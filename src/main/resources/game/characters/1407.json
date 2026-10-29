@@ -7,11 +7,7 @@
       "source": "1407 逍蝶 天赋 掌心溡过的荒芜 (140704) 与「机制备注」：依据 tbgd `Avatar_Castorice_00_Ability.json` 的 `Castorice_Passive_MaxCount` 表达式 `5.3125 × 队伍最高等级²`（结果 ≤ 2000 时钳为 2000）",
       "note": "⭐ `\"scope\": \"PARTY\"` **是必需的** ✓：`Battle.registerPartyResources`（`:701`）会**跳过**所有 `scope` 不是 `PARTY` 的声明 ✓（`:707`）⇒ 没有它就进不了战斗的资源表 ✗，`partyResource(名)` 会返回 **null** ✗ —— 这一行解释了前面全部的 +0 ✓。⚠ 上限 **34,000** = 文档公式在**满级 Lv80** 的值 ✓（文档表：均衡 0 ⇒ 2,125 … 满级 ⇒ 34,000 ✓）；⚠ 资源只能声明**一个** `max` ✗ 而真实上限随等级变 ✗⇒ 取满级值并在此说明 ✓。"
     },
-    {
-      "id": "生死之诗的溢出消耗",
-      "max": 2147483647,
-      "source": "⚠ **不是数据里的名字** —— 「召唤死龙时消耗的溢出量」的存放处（基点，`amount_percent: 12`）。"
-    }
+    { "id": "生死之诗的溢出消耗", "max": 2147483647, "source": "⚠ **不是数据里的名字** —— 「召唤死龙时消耗的溢出量」的存放处（基点，`amount_percent: 12`）。" }
   ],
   "rules": [
     {
@@ -34,26 +30,10 @@
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
       ],
       "source": "1407 遐蝶 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 50% 生命上限、战技 50%/30%、终结技 165 速度与 100% 新蕊上限、天赋 20% 增伤与 3 层）",
       "note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **登记（本角色的核心是三样引擎没有的东西）**：① **忆灵（死龙•玻吕刻斯）** ✗ —— 「召唤忆灵死龙使其**行动提前 100%**，…死龙初始拥有 **165 点速度**以及**等同于【新蕊】上限 100% 的固定生命上限**。死龙 **3 个回合后**或**生命值为 0** 时消失」✗ —— ⭐ 引擎**有** `SUMMON` ✓（1005/1504 用过 ✓），但它需要一份**声明完整的忆灵文件** ✓（**HEALTH 与 SPEED 都要有** ✗，否则装载器拒绝 ✓）；本角色的忆灵**面板依赖【新蕊】上限** ✗，而那是上一条说的**跨单位公式** ✗ ⇒ **这份忆灵文件写不出来** ✓ （与 1112/1222 **同类但不是同一原因** ✓：那两个是文档没给面板 ✗，这个是**面板依赖另一个资源** ✗）；② **境界【遗世冥域】** ✗ —— 「使敌方全体**全属性抗性降低 20%**」⚠ **订正（2026-10-02 实测）**：这个**属性已经存在** ✓ —— `AttributeType.RESISTANCE_REDUCTION`（`resistance_reduction` ✓，它的注释**逐字引用的就是这句话** ✓）⇒ 「全属性抗性」**不再是缺的能力** ✗；本条真正缺的收窄为两件 ✓：**(a) 死龙**（忆灵面板依赖【新蕊】上限 ✗ ⇒ 召唤不出来 ✓）、**(b)「死龙消失时同时解除」需要一个 `ticks_on: 「summon」`** ✓（现只接受 `「self」` ✓，见 `requireTickOwner` ✓；⚠ 好消息是**锚点即时钟** ✓ —— `removeBuffsAnchoredTo` 读的就是 `ticksOn` ✓ ⇒ 这一个改动**同时**给出「按死龙的回合数计」与「死龙一死就解除」两半 ✓）+ **场条件** ✗（「境界效果全场唯一」✓）；③ **「若遐蝶持有天赋的造成伤害提高效果，使该效果扩散至死龙」**✗（把一个修饰**复制到另一个单位** ✗）；④ **消耗生命值**一族 ✗ —— 战技「消耗我方**全体**当前 **30%** 的生命值…若当前生命值不足，**最多使当前生命值降至 1 点**」✗、强化战技「消耗除死龙以外的我方全体当前 **40%** 的生命值…**连携攻击**」✗（**自伤** ✗ + **钳到 1 点** ✗ + **连携** ✗，与 1310/1205/1404 同族 ✓）；⑤ **技能替换** ✗ —— 「若死龙在场，战技**替换为**【骸爪，冥龙之环拥】」✗；⑥ **秘技** ✗ —— 【冥茫】状态的场外效果、**自动召唤并展开境界**、以及「进入战斗后**未召唤死龙**则获得等同于上限 30% 的【新蕊】」✗；⑦ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；⑧ **星魂**未读 ✗。"
@@ -61,15 +41,9 @@
     {
       "on": "HP_LOST",
       "id": "talent_newbud_per_hp_lost",
-      "when": [
-        "target == self"
-      ],
+      "when": ["target == self"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "新蕊",
-          "amountFromEvent": true
-        }
+        { "op": "GAIN_RESOURCE", "resource": "新蕊", "amountFromEvent": true }
       ],
       "source": "1407 逍蝶 天赋 掌心溡过的荒芜 (140704): 「【新蕊】上限与场上全体角色等级有关，我方全体每损失 1 点生命值逍蝶获得 1 点【新蕊】」",
       "note": "⭐ 用已有的 `amountFromEvent` ✓（同 1506 ✓）；`when: [\"target == self\"]` 照 `Battle.applyDamage:1344` 的注释写 ✓。⚠ 仅「本人那一半」 ✓：「我方全体」那半看派发 ✓。"
@@ -77,17 +51,9 @@
     {
       "on": "LETHAL_DAMAGE",
       "id": "mooncocoon_holds_the_blow",
-      "when": [
-        "actor is_ally"
-      ],
+      "when": ["actor is_ally"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "月茧",
-          "defers_death": true,
-          "permanent": true,
-          "target": "target"
-        }
+        { "op": "APPLY_BUFF", "buff": "月茧", "defers_death": true, "permanent": true, "target": "target" }
       ],
       "source": "1407 遐蝶 仓库技 「月茧之庇 / Sanctuary of Mooncocoon」：「战斗中，若我方角色受到致命攻击，则本次行动中所有受到致命攻击的我方角色**获得【月茧】状态**。【月茧】状态下的角色会**暂时延后陷入无法战斗状态**，且**可以正常行动**。若**行动后**、**下一次回合开始前**当前生命值**提高或获得护盾**，则**解除【月茧】状态**，否则将**立即陷入无法战斗状态**」",
       "note": "⭐ 2026-10-02（第 54 件）：⭐ **延后死亡** ✓ —— 原句说的是「暂时延后陷入无法战斗状态」✓，而**不是**回血 ✗ ⇒ ❗ 受害者真的停在 **0 血**（那就是「延后」本身 ✓），**救它的是状态消失** ✓。⭐ 两个事件是现成的 ✓（`HEALED` ✓ 与 `SHIELD_GRANTED` ✓ = 「生命值提高或获得护盾」✓），而**新能力只有一件**：一个使引擎**持有**死亡而不提交的状态 ✓（`defers_death` ✓ / `DeferredDeathBuff` ✓）。⚠ 提交点在该单位的 **`TURN_END`** ✓ —— 因为原句说「可以**正常行动**」✓，在回合**开始**前提交会让它没行动就倒 ✗（我第一版就是那么写的 ✗，已改 ✓）。⚠ **仓库技只实现一半** ✗：引擎只在该角色**在队**时发它的表 ✓；「获得该角色后（不上场也生效）」那一半已登记 ✗。 ⚠ 「本次行动中**所有**」由**逐个受害者各自触发**实现 ✓（与第 51 件同一结论 ✓）。 ⭐ 2026-10-02（本轮）：目标从 `target`（**只有当前这一个**受害者）改为 `all_allies_lethally_hit_this_action`（**本次行动内受到致命攻击的全体**）—— 那才是原句「本次行动中**所有**受到致命攻击的我方角色」里的「所有」。 ⚠ 2026-10-02（本轮）：我试过把它改成 `all_allies_lethally_hit_this_action`（原句的「**所有**」）✗，但**测不出来** ✗：本条是 `permanent: true` ✓，第一击给第一个受害者的状态**一直在** ✓，所以“选择器触及全体”与“每一击各给自己那个”读数**相同** ✗。★ 真正能区分的场景是：某个受害者的状态**已被治疗解除** ✓，而同一行动内又有新的致命攻击 ✓——那时选择器会让它**重新获得** ✓，而 `target` 不会 ✗。"
@@ -95,15 +61,9 @@
     {
       "on": "HEALED",
       "id": "mooncocoon_a_heal_ends_it",
-      "when": [
-        "target has_state 月茧"
-      ],
+      "when": ["target has_state 月茧"],
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "月茧",
-          "target": "target"
-        }
+        { "op": "REMOVE_STATE", "buff": "月茧", "target": "target" }
       ],
       "source": "1407 遐蝶 仓库技 「月茧之庇 / Sanctuary of Mooncocoon」：「战斗中，若我方角色受到致命攻击，则本次行动中所有受到致命攻击的我方角色**获得【月茧】状态**。【月茧】状态下的角色会**暂时延后陷入无法战斗状态**，且**可以正常行动**。若**行动后**、**下一次回合开始前**当前生命值**提高或获得护盾**，则**解除【月茧】状态**，否则将**立即陷入无法战斗状态**」",
       "note": "「若…当前生命值**提高**…则解除【月茧】状态」 ✓ —— 用现成的 `HEALED` 事件 ✓（`actor` = 提供者、`target` = 受惠者 ✓）。⚠ 守卫写成 `target has_state 月茧` ✓：只有**还在延后中**的那个单位才会被解除 ✓。"
@@ -111,15 +71,9 @@
     {
       "on": "SHIELD_GRANTED",
       "id": "mooncocoon_a_shield_ends_it",
-      "when": [
-        "target has_state 月茧"
-      ],
+      "when": ["target has_state 月茧"],
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "月茧",
-          "target": "target"
-        }
+        { "op": "REMOVE_STATE", "buff": "月茧", "target": "target" }
       ],
       "source": "1407 遐蝶 仓库技 「月茧之庇 / Sanctuary of Mooncocoon」：「战斗中，若我方角色受到致命攻击，则本次行动中所有受到致命攻击的我方角色**获得【月茧】状态**。【月茧】状态下的角色会**暂时延后陷入无法战斗状态**，且**可以正常行动**。若**行动后**、**下一次回合开始前**当前生命值**提高或获得护盾**，则**解除【月茧】状态**，否则将**立即陷入无法战斗状态**」",
       "note": "「…或**获得护盾**，则解除【月茧】状态」 ✓ —— 用现成的 `SHIELD_GRANTED` 事件 ✓。⚠ 护盾跟治疗是**两条独立的退出路** ✓（原句的「或」✓）。"
@@ -127,17 +81,9 @@
     {
       "id": "life_ode_widens_newbud_overflow",
       "on": "CAST_SETUP",
-      "when": [
-        "target == self",
-        "from_skill_id == 17"
-      ],
+      "when": ["target == self", "from_skill_id == 17"],
       "do": [
-        {
-          "op": "RAISE_RESOURCE_CAP",
-          "resource": "新蕊",
-          "amount": 680,
-          "target": "self"
-        }
+        { "op": "RAISE_RESOURCE_CAP", "resource": "新蕊", "amount": 680, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 17 「献予「生死」之诗」（数据槽位 17，SkillID 1141517）：「整场生效，对遐蝶施放时，**【新蕊】可以溢出至 #3%**」（#3 = 2）。",
       "note": "⭐ 2% 的对象是**声明的上限**：【新蕊】在本文件里是 `max: 34000`（出处是 `Castorice_Passive_MaxCount` 的公式）⇒ 2% = **680** ⇒ 本条把**溢出容量**抬高 680（**不动正常上限**）。⭐ 而这只是本技能的**第一句**；后两句（消耗溢出、消耗量→死龙天赋倍率）仍登记。"
@@ -145,16 +91,9 @@
     {
       "id": "life_ode_raises_the_ratio_against_a_small_pack",
       "on": "SUMMONED",
-      "when": [
-        "actor == summon",
-        "enemy_count <= 2"
-      ],
+      "when": ["actor == summon", "enemy_count <= 2"],
       "do": [
-        {
-          "op": "MODIFY_RULE",
-          "rule": "dragon_hollow_wing_damage",
-          "effect_percent": 0.0024
-        }
+        { "op": "MODIFY_RULE", "rule": "dragon_hollow_wing_damage", "effect_percent": 0.0024 }
       ],
       "source": "1415 昔涟 忆灵技能 17：「…召唤时**若场上敌方目标小于等于 #6 名，伤害倍率额外提高 #5**」（#6 = 2，#5 = 0.0024）。",
       "note": "⭐ 条件 `enemy_count >= 4`：**已出货的词汇**（`TriggerTable` 的 `enemy_count`，而 `1413.json` 的 `talent_memosprite_damage_enemy_count_4` 就是它的读者）。⭐ `#5` 与 `#1` **同单位**（都是 `0.56` 那种份额）⇒ 直接作为 `effect_percent` 加上去。⭐ 而它必须**在伤害那一条之前**立案。  ⭐ **2026-10-02 实测**：条件词汇是 `enemy_count` 加一个**比较**（`1413.json` 里那条叫 `…_enemy_count_4` 的写的是 `>= 4`）—— 而本句要的是 **`<= 2`**；直接把他人的条件整条搬过来会把意思弄反。"
@@ -162,28 +101,11 @@
     {
       "id": "life_ode_summon_spends_captures_and_raises",
       "on": "SUMMONED",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "SPEND_RESOURCE",
-          "resource": "新蕊",
-          "overflow_only": true,
-          "target": "self"
-        },
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "生死之诗的溢出消耗",
-          "amountFromPrevious": true,
-          "amountPercent": 12.0,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_RULE",
-          "rule": "dragon_hollow_wing_damage",
-          "effect_percent_from_resource": "生死之诗的溢出消耗"
-        }
+        { "op": "SPEND_RESOURCE", "resource": "新蕊", "overflow_only": true, "target": "self" },
+        { "op": "GAIN_RESOURCE", "resource": "生死之诗的溢出消耗", "amountFromPrevious": true, "amountPercent": 12.0, "target": "self" },
+        { "op": "MODIFY_RULE", "rule": "dragon_hollow_wing_damage", "effect_percent_from_resource": "生死之诗的溢出消耗" }
       ],
       "source": "1415 昔涟 忆灵技能 17：「召唤死龙时会消耗所有溢出【新蕊】，**每消耗 1% 溢出值**，使本次召唤的死龙触发天赋【灼掠幽墟的晦翼】的技能效果时，造成的伤害倍率提高 #2%」（#2 = 0.0012）。",
       "note": "⭐ **三个效果必须同一条规则**：`previousCredited` 是**每条规则独立**的（第 108/111 轮）。⭐ 而且**不能再有第二条规则抢先消耗**（第 111 轮实测：那样本条的消耗就移不动任何东西，捕获读 0）。⭐ 而本条必须在**伤害那一条之前**（同一事件按文件顺序）。⚠ 而“每次**到达**都会触发”仍是待办 5（遐蝶同时有忆灵与仆从）。"
@@ -191,18 +113,9 @@
     {
       "id": "dragon_hollow_wing_damage",
       "on": "SUMMONED",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "DAMAGE",
-          "times": 6,
-          "scale": "owner_max_hp",
-          "percent": 0.56,
-          "element": "Quantum",
-          "target": "random_enemy"
-        }
+        { "op": "DAMAGE", "times": 6, "scale": "owner_max_hp", "percent": 0.56, "element": "Quantum", "target": "random_enemy" }
       ],
       "source": "1407 遐蝶 亿灵死龙的天赋 【灼掠幽墟的晦翼】（`SkillID 1140712`，`Skill23`，等级 10 参数 `[0.56, 6, 0.084, 1120]`）：「消耗全部生命，造成 #2 次伤害，每次伤害对敌方随机单体造成等同于遐蝶 #1% 生命上限的量子属性伤害…」—— **本条只管伤害**（另两条各自一条，因为 `MODIFY_RULE` 会改**整条规则**的份额）。",
       "note": "⭐ **为何拆成三条**：`MODIFY_RULE{effect_percent}` 通过 `amendRuleEffectPercent` 加在**命名规则的每一个效果**上（`amendedEffect`）⇒ 若合并，诗会连**生命代价**与**治疗**一起抬高。⭐ 而数值全部来自数据行：`#1 = 0.56`、`#2 = 6`。口径 `owner_max_hp` = **遐蝶**的生命上限（规则主人是她）。"
@@ -210,16 +123,9 @@
     {
       "id": "dragon_hollow_wing_cost",
       "on": "SUMMONED",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "CONSUME_HP",
-          "scale": "owner_max_hp",
-          "percent": 1.0,
-          "target": "self"
-        }
+        { "op": "CONSUME_HP", "scale": "owner_max_hp", "percent": 1.0, "target": "self" }
       ],
       "source": "同上：「**消耗全部生命**」。",
       "note": "⭐ “全部”就是 `percent: 1.0`（主人生命上限的 100%）。"
@@ -227,17 +133,9 @@
     {
       "id": "dragon_hollow_wing_heal",
       "on": "SUMMONED",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.084,
-          "amount": 1120,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.084, "amount": 1120, "target": "all_allies" }
       ],
       "source": "同上：「同时为我方全体回复等同于遐蝶 #3% 生命上限 + #4 点的生命值」（`#3 = 0.084`、`#4 = 1120`）。",
       "note": "⭐ 两部分都在：份额（`scale` + `percent`）与常量（`amount`）。"

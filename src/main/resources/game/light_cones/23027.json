@@ -3,9 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23027_break_ignores_defence",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -23,17 +21,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone23027_speed_at_high_break",
-      "when": [
-        "self_attr:BREAKING_EFFECT >= 1.5"
-      ],
+      "when": ["self_attr:BREAKING_EFFECT >= 1.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
       "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
@@ -43,9 +33,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23027_break_ignores_defence",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -63,17 +51,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone23027_speed_at_high_break",
-      "when": [
-        "self_attr:BREAKING_EFFECT >= 1.5"
-      ],
+      "when": ["self_attr:BREAKING_EFFECT >= 1.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.14,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.14, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
       "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
@@ -83,9 +63,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23027_break_ignores_defence",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -103,17 +81,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone23027_speed_at_high_break",
-      "when": [
-        "self_attr:BREAKING_EFFECT >= 1.5"
-      ],
+      "when": ["self_attr:BREAKING_EFFECT >= 1.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.16,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.16, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
       "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
@@ -123,9 +93,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23027_break_ignores_defence",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -143,17 +111,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone23027_speed_at_high_break",
-      "when": [
-        "self_attr:BREAKING_EFFECT >= 1.5"
-      ],
+      "when": ["self_attr:BREAKING_EFFECT >= 1.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.18,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.18, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
       "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
@@ -163,9 +123,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23027_break_ignores_defence",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -183,17 +141,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone23027_speed_at_high_break",
-      "when": [
-        "self_attr:BREAKING_EFFECT >= 1.5"
-      ],
+      "when": ["self_attr:BREAKING_EFFECT >= 1.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
       "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"

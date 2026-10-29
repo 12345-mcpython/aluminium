@@ -2,10 +2,7 @@
   {
     "on": "SKILL_CAST",
     "id": "talent_wind_pen",
-    "when": [
-      "actor is_ally",
-      "target == self"
-    ],
+    "when": ["actor is_ally", "target == self"],
     "cooldown": 2,
     "do": [
       {
@@ -19,59 +16,35 @@
     "source": "1002 丹恒 天赋 寸长寸强 (100204, Enhance): 「当丹恒成为我方技能的施放目标时，下一次攻击的风属性抗性穿透提高36%。该效果在2回合后可再次触发。」",
     "note": "「当丹恒**成为我方技能的施放目标**时，**下一次攻击**的风属性**抗性穿透**提高 **36%**；该效果在 **2 回合后可再次触发**」—— ① 事件用 `SKILL_CAST` ✓：它是**带被瞄准单位**的施放事件 ✓（`aimed` ✓），所以 `target == self` 正好是\"被瞄准的是我\" ✓；② 「我方技能」= `actor is_ally` ✓；③ 「风属性抗性穿透」对应引擎的 **`DAMAGE_PENETRATION`** ✓（术语表释义是\"造成伤害时**无视**敌方目标一部分对应伤害属性的**抗性值**\" ✓，正是 `Damage` 的 penetration 区 ✓）；④ 「下一次攻击」用既有的 **`until: next_attack`** 时长 ✓（不是 N 回合 ✗）；⑤ 「2 回合后可再次触发」用规则级 **`cooldown: 2`** ✓。⭐ **2026-10-17：36% 改成读行** ✓ —— 原先是**写死的字面量** `percent: 0.36` ✗，而天赋参数表那一列**随等级变**：`[0.18, 2]` … `[0.36, 2]`（Lv10）… `[0.45, 2]`（Lv15）✓ ⇒ 星魂 5 把天赋抬到 12 级后应为 **0.396** ✗，旧写法却仍是 0.36 ✗。现在写 `percent_from_skill_param: \"TALENT:0\"` ✓（0 基第 1 项，与正文 `#1` 对齐 ✓），读的是**天赋当前等级那一行** ✓。⚠ 这句也顶出了引擎一个口子 ✓：**没有 scale 的份额**原先只认 `percent_from_cast_param` / `percent_from_resource` ✗，`percent_from_skill_param` 会掉到 scale 分支、在 `null` 上崩 ✗ —— 现在「无 scale + 任一种份额写法」都走同一个 `shareOf` ✓（判据 `DanHengLevelSourceTest`）。⚠ 「2 回合」仍是字面量 ✓：它来自同一行的第 2 项、且**全表恒定** ✓，而时长**没有** `turns_from_param` 这种写法 ✓ ⇒ 字面量 + 与行对得上的判据 ✓。⚠ **本条旧注记的四处登记，逐条交代现状** ✓（纪律 33：登记会过期，过期的登记比缺失更坏 ✓）：\n① 战技「触发暴击时 100% 基础概率使目标速度降低 12%」 ✅ **已落地** ✓ = `skill_crit_slows_the_target`（`CRIT_DEALT` + `from_skill SKILL` + `base_chance: 1.0` ✓）—— 当时登记的两个理由**都过期了** ✗：「缺\"这一发暴击了\"的可观测」错在**没查到 `CRIT_DEALT` 事件** ✓（它由引擎在暴击判定后立刻发出 ✓），而「`MODIFY_ATTR` 上没有 `base_chance`」错在**没查字段** ✓（它有 ✓，先例 1004 ✓）；本轮另给该事件补了**施放信息** ✓（`CAST_CARRYING_EVENTS` ✓），否则 `from_skill` 在它上面会被加载期拒绝 ✗。\n② 秘技「下一次战斗开始时攻击力提高 40%，持续 3 回合」 ✅ **已落地** ✓ = `technique_opening_attack`。\n③ 行迹与星魂 ✅ **已读** ✓：赤子（潜龙）= `trace_low_hp_aggro_down` + `_cleanup` ✓；绝影 = `trace_fleeting_shadow_speed` ✓；星魂 3/5 = `eidolon3_levels` / `eidolon5_levels` ✓；星魂 4 = `eidolon4_ult_kill_acts_again` ✓；星魂 6 = `eidolon6_deepens_the_slow` ✓。\n⚠ **仍然写不了的四句，都是引擎能力缺口** ✗（**登记，不近似** ✓）：\n（A）终结技「当受到攻击的敌方目标**处于减速状态**时，终结技造成的伤害倍率提高 120%」—— 需要「**目标是否处于减速**」这个**可问状态** ✗：引擎里速度降低只是一个**属性修饰** ✓（`MODIFY_ATTR SPEED` 负数 ✓），没有任何谓词能问「它被减速了吗」✗，也读不到**目标**的属性 ✗（`self_attr:` 只读自己 ✓）。1004 瓦尔特的天赋面对同一句话，登记的是同一条缺口 ✓。⚠ 若把减速写成**具名状态**再问 `target has_state`，那只对**本角色自己施加的**减速生效 ✗ ⇒ 别的角色的减速不会被认 ✓，这是**近似**，所以没写 ✓。\n（B）行迹**罡风**「普攻对**减速状态**下的敌方目标造成的伤害提高 40%」—— 同 (A) 的缺口 ✗。\n（C）星魂 1「暴击率提高 12%」 ✅ **本轮已落地** ✓ = `eidolon1_crit_chance_against_a_healthy_target` —— 当时登记的理由「`instance` 通道时机对不上这一发」**是错的** ✗：`DEALING_DAMAGE` 在 `applyDamage` 里发出的位置**就在暴击判定之前** ✓（源码注释点名 crit 属于「让它读到改后数值」的那几个区 ✓）⇒ 这一发真的会读到 `damage.addCritChance(...)` ✓。\n（D）星魂 2「天赋的冷却时间减少 1 回合」—— `MODIFY_RULE` 能改 `per_turn` / 效果时长 / 上限 / 倍率 ✗，**没有改 `cooldown` 的口子** ✓。\n⚠ 另**登记**（不是缺口，是原文边界）：本条只兑现「成为**我方技能**的施放目标」✓ ⇒ 友方的**普攻**也会触发 ✓（普攻也是「技能」✓），而敌方技能不会 ✓（`actor is_ally` ✓）。\n\n⚠ **2026-10-17 更新：下面 (A)(B)(D) 三句已全部落地** ✓（原文保留，作为**当时的判断** ✓ —— 下一个人会踩同一个坑 ✓）。① (A) 终结技「目标处于减速状态时倍率 +120%」 ⇒ `ult_ethereal_dream_hits_a_slowed_target` ✓；② (B) 行迹罡风「普攻对减速目标 +40%」 ⇒ `trace_gang_feng_hits_a_slowed_target` ✓；③ (D) 星魂 2「天赋冷却 −1」 ⇒ `eidolon2_shortens_the_talent_cooldown` ✓。⚠ **当时的错在哪**（§6.2 要求把错理由留下 ✓）：(A)(B) 我断定「减速不可问」✗ —— 前提「减速只是属性修饰」✓ **是对的**，错在我由此推出「没有别的读法」✗：问 **`SPEED` 上有没有负修饰** 就是原文的意思 ✓；(D) 我断定「`MODIFY_RULE` 没有改冷却的口子」✗ —— 当时**确实没有** ✓，但那是一个**缺的能力** ✓，不是一句**写不出来的话** ✗：缺能力就补能力 ✓，而我把「引擎没做」写成了「句子写不了」✗。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "level_convention",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
     ],
     "source": "1002 丹恒 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 260%、终结技 400%、天赋 +36% 穿透）",
     "note": "本文件说明自己的数字来自哪一行（M-32）。数值取自 Lv10 行 ✓：普攻 **1.4** / 战技 260% / 终结技 400% / 天赋 +36% 穿透 / 秘技 +40% 攻击力 ✓。⚠ **一处口径差，量过并登记** ✓：文档正文的普攻写的是 **100%** ✓，那是技能表 **Lv6** 行（共 10 行）✓，而 **Lv10 行是 140%** ✗ —— 本文件按**全库统一的 Lv10 口径**（RAISE_SKILL_LEVEL +9 ✓，与其余角色文件相同 ✓），所以引擎里的普攻是 140% ✓。要改这个口径是**全库的决定** ✓，不在本条内容里单独改 ✗（改了它，所有角色的普攻会一起动 ✗）。⚠ **本文件已实现的与仍缺的，逐条写在 `talent_wind_pen` 的 note 里** ✓（那里是唯一的台账 ✓，本条不再复制一份 ✗ —— 复制就会分叉 ✓）。 ⚠ **地图攻击（slot 6）** ✓：MazeNormal / 风属性 / 单体韧性 **30** ✓ —— 本文件**不写成规则** ✗（地图层不在这台引擎里 ✓）；由 **Battle.declareMapAttack** 在开战前声明 ✓、startBattle() 按 **slot 6 自己的技能数据**削韧 ✓（元素与数值都读数据 ✓，Battle 里不写死 ✓）。 ⚠ **伤害段数（分裂比）由数据表负责** ✓（2026-10-17 补齐 ✓）：`data/skill_effects.json` 的 `1002` 条目写了 `1: [0.45, 0.55]`（普攻 **2 段**）与 `2: [0.3, 0.15, 0.15, 0.4]`（战技 **4 段**）✓ —— 与文档的「官方最大命中次数 2 / 4」和分段表逐项相同 ✓。⚠ **合计不变、段数变了** ✓：每个分数是**这一行倍率的分数** ✓（和 = 1.0 ✓），所以总伤害与从前一样 ✓，但每一段**各自掷暴击** ✓ ⇒ 「战技造成的伤害**触发暴击时**…减速」从**一掷**变成**四掷** ✓（`DanHengSegmentsTest` 钉住：4 段 / 4 次独立暴击 / 减速仍是一条 -12% ✓）。⚠ 其余技能的分段表**尚未导出** ✗（全库 96 张 >1 段的表、59 个文件 ✓）⇒ 它们仍按**单段**结算 ✓，这是**登记**而不是近似 ✓（合计一样 ✓）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "technique_opening_attack",
-    "when": [
-      "self has_state 秘技"
-    ],
+    "when": ["self has_state 秘技"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ATTACK",
-        "percent_from_skill_param": "TECHNIQUE:0",
-        "turns": 3,
-        "target": "self"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent_from_skill_param": "TECHNIQUE:0", "turns": 3, "target": "self" }
     ],
     "source": "1002 丹恒 秘技 破敌锋芒 (100207, Maze/Enhance): 「使用秘技后，下一次战斗开始时丹恒攻击力提高40%，持续3回合。」",
     "note": "「**使用秘技后**，下一次战斗开始时丹恒**攻击力提高 40%**，持续 **3 回合**」—— ① **门槛**用 `self has_state 秘技` ✓（第 178 轮：`Battle.markTechniqueUsed(unit)` 在开战前登记 ✓，`startBattle()` 在**任何 `BATTLE_START` 规则之前**加一个 `StateBuff(\"秘技\")` ✓ ⇒ 内容无需学新词 ✓）；② 加成用 `MODIFY_ATTR ATTACK percent 0.4 turns 3` ✓（\"下一次战斗开始时\"= `BATTLE_START` ✓、\"持续 3 回合\" ✓）。⭐ **2026-10-17：40% 改成读行** ✓（秘技参数表只有 1 行 `[0.4, 3]` ✓ ⇒ 数字不变 ✓，但来源写进了规则 ✓，不再是一个看着像拍出来的字面量 ✓）。⚠ 本条自第 153 轮起登记为\"缺秘技门槛\" ✗，第 178 轮补上能力后被**回收** ✓。"
   },
+
   {
     "on": "HP_LOST",
     "id": "trace_low_hp_aggro_down",
-    "when": [
-      "target == self",
-      "hp_percent <= 0.5"
-    ],
+    "when": ["target == self", "hp_percent <= 0.5"],
     "do": [
       {
         "op": "MODIFY_ATTR",
@@ -85,146 +58,94 @@
     "source": "1002 行迹 潜龙 (1002101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）",
     "note": "「若当前生命值百分比**小于等于 50%**，则被敌方目标攻击的概率**降低**」—— ⭐ **一句话，两位角色同形**，数值与门槛都在上游 ✓。① `ExcelOutput/AvatarSkillTreeConfig.json` 该点（`PointID 1002101`、`PointTriggerKey PointB1`）的 `ParamList = [{\"Value\": 0.5}, {\"Value\": 0.5}]` ✓：第一个 0.5 是文档点名的**门槛** ✓、第二个是**比率** ✓（两个值相等 ⇒ 顺序之争不影响数字 ✓，这一点如实写明 ✓）。② 上游挂的是 `MAvatar_DanHeng_00_SkillTree_AggroDown` （由 MAvatar_DanHeng_00_LowHP_AggroDown 在 OnStack/OnHPChange 上按 ByCompareHPRatio LessEqual 分支挂载），它写的属性是 **`AggroAddedRatio`** ✓，而全局 `M_SkillTree_AggroDown` 把它写成 **0 − 参数** ✓ ⇒ 值 = **−0.5** ⇒ 引擎读作 `权重 × (1 + (−0.5))` = **×0.5** ✓。③ ⭐ **触发时机是查出来的，不是猜的**：丹恒的 `MAvatar_DanHeng_00_LowHP_AggroDown` 在 **`OnStack` 与 `OnHPChange`** 两个回调上都挂了同一个 `ByCompareHPRatio` **LessEqual** 谓词 ✓ ⇒ 游戏是**只要生命值变化就重判** ✓；引擎里与它等价的是 **`HP_LOST`（掉到门槛下就挂）+ `HEALED`（回到门槛上就摘）** 这一对 ✓ —— 因为生命值只可能通过这两件事改变 ✓，所以这不是近似，而是同一次重判 ✓。④ 因此**两条规则**：挂（`MODIFY_ATTR` + 具名 `buff: 潜龙` + `permanent`）与摘（`REMOVE_STATE` 同名的 `buff`）✓。⚠ 具名是必要的：`REMOVE_STATE` 按**名字**摘 ✓；不带名字的修饰摘不掉 ✗。⚠ 重复挂不会叠加 ✓（同名 buff 上限 1 ✓，测试里专门用\"再掉一次血\"钉住这一点 ✓）。⚠ **登记的两处差异**：① 若生命值**不经治疗**而回到门槛之上（例如生命上限被提高 ✗），这条摘除规则不会触发 ✗；② 战斗开始时若已低于 50%（这三位都不会 ✗，他们不消耗自身生命 ✗）⇒ 也不会挂上 ✗。"
   },
+
   {
     "on": "HEALED",
     "id": "trace_low_hp_aggro_down_cleanup",
-    "when": [
-      "target == self",
-      "hp_percent > 0.5"
-    ],
+    "when": ["target == self", "hp_percent > 0.5"],
     "do": [
-      {
-        "op": "REMOVE_STATE",
-        "buff": "潜龙",
-        "target": "self"
-      }
+      { "op": "REMOVE_STATE", "buff": "潜龙", "target": "self" }
     ],
     "source": "1002 行迹 潜龙 (1002101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）（回到门槛之上的收尾，由 ③ 的 OnHPChange 重判推出）",
     "note": "上一条规则的收尾 ✓：`REMOVE_STATE` 按**名字**摘掉 `潜龙` 那个具名修饰 ✓，`target: self` 因为修饰挂在自己身上 ✓。⚠ 条件是 `hp_percent > 0.5` ✓（`hp_percent` 读的是**规则主人自己**的生命值 ✓，是分数 0–1 ⇒ 写 `0.5` 而不是 `50` ✓）；⚠ 摘一个不存在的东西**不是错误** ✓（每次治疗都会触发这条 ✓）。"
   },
+
   {
     "on": "CRIT_DEALT",
     "id": "skill_crit_slows_the_target",
-    "when": [
-      "actor == self",
-      "from_skill SKILL"
-    ],
+    "when": ["actor == self", "from_skill SKILL"],
     "max_eidolon": 5,
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "SPEED",
-        "percent": -0.12,
-        "turns": 2,
-        "base_chance": 1.0,
-        "target": "target"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": -0.12, "turns": 2, "base_chance": 1.0, "target": "target" }
     ],
     "source": "1002 丹恒 战技 云骑枪术•疾雨 (100202, BPSkill/SingleAttack): 「对指定敌方单体造成等同于丹恒260%攻击力的风属性伤害。战技造成的伤害触发暴击时，有100%的基础概率使受到攻击的敌方目标速度降低12%，持续2回合。」 param Lv10 → [2.6, 0.12, 2, 1]（#2 = 减速比率、#3 = 回合数、#4 = 基础概率）",
     "note": "「**战技造成的伤害触发暴击时**，有 **100%** 的**基础概率**使受到攻击的敌方目标**速度降低 12%**，持续 **2** 回合」—— ① **触发时机**：`CRIT_DEALT` ✓ —— 这个事件由 `Battle` 在暴击判定之后立刻发出 ✓（`applyDamage` 的暴击区之后 ✓），而「暴击了」正是它的定义 ✓ ⇒ 不需要「这一发暴击了」这种谓词 ✗；② 「**战技**造成的伤害」⇒ `from_skill SKILL` ✓ —— ⚠ **本轮给引擎补了这一处** ✓：`CRIT_DEALT` 此前**不携带施放信息** ✗，所以 `from_skill` 在它上面会在**加载期**被拒绝 ✓（`CAST_CARRYING_EVENTS` 是闭集 ✓）；现在它随伤害实例一起带上 `getCastCategory()` ✓ —— 依据是「暴击是**这一发实例**的属性 ✓，而实例知道自己是哪个技能打的 ✓」✓。**实测**：改动前该事件有 **0 个读者** ✓（全库扫描），所以没有任何规则是被按从前的空缺写成的 ✓。③ 「**100% 的基础概率**」⇒ `base_chance: 1.0` ✓（不是规则级 `chance` ✗）—— 两者语义不同 ✓：`base_chance` 会过**效果命中 × 效果抵抗** ✓，所以 100% 只是**基础**值 ✓，不是保证 ✓（先例 1004 的 `skill_speed_down` 用的是同一个字段 ✓）；④ 减速 12% ⇒ `SPEED percent: -0.12` ✓（平值属性 ⇒ `percent` 是基数的份额 ✓，与 1004 的 `-0.1` 同约定 ✓）；⑤ `turns: 2` ✓、`target: target` ✓（「受到攻击的敌方目标」= 被这一发打中的那个 ✓）。⚠ **重复施加不是错误**：她的战技分 **4 段** ✓（文档的分段表 ✓），其中任何一段暴击都会再触发一次 ✓；而重挂的是**同一个属性、同一时长**的修饰 ✓ ⇒ 替换而非叠加 ✓（引擎对同名/同类修饰的默认行为 ✓），结果仍是「速度降低 12%，持续 2 回合」✓ ⇒ 不写 `per_attack` ✗（那会让「第 3 段才暴击」这种情形在已用掉配额后失掉它 ✓）。"
   },
+
   {
     "on": "CRIT_DEALT",
     "id": "eidolon6_deepens_the_slow",
-    "when": [
-      "actor == self",
-      "from_skill SKILL"
-    ],
+    "when": ["actor == self", "from_skill SKILL"],
     "min_eidolon": 6,
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "SPEED",
-        "percent": -0.2,
-        "turns": 2,
-        "base_chance": 1.0,
-        "target": "target"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": -0.2, "turns": 2, "base_chance": 1.0, "target": "target" }
     ],
     "source": "1002 星魂6 须绳缚身，沉潜勿用: 「战技触发的减速状态使目标的速度额外降低8%。」 param = [0.08]",
     "note": "「战技触发的减速状态使目标的速度**额外降低 8%**」—— ⇒ 12% + 8% = **20%** ✓，所以本条写的是**总量** `-0.2` ✓ 而不是再加一条 `-0.08` ✗：两条 `MODIFY_ATTR` 打同一属性会**各自**存在 ✓（引擎允许 buff 与 debuff 并存 ✓），结果是 -0.12 与 -0.08 **分别相乘/相加** 的细节取决于引擎内部 ✓ —— 写成一个 -0.2 没有这个问题 ✓；① 与基础那条**互斥** ✓：基础那条是 `max_eidolon: 5` ✓、本条是 `min_eidolon: 6` ✓ （引擎为「这条从 N 魂起替换那条」专门提供的那一对 ✓，见 `TriggerSpec.maxEidolon` 的注释 ✓）；② 参数 `[0.08]` ✓ 与正文的 8% 一致 ✓；其余（事件 / `from_skill` / `base_chance` / 回合）与基础那条**同源** ✓ —— 因为原文说的是「战技触发的减速状态」✓，即被本条**修改**的那一个 ✓。"
   },
+
   {
     "on": "ALLY_ATTACK",
     "id": "trace_fleeting_shadow_speed",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "chance": 0.5,
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "SPEED",
-        "percent": 0.2,
-        "turns": 2,
-        "target": "self"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.2, "turns": 2, "target": "self" }
     ],
     "source": "1002 行迹 绝影 (1002102): 「施放攻击后有50%的固定概率使自身速度提高20%，持续2回合。」 param = [0.5, 0.2, 2]",
     "note": "「**施放攻击后**有 **50%** 的**固定概率**使自身速度提高 **20%**，持续 **2** 回合」—— ① 「施放攻击」⇒ `ALLY_ATTACK` ✓（这个事件**每次施放只发一次** ✓，所以 4 段战技也只掷一次骰子 ✓ —— 挂 `DEALING_DAMAGE` 会逐段掷 ✗）；⭐ **2026-10-17：三个数都能落到游戏表上** ✓ —— `ExcelOutput/AvatarSkillTreeConfig.json` 的 `PointID 1002102`（`PointB2`、`Avatar_DanHeng_SkillTree02`）`ParamList = [{0.5}, {0.2}, {2}]` ✓ = 固定概率 / 速度 / 回合 ✓，与正文的 50% / 20% / 2 逐项相同 ✓。② 「**固定概率**」⇒ **规则级 `chance: 0.5`** ✓，**不是** `base_chance` ✗ —— 原文自己解释了这个词：「不会被任何因素影响的固定概率」✓ ⇒ 不经过效果命中/抵抗 ✓，而 `base_chance` 会 ✓（这正是两个字段的分界 ✓）；③ 「自身速度提高 20%」⇒ `MODIFY_ATTR SPEED percent: 0.2` ✓（正数 = 增益 ✓，平值属性 ⇒ 份额 ✓）；④ `turns: 2` ✓、`target: self` ✓。⚠ 「施放**攻击**」包含普攻/战技/终结技 ✓，`ALLY_ATTACK` 正是这三种共用的那一个事件 ✓ ⇒ 不写 `from_skill` ✗（原文没有限定槽位 ✓）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon3_levels",
     "min_eidolon": 3,
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 1
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
     ],
     "source": "1002 星魂3: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 技能等级+{'100202': 2, '100201': 1}",
     "note": "「SKILL +2、COMMON +1」—— 两条 `RAISE_SKILL_LEVEL` ✓，与本库其余星魂等级声明同形 ✓。⚠ 「最多不超过 15 级 / 10 级」**不在这里写** ✗：上限由技能数据自己的等级行数决定 ✓，再写一个上限就是**第二套上限** ✗。⚠ 槽位映射：`100201` = `COMMON`、`100202` = `SKILL`、`100203` = `ULTRA`、`100204` = `TALENT` ✓（引擎的槽位约定 ✓）。"
   },
+
   {
     "on": "KILL",
     "id": "eidolon4_ult_kill_acts_again",
-    "when": [
-      "actor == self",
-      "from_skill ULTRA"
-    ],
+    "when": ["actor == self", "from_skill ULTRA"],
     "min_eidolon": 4,
     "do": [
-      {
-        "op": "EXTRA_TURN",
-        "target": "self"
-      }
+      { "op": "EXTRA_TURN", "target": "self" }
     ],
     "source": "1002 星魂4 奋迅三昧，如日空居: 「施放终结技消灭敌方目标时，丹恒立即行动。」",
     "note": "「**施放终结技消灭敌方目标时**，丹恒**立即行动**」—— ① 事件 `KILL` ✓：它在击杀的**那一刻**发出 ✓（`Battle.applyDamage` 在目标死亡时 ✓，actor = 造成这一发的人 ✓）；② 「**施放终结技**」⇒ `from_skill ULTRA` ✓ —— ⚠ `KILL` 在 `CAST_CARRYING_EVENTS` 里 ✓（它随伤害实例带上 `getCastCategory()` ✓），所以这个限定**在加载期就受支持** ✓，不是本轮新加的 ✓；③ 「立即行动」⇒ `EXTRA_TURN` + `target: self` ✓（与本库已有的几条同形 ✓）；④ `min_eidolon: 4` ✓。⭐ **2026-10-17：改成「这一发伤害的**来源施放**」** ✓ —— 原文是「施放终结技**造成**的伤害致命」✓，而**击破伤害**是引擎从这一发派生出来的实例 ✓（`causedByCast` ✓），它自己仍带 `UNSPECIFIED` ✓（否则终结技的 +120% 倍率会被加到击破伤害上 ✗）。判据 `eidolon4GrantsAnExtraTurnOnlyForAnUltimateKillAtRankFour` 的四条实测 ✓：① 自己的终结技**直接**致 ⇒ **触发** ✓；② 终结技击破、**由那一发的击破伤害**致 ⇒ **触发** ✓；③ 他自己后续的持续伤害致 ⇒ **不触发** ✓；④ 别的角色的终结技致 ⇒ **不触发** ✓。⚠ **残留边界**：原文说「消灭敌方目标时」✓，本条看的是**致死的那一发** ✓；若终结技把目标打到 1 血、随后由**追加伤害/持续伤害**补掉最后一击 ✗，那一次`KILL`的 `from_skill`会是那条伤害的槽位 ✓（`ULTRA` 或 `TALENT` ✓）⇒ 本条**不会**触发 ✗。这是**照原文**的实现 ✓（原文限定「施放终结技消灭」✓），但值得写下来，因为它在游戏里可能由终结技的后续段完成 ✗。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon5_levels",
     "min_eidolon": 5,
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 2
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
     ],
     "source": "1002 星魂5: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 技能等级+{'100203': 2, '100204': 2}",
     "note": "「ULTRA +2、TALENT +2」—— 两条 `RAISE_SKILL_LEVEL` ✓，与本库其余星魂等级声明同形 ✓。⚠ 「最多不超过 15 级 / 10 级」**不在这里写** ✗：上限由技能数据自己的等级行数决定 ✓，再写一个上限就是**第二套上限** ✗。⚠ 槽位映射：`100201` = `COMMON`、`100202` = `SKILL`、`100203` = `ULTRA`、`100204` = `TALENT` ✓（引擎的槽位约定 ✓）。"
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "eidolon1_crit_chance_against_a_healthy_target",
-    "when": [
-      "actor == self",
-      "target_hp_percent >= 0.5"
-    ],
+    "when": ["actor == self", "target_hp_percent >= 0.5"],
     "min_eidolon": 1,
     "do": [
       {
@@ -239,51 +160,35 @@
     "source": "1002 星魂1 穷高极天，亢盈难久: 「当击中的敌方目标当前生命值百分比大于等于50%时，暴击率提高12%。」 param = [0.5, 0.12]",
     "note": "「当**击中的敌方目标当前生命值百分比大于等于 50%** 时，**暴击率提高 12%**」—— ① 事件 `DEALING_DAMAGE` ✓ —— ⭐ **这是能写这一句的关键** ✓：该事件在 `Battle.applyDamage` 里发出的位置**在暴击判定之前** ✓（源码注释原话：announcement sits between the two halves，「every zone below -- crit, defence, toughness reduction, resistance -- has to read the mutated numbers」✓）⇒ 规则在这里改的暴击率**这一发真的会读到** ✓；② `MODIFY_ATTR` + `attribute: CRIT_CHANCE` + **`instance: true`** ✓ —— `instance` 表示「这个修正属于**正在结算的这一发**」✓（不是给角色挂一个持续 buff ✓），引擎对 `CRIT_CHANCE` 走 `damage.addCritChance(...)` ✓、而暴击判定读的正是 `damage.getExtraCritChance()` ✓ ⇒ 两者是同一根线 ✓；③ ⚠ **比率型属性** ⇒ `percent: 0.12` 就是**百分点** ✓（0.12 = +12%，不是 ×1.12 ✓，见 `AttributeType` 的比率约定 ✓）；④ 条件 `target_hp_percent >= 0.5` ✓（读**目标**的生命百分比 ✓，`0.5` 是分数 ✓）；⑤ `min_eidolon: 1` ✓。⚠ **本条此前被我登记为\"写不了\"** ✗ —— 理由是「需要在暴击判定之前改这一次的暴击率」✗，而那个理由**错了** ✓：`DEALING_DAMAGE` 本来就在判定之前 ✓。这是同一轮里**第三处**因为\"没去读代码\"而写错的登记 ✓（前两处：`base_chance` ✓、`CRIT_DEALT` ✓）。⚠ **登记一处范围差**：原文说「击中的敌方目标」✓，本条读的是**事件的目标**（`target_hp_percent` ✓）⇒ 对**单体**技能完全等价 ✓；若将来给丹恒加**弹射/群攻** ✗，则每个被命中的目标各判一次 ✓，而本条的 `instance` 修正只作用于**这一发** ✓ —— 那仍然是逐发各判 ✓，与原文一致 ✓。⚠ **`until: next_attack` 是给校验器写的，不是给引擎读的** ✓：`MODIFY_ATTR` 的校验要求「时长三选一」✓（`turns` / `permanent` / `until` ✓），而 `instance: true` 的分支在**创建任何 buff 之前就 `return` 了** ✓（它只调 `damage.addCritChance(...)` ✓）⇒ 这个时长**永远不会被用到** ✓；写 `next_attack` 而不是别的，是因为它最贴近含义（「下一次攻击」= 这一发 ✓），让读的人不会误解 ✓。"
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "ult_ethereal_dream_hits_a_slowed_target",
-    "when": [
-      "actor == self",
-      "from_skill ULTRA",
-      "target is_slowed"
-    ],
+    "when": ["actor == self", "from_skill ULTRA", "target is_slowed"],
     "do": [
-      {
-        "op": "ADD_DAMAGE",
-        "scale": "self_attr:ATTACK",
-        "percent_from_skill_param": "ULTRA:1"
-      }
+      { "op": "ADD_DAMAGE", "scale": "self_attr:ATTACK", "percent_from_skill_param": "ULTRA:1" }
     ],
     "source": "1002 丹恒 终结技 洞天幻化，长梦一觉 (100203, Ultra/SingleAttack): 「对指定敌方单体造成等同于丹恒400%攻击力的风属性伤害。当受到攻击的敌方目标处于减速状态时，终结技造成的伤害倍率提高120%。」 param Lv10 → [4, 1.2]（#1 = 倍率、#2 = 目标减速时追加的倍率）",
     "note": "「当受到攻击的敌方目标**处于减速状态**时，终结技造成的伤害**倍率提高 120%**」—— ① 条件用 **`target is_slowed`** ✓（本轮为这句补的谓词 ✓）：减速在引擎里只有一个表示 —— **负的 `SPEED` 修饰** ✓（战技的 `MODIFY_ATTR` 与 `ControlBuff` 的减速都是它 ✓），所以谓词问的是 **`SPEED` 身上有没有负修饰** ✓，而不是「有没有本文件施加的那条」✗ —— 后者会把**别的角色**施加的减速判成没有 ✓。② **「倍率提高」不是「伤害提高」** ✓：120% 是**攻击力倍数的一部分**（Lv10：4.0 + 1.2 = 5.2 ✓），所以走 **`ADD_DAMAGE`** ✓ —— 它加到这一发的**基数层**（`Damage.addFlat` ✓），和技能倍率一起过增伤 / 暴击 / 防御 / 抗性 ✓；写成 `BOOST_DAMAGE`（增伤区 `1 + Σ`）会得到 `4.0 × (1 + 1.2)` ✗ —— 一个看起来像做完了的错数字 ✗（`AddDamageOpTest` 专门钉住这一对不相等 ✓）。③ **数值走技能参数** ✓：`percent_from_skill_param: ULTRA:1` 读**自己终结技当前等级的第 2 项** ✓（0 基）—— Lv10 是 1.2 ✓，而且**随等级走** ✓：星魂 5 把终结技抬到 12 级后基础倍率变 4.32、这一项变 1.296 ✓，写死 1.2 会在那里悄悄少算 ✗。④ `actor == self` ✓ + `from_skill ULTRA` ✓（别人的终结技、自己的别的槽位都不吃这一句 ✓）。⚠ **登记一处形状差**：原文的伤害分段表写的是「默认 1 段 ＋ **互斥分支**的变体 1 段」✓ ⇒ 本条把这一发做成**同一次结算**（5.2 倍率、暴击只掷一次 ✓）；若将来发现游戏是两次独立结算 ✗，改法是把 `ADD_DAMAGE` 换成一次追加实例 ✓ —— 数值不变、暴击次数变 ✓。"
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "trace_gang_feng_hits_a_slowed_target",
-    "when": [
-      "actor == self",
-      "from_skill COMMON",
-      "target is_slowed"
-    ],
+    "when": ["actor == self", "from_skill COMMON", "target is_slowed"],
     "do": [
-      {
-        "op": "BOOST_DAMAGE",
-        "percent": 0.4
-      }
+      { "op": "BOOST_DAMAGE", "percent": 0.4 }
     ],
     "source": "1002 行迹 罡风 (1002103): 「普攻对减速状态下的敌方目标造成的伤害提高40%。」",
     "note": "「**普攻**对**减速状态**下的敌方目标造成的**伤害提高 40%**」—— ① `from_skill COMMON` ✓（普攻槽位；战技 / 终结技不吃 ✓）；② `target is_slowed` ✓（与终结技那条**同一个谓词** ✓）；③ **`BOOST_DAMAGE`** ✓ —— 这句是「造成的**伤害**提高」✓，加的是这一发的**增伤区**（`1 + Σ`）✓，不是倍率 ✓：与 1001 三月七的「伤害**值**提高，提高数值等同于防御力的 30%」**不同** ✗（那条是 `ADD_DAMAGE` ✓）—— 两条 op 的分界就在「伤害」与「伤害值 / 倍率」这几个字上 ✓。⭐ **2026-10-17：40% 落到游戏表上** ✓ —— `AvatarSkillTreeConfig` 的 `PointID 1002103`（`PointB3`）`ParamList = [{0.4}]` ✓。⚠ **登记一处边界**：原文说「普攻对…」✓，本条读的是**这一发伤害的目标** ✓ ⇒ 对单体普攻完全等价 ✓。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon2_shortens_the_talent_cooldown",
     "min_eidolon": 2,
     "do": [
-      {
-        "op": "MODIFY_RULE",
-        "rule": "talent_wind_pen",
-        "cooldown_delta": -1
-      }
+      { "op": "MODIFY_RULE", "rule": "talent_wind_pen", "cooldown_delta": -1 }
     ],
     "source": "1002 星魂2 威制八毒，灭却炎烟: 「天赋的冷却时间减少1回合。」",
     "note": "「天赋的**冷却时间减少 1 回合**」—— ① **`MODIFY_RULE` + `cooldown_delta: -1`** ✓（本轮为这句补的能力 ✓：`MODIFY_RULE` 原先只改每回合次数 / 概率 / 时长 / 上限 / 倍率 ✗，没有改冷却的口子 ✗）；② 点名 `talent_wind_pen` ✓（那条自己写着 `cooldown: 2` ✓ ⇒ 2 − 1 = 1 ✓，规则本体**不改** ✓ —— 修正属于星魂，不属于天赋 ✓）；③ 加载期就查两件事 ✓：被点名的规则**确实写了 `cooldown`** ✓、结果**不为负** ✓（否则「减少」会悄悄把一条有限制的规则变成无限制 ✗）；④ `min_eidolon: 2` ✓。"

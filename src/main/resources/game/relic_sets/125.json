@@ -3,10 +3,7 @@
     {
       "on": "HEALED",
       "id": "gentle_rain_on_healing_another",
-      "when": [
-        "actor is_ally",
-        "target is_other_ally"
-      ],
+      "when": ["actor is_ally", "target is_other_ally"],
       "per_turn": 1,
       "do": [
         {

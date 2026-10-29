@@ -3,9 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21057_summon_crit_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -24,9 +22,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21057_summon_crit_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -45,9 +41,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21057_summon_crit_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -66,9 +60,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21057_summon_crit_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -87,9 +79,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21057_summon_crit_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",

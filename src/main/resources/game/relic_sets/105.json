@@ -4,14 +4,7 @@
       "on": "ALLY_ATTACK",
       "id": "relic105_4_attack_stack_on_attack",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.05,
-          "permanent": true,
-          "max_stacks": 5,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.05, "permanent": true, "max_stacks": 5, "target": "self" }
       ],
       "source": "relic set 105 (Champion of Streetwise Boxing), 4-piece ability Ability51051: \"After the wearer attacks or is hit, their ATK increases by #1[i]% for the rest of the battle. This effect can stack up to #2[i] time(s).\" param = [0.05, 5]",
       "note": "「施放攻击**或受到攻击后**，本场战斗中攻击力提高 **5%**，**最多叠加 5 层**」—— 两条规则（ALLY_ATTACK / TAKING_HIT）各用一条修饰 ✓。\n⛔ **仍开（已登记 §4.3）**：max_stacks: 5 写在修饰上、没有层缓冲 ⇒ 实测**只加一层** ✗；ADD_STACK ＋ per_stack 在遗器侧**是可用的** ✓（115/116 就这么写 ✓），本次回退是因为**遗器判据的裸上下文**（没有 \target/\u0007ctor 的一方）让新加的门条件匹配不上 ✗ ⇒ 下一轮带着判据一起改 ✓。"
@@ -20,14 +13,7 @@
       "on": "TAKING_HIT",
       "id": "relic105_4_attack_stack_on_hurt",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.05,
-          "permanent": true,
-          "max_stacks": 5,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.05, "permanent": true, "max_stacks": 5, "target": "self" }
       ],
       "source": "relic set 105 (Champion of Streetwise Boxing), 4-piece ability Ability51051: \"After the wearer attacks or is hit, their ATK increases by #1[i]% for the rest of the battle. This effect can stack up to #2[i] time(s).\" param = [0.05, 5]",
       "note": "「施放攻击**或受到攻击后**，本场战斗中攻击力提高 **5%**，**最多叠加 5 层**」—— 两条规则（ALLY_ATTACK / TAKING_HIT）各用一条修饰 ✓。\n⛔ **仍开（已登记 §4.3）**：max_stacks: 5 写在修饰上、没有层缓冲 ⇒ 实测**只加一层** ✗；ADD_STACK ＋ per_stack 在遗器侧**是可用的** ✓（115/116 就这么写 ✓），本次回退是因为**遗器判据的裸上下文**（没有 \target/\u0007ctor 的一方）让新加的门条件匹配不上 ✗ ⇒ 下一轮带着判据一起改 ✓。"

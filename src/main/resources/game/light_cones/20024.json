@@ -1,28 +1,12 @@
 {
-  "resources": [
-    {
-      "id": "笑点",
-      "max": 999,
-      "initial": 0
-    }
-  ],
+  "resources": [{ "id": "笑点", "max": 999, "initial": 0 }],
   "1": [
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_met",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 >= 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 >= 10"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "笑点达标", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -38,17 +22,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_lost",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 < 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 < 10"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "笑点达标", "amount": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -66,19 +42,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_met",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 >= 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 >= 10"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "笑点达标", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -94,17 +60,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_lost",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 < 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 < 10"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "笑点达标", "amount": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -122,19 +80,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_met",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 >= 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 >= 10"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "笑点达标", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -150,17 +98,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_lost",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 < 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 < 10"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "笑点达标", "amount": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -178,19 +118,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_met",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 >= 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 >= 10"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "笑点达标", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -206,17 +136,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_lost",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 < 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 < 10"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "笑点达标", "amount": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -234,19 +156,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_met",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 >= 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 >= 10"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "笑点达标", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -262,17 +174,9 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "cone20024_threshold_lost",
-      "when": [
-        "actor == self",
-        "self_resource:笑点 < 10"
-      ],
+      "when": ["actor == self", "self_resource:笑点 < 10"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "笑点达标",
-          "amount": 1,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "笑点达标", "amount": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",

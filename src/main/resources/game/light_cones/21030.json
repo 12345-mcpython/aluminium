@@ -3,17 +3,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21030_ult_defence_scaled_damage",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.6,
-          "scale": "self_attr:DEFENCE"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.6, "scale": "self_attr:DEFENCE" }
       ],
       "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
       "note": "「使装备者施放终结技时造成的伤害值提高，提高数值**等同于装备者防御力的 #2%**，该效果**每次施放终结技时对每个敌方目标仅生效 1 次**」—— DEALING_DAMAGE ＋ \from_category ULTRA ＋ ADD_DAMAGE{scale: self_attr:DEFENCE} ✓；per_attack: 1 ✓（终结技是多段的 ✓，没这道上限会每段都付一次 ✗）。"
@@ -23,17 +16,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21030_ult_defence_scaled_damage",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.75,
-          "scale": "self_attr:DEFENCE"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.75, "scale": "self_attr:DEFENCE" }
       ],
       "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
       "note": "「使装备者施放终结技时造成的伤害值提高，提高数值**等同于装备者防御力的 #2%**，该效果**每次施放终结技时对每个敌方目标仅生效 1 次**」—— DEALING_DAMAGE ＋ \from_category ULTRA ＋ ADD_DAMAGE{scale: self_attr:DEFENCE} ✓；per_attack: 1 ✓（终结技是多段的 ✓，没这道上限会每段都付一次 ✗）。"
@@ -43,17 +29,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21030_ult_defence_scaled_damage",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.9,
-          "scale": "self_attr:DEFENCE"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.9, "scale": "self_attr:DEFENCE" }
       ],
       "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
       "note": "「使装备者施放终结技时造成的伤害值提高，提高数值**等同于装备者防御力的 #2%**，该效果**每次施放终结技时对每个敌方目标仅生效 1 次**」—— DEALING_DAMAGE ＋ \from_category ULTRA ＋ ADD_DAMAGE{scale: self_attr:DEFENCE} ✓；per_attack: 1 ✓（终结技是多段的 ✓，没这道上限会每段都付一次 ✗）。"
@@ -63,17 +42,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21030_ult_defence_scaled_damage",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 1.05,
-          "scale": "self_attr:DEFENCE"
-        }
+        { "op": "ADD_DAMAGE", "percent": 1.05, "scale": "self_attr:DEFENCE" }
       ],
       "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
       "note": "「使装备者施放终结技时造成的伤害值提高，提高数值**等同于装备者防御力的 #2%**，该效果**每次施放终结技时对每个敌方目标仅生效 1 次**」—— DEALING_DAMAGE ＋ \from_category ULTRA ＋ ADD_DAMAGE{scale: self_attr:DEFENCE} ✓；per_attack: 1 ✓（终结技是多段的 ✓，没这道上限会每段都付一次 ✗）。"
@@ -83,17 +55,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21030_ult_defence_scaled_damage",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 1.2,
-          "scale": "self_attr:DEFENCE"
-        }
+        { "op": "ADD_DAMAGE", "percent": 1.2, "scale": "self_attr:DEFENCE" }
       ],
       "source": "光锥 21030: 「使装备者施放终结技时造成的伤容提高，提高数值等同于装备者防御力的#2[i]%，该效果每次施放终结技时对每个敌方目标仅生效1次。」",
       "note": "「使装备者施放终结技时造成的伤害值提高，提高数值**等同于装备者防御力的 #2%**，该效果**每次施放终结技时对每个敌方目标仅生效 1 次**」—— DEALING_DAMAGE ＋ \from_category ULTRA ＋ ADD_DAMAGE{scale: self_attr:DEFENCE} ✓；per_attack: 1 ✓（终结技是多段的 ✓，没这道上限会每段都付一次 ✗）。"

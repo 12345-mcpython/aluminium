@@ -2,9 +2,7 @@
   {
     "on": "SKILL_CAST",
     "id": "skill_burn",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
       {
         "op": "APPLY_DOT",
@@ -19,178 +17,106 @@
     "source": "1109 虎克 战技 嘿！记得虎克吗 (110902, BPSkill/SingleAttack): 「对指定敌方单体造成等同于虎克240%攻击力的火属性伤害，同时有100%的基础概率使其陷入灼烧状态，持续2回合。灼烧状态下，敌方目标每回合开始时受到等同于虎克65%攻击力的火属性持续伤害。」",
     "note": "「有 **100% 的基础概率**使其陷入**灼烧**状态，持续 2 回合。灼烧状态下，敌方目标**每回合开始时**受到等同于虎克 **65% 攻击力**的火属性持续伤害」—— 一句话三件事：`base_chance: 1.0`、`turns: 2`、以及**持续伤害的倍率与来源**（`element` + `scale: self_attr:ATTACK` + `percent`，与 DOT 的既有约定一致 ✓）。⚠ 文档写「基础概率」而不是必然施加：`APPLY_DOT` **照旧过骰子**（源码里 `baseChance = base_chance ?? 1.0` 后走 `tryApplyDebuff` ✓），所以 100% 只是**基础**概率，仍受效果命中的加成与目标**效果抵抗**的削减 ✓（引擎里 DOT 的 specific 键传 `null` ⇒ 没有额外的特定抗性项 ✓）。⚠ 240% 那半伤害由引擎自己的技能行负责 ✓。"
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
     ],
     "source": "1109 虎克 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（战技 240% + 灼烧 65%、终结技 400%、天赋 100%+5 点能量）",
     "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **尚未分类（逐条登记）**：① 天赋「攻击处于**灼烧**状态的敌方目标时，追加 1 次等同于虎克 100% 攻击力的火属性**附加伤害**，并额外恢复 5 点能量」—— 触发条件与回能都已具备（`DEALING_DAMAGE` + `target has_state 灼烧` + `GAIN_ENERGY`），⭐ **该句已于同档写出** ✓（见本档 `:156` 的规则：`DEALING_DAMAGE` + `target has_state 灼烧` ⇒ `DAMAGE` + `GAIN_ENERGY` ✓）；⚠ **本条注记此前说「唯一缺的是那个 op 名」** ✗ —— ⚠ **而它一直存在** ✓：就是 **`ADD_DAMAGE`** ✓（⚠ 已出货于光锥 `20018` 与 `21030` ✓，各五档 ✓）。**2026-09-30 修订** ✓。⚠ 以下为**修订前**的记录，保留以便对照：② 终结技「施放终结技后，**下一次施放的战技得到强化**，强化后的战技能够同时对指定敌方单体及其**相邻目标**造成伤害」—— 缺两样：**强化战技的装载键**（强化战技是独立的数据行，如 110908，而装载器要的是**槽位** ✓，需要先读出它的槽位 ✓）与**相邻选择器**（引擎没有「位置轴」，已登记为缺口 ✓）；③ 秘技「立即攻击敌人，进入战斗后对敌方**随机单体**造成 50% 攻击力的火属性伤害，同时有 100% 基础概率使敌方**每个**单体陷入灼烧，持续 3 回合」—— 缺**「用过秘技」的门槛**（无条件写出就会永远施加 ✗）与**随机单体**选择器 ✓；④ 行迹与星魂：✅ **已读并写出** ✓（见本档 `trace_play_with_fire` 等规则 ✓）—— ⚠ 原写「本轮未读」✗，**2026-09-30 修订** ✓。"
   },
+
   {
     "on": "ULT_CAST",
     "id": "trace_play_with_fire",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "ADVANCE",
-        "percent": 0.2,
-        "target": "self"
-      },
-      {
-        "op": "GAIN_ENERGY",
-        "amount": 5,
-        "target": "self"
-      }
+      { "op": "ADVANCE", "percent": 0.2, "target": "self" },
+      { "op": "GAIN_ENERGY", "amount": 5, "target": "self" }
     ],
     "source": "1109 虎克 行迹 玩火 (1109103): 「施放终结技后，虎克的行动提前20%并额外恢复5点能量。」",
     "note": "「施放终结技后，虎克的**行动提前 20%** 并**额外恢复 5 点能量**」—— 两个效果各用既有 op：`ADVANCE`（行动提前 ✓）与 `GAIN_ENERGY`（回能 ✓）。⚠ 「行动提前」按文档术语是\"使目标在下次行动前的**等待间隔缩短**\" ✓，与 `ADVANCE` 的语义一致 ✓。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon2_longer_burn",
     "min_eidolon": 2,
     "do": [
-      {
-        "op": "MODIFY_RULE",
-        "rule": "skill_burn",
-        "effect_turns": 1
-      }
+      { "op": "MODIFY_RULE", "rule": "skill_burn", "effect_turns": 1 }
     ],
     "source": "1109 虎克 星魂 2 吃好喝好长身体: 「战技使敌方目标陷入的灼烧状态持续时间增加1回合。」",
     "note": "「战技使敌方目标陷入的**灼烧状态持续时间增加 1 回合**」—— 用 `MODIFY_RULE` 的 **`effect_turns`** 分支（第 130 轮读出的分派表：这个字段改的是**该规则效果的时长** ✓），修的正是 `skill_burn` 那条规则上的 `turns` ✓，而不是另写一条更长的 DOT（那样两条会互相顶掉 ✗ —— 引擎自己的注释也这么写 ✓）。"
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "eidolon6_bonus_against_burning",
     "min_eidolon": 6,
-    "when": [
-      "actor == self",
-      "target has_state 灼烧"
-    ],
+    "when": ["actor == self", "target has_state 灼烧"],
     "do": [
-      {
-        "op": "BOOST_DAMAGE",
-        "percent": 0.2
-      }
+      { "op": "BOOST_DAMAGE", "percent": 0.2 }
     ],
     "source": "1109 虎克 星魂 6 随时准备打坏人: 「虎克对灼烧状态下的敌方目标造成的伤害提高20%。」",
     "note": "「虎克对**灼烧状态**下的敌方目标造成的伤害提高 20%」—— `DEALING_DAMAGE` + `target has_state 灼烧` + `BOOST_DAMAGE`（`damage.addBoost(percent)` ✓ 改的是**正在结算的这一次**伤害 ✓）。⚠ 这正是 `BOOST_DAMAGE` 与 `ADD_DAMAGE` 的分工：前者按**百分比**、后者按**固定值**，两者都作用于当前实例 ✓（都不产生新实例 ✗）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon3_levels",
     "min_eidolon": 3,
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 1
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
     ],
     "source": "1109 虎克 星魂 3 不挑不选全都要: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」",
     "note": "「战技等级 +2；普攻等级 +1」—— 与等级口径那条叠加 ✓。⚠ 该星魂的**第三项**（`110909`：强化战技 +2）**未写**：那是**强化战技**这个独立行的等级，而本文件尚未把强化战技写成槽位（终结技那半句仍登记中 ✓）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon5_levels",
     "min_eidolon": 5,
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 2
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
     ],
     "source": "1109 虎克 星魂 5 好事留名鼹鼠党: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」",
     "note": "「终结技等级 +2；天赋等级 +2」—— 同星魂 3 的做法 ✓。"
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "talent_followup_against_burning",
-    "when": [
-      "actor == self",
-      "target has_state 灼烧",
-      "damage_is_attack"
-    ],
+    "when": ["actor == self", "target has_state 灼烧", "damage_is_attack"],
     "do": [
-      {
-        "op": "DAMAGE",
-        "element": "Fire",
-        "target": "target",
-        "scale": "self_attr:ATTACK",
-        "percent": 1.0
-      },
-      {
-        "op": "GAIN_ENERGY",
-        "amount": 5,
-        "target": "self"
-      }
+      { "op": "DAMAGE", "element": "Fire", "target": "target", "scale": "self_attr:ATTACK", "percent": 1.0 },
+      { "op": "GAIN_ENERGY", "amount": 5, "target": "self" }
     ],
     "source": "1109 虎克 天赋 哈！火上浇油 (110904, Enhance): 「攻击处于灼烧状态的敌方目标时，追加1次等同于虎克100%攻击力的火属性附加伤害，并额外恢复5点能量。」",
     "note": "「攻击处于**灼烧**状态的敌方目标时，**追加 1 次**等同于虎克 **100% 攻击力**的火属性**附加伤害**，并**额外恢复 5 点能量**」—— ① 触发条件 = `DEALING_DAMAGE` + `target has_state 灼烧`；② 额外实例用 `DAMAGE`（引擎的 `applyAdditionalDamage`：`DamageType.ADDITIONAL` + `notCountsAsAttack` + 受害者不给能量 ✓），倍率取自**技能参数行**（他普攻那一行正是 100% 攻击力 ✓，与文档数字一致 ⇒ 不必另造倍率 ✓）；③ 回能用 `GAIN_ENERGY` ✓。⚠ **护栏 `damage_is_attack` 不可省**：额外那次本身也是一次 `DEALING_DAMAGE` ⇒ 没有护栏时本规则会**自我触发**直到撞上引擎的递归上限 ✗。因为 `!` 取反只允许作用于队伍类条件（源码原话：only those can be negated），护栏只能**正向**写：这次伤害\"算不算一次攻击\" ✓ —— 附加伤害实例带 `notCountsAsAttack` ⇒ 该条件为假 ⇒ 链条到此为止 ✓。 ⚠ DAMAGE **必须**给 damage_param（倍率在技能参数行里的下标，无默认值 ✓）：他普攻那一行只有一项（100% 攻击力）⇒ 下标 0 ✓。 ⚠ **第 188 轮修正：改用字面倍率** ✓ —— 本条原先指向 `COMMON` 的 `damage_param 0` ✗，而 `data/skills.json` 里那一行的 **Lv10 值是 1.4** ✗（文档写 **100%** ✓）；按第 187 轮的策略 ✓，改成 `scale: self_attr:ATTACK` + `percent: 1.0` ✓（字面倍率读的是**结算后**属性 ✓）。"
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "trace_childlike",
-    "when": [
-      "actor == self",
-      "target has_state 灼烧",
-      "damage_is_attack"
-    ],
+    "when": ["actor == self", "target has_state 灼烧", "damage_is_attack"],
     "do": [
-      {
-        "op": "HEAL",
-        "scale": "owner_max_hp",
-        "percent": 0.05,
-        "target": "self"
-      }
+      { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.05, "target": "self" }
     ],
     "source": "1109 虎克 行迹 童真 (1109101): 「触发天赋时，回复等同于虎克生命上限5%的生命值。」",
     "note": "「**触发天赋时**，回复等同于虎克生命上限 **5%** 的生命值」—— 天赋的触发条件就是「攻击处于灼烧状态的敌方目标时」 ✓，所以本条挂**同一个事件 + 同一组条件** ✓，而不是另找\"天赋触发过\"的标记（引擎没有这种标记 ✗，而这两者在这个句子里是等价的 ✓）。⚠ **护栏同样必须带上**（`damage_is_attack`）：否则天赋追加的那次附加伤害会**再触发一次本行迹** ⇒ 每次攻击回两次血 ✗。⚠ 治疗量是**虎克自己**的生命上限（`scale: owner_max_hp` ✓，与 `HEAL`/`SHIELD` 共用的词表一致 ✓）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "trace_innocence",
     "do": [
-      {
-        "op": "RESIST_DEBUFF",
-        "percent": 0.35,
-        "permanent": true,
-        "target": "self",
-        "kind": "control"
-      }
+      { "op": "RESIST_DEBUFF", "percent": 0.35, "permanent": true, "target": "self", "kind": "control" }
     ],
     "source": "1109 虎克 行迹 无邪 (1109102): 「抵抗控制类负面状态的概率提高35%。」",
     "note": "「抵抗**控制类**负面状态的概率提高 35%」—— 引擎把\"按**类**抵抗\"建模成自己的 `ClassResistBuff`（`BuffManager.debuffResistOf(DebuffClass)` ✓），而控制类正是 `DebuffClass.CONTROL` ✓（冻结/纠缠/禁锢等 ✓），所以用 `RESIST_DEBUFF` + `debuff_class` ✓，而不是去改通用的效果抵抗 ✗（后者对所有负面效果生效，会**过度** ✗）。⚠ `permanent: true`：行迹是常驻的 ✓（不是\"持续 N 回合\" ✗）。 ⚠ 字段名是 kind 且取值**小写**（control / dot）—— 装载器原话：Op RESIST_DEBUFF requires kind (which class of negative state it resists; known: control / dot) ✓。"

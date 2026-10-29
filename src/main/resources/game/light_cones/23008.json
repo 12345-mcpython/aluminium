@@ -3,17 +3,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23008_energy_per_target",
-      "when": [
-        "actor == self",
-        "damage_is_attack"
-      ],
+      "when": ["actor == self", "damage_is_attack"],
       "per_attack": 3,
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 3,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 3, "target": "self" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -21,17 +14,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23008_party_speed",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "amount": 12,
-          "turns": 1,
-          "target": "all_allies"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 12, "turns": 1, "target": "all_allies" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放终结技后，使我方全体速度提高#2[i]点，持续1回合。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -41,17 +26,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23008_energy_per_target",
-      "when": [
-        "actor == self",
-        "damage_is_attack"
-      ],
+      "when": ["actor == self", "damage_is_attack"],
       "per_attack": 3,
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 3.5,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 3.5, "target": "self" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -59,17 +37,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23008_party_speed",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "amount": 14,
-          "turns": 1,
-          "target": "all_allies"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 14, "turns": 1, "target": "all_allies" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放终结技后，使我方全体速度提高#2[i]点，持续1回合。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -79,17 +49,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23008_energy_per_target",
-      "when": [
-        "actor == self",
-        "damage_is_attack"
-      ],
+      "when": ["actor == self", "damage_is_attack"],
       "per_attack": 3,
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 4,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 4, "target": "self" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -97,17 +60,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23008_party_speed",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "amount": 16,
-          "turns": 1,
-          "target": "all_allies"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 16, "turns": 1, "target": "all_allies" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放终结技后，使我方全体速度提高#2[i]点，持续1回合。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -117,17 +72,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23008_energy_per_target",
-      "when": [
-        "actor == self",
-        "damage_is_attack"
-      ],
+      "when": ["actor == self", "damage_is_attack"],
       "per_attack": 3,
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 4.5,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 4.5, "target": "self" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -135,17 +83,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23008_party_speed",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "amount": 18,
-          "turns": 1,
-          "target": "all_allies"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 18, "turns": 1, "target": "all_allies" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放终结技后，使我方全体速度提高#2[i]点，持续1回合。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -155,17 +95,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23008_energy_per_target",
-      "when": [
-        "actor == self",
-        "damage_is_attack"
-      ],
+      "when": ["actor == self", "damage_is_attack"],
       "per_attack": 3,
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 5,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 5, "target": "self" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"
@@ -173,17 +106,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23008_party_speed",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "amount": 20,
-          "turns": 1,
-          "target": "all_allies"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 20, "turns": 1, "target": "all_allies" }
       ],
       "source": "光锥 23008 棺的回响: 「当装备者施放终结技后，使我方全体速度提高#2[i]点，持续1回合。」",
       "note": "⭐ **常数归引擎** ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**不重写** ✗（写了会双重计算 ✗）。⭐ 可写的两句 ✓：①「**当装备者施放攻击后，每命中1名不同的敌方目标，恢复#3[f1]点能量，每次攻击最多通过该方式恢复#4[i]次能量**」⇒ `DEALING_DAMAGE` + `damage_is_attack` ✓ + **`per_attack: #4`** ✓（本轮新做的计数版本 ✓）+ `GAIN_ENERGY` ✓；②「**当装备者施放终结技后，使我方全体速度提高#2[i]点**，持续1回合」⇒ `ULT_CAST` + `MODIFY_ATTR SPEED amount` + `turns: 1` + `target: all_allies` ✓。⚠ 每个实例 = 每个受害者 ✓（引擎每次攻击对每个受害者只结算一个实例 ✓）⇒ 「不同目标」与「实例」在实践上同义 ✓（并由 `per_attack` 封顶 ✓）。"

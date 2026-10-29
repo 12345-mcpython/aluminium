@@ -4,26 +4,9 @@
       "on": "BATTLE_START",
       "id": "cone23021_mask_at_battle_start",
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.1,
-          "turns": 3,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.28,
-          "turns": 3,
-          "target": "other_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.1, "turns": 3, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.28, "turns": 3, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「战斗开始时，使装备者获得【假面】，持续#6[i]回合。当装备者持有【假面】时，装备者的队友暴击率提高#5[i]%，暴击伤害提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -31,9 +14,7 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_per_point",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -51,36 +32,12 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_pays_out",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.1,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.28,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.1, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.28, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -88,9 +45,7 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_per_overflow",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -108,36 +63,12 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_pays_out_overflow",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.1,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.28,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.1, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.28, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。⭐⭐ **发放也要听溢出** ✓：文档说的是「【彩焰】**达到** 4 层」✓，不问它从哪来 ✓ —— 只挂 `SKILL_POINT_GAINED` 会让\"溢出凑满\"时**不换【假面】** ✗（实测 ✓）。"
@@ -148,26 +79,9 @@
       "on": "BATTLE_START",
       "id": "cone23021_mask_at_battle_start",
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.11,
-          "turns": 3,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.35,
-          "turns": 3,
-          "target": "other_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.11, "turns": 3, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.35, "turns": 3, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「战斗开始时，使装备者获得【假面】，持续#6[i]回合。当装备者持有【假面】时，装备者的队友暴击率提高#5[i]%，暴击伤害提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -175,9 +89,7 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_per_point",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -195,36 +107,12 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_pays_out",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.11,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.35,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.11, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.35, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -232,9 +120,7 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_per_overflow",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -252,36 +138,12 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_pays_out_overflow",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.11,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.35,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.11, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.35, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。⭐⭐ **发放也要听溢出** ✓：文档说的是「【彩焰】**达到** 4 层」✓，不问它从哪来 ✓ —— 只挂 `SKILL_POINT_GAINED` 会让\"溢出凑满\"时**不换【假面】** ✗（实测 ✓）。"
@@ -292,26 +154,9 @@
       "on": "BATTLE_START",
       "id": "cone23021_mask_at_battle_start",
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.12,
-          "turns": 3,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.42,
-          "turns": 3,
-          "target": "other_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "turns": 3, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.42, "turns": 3, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「战斗开始时，使装备者获得【假面】，持续#6[i]回合。当装备者持有【假面】时，装备者的队友暴击率提高#5[i]%，暴击伤害提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -319,9 +164,7 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_per_point",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -339,36 +182,12 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_pays_out",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.12,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.42,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.42, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -376,9 +195,7 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_per_overflow",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -396,36 +213,12 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_pays_out_overflow",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.12,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.42,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.42, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。⭐⭐ **发放也要听溢出** ✓：文档说的是「【彩焰】**达到** 4 层」✓，不问它从哪来 ✓ —— 只挂 `SKILL_POINT_GAINED` 会让\"溢出凑满\"时**不换【假面】** ✗（实测 ✓）。"
@@ -436,26 +229,9 @@
       "on": "BATTLE_START",
       "id": "cone23021_mask_at_battle_start",
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.13,
-          "turns": 3,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.49,
-          "turns": 3,
-          "target": "other_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.13, "turns": 3, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.49, "turns": 3, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「战斗开始时，使装备者获得【假面】，持续#6[i]回合。当装备者持有【假面】时，装备者的队友暴击率提高#5[i]%，暴击伤害提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -463,9 +239,7 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_per_point",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -483,36 +257,12 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_pays_out",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.13,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.49,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.13, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.49, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -520,9 +270,7 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_per_overflow",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -540,36 +288,12 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_pays_out_overflow",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.13,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.49,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.13, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.49, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。⭐⭐ **发放也要听溢出** ✓：文档说的是「【彩焰】**达到** 4 层」✓，不问它从哪来 ✓ —— 只挂 `SKILL_POINT_GAINED` 会让\"溢出凑满\"时**不换【假面】** ✗（实测 ✓）。"
@@ -580,26 +304,9 @@
       "on": "BATTLE_START",
       "id": "cone23021_mask_at_battle_start",
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.14,
-          "turns": 3,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.56,
-          "turns": 3,
-          "target": "other_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.14, "turns": 3, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.56, "turns": 3, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「战斗开始时，使装备者获得【假面】，持续#6[i]回合。当装备者持有【假面】时，装备者的队友暴击率提高#5[i]%，暴击伤害提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -607,9 +314,7 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_per_point",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -627,36 +332,12 @@
     {
       "on": "SKILL_POINT_GAINED",
       "id": "cone23021_flame_pays_out",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.14,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.56,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.14, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.56, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。"
@@ -664,9 +345,7 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_per_overflow",
-      "when": [
-        "self_stacks:彩焰 < 4"
-      ],
+      "when": ["self_stacks:彩焰 < 4"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -684,36 +363,12 @@
     {
       "on": "SKILL_POINT_OVERFLOWED",
       "id": "cone23021_flame_pays_out_overflow",
-      "when": [
-        "self_stacks:彩焰 >= 4"
-      ],
+      "when": ["self_stacks:彩焰 >= 4"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "彩焰",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "假面",
-          "turns": 4,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.14,
-          "turns": 4,
-          "target": "other_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.56,
-          "turns": 4,
-          "target": "other_allies"
-        }
+        { "op": "REMOVE_STACK", "buff": "彩焰", "amount": 4, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "假面", "turns": 4, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.14, "turns": 4, "target": "other_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.56, "turns": 4, "target": "other_allies" }
       ],
       "source": "光锥 23021: 「当【彩焰】达到#4[i]层后，**移除所有【彩焰】**并获得【假面】，持续#3[i]回合。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 四句都写了 ✓：① `BATTLE_START` ⇒ `APPLY_BUFF 假面 turns 3` ✓；② `SKILL_POINT_GAINED` + `self_stacks:彩焰 < 4` ⇒ **`ADD_STACK` 带 `scale: event_amount`** ✓（“**每恢复 1 个**” ✓：一次 +2 的恢复给**两层** ✓）；③ 同事件 + `>= 4` ⇒ 清空彩焰 + `APPLY_BUFF 假面 turns 4` ✓；④ 获得假面时同时给 **`other_allies`** 加成 ✓（“队友” ✓，不包括自己 ✓）。⭐ 为什么要 `event_amount` ✓：事件的 `amount` 字段**已在 `TriggerContext` 里** ✓（第 1646 行 ✓），而 `ADD_STACK` 原来只看字面 `amount` ✗ ⇒ **一次 +2 只给 1 层** ✗（就是近似 ✗）。⭐⭐ **发放也要听溢出** ✓：文档说的是「【彩焰】**达到** 4 层」✓，不问它从哪来 ✓ —— 只挂 `SKILL_POINT_GAINED` 会让\"溢出凑满\"时**不换【假面】** ✗（实测 ✓）。"

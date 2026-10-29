@@ -3,18 +3,9 @@
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone21041_trick_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "戏法",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 1,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -30,17 +21,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone21041_attack_at_high_ehr",
-      "when": [
-        "self_attr:EFFECT_HIT_RATE >= 0.8"
-      ],
+      "when": ["self_attr:EFFECT_HIT_RATE >= 0.8"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
       "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
@@ -50,18 +33,9 @@
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone21041_trick_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "戏法",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 1,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -77,17 +51,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone21041_attack_at_high_ehr",
-      "when": [
-        "self_attr:EFFECT_HIT_RATE >= 0.8"
-      ],
+      "when": ["self_attr:EFFECT_HIT_RATE >= 0.8"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.24,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.24, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
       "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
@@ -97,18 +63,9 @@
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone21041_trick_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "戏法",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 1,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -124,17 +81,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone21041_attack_at_high_ehr",
-      "when": [
-        "self_attr:EFFECT_HIT_RATE >= 0.8"
-      ],
+      "when": ["self_attr:EFFECT_HIT_RATE >= 0.8"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.28,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.28, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
       "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
@@ -144,18 +93,9 @@
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone21041_trick_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "戏法",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 1,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -171,17 +111,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone21041_attack_at_high_ehr",
-      "when": [
-        "self_attr:EFFECT_HIT_RATE >= 0.8"
-      ],
+      "when": ["self_attr:EFFECT_HIT_RATE >= 0.8"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.32,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.32, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
       "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
@@ -191,18 +123,9 @@
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone21041_trick_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "戏法",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 1,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -218,17 +141,9 @@
     {
       "on": "BATTLE_START",
       "id": "cone21041_attack_at_high_ehr",
-      "when": [
-        "self_attr:EFFECT_HIT_RATE >= 0.8"
-      ],
+      "when": ["self_attr:EFFECT_HIT_RATE >= 0.8"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.36,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.36, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
       "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"

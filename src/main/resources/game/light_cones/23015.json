@@ -3,26 +3,10 @@
     {
       "on": "BASIC_ATTACK",
       "id": "cone23015_dragon_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "龙吟",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.18,
-          "per_stack": "龙吟",
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "龙吟", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.18, "per_stack": "龙吟", "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
@@ -40,26 +24,10 @@
     {
       "on": "BASIC_ATTACK",
       "id": "cone23015_dragon_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "龙吟",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.21,
-          "per_stack": "龙吟",
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "龙吟", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.21, "per_stack": "龙吟", "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
@@ -77,26 +45,10 @@
     {
       "on": "BASIC_ATTACK",
       "id": "cone23015_dragon_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "龙吟",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.24,
-          "per_stack": "龙吟",
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "龙吟", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.24, "per_stack": "龙吟", "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
@@ -114,26 +66,10 @@
     {
       "on": "BASIC_ATTACK",
       "id": "cone23015_dragon_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "龙吟",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.27,
-          "per_stack": "龙吟",
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "龙吟", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.27, "per_stack": "龙吟", "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
@@ -151,26 +87,10 @@
     {
       "on": "BASIC_ATTACK",
       "id": "cone23015_dragon_stack",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "龙吟",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.3,
-          "per_stack": "龙吟",
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "龙吟", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.3, "per_stack": "龙吟", "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",

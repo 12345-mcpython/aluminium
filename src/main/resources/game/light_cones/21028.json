@@ -2,111 +2,66 @@
   "1": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST"
-      ],
+      "on_any": ["SKILL_CAST"],
       "id": "cone21028_party_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "target_max_hp",
-          "percent": 0.02,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "scale": "target_max_hp", "percent": 0.02, "target": "all_allies" }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
       "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "2": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST"
-      ],
+      "on_any": ["SKILL_CAST"],
       "id": "cone21028_party_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "target_max_hp",
-          "percent": 0.02,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "scale": "target_max_hp", "percent": 0.02, "target": "all_allies" }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
       "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "3": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST"
-      ],
+      "on_any": ["SKILL_CAST"],
       "id": "cone21028_party_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "target_max_hp",
-          "percent": 0.02,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "scale": "target_max_hp", "percent": 0.02, "target": "all_allies" }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
       "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "4": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST"
-      ],
+      "on_any": ["SKILL_CAST"],
       "id": "cone21028_party_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "target_max_hp",
-          "percent": 0.02,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "scale": "target_max_hp", "percent": 0.02, "target": "all_allies" }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
       "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "5": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST"
-      ],
+      "on_any": ["SKILL_CAST"],
       "id": "cone21028_party_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "target_max_hp",
-          "percent": 0.02,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "scale": "target_max_hp", "percent": 0.02, "target": "all_allies" }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
       "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ]
 }

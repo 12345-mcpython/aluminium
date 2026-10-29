@@ -3,26 +3,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone22008_crit_after_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "地平线层数",
-          "amount": 1,
-          "max_stacks": 10,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.03,
-          "per_stack": "地平线层数",
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "地平线层数", "amount": 1, "max_stacks": 10, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.03, "per_stack": "地平线层数", "turns": 2, "target": "self" }
       ],
       "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
       "note": "「**装备者施放追加攻击后**，暴击伤害提高 3%，持续 2 回合，**最多叠加 10 层**」—— `FOLLOW_UP` ＋ `actor == self` ＋ **`ADD_STACK{max_stacks: 10, turns: 2}` ＋ `MODIFY_ATTR CRIT_ATTACK{per_stack}`** ✓；「攻击力提高 12%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 10` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ **永远只 +3%** ✗（同族：21005/23046/24000 ✓）。"
@@ -32,18 +16,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone22008_crit_after_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "地平线层数",
-          "amount": 1,
-          "max_stacks": 10,
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "地平线层数", "amount": 1, "max_stacks": 10, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -61,26 +36,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone22008_crit_after_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "地平线层数",
-          "amount": 1,
-          "max_stacks": 10,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.04,
-          "per_stack": "地平线层数",
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "地平线层数", "amount": 1, "max_stacks": 10, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.04, "per_stack": "地平线层数", "turns": 2, "target": "self" }
       ],
       "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
       "note": "「**装备者施放追加攻击后**，暴击伤害提高 3%，持续 2 回合，**最多叠加 10 层**」—— `FOLLOW_UP` ＋ `actor == self` ＋ **`ADD_STACK{max_stacks: 10, turns: 2}` ＋ `MODIFY_ATTR CRIT_ATTACK{per_stack}`** ✓；「攻击力提高 12%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 10` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ **永远只 +3%** ✗（同族：21005/23046/24000 ✓）。"
@@ -90,18 +49,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone22008_crit_after_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "地平线层数",
-          "amount": 1,
-          "max_stacks": 10,
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "地平线层数", "amount": 1, "max_stacks": 10, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -119,26 +69,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone22008_crit_after_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "地平线层数",
-          "amount": 1,
-          "max_stacks": 10,
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.05,
-          "per_stack": "地平线层数",
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "地平线层数", "amount": 1, "max_stacks": 10, "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.05, "per_stack": "地平线层数", "turns": 2, "target": "self" }
       ],
       "source": "光锥 22008: 「装备者施放追加攻击后，使装备者的暴击伤容提高#2[f1]%，持续#3[i]回合，该效果最多叠加#4[i]层。」",
       "note": "「**装备者施放追加攻击后**，暴击伤害提高 3%，持续 2 回合，**最多叠加 10 层**」—— `FOLLOW_UP` ＋ `actor == self` ＋ **`ADD_STACK{max_stacks: 10, turns: 2}` ＋ `MODIFY_ATTR CRIT_ATTACK{per_stack}`** ✓；「攻击力提高 12%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 10` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ **永远只 +3%** ✗（同族：21005/23046/24000 ✓）。"

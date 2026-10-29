@@ -4,13 +4,7 @@
       "on": "BATTLE_START",
       "id": "cone23030_aggro_up",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "AGGRO_ADDED_RATIO",
-          "percent": 5,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23030 落日时起舞: 「使装备者受到攻击的概率大幅提高」",
       "note": "⭐⭐⭐ **「受到攻击的概率大幅提高」的数值来自上游** ✓（文本**没给数** ✗）：`Config/ConfigAbility/Equip/EquipmemtAbility.json` 里 `MEquip_23030_Main` 的 `OnStack` 回调写了 **`Property: \"AggroAddedRatio\"`** ✓，其值是**动态的** ✓并指向 `DynamicValues.Floats` 的 **`SkillEquip Index 4`** ✓ ⇒ 就是本行里**没被正文引用**的 `values[3] = 5` ✓✓ ⇒ **仇恨 +500%** ✓。⭐ 写成 `MODIFY_ATTR AGGRO_ADDED_RATIO percent 5 permanent` ✓（第 1001 战技同一通道 ✓）。"
@@ -18,18 +12,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23030_fire_dance",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "火舞",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
@@ -48,13 +33,7 @@
       "on": "BATTLE_START",
       "id": "cone23030_aggro_up",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "AGGRO_ADDED_RATIO",
-          "percent": 5,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23030 落日时起舞: 「使装备者受到攻击的概率大幅提高」",
       "note": "⭐⭐⭐ **「受到攻击的概率大幅提高」的数值来自上游** ✓（文本**没给数** ✗）：`Config/ConfigAbility/Equip/EquipmemtAbility.json` 里 `MEquip_23030_Main` 的 `OnStack` 回调写了 **`Property: \"AggroAddedRatio\"`** ✓，其值是**动态的** ✓并指向 `DynamicValues.Floats` 的 **`SkillEquip Index 4`** ✓ ⇒ 就是本行里**没被正文引用**的 `values[3] = 5` ✓✓ ⇒ **仇恨 +500%** ✓。⭐ 写成 `MODIFY_ATTR AGGRO_ADDED_RATIO percent 5 permanent` ✓（第 1001 战技同一通道 ✓）。"
@@ -62,18 +41,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23030_fire_dance",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "火舞",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
@@ -92,13 +62,7 @@
       "on": "BATTLE_START",
       "id": "cone23030_aggro_up",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "AGGRO_ADDED_RATIO",
-          "percent": 5,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23030 落日时起舞: 「使装备者受到攻击的概率大幅提高」",
       "note": "⭐⭐⭐ **「受到攻击的概率大幅提高」的数值来自上游** ✓（文本**没给数** ✗）：`Config/ConfigAbility/Equip/EquipmemtAbility.json` 里 `MEquip_23030_Main` 的 `OnStack` 回调写了 **`Property: \"AggroAddedRatio\"`** ✓，其值是**动态的** ✓并指向 `DynamicValues.Floats` 的 **`SkillEquip Index 4`** ✓ ⇒ 就是本行里**没被正文引用**的 `values[3] = 5` ✓✓ ⇒ **仇恨 +500%** ✓。⭐ 写成 `MODIFY_ATTR AGGRO_ADDED_RATIO percent 5 permanent` ✓（第 1001 战技同一通道 ✓）。"
@@ -106,18 +70,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23030_fire_dance",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "火舞",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
@@ -136,13 +91,7 @@
       "on": "BATTLE_START",
       "id": "cone23030_aggro_up",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "AGGRO_ADDED_RATIO",
-          "percent": 5,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23030 落日时起舞: 「使装备者受到攻击的概率大幅提高」",
       "note": "⭐⭐⭐ **「受到攻击的概率大幅提高」的数值来自上游** ✓（文本**没给数** ✗）：`Config/ConfigAbility/Equip/EquipmemtAbility.json` 里 `MEquip_23030_Main` 的 `OnStack` 回调写了 **`Property: \"AggroAddedRatio\"`** ✓，其值是**动态的** ✓并指向 `DynamicValues.Floats` 的 **`SkillEquip Index 4`** ✓ ⇒ 就是本行里**没被正文引用**的 `values[3] = 5` ✓✓ ⇒ **仇恨 +500%** ✓。⭐ 写成 `MODIFY_ATTR AGGRO_ADDED_RATIO percent 5 permanent` ✓（第 1001 战技同一通道 ✓）。"
@@ -150,18 +99,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23030_fire_dance",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "火舞",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
@@ -180,13 +120,7 @@
       "on": "BATTLE_START",
       "id": "cone23030_aggro_up",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "AGGRO_ADDED_RATIO",
-          "percent": 5,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23030 落日时起舞: 「使装备者受到攻击的概率大幅提高」",
       "note": "⭐⭐⭐ **「受到攻击的概率大幅提高」的数值来自上游** ✓（文本**没给数** ✗）：`Config/ConfigAbility/Equip/EquipmemtAbility.json` 里 `MEquip_23030_Main` 的 `OnStack` 回调写了 **`Property: \"AggroAddedRatio\"`** ✓，其值是**动态的** ✓并指向 `DynamicValues.Floats` 的 **`SkillEquip Index 4`** ✓ ⇒ 就是本行里**没被正文引用**的 `values[3] = 5` ✓✓ ⇒ **仇恨 +500%** ✓。⭐ 写成 `MODIFY_ATTR AGGRO_ADDED_RATIO percent 5 permanent` ✓（第 1001 战技同一通道 ✓）。"
@@ -194,18 +128,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23030_fire_dance",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "火舞",
-          "amount": 1,
-          "max_stacks": 2,
-          "turns": 2,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",

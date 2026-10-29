@@ -4,17 +4,11 @@
       "on": "SKILL_CAST",
       "id": "cone21007_party_energy",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 2.0,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 2.0, "target": "all_allies" }
       ],
       "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
       "note": "「并在施放战技时为我方全体恢复 #2[f1] 点能量」—— `SKILL_CAST` ＋ `target: all_allies` ✓（叠影 1 = 2 点 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✓：没有它，**队友**放战技也会给全队回能 ✗（本族的第五条：20012/20013/20020/21004 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "2": [
@@ -22,17 +16,11 @@
       "on": "SKILL_CAST",
       "id": "cone21007_party_energy",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 2.5,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 2.5, "target": "all_allies" }
       ],
       "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
       "note": "「并在施放战技时为我方全体恢复 #2[f1] 点能量」—— `SKILL_CAST` ＋ `target: all_allies` ✓（叠影 1 = 2 点 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✓：没有它，**队友**放战技也会给全队回能 ✗（本族的第五条：20012/20013/20020/21004 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "3": [
@@ -40,17 +28,11 @@
       "on": "SKILL_CAST",
       "id": "cone21007_party_energy",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 3.0,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 3.0, "target": "all_allies" }
       ],
       "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
       "note": "「并在施放战技时为我方全体恢复 #2[f1] 点能量」—— `SKILL_CAST` ＋ `target: all_allies` ✓（叠影 1 = 2 点 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✓：没有它，**队友**放战技也会给全队回能 ✗（本族的第五条：20012/20013/20020/21004 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "4": [
@@ -58,17 +40,11 @@
       "on": "SKILL_CAST",
       "id": "cone21007_party_energy",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 3.5,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 3.5, "target": "all_allies" }
       ],
       "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
       "note": "「并在施放战技时为我方全体恢复 #2[f1] 点能量」—— `SKILL_CAST` ＋ `target: all_allies` ✓（叠影 1 = 2 点 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✓：没有它，**队友**放战技也会给全队回能 ✗（本族的第五条：20012/20013/20020/21004 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "5": [
@@ -76,17 +52,11 @@
       "on": "SKILL_CAST",
       "id": "cone21007_party_energy",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 4.0,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 4.0, "target": "all_allies" }
       ],
       "source": "光锥 21007 同一种心情: 「在施放战技时为我方全体恢复#2点能量」",
       "note": "「并在施放战技时为我方全体恢复 #2[f1] 点能量」—— `SKILL_CAST` ＋ `target: all_allies` ✓（叠影 1 = 2 点 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✓：没有它，**队友**放战技也会给全队回能 ✗（本族的第五条：20012/20013/20020/21004 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ]
 }

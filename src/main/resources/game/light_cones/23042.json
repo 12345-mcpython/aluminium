@@ -3,16 +3,9 @@
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.18,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.18, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23042（叠影 1）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.18、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
@@ -22,16 +15,9 @@
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.225,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.225, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23042（叠影 2）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.225、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
@@ -41,16 +27,9 @@
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.27,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.27, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23042（叠影 3）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.27、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
@@ -60,16 +39,9 @@
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.315,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.315, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23042（叠影 4）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.315、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
@@ -79,16 +51,9 @@
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.36,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.36, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23042（叠影 5）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.36、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"

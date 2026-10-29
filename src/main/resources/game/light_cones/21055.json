@@ -3,10 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21055_healthy_attacker",
-      "when": [
-        "actor is_ally",
-        "actor_hp_percent >= 0.5"
-      ],
+      "when": ["actor is_ally", "actor_hp_percent >= 0.5"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -25,10 +22,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21055_healthy_attacker",
-      "when": [
-        "actor is_ally",
-        "actor_hp_percent >= 0.5"
-      ],
+      "when": ["actor is_ally", "actor_hp_percent >= 0.5"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -47,10 +41,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21055_healthy_attacker",
-      "when": [
-        "actor is_ally",
-        "actor_hp_percent >= 0.5"
-      ],
+      "when": ["actor is_ally", "actor_hp_percent >= 0.5"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -69,10 +60,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21055_healthy_attacker",
-      "when": [
-        "actor is_ally",
-        "actor_hp_percent >= 0.5"
-      ],
+      "when": ["actor is_ally", "actor_hp_percent >= 0.5"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -91,10 +79,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21055_healthy_attacker",
-      "when": [
-        "actor is_ally",
-        "actor_hp_percent >= 0.5"
-      ],
+      "when": ["actor is_ally", "actor_hp_percent >= 0.5"],
       "do": [
         {
           "op": "MODIFY_ATTR",

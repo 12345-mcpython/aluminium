@@ -6,27 +6,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -61,27 +43,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -109,9 +73,7 @@
       ],
       "source": "光锥 21032 秘密: 「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」",
       "note": "⛔ **仍开（已登记 §4.3）**：「在战斗开始时以及当装备者回合开始时，**随机生效 1 个**效果（三选一，替换上次的、且本次不与上次重复）」—— 引擎**没有「从 N 条里随机取一」的规则拼法** ✗（`chance` 是**每条规则的独立概率** ✓，不是互斥抽样 ✗）⇒ 本文件把**三个效果同时生效** ✗ —— 这是**已知的错**，不是近似 ✓；三档数值（10/12.5/15/17.5/20%、12/15/18/21/24%、6/7.5/9/10.5/12%）✓ 与三个 `REMOVE_STATE` 的清理形状 ✓ 都在。缺口见证：`ConeAuditBatchTenTest` 钉住「三个效果同时存在」✓（能力落地时它会红 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "2": [
@@ -121,27 +83,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -176,27 +120,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -224,9 +150,7 @@
       ],
       "source": "光锥 21032 秘密: 「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」",
       "note": "⛔ **仍开（已登记 §4.3）**：「在战斗开始时以及当装备者回合开始时，**随机生效 1 个**效果（三选一，替换上次的、且本次不与上次重复）」—— 引擎**没有「从 N 条里随机取一」的规则拼法** ✗（`chance` 是**每条规则的独立概率** ✓，不是互斥抽样 ✗）⇒ 本文件把**三个效果同时生效** ✗ —— 这是**已知的错**，不是近似 ✓；三档数值（10/12.5/15/17.5/20%、12/15/18/21/24%、6/7.5/9/10.5/12%）✓ 与三个 `REMOVE_STATE` 的清理形状 ✓ 都在。缺口见证：`ConeAuditBatchTenTest` 钉住「三个效果同时存在」✓（能力落地时它会红 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "3": [
@@ -236,27 +160,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -291,27 +197,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -339,9 +227,7 @@
       ],
       "source": "光锥 21032 秘密: 「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」",
       "note": "⛔ **仍开（已登记 §4.3）**：「在战斗开始时以及当装备者回合开始时，**随机生效 1 个**效果（三选一，替换上次的、且本次不与上次重复）」—— 引擎**没有「从 N 条里随机取一」的规则拼法** ✗（`chance` 是**每条规则的独立概率** ✓，不是互斥抽样 ✗）⇒ 本文件把**三个效果同时生效** ✗ —— 这是**已知的错**，不是近似 ✓；三档数值（10/12.5/15/17.5/20%、12/15/18/21/24%、6/7.5/9/10.5/12%）✓ 与三个 `REMOVE_STATE` 的清理形状 ✓ 都在。缺口见证：`ConeAuditBatchTenTest` 钉住「三个效果同时存在」✓（能力落地时它会红 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "4": [
@@ -351,27 +237,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -406,27 +274,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -454,9 +304,7 @@
       ],
       "source": "光锥 21032 秘密: 「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」",
       "note": "⛔ **仍开（已登记 §4.3）**：「在战斗开始时以及当装备者回合开始时，**随机生效 1 个**效果（三选一，替换上次的、且本次不与上次重复）」—— 引擎**没有「从 N 条里随机取一」的规则拼法** ✗（`chance` 是**每条规则的独立概率** ✓，不是互斥抽样 ✗）⇒ 本文件把**三个效果同时生效** ✗ —— 这是**已知的错**，不是近似 ✓；三档数值（10/12.5/15/17.5/20%、12/15/18/21/24%、6/7.5/9/10.5/12%）✓ 与三个 `REMOVE_STATE` 的清理形状 ✓ 都在。缺口见证：`ConeAuditBatchTenTest` 钉住「三个效果同时存在」✓（能力落地时它会红 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "5": [
@@ -466,27 +314,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -521,27 +351,9 @@
       "one_of": true,
       "one_of_no_repeat": "cone21032_secret",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-攻击力",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-暴击伤害",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
-        {
-          "op": "REMOVE_STATE",
-          "buff": "秘密-能量恢复",
-          "kind": "own",
-          "target": "all_allies",
-          "always": true
-        },
+        { "op": "REMOVE_STATE", "buff": "秘密-攻击力", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-暴击伤害", "kind": "own", "target": "all_allies", "always": true },
+        { "op": "REMOVE_STATE", "buff": "秘密-能量恢复", "kind": "own", "target": "all_allies", "always": true },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -569,9 +381,7 @@
       ],
       "source": "光锥 21032 秘密: 「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力 +10%；暴击伤害 +12%；能量恢复效率 +6%。」",
       "note": "⛔ **仍开（已登记 §4.3）**：「在战斗开始时以及当装备者回合开始时，**随机生效 1 个**效果（三选一，替换上次的、且本次不与上次重复）」—— 引擎**没有「从 N 条里随机取一」的规则拼法** ✗（`chance` 是**每条规则的独立概率** ✓，不是互斥抽样 ✗）⇒ 本文件把**三个效果同时生效** ✗ —— 这是**已知的错**，不是近似 ✓；三档数值（10/12.5/15/17.5/20%、12/15/18/21/24%、6/7.5/9/10.5/12%）✓ 与三个 `REMOVE_STATE` 的清理形状 ✓ 都在。缺口见证：`ConeAuditBatchTenTest` 钉住「三个效果同时存在」✓（能力落地时它会红 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ]
 }

@@ -3,18 +3,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23031_glow_on_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "流光", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者施放追加攻击时，获得1层【流光】，最多叠加#3[i]层。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -22,10 +13,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23031_ult_defence_ignore",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -43,16 +31,9 @@
     {
       "on": "TURN_END",
       "id": "cone23031_glow_decay",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "流光", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者回合结束时，移除1层【流光】。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -62,18 +43,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23031_glow_on_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "流光", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者施放追加攻击时，获得1层【流光】，最多叠加#3[i]层。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -81,10 +53,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23031_ult_defence_ignore",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -102,16 +71,9 @@
     {
       "on": "TURN_END",
       "id": "cone23031_glow_decay",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "流光", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者回合结束时，移除1层【流光】。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -121,18 +83,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23031_glow_on_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "流光", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者施放追加攻击时，获得1层【流光】，最多叠加#3[i]层。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -140,10 +93,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23031_ult_defence_ignore",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -161,16 +111,9 @@
     {
       "on": "TURN_END",
       "id": "cone23031_glow_decay",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "流光", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者回合结束时，移除1层【流光】。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -180,18 +123,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23031_glow_on_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "流光", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者施放追加攻击时，获得1层【流光】，最多叠加#3[i]层。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -199,10 +133,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23031_ult_defence_ignore",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -220,16 +151,9 @@
     {
       "on": "TURN_END",
       "id": "cone23031_glow_decay",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "流光", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者回合结束时，移除1层【流光】。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -239,18 +163,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23031_glow_on_follow_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "流光", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者施放追加攻击时，获得1层【流光】，最多叠加#3[i]层。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"
@@ -258,10 +173,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23031_ult_defence_ignore",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -279,16 +191,9 @@
     {
       "on": "TURN_END",
       "id": "cone23031_glow_decay",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "流光",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "流光", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23031: 「装备者回合结束时，移除1层【流光】。」",
       "note": "⭐⭐ **`FOLLOW_UP` 是现成事件** ✓（本轮查枚举后确认 ✓）⇒ 「装备者**施放追加攻击**时」直接写 ✓；① `FOLLOW_UP` ⇒ `ADD_STACK 流光 max 2` ✓；② `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE 0.27` ✓+ **`per_stack: self_stacks:流光`** ✓（每层独立生效 ✓）；③ `TURN_END` ⇒ `REMOVE_STACK 流光 1` ✓。⭐ 「无视目标 X% 防御力」用 **`DEFENCE_IGNORE`** ✓（与 1220 同一写法 ✓），而**不**是 `ULTIMATE_DAMAGE_BOOST` ✗（那是伤容加成 ✓，不是无视防御 ✗）。"

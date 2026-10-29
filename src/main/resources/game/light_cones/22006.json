@@ -4,13 +4,7 @@
       "on": "BATTLE_START",
       "id": "cone22006_crit_damage",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 22006: 使装备者的暴击伤害提高#1[i]%。开拓者•记忆装备时，使我方全体目标造成的伤害提高#2[i]%，强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone22006_crit_damage`** ✗ —— 那一半**就是光锥自己的** `crit_attack` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：另外两句**整块没有** ✗ —— ① 「**开拓者·记忆装备时**，使我方全体造成的伤害提高 #2%」（需要「装备者是某个角色」这个门 ✓ 引擎只有 `ally_cid:` 之类的单位点名 ✗）；② 「强化普攻【明天，一同写下！】造成的伤害提高 #3%」需要**按技能 id 认那一招** ✓（`from_skill_id` 有 ✓，但「强化普攻」属于哪个槽还没定 ✓）。⇒ 三件事留作独立的一批 ✓；缺口见证：`ConeAuditBatchSixteenTest` ✓。"
@@ -21,13 +15,7 @@
       "on": "BATTLE_START",
       "id": "cone22006_crit_damage",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.15,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.15, "permanent": true, "target": "self" }
       ],
       "source": "光锥 22006: 使装备者的暴击伤害提高#1[i]%。开拓者•记忆装备时，使我方全体目标造成的伤害提高#2[i]%，强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone22006_crit_damage`** ✗ —— 那一半**就是光锥自己的** `crit_attack` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：另外两句**整块没有** ✗ —— ① 「**开拓者·记忆装备时**，使我方全体造成的伤害提高 #2%」（需要「装备者是某个角色」这个门 ✓ 引擎只有 `ally_cid:` 之类的单位点名 ✗）；② 「强化普攻【明天，一同写下！】造成的伤害提高 #3%」需要**按技能 id 认那一招** ✓（`from_skill_id` 有 ✓，但「强化普攻」属于哪个槽还没定 ✓）。⇒ 三件事留作独立的一批 ✓；缺口见证：`ConeAuditBatchSixteenTest` ✓。"
@@ -38,13 +26,7 @@
       "on": "BATTLE_START",
       "id": "cone22006_crit_damage",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.18,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.18, "permanent": true, "target": "self" }
       ],
       "source": "光锥 22006: 使装备者的暴击伤害提高#1[i]%。开拓者•记忆装备时，使我方全体目标造成的伤害提高#2[i]%，强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone22006_crit_damage`** ✗ —— 那一半**就是光锥自己的** `crit_attack` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：另外两句**整块没有** ✗ —— ① 「**开拓者·记忆装备时**，使我方全体造成的伤害提高 #2%」（需要「装备者是某个角色」这个门 ✓ 引擎只有 `ally_cid:` 之类的单位点名 ✗）；② 「强化普攻【明天，一同写下！】造成的伤害提高 #3%」需要**按技能 id 认那一招** ✓（`from_skill_id` 有 ✓，但「强化普攻」属于哪个槽还没定 ✓）。⇒ 三件事留作独立的一批 ✓；缺口见证：`ConeAuditBatchSixteenTest` ✓。"
@@ -55,13 +37,7 @@
       "on": "BATTLE_START",
       "id": "cone22006_crit_damage",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.21,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.21, "permanent": true, "target": "self" }
       ],
       "source": "光锥 22006: 使装备者的暴击伤害提高#1[i]%。开拓者•记忆装备时，使我方全体目标造成的伤害提高#2[i]%，强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone22006_crit_damage`** ✗ —— 那一半**就是光锥自己的** `crit_attack` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：另外两句**整块没有** ✗ —— ① 「**开拓者·记忆装备时**，使我方全体造成的伤害提高 #2%」（需要「装备者是某个角色」这个门 ✓ 引擎只有 `ally_cid:` 之类的单位点名 ✗）；② 「强化普攻【明天，一同写下！】造成的伤害提高 #3%」需要**按技能 id 认那一招** ✓（`from_skill_id` 有 ✓，但「强化普攻」属于哪个槽还没定 ✓）。⇒ 三件事留作独立的一批 ✓；缺口见证：`ConeAuditBatchSixteenTest` ✓。"
@@ -72,13 +48,7 @@
       "on": "BATTLE_START",
       "id": "cone22006_crit_damage",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.24,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.24, "permanent": true, "target": "self" }
       ],
       "source": "光锥 22006: 使装备者的暴击伤害提高#1[i]%。开拓者•记忆装备时，使我方全体目标造成的伤害提高#2[i]%，强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone22006_crit_damage`** ✗ —— 那一半**就是光锥自己的** `crit_attack` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：另外两句**整块没有** ✗ —— ① 「**开拓者·记忆装备时**，使我方全体造成的伤害提高 #2%」（需要「装备者是某个角色」这个门 ✓ 引擎只有 `ally_cid:` 之类的单位点名 ✗）；② 「强化普攻【明天，一同写下！】造成的伤害提高 #3%」需要**按技能 id 认那一招** ✓（`from_skill_id` 有 ✓，但「强化普攻」属于哪个槽还没定 ✓）。⇒ 三件事留作独立的一批 ✓；缺口见证：`ConeAuditBatchSixteenTest` ✓。"

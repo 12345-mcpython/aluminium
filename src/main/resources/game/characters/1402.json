@@ -1,161 +1,88 @@
 [
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self",
-      "self_summon_count >= 1"
-    ],
+    "when": ["actor == self", "self_summon_count >= 1"],
     "do": [
-      {
-        "op": "HEAL",
-        "scale": "target_max_hp",
-        "percent": 0.5,
-        "target": "summon"
-      }
+      { "op": "HEAL", "scale": "target_max_hp", "percent": 0.5, "target": "summon" }
     ],
     "source": "1402 阿格莱雅 战技 高举吧，升华的名讳 (skill 140202, BPSkill/Summon) 第一句: 「为衣匠回复等同于其#1[i]%生命上限的生命值。」 param Lv10 = [0.5, 0, 5]",
     "note": "The 「衣匠已在场」 half: restore 50% of its Max HP. ⚠ That 0.5 is written here because HEAL's `scale` + `percent` take a literal and do not read a skill's parameter table. It is the Lv10 row the prose quotes (Lv1 would be 0.25) -- the same 「which row」 question `damage_level` answers for the ops that DO read a table, so it is registered with M-32. ⚠ `target: \"summon\"` fails loudly when there is no memosprite, which is why this rule needs `self_summon_count >= 1`; the next rule uses `== 0`, so the two halves are mutually exclusive by construction rather than by watching whether the summon actually happened (SUMMON is idempotent, so that is not observable afterwards)."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self",
-      "self_summon_count == 0"
-    ],
+    "when": ["actor == self", "self_summon_count == 0"],
     "do": [
-      {
-        "op": "SUMMON"
-      },
-      {
-        "op": "ADVANCE",
-        "percent": 1.0,
-        "target": "self"
-      }
+      { "op": "SUMMON" },
+      { "op": "ADVANCE", "percent": 1.0, "target": "self" }
     ],
     "source": "1402 阿格莱雅 战技 高举吧，升华的名讳 (skill 140202, BPSkill/Summon) 第二句: 「若衣匠不在场，则召唤忆灵衣匠，并使自身立即行动。」",
     "note": "The 「衣匠不在场」 half: summon, and make HER take action immediately. ⚠ 「并使自身立即行动」 hangs off the 「若…则召唤」 branch (the 并 continues the summoning clause), so it lives in THIS rule and not in the one above -- putting it in both would advance her even when the memosprite was already out, which the text does not say. ⚠ `self_summon_count == 0` is the rare reverse spelling of that condition: it means \"I have no summon out\", NOT \"there is no battlefield\" -- a context without a battle makes these conditions fail outright (engine.md 4.6), so it cannot fire by accident."
   },
+
   {
     "on": "ULT_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "SUMMON"
-      },
-      {
-        "op": "HEAL",
-        "scale": "target_max_hp",
-        "percent": 1.0,
-        "target": "summon"
-      },
-      {
-        "op": "APPLY_BUFF",
-        "buff": "至高之姿",
-        "permanent": true,
-        "ticks_on": "summon",
-        "target": "self"
-      },
-      {
-        "op": "ADVANCE",
-        "percent": 1.0,
-        "target": "self"
-      }
+      { "op": "SUMMON" },
+      { "op": "HEAL", "scale": "target_max_hp", "percent": 1.0, "target": "summon" },
+      { "op": "APPLY_BUFF", "buff": "至高之姿", "permanent": true, "ticks_on": "summon", "target": "self" },
+      { "op": "ADVANCE", "percent": 1.0, "target": "self" }
     ],
     "source": "1402 阿格莱雅 终结技 残梦，由始至终 (skill 140203, Ultra/Enhance): 「召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入【至高之姿】状态并使自身立即行动。」 param Lv10 = [0.15, 0, 0, 100, 0, 0]",
     "note": "Four things, in the order the text writes them: summon, restore, enter the stance, advance herself. ⚠ 「若衣匠已在场，则使其生命值回复至上限」 needs NO branch: SUMMON is idempotent per summoner (already out => nothing happens), and the HEAL that follows is a full-HP heal on a fresh one (clamped by its Max HP, i.e. no change) -- the two cases are observably identical, so one rule covers both. ⚠ 「回复至上限」 is written as 「heal by 100% of its Max HP」: Battle.heal clamps current HP at the maximum, so the two are the same result rather than an approximation. ⚠ The ORDER is not decoration: `target: \"summon\"` in the HEAL and the ADVANCE fails loudly when nothing is out, so SUMMON has to come first -- and there is a test for that. ⭐ **2026-10-02 收窄**：【至高之姿】**本身现在就写出来了** ✓ —— `APPLY_BUFF` + `permanent: true` + **`ticks_on: \"summon\"`** ✓：文档没有给它回合数 ✓（它由「行动序列上的倒计时」结束 ✓），而**收窄点就在那一行** ✓ —— `ticks_on: \"summon\"` 把它的**寿命锚在衣匠身上** ✓ ⇒ 「**衣匠消失时阿莱莱雅解除【至高之姿】状态**」由引擎既有的锚点清扫完成 ✓（`removeBuffsAnchoredTo` 判的就是 `ticksOn` ✓，`releaseBuffsAnchoredToTheDead` 已扫两个阵营 ✓）。⚠ **仍登记（这个状态的**内容**）**：SPD +15%/层（层数来自衣匠的忆灵天赋 ✗）、普攻被替换为【孤锋千吻】且无法施放战技（技能替换 ✗）、衣匠免疫控制类负面状态（召唤物的免疫 ✗）、以及那个 100 速度的倒计时使衣匠自毁（`START_COUNTDOWN`/`COUNTDOWN_TURN` 存在 ✓，但\"回合开始时使衣匠自毁\"需要一个\"让召唤物退场\"的写法 ✗）—— ⚠ 于是本条出货的是**状态的生命周期**（进入 + 随衣匠解除 ✓），状态里**做什么**仍逐条登记 ✓，而不是用 `permanent` 冒充 ✓。⚠ Also un-authored: 衣匠's OWN attack. Its 忆灵技能1 is a Blast for 「110% 攻击力」 of 雷, but no document gives 衣匠 an ATK (the panel states only HP and SPD), and scaling it off 阿格莱雅's ATK would be a guess -- so it is not written, and the loader would refuse it anyway (Memeprites.validateAttack rejects a base the panel never states)."
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "talent_fissure_thread_bonus",
-    "when": [
-      "actor == self",
-      "self_summon_count >= 1",
-      "target has_state 间隙织线"
-    ],
+    "when": ["actor == self", "self_summon_count >= 1", "target has_state 间隙织线"],
     "do": [
-      {
-        "op": "ADD_DAMAGE",
-        "scale": "self_attr:ATTACK",
-        "percent": 0.3,
-        "element": "Thunder"
-      }
+      { "op": "ADD_DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.3, "element": "Thunder" }
     ],
     "source": "1402 阿格莱雅 天赋: 「衣匠在场时…攻击处于【间隙织线】状态下的敌人后，额外造成等同于阿格莱雅攻击力30%的雷属性附加伤害」",
     "note": "「**衣匠在场时**…攻击处于**【间隙织线】**状态下的敌人后，**额外造成等同于阿格莱雅攻击力 30% 的雷属性附加伤害**」—— ① `ADD_DAMAGE` ✓ + `scale: self_attr:ATTACK` ✓（形状照抄 **1001 星魂 4** ✓，它的注记写明这条落在**基数层** ✓ ⇒ 吃增伤/暴击/防御/抗性 ✓ = 正是\"额外附加伤害\"的意思 ✓）；② 「衣匠在场时」用 **`self_summon_count >= 1`** ✓（她开局就召唤衣匠 ✓）；③ 「处于【间隙织线】状态下」用 **`target has_state 间隙织线`** ✓（状态名**抄自文档** ✓）；④ 属性写 **`element: Thunder`** ✓（句子明写雷属性 ✓）。"
   },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "talent_fissure_thread_applies_state",
-    "when": [
-      "actor == self",
-      "self_summon_count >= 1"
-    ],
+    "when": ["actor == self", "self_summon_count >= 1"],
     "do": [
-      {
-        "op": "REMOVE_STATE",
-        "buff": "间隙织线",
-        "target": "all_enemies"
-      },
-      {
-        "op": "APPLY_BUFF",
-        "buff": "间隙织线",
-        "turns": 3,
-        "target": "target"
-      }
+      { "op": "REMOVE_STATE", "buff": "间隙织线", "target": "all_enemies" },
+      { "op": "APPLY_BUFF", "buff": "间隙织线", "turns": 3, "target": "target" }
     ],
     "source": "1402 阿格莱雅 天赋: 「衣匠在场时，阿格莱雅施放攻击时使目标陷入【间隙织线】状态」",
     "note": "「**衣匠在场时**，阿格莱雅**施放攻击时使目标陷入【间隙织线】状态**」—— ① `on: DEALING_DAMAGE` ✓（\"施放攻击\"涵盖普攻/战技/终结技 ✓）；② 「衣匠在场时」用 **`self_summon_count >= 1`** ✓；③ 状态名 **抄自文档** ✓，且**施加**用 `APPLY_BUFF` ✓、**检查**用 `has_state` ✓ —— 第 69/270 轮的测试**已实测**两者是同一机制 ✓（用 `APPLY_BUFF` 施加的状态，`has_state` 能匹配 ✓）⇒ 天赋的前后两半**可以互相衔接** ✓；⚠ ④ **登记**：「**【间隙织线】仅对最新被施加的目标生效**」✗ —— 这是一条**唯一性**规则 ✓（新目标被标记时旧目标失去 ✓），现有词汇里**没有**表达它的方式 ✗ ⇒ **登记而不近似** ✓。\n\n⭐ 2026-09-30 转正：「【间隙织线】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE` 先把这个名字从**全体**摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ `TriggerInterpreter:2515` 的注释原话：*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half of 星期日的【蒙福者】*；⚠ 而 `1215` 的注记说得更直白：*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）—— 每次施放都会跑一遍。"
   },
+
   {
     "id": "memosprite_ode_of_romance_marks_aglaea",
     "on": "CAST_SETUP",
-    "when": [
-      "target == self",
-      "actor is_summon",
-      "from_skill_id == 14"
-    ],
+    "when": ["target == self", "actor is_summon", "from_skill_id == 14"],
     "do": [
-      {
-        "op": "APPLY_BUFF",
-        "buff": "浪漫",
-        "permanent": true,
-        "target": "self"
-      }
+      { "op": "APPLY_BUFF", "buff": "浪漫", "permanent": true, "target": "self" }
     ],
     "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」：「**对阿格莱雅施放时，使阿格莱雅获得【浪漫】**」。",
     "note": "★ `from_skill_id == 14` 是该技能的**数据槽位**（数据项 SkillID 1141514 ⇒ 槽位 14），与已出货的第五句同形。⚠ 原句的其余四部分（衣匠天赋叠层、攻击后消耗回能、伤害提高 #2%、无视目标 #3% 防御）**未写**，已逐条登记。"
   },
+
   {
     "id": "memosprite_ode_of_romance_spends_itself_for_energy",
     "on": "ALLY_ATTACK",
-    "when": [
-      "self has_state 浪漫"
-    ],
+    "when": ["self has_state 浪漫"],
     "do": [
-      {
-        "op": "GAIN_ENERGY",
-        "amount": 70.0,
-        "target": "self"
-      },
-      {
-        "op": "REMOVE_STATE",
-        "buff": "浪漫",
-        "target": "self"
-      }
+      { "op": "GAIN_ENERGY", "amount": 70.0, "target": "self" },
+      { "op": "REMOVE_STATE", "buff": "浪漫", "target": "self" }
     ],
     "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「**阿格莱雅或衣匠攻击后，消耗【浪漫】为自身恢复 70 点能量。**」",
     "note": "⭐ 触发用 `ALLY_ATTACK`：原句是「阿格莱雅**或衣匠**攻击后」——两个主体都算，而能量给的是**规则持有者**（即阿格莱雅），所以两个效果都是 `target: \"self\"`。⭐ `#1` 在数据里**每一级都是 70**，所以写成字面量**不是**近似。"
   },
+
   {
     "id": "memosprite_ode_of_romance_raises_damage_and_pierces_defence",
     "on": "CAST_SETUP",
-    "when": [
-      "target == self",
-      "actor is_summon",
-      "from_skill_id == 14"
-    ],
+    "when": ["target == self", "actor is_summon", "from_skill_id == 14"],
     "do": [
       {
         "op": "MODIFY_ATTR",
@@ -177,15 +104,11 @@
     "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
     "note": "⭐ 两个修饰带名字（`buff`，用游戏自己的修饰名 `MServant_CyreneServant_00_AmazingBuff_Aglaea`），⭐ 数值走 `percent_from_cast_param`（#2 ⇒ 索引 1，#3 ⇒ 索引 2），因为它们随等级变。 ⚠ 这一条只管她自己：「对衣匠也生效」需要忆灵在场，而那个条件不该压在她身上。"
   },
+
   {
     "id": "memosprite_ode_of_romance_also_reaches_the_garmentmaker",
     "on": "CAST_SETUP",
-    "when": [
-      "target == self",
-      "actor is_summon",
-      "from_skill_id == 14",
-      "self_summon_count >= 1"
-    ],
+    "when": ["target == self", "actor is_summon", "from_skill_id == 14", "self_summon_count >= 1"],
     "do": [
       {
         "op": "MODIFY_ATTR",
@@ -207,37 +130,24 @@
     "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
     "note": "「阿格莱雅**与衣匠**」的衣匠那一半。⭐ 两个修饰带名字（`buff`，用游戏自己的修饰名 `MServant_CyreneServant_00_AmazingBuff_Aglaea`），⭐ 数值走 `percent_from_cast_param`（#2 ⇒ 索引 1，#3 ⇒ 索引 2），因为它们随等级变。"
   },
+
   {
     "id": "memosprite_ode_of_romance_ends_with_her_stance",
     "on": "STATE_ENDED",
-    "when": [
-      "self state_ended 至高之姿"
-    ],
+    "when": ["self state_ended 至高之姿"],
     "do": [
-      {
-        "op": "REMOVE_STATE",
-        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
-        "kind": "own",
-        "target": "self"
-      }
+      { "op": "REMOVE_STATE", "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea", "kind": "own", "target": "self" }
     ],
     "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
     "note": "⭐ 时长：看着 `STATE_ENDED` 的伴随规则。⭐ `\"kind\": \"own\"` 是关键：上一轮只按**名字**摘，把她**本来就有的 0.2** 也摘了下来（实测：两边都变 0.0，而它们在这句诗之前都是 0.2）。这个来源筛子就是 `EXTEND_BUFF` 一直在用的那个（`extendBuffsFrom(ctx.owner(), …)`）。"
   },
+
   {
     "id": "memosprite_ode_of_romance_stance_end_also_clears_the_garmentmaker",
     "on": "STATE_ENDED",
-    "when": [
-      "self state_ended 至高之姿",
-      "self_summon_count >= 1"
-    ],
+    "when": ["self state_ended 至高之姿", "self_summon_count >= 1"],
     "do": [
-      {
-        "op": "REMOVE_STATE",
-        "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
-        "kind": "own",
-        "target": "summon"
-      }
+      { "op": "REMOVE_STATE", "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea", "kind": "own", "target": "summon" }
     ],
     "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）：「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，持续至阿格莱雅退出【至高之姿】状态。」",
     "note": "同上，但摘的是衣匠身上那份。"

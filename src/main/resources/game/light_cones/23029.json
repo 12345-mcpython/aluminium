@@ -3,13 +3,8 @@
     {
       "on": "BASIC_ATTACK",
       "id": "cone23029_armor_break_normal",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
-      "when": [
-        "actor == self"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "APPLY_BUFF",
@@ -17,10 +12,7 @@
           "turns": 2,
           "base_chance": 0.6,
           "target": "target",
-          "target_when": [
-            "!target has_state 卸甲",
-            "!target has_state 穷寇"
-          ]
+          "target_when": ["!target has_state 卸甲", "!target has_state 穷寇"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
@@ -28,10 +20,7 @@
           "turns": 2,
           "base_chance": 0.6,
           "target": "target",
-          "target_when": [
-            "!target has_state 卸甲",
-            "!target has_state 穷寇"
-          ]
+          "target_when": ["!target has_state 卸甲", "!target has_state 穷寇"]
         }
       ],
       "source": "光锥 23029 那无数个春天: 「装备者施放普攻、战技、终结技攻击敌方目标后，有 #2% 的基础概率使其陷入【卸甲】状态。【卸甲】状态下，敌方目标受到的伤害提高 #3%，持续 #4 回合。」",

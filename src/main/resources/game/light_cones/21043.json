@@ -3,9 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21043_damage_per_shielded_ally",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -24,9 +22,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21043_damage_per_shielded_ally",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -45,9 +41,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21043_damage_per_shielded_ally",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -66,9 +60,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21043_damage_per_shielded_ally",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -87,9 +79,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21043_damage_per_shielded_ally",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",

@@ -1,10 +1,7 @@
 [
   {
     "on": "ULT_CAST",
-    "when": [
-      "actor == self",
-      "target != self"
-    ],
+    "when": ["actor == self", "target != self"],
     "do": [
       {
         "op": "MODIFY_ATTR",
@@ -15,348 +12,188 @@
         "turns": 2,
         "target": "target"
       },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ATTACK",
-        "percent": 0.6,
-        "buff": "敕令",
-        "turns": 2,
-        "target": "target"
-      },
-      {
-        "op": "APPLY_BUFF",
-        "buff": "敕令",
-        "turns": 2,
-        "target": "target"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.6, "buff": "敕令", "turns": 2, "target": "target" },
+      { "op": "APPLY_BUFF", "buff": "敕令", "turns": 2, "target": "target" }
     ],
     "source": "1215 寒鸦 终结技 十王敕令，遍土遵行 (skill 121503, Ultra/Enhance): 「使指定我方单体速度提高，提高数值等同于寒鸦速度的20.00%，并使该目标攻击力提高60%，持续2回合。」 param Lv10 → #1 = 0.2（寒鸦速度的份额）, #2 = 0.6, #3 = 2 回合",
     "note": "One sentence, three effects, and the third is the interesting one. ⚠ The SPD boost is a <b>derived</b> magnitude (`scale: self_attr:SPEED`, read off 寒鸦 — 「等同于寒鸦速度的20%」 — and frozen when she casts), while the ATK boost is a plain 60%; both are ordinary modifiers, both carry `buff: 敕令` so that 星魂 4's 「终结技的持续时间额外增加1回合」 has a name to reach. ⚠ The <b>marker state</b> 「敕令」 is not decoration either: 星魂 1 says 「持有<b>终结技效果</b>的我方目标消灭敌方目标时，寒鸦行动提前15%」, and \"carries my ultimate's effect\" is only readable if the effect is also a <b>state</b> — a named modifier is invisible to `has_state` (which reads states, controls and DoTs). The marker shares the modifiers' `turns`, so the three end together. ⚠ `target != self` is 「指定我方单体」: a self-cast is not a target she may buff, and `ULT_CAST` reaches her own table too.",
     "id": "ult_blessing"
   },
+
   {
     "on": "KILL",
-    "when": [
-      "actor has_state 敕令"
-    ],
+    "when": ["actor has_state 敕令"],
     "do": [
-      {
-        "op": "ADVANCE",
-        "percent": 0.15,
-        "target": "self"
-      }
+      { "op": "ADVANCE", "percent": 0.15, "target": "self" }
     ],
     "min_eidolon": 1,
     "per_turn": 1,
     "source": "1215 寒鸦 星魂 1 一心 (Avatar_Hanya_Rank01): 「持有终结技效果的我方目标消灭敌方目标时，寒鸦行动提前15%，该效果每回合只能触发1次。」 param = [0.15, 1]",
     "note": "⚠ `actor has_state 敕令` is the whole clause: `KILL`'s `actor` is the <b>killer</b>, so this asks \"does the one who got the kill carry my ultimate's effect\" — which is what 「持有终结技效果的我方目标消灭敌方目标时」 says, rather than \"I got a kill\" (`actor == self`, a different sentence). That works only because the ultimate also plants a marker <b>state</b> (see its note). ⚠ `target: self` is 寒鸦: 「**寒鸦**行动提前15%」 — the one who acted early is her, not the killer. ⚠ `per_turn: 1` is 「该效果每回合只能触发1次」 (counted in her own turns, like every `per_turn`). ⚠ `min_eidolon: 1` is the gate."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "SPEED",
-        "percent": 0.2,
-        "turns": 1,
-        "target": "self"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.2, "turns": 1, "target": "self" }
     ],
     "min_eidolon": 2,
     "source": "1215 寒鸦 星魂 2 二观 (Avatar_Hanya_Rank02): 「施放战技后，速度提高20%，持续1回合。」 param = [0.2, 1]",
     "note": "「施放**战技**后，速度提高20%，持续1回合」. ⚠ `SKILL_CAST` (not `ALLY_ATTACK`, not `BASIC_ATTACK`): the sentence names the Skill slot, and the emitter already splits the three in-battle casts, so this cannot fire on 普攻 or 终结技. ⚠ `actor == self` is load-bearing: SKILL_CAST is broadcast to the whole side. ⚠ The target is 寒鸦 herself — 「速度提高」 with no other subject in the sentence. ⚠ `min_eidolon: 2` is the gate."
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 1
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
     ],
     "min_eidolon": 3,
     "source": "1215 寒鸦 星魂 3 三尘 (Avatar_Hanya_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'121502': 2, '121501': 1}",
     "note": "「**战技**等级+2，最多不超过15级；**普攻**等级+1，最多不超过10级」 — two slots in one sentence, so two effects in one rule (M-32: the level a skill is read at is content, and the raise is a fact of the loadout, which is why it is a `BATTLE_START` amendment rather than a battle event). ⚠ The caps are her parameter tables' own sizes (SKILL 15 rows, COMMON 10 rows), so a raise past them fails loudly at fire time instead of reading a row that does not exist — a `cap` field would be a second place to state the same limit. ⚠ `min_eidolon: 3` is the gate."
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 2
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
     ],
     "min_eidolon": 5,
     "source": "1215 寒鸦 星魂 5 五阴 (Avatar_Hanya_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'121503': 2, '121504': 2}",
     "note": "「**终结技**等级+2，最多不超过15级；**天赋**等级+2，最多不超过15级」 — the same shape as 星魂 3, for the other two slots. ⚠ It matters to this file in a concrete way: raising ULTRA raises the row her ultimate's numbers are read from, and raising TALENT raises the row her (still registered) talent boost would read. ⚠ Caps = the tables' own sizes, as above. ⚠ `min_eidolon: 5` is the gate."
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
     ],
     "source": "1215 寒鸦 天赋 罚恶 (skill 121504) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（「造成的伤害提高30%」按该行读）",
     "note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self",
-      "target != self"
-    ],
+    "when": ["actor == self", "target != self"],
     "do": [
-      {
-        "op": "REMOVE_STATE",
-        "buff": "承负",
-        "target": "all_enemies"
-      },
-      {
-        "op": "REMOVE_STATE",
-        "buff": "承负次数",
-        "target": "all_enemies"
-      },
-      {
-        "op": "REMOVE_STATE",
-        "buff": "承负返还",
-        "target": "all_enemies"
-      },
-      {
-        "op": "APPLY_BUFF",
-        "buff": "承负",
-        "permanent": true,
-        "target": "target"
-      }
+      { "op": "REMOVE_STATE", "buff": "承负", "target": "all_enemies" },
+      { "op": "REMOVE_STATE", "buff": "承负次数", "target": "all_enemies" },
+      { "op": "REMOVE_STATE", "buff": "承负返还", "target": "all_enemies" },
+      { "op": "APPLY_BUFF", "buff": "承负", "permanent": true, "target": "target" }
     ],
     "source": "1215 寒鸦 战技 生灭系缚 (skill 121502) 第二句: 「…并使其陷入【承负】状态…【承负】仅对最新被施加的目标生效，并会在触发2次战技点恢复效果后自动解除。」（伤害是引擎自己的技能路径，不需要规则）",
     "note": "The 【承负】 half of her Skill (the 240% damage is the engine's own path). ⚠ The three REMOVE_STATE effects are 「仅对最新被施加的目标生效」: the state goes off everybody, then onto the new target -- there is no \"only one holder\" flag, the removal IS that clause (星期日's 【蒙福者】 reads the same way). ⚠ The two counters are cleared with it so a new target starts both at zero; their meaning is in the notes below. ⚠ `permanent: true` is not \"forever\": 承负 has no turn count (its end is 「触发 2 次战技点恢复效果后」, a threshold), so stating `turns` would be a different duration in every fight -- the removal rule below is the honest spelling."
   },
+
   {
     "on": "ALLY_ATTACK",
-    "when": [
-      "target has_state 承负",
-      "actor is_other_ally",
-      "from_skill COMMON"
-    ],
+    "when": ["target has_state 承负", "actor is_other_ally", "from_skill COMMON"],
     "do": [
-      {
-        "op": "ADD_STACK",
-        "buff": "承负次数",
-        "max_stacks": 2,
-        "permanent": true,
-        "target": "target"
-      }
+      { "op": "ADD_STACK", "buff": "承负次数", "max_stacks": 2, "permanent": true, "target": "target" }
     ],
     "source": "1215 寒鸦 战技: 「每当我方目标对【承负】状态下的敌方目标施放2次普攻、战技、终结技后…」 之一（普攻）",
     "note": "One of THREE mark rules, one per qualifying cast slot. ⚠ Three rules rather than one because the condition DSL has no OR and `from_skill` states a single slot -- and that is the point: an attack matches exactly one of them, so each qualifying attack adds exactly ONE mark. ⚠ `追加攻击` and DoT instances carry no cast slot, so they match none of the three -- which is what 「普攻、战技、终结技」 excludes. ⚠ `max_stacks: 2` caps the counter at the threshold (see the rule that answers it). ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
   },
+
   {
     "on": "ALLY_ATTACK",
-    "when": [
-      "target has_state 承负",
-      "actor is_other_ally",
-      "from_skill SKILL"
-    ],
+    "when": ["target has_state 承负", "actor is_other_ally", "from_skill SKILL"],
     "do": [
-      {
-        "op": "ADD_STACK",
-        "buff": "承负次数",
-        "max_stacks": 2,
-        "permanent": true,
-        "target": "target"
-      }
+      { "op": "ADD_STACK", "buff": "承负次数", "max_stacks": 2, "permanent": true, "target": "target" }
     ],
     "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之二（战技）",
     "note": "The 战技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
   },
+
   {
     "on": "ALLY_ATTACK",
-    "when": [
-      "target has_state 承负",
-      "actor is_other_ally",
-      "from_skill ULTRA"
-    ],
+    "when": ["target has_state 承负", "actor is_other_ally", "from_skill ULTRA"],
     "do": [
-      {
-        "op": "ADD_STACK",
-        "buff": "承负次数",
-        "max_stacks": 2,
-        "permanent": true,
-        "target": "target"
-      }
+      { "op": "ADD_STACK", "buff": "承负次数", "max_stacks": 2, "permanent": true, "target": "target" }
     ],
     "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之三（终结技）",
     "note": "The 终结技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
   },
+
   {
     "on": "ALLY_ATTACK",
-    "when": [
-      "target_stacks:承负次数 >= 2"
-    ],
+    "when": ["target_stacks:承负次数 >= 2"],
     "do": [
-      {
-        "op": "GAIN_SKILL_POINT",
-        "amount": 1.0
-      },
-      {
-        "op": "ADD_STACK",
-        "buff": "承负返还",
-        "max_stacks": 2,
-        "permanent": true,
-        "target": "target"
-      },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ATTACK",
-        "percent": 0.1,
-        "turns": 1,
-        "target": "attacker"
-      },
-      {
-        "op": "GAIN_ENERGY",
-        "amount": 2.0
-      },
-      {
-        "op": "REMOVE_STATE",
-        "buff": "承负次数",
-        "target": "target"
-      },
-      {
-        "op": "REMOVE_STATE",
-        "buff": "承负",
-        "target": "target"
-      }
+      { "op": "GAIN_SKILL_POINT", "amount": 1.0 },
+      { "op": "ADD_STACK", "buff": "承负返还", "max_stacks": 2, "permanent": true, "target": "target" },
+      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.1, "turns": 1, "target": "attacker" },
+      { "op": "GAIN_ENERGY", "amount": 2.0 },
+      { "op": "REMOVE_STATE", "buff": "承负次数", "target": "target" },
+      { "op": "REMOVE_STATE", "buff": "承负", "target": "target" }
     ],
     "source": "1215 寒鸦 战技: 「…立即为我方恢复1个战技点…并在触发2次战技点恢复效果后自动解除。」 + 行迹 录事「触发【承负】战技点回复效果的我方单位攻击力提高10%，持续1回合」 + 行迹 还阳「当【承负】战技点恢复效果被触发时，自身恢复2点能量」",
     "note": "The threshold: at two marks the party gets a skill point (「立即为我方恢复1个战技点」), the third mark clears the whole state (「触发 2 次…后自动解除」 is the SECOND counter -- see below), and the two traces that hang off \"the refund was triggered\" ride in the same rule. ⚠ Why the traces are effects here rather than rules of their own: 「触发…时」 is this moment, and the engine has no event for \"a skill point was refunded\" -- adding one would be a capability for a single reader, while these three consequences are unconditional at that moment. ⚠ 还阳 heals HER energy (`GAIN_ENERGY` with no target = the rule owner) while 录事 boosts the ALLY that triggered it (`target: actor`). ⚠ Order matters inside the rule: the 承负返还 counter increments before the removals, and the removal of 承负次数 resets the two-mark threshold. ⚠ This rule is LAST among the ALLY_ATTACK ones on purpose: rules of one event are evaluated in file order, so the marks land before the threshold is read."
   },
+
   {
     "on": "DEALING_DAMAGE",
-    "when": [
-      "target has_state 承负",
-      "actor is_ally",
-      "from_skill COMMON"
-    ],
+    "when": ["target has_state 承负", "actor is_ally", "from_skill COMMON"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent": 0.3,
-        "turns": 2,
-        "target": "attacker"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.3, "turns": 2, "target": "attacker" }
     ],
     "source": "1215 寒鸦 天赋 罚恶 (skill 121504): 「我方目标对陷入【承负】状态下的敌方目标施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合。」 之一（普攻）",
     "note": "「我方目标对陷入【承负】…施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合」 -- the boost is granted to the ATTACKER (`target: actor`) and lasts 2 of their turns, so it is an ordinary modifier, not a one-instance `BOOST_DAMAGE`. ⚠ It fires on the instance that satisfies the condition, which is why the sentence says 「施放…时」: the zone is assembled after the trigger, so this very hit is boosted too. ⚠ Three rules again (one per slot), matching one apiece. ⚠ `actor is_ally` is 「我方目标」: 寒鸦 herself counts (she is one of ours), an enemy attack does not.",
     "id": "talent_common"
   },
+
   {
     "on": "DEALING_DAMAGE",
-    "when": [
-      "target has_state 承负",
-      "actor is_ally",
-      "from_skill SKILL"
-    ],
+    "when": ["target has_state 承负", "actor is_ally", "from_skill SKILL"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent": 0.3,
-        "turns": 2,
-        "target": "attacker"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.3, "turns": 2, "target": "attacker" }
     ],
     "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之二（战技）",
     "note": "The 战技 half of her talent -- see the 普攻 rule above.",
     "id": "talent_skill"
   },
+
   {
     "on": "DEALING_DAMAGE",
-    "when": [
-      "target has_state 承负",
-      "actor is_ally",
-      "from_skill ULTRA"
-    ],
+    "when": ["target has_state 承负", "actor is_ally", "from_skill ULTRA"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent": 0.3,
-        "turns": 2,
-        "target": "attacker"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.3, "turns": 2, "target": "attacker" }
     ],
     "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之三（终结技）",
     "note": "The 终结技 half of her talent -- see the 普攻 rule above.",
     "id": "talent_ultra"
   },
+
   {
     "on": "KILL",
-    "when": [
-      "target has_state 承负",
-      "target_stacks:承负返还 <= 1"
-    ],
+    "when": ["target has_state 承负", "target_stacks:承负返还 <= 1"],
     "do": [
-      {
-        "op": "GAIN_SKILL_POINT",
-        "amount": 1.0
-      }
+      { "op": "GAIN_SKILL_POINT", "amount": 1.0 }
     ],
     "source": "1215 寒鸦 行迹 幽府: 「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的触发次数小于等于1，则额外回复1点战技点。」",
     "note": "「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的**触发次数小于等于1**，则额外回复1点战技点」. ⚠ `target has_state 承负` reads the VICTIM (KILL's subject is the one who died), which is what 「持有【承负】的敌方目标」 names. ⚠ The condition is the SECOND counter: 承负次数 is reset at every refund (it is the \"2 次\" threshold), so it cannot count refunds -- 承负返还 is incremented by the refund rule and never cleared, which is exactly 「触发次数」. ⚠ `<= 1` rather than a threshold: the sentence is a ceiling, not a target."
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon4_duration",
     "min_eidolon": 4,
     "do": [
-      {
-        "op": "MODIFY_RULE",
-        "rule": "ult_blessing",
-        "effect_turns": 1
-      }
+      { "op": "MODIFY_RULE", "rule": "ult_blessing", "effect_turns": 1 }
     ],
     "source": "1215 寒鸦 星魂 4 四谛 (Avatar_Hanya_Rank04): 「终结技的持续时间额外增加1回合。」 param = [1]",
     "note": "「终结技的**持续时间**额外增加1回合」. ⚠ This is `MODIFY_RULE`'s **third form** (2026-09-28): an amendment to the named rule's own effect values, not to how often it runs. ⚠ Why it may not be written as a second rule with longer `turns`: the ultimate's two modifiers and its marker state are re-applied on every cast, and a same-kind modifier **refreshes instead of stacking** -- the second one would *replace* the first, leaving the duration at the base 2. Raising the value in place is the only spelling that gets 3. ⚠ `effect_turns: 1` lands on every effect of `ult_blessing` that states a `turns` (both modifiers and the 敕令 marker), so all three end together as they did before."
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon6_talent",
     "min_eidolon": 6,
     "do": [
-      {
-        "op": "MODIFY_RULE",
-        "rule": "talent_common",
-        "effect_percent": 0.1
-      },
-      {
-        "op": "MODIFY_RULE",
-        "rule": "talent_skill",
-        "effect_percent": 0.1
-      },
-      {
-        "op": "MODIFY_RULE",
-        "rule": "talent_ultra",
-        "effect_percent": 0.1
-      }
+      { "op": "MODIFY_RULE", "rule": "talent_common", "effect_percent": 0.1 },
+      { "op": "MODIFY_RULE", "rule": "talent_skill", "effect_percent": 0.1 },
+      { "op": "MODIFY_RULE", "rule": "talent_ultra", "effect_percent": 0.1 }
     ],
     "source": "1215 寒鸦 星魂 6 六正 (Avatar_Hanya_Rank06): 「天赋的伤害提高效果额外提高10%。」 param = [0.1]",
     "note": "「天赋的伤害提高效果额外提高10%」 (30% -> 40%). ⚠ Three amendments for one sentence, because the talent is three rules -- one per cast slot (see their notes); 「天赋的伤害提高效果」 names all of it, so all three are raised. ⚠ Written as an amendment rather than as a second, bigger rule: the three rules grant a `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST`, and a fourth rule granting 0.1 would **replace** the 0.3 currently on the attacker instead of adding to it (same-kind modifiers refresh) -- the number would come out 0.1, and nothing would look broken."

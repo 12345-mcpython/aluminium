@@ -2,113 +2,72 @@
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "DEFENCE",
-        "percent": 0.2,
-        "turns": 2,
-        "target": "all_allies"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "DEFENCE", "percent": 0.2, "turns": 2, "target": "all_allies" }
     ],
     "source": "1101 布洛妮娅 trace 阵地: 「战斗开始时，我方全体的防御力提高#2[i]%，持续#1[i]回合。」 param = [2, 0.2]",
     "note": "The trace's own numbers, and the reading order is worth checking rather than trusting: param[0] = 2 is the turn count and param[1] = 0.2 the DEF share, while the text names them the other way round (#2[i]% then #1[i] turns). 'target: all_allies' is 「我方全体」 — without it the effect would default to the rule's owner and buff only Bronya. Same shape as the Passerby 4-piece and 知更鸟's 军势: a battle-start party buff."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "min_eidolon": 1,
     "chance": 0.5,
     "cooldown": 1,
     "do": [
-      {
-        "op": "GAIN_SKILL_POINT",
-        "amount": 1
-      }
+      { "op": "GAIN_SKILL_POINT", "amount": 1 }
     ],
     "source": "1101 布洛妮娅 星魂 1 养精蓄锐: 「施放战技时，有#1[i]%固定概率恢复1个战技点，该效果有1回合的触发冷却。」 param = [0.5]",
     "note": "Three of the vocabularies added on 2026-09-27 meet in one sentence: min_eidolon (it IS an Eidolon, so the rank gate sits next to the mechanic rather than in a loader), chance (50%, rolled against the battle's injected generator) and cooldown ('1 回合的触发冷却' = at most once per own turn). 'actor == self' is 「施放战技时」: the cast has to be hers. This is the case engine.md §9 and SkillPointGameParityTest had registered as 'not implemented' since long before the trigger table existed — the missing part was never one hook but these three."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self",
-      "target != self"
-    ],
+    "when": ["actor == self", "target != self"],
     "do": [
-      {
-        "op": "ADVANCE",
-        "percent": 1.0,
-        "target": "target"
-      }
+      { "op": "ADVANCE", "percent": 1.0, "target": "target" }
     ],
     "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support) 第二句: 「并使该目标立即行动…当对自身施放该技能时，无法触发立即行动效果。」",
     "note": "「使该目标立即行动」 -- `target` is the unit this cast was AIMED at, which is what M-35 added to the cast events (before it, `ctx.target()` was null for every cast and this sentence was unexpressible). ⚠ The second half of the sentence is the condition: 「当对自身施放该技能时，无法触发立即行动效果」 is exactly `target != self`, and it is why this is a SEPARATE rule from the dispel/damage one below -- casting it on herself still dispels and still grants the damage boost, it just does not give her a second action."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "DISPEL",
-        "amount": 1,
-        "target": "target"
-      },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent": 0.66,
-        "turns": 1,
-        "target": "target"
-      }
+      { "op": "DISPEL", "amount": 1, "target": "target" },
+      { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.66, "turns": 1, "target": "target" }
     ],
     "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support): 「解除指定我方单体的1个负面效果，并使该目标立即行动，造成的伤害提高#1[i]%，持续#3[i]回合。」 param Lv10 = [0.66, 0, 1, 1]",
     "note": "「解除指定我方单体的1个负面效果」 + 「造成的伤害提高 66%，持续 1 回合」, both on the aimed ally (`target: \"target\"`). ⚠ 0.66 is written here because MODIFY_ATTR takes a literal; it is the Lv10 row the prose quotes (Lv1 = 0.33, Lv15 = 0.825) -- the same 「which row」 question `damage_level` answers for the ops that read a table (M-32). ⚠ `DISPEL` on a target with nothing to remove is not an error (the op's contract: 「取不到不算错」). ⚠ No condition on the aimed unit beyond `actor == self`, because this half applies in BOTH cases -- only the immediate action is barred for a self-cast, which is why that one is gated `target != self`."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "EXTEND_BUFF",
-        "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "turns": 1,
-        "target": "target"
-      }
+      { "op": "EXTEND_BUFF", "attribute": "ALL_DAMAGE_TYPE_BOOST", "turns": 1, "target": "target" }
     ],
     "min_eidolon": 6,
     "source": "1101 布洛妮娅 星魂 6 气贯长虹 (Avatar_Bronya_Rank06): 「战技对指定我方目标造成的伤害提高效果的持续时间增加1回合。」 param = [1]",
     "note": "「战技对指定我方目标造成的**伤害提高效果**的持续时间增加1回合」: the sentence names an <b>effect</b> rather than a state, and the engine's handle for it is the attribute the modifier sits on (`ALL_DAMAGE_TYPE_BOOST`) -- which is the Skill rule's own `MODIFY_ATTR` in the rule above. ⚠ `min_eidolon: 6` is the whole of what makes this an Eidolon (the engine knows nothing else about 星魂). ⚠ Why the filter is stated rather than \"lengthen everything I applied\": her 「作战再部署」 trace gives the whole party +20% DEFENCE for 2 turns at BATTLE_START, and that buff can still be ticking when she casts her Skill -- a filter that said \"all of mine\" would silently add a turn to it as well. That is the case the attribute/name axis exists to prevent (`ExtendBuffTest.itDoesNotLengthenTheOwnersOtherBuffs`). ⚠ NOT authored from this Eidolon: nothing else -- it is a one-sentence Eidolon."
   },
+
   {
     "on": "ULT_CAST",
     "id": "ult_party_attack",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ATTACK",
-        "percent": 0.55,
-        "turns": 2,
-        "target": "all_allies"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.55, "turns": 2, "target": "all_allies" }
     ],
     "source": "1101 布洛妮娅 终结技（数据出处 skill_id 110102）: 「使我方全体攻击力提高55%…持续2回合」",
     "note": "「使我方全体**攻击力提高 55%**…持续 **2 回合**」—— `MODIFY_ATTR ATTACK` + `percent: 0.55` ✓ + `turns: 2` ✓ + `all_allies` ✓；⭐ **数据核实（强检查）** ✓：她的终结技就是 **`skill_id 110102`（The Belobog March / 贝洛伯格进行曲 ✓）**，其 **`param_list` 第 10 行（Lv10 ✓）同时含 `0.55` / `0.16` / `0.2` / `2`** ✓ （⚠ 走过的弯路如实记：先找 **`param`** 字段 ✗ —— **本文件叫 `param_list`** ✓；再按\"值反查 skill_id\"定位到 `110102` ✓ 却**读成了首行（Lv1）** ✗ ⇒ 现按 **Lv10 行**核实 ✓）。"
   },
+
   {
     "on": "ULT_CAST",
     "id": "ult_party_crit_damage",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
       {
         "op": "MODIFY_ATTR",

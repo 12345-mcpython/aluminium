@@ -3,19 +3,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone21065_elation_stack",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "欢愉度",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "欢愉度", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
@@ -33,19 +23,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone21065_elation_stack",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "欢愉度",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "欢愉度", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
@@ -63,19 +43,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone21065_elation_stack",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "欢愉度",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "欢愉度", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
@@ -93,19 +63,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone21065_elation_stack",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "欢愉度",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "欢愉度", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
@@ -123,19 +83,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone21065_elation_stack",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "欢愉度",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "欢愉度", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",

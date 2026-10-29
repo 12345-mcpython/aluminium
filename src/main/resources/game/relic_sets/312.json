@@ -10,9 +10,7 @@
           "percent": 0.1,
           "permanent": true,
           "target": "all_allies",
-          "target_when": [
-            "is_other_same_element_as_self"
-          ]
+          "target_when": ["is_other_same_element_as_self"]
         }
       ],
       "source": "relic set 312 (2-piece) Ability53121: \"Increases the wearer's Energy Regeneration Rate by 5%. Increases the DMG dealt by other allies with the same Type as the wearer by 10%.\" — the ERR is the properties stat; the DMG half is BATTLE_START + a per-target filter.",

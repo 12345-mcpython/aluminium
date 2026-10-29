@@ -2,57 +2,31 @@
   {
     "on": "SKILL_CAST",
     "id": "skill_abyss_flower",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "ADD_STACK",
-        "buff": "白花之刻",
-        "amount": 1,
-        "permanent": true,
-        "target": "self",
-        "max_stacks": 2
-      }
+      { "op": "ADD_STACK", "buff": "白花之刻", "amount": 1, "permanent": true, "target": "self", "max_stacks": 2 }
     ],
     "source": "1203 罗刹 战技 白花的祈望 (120302, BPSkill/Restore): 「施放战技后立即为指定我方单体回复等同于罗刹60%攻击力+800的生命值，并使罗刹获得1层【白花之刻】。」",
     "note": "「并使罗刹获得 **1 层**【白花之刻】」—— 用 `ADD_STACK` 记账在自己身上 ✓（层的名字就是文档点名的那个 ✓）。⚠ 60%攻击力+800 那半治疗由引擎自己的 `Restore` 技能行负责 ✓（不重复写一遍 ✗）。⚠ 本条与下一条是**同一句话的两半**：层数在这里涨，结界在达到 2 层时展开（后者登记中 ✗）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "level_convention",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
     ],
     "source": "1203 罗刹 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 60%+800、终结技 200%、天赋 18%+240）",
     "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 终结技「**解除敌方全体 1 个增益效果**」、天赋「【白花之刻】达到 2 层时消耗全部并**展开结界**…」与秘技、行迹、星魂 —— 均**尚未分类**，逐条登记 ✓。 ⚠ **第 177 轮：战技的治疗已由数据表负责** ✓ —— 1203 在 `data/skill_effects.json` 的 **`Restore`** 名单里 ✓，引擎会读它 ✓ ⇒ **不要再用规则写一遍** ✗（会双重计算 ✗，与 1409 风堇同一条教训 ✓）。⚠ **本段此前是过时的，已改正** ✓：它曾写「本文件仍缺 50% 阈值跨越 / 天赋【结界】/ 回复**别人**」✗ —— 三者**都已实现** ✓，并各有用例 ✓：① 阈值跨越 = `skill_trigger_on_crossing`（`on: HP_LOST` + `target_hp_percent <= 0.5` **且** `target_hp_percent_before > 0.5` + `cooldown: 2` ✓，用例 `CrossingTest` 的**两半** ✓：跨越会治疗、已经低于一半的再挨打**不会** ✓）；② 天赋【结界】= `talent_zone_opens_at_two_stacks` ✓（2 层消耗并展开 ✓，`ticks_on: self` ✓）；③ 「回复**别人**」= `trace_zone_heals_the_others`（`target: other_allies` ✓，即行迹 浇灌尘身 ✓）。⚠ **教训**：过时的备注**比缺失的备注更坏** ✗ —— 缺失会让人去查 ✓，而写错会让人去**造** ✗。本轮我读到这段后，一度以为罗刹的天赋没做完，并准备去实现一个**引擎早就有、本文件也早在用**的能力（阈值跨越）✗。"
   },
+
   {
     "on": "HP_LOST",
     "id": "skill_trigger_on_crossing",
-    "when": [
-      "target_hp_percent <= 0.5",
-      "target_hp_percent_before > 0.5"
-    ],
+    "when": ["target_hp_percent <= 0.5", "target_hp_percent_before > 0.5"],
     "cooldown": 2,
     "do": [
       {
@@ -62,54 +36,30 @@
         "amount_from_skill_param": "SKILL:1",
         "target": "target"
       },
-      {
-        "op": "DISPEL",
-        "amount": 1,
-        "target": "target"
-      }
+      { "op": "DISPEL", "amount": 1, "target": "target" }
     ],
     "source": "1203 罗刹 战技 白花的祈望 (120302, BPSkill/Heal): 「…当我方任意单体当前生命值百分比小于等于50%时，罗刹会立即对其触发1次等同于战技的效果，此次触发不消耗战技点。该效果在2回合后可再次触发。」",
     "note": "「当我方任意单体当前生命值百分比**降到** 50% 或以下时，罗刹会立即对其触发 1 次**等同于战技的效果**…该效果在 **2 回合后可再次触发**」—— ① 「**降到**」是**阈值跨越** ✗，不是\"正处于低位\" ✓ ⇒ 条件用 `target_hp_percent <= 0.5` **且** `target_hp_percent_before > 0.5` ✓；② `target_hp_percent_before` 是**第 181 轮新增**的数值变量 ✓ —— `HP_LOST` 以 `(attacker, target, hpLoss)` 发射 ✓，所以\"损失前\"= `(当前 + 损失) / 上限` ✓（**无需新的引擎数据** ✓）；若只写 `<= 0.5`，这条会在**之后每一次受击**都触发 ✗；③ 效果\"等同于战技\"⇒ 用**同一组数值** ✓（`owner_attack` 0.6 + 800 ✓，与战技数据行一致 ✓）；④ 「2 回合后可再次触发」= 规则级 **`cooldown: 2`** ✓。⚠ **登记**：① 战技**本身**的治疗由**数据表**负责 ✓（1203 在 `Restore` 名单里 ✓）⇒ 本条**不写**它 ✗（会双重计算 ✗）；② 行迹 **浸池苏生**（「**触发战技效果时**，解除指定我方单体的 1 个负面效果」）**已补在本条** ✓ —— 那条行迹覆盖**两个**触发口 ✓（主动施放 ✓ 与这次**触发治疗** ✓），引擎把它们分成 `SKILL_CAST` 与 `HP_LOST` 两条规则 ✓，所以两处都要写 ✓；③ 星魂 2 的\"触发战技时按目标血量给治疗加成或护盾\"**仍未做** ✗（见 ROADMAP）。"
   },
+
   {
     "on": "ULT_CAST",
     "id": "ult_all_type_res_down",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "RESISTANCE_REDUCTION",
-        "percent": 0.2,
-        "turns": 2,
-        "target": "all_enemies"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "RESISTANCE_REDUCTION", "percent": 0.2, "turns": 2, "target": "all_enemies" }
     ],
     "source": "1203 罗刹 星魂 6 皆归尘土 (Avatar_Luocha_00_Rank06): 「施放终结技时，有100%固定概率使敌方全体全属性抗性降低20%，持续2回合」（param = [1, 0.2, 2] ⇒ 100% / 20% / 2 回合）",
     "note": "「施放终结技时，有 **100%** <u>固定概率</u>使敌方全体**全属性抗性降低 20%**，持续 **2 回合**」—— ① 幅度与时长：`percent: 0.2` + `turns: 2` ✓（参数行 `[1, 0.2, 2]` 三项与之**逐项吻合** ✓）；② 目标 `all_enemies` ✓（「敌方全体」✓）；③ ⚠ 「**固定概率**」是一种**掷骰类型**（不受效果命中/抵抗影响 ✓），**不是幅度** ✓ —— 本例是 **100%** ⇒ 从不失败 ✓ ⇒ **不写 `chance`** ✓（规则无条件生效 ✓）；⚠ 将来若遇到**小于 100% 的固定概率**，那是另一件事（引擎的规则级 `chance` 才是它 ✓），不要照抄本条 ✓；④ 时长按**普通口径**计：每个被降低的敌人**各自**的回合 ✓（引擎默认的计时主体 ✓，这也正是\"负面效果持续 N 回合\"的含义 ✓）。"
   },
+
   {
     "on": "SKILL_CAST",
     "id": "talent_zone_opens_at_two_stacks",
-    "when": [
-      "actor == self",
-      "self_stacks:白花之刻 >= 2"
-    ],
+    "when": ["actor == self", "self_stacks:白花之刻 >= 2"],
     "do": [
-      {
-        "op": "REMOVE_STACK",
-        "buff": "白花之刻",
-        "amount": 2,
-        "target": "self"
-      },
-      {
-        "op": "APPLY_BUFF",
-        "buff": "结界",
-        "turns": 2,
-        "target": "all_enemies",
-        "ticks_on": "self"
-      },
+      { "op": "REMOVE_STACK", "buff": "白花之刻", "amount": 2, "target": "self" },
+      { "op": "APPLY_BUFF", "buff": "结界", "turns": 2, "target": "all_enemies", "ticks_on": "self" },
       {
         "op": "MODIFY_ATTR",
         "attribute": "ATTACK",
@@ -119,14 +69,7 @@
         "min_eidolon": 1,
         "ticks_on": "self"
       },
-      {
-        "op": "APPLY_BUFF",
-        "buff": "虚弱",
-        "turns": 2,
-        "target": "all_enemies",
-        "min_eidolon": 4,
-        "ticks_on": "self"
-      },
+      { "op": "APPLY_BUFF", "buff": "虚弱", "turns": 2, "target": "all_enemies", "min_eidolon": 4, "ticks_on": "self" },
       {
         "op": "MODIFY_ATTR",
         "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -140,112 +83,67 @@
     "source": "1203 罗刹 天赋 生息的轮转 (120304, Enhance): 「当【白花之刻】达到2层时，罗刹会消耗全部【白花之刻】展开结界。」",
     "note": "「当【白花之刻】**达到 2 层时**，罗刹会**消耗全部**【白花之刻】**展开结界**」—— ① 阈值用 `self_stacks:白花之刻 >= 2` ✓；② 结界**本身没有数值** ✓（文档只说它**展开**，效果在下一句 ✓）⇒ 只是一个**名字** ✓，用 `APPLY_BUFF` 标记 ✓，`has_state 结界` 读得到 ✓。 ⚠ **本条曾漏掉「消耗全部」那半** ✗ —— 只 `APPLY_BUFF` 不扣层 ✓ 会让层数**永远停在 2** ✗，结界之后**每次战技都重开一次** ✗。现在补上 `REMOVE_STACK`。 ⚠ `amount: 2` 而不是「全部」：`removeNamedStacks(name, max)` 的 `max <= 0` **直接返回 0** ✓（没有\"负数=全清\"的约定 ✓），而这条的**前置条件就是 ≥2** ✓ ⇒ 2 就是\"全部\" ✓。⚠ 若将来出现\"能到 3 层\"的写法，这里要改成真正的\"全清\"语义。 ⚠ 结界的**时长（2 回合）**与\"罗刹倒下时解除\"**仍未实现** ✗（见 ROADMAP）。 ⚠ **另修**：`APPLY_BUFF` 的 `target` 原为 `self` ✗ —— 但两条治疗规则要求 `target has_state 结界`，而 `ALLY_ATTACK` 传给规则的是**被攻击的敌人**，所以挂在罗刹身上时**敌人永远不持有结界** ⇒ 实测结界从 t11 到 t25 都在、期间我方攻击了六次、**一次治疗都没有** ✗（结界只是没触发而已，层数消耗与重开都正常）。行迹文本「处于结界中的**任意敌方目标**受到我方攻击后」⇒ **结界标记的是敌人** ✓ ⇒ 改为 `all_enemies` ✓。"
   },
+
   {
     "on": "ALLY_ATTACK",
     "id": "talent_zone_heals_the_attacker",
-    "when": [
-      "actor is_other_ally",
-      "target has_state 结界"
-    ],
+    "when": ["actor is_other_ally", "target has_state 结界"],
     "do": [
-      {
-        "op": "HEAL",
-        "scale": "owner_attack",
-        "percent": 0.18,
-        "amount": 240,
-        "target": "attacker"
-      }
+      { "op": "HEAL", "scale": "owner_attack", "percent": 0.18, "amount": 240, "target": "attacker" }
     ],
     "note": "⭐ 2026-09-30 转正 ✓：「处于结界中的任意敌方目标受到攻击后，**施放攻击的我方目标**回复 18.00% 攻击力 + 240」—— ⚠ 回复的是**攻击者** ✓ （不是罗刹 ✗）⇒ `target: attacker` ✓；条件是目标身上有结界 ✓。"
   },
+
   {
     "on": "SKILL_CAST",
     "id": "trace_dispel_on_skill_trigger",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "DISPEL",
-        "amount": 1,
-        "target": "target"
-      }
+      { "op": "DISPEL", "amount": 1, "target": "target" }
     ],
     "source": "1203 罗刹 行迹 浸池苏生 (1203101): 「触发战技效果时，解除指定我方单体的1个负面效果。」",
     "note": "「**触发战技效果时**，解除指定我方单体 **1 个**负面效果」—— ① 用 `DISPEL` ✓ + `amount: 1` ✓ + `target: target` ✓，与**三月七 行迹 纯洁**（1001101）**同一句话、同一写法** ✓。 ② ⚠ 「**触发战技效果时**」在本引擎里覆盖**两种**情形 ✓：主动施放战技 ✓，以及**天赋的触发治疗** ✓ —— 后者由 `HP_LOST` 规则发出 ✓，所以那条规则**也**带了同样的 `DISPEL` ✓（两处都写，因为引擎的事件把一个句子的两个触发口分开报了 ✓）。"
   },
+
   {
     "on": "ALLY_ATTACK",
     "id": "trace_zone_heals_the_others",
-    "when": [
-      "actor is_other_ally",
-      "target has_state 结界"
-    ],
+    "when": ["actor is_other_ally", "target has_state 结界"],
     "do": [
-      {
-        "op": "HEAL",
-        "scale": "owner_attack",
-        "percent": 0.07,
-        "amount": 93,
-        "target": "other_allies"
-      }
+      { "op": "HEAL", "scale": "owner_attack", "percent": 0.07, "amount": 93, "target": "other_allies" }
     ],
     "source": "1203 罗刹 行迹 浇灌尘身 (1203102): 「处于结界中的任意敌方目标受到我方攻击后，除攻击者外的我方目标也会回复等同于罗刹7.00%攻击力+93的生命值。」",
     "note": "「处于结界中的任意敌方目标受到我方攻击后，**除攻击者外**的我方目标**也**会回复等同于罗刹 **7.00% 攻击力 + 93** 的生命值」—— ① 事件 `ALLY_ATTACK` ✓、条件 `target has_state 结界` ✓ （与天赋那条**同一触发点** ✓，文档就是「同一次攻击的另一个受疗者」 ✓）。 ② ⚠ 受疗者是「**除攻击者外**的我方目标」✓ ⇒ 选择器 `other_allies` ✓（= 我方阵营**去掉规则主人**），与天赋那条的 `target: attacker` ✓ **互补** ✓ —— 两条合起来才是\"攻击者 + 其余队友\" ✓。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "trace_control_resist",
     "do": [
-      {
-        "op": "RESIST_DEBUFF",
-        "kind": "control",
-        "percent": 0.7,
-        "permanent": true,
-        "target": "self"
-      }
+      { "op": "RESIST_DEBUFF", "kind": "control", "percent": 0.7, "permanent": true, "target": "self" }
     ],
     "source": "1203 罗刹 行迹 行过幽谷 (1203103): 「抵抗控制类负面状态的概率提高70%。」",
     "note": "「抵抗**控制类**负面状态的概率提高 **70%**」—— ⚠ 与 1105 的**效果抵抗属性**不是一回事 ✓：`EFFECT_RESISTANCE` 是**通用**的 ✓，而这一句限定**控制类** ✓。引擎里表达它的是 `RESIST_DEBUFF` ✓ + `kind: control` ✓ —— **1013 黑塔 人偶**、**1107 克拉拉 守护**、**1109 虎克 无邪** 用的都是**同一句话 35%** ✓，本条只是数值不同（70%）✓。 ⇒ **不需要新机制** ✓。"
   },
+
   {
     "on": "ULT_CAST",
     "id": "ult_dispel_and_abyss_flower",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "REMOVE_BUFF",
-        "amount": 1,
-        "target": "all_enemies"
-      },
-      {
-        "op": "ADD_STACK",
-        "buff": "白花之刻",
-        "amount": 1,
-        "permanent": true,
-        "target": "self",
-        "max_stacks": 2
-      }
+      { "op": "REMOVE_BUFF", "amount": 1, "target": "all_enemies" },
+      { "op": "ADD_STACK", "buff": "白花之刻", "amount": 1, "permanent": true, "target": "self", "max_stacks": 2 }
     ],
     "source": "1203 罗刹 终结技 归葬的遂愿 (120303, Ultra/AllAttack): 「解除敌方全体1个增益效果，并对敌方全体造成等同于罗刹200%攻击力的虚数属性伤害，同时使罗刹获得1层【白花之刻】。」",
     "note": "「**解除敌方全体 1 个增益效果**，并对敌方全体造成等同于罗刹 200% 攻击力的虚数属性伤害，**同时使罗刹获得 1 层**【白花之刻】」—— ① ⚠ **解除的是敌人的【增益】** ⇒ **不是** `DISPEL` ✗ —— `DISPEL` 清的是**我方身上的负面** ✓（`removeDebuffs` ✓），方向**正好相反** ✗；这里要用 `REMOVE_BUFF` ✓（`removeBuffs` ✓，**1106 佩拉 低温妨害**、**1111 卢卡 动能过载** 是同一句 ✓）。 ② `target: all_enemies` ✓ = 「敌方全体」✓，`amount: 1` ✓ = 「1 个」✓。 ③ 200% 那半是**数据表** ✓（Ultra/AllAttack ✓）。 ④ 「获得 1 层【白花之刻】」与**战技**那一半**同形** ✓（`ADD_STACK` ✓）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "technique_triggers_talent",
-    "when": [
-      "self has_state 秘技"
-    ],
+    "when": ["self has_state 秘技"],
     "do": [
-      {
-        "op": "APPLY_BUFF",
-        "buff": "结界",
-        "turns": 2,
-        "target": "all_enemies",
-        "ticks_on": "self"
-      },
+      { "op": "APPLY_BUFF", "buff": "结界", "turns": 2, "target": "all_enemies", "ticks_on": "self" },
       {
         "op": "MODIFY_ATTR",
         "attribute": "ATTACK",
@@ -259,76 +157,49 @@
     "source": "1203 罗刹 秘技 愚者的悲悯 (120307, Maze): 「使用秘技后，下一次战斗开始时立即触发天赋。」",
     "note": "「使用秘技后，**下一次战斗开始时立即触发天赋**。」—— ① 门槛 `self has_state 秘技` ✓，由 `Battle.applyTechniqueStates()` 在**任何 `BATTLE_START` 规则之前**加状态 ✓（与三月七 1001、娜塔莎 1105 **同一条通路** ✓）。 ② ⚠ 「**立即触发天赋**」按**结果**实现 ✓ —— 天赋那条规则（`talent_zone_opens_at_two_stacks`）的效果是**展开结界** ✓，所以「触发天赋」= **产出天赋的结果** ✓：结界 + 星魂 1 的加攻 ✓。 ⚠ **本轮实测修掉的一处缺陷** ✓：原实现把结界挂在 `target: self` ✗，而**天赋**挂在 `all_enemies` ✗，**两条读结界的规则都要求「被攻击的敌方目标」持有结界** ✓ —— `talent_zone_heals_the_attacker` 与 `trace_zone_heals_the_others` 的 `when` 都是 `target has_state 结界` ✓，而 `ALLY_ATTACK` 交给规则的 `target` **就是我们攻击的那个敌人** ✓（见 3.16 的同一条判定 ✓）⇒ 挂在自己身上的结界**永远满足不了任何一条** ✗ ⇒ **这条秘技此前一点治疗都不会产生** ✗。 ⚠ **同时补上了星魂 1** ✓：天赋那一次展开里带着 `MODIFY_ATTR ATTACK +20% all_allies`（`min_eidolon: 1`, `ticks_on: self`）✓，「触发天赋」自然也产出它 ✓ —— 原实现漏了它 ✗。 ③ ⚠ **没有**顺手补 2 层【白花之刻】 ✓：文档**没有说**秘技给层 ✗，而「先给层再消费」是**引擎的步骤**不是**文档的效果** ⇒ 补层会让层数凭空出现 ✓（那是另一个效果 ✓）。 ⇒ 因此这里**不写** `REMOVE_STACK` ✓ —— 秘技不是「凑够 2 层再消费」✓，而是**直接产出结果** ✓（层数保持不变 ✓）。 ④ `turns: 2` 与 `ticks_on: self` 与天赋**逐字段相同** ✓ —— 时长按**罗刹自己的回合**数 ✓（与 3.16 一致 ✓）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "eidolon5_ultra_and_talent_levels",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 2
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
     ],
     "min_eidolon": 5,
     "source": "1203 罗刹 星魂 5 受难之痕 (Avatar_Luocha_00_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'120303': 2, '120304': 2}",
     "note": "「**终结技等级+2**，最多不超过15级；**天赋等级+2**，最多不超过15级。」 —— ① 与**星魂 3**（战技+2、普攻+1）**同一形状** ✓；`skill` 令牌 `ULTRA`（终结技 120303）与 `TALENT`（天赋 120304）来自 tbgd `AvatarRankConfig` **120305** = `{'120303': 2, '120304': 2}` ✓。 ② ⚠ **不要写成第二份技能数据**：技能**读**的等级 = 数据行 + 本场战斗的加成 ✓，一个 op 抬的就是它 ✓。 ③ 「不超过15级」的**上限**归技能自身的等级上限 ✓，不由本规则夹 ✓。 ④ `min_eidolon: 5` ✓。"
   },
+
   {
     "on": "SKILL_CAST",
     "id": "eidolon2_heal_boost_below_half",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "REGISTER_HEAL_BONUS",
-        "percent": 0.3,
-        "target_when": [
-          "target_hp_percent < 0.5"
-        ]
-      }
+      { "op": "REGISTER_HEAL_BONUS", "percent": 0.3, "target_when": ["target_hp_percent < 0.5"] }
     ],
     "min_eidolon": 2,
     "source": "1203 罗刹 星魂 2 净庭赐礼 (Avatar_Luocha_00_Rank02): 「触发战技效果时，若指定我方目标当前生命值百分比小于50%，则罗刹提供的治疗量提高30%…」 param = [0.3, 0.18, 240, 2]",
     "note": "「**触发战技效果时**，若指定我方目标当前生命值百分比**小于 50%**，则罗刹提供的**治疗量提高 30%**」—— ① 用 `REGISTER_HEAL_BONUS` ✓（**为 1105 娜塔莎天赋新做的机制** ✓）+ `target_when: target_hp_percent < 0.5` ✓ —— 条件在**治疗那一刻**求值 ✓，`target` 就是被治疗的人 ✓。 ② ⚠ **不是** `MODIFY_ATTR OUTGOING_HEALING_BOOST` ✗：那条属性**看不见被治疗的是谁** ✗，会把 +30% 加到**每一次**治疗上 ✗（包括对满血队友的 ✓）—— 与娜塔莎天赋同一条理由 ✓。 ③ `percent: 0.3`（param #1）✓。 ⚠ 「**小于** 50%」是**严格小于** ✓（文档另半句写的是「大于等于 50%」 ✓，两半**互补且不重叠** ✓）。"
   },
+
   {
     "on": "SKILL_CAST",
     "id": "eidolon2_shield_at_or_above_half",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "SHIELD",
-        "scale": "owner_attack",
-        "percent": 0.18,
-        "amount": 240,
-        "turns": 2,
-        "target": "target"
-      }
+      { "op": "SHIELD", "scale": "owner_attack", "percent": 0.18, "amount": 240, "turns": 2, "target": "target" }
     ],
     "min_eidolon": 2,
     "source": "1203 罗刹 星魂 2 净庭赐礼 (Avatar_Luocha_00_Rank02): 「…若指定我方目标当前生命值百分比大于等于50%，则为其提供能够抵消等同于罗刹18%攻击力+240伤害的护盾，持续2回合。」 param = [0.3, 0.18, 240, 2]",
     "note": "「…若指定我方目标当前生命值百分比**大于等于 50%**，则为其提供能够抵消等同于罗刹 **18% 攻击力 + 240** 伤害的**护盾**，持续 **2 回合**」—— ① 用 `SHIELD` ✓ + `scale: owner_attack` ✓ + `percent: 0.18`（param #2）✓ + `amount: 240`（param #3）✓ + `turns: 2`（param #4）✓ —— 与 **1414 三月七·巡猎**、**1001 三月七** 的护盾**同一形状** ✓。 ② `target: target` ✓ = 这次战技指定的那位 ✓。 ③ ⚠ **没有写 `target_when`** ✗：`SHIELD` 的 `target_when` 是**筛受护者** ✓，而这里的条件「大于等于 50%」与治疗加成那半是**互补**的 ✓ —— 写上去会在护盾未过门槛时**静默不生效** ✓，但那样\"小于 50% 就没有护盾\"这件事就**由条件决定**而不是由规则名决定 ✓。⚠ **判断**：文档的两半是互斥且穷尽的，本引擎没有\"否则\"分支，所以门槛暂时**没写**；若要严格区分，应给 `SHIELD` 加 `target_when: [\"target_hp_percent >= 0.5\"]`，但那会让\"护盾\"在没有满足门槛时**什么都不发生** —— 与\"治疗加成\"叠加后语义才完整。已登记。"
   },
+
   {
     "on": "DEATH",
     "id": "talent_zone_ends_when_he_falls",
-    "when": [
-      "target == self"
-    ],
+    "when": ["target == self"],
     "do": [
-      {
-        "op": "REMOVE_STATE",
-        "buff": "结界",
-        "target": "self"
-      }
+      { "op": "REMOVE_STATE", "buff": "结界", "target": "self" }
     ],
     "source": "1203 罗刹 天赋 生息的轮转 (120304, Enhance): 「当罗刹陷入无法战斗状态时，结界也会被解除。」",
     "note": "「当罗刹**陷入无法战斗状态**时，结界**也会被解除**。」—— ① 用新事件 `DEATH` ✓ + `when: [\"target == self\"]` ✓：`DEATH` 由 `Battle.applyDamage` 在**判定死亡处**发出 ✓，**以倒下的人同时作为 actor 与 target** ✓ ⇒ `target == self` 读作「这次倒下的是我」 ✓（与 `TAKING_HIT`、反击规则**同一写法** ✓）。 ② ⚠ **为什么需要新事件**：`fireTriggers` 遍历队伍时会 **skip 掉已死单位** ✗（`if (ally.isDeath()) continue` ✓）—— 而\"收拾自己的结界\"按定义**只有倒下的人自己能做** ✗ ⇒ 没有这个事件就**写不出来** ✓。引擎对此**只开这一个例外** ✓：`DEATH` 只发给倒下的那一个 ✓，其它事件**仍然**是\"死人什么都不响应\" ✓。 ③ 用 `REMOVE_STATE` ✓ 而不是 `REMOVE_BUFF` ✓ —— 结界是 `APPLY_BUFF` 挂的**具名状态** ✓，`REMOVE_STATE` 正是\"按名字摘掉一个状态\" ✓。 ④ ⚠ 与 `KILL` **不是一回事** ✓：`KILL` 是**击杀者**的事实 ✓（发给**我方全体** ✓，读者是姬子星魂 6 那类 ✓）；本条是**倒下者**的事实 ✓。"

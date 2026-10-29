@@ -3,19 +3,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone24001_crit_vs_low_hp",
-      "when": [
-        "actor == self",
-        "target_hp_percent <= 0.5"
-      ],
+      "when": ["actor == self", "target_hp_percent <= 0.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.08,
-          "instance": true,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.08, "instance": true, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「装备者对**生命值百分比 ≤ 50%** 的敌方目标暴击率额外提高 8%」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target_hp_percent <= 0.5` ＋ `MODIFY_ATTR{instance: true}` ✓（8/8/8/8/8% ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24001_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（8% ✓）⇒ 重复会读成两倍 ✗。"
@@ -24,38 +14,20 @@
       "on": "KILL",
       "id": "cone24001_attack_after_kill",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.2,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.2, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「当装备者**消灭**敌方目标后，攻击力提高 20%，持续 2 回合」—— `KILL` ＋ **`actor == self`** ✓ ＋ `MODIFY_ATTR ATTACK{turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有门 ⇒ **队友的击杀**也给她加攻击 ✗（本审计第十二次同形 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "2": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone24001_crit_vs_low_hp",
-      "when": [
-        "actor == self",
-        "target_hp_percent <= 0.5"
-      ],
+      "when": ["actor == self", "target_hp_percent <= 0.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.1,
-          "instance": true,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.1, "instance": true, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「装备者对**生命值百分比 ≤ 50%** 的敌方目标暴击率额外提高 8%」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target_hp_percent <= 0.5` ＋ `MODIFY_ATTR{instance: true}` ✓（8/8/8/8/8% ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24001_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（8% ✓）⇒ 重复会读成两倍 ✗。"
@@ -64,38 +36,20 @@
       "on": "KILL",
       "id": "cone24001_attack_after_kill",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.25,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.25, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「当装备者**消灭**敌方目标后，攻击力提高 20%，持续 2 回合」—— `KILL` ＋ **`actor == self`** ✓ ＋ `MODIFY_ATTR ATTACK{turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有门 ⇒ **队友的击杀**也给她加攻击 ✗（本审计第十二次同形 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "3": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone24001_crit_vs_low_hp",
-      "when": [
-        "actor == self",
-        "target_hp_percent <= 0.5"
-      ],
+      "when": ["actor == self", "target_hp_percent <= 0.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.12,
-          "instance": true,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "instance": true, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「装备者对**生命值百分比 ≤ 50%** 的敌方目标暴击率额外提高 8%」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target_hp_percent <= 0.5` ＋ `MODIFY_ATTR{instance: true}` ✓（8/8/8/8/8% ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24001_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（8% ✓）⇒ 重复会读成两倍 ✗。"
@@ -104,38 +58,20 @@
       "on": "KILL",
       "id": "cone24001_attack_after_kill",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.3,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.3, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「当装备者**消灭**敌方目标后，攻击力提高 20%，持续 2 回合」—— `KILL` ＋ **`actor == self`** ✓ ＋ `MODIFY_ATTR ATTACK{turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有门 ⇒ **队友的击杀**也给她加攻击 ✗（本审计第十二次同形 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "4": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone24001_crit_vs_low_hp",
-      "when": [
-        "actor == self",
-        "target_hp_percent <= 0.5"
-      ],
+      "when": ["actor == self", "target_hp_percent <= 0.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.14,
-          "instance": true,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.14, "instance": true, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「装备者对**生命值百分比 ≤ 50%** 的敌方目标暴击率额外提高 8%」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target_hp_percent <= 0.5` ＋ `MODIFY_ATTR{instance: true}` ✓（8/8/8/8/8% ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24001_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（8% ✓）⇒ 重复会读成两倍 ✗。"
@@ -144,38 +80,20 @@
       "on": "KILL",
       "id": "cone24001_attack_after_kill",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.35,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.35, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「当装备者**消灭**敌方目标后，攻击力提高 20%，持续 2 回合」—— `KILL` ＋ **`actor == self`** ✓ ＋ `MODIFY_ATTR ATTACK{turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有门 ⇒ **队友的击杀**也给她加攻击 ✗（本审计第十二次同形 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "5": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone24001_crit_vs_low_hp",
-      "when": [
-        "actor == self",
-        "target_hp_percent <= 0.5"
-      ],
+      "when": ["actor == self", "target_hp_percent <= 0.5"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.16,
-          "instance": true,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.16, "instance": true, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（低血目标额外暴击率）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「装备者对**生命值百分比 ≤ 50%** 的敌方目标暴击率额外提高 8%」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target_hp_percent <= 0.5` ＋ `MODIFY_ATTR{instance: true}` ✓（8/8/8/8/8% ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24001_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（8% ✓）⇒ 重复会读成两倍 ✗。"
@@ -184,19 +102,11 @@
       "on": "KILL",
       "id": "cone24001_attack_after_kill",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.4,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.4, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24001 星海巡航（消灭目标后）: 使装备者的暴击率提高#1[i]%，装备者对生命值百分比小于等于#2[i]%的敌方目标暴击率额外提高#3[i]%。当装备者消灭敌方目标后，攻击力提高#4[i]%，持续#5[i]回合。",
       "note": "「当装备者**消灭**敌方目标后，攻击力提高 20%，持续 2 回合」—— `KILL` ＋ **`actor == self`** ✓ ＋ `MODIFY_ATTR ATTACK{turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有门 ⇒ **队友的击杀**也给她加攻击 ✗（本审计第十二次同形 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ]
 }

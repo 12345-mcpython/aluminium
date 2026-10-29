@@ -2,24 +2,10 @@
   "1": [
     {
       "id": "cone23034_chant_for_the_target_skill",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 6,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 6, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -35,24 +21,10 @@
     },
     {
       "id": "cone23034_chant_for_the_target_ult",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 6,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 6, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -69,84 +41,38 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_count_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 1)。"
     },
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_pay_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_count_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 1)。"
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_pay_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
@@ -154,24 +80,10 @@
   "2": [
     {
       "id": "cone23034_chant_for_the_target_skill",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 6.5,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 6.5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -187,24 +99,10 @@
     },
     {
       "id": "cone23034_chant_for_the_target_ult",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 6.5,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 6.5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -221,84 +119,38 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_count_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 2)。"
     },
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_pay_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_count_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 2)。"
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_pay_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
@@ -306,24 +158,10 @@
   "3": [
     {
       "id": "cone23034_chant_for_the_target_skill",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 7,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 7, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -339,24 +177,10 @@
     },
     {
       "id": "cone23034_chant_for_the_target_ult",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 7,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 7, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -373,84 +197,38 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_count_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 3)。"
     },
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_pay_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_count_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 3)。"
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_pay_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
@@ -458,24 +236,10 @@
   "4": [
     {
       "id": "cone23034_chant_for_the_target_skill",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 7.5,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 7.5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -491,24 +255,10 @@
     },
     {
       "id": "cone23034_chant_for_the_target_ult",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 7.5,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 7.5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -525,84 +275,38 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_count_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 4)。"
     },
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_pay_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_count_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 4)。"
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_pay_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
@@ -610,24 +314,10 @@
   "5": [
     {
       "id": "cone23034_chant_for_the_target_skill",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 8,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 8, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -643,24 +333,10 @@
     },
     {
       "id": "cone23034_chant_for_the_target_ult",
-      "when": [
-        "actor == self",
-        "target is_ally"
-      ],
+      "when": ["actor == self", "target is_ally"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 8,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "圣咏",
-          "amount": 1,
-          "max_stacks": 3,
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "GAIN_ENERGY", "amount": 8, "target": "self" },
+        { "op": "ADD_STACK", "buff": "圣咏", "amount": 1, "max_stacks": 3, "turns": 3, "target": "target" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -677,84 +353,38 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_count_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 5)。"
     },
     {
       "on": "SKILL_CAST",
       "id": "cone23034_skill_point_pay_skill",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_count_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "施放计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "施放计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 5)。"
     },
     {
       "on": "ULT_CAST",
       "id": "cone23034_skill_point_pay_ult",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:施放计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:施放计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "施放计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "施放计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
