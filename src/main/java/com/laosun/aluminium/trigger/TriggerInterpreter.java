@@ -294,6 +294,13 @@ public final class TriggerInterpreter {
             // named rule's own effect values. Note: A COPY, not a mutation: the compiled EffectSpec is shared by every
             // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).
             // The fast path returns the same instance, so the 5places that read `percent`/`turns` stay untouched.
+            // 「在任意目标回合**第一次**提供治疗/护盾时」 (1512's talent): the window is the turn and the key is the effect's own
+            // word, so a second grant in the same turn is skipped - and a new turn starts the window over.
+            if (effect.getOncePerTurn() != null && !effect.getOncePerTurn().isBlank()
+                    && ctx.battle() != null && !ctx.battle().firstThisTurn(effect.getOncePerTurn().trim())) {
+                effectIndex++;
+                continue;
+            }
             if (effect.getMinEidolon() != null && eidolonRankOf(ctx.owner()) < effect.getMinEidolon()) {
                 //: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
                 // `min_eidolon` cannot express this -- it would switch off the whole rule, base part included.

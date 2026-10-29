@@ -100,18 +100,19 @@ public class FeverDamageBoostTest {
         Battle battle = new Battle(List.of(robin, ally), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        if (vibes > 0) {
-            battle.partyResource(VIBES).gain(vibes);
-        }
-        Assertions.assertEquals(Math.min(vibes, 50), battle.partyResourceValue(VIBES),
-                "precondition: the gauge moved");
         if (fever) {
             robin.getBuffManager().addBuff(new StateBuff(FEVER, 99));
         }
         battle.processRequests();
+        // The warm-up attack is what raises 【Fever】's own listeners; it also EARNS vibes (her talent pays 1 per attack,
+        // the guest clause pays 2 more), so the gauge is pinned AFTER it - the number under test is the boost at a known
+        // gauge, not the gauge a warm-up happened to leave behind.
         SkillExecutor.execute(battle, robin.getSkills().get(SkillType.COMMON), robin,
                 List.of(battle.enemies().get(0)));
         battle.processRequests();
+        battle.partyResource(VIBES).setValue(vibes);
+        Assertions.assertEquals(vibes, battle.partyResourceValue(VIBES),
+                "precondition: the gauge is exactly the number this case is about");
 
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));

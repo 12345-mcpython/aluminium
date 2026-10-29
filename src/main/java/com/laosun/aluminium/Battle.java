@@ -1159,6 +1159,24 @@ public class Battle {
         return effect == null ? null : effect.getOncePerBattle();
     }
 
+    /**
+     * The keys already spent for 「本回合第一次」 ({@code "once_per_turn"}), cleared at every turn start.
+     *
+     * <p><b>Why the battle owns this and not a unit.</b> The sentence is 「在<b>任意目标</b>回合第一次提供治疗/护盾时」 - the
+     * window is the turn, not the granter - so one shared set is exactly the sentence's scope.
+     */
+    private final java.util.Set<String> oncePerTurnUsed = new java.util.HashSet<>();
+
+    /**
+     * Consumes a {@code "once_per_turn"} key: the first call within a turn answers {@code true}, every later one false.
+     *
+     * @param key the effect's own key (its {@code once_per_turn} word)
+     * @return whether this is the first use of that key in the current turn
+     */
+    public boolean firstThisTurn(String key) {
+        return oncePerTurnUsed.add(key);
+    }
+
     public boolean requestSkill(Skill skill, CanHit user, List<? extends CanHit> target) {
         if (skill == null || user == null || target == null) {
             return false;
@@ -2641,6 +2659,12 @@ public class Battle {
      * @return how many rules fired
      */
     public int fire(TriggerPayload.Simple payload) {
+        // 「本回合第一次」 (1512's talent): the window is the turn, so it opens where a turn opens - on the TURN_START
+        // event itself. Clearing it in the turn ROUTINE instead would leave a hand-raised TURN_START (a replay, a test,
+        // any caller that begins a turn) with the previous turn's marks still spent.
+        if (payload.event() == TriggerEvent.TURN_START) {
+            oncePerTurnUsed.clear();
+        }
         return triggerBus.fire(payload);
     }
 
