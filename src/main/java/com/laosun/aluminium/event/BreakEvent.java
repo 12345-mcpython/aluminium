@@ -1,8 +1,8 @@
 package com.laosun.aluminium.event;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.DamageElement;
 
 /**
  * Weakness break event: fired once when an enemy has just been broken (the moment the

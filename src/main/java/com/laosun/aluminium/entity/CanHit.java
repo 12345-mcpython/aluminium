@@ -1,41 +1,29 @@
 package com.laosun.aluminium.entity;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.buff.AbstractBuff;
+import com.laosun.aluminium.buff.BuffManager;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.energy.EnergyGain;
+import com.laosun.aluminium.energy.EnergyProvider;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.buff.AbstractBuff;
-import com.laosun.aluminium.buff.BuffManager;
-import com.laosun.aluminium.enemy.Enemy;
-import com.laosun.aluminium.energy.EnergyGain;
-import com.laosun.aluminium.energy.EnergyProvider;
 import com.laosun.aluminium.event.*;
 import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.state.*;
 import com.laosun.aluminium.trigger.TriggerTable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
-import com.laosun.aluminium.state.HealthState;
-import com.laosun.aluminium.state.RuleChanceState;
-import com.laosun.aluminium.state.ConditionalHealBonuses;
-import com.laosun.aluminium.state.TriggerCooldowns;
-import com.laosun.aluminium.state.ShieldState;
-import com.laosun.aluminium.state.AttributeSheet;
-import com.laosun.aluminium.state.SkillBonuses;
-import com.laosun.aluminium.state.EnergyState;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.state.Resource;
-import com.laosun.aluminium.state.SkillSet;
-import com.laosun.aluminium.state.RuleAmendments;
-import com.laosun.aluminium.state.ResourceManager;
-import com.laosun.aluminium.state.RuleLimits;
-import com.laosun.aluminium.Signal;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * Abstract base for all entities that can participate in combat.

@@ -6,8 +6,6 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.laosun.aluminium.entity.Summon;
-import com.laosun.aluminium.damage.Damage;
 
 /**
  * The type of effect a skill produces, mapped from the {@code skill_effect} field

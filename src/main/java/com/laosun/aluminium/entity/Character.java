@@ -1,6 +1,7 @@
 package com.laosun.aluminium.entity;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.SkillTraceData;
 import com.laosun.aluminium.beans.Translate;
@@ -8,6 +9,9 @@ import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.equipment.ExtraBasicPromote;
+import com.laosun.aluminium.equipment.RelicSuit;
+import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.skill.DefaultSkill;
 import com.laosun.aluminium.skill.Skill;
@@ -26,14 +30,9 @@ import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
-import static com.laosun.aluminium.enums.AttributeType.*;
 import static com.laosun.aluminium.DoubleValue.Modifier.ModifierSource.BASE;
-import com.laosun.aluminium.equipment.RelicSuit;
-import com.laosun.aluminium.equipment.ExtraBasicPromote;
-import com.laosun.aluminium.equipment.Weapon;
-import com.laosun.aluminium.DoubleValue;
+import static com.laosun.aluminium.enums.AttributeType.*;
 
 /**
  * A player-controlled character with full combat stats.
@@ -72,15 +71,6 @@ public class Character extends CanHit {
      * so the character has to remember its own id.
      */
     private int cid;
-
-    /**
-     * This character's own data id (its file name under {@code resources/game/characters/}).
-     *
-     * <p>Reader: the {@code ally_cid:<cid>} selector -- "when the Demiurge (德谬歌) casts a memosprite skill, make <b>Hyacine (风堇)</b> gain 2 layers ..." names a character, and nothing in the selector set could.
-     */
-    public int getCid() {
-        return cid;
-    }
 
     /**
      * This character's mechanics, as data.
@@ -177,6 +167,7 @@ public class Character extends CanHit {
         // Configuration, not battle state: a copy is the same character, so it keeps its Eidolon ranks (the
         // `CanHit` copy constructor deliberately resets the per-battle things, and this is not one of them).
         this.eidolonRank = other.eidolonRank;
+        this.triggerTable = other.triggerTable;
     }
 
     /**
@@ -223,14 +214,6 @@ public class Character extends CanHit {
         character.setSkillLevel(skillLevel);
         character.setSkills(skills);
         return character;
-    }
-
-    public void setSkillByClass(SkillType skillType, Function<Integer, ? extends Skill> skillFunction) {
-        setSkill(skillType, skillFunction.apply(skillLevel.get(skillType)));
-    }
-
-    public void setSkillLevel(SkillType skillType, int skillLevel) {
-        this.skillLevel.put(skillType, skillLevel);
     }
 
     /**
@@ -451,7 +434,7 @@ public class Character extends CanHit {
             character.setCid(cid);
             // path and aggro come from the character data (mt = path string, aggro = the game multiplier itself)
             character.setPath(this.path != null ? this.path : Path.fromMt(characterData.mt()));
-            character.setAggro(characterData.aggro() > 0 ? characterData.aggro() : 0);
+            character.setAggro(Math.max(characterData.aggro(), 0));
             // the element likewise comes from the character data (attribute is all lowercase; for the
             // parsing convention see DamageElement#fromString)
             character.setElement(DamageElement.fromString(characterData.attribute()));

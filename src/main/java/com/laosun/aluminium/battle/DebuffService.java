@@ -1,9 +1,9 @@
 package com.laosun.aluminium.battle;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.buff.AbstractBuff;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.trigger.TriggerPayload;
 
 /**

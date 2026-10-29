@@ -1,6 +1,7 @@
 package com.laosun.aluminium.equipment;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.RelicSet;
 import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.enums.AttributeType;
@@ -15,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * A collection of up to 6 relics (one per {@link RelicType}) equipped on a character.

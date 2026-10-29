@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 import java.util.List;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * One entry of {@code data/skill_effects.json}: <b>how to read a non-damaging skill's

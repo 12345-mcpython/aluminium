@@ -2,10 +2,10 @@ package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
 
 import java.util.ArrayList;

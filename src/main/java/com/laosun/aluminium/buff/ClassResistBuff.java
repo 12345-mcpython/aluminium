@@ -1,7 +1,7 @@
 package com.laosun.aluminium.buff;
 
-import com.laosun.aluminium.enums.DebuffClass;
 import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.DebuffClass;
 
 /**
  * "the chance to resist <b>control-class</b> negative states is increased by 35%" / "immune to <b>control-class</b> negative states" - a <b>class</b> resistance, carried by the

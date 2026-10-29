@@ -2,7 +2,6 @@ package com.laosun.aluminium.enums;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.laosun.aluminium.damage.Damage;
 
 /**
  * A skill's data-side {@code attack_type} (the raw value in {@code skills.json}).

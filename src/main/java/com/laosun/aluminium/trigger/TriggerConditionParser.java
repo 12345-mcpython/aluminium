@@ -1,9 +1,12 @@
 package com.laosun.aluminium.trigger;
 
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Countdown;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.trigger.TriggerTable.Condition;
 import com.laosun.aluminium.trigger.TriggerTable.PartyCondition;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
@@ -13,12 +16,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.entity.Countdown;
-import com.laosun.aluminium.entity.Summon;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.state.ResourceManager;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * Compiles a rule's {@code when} text into a {@link Condition}: the condition half of the trigger

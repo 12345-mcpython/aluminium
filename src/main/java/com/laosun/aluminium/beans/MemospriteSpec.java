@@ -3,7 +3,6 @@ package com.laosun.aluminium.beans;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
-import com.laosun.aluminium.entity.Summon;
 
 /**
  * A character's memosprite (Memosprite, 忆灵) as data: its name, and how its panel is <b>derived from its

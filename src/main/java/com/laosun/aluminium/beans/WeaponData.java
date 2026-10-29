@@ -3,7 +3,6 @@ package com.laosun.aluminium.beans;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
-import com.laosun.aluminium.equipment.Weapon;
 
 /**
  * Raw weapon (light cone) data deserialized from weapons.json.

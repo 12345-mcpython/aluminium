@@ -5,7 +5,6 @@ import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.entity.CanHit;
 
 import java.util.List;
-import com.laosun.aluminium.entity.Character;
 
 public abstract class Skill {
     public abstract int getLevel();

@@ -2,14 +2,14 @@ package com.laosun.aluminium.battle;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.damage.BattleDamage;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.damage.BattleDamage;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.trigger.TriggerPayload;
 
 import java.util.List;

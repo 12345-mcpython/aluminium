@@ -1,34 +1,29 @@
 package com.laosun.aluminium;
 
-import com.laosun.aluminium.data.SkillData;
-import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.*;
-import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.ai.TargetSelector;
+import com.laosun.aluminium.battle.WaveManager;
 import com.laosun.aluminium.buff.AbstractBuff;
-import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.damage.BattleDamage;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.energy.EnergyGain;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Countdown;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.skill.DefaultSkill;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.skillpoint.StandardSkillPointPolicy;
-import com.laosun.aluminium.trigger.TriggerInterpreter;
 import com.laosun.aluminium.trigger.TriggerPayload;
 import com.laosun.aluminium.trigger.TriggerTable;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.entity.Countdown;
-import com.laosun.aluminium.entity.Summon;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.state.Resource;
-import com.laosun.aluminium.battle.WaveManager;
-import com.laosun.aluminium.state.ResourceManager;
-import com.laosun.aluminium.damage.BattleDamage;
 
 
 public class Battle {

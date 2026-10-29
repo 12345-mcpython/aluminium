@@ -1,20 +1,19 @@
 package com.laosun.aluminium.trigger;
 
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.entity.Character;
-import com.laosun.aluminium.DoubleValue;
-import com.laosun.aluminium.entity.Summon;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
 
 import java.util.Locale;
-import com.laosun.aluminium.damage.Damage;
 
 /**
  * Works out the numbers a trigger effect uses: how much damage, how much healing, how much of

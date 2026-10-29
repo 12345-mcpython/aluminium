@@ -1,7 +1,7 @@
 package com.laosun.aluminium.utils;
 
-import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enums.AttributeType;
 
 import java.util.EnumMap;
 import java.util.Map;

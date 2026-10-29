@@ -1,7 +1,6 @@
 package com.laosun.aluminium.buff;
 
 import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.BattleDamage;
 
 /**
  * A <b>timed</b> shield: "提供能够抵消等同于三月七5%防御力+60伤害的护盾，<b>持续3回合</b>".

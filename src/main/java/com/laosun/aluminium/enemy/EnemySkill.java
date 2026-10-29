@@ -2,10 +2,10 @@ package com.laosun.aluminium.enemy;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EnemySkillData;
-import com.laosun.aluminium.data.SkillData;
-import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.data.SkillData;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.trigger.TriggerPayload;
 import lombok.Getter;

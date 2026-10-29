@@ -1,5 +1,4 @@
 package com.laosun.aluminium.exceptions;
-import com.laosun.aluminium.entity.Character;
 
 /**
  * Thrown when an invalid or missing character configuration is encountered.

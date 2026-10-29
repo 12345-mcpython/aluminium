@@ -2,11 +2,11 @@ package com.laosun.aluminium.damage;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enemy.Enemy;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Weakness break damage.

@@ -1,6 +1,5 @@
 package com.laosun.aluminium.data;
 
-import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.Skill;
 import com.laosun.aluminium.enums.DamageElement;
@@ -12,9 +11,6 @@ import lombok.Getter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.entity.Character;
 
 /**
  * Runtime view of a skill loaded from {@code skills.json}, resolved for a

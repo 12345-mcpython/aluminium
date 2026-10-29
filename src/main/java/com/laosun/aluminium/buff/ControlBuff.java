@@ -1,9 +1,9 @@
 package com.laosun.aluminium.buff;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * A <b>control state</b> as one buff: Frozen / Entanglement / Imprisonment - "cannot act", "speed reduced" and, for Frozen,

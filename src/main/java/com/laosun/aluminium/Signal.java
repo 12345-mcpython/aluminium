@@ -1,12 +1,12 @@
 package com.laosun.aluminium;
 
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.AttributeType;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicLong;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * A combatant's position in the turn-based action queue.

@@ -1,9 +1,6 @@
 package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.state.Resource;
-import com.laosun.aluminium.state.ResourceManager;
 
 /**
  * One resource a character <b>declares</b>, from the {@code resources} block of

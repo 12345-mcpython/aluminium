@@ -1,12 +1,12 @@
 package com.laosun.aluminium.enemy;
 
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
-import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.entity.Character;
-import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.utils.AttributeBuilder;
 
 /**
