@@ -439,14 +439,25 @@ final class TriggerValidator {
                     requirePercent(effect, op, spec);
                     // Note: `percent_from_cast_param` is a SECOND way to state the share: a share from the cast skill with
                     // no `scale` is exactly as well-formed as one with `percent`, and this check calls it "neither".
-                } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null
-                        && effect.getPercentFromSkillParam() == null && effect.getPercentFromResource() == null)
+                } else if ((effect.getPercent() == null && effect.getPercentFrom() == null
+                        && effect.getPercentFromCastParam() == null
+                        && effect.getPercentFromSkillParam() == null && effect.getPercentFromResource() == null
+                        && effect.getPercentFromSummonParam() == null)
                         == (effect.getAmount() == null)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs exactly one of \"percent\" (a share) or \"amount\" (a flat value) unless it also states a \"scale\", in which "
                                     + "case both are read as percent x scale + amount; it states "
-                                    + (effect.getPercent() == null && effect.getAmount() == null ? "neither" : "both")
+                                    + ((effect.getPercent() == null && effect.getPercentFrom() == null && effect.getAmount() == null) ? "neither" : "both")
                                     + " (source: " + spec.getSource() + ")");
+                }
+                // The share may be a number provider: validated here because this branch never reaches `requirePercent`.
+                NumberProviders.validate(effect.getPercentFrom(), "percent_from", op, spec);
+                if (effect.getPercentFrom() != null && (effect.getPercentFromCastParam() != null
+                        || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null
+                        || effect.getPercentFromSummonParam() != null)) {
+                    throw new IllegalArgumentException("Op " + op + " states a share twice: \"percent_from\" is the"
+                            + " general spelling and replaces \"percent_from_cast_param\" / \"percent_from_skill_param\" /"
+                            + " \"percent_from_summon_param\" / \"percent_from_resource\" (source: " + spec.getSource() + ")");
                 }
                 // ? A derived ceiling on a modifier: both fields, or neither.
                 if (effect.getCapAmount() != null
@@ -1451,6 +1462,9 @@ final class TriggerValidator {
         if (effect.getAmountFromSummonParam() != null) {
             stated.add("amount_from_summon_param");
         }
+        if (effect.getAmountFrom() != null) {
+            stated.add("amount_from");
+        }
         if (stated.size() > 1) {
             throw new IllegalArgumentException(
                     "Op " + op + " states more than one flat source (" + String.join(" / ", stated)
@@ -1463,6 +1477,7 @@ final class TriggerValidator {
         if (effect.getAmountFromSummonParam() != null) {
             requireSummonParamSpelling(effect.getAmountFromSummonParam(), "amount_from_summon_param", op, spec);
         }
+        NumberProviders.validate(effect.getAmountFrom(), "amount_from", op, spec);
     }
 
     /**
@@ -1613,6 +1628,9 @@ final class TriggerValidator {
         if (effect.getPercentFromSummonParam() != null) {
             stated.add("percent_from_summon_param");
         }
+        if (effect.getPercentFrom() != null) {
+            stated.add("percent_from");
+        }
         // "50% of the original": `percent` (the fraction) beside exactly one row/counter share (the base).
         boolean rowFraction = percentMayScaleRow && effect.getPercent() != null && stated.size() == 2;
         if (stated.size() > 1 && !rowFraction) {
@@ -1635,6 +1653,7 @@ final class TriggerValidator {
         if (effect.getPercentFromSummonParam() != null) {
             requireSummonParamSpelling(effect.getPercentFromSummonParam(), "percent_from_summon_param", op, spec);
         }
+        NumberProviders.validate(effect.getPercentFrom(), "percent_from", op, spec);
     }
 
     /**
