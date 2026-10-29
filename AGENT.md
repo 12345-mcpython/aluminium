@@ -334,7 +334,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 ⭐ **一条命令**：`.\gradlew.bat gate --console=plain` ✓ —— 跑「全量测试 ＋ 五个 demo ＋ 每份捕获的 `compare` ＋ `replay --strict` ＋ `javadoc`」✓，任何一步非零就**整条失败** ✓，末尾打印一行 `GATE: PASS tests=… failures=… suites=…` ✓。
 
-- ⚠ 它**强制** `:test` 真跑（`build.gradle` 的 `outputs.upToDateWhen` 在 `gate` 下返回 false ✓）—— 免得闸门自己踩 UP-TO-DATE 那个坑 ✓。
+- ⚠ 它**强制** `:test` 真跑 ✓，**也强制四个 `compile*` 任务**真跑 ✓（同一个 `outputs.upToDateWhen` 口子）—— 后者是 2026-10-29 量出来的：把类挪到**新包**之后，Gradle 的增量编译既不报错也不编译它，`compileTestJava` 报 UP-TO-DATE 而四个测试类**没有 .class** ⇒ `:test` 只跑了一个更小的套件，闸门照样打印 PASS ✗（见 §6.1(i)）。
 - ⚠ 它**不做**两件事，别以为做了 ✗：与**基线**逐行比 demo 输出（那要人判断"这个改动是故意的" ✓，见下）、**变异验证**（§6.4 是按改动做的 ✓）。
 
 下面是它逐步做的事（要单跑某一步或要对比基线时用）✓：
@@ -1028,6 +1028,17 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 `battle.queue.getTimeRemaining` / `battle.characters` / `battle.queue.getCurrentActor` / `battle.queue.peekNext`）。⇒ **动公共面之后，跑一次上一层**
 （`cd ../tui && gradlew test` ✓）—— 它不是可选的礼貌，是"公共面到底改了谁"唯一能回答的方式 ✓。
 ⚠ 这次修复也划出了边界：只把访问方式换成访问器就够 ✓（行为没变、用例全绿 ✓）—— 顺手把上一层"重构一遍"是多余的 ✗。
+
+#### (i) 把一个类挪到**新包**之后，Gradle 可能既不报错也不编译它
+
+⚠ 2026-10-29 实测（`models/` 拆包那一轮）：测试类从 `com.laosun.aluminium.models.trigger` 挪到
+`com.laosun.aluminium.trigger` 之后，`compileTestJava` **报 BUILD SUCCESSFUL** ✓，而 §3.3 的闸门**照样打印 `GATE: PASS`** ✓ ——
+可 `build/classes/java/test/.../trigger/` 里**一个 .class 都没有** ✗，`:test` 于是跑了一个**少了四个套件**的集合
+（`908` 套件 vs 真正的 `912` ✓），而它**仍然是绿的** ✗。
+判据：**套件数/用例数与上一批对不上**就是它（不是"测试变少了"）✓；`compileTestJava --rerun-tasks` 之后四个类才出现 ✓。
+⇒ 两条结论：① `gate` 现在**强制四个 `compile*` 任务**真跑 ✓（`build.gradle` 的 `outputs.upToDateWhen`，与 `:test` 同一个口子）；
+② **动包之后，第一次闸门要读套件数**，别只看 `PASS` ✓ —— 这正是 §1.6「一处通过 ≠ 处处通过」的又一面：
+**编译通过 ≠ 该类被编译过** ✓。
 
 ### 6.2 效力与撤回
 
