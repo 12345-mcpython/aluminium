@@ -132,7 +132,18 @@ public class SkillEffectSpec {
      *
      * <p>Checked by {@code SkillCastability} at the one cast gate ({@code CastService.useSkill}); a failed condition
      * makes the cast be <b>refused</b>, exactly as an empty energy bar does.
+     *
+     * <p>Separately, {@link #getOncePerBattle()} states the castability that is a matter of history rather than of a
+     * resource - 「单场战斗中只能施放 1 次」 (1415's ultimate, 141503): the first cast spends it, and no later one may
+     * happen in the same battle.
+     * <b>history</b> - the first cast spends it, and no later one may happen in the same battle.
+     *
+         * <p>Checked by {@code SkillCastability} and recorded by the battle when the cast is committed, so a refused cast
+     * does not consume the single use.
      */
+    @SerializedName("once_per_battle")
+    private Boolean oncePerBattle;
+
     @SerializedName("castable_when")
     private List<String> castableWhen;
 

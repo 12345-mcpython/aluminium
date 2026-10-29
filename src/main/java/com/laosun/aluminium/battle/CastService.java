@@ -68,12 +68,14 @@ public final class CastService {
                 return false;
             }
             requests.add(skill, user, target);
+            battle.markSingleUseSpent(skill);
             return ultimates.settle(user, skill);
         }
         if (!skillPoints.onSkillCast(skill, user)) {
             return false;
         }
         requests.add(skill, user, target);
+        battle.markSingleUseSpent(skill);
         return true;
     }
 
