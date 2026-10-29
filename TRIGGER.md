@@ -119,7 +119,12 @@
 | `hp_pct` / `shield_pct` | 同上 | **百分比** `当前/上限` ✓（盾的份额 = 盾 / 生命上限 ✓）|
 | `state_turns` | `{"name": "充能", "min"?: n, "max"?: n}` | **剩余回合** ✓（多个同名取最大 ✓，没有 = 0 ✓）|
 | `camp` | `PLAYER` / `ENEMY` / `NEUTRAL`（或数组 = 任一）| **阵营** ✓（绝对）|
-| `same_as` | `self` / `actor` / `target` | **同一性**：这一方就是那一方 ✓（`actor == self` 在内容里有 1238 处，是出现最多的条件 ✓）|
+| `summon_count` | 数字或 `{"min"/"max"}` | 该单位**在场的召唤物数**（= `self_summon_count` ✓）|
+| `enemy_count` | 同上 | 该单位的**敌人存活数**（= `enemy_count` ✓）|
+| `resource` | `{"name": "追忆", "min"?: n, "max"?: n}` | 该单位的计数器（= `self_resource:` / `summon_resource:` ✓；**没声明会报错** ✓）|
+| `energy_pct` | 同上 | 能量百分比（= `self_energy_percent` ✓）|
+| `debuff_count` | 同上 | 负面效果数（= `target_debuff_count` ✓）|
+| `same_as` | `self` / `actor` / `target` / `summon` | **同一性**：这一方就是那一方 ✓（`actor == self` 在内容里有 1238 处，是出现最多的条件 ✓）|
 | `team` | `own` / `other` | **相对规则主人**的阵营 ✓（"我方 / 对方" ✓）|
 | `attribute` | `{"name": "SPEED", "min"?: n, "max"?: n}` | 任意属性 ✓（名字在装载期校验 ✓）|
 | `stacks` | `{"name": "充能", "min"?: n, "max"?: n}` | 层数 ✓（= `self_stacks:` ✓）|

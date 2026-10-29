@@ -47,12 +47,12 @@ import java.util.TreeSet;
 final class EntityPredicates {
 
     /** The subjects a predicate may be asked about. */
-    static final Set<String> SUBJECTS = Set.of("self", "actor", "target");
+    static final Set<String> SUBJECTS = Set.of("self", "actor", "target", "summon");
 
     /** Every accepted sub-predicate, in one place so the loader's error can list it. */
     static final Set<String> KEYS = Set.of(
             "is_ally", "is_enemy", "is_dead", "is_summon",
-            "same_as",
+            "same_as", "summon_count", "enemy_count", "resource", "energy_pct", "debuff_count",
             "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "has_shield", "shield_from",
             "level", "cid", "speed", "eidolon", "skill_level", "state_turns",
             "attribute", "stacks", "state", "path", "element", "camp", "team");
@@ -88,8 +88,10 @@ final class EntityPredicates {
             }
             switch (key) {
                 case "is_ally", "is_enemy", "is_dead", "is_summon", "has_shield" -> requireBoolean(key, entry.getValue(), where);
-                case "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "level", "cid", "speed", "eidolon" ->
+                case "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "level", "cid", "speed", "eidolon",
+                        "summon_count", "enemy_count", "energy_pct", "debuff_count" ->
                         requireRange(key, entry.getValue(), where);
+                case "resource" -> requireNamedRange(key, entry.getValue(), where);
                 case "camp" -> requireCamp(entry.getValue(), where);
                 case "team" -> requireTeam(entry.getValue(), where);
                 case "skill_level" -> {
@@ -107,7 +109,7 @@ final class EntityPredicates {
                 case "state", "path", "element" -> requireStrings(key, entry.getValue(), where);
                 case "same_as" -> {
                     String other = requireString(key, entry.getValue(), where).trim();
-                    if (!SUBJECTS.contains(other)) {
+                    if (!"summon".equals(other) && !SUBJECTS.contains(other)) {
                         throw new IllegalArgumentException("the sub-predicate \"same_as\" names \"" + other
                                 + "\"; it is self / actor / target" + where);
                     }
@@ -217,6 +219,9 @@ final class EntityPredicates {
             case "self" -> ctx.owner();
             case "actor" -> ctx.actor();
             case "target" -> ctx.target();
+            // "the rule owner's memosprite": the subject the content spells `summon` (its own wording for 长夜 / 小伊卡 /
+            // 德谬歌 / 晴空乐手). A memosprite that is not on the field makes every predicate about it fail.
+            case "summon" -> ctx.battle() == null || ctx.owner() == null ? null : ctx.battle().summonOf(ctx.owner());
             default -> null;
         };
     }
@@ -275,6 +280,29 @@ final class EntityPredicates {
                 CanHit other = unitOf(value.getAsString().trim(), ctx);
                 yield other != null && other == unit;
             }
+            case "summon_count" -> {
+                // "the owner has a memosprite on the field" is `{ "summon_count": { "min": 1 } }`.
+                yield inRange(unit instanceof Summon ? 0 : ctx.battle() == null ? 0 : ctx.battle().summonCountOf(unit),
+                        value);
+            }
+            case "enemy_count" -> {
+                var battle = ctx.battle();
+                yield battle != null && inRange(battle.getOpponents(unit).stream().filter(opponent -> !opponent.isDeath())
+                        .count(), value);
+            }
+            case "resource" -> {
+                var named = value.getAsJsonObject();
+                var resources = unit.getResources();
+                if (resources == null || !resources.has(named.get("name").getAsString())) {
+                    throw new IllegalStateException("the entity predicate reads the counter \""
+                            + named.get("name").getAsString() + "\", which " + unit.getName()
+                            + " does not declare - a counter that answers 0 is a wrong number with no symptom");
+                }
+                yield inRange(resources.get(named.get("name").getAsString()).exactValue(), named);
+            }
+            case "energy_pct" -> inRange(unit.getMaxEnergy() <= 0 ? 0 : unit.getCurrentEnergy() / unit.getMaxEnergy(),
+                    value);
+            case "debuff_count" -> inRange(unit.getBuffManager().debuffCount(), value);
             case "camp" -> anyOf(value, name -> unit.getCamp() != null
                     && unit.getCamp().name().equalsIgnoreCase(name.trim()));
             case "team" -> {
