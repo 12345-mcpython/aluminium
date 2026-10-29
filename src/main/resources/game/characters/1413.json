@@ -384,6 +384,34 @@
       ],
       "source": "1413 长夜月 忆灵技1（ServantID 11413 数据槽位 1，参数行 `[0.25, 0.05, 4, 1]`）：「…施放后获得 **#4** 点【忆质】」—— `#4` = 参数下标 3，各等级都是 **1**。",
       "note": "「**施放后**获得 #4 点【忆质】」—— ① 点数**读这一发自己的行**（`amount_from_cast_param: 3`，与伤害那条的 `percent_from_cast_param: 0` 同一拼法），**不写字面量 1**：字面量在数据改行时会静默错；② 门 `actor == summon` + `from_skill_id == 1` —— 与 §3.7zb 那条教训同形：`is_summon` 会把**别人**的忆灵也算进来，只有**长夜**施放它自己的槽位 1 才给长夜月【亿质】；③ 资源名用数据里的「**亿质**」（不是「忆质」—— TextMap 哈希 14616362604670218887 就是「亿质」，见下面的 `resources`）。⭐ **2026-10-29 换事件：`CAST_SETUP` → `ATTACK_FINISHED`** —— 「施放后」是**这一发结算之后**，而 `CAST_SETUP` 在伤害展开**之前**发 ⇒ 那一发会白吃 1 点（实测：本应是 0.06 份额的一发读成 0.063）。捕获是判据：窗口里第一次忆灵技1 的份额正是 0.06（0 点），而不是 0.063 ✓。【已把守：`EvernightMemoryFoldTest`（资源 0 点 ⇒ 份额 0.60 ✓）】⚠ **同句的另一半已落地**：「每有 #3 点【忆质】额外造成 #2%」= `skill_effects.json` 11413/1 的 `resource_share` ✓（并进那六发的份额，不是额外实例 ✓）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "memosprite_dream_dump_spends_everything",
+      "when": [
+        "actor == summon",
+        "from_skill_id == 7"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "亿质",
+          "spendAll": true,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 1.0,
+          "target": "self"
+        },
+        {
+          "op": "DISMISS_SUMMON",
+          "target": "summon"
+        }
+      ],
+      "source": "1413 长夜月 忆灵技2「迷梦，流失，如露」(1141307, SkillTriggerKey Skill11)：「…施放后，消耗全部【忆质】和生命值，并使「长夜」消失。」",
+      "note": "「**施放后**，消耗全部【忆质】和生命值，并使「长夜」消失」—— 三句三个 op ✓：① `SPEND_RESOURCE` + **`spendAll`**（「全部」，不写数目 ✓）；② `CONSUME_HP` `scale: owner_max_hp` + `percent: 1.0`（「生命值」= 她自己的上限；op 内部的**下限 1 点**就是原文没说要死 ✓）；③ `DISMISS_SUMMON`（新 op，「消失」≠ 死亡 ✓，走 `perish()` 后 `SUMMON_LEFT` 照常公告 ✓）。⚠ 挂 `ATTACK_FINISHED` 而不是 `CAST_SETUP`：与 11413/1 那条同一个理由 —— 「施放**后**」是这一发**结算之后** ✓；这里的后果（把自己的忆质清零）若在伤害前发生，这一发就会按 0 点结算 ✗ —— 而伤害恰恰要按**这一发开始时**的点数算 ✓（`per_share` 读的是同一时刻）。⚠ 门 `actor == summon` + `from_skill_id == 7`：只有**长夜**施放它自己的槽 7 才触发 ✓（别人的忆灵不算 ✓）。【已把守：`EvernightDreamDumpTest`（50 点 ⇒ 伤害按 50 点算完，随后忆质归零、她降到 1 点生命、长夜离场 ✓）】"
     }
   ],
   "resources": [

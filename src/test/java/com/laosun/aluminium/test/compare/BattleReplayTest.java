@@ -40,16 +40,21 @@ public class BattleReplayTest {
     private static final String CAPTURE = "src/test/resources/captures/veritas-085418.json";
 
     /**
-     * Every captured cast is driven, except the one whose data row does not exist - and that one is named.
+     * Every captured cast is driven - there is no "the data does not carry that row" left in this fixture.
+     *
+     * <p>⚠ It used to be 12/13: cast 6 looked up data slot 8, and 长夜 has no slot 8 (its slots are
+     * {@code SkillID % 100} ⇒ [1,3,5,6,7]). It is 1141307, data slot 7, and the two capabilities that row needs
+     * (per-point shares with a separate main-target price, and the post-cast consume-and-dismiss) landed on
+     * 2026-10-29 - so the count is now 13/13 and this case says so.
      */
     @Test
-    public void thePlanDrivesEveryCastTheDataCanDrive() {
+    public void thePlanDrivesEveryCastTheCaptureHas() {
         Run run = run(PLAN);
         Assertions.assertEquals(0, run.exit, "the replay must complete on the committed plan; output was:\n" + run.out);
-        Assertions.assertTrue(run.out.contains("casts: 13 in the capture ; driven: 12 ; not drivable: 1"),
-                "13 captured casts, 12 driven: 长夜's 强化普攻 (slot 8) has no row in skills.json; output was:\n" + run.out);
-        Assertions.assertTrue(run.out.contains("the memosprite has no skill at data slot 8"),
-                "the cast that cannot be driven must say WHY, not vanish; output was:\n" + run.out);
+        Assertions.assertTrue(run.out.contains("casts: 13 in the capture ; driven: 13 ; not drivable: 0"),
+                "every captured cast is drivable now; output was:\n" + run.out);
+        Assertions.assertFalse(run.out.contains("has no skill at data slot"),
+                "and no row may still name a missing data slot; output was:\n" + run.out);
     }
 
     /**

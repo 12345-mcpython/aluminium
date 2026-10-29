@@ -110,6 +110,44 @@ public class SkillEffectSpec {
     private ResourceShare resourceShare;
 
     /**
+     * A share that is a <b>count</b> of a resource rather than a fraction: 「当前每持有 1 点【X】对主目标造成 #1% 生命上限…，
+     * 对其他敌方目标造成 #2%」.
+     *
+     * <p>Reader: 11413/7, 「迷梦，流失，如露」. Distinct from {@link #getResourceShare()} on purpose - that one <b>adds</b> a
+     * step share to a fixed one (「每有 4 点额外造成 12%」), this one <b>multiplies</b> the whole share by how many points
+     * are held, and prices the main target separately from the rest. The recorded fight's cast is 3.0 on the main and 1.5
+     * on the other target = {@code 0.06 x 50} and {@code 0.03 x 50} at the Lv1 row, so the count and the two parameters
+     * are all that is needed.
+     */
+    @SerializedName("per_resource_share")
+    private PerResourceShare perResourceShare;
+
+    /**
+     * {@code share = parameter[main or other] x (points held)}, both read at the cast's level.
+     */
+    @Getter
+    public static class PerResourceShare {
+
+        /**
+         * The resource's id as the trigger tables spell it - 1413's 「**亿质**」.
+         */
+        @SerializedName("resource")
+        private String resource;
+
+        /**
+         * Which parameter prices the <b>aimed</b> target (「对主目标… #1%」 ⇒ 0-based {@code 0}).
+         */
+        @SerializedName("main_param")
+        private int mainParam;
+
+        /**
+         * Which parameter prices <b>every other</b> enemy (「对其他敌方目标… #2%」 ⇒ 0-based {@code 1}).
+         */
+        @SerializedName("other_param")
+        private int otherParam;
+    }
+
+    /**
      * How a resource turns into extra share: {@code (held / step) x share}, both terms read from the same level row.
      */
     @Getter
