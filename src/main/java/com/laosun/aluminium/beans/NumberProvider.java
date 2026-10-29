@@ -80,4 +80,50 @@ public final class NumberProvider {
     /** {@code negate} / {@code abs}: the operand. */
     @SerializedName("input")
     private NumberProvider input;
+
+    /** {@code attr}: the attribute's name as {@code AttributeType} spells it ({@code ATTACK}, {@code DEFENCE}, ...). */
+    @SerializedName("attribute")
+    private String attribute;
+
+    /** {@code attr} / {@code stacks}: whose number ({@code owner} = the rule owner, {@code target}). Default owner. */
+    @SerializedName("whose")
+    private String whose;
+
+    /** {@code attr}: keep only the part above this threshold ({@code max(0, value - above)}), like {@code self_attr_above:}. */
+    @SerializedName("above")
+    private Double above;
+
+    /** {@code stacks}: the counter's name, as {@code APPLY_BUFF} spells it. */
+    @SerializedName("buff")
+    private String buff;
+
+    /** {@code uniform}: the interval's low end (inclusive). */
+    @SerializedName("min")
+    private NumberProvider min;
+
+    /** {@code uniform}: the interval's high end (exclusive). */
+    @SerializedName("max")
+    private NumberProvider max;
+
+    /** {@code weighted_list}: the weighted choices. */
+    @SerializedName("distribution")
+    private List<Weighted> distribution;
+
+    /**
+     * One entry of a {@code weighted_list}: a weight and the provider it selects.
+     */
+    @Getter
+    @Setter
+    @ToString
+    @NoArgsConstructor
+    public static final class Weighted {
+
+        /** The relative weight; must be positive. */
+        @SerializedName("weight")
+        private Double weight;
+
+        /** The provider this entry contributes when picked. */
+        @SerializedName("value")
+        private NumberProvider value;
+    }
 }

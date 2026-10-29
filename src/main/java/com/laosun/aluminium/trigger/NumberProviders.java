@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.beans.NumberProvider;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
@@ -34,8 +35,9 @@ public final class NumberProviders {
      * place to be registered.
      */
     static final Set<String> TYPES = Set.of(
-            "const", "skill_param", "cast_param", "summon_param", "resource",
-            "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg");
+            "const", "skill_param", "cast_param", "summon_param", "resource", "attr", "stacks",
+            "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg",
+            "uniform", "weighted_list");
 
     private NumberProviders() {
     }
@@ -83,6 +85,18 @@ public final class NumberProviders {
             }
             case "negate" -> -resolve(requireOperand(provider.getInput(), "negate", "input"), effect, ctx);
             case "abs" -> Math.abs(resolve(requireOperand(provider.getInput(), "abs", "input"), effect, ctx));
+            case "attr" -> attributeOf(provider, ctx);
+            case "stacks" -> stacksOf(provider, ctx);
+            case "uniform" -> {
+                double low = resolve(requireOperand(provider.getMin(), "uniform", "min"), effect, ctx);
+                double high = resolve(requireOperand(provider.getMax(), "uniform", "max"), effect, ctx);
+                if (high < low) {
+                    throw new IllegalStateException("a \"uniform\" provider has max (" + high + ") below min (" + low
+                            + "); the interval is empty");
+                }
+                yield low + (high - low) * random(ctx).nextDouble();
+            }
+            case "weighted_list" -> weighted(provider, effect, ctx);
             default -> throw new IllegalStateException("unknown number provider type \"" + provider.getType()
                     + "\"; known types: " + String.join(" / ", new java.util.TreeSet<>(TYPES)));
         };
@@ -153,6 +167,57 @@ public final class NumberProviders {
             }
             case "negate", "abs" -> validate(requireOperand(provider.getInput(), provider.getType(), "input"),
                     field, op, spec);
+            case "attr" -> {
+                if (provider.getAttribute() == null || provider.getAttribute().isBlank()) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"attr\" needs \"attribute\" "
+                            + "(e.g. ATTACK / DEFENCE / SPEED)" + where);
+                }
+                if (provider.getWhose() != null && !provider.getWhose().equals("owner")
+                        && !provider.getWhose().equals("target")) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"attr\" names whose \""
+                            + provider.getWhose() + "\"; it is owner or target" + where);
+                }
+            }
+            case "stacks" -> {
+                if (provider.getBuff() == null || provider.getBuff().isBlank()) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"stacks\" needs \"buff\"" + where);
+                }
+                if (provider.getWhose() != null && !provider.getWhose().equals("owner")
+                        && !provider.getWhose().equals("target")) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"stacks\" names whose \""
+                            + provider.getWhose() + "\"; it is owner or target" + where);
+                }
+            }
+            case "uniform" -> {
+                if (provider.getMin() == null || provider.getMax() == null) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"uniform\" needs both \"min\" and "
+                            + "\"max\"" + where);
+                }
+                validate(provider.getMin(), field, op, spec);
+                validate(provider.getMax(), field, op, spec);
+            }
+            case "weighted_list" -> {
+                List<NumberProvider.Weighted> distribution = provider.getDistribution();
+                if (distribution == null || distribution.isEmpty()) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"weighted_list\" needs a non-empty "
+                            + "\"distribution\" of {\"weight\": ..., \"value\": {...}}" + where);
+                }
+                boolean positive = false;
+                for (NumberProvider.Weighted entry : distribution) {
+                    if (entry.getWeight() != null && entry.getWeight() > 0) {
+                        positive = true;
+                    }
+                    if (entry.getValue() == null) {
+                        throw new IllegalArgumentException("\"" + field + "\" of type \"weighted_list\" has an entry with"
+                                + " no \"value\"" + where);
+                    }
+                    validate(entry.getValue(), field, op, spec);
+                }
+                if (!positive) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"weighted_list\" has no positive weight"
+                            + where);
+                }
+            }
             default -> {
                 // Unreachable: the closed set above is checked first.
             }
@@ -224,6 +289,112 @@ public final class NumberProviders {
         return Boolean.TRUE.equals(provider.getBasisPoints()) ? raw / 10000.0 : raw;
     }
 
+    /**
+     * One attribute of one unit: {@code {"type": "attr", "attribute": "DEFENCE", "whose": "owner"}}.
+     *
+     * <p>The {@code owner} form goes through the same {@code self_attr:} reader the {@code scale} family uses, so the two
+     * spellings cannot drift. {@code target} reads the event's own target, and a missing target is loud - a share of
+     * nobody is not a number. {@code above} is the {@code self_attr_above:} reading: keep only the part over the
+     * threshold, which is how "the Speed above 100" is spelled.
+     */
+    private static double attributeOf(NumberProvider provider, TriggerContext ctx) {
+        if (provider.getAttribute() == null || provider.getAttribute().isBlank()) {
+            throw new IllegalStateException("an \"attr\" provider needs \"attribute\"");
+        }
+        String whose = provider.getWhose() == null ? "owner" : provider.getWhose();
+        double value;
+        if ("owner".equals(whose)) {
+            value = TriggerMagnitudes.resolveScale("self_attr:" + provider.getAttribute().trim(), 1.0, ctx);
+        } else if ("target".equals(whose)) {
+            CanHit target = ctx.target();
+            if (target == null) {
+                throw new IllegalStateException("an \"attr\" provider with whose \"target\" needs the event to carry a"
+                        + " target, and this one carries none");
+            }
+            com.laosun.aluminium.DoubleValue attribute = target.getAttribute(
+                    com.laosun.aluminium.enums.AttributeType.fromString(provider.getAttribute().trim()));
+            if (attribute == null) {
+                throw new IllegalStateException("the \"attr\" provider reads " + provider.getAttribute() + " from "
+                        + target.getName() + ", which has no resolved value for it");
+            }
+            value = attribute.get();
+        } else {
+            throw new IllegalStateException("an \"attr\" provider names whose \"" + whose + "\"; it is owner or target");
+        }
+        return provider.getAbove() == null ? value : Math.max(0, value - provider.getAbove());
+    }
+
+    /**
+     * One counter's stack count: {@code {"type": "stacks", "buff": "充能"}}.
+     *
+     * <p>Same reading as the {@code self_stacks:} / {@code target_stacks:} scales ({@code BuffManager.stacksOf}), so a
+     * rule that spells the count as a provider and one that spells it as a scale agree by construction.
+     */
+    private static double stacksOf(NumberProvider provider, TriggerContext ctx) {
+        if (provider.getBuff() == null || provider.getBuff().isBlank()) {
+            throw new IllegalStateException("a \"stacks\" provider needs \"buff\"");
+        }
+        String whose = provider.getWhose() == null ? "owner" : provider.getWhose();
+        String scale = ("target".equals(whose) ? "target_stacks:" : "self_stacks:") + provider.getBuff().trim();
+        Double value = TriggerMagnitudes.stackScale(scale, 1.0, ctx);
+        if (value == null) {
+            throw new IllegalStateException("the \"stacks\" provider reads \"" + scale + "\", which is not a counter scale");
+        }
+        return value;
+    }
+
+    /**
+     * A weighted choice: {@code {"type": "weighted_list", "distribution": [{"weight": 3, "value": {...}}, ...]}}.
+     *
+     * <p>A zero-weight entry is legal and never picked, which is how a rule states "this fallback only when nothing else
+     * applies". Weights are <b>relative</b>, so they need not sum to 1.
+     */
+    private static double weighted(NumberProvider provider, EffectSpec effect, TriggerContext ctx) {
+        List<NumberProvider.Weighted> distribution = provider.getDistribution();
+        if (distribution == null || distribution.isEmpty()) {
+            throw new IllegalStateException("a \"weighted_list\" provider needs a non-empty \"distribution\"");
+        }
+        double total = 0;
+        for (NumberProvider.Weighted entry : distribution) {
+            if (entry.getWeight() == null || entry.getWeight() <= 0) {
+                continue;
+            }
+            total += entry.getWeight();
+        }
+        if (total <= 0) {
+            throw new IllegalStateException("a \"weighted_list\" provider has no positive weight");
+        }
+        double roll = random(ctx).nextDouble() * total;
+        double accumulated = 0;
+        for (NumberProvider.Weighted entry : distribution) {
+            if (entry.getWeight() == null || entry.getWeight() <= 0) {
+                continue;
+            }
+            accumulated += entry.getWeight();
+            if (roll < accumulated) {
+                return resolve(requireOperand(entry.getValue(), "weighted_list", "value"), effect, ctx);
+            }
+        }
+        // Floating-point edge: the roll landed exactly on the end of the last entry.
+        for (int i = distribution.size() - 1; i >= 0; i--) {
+            NumberProvider.Weighted entry = distribution.get(i);
+            if (entry.getWeight() != null && entry.getWeight() > 0) {
+                return resolve(requireOperand(entry.getValue(), "weighted_list", "value"), effect, ctx);
+            }
+        }
+        throw new IllegalStateException("a \"weighted_list\" provider has no positive weight");
+    }
+
+    /**
+     * The battle's random source, so a seeded battle reproduces and a test can pin the draw.
+     */
+    private static java.util.Random random(TriggerContext ctx) {
+        if (ctx.battle() == null) {
+            throw new IllegalStateException("a random provider needs a battle to draw from, and this event carries none");
+        }
+        return ctx.battle().getRng();
+    }
+
     private static double fold(NumberProvider provider, EffectSpec effect, TriggerContext ctx, String type,
                                double identity, java.util.function.DoubleBinaryOperator operator) {
         double result = identity;
@@ -262,6 +433,22 @@ public final class NumberProviders {
         copy.setLeft(copyOf(provider.getLeft()));
         copy.setRight(copyOf(provider.getRight()));
         copy.setInput(copyOf(provider.getInput()));
+        copy.setAttribute(provider.getAttribute());
+        copy.setWhose(provider.getWhose());
+        copy.setAbove(provider.getAbove());
+        copy.setBuff(provider.getBuff());
+        copy.setMin(copyOf(provider.getMin()));
+        copy.setMax(copyOf(provider.getMax()));
+        if (provider.getDistribution() != null) {
+            List<NumberProvider.Weighted> distribution = new ArrayList<>();
+            for (NumberProvider.Weighted entry : provider.getDistribution()) {
+                NumberProvider.Weighted copyEntry = new NumberProvider.Weighted();
+                copyEntry.setWeight(entry.getWeight());
+                copyEntry.setValue(copyOf(entry.getValue()));
+                distribution.add(copyEntry);
+            }
+            copy.setDistribution(distribution);
+        }
         return copy;
     }
 }

@@ -1424,7 +1424,8 @@ final class TriggerValidator {
 
     static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
         requireSingleFlatSource(effect, op, spec);
-        if (effect.getAmount() == null && effect.getAmountFromAttr() == null
+        if (effect.getAmount() == null && effect.getAmountFrom() == null
+                && effect.getAmountFromAttr() == null
                 && effect.getAmountFromResource() == null
                 && !Boolean.TRUE.equals(effect.getAmountFromEvent())
                 && !Boolean.TRUE.equals(effect.getAmountFromPrevious())
