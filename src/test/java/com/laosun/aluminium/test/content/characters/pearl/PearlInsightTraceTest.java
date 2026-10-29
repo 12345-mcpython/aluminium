@@ -5,17 +5,17 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * Character 1503 (Pearl): the two halves of her trace 洞察万物 (Insight Into All Things), the effect-resistance half
@@ -135,7 +135,7 @@ public class PearlInsightTraceTest {
                 "precondition: she holds none of the counter yet, so the aura cannot be up");
 
         Character aim = battle.characters().get(1);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, aim, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, aim, 0, 0));
         battle.processRequests();
         double pearlGain = pearl.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - pearlBefore;
         double allyGain = ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - allyBefore;
@@ -189,7 +189,7 @@ public class PearlInsightTraceTest {
      */
     private static Character pearlWith(double defence, int eidolon) {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, eidolon);
-        pearl.setAttribute(AttributeType.DEFENCE, new com.laosun.aluminium.models.DoubleValue(defence));
+        pearl.setAttribute(AttributeType.DEFENCE, new com.laosun.aluminium.DoubleValue(defence));
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
@@ -229,7 +229,7 @@ public class PearlInsightTraceTest {
             // falls on the aim), so a mutant of the gate to the archetype state survived - the gate only becomes
             // observable when the aim is somebody else, which is also how the ability is actually played.
             Character aim = battle.characters().get(1);
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, her, aim, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, her, aim, 0, 0));
             battle.processRequests();
             if (keepHerKit) {
                 // Only assertable with her rules in place: 深度学习 is a state HER OWN Ultimate rule applies, so a

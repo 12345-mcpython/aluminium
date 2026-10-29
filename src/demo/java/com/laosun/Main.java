@@ -8,35 +8,35 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.ai.TargetSelector;
-import com.laosun.aluminium.models.buff.CounterMechanic;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.SuperBreakBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.enemy.EnemySkill;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.battle.BattleDriver;
-import com.laosun.aluminium.models.battle.BattleNarrator;
-import com.laosun.aluminium.models.battle.TurnLoop;
-import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.ai.TargetSelector;
+import com.laosun.aluminium.buff.CounterMechanic;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.buff.SuperBreakBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.enemy.EnemySkill;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.battle.BattleDriver;
+import com.laosun.aluminium.battle.BattleNarrator;
+import com.laosun.aluminium.battle.TurnLoop;
+import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.MapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.equipment.RelicSuit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.ExtraBasicPromote;
-import com.laosun.aluminium.models.equipment.Relic;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.equipment.RelicSuit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.ExtraBasicPromote;
+import com.laosun.aluminium.equipment.Relic;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * aluminium engine demo: one complete battle.
@@ -483,15 +483,15 @@ public class Main {
      */
     private static String describeControl(Enemy enemy) {
         List<String> parts = new ArrayList<>();
-        for (com.laosun.aluminium.models.buff.ControlBuff control
-                : enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.ControlBuff.class)) {
+        for (com.laosun.aluminium.buff.ControlBuff control
+                : enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.ControlBuff.class)) {
             parts.add("ControlBuff " + control.getName()
                     + (control.canAct() ? " (acts, slower)" : " (cannot act)"));
         }
         // The slow a non-blocking control attaches is part of that state now, so counting every
         // StatModifierBuff would print the same fact twice; only a slow with no control beside it is worth naming.
         if (parts.isEmpty()) {
-            int slows = enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buff.StatModifierBuff.class);
+            int slows = enemy.getBuffManager().countBuffs(com.laosun.aluminium.buff.StatModifierBuff.class);
             if (slows > 0) {
                 parts.add("StatModifierBuff ×" + slows + " (slow)");
             }

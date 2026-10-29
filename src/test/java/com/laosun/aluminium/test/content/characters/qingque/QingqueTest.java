@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.qingque;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -33,14 +33,14 @@ public class QingqueTest {
         battle.startBattle();
 
         Assertions.assertEquals(0, tilesOf(qingque), "the document states no initial value, so it starts at 0");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, enemy, 0, 0));
         Assertions.assertEquals(1, tilesOf(qingque), "「我方目标回合开始时…随机抽取1张」 (at the start of one of our targets' turns ... draws 1 tile at random)");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, qingque, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, qingque, enemy, 0, 0));
         Assertions.assertEquals(1, tilesOf(qingque),
                 "the gate is `actor is_other_ally`: her OWN turn start adds nothing (the document's wording is ambiguous and the rule says so)");
 
         for (int i = 0; i < 6; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, enemy, 0, 0));
         }
         Assertions.assertEquals(4, tilesOf(qingque),
                 "「最多持有4张琼玉牌」 (holds at most 4 jade tiles) -- eight draws must still read four");
@@ -74,7 +74,7 @@ public class QingqueTest {
         double before = qingque.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
         for (int i = 0; i < 5; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, qingque, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, qingque, enemy, 0, 0));
         }
 
         Assertions.assertEquals(0.28 * 4, qingque.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-6,

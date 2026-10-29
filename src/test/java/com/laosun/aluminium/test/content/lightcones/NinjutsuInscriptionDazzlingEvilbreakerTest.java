@@ -3,17 +3,17 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.Signal;
 
 /**
  * Light cone 23033: energy at the start of the battle, and the [雷遁] state machine -- an Ultimate arms it, two basic attacks
@@ -44,14 +44,14 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     }
 
     private void basicAttack(Battle battle) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.NORMAL, 0, 0, java.util.List.of()));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.NORMAL, 0, 0, java.util.List.of()));
     }
 
     @Test
     public void anUltimateArmsAndTwoBasicsSpendIt() {
         Battle battle = battle(true);
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(MINE), "nothing yet");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         boolean armed = wearer.getBuffManager().stacksOf(MINE) >= 1;
         basicAttack(battle);
         int one = wearer.getBuffManager().stacksOf(COUNT);
@@ -106,7 +106,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
         enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         basicAttack(battle);
         double before = actionTime(battle);
         basicAttack(battle);
@@ -125,10 +125,10 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     @Test
     public void anotherUltimateResetsTheCount() {
         Battle battle = battle(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         basicAttack(battle);
         int one = wearer.getBuffManager().stacksOf(COUNT);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         int afterReset = wearer.getBuffManager().stacksOf(COUNT);
         System.out.println("[23033] one basic=" + one + " ; after another Ultimate=" + afterReset);
         Assertions.assertEquals(1, one, "one basic attack counted");
@@ -138,8 +138,8 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     @Test
     public void aNonNormalAttackDoesNotCount() {
         Battle battle = battle(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         System.out.println("[23033] after a Skill used as an attack: count="
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "Basic ATK (普攻) only");
@@ -150,13 +150,13 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
         Battle battle = battle(true);
         // `matching` evaluates conditions (discipline 182): the payout branch is only reachable once the count is full --
         // and the count must be raised through the REAL path (handing the buff manager a StackBuff directly did not show up).
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         for (int i = 0; i < 2; i++) {
             basicAttack(battle);
         }
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "the payout already cleared it");
         int pinned = 0;
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         basicAttack(battle);
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.ALLY_ATTACK,
                 new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle, SkillCategory.NORMAL))) {

@@ -7,11 +7,11 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.exceptions.CharacterException;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.RelicSuit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.RelicSuit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -108,10 +108,10 @@ public class SummonOpTest {
 
         Assertions.assertNull(battle.memospriteOf(aglaea), "her file has no battle-start rule");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, null, 0, 0));
         Assertions.assertNull(battle.memospriteOf(aglaea), "「阿格莱雅」 (Aglaea) -- an ally's Ultimate is not hers");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
         Assertions.assertNotNull(battle.memospriteOf(aglaea), "and hers is");
     }
 
@@ -127,9 +127,9 @@ public class SummonOpTest {
         Battle battle = new Battle(List.of(aglaea), List.of(monster()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
         Summon first = battle.memospriteOf(aglaea);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
 
         Assertions.assertSame(first, battle.memospriteOf(aglaea), "still the one");
         Assertions.assertEquals(2, battle.allies().size(), "the hero and the one memosprite");
@@ -227,7 +227,7 @@ public class SummonOpTest {
         himeko.setTriggerTable(new TriggerTable(NO_MEMOSPRITE, List.of(summonRule())));
 
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, himeko, null, 0, 0)));
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, himeko, null, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains("memosprites"), refused.getMessage());
     }

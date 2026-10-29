@@ -7,7 +7,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.TriggerTable;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 
 /**
  * Loads character trigger tables from {@code resources/game/characters/<cid>.json}.

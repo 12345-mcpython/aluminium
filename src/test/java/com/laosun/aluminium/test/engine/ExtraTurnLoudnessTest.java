@@ -4,8 +4,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -54,7 +54,7 @@ public class ExtraTurnLoudnessTest {
                 TriggerSpecs.rule("TURN_START", List.of(), extraTurn("summon")))));
 
         Throwable thrown = Assertions.assertThrows(RuntimeException.class,
-                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0)),
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0)),
                 "「德谬歌立即获得 1 个额外回合」 (Demiurge immediately gains 1 extra turn)-- and when it cannot be granted, say so");
         String message = String.valueOf(thrown.getMessage());
         System.out.println("[loud_turn] memosprite -> " + thrown.getClass().getSimpleName() + ": "
@@ -77,7 +77,7 @@ public class ExtraTurnLoudnessTest {
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), extraTurn("self")))));
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
         System.out.println("[loud_turn] a character in the queue -> extra turn actor = "
                 + (battle.getExtraTurnActor() == null ? "none" : battle.getExtraTurnActor().getName()));
         Assertions.assertSame(ally, battle.getExtraTurnActor(), "an ordinary character can still take an extra turn");

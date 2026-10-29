@@ -5,9 +5,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -26,7 +26,7 @@ import java.util.List;
  * neighbours the centre's number. Nothing caught any of it, because no test ever let the op run - a green suite is not
  * a verification.
  *
- * <p>Now it hands the cast to {@link com.laosun.aluminium.models.skill.SkillExecutor}, the engine's own path, so there
+ * <p>Now it hands the cast to {@link com.laosun.aluminium.skill.SkillExecutor}, the engine's own path, so there
  * is <b>one</b> reading of a skill's row. What each case below pins:
  * <ul>
  *   <li>the commanded cast IS that unit's own cast - same units, same numbers (and <b>not zero</b>, or "the same"
@@ -106,7 +106,7 @@ public class CastSkillTest {
         battle.startBattle();
         double before = enemy.getCurrentHp();
         if (commanded) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
         } else {
             caster.getSkills().get(SkillType.ULTRA).execute(battle, caster, List.of(enemy));
         }
@@ -140,7 +140,7 @@ public class CastSkillTest {
 
         // Note: A commanded cast is aimed at the FIRST living opponent (the op's `target` names who CASTS, not who is
         // hit), so the blast is centred on the left unit and its only neighbour is the middle one.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
 
         double centreHits = before[0] - left.getCurrentHp();
         double neighbourHits = before[1] - centre.getCurrentHp();
@@ -204,7 +204,7 @@ public class CastSkillTest {
         Battle battle = new Battle(List.of(owner, caster), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
         return before - enemy.getCurrentHp();
     }
 
@@ -224,11 +224,11 @@ public class CastSkillTest {
         // Note: "[血仇]状态期间…自身回合开始时自动施放[弑王成王]": the gate is part of the sentence, so the scene
         // enters the state. The rule used to fire unconditionally, which is the defect that gate corrects.
         him.getBuffManager().addBuff(
-                new com.laosun.aluminium.models.buff.StateBuff("血仇", 9, true));
+                new com.laosun.aluminium.buff.StateBuff("血仇", 9, true));
         battle.processRequests();
 
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, him, him, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, him, him, 0, 0));
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
                 "the commanded cast moved the enemy's HP (" + before + " -> " + enemy.getCurrentHp() + ")");
@@ -245,7 +245,7 @@ public class CastSkillTest {
         battle.startBattle();
 
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, him, him, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, him, him, 0, 0));
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
                 "the commanded talent moved the enemy's HP (" + before + " -> " + enemy.getCurrentHp() + ")");
@@ -341,7 +341,7 @@ public class CastSkillTest {
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0)));
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains("skill_effects.json"), refused.getMessage());
     }

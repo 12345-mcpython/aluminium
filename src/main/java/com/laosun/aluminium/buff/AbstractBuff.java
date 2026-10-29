@@ -1,0 +1,445 @@
+package com.laosun.aluminium.buff;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.SkillCategory;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.event.AttackEvent;
+import com.laosun.aluminium.event.SkillCastEvent;
+import com.laosun.aluminium.skill.Skill;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent {
+    protected CanHit source;
+    protected int remainingDuration;
+    protected final int id;
+    protected final boolean isEarlyBuff;
+
+    /**
+     * Whether this buff has <b>no turn limit</b> ("for the rest of the battle").
+     *
+     * <p><b>Why a flag and not a huge number.</b> {@code remainingDuration} is an {@code int} the
+     * manager decrements once per turn ({@code processBuffTick}), so "forever" spelled as
+     * {@code Integer.MAX_VALUE} would be a magic number that still silently counts down, and any
+     * other large constant would just move the same lie. A permanent buff is instead <b>never
+     * ticked</b>: {@code BuffManager.processBuffTick} skips it, so the duration cannot drift and the
+     * buff disappears only when it is removed explicitly (dispel / death / {@code clearAll}).
+     *
+     * <p>Default {@code false}: every existing buff keeps its turn count and keeps expiring.
+     */
+    @Getter
+    protected final boolean permanent;
+
+    /**
+     * Whose <b>turn boundaries</b> count this buff's duration down; {@code null} = the unit that carries it.
+     *
+     * <p><b>Why the clock is not always the carrier.</b> Sunday's [蒙福者] says "星期日自身每回合开始时
+     * [蒙福者]状态持续回合减1" - the state sits on the ally, but its duration is spent by <b>his</b> turns.
+     * Modelling that as an ordinary timed buff on the ally would count it down on the <i>ally's</i> turns: a
+     * different number of turns in every real fight, with nothing to see. So the anchor is stated, and
+     * {@code Battle} sweeps the other units for buffs anchored to whoever is taking their turn.
+     *
+     * <p>Note: {@code null} is the default and must stay the ordinary case: every existing buff ticks on its carrier.
+     * Note: An anchored buff outlives its carrier's usefulness if the anchor dies, so the anchor's death removes it
+     * ({@code Battle.removeDeadCombatants} to {@link BuffManager#removeBuffsAnchoredTo(CanHit)}); without that a
+     * buff whose clock never comes again would sit there for the rest of the battle.
+     */
+    private CanHit tickOwner;
+
+    /**
+     * Whether {@code who}'s turn boundary ticks this buff.
+     *
+     * @param who the unit whose turn is beginning or ending
+     * @return {@code true} = this buff's duration is spent by that unit's turns
+     */
+    public boolean ticksOn(CanHit who) {
+        CanHit clock = tickOwner == null ? owner : tickOwner;
+        return clock != null && clock == who;
+    }
+
+    /**
+     * Anchors this buff's duration to {@code clockOwner}'s turns instead of its carrier's.
+     *
+     * @param clockOwner the unit whose turns count it down
+     */
+    public void setTickOwner(CanHit clockOwner) {
+        this.tickOwner = clockOwner;
+    }
+
+    /**
+     * Who this buff is currently attached to (written by {@link BuffManager#addBuff(AbstractBuff)} at
+     * attach time).
+     *
+     * <p>Why it exists: {@code Battle.assemble} broadcasts {@code DamageEvent} to both the attacker and
+     * the target, and buffs like "vulnerability (易伤, a debuff on the target)" / "reduction (减伤, a buff
+     * on the target)" that only inject a damage zone during settlement MUST know whether they are the target
+     * of this instance - otherwise vulnerability attached to an enemy would also boost the damage when that
+     * enemy itself attacks.
+     *
+     * <p>It is not the same thing as {@link #source} (the applier), do not confuse them: {@code source} is
+     * who applied it, {@code owner} is who it is attached to.
+     */
+    @Setter
+    protected CanHit owner;
+
+
+    private static final AtomicInteger ID_GENERATOR = new AtomicInteger(1);
+
+    public AbstractBuff(int duration, boolean isEarlyBuff) {
+        this(duration, isEarlyBuff, false);
+    }
+
+    /**
+     * @param duration    turns until expiry; ignored when {@code permanent} is {@code true}
+     * @param isEarlyBuff {@code true} = tick on {@code beforeMove}, {@code false} = on {@code afterMove}
+     * @param permanent   {@code true} = the buff has no turn limit and is never ticked
+     */
+    public AbstractBuff(int duration, boolean isEarlyBuff, boolean permanent) {
+        this.remainingDuration = duration;
+        this.isEarlyBuff = isEarlyBuff;
+        this.permanent = permanent;
+        this.id = ID_GENERATOR.getAndIncrement();
+    }
+
+    /**
+     * What ends this buff, when it is not a number of turns: "持续到施放首次攻击后结束" and friends.
+     *
+     * <p><b>Why this is on the base class.</b> A lifetime is a property of "how long does this last", which
+     * every buff already has an opinion about ({@code remainingDuration} / {@code permanent}) - and the three
+     * buff classes a rule can create ({@code StatModifierBuff}, {@code StateBuff}, and the damage-taken pair)
+     * all need the same answer. Putting it here means the behaviour is implemented once and any future buff
+     * can carry one by setting the field, rather than each class growing its own copy of "remove myself when
+     * the owner attacks".
+     *
+     * <p>Note: The default is an <b>empty set</b>: every existing buff keeps expiring exactly as it did, and a
+     * buff only behaves differently when a rule says {@code "until": ...}.
+     */
+    public enum Lifetime {
+        /**
+         * Ends after its owner finishes an attack that landed - a basic attack, a Skill or an Ultimate.
+         */
+        NEXT_ATTACK,
+        /**
+         * Ends after its owner casts a Skill.
+         */
+        NEXT_SKILL,
+        /**
+         * Ends after its owner casts an Ultimate.
+         */
+        NEXT_ULTIMATE,
+        /**
+         * Ends after its owner casts an <b>Elation skill</b> - the skill the Aha Moment's participants cast.
+         *
+         * <p>Reader: 1513's talent 「并在施放后使自身下一次在阿哈时刻中施放的欢愉技强化为【All in！敬炽烈一夏】」 - a slot swap that
+         * has to survive until the NEXT Elation cast and be consumed by it. {@code NEXT_SKILL} cannot say it (it ends on
+         * a 战技) and {@code CAST_END} is too early (it would end in the cast that granted it).
+         */
+        NEXT_ELATION_SKILL,
+        /**
+         * Ends when the cast being delivered right now finishes (cones 20001 / 21000).
+         *
+         * <p>"施放战技和终结技时，治疗量提高 12%" is neither a turn nor permanent: upstream scopes it to the cast
+         * itself ({@code MEquip_20001_Main} adds on {@code OnBeforeSkillUse} and removes on {@code OnAfterSkillUse}).
+         * `turns` would over-apply to later heals in the same turn, and heals have no instance scope (only damage
+         * does, as {@code BOOST_DAMAGE}) -- so this is the shape that states what the documents state.
+         */
+        CAST_END,
+        /**
+         * Until the carrier's own turn ends (cone 23053's "若在同一回合内消耗 >= 4 个战技点"
+         * and cone 23061's "我方任意角色在自身同一回合内累计消耗…").
+         *
+         * <p>The symmetric partner of {@link #CAST_END}: that one scopes a value to one cast, this one to one turn. It is
+         * swept by {@code BuffManager.afterMove}, which is the carrier's OWN turn end -- the tick point that already advances
+         * every duration, so no battle handle is needed. Measured: a plain {@code turns: 1} stack is NOT
+         * cleared by beforeMove / afterMove / tickForeign, so "同一回合内" had no spelling at all.
+         */
+        TURN_END,
+
+        /**
+         * "持续至下一个…回合开始时" (1405's [真知], whose text is "持续至下一个那刻夏回合开始时").
+         *
+         * <p>Ends when the OWNER's own turn starts, which is neither `TURN_END` (the end of the current turn, too early when the buff is granted during that turn) nor `NEXT_ATTACK` (ends when
+         * the owner next lands an attack, which the sentence does not say).
+         */
+        NEXT_TURN_START
+    }
+
+    /**
+     * The events that end this buff; <b>empty</b> means "no event-based end". Written by whoever creates the
+     * buff (the trigger interpreter, from the rule's {@code "until": ...}).
+     *
+     * <p><b>Why a set.</b> The game states durations as disjunctions - "持续至装备者下次施放普攻<b>或</b>战技后"
+     * (relic set 12) - and the buff ends at the <b>first</b> of the named events: a duration is one fact, however
+     * many events can end it. The alternative shapes are both wrong, and both look like they work: naming one of
+     * the two events makes a Skill silently not end a buff that its text says it ends, and creating two buffs (one
+     * per event) makes them <b>replace each other</b> on the same kind + target, so only the later one is ever up.
+     */
+    @Getter
+    protected Set<Lifetime> lifetimes = EnumSet.noneOf(Lifetime.class);
+
+    /**
+     * Replaces the ending events with the ones a rule named; an empty collection means "no event-based end",
+     * which is what a buff that states no {@code "until"} gets.
+     */
+    public void setLifetimes(Collection<Lifetime> lifetimes) {
+        this.lifetimes.clear();
+        if (lifetimes != null) {
+            this.lifetimes.addAll(lifetimes);
+        }
+    }
+
+    /**
+     * Ends this buff when its <b>owner</b> finishes an attack.
+     *
+     * <p>The owner test is what keeps it to the right unit: the engine broadcasts "an attack happened" to
+     * every member of our side ({@code AttackEvent} is how Robin's and Tribbie's third-party kits hear about
+     * it), so without it a teammate's attack would consume somebody else's "for the next attack" buff.
+     */
+    @Override
+    public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
+                            List<? extends CanHit> hitTargets, double totalDamage) {
+        if (lifetimes.contains(Lifetime.NEXT_ATTACK) && attacker != null && attacker == owner) {
+            endNow();
+        }
+    }
+
+    /**
+     * Ends this buff when its <b>owner</b> casts the kind of skill one of its lifetimes names.
+     *
+     * <p>Which cast this is comes from the parsed skill data ({@code SkillCategory}), the same source the
+     * trigger emitters use - never from a skill's name or slot. The notification arrives <b>before</b> the cast
+     * trigger events, so a buff that a rule grants on this very cast is not ended by it.
+     */
+    @Override
+    public void onSkillCast(Battle battle, CanHit user, Skill skill,
+                            List<? extends CanHit> hitTargets, List<? extends CanHit> targets) {
+        if (user == null || user != owner) {
+            return;
+        }
+        SkillCategory category = skill == null || skill.getData() == null
+                ? null
+                : skill.getData().getCategory();
+        if ((lifetimes.contains(Lifetime.NEXT_SKILL) && category == SkillCategory.BPSKILL)
+                || (lifetimes.contains(Lifetime.NEXT_ULTIMATE) && category == SkillCategory.ULTRA)
+                || (lifetimes.contains(Lifetime.NEXT_ELATION_SKILL) && category == SkillCategory.ELATION_DAMAGE)) {
+            endNow();
+        }
+    }
+
+    /**
+     * Takes this buff off its owner through the owner's manager, so the modifier is dropped by id exactly the
+     * way an expiry does it.
+     *
+     * <p>Safe to call while the manager is iterating its buffs: every traversal goes through
+     * {@code List.copyOf}, which is what makes "a buff that removes itself on an event" possible at all.
+     */
+    private void endNow() {
+        if (owner != null) {
+            owner.getBuffManager().removeBuff(this);
+        }
+    }
+
+    @Override
+    public void setSource(CanHit h) {
+        source = h;
+    }
+
+    @Override
+    public CanHit getSource() {
+        return source;
+    }
+
+    /**
+     * Which <b>rule</b> created this buff, by its {@code id}, or {@code ""} when the rule states none.
+     *
+     * <p><b>Why the source is not enough.</b> "战技提供的护盾" (1001 March 7th (三月七) Eidolon 6) names the <i>ability</i>, not just
+     * the person: March 7th has two shields of her own (her Skill's and Eidolon 2's at battle start), so "a shield from
+     * March 7th (三月七)" would heal an ally the star level does not mean to heal - a wrong number with nothing to report. The rule
+     * id is the one handle that tells them apart, and it is stamped where every buff already gets its source
+     * ({@code TriggerInterpreter.withSource}).
+     */
+    @Getter
+    @Setter
+    protected String ruleId = "";
+
+    /**
+     * Whether this buff asks NOT to evict others of its kind. Measured: `StatModifierBuff` identity is
+     * `(attribute, modifierType, sourceRole)`, so two rules granting the same attribute evict each other -- while some
+     * documents have both in effect at once. Note: Opt-in on purpose: making every different rule coexist broke seven shipped
+     * readings, so eviction stays the default and only the effect that says so is exempt.
+     */
+    private boolean keepsSiblings;
+
+    /**
+     * Whether this buff asks not to evict others of its kind.
+     */
+    public boolean keepsSiblings() {
+        return keepsSiblings;
+    }
+
+    /**
+     * Sets the ask (see {@link #keepsSiblings()}).
+     */
+    public void setKeepsSiblings(boolean keeps) {
+        this.keepsSiblings = keeps;
+    }
+
+    /**
+     * The <b>name the data gave this buff</b> - "协奏" for a modifier that is an effect <i>of</i> the [协奏] state.
+     *
+     * <p><b>Why a name is needed at all.</b> A modifier's lifetime can follow a state instead of a turn count
+     * ("处于[协奏]状态时，我方全体攻击力提高…" lasts until the state ends, and the state ends when a countdown's turn
+     * arrives). Removal by name existed only for <b>states</b> ({@code BuffManager.removeState}), so such a modifier
+     * could only be written as {@code permanent} - a buff that never comes off, which is a wrong number with no
+     * symptom. Naming it lets {@code removeState} reach it.
+     *
+     * <p>Note: Empty ({@code ""}) means <b>unnamed</b>, and the removal loop skips it: every modifier that does not state a
+     * name is not reachable by {@code removeState}, so it keeps its ordinary lifetime.
+     */
+    @Getter
+    @Setter
+    protected String buffName = "";
+
+    /**
+     * Whether carrying this buff means <b>the unit does not take its own turns</b>.
+     *
+     * <p>Robin's (知更鸟) [协奏]: "[协奏]状态结束前<b>不会进入自己的回合</b>且无法行动" - while the state lasts she is not in the
+     * order at all, and the countdown acts in her place. That is <b>not</b> what a control does: {@code ControlBuff}
+     * stops a unit from <i>acting</i> but still lets its turn arrive (and its DOTs tick), while this flag makes the
+     * turn itself pass without the unit. Conflating the two would silently change every "被冻结仍会掉血" reading.
+     */
+    @Getter
+    @Setter
+    protected boolean suspendsTurns = false;
+
+    @Override
+    public int duration() {
+        return remainingDuration;
+    }
+
+    @Override
+    public abstract boolean canAct();
+
+    /**
+     * Whether this buff is a <b>negative effect</b> (negative effect) - the thing "解除 N 个负面效果" removes and
+     * "目标身上有几个负面" counts.
+     *
+     * <p><b>Where the classification lives, and why not abstract.</b> The default is {@code false}, and the
+     * debuffs override it: the five of them are pinned together in {@code DebuffTest}'s table, so the set is
+     * decided in one readable place instead of being implied by whichever classes happen to override a method.
+     * The trade is deliberate - a new buff class starts as "not a debuff", which is the safe direction (it can
+     * never be dispelled by accident), and it gets classified on purpose when its content arrives, exactly like
+     * a relic ability is either authored or registered.
+     *
+     * <p>It answers a <b>game-semantics</b> question rather than a mechanical one, which is why a few answers
+     * look surprising until you read the text: "减伤" is a <i>positive</i> effect even though it sits on the
+     * defender ({@link ReductionBuff}), "受到伤害提高" is negative ({@link VulnerabilityBuff}), and a
+     * {@link StatModifierBuff} answers by its {@code sourceRole} - the same sign that decided whether it landed
+     * in the buff or the debuff half of the attribute.
+     */
+    public boolean isDebuff() {
+        return false;
+    }
+
+    /**
+     * Which <b>class</b> of negative state this buff is, or {@code null} when it belongs to none.
+     *
+     * <p>It exists for the two sentences that protect against a whole family - "抵抗<b>控制类</b>负面状态的概率提高35%"
+     * (Clara (克拉拉) Under Protection (守护)) and "免疫<b>控制类</b>负面状态" (Cyrene's (长夜月) memosprite "长夜") - and the point is that a <b>new</b> state of
+     * that family is covered the day it is written, instead of falling outside a hand-kept list of resistance keys.
+     * Like {@link #isDebuff()}, the answer comes from the buff class itself, which is the only place that knows.
+     *
+     * <p>Note: The default is {@code null}, which is the safe direction: an unclassified state is <b>not</b> blocked by a
+     * class resistance, so this vocabulary cannot silently make content immune to something its text never mentions.
+     * A buff that IS in a class says so where it is defined ({@link ControlBuff}, {@link DotBuff}).
+     */
+    public com.laosun.aluminium.enums.DebuffClass debuffClass() {
+        return null;
+    }
+
+    @Override
+    public abstract void applyEffect(CanHit target);
+
+    @Override
+    public abstract void removeBuff(CanHit target);
+
+    @Override
+    public abstract void tickEffect(CanHit target);
+
+    public boolean isSameKind(AbstractBuff other) {
+        return this.getClass() == other.getClass();
+    }
+
+    /**
+     * Whether this buff may accumulate alongside another instance of the same kind.
+     *
+     * <p>Default {@code false}: {@link BuffManager#addBuff} removes every same-kind buff first, which is
+     * the engine's long-standing "casting the same buff again refreshes it" rule
+     * ({@code BuffManagerTest.sameKindBuffRefreshesInsteadOfStacking}). A buff that really accumulates
+     * overrides this and declares its cap through {@link #maxStacks()}.
+     */
+    public boolean isStackable() {
+        return false;
+    }
+
+    /**
+     * How many instances of this buff may be attached at once. Meaningful only when
+     * {@link #isStackable()} is {@code true}; {@code 1} means "replace, do not stack".
+     */
+    public int maxStacks() {
+        return 1;
+    }
+
+    /**
+     * The key that decides which buffs are <b>stacks of one another</b>.
+     *
+     * <p>Deliberately separate from {@link #isSameKind}: "same kind" answers "should this replace
+     * that?" (a behaviour the existing tests pin), while "same stack group" answers "should this
+     * accumulate with that?". Folding them into one predicate would force every stackable buff to
+     * also change its replace semantics.
+     *
+     * @return the group key; {@code null} (the default) means "never a stack sibling"
+     */
+    public Object stackGroupKey() {
+        return null;
+    }
+
+    protected void decreaseDuration() {
+        remainingDuration--;
+    }
+
+    /*
+     * Adds turns to this buff's remaining duration - "…的持续时间<b>增加1回合</b>".
+     *
+     * <p><b>Why this is on the base class.</b> Every timed buff already has a duration, and a whole family of
+     * trace/Eidolon sentences lengthens one that is <b>already up</b> rather than creating a new one (10 of the 9
+     * documents say "持续时间增加" or "持续时间延长"). Without it, such a sentence has to be folded into the numbers
+     * of the ability it lengthens - which hides the trace's own line and quietly changes the base ability's stated
+     * value.
+     *
+     * <p>Note: A <b>permanent</b> buff has no countdown to lengthen, so nothing happens to one: {@code permanent} means
+     * "never ticked", and adding turns would be a number nobody ever reads. The caller
+     * ({@code BuffManager.extendBuffsFrom}) filters those out; this method only does the arithmetic.
+     *
+     * @param turns how many turns to add (positive; the op that calls this validates that)
+     */
+    /**
+     * The turns this buff has left (emainingDuration is protected). Needed to measure a clause that <b>shortens</b>
+     * a live effect: 「使自身所有持续效果持续回合数减 1」 - 'the state is still there' cannot tell 3 turns from 2.
+     *
+     * @return remaining turns (0 for a permanent buff, which has no countdown)
+     */
+    public int remainingTurns() {
+        return remainingDuration;
+    }
+
+    public void extendDuration(int turns) {
+        remainingDuration = Math.max(0, remainingDuration + turns);   // signed, clamped at zero (the game's Min: 0)
+    }
+}

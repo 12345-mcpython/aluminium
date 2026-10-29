@@ -5,16 +5,16 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.energy.EnergyGain;
-import com.laosun.aluminium.models.energy.EnergyProvider;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.energy.EnergyGain;
+import com.laosun.aluminium.energy.EnergyProvider;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -179,7 +179,7 @@ public class EnergyBattleTest {
         Enemy victim = dummy(100);
         victim.setMaxEnergy(100);
         Battle battle = newBattle(hero, victim);
-        victim.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(hero, DamageElement.FIRE, 10_000, 1));
+        victim.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(hero, DamageElement.FIRE, 10_000, 1));
 
         battle.tickDots(victim);
 
@@ -226,7 +226,7 @@ public class EnergyBattleTest {
         victim.setStance(30);
         victim.setMaxStance(30);
         Character hero = character("hero", 120);
-        hero.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.SuperBreakBuff(3));
+        hero.getBuffManager().addBuff(new com.laosun.aluminium.buff.SuperBreakBuff(3));
         Battle battle = newBattle(hero, victim);
 
         battle.castImmediate(new DefaultSkill(1003, 2, 1), hero, List.of(victim));
@@ -246,7 +246,7 @@ public class EnergyBattleTest {
         Enemy victim = dummy(100_000);
         victim.setMaxEnergy(120);
         Battle battle = newBattle(hero, victim);
-        victim.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(hero, DamageElement.FIRE, 50, 1));
+        victim.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(hero, DamageElement.FIRE, 50, 1));
 
         battle.tickDots(victim);
 

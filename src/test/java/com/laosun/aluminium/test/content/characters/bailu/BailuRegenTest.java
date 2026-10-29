@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.bailu;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -48,14 +48,14 @@ public class BailuRegenTest {
         Fixture f = new Fixture();
         // Note: A hand-built StateBuff carries no `buffName` (only `APPLY_BUFF` sets one), so the precondition counts STATE
         // buffs rather than named ones -- `stacksOf` is about names and would read 0 here.
-        f.ally.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("生息", 1));
-        int statesBefore = f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StateBuff.class).size();
+        f.ally.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("生息", 1));
+        int statesBefore = f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StateBuff.class).size();
 
         f.castUltimate();
 
         Assertions.assertTrue(f.ally.getBuffManager().hasState("生息"), "still there (extended, not reset)");
         Assertions.assertEquals(statesBefore,
-                f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StateBuff.class).size(),
+                f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StateBuff.class).size(),
                 "「this effect cannot stack」: the second branch EXTENDS the state instead of applying another one");
     }
 
@@ -68,12 +68,12 @@ public class BailuRegenTest {
         // Note: Counted rather than "is it non-empty": the reduction zone is also used elsewhere, so an emptiness assertion
         // would have been a claim about the whole battle rather than about this cast.
         int before = f.ally.getBuffManager().allBuffsOf(
-                com.laosun.aluminium.models.buff.ReductionBuff.class).size();
+                com.laosun.aluminium.buff.ReductionBuff.class).size();
 
         f.castUltimate();
 
         Assertions.assertTrue(f.ally.getBuffManager().allBuffsOf(
-                        com.laosun.aluminium.models.buff.ReductionBuff.class).size() > before,
+                        com.laosun.aluminium.buff.ReductionBuff.class).size() > before,
                 "「characters that have [生息] (Invigoration) take 10% less damage」 -- the reduction goes up with the state");
     }
 

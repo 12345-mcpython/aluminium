@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.cyrene;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -32,13 +32,13 @@ public class CyreneTest {
         battle.startBattle();
 
         Assertions.assertEquals(0, recollectionOf(cyrene), "the document states no initial value, so it starts at 0");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, cyrene, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, cyrene, enemy, 0, 0));
         Assertions.assertEquals(1, recollectionOf(cyrene), "「获得1点【追忆】」 (gains 1 point of Recollection (【追忆】))");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
         Assertions.assertEquals(4, recollectionOf(cyrene), "「获得3点【追忆】」 (gains 3 points of Recollection) -- the other writer");
 
         for (int i = 0; i < 8; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
         }
         Assertions.assertEquals(27, recollectionOf(cyrene),
                 "「【追忆】达到24点时可激活终结技」 (at 24 points of Recollection the Ultimate can be activated) -- thirty-two casts must still read twenty-four");

@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import com.laosun.aluminium.enums.RelicType;
 
 import java.util.List;
-import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.equipment.RelicSuit;
 
 /**
  * One relic set as defined by {@code relic_sets.json} - the table of 2-piece / 4-piece bonuses

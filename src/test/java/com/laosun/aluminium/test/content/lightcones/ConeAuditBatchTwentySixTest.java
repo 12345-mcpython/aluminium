@@ -5,8 +5,8 @@ import com.google.gson.JsonParser;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -59,7 +59,7 @@ public class ConeAuditBatchTwentySixTest {
                 "「施放终结技时重置可触发次数」");
 
         int before = f.battle.getSkillPoints();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WEAKNESS_ADDED, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.WEAKNESS_ADDED, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[23050] 添加弱点后战技点 " + before + " -> " + f.battle.getSkillPoints());
         Assertions.assertEquals(before + 1, f.battle.getSkillPoints(), "「恢复 1 个战技点」");
     }

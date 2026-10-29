@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.jingliu;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.Signal;
 
 /**
  * 1212 Jingliu, from her own file: the Syzygy stack, its cap, and the threshold that fires her Action Advance.
@@ -32,12 +32,12 @@ public class JingliuTest {
         Battle battle = new Battle(List.of(jingliu), List.of(enemy), fixed());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
         Assertions.assertEquals(1, jingliu.getBuffManager().stacksOf("朔望"),
                 "「并获得1层【朔望】」 (and gains 1 stack of [朔望])");
 
         for (int i = 0; i < 4; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
         }
         Assertions.assertEquals(3, jingliu.getBuffManager().stacksOf("朔望"),
                 "「【朔望】最多可累计3层」 ([朔望] accumulates at most 3 stacks) -- five casts must still read three");
@@ -68,9 +68,9 @@ public class JingliuTest {
         Battle battle = new Battle(List.of(jingliu), List.of(enemy), fixed());
         battle.startBattle();
         for (int i = 0; i < casts; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
         }
-        for (com.laosun.aluminium.models.Signal signal : battle.queue().snapshot()) {
+        for (com.laosun.aluminium.Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == jingliu) {
                 return battle.queue().getTimeRemaining(signal);
             }

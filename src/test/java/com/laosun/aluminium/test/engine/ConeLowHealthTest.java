@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -31,7 +31,7 @@ public class ConeLowHealthTest {
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         double base = unit.getAttribute(AttributeType.ATTACK).baseValue();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, null, 0, 0));
         double gain = unit.getAttribute(AttributeType.ATTACK).get() - before;
         Assertions.assertTrue(gain > 0, "a kill grants attack (gain " + gain + ", base " + base + ")");
     }
@@ -59,7 +59,7 @@ public class ConeLowHealthTest {
         }
         double before = unit.getAttribute(attribute).get();
         double base = unit.getAttribute(attribute).baseValue();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, unit, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, unit, null, 0, 0));
         double gain = unit.getAttribute(attribute).get() - before;
         return attribute == AttributeType.CRIT_CHANCE ? gain : gain / base;
     }

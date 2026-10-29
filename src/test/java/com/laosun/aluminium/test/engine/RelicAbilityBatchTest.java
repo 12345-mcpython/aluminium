@@ -8,14 +8,14 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.enemy.SummonFactory;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.StatModifierBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.enemy.SummonFactory;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * A content pass over the {@code Writable now:} backlog - five relic abilities whose every clause
@@ -132,11 +132,11 @@ public class RelicAbilityBatchTest {
         battle.startBattle();
         double before = wearer.getCurrentEnergy();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, ally, dummy(), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, ally, dummy(), 0, 0));
         Assertions.assertEquals(before, wearer.getCurrentEnergy(), EPS,
                 "「装备者击破」 (a break by the wearer): a teammate's break is not hers");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, dummy(), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, dummy(), 0, 0));
         Assertions.assertEquals(before + 3, wearer.getCurrentEnergy(), EPS,
                 "param #2 is 3 -- the registered reason's 8 has no parameter behind it");
     }
@@ -161,7 +161,7 @@ public class RelicAbilityBatchTest {
         Enemy clean = dummy();
         Battle battle = new Battle(List.of(wearer, ally), List.of(debuffed, clean), BattleFixture.seeded());
         battle.startBattle();
-        debuffed.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(
+        debuffed.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(
                 wearer, DamageElement.FIRE, 1, 2));      // any debuff: the count is what the text asks for
 
         double onDebuffed = hit(battle, wearer, debuffed);
@@ -198,7 +198,7 @@ public class RelicAbilityBatchTest {
         Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS, "param #1");
         Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS, "param #1");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, null, 0, 0));
 
         Assertions.assertEquals(0.45, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
                 "0.20 + 0.25: 「额外提高」 (raised by an extra amount) adds, which is what max_stacks: 2 is for");
@@ -238,7 +238,7 @@ public class RelicAbilityBatchTest {
         // Measured as a delta: the relic's random sub-stats can carry FIRE_DAMAGE_BOOST themselves, which is
         // how the first draft of this case came out at 0.444.
         double before = boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, null, 0, 0));
         Assertions.assertEquals(before + 0.12, boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST), EPS, "param #2");
 
         battle.castImmediate(new DefaultSkill(WEARER, 1, 1), wearer, List.of(battle.enemyUnits().getFirst()));
@@ -256,11 +256,11 @@ public class RelicAbilityBatchTest {
         Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, dummy(), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, dummy(), 0, 0));
         Assertions.assertEquals(0, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
                 "「装备者施放追加攻击时」 (when the wearer casts a follow-up attack): a teammate's follow-up is not hers");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, dummy(), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, dummy(), 0, 0));
         Assertions.assertEquals(0.36, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
                 "param #2 is 0.36 -- the registered reason said 12%");
     }
@@ -291,7 +291,7 @@ public class RelicAbilityBatchTest {
         double wearerHp = wearer.getMaxHp();
         double allyBoost = boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST);
 
-        Assertions.assertDoesNotThrow(() -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0)),
+        Assertions.assertDoesNotThrow(() -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0)),
                 "no memosprite out: the condition keeps the summon-targeted effect from being reached");
         Assertions.assertEquals(wearerHp, wearer.getMaxHp(), EPS, "…so nothing was granted");
 
@@ -302,7 +302,7 @@ public class RelicAbilityBatchTest {
         // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
         Summon evey = battle.summon(wearer, MONSTER, 1);
         battle.processRequests();                                // where SUMMONED is fired, by design
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0));
 
         double bareHp = CharacterFactory.create(WEARER, LEVEL).getMaxHp();
         Assertions.assertEquals(0.24 * bareHp, wearer.getMaxHp() - wearerHp, 0.5,
@@ -532,8 +532,8 @@ public class RelicAbilityBatchTest {
         Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        for (com.laosun.aluminium.models.buff.StatModifierBuff buff
-                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class)) {
+        for (com.laosun.aluminium.buff.StatModifierBuff buff
+                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StatModifierBuff.class)) {
             if (buff.getAttribute() == AttributeType.ALL_DAMAGE_TYPE_BOOST) {
                 return buff.getValue();
             }
@@ -569,8 +569,8 @@ public class RelicAbilityBatchTest {
         Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        for (com.laosun.aluminium.models.buff.StatModifierBuff buff
-                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class)) {
+        for (com.laosun.aluminium.buff.StatModifierBuff buff
+                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StatModifierBuff.class)) {
             if (buff.getAttribute() == AttributeType.CRIT_CHANCE) {
                 return buff.getValue();
             }
@@ -667,7 +667,7 @@ public class RelicAbilityBatchTest {
         Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         enemy.getBuffManager().addBuff(
-                new com.laosun.aluminium.models.buff.DotBuff(wearer, DamageElement.FIRE, 100, 3));
+                new com.laosun.aluminium.buff.DotBuff(wearer, DamageElement.FIRE, 100, 3));
         double before = enemy.getCurrentHp();
 
         for (int guard = 0; guard < 40; guard++) {
@@ -690,8 +690,8 @@ public class RelicAbilityBatchTest {
         Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        for (com.laosun.aluminium.models.buff.StatModifierBuff buff
-                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class)) {
+        for (com.laosun.aluminium.buff.StatModifierBuff buff
+                : wearer.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StatModifierBuff.class)) {
             if (buff.getAttribute() == AttributeType.DOT_DAMAGE_BOOST) {
                 return buff.getValue();
             }

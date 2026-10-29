@@ -7,9 +7,9 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -104,7 +104,7 @@ public class TurnSuspensionTest {
          */
         private void suspendMarchFromARule() {
             march.setTriggerTable(new TriggerTable(MARCH, List.of(turnStartMarker(), suspendingState())));
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, march, march, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, march, march, 0, 0));
             Assertions.assertTrue(march.getBuffManager().suspendsTurns(),
                     "precondition: the state carries the flag");
             march.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 200, 3));

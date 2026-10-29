@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -286,7 +286,7 @@ public class SilverWolfLV999KitTest {
      * Fires the Elation skill's cast event, which is what her trace and her slot-20 rule both hang on.
      */
     private static void fireElationSkill(Battle battle, Character wolf) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wolf, battle.enemyUnits().getFirst(), 0, 0,
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wolf, battle.enemyUnits().getFirst(), 0, 0,
                 com.laosun.aluminium.enums.SkillCategory.ELATION_DAMAGE, 20, 0, java.util.List.of()));
         battle.processRequests();
     }
@@ -299,7 +299,7 @@ public class SilverWolfLV999KitTest {
         battle.processRequests();
         // Note: Driven here because the fixture casts directly rather than through a move, so the engine's own
         // end-of-attack announcement never runs. The rule that ends 【无敌玩家】 hangs on this event.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, unit, victim, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, unit, victim, 1, 0));
         battle.processRequests();
     }
 

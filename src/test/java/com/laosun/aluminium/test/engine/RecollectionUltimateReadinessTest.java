@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +41,7 @@ public class RecollectionUltimateReadinessTest {
         battle.processRequests();
         her = battle.characters().getFirst();
         if (insideTheRipple) {
-            com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.ULTRA),
+            com.laosun.aluminium.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.ULTRA),
                     her, List.of(battle.enemies().getFirst()));
             battle.processRequests();
             her = battle.characters().getFirst();
@@ -49,7 +49,7 @@ public class RecollectionUltimateReadinessTest {
                     "precondition: the ripple came up with her ultimate");
         }
         her.getResources().gain(MEMORY, seeded);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.COMMON), her,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.COMMON), her,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return battle.isUltraReady(battle.characters().getFirst());

@@ -4,17 +4,17 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * 1220's trace (行迹) "解形" (1220102): "the follow-up attack's CRIT DMG is increased by 36%".
@@ -55,8 +55,8 @@ public class FeixiaoFollowUpCritTest {
         // NOT fixedCrit: that path bypasses the crit zone, so an instance's extra crit damage stays invisible
         // (measured: the ratio stayed exactly 1.0). A guaranteed crit instead -- the zone runs and the roll cannot fail.
         unit.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
-                .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(
-                        2.0, com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BUFF, 122001));
+                .addModifier(com.laosun.aluminium.DoubleValue.Modifier.pure(
+                        2.0, com.laosun.aluminium.DoubleValue.Modifier.ModifierSource.BUFF, 122001));
         Assertions.assertTrue(unit.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE).get() >= 1.0,
                 "precondition: every hit crits");
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.WIND, DamageType.NORMAL, 1000));

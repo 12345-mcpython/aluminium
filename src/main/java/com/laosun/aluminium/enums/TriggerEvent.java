@@ -2,10 +2,10 @@ package com.laosun.aluminium.enums;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Countdown;
-import com.laosun.aluminium.models.battle.WaveManager;
-import com.laosun.aluminium.models.state.ResourceManager;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Countdown;
+import com.laosun.aluminium.battle.WaveManager;
+import com.laosun.aluminium.state.ResourceManager;
 
 /**
  * The trigger sources a character mechanic can subscribe to.
@@ -17,7 +17,7 @@ import com.laosun.aluminium.models.state.ResourceManager;
  *
  * <p>Note: <b>Not every value is wired yet.</b> The ones marked have an emitter in the engine; the
  * rest are declared so the JSON vocabulary is stable and so an unwired trigger fails <b>loudly at
- * load time</b> ({@link #isWired()}) rather than silently doing nothing. See {@link com.laosun.aluminium.models.trigger.TriggerVocabulary}
+ * load time</b> ({@link #isWired()}) rather than silently doing nothing. See {@link com.laosun.aluminium.trigger.TriggerVocabulary}
  * for the events that actually fire today.
  */
 public enum TriggerEvent {
@@ -196,7 +196,7 @@ public enum TriggerEvent {
      *
      * <p>Note: <b>Fired from two places, deliberately.</b> A shield reaches the field either as a raw grant
      * ({@code Battle.grantShield}, no {@code turns}) or through a
-     * {@link com.laosun.aluminium.models.buff.ShieldBuff} (timed). The buff is applied by the buff manager, which
+     * {@link com.laosun.aluminium.buff.ShieldBuff} (timed). The buff is applied by the buff manager, which
      * has no {@code Battle} handle, so the interpreter fires this from the timed arm itself - the two paths
      * disagree about who owns the lifetime, not about the fact being announced.
      *
@@ -337,7 +337,7 @@ public enum TriggerEvent {
      *
      * <p><b>It is fired for a summon of either camp</b> (a boss's minion attacks too); which summons a
      * rule cares about is its own question, and the condition for it is {@code actor == summon} (the
-     * rule owner's own summon) - see {@link com.laosun.aluminium.models.trigger.TriggerVocabulary}. Without that condition a rule would also
+     * rule owner's own summon) - see {@link com.laosun.aluminium.trigger.TriggerVocabulary}. Without that condition a rule would also
      * fire when a <em>teammate's</em> summon attacks, which is the same over-trigger in another coat.
      *
      * <p>An attack that connected with nothing does not fire it, and neither does a summon with no
@@ -352,7 +352,7 @@ public enum TriggerEvent {
      * null and {@code SkillExecutor} must not be reused for it. So an enemy attack told nobody, and a clause of
      * the form "when an enemy attacks" had no event to hang off. That is the lead half of F-5.
      *
-     * <p>Fired only when the user is an {@link com.laosun.aluminium.models.enemy.Enemy} -- a memosprite
+     * <p>Fired only when the user is an {@link com.laosun.aluminium.enemy.Enemy} -- a memosprite
      * attacking through the same class raises {@link #SUMMON_ATTACK} instead -- and only when something was
      * really hit. Its subject is the attacker and its target is the VICTIM, so "an enemy attacked me" is
      * expressible as {@code target == self}.
@@ -427,7 +427,7 @@ public enum TriggerEvent {
      *
      * <p><b>Why the moment needs an event at all.</b> Robin (知更鸟)'s [协奏] lasts "until its countdown's turn arrives", which is a fact about
      * the <b>action order</b> rather than about anybody's turn count - so the state cannot be given a `turns` and the
-     * arrival has to be announced. The countdown is an ordinary {@link com.laosun.aluminium.models.entity.Countdown} scheduled
+     * arrival has to be announced. The countdown is an ordinary {@link com.laosun.aluminium.entity.Countdown} scheduled
      * by the queue, which is what makes advances/breaks move it for free.
      *
      * <p>Note: <b>{@code actor} is the countdown, not the character whose state it ends.</b> The rule that reacts is

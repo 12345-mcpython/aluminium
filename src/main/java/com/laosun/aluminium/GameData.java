@@ -16,10 +16,10 @@ import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.data.WeaponTriggerTables;
-import com.laosun.aluminium.models.trigger.RelicTriggerTableProvider;
-import com.laosun.aluminium.models.trigger.TriggerTable;
-import com.laosun.aluminium.models.trigger.TriggerTableProvider;
-import com.laosun.aluminium.models.trigger.WeaponTriggerTableProvider;
+import com.laosun.aluminium.trigger.RelicTriggerTableProvider;
+import com.laosun.aluminium.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.TriggerTableProvider;
+import com.laosun.aluminium.trigger.WeaponTriggerTableProvider;
 import com.laosun.aluminium.utils.JSONReader;
 import com.laosun.aluminium.utils.MapUtils;
 

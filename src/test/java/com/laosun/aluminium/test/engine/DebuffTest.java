@@ -7,10 +7,10 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.*;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.*;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -150,14 +150,14 @@ public class DebuffTest {
         dummy.getBuffManager().addBuff(new DotBuff(actor, DamageElement.FIRE, 100, 3));
         dummy.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.2));
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, dummy, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, dummy, 1, 0)),
                 "the subject carries two debuffs");
 
         dummy.getBuffManager().removeOneBuff(VulnerabilityBuff.class);
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, dummy, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, dummy, 1, 0)),
                 "now it carries one, so 「>= 2」 fails");
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0)),
                 "an event with no subject reads NaN, which fails every comparison instead of passing it");
     }
 
@@ -171,7 +171,7 @@ public class DebuffTest {
         Enemy dummy = battle.enemyUnits().getFirst();
         actor.getBuffManager().addBuff(new DotBuff(actor, DamageElement.FIRE, 100, 3));
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, dummy, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, dummy, 1, 0)),
                 "MY debuffs are not the target's debuffs");
     }
 
@@ -256,7 +256,7 @@ public class DebuffTest {
     }
 
     private static int fire(Battle battle, Character actor) {
-        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
+        return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     private static Enemy dummy() {

@@ -3,7 +3,7 @@ package com.laosun.aluminium.data;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.SkillEffectSpec;
-import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.skill.Skill;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;

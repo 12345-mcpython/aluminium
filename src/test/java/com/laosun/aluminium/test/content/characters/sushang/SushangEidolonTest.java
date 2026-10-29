@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.ReductionBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.ReductionBuff;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -139,14 +139,14 @@ public class SushangEidolonTest {
                         > rankZero.sushang.getAttribute(AttributeType.SPEED).get(),
                 "「进入战斗后素裳立即获得1层天赋的加速效果」 - rank 6 starts faster before anything breaks");
 
-        atSix.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
+        atSix.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
         double afterOne = atSix.sushang.getAttribute(AttributeType.SPEED).get();
-        atSix.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
+        atSix.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
         double afterTwo = atSix.sushang.getAttribute(AttributeType.SPEED).get();
         Assertions.assertTrue(afterTwo > afterOne,
                 "「天赋的加速效果可以叠加」 - a second break stacks: " + afterOne + " -> " + afterTwo);
 
-        atSix.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
+        atSix.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
         Assertions.assertEquals(afterTwo, atSix.sushang.getAttribute(AttributeType.SPEED).get(), 1e-9,
                 "「最多叠加2层」 - a third break changes nothing");
     }

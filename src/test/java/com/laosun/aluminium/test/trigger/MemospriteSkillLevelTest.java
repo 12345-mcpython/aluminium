@@ -7,11 +7,11 @@ import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.skill.SkillExecutor;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * A <b>memosprite's</b> skill level: 「忆灵技等级+1」, and reading one of its rows from somebody else's event.
@@ -38,7 +38,7 @@ import com.laosun.aluminium.models.entity.CanHit;
  * inherits the raise without a copy step.
  *
  * <p><b>Why a custom spec in one case.</b> Every shipped memosprite is declared at level 10 and every one of its tables
- * has ten rows - so a container-level raise clamps straight back to 10 ({@link com.laosun.aluminium.models.entity.CanHit#skillLevel}
+ * has ten rows - so a container-level raise clamps straight back to 10 ({@link com.laosun.aluminium.entity.CanHit#skillLevel}
  * clamps to the table's row count, which IS the documented cap). To watch the number move, that case builds the same
  * spec at a lower declared level, i.e. the state a future 「忆灵技等级+1」 would move.
  */
@@ -94,7 +94,7 @@ public class MemospriteSkillLevelTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         MemospriteSpec declaredAtFive = withDeclaredLevel(Memosprites.of(CYRENE), ODE, 5);
 
-        Summon plain = com.laosun.aluminium.models.enemy.SummonFactory.memosprite(cyrene, declaredAtFive);
+        Summon plain = com.laosun.aluminium.enemy.SummonFactory.memosprite(cyrene, declaredAtFive);
         // Note: The factory builds, the BATTLE links (`Battle.summonMemosprite` sets the master). A test that skips the
         // battle has to set it itself, or the level resolver has no summoner to ask.
         plain.setMaster(cyrene);
@@ -102,7 +102,7 @@ public class MemospriteSkillLevelTest {
                 "no raise, so the level is exactly what the spec declares");
 
         cyrene.raiseMemospriteSkillLevel(ODE, 1);
-        Summon raised = com.laosun.aluminium.models.enemy.SummonFactory.memosprite(cyrene, declaredAtFive);
+        Summon raised = com.laosun.aluminium.enemy.SummonFactory.memosprite(cyrene, declaredAtFive);
         raised.setMaster(cyrene);
         // Note: The RECEIVER is the memosprite - that is who casts, and `skillLevel` is the resolver `SkillExecutor`
         // calls on the caster. Asking the character instead finds no such skill in its own map and answers the bare
@@ -121,13 +121,13 @@ public class MemospriteSkillLevelTest {
     public void aRaisePastTheTableIsClampedToTheTablesRows() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         MemospriteSpec shipped = Memosprites.of(CYRENE);
-        Summon atTen = com.laosun.aluminium.models.enemy.SummonFactory.memosprite(cyrene, shipped);
+        Summon atTen = com.laosun.aluminium.enemy.SummonFactory.memosprite(cyrene, shipped);
         int rows = atTen.skillAt(ODE).getData().getSkills().size();
         Assertions.assertEquals(rows, atTen.skillLevel(atTen.skillAt(ODE)),
                 "precondition: the shipped spec declares the last row");
 
         cyrene.raiseMemospriteSkillLevel(ODE, 1);
-        Summon afterRaise = com.laosun.aluminium.models.enemy.SummonFactory.memosprite(cyrene, shipped);
+        Summon afterRaise = com.laosun.aluminium.enemy.SummonFactory.memosprite(cyrene, shipped);
         Assertions.assertEquals(rows, afterRaise.skillLevel(afterRaise.skillAt(ODE)),
                 "a raise cannot read a row the data does not have");
     }
@@ -274,7 +274,7 @@ public class MemospriteSkillLevelTest {
 
             before = cyrene.getAttribute(AttributeType.ATTACK).get();
             if ("percent".equals(spelling)) {
-                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
+                battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
             } else {
                 SkillExecutor.execute(battle, ode(), demiurge, List.of(battle.characters().get(1)));
             }

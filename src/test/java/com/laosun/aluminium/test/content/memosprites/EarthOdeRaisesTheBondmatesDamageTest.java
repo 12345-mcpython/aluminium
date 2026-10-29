@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.memosprites;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -27,7 +27,7 @@ public class EarthOdeRaisesTheBondmatesDamageTest {
         battle.processRequests();
         // his own skill hands [同袍] to the one it is aimed at
         him = battle.characters().get(1);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, him.getSkills().get(SkillType.SKILL), him,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, him.getSkills().get(SkillType.SKILL), him,
                 List.of(battle.characters().get(2)));
         battle.processRequests();
         Assertions.assertTrue(battle.characters().get(2).getBuffManager().hasState("同袍"),
@@ -38,7 +38,7 @@ public class EarthOdeRaisesTheBondmatesDamageTest {
         battle.processRequests();
         var ode = sprite.skillAt(25);
         Assertions.assertNotNull(ode, "precondition: slot 25");
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite,
                 List.of(battle.characters().get(1)));
         battle.processRequests();
         double after = battle.characters().get(2).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();

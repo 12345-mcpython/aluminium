@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.characters.cyrene;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.SkillEffectSpec;
 import com.laosun.aluminium.data.SkillEffects;
-import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.skill.DefaultSkill;
 import com.laosun.aluminium.utils.JSONReader;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

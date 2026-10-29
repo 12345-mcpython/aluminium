@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -37,7 +37,7 @@ public class ConeAuditBatchThirteenTest {
 
         Summon sprite = f.battle.summonServant(f.wearer);
         double before = f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, f.ally, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, f.ally, 0, 0));
         double after = f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[21050] 忆灵对队友施放技能后，队友的增伤 " + before + " -> " + after);
         Assertions.assertEquals(0.08, after - before, 1e-9, "「忆灵对我方目标施放技能时，我方全体伤害 +8%」");
@@ -91,7 +91,7 @@ public class ConeAuditBatchThirteenTest {
         Summon sprite = f.battle.summonServant(f.wearer);
         double wearerBefore = f.wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double spriteBefore = sprite.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, sprite, f.battle.enemyUnits().getFirst(), 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, sprite, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[21054] 治疗加成: 她 " + wearerBefore + " -> "
                 + f.wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() + " ; 忆灵 " + spriteBefore + " -> "
                 + sprite.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get());
@@ -109,7 +109,7 @@ public class ConeAuditBatchThirteenTest {
         Fixture f = new Fixture(21055);
         double allyBefore = f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         double wearerBefore = f.wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, f.ally, f.battle.enemyUnits().getFirst(), 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, f.ally, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[21055] 队友的增伤 " + allyBefore + " -> "
                 + f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() + " ; 她的 " + wearerBefore + " -> "
                 + f.wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());

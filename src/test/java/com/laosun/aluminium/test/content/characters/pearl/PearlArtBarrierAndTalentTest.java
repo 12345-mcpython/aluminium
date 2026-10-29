@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -41,8 +41,8 @@ public class PearlArtBarrierAndTalentTest {
         Character elation = battle.characters().get(1);
         Character hunter = battle.characters().get(2);
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, elation, 0, 0));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, elation, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0));
         boolean onElation = elation.getBuffManager().hasState(BARRIER);
         boolean onHunter = hunter.getBuffManager().hasState(BARRIER);
         System.out.println("[pearl_barrier] on the Elation ally = " + onElation + " ; on the Hunt ally = " + onHunter);
@@ -57,11 +57,11 @@ public class PearlArtBarrierAndTalentTest {
         Character ally = battle.characters().get(2);
 
         ally.takeDamage(ally.getMaxHp() * 0.8);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, ally, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, ally, ally, 0, 0));
         boolean below = ally.getBuffManager().hasState(GRIT);
 
         ally.heal(ally.getMaxHp());
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, ally, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, ally, ally, 0, 0));
         boolean above = ally.getBuffManager().hasState(GRIT);
         System.out.println("[pearl_talent] reduction below half = " + below + " ; after healing above half = " + above);
 
@@ -105,7 +105,7 @@ public class PearlArtBarrierAndTalentTest {
 
         double withTalent = hurtBy(battle, attacker, ally, readingInstance);
         ally.getBuffManager().removeState(GRIT);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, ally, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, ally, ally, 0, 0));
         Assertions.assertFalse(ally.getBuffManager().hasState(GRIT),
                 "precondition: the reduction is off for the control reading");
         double without = hurtBy(battle, attacker, ally, readingInstance);

@@ -6,7 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
-import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.trigger.TriggerInterpreter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -14,10 +14,10 @@ import lombok.ToString;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.state.Resource;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.state.Resource;
+import com.laosun.aluminium.entity.Character;
 
 /**
  * One effect inside a trigger: "do this".
@@ -613,7 +613,7 @@ public class EffectSpec {
      * "将笑点计入该状态": apply this state as a <b>stackable</b> one (1505's [好活当赏]).
      *
      * <p>A plain state REFRESHES when re-applied (its identity is its name, deliberately), so a count cannot ride on it;
-     * this flag selects {@link com.laosun.aluminium.models.buff.StackableStateBuff}, whose instances accumulate and are
+     * this flag selects {@link com.laosun.aluminium.buff.StackableStateBuff}, whose instances accumulate and are
      * counted by name, while still being the `StateBuff` that announces its own end.
      */
     @SerializedName("stackable")
@@ -829,7 +829,7 @@ public class EffectSpec {
      *
      * <p>Note: Only {@code APPLY_BUFF} reads it. The engine holds the death instead of committing it, and commits it at the
      * carrier's next turn if the state is still there -- so the state's own removal is what saves the carrier. See
-     * {@link com.laosun.aluminium.models.buff.DeferredDeathBuff}.
+     * {@link com.laosun.aluminium.buff.DeferredDeathBuff}.
      */
     @SerializedName("defers_death")
     private Boolean defersDeath;

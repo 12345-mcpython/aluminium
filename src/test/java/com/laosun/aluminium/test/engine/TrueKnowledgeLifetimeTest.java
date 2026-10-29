@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -38,11 +38,11 @@ public class TrueKnowledgeLifetimeTest {
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 18");
         Character aimed = battle.characters().get(1);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
         aimed = battle.characters().get(1);
         var basic = aimed.getSkills().get(SkillType.COMMON);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, basic, aimed,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, basic, aimed,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         boolean still = battle.characters().get(1).getBuffManager().hasState(KNOWLEDGE);

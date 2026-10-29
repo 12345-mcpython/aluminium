@@ -4,13 +4,13 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 import java.util.Map;
-import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.equipment.RelicSuit;
 
 /**
  * The six equipment slots on a character that can hold relics.
  *
  * <p>Each type has a fixed pool of possible main attributes and can
- * appear exactly once in a {@link com.laosun.aluminium.models.equipment.RelicSuit}.
+ * appear exactly once in a {@link com.laosun.aluminium.equipment.RelicSuit}.
  */
 @Getter
 public enum RelicType {

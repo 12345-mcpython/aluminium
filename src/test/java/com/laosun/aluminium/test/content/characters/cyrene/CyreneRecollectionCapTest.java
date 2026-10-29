@@ -2,9 +2,9 @@ package com.laosun.aluminium.test.content.characters.cyrene;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.ControlBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.ControlBuff;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class CyreneRecollectionCapTest {
         Assertions.assertTrue(her.getBuffManager().debuffCount() > 0, "precondition: she carries a debuff");
         her.getResources().gain(MEMORY, 23);
         var basic = her.getSkills().get(SkillType.COMMON);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, basic, her,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, basic, her,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         int left = battle.characters().getFirst().getBuffManager().debuffCount();

@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.characters.pearl;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -109,7 +109,7 @@ public class PearlEidolon2RewardTest {
         Character archetype = battle.characters().get(1);
 
         int punchlineStart = battle.partyResource(PUNCHLINE).value();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0));
         battle.processRequests();
         int granted = pearl.getResources().value(COUNTER);
         int punchlineGranted = battle.partyResource(PUNCHLINE).value() - punchlineStart;
@@ -117,7 +117,7 @@ public class PearlEidolon2RewardTest {
             pearl.getResources().spend(COUNTER, spendAfterGrant);
         }
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0));
         battle.processRequests();
 
         // What is left after the closing clause, measured against where the turn started on each counter.
@@ -134,7 +134,7 @@ public class PearlEidolon2RewardTest {
         battle.startBattle();
         battle.processRequests();
         battle.characters().get(1).getBuffManager()
-                .addBuff(new com.laosun.aluminium.models.buff.StateBuff("美学底本", 3, false));
+                .addBuff(new com.laosun.aluminium.buff.StateBuff("美学底本", 3, false));
         return battle;
     }
 }

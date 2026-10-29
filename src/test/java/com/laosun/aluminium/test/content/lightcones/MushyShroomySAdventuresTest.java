@@ -5,11 +5,11 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -53,7 +53,7 @@ public class MushyShroomySAdventuresTest {
     private void elationCast(Battle battle, SkillCategory category) {
         var skill = wearer.getSkills().values().iterator().next();
         var token = battle.beginCast(skill, wearer);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wearer, enemy, 0, 0, category, 0, 0, java.util.List.of()));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wearer, enemy, 0, 0, category, 0, 0, java.util.List.of()));
         battle.endCastOutcome();
         battle.endCast(token);
     }
@@ -97,7 +97,7 @@ public class MushyShroomySAdventuresTest {
         Enemy target = BattleFixture.monster();
         Battle arena = new Battle(List.of(caster), List.of(target), BattleFixture.seeded());
         arena.startBattle();
-        var elation = new com.laosun.aluminium.models.skill.DefaultSkill(1513, 20, LEVEL);
+        var elation = new com.laosun.aluminium.skill.DefaultSkill(1513, 20, LEVEL);
         Assertions.assertNotNull(elation.getData(), "1513 has a skill at slot 20");
         Assertions.assertEquals(SkillCategory.ELATION_DAMAGE, elation.getData().getCategory(),
                 "and its data spells the category ElationDamage");

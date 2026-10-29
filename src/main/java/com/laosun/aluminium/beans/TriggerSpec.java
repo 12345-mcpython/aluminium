@@ -1,13 +1,13 @@
 package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.TriggerTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * One trigger rule from {@code resources/game/characters/<cid>.json}:

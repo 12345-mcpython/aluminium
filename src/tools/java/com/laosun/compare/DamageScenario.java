@@ -7,7 +7,7 @@ import lombok.Setter;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * One comparison scenario: <b>what the original game computed, next to what this engine computes</b>.

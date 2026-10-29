@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -73,7 +73,7 @@ public class StackScaledMagnitudeTest {
 
     private static void mark(Fixture f, int stacks) {
         for (int i = 0; i < stacks; i++) {
-            f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, f.jiaoqiu, f.enemy, 1, 1000));
+            f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, f.jiaoqiu, f.enemy, 1, 1000));
         }
         Assertions.assertEquals(stacks, f.enemy.getBuffManager().stacksOf(COUNTER),
                 "precondition: the talent marked exactly " + stacks + " stack(s)");

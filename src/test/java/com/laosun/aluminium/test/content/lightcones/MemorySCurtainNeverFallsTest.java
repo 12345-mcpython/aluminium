@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -50,7 +50,7 @@ public class MemorySCurtainNeverFallsTest {
     public void aSkillLiftsTheWholeParty() {
         Battle battle = battle(true);
         double before = partyBoost();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         double after = partyBoost();
         System.out.println("[24005] party damage boost before=" + before + " after a Skill=" + after);
         Assertions.assertEquals(2 * BOOST, after - before, 1e-9, "8% each for the wearer and the ally");
@@ -60,7 +60,7 @@ public class MemorySCurtainNeverFallsTest {
     public void somebodyElsesSkillDoesNotCount() {
         Battle battle = battle(true);
         double before = partyBoost();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, enemy, 0, 0));
         System.out.println("[24005] after the ALLY's Skill: +" + (partyBoost() - before));
         Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "the wearer's own cast (false case)");
     }
@@ -91,7 +91,7 @@ public class MemorySCurtainNeverFallsTest {
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
         double before = partyBoost();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         System.out.println("[24005] without the cone: +" + (partyBoost() - before));
         Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "no cone, no boost (false case)");
     }

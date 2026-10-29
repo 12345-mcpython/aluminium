@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.playerboy;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -48,7 +48,7 @@ public class TrailblazerDefencePerStackTest {
         double base = trailblazer.getAttribute(AttributeType.DEFENCE).baseValue();
         double before = trailblazer.getAttribute(AttributeType.DEFENCE).get();
         for (int i = 0; i < layers; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, trailblazer, enemy, 1, 1000));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, trailblazer, enemy, 1, 1000));
         }
         Assertions.assertEquals(layers, trailblazer.getBuffManager().stacksOf(counter),
                 "precondition: the talent marked exactly " + layers + " layer(s)");

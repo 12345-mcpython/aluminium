@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -53,10 +53,10 @@ public class SparkleTest {
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 0));
         double afterOne = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         for (int i = 0; i < 4; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 0));
         }
         double afterFive = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
@@ -79,7 +79,7 @@ public class SparkleTest {
         Assertions.assertTrue(battle.spendSkillPoint(), "the fixture must have a point to spend");
         int before = battle.getSkillPoints();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, sparkle, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, sparkle, enemy, 0, 0));
 
         Assertions.assertEquals(Math.min(before + 4, battle.getSkillPointMax()), battle.getSkillPoints(),
                 "「为我方恢复 4 个战技点」 (clamped by the pool's ceiling)");

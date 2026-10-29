@@ -4,18 +4,18 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * Light cone 23006: a hit inflicts [游丝] -- a NAMED thunder damage-over-time -- and a target in [游丝]
@@ -39,8 +39,8 @@ public class PatienceIsAllYouNeedTest {
         // Note: A base chance of 1.0 still ROLLS against the victim's effect RES (the project's own rule), so the applier
         // has to hold EFFECT_HIT_RATE or the DOT never lands and the reading is a silent zero (measured this round).
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_HIT_RATE)
-                .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(
-                        1.0, com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BUFF, 230600));
+                .addModifier(com.laosun.aluminium.DoubleValue.Modifier.pure(
+                        1.0, com.laosun.aluminium.DoubleValue.Modifier.ModifierSource.BUFF, 230600));
         Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
@@ -67,7 +67,7 @@ public class PatienceIsAllYouNeedTest {
         enemy = BattleFixture.monster();
         // The UNNAMED thunder DOT, built directly: the element alone, which is everything this engine could express
         // before today. (An event-driven fixture needs an event that carries a target, and BATTLE_START does not -- measured.)
-        enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(
                 wearer, DamageElement.THUNDER, 20, 2));
         boolean thread = enemy.getBuffManager().hasState("游丝");
         boolean shock = enemy.getBuffManager().hasState("触电");

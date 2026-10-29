@@ -1,8 +1,8 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -47,7 +47,7 @@ public class TrueSelfOdeGivesStoryTest {
             battle.processRequests();
             var ode = sprite.skillAt(ODE_SLOT);
             Assertions.assertNotNull(ode, "precondition: slot 26");
-            com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(cyrene));
+            com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite, List.of(cyrene));
             battle.processRequests();
             cyrene = battle.characters().getFirst();
         }
@@ -56,7 +56,7 @@ public class TrueSelfOdeGivesStoryTest {
         cyrene = battle.characters().getFirst();
         var ult = cyrene.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: her ultimate");
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ult, cyrene,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ult, cyrene,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return dragon.getResources().has(STORY) ? dragon.getResources().value(STORY) : 0;

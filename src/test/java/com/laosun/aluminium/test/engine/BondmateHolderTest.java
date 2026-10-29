@@ -5,12 +5,12 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.buff.StateBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -70,7 +70,7 @@ public class BondmateHolderTest {
         double firstBefore = first.getAttribute(AttributeType.ATTACK).get();
         double secondBefore = second.getAttribute(AttributeType.ATTACK).get();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, first, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, first, 0, 0));
         Assertions.assertEquals(firstBefore, first.getAttribute(AttributeType.ATTACK).get(), EPS,
                 "nobody holds " + BONDMATE + " yet, so the effect must reach nobody (and must not throw)");
         Assertions.assertEquals(secondBefore, second.getAttribute(AttributeType.ATTACK).get(), EPS,
@@ -78,7 +78,7 @@ public class BondmateHolderTest {
 
         second.getBuffManager().addBuff(new StateBuff(BONDMATE, 3, false));
         double hisAttack = him.getAttribute(AttributeType.ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, first, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, first, 0, 0));
 
         Assertions.assertEquals(secondBefore + 0.15 * hisAttack, second.getAttribute(AttributeType.ATTACK).get(), EPS,
                 "the holder is buffed by 15% of HIS attack (" + hisAttack + ")");
@@ -146,7 +146,7 @@ public class BondmateHolderTest {
         double himBefore = him.getAttribute(AttributeType.ATTACK).get();
         double allyBefore = ally.getAttribute(AttributeType.ATTACK).get();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, ally, 0, 0));
 
         Assertions.assertTrue(ally.getBuffManager().hasState(BONDMATE),
                 "precondition: the cast designated the aimed ally as " + BONDMATE);
@@ -188,12 +188,12 @@ public class BondmateHolderTest {
         battle.startBattle();
 
         double before = him.getCurrentEnergy();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, him, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, him, enemy, 0, 0));
         Assertions.assertEquals(before, him.getCurrentEnergy(), EPS,
                 "the attacker does not hold " + BONDMATE + ", so nothing is paid");
 
         ally.getBuffManager().addBuff(new StateBuff(BONDMATE, 3, false));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(before + 6, him.getCurrentEnergy(), EPS,
                 "and when the Bondmate attacks, he gets 6");
     }

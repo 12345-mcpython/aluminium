@@ -5,10 +5,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -44,7 +44,7 @@ public class ConeAuditBatchSeventeenTest {
 
         Fixture g = new Fixture(23000, 2);
         double before = g.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST);
-        g.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, g.battle.enemyUnits().getFirst(),
+        g.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, g.battle.enemyUnits().getFirst(),
                 g.battle.enemyUnits().getFirst(), 0, 0));
         double after = g.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST) - before;
         System.out.println("[23000] 击破后的增伤 " + after);
@@ -201,7 +201,7 @@ public class ConeAuditBatchSeventeenTest {
             Weapon weapon = cone == null ? null : Weapon.build(cone, LEVEL, false, 1);
             this.wearer = CharacterFactory.create(WEARER, LEVEL, false, weapon);
             this.ally = CharacterFactory.create(1204, LEVEL);
-            List<com.laosun.aluminium.models.enemy.Enemy> foes = enemies == 1
+            List<com.laosun.aluminium.enemy.Enemy> foes = enemies == 1
                     ? List.of(BattleFixture.dummy())
                     : List.of(BattleFixture.dummy(), BattleFixture.dummy());
             this.battle = new Battle(List.of(wearer, ally), foes, BattleFixture.alwaysRoll(0.9999));

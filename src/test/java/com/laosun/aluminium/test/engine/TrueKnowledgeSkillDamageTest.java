@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -72,14 +72,14 @@ public class TrueKnowledgeSkillDamageTest {
         Assertions.assertNotNull(ode, "precondition: slot 18");
         // the SAME cast either way; only the aim moves
         Character aimed = battle.characters().get(atHim ? 1 : 0);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
         him = battle.characters().get(1);
         double captured = him.getResources().has(CAPTURED) ? him.getResources().value(CAPTURED) : 0;
         var skill = him.getSkills().get(slot);
         Assertions.assertNotNull(skill, "precondition: " + slot);
         double before = battle.enemies().getFirst().getCurrentHp();
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, skill, him,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, skill, him,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return new double[]{before - battle.enemies().getFirst().getCurrentHp(), captured,

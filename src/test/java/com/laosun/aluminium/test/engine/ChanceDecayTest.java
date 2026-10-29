@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -61,7 +61,7 @@ public class ChanceDecayTest {
         Assertions.assertEquals(2, wolf.getResources().value(COUNTER),
                 "a second success makes it 4%, so the 0.1 draw that passed at 20% now fires nothing");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wolf, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wolf, wolf, 0, 0));
         battle.processRequests();
         fire(battle, rng, 0.9);
         Assertions.assertEquals(3, wolf.getResources().value(COUNTER),
@@ -112,7 +112,7 @@ public class ChanceDecayTest {
     private static void fire(Battle battle, ScriptedRng rng, double draw) {
         rng.nextDoubleValue = draw;
         Character wolf = battle.characters().getFirst();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
         battle.processRequests();
     }
 

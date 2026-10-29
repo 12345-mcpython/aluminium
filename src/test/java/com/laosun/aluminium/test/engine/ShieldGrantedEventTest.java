@@ -7,9 +7,9 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * {@code SHIELD_GRANTED} - "a shield was granted" as an event, and Dahlia (大丽花)'s trace that needs it.
@@ -68,7 +68,7 @@ public class ShieldGrantedEventTest {
         f.ally.setTriggerTable(new TriggerTable(ALLY, List.of(timedShieldRule())));
         f.hurt();
 
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.ally, f.dahlia, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.ally, f.dahlia, 0, 0));
 
         Assertions.assertTrue(f.dahlia.getShield() > 0, "precondition: the timed shield is on her");
         Assertions.assertEquals(HEAL, f.healed(), EPS,
@@ -259,7 +259,7 @@ public class ShieldGrantedEventTest {
 
     private static Enemy enemy() {
         Enemy enemy = BattleFixture.monster();
-        enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new com.laosun.aluminium.models.DoubleValue(0));
+        enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new com.laosun.aluminium.DoubleValue(0));
         return enemy;
     }
 

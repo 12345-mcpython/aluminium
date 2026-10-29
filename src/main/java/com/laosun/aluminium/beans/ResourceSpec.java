@@ -1,9 +1,9 @@
 package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.state.Resource;
-import com.laosun.aluminium.models.state.ResourceManager;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.state.Resource;
+import com.laosun.aluminium.state.ResourceManager;
 
 /**
  * One resource a character <b>declares</b>, from the {@code resources} block of
@@ -18,7 +18,7 @@ import com.laosun.aluminium.models.state.ResourceManager;
  * }
  * </pre>
  *
- * <p><b>Why a declaration is needed at all.</b> {@link com.laosun.aluminium.models.state.ResourceManager#gain}
+ * <p><b>Why a declaration is needed at all.</b> {@link com.laosun.aluminium.state.ResourceManager#gain}
  * answers {@code 0} for an id it has never seen, and {@code value} answers {@code 0} too - so without a
  * declaration a {@code GAIN_RESOURCE} rule would load, fire, and quietly do nothing, and a
  * {@code self_resource:Charge (充能) >= 3} condition would be read as "0, so no". Both are wrong answers with no

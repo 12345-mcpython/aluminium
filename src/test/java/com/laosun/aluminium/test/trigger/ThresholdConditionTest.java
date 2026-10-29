@@ -4,10 +4,10 @@ package com.laosun.aluminium.test.trigger;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -74,7 +74,7 @@ public class ThresholdConditionTest {
                 TriggerEvent.ALLY_ATTACK.name(), List.of(condition), energy()))));
         Battle battle = new Battle(List.of(owner), List.of(enemy), fixed());
         battle.startBattle();
-        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0));
+        return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0));
     }
 
     /**
@@ -87,7 +87,7 @@ public class ThresholdConditionTest {
                 TriggerEvent.ALLY_ATTACK.name(), List.of(condition), energy()))));
         Battle battle = new Battle(List.of(owner), List.of(enemy), fixed());
         battle.startBattle();
-        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, hitCount, 0));
+        return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, hitCount, 0));
     }
 
     /**
@@ -104,7 +104,7 @@ public class ThresholdConditionTest {
             battle.applyDamage(owner, new Damage(enemy, owner, com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                     com.laosun.aluminium.enums.DamageType.NORMAL, owner.getMaxHp() * 0.9));
         }
-        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0));
+        return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0));
     }
 
     private static EffectSpec energy() {

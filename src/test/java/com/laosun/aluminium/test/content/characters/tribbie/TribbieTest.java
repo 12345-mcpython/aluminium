@@ -4,9 +4,9 @@ package com.laosun.aluminium.test.content.characters.tribbie;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -85,7 +85,7 @@ public class TribbieTest {
         Battle battle = new Battle(List.of(tribbie, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, teammate ? ally : tribbie, tribbie, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, teammate ? ally : tribbie, tribbie, 0, 0));
         return before - enemy.getCurrentHp();
     }
 
@@ -123,7 +123,7 @@ public class TribbieTest {
         Battle battle = new Battle(List.of(tribbie, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, tribbie, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, tribbie, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

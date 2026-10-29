@@ -6,13 +6,13 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -106,9 +106,9 @@ public class HimekoChargeTest {
 
         // Two more breaks: the third point lands, the fourth is swallowed by the cap (overflow is 0 by default,
         // so "上限3点" is enforced by the declaration rather than by arithmetic in the rule).
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
         Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "the cap is reached");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
         Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "and cannot be passed");
     }
 
@@ -190,7 +190,7 @@ public class HimekoChargeTest {
         chargeTo(himeko, first, battle);
 
         double secondBefore = second.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0));
         double dealt = secondBefore - second.getCurrentHp();
         Assertions.assertTrue(dealt > 0, "precondition: the follow-up landed on the second enemy");
 
@@ -217,10 +217,10 @@ public class HimekoChargeTest {
         battle.startBattle();
         chargeTo(himeko, first, battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
                 "the rule fires once");
         double secondBefore = second.getCurrentHp();
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
                 "the charge is gone, so nothing fires again");
         Assertions.assertEquals(secondBefore, second.getCurrentHp(), EPS);
     }
@@ -278,7 +278,7 @@ public class HimekoChargeTest {
      */
     private static void chargeTo(Character himeko, Enemy enemy, Battle battle) {
         while (himeko.getResources().value(CHARGE) < 3) {
-            Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, enemy, 0, 0)),
+            Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, enemy, 0, 0)),
                     "her break rule must fire for an enemy break");
         }
     }

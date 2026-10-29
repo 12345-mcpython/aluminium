@@ -5,15 +5,15 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * 1206 Sushang: the ultimate's two clauses, and the trace that counts her own Sword Stance.
@@ -48,7 +48,7 @@ public class SushangUltimateAndTraceTest {
         double before = f.remainingWaitOf(f.sushang);
         Assertions.assertTrue(before > 0, "precondition: she is waiting her turn (" + before + ")");
 
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0));
 
         double after = f.remainingWaitOf(f.sushang);
         System.out.println("[1206] 大招前后的剩余等待: " + before + " -> " + after
@@ -70,7 +70,7 @@ public class SushangUltimateAndTraceTest {
         double before = f.sushang.getAttribute(AttributeType.ATTACK).get();
         double allyBefore = f.ally.getAttribute(AttributeType.ATTACK).get();
 
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0));
 
         Assertions.assertTrue(f.sushang.getAttribute(AttributeType.ATTACK).get() > before,
                 "「攻击力提高30%」 must raise her ATTACK: " + before + " -> "
@@ -147,7 +147,7 @@ public class SushangUltimateAndTraceTest {
         }
 
         /** A unit's remaining wait, read off the action bar's own snapshot (the battle clock does not move). */
-        private double remainingWaitOf(com.laosun.aluminium.models.entity.CanHit unit) {
+        private double remainingWaitOf(com.laosun.aluminium.entity.CanHit unit) {
             for (var signal : battle.queue().snapshot()) {
                 if (signal.getCanHit() == unit) {
                     return battle.queue().getTimeRemaining(signal);

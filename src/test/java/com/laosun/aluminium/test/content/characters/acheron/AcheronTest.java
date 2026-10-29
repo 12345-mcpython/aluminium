@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.acheron;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -30,11 +30,11 @@ public class AcheronTest {
         battle.startBattle();
 
         Assertions.assertEquals(0, dreamOf(acheron), "the document states no initial value, so it starts at 0");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0));
         Assertions.assertEquals(1, dreamOf(acheron), "「获得1点【残梦】」 (gains 1 point of [残梦])");
 
         for (int i = 0; i < 11; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0));
         }
         Assertions.assertEquals(9, dreamOf(acheron),
                 "「【残梦】达到9点时可激活终结技」 (at 9 points of [残梦] the Ultimate can be activated) -- twelve casts must still read nine");

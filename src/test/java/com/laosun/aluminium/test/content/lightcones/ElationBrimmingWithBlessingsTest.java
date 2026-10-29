@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class ElationBrimmingWithBlessingsTest {
         Battle battle = battle(true);
         double allyBase = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
         double wearerBase = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0));
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         double wearerDelta = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - wearerBase;
         System.out.println("[24006] skill on ally: ally +" + allyDelta + " wearer +" + wearerDelta);
@@ -58,9 +58,9 @@ public class ElationBrimmingWithBlessingsTest {
     public void theUltimateDoesTheSameAndAnEnemyTargetDoesNothing() {
         Battle battle = battle(true);
         double allyBase = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
         double afterEnemy = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, ally, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, ally, 1, 0));
         double afterAlly = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[24006] ult on enemy: +" + afterEnemy + " ; ult on ally: +" + afterAlly);
         Assertions.assertEquals(0.0, afterEnemy, 1e-9, "an enemy is not a single ally (我方单体角色) -- the false case");
@@ -95,8 +95,8 @@ public class ElationBrimmingWithBlessingsTest {
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
         double base = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, ally, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, ally, 1, 0));
         Assertions.assertEquals(base, ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get(), 1e-9,
                 "no cone, no change (false case)");
     }

@@ -8,9 +8,9 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.exceptions.CharacterException;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.test.support.TriggerSpecs;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
-import com.laosun.aluminium.models.state.ResourceManager;
+import com.laosun.aluminium.state.ResourceManager;
 
 /**
  * A character's <b>declared resources</b> and the {@code self_resource:<NAME>} condition that reads them.
@@ -232,7 +232,7 @@ public class CharacterResourceTest {
         Battle battle = new Battle(List.of(charged, empty), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, empty, null, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, empty, null, 1, 0)),
                 "the actor holds none, but the rule belongs to the charged owner");
 
         Character chargedAgain = characterWithCharge(0);
@@ -242,7 +242,7 @@ public class CharacterResourceTest {
         Battle mirror = new Battle(List.of(chargedAgain, fullActor), List.of(dummy()), BattleFixture.seeded());
         mirror.startBattle();
 
-        Assertions.assertEquals(0, mirror.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, fullActor, null, 1, 0)),
+        Assertions.assertEquals(0, mirror.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, fullActor, null, 1, 0)),
                 "and the other way round: the actor's stacks are none of this rule's business");
     }
 
@@ -264,7 +264,7 @@ public class CharacterResourceTest {
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
                 "cannot read it -> the condition fails, the same rule every other unreadable variable follows");
     }
 
@@ -395,7 +395,7 @@ public class CharacterResourceTest {
         owner.setTriggerTable(new TriggerTable(PLAIN, List.of(chargeThresholdRule())));
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
-        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
+        return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
     }
 
     /**

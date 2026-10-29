@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.sparkle;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -40,7 +40,7 @@ public class SparkleEidolonTest {
         Battle battle = new Battle(List.of(sparkle, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         for (int i = 0; i < layers; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, sparkle, enemy, 1, 1));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, sparkle, enemy, 1, 1));
         }
         Assertions.assertEquals(layers, sparkle.getBuffManager().stacksOf(COUNTER),
                 "precondition: the talent counted " + layers + " layer(s)");

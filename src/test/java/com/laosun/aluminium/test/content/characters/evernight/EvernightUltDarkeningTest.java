@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.evernight;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -32,7 +32,7 @@ public class EvernightUltDarkeningTest {
         Battle battle = new Battle(List.of(evernight, ally), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        ((com.laosun.aluminium.models.enemy.Enemy) battle.enemies().get(0)).breakEnemy(DamageElement.ICE);
+        ((com.laosun.aluminium.enemy.Enemy) battle.enemies().get(0)).breakEnemy(DamageElement.ICE);
 
         double before = allyHit(battle, ally);
         SkillExecutor.execute(battle, evernight.getSkills().get(SkillType.ULTRA), evernight,

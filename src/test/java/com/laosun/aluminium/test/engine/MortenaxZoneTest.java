@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.ReductionBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.ReductionBuff;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class MortenaxZoneTest {
         Assertions.assertEquals(baseHeal * 1.5, battle.calculateHeal(ally, mortenax, 1000), EPS,
                 "\"healing received is raised by 50%\" (「受到的治疗量提高50%」)");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(mortenax).getFirst(), mortenax, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(mortenax).getFirst(), mortenax, 0, 0));
 
         Assertions.assertEquals(baseWeight, battle.aggroOf(mortenax), EPS,
                 "「倒计时回合开始时结界解除」 (the zone is removed when the countdown's turn starts) -- the weight goes back");
@@ -74,7 +74,7 @@ public class MortenaxZoneTest {
         Assertions.assertEquals(0.2, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
                 "\"while the zone lasts, all enemies get 20% All-Type RES Reduction\" (「结界持续期间，使敌方全体全属性抗性降低20%」)");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(withEidolon).getFirst(), withEidolon, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(withEidolon).getFirst(), withEidolon, 0, 0));
 
         Assertions.assertEquals(0.0, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
                 "「倒计时回合开始时结界解除」 (the zone is removed when the countdown's turn starts) -- the reduction goes with the zone");

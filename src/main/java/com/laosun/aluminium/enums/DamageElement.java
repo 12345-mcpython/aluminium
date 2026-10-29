@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * The damage element of a skill or attack, mapped from the {@code element} field
@@ -21,7 +21,7 @@ import com.laosun.aluminium.models.damage.Damage;
  * carry the value {@code "Unknown"} in the game data. Parsing such a value is
  * <em>not</em> a failure and is not mapped to any element: {@link #fromString} simply
  * returns {@code null}, signalling "this skill has no damage element". Only
- * {@link com.laosun.aluminium.models.damage.Damage Damage} combat objects carry an element,
+ * {@link com.laosun.aluminium.damage.Damage Damage} combat objects carry an element,
  * and a skill that deals damage must never fall back to {@code null}.
  *
  * @see SkillData#getElement()

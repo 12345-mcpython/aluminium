@@ -2,34 +2,33 @@ package com.laosun.aluminium;
 
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.ai.TargetSelector;
-import com.laosun.aluminium.models.buff.AbstractBuff;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.energy.EnergyGain;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
-import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
-import com.laosun.aluminium.models.trigger.TriggerInterpreter;
-import com.laosun.aluminium.models.trigger.TriggerPayload;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.ai.TargetSelector;
+import com.laosun.aluminium.buff.AbstractBuff;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.energy.EnergyGain;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.skill.SkillExecutor;
+import com.laosun.aluminium.skillpoint.SkillPointPolicy;
+import com.laosun.aluminium.skillpoint.StandardSkillPointPolicy;
+import com.laosun.aluminium.trigger.TriggerInterpreter;
+import com.laosun.aluminium.trigger.TriggerPayload;
+import com.laosun.aluminium.trigger.TriggerTable;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Countdown;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.state.Resource;
-import com.laosun.aluminium.models.battle.WaveManager;
-import com.laosun.aluminium.models.state.ResourceManager;
-import com.laosun.aluminium.models.damage.BattleDamage;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Countdown;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.state.Resource;
+import com.laosun.aluminium.battle.WaveManager;
+import com.laosun.aluminium.state.ResourceManager;
+import com.laosun.aluminium.damage.BattleDamage;
 
 
 public class Battle {
@@ -51,7 +50,7 @@ public class Battle {
     /**
      * Told what a damage instance actually settled, so a front end can show a number the engine stands behind.
      *
-     * <p><b>Why this exists rather than a buff hook.</b> {@link com.laosun.aluminium.models.event.DamageEvent} is the
+     * <p><b>Why this exists rather than a buff hook.</b> {@link com.laosun.aluminium.event.DamageEvent} is the
      * buff-facing surface and it fires <i>inside</i> the zone arithmetic, before the zones are multiplied -- so the
      * damage it carries is intermediate, and a screen reading it would print a figure the engine never applied. The
      * settled amount also cannot be worked out afterwards by assembling the hit again: assembly is additive
@@ -224,39 +223,39 @@ public class Battle {
     /**
      * Observer registration and announcement.
      */
-    private final com.laosun.aluminium.models.battle.BattleObservers observers =
-            new com.laosun.aluminium.models.battle.BattleObservers();
-    private final com.laosun.aluminium.models.battle.UltimateService ultimates =
-            new com.laosun.aluminium.models.battle.UltimateService(this);
-    private final com.laosun.aluminium.models.battle.EnergyService energy =
-            new com.laosun.aluminium.models.battle.EnergyService(this::onEnergyCredited);
-    private final com.laosun.aluminium.models.battle.TriggerFacts triggerFacts =
-            new com.laosun.aluminium.models.battle.TriggerFacts();
-    private final com.laosun.aluminium.models.battle.DamageMarks damageMarks =
-            new com.laosun.aluminium.models.battle.DamageMarks();
-    private final com.laosun.aluminium.models.battle.WaveState waveState =
-            new com.laosun.aluminium.models.battle.WaveState();
-    private final com.laosun.aluminium.models.battle.TriggerBus triggerBus =
-            new com.laosun.aluminium.models.battle.TriggerBus(this, triggerFacts);
-    private final com.laosun.aluminium.models.battle.DamageService damageService =
-            new com.laosun.aluminium.models.battle.DamageService(this, triggerBus, damageMarks, energy,
+    private final com.laosun.aluminium.battle.BattleObservers observers =
+            new com.laosun.aluminium.battle.BattleObservers();
+    private final com.laosun.aluminium.battle.UltimateService ultimates =
+            new com.laosun.aluminium.battle.UltimateService(this);
+    private final com.laosun.aluminium.battle.EnergyService energy =
+            new com.laosun.aluminium.battle.EnergyService(this::onEnergyCredited);
+    private final com.laosun.aluminium.battle.TriggerFacts triggerFacts =
+            new com.laosun.aluminium.battle.TriggerFacts();
+    private final com.laosun.aluminium.battle.DamageMarks damageMarks =
+            new com.laosun.aluminium.battle.DamageMarks();
+    private final com.laosun.aluminium.battle.WaveState waveState =
+            new com.laosun.aluminium.battle.WaveState();
+    private final com.laosun.aluminium.battle.TriggerBus triggerBus =
+            new com.laosun.aluminium.battle.TriggerBus(this, triggerFacts);
+    private final com.laosun.aluminium.battle.DamageService damageService =
+            new com.laosun.aluminium.battle.DamageService(this, triggerBus, damageMarks, energy,
                     observers, this::broadcastHpLoss, this::broadcastKill);
-    private final com.laosun.aluminium.models.battle.BreakService breakService =
-            new com.laosun.aluminium.models.battle.BreakService(this, damageService, triggerBus,
+    private final com.laosun.aluminium.battle.BreakService breakService =
+            new com.laosun.aluminium.battle.BreakService(this, damageService, triggerBus,
                     this::broadcastBreak);
-    private final com.laosun.aluminium.models.battle.DeathService deathService =
-            new com.laosun.aluminium.models.battle.DeathService(this, triggerBus);
-    private final com.laosun.aluminium.models.battle.SustainService sustain =
-            new com.laosun.aluminium.models.battle.SustainService(this,
+    private final com.laosun.aluminium.battle.DeathService deathService =
+            new com.laosun.aluminium.battle.DeathService(this, triggerBus);
+    private final com.laosun.aluminium.battle.SustainService sustain =
+            new com.laosun.aluminium.battle.SustainService(this,
                     this::onHealSettled, this::onShieldGranted);
-    private final com.laosun.aluminium.models.battle.TickService ticks =
-            new com.laosun.aluminium.models.battle.TickService(damageService, sustain);
-    private final com.laosun.aluminium.models.battle.Battlefield battlefield =
-            new com.laosun.aluminium.models.battle.Battlefield(this);
-    private final com.laosun.aluminium.models.battle.ChanceService chances =
-            new com.laosun.aluminium.models.battle.ChanceService(this);
-    private final com.laosun.aluminium.models.battle.DebuffService debuffs =
-            new com.laosun.aluminium.models.battle.DebuffService(this, triggerBus);
+    private final com.laosun.aluminium.battle.TickService ticks =
+            new com.laosun.aluminium.battle.TickService(damageService, sustain);
+    private final com.laosun.aluminium.battle.Battlefield battlefield =
+            new com.laosun.aluminium.battle.Battlefield(this);
+    private final com.laosun.aluminium.battle.ChanceService chances =
+            new com.laosun.aluminium.battle.ChanceService(this);
+    private final com.laosun.aluminium.battle.DebuffService debuffs =
+            new com.laosun.aluminium.battle.DebuffService(this, triggerBus);
 
     /** @param observer the damage observer */
     public void addDamageObserver(DamageObserver observer) {
@@ -432,7 +431,7 @@ public class Battle {
      * The <b>enemy camp's roster</b> - every combatant fighting against us, in battlefield order.
      *
      * <p>Note: <b>Deliberately {@code CanHit}, not {@code Enemy}</b>. Typing it as
-     * {@code List<Enemy>} would make an enemy-side {@link com.laosun.aluminium.models.entity.Summon}
+     * {@code List<Enemy>} would make an enemy-side {@link com.laosun.aluminium.entity.Summon}
      * <b>structurally impossible to place</b>: the action bar accepts any {@code CanHit}
      * ({@code Queue.addCombatants} takes {@code List<? extends CanHit>}), and camp-agnostic code
      * ({@code TargetSelector}, {@code opposingCamp}) was already written against {@code CanHit},
@@ -515,8 +514,8 @@ public class Battle {
         currentMove = signal;
     }
 
-    private final com.laosun.aluminium.models.battle.BattleResult battleResult =
-            new com.laosun.aluminium.models.battle.BattleResult(this);
+    private final com.laosun.aluminium.battle.BattleResult battleResult =
+            new com.laosun.aluminium.battle.BattleResult(this);
 
     /**
      * The current battle status.
@@ -537,8 +536,8 @@ public class Battle {
     @Setter
     private WaveManager waveManager;
 
-    private final com.laosun.aluminium.models.battle.PendingCombatants pendingCombatants =
-            new com.laosun.aluminium.models.battle.PendingCombatants(this);
+    private final com.laosun.aluminium.battle.PendingCombatants pendingCombatants =
+            new com.laosun.aluminium.battle.PendingCombatants(this);
 
     /**
      * The combatants queued to enter the action bar at the next settle, in entry order.
@@ -549,8 +548,8 @@ public class Battle {
         return pendingCombatants.view();
     }
 
-    private final com.laosun.aluminium.models.battle.Countdowns countdowns =
-            new com.laosun.aluminium.models.battle.Countdowns(this);
+    private final com.laosun.aluminium.battle.Countdowns countdowns =
+            new com.laosun.aluminium.battle.Countdowns(this);
 
     /**
      * The read-only entry point for countdowns (1408's transformation countdown predicate, and the like predicates at
@@ -567,19 +566,19 @@ public class Battle {
      * action bar (see {@link #fireSummoned}). Separate from {@link #addRequestItems} on purpose: that queue is
      * shared with wave entries, and a wave arriving is not a summon.
      */
-    private final com.laosun.aluminium.models.battle.SummonedBuffer summoned =
-            new com.laosun.aluminium.models.battle.SummonedBuffer();
+    private final com.laosun.aluminium.battle.SummonedBuffer summoned =
+            new com.laosun.aluminium.battle.SummonedBuffer();
 
     /**
      * The facts the caller declared before the battle started.
      */
-    private final com.laosun.aluminium.models.battle.PreBattle preBattle =
-            new com.laosun.aluminium.models.battle.PreBattle();
+    private final com.laosun.aluminium.battle.PreBattle preBattle =
+            new com.laosun.aluminium.battle.PreBattle();
 
     /**
      * The techniques the battle was CREATED with, or {@code null} when the caller marks them later.
      *
-     * <p>Kept beside {@link com.laosun.aluminium.models.battle.PreBattle#techniqueUsers()} rather than replacing it: the battle's own state is still
+     * <p>Kept beside {@link com.laosun.aluminium.battle.PreBattle#techniqueUsers()} rather than replacing it: the battle's own state is still
      * "which units hold 秘技", and this is only the construction-time answer to that question. Both routes
      * end in the same list, so nothing downstream can tell which one was used.
      *
@@ -744,14 +743,14 @@ public class Battle {
      * "skill has a 50% chance of +1", Sushang (素裳) "skill on a weakness-broken target +1",
      * Sparkle (花火) "max +2", ...). If all of those branches were added here,
      * {@code Battle} would fill up with "because of some character" conditionals, violating the three-way split.
-     * See {@link com.laosun.aluminium.models.skillpoint.SkillPointPolicy}.
+     * See {@link com.laosun.aluminium.skillpoint.SkillPointPolicy}.
      *
      * <p>The default is {@link StandardSkillPointPolicy} (start 3 / max 5 / our basic attack +1 / skill -1 /
      * everything else neutral). To swap in another rule set for the team (e.g. Sparkle (花火) raising the max),
      * call {@link #setSkillPointPolicy}; it rewires the event reports, which a plain field assignment could not.
      */
-    private final com.laosun.aluminium.models.battle.SkillPoints skillPoints =
-            new com.laosun.aluminium.models.battle.SkillPoints(this,
+    private final com.laosun.aluminium.battle.SkillPoints skillPoints =
+            new com.laosun.aluminium.battle.SkillPoints(this,
                     this::broadcastSkillPointGained, this::onSkillPointSpent);
 
     /**
@@ -767,7 +766,7 @@ public class Battle {
      * Replaces the skill point policy and wires its reports into this battle's events.
      *
      * <p>The setter exists rather than a public field because the wiring is not optional: a policy that
-     * is installed without {@link com.laosun.aluminium.models.battle.SkillPoints} still holds the points, but
+     * is installed without {@link com.laosun.aluminium.battle.SkillPoints} still holds the points, but
      * {@code SKILL_POINT_GAINED} / {@code SKILL_POINT_SPENT} never fire, so every rule gated on them
      * silently stops working. The constructor wires the default; this method is the other way in.
      *
@@ -856,10 +855,10 @@ public class Battle {
     }
 
 
-    private final com.laosun.aluminium.models.battle.SkillRequests skillRequests =
-            new com.laosun.aluminium.models.battle.SkillRequests(this);
-    private final com.laosun.aluminium.models.battle.CastService cast =
-            new com.laosun.aluminium.models.battle.CastService(this, skillPoints, ultimates, skillRequests);
+    private final com.laosun.aluminium.battle.SkillRequests skillRequests =
+            new com.laosun.aluminium.battle.SkillRequests(this);
+    private final com.laosun.aluminium.battle.CastService cast =
+            new com.laosun.aluminium.battle.CastService(this, skillPoints, ultimates, skillRequests);
 
     /**
      * Injected random source (crit rolls / target selection); a fixed seed makes a
@@ -908,11 +907,11 @@ public class Battle {
      * that belongs to the party, not to whoever happened to declare it -- `ResourceManager` refuses to keep such a thing
      * per character, and this is the owner it asks for. Registered once at the start of the battle from the declarations.
      */
-    private final com.laosun.aluminium.models.battle.PartyResources partyResources =
-            new com.laosun.aluminium.models.battle.PartyResources();
-    private final com.laosun.aluminium.models.battle.SummonService summons;
-    private final com.laosun.aluminium.models.battle.CastOutcome castOutcome =
-            new com.laosun.aluminium.models.battle.CastOutcome();
+    private final com.laosun.aluminium.battle.PartyResources partyResources =
+            new com.laosun.aluminium.battle.PartyResources();
+    private final com.laosun.aluminium.battle.SummonService summons;
+    private final com.laosun.aluminium.battle.CastOutcome castOutcome =
+            new com.laosun.aluminium.battle.CastOutcome();
 
 
     public record SkillRequest(Skill skill, CanHit object, List<? extends CanHit> target) {
@@ -947,7 +946,7 @@ public class Battle {
      */
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng, GameData data) {
         this.data = java.util.Objects.requireNonNull(data, "data");
-        this.summons = new com.laosun.aluminium.models.battle.SummonService(this, data, summoned::add);
+        this.summons = new com.laosun.aluminium.battle.SummonService(this, data, summoned::add);
         characterRoster = new ArrayList<>(characterQueue);
         // The camp view of our side: the same instances, one more list. A friendly summon is appended here
         // (and only here) by summon(...), so `characters` stays exactly "our characters".
@@ -1214,7 +1213,7 @@ public class Battle {
      * Claims the laugh count for the NEXT cast to begin: 「使其立即施放 1 次固定计入 20 笑点的欢愉技」.
      *
      * <p>Called by {@code CAST_SKILL} right before it executes the cast it commands - see
-     * {@link com.laosun.aluminium.models.battle.CastOutcome} for why the claim and the cast cannot be the same moment.
+     * {@link com.laosun.aluminium.battle.CastOutcome} for why the claim and the cast cannot be the same moment.
      *
      * @param laughs the count that cast's Elation damage is folded with (0 is legal: "counting nothing")
      */
@@ -1292,7 +1291,7 @@ public class Battle {
         return partyResources.value(id);
     }
 
-    public com.laosun.aluminium.models.state.Resource partyResource(String id) {
+    public com.laosun.aluminium.state.Resource partyResource(String id) {
         return partyResources.resource(id);
     }
 
@@ -1412,7 +1411,7 @@ public class Battle {
      * than being guessed at (the data really does contain such skills).
      */
     private void applyDeclaredMapAttacks() {
-        for (com.laosun.aluminium.models.battle.PreBattle.MapAttack hit : preBattle.mapAttacks()) {
+        for (com.laosun.aluminium.battle.PreBattle.MapAttack hit : preBattle.mapAttacks()) {
             // The cast is safe: `declareMapAttack` refuses a target that is not an enemy.
             Enemy enemy = (Enemy) hit.target();
             if (enemy.isDeath()) {
@@ -1463,8 +1462,8 @@ public class Battle {
         }
     }
 
-    private final com.laosun.aluminium.models.battle.ExtraTurnState extraTurns =
-            new com.laosun.aluminium.models.battle.ExtraTurnState();
+    private final com.laosun.aluminium.battle.ExtraTurnState extraTurns =
+            new com.laosun.aluminium.battle.ExtraTurnState();
 
     /**
      * Whether the battle is already over (won or lost).
@@ -1718,7 +1717,7 @@ public class Battle {
             // "at the end of the turn": the turn is over HERE -- after the actor's own hook and the late tick, so a rule
             // sees the state the turn ended in.
             // A timed weakness is counted in the TARGET's own turns, so it runs down when that unit's turn ends.
-            if (actor instanceof com.laosun.aluminium.models.enemy.Enemy ticking) {
+            if (actor instanceof com.laosun.aluminium.enemy.Enemy ticking) {
                 ticking.tickTimedWeaknesses();
             }
             // 「各个【好活当赏】的持续时间各自独立计算」: a laugh snapshot is counted in ITS HOLDER's own turns, exactly like
@@ -1794,7 +1793,7 @@ public class Battle {
      *
      * <p>The list is drained <b>before</b> the events are fired: a rule that answers "when summoned" by summoning
      * something else must not make this loop chase its own tail (that recursion is bounded by
-     * {@link com.laosun.aluminium.models.battle.TriggerFiring#MAX_DEPTH}, but there is no reason to build it), and the new arrival is picked up by the
+     * {@link com.laosun.aluminium.battle.TriggerFiring#MAX_DEPTH}, but there is no reason to build it), and the new arrival is picked up by the
      * next settle like any other.
      */
     private void fireSummoned() {
@@ -1847,14 +1846,14 @@ public class Battle {
      * @return the settled damage
      */
     private double applyDamage(CanHit target, Damage damage,
-                               com.laosun.aluminium.models.battle.DamageService.EnergyGrant grant) {
+                               com.laosun.aluminium.battle.DamageService.EnergyGrant grant) {
         return damageService.applyDamage(target, damage, grant);
     }
 
 
     /**
      * The only energy gain entry point inside battle: the rules are decided by {@code target}'s own
-     * {@link com.laosun.aluminium.models.energy.EnergyProvider}; team charging (Tingyun (停云)/Huohuo (藿藿)/
+     * {@link com.laosun.aluminium.energy.EnergyProvider}; team charging (Tingyun (停云)/Huohuo (藿藿)/
      * Sunday (星期日)) will in the future also grant energy to other targets from here.
      *
      * @param target the one gaining energy
@@ -2041,7 +2040,7 @@ public class Battle {
     /**
      * A unit's current aggro value: it decides the probability of the enemy selecting it.
      *
-     * <p>This is the stated weight of {@link com.laosun.aluminium.models.battle.AggroTable} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
+     * <p>This is the stated weight of {@link com.laosun.aluminium.battle.AggroTable} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
      * applied - "the probability of being attacked is greatly increased" is a <b>soft</b> modifier on the same weighted draw, which is why it is an
      * attribute and not a {@code TauntBuff} (a taunt is the hard "can only be selected", and
      * {@link TargetSelector} is where that lives).
@@ -2050,7 +2049,7 @@ public class Battle {
      * @return the aggro value (&gt; 0)
      */
     public double aggroOf(CanHit entity) {
-        return com.laosun.aluminium.models.battle.AggroTable.aggroOf(entity);
+        return com.laosun.aluminium.battle.AggroTable.aggroOf(entity);
     }
 
     /**
@@ -2060,7 +2059,7 @@ public class Battle {
      * @return an ordered unit to probability mapping; an empty list returns an empty table
      */
     public Map<CanHit, Double> getAggroTable(List<? extends CanHit> allies) {
-        return com.laosun.aluminium.models.battle.AggroTable.table(allies);
+        return com.laosun.aluminium.battle.AggroTable.table(allies);
     }
 
     /**
@@ -2185,8 +2184,8 @@ public class Battle {
         }
         // The recipient's HP as it stands now, i.e. BEFORE this heal lands -- which is what the sentence means by
         // "a target whose current HP percentage is 30% or lower".
-        com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext ctx =
-                new com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext(
+        com.laosun.aluminium.trigger.TriggerTable.TriggerContext ctx =
+                new com.laosun.aluminium.trigger.TriggerTable.TriggerContext(
                         healer, healer, target, 0, 0, null, this);
         double bonus = 0;
         for (CanHit.ConditionalHealBonus entry : healer.conditionalHealBonuses()) {
@@ -2315,7 +2314,7 @@ public class Battle {
     /**
      * The shield amount after the provider's own boost ("the shield granted is increased by X%").
      *
-     * <p>A one-line delegate: the body lives in {@link com.laosun.aluminium.models.damage.BattleDamage}
+     * <p>A one-line delegate: the body lives in {@link com.laosun.aluminium.damage.BattleDamage}
      * with the rest of the settlement arithmetic, but this name is public API that tests read
      * (measured as load-bearing by {@code JourneyForeverPeacefulTest}: it still returned the bare
      * 1000 until a battle had started), so it keeps its home and its signature.
@@ -2473,10 +2472,10 @@ public class Battle {
     // trigger table three-way split).
     // ==================================================================
 
-    private final com.laosun.aluminium.models.battle.AttackSequence attackSequence =
-            new com.laosun.aluminium.models.battle.AttackSequence();
-    private final com.laosun.aluminium.models.battle.CounterNest counterNest =
-            new com.laosun.aluminium.models.battle.CounterNest();
+    private final com.laosun.aluminium.battle.AttackSequence attackSequence =
+            new com.laosun.aluminium.battle.AttackSequence();
+    private final com.laosun.aluminium.battle.CounterNest counterNest =
+            new com.laosun.aluminium.battle.CounterNest();
 
     /**
      * How many attacks have finished -- the boundary a rule-level {@code once_per_attack} reads.
@@ -2778,7 +2777,7 @@ public class Battle {
     }
 
     /**
-     * Tells our side that one <b>attack</b> has finished - {@link com.laosun.aluminium.models.event.AttackEvent},
+     * Tells our side that one <b>attack</b> has finished - {@link com.laosun.aluminium.event.AttackEvent},
      * fired <b>once per attack</b>, after every instance of it has been settled.
      *
      * <p><b>Which attacks fire it.</b> A character's skill activation ({@code SkillExecutor}) and, since
@@ -2787,7 +2786,7 @@ public class Battle {
      * damage go straight through {@link #applyDamage} and are <em>part of</em> somebody else's attack. That
      * exclusion is not an oversight, it is what makes the notification safe to hand to arbitrary listeners:
      * listeners are allowed to answer an attack by dealing damage (that is how a third-party kit lands), so a
-     * derived hit that fired the event again would recurse until {@link com.laosun.aluminium.models.battle.TriggerFiring#MAX_DEPTH} threw. A follow-up
+     * derived hit that fired the event again would recurse until {@link com.laosun.aluminium.battle.TriggerFiring#MAX_DEPTH} threw. A follow-up
      * attack therefore does <b>not</b> consume an {@code "until": "next_attack"} buff: that accepted
      * under-consumption is recorded rather than hidden.
      *
@@ -2846,7 +2845,7 @@ public class Battle {
     /**
      * Runs a <b>buff-path reaction</b> (today: a counter-attack) that must not nest.
      *
-     * <p>Note: Why this exists and why it is not {@link com.laosun.aluminium.models.battle.TriggerFiring#MAX_DEPTH}: a counter is triggered by HP loss,
+     * <p>Note: Why this exists and why it is not {@link com.laosun.aluminium.battle.TriggerFiring#MAX_DEPTH}: a counter is triggered by HP loss,
      * and a counter's own damage causes HP loss. Two units wearing a counter would therefore hit each
      * other forever. The trigger-table version of a counter is stopped loudly by
      * {@link #fireTriggers}'s depth guard, because it is fired from there - but a buff reacts through
@@ -2930,7 +2929,7 @@ public class Battle {
             extra.fixedCrit(fixedCritRate != 0.0, fixedCritDamage);
         }
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
-        double settled = applyDamage(target, extra.notCountsAsAttack(), com.laosun.aluminium.models.battle.DamageService.EnergyGrant.KILL_ONLY);
+        double settled = applyDamage(target, extra.notCountsAsAttack(), com.laosun.aluminium.battle.DamageService.EnergyGrant.KILL_ONLY);
         // This is the engine's one and only notion of a follow-up attack, so the
         // data-facing FOLLOW_UP event is emitted here rather than from a second attack path.
         // Gated on the instance having really connected: an additional-damage sweep swallowed by
@@ -2960,7 +2959,7 @@ public class Battle {
     public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
         Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
         // KILL_ONLY: true damage is likewise derived damage, so the victim gains no energy; a kill is still credited to the attacker
-        return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), com.laosun.aluminium.models.battle.DamageService.EnergyGrant.KILL_ONLY);
+        return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), com.laosun.aluminium.battle.DamageService.EnergyGrant.KILL_ONLY);
     }
 
     /**
@@ -3262,7 +3261,7 @@ public class Battle {
             if (unit == null || unit.isDeath()) {
                 continue;
             }
-            unit.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("秘技", 1, true));
+            unit.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1, true));
         }
         // The technique's own mark, on the unit the caller named - 「使用秘技后获得【美学底本】」. Applied HERE rather than
         // by a rule because it exists BEFORE the battle does; the rules then read it (`self has_state 美学底本`) to find
@@ -3275,7 +3274,7 @@ public class Battle {
         CanHit archetype = preBattle.archetypeHolder();
         if (archetype != null && !archetype.isDeath()) {
             archetype.getBuffManager()
-                    .addBuff(new com.laosun.aluminium.models.buff.StateBuff("美学底本", 1, true));
+                    .addBuff(new com.laosun.aluminium.buff.StateBuff("美学底本", 1, true));
         }
     }
 

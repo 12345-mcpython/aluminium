@@ -1,7 +1,7 @@
 package com.laosun.aluminium.test.trigger;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +56,7 @@ public class LifeOdeRaisesTheDragonTalentTest {
     private static double hits(boolean castTheOde, int enemies) {
         Character her = CharacterFactory.create(CASTORICE, LEVEL);
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
-        List<com.laosun.aluminium.models.enemy.Enemy> pack = new java.util.ArrayList<>();
+        List<com.laosun.aluminium.enemy.Enemy> pack = new java.util.ArrayList<>();
         for (int i = 0; i < enemies; i++) {
             pack.add(BattleFixture.monster());
         }
@@ -69,7 +69,7 @@ public class LifeOdeRaisesTheDragonTalentTest {
             battle.processRequests();
             var ode = sprite.skillAt(ODE_SLOT);
             Assertions.assertNotNull(ode, "precondition: slot 17");
-            com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(her));
+            com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite, List.of(her));
             battle.processRequests();
             her = battle.characters().getFirst();
         }

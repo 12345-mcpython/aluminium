@@ -5,15 +5,15 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.DebuffClass;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * 1013 Herta, from her own file: a per-target threshold bonus, a control-class resistance, and the frozen bonus.
@@ -51,7 +51,7 @@ public class HertaTest {
         });
         battle.startBattle();
         // Below the threshold, settled through the engine (its category is UNSPECIFIED, so her rule cannot apply to it).
-        battle.applyDamage(hurt, new com.laosun.aluminium.models.damage.Damage(herta, hurt,
+        battle.applyDamage(hurt, new com.laosun.aluminium.damage.Damage(herta, hurt,
                 com.laosun.aluminium.enums.DamageElement.ICE,
                 com.laosun.aluminium.enums.DamageType.NORMAL, hurt.getMaxHp() * 0.6));
         double healthyBefore = healthy.getCurrentHp();
@@ -95,7 +95,7 @@ public class HertaTest {
             battle.startBattle();
             // Put the second dummy below the threshold without touching the first. `setCurrentHp` does not exist, so the
             // engine settles a plain instance instead; its cast category is UNSPECIFIED, so her skill rule cannot apply to it.
-            battle.applyDamage(hurt, new com.laosun.aluminium.models.damage.Damage(herta, hurt,
+            battle.applyDamage(hurt, new com.laosun.aluminium.damage.Damage(herta, hurt,
                     com.laosun.aluminium.enums.DamageElement.ICE,
                     com.laosun.aluminium.enums.DamageType.NORMAL, hurt.getMaxHp() * 0.6));
         }

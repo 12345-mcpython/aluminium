@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.characters.silverwolflv999;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -199,7 +199,7 @@ public class SilverWolfLV999LootPickTest {
         int pointsBefore = battle.getSkillPoints();
         int laughsBefore = battle.partyResourceValue(LAUGH);
         Character wolf = battle.characters().getFirst();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         double[] lost = new double[beforeHp.length];
         double totalLost = 0;
@@ -222,7 +222,7 @@ public class SilverWolfLV999LootPickTest {
      * The same, with however many identical enemies the case needs.
      */
     private static Battle battle(ScriptedRng rng, int enemies) {
-        List<com.laosun.aluminium.models.enemy.Enemy> roster = new java.util.ArrayList<>();
+        List<com.laosun.aluminium.enemy.Enemy> roster = new java.util.ArrayList<>();
         for (int i = 0; i < enemies; i++) {
             roster.add(BattleFixture.monster());
         }

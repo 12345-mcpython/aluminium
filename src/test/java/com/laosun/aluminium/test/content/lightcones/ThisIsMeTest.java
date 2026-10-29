@@ -4,18 +4,18 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * Light cone 21030: the wearer's Ultimate carries extra damage equal to 60% of its own DEFENCE.
@@ -36,8 +36,8 @@ public class ThisIsMeTest {
         Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
-                .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(-1.0,
-                        com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BUFF, 210301));
+                .addModifier(com.laosun.aluminium.DoubleValue.Modifier.pure(-1.0,
+                        com.laosun.aluminium.DoubleValue.Modifier.ModifierSource.BUFF, 210301));
         return battle;
     }
 
@@ -122,7 +122,7 @@ public class ThisIsMeTest {
     private double hit(Battle battle, SkillCategory category) {
         // The category rides on the Damage INSTANCE (measured: applyDamage has no (target, damage, category)
         // overload -- the third parameter is an EnergyGrant), which is also why a cast-scoped boost can be scoped at all.
-        return battle.applyDamage(enemy, new com.laosun.aluminium.models.damage.Damage(wearer, enemy,
+        return battle.applyDamage(enemy, new com.laosun.aluminium.damage.Damage(wearer, enemy,
                 com.laosun.aluminium.enums.DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.NORMAL, 1000,
                 category));
     }

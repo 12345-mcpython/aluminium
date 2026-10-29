@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.ControlBuff;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.ControlBuff;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;

@@ -5,8 +5,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -55,7 +55,7 @@ public class EventAmountModifierTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         double before = owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, owner, owner, 0, spent));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, owner, owner, 0, spent));
         battle.processRequests();
         return owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before;
     }

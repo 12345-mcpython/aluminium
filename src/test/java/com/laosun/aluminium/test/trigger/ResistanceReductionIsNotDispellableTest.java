@@ -3,16 +3,16 @@ package com.laosun.aluminium.test.trigger;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * 「全属性抗性降低 X%」 must not be dispellable as a 增益.
@@ -84,12 +84,12 @@ public class ResistanceReductionIsNotDispellableTest {
 
         if (reduceResistance) {
             enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION)
-                    .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(
-                            0.2, com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.DEBUFF, 0));
+                    .addModifier(com.laosun.aluminium.DoubleValue.Modifier.pure(
+                            0.2, com.laosun.aluminium.DoubleValue.Modifier.ModifierSource.DEBUFF, 0));
         }
 
         double before = enemy.getCurrentHp();
-        battle.applyDamage(enemy, new com.laosun.aluminium.models.damage.Damage(attacker, enemy,
+        battle.applyDamage(enemy, new com.laosun.aluminium.damage.Damage(attacker, enemy,
                 com.laosun.aluminium.enums.DamageElement.IMAGINARY,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 1000));
         return before - enemy.getCurrentHp();

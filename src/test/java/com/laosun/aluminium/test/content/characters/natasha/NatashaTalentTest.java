@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.content.characters.natasha;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Natasha's talent (天赋 生机焕发): +50% healing, but only on a recipient at 30% HP or lower.
@@ -185,7 +185,7 @@ public class NatashaTalentTest {
 
         Battle battle = battle(natasha, List.of(natasha, ally), registerTalent);
         ally.getBuffManager().addBuff(
-                new com.laosun.aluminium.models.buff.RegenBuff(natasha, "持续治疗", 500, 2));
+                new com.laosun.aluminium.buff.RegenBuff(natasha, "持续治疗", 500, 2));
         positionAt(ally, LOW_FRACTION);
 
         return battle.tickRegens(ally);
@@ -206,7 +206,7 @@ public class NatashaTalentTest {
         Battle battle = new Battle(party, List.of(EnemyFactory.create(MONSTER, LEVEL, 1)),
                 BattleFixture.alwaysRoll(1.0));
         if (!registerTalent) {
-            natasha.setTriggerTable(new com.laosun.aluminium.models.trigger.TriggerTable(NATASHA, List.of()));
+            natasha.setTriggerTable(new com.laosun.aluminium.trigger.TriggerTable(NATASHA, List.of()));
         }
         battle.startBattle();
         return battle;

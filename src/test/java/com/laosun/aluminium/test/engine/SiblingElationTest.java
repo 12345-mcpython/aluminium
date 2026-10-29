@@ -6,11 +6,11 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -61,7 +61,7 @@ public class SiblingElationTest {
             battle.startBattle();
             double before = tb.getCurrentEnergy();
 
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, tb, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, tb, enemy, 0, 0));
 
             Assertions.assertEquals(10.0, tb.getCurrentEnergy() - before, 1e-6,
                     "cid " + cid + ": \"after casting an attack, restores a fixed 10 Energy\" (「施放攻击后，固定恢复10点能量」)");
@@ -128,7 +128,7 @@ public class SiblingElationTest {
         Battle battle = new Battle(List.of(tb, ally), List.of(BattleFixture.monster()), fixed());
         battle.startBattle();
         double before = timeRemaining(battle, ally);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, tb, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, tb, ally, 0, 0));
         return new double[]{before, timeRemaining(battle, ally)};
     }
 
@@ -164,7 +164,7 @@ public class SiblingElationTest {
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, tb, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, tb, ally, 0, 0));
         return ally.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }
 

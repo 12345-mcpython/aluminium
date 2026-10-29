@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.StackableStateBuff;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.StackableStateBuff;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -41,7 +41,7 @@ public class AttachedBuffProbeTest {
         battle.processRequests();
 
         int plain = owner.getBuffManager().countBuffs(
-                com.laosun.aluminium.models.buff.StateBuff.class);
+                com.laosun.aluminium.buff.StateBuff.class);
         int stackable = owner.getBuffManager().countBuffs(StackableStateBuff.class);
         System.out.println("[probe] asStateBuff=" + plain
                 + " asStackableStateBuff=" + stackable

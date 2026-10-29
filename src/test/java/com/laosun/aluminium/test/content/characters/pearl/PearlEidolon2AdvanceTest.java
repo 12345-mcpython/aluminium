@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.pearl;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -97,7 +97,7 @@ public class PearlEidolon2AdvanceTest {
         Character archetype = battle.characters().get(3);
 
         double[] before = waits(battle, pearl, elationA, elationB, archetype);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0));
         battle.processRequests();
         double[] after = waits(battle, pearl, elationA, elationB, archetype);
         return new Fraction(after[3] / before[3], after[1] / before[1], after[2] / before[2]);

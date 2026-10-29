@@ -5,11 +5,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -104,7 +104,7 @@ public class NinjaRecordSoundHuntTest {
         // write the same modifier (same value, so the second replaces the first and nothing moves). Emitting HEALED directly
         // isolates this half, which is exactly what the clause says ("after recovering HP").
         double before = target.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, healer, target, 0, 200.0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, healer, target, 0, 200.0));
         double afterHeal = target.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[22003] heal half: crit " + before + " -> " + afterHeal);
         Assertions.assertEquals(before + 0.18, afterHeal, 1e-9, "recovering HP raises crit damage by 18 points");

@@ -1,10 +1,10 @@
-package com.laosun.aluminium.models.tests;
+package com.laosun.aluminium.tests;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.SkillData;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.skill.SkillExecutor;
 
 import java.util.List;
 

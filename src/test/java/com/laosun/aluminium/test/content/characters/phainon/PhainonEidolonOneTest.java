@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.characters.phainon;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -57,7 +57,7 @@ public class PhainonEidolonOneTest {
         // full-HP fixture would read 0 whatever the share is - and a raw "set HP to 0" write is not an API this engine has.
         phainon.consumeHp(maxHp * 0.5);
         double before = phainon.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.LETHAL_DAMAGE, phainon, phainon, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.LETHAL_DAMAGE, phainon, phainon, 0, 0));
         battle.processRequests();
         double healed = phainon.getCurrentHp() - before;
         System.out.println("[1408] a killing blow during 【变身】 heals " + healed + " of " + maxHp

@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.silverwolf;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -33,11 +33,11 @@ public class SilverWolfTest {
         Assertions.assertTrue(before > 0, "the fixture must have defence to shred: " + before);
 
         // A control: firing an unrelated event must not shred anything.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, silverWolf, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, silverWolf, enemy, 0, 0));
         Assertions.assertEquals(0.0, (before - enemy.getAttribute(AttributeType.DEFENCE).get()) / before, 1e-9,
                 "an unrelated event must not shred defence");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, silverWolf, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, silverWolf, enemy, 0, 0));
         double after = enemy.getAttribute(AttributeType.DEFENCE).get();
 
         Assertions.assertEquals(0.45, (before - after) / before, 1e-6,

@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.characters.silverwolflv999;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -86,7 +86,7 @@ public class SilverWolfLV999LootBoxChanceTest {
         var enemies = battle.enemyUnits();
         double before = enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
         Character wolf = battle.characters().getFirst();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         return before - enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
     }

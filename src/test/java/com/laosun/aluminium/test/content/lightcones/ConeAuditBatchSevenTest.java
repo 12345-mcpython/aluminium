@@ -6,10 +6,10 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -97,9 +97,9 @@ public class ConeAuditBatchSevenTest {
         f.battle.processRequests();
         double burn = enemy.getCurrentHp() - before + 0;   // the burn ticks on the enemy's turn; read what landed now
         System.out.println("[21016] 她的防御 " + defence + " ; 灼烧那一发在敌人身上落了 " + burn
-                + " ; 敌人身上有灼烧 = " + (enemy.getBuffManager().hasBuff(com.laosun.aluminium.models.buff.DotBuff.class)));
+                + " ; 敌人身上有灼烧 = " + (enemy.getBuffManager().hasBuff(com.laosun.aluminium.buff.DotBuff.class)));
         // The burn is a state on the enemy whose per-tick value is 40% of her DEFENCE; the state existing is the reading.
-        Assertions.assertTrue(enemy.getBuffManager().hasBuff(com.laosun.aluminium.models.buff.DotBuff.class),
+        Assertions.assertTrue(enemy.getBuffManager().hasBuff(com.laosun.aluminium.buff.DotBuff.class),
                 "「受到攻击后有基础概率使敌方目标陷入灼烧状态」—— 状态要挂在敌人身上");
     }
 
@@ -112,7 +112,7 @@ public class ConeAuditBatchSevenTest {
         double base = f.attribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST) + f.attribute(AttributeType.SKILL_DAMAGE_BOOST);
         f.wearer.setCurrentEnergy(f.wearer.getMaxEnergy());
         // The rule re-reads at the wearer's own turn start (mid-turn ENERGY_GAINED doubled the layers - measured, reverted).
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
         double full = f.attribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST) + f.attribute(AttributeType.SKILL_DAMAGE_BOOST);
         System.out.println("[21017] 两档合计: 一般 " + base + " ; 满能量 " + full);
         Assertions.assertEquals(0.48, full - base, 1e-9, "「能量满时，该效果额外提高 24%」⇒ 两档各多 0.24（合计 +0.48）");

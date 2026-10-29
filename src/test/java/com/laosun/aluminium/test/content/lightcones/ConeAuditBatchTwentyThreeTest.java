@@ -5,8 +5,8 @@ import com.google.gson.JsonParser;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -89,7 +89,7 @@ public class ConeAuditBatchTwentyThreeTest {
 
         Fixture f = new Fixture(23034);
         f.wearer.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, f.ally, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, f.ally, 0, 0));
         f.battle.processRequests();
         System.out.println("[23034] 对队友施放战技后的能量 " + f.wearer.getCurrentEnergy() + " ; 队友的增伤 "
                 + f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());

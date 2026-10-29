@@ -5,10 +5,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -48,7 +48,7 @@ public class ConeAuditBatchSixTest {
 
         f.wearer.setCurrentEnergy(0);
         f.ally.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SKILL_CAST, f.wearer,
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SKILL_CAST, f.wearer,
                 f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[21007] 她放战技后: 自己 +" + f.wearer.getCurrentEnergy() + "、队友 +" + f.ally.getCurrentEnergy());
         Assertions.assertEquals(2.0, f.wearer.getCurrentEnergy(), 1e-9, "「我方全体恢复 2 点能量」（叠影 1）");
@@ -57,7 +57,7 @@ public class ConeAuditBatchSixTest {
         Fixture other = new Fixture(21007, true);
         other.wearer.setCurrentEnergy(0);
         other.ally.setCurrentEnergy(0);
-        other.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SKILL_CAST, other.ally,
+        other.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SKILL_CAST, other.ally,
                 other.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[21007] 队友放战技后: 装备者 +" + other.wearer.getCurrentEnergy());
         Assertions.assertEquals(0.0, other.wearer.getCurrentEnergy(), 1e-9, "「施放战技时」指装备者自己");

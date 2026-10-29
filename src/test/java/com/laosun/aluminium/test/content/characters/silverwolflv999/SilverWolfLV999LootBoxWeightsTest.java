@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.characters.silverwolflv999;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -96,7 +96,7 @@ public class SilverWolfLV999LootBoxWeightsTest {
     private record Fixture(Battle battle, Character wolf, ScriptedRng rng, int pointsBefore, double[] enemyHp) {
         int roll() {
             rng.lastBound = -1;
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
             battle.processRequests();
             Assertions.assertTrue(rng.lastBound > 0, "the pick must roll against the weight total");
             return rng.lastBound;
@@ -115,7 +115,7 @@ public class SilverWolfLV999LootBoxWeightsTest {
             // The rider lands on ONE enemy, so it shows up as an UNEVEN loss: the box's own damage is split evenly, so
             // the other two branches leave the two losses identical. (Measured: the rider is only ~29 beside the box's
             // ~73 per enemy - an absolute threshold read "nothing landed".)
-            List<com.laosun.aluminium.models.enemy.Enemy> enemies = battle.enemyUnits();
+            List<com.laosun.aluminium.enemy.Enemy> enemies = battle.enemyUnits();
             double first = enemyHp[0] - enemies.get(0).getCurrentHp();
             double second = enemyHp[1] - enemies.get(1).getCurrentHp();
             Assertions.assertTrue(Math.abs(first - second) > 1e-6,

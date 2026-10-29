@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -121,7 +121,7 @@ public class PastAndFutureNextAllyTest {
         CanHit firstAlly = ord.stream().filter(u -> u != own && bt.allies().contains(u)).findFirst().orElseThrow();
         Assertions.assertNotEquals(firstAlly, exp, "the fixture must separate 'next to act' from 'first ally'");
 
-        int fired = bt.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ATTACK_FINISHED, own, exp, 1, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
+        int fired = bt.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.ATTACK_FINISHED, own, exp, 1, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         Assertions.assertTrue(fired >= 1, "the wearer's rule fires");
         Assertions.assertEquals(0.16, exp.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
                 "the ally who acts NEXT gets the boost");

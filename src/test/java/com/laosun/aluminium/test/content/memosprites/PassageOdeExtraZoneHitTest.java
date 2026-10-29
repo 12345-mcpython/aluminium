@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -48,7 +48,7 @@ public class PassageOdeExtraZoneHitTest {
         battle.processRequests();
         tribbie = battle.characters().get(1);
         var ult = tribbie.getSkills().get(SkillType.ULTRA);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ult, tribbie,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ult, tribbie,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(tribbie.getBuffManager().hasState("结界"), "precondition: the zone is open");
@@ -56,7 +56,7 @@ public class PassageOdeExtraZoneHitTest {
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 15");
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(tribbie));
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite, List.of(tribbie));
         battle.processRequests();
         tribbie = battle.characters().get(1);
         Assertions.assertTrue(tribbie.getBuffManager().hasState(GATE), "precondition: the ode's state landed");
@@ -65,7 +65,7 @@ public class PassageOdeExtraZoneHitTest {
         }
         double before = battle.enemies().getFirst().getCurrentHp();
         var basic = tribbie.getSkills().get(SkillType.COMMON);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, basic, tribbie,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, basic, tribbie,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return before - battle.enemies().getFirst().getCurrentHp();

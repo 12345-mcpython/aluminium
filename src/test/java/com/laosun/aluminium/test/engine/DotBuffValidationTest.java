@@ -1,11 +1,11 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * Every input of a {@code DotBuff} comes from data, so each one has to be rejected at

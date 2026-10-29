@@ -5,9 +5,9 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -151,7 +151,7 @@ public class ArcherKitTest {
             f.battle.getSkillPointPolicy().gain(1);
         }
         double before = f.archer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, f.archer, f.archer, 0, 1));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, f.archer, f.archer, 0, 1));
         f.battle.processRequests();
         return f.archer.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }

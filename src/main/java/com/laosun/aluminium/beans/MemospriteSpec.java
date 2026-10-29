@@ -3,7 +3,7 @@ package com.laosun.aluminium.beans;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.entity.Summon;
 
 /**
  * A character's memosprite (Memosprite, 忆灵) as data: its name, and how its panel is <b>derived from its
@@ -140,7 +140,7 @@ public record MemospriteSpec(@SerializedName("name") String name,
      * memosprite's Max HP synced with its summoner's (only speed is excluded). The reading this javadoc used to carry -
      * "its own, which is half of hers, so reading the summoner would be 2 x too large" - had the sign backwards: the
      * engine was 2 x too <b>small</b> against the recorded fight, whose memosprite instances are exactly
-     * {@code share x the summoner's panel}. Where that is decided now is {@link com.laosun.aluminium.models.entity.Summon#damageBase};
+     * {@code share x the summoner's panel}. Where that is decided now is {@link com.laosun.aluminium.entity.Summon#damageBase};
      * {@code base} and {@code percent} here still say which attribute the row names and what share it takes.
      *
      * <p>Note: where a document instead scales off the <em>summoner</em> (Jing Yuan (景元)'s "神君" hits for "equal to 66% of Jing Yuan (景元)'s ATK"), the panel carries the share and the

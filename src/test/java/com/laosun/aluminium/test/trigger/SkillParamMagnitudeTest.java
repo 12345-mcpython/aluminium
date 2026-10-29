@@ -5,16 +5,16 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.entity.Summon;
 
 /**
  * A {@code HEAL} / {@code SHIELD} whose <b>share and constant both</b> come out of the rule owner's own skill row, at
@@ -256,7 +256,7 @@ public class SkillParamMagnitudeTest {
         battle.startBattle();
         battle.castImmediate(march.getSkills().get(SkillType.ULTRA), march, List.of(enemy));
 
-        var burn = enemy.getBuffManager().findBuff(com.laosun.aluminium.models.buff.DotBuff.class);
+        var burn = enemy.getBuffManager().findBuff(com.laosun.aluminium.buff.DotBuff.class);
         Assertions.assertNotNull(burn, "precondition: the DOT landed on the enemy");
         return burn.getBaseDamage();
     }
@@ -282,7 +282,7 @@ public class SkillParamMagnitudeTest {
         Character march = builder.build();
         Battle battle = new Battle(List.of(march), List.of(BattleFixture.dummy()), BattleFixture.seeded());
         battle.startBattle();
-        battle.castImmediate(new com.laosun.aluminium.models.skill.DefaultSkill(MARCH, 2, skillLevel), march,
+        battle.castImmediate(new com.laosun.aluminium.skill.DefaultSkill(MARCH, 2, skillLevel), march,
                 List.of(march));
         return march.getShield();
     }

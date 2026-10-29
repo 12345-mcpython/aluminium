@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -145,7 +145,7 @@ public class ArcherEidolonLevelsTest {
         Battle battle = battle(eidolonRank);
         Character archer = battle.characters().getFirst();
         int before = battle.getSkillPoints();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, archer, archer, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, archer, archer, 0, 0));
         battle.processRequests();
         return battle.getSkillPoints() - before;
     }
@@ -193,7 +193,7 @@ public class ArcherEidolonLevelsTest {
      * A battle whose Charge pool is topped up, so the talent's follow-up is available whatever the Eidolon rank.
      */
     private static Battle battle(int eidolonRank, int enemies, boolean topUpCharge) {
-        List<com.laosun.aluminium.models.enemy.Enemy> foes = new ArrayList<>();
+        List<com.laosun.aluminium.enemy.Enemy> foes = new ArrayList<>();
         for (int i = 0; i < enemies; i++) {
             // Note: a REAL monster rather than the 0-DEF dummy: the defence-ignore reading needs a defence factor that is
             // not 1.0 (measured: with the dummy it reads 1.0 -> 1.0 and proves nothing).

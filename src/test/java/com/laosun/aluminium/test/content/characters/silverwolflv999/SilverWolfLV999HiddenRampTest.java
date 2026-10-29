@@ -1,13 +1,13 @@
 package com.laosun.aluminium.test.content.characters.silverwolflv999;
 
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 
 /**
  * Character 1506 (Silver Wolf LV.999): her enhanced-basic ramp, pinned as the DECOMPOSITION it is.

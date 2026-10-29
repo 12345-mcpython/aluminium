@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -82,7 +82,7 @@ public class PhainonEidolonLevelsTest {
         Character phainon = battle.characters().getFirst();
         Character ally = battle.characters().get(1);
         double before = phainon.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, phainon, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, phainon, 0, 0));
         battle.processRequests();
         return phainon.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }

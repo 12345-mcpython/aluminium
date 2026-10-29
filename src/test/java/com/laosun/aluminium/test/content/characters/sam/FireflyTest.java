@@ -2,9 +2,9 @@ package com.laosun.aluminium.test.content.characters.sam;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -35,7 +35,7 @@ public class FireflyTest {
         double before = remaining(battle, firefly);
         Assertions.assertTrue(before > 0, "the fixture must have a wait to skip: " + before);
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, firefly, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, firefly, enemy, 0, 0));
         double after = remaining(battle, firefly);
 
         Assertions.assertEquals(0.75, after / before, 1e-6,
@@ -54,7 +54,7 @@ public class FireflyTest {
         double before = remaining(battle, firefly);
         Assertions.assertTrue(before > 0, "the fixture must have a wait to skip: " + before);
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, firefly, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, firefly, enemy, 0, 0));
 
         Assertions.assertEquals(0.0, remaining(battle, firefly), 1e-6,
                 "「自身行动提前100%」 (advances her own action by 100%): " + before + " -> 0");

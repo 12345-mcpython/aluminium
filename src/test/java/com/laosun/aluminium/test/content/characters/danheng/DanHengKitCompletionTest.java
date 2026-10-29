@@ -7,11 +7,11 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.buff.StatModifierBuff;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -136,7 +136,7 @@ public class DanHengKitCompletionTest {
      */
     private static Object breakingUltimateKillActor() {
         Character danHeng = CharacterFactory.create(DANHENG, LEVEL, true, null, null, 4);
-        com.laosun.aluminium.models.enemy.Enemy enemy =
+        com.laosun.aluminium.enemy.Enemy enemy =
                 BattleFixture.enemy(100201602, 90);              // weak to Wind: his ultimate can break it
         Battle battle = new Battle(new ArrayList<>(List.of(danHeng)), new ArrayList<>(List.of(enemy)),
                 BattleFixture.seeded());
@@ -151,7 +151,7 @@ public class DanHengKitCompletionTest {
         Assertions.assertTrue(enemy.isWeakTo(com.laosun.aluminium.enums.DamageElement.WIND),
                 "precondition: Wind reduces its toughness at all");
 
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
                 danHeng, List.of(enemy));
         Assertions.assertTrue(enemy.isDeath(), "precondition: the break damage killed it");
         Assertions.assertTrue(enemy.isBroken(), "precondition: the ultimate broke it");
@@ -161,7 +161,7 @@ public class DanHengKitCompletionTest {
     /** The ultimate's settled normal damage against that monster, measured rather than assumed. */
     private static double ultimateDamageAgainst(int monsterId) {
         Character danHeng = CharacterFactory.create(DANHENG, LEVEL, true, null, null, 4);
-        com.laosun.aluminium.models.enemy.Enemy enemy = BattleFixture.enemy(monsterId, 90);
+        com.laosun.aluminium.enemy.Enemy enemy = BattleFixture.enemy(monsterId, 90);
         Battle battle = new Battle(new ArrayList<>(List.of(danHeng)), new ArrayList<>(List.of(enemy)),
                 BattleFixture.seeded());
         battle.startBattle();
@@ -173,7 +173,7 @@ public class DanHengKitCompletionTest {
                 settled[0] = applied;
             }
         });
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
                 danHeng, List.of(enemy));
         return settled[0];
     }
@@ -190,7 +190,7 @@ public class DanHengKitCompletionTest {
         battle.startBattle();
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
         enemy.heal(1_000_000);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
                 danHeng, List.of(enemy));
         Assertions.assertFalse(enemy.isDeath(), "precondition: the ultimate did not kill it");
         Assertions.assertNull(battle.getExtraTurnActor(), "precondition: nothing scheduled yet");
@@ -217,14 +217,14 @@ public class DanHengKitCompletionTest {
     public void theTalentAnswersOnlyToAnAllySkillAimedAtHim() {
         // (1) an ENEMY skill aimed at him: 「我方技能」 says no
         Fixture enemySkill = new Fixture(0);
-        enemySkill.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, enemySkill.enemy, enemySkill.danheng, 0, 0));
+        enemySkill.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, enemySkill.enemy, enemySkill.danheng, 0, 0));
         Assertions.assertEquals(0.0,
                 enemySkill.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
                 "「我方技能」 - an enemy's Skill aimed at him must not raise his penetration");
 
         // (2) an ALLY skill aimed at somebody ELSE: 「的施放目标」 says no
         Fixture elsewhere = new Fixture(0);
-        elsewhere.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, elsewhere.ally, elsewhere.ally, 0, 0));
+        elsewhere.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, elsewhere.ally, elsewhere.ally, 0, 0));
         Assertions.assertEquals(0.0,
                 elsewhere.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
                 "being on his team is not enough - the Skill has to be aimed at HIM");
@@ -232,7 +232,7 @@ public class DanHengKitCompletionTest {
         // (3) the ally's BASIC attack aimed at him: 「技能」 in this document includes a basic attack (the rule's note
         // records that reading), so this one DOES fire - it is the control that the gate is 「我方」, not 「战技」.
         Fixture allyBasic = new Fixture(0);
-        allyBasic.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, allyBasic.ally, allyBasic.danheng, 0, 0));
+        allyBasic.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, allyBasic.ally, allyBasic.danheng, 0, 0));
         Assertions.assertTrue(allyBasic.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get() > 0,
                 "an ally's attack aimed at him does trigger it: the gate is 「我方技能」, not a particular slot");
     }
@@ -246,7 +246,7 @@ public class DanHengKitCompletionTest {
         Fixture f = new Fixture(0);
         double before = f.danheng.getAttribute(AttributeType.SPEED).get();
 
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,
                 f.danheng, f.enemy, 0, 0));
 
         double after = f.danheng.getAttribute(AttributeType.SPEED).get();

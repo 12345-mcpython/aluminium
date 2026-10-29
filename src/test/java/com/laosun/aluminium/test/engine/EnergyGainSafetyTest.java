@@ -1,9 +1,9 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.energy.EnergyGain;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.energy.EnergyGain;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

@@ -5,9 +5,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * The move of the "only the newest target it was applied to is affected" family: `REMOVE_STATE` first takes the name off everybody, then `APPLY_BUFF` gives it to the new target
@@ -51,7 +51,7 @@ public class NewestHolderOnlyTest {
         return TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), apply);
     }
 
-    private static boolean marked(Battle battle, com.laosun.aluminium.models.entity.CanHit who) {
+    private static boolean marked(Battle battle, com.laosun.aluminium.entity.CanHit who) {
         // Note: APPLY_BUFF creates a StateBuff, and the query for it is hasState - - not stacksOf (that queries ADD_STACK's layer count).
         // TriggerTable:2899 is exactly `has_state`'s implementation: `who.getBuffManager().hasState(state)`.
         return who.getBuffManager().hasState(MARK);
@@ -71,9 +71,9 @@ public class NewestHolderOnlyTest {
         Battle battle = new Battle(List.of(wearer, a), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, a, 0, 0));      // Note: a gets the mark
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, a, 0, 0));      // Note: a gets the mark
         boolean aHad = marked(battle, a);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));  // Note: switch it to the enemy
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));  // Note: switch it to the enemy
         return new boolean[]{aHad, marked(battle, a), marked(battle, enemy)};
     }
 

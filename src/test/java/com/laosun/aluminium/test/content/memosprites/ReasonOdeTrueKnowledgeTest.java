@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -50,7 +50,7 @@ public class ReasonOdeTrueKnowledgeTest {
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 18");
         Character aimed = battle.characters().get(aimedAtHim ? 1 : 2);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
         Character target = battle.characters().get(1);
         return new double[]{target.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(),

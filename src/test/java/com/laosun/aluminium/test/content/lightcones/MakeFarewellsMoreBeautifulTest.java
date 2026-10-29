@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -52,11 +52,11 @@ public class MakeFarewellsMoreBeautifulTest {
         // first is the only one that can be observed. Firing the wearer's loss first made an `actor == summon` mutation inert
         // (discipline 225) -- measured, the value was already 0.3 by then.
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, sprite, sprite, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, sprite, sprite, 0, 0));
         double afterSprite = ignore();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
         double afterWearer = ignore();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
         double afterAgain = ignore();
         System.out.println("[23040] defence ignore: before=" + before + " the memosprite's loss=" + afterSprite
                 + " wearer loss=" + afterWearer + " second loss=" + afterAgain);
@@ -69,8 +69,8 @@ public class MakeFarewellsMoreBeautifulTest {
     @Test
     public void nothingElseGrantsIt() {
         build(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, null, 0, 0));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         System.out.println("[23040] after a turn start and a skill: ignore=" + ignore());
         Assertions.assertEquals(0.0, ignore(), 1e-9, "the trigger is an HP loss (false case)");
     }
@@ -78,7 +78,7 @@ public class MakeFarewellsMoreBeautifulTest {
     @Test
     public void withoutTheConeNothingIsGranted() {
         build(false);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
         System.out.println("[23040] without the cone: ignore=" + ignore());
         Assertions.assertEquals(0.0, ignore(), 1e-9, "no cone, no flower (false case)");
     }
@@ -90,7 +90,7 @@ public class MakeFarewellsMoreBeautifulTest {
         // With NO memosprite on the field the wearer's rule is the only one that can match.
         build(true);
         double before = ignore();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, wearer, wearer, 0, 0));
         double after = ignore();
         System.out.println("[23040] with no memosprite at all: before=" + before + " after the wearer's loss=" + after);
         Assertions.assertEquals(0.0, before, 1e-9, "nothing before a loss");

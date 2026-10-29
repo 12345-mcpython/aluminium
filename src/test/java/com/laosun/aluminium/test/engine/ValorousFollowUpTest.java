@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.equipment.Relic;
 
 /**
  * Relic set 315 (2 pieces): an ally's follow-up grants a stack of Merit (功勋) (capped), each stack raises follow-up damage, and a FULL stack adds crit damage.
@@ -38,10 +38,10 @@ public class ValorousFollowUpTest {
         battle.setCurrentMove(new Signal(wearer));
         battle.beforeMove();
         double baseline = wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         Assertions.assertEquals(baseline, wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), 1e-6,
                 "the wearer's own follow-up must not mark Merit (功勋)");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0));
         Assertions.assertTrue(wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get() > baseline,
                 "an ally's follow-up does: " + baseline + " -> " + wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());
     }
@@ -59,7 +59,7 @@ public class ValorousFollowUpTest {
         double critDamageBefore = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         int firings = CAP + 2;
         for (int i = 0; i < firings; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0));
         }
         Assertions.assertEquals(0.05 * CAP, wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get() - boostBefore, 1e-6,
                 "of " + firings + " follow-ups only " + CAP + " may stack");

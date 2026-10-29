@@ -1,5 +1,5 @@
 package com.laosun.aluminium.enums;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 
 /**
  * The category of a character's skill.

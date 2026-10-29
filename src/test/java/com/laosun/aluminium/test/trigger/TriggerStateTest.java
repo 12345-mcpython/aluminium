@@ -7,11 +7,11 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.buff.StateBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -79,10 +79,10 @@ public class TriggerStateTest {
         Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0)),
                 "before the state is applied the conditioned rule must not fire");
         Assertions.assertEquals(1, fire(battle, owner), "the state is applied");
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0)),
                 "now that the owner is in 【协奏】, the conditioned rule fires");
     }
 
@@ -97,12 +97,12 @@ public class TriggerStateTest {
         ally.getBuffManager().addBuff(new StateBuff("触电", 2));
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)),
                 "the subject of the event is in the shocked state");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
                 "the owner is NOT in the shocked state, so the rule must not fire -- reading the owner here would make "
                         + "every 'the target is in state X' rule fire on the wrong unit");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
                 "an event with no subject fails the condition instead of accidentally passing it");
     }
 
@@ -118,7 +118,7 @@ public class TriggerStateTest {
         Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
 
         Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
         Assertions.assertTrue(owner.getBuffManager().hasState("转魄"),
@@ -342,9 +342,9 @@ public class TriggerStateTest {
         Enemy enemy = dummy();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)),
                 "a teammate is on our side");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0)),
                 "…and an enemy target is not: the rule must not fire on a cast aimed at the other side");
     }
 
@@ -359,9 +359,9 @@ public class TriggerStateTest {
         Enemy enemy = dummy();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0)));
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)));
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0)));
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)));
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
                 "no target at all is not \"the other side\" either");
     }
 
@@ -392,18 +392,18 @@ public class TriggerStateTest {
     public void hasSamePathAllyReadsTheParty() {
         Battle same = withAllyOf(1013, pathRule(gain(1)));
         drainSkillPoints(same);
-        Assertions.assertEquals(1, same.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, same.characters().getFirst(), null, 1, 0)),
+        Assertions.assertEquals(1, same.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, same.characters().getFirst(), null, 1, 0)),
                 "Herta (黑塔) is Erudition, like Himeko (姬子)");
 
         Battle other = withAllyOf(1210, pathRule(gain(1)));
         drainSkillPoints(other);
         Assertions.assertEquals(0,
-                other.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, other.characters().getFirst(), null, 1, 0)),
+                other.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, other.characters().getFirst(), null, 1, 0)),
                 "Guinaifen (桂乃芬) is Nihility: 「same Path」 does not hold");
 
         Battle alone = battleWith(pathRule(gain(1)));
         drainSkillPoints(alone);
-        Assertions.assertEquals(0, alone.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, alone.characters().getFirst(), null, 1, 0)),
+        Assertions.assertEquals(0, alone.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, alone.characters().getFirst(), null, 1, 0)),
                 "nobody else on the field is not 「at least one teammate exists」");
     }
 
@@ -419,7 +419,7 @@ public class TriggerStateTest {
         ally.takeDamage(9_999_999);
         battle.processRequests();
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
                 "a corpse is not 「a teammate on the same Path as the wearer」");
     }
 
@@ -432,14 +432,14 @@ public class TriggerStateTest {
         Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
                 "precondition: no teammate shares the Path, so the positive spelling is silent");
 
         Battle negated = withAllyOf(1210,
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!self has_same_path_ally"), gain(1)));
         drainSkillPoints(negated);
         Assertions.assertEquals(1,
-                negated.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negated.characters().getFirst(), null, 1, 0)));
+                negated.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negated.characters().getFirst(), null, 1, 0)));
     }
 
     /**
@@ -473,11 +473,11 @@ public class TriggerStateTest {
         Enemy resistant = dummy();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, weak, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, weak, 1, 0)),
                 "a fire-weak enemy");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, resistant, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, resistant, 1, 0)),
                 "an enemy with no fire weakness");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
                 "a character has no weakness bar at all");
     }
 
@@ -527,12 +527,12 @@ public class TriggerStateTest {
         Assertions.assertTrue(owner.getSkills().get(SkillType.COMMON).getData().isLoaded(),
                 "precondition: and her COMMON row is real, so the two units differ in exactly one slot");
 
-        Assertions.assertEquals(2, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0)),
+        Assertions.assertEquals(2, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0)),
                 "8010 has both slots, so both rules run");
         Assertions.assertEquals(3, battle.getSkillPoints(), "and each granted its own amount (1 + 2)");
 
         drainSkillPoints(battle);
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
                 "Himeko (姬子) has COMMON but no Elation skill: only the second rule runs");
         Assertions.assertEquals(2, battle.getSkillPoints(),
                 "and only ITS amount lands (2, measured from a drained bar so no cap can hide the difference)");
@@ -553,9 +553,9 @@ public class TriggerStateTest {
         Character elation = battle.characters().get(1);
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
                 "Himeko (姬子) has no Elation skill, so the negated condition holds");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0)),
                 "8010 HAS one, so it must not");
     }
 
@@ -596,7 +596,7 @@ public class TriggerStateTest {
         Character harmony = battle.characters().get(1);
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0)),
                 "Tingyun (停云) is Harmony: only the first rule matches");
         Assertions.assertEquals(1, battle.getSkillPoints(), "and it is the one that granted a point");
     }
@@ -628,9 +628,9 @@ public class TriggerStateTest {
         Character harmony = battle.characters().get(1);
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0)),
                 "the target IS Harmony, so the negated condition fails");
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
                 "Himeko (姬子) is Erudition, so it holds");
     }
 
@@ -649,7 +649,7 @@ public class TriggerStateTest {
         Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
                 "there is no target for this event: the negation must not turn that into a match");
     }
 
@@ -757,7 +757,7 @@ public class TriggerStateTest {
     }
 
     private static int fire(Battle battle, Character actor, TriggerEvent event) {
-        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, actor, null, 1, 0));
+        return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(event, actor, null, 1, 0));
     }
 
     /**

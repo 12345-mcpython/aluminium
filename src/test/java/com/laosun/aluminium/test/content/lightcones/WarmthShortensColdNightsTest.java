@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -45,7 +45,7 @@ public class WarmthShortensColdNightsTest {
         battle.beforeMove();
         ally.takeDamage(ally.getMaxHp() * 0.3);
         double allyBefore = ally.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, wearer, enemy, 0, 0));
         double afterBasic = ally.getCurrentHp();
         Assertions.assertTrue(afterBasic > allyBefore,
                 "a basic attack heals the ally: " + allyBefore + " -> " + afterBasic);
@@ -53,7 +53,7 @@ public class WarmthShortensColdNightsTest {
         // 1% of max HP: the heal is 2%, so this is visible AND cannot kill anyone.
         ally.takeDamage(ally.getMaxHp() * 0.01);
         double before2 = ally.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         Assertions.assertTrue(ally.getCurrentHp() > before2,
                 "and so does a skill, through on_any: " + before2 + " -> " + ally.getCurrentHp());
     }

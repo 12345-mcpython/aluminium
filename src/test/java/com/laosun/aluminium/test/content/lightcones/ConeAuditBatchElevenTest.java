@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -51,13 +51,13 @@ public class ConeAuditBatchElevenTest {
     public void coneTwoInnocentThreeSevenStacksLuckAndClearsAtTurnEnd() {
         Fixture f = new Fixture(21037, false);
         double base = f.attribute(AttributeType.CRIT_ATTACK);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.CRIT_DEALT, f.wearer,
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.CRIT_DEALT, f.wearer,
                 f.battle.enemyUnits().getFirst(), 0, 0));
         double one = f.attribute(AttributeType.CRIT_ATTACK) - base;
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.CRIT_DEALT, f.wearer,
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.CRIT_DEALT, f.wearer,
                 f.battle.enemyUnits().getFirst(), 0, 0));
         double two = f.attribute(AttributeType.CRIT_ATTACK) - base;
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_END, f.wearer, f.wearer, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_END, f.wearer, f.wearer, 0, 0));
         double cleared = f.attribute(AttributeType.CRIT_ATTACK) - base;
         System.out.println("[21037] 暴伤增量: 1 层 " + one + " ; 2 层 " + two + " ; 回合结束后 " + cleared);
         Assertions.assertEquals(0.08, one, 1e-9, "每层 8%（叠影 1）");
@@ -88,7 +88,7 @@ public class ConeAuditBatchElevenTest {
         Fixture f = new Fixture(21041, false);
         double base = f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST);
         for (int i = 0; i < 4; i++) {
-            f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.DEBUFF_APPLIED, f.wearer,
+            f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.DEBUFF_APPLIED, f.wearer,
                     f.battle.enemyUnits().getFirst(), 0, 0));
         }
         double after = f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST) - base;
@@ -122,7 +122,7 @@ public class ConeAuditBatchElevenTest {
     public void coneTwoInnocentFourZeroNeedsTwoWeakTargets() {
         Fixture f = new Fixture(21040, false);
         double before = f.attribute(AttributeType.CRIT_ATTACK);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, f.wearer,
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, f.wearer,
                 f.battle.enemyUnits().getFirst(), 0, 0));
         double after = f.attribute(AttributeType.CRIT_ATTACK) - before;
         System.out.println("[21040] 弱点计数不足时的暴伤增量 " + after

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -52,7 +52,7 @@ public class DerivedReadTimingTest {
         her.setTriggerTable(new TriggerTable(PEARL, List.of(
                 grant("ELATION_DAMAGE_BOOST", 0.5),
                 derive("OUTGOING_HEALING_BOOST", "ELATION_DAMAGE_BOOST", 0.2))));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, her, her, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, her, her, 0, 0));
         battle.processRequests();
 
         double elation = her.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();

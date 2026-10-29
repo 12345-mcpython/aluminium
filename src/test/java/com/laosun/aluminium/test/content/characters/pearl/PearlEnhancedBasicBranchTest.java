@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.characters.pearl;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.SkillSwapBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.SkillSwapBuff;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +56,7 @@ public class PearlEnhancedBasicBranchTest {
         Character target = battle.characters().stream().filter(c -> c.getCid() == archetype).findFirst()
                 .orElseThrow();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, target, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, target, 0, 0));
 
         SkillSwapBuff swap = pearl.getBuffManager().findBuff(SkillSwapBuff.class);
         Assertions.assertNotNull(swap, "the Ultimate installs a skill swap on Pearl");

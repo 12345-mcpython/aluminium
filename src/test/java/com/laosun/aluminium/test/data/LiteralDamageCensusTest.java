@@ -82,7 +82,7 @@ public class LiteralDamageCensusTest {
     @Test
     public void herFileStillLoads() {
         var hero = com.laosun.aluminium.utils.CharacterFactory.create(1206, 80);
-        var enemy = com.laosun.aluminium.models.enemy.Enemy.fromAttributes("Dummy", 60000, 500, 100, 90);
+        var enemy = com.laosun.aluminium.enemy.Enemy.fromAttributes("Dummy", 60000, 500, 100, 90);
         Battle battle = new Battle(List.of(hero), List.of(enemy), new Random() {
             @Override
             public double nextDouble() {

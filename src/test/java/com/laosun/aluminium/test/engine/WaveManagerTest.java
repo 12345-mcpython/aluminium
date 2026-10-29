@@ -4,10 +4,10 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.StageBean;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.battle.WaveManager;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.battle.WaveManager;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.data.StageLazyLoadTest;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.Signal;
 
 /**
  * P-4 acceptance: stage data ({@code stage.json}) + waves.
@@ -352,7 +352,7 @@ public class WaveManagerTest {
         return Character.fromAttributes("hero", 10_000, 100, 100, 100);
     }
 
-    private static com.laosun.aluminium.models.Signal signalOf(Battle battle, Enemy enemy) {
+    private static com.laosun.aluminium.Signal signalOf(Battle battle, Enemy enemy) {
         return battle.queue().getHeap().stream()
                 .filter(s -> s.getCanHit() == enemy)
                 .findFirst()

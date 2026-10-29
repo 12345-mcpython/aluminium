@@ -1,10 +1,10 @@
 package com.laosun.aluminium.test.data;
 
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.buff.BuffManager;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.buff.BuffManager;
+import com.laosun.aluminium.buff.StatModifierBuff;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

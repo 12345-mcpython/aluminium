@@ -2,12 +2,12 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -62,7 +62,7 @@ public class DanceDanceDanceTest {
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = timeRemaining(battle, ally);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         double after = timeRemaining(battle, ally);
         System.out.println("[21018] ally av " + before + " -> " + after + " ratio=" + (after / before));
         Assertions.assertFalse(Double.isNaN(before), "precondition: the ally is in the queue");
@@ -75,7 +75,7 @@ public class DanceDanceDanceTest {
         Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), BattleFixture.seeded());
         plain.startBattle();
         double plainBefore = timeRemaining(plain, plainAlly);
-        plain.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, plainWearer, other, 0, 0));
+        plain.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, plainWearer, other, 0, 0));
         double plainAfter = timeRemaining(plain, plainAlly);
         System.out.println("[21018] without the cone: " + plainBefore + " -> " + plainAfter);
         Assertions.assertEquals(plainBefore, plainAfter, 1e-9, "no cone, no advance (false case)");

@@ -6,13 +6,13 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -75,7 +75,7 @@ public class OtherAlliesTargetTest {
         battle.startBattle();
         double ownerBefore = timeRemaining(battle, owner);
 
-        int fired = battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
+        int fired = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertEquals(1, fired);
         Assertions.assertEquals(0, timeRemaining(battle, battle.characters().get(1)), EPS, "teammate 1 acts now");
@@ -98,7 +98,7 @@ public class OtherAlliesTargetTest {
         Character owner = battle.characters().getFirst();
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertEquals(0, timeRemaining(battle, owner), EPS, "「我方全体」 (all allies) includes the wearer");
         Assertions.assertEquals(0, timeRemaining(battle, battle.characters().get(1)), EPS);
@@ -116,7 +116,7 @@ public class OtherAlliesTargetTest {
         Summon minion = battle.summon(owner, MONSTER, 1);
         battle.processRequests();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertEquals(0, timeRemaining(battle, minion), EPS,
                 "「我方」 (our side) is the side, not the character list -- the same reading all_allies has");
@@ -155,7 +155,7 @@ public class OtherAlliesTargetTest {
         battle.startBattle();
         double robinBefore = timeRemaining(battle, robin);
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, robin, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, robin, null, 0, 0));
 
         Assertions.assertEquals(0, timeRemaining(battle, first), EPS, "\"makes allies other than herself act immediately\" (「使除自身以外的队友立即行动」)");
         Assertions.assertEquals(0, timeRemaining(battle, second), EPS);
@@ -208,7 +208,7 @@ public class OtherAlliesTargetTest {
         double ownerBefore = timeRemaining(battle, owner);
 
         // The ULT_CAST event carries the unit the cast was AIMED AT, which is what "指定" means.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, chosen, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, chosen, 0, 0));
 
         Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "「指定我方单体」 (a designated single ally)acts now");
         Assertions.assertEquals(0, timeRemaining(battle, chosenSummon), EPS, "「及其召唤物」 (and its summons) acts with it");
@@ -231,7 +231,7 @@ public class OtherAlliesTargetTest {
         Character chosen = battle.characters().get(1);
         battle.startBattle();
 
-        int fired = battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, chosen, 0, 0));
+        int fired = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, chosen, 0, 0));
 
         Assertions.assertEquals(1, fired, "the rule fires; having no summon is not a failure");
         Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "the chosen unit acts now");
@@ -251,7 +251,7 @@ public class OtherAlliesTargetTest {
         chosenSummon.takeDamage(9_999_999);
         battle.processRequests();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, chosen, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, chosen, 0, 0));
 
         Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS,
                 "「及其召唤物」 (and its summons) means the one that is on the field -- a corpse is not advanced");
@@ -275,7 +275,7 @@ public class OtherAlliesTargetTest {
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, owner, 0, 0)));
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, owner, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains(TARGET_AND_SUMMON), refused.getMessage());
     }

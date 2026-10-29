@@ -6,10 +6,10 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.buff.StateBuff;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -131,10 +131,10 @@ public class MydeiBloodfeudSkillsTest {
         other.startBattle();
         other.processRequests();
         // Note: AFTER startBattle, so the slot carries the level the convention gives it -- the trap the earlier attempt fell into.
-        byHand.getSkills().put(SkillType.SKILL, new com.laosun.aluminium.models.skill.DefaultSkill(
+        byHand.getSkills().put(SkillType.SKILL, new com.laosun.aluminium.skill.DefaultSkill(
                 MYDEI, 9, byHand.getSkills().get(SkillType.SKILL).getLevel()));
         double otherBefore = other.enemies().getFirst().getCurrentHp();
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(other,
+        com.laosun.aluminium.skill.SkillExecutor.execute(other,
                 byHand.getSkills().get(SkillType.SKILL), byHand, List.of(other.enemies().getFirst()));
         other.processRequests();
         double manual = otherBefore - other.enemies().getFirst().getCurrentHp();
@@ -159,7 +159,7 @@ public class MydeiBloodfeudSkillsTest {
 
         him.getResources().gain(CHARGE, 100);
         battle.noteChangedResource(CHARGE);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 100));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 100));
         battle.processRequests();
         int charge = him.getResources().value(CHARGE);
         System.out.println("[mydei-skills] charge after entering bloodfeud with 100 = " + charge);
@@ -185,7 +185,7 @@ public class MydeiBloodfeudSkillsTest {
         him.getResources().gain(CHARGE, 150);
         battle.noteChangedResource(CHARGE);
         double enemyBefore = battle.enemies().getFirst().getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 150));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 150));
         battle.processRequests();
         int charge = him.getResources().value(CHARGE);
         double enemyAfter = battle.enemies().getFirst().getCurrentHp();

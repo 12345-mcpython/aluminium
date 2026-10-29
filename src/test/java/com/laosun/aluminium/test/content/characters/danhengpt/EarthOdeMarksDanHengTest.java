@@ -1,8 +1,8 @@
 package com.laosun.aluminium.test.content.characters.danhengpt;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -41,7 +41,7 @@ public class EarthOdeMarksDanHengTest {
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 25");
         Character aimed = battle.characters().get(aimedAtHim ? 1 : 0);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
         return battle.characters().get(1).getBuffManager().hasState(STATE) ? 1 : 0;
     }

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * 8002, the sibling id of 8001: the same Trailblazer (Destruction) kit, verified number by number.
@@ -37,11 +37,11 @@ public class TrailblazerSiblingTest {
         battle.startBattle();
         double before = tb.getAttribute(AttributeType.ATTACK).get();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
         double afterOne = tb.getAttribute(AttributeType.ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
         double afterTwo = tb.getAttribute(AttributeType.ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
         double afterThree = tb.getAttribute(AttributeType.ATTACK).get();
 
         Assertions.assertTrue(afterOne > before, "\"after each time an enemy target's Weakness is Broken, ATK is raised by 20%\" (「每次击破敌方目标的弱点后，攻击力提高20%」): " + before + " -> " + afterOne);
@@ -59,7 +59,7 @@ public class TrailblazerSiblingTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.markTechniqueUsed(tb);
-        battle.applyDamage(ally, new com.laosun.aluminium.models.damage.Damage(enemy, ally,
+        battle.applyDamage(ally, new com.laosun.aluminium.damage.Damage(enemy, ally,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.5));
         double hurt = ally.getCurrentHp();
@@ -81,7 +81,7 @@ public class TrailblazerSiblingTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
-        battle.applyDamage(ally, new com.laosun.aluminium.models.damage.Damage(enemy, ally,
+        battle.applyDamage(ally, new com.laosun.aluminium.damage.Damage(enemy, ally,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.5));
         double hurt = ally.getCurrentHp();

@@ -5,12 +5,12 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class ConeBreakAndAuraTest {
         // The state application rolls: give the applier effect hit rate first (discipline 145).
         withCone.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 230350));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, withCone, target, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, withCone, target, 0, 0));
         // Note: ADD_STACK builds a COUNTER, not a state hasState() reports (measured: hasState was false while the
         // damage ratio below did move). So the stacking is asserted where it is observable: the ratio and the spec.
         int spec = 0;
@@ -92,7 +92,7 @@ public class ConeBreakAndAuraTest {
         Character plainWearer = CharacterFactory.create(WEARER, LEVEL);
         Battle plainBattle = battle(plainWearer, reference);
         double baseline = reference.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemyOf(battle, wearer), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemyOf(battle, wearer), 0, 0));
         double afterFollowUp = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23038] ally crit damage baseline(no cone)=" + baseline + " with cone=" + afterFollowUp
                 + " ; state on the wearer=" + wearer.getBuffManager().hasState("谕示"));
@@ -115,7 +115,7 @@ public class ConeBreakAndAuraTest {
         Assertions.assertEquals(1, pinnedTurns, "exactly one party aura rule on FOLLOW_UP");
         Assertions.assertTrue(wearer.getBuffManager().hasState("谕示"), "carried by the state");
         // A battle without the cone: the same stimulus changes nothing.
-        plainBattle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, plainWearer, enemyOf(plainBattle, plainWearer), 0, 0));
+        plainBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, plainWearer, enemyOf(plainBattle, plainWearer), 0, 0));
         System.out.println("[23038] without the cone, after the same stimulus: "
                 + reference.getAttribute(AttributeType.CRIT_ATTACK).get() + " (baseline " + baseline + ")");
         Assertions.assertEquals(baseline, reference.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,

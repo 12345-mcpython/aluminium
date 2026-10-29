@@ -3,16 +3,16 @@ package com.laosun.aluminium.test.content.characters.hyacine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * 1409 风堇's 忆灵技4 「消失时，使风堇行动提前 30%」 and the other half of her Rank 6 aura
@@ -85,7 +85,7 @@ public class HyacineMemospriteLeavesTest {
         }
 
         /** 风堇 的剩余等待，从行动条自己的快照读。 */
-        double remainingWaitOf(com.laosun.aluminium.models.entity.CanHit unit) {
+        double remainingWaitOf(com.laosun.aluminium.entity.CanHit unit) {
             for (var signal : battle.queue().snapshot()) {
                 if (signal.getCanHit() == unit) {
                     return battle.queue().getTimeRemaining(signal);
@@ -94,7 +94,7 @@ public class HyacineMemospriteLeavesTest {
             throw new AssertionError(unit.getName() + " is not on the action bar");
         }
 
-        double pen(com.laosun.aluminium.models.entity.CanHit unit) {
+        double pen(com.laosun.aluminium.entity.CanHit unit) {
             return unit.getAttribute(AttributeType.DAMAGE_PENETRATION).get();
         }
     }

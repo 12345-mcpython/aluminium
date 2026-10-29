@@ -2,9 +2,9 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -30,10 +30,10 @@ public class LightConeChannelTest {
         Fixture f = fixture(true);
         Assertions.assertEquals(0, f.character.getBuffManager().stacksOf(COUNTER),
                 "precondition: nothing before the attacks");
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.character, f.enemy, 1, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.character, f.enemy, 1, 0));
         Assertions.assertEquals(1, f.character.getBuffManager().stacksOf(COUNTER), "a basic attack grants one layer");
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.character, f.enemy, 1, 0));
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.character, f.enemy, 1, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.character, f.enemy, 1, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.character, f.enemy, 1, 0));
         Assertions.assertEquals(3, f.character.getBuffManager().stacksOf(COUNTER),
                 "and the skill and the ultimate each grant one more");
     }
@@ -41,7 +41,7 @@ public class LightConeChannelTest {
     @Test
     public void withoutTheLightConeNothingIsGranted() {
         Fixture f = fixture(false);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.character, f.enemy, 1, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.character, f.enemy, 1, 0));
         Assertions.assertEquals(0, f.character.getBuffManager().stacksOf(COUNTER),
                 "the rules come from the light cone, so an unequipped character has none");
     }
@@ -80,7 +80,7 @@ public class LightConeChannelTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(character), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, character, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, character, enemy, 1, 0));
         Assertions.assertEquals(1, character.getBuffManager().stacksOf(COUNTER), "precondition: one layer");
         double base = character.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).baseValue();
         double value = character.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();

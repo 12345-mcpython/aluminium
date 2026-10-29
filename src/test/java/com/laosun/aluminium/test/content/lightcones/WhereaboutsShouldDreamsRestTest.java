@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -49,7 +49,7 @@ public class WhereaboutsShouldDreamsRestTest {
     public void breakingCollapsesAndSlows() {
         build(true);
         double speedBefore = enemy.getAttribute(AttributeType.SPEED).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
         int collapse = enemy.getBuffManager().stacksOf(COLLAPSE);
         double speedAfter = enemy.getAttribute(AttributeType.SPEED).get();
         System.out.println("[23025] collapse stacks=" + collapse + " (hasState="
@@ -63,7 +63,7 @@ public class WhereaboutsShouldDreamsRestTest {
     @Test
     public void withoutTheConeNothingCollapses() {
         build(false);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
         System.out.println("[23025] without the cone: stacks=" + enemy.getBuffManager().stacksOf(COLLAPSE));
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf(COLLAPSE), "no cone, no collapse (false case)");
     }

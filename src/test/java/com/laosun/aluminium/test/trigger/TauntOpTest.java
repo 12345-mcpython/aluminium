@@ -6,10 +6,10 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.TauntBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.TauntBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * {@code TAUNT} - "使目标陷入嘲讽状态，持续N回合" (make the target enter the taunted state for N turns).
@@ -45,7 +45,7 @@ public class TauntOpTest {
         Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
 
         List<TauntBuff> buffs = enemy.getBuffManager().allBuffsOf(TauntBuff.class);
         Assertions.assertEquals(1, buffs.size(), "the enemy is taunted");
@@ -62,7 +62,7 @@ public class TauntOpTest {
         Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
 
         Assertions.assertTrue(owner.getBuffManager().allBuffsOf(TauntBuff.class).isEmpty(),
                 "the rule owner is not taunted -- `target` names the event's subject");
@@ -119,7 +119,7 @@ public class TauntOpTest {
         // effect resistance (效果抵抗)), so the fixture states the other side of that roll: Ice Edge (冰锋)'s own 30% effect resistance would otherwise make
         // every case here a coin flip. The pipeline itself is pinned by DebuffResistTest.
         enemy.setAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_RESISTANCE,
-                new com.laosun.aluminium.models.DoubleValue(0));
+                new com.laosun.aluminium.DoubleValue(0));
         return enemy;
     }
 }

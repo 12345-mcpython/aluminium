@@ -4,8 +4,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -44,7 +44,7 @@ public class AhaEndExtraTurnTest {
         TriggerSpecs.set(lay, "target", "all_allies");
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), lay))));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, owner, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, owner, 0, 0));
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(MOMENT), "precondition: the moment is on her");
 
