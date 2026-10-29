@@ -3,9 +3,9 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_consumes_hp",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": {"same_as": "self"}}],
       "do": [
-        { "op": "CONSUME_HP", "scale": "owner_max_hp", "percent": 0.1, "target": "self" }
+        {"op": "CONSUME_HP", "scale": "owner_max_hp", "percent": 0.1, "target": "self"}
       ],
       "source": "1413 长夜月 战技 白昼悄然离去 (141302): 「消耗长夜月当前 #6[i]% 的生命值召唤忆灵「长夜」…」 param = [0.24, 2, 2, 0.5, 12, 0.1]",
       "note": "「消耗长夜月当前 10% 的生命值」—— `CONSUME_HP` ✓（走 `consumeHp` 并发 `HP_CONSUMED` ✓，不发 `HP_LOST` ✓，与\"代价不是伤害\"一致 ✓）。⚠ 登记：文档是**当前**生命值的 10%，这里用 `owner_max_hp`（上限）—— 残血时偏大 ✗；份额词汇里暂无\"当前生命值\" ✓。"
@@ -13,10 +13,10 @@
     {
       "on": "HP_CONSUMED",
       "id": "talent_hp_cost_raises_her_crit_damage",
-      "when_predicates": [{"type": "entity", "entity": "target", "json": { "same_as": "self" }}],
+      "when_predicates": [{"type": "entity", "entity": "target", "json": {"same_as": "self"}}],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "amount": 0.6, "turns": 2, "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount": 2 }
+        {"op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "amount": 0.6, "turns": 2, "target": "self"},
+        {"op": "GAIN_RESOURCE", "resource": "亿质", "amount": 2}
       ],
       "source": "1413 长夜月 天赋 今夜与我同行 (141304): 「长夜月或忆灵「长夜」每次生命降低时，使自身和忆灵「长夜」的暴击伤害提高#2[i]%，持续 #3[i] 回合，并获得 #1[i] 点【忆质】。」 param = [2, 0.6, 2, 160, 0.5, 16, 0.05]",
       "note": "「生命降低时，**自身**的暴击伤害提高 60%（2 回合），并获得 2 点【忆质】」—— ① 挂 `HP_CONSUMED` ✓（战技消耗生命 ✓）；② `CRIT_ATTACK` 用 **`amount: 0.6`**（点数属性，写 `percent` 会被当\"基础的百分比\" ✗）；③ `亿质 +2` ✓。⭐ **忆灵那一半已补**（同一份额 0.6，`target: summon` ✓，两条既有判据的期望同步加了 0.6 ✓）；旧的登记：：文档说\"**自身和忆灵**\"，但给忆灵也加 0.6 会顶红 `EvernightCritForSummonsTest` 与 `TimeOdeRaisesHerCritTest`（它们钉的是\"忆灵暴伤收益 = 她暴伤 × 战技#1\"，实测多出 0.072 = 0.6 × 0.12）✗ —— 这两条判据的**口径**需要扩展成\"战技#1 + 天赋 0.6\"两段，本轮先把角色自身那半落地 ✓，忆灵那半等判据口径更新 ✓。 || 2026-10-18（第 40 轮）：忆灵那半**又试了一次**（`target: summon`，先 `percent: 0.6` 后 `amount: 0.6`）——两次实测都让忆灵多出 **0.072**（= 0.6 × 0.12，忆灵暴伤基础 0.12）而不是 0.6 ✗ ⇒ 说明给**忆灵**的属性修饰走的是**份额**路径（`amount` 与 `percent` 在这条路径上同效），而给**她本人**的 `amount: 0.6` 是点数 ✓（同一条规则里两种口径 ✗）。⇒ 忆灵那半需要的是\"按点数给忆灵\"的写法/能力 ⇒ 下一轮先量 `statModifier` 对 `Summon` 目标的口径，再写。"
@@ -24,7 +24,7 @@
     {
       "on": "BATTLE_START",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 }
+        {"op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9}
       ],
       "source": "1413 长夜月 终结技 (skill 141303) 的**等级口径**: 她的终结技在文档里按 Lv10 引用（#1[i]% 长夜生命上限的冰属性伤害按 Lv10 行读）",
       "note": "The file stating **which level its numbers were quoted at** (M-32), replacing the `damage_level: 10` that her ultimate's damage rule used to carry. ⚠ A level is a fact about the skill (every effect reads it, and a 星魂's raise composes with it), while `damage_level` pins one effect to one row — the difference only shows once something raises a level, which is exactly what the 星魂 sentences do. ⚠ Base 1 in the engine, so 「quoted at Lv10」 is +9. ⚠ Unconditional, and not a mechanic. ⚠ Her ultimate's parameter table has 15 rows, so a later raise stays inside it; going past the table fails loudly at fire time. || 2026-10-18：**天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地**，三条实测结论：① 文档写作【忆质】✓，本文件声明的是 **`亿质`** ✓ —— 用错名字会在**装配期**直接报错（`CharacterException: ... uses the resource 忆质, which the character does not declare` ✓，这次正是这么被抓到的 ✓）；② 她的战技是「**消耗**当前生命值 10%」⇒ 引擎区分\"受伤\"（`HP_LOST`）与\"代价\"（`consumeHp` 不触发 `HP_LOST` ✓）——所以按 `HP_LOST` 写，放完战技暴伤**不动** ✗；③ 又补了一条 `HP_CONSUMED` 的孪生规则，**仍然不动** ✗ ⇒ 说明\"战技消耗 10% 生命\"这件事在引擎里**要么没被执行、要么没发 `HP_CONSUMED`** ✗。下一步：用探针打印放战技前后的 `currentHp` 与 `HP_CONSUMED`/`HP_LOST` 计数，再决定挂哪个事件 ✓。 || 2026-10-18：天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地。三条实测：① 资源名：文档写【忆质】，本文件声明的是 亿质 —— 用错会在装配期直接抛 CharacterException；② 只挂 HP_LOST 时放完战技暴伤不动（0.633 → 0.633）；补 HP_CONSUMED 孪生规则仍不动；③ 第 32 轮探针把原因钉死：放战技前后 currentHp 一模一样（1556.97696 → 1556.97696），HP_LOST 与 HP_CONSUMED 计数都是 0 ⇒ 引擎根本没有执行技能数据里的\"消耗 #6% 生命值\"这个代价（引擎缺口，见 AGENT.md 3.7g）⇒ 天赋要等这个能力补上。 || 2026-10-18（第 33 轮）：把「战技消耗 10% 生命」用 `CONSUME_HP`（`scale: owner_max_hp`, `percent: 0.1`）写成规则 ✓，再把天赋挂到 `HP_CONSUMED` ✓ —— 两条都**能加载、也能让暴伤 +60** ✓，但**顶红了另外两条既有判据**：`EvernightCritForSummonsTest`（期望\"忆灵暴伤收益 = 她暴伤 × 战技#1\"= 0.07596，实得 0.14796）与 `TimeOdeRaisesHerCritTest`（0.11394 → 0.22194）—— 差值 **0.072 = 0.6 × 0.12** ⇒ 天赋给忆灵的那 0.6 **点数**在那两条判据的口径里被算成了\"额外收益\"（它们钉的是\"战技#1 那一段\"）。⚖ 这不是内容写错，而是**判据口径需要扩展**（把天赋那一段也纳入期望值），但那要同时改两条既有判据的语义 ⇒ 本轮**先回滚内容**、把这件事登记下来，下一轮决定是\"扩判据\"还是\"把天赋的忆灵那半换成别的写法\" ✓。"
@@ -32,7 +32,7 @@
     {
       "on": "BATTLE_START",
       "do": [
-        { "op": "SUMMON" }
+        {"op": "SUMMON"}
       ],
       "source": "1413 长夜月 天赋: 「进入战斗时召唤忆灵「长夜」。」",
       "note": "The summoning clause only; 「长夜」's panel is derived from her in resources/memosprites/1413.json, and everything else her talent says (the CRIT DMG on HP loss, 【忆质】) is not authored yet. No `target`: a memosprite belongs to its summoner, so there is nothing to point at -- SUMMON refuses one rather than ignoring it. Firing this twice keeps the memosprite already out (the op is idempotent per summoner), which is what 「若已在场…」 implies; the refresh variant is not modelled. A character with a SUMMON rule but no memosprite spec is refused when the character is built (CharacterFactory), not mid-battle."
@@ -41,25 +41,25 @@
       "on": "CAST_SETUP",
       "when": ["actor == self", "from_skill_id == 3"],
       "do": [
-        { "op": "DELEGATE_DAMAGE", "skill": "ULTRA" }
+        {"op": "DELEGATE_DAMAGE", "skill": "ULTRA"}
       ],
       "source": "1413 长夜月 终结技 晚安，全世界无眠 (skill 141303, Ultimate/AoEAttack/Ice): 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害…」",
       "note": "Her ultimate's damage is NOT hers to deal, and this rule is where that is said. ⚠ Without it the engine's ordinary damage path swings 141303's own `damage_list` with HER attack as the base (measured 2026-09-27: 8818.5 on 1002011 with an empty table), and the ULT_CAST rule below swings the memosprite's Max-HP share on top -- two damage instances where the document describes one, the first of them scaled off the wrong attribute (M-40). ⚠ It has to be CAST_SETUP and not ULT_CAST: the cast events fire AFTER the damage has been expanded, so a rule there can only describe the swing, never prevent it. ⚠ `actor == self` is required (CAST_SETUP reaches every character's table) and the op verifies it as well rather than trusting the condition. ⚠ `skill: \"ULTRA\"` is likewise a check, not decoration: the condition DSL has no variable for \"which slot is being cast\", so this comparison IS the gate -- naming SKILL here would delegate her Skill instead. ⚠ Its sibling is the ULT_CAST rule below, which delivers the swing this one hands over (SUMMON + COMMAND_SUMMON); the toughness (90, from 141303's own `stance_list`) rides along THERE, because a delegated cast expands no damage of its own and therefore removes no toughness of its own.  ⚠ **2026-10-02 补上的门**：原来只有 `actor == self`，而 `CAST_SETUP` 对**每一次**施放都会发 ⇒ 她施放**战技**时它也去交接一个终结技的挥击，引擎报 “DELEGATE_DAMAGE names ULTRA (slot 3) but the cast in progress is slot 2”。⚠ 这意味着**这条规则对她的战技从来没工作过**（一直抛异常），因为没有判据铸过她的战技。"
     },
     {
       "on": "SUMMONED",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": {"same_as": "summon"}}],
       "do": [
-        { "op": "ADVANCE", "percent": 1.0, "target": "summon" }
+        {"op": "ADVANCE", "percent": 1.0, "target": "summon"}
       ],
       "source": "1413 长夜月 忆灵技能3 与夜，形影，不离: 「被召唤时，使自身立即行动。」",
       "note": "The memosprite's own skill, expressed as a rule on its summoner -- which is where the engine's tables live. ⚠ `actor == summon` is required: SUMMONED is delivered to every character's table, so without it a teammate's memosprite entering would also advance HERS. ⚠ `percent: 1.0` skips all of the target's REMAINING time to act, so the memosprite acts immediately -- that is what 立即行动 means, and 0.5 would be 行动提前 50%. ⚠ The event is fired AFTER the unit is in the action bar (Battle.fireSummoned, drained by processRequests): an ADVANCE against a unit that has no signal yet is silently lost, and this rule is exactly the kind that would expose it."
     },
     {
       "on": "SUMMONED",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": {"same_as": "summon"}}],
       "do": [
-        { "op": "RESIST_DEBUFF", "kind": "control", "percent": 1.0, "permanent": true, "target": "summon" }
+        {"op": "RESIST_DEBUFF", "kind": "control", "percent": 1.0, "permanent": true, "target": "summon"}
       ],
       "source": "1413 长夜月 忆灵技能2 孤独，浮游，漆黑 (效果ID 10000011): 「「长夜」免疫控制类负面状态，被攻击的概率提高。」",
       "note": "「免疫控制类负面状态」 and 克拉拉's 「抵抗控制类负面状态的概率提高35%」 are ONE mechanic at different strengths: percent 1.0 leaves nothing of the chance, so this is the same op and the same buff class as the 35% trace -- there is no second 'immunity' vocabulary to keep in sync. ⚠ The immunity is 长夜's own, so the effect targets the MEMOSPRITE ('target': 'summon'), not her summoner: a control aimed at 「长夜」 asks its own BuffManager, and 长夜月 standing next to it is unaffected by this rule. ⚠ Granted on SUMMONED rather than at BATTLE_START even though both would work: the summon's existence at BATTLE_START depends on the table order of two rules in one event, and 「在场时」 is exactly the lifetime this event already marks. ⚠ 'actor == summon' is required -- SUMMONED reaches every character's table, so without it a teammate's memosprite entering would make HERS immune. ⚠ 'permanent': true, because 「免疫…」 here states no duration and the memosprite is immune for as long as it is on the field (leaving the field removes it with the unit). ⚠ The 「被攻击的概率提高」 half of the same sentence is already carried by the memosprite spec's `aggro` (125, from the ServantID block), and 「「长夜」在场时…伤害提高50%」 is registered rather than approximated."
@@ -67,23 +67,23 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_taunt_aggro",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": {"same_as": "summon"}}],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 3, "permanent": true, "target": "summon" }
+        {"op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 3, "permanent": true, "target": "summon"}
       ],
       "source": "1413 长夜月 忆灵技能 2 孤独，浮游，漆黑 (效果ID 10000011): 「「长夜」免疫控制类负面状态，被攻击的概率提高。「长夜」在场时，长夜月和「长夜」造成的伤害提高50%。」参数（全部等级）= [0.25…0.7, 3] ⇒ 第一个 = 正文点名的 50%（Lv6 = 0.5）、第二个 = 未被正文引用的恒定 3",
       "note": "「「长夜」**被攻击的概率提高**」—— 数值是**未被正文引用的那个参数** ✓：① 忆灵技能2 的参数表是 `[0.25…0.7, 3]` ✓，第一个值就是正文点名的「伤害提高 **50%**」（Lv6 = 0.5 ✓），第二个是**恒定 3 且正文从不提它** ✓ ⇒ 按同一条方法 ⇒ 软仇恨比率 **3** ⇒ 权重 **×(1+3) = ×4** ✓（⭐ 这是该方法的**第四次**命中：1001 第 5 个参数 = 5、1107 第 2 个 = 5、1110 第 6 个 = 5、这里第 2 个 = 3 ✓）。② 上游 `Config/ConfigAbility/Servant/Servant_EvernightServant_00_Ability.json` 的属性集合恰好是 `{AggroAddedRatio, AllDamageTypeAddedRatio, SpeedAddedRatio}` ✓，其中 `MServant_EvernightServant_00_Passive` 在 `OnStack` 里写 `AggroAddedRatio` ✓ ⇒ 忆灵确实自带一个软仇恨权重 ✓（引擎侧的基础权重是忆灵规格里的 `\"aggro\": 125` ✓ ⇒ 125 × 4 = **500** ✓）。⚠ **同一句的前半段早已出货** ✓：`characters/1413.json` 里已有 `RESIST_DEBUFF kind control percent 1.0 permanent target summon` ✓ ⇒ 「免疫控制类负面状态」**不需要**再动 ✓；⭐ 这恰好解释了为什么忆灵文件里**一个免疫类属性都没有** ✓（`Immune`/`Immunity`/`StatusResistance`/`DebuffResist` 在该文件里各 **0** 次 ✓）—— 因为那一半是用**满抗性**建模的 ✓。⚠ 写法与同文件另两条 `SUMMONED` 规则一致 ✓（`when: [\"actor == summon\"]` + `target: summon` ✓）；⚠ 技能 1/3/4/5 与「在场时伤害提高 50%」的其余部分**不在本条**（前者是技能数据、后者是增益 ✓，已在别的规则里 ✓）。"
     },
     {
       "on": "ULT_CAST",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": {"same_as": "self"}}],
       "do": [
-        { "op": "SUMMON" },
-        { "op": "COMMAND_SUMMON", "skill": "ULTRA", "damage_param": 0, "attribute": "HEALTH" },
-        { "op": "APPLY_BUFF", "buff": "至暗之谜", "turns": 3, "target": "self" },
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.3, "turns": 3, "coexist": true, "target": "all_enemies" },
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.6, "turns": 3, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.6, "turns": 3, "target": "summon" }
+        {"op": "SUMMON"},
+        {"op": "COMMAND_SUMMON", "skill": "ULTRA", "damage_param": 0, "attribute": "HEALTH"},
+        {"op": "APPLY_BUFF", "buff": "至暗之谜", "turns": 3, "target": "self"},
+        {"op": "MODIFY_DAMAGE_TAKEN", "percent": 0.3, "turns": 3, "coexist": true, "target": "all_enemies"},
+        {"op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.6, "turns": 3, "target": "self"},
+        {"op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.6, "turns": 3, "target": "summon"}
       ],
       "id": "ult_summons_and_darkens",
       "source": "1413 长夜月 终结技 晚安，全世界无眠 (141303): 「…使长夜月进入【至暗之谜】状态，期间敌方全体受到的伤害提高#4[i]%，长夜月和忆灵「长夜」造成的伤害提高#3[i]%…」 param = [2, 2, 0.6, 0.3]",
@@ -92,9 +92,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_4",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 4 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": {"enemy_count": {"min": 4}}}, {"type": "entity", "entity": "actor", "json": {"same_as": "summon"}}],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.2 }
+        {"op": "BOOST_DAMAGE", "percent": 0.2}
       ],
       "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于4 或以上名时，我方忆灵造成的伤害为原伤害的120%」",
       "note": "「长夜月在场时，**场上敌方目标数量**等于 4 或以上 名时，**我方忆灵造成的伤害为原伤害的 120%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。 ⚠ **换算说明** ✓：数据行写的是\"原伤害的 **125%**\" ✓ ⇒ 本规则存 **+0.25** ✓ （`percent: 0.25` 即\"提高 25%\" ✓）⇒ **25% 不是缺出处，是换算** ✓。"
@@ -102,9 +102,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_3",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 3, "max": 3 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": {"enemy_count": {"min": 3, "max": 3}}}, {"type": "entity", "entity": "actor", "json": {"same_as": "summon"}}],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.25 }
+        {"op": "BOOST_DAMAGE", "percent": 0.25}
       ],
       "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于3名时，我方忆灵造成的伤害为原伤害的125%」",
       "note": "「长夜月在场时，**场上敌方目标数量**等于 3 名时，**我方忆灵造成的伤害为原伤害的 125%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。"
@@ -112,9 +112,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_2",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 2, "max": 2 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": {"enemy_count": {"min": 2, "max": 2}}}, {"type": "entity", "entity": "actor", "json": {"same_as": "summon"}}],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.3 }
+        {"op": "BOOST_DAMAGE", "percent": 0.3}
       ],
       "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于2名时，我方忆灵造成的伤害为原伤害的130%」",
       "note": "「长夜月在场时，**场上敌方目标数量**等于 2 名时，**我方忆灵造成的伤害为原伤害的 130%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。 ⚠ **换算说明** ✓：数据行写的是\"原伤害的 **125%**\" ✓ ⇒ 本规则存 **+0.25** ✓ （`percent: 0.25` 即\"提高 25%\" ✓）⇒ **25% 不是缺出处，是换算** ✓。"
@@ -122,9 +122,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_1",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 1, "max": 1 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": {"enemy_count": {"min": 1, "max": 1}}}, {"type": "entity", "entity": "actor", "json": {"same_as": "summon"}}],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.5 }
+        {"op": "BOOST_DAMAGE", "percent": 0.5}
       ],
       "source": "1413 长夜月 天赋: 「长夜月在场时，场上敌方目标数量等于1名时，我方忆灵造成的伤害为原伤害的150%」",
       "note": "「长夜月在场时，**场上敌方目标数量**等于 1 名时，**我方忆灵造成的伤害为原伤害的 150%**」—— ① ⭐ 用 **`BOOST_DAMAGE`** ✓：它抬的是**正在结算的这一击** ✓，而 `DEALING_DAMAGE` 正是\"结算前把待结算实例交出来\"的事件 ✓（⚠ 实测：改成 `MODIFY_ATTR` 加属性**来不及** ✗ —— 比值仍是 1.0 ✓）；② ⭐ 作用域用 **`actor == summon`** ✓（词汇表已有 ✓，问的是\"事件的主体是否是我的召唤物\" ✓）—— 否则主人**自己**的伤害也会被这条规则抬起来 ✗；③ 条件用第 67/270 轮落地的 **`enemy_count`** ✓；④ 四档**互斥** ✓（`>= 4` / `== 3` / `== 2` / `== 1` ✓）；⑤ 数值直接来自句子 ✓（120/125/130/150% ⇒ +20/+25/+30/+50% ✓）；⑥ ⚠ **实测**：主人挂 `DEALING_DAMAGE` 规则时忆灵出手**会触发** ✓（技能点 3→4 ✓），不挂则 3→3 ✓。 ⚠ **换算说明** ✓：数据行写的是\"原伤害的 **125%**\" ✓ ⇒ 本规则存 **+0.25** ✓ （`percent: 0.25` 即\"提高 25%\" ✓）⇒ **25% 不是缺出处，是换算** ✓。"
@@ -134,7 +134,7 @@
       "on": "CAST_SETUP",
       "when": ["target == self", "from_skill_id == 24"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "长夜的迷梦增伤", "scale": "cast_skill_param:0", "percent": 10000, "target": "self" }
+        {"op": "GAIN_RESOURCE", "resource": "长夜的迷梦增伤", "scale": "cast_skill_param:0", "percent": 10000, "target": "self"}
       ],
       "source": "1415 昔涟 忆灵技能 24 「献予「岁月」之诗」（数据槽位 24，SkillID 1141524）：「整场生效，对**长夜月**施放后，**「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%**」—— 本条只做**捕获**（把 #1 存成基点），下一条在伤害时用它。",
       "note": "⭐ 为什么要捕获：该数字在 24 号行里，而忆灵技能行**任何份额拼法都读不到**（`Summon` 按 `int` 数据槽位存）；但**施放那一刻**读得到（`castParamValue` 走 actor）。⭐ 而 `#1` 是个**小于 1 的份额**（0.09 → 0.252）而资源是整数 ⇒ 存**基点**（`percent: 10000`）。"
@@ -160,7 +160,7 @@
       "on": "CAST_SETUP",
       "when": ["target == self", "from_skill_id == 24"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "岁月之诗的亿质点数", "scale": "cast_skill_param:1", "target": "self" }
+        {"op": "GAIN_RESOURCE", "resource": "岁月之诗的亿质点数", "scale": "cast_skill_param:1", "target": "self"}
       ],
       "source": "1415 昔涟 忆灵技能 24 的 `MDF_ExtraPoint`（从能力文件读到）⇒ 它就是 `#2`，而 `#2` 来自技能参数。",
       "note": "⭐ **不乘 10000**（与份额那些相反）：`#2` 是**点数**，不是小于 1 的份额，而 `amount_from_resource` 取的是**原值**。"
@@ -170,7 +170,7 @@
       "on": "SKILL_CAST",
       "when": ["actor == self", "from_skill_id == 2"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self" }
+        {"op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self"}
       ],
       "source": "1415 昔涟 忆灵技能 24：「长夜月施放战技/终结技后，**额外获得 #2 点【亿质】**」（战技 那半）。",
       "note": "⭐ 数值路径：施放 24 号时把 `#2` 捕获进 `岁月之诗的亿质点数`，战技/终结技时再用 `amount_from_resource` 取出。"
@@ -180,7 +180,7 @@
       "on": "ULT_CAST",
       "when": ["actor == self", "from_skill_id == 3"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self" }
+        {"op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self"}
       ],
       "source": "1415 昔涟 忆灵技能 24：「长夜月施放战技/终结技后，**额外获得 #2 点【亿质】**」（终结技 那半）。",
       "note": "⭐ 数值路径：施放 24 号时把 `#2` 捕获进 `岁月之诗的亿质点数`，战技/终结技时再用 `amount_from_resource` 取出。"
@@ -190,14 +190,7 @@
       "on": "SKILL_CAST",
       "when": ["actor == self", "from_skill_id == 2"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "scale": "self_attr:crit_attack",
-          "percent_from_skill_param": "SKILL:0",
-          "turns": 2,
-          "target": "all_summons"
-        }
+        {"op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "scale": "self_attr:crit_attack", "percent_from_skill_param": "SKILL:0", "turns": 2, "target": "all_summons"}
       ],
       "source": "1413 长夜月 战技「白昼悄然离去」（SkillID 141302）：「…并**使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%**，持续 #2 回合…」。",
       "note": "⭐ 数值不落字面：`percent_from_skill_param: SKILL:0` 读她自己战技的 `#1`（实测：0.12 → 0.264）；⭐ 份额的底是**她自己的暴伤**（`self_attr:crit_attack`，引擎里叫 `CRIT_ATTACK`）；⭐ 目标是新选择器 `all_summons`（本轮新增）。"
@@ -207,7 +200,7 @@
       "on": "CAST_SETUP",
       "when": ["target == self", "from_skill_id == 24"],
       "do": [
-        { "op": "MODIFY_RULE", "rule": "her_skill_raises_our_memosprites_crit_damage", "effect_percent": 0.06 }
+        {"op": "MODIFY_RULE", "rule": "her_skill_raises_our_memosprites_crit_damage", "effect_percent": 0.06}
       ],
       "source": "1415 昔涟 忆灵技能 24：「**长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%」（#3 = 0.06）。",
       "note": "⭐ 增量加在**拼法解出的份额**上（本轮引擎改动）：`(0.12 + 0.06) × 暴伤`。"
@@ -217,7 +210,7 @@
       "id": "memosprite_skill_one_grants_memory",
       "when": ["actor == summon", "from_skill_id == 1"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "cast_param", "index": 3}, "target": "self" }
+        {"op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "cast_param", "index": 3}, "target": "self"}
       ],
       "source": "1413 长夜月 忆灵技1（ServantID 11413 数据槽位 1，参数行 `[0.25, 0.05, 4, 1]`）：「…施放后获得 **#4** 点【忆质】」—— `#4` = 参数下标 3，各等级都是 **1**。",
       "note": "「**施放后**获得 #4 点【忆质】」—— ① 点数**读这一发自己的行**（`amount_from_cast_param: 3`，与伤害那条的 `percent_from_cast_param: 0` 同一拼法），**不写字面量 1**：字面量在数据改行时会静默错；② 门 `actor == summon` + `from_skill_id == 1` —— 与 §3.7zb 那条教训同形：`is_summon` 会把**别人**的忆灵也算进来，只有**长夜**施放它自己的槽位 1 才给长夜月【亿质】；③ 资源名用数据里的「**亿质**」（不是「忆质」—— TextMap 哈希 14616362604670218887 就是「亿质」，见下面的 `resources`）。⭐ **2026-10-29 换事件：`CAST_SETUP` → `ATTACK_FINISHED`** —— 「施放后」是**这一发结算之后**，而 `CAST_SETUP` 在伤害展开**之前**发 ⇒ 那一发会白吃 1 点（实测：本应是 0.06 份额的一发读成 0.063）。捕获是判据：窗口里第一次忆灵技1 的份额正是 0.06（0 点），而不是 0.063 ✓。【已把守：`EvernightMemoryFoldTest`（资源 0 点 ⇒ 份额 0.60 ✓）】⚠ **同句的另一半已落地**：「每有 #3 点【忆质】额外造成 #2%」= `skill_effects.json` 11413/1 的 `resource_share` ✓（并进那六发的份额，不是额外实例 ✓）。"
@@ -227,9 +220,9 @@
       "id": "memosprite_dream_dump_spends_everything",
       "when": ["actor == summon", "from_skill_id == 7"],
       "do": [
-        { "op": "SPEND_RESOURCE", "resource": "亿质", "spendAll": true, "target": "self" },
-        { "op": "CONSUME_HP", "scale": "owner_max_hp", "percent": 1.0, "target": "self" },
-        { "op": "DISMISS_SUMMON", "target": "summon" }
+        {"op": "SPEND_RESOURCE", "resource": "亿质", "spendAll": true, "target": "self"},
+        {"op": "CONSUME_HP", "scale": "owner_max_hp", "percent": 1.0, "target": "self"},
+        {"op": "DISMISS_SUMMON", "target": "summon"}
       ],
       "source": "1413 长夜月 忆灵技2「迷梦，流失，如露」(1141307, SkillTriggerKey Skill11)：「…施放后，消耗全部【忆质】和生命值，并使「长夜」消失。」",
       "note": "「**施放后**，消耗全部【忆质】和生命值，并使「长夜」消失」—— 三句三个 op ✓：① `SPEND_RESOURCE` + **`spendAll`**（「全部」，不写数目 ✓）；② `CONSUME_HP` `scale: owner_max_hp` + `percent: 1.0`（「生命值」= 她自己的上限；op 内部的**下限 1 点**就是原文没说要死 ✓）；③ `DISMISS_SUMMON`（新 op，「消失」≠ 死亡 ✓，走 `perish()` 后 `SUMMON_LEFT` 照常公告 ✓）。⚠ 挂 `ATTACK_FINISHED` 而不是 `CAST_SETUP`：与 11413/1 那条同一个理由 —— 「施放**后**」是这一发**结算之后** ✓；这里的后果（把自己的忆质清零）若在伤害前发生，这一发就会按 0 点结算 ✗ —— 而伤害恰恰要按**这一发开始时**的点数算 ✓（`per_share` 读的是同一时刻）。⚠ 门 `actor == summon` + `from_skill_id == 7`：只有**长夜**施放它自己的槽 7 才触发 ✓（别人的忆灵不算 ✓）。【已把守：`EvernightDreamDumpTest`（50 点 ⇒ 伤害按 50 点算完，随后忆质归零、她降到 1 点生命、长夜离场 ✓）】"
