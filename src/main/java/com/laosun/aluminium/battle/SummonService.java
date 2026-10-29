@@ -140,6 +140,31 @@ public final class SummonService {
     }
 
     /**
+     * Brings <b>one more instance</b> of a character's memosprite onto the field - 「「晴空乐手」全员登台」 means several
+     * instances of the SAME memosprite stand at once (measured from the recorded fight: the vulnerability aura's number
+     * matches two of them, and the servants' own row prices 1/2/3 members separately).
+     *
+     * <p>Unlike {@link #memosprite(Character)}, this never answers an existing one: a second call is the second instance.
+     *
+     * @param master the summoning character
+     * @return the newly placed instance
+     */
+    public Summon memospriteInstance(Character master) {
+        if (master == null) {
+            throw new IllegalArgumentException("A memosprite needs a summoner");
+        }
+        if (master.isDeath()) {
+            throw new IllegalArgumentException(
+                    "A dead character cannot summon a memosprite (" + master.getName() + ")");
+        }
+        Summon summoned = SummonFactory.memosprite(master, battle::partyResourceValue);
+        summoned.setMaster(master);
+        battle.addCombatant(summoned);
+        onSummoned.accept(summoned);
+        return summoned;
+    }
+
+    /**
      * Brings a character's servant onto the field.
      *
      * @param master the summoning character
