@@ -534,12 +534,25 @@
         }
       ],
       "source": "1415 昔涟 强化普攻「向着爱与明天♪」(SkillID 141508, SkillTriggerKey Skill11; skills.json 的 skill_effect 是 AoEAttack)：文档原句「获得#2点【追忆】并对指定敌方单体造成等同于昔涟#3%生命上限的冰属性伤害，随后对敌方全体造成等同于昔涟#1%生命上限的冰属性伤害」⇒ 一行两段、按句子顺序结算：#3（参数索引 2）= 单体那一段、#1（索引 0）= 全体那一段。官方最大命中次数 skill_max_hits.json avatars.1415.Skill11 = 2，与两段一致。削韧按各段自己的形状取列（引擎既有的 stanceFor 口径）：单体段 stance_list.single=30，全体段 all=15（每名敌人）。",
-      "note": "⚠ 待核：游戏 ConfigAbility `Avatar_Cyrene_00_Skill11_Phase02` 的第一发 DamageByAttackProperty 写死 StanceValue=15，与「单体段取 single=30」不一致；两段各自的削韧没有更强证据前，按列读，别把 15 当成结论。"
+      "note": "⚠ 待核：游戏 ConfigAbility `Avatar_Cyrene_00_Skill11_Phase02` 的第一发 DamageByAttackProperty 写死 StanceValue=15，与「单体段取 single=30」不一致；两段各自的削韧没有更强证据前，按列读，别把 15 当成结论。 ⚠ 2026-10-29：`castable_when` 只允许**在【往昔的涟漪】里**施放 —— 全文原句「普攻强化为【向着爱与明天♪】且**仅能使用该普攻**」 ⇒ 这一发是那个状态下的唯一普攻 ✓（这个槽只由终结技的 `REPLACE_SKILL` 装上 ⇒ 这道门等价于\"状态在才存在\"✓，写出来是为了让\"仅能\"可读、可判 ✓）。",
+      "castable_when": [
+        "self has_state 往昔的涟漪"
+      ]
     },
     "3": {
       "once_per_battle": true,
-      "source": "1415 昔涟 终结技 诗的「◦」誓约的「∞」 (141503): 「…单场战斗中只能施放1次。」",
-      "note": "「单场战斗中只能施放 1 次」 ⇒ `once_per_battle: true`（引擎新开：这是**历史**类可施放性，不是资源类 ✓）。本行**不含**任何 effect（数据侧不发效果，规则在 characters/1415.json 里 ✓）。"
+      "castable_when": [
+        "!self has_state 往昔的涟漪"
+      ],
+      "source": "1415 昔涟 终结技 诗的「◦」誓约的「∞」 (141503)：「…单场战斗中只能施放1次。」＋「仅能使用该普攻」。",
+      "note": "① `once_per_battle` ✓（历史类）；② 涟漪里**不再**能放这一发（同一个「仅能」读法 ✓）—— 涟漪里被激活的是**另一行**终结技（141514「一如初见的重逢」✓），所以这一道门不挡它 ✓。"
+    },
+    "2": {
+      "castable_when": [
+        "!self has_state 往昔的涟漪"
+      ],
+      "source": "1415 昔涟 战技 盛放吧，来世的乐土 (141502)：与终结技「…普攻强化为【向着爱与明天♪】且仅能使用该普攻」相配 —— 涟漪里不再有战技。",
+      "note": "⚠ **读法登记**：原句只说「**仅能使用该普攻**」。本文件把它读成「涟漪里战技不可用」⇒ `castable_when: !has_state 往昔的涟漪` ✓（一个槽一条数据，读错只改这一行 ✓）。若日后拿到涟漪形态的完整技能表（是否保留战技），以那张表为准。"
     }
   },
   "8007": {
