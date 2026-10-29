@@ -19,8 +19,8 @@
       {
         "op": "SHIELD",
         "scale": "owner_def",
-        "percent_from_skill_param": "SKILL:0",
-        "amount_from_skill_param": "SKILL:1",
+        "percent_from": {"type": "skill_param", "skill": "SKILL", "index": 0},
+        "amount_from": {"type": "skill_param", "skill": "SKILL", "index": 1},
         "turns": 3,
         "buff": "坚垣筹码",
         "target": "all_allies"

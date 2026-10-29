@@ -346,7 +346,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `weighted_list` | `distribution: [{weight, value}]` | 按权重随机（权重是**相对**的 ✓、`0` 权重的项**永远不中** ✓ —— 用作"兜底"）|
 
 ⚠ **装载期就拒绝**：`type` 不在上表 ✓、`const` 缺 `value` ✓、`skill_param` 缺 `skill` ✓、`*_param` 缺 `index` ✓、`summon_param` 缺 `slot` ✓、`add` 族缺 `inputs` ✓、`sub`/`div` 缺操作数 ✓、`attr` 缺 `attribute` ✓、`stacks` 缺 `buff` ✓、`uniform` 缺 `min`/`max` ✓、`weighted_list` 没有正权重 ✓、`cast_applied` 缺 `state` ✓、`party_resource` 缺 `resource` ✓、`steps` 缺 `counter`/正 `step` ✓、`energy` 的 `relation` 不是 `current`/`max` ✓，以及与对应字段拼法同时写 ✓。
-⚠ **provider 不做分支** ✗ —— `conditional` 一类**故意没有** ✓：要不要执行是**条件**（`when`）的事 ✓，一个数字里再分一套执行模型是第二条路 ✓。
+⚠ **`MODIFY_RULE` 改不了 provider 份额** ✗ —— `effect_percent` 只能加在**字面 `percent`** 上（`amendmentDelta` 只进 `percent_from_skill_param` 那一支 ✓）；`percent_from` 的规则**没有"被改大"的语义** ✗。实测（2026-10-29 迁移那一批）：1413 里被 `MODIFY_RULE` 改的那条规则改成 provider 后，装载期报「none of that rule's effects states a "percent"」✗ ⇒ 那条规则**保留旧拼法** ✓。⚠ **provider 不做分支** ✗ —— `conditional` 一类**故意没有** ✓：要不要执行是**条件**（`when`）的事 ✓，一个数字里再分一套执行模型是第二条路 ✓。
 
 | 字段 | 读的是 | 哪些 op 读 |
 |---|---|---|

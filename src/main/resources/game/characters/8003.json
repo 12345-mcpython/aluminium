@@ -18,8 +18,8 @@
       {
         "op": "SHIELD",
         "scale": "owner_def",
-        "percent_from_skill_param": "TALENT:0",
-        "amount_from_skill_param": "TALENT:3",
+        "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 0},
+        "amount_from": {"type": "skill_param", "skill": "TALENT", "index": 3},
         "turns": 2,
         "target": "all_allies"
       }
@@ -48,8 +48,8 @@
       {
         "op": "SHIELD",
         "scale": "owner_def",
-        "percent_from_skill_param": "TALENT:0",
-        "amount_from_skill_param": "TALENT:3",
+        "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 0},
+        "amount_from": {"type": "skill_param", "skill": "TALENT", "index": 3},
         "turns": 2,
         "target": "all_allies"
       }
@@ -66,8 +66,8 @@
       {
         "op": "SHIELD",
         "scale": "owner_def",
-        "percent_from_skill_param": "TALENT:0",
-        "amount_from_skill_param": "TALENT:3",
+        "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 0},
+        "amount_from": {"type": "skill_param", "skill": "TALENT", "index": 3},
         "turns": 2,
         "target": "all_allies"
       }

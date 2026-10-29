@@ -8,7 +8,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "DAMAGE_PENETRATION",
-        "percent_from_skill_param": "TALENT:0",
+        "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 0},
         "until": "next_attack",
         "target": "self"
       }
@@ -35,7 +35,7 @@
     "id": "technique_opening_attack",
     "when": ["self has_state 秘技"],
     "do": [
-      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent_from_skill_param": "TECHNIQUE:0", "turns": 3, "target": "self" }
+      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent_from": {"type": "skill_param", "skill": "TECHNIQUE", "index": 0}, "turns": 3, "target": "self" }
     ],
     "source": "1002 丹恒 秘技 破敌锋芒 (100207, Maze/Enhance): 「使用秘技后，下一次战斗开始时丹恒攻击力提高40%，持续3回合。」",
     "note": "「**使用秘技后**，下一次战斗开始时丹恒**攻击力提高 40%**，持续 **3 回合**」—— ① **门槛**用 `self has_state 秘技` ✓（第 178 轮：`Battle.markTechniqueUsed(unit)` 在开战前登记 ✓，`startBattle()` 在**任何 `BATTLE_START` 规则之前**加一个 `StateBuff(\"秘技\")` ✓ ⇒ 内容无需学新词 ✓）；② 加成用 `MODIFY_ATTR ATTACK percent 0.4 turns 3` ✓（\"下一次战斗开始时\"= `BATTLE_START` ✓、\"持续 3 回合\" ✓）。⭐ **2026-10-17：40% 改成读行** ✓（秘技参数表只有 1 行 `[0.4, 3]` ✓ ⇒ 数字不变 ✓，但来源写进了规则 ✓，不再是一个看着像拍出来的字面量 ✓）。⚠ 本条自第 153 轮起登记为\"缺秘技门槛\" ✗，第 178 轮补上能力后被**回收** ✓。"
@@ -166,7 +166,7 @@
     "id": "ult_ethereal_dream_hits_a_slowed_target",
     "when": ["actor == self", "from_skill ULTRA", "target is_slowed"],
     "do": [
-      { "op": "ADD_DAMAGE", "scale": "self_attr:ATTACK", "percent_from_skill_param": "ULTRA:1" }
+      { "op": "ADD_DAMAGE", "scale": "self_attr:ATTACK", "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 1} }
     ],
     "source": "1002 丹恒 终结技 洞天幻化，长梦一觉 (100203, Ultra/SingleAttack): 「对指定敌方单体造成等同于丹恒400%攻击力的风属性伤害。当受到攻击的敌方目标处于减速状态时，终结技造成的伤害倍率提高120%。」 param Lv10 → [4, 1.2]（#1 = 倍率、#2 = 目标减速时追加的倍率）",
     "note": "「当受到攻击的敌方目标**处于减速状态**时，终结技造成的伤害**倍率提高 120%**」—— ① 条件用 **`target is_slowed`** ✓（本轮为这句补的谓词 ✓）：减速在引擎里只有一个表示 —— **负的 `SPEED` 修饰** ✓（战技的 `MODIFY_ATTR` 与 `ControlBuff` 的减速都是它 ✓），所以谓词问的是 **`SPEED` 身上有没有负修饰** ✓，而不是「有没有本文件施加的那条」✗ —— 后者会把**别的角色**施加的减速判成没有 ✓。② **「倍率提高」不是「伤害提高」** ✓：120% 是**攻击力倍数的一部分**（Lv10：4.0 + 1.2 = 5.2 ✓），所以走 **`ADD_DAMAGE`** ✓ —— 它加到这一发的**基数层**（`Damage.addFlat` ✓），和技能倍率一起过增伤 / 暴击 / 防御 / 抗性 ✓；写成 `BOOST_DAMAGE`（增伤区 `1 + Σ`）会得到 `4.0 × (1 + 1.2)` ✗ —— 一个看起来像做完了的错数字 ✗（`AddDamageOpTest` 专门钉住这一对不相等 ✓）。③ **数值走技能参数** ✓：`percent_from_skill_param: ULTRA:1` 读**自己终结技当前等级的第 2 项** ✓（0 基）—— Lv10 是 1.2 ✓，而且**随等级走** ✓：星魂 5 把终结技抬到 12 级后基础倍率变 4.32、这一项变 1.296 ✓，写死 1.2 会在那里悄悄少算 ✗。④ `actor == self` ✓ + `from_skill ULTRA` ✓（别人的终结技、自己的别的槽位都不吃这一句 ✓）。⚠ **登记一处形状差**：原文的伤害分段表写的是「默认 1 段 ＋ **互斥分支**的变体 1 段」✓ ⇒ 本条把这一发做成**同一次结算**（5.2 倍率、暴击只掷一次 ✓）；若将来发现游戏是两次独立结算 ✗，改法是把 `ADD_DAMAGE` 换成一次追加实例 ✓ —— 数值不变、暴击次数变 ✓。"

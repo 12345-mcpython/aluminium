@@ -132,10 +132,13 @@ public class SilverWolfLV999LootPickTest {
     @Test
     public void theBoxsShareIsReadFromHerUltimateRow() {
         var box = compileBoxEffect();
-        System.out.println("[1506] the box's share: from_skill_param=" + box.getPercentFromSkillParam()
+        var share = box.getPercentFrom();
+        System.out.println("[1506] the box's share: provider=" + share
                 + " literal=" + box.getPercent());
-        Assertions.assertEquals("ULTRA:2", box.getPercentFromSkillParam(),
-                "「造成 90% 的虚数属性欢愉伤害」 states a share of the Ultimate's own row, item #3");
+        Assertions.assertNotNull(share, "「造成 90% 的虚数属性欢愉伤害」 states a share of the Ultimate's own row");
+        Assertions.assertEquals("skill_param", share.getType(), "the share is a row lookup, not a literal");
+        Assertions.assertEquals("ULTRA", share.getSkill(), "of her ULTIMATE");
+        Assertions.assertEquals(2, share.getIndex(), "item #3 of that row (zero-based, the data's own spelling)");
         Assertions.assertNull(box.getPercent(), "and not a literal, which is what the page's Lv10 display row would give");
     }
 

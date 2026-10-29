@@ -95,7 +95,7 @@
       "do": [
         { "op": "APPLY_BUFF", "buff": "无敌玩家", "permanent": true, "target": "self" },
         { "op": "SPEND_RESOURCE", "resource": "里程碑配额", "spendAll": true, "min_eidolon": 2, "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "里程碑配额", "amount_from_resource": "隐藏分", "min_eidolon": 2, "target": "self" },
+        { "op": "GAIN_RESOURCE", "resource": "里程碑配额", "amount_from": {"type": "resource", "resource": "隐藏分"}, "min_eidolon": 2, "target": "self" },
         { "op": "GAIN_RESOURCE", "resource": "强化普攻次数", "amount": 3, "to_max": true },
         { "op": "GAIN_RESOURCE", "resource": "隐藏分", "amount": 20 }
       ],
@@ -161,7 +161,7 @@
         {
           "op": "ADD_DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent_from_skill_param": "TALENT:2",
+          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 2},
           "element": "Imaginary",
           "damage_type": "ELATION"
         }
@@ -177,7 +177,7 @@
         {
           "op": "ADD_DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent_from_skill_param": "TALENT:2",
+          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 2},
           "element": "Imaginary",
           "damage_type": "ELATION"
         }
@@ -419,7 +419,7 @@
         {
           "op": "DAMAGE",
           "scale": "elation_base",
-          "percent_from_skill_param": "ULTRA:2",
+          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 2},
           "element": "Imaginary",
           "damage_type": "ELATION",
           "target": "all_enemies",
@@ -468,7 +468,7 @@
         {
           "op": "DAMAGE",
           "scale": "elation_base",
-          "percent_from_skill_param": "ULTRA:2",
+          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 2},
           "element": "Imaginary",
           "damage_type": "ELATION",
           "target": "all_enemies",

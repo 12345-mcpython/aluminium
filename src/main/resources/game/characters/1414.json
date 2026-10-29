@@ -10,8 +10,8 @@
         {
           "op": "SHIELD",
           "scale": "owner_attack",
-          "percent_from_skill_param": "SKILL:0",
-          "amount_from_skill_param": "SKILL:1",
+          "percent_from": {"type": "skill_param", "skill": "SKILL", "index": 0},
+          "amount_from": {"type": "skill_param", "skill": "SKILL", "index": 1},
           "turns": 3,
           "target": "all_allies"
         }
@@ -44,8 +44,8 @@
         {
           "op": "SHIELD",
           "scale": "owner_attack",
-          "percent_from_skill_param": "ULTRA:3",
-          "amount_from_skill_param": "ULTRA:4",
+          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 3},
+          "amount_from": {"type": "skill_param", "skill": "ULTRA", "index": 4},
           "turns": 3,
           "target": "all_allies"
         }

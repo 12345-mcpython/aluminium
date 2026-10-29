@@ -87,7 +87,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent_from_cast_param": 1,
+        "percent_from": {"type": "cast_param", "index": 1},
         "permanent": true,
         "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
         "target": "self"
@@ -95,7 +95,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "DEFENCE_IGNORE",
-        "percent_from_cast_param": 2,
+        "percent_from": {"type": "cast_param", "index": 2},
         "permanent": true,
         "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
         "target": "self"
@@ -113,7 +113,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent_from_cast_param": 1,
+        "percent_from": {"type": "cast_param", "index": 1},
         "permanent": true,
         "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
         "target": "summon"
@@ -121,7 +121,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "DEFENCE_IGNORE",
-        "percent_from_cast_param": 2,
+        "percent_from": {"type": "cast_param", "index": 2},
         "permanent": true,
         "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
         "target": "summon"

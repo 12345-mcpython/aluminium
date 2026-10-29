@@ -147,7 +147,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent_from_resource": "长夜的迷梦增伤",
+          "percent_from": {"type": "resource", "resource": "长夜的迷梦增伤", "basis_points": true},
           "permanent": true,
           "target": "attacker"
         }
@@ -170,7 +170,7 @@
       "on": "SKILL_CAST",
       "when": ["actor == self", "from_skill_id == 2"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from_resource": "岁月之诗的亿质点数", "target": "self" }
+        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 24：「长夜月施放战技/终结技后，**额外获得 #2 点【亿质】**」（战技 那半）。",
       "note": "⭐ 数值路径：施放 24 号时把 `#2` 捕获进 `岁月之诗的亿质点数`，战技/终结技时再用 `amount_from_resource` 取出。"
@@ -180,7 +180,7 @@
       "on": "ULT_CAST",
       "when": ["actor == self", "from_skill_id == 3"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from_resource": "岁月之诗的亿质点数", "target": "self" }
+        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 24：「长夜月施放战技/终结技后，**额外获得 #2 点【亿质】**」（终结技 那半）。",
       "note": "⭐ 数值路径：施放 24 号时把 `#2` 捕获进 `岁月之诗的亿质点数`，战技/终结技时再用 `amount_from_resource` 取出。"
@@ -217,7 +217,7 @@
       "id": "memosprite_skill_one_grants_memory",
       "when": ["actor == summon", "from_skill_id == 1"],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from_cast_param": 3, "target": "self" }
+        { "op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "cast_param", "index": 3}, "target": "self" }
       ],
       "source": "1413 长夜月 忆灵技1（ServantID 11413 数据槽位 1，参数行 `[0.25, 0.05, 4, 1]`）：「…施放后获得 **#4** 点【忆质】」—— `#4` = 参数下标 3，各等级都是 **1**。",
       "note": "「**施放后**获得 #4 点【忆质】」—— ① 点数**读这一发自己的行**（`amount_from_cast_param: 3`，与伤害那条的 `percent_from_cast_param: 0` 同一拼法），**不写字面量 1**：字面量在数据改行时会静默错；② 门 `actor == summon` + `from_skill_id == 1` —— 与 §3.7zb 那条教训同形：`is_summon` 会把**别人**的忆灵也算进来，只有**长夜**施放它自己的槽位 1 才给长夜月【亿质】；③ 资源名用数据里的「**亿质**」（不是「忆质」—— TextMap 哈希 14616362604670218887 就是「亿质」，见下面的 `resources`）。⭐ **2026-10-29 换事件：`CAST_SETUP` → `ATTACK_FINISHED`** —— 「施放后」是**这一发结算之后**，而 `CAST_SETUP` 在伤害展开**之前**发 ⇒ 那一发会白吃 1 点（实测：本应是 0.06 份额的一发读成 0.063）。捕获是判据：窗口里第一次忆灵技1 的份额正是 0.06（0 点），而不是 0.063 ✓。【已把守：`EvernightMemoryFoldTest`（资源 0 点 ⇒ 份额 0.60 ✓）】⚠ **同句的另一半已落地**：「每有 #3 点【忆质】额外造成 #2%」= `skill_effects.json` 11413/1 的 `resource_share` ✓（并进那六发的份额，不是额外实例 ✓）。"

@@ -19,15 +19,15 @@
           "op": "HEAL",
           "scale": "owner_max_hp",
           "target": "all_allies",
-          "percent_from_skill_param": "ULTRA:0",
-          "amount_from_skill_param": "ULTRA:1"
+          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 0},
+          "amount_from": {"type": "skill_param", "skill": "ULTRA", "index": 1}
         },
         {
           "op": "HEAL",
           "scale": "owner_max_hp",
           "target": "summon",
-          "percent_from_skill_param": "ULTRA:5",
-          "amount_from_skill_param": "ULTRA:6"
+          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 5},
+          "amount_from": {"type": "skill_param", "skill": "ULTRA", "index": 6}
         }
       ],
       "source": "1409 风堇 终结技 飞入晨昏的我们 (141303): 「…为我方全体目标回复等同于风堇 #1(10)% 生命上限 + #2(200) 的生命值，为小伊卡回复等同于风堇 #6(12)% 生命上限 + #7(240) 的生命值」 param = [0.1, 200, 0.3, 600, 3, 0.12, 240]",
@@ -42,8 +42,8 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
-          "percent_from_skill_param": "ULTRA:2",
-          "amount_from_skill_param": "ULTRA:3",
+          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 2},
+          "amount_from": {"type": "skill_param", "skill": "ULTRA", "index": 3},
           "max_stacks": 2,
           "turns": 3,
           "target": "all_allies"
@@ -171,7 +171,7 @@
           "stackable": true,
           "buff": "疗愈世间的晨曦",
           "target": "summon",
-          "percent_from_skill_param": "TALENT:2"
+          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 2}
         }
       ],
       "source": "1409 风堇 天赋 疗愈世间的晨曦 (140904): 「风堇或小伊卡提供治疗时，小伊卡造成的伤害提高 #3[i]%，持续 #4[i] 回合，最多可叠加 #5[i] 层。」 param = [0.5, 1, 0.8, 2, 3]",
@@ -205,7 +205,7 @@
         {
           "op": "DAMAGE",
           "scale": "self_resource:小伊卡累计治疗",
-          "percent_from_cast_param": 0,
+          "percent_from": {"type": "cast_param", "index": 0},
           "attacker": "summon",
           "element": "Wind",
           "target": "all_enemies"
@@ -348,8 +348,8 @@
         {
           "op": "HEAL",
           "scale": "owner_max_hp",
-          "percent_from_skill_param": "SKILL:0",
-          "amount_from_skill_param": "SKILL:1",
+          "percent_from": {"type": "skill_param", "skill": "SKILL", "index": 0},
+          "amount_from": {"type": "skill_param", "skill": "SKILL", "index": 1},
           "target": "all_allies"
         }
       ],
@@ -364,8 +364,8 @@
         {
           "op": "HEAL",
           "scale": "owner_max_hp",
-          "percent_from_skill_param": "SKILL:2",
-          "amount_from_skill_param": "SKILL:3",
+          "percent_from": {"type": "skill_param", "skill": "SKILL", "index": 2},
+          "amount_from": {"type": "skill_param", "skill": "SKILL", "index": 3},
           "target": "summon"
         }
       ],
