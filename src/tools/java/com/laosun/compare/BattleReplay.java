@@ -13,6 +13,7 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.Resource;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
@@ -200,6 +201,17 @@ public final class BattleReplay {
 
         /** How many times this skill was cast back to back; absent = once. */
         private Integer repeat = 1;
+
+        /**
+         * Counters the fight already held when this cast happened, as {@code {resource: value}} - the window's
+         * <b>unobserved prefix</b>, stated per cast instead of invented once for the whole fight.
+         *
+         * <p>Reader: cast 4 of the committed fixture. The game's 忆灵技1 reads ten points of 【忆质】 there
+         * ({@code 0.6 + (10/4) x 0.12 = 0.9} against the row's 0.6), while a replay that starts from zero earns only the
+         * single point its first cast granted. The number is <b>derived from the capture's own arithmetic</b>, not
+         * guessed - which is why it may be written here and why the tool prints it (see the row's `seeded:` line).
+         */
+        private Map<String, Integer> resources;
 
         /** Why this slot is the one the capture used, or why it cannot be driven. */
         private String note;
@@ -391,6 +403,7 @@ public final class BattleReplay {
             // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
             // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
             applyCastPanel(row, battle, byCid);
+            seedResources(row, battle, byCid);
             CanHit target = row.spec.getTarget() == null || row.spec.getTarget() < 1
                     || row.spec.getTarget() > enemies.size()
                     ? null : enemies.get(row.spec.getTarget() - 1);
@@ -592,6 +605,30 @@ public final class BattleReplay {
             servant.setAttribute(AttributeType.HEALTH,
                     new DoubleValue(servantHealthRatio((int) row.actor) * row.group.health()));
         }
+    }
+
+    /**
+     * Writes the counters the capture already held when this cast happened - the window's <b>prefix</b>, which the
+     * payload does not carry and a replay cannot earn.
+     *
+     * <p>Printed as {@code seeded:} so a reader can tell a reproduced number from one the plan declared, and so the
+     * fixture's own comments can say where each number was derived from (cast 4's ten points come from
+     * {@code (0.09 - 0.06) x 4 / 0.12}).
+     */
+    private static void seedResources(Row row, Battle battle, Map<Integer, Character> byCid) {
+        Character actor = byCid.get((int) row.actor);
+        if (actor == null || row.spec.getResources() == null || row.spec.getResources().isEmpty()) {
+            return;
+        }
+        row.spec.getResources().forEach((id, value) -> {
+            Resource resource = actor.getResources().get(id);
+            if (resource == null) {
+                resource = actor.getResources().register(id, Math.max(1, value), 0);
+            }
+            resource.setValue(value);
+        });
+        System.out.printf(Locale.ROOT, "     seeded: %s (the window's unobserved prefix)%n",
+                row.spec.getResources());
     }
 
     /**
