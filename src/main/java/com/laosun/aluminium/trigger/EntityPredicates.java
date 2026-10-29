@@ -9,6 +9,7 @@ import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.entity.Summon;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.trigger.TriggerTable.Condition;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
 
@@ -51,9 +52,9 @@ final class EntityPredicates {
     /** Every accepted sub-predicate, in one place so the loader's error can list it. */
     static final Set<String> KEYS = Set.of(
             "is_ally", "is_enemy", "is_dead", "is_summon",
-            "hp", "hp_pct", "max_hp", "energy", "shield", "has_shield", "shield_from",
-            "level", "cid", "speed",
-            "attribute", "stacks", "state", "path", "element");
+            "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "has_shield", "shield_from",
+            "level", "cid", "speed", "eidolon", "skill_level", "state_turns",
+            "attribute", "stacks", "state", "path", "element", "camp", "team");
 
     private EntityPredicates() {
     }
@@ -86,8 +87,15 @@ final class EntityPredicates {
             }
             switch (key) {
                 case "is_ally", "is_enemy", "is_dead", "is_summon", "has_shield" -> requireBoolean(key, entry.getValue(), where);
-                case "hp", "hp_pct", "max_hp", "energy", "shield", "level", "cid", "speed" ->
+                case "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "level", "cid", "speed", "eidolon" ->
                         requireRange(key, entry.getValue(), where);
+                case "camp" -> requireCamp(entry.getValue(), where);
+                case "team" -> requireTeam(entry.getValue(), where);
+                case "skill_level" -> {
+                    requireNamedRange(key, entry.getValue(), where);
+                    requireSkillSlot(entry.getValue().getAsJsonObject().get("name").getAsString(), where);
+                }
+                case "state_turns" -> requireNamedRange(key, entry.getValue(), where);
                 case "shield_from" -> {
                     String provider = requireString(key, entry.getValue(), where).trim();
                     if (!SUBJECTS.contains(provider)) {
@@ -167,6 +175,7 @@ final class EntityPredicates {
             case "has_shield" -> (unit.getShield() > 0) == value.getAsBoolean();
             case "hp" -> inRange(unit.getCurrentHp(), value);
             case "hp_pct" -> inRange(unit.getMaxHp() <= 0 ? 0 : unit.getCurrentHp() / unit.getMaxHp(), value);
+            case "shield_pct" -> inRange(unit.getMaxHp() <= 0 ? 0 : unit.getShield() / unit.getMaxHp(), value);
             case "max_hp" -> inRange(unit.getMaxHp(), value);
             case "energy" -> inRange(unit.getCurrentEnergy(), value);
             case "shield" -> inRange(unit.getShield(), value);
@@ -191,6 +200,27 @@ final class EntityPredicates {
             case "stacks" -> {
                 JsonObject named = value.getAsJsonObject();
                 yield inRange(unit.getBuffManager().stacksOf(named.get("name").getAsString()), named);
+            }
+            case "state_turns" -> {
+                JsonObject named = value.getAsJsonObject();
+                yield inRange(unit.getBuffManager().remainingTurnsOf(named.get("name").getAsString()), named);
+            }
+            case "eidolon" -> unit instanceof Character character && inRange(character.getEidolonRank(), value);
+            case "skill_level" -> {
+                JsonObject named = value.getAsJsonObject();
+                String slot = named.get("name").getAsString().trim();
+                yield unit instanceof Character character
+                        && character.getSkillLevel() != null
+                        && character.getSkillLevel().containsKey(skillSlot(slot))
+                        && inRange(character.getSkillLevel().get(skillSlot(slot)), named);
+            }
+            case "camp" -> anyOf(value, name -> unit.getCamp() != null
+                    && unit.getCamp().name().equalsIgnoreCase(name.trim()));
+            case "team" -> {
+                String side = value.getAsString().trim();
+                CanHit owner = ctx.owner();
+                boolean own = owner != null && owner.getCamp() == unit.getCamp();
+                yield "own".equals(side) ? own : !own;
             }
             default -> false;
         };
@@ -273,6 +303,60 @@ final class EntityPredicates {
             return value.getAsString();
         }
         throw new IllegalArgumentException("the sub-predicate \"" + key + "\" takes a string, got " + value + where);
+    }
+
+    /**
+     * The closed set of camps: a bare name or a list meaning "any of".
+     */
+    private static void requireCamp(JsonElement value, String where) {
+        requireStrings("camp", value, where);
+        List<String> names = new ArrayList<>();
+        if (value.isJsonArray()) {
+            for (JsonElement element : value.getAsJsonArray()) {
+                names.add(element.getAsString());
+            }
+        } else {
+            names.add(value.getAsString());
+        }
+        for (String name : names) {
+            if (!isCamp(name)) {
+                throw new IllegalArgumentException("the sub-predicate \"camp\" names \"" + name + "\"; it is "
+                        + java.util.Arrays.toString(Camp.values()) + where);
+            }
+        }
+    }
+
+    /**
+     * {@code team}: {@code own} or {@code other}, relative to the rule owner's camp.
+     */
+    private static void requireTeam(JsonElement value, String where) {
+        String side = requireString("team", value, where).trim();
+        if (!"own".equals(side) && !"other".equals(side)) {
+            throw new IllegalArgumentException("the sub-predicate \"team\" names \"" + side
+                    + "\"; it is own (the rule owner's camp) or other" + where);
+        }
+    }
+
+    private static boolean isCamp(String name) {
+        for (Camp camp : Camp.values()) {
+            if (camp.name().equalsIgnoreCase(name.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static SkillType skillSlot(String name) {
+        return SkillType.valueOf(name.trim().toUpperCase(java.util.Locale.ROOT));
+    }
+
+    private static void requireSkillSlot(String name, String where) {
+        try {
+            skillSlot(name);
+        } catch (IllegalArgumentException unknown) {
+            throw new IllegalArgumentException("the sub-predicate \"skill_level\" names the unknown skill slot \""
+                    + name + "\"; it is " + java.util.Arrays.toString(SkillType.values()) + where, unknown);
+        }
     }
 
     private static void requireStrings(String key, JsonElement value, String where) {

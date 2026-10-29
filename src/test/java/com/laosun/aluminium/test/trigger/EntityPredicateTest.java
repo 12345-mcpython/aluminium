@@ -143,6 +143,67 @@ public class EntityPredicateTest {
     }
 
     /**
+     * {@code camp} and {@code team} split the sides: a camp name is absolute, {@code team} is relative to the rule
+     * owner (the thing a sentence like "an ally" actually means).
+     */
+    @Test
+    public void campAndTeamSplitTheSides() {
+        Context scene = context(true);
+
+        Assertions.assertTrue(test(entity("self", "{\"camp\": \"PLAYER\"}"), scene), "the owner's camp");
+        Assertions.assertTrue(test(entity("target", "{\"camp\": [\"ENEMY\", \"NEUTRAL\"]}"), scene), "a list means any of");
+        Assertions.assertTrue(test(entity("target", "{\"team\": \"other\"}"), scene), "the monster is on the other side");
+        Assertions.assertTrue(test(entity("self", "{\"team\": \"own\"}"), scene), "the owner is on our side");
+    }
+
+    /**
+     * {@code eidolon} and {@code skill_level} read the character's own ranks: a slot at level 1 is below level 2.
+     */
+    @Test
+    public void eidolonAndSkillLevelReadTheCharactersRanks() {
+        Context scene = context(true);
+        int eidolon = scene.owner.getEidolonRank();
+        int skill = scene.owner.getSkillLevel().get(com.laosun.aluminium.enums.SkillType.SKILL);
+
+        Assertions.assertTrue(test(entity("self", "{\"eidolon\": " + eidolon + "}"), scene), "the character's rank");
+        Assertions.assertFalse(test(entity("self", "{\"eidolon\": " + (eidolon + 1) + "}"), scene), "one above does not");
+        Assertions.assertTrue(test(entity("self", "{\"skill_level\": {\"name\": \"SKILL\", \"min\": " + skill + "}}"), scene),
+                "the Skill slot's level");
+        Assertions.assertFalse(test(entity("self", "{\"skill_level\": {\"name\": \"SKILL\", \"min\": " + (skill + 1) + "}}"), scene),
+                "and it is not one level higher");
+    }
+
+    /**
+     * {@code state_turns} is the remaining duration; a state that is not there reads 0.
+     */
+    @Test
+    public void stateTurnsReadsTheRemainingDuration() {
+        Context scene = context(true);
+        scene.owner.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("充能", 2, true, 9));
+
+        Assertions.assertTrue(test(entity("self", "{\"state_turns\": {\"name\": \"充能\", \"min\": 2}}"), scene),
+                "two turns are still on it");
+        Assertions.assertFalse(test(entity("self", "{\"state_turns\": {\"name\": \"充能\", \"min\": 3}}"), scene),
+                "and not three");
+        Assertions.assertTrue(test(entity("self", "{\"state_turns\": {\"name\": \"别的\", \"max\": 0}}"), scene),
+                "a state that does not exist has 0 turns left");
+    }
+
+    /**
+     * {@code shield_pct} is a percentage of Max HP, like {@code hp_pct}.
+     */
+    @Test
+    public void shieldPctIsAPercentageOfMaxHp() {
+        Context scene = context(true);
+        scene.owner.getShieldState().set(scene.owner.getMaxHp() / 4);
+
+        Assertions.assertTrue(test(entity("self", "{\"shield_pct\": {\"max\": 0.25}}"), scene),
+                "a quarter of Max HP is at the top of the window");
+        Assertions.assertFalse(test(entity("self", "{\"shield_pct\": {\"min\": 0.5}}"), scene), "and not a half");
+        Assertions.assertTrue(test(entity("self", "{\"shield_pct\": 0.25}"), scene), "a bare number reads as at least");
+    }
+
+    /**
      * The shapes that mean nothing are refused at load.
      */
     @Test
@@ -153,6 +214,9 @@ public class EntityPredicateTest {
         assertRefused(entity("self", "{\"attribute\": {\"name\": \"NOPE\"}}"), "NOPE");       // unknown attribute
         assertRefused(entity("nowhere", "{\"is_ally\": true}"), "nowhere");                  // unknown subject
         assertRefused(entity("target", "{\"shield_from\": \"nowhere\"}"), "shield_from");     // unknown provider
+        assertRefused(entity("self", "{\"camp\": \"SIDEWAYS\"}"), "SIDEWAYS");              // unknown camp
+        assertRefused(entity("self", "{\"team\": \"middle\"}"), "middle");                   // unknown team
+        assertRefused(entity("self", "{\"skill_level\": {\"name\": \"BOGUS\"}}"), "BOGUS");     // unknown slot
     }
 
     // --- fixtures ---------------------------------------------------------------------------------------------------
