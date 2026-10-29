@@ -43,6 +43,41 @@ public final class Predicates {
         return compile(spec, rule, registry, new LinkedHashSet<>());
     }
 
+    /**
+     * An event predicate's facts rendered as the condition text the parser already understands: {@code from_skill_id == 1},
+     * {@code from_skill SKILL}, {@code from_category ULTRA}, {@code damage_is_attack}.
+     *
+     * <p>Keyed by the fact's own spelling rather than by a new grammar: the words that read the firing already exist in
+     * {@code TriggerConditionParser}, and a second way to spell them is exactly what this project refuses.
+     *
+     * @param json  the facts
+     * @param where the rule's source, for the error message
+     * @return the condition text
+     */
+    static String eventSpelling(com.google.gson.JsonObject json, String where) {
+        java.util.List<String> parts = new java.util.ArrayList<>();
+        for (var entry : json.entrySet()) {
+            String key = entry.getKey().trim();
+            com.google.gson.JsonElement value = entry.getValue();
+            switch (key) {
+                case "from_skill", "from_category" -> parts.add(key + " " + value.getAsString());
+                case "damage_is_attack" -> parts.add(value.getAsBoolean() ? key : "!" + key);
+                default -> {
+                    if (!value.isJsonPrimitive() || !value.getAsJsonPrimitive().isNumber()) {
+                        throw new IllegalArgumentException("an \"event\" predicate states \"" + key + "\" as " + value
+                                + "; a fact this vocabulary knows is a number, a name (from_skill / from_category)"
+                                + " or a boolean (damage_is_attack)" + where);
+                    }
+                    parts.add(key + " == " + value.getAsString());
+                }
+            }
+        }
+        if (parts.isEmpty()) {
+            throw new IllegalArgumentException("an \"event\" predicate states no facts" + where);
+        }
+        return String.join(" && ", parts);
+    }
+
     private static Condition compile(PredicateSpec spec, TriggerSpec rule, Map<String, PredicateSpec> registry,
                                      Set<String> visiting) {
         String where = " (source: " + rule.getSource() + ")";
@@ -52,6 +87,15 @@ public final class Predicates {
         }
         return switch (spec.getType().trim()) {
             case "entity" -> EntityPredicates.compile(spec, rule);
+            case "event" -> {
+                // 「这次施放是哪个槽」「这一发算不算攻击」: facts about the FIRING, not about any unit. The entity predicate
+                // cannot say them and the condition parser already can - so this type states the facts and lets the parser
+                // compile them, which keeps one reader and one spelling (source() is then the sentence itself).
+                if (spec.getJson() == null) {
+                    throw new IllegalArgumentException("an \"event\" predicate needs its facts in \"json\"" + where);
+                }
+                yield TriggerConditionParser.parseCondition(eventSpelling(spec.getJson(), where), rule);
+            }
             case "all_of", "any_of" -> {
                 if (spec.getTerms() == null || spec.getTerms().isEmpty()) {
                     throw new IllegalArgumentException("an \"" + spec.getType() + "\" predicate needs a non-empty"
@@ -93,7 +137,7 @@ public final class Predicates {
                 yield compile(named, rule, registry, visiting);
             }
             default -> throw new IllegalArgumentException("unknown predicate type \"" + spec.getType()
-                    + "\"; known types: all_of / any_of / not / entity / ref" + where);
+                    + "\"; known types: all_of / any_of / not / entity / event / ref" + where);
         };
     }
 

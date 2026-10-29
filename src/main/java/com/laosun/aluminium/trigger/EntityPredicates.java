@@ -234,7 +234,15 @@ final class EntityPredicates {
                 }
                 case "attribute" -> {
                     var named = value.getAsJsonObject();
-                    String name = named.get("name").getAsString();
+                    // The parser lowercases an attribute name in its spelling ("self_attr:speed >= 160.0"), so the
+                    // renderer does too - otherwise a log line and the file disagree in case alone.
+                    String name = named.get("name").getAsString().toLowerCase(java.util.Locale.ROOT);
+                    if (named.has("gt")) {
+                        yield "self_attr:" + name + " > " + number(named.get("gt"));
+                    }
+                    if (named.has("lt")) {
+                        yield "self_attr:" + name + " < " + number(named.get("lt"));
+                    }
                     if (named.has("min")) {
                         yield "self_attr:" + name + " >= " + number(named.get("min"));
                     }
@@ -242,6 +250,12 @@ final class EntityPredicates {
                 }
                 case "hp_pct" -> {
                     var range = value.getAsJsonObject();
+                    if (range.has("gt")) {
+                        yield "target_hp_percent > " + number(range.get("gt"));
+                    }
+                    if (range.has("lt")) {
+                        yield "target_hp_percent < " + number(range.get("lt"));
+                    }
                     yield "target_hp_percent " + (range.has("min") ? ">= " : "<= ")
                             + number(range.has("min") ? range.get("min") : range.get("max"));
                 }
@@ -337,14 +351,22 @@ final class EntityPredicates {
                         .count(), value);
             }
             case "resource" -> {
+                // The same two places the `self_resource:` scale reads, in the same order: the unit's own store first, then
+                // the PARTY one (a team-scoped counter lives there - 1512's 气氛值). Reading only the unit's own store made
+                // every party-scoped clause fail on a member that does not carry it.
                 var named = value.getAsJsonObject();
+                String name = named.get("name").getAsString();
                 var resources = unit.getResources();
-                if (resources == null || !resources.has(named.get("name").getAsString())) {
-                    throw new IllegalStateException("the entity predicate reads the counter \""
-                            + named.get("name").getAsString() + "\", which " + unit.getName()
-                            + " does not declare - a counter that answers 0 is a wrong number with no symptom");
+                if (resources != null && resources.has(name)) {
+                    yield inRange(resources.get(name).exactValue(), named);
                 }
-                yield inRange(resources.get(named.get("name").getAsString()).exactValue(), named);
+                var party = ctx.battle() == null ? null : ctx.battle().partyResource(name);
+                if (party == null) {
+                    throw new IllegalStateException("the entity predicate reads the counter \"" + name + "\", which "
+                            + unit.getName() + " does not carry and the party does not declare - a counter that answers"
+                            + " 0 is a wrong number with no symptom");
+                }
+                yield inRange(party.exactValue(), named);
             }
             case "energy_pct" -> inRange(unit.getMaxEnergy() <= 0 ? 0 : unit.getCurrentEnergy() / unit.getMaxEnergy(),
                     value);
@@ -390,6 +412,14 @@ final class EntityPredicates {
         if (range.has("max") && actual > range.get("max").getAsDouble()) {
             return false;
         }
+        // Strict bounds, for the sentences that say 大于/小于 rather than 大于等于: 「SPEED > 200」. A closed range cannot
+        // express them (`>= 201` would be a different statement about a non-integer), so they get their own keys.
+        if (range.has("gt") && actual <= range.get("gt").getAsDouble()) {
+            return false;
+        }
+        if (range.has("lt") && actual >= range.get("lt").getAsDouble()) {
+            return false;
+        }
         return true;
     }
 
@@ -422,12 +452,14 @@ final class EntityPredicates {
         }
         if (value.isJsonObject()) {
             JsonObject range = value.getAsJsonObject();
-            unknownKeys(range, Set.of("min", "max"), key, where);
-            if (!range.has("min") && !range.has("max")) {
+            // `gt` / `lt` are the STRICT bounds: 「速度大于 200」 has no inclusive spelling (`>= 201` is a different
+            // statement about a non-integer), so the range carries them as their own keys.
+            unknownKeys(range, Set.of("min", "max", "gt", "lt"), key, where);
+            if (!range.has("min") && !range.has("max") && !range.has("gt") && !range.has("lt")) {
                 throw new IllegalArgumentException("the sub-predicate \"" + key + "\" takes a number or {\"min\": ...}"
-                        + " / {\"max\": ...}, got an empty object" + where);
+                        + " / {\"max\": ...} / {\"gt\": ...} / {\"lt\": ...}, got an empty object" + where);
             }
-            for (String end : new String[]{"min", "max"}) {
+            for (String end : new String[]{"min", "max", "gt", "lt"}) {
                 if (range.has(end) && !range.get(end).getAsJsonPrimitive().isNumber()) {
                     throw new IllegalArgumentException("the sub-predicate \"" + key + "\" needs a numeric \"" + end
                             + "\", got " + range.get(end) + where);
@@ -523,12 +555,12 @@ final class EntityPredicates {
                     + " got " + value + where);
         }
         JsonObject named = value.getAsJsonObject();
-        unknownKeys(named, Set.of("name", "min", "max"), key, where);
+        unknownKeys(named, Set.of("name", "min", "max", "gt", "lt"), key, where);
         JsonElement name = named.get("name");
         if (name == null || !name.getAsJsonPrimitive().isString() || name.getAsString().isBlank()) {
             throw new IllegalArgumentException("the sub-predicate \"" + key + "\" needs a non-empty \"name\"" + where);
         }
-        for (String end : new String[]{"min", "max"}) {
+        for (String end : new String[]{"min", "max", "gt", "lt"}) {
             if (named.has(end) && !named.get(end).getAsJsonPrimitive().isNumber()) {
                 throw new IllegalArgumentException("the sub-predicate \"" + key + "\" needs a numeric \"" + end
                         + "\", got " + named.get(end) + where);

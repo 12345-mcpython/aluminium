@@ -183,7 +183,7 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "the_second_performer_when_the_gauge_reaches_six",
-      "when": ["self_resource:气氛值 >= 6", "self_summon_count == 1"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "resource": { "name": "气氛值", "min": 6.0 } }}, {"type": "entity", "entity": "self", "json": { "summon_count": { "min": 1, "max": 1 } }}],
       "do": [
         {"op": "SUMMON", "another_instance": true}
       ],
@@ -193,7 +193,7 @@
     {
       "on": "RESOURCE_CHANGED",
       "id": "the_third_performer_when_the_gauge_reaches_twelve",
-      "when": ["self_resource:气氛值 >= 12", "self_summon_count == 2"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "resource": { "name": "气氛值", "min": 12.0 } }}, {"type": "entity", "entity": "self", "json": { "summon_count": { "min": 2, "max": 2 } }}],
       "do": [
         {"op": "SUMMON", "another_instance": true}
       ],
@@ -203,7 +203,7 @@
     {
       "on": "SUMMONED",
       "id": "fever_opens_when_the_whole_band_is_on_stage",
-      "when": ["self_summon_count >= 3"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 3 } }}],
       "do": [
         {"op": "APPLY_BUFF", "buff": "Fever", "permanent": true, "target": "self"}
       ],
