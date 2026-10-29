@@ -119,7 +119,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent_from_cast_param": 0,
+        "percent_from": {"type": "cast_param", "index": 0},
         "permanent": true,
         "target": "self"
       }

@@ -62,7 +62,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent_from_cast_param": 2,
+          "percent_from": {"type": "cast_param", "index": 2},
           "until": "next_turn_start",
           "target": "allies_of_path:智识"
         },
@@ -77,7 +77,7 @@
       "on": "DEALING_DAMAGE",
       "when": ["actor == self", "self has_state 真知", "from_skill SKILL"],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent_from_resource": "真知的战技增伤" }
+        { "op": "BOOST_DAMAGE", "percent_from": {"type": "resource", "resource": "真知的战技增伤", "basis_points": true} }
       ],
       "source": "1415 昔涟 忆灵技能 18 「献予「理性」之诗」（SkillID 1141518）：「…所有「智识」命途角色攻击力提高 #3%、**造成的战技伤害提高 #2%**」（#2 = 0.20）。",
       "note": "⭐ **本轮的发现：这件能力不需要新词汇**。当初登记的阻碍是“`damage_type` 只能逐次”，而正确的形状是：**用 `from_skill SKILL` 把它限定到战技实例**（已出货的条件）、用**状态**承载它的存续、而用 `BOOST_DAMAGE` 改那一次实例。⭐ 而 `requirePercent`（`BOOST_DAMAGE` 自己的校验就调它）**自第 83 轮起就接受 `percent_from_resource`**。"

@@ -32,8 +32,8 @@
       {
         "op": "HEAL",
         "scale": "owner_attack",
-        "percent_from_skill_param": "SKILL:0",
-        "amount_from_skill_param": "SKILL:1",
+        "percent_from": {"type": "skill_param", "skill": "SKILL", "index": 0},
+        "amount_from": {"type": "skill_param", "skill": "SKILL", "index": 1},
         "target": "target"
       },
       { "op": "DISPEL", "amount": 1, "target": "target" }

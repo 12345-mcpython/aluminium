@@ -127,7 +127,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "percent_from_skill_param": "TALENT:0",
+          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 0},
           "turns": 3,
           "target": "self"
         }

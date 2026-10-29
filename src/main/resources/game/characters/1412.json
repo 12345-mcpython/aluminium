@@ -186,7 +186,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "percent_from_cast_param": 0,
+          "percent_from": {"type": "cast_param", "index": 0},
           "permanent": true,
           "target": "all_allies",
           "target_when": ["target has_state 军功"]
@@ -213,7 +213,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent_from_resource": "充能",
+          "percent_from": {"type": "resource", "resource": "充能", "basis_points": true},
           "permanent": true,
           "target": "self"
         }

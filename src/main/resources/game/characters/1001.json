@@ -7,8 +7,8 @@
       {
         "op": "SHIELD",
         "scale": "owner_def",
-        "percent_from_skill_param": "SKILL:0",
-        "amount_from_skill_param": "SKILL:3",
+        "percent_from": {"type": "skill_param", "skill": "SKILL", "index": 0},
+        "amount_from": {"type": "skill_param", "skill": "SKILL", "index": 3},
         "turns": 3,
         "target": "target"
       }
@@ -100,7 +100,7 @@
         "base_chance": 0.5,
         "element": "Ice",
         "scale": "self_attr:ATTACK",
-        "percent_from_skill_param": "ULTRA:3",
+        "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 3},
         "target": "all_enemies"
       }
     ],

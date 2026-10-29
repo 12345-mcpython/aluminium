@@ -7,8 +7,8 @@
       {
         "op": "HEAL",
         "scale": "owner_attack",
-        "percent_from_skill_param": "SKILL:2",
-        "amount_from_skill_param": "SKILL:3",
+        "percent_from": {"type": "skill_param", "skill": "SKILL", "index": 2},
+        "amount_from": {"type": "skill_param", "skill": "SKILL", "index": 3},
         "target": "self"
       }
     ],

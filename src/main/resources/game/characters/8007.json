@@ -64,7 +64,7 @@
         "op": "MODIFY_ATTR",
         "attribute": "ATTACK",
         "scale": "actor_attr:HEALTH",
-        "percent_from_cast_param": 0,
+        "percent_from": {"type": "cast_param", "index": 0},
         "permanent": true,
         "target": "self"
       },
@@ -72,7 +72,7 @@
         "op": "MODIFY_ATTR",
         "attribute": "CRIT_CHANCE",
         "scale": "actor_attr:CRIT_CHANCE",
-        "percent_from_cast_param": 1,
+        "percent_from": {"type": "cast_param", "index": 1},
         "permanent": true,
         "target": "self"
       },
@@ -91,7 +91,7 @@
         "op": "MODIFY_ATTR",
         "attribute": "ATTACK",
         "scale": "actor_attr:HEALTH",
-        "percent_from_cast_param": 0,
+        "percent_from": {"type": "cast_param", "index": 0},
         "permanent": true,
         "target": "summon"
       },
@@ -99,7 +99,7 @@
         "op": "MODIFY_ATTR",
         "attribute": "CRIT_CHANCE",
         "scale": "actor_attr:CRIT_CHANCE",
-        "percent_from_cast_param": 1,
+        "percent_from": {"type": "cast_param", "index": 1},
         "permanent": true,
         "target": "summon"
       }

@@ -6,7 +6,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "SPEED",
-        "percent_from_skill_param": "TALENT:0",
+        "percent_from": { "type": "skill_param", "skill": "TALENT", "index": 0 },
         "turns": 2,
         "target": "self",
         "max_stacks": 1,
@@ -28,7 +28,7 @@
         "element": "Physical",
         "target": "target",
         "scale": "self_attr:ATTACK",
-        "percent_from_skill_param": "SKILL:1"
+        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
       }
     ],
     "source": "1206 素裳 战技 云骑剑经•山倾 (120602, BPSkill/SingleAttack): 「对指定敌方单体造成等同于素裳210%攻击力的物理属性伤害。同时最后一击后有33%概率发动【剑势】，对目标造成等同于素裳100%攻击力的物理属性附加伤害。若该目标处于弱点击破状态，则【剑势】必定发动。」",
@@ -45,7 +45,7 @@
         "element": "Physical",
         "target": "target",
         "scale": "self_attr:ATTACK",
-        "percent_from_skill_param": "SKILL:1"
+        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
       }
     ],
     "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」",
@@ -121,7 +121,7 @@
     "id": "ult_raises_her_attack",
     "when": ["actor == self"],
     "do": [
-      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent_from_skill_param": "ULTRA:3", "turns": 2, "target": "self" }
+      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent_from": { "type": "skill_param", "skill": "ULTRA", "index": 3 }, "turns": 2, "target": "self" }
     ],
     "source": "1206 素裳 终结技 太虚形蕴•烛夜: 「同时使其攻击力提高30%，且施放战技时额外增加2次【剑势】的发动判定，持续2回合。」 param Lv10 → [3.2, 2, 0.5, 0.3]（#1 伤害倍率、#2 额外判定次数、#3 额外判定倍率、#4 攻击力）",
     "note": "「同时**使其攻击力提高 30%**…持续 **2** 回合」—— ① 「其」指前一句「使素裳立即行动」的主语 ⇒ 还是**素裳自己** ✓（原文是「并使素裳立即行动。同时使其攻击力提高」✓）⇒ `target: self` ✓；② `MODIFY_ATTR` + `ATTACK` + `percent: 0.3` + `turns: 2` ✓（普通属性修正 ✓，不是「对敌方」的区间 ✓ ⇒ 用 `MODIFY_ATTR` 而非 `MODIFY_DAMAGE_TAKEN` ✓）；③ ⚠ **不具名** `buff`：本条没有任何「摘除 / 延长 / 按名字查」的读者 ✗（对照 1215 的 `敕令`，那条是被星魂 4 按名字找的 ✓）⇒ 不具名更短，也不引入一个无人读的状态 ✓。✅ **同句的另一半已落地** ✓（本条只写攻击力那一句 ✓）：「施放战技时**额外增加 2 次【剑势】的发动判定**，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」= `ult_grants_two_extra_sword_stance_rolls`（2 回合标记 ✓）+ `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed`（各 `chance_rolls: 2` ✓、`percent: 0.5` ✓）。⚠ 本条**不**承担那两件事 ✗：一条规则一个句子 ✓，把「攻击力」与「额外判定」塞进同一条会让「哪一句没兑现」查不出来 ✓。⭐⭐ **CORRECTED（2026-10-19）数值改成读行** ✓：`percent: 0.3` 是**终结技第 10 行**的 #4 ✓（`skills.json` 1206 槽 3 的 Lv10 = `[3.2, 2, 0.5, 0.3]` ✓），而**星魂 3 给终结技 +2 级** ⇒ 有效等级 12 ⇒ 那一行是 **0.324** ✗ ⇒ 写死会少算 ✓（症状：沉默 ✓）。现在读 `percent_from_skill_param: \"ULTRA:3\"` ✓（0 基的 #4 ✓）：E0 = 0.3 ✓、E3 = 0.324 ✓ —— 判据 `SushangLevelRowsTest` 钉住**两端** ✓。⚠ 同行的 #2（额外判定次数 2 ✓）与 #3（50% ✓）**全等级恒定** ✓ ⇒ 那两处保持字面量 ✓。"
@@ -217,7 +217,7 @@
       {
         "op": "MODIFY_ATTR",
         "attribute": "SPEED",
-        "percent_from_skill_param": "TALENT:0",
+        "percent_from": { "type": "skill_param", "skill": "TALENT", "index": 0 },
         "turns": 2,
         "max_stacks": 2,
         "buff": "加速",
@@ -274,7 +274,7 @@
         "target": "target",
         "scale": "self_attr:ATTACK",
         "percent": 0.5,
-        "percent_from_skill_param": "SKILL:1"
+        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
       }
     ],
     "source": "1206 素裳 终结技: 「施放战技时额外增加2次【剑势】的发动判定，持续2回合。通过额外判定发动的【剑势】伤害为原伤害的50%。」",
@@ -294,7 +294,7 @@
         "target": "target",
         "scale": "self_attr:ATTACK",
         "percent": 0.5,
-        "percent_from_skill_param": "SKILL:1"
+        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
       }
     ],
     "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」+ 终结技: 「…额外增加2次【剑势】的发动判定…」",

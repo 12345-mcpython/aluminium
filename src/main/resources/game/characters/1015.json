@@ -124,7 +124,7 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent_from_skill_param": "TALENT:0",
+          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 0},
           "element": "Quantum",
           "target": "target_else_random_enemy",
           "as_attack": true
@@ -142,7 +142,7 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent_from_skill_param": "TECHNIQUE:0",
+          "percent_from": {"type": "skill_param", "skill": "TECHNIQUE", "index": 0},
           "element": "Quantum",
           "target": "all_enemies"
         },
