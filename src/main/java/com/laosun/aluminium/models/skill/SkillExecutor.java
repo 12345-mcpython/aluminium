@@ -457,7 +457,10 @@ public final class SkillExecutor {
         // Note: The description names the base: "DEF" -> DEF, "Max HP" -> Max HP, otherwise ATK. 18 documents scale a DAMAGE clause
         // off Max HP and 3 off DEF, and multiplying ATTACK for those dealt the wrong damage.
         AttributeType baseAttribute = data.damageBaseAttribute();
-        double base = user.damageBase(baseAttribute) * params.getFirst();
+        // A row may state a share that GROWS with a resource: 11413/1's 「长夜月当前每有 #3 点【忆质】，则额外造成 #2%」,
+        // which the game folds into the same six instances (the capture's one cast reads 0.09 where the row says 0.06).
+        double rowShare = params.getFirst() + resourceShareOf(skill, user, params);
+        double base = user.damageBase(baseAttribute) * rowShare;
         // Note: A blast states TWO multipliers: the centre and the neighbours. 1008's ultimate row is
         // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%...and 160% to enemies adjacent to it".
         // Applying the centre value to the neighbours too would double the documented damage on every
@@ -606,6 +609,49 @@ public final class SkillExecutor {
         // Note: The SLOT rides along, so a rule can gate on 「施放【支柱•死星天裁】的攻击后」 (1408's Eidolon 6). It is the
         // same number every other cast event reports as `from_skill_id`.
         battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage, skill.getSkillSlot());
+    }
+
+    /**
+     * The part of a row's share that a resource adds, or {@code 0} when the row states none.
+     *
+     * <p>The shape is data ({@code skill_effects.json}'s {@code resource_share}): 「每有 #3 点【忆质】，则额外造成 #2%」
+     * is {@code (resource / #3) x #2}, added <b>into the same instances</b> — it is not extra hits, which is what the
+     * capture shows (one cast, six instances, share 0.09 instead of the row's 0.06).
+     *
+     * <p><b>Whose resource.</b> The sentence says 「长夜月当前每有…」 - the <b>summoner's</b>, and the caster here is the
+     * memosprite. Same rule as {@link CanHit#damageBase}: the servant fights with its master's sheet.
+     *
+     * <p>A resource that is not registered yet counts as 0 rather than throwing: the table may declare the reader before
+     * any rule grants the resource.
+     */
+    private static double resourceShareOf(Skill skill, CanHit user, List<Double> params) {
+        SkillEffectSpec spec = SkillEffects.forSkill(skill);
+        SkillEffectSpec.ResourceShare shape = spec == null ? null : spec.getResourceShare();
+        if (shape == null || shape.getResource() == null) {
+            return 0;
+        }
+        if (shape.getStepParam() < 0 || shape.getStepParam() >= params.size()) {
+            throw new IllegalStateException("skill_effects.json's resource_share for " + skill.getCid() + "/"
+                    + skill.getSkillSlot() + " points at parameter #" + (shape.getStepParam() + 1)
+                    + ", but the row has " + params.size());
+        }
+        if (shape.getShareParam() < 0 || shape.getShareParam() >= params.size()) {
+            throw new IllegalStateException("skill_effects.json's resource_share for " + skill.getCid() + "/"
+                    + skill.getSkillSlot() + " points at parameter #" + (shape.getShareParam() + 1)
+                    + ", but the row has " + params.size());
+        }
+        double step = params.get(shape.getStepParam());
+        if (step <= 0) {
+            throw new IllegalStateException("skill_effects.json's resource_share for " + skill.getCid() + "/"
+                    + skill.getSkillSlot() + " divides by parameter #" + (shape.getStepParam() + 1) + " = " + step);
+        }
+        CanHit holder = user instanceof com.laosun.aluminium.models.Summon summon && summon.getMaster() != null
+                ? summon.getMaster()
+                : user;
+        int held = holder.getResources().get(shape.getResource()) == null
+                ? 0
+                : holder.getResources().get(shape.getResource()).value();
+        return held / step * params.get(shape.getShareParam());
     }
 
     /**
