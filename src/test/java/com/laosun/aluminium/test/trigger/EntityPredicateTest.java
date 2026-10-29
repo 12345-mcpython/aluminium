@@ -231,7 +231,8 @@ public class EntityPredicateTest {
 
         var stacks = com.laosun.aluminium.trigger.Predicates.compile(
                 entity("self", "{\"stacks\": {\"name\": \"充能\", \"min\": 3}}"), rule, null);
-        Assertions.assertEquals("self_stacks:充能 >= 3", stacks.source());
+        Assertions.assertEquals("self_stacks:充能 >= 3.0", stacks.source(),
+                "an integral threshold is spelled with a decimal point, as the condition parser spells it");
     }
 
     /**
