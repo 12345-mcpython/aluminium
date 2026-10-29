@@ -24,9 +24,10 @@ import java.util.Map;
  * 2960 → 4526 → 4309 across it). The panel's Max HP is therefore not in the payload, so it is not asserted here - what
  * is asserted is the two stats the capture states as panels.
  *
- * <p>⚠ <b>1512 carries a known 0.068 attack residual</b> (0.003%). It is asserted as a bound rather than a number so the
- * gap stays visible; the suspected cause is a set-bonus or cone rounding, not a missing input (her relics and all ten of
- * her stat traces are in the build).
+ * <p><b>The 0.003% that used to be here was the data.</b> 1512's attack read 0.068 high until the main-attribute table
+ * was regenerated: {@code generate_data.py}'s {@code parse_relic} rounded the per-level add to five decimals
+ * ({@code 0.024192} became {@code 0.02419}), and a character wearing two ATK% pieces turns that 0.00003 per level into
+ * 0.068 attack. The formula was right all along; the table was not precise enough to see it.
  */
 public class PanelFromDumpTest {
 
@@ -50,10 +51,11 @@ public class PanelFromDumpTest {
             double attack = character.getAttribute(AttributeType.ATTACK).get();
             double defence = character.getAttribute(AttributeType.DEFENCE).get();
 
-            // Note: the capture prints ~7 significant digits, so the comparison is RELATIVE (1e-6 of the value);
-            // 1512's known residual is 2.6e-5, so her bound is the one that leaves it visible as a bound.
-            double attackTolerance = facts.captureAttack * (facts.cid == 1512 ? 5e-5 : 1e-6);
-            Assertions.assertEquals(facts.captureAttack, attack, attackTolerance,
+            // Note: the capture prints ~7 significant digits, so the comparison is RELATIVE (1e-6 of the value).
+            // 1512 used to sit 0.003% high; that was the data, not the formula - see the generator's `parse_relic`
+            // (a 5-decimal rounding of the main stat's per-level add: 0.024192 became 0.02419, and two ATK% pieces
+            // turned 0.00003 per level into 0.068 attack). With the table regenerated at 10 decimals she matches too.
+            Assertions.assertEquals(facts.captureAttack, attack, facts.captureAttack * 1e-6,
                     "cid " + facts.cid + ": ATTACK must be the panel the capture reports");
             Assertions.assertEquals(facts.captureDefence, defence, facts.captureDefence * 1e-6,
                     "cid " + facts.cid + ": DEFENCE must be the panel the capture reports");
