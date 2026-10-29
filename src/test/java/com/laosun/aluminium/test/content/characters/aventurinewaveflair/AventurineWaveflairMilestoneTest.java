@@ -3,15 +3,15 @@ package com.laosun.aluminium.test.content.characters.aventurinewaveflair;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * 1513 (砂金•戏浪)'s talent milestone: 「【热意】达到10点时，砂金•戏浪会立即施放1次<b>固定计入20笑点</b>的【举杯！敬炽烈一夏】，
@@ -90,7 +90,7 @@ public class AventurineWaveflairMilestoneTest {
         wolf.getResources().gain(FERVOR, 12);
         double before = enemy.getCurrentHp();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
         battle.processRequests();
 
         System.out.println("[1513] a turn start with 12 points: damage " + (before - enemy.getCurrentHp())
@@ -151,7 +151,7 @@ public class AventurineWaveflairMilestoneTest {
         wolf = CharacterFactory.create(OWNER, 80);
         // A crit roll would make every damage ratio below a coin toss, so it is pinned off.
         wolf.setAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE,
-                new com.laosun.aluminium.models.DoubleValue(0));
+                new com.laosun.aluminium.DoubleValue(0));
         ally = CharacterFactory.create(ALLY, 80);
         enemy = BattleFixture.monster();
         battle = new Battle(List.of(wolf, ally), List.of(enemy), BattleFixture.seeded());
@@ -166,7 +166,7 @@ public class AventurineWaveflairMilestoneTest {
      * ally's swing: what is under test here is the counter and what the crossing does with it.
      */
     private void alleyAttacks() {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0));
         battle.processRequests();
     }
 

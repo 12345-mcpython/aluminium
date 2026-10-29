@@ -6,17 +6,17 @@ import com.laosun.aluminium.beans.Skill.StanceList;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillEffectType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * A Bounce skill's share and hit count come out of its row <b>at the level it is cast at</b>.
@@ -153,7 +153,7 @@ public class BounceSkillLevelTest {
         Character asta = Character.builder().cid(ASTA).level(LEVEL).build();
         Enemy enemy = BattleFixture.monster();
         enemy.setAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH,
-                new com.laosun.aluminium.models.DoubleValue(1_000_000));
+                new com.laosun.aluminium.DoubleValue(1_000_000));
         enemy.heal(1_000_000);
         Battle battle = new Battle(List.of(asta), List.of(enemy), BattleFixture.alwaysRoll(1.0));
 

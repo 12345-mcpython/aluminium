@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.characters.yanqing;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +29,7 @@ public class YanqingTraceTest {
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - before;
         System.out.println("[1209] effectResGain=" + gain + " hasState="
                 + unit.getBuffManager().hasState("智剑连心"));

@@ -1,10 +1,10 @@
 package com.laosun.aluminium.exceptions;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 
 /**
  * Thrown when an invalid or missing character configuration is encountered.
  *
- * <p>Typically raised during {@link com.laosun.aluminium.models.entity.Character.Builder#build()}
+ * <p>Typically raised during {@link com.laosun.aluminium.entity.Character.Builder#build()}
  * when a character ID is not found in the data source or is zero/null.
  */
 public class CharacterException extends RuntimeException {

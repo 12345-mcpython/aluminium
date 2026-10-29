@@ -2,10 +2,10 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -33,17 +33,17 @@ public class PasskeyTest {
         double start = unit.getCurrentEnergy();
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double afterFirst = unit.getCurrentEnergy();
         Assertions.assertEquals(8.0, afterFirst - start, 1e-6,
                 "rank 1 grants eight energy: " + start + " -> " + afterFirst);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         Assertions.assertEquals(afterFirst, unit.getCurrentEnergy(), 1e-6,
                 "per_turn: 1 -- a second skill in the same turn grants nothing");
         battle.afterMove();
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         Assertions.assertEquals(16.0, unit.getCurrentEnergy() - start, 1e-6,
                 "the next turn grants again: " + unit.getCurrentEnergy());
     }

@@ -6,10 +6,10 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -108,7 +108,7 @@ public class DotCeilingTest {
                 return 0.0;
             }
         });
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, victim, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, victim, 0, 0));
 
         List<DotBuff> dots = victim.getBuffManager().allBuffsOf(DotBuff.class);
         Assertions.assertEquals(1, dots.size(), "precondition: one DOT landed");

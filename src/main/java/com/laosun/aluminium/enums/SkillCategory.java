@@ -2,7 +2,7 @@ package com.laosun.aluminium.enums;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * A skill's data-side {@code attack_type} (the raw value in {@code skills.json}).
@@ -176,7 +176,7 @@ public enum SkillCategory {
      *
      * <p>Note: do not use this as the test for "should skill points be settled" - the skill point rule is
      * "basic attack +1 / skill -1 / everything else neutral", expressed by
-     * {@link com.laosun.aluminium.models.skillpoint.SkillPointPolicy}.
+     * {@link com.laosun.aluminium.skillpoint.SkillPointPolicy}.
      */
     public boolean isCombatAction() {
         return this == NORMAL || this == BPSKILL || this == ULTRA;

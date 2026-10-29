@@ -1,17 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
-import com.laosun.aluminium.models.state.AttributeSheet;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.state.ConditionalHealBonuses;
-import com.laosun.aluminium.models.state.EnergyState;
-import com.laosun.aluminium.models.state.HealthState;
-import com.laosun.aluminium.models.state.RuleAmendments;
-import com.laosun.aluminium.models.state.RuleChanceState;
-import com.laosun.aluminium.models.state.RuleLimits;
-import com.laosun.aluminium.models.state.ShieldState;
-import com.laosun.aluminium.models.state.SkillBonuses;
-import com.laosun.aluminium.models.state.SkillSet;
-import com.laosun.aluminium.models.state.TriggerCooldowns;
+import com.laosun.aluminium.state.AttributeSheet;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.state.ConditionalHealBonuses;
+import com.laosun.aluminium.state.EnergyState;
+import com.laosun.aluminium.state.HealthState;
+import com.laosun.aluminium.state.RuleAmendments;
+import com.laosun.aluminium.state.RuleChanceState;
+import com.laosun.aluminium.state.RuleLimits;
+import com.laosun.aluminium.state.ShieldState;
+import com.laosun.aluminium.state.SkillBonuses;
+import com.laosun.aluminium.state.SkillSet;
+import com.laosun.aluminium.state.TriggerCooldowns;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

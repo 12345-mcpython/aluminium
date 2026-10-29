@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.silverwolflv999;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +56,7 @@ public class SilverWolfLV999LootBoxWaveTest {
             enemy.perish();                       // 「触发前目标被消灭」: the field is empty when the point is spent
         }
         int pointsBefore = battle.getSkillPoints();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         Assertions.assertEquals(pointsBefore, battle.getSkillPoints(),
                 "with nobody to hit, the box is HELD - a delivered one would have granted 2 skill points here");
@@ -64,7 +64,7 @@ public class SilverWolfLV999LootBoxWaveTest {
         Enemy fresh = BattleFixture.monster();      // the next wave walks in
         battle.addCombatant(fresh);
         double freshBefore = fresh.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         battle.processRequests();
         System.out.println("[1506] after the wave: points +" + (battle.getSkillPoints() - pointsBefore)
                 + ", the new enemy lost " + (freshBefore - fresh.getCurrentHp()));
@@ -83,7 +83,7 @@ public class SilverWolfLV999LootBoxWaveTest {
         Battle battle = battle(rng);
         Character wolf = battle.characters().getFirst();
         int pointsBefore = battle.getSkillPoints();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         Assertions.assertEquals(pointsBefore + 2, battle.getSkillPoints(),
                 "an enemy was standing, so nothing is held - the pick lands in the same firing");
@@ -105,20 +105,20 @@ public class SilverWolfLV999LootBoxWaveTest {
         for (Enemy enemy : battle.enemyUnits()) {
             enemy.perish();
         }
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         int pointsBefore = battle.getSkillPoints();
 
         Enemy fresh = BattleFixture.monster();
         battle.addCombatant(fresh);
         rng.nextDoubleValue = 0.9;                 // would FAIL a 20% roll
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(pointsBefore + 2, battle.getSkillPoints(),
                 "delivery does NOT re-roll: the held firing's own success is what buys these effects");
 
         rng.nextDoubleValue = 0.9;
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         Assertions.assertEquals(pointsBefore + 2, battle.getSkillPoints(),
                 "and the held firing already decayed the chance to 20%: this 0.9 draw fires nothing");

@@ -8,11 +8,11 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.buff.VulnerabilityBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.buff.VulnerabilityBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -161,7 +161,7 @@ public class ScopedDamageTakenTest {
                 return roll;
             }
         });
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, defender, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, defender, 0, 0));
         Damage damage = new Damage(owner, defender, DamageElement.FIRE, DamageType.DOT, BASE);
         return battle.applyDamage(defender, damage);
     }

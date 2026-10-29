@@ -6,9 +6,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -100,7 +100,7 @@ public class TriggerRemoveStackTest {
         Character owner = battle.characters().getFirst();
 
         fire(battle, owner);                                          // +10%
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, owner, owner, 0, 0)); // +50% (same group -> a second stack)
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, owner, owner, 0, 0)); // +50% (same group -> a second stack)
         Assertions.assertEquals(0.6, boostOf(owner), EPS, "precondition: both stacks are on");
 
         remove(battle, owner);
@@ -121,7 +121,7 @@ public class TriggerRemoveStackTest {
         Assertions.assertEquals(0.18, boostOf(owner), EPS);
 
         // the remove rule targets the event's subject, so fire with the owner as the subject
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, owner, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, owner, 0, 0));
         Assertions.assertEquals(0.0, boostOf(owner), EPS, "the stack came off the event's target");
         Assertions.assertEquals(0.0, boostOf(ally), EPS, "and never off the rule's owner");
     }
@@ -227,11 +227,11 @@ public class TriggerRemoveStackTest {
     }
 
     private static void fire(Battle battle, Character actor) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     private static int remove(Battle battle, Character actor) {
-        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, actor, null, 0, 0));
+        return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, actor, null, 0, 0));
     }
 
     /**

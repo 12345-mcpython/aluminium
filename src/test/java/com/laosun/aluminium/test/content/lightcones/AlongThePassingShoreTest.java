@@ -3,17 +3,17 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * Light cone 23024: hitting a target puts [泡影] on it for one turn (once per attack per target), damage against such targets is 24%
@@ -44,7 +44,7 @@ public class AlongThePassingShoreTest {
         boolean before = enemy.getBuffManager().hasState(BUBBLE);
         // \\u2605 A real damage instance, not a bare event: `DEALING_DAMAGE` carries the instance, and firing it without one makes
         // the cone's other rule refuse ("needs the damage instance being settled") -- measured.
-        battle.applyDamage(enemy, new com.laosun.aluminium.models.damage.Damage(wearer, enemy,
+        battle.applyDamage(enemy, new com.laosun.aluminium.damage.Damage(wearer, enemy,
                 com.laosun.aluminium.enums.DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.NORMAL, 100));
         boolean after = enemy.getBuffManager().hasState(BUBBLE);
         System.out.println("[23024] bubble before=" + before + " after a hit=" + after);

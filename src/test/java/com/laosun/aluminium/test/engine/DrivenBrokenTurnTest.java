@@ -2,11 +2,11 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.battle.BattleDriver;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.battle.BattleDriver;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

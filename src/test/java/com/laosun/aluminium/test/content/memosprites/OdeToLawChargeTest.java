@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class OdeToLawChargeTest {
         // Note: Applied directly: measured, the six-charge upgrade's RESOURCE_CHANGED trigger does not fire in this scene, and
         // this reading is about the ode's rule, not about that one.
         cerydra.getBuffManager().addBuff(
-                new com.laosun.aluminium.models.buff.StateBuff(PEERAGE, 9, true));
+                new com.laosun.aluminium.buff.StateBuff(PEERAGE, 9, true));
         Assertions.assertTrue(cerydra.getBuffManager().hasState(PEERAGE), "precondition: the peerage is up");
 
         // the skill cast that triggers the coup

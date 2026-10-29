@@ -5,13 +5,13 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -94,7 +94,7 @@ public class ConeEventsTest {
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         for (int i = 0; i < 4; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEBUFF_APPLIED, unit, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.DEBUFF_APPLIED, unit, enemy, 0, 0));
         }
         double after = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[21041] damage boost " + before + " -> " + after + " (delta=" + (after - before) + ")");

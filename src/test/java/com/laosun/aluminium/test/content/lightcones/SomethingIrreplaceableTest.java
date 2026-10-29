@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,9 +46,9 @@ public class SomethingIrreplaceableTest {
             double energy = wearer.getCurrentEnergy();
             double boost = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
             if (event == TriggerEvent.KILL) {
-                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, wearer, enemy, 0, 0));
+                battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(event, wearer, enemy, 0, 0));
             } else {
-                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, enemy, wearer, 0, 100));
+                battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(event, enemy, wearer, 0, 100));
             }
             double energyDelta = wearer.getCurrentEnergy() - energy;
             double boostDelta = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boost;
@@ -88,7 +88,7 @@ public class SomethingIrreplaceableTest {
     public void aKillBySomebodyElseIsNotTheWearers() {
         Battle battle = battle(true);
         double boost = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, enemy, null, 0, 0));   // the enemy did the killing
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, enemy, null, 0, 0));   // the enemy did the killing
         System.out.println("[23002] after someone else's kill: boost +"
                 + (wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boost));
         Assertions.assertEquals(0.0, wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boost, 1e-9,

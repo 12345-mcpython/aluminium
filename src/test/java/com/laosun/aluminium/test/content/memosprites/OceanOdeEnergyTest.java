@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class OceanOdeEnergyTest {
 
         hysilens.setCurrentEnergy(20);
         double before = hysilens.getCurrentEnergy();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, cyrene, battle.enemies().getFirst(), 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, cyrene, battle.enemies().getFirst(), 1, 0));
         battle.processRequests();
         double after = hysilens.getCurrentEnergy();
         boolean stillMarked = hysilens.getBuffManager().hasState(MARK);

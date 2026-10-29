@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.himekonova;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +36,7 @@ public class HimekoNovaTest {
         battle.startBattle();
         double allyBoostBefore = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, himeko, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, himeko, enemy, 0, 0));
 
         Assertions.assertTrue(himeko.getBuffManager().hasState("领航旗语"),
                 "「姬子•启行获得【领航旗语】」 (Himeko - Nova gains Navigator's Semaphore (【领航旗语】))");

@@ -2,11 +2,11 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class ButTheBattleIsnTOverTest {
     }
 
     private void ultOnAlly(Battle battle, CanHit ally) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, ally, 0, 0));
     }
 
     private int rulesMatching(Battle battle, CanHit ally) {
@@ -91,7 +91,7 @@ public class ButTheBattleIsnTOverTest {
     @Test
     public void anUltimateOnAnEnemyNeverCounts() {
         Battle battle = battle(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         int counted = wearer.getBuffManager().stacksOf(COUNT);
         System.out.println("[23003] after an ultimate aimed at an ENEMY: counter=" + counted
                 + " points=" + battle.getSkillPoints());
@@ -103,7 +103,7 @@ public class ButTheBattleIsnTOverTest {
     public void somebodyElsesUltimateDoesNotCount() {
         Battle battle = battle(true);
         CanHit ally = battle.allies().get(1);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, wearer, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, wearer, 0, 0));
         System.out.println("[23003] after the ALLY's ultimate: counter=" + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "the wearer's own casts (false case)");
     }

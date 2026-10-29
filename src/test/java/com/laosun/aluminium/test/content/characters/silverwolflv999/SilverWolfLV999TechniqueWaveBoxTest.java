@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 
 /**
  * Character 1506 (Silver Wolf LV.999): her technique's wave clause.

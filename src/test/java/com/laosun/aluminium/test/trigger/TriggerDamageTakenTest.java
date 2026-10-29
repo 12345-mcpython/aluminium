@@ -8,14 +8,14 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.buff.ReductionBuff;
-import com.laosun.aluminium.models.buff.VulnerabilityBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.buff.ReductionBuff;
+import com.laosun.aluminium.buff.VulnerabilityBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.equipment.Relic;
 
 /**
  * The {@code MODIFY_DAMAGE_TAKEN} op: "受到的伤害提高 X%" (vulnerability, 易伤) and "受到的伤害降低 X%" (reduction, 减伤) as data.
@@ -236,7 +236,7 @@ public class TriggerDamageTakenTest {
      * Fires the rule with the dummy as the event's subject, which is what {@code target} selects.
      */
     private static void fireOnDummy(Battle battle) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.characters().getFirst(), dummy(battle), 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.characters().getFirst(), dummy(battle), 1, 0));
     }
 
     private static Enemy dummy(Battle battle) {
@@ -311,7 +311,7 @@ public class TriggerDamageTakenTest {
     }
 
     private static void fire(Battle battle, Character actor) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     /**

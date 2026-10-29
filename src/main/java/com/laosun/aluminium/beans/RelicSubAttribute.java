@@ -2,7 +2,7 @@ package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.equipment.Relic;
 
 /**
  * Relic sub-attribute value tables deserialized from sub_attribute.json.

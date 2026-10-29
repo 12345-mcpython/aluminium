@@ -6,11 +6,11 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -44,9 +44,9 @@ public class ConeAuditBatchThreeTest {
         Fixture f = new Fixture(20012, true);
         Enemy enemy = f.battle.enemyUnits().getFirst();
         f.wearer.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, enemy, 0, 0));
         double first = f.wearer.getCurrentEnergy();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, enemy, 0, 0));
         double second = f.wearer.getCurrentEnergy();
         System.out.println("[20012] 自己第一发后 " + first + " ; 同一回合第二发后 " + second);
         Assertions.assertEquals(4.0, first, 1e-9, "叠影 1 的 #1 = 4");
@@ -56,7 +56,7 @@ public class ConeAuditBatchThreeTest {
         // even with the gate broken (measured: it did, until this moved into its own fixture).
         Fixture other = new Fixture(20012, true);
         other.wearer.setCurrentEnergy(0);
-        other.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, other.ally, other.battle.enemyUnits().getFirst(), 0, 0));
+        other.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, other.ally, other.battle.enemyUnits().getFirst(), 0, 0));
         double teammate = other.wearer.getCurrentEnergy();
         System.out.println("[20012] 队友施放战技后 " + teammate);
         Assertions.assertEquals(0.0, teammate, 1e-9, "「使**装备者**施放攻击」—— 队友的不算");
@@ -64,7 +64,7 @@ public class ConeAuditBatchThreeTest {
         // ⚠ Fired as an EVENT, not through `applyDamage`: taking a hit also credits the engine's own hit energy (+10), which
         // would hide what this cone does or does not add.
         f.wearer.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, f.wearer, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, f.wearer, 0, 0));
         System.out.println("[20012] 单发 `TAKING_HIT` 之后的能量 " + f.wearer.getCurrentEnergy()
                 + "（「受到攻击」那一半仍未表达 —— 已登记 §4.3）");
         Assertions.assertEquals(0.0, f.wearer.getCurrentEnergy(), 1e-9,
@@ -79,14 +79,14 @@ public class ConeAuditBatchThreeTest {
         Fixture f = new Fixture(20013, true);
         Enemy enemy = f.battle.enemyUnits().getFirst();
         f.wearer.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, enemy, 0, 0));
         double first = f.wearer.getCurrentEnergy();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, enemy, 0, 0));
         double second = f.wearer.getCurrentEnergy();
         // ⚠ Fresh battle for the teammate half, for the same reason as 20012: the per-turn limit would hide a broken gate.
         Fixture other = new Fixture(20013, true);
         other.wearer.setCurrentEnergy(0);
-        other.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, other.ally, other.battle.enemyUnits().getFirst(), 0, 0));
+        other.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, other.ally, other.battle.enemyUnits().getFirst(), 0, 0));
         double teammate = other.wearer.getCurrentEnergy();
         System.out.println("[20013] 自己施放战技 " + first + " ; 同回合再来一次 " + second + " ; 队友施放后 " + teammate);
         Assertions.assertEquals(8.0, first, 1e-9, "叠影 1 的 #1 = 8");
@@ -187,7 +187,7 @@ public class ConeAuditBatchThreeTest {
         Enemy victim = f.battle.enemyUnits().getFirst();
         Character breaker = wearerBreaks ? f.wearer : f.ally;
         // ⚠ `applyDamage` does not empty a stance bar; the clause is about the BREAK event, so the fixture fires it.
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, breaker, victim, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, breaker, victim, 0, 0));
         f.battle.processRequests();
         return f.wearer.getCurrentHp() - before;
     }

@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -42,7 +42,7 @@ public class TrueSelfOdeExtraIceTest {
         var dance = dragon.skillAt(1);
         Assertions.assertNotNull(dance, "precondition: the dance is data slot 1");
         double before = battle.enemies().getFirst().getCurrentHp();
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, dance, dragon,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, dance, dragon,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return before - battle.enemies().getFirst().getCurrentHp();

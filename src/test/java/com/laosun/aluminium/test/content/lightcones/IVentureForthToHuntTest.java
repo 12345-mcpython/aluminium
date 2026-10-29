@@ -2,10 +2,10 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -41,11 +41,11 @@ public class IVentureForthToHuntTest {
     @Test
     public void followUpsStackItToTheCapOfTwo() {
         Battle battle = battle(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         int one = wearer.getBuffManager().stacksOf(GLOW);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         int two = wearer.getBuffManager().stacksOf(GLOW);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         int three = wearer.getBuffManager().stacksOf(GLOW);
         System.out.println("[23031] glow after 1/2/3 follow-ups = " + one + "/" + two + "/" + three);
         Assertions.assertEquals(1, one, "a follow-up grants one layer");
@@ -56,10 +56,10 @@ public class IVentureForthToHuntTest {
     @Test
     public void turnEndRemovesOneLayer() {
         Battle battle = battle(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         int before = wearer.getBuffManager().stacksOf(GLOW);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_END, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_END, wearer, null, 0, 0));
         int after = wearer.getBuffManager().stacksOf(GLOW);
         System.out.println("[23031] glow before turn end = " + before + " after = " + after);
         Assertions.assertEquals(2, before, "two layers first");

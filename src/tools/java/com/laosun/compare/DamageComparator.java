@@ -7,14 +7,14 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
 
 import java.io.IOException;
@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Compares one scenario's numbers against the original game, <b>zone by zone</b>.
@@ -193,7 +193,7 @@ public final class DamageComparator {
 
         if (Boolean.TRUE.equals(stated.getSuppressContent())) {
             // A stand-in, not a character: an empty trigger table keeps the kit out of a hit the capture already states.
-            attacker.setTriggerTable(com.laosun.aluminium.models.trigger.TriggerTable.EMPTY);
+            attacker.setTriggerTable(com.laosun.aluminium.trigger.TriggerTable.EMPTY);
         }
         Battle battle = new Battle(new ArrayList<>(List.of(attacker)), new ArrayList<>(List.of(enemy)),
                 roll(scenario.getCrit()));
@@ -260,9 +260,9 @@ public final class DamageComparator {
             double value = buff.getValue() == null ? 0 : buff.getValue();
             switch (String.valueOf(buff.getKind()).toLowerCase(Locale.ROOT)) {
                 case "vulnerable" -> enemy.getBuffManager().addBuff(
-                        new com.laosun.aluminium.models.buff.VulnerabilityBuff(turns, value));
+                        new com.laosun.aluminium.buff.VulnerabilityBuff(turns, value));
                 case "reduction" -> enemy.getBuffManager().addBuff(
-                        new com.laosun.aluminium.models.buff.ReductionBuff(turns, value));
+                        new com.laosun.aluminium.buff.ReductionBuff(turns, value));
                 default -> throw new IllegalArgumentException("unknown buff kind \"" + buff.getKind()
                         + "\": use \"vulnerable\" or \"reduction\"");
             }
@@ -280,7 +280,7 @@ public final class DamageComparator {
      * Installs absolute attribute values, so the scenario's panel is the one the game's numbers came from (this engine's
      * sheet has no light cone / relics unless one is handed in).
      */
-    private static void applyOverrides(com.laosun.aluminium.models.entity.CanHit unit, Map<String, Double> attributes) {
+    private static void applyOverrides(com.laosun.aluminium.entity.CanHit unit, Map<String, Double> attributes) {
         if (attributes == null) {
             return;
         }

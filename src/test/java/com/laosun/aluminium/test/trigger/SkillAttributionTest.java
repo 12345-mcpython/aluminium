@@ -10,11 +10,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * "when casting the <b>Skill</b> and breaking an enemy target's weakness" - an event that says <b>who</b>, and now also <b>which skill</b>.
@@ -254,7 +254,7 @@ public class SkillAttributionTest {
             battle.startBattle();
         }
 
-        private void breakWith(com.laosun.aluminium.models.skill.Skill skill) {
+        private void breakWith(com.laosun.aluminium.skill.Skill skill) {
             battle.castImmediate(skill, hero, List.of(enemy));
         }
 

@@ -1,10 +1,10 @@
 package com.laosun.aluminium.test.trigger;
 
-import com.laosun.aluminium.models.trigger.CastFacts;
-import com.laosun.aluminium.models.trigger.EventFacts;
-import com.laosun.aluminium.models.trigger.RuleScope;
-import com.laosun.aluminium.models.trigger.TriggerSubject;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.CastFacts;
+import com.laosun.aluminium.trigger.EventFacts;
+import com.laosun.aluminium.trigger.RuleScope;
+import com.laosun.aluminium.trigger.TriggerSubject;
+import com.laosun.aluminium.trigger.TriggerTable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

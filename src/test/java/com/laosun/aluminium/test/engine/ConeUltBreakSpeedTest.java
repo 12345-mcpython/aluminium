@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -35,7 +35,7 @@ public class ConeUltBreakSpeedTest {
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         double base = unit.getAttribute(AttributeType.ATTACK).baseValue();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.ATTACK).get() - before;
         Assertions.assertEquals(0.24 * base, gain, 1e-3,
                 "rank 1: base=" + base + " gain=" + gain + " (share 0.24)");
@@ -51,7 +51,7 @@ public class ConeUltBreakSpeedTest {
         battle.beforeMove();
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         double healed = unit.getCurrentHp() - before;
         Assertions.assertEquals(unit.getMaxHp() * 0.12, healed, 1.0,
                 "rank 1 heals 12% of max HP: " + healed + " of " + unit.getMaxHp());

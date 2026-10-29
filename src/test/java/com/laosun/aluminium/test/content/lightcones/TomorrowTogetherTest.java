@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -47,7 +47,7 @@ public class TomorrowTogetherTest {
         Battle battle = battle(true);
         double wearerBase = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
         double allyBase = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
         double wearerDelta = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - wearerBase;
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[22007] after the Ultimate: wearer +" + wearerDelta + " ally +" + allyDelta);
@@ -59,7 +59,7 @@ public class TomorrowTogetherTest {
     public void aSkillCastDoesNothing() {
         Battle battle = battle(true);
         double base = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0));
         System.out.println("[22007] after a Skill: ally +"
                 + (ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base));
         Assertions.assertEquals(0.0, ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base, 1e-9,
@@ -70,7 +70,7 @@ public class TomorrowTogetherTest {
     public void aNonWearerUltimateDoesNothing() {
         Battle battle = battle(true);
         double base = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, enemy, 1, 0));
         System.out.println("[22007] after the ALLY's Ultimate: wearer +"
                 + (wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base));
         Assertions.assertEquals(0.0, wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base, 1e-9,
@@ -105,7 +105,7 @@ public class TomorrowTogetherTest {
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
         double base = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
         Assertions.assertEquals(base, ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get(), 1e-9,
                 "no cone, no change (false case)");
     }

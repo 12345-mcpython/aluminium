@@ -5,10 +5,10 @@ import com.google.gson.JsonParser;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.buff.BuffManager;
-import com.laosun.aluminium.models.buff.StateBuff;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.buff.BuffManager;
+import com.laosun.aluminium.buff.StateBuff;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -102,7 +102,7 @@ public class ConeAuditBatchTwelveTest {
         f.wearer.setCurrentEnergy(0);
         f.battle.enemyUnits().getFirst().getBuffManager().addBuff(new StateBuff(BuffManager.BROKEN_STATE, 2, false));
         for (int i = 0; i < 3; i++) {
-            f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
+            f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
         }
         System.out.println("[21048] energy after three attacks " + f.wearer.getCurrentEnergy() + " (2 x 3 = 6)");
         Assertions.assertEquals(6.0, f.wearer.getCurrentEnergy(), 1e-9, "「每回合最多触发 2 次」");

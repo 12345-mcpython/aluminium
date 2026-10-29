@@ -2,10 +2,10 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -42,10 +42,10 @@ public class ShadowburnTest {
         Battle battle = battle(true);
         double energy = wearer.getCurrentEnergy();
         int points = battle.getSkillPoints();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
         double afterFirst = wearer.getCurrentEnergy() - energy;
         int pointsFirst = battle.getSkillPoints() - points;
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
         double afterSecond = wearer.getCurrentEnergy() - energy - afterFirst;
         int pointsSecond = battle.getSkillPoints() - points - pointsFirst;
         System.out.println("[20021] first summon: energy +" + afterFirst + " points +" + pointsFirst
@@ -78,7 +78,7 @@ public class ShadowburnTest {
         Battle battle = battle(false);
         double energy = wearer.getCurrentEnergy();
         int points = battle.getSkillPoints();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
         System.out.println("[20021] without the cone: energy +" + (wearer.getCurrentEnergy() - energy)
                 + " points +" + (battle.getSkillPoints() - points));
         Assertions.assertEquals(0.0, wearer.getCurrentEnergy() - energy, 1e-9, "no cone, no energy (false case)");

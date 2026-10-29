@@ -1,9 +1,9 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Queue;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

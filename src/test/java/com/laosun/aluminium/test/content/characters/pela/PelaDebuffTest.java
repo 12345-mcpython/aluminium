@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -68,8 +68,8 @@ public class PelaDebuffTest {
     @Test
     public void herSkillStripsABenefitAndNotADebuff() {
         Fixture f = new Fixture();
-        f.enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("测试增益", 2));
-        f.enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(f.pela,
+        f.enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("测试增益", 2));
+        f.enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(f.pela,
                 com.laosun.aluminium.enums.DamageElement.FIRE, 10, 2));
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("测试增益"), "precondition: the enemy has a shield");
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"), "precondition: and a DOT");
@@ -102,7 +102,7 @@ public class PelaDebuffTest {
          */
         private TriggerTable.TriggerContext ctx(boolean debuffed) {
             if (debuffed) {
-                enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(pela,
+                enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(pela,
                         com.laosun.aluminium.enums.DamageElement.FIRE, 10, 2));
             }
             return new TriggerTable.TriggerContext(pela, pela, enemy, 0, 0, null, battle);

@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -36,13 +36,13 @@ public class RippleEndlessWardTest {
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters().getFirst();
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.SKILL),
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.SKILL),
                 cyrene, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         cyrene = battle.characters().getFirst();
         Assertions.assertTrue(cyrene.getBuffManager().hasState(WARD), "precondition: the ward is up");
         if (thenTheUltimate) {
-            com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
+            com.laosun.aluminium.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
                     cyrene, List.of(battle.enemies().getFirst()));
             battle.processRequests();
             cyrene = battle.characters().getFirst();

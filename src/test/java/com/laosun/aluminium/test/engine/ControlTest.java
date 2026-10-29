@@ -5,15 +5,15 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.buff.ControlBuff;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.buff.ControlBuff;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.buff.StatModifierBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
@@ -466,7 +466,7 @@ public class ControlTest {
          * The same for any event (some cases need a second event to observe what the first one applied).
          */
         private int fire(com.laosun.aluminium.enums.TriggerEvent event) {
-            return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, hero, enemy, 1, 0));
+            return battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(event, hero, enemy, 1, 0));
         }
     }
 

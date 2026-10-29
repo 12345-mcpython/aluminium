@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.characters.himeko;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * Himeko (1003)'s 2026-10-19 audit: the three traces and Eidolon 1, read as battles.
@@ -67,7 +67,7 @@ public class HimekoAuditTest {
         Battle battle = new Battle(List.of(her), List.of(victim), always(0.99));
         battle.startBattle();
         double before = her.getAttribute(AttributeType.SPEED).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.FOLLOW_UP, her, victim, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.FOLLOW_UP, her, victim, 0, 0));
         battle.processRequests();
         double gained = her.getAttribute(AttributeType.SPEED).get() - before;
         System.out.println("[1003] 星魂1 追加攻击后速度增量 " + gained);
@@ -144,7 +144,7 @@ public class HimekoAuditTest {
         Enemy victim = BattleFixture.monster();
         Battle battle = new Battle(List.of(her), List.of(victim), rolls);
         battle.startBattle();
-        java.util.List<com.laosun.aluminium.models.damage.Damage> settled = new java.util.ArrayList<>();
+        java.util.List<com.laosun.aluminium.damage.Damage> settled = new java.util.ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         battle.castImmediate(her.getSkills().get(SkillType.COMMON), her, List.of(victim));
         battle.processRequests();
@@ -160,7 +160,7 @@ public class HimekoAuditTest {
         Enemy victim = BattleFixture.monster();
         Battle battle = new Battle(List.of(her), List.of(victim), always(0.99));
         battle.startBattle();
-        java.util.List<com.laosun.aluminium.models.damage.Damage> settled = new java.util.ArrayList<>();
+        java.util.List<com.laosun.aluminium.damage.Damage> settled = new java.util.ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         battle.castImmediate(her.getSkills().get(SkillType.COMMON), her, List.of(victim));
         battle.processRequests();

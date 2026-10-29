@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.entity.Summon;
 
 /**
  * The fourth audit batch of light cones (20018-20024), each clause read as a BATTLE.
@@ -96,12 +96,12 @@ public class ConeAuditBatchFourTest {
         Fixture f = new Fixture(20021, false, 1409);
         f.wearer.setCurrentEnergy(0);
         int spBefore = f.battle.getSkillPoints();
-        com.laosun.aluminium.models.entity.Summon summon = f.battle.summonServant(f.wearer);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SUMMONED, f.wearer, summon, 0, 0));
+        com.laosun.aluminium.entity.Summon summon = f.battle.summonServant(f.wearer);
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SUMMONED, f.wearer, summon, 0, 0));
         int firstSp = f.battle.getSkillPoints() - spBefore;
         double firstEnergy = f.wearer.getCurrentEnergy();
         f.wearer.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SUMMONED, f.wearer, summon, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.SUMMONED, f.wearer, summon, 0, 0));
         double secondEnergy = f.wearer.getCurrentEnergy();
         System.out.println("[20021] 首次召唤: 战技点 +" + firstSp + "、能量 +" + firstEnergy
                 + " ; 再次召唤: 能量 +" + secondEnergy);
@@ -116,13 +116,13 @@ public class ConeAuditBatchFourTest {
     @Test
     public void coneTwoThousandTwentyTwoStacksMemorialOnTheSummonsTurn() {
         Fixture f = new Fixture(20022, false, 1409);
-        com.laosun.aluminium.models.entity.Summon summon = f.battle.summonServant(f.wearer);
+        com.laosun.aluminium.entity.Summon summon = f.battle.summonServant(f.wearer);
         double before = f.wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         // ⚠ Fired as an event: the queue never gave the sprite a turn of its own in 40 steps, and the clause is about the
         // moment (「忆灵的回合开始时」), which is what `TURN_START` with the summon as actor is.
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, summon, summon, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, summon, summon, 0, 0));
         double afterOne = f.wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, summon, summon, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, summon, summon, 0, 0));
         double afterTwo = f.wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[20022] 忆灵第 1 个回合后增伤 " + (afterOne - before)
                 + " ; 第 2 个回合后 " + (afterTwo - before));

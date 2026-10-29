@@ -1,6 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
-import com.laosun.aluminium.models.trigger.TriggerOperator;
+import com.laosun.aluminium.trigger.TriggerOperator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class TriggerDispatchCoverageTest {
 
     private static final Path DISPATCHER =
-            Path.of("src/main/java/com/laosun/aluminium/models/trigger/TriggerInterpreter.java");
+            Path.of("src/main/java/com/laosun/aluminium/trigger/TriggerInterpreter.java");
 
     @Test
     public void thereIsOneArmPerWiredOp() throws IOException {

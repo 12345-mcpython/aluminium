@@ -3,14 +3,14 @@ package com.laosun.aluminium.test.content.characters.silverwolflv999;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Character 1506 (Silver Wolf LV.999), batch 2: her skill LEVELS, her speed trace, and Eidolon 6's 增笑.
@@ -165,7 +165,7 @@ public class SilverWolfLV999EidolonLevelsTest {
                 List.of(wolf, CharacterFactory.create(ALLY, 80)),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         if (share != 0) {
-            wolf.getBuffManager().addBuff(com.laosun.aluminium.models.buff.StatModifierBuff
+            wolf.getBuffManager().addBuff(com.laosun.aluminium.buff.StatModifierBuff
                     .percentBuff(AttributeType.SPEED, share, 1));
         }
         System.out.println("[1506] Speed buff " + share + " -> Speed reads "

@@ -5,8 +5,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -102,7 +102,7 @@ public class SkillPointConditionTest {
         Assertions.assertEquals(skillPoints, battle.getSkillPoints(), "precondition: the pool holds what the case asks");
         Assertions.assertEquals(5 + CAP_BONUS, battle.getSkillPointMax(), "precondition: the cap was raised");
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, owner, owner, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, owner, owner, 0, 1));
         battle.processRequests();
         return battle.characters().getFirst().getResources().value(COUNTER);
     }

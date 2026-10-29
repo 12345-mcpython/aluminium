@@ -4,13 +4,13 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.buff.ShieldBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.buff.ShieldBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.equipment.RelicSuit;
 
 /**
  * "increases the shield amount provided by <b>the wearer</b> by X%" - relic 103 (20%) / 128 (10% + 12%) and one light cone, four readers.
@@ -147,7 +147,7 @@ public class ShieldBoostTest {
         giver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shieldWithTurns(100, 3)))));
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
 
         ShieldBuff buff = shielded.getBuffManager().allBuffsOf(ShieldBuff.class).getFirst();
         Assertions.assertEquals(120, buff.getAmount(), EPS, "the buff's amount is the boosted one");
@@ -166,7 +166,7 @@ public class ShieldBoostTest {
         giver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shield(100)))));
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
 
         Assertions.assertEquals(120, shielded.getShield(), EPS);
         Assertions.assertEquals(0, shielded.getBuffManager().allBuffsOf(ShieldBuff.class).size(),
@@ -294,7 +294,7 @@ public class ShieldBoostTest {
      * The same with exactly the first two cavern pieces, which is what a 2-piece bonus needs.
      */
     private static Character wearingTwoPieces(int setId) {
-        com.laosun.aluminium.models.equipment.RelicSuit suit = new com.laosun.aluminium.models.equipment.RelicSuit();
+        com.laosun.aluminium.equipment.RelicSuit suit = new com.laosun.aluminium.equipment.RelicSuit();
         for (com.laosun.aluminium.enums.RelicType slot : List.of(
                 com.laosun.aluminium.enums.RelicType.HEAD, com.laosun.aluminium.enums.RelicType.HAND)) {
             suit.addToSuit(RelicFactory.piece(setId, slot, STAR, RELIC_LEVEL));

@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -39,7 +39,7 @@ public class ConeScopedBoostTest {
         battle.startBattle();
         double skillBefore = unit.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get();
         double ultBefore = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double skillAfter = unit.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get();
         double ultAfter = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get();
         System.out.println("[23037] skill " + skillBefore + " -> " + skillAfter
@@ -73,14 +73,14 @@ public class ConeScopedBoostTest {
         double allyBefore = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         double enemyBefore = enemy.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         for (int i = 0; i < 5; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, ally, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, ally, 0, 0));
         }
         double allyAfter = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[23034] ally boost " + allyBefore + " -> " + allyAfter
                 + " (delta=" + (allyAfter - allyBefore) + ")");
         Assertions.assertEquals(0.15 * 3, allyAfter - allyBefore, 1e-9, "five casts cap at three layers of 15 points");
         // The FALSE case: aiming the same cast at an ENEMY must grant nothing.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         System.out.println("[23034] enemy boost " + enemyBefore + " -> "
                 + enemy.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
         Assertions.assertEquals(enemyBefore, enemy.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,

@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.characters.silverwolflv999;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -58,7 +58,7 @@ public class SilverWolfLV999ZoneTest {
         castUltimate(battle, wolf);
 
         double before = totalEnemyHp(battle);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         double after = totalEnemyHp(battle);
         System.out.println("[1506] enemy HP before/after one spent Skill Point: " + before + " -> " + after
@@ -75,7 +75,7 @@ public class SilverWolfLV999ZoneTest {
         Battle battle = newBattle();
         Character wolf = battle.characters().getFirst();
         double before = totalEnemyHp(battle);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         double after = totalEnemyHp(battle);
         System.out.println("[1506] with no Ultimate: enemy HP " + before + " -> " + after);

@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -94,7 +94,7 @@ public class CrossCidSkillParamTest {
         Character subject = battle.characters().get(0);
         double before = subject.getAttribute(AttributeType.ATTACK).get();
         // Note: fire it for the RULE OWNER only: the no-argument form fires for every unit, which made the two runs accumulate a different number of times
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, subject, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, subject, null, 0, 0));
         battle.processRequests();
         double after = subject.getAttribute(AttributeType.ATTACK).get();
         // Note: the ABSOLUTE delta is the share: MODIFY_ATTR adds `scale * percent` to the attribute, so `after - before` is the row value itself

@@ -5,18 +5,18 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.battle.WaveManager;
+import com.laosun.aluminium.battle.WaveManager;
 
 /**
  * Light cone 23011: at the start of EVERY WAVE, each ally heals a share of its OWN lost HP.
@@ -54,7 +54,7 @@ public class SheAlreadyShutHerEyesTest {
         double lost = ally.getMaxHp() - ally.getCurrentHp();
         double before = ally.getCurrentHp();
         double wearerBefore = wearer.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         double healed = ally.getCurrentHp() - before;
         double wearerHealed = wearer.getCurrentHp() - wearerBefore;
         System.out.println("[23011] lost=" + lost + " alliedHealed=" + healed + " expected=" + (lost * SHARE)
@@ -102,7 +102,7 @@ public class SheAlreadyShutHerEyesTest {
         Character waveWearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Character waveAlly = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(waveWearer, waveAlly), new java.util.ArrayList<>(), BattleFixture.seeded());
-        new com.laosun.aluminium.models.battle.WaveManager(battle, stage);
+        new com.laosun.aluminium.battle.WaveManager(battle, stage);
         Enemy source = BattleFixture.monster();
         battle.applyDamage(waveAlly, new Damage(source, waveAlly, DamageElement.FIRE, DamageType.NORMAL, 400));
         double lost = waveAlly.getMaxHp() - waveAlly.getCurrentHp();
@@ -121,7 +121,7 @@ public class SheAlreadyShutHerEyesTest {
         Battle battle = battle(false);
         battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 400));
         double before = ally.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         System.out.println("[23011] without the cone: " + before + " -> " + ally.getCurrentHp());
         Assertions.assertEquals(before, ally.getCurrentHp(), 1e-9, "no cone, no heal (false case)");
     }

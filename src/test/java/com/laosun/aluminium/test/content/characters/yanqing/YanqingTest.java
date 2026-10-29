@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.yanqing;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -32,7 +32,7 @@ public class YanqingTest {
         double critBefore = yanqing.getAttribute(AttributeType.CRIT_CHANCE).get();
         double dmgBefore = yanqing.getAttribute(AttributeType.CRIT_ATTACK).get();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, yanqing, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, yanqing, enemy, 0, 0));
 
         Assertions.assertTrue(yanqing.getBuffManager().hasState("智剑连心"),
                 "「并为彦卿附加【智剑连心】」 (and applies Soulsteel Sync (【智剑连心】) to Yanqing)");
@@ -80,10 +80,10 @@ public class YanqingTest {
         battle.startBattle();
         if (synced) {
             // The state is applied DIRECTLY, so the Skill's own CRIT modifiers cannot interfere: this clause is about the Ultimate alone.
-            yanqing.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("智剑连心", 1, false));
+            yanqing.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("智剑连心", 1, false));
         }
         double before = yanqing.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, yanqing, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, yanqing, enemy, 0, 0));
         return yanqing.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }
 
@@ -96,7 +96,7 @@ public class YanqingTest {
         Battle battle = new Battle(List.of(yanqing), List.of(enemy), fixed(roll));
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, yanqing, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, yanqing, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

@@ -5,10 +5,10 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -62,7 +62,7 @@ public class CastCountedLaughsTest {
         Enemy enemy = battle.enemyUnits().getFirst();
 
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, commander, commander, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, commander, commander, 0, 0));
         battle.processRequests();
         double commanded = before - enemy.getCurrentHp();
 
@@ -97,7 +97,7 @@ public class CastCountedLaughsTest {
         Battle battle = build(ELATION, 20);
         Character commander = battle.characters().get(1);
         Assertions.assertNull(battle.castCountedLaughs(), "precondition: no cast has claimed anything yet");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, commander, commander, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, commander, commander, 0, 0));
         battle.processRequests();
         System.out.println("[cast_laughs] after the commanded cast the window holds "
                 + battle.castCountedLaughs());
@@ -117,7 +117,7 @@ public class CastCountedLaughsTest {
         Character commander = battle.characters().get(1);
         Enemy enemy = battle.enemyUnits().getFirst();
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, commander, commander, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, commander, commander, 0, 0));
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

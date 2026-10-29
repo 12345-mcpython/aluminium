@@ -6,12 +6,12 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -110,7 +110,7 @@ public class CastAppliedCountTest {
         // Freezable enemies, so the out-of-cast freeze really lands (a1) and the ultimate then lands its own (3).
         Battle contaminated = ultimateBattle(heroWithAnOutOfCastFreeze(), 3, 0);
         // The freeze happens on a hit she takes, long before the ultimate: `attacker` is the one who gets frozen.
-        contaminated.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, contaminated.enemyUnits().getFirst(),
+        contaminated.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, contaminated.enemyUnits().getFirst(),
                 contaminated.characters().getFirst(), 1, 0));
 
         double withStale = castUltimate(contaminated);

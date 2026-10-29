@@ -1,8 +1,8 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.GameData;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

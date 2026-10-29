@@ -1,6 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
-import com.laosun.aluminium.models.trigger.TriggerOperator;
+import com.laosun.aluminium.trigger.TriggerOperator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

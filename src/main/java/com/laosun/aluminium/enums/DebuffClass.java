@@ -1,7 +1,7 @@
 package com.laosun.aluminium.enums;
 
 import java.util.Locale;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * The <b>class</b> of a negative state (negative state class), as the documents group them:

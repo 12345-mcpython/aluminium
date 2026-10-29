@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.characters.pearl;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -72,7 +72,7 @@ public class PearlRoundAllowanceTest {
         Assertions.assertEquals(50, total, "precondition: the first round is spent");
 
         // Her turn: the reset runs first, so her own 5 points belong to the NEW round.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, pearl, pearl, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, pearl, pearl, 0, 0));
         battle.processRequests();
         int afterHerTurn = pearl.getResources().value(COUNTER);
         drain(pearl);
@@ -96,7 +96,7 @@ public class PearlRoundAllowanceTest {
     // ==================================================================
 
     private static void allyTurn(Battle battle, Character actor) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, actor, actor, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, actor, actor, 0, 0));
         battle.processRequests();
     }
 

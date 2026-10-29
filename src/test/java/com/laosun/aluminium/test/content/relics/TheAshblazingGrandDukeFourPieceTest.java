@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.relics;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
@@ -13,8 +13,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Relic;
 
 /**
  * Relic set 115 (The Ashblazing Grand Duke), 4-piece: each FOLLOW-UP damage instance raises ATK by 6% for 3 turns, up
@@ -45,7 +45,7 @@ public class TheAshblazingGrandDukeFourPieceTest {
 
     private void followUps(Battle battle, int count) {
         for (int i = 0; i < count; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         }
     }
 

@@ -5,20 +5,20 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * Light cone 23036: the wearer AND its memosprite weave a stack of [织锦] with every attack, each layer lifts crit damage, and
@@ -51,8 +51,8 @@ public class TimeWovenIntoGoldTest {
         return battle;
     }
 
-    private void attack(com.laosun.aluminium.models.entity.CanHit attacker) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, attacker, enemy, 1, 0));
+    private void attack(com.laosun.aluminium.entity.CanHit attacker) {
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, attacker, enemy, 1, 0));
     }
 
     private double critHit() {

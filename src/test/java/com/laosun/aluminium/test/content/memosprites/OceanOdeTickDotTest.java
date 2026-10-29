@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.memosprites;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -70,7 +70,7 @@ public class OceanOdeTickDotTest {
         enemy.getBuffManager().addBuff(new DotBuff(hysilens, DamageElement.FIRE, BURN, 3));
         double before = enemy.getCurrentHp();
         // fire the event by hand, with the skill key: only the clause is under test
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, battle.characters().get(1), enemy, 1, 0.0, null, skillId, 0, java.util.List.of()));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, battle.characters().get(1), enemy, 1, 0.0, null, skillId, 0, java.util.List.of()));
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

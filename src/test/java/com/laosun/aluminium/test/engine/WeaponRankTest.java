@@ -1,6 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.equipment.Weapon;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

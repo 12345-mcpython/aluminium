@@ -5,13 +5,13 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +46,7 @@ public class ConeStateAndDebuffTest {
         unit.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 210150));
         double before = enemy.getAttribute(AttributeType.DEFENCE).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, unit, enemy, 0, 0));
         System.out.println("[21015] state=" + enemy.getBuffManager().hasState("攻陷")
                 + " defence " + before + " -> " + enemy.getAttribute(AttributeType.DEFENCE).get());
         Assertions.assertTrue(enemy.getBuffManager().hasState("攻陷"), "the state landed");
@@ -113,7 +113,7 @@ public class ConeStateAndDebuffTest {
         unit.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(5.0, DoubleValue.Modifier.ModifierSource.BUFF, 230208));
         battle.tryApplyDebuff(unit, enemy,
-                new com.laosun.aluminium.models.buff.DotBuff(unit, DamageElement.FIRE, 100, 2), 1.0, null);
+                new com.laosun.aluminium.buff.DotBuff(unit, DamageElement.FIRE, 100, 2), 1.0, null);
     }
 
     /**
@@ -133,7 +133,7 @@ public class ConeStateAndDebuffTest {
         // Note: The spec query EVALUATES conditions, so the enemy must really carry a debuff before asking
         // (discipline from round 254: a count on a false condition is 0 by construction).
         giveTheEnemyADebuff(unit, enemy, battle);
-        System.out.println("[23020] enemy debuffs=" + enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buff.DotBuff.class));
+        System.out.println("[23020] enemy debuffs=" + enemy.getBuffManager().countBuffs(com.laosun.aluminium.buff.DotBuff.class));
         int critPerDebuff = 0;
         for (var rule : unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0))) {
@@ -172,7 +172,7 @@ public class ConeStateAndDebuffTest {
         // Comparing two different enemies conflated the per-debuff crit rule (measured 1.424 instead of 1.0).
         double additionalBefore = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
         double ordinaryBefore = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         System.out.println("[23020] debate state=" + unit.getBuffManager().hasState("论辩")
                 + " damage boost=" + unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
         Assertions.assertTrue(unit.getBuffManager().hasState("论辩"), "the debate state is on the wearer");

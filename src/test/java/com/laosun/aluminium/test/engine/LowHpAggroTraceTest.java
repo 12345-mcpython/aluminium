@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -49,7 +49,7 @@ public class LowHpAggroTraceTest {
                             + "1 + (-0.5) => x0.5 (cid " + cid + ")");
 
             // A second loss while already below the gate must not stack a second modifier.
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, enemy, owner, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, enemy, owner, 0, 0));
             Assertions.assertEquals(full * 0.5, battle.aggroOf(owner), EPS,
                     "re-applying a named modifier must not stack (cid " + cid + ")");
 

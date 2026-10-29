@@ -2,15 +2,15 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * 1415's memosprite skill 18 "献予'理性'之诗": "为我方恢复 #4 个战技点并使那刻夏立即行动".
@@ -57,7 +57,7 @@ public class ReasonOdePointAndActionTest {
     /**
      * How much action value the unit still has -- zero means "acts now" (mirrors AglaeaMemospriteTest).
      */
-    private static double timeRemaining(Battle battle, com.laosun.aluminium.models.entity.CanHit target) {
+    private static double timeRemaining(Battle battle, com.laosun.aluminium.entity.CanHit target) {
         for (var signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
                 return battle.queue().getTimeRemaining(signal);

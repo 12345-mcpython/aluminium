@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,11 +46,11 @@ public class WelcomeToTheCosmicCityLaughterTest {
     }
 
     private void selfUlt(Battle battle) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, wearer, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, wearer, 1, 0));
     }
 
     private void normalAttack(Battle battle) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.NORMAL, 0, 0, java.util.List.of()));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.NORMAL, 0, 0, java.util.List.of()));
     }
 
     private int laughter() {
@@ -96,7 +96,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     @Test
     public void anEnemyTargetedUltGrantsNothing() {
         Battle battle = battle(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
         System.out.println("[23057] ult on an enemy: laughter=" + laughter());
         Assertions.assertEquals(0, laughter(), "on oneself is the clause (false case)");
     }
@@ -104,7 +104,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     @Test
     public void aNonNormalAttackDoesNotCount() {
         Battle battle = battle(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         System.out.println("[23057] a Skill used as an attack: Basic ATK (普攻) counter = "
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "only basic attacks count");

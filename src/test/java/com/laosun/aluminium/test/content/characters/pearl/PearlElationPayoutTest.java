@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -56,7 +56,7 @@ public class PearlElationPayoutTest {
         Character pearl = battle.characters().get(0);
         Character attacker = battle.characters().get(battle.characters().size() - 1);
         if (armTheTeam) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, SkillCategory.ELATION_DAMAGE, 0, 0, java.util.List.of()));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, SkillCategory.ELATION_DAMAGE, 0, 0, java.util.List.of()));
         }
         double before = battle.enemies().getFirst().getCurrentHp();
         battle.castImmediate(attacker.getSkills().get(SkillType.COMMON), attacker,

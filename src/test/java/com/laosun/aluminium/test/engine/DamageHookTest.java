@@ -3,21 +3,21 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource;
-import com.laosun.aluminium.models.buff.AbstractBuff;
-import com.laosun.aluminium.models.buff.ReductionBuff;
-import com.laosun.aluminium.models.buff.VulnerabilityBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.event.DamageEvent;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue.Modifier.ModifierSource;
+import com.laosun.aluminium.buff.AbstractBuff;
+import com.laosun.aluminium.buff.ReductionBuff;
+import com.laosun.aluminium.buff.VulnerabilityBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.event.DamageEvent;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * -acceptance: buffs inject zones through {@code DamageEvent} during settlement.

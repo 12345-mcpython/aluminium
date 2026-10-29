@@ -2,9 +2,9 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -24,7 +24,7 @@ public class RippleReinforcedBasicTest {
         battle.processRequests();
         cyrene = battle.characters().getFirst();
         int before = cyrene.getSkills().get(SkillType.COMMON).getSkillSlot();
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
                 cyrene, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         int after = battle.characters().getFirst().getSkills().get(SkillType.COMMON).getSkillSlot();

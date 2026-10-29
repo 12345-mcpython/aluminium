@@ -2,12 +2,12 @@ package com.laosun.aluminium.test.content.relics;
 
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.TriggerTable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.equipment.Relic;
 
 /**
  * Relic set 325, 2-piece: the Elation thresholds, hung on every event that can raise it.

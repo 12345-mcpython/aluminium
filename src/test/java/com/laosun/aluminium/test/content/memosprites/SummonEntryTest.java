@@ -7,11 +7,11 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -19,10 +19,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * {@code SUMMONED} - "when summoned", and the reason its timing is part of the contract.

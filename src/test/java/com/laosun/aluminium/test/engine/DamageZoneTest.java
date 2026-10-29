@@ -2,15 +2,15 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue.Modifier.ModifierSource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
-import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BUFF;
-import com.laosun.aluminium.models.DoubleValue;
+import static com.laosun.aluminium.DoubleValue.Modifier.ModifierSource.BUFF;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * acceptance (plus the constructor checks): every zone asserts its own

@@ -3,7 +3,7 @@ package com.laosun.aluminium.data;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.TriggerTable;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.equipment.Weapon;
 
 /**
  * Loads a light cone's trigger rules from {@code resources/game/light_cones/<weaponId>.json}.

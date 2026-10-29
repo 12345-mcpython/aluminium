@@ -6,10 +6,10 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -75,7 +75,7 @@ public class RolledAttributeModifierTest {
         });
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, applier, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, applier, enemy, 0, 0));
 
         return enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
     }
@@ -136,7 +136,7 @@ public class RolledAttributeModifierTest {
             // and removed the reduction the technique had just applied. It is fired directly rather than casting the
             // skill, because a bounce cast would deal damage and could kill the monster under inspection.
             if (fireSkillCast) {
-                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, candidate, 0, 0));
+                battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, candidate, 0, 0));
             }
             double ratio = candidate.getAttribute(attribute).get()
                     / candidate.getAttribute(attribute).baseValue();

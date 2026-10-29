@@ -6,13 +6,13 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.SpeedBoostBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.enemy.SummonFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.SpeedBoostBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.enemy.SummonFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -20,18 +20,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.battle.WaveManager;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.battle.WaveManager;
+import com.laosun.aluminium.Signal;
 
 /**
  * a monster's summon roster becomes a combatant that can actually be put on the field.
  *
  * <p><b>What was missing before this.</b> Two halves of "summons exist" had each been paid for and neither
  * was usable alone: {@code Battle.enemies} was widened to {@code List<CanHit>}, so the camp
- * <em>could</em> hold one; and {@code models/Summon} was declared, so the type existed. But production code
+ * <em>could</em> hold one; and {@code entity/Summon} was declared, so the type existed. But production code
  * never called {@code new Summon(...)} anywhere, and {@code monster_config.json}'s {@code summon_id} column
  * - non-empty for <b>692 of 2649 monsters</b> - was not parsed at all. This is the piece that connects them:
  * the roster travels from the data onto the master, and a factory plus one {@code Battle} call turn an id

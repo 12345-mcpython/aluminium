@@ -3,18 +3,18 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Cones 21051 and 21054 -- both grant their bonus to "装备者与忆灵", i.e. to the wearer AND its memosprite and to nobody else.
@@ -52,7 +52,7 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
         double wearerBefore = wearer.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get();
         double spriteBefore = memosprite.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get();
         double allyBefore = ally.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         double wearerDelta = wearer.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get() - wearerBefore;
         double spriteDelta = memosprite.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get() - spriteBefore;
         double allyDelta = ally.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get() - allyBefore;
@@ -69,7 +69,7 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
         double wearerBefore = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double spriteBefore = memosprite.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double allyBefore = ally.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, memosprite, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, memosprite, enemy, 1, 0));
         double wearerDelta = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - wearerBefore;
         double spriteDelta = memosprite.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - spriteBefore;
         double allyDelta = ally.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - allyBefore;
@@ -85,7 +85,7 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
         Battle battle = battle(CONE_HEAL);
         double before = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         // The wearer's OWN cast, not its memosprite's: the gate is `actor == summon`.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, wearer, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, wearer, enemy, 1, 0));
         System.out.println("[21054] SUMMON_ATTACK with the master as actor: delta="
                 + (wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - before));
         Assertions.assertEquals(before, wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get(), 1e-9,
@@ -110,7 +110,7 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
     /**
      * Every effect of the one rule for that event: attribute, percent, turns, and the two targets exactly once each.
      */
-    private double pinOne(Battle battle, TriggerEvent event, com.laosun.aluminium.models.entity.CanHit actor,
+    private double pinOne(Battle battle, TriggerEvent event, com.laosun.aluminium.entity.CanHit actor,
                           String ruleId, String attribute, double percent, int turns) {
         int effects = 0;
         double seen = 0;
@@ -154,8 +154,8 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
         Battle battle = battle(0);
         double basicBefore = wearer.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get();
         double healBefore = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, memosprite, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, memosprite, enemy, 1, 0));
         System.out.println("[21051/21054] without the cones: basic +"
                 + (wearer.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get() - basicBefore) + " heal +"
                 + (wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - healBefore));

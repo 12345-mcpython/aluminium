@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -75,7 +75,7 @@ public class SplitDamageTest {
         roster.get(1).perish();                       // one of the two is already down
         double before = roster.get(0).getCurrentHp();
         Character wolf = battle.characters().getFirst();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
         battle.processRequests();
         double alive = before - roster.get(0).getCurrentHp();
         System.out.println("[split] with one of two enemies dead, the living one took " + alive
@@ -122,7 +122,7 @@ public class SplitDamageTest {
         var roster = battle.enemyUnits();
         double before = roster.getFirst().getCurrentHp();
         Character wolf = battle.characters().getFirst();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
         battle.processRequests();
         return before - roster.getFirst().getCurrentHp();
     }
@@ -131,7 +131,7 @@ public class SplitDamageTest {
         Battle battle = battle(enemies, true);
         double before = battle.enemyUnits().stream().mapToDouble(e -> e.getCurrentHp()).sum();
         Character wolf = battle.characters().getFirst();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
         battle.processRequests();
         return before - battle.enemyUnits().stream().mapToDouble(e -> e.getCurrentHp()).sum();
     }

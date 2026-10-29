@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -51,7 +51,7 @@ public class AllyCidSelectorTest {
         TriggerSpecs.set(stacks, "target", "ally_cid:" + NAMED);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), stacks))));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, null, null, 0, 0));
 
         int namedHas = named.getBuffManager().stacksOf(MARK);
         int otherHas = other.getBuffManager().stacksOf(MARK);

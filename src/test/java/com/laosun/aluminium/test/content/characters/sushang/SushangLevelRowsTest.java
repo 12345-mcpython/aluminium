@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -90,7 +90,7 @@ public class SushangLevelRowsTest {
         double before = victim.getCurrentHp();
         battle.requestSkill(sushang.getSkills().get(SkillType.SKILL), sushang, List.of(victim));
         battle.processRequests();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, sushang, victim, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, sushang, victim, 1, 0));
         battle.processRequests();
         double dealt = before - victim.getCurrentHp();
         Assertions.assertTrue(dealt > 0, "premise: the cast really settles damage");
@@ -119,7 +119,7 @@ public class SushangLevelRowsTest {
         double before = sushang.getAttribute(AttributeType.SPEED).get();
         // Note: the BREAK event's actor is the attacker and its target is the enemy whose toughness broke (Battle's own
         // shape), which is exactly what the talent's rule reads.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, sushang, victim, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, sushang, victim, 0, 0));
         battle.processRequests();
         double after = sushang.getAttribute(AttributeType.SPEED).get();
         Assertions.assertTrue(after > before, "premise: the break really raises her SPD");

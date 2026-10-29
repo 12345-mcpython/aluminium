@@ -5,9 +5,9 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.skill.DefaultSkill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -114,7 +114,7 @@ public class ArcherLoopTest {
         f.castSkillAndReadBoostFactor();
         Assertions.assertTrue(f.archer.getBuffManager().hasState(LOOP), "precondition: the loop is on");
 
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         f.battle.processRequests();
         Assertions.assertFalse(f.archer.getBuffManager().hasState(LOOP), "波次清空 ⇒ 退出");
         Assertions.assertEquals(0, f.archer.getResources().value(CYCLES), "并清空计数器");

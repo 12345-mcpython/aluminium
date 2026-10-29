@@ -3,13 +3,13 @@ package com.laosun.aluminium.beans;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
-import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.equipment.Weapon;
 
 /**
  * Raw weapon (light cone) data deserialized from weapons.json.
  *
  * <p>Contains base stats at level 1 and skill data. Final weapon stats are
- * computed by {@link com.laosun.aluminium.models.equipment.Weapon#build(int, int, boolean)}
+ * computed by {@link com.laosun.aluminium.equipment.Weapon#build(int, int, boolean)}
  * applying level scaling.
  *
  * <p>{@code rarity} (3/4/5 stars) is carried because it is needed to choose a cone sensibly.

@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +38,7 @@ public class ConeSpeedEnergyTest {
         battle.beforeMove();
         double speedBefore = unit.getAttribute(AttributeType.SPEED).get();
         double base = unit.getAttribute(AttributeType.SPEED).baseValue();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.SPEED).get() - speedBefore;
         Assertions.assertEquals(0.08 * base, gain, 1e-3,
                 "speed after the ultimate: base=" + base + " gain=" + gain);
@@ -53,14 +53,14 @@ public class ConeSpeedEnergyTest {
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getCurrentEnergy();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
         Assertions.assertEquals(0.0, unit.getCurrentEnergy() - before, 1e-6,
                 "a HEALTHY target grants nothing -- the state condition must gate");
         battle.reduceToughness(unit, enemy, enemy.getStanceWeak().iterator().next(), 999);
         double afterBreak = unit.getCurrentEnergy();
         int hits = 2 + 2;
         for (int i = 0; i < hits; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
         }
         double granted = unit.getCurrentEnergy() - afterBreak;
         Assertions.assertEquals(3.0 * 2, granted, 1e-6,
@@ -77,7 +77,7 @@ public class ConeSpeedEnergyTest {
         battle.beforeMove();
         battle.reduceToughness(unit, enemy, enemy.getStanceWeak().iterator().next(), 999);
         double before = unit.getCurrentEnergy();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         Assertions.assertEquals(3.0, unit.getCurrentEnergy() - before, 1e-6,
                 "a skill as the FIRST event of the turn must grant -- this is the on_any path");
     }

@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.phainon;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -36,12 +36,12 @@ public class PhainonTest {
         // now written, so the pool opens at one. The reading is unchanged in kind: it starts where the sentences say.
         Assertions.assertEquals(1, coreflameOf(phainon),
                 "「战斗开始时，获得 1 点【火种】」 (at the start of battle, gains 1 point of Kindling (【火种】))");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0));
         Assertions.assertEquals(3, coreflameOf(phainon),
                 "「获得2点【火种】」 (gains 2 points of Kindling) -- one from the battle start, two from the cast");
 
         for (int i = 0; i < 9; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0));
         }
         // Note: 12 -> 15. This expectation was written while the file declared only `max: 12`, and the
         // document's sentence does not stop there: "[火种]达到 12 点时可激活终结技，达到上限后还可最多溢出 3 点".
@@ -68,7 +68,7 @@ public class PhainonTest {
         double allyBefore = ally.getCurrentEnergy();
         double herBefore = phainon.getCurrentEnergy();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, phainon, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, phainon, ally, 0, 0));
 
         Assertions.assertEquals(25.0, ally.getCurrentEnergy() - allyBefore, 1e-6,
                 "「为我方队友恢复25点能量」 (restores 25 Energy to allied teammates)");

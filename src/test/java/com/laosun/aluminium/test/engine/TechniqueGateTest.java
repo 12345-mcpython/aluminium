@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * The technique gate: a technique happens outside the battle, so the caller declares it and the engine turns it into a state.
@@ -36,7 +36,7 @@ public class TechniqueGateTest {
         battle.markTechniqueUsed(tb);
         // BEFORE the battle: hurt the ally, so the opening technique heal has somewhere to go (at full HP it restores 0 and the
         // engine, correctly, fires no heal event -- which is why the first version of this case could assert nothing).
-        battle.applyDamage(ally, new com.laosun.aluminium.models.damage.Damage(enemy, ally,
+        battle.applyDamage(ally, new com.laosun.aluminium.damage.Damage(enemy, ally,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.5));
         double hurt = ally.getCurrentHp();

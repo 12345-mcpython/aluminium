@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.characters.silverwolflv999;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -196,7 +196,7 @@ public class SilverWolfLV999MilestoneQuotaTest {
      * One party-scoped laugh gain, which 「获得笑点时，获得等量【隐藏分】」 turns into hidden points.
      */
     private void feederLaughs() {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DAMAGE_SETTLED, feeder, feeder, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.DAMAGE_SETTLED, feeder, feeder, 0, 0));
         battle.processRequests();
     }
 

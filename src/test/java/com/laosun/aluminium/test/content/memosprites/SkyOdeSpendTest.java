@@ -5,9 +5,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.skill.SkillExecutor;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -50,7 +50,7 @@ public class SkyOdeSpendTest {
         TriggerSpecs.set(layers, "target", "ally_cid:" + HYACINE);
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), layers))));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0));
         Assertions.assertEquals(3, hyacine.getBuffManager().stacksOf(MARK), "precondition: three layers");
 
         System.out.println("[sky_spend] the engine slot ids: common="

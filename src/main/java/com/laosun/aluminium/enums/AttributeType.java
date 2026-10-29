@@ -5,11 +5,11 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Relic;
-import com.laosun.aluminium.models.damage.BreakDamageCalculator;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Relic;
+import com.laosun.aluminium.damage.BreakDamageCalculator;
 
 /**
  * All character and equipment attribute types used in combat stat calculation.
@@ -434,7 +434,7 @@ public enum AttributeType {
      *
      * <p>They are <b>not</b> runtime attributes: the builder folds each one into its base
      * attribute's modifier list and then stores the variant slot as {@code null}, which is why
-     * {@link com.laosun.aluminium.models.entity.CanHit#getAttribute(AttributeType)} returns {@code null}
+     * {@link com.laosun.aluminium.entity.CanHit#getAttribute(AttributeType)} returns {@code null}
      * for them. So a buff must never target one - it would look like it worked and change nothing.
      *
      * <p>Note this is <b>not</b> the same question as {@link #isPercent}: that one is about the

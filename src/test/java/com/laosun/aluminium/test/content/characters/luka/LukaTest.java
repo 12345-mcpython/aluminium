@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -68,7 +68,7 @@ public class LukaTest {
         Fixture f = new Fixture();
         f.ultimate();
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(
-                        com.laosun.aluminium.models.buff.VulnerabilityBuff.class).isEmpty(),
+                        com.laosun.aluminium.buff.VulnerabilityBuff.class).isEmpty(),
                 "「有100%的基础概率使指定敌方单体受到的伤害提高20.00%」 -- the zone is up (an easy draw)");
     }
 
@@ -103,7 +103,7 @@ public class LukaTest {
 
         f.skillCast();
 
-        var dots = f.enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.DotBuff.class);
+        var dots = f.enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.DotBuff.class);
         Assertions.assertEquals(1, dots.size(), "「使目标陷入裂伤状态」 (puts the target into the Bleed (裂伤) state)");
         Assertions.assertEquals(attack * 3.38, dots.get(0).getBaseDamage(), 1e-3,
                 "⚠ the shipped `cap_scale`/`cap_percent` mapped: the per-turn damage is the owner's attack × 3.38. An "

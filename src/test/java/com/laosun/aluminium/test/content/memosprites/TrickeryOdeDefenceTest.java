@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -44,10 +44,10 @@ public class TrickeryOdeDefenceTest {
         battle.processRequests();
         // The mark is applied by Cipher (赛飞儿)'s OWN ultimate rule (`talent_patron_on_ult`, ULT_CAST -> APPLY_BUFF 老主顾), so the judge does not have to construct a buff by hand.
         cipher = battle.characters().get(1);
-        com.laosun.aluminium.models.skill.Skill ult =
+        com.laosun.aluminium.skill.Skill ult =
                 cipher.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: her ultimate");
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ult, cipher, List.of(marked));
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ult, cipher, List.of(marked));
         battle.processRequests();
         Assertions.assertTrue(marked.getBuffManager().hasState(PATRON), "precondition: the mark is on");
         double markedBefore = marked.getAttribute(AttributeType.DEFENCE).get();
@@ -56,7 +56,7 @@ public class TrickeryOdeDefenceTest {
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 20");
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, ode, sprite,
                 List.of(battle.characters().get(1)));
         battle.processRequests();
         double markedNow = marked.getAttribute(AttributeType.DEFENCE).get();

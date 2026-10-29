@@ -2,9 +2,9 @@ package com.laosun.aluminium.test.content.characters.cyrene;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.ControlBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.ControlBuff;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -36,7 +36,7 @@ public class CyreneRippleTierTest {
         battle.processRequests();
         her = battle.characters().getFirst();
         Assertions.assertTrue(her.getSkills().containsKey(SkillType.ULTRA), "precondition: her ultimate");
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.ULTRA), her,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.ULTRA), her,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         her = battle.characters().getFirst();
@@ -49,7 +49,7 @@ public class CyreneRippleTierTest {
         her.getBuffManager().addBuff(new ControlBuff(control, 3));
         her.getResources().gain(MEMORY, 11);
         // her basic is the writer that carries her to twelve
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.COMMON), her,
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.COMMON), her,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return battle.characters().getFirst().getBuffManager().debuffCount();

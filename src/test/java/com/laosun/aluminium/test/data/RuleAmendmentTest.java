@@ -6,11 +6,11 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * "raise the number of times the talent's counter effect can trigger per turn by <b>1</b>" / "raise the <b>base chance</b> to freeze the enemy target by 15%" - a rule that raises a number on
@@ -221,11 +221,11 @@ public class RuleAmendmentTest {
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, specs));
         Battle battle = new Battle(List.of(hero), List.of(monster()), fixed(0.0));
         battle.startBattle();
-        hero.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.ShieldBuff(hero, 100, 3));
+        hero.getBuffManager().addBuff(new com.laosun.aluminium.buff.ShieldBuff(hero, 100, 3));
 
         int fired = 0;
         for (int hit = 0; hit < 3; hit++) {
-            fired += battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0));
+            fired += battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0));
         }
         return fired;
     }
@@ -237,11 +237,11 @@ public class RuleAmendmentTest {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, rank);
         Battle battle = new Battle(List.of(hero), List.of(monster()), fixed(0.0));
         battle.startBattle();
-        hero.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.ShieldBuff(hero, 100, 3));
+        hero.getBuffManager().addBuff(new com.laosun.aluminium.buff.ShieldBuff(hero, 100, 3));
 
         int fired = 0;
         for (int hit = 0; hit < 3; hit++) {
-            fired += battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0));
+            fired += battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0));
         }
         return fired;
     }
@@ -256,7 +256,7 @@ public class RuleAmendmentTest {
         Battle battle = new Battle(List.of(hero), List.of(monster()), fixed(roll));
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
 
         return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
     }
@@ -276,7 +276,7 @@ public class RuleAmendmentTest {
         Battle battle = new Battle(List.of(hero), List.of(monster()), fixed(roll));
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
 
         return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
     }

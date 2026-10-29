@@ -6,9 +6,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -55,12 +55,12 @@ public class March7thHuntTest {
 
         int start = chargeOf(march);
         // 1) an ordinary ally attack: nobody is the Shifu yet, so nothing is granted
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(start, chargeOf(march),
                 "「【师父】施放攻击」 (the Shifu casts an attack) -- before the Skill, no ally is the Shifu");
 
         // 2) her own basic attack: +1
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, march, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, march, enemy, 0, 0));
         Assertions.assertEquals(start + 1, chargeOf(march),
                 "「随后获得1点充能」 (then gains 1 point of charge)");
 
@@ -69,7 +69,7 @@ public class March7thHuntTest {
         Assertions.assertTrue(ally.getBuffManager().hasState("师父"),
                 "「使除自身以外的我方指定单体成为【师父】」 (make a designated single ally other than herself the Shifu)");
         int beforeShifu = chargeOf(march);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(beforeShifu + 1, chargeOf(march),
                 "「【师父】施放攻击后，三月七每次获得最多1点充能」 (after the Shifu attacks, March 7th gains at most 1 point of charge each time)");
     }

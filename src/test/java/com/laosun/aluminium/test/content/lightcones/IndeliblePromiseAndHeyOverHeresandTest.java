@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +29,7 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
         battle.startBattle();
         double breakEffect = unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - breakBefore;
         double critBefore = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double crit = unit.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore;
         System.out.println("[21042] breakEffect=" + breakEffect + " critAfterUlt=" + crit);
         // 2026-10-19: the break share is the cone's own `breaking_effect` property (it is in the panel before the
@@ -48,7 +48,7 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
         double health = unit.getAttribute(AttributeType.HEALTH).get() - healthBefore;
         double base = unit.getAttribute(AttributeType.HEALTH).baseValue();
         double healingBefore = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double healing = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - healingBefore;
         System.out.println("[22001] healthGain=" + health + " base=" + base + " healingAfterSkill=" + healing);
         // 2026-10-19: the health share is the cone's own health_percent property (it is in the panel before the battle

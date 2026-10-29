@@ -6,10 +6,10 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -129,7 +129,7 @@ public class TickDotNowTest {
                 TriggerSpecs.set(dot, "maxStacks", 1);
             }
             owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("KILL", List.of("actor == self"), dot))));
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, enemy, 0, 0));
             Assertions.assertFalse(enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "precondition: the DOT landed");
         }
     }

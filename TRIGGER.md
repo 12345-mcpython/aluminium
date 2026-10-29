@@ -225,7 +225,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 ⚠ **只有 `REDUCE_TOUGHNESS` 是"声明了但还没实现"** ✓ —— 写它会**在加载期**报错并说明原因 ✓
 
 ⚠ **常用操作的参数以源码的 op 表为准** ✓ —— 那张表在
-`models/trigger/TriggerInterpreter` 的类注释里，**每个 op 一行，列出它的参数与状态** ✓。
+`trigger/TriggerInterpreter` 的类注释里，**每个 op 一行，列出它的参数与状态** ✓。
 本文不复制它 ✗：**复制一份就会和源表分叉** ✓（与 §7 同一条理由）。
 
 ### 5.2 目标（`target`）

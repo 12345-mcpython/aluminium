@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -34,7 +34,7 @@ public class ElationAccumulatorTest {
 
     private int gain(double energy) {
         int before = elation.getResources().value(ACC);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ENERGY_GAINED, elation, elation, 1, energy));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ENERGY_GAINED, elation, elation, 1, energy));
         return elation.getResources().value(ACC) - before;
     }
 

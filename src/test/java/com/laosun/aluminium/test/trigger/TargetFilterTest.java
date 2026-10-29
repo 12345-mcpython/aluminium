@@ -5,10 +5,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -123,7 +123,7 @@ public class TargetFilterTest {
             TriggerSpecs.set(dot, "baseChance", 1.0);
             TriggerSpecs.set(dot, "target", "target");
             hero.setTriggerTable(new TriggerTable(CID, List.of(TriggerSpecs.rule("SKILL_CAST", null, dot))));
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, hero, second, 1, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, hero, second, 1, 0));
             Assertions.assertTrue(second.getBuffManager().hasState("触电"), "precondition: the second enemy is shocked");
             Assertions.assertFalse(first.getBuffManager().hasState("触电"), "precondition: the first is not");
             hero.setTriggerTable(new TriggerTable(CID, List.of(rule(filter))));
@@ -134,7 +134,7 @@ public class TargetFilterTest {
             secondHpBefore = second.getCurrentHp();
             // the event's own subject is the FIRST enemy, so a filter that tested the event's target instead of the
             // candidate would hit the first and spare the second -- the opposite of what the sentence says
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, hero, first, 1, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(event, hero, first, 1, 0));
         }
     }
 

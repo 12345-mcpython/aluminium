@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.data.SkillData;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.energy.StandardEnergyProvider;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.energy.StandardEnergyProvider;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.skill.Skill;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

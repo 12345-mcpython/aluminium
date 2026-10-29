@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.Locale;
 import java.util.Map;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * The damage type of one damage instance (basic attack / skill / ultimate / break / DOT / true damage…).
@@ -21,7 +21,7 @@ import com.laosun.aluminium.models.damage.Damage;
  *   (HSR.md §6.5 / GLOSSARY).</li>
  * </ul>
  *
- * <p>{@link com.laosun.aluminium.models.damage.Damage.Area#applies(DamageType)} consumes
+ * <p>{@link com.laosun.aluminium.damage.Damage.Area#applies(DamageType)} consumes
  * both flags, so a zone removes itself instead of relying on callers not to add it.
  *
  * <h2>Which values are actually used Note:</h2>

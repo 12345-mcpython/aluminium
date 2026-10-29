@@ -5,10 +5,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -50,8 +50,8 @@ public class ConeAuditBatchNineTest {
         // ACTUAL lost HP (a unit can already be below its maximum when the battle starts).
         double lostWearer = f.wearer.getMaxHp() - f.wearer.getCurrentHp();
         double lostAlly = f.ally.getMaxHp() - f.ally.getCurrentHp();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, f.wearer, f.wearer, 0, 0));
-        bare.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, bare.wearer, bare.wearer, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, f.wearer, f.wearer, 0, 0));
+        bare.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, bare.wearer, bare.wearer, 0, 0));
         for (int i = 0; i < 2; i++) {
             double healed = f.battle.characters().get(i).getCurrentHp() - bare.battle.characters().get(i).getCurrentHp();
             double expected = (i == 0 ? lostWearer : lostAlly) * 0.3;

@@ -1,6 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

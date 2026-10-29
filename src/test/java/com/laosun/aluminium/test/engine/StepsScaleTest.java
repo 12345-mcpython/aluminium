@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * {@code steps:<COUNTER>:<N>} - "every N points of a counter", as {@code floor(value / N)}.
@@ -72,7 +72,7 @@ public class StepsScaleTest {
 
         // An ATTRIBUTE by name, read through the same branch: her own SPEED, one step per 50.
         Character speedy = unit(COUNTER, 0);
-        speedy.setAttribute(AttributeType.SPEED, new com.laosun.aluminium.models.DoubleValue(174));
+        speedy.setAttribute(AttributeType.SPEED, new com.laosun.aluminium.DoubleValue(174));
         Assertions.assertEquals(3.0, read(speedy, stepsEffect("SPEED", 50)), 1e-9,
                 "174 speed is three whole 50s, and the name resolved as an attribute");
     }
@@ -133,7 +133,7 @@ public class StepsScaleTest {
         battle.startBattle();
         battle.processRequests();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, unit, unit, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, unit, unit, 0, 0));
         battle.processRequests();
         double after = unit.getAttribute(AttributeType.ATTACK).get();
         // Measured: the ATTACK delta IS the step count (one step under `percent: 1.0` moved it by exactly 1.0), so the
@@ -146,7 +146,7 @@ public class StepsScaleTest {
      */
     private static Character unit(String ignoredCounterName, int value) {
         Character unit = Character.fromAttributes("unit", 1000, 100, 100, 100);
-        unit.setAttribute(AttributeType.SPEED, new com.laosun.aluminium.models.DoubleValue(value));
+        unit.setAttribute(AttributeType.SPEED, new com.laosun.aluminium.DoubleValue(value));
         return unit;
     }
 }

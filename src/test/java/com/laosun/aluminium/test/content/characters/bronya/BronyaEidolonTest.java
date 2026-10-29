@@ -4,9 +4,9 @@ package com.laosun.aluminium.test.content.characters.bronya;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -151,9 +151,9 @@ public class BronyaEidolonTest {
      * The remaining durations of a unit's timed stat modifiers on one attribute.
      */
     private static List<Integer> durationsOf(Character who, AttributeType attribute) {
-        return who.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class).stream()
+        return who.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StatModifierBuff.class).stream()
                 .filter(buff -> buff.getAttribute() == attribute)
-                .map(com.laosun.aluminium.models.buff.StatModifierBuff::duration)
+                .map(com.laosun.aluminium.buff.StatModifierBuff::duration)
                 .toList();
     }
 

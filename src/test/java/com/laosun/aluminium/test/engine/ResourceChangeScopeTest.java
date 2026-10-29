@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
@@ -64,7 +64,7 @@ public class ResourceChangeScopeTest {
         receiver.setTriggerTable(new TriggerTable(1, rules));
 
         Battle battle = battleWith(receiver, grantOuterAtTurnStart());
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, battle.characters().get(1), battle.characters().get(1), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, battle.characters().get(1), battle.characters().get(1), 0, 0));
         battle.processRequests();
 
         System.out.println("[scope] outer " + value(receiver, OUTER) + " -> inner " + value(receiver, INNER)
@@ -108,10 +108,10 @@ public class ResourceChangeScopeTest {
                         oneInto(LATE)))));
         Battle battle = battleWith(receiver, grantOuterAtTurnStart());
         Character giver = battle.characters().get(1);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, giver, giver, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, giver, giver, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(3, value(receiver, INNER), "precondition: the nested move happened");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DAMAGE_SETTLED, giver, giver, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.DAMAGE_SETTLED, giver, giver, 0, 0));
         battle.processRequests();
         return receiver;
     }

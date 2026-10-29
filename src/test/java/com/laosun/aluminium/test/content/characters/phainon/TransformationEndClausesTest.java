@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.characters.phainon;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -105,13 +105,13 @@ public class TransformationEndClausesTest {
         battle.startBattle();
         battle.processRequests();
 
-        owner.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff(STATE, 9, true));
+        owner.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(STATE, 9, true));
         owner.getBuffManager().removeState(STATE);
         battle.processRequests();
         double atkAfterOneEnd = owner.getAttribute(AttributeType.ATTACK).get();
         int seedsAfterOneEnd = owner.getResources().value(SEEDS);
 
-        owner.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff(STATE, 9, true));
+        owner.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(STATE, 9, true));
         owner.getBuffManager().removeState(STATE);
         battle.processRequests();
         double atkAfterTwoEnds = owner.getAttribute(AttributeType.ATTACK).get();

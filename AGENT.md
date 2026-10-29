@@ -301,7 +301,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 ## 三、角色 A：改引擎的
 
-> **谁读**：动 `Battle` / `SkillExecutor` / `Damage` / `CanHit` / `models/**` / `models/trigger/**` 的人 ✓。
+> **谁读**：动 `Battle` / `SkillExecutor` / `Damage` / `CanHit` / 领域包（`entity/` `state/` `damage/` `buff/` `trigger/` …） 的人 ✓。
 > **不读也行**：只写 `src/main/resources/` 下 JSON 的人 ✓（去 §四）。
 > ⚠ **改引擎的每一批都必须过 §3.3 的四道闸门** ✓，并**贴出数字** ✓。
 
@@ -323,7 +323,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 | 层 | 是什么 | 位置 | 判据 |
 |---|---|---|---|
-| **引擎** | 通用能力（伤害 / 能量 / 韧性 / 行动条 / buff / 资源） | `Battle`、`models/*`、`models/trigger/*` | 与具体角色无关，**不得出现 cid** |
+| **引擎** | 通用能力（伤害 / 能量 / 韧性 / 行动条 / buff / 资源） | `Battle`、领域包（`entity/` `state/` `damage/` `buff/` `trigger/` …） | 与具体角色无关，**不得出现 cid** |
 | **数据** | 「在某事件后，做一件**引擎已有能力**的事」 | `characters/*.json`、`relic_sets/`、`light_cones/` | 触发器 + 条件 + 效果能写完 ⇒ **不写 Java** |
 | **逃生舱** | 需要跨系统状态机，数据表达不出来 | 一个 Java 类 + §4.1 登记 | **登记了**才算合规 |
 
@@ -422,31 +422,31 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | 类 | 关键口子 |
 |---|---|
 | `Battle` | `applyDamage`（**唯一结算入口**）/ `performAction` / `useSkill` / `castUltra` / `startBattle` / `stepForward` / `beforeMove` / `afterMove` / `processRequests` / `grantExtraTurn` / `heal` / `grantShield` / `skillPointPolicy` |
-| `models.damage.Damage` | `toValue()` / `breakdown()` / 7 个乘区 accessor / `addBoost` 等装配口 / `crit` / `trueDamage` / `notCountsAsAttack` |
-| `models.entity.CanHit` | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel` / `getCamp` / `getEnergyProvider` / 事件转发 |
-| `models.state.Resource` | `gainClamped` / `gain`（显式溢出）/ `spend` / `spendExactly` / `setMaxOverflow` / `isFull` / `isCapped` |
-| `models.skillpoint.*` | `SkillPointPolicy`（接口）/ `StandardSkillPointPolicy`（基础规则 + `gainForCast` 覆盖点） |
+| `damage.Damage` | `toValue()` / `breakdown()` / 7 个乘区 accessor / `addBoost` 等装配口 / `crit` / `trueDamage` / `notCountsAsAttack` |
+| `entity.CanHit` | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel` / `getCamp` / `getEnergyProvider` / 事件转发 |
+| `state.Resource` | `gainClamped` / `gain`（显式溢出）/ `spend` / `spendExactly` / `setMaxOverflow` / `isFull` / `isCapped` |
+| `skillpoint.*` | `SkillPointPolicy`（接口）/ `StandardSkillPointPolicy`（基础规则 + `gainForCast` 覆盖点） |
 | `SkillData` | `getElement()` / `getEffect()` / `getStanceList()` / `getSkills()`（倍率表）/ **`getCategory()`** / `getSpNeed()` |
 | `Queue` | `move` / `setTopZero` / `delayAction` / `advanceActionByPercent` / `refreshSpeed` / `grantExtraTurn` |
 | `utils.CharacterFactory` | `create(cid, level)` / `usesSpecialResource(cid)` / `exists` |
-| `models.enemy.EnemyFactory` | `create(monsterId, level, hardLevelGroup)` |
+| `enemy.EnemyFactory` | `create(monsterId, level, hardLevelGroup)` |
 | `utils.StageFactory` | `load(stageId)` |
 | `Constant` | `CHARACTERS` / `WEAPONS` / `SKILLS` / `SKILL_TRACES` / `MONSTERS` / `SKILL_SLOT` / `stages()`（懒加载） |
 
-**包 → 放什么**（2026-10-29 拆过一次，`models/` 不再是平铺的 ✓；找类先看这张表 ✓）：
+**包 → 放什么**（2026-10-29 拆过一次：`models/` 那层已经**去掉** ✓，领域包与 `beans/` `data/` 平级 ✓；找类先看这张表 ✓）：
 
 | 包 | 放什么 |
 |---|---|
 | `com.laosun.aluminium`（根） | `Battle` / `Queue` / `Constant` / `BattleEvents`（战斗与行动条的**门面**） |
-| `models.entity` | **会挨打的东西**：`CanHit`（抽象基类）· `Character` · `Summon` · `Countdown`（`Enemy` 在 `models.enemy`） |
-| `models.state` | **挂在单位身上的状态**：`AttributeSheet` · `EnergyState` · `HealthState` · `ShieldState` · `SkillSet` · `SkillBonuses` · `Resource` / `ResourceManager` · `TriggerCooldowns` · `RuleLimits` · `RuleAmendments` · `RuleChanceState` · `ConditionalHealBonuses` |
-| `models.damage` | **一发伤害**：`Damage` · `BattleDamage`（装配）· `BreakDamageCalculator` |
-| `models.equipment` | **装备**：`Relic` · `RelicSuit` · `Weapon` · `ExtraBasicPromote` |
-| `models.battle` | **从 `Battle` 拆出来的协作者**（39 个服务）＋ `WaveManager` |
-| `models.buff` | `AbstractBuff` 家族 ＋ `BuffManager` |
-| `models.trigger` | 触发器的五个协作者（词表 / 校验 / 解释 / 幅度 / 目标）＋ 表与解析器 |
-| `models.skill` / `models.enemy` / `models.event` / `models.energy` / `models.ai` / `models.skillpoint` | 按名字读 |
-| `models/` 根 | 只剩**跨包的值类型**：`DoubleValue`（数值＋修饰链）· `Signal`（行动条上的一项） |
+| `entity` | **会挨打的东西**：`CanHit`（抽象基类）· `Character` · `Summon` · `Countdown`（`Enemy` 在 `enemy/`） |
+| `state` | **挂在单位身上的状态**：`AttributeSheet` · `EnergyState` · `HealthState` · `ShieldState` · `SkillSet` · `SkillBonuses` · `Resource` / `ResourceManager` · `TriggerCooldowns` · `RuleLimits` · `RuleAmendments` · `RuleChanceState` · `ConditionalHealBonuses` |
+| `damage` | **一发伤害**：`Damage` · `BattleDamage`（装配）· `BreakDamageCalculator` |
+| `equipment` | **装备**：`Relic` · `RelicSuit` · `Weapon` · `ExtraBasicPromote` |
+| `battle` | **从 `Battle` 拆出来的协作者**（39 个服务）＋ `WaveManager` |
+| `buff` | `AbstractBuff` 家族 ＋ `BuffManager` |
+| `trigger` | 触发器的五个协作者（词表 / 校验 / 解释 / 幅度 / 目标）＋ 表与解析器 |
+| `skill` / `enemy` / `event` / `energy` / `ai` / `skillpoint` | 按名字读 |
+| 主包根 | `Battle` / `Queue` / `Constant` / `BattleEvents` ＋ 两个跨包的值类型 `DoubleValue`（数值＋修饰链）· `Signal`（行动条上的一项） |
 | `beans` / `data` / `enums` / `utils` / `exceptions` | JSON DTO / 装载与生成表 / 枚举 / 工厂与工具 / 异常 |
 
 ⚠ **拆分的刀口被不变量钉住**：`DEALING_DAMAGE` 公告**在装配中途**发射 ✓；
@@ -857,7 +857,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 | 层 | 内容 | 状态 | 在哪能查 |
 |---|---|---|---|
-| **A 层** | P8-6/7/8 + P8-3：角色机制 = 数据的总开关 | ✅ **已完成** | `models/trigger/*` ＋ `characters/*.json` |
+| **A 层** | P8-6/7/8 + P8-3：角色机制 = 数据的总开关 | ✅ **已完成** | `trigger/*` ＋ `characters/*.json` |
 | **B 层** | P9：敌人技能与 AI | 🚧 进行中 | §4.2 |
 | **C 层** | P10：机制补完 | ✅ **已完成**（P10-4 / P10-5 收口；P10-6 的"**哪个** debuff"仍缺数据 ⇒ 按 §4.3 登记，属数据侧 ✗） | §4.2 |
 | **D 层** | P11：演示与收尾 | 未开始 | §4.2 |
@@ -1410,7 +1410,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | `TestCharacters.withoutTriggerFile()` 是"取最小 id" | ✗ **已过时** ✓ —— 现在**pin `1506`** ＋ `TriggerTables.exists(cid)` 时**大声抛异常** ✓（`TestCharacters` ✓）；⚠ 但它的 **javadoc 还写着"取最小 id"** ✗ ⇒ **注释与实现不符**，以**实现**为准 ✓（§1.3：错的注释让人照着做 ✗） |
 
 > ⚠ **文档说"没做"、其实已经做了的两处**（2026-10-16 实测 ✓，**照抄会白干** ✗）：
-> ① **P9-5 的"受击反击"** —— `models/buff/CounterMechanic.java` **已存在** ✓、
+> ① **P9-5 的"受击反击"** —— `buff/CounterMechanic.java` **已存在** ✓、
 > `Main` 已装配 ✓、`BossMechanicTest` 钉住 ✓ ⇒ 实际**只剩"多血条 / 锁血"** ✓；
 > ② **欢愉的 `elation_basic_level_damage.json`"从未被加载"** —— **已过时** ✓，
 > 现由 `Constant.ELATION_BASIC_LEVEL_DAMAGE` 加载 ✓，`ElationBaseTableTest` 钉住 ✓。

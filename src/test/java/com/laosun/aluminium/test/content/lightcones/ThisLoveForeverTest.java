@@ -5,19 +5,19 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * Light cone 23052: where the wearer's MEMOSPRITE aims its skill decides what the party gets -- at an ally it marks [空白] and
@@ -58,7 +58,7 @@ public class ThisLoveForeverTest {
         build(true);
         double before = wearableHit();
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0));
         int blank = wearer.getBuffManager().stacksOf(BLANK);
         double after = wearableHit();
         System.out.println("[23052] blank=" + blank + " ; damage on the enemy " + before + " -> " + after
@@ -72,7 +72,7 @@ public class ThisLoveForeverTest {
         build(true);
         double before = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, enemy, 0, 0));
         int poem = wearer.getBuffManager().stacksOf(POEM);
         double after = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23052] poem=" + poem + " ; party crit damage " + before + " -> " + after
@@ -85,7 +85,7 @@ public class ThisLoveForeverTest {
     @Test
     public void theWearerCastingIsNotTheMemospriteCasting() {
         build(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 0, 0));
         System.out.println("[23052] after the WEARER casts: blank=" + wearer.getBuffManager().stacksOf(BLANK)
                 + " poem=" + wearer.getBuffManager().stacksOf(POEM));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(BLANK), "actor == summon (false case)");
@@ -96,7 +96,7 @@ public class ThisLoveForeverTest {
     public void withoutTheConeNothingHappens() {
         build(false);
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0));
         System.out.println("[23052] without the cone: blank=" + wearer.getBuffManager().stacksOf(BLANK));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(BLANK), "no cone, no mark (false case)");
     }

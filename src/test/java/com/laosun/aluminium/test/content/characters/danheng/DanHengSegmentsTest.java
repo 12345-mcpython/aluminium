@@ -5,11 +5,11 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -144,7 +144,7 @@ public class DanHengSegmentsTest {
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
 
-        SkillExecutor.execute(battle, new com.laosun.aluminium.models.skill.DefaultSkill(DAN_HENG, slotNumber(slot), level),
+        SkillExecutor.execute(battle, new com.laosun.aluminium.skill.DefaultSkill(DAN_HENG, slotNumber(slot), level),
                 danHeng, List.of(enemy));
         return new Cast(danHeng, enemy, settled, rng);
     }

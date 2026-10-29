@@ -4,10 +4,10 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -41,9 +41,9 @@ public class DotCoexistenceTest {
         Fixture f = fixture();
         f.hero.setTriggerTable(table(f.hero));
 
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, f.hero, f.enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, f.hero, f.enemy, 0, 0));
         int afterOne = f.enemy.getBuffManager().allBuffsOf(DotBuff.class).size();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, f.hero, f.enemy, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, f.hero, f.enemy, 0, 0));
         int afterTwo = f.enemy.getBuffManager().allBuffsOf(DotBuff.class).size();
 
         Assertions.assertEquals(1, afterOne, "precondition: one application, one DOT");

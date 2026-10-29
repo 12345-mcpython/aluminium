@@ -6,11 +6,11 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.SkillSwapBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.SkillSwapBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -177,7 +177,7 @@ public class SkillSwapTest {
             TriggerSpecs.set(effect, "target", "self");
             gallagher.setTriggerTable(new TriggerTable(GALLAGHER,
                     List.of(TriggerSpecs.rule("KILL", List.of("actor == self"), effect))));
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, gallagher, gallagher, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, gallagher, gallagher, 0, 0));
 
             List<SkillSwapBuff> swaps = swaps().stream().filter(swap -> swap.getSlot() == slot).toList();
             Assertions.assertEquals(1, swaps.size(), "precondition: the swap for " + slot + " landed");

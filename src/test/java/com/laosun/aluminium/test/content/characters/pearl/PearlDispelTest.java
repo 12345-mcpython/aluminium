@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.buff.StateBuff;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -30,7 +30,7 @@ public class PearlDispelTest {
         ally.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 100, 3));
         ally.getBuffManager().addBuff(new StateBuff("_probe_state", 3));
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
                 (SkillCategory) null, 8, 0, java.util.List.of()));
 
         boolean dot = ally.getBuffManager().hasBuff(DotBuff.class);
@@ -48,7 +48,7 @@ public class PearlDispelTest {
         Character ally = battle.characters().get(1);
         ally.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 100, 3));
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
                 (SkillCategory) null, 1, 0, java.util.List.of()));
 
         Assertions.assertTrue(ally.getBuffManager().hasBuff(DotBuff.class),

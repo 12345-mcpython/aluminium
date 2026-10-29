@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * "[生息]结束时若我方目标当前生命值等于其生命上限，则额外恢复目标 8 点能量" (1211,).
@@ -51,7 +51,7 @@ public class StateEndedEnergyProbeTest {
         if (missing > 0) {
             // Note: Measured: no HP setter exists, and DamageElement has no IMAGINARY. So she is damaged the way the game
             // damages -- through applyDamage -- with the enemy as attacker and an element the enum really has.
-            battle.applyDamage(owner, new com.laosun.aluminium.models.damage.Damage(battle.enemies().get(0), owner,
+            battle.applyDamage(owner, new com.laosun.aluminium.damage.Damage(battle.enemies().get(0), owner,
                     com.laosun.aluminium.enums.DamageElement.QUANTUM,
                     com.laosun.aluminium.enums.DamageType.NORMAL, owner.getMaxHp() * missing));
             battle.processRequests();

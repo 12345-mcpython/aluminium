@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -41,7 +41,7 @@ public class AttackerElementTest {
                 TriggerSpecs.rule("ULT_CAST", List.of("actor == self"), instance))));
 
         double before = enemy.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0));
         double dealt = before - enemy.getCurrentHp();
         System.out.println("[attacker_element] pearl is Ice; the instance dealt " + dealt);
         Assertions.assertTrue(dealt > 0, "the reserved word resolved to her own element and the hit landed");

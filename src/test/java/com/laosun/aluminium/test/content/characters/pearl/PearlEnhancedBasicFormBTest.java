@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.pearl;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -42,7 +42,7 @@ public class PearlEnhancedBasicFormBTest {
         Character archetype = battle.characters().get(2);      // the Hunt ally: NOT Elation, so slot 9
         Character secondLowest = battle.characters().get(1);
         Character other = battle.characters().get(3);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0));
         battle.processRequests();
         // ⚠ CORRECTED (2026-10-18, data migration): data slot **10**, not 9 (150309 no longer exists).
         Assertions.assertEquals(10, pearl.getSkills().get(SkillType.COMMON).getSkillSlot(),
@@ -109,7 +109,7 @@ public class PearlEnhancedBasicFormBTest {
     private static int slotAfterUltimate() {
         Battle battle = newBattle();
         Character pearl = battle.characters().get(0);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, battle.characters().get(2), 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, battle.characters().get(2), 0, 0));
         battle.processRequests();
         for (SkillType slot : SkillType.values()) {
             if (pearl.getSkills().get(SkillType.COMMON) != null

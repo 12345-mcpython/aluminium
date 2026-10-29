@@ -10,12 +10,12 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.enemy.SummonFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.enemy.SummonFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -24,10 +24,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * {@code actor == summon} / {@code target == summon} and the {@code SUMMON_ATTACK} event - "装备者的忆灵攻击时" (when the wearer's Memosprite attacks).
@@ -105,9 +105,9 @@ public class SummonConditionTest {
         Summon theirs = battle.summonMemosprite(teammate);
         Summon mine = battle.summonMemosprite(owner);
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, theirs, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, theirs, null, 1, 0)),
                 "a teammate's memosprite is not mine");
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)),
                 "my own is");
     }
 
@@ -122,7 +122,7 @@ public class SummonConditionTest {
         Summon minion = battle.summon(boss, OTHER_MONSTER, 1);
 
         Assertions.assertEquals(Camp.ENEMY, minion.getCamp(), "precondition: it really is a summon");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, minion, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, minion, null, 1, 0)),
                 "…but it belongs to the other camp, so `summon` is not it");
     }
 
@@ -135,8 +135,8 @@ public class SummonConditionTest {
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)));
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)));
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0)),
                 "…while the owner acting is exactly what it means");
     }
 
@@ -149,8 +149,8 @@ public class SummonConditionTest {
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0)));
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)));
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0)));
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)));
     }
 
     /**
@@ -162,7 +162,7 @@ public class SummonConditionTest {
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)));
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0)));
     }
 
     /**
@@ -181,8 +181,8 @@ public class SummonConditionTest {
         Summon second = place(battle, owner, aoeSpec());
 
         Assertions.assertEquals(2, battle.summonCountOf(owner), "precondition: the owner has two out");
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, first, null, 1, 0)));
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, second, null, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, first, null, 1, 0)));
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, second, null, 1, 0)),
                 "the second one is mine too");
     }
 
@@ -195,9 +195,9 @@ public class SummonConditionTest {
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, dummy(), mine, 1, 100)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, dummy(), mine, 1, 100)),
                 "my memosprite was hit");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, dummy(), owner, 1, 100)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, dummy(), owner, 1, 100)),
                 "I was hit, and I am not my memosprite");
     }
 
@@ -244,7 +244,7 @@ public class SummonConditionTest {
         battle.summonMemosprite(owner);
         battle.processRequests();
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0)),
                 "my own summon is out; the ALLY has none -- so only one of the two questions answers yes");
     }
 
@@ -261,7 +261,7 @@ public class SummonConditionTest {
         battle.summonMemosprite(ally);
         battle.processRequests();
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0)),
                 "the ALLY's memosprite is what this counts, and the owner still has none");
     }
 
@@ -283,9 +283,9 @@ public class SummonConditionTest {
         battle.summonMemosprite(owner);
         battle.processRequests();
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0)),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, ally, 1, 0)),
                 "contrast: an ally with no summon really is 'zero'");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0)),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0)),
                 "…but an event with no subject is not zero either: 'cannot read it' is a third fact");
     }
 

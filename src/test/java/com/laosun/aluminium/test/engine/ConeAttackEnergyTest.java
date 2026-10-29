@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -75,7 +75,7 @@ public class ConeAttackEnergyTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = turnBattle(unit, enemy);
         double before = unit.getCurrentEnergy();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(event, unit, enemy, 0, 0));
         return unit.getCurrentEnergy() - before;
     }
 
@@ -83,9 +83,9 @@ public class ConeAttackEnergyTest {
         Character unit = wearer(cone);
         Enemy enemy = BattleFixture.monster();
         Battle battle = turnBattle(unit, enemy);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
         double afterFirst = unit.getCurrentEnergy();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         return unit.getCurrentEnergy() - afterFirst;
     }
 }

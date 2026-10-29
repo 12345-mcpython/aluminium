@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.StubEnemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.StubEnemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -133,10 +133,10 @@ public class StubEnemyTest {
         stub.takeDamage(600);                                   // down to 40% of max
         System.out.println("[stub] at " + Math.round(100 * stub.getCurrentHp() / stub.getMaxHp())
                 + "% HP the active skill is " + (stub.activeSkill() == null ? "the ordinary one"
-                : ((com.laosun.aluminium.models.enemy.EnemySkill) stub.activeSkill()).getElement()));
+                : ((com.laosun.aluminium.enemy.EnemySkill) stub.activeSkill()).getElement()));
         Assertions.assertNotNull(stub.activeSkill(), "at or below half HP the phase skill takes over");
         Assertions.assertEquals(DamageElement.FIRE,
-                ((com.laosun.aluminium.models.enemy.EnemySkill) stub.activeSkill()).getElement(),
+                ((com.laosun.aluminium.enemy.EnemySkill) stub.activeSkill()).getElement(),
                 "and it is the skill that was registered");
     }
 
@@ -161,7 +161,7 @@ public class StubEnemyTest {
      */
     @Test
     public void theDataBackedFactoryIsUntouched() {
-        Enemy real = com.laosun.aluminium.models.enemy.EnemyFactory.create(MONSTERISH, 90, 1);
+        Enemy real = com.laosun.aluminium.enemy.EnemyFactory.create(MONSTERISH, 90, 1);
         System.out.println("[stub] a data-backed monster: " + real.getName() + " hp " + real.getMaxHp());
         Assertions.assertTrue(real.getMaxHp() > 0, "a real monster still builds from its config");
         Assertions.assertNotNull(real.getSkills().get(SkillType.COMMON), "and still has its fallback attack");

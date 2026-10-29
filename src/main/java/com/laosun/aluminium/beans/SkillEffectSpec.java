@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * One entry of {@code data/skill_effects.json}: <b>how to read a non-damaging skill's
@@ -105,7 +105,7 @@ public class SkillEffectSpec {
      * payload shows six instances, not twelve.
      *
      * <p>Whose resource: the row says 「长夜月当前每有…」 - the <b>summoner's</b>, read through the same "who owns this
-     * sheet" rule the damage base uses ({@link com.laosun.aluminium.models.entity.CanHit#damageBase}).
+     * sheet" rule the damage base uses ({@link com.laosun.aluminium.entity.CanHit#damageBase}).
      */
     @SerializedName("resource_share")
     private ResourceShare resourceShare;

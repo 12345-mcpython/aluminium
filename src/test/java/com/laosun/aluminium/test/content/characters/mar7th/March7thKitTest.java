@@ -7,13 +7,13 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.skill.DefaultSkill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -218,8 +218,8 @@ public class March7thKitTest {
 
         // The second half of that sentence, and the reason it is one rule: "冻结状态下 ...每回合开始时受到等同于
         // 三月七60%攻击力的冰属性附加伤害".
-        com.laosun.aluminium.models.buff.DotBuff ice = enemy.getBuffManager()
-                .findBuff(com.laosun.aluminium.models.buff.DotBuff.class);
+        com.laosun.aluminium.buff.DotBuff ice = enemy.getBuffManager()
+                .findBuff(com.laosun.aluminium.buff.DotBuff.class);
         Assertions.assertNotNull(ice, "the frozen enemy carries the state's per-turn damage");
         Assertions.assertEquals(0.6 * march.getAttribute(AttributeType.ATTACK).get(), ice.getBaseDamage(), EPS,
                 "60% of HER attack, read when the freeze landed");
@@ -331,8 +331,8 @@ public class March7thKitTest {
         Fixture f = new Fixture();
         f.shieldTheAlly();
 
-        com.laosun.aluminium.models.buff.ShieldBuff shield =
-                f.ally.getBuffManager().findBuff(com.laosun.aluminium.models.buff.ShieldBuff.class);
+        com.laosun.aluminium.buff.ShieldBuff shield =
+                f.ally.getBuffManager().findBuff(com.laosun.aluminium.buff.ShieldBuff.class);
 
         Assertions.assertEquals(4, shield.duration(),
                 "3 turns from the Skill + 1 from the Reinforce (加护) trace -- \"the shield the Skill provides lasts 1 turn longer\" (「战技提供的护盾持续时间增加1回合」)");

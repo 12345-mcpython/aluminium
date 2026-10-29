@@ -4,9 +4,9 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * "equal to <b>the original damage</b> X%" - the rider settles to the share the text states.
@@ -88,7 +88,7 @@ public class OriginalDamageRiderTest {
         // 2026-10-19: 行迹「道标」现在会在血线之上加暴击率，那会让这一发的暴击抽签变掉、原始伤害跟着变；
         // 这条判据量的是「2 × 40% × 原伤害」，所以把暴击关掉（与 HimekoChargeTest 的同一手法）。
         her.setAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE,
-                new com.laosun.aluminium.models.DoubleValue(0));
+                new com.laosun.aluminium.DoubleValue(0));
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(her), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();

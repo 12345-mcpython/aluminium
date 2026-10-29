@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -48,14 +48,14 @@ public class SilverWolfLV999GodmodeClausesTest {
         battle.startBattle();
         battle.processRequests();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
         Assertions.assertTrue(wolf.getBuffManager().hasState(FREEZE),
                 "premise: a 100% base chance control lands on her when nothing protects her");
         wolf.getBuffManager().removeState(FREEZE);
 
         castUltimate(battle, wolf);
         Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "premise: the Ultimate puts her in 【无敌玩家】");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
         System.out.println("[1506] in 【无敌玩家】, after the same control: 冻结="
                 + wolf.getBuffManager().hasState(FREEZE));
         Assertions.assertFalse(wolf.getBuffManager().hasState(FREEZE),
@@ -65,7 +65,7 @@ public class SilverWolfLV999GodmodeClausesTest {
             cast(battle, wolf, SkillType.COMMON, battle.enemyUnits().getFirst());
         }
         Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "premise: three enhanced basics end the state");
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
         System.out.println("[1506] after leaving 【无敌玩家】, the same control: 冻结="
                 + wolf.getBuffManager().hasState(FREEZE));
         Assertions.assertTrue(wolf.getBuffManager().hasState(FREEZE),
@@ -153,7 +153,7 @@ public class SilverWolfLV999GodmodeClausesTest {
     private static void cast(Battle battle, Character unit, SkillType slot, Enemy victim) {
         battle.requestSkill(unit.getSkills().get(slot), unit, List.of(victim));
         battle.processRequests();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, unit, victim, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, unit, victim, 1, 0));
         battle.processRequests();
     }
 

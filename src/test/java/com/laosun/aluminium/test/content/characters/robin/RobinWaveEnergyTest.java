@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.characters.robin;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -49,7 +49,7 @@ public class RobinWaveEnergyTest {
         battle.startBattle();
         battle.processRequests();
         double before = robin.getCurrentEnergy();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         battle.processRequests();
         return robin.getCurrentEnergy() - before;
     }

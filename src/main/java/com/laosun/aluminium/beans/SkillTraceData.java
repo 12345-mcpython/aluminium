@@ -2,7 +2,7 @@ package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.skill.SkillTrace;
+import com.laosun.aluminium.skill.SkillTrace;
 
 import java.util.List;
 

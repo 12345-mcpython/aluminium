@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -43,7 +43,7 @@ public class AlliesOfPathExceptSelectorTest {
         f.owner.setTriggerTable(new TriggerTable(PEARL, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(),
                         marker("allies_of_path_except:欢愉:self,target")))));
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0));
         f.battle.processRequests();
 
         System.out.println("[path_except] mate " + f.stacks(f.mate) + " ; owner " + f.stacks(f.owner)
@@ -73,7 +73,7 @@ public class AlliesOfPathExceptSelectorTest {
                         marker("allies_of_path_except:欢愉:actor")))));
         // `actor` on BATTLE_START is nobody (the event has no actor), so the list names no existing unit.
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)));
+                () -> f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)));
         System.out.println("[path_except] refused: " + refused.getMessage());
         Assertions.assertTrue(refused.getMessage().contains("excludes nothing"),
                 "the message says what is wrong: " + refused.getMessage());
@@ -89,7 +89,7 @@ public class AlliesOfPathExceptSelectorTest {
                 TriggerSpecs.rule("BATTLE_START", List.of(),
                         marker("allies_of_path_except:不存在的命途:self")))));
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0)));
+                () -> f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0)));
         System.out.println("[path_except] refused: " + refused.getMessage());
         Assertions.assertTrue(refused.getMessage().contains("not a path"),
                 "the message names the problem: " + refused.getMessage());
@@ -105,7 +105,7 @@ public class AlliesOfPathExceptSelectorTest {
                 TriggerSpecs.rule("BATTLE_START", List.of(),
                         marker("allies_of_path_except:欢愉")))));
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0)));
+                () -> f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0)));
         System.out.println("[path_except] refused: " + refused.getMessage());
         Assertions.assertTrue(refused.getMessage().contains("no exclusion list"),
                 "the message asks for one: " + refused.getMessage());

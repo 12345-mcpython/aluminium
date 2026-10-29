@@ -2,16 +2,16 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * Light cone 2301: when any ally casts an ultimate, the wearer heals the ally with the LOWEST HP percentage for 10% of
@@ -36,11 +36,11 @@ public class NightOfFrightTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, hurt, healthy), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.applyDamage(hurt, new com.laosun.aluminium.models.damage.Damage(enemy, hurt,
+        battle.applyDamage(hurt, new com.laosun.aluminium.damage.Damage(enemy, hurt,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, hurt.getMaxHp() * 0.5));
         double before = hurt.getCurrentHp();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         return hurt.getCurrentHp() - before;
     }
 

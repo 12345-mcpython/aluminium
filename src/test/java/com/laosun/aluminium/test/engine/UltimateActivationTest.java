@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -25,7 +25,7 @@ public class UltimateActivationTest {
         battle.processRequests();
         boolean beforeAlly = battle.isUltraReady(battle.characters().get(1));
         cyrene = battle.characters().get(0);
-        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
+        com.laosun.aluminium.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
                 cyrene, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         boolean afterAlly = battle.isUltraReady(battle.characters().get(1));

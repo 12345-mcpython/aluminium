@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.Signal;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.equipment.Relic;
 
 /**
  * Relic set 313 (planar, 2 pieces): crit rate from battle start, and crit DMG per kill capped at the document's own stack count.
@@ -50,7 +50,7 @@ public class SigoniaCritTest {
         double before = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         int firings = 10 + 2;
         for (int i = 0; i < firings; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, enemy, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, enemy, 0, 0));
         }
         double gain = unit.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
         Assertions.assertEquals(0.04 * 10, gain, 1e-6,

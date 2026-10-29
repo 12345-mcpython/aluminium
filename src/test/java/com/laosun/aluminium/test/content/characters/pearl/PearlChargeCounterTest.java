@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.pearl;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -146,7 +146,7 @@ public class PearlChargeCounterTest {
         // Note: ATTACK_FINISHED is fired HERE because the fixture drives the attack directly rather than through a turn,
         // so the move that would normally fire it never runs. The rule that ends the state hangs on this event, and a
         // fixture that skipped it would read 'the state never ends' for a reason that is about the fixture.
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, pearl, victim, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, pearl, victim, 1, 0));
         battle.processRequests();
     }
 

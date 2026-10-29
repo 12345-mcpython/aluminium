@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.pearl;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -29,12 +29,12 @@ public class PearlTraceCounterTest {
         Character ally = battle.characters().get(1);
 
         int before = (int) pearl.getResources().get(COUNTER).getValue();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
         int afterAlly = (int) pearl.getResources().get(COUNTER).getValue();
 
         // Push it to the declared cap and fire again: the resource's own max must hold it at 50.
         for (int i = 0; i < 20; i++) {
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
         }
         int capped = (int) pearl.getResources().get(COUNTER).getValue();
         System.out.println("[pearl_trace] counter " + before + " -> " + afterAlly + " after one ally turn ; capped at " + capped);

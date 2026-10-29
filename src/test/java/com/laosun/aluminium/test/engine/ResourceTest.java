@@ -7,14 +7,14 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.ResourceScope;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.energy.EnergyGain;
-import com.laosun.aluminium.models.energy.EnergyProvider;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.*;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.energy.EnergyGain;
+import com.laosun.aluminium.energy.EnergyProvider;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -22,11 +22,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.state.Resource;
-import com.laosun.aluminium.models.state.ResourceManager;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.state.Resource;
+import com.laosun.aluminium.state.ResourceManager;
+import com.laosun.aluminium.DoubleValue;
 
 /**
  * Stack resources: the abstraction that lets "stack instead of an energy bar" characters work
@@ -392,13 +392,13 @@ public class ResourceTest {
                 rule("ALLY_ATTACK", List.of("actor != self"), gainResource("charge", 3, false)))));
 
         Battle battle = newBattle(hero);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
         Assertions.assertEquals(3, hero.getResources().value("charge"));
 
         // A second rule spends it: a spend that fits succeeds.
         hero.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
                 rule("ALLY_ATTACK", List.of("actor != self"), spendResource("charge", 3)))));
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
         Assertions.assertEquals(0, hero.getResources().value("charge"), "spent back to 0");
     }
 
@@ -418,7 +418,7 @@ public class ResourceTest {
 
         Battle battle = newBattle(hero);
         IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
         Assertions.assertTrue(e.getMessage().contains("needs 5"), e.getMessage());
     }
 
@@ -433,7 +433,7 @@ public class ResourceTest {
 
         Battle battle = newBattle(hero);
         IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
         Assertions.assertTrue(e.getMessage().contains("no such resource"), e.getMessage());
     }
 

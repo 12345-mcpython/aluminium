@@ -7,11 +7,11 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -103,13 +103,13 @@ public class ConeAuditBatchFiveTest {
     public void coneTwoInnocentPaysForHerOwnAttackOnly() {
         Fixture f = new Fixture(21004, true);
         f.wearer.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
         double first = f.wearer.getCurrentEnergy();
-        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
         double second = f.wearer.getCurrentEnergy();
         Fixture other = new Fixture(21004, true);
         other.wearer.setCurrentEnergy(0);
-        other.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, other.ally, other.battle.enemyUnits().getFirst(), 0, 0));
+        other.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, other.ally, other.battle.enemyUnits().getFirst(), 0, 0));
         double teammate = other.wearer.getCurrentEnergy();
         System.out.println("[21004] 自己第一发后 " + first + " ; 同回合第二发后 " + second + " ; 队友施放后 " + teammate);
         Assertions.assertEquals(4.0, first, 1e-9, "「施放攻击后额外恢复 4 点」（叠影 1）");
@@ -127,7 +127,7 @@ public class ConeAuditBatchFiveTest {
         double share = f.wearer.getAttribute(AttributeType.ATTACK).baseValue() * 0.12;
         double[] gains = new double[5];
         for (int i = 0; i < 4; i++) {
-            f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
+            f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
             gains[i] = f.wearer.getAttribute(AttributeType.ATTACK).get() - start;
         }
         System.out.println("[21005] 每层攻击增量 " + gains[0] + " / " + gains[1] + " / " + gains[2] + " / " + gains[3]
@@ -173,7 +173,7 @@ public class ConeAuditBatchFiveTest {
             Character ally = battle.characters().get(1);
             ally.setTriggerTable(new TriggerTable(9300 + i, List.of(
                     TriggerSpecs.rule(TriggerEvent.ALLY_ATTACK.name(), List.of(), slow))));
-            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, target, 1, 0));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, target, 1, 0));
         }
     }
 

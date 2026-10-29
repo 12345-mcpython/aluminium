@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.data;
 
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.trigger.TriggerTableTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

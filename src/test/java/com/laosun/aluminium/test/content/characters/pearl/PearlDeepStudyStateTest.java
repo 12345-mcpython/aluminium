@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.pearl;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -33,14 +33,14 @@ public class PearlDeepStudyStateTest {
         Character hunter = battle.characters().get(2);
 
         int before = (int) pearl.getResources().get(COUNTER).getValue();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, elation, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, elation, 0, 0));
         boolean archetype = elation.getBuffManager().hasState(ARCHETYPE);
         boolean deep = pearl.getBuffManager().hasState(DEEP);
         boolean hunterUntouched = hunter.getBuffManager().hasState(ARCHETYPE);
         int after = (int) pearl.getResources().get(COUNTER).getValue();
 
         // a second ultimate on the other ally must mark THAT one
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0));
         boolean hunterMarked = hunter.getBuffManager().hasState(ARCHETYPE);
         System.out.println("[pearl_states] archetype on the target = " + archetype + " ; deep study on Pearl = "
                 + deep + " ; the other ally marked? " + hunterUntouched + " then " + hunterMarked

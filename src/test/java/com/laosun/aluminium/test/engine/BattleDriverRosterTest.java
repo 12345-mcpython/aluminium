@@ -2,14 +2,14 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.battle.AutoPolicy;
-import com.laosun.aluminium.models.battle.BattleDriver;
-import com.laosun.aluminium.models.battle.BattleListener;
-import com.laosun.aluminium.models.battle.SkillPolicy;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.battle.AutoPolicy;
+import com.laosun.aluminium.battle.BattleDriver;
+import com.laosun.aluminium.battle.BattleListener;
+import com.laosun.aluminium.battle.SkillPolicy;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.entity.Summon;
 
 /**
  * The driver's action branches are actually reached, with real characters and a real enemy.

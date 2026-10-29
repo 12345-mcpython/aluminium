@@ -2,15 +2,15 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.energy.EnergyProvider;
-import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
-import com.laosun.aluminium.models.energy.StandardEnergyProvider;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.energy.EnergyProvider;
+import com.laosun.aluminium.energy.NoConventionalEnergyProvider;
+import com.laosun.aluminium.energy.StandardEnergyProvider;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.damage.Damage;
 
 /**
  * Special energy-provider characters use an independent {@link EnergyProvider}
@@ -61,7 +61,7 @@ public class SpecialEnergyProviderTest {
         Character any = CharacterFactory.create(1308, 80);      // Acheron
         Skill skill = realSkill(1308, SkillType.COMMON);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        var hit = new com.laosun.aluminium.models.damage.Damage(any, enemy,
+        var hit = new com.laosun.aluminium.damage.Damage(any, enemy,
                 com.laosun.aluminium.enums.DamageElement.THUNDER,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 100);
 
@@ -80,7 +80,7 @@ public class SpecialEnergyProviderTest {
         Character regular = CharacterFactory.create(1204, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         // onTakingHit checks damage == null itself (that means "no damage event"), so give it a real damage instance here
-        var hit = new com.laosun.aluminium.models.damage.Damage(regular, enemy,
+        var hit = new com.laosun.aluminium.damage.Damage(regular, enemy,
                 com.laosun.aluminium.enums.DamageElement.THUNDER,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 100);
 

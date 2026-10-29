@@ -2,10 +2,10 @@ package com.laosun.aluminium.test.content.characters.phainon;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.skill.DefaultSkill;
+import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -142,7 +142,7 @@ public class PhainonEidolonSixTest {
     }
 
     private static Battle newBattle(int eidolonRank, int enemies) {
-        List<com.laosun.aluminium.models.enemy.Enemy> foes = new ArrayList<>();
+        List<com.laosun.aluminium.enemy.Enemy> foes = new ArrayList<>();
         for (int i = 0; i < enemies; i++) {
             // Note: a 1,000,000-HP, 0-DEF dummy, and no crits. Both are load-bearing for the ratio this class asserts:
             //   * a REAL monster can be over-killed, and the engine accumulates what the victim TOOK while the observer

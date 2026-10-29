@@ -5,12 +5,12 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.equipment.Weapon;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.equipment.Weapon;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -53,7 +53,7 @@ public class IShallBeMyOwnSwordTest {
     }
 
     private void teammateIsHit() {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, ally, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, ally, 0, 0));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class IShallBeMyOwnSwordTest {
         build(true);
         teammateIsHit();
         int one = wearer.getBuffManager().stacksOf(MOON);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, ally, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, ally, null, 0, 0));
         int two = wearer.getBuffManager().stacksOf(MOON);
         teammateIsHit();
         teammateIsHit();
@@ -96,7 +96,7 @@ public class IShallBeMyOwnSwordTest {
         build(true);
         teammateIsHit();
         teammateIsHit();
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0));
         int after = wearer.getBuffManager().stacksOf(MOON);
         System.out.println("[23014] stacks after the wearer attacks=" + after);
         Assertions.assertEquals(0, after, "removed after casting an attack (施放攻击后解除)");

@@ -7,8 +7,8 @@ import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.exceptions.RelicException;
-import com.laosun.aluminium.models.equipment.Relic;
-import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.equipment.Relic;
+import com.laosun.aluminium.equipment.RelicSuit;
 
 import java.util.List;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models.trigger;
+package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.TriggerSpec;
 import org.junit.jupiter.api.Assertions;

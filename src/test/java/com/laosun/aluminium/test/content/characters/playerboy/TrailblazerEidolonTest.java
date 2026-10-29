@@ -6,9 +6,9 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -62,7 +62,7 @@ public class TrailblazerEidolonTest {
             Assertions.assertTrue(enemy.getBuffManager().hasState("弱点击破"),
                     "precondition: emptying the bar of a weak enemy puts it in Weakness Break (弱点击破)");
         }
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, trailblazer, enemy, 1, 1000));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, trailblazer, enemy, 1, 1000));
         return trailblazer.getAttribute(AttributeType.CRIT_CHANCE).get()
                 - trailblazer.getAttribute(AttributeType.CRIT_CHANCE).baseValue();
     }

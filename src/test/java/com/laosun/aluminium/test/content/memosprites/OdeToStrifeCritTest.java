@@ -1,12 +1,12 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.entity.CanHit;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.entity.Summon;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.buff.StateBuff;
+import com.laosun.aluminium.skill.Skill;
+import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;

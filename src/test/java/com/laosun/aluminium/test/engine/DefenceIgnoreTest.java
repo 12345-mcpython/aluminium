@@ -9,11 +9,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.entity.Character;
-import com.laosun.aluminium.models.damage.Damage;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -184,7 +184,7 @@ public class DefenceIgnoreTest {
         Battle battle = new Battle(List.of(jade), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
 
         Assertions.assertEquals(0.12, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS);
     }
@@ -198,7 +198,7 @@ public class DefenceIgnoreTest {
         Battle battle = new Battle(List.of(jade), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
 
         Assertions.assertEquals(0, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
                 "at Eidolon 3 the ability does not exist yet");
@@ -214,7 +214,7 @@ public class DefenceIgnoreTest {
         Battle battle = new Battle(List.of(jade, ally), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, null, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, null, 0, 0));
 
         Assertions.assertEquals(0, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
                 "the text says when casting the ultimate -- HER ultimate, so `actor == self` is doing its job");
