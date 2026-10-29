@@ -102,6 +102,72 @@ test {
     // UP-TO-DATE, so the new guard stayed green while the document was wrong - a guard that does not run is worse than
     // none, because it is believed.
     inputs.file('TRIGGER.md')
+    // When the requested task is `gate`, the tests must REALLY run: `gate` is the thing a report cites, and an
+    // UP-TO-DATE `:test` rewrites the previous XML - the exact trap §3.3 documents. Plain `:test` stays incremental.
+    outputs.upToDateWhen { !gradle.startParameter.taskNames.any { it == 'gate' || it.endsWith(':gate') } }
+}
+
+
+// ======================================================================
+// `gate` - the four gates of AGENT.md §3.3, in one command.
+//
+// Why a task and not a checklist: the gates were five hand-typed commands plus "diff the demos against a baseline",
+// and the ledger records two failures that came from running them by hand (a stale `:test` XML believed to be fresh;
+// a demo compared against the wrong baseline). A task cannot be half-remembered, and it fails the build on the first
+// non-zero exit, so "GATE: PASS" always means every step ran and returned 0.
+//
+// What it does NOT do: compare demo output against a stored baseline (that needs a human to say "this change is
+// intended"), and mutation checks (AGENT.md §6.4 - those are per-change, not per-batch).
+// ======================================================================
+def demoModes = ['battle', 'mechanics', 'technique', 'driven', 'all']
+
+def gateDemos = demoModes.collect { mode ->
+    tasks.register("gateDemo${mode.capitalize()}", JavaExec) {
+        group = 'verification'
+        classpath = sourceSets.demo.runtimeClasspath
+        mainClass = 'com.laosun.Main'
+        args = mode == 'battle' ? [] : [mode]
+    }
+}
+
+def gateCompares = fileTree('scenarios') { include 'capture-*.json' }.files.sort { it.name }.collect { scenario ->
+    tasks.register("gateCompare${scenario.name.replaceAll(/[^A-Za-z0-9]/, '_')}", JavaExec) {
+        group = 'verification'
+        classpath = sourceSets.demo.runtimeClasspath
+        mainClass = 'com.laosun.Main'
+        args = ['compare', "scenarios/${scenario.name}"]
+    }
+}
+
+tasks.register('gateReplay', JavaExec) {
+    group = 'verification'
+    description = 'The whole-battle replay, strict: exits 1 when any comparable cast\u2019s base differs.'
+    classpath = sourceSets.demo.runtimeClasspath
+    mainClass = 'com.laosun.Main'
+    args = ['replay', 'scenarios/veritas-085418.replay.json', '--strict']
+}
+
+tasks.register('gate') {
+    group = 'verification'
+    description = 'All of AGENT.md \u00a73.3: full tests, every demo, every scenario comparison, the strict replay, javadoc.'
+    dependsOn gateDemos, gateCompares, 'gateReplay', 'test', 'javadoc'
+    // No outputs: a gate must run every time it is asked, never be "up to date".
+    outputs.upToDateWhen { false }
+    doLast {
+        def results = fileTree("${buildDir}/test-results/test") { include '*.xml' }.files
+        int tests = 0
+        int failures = 0
+        results.each { f ->
+            def suite = new groovy.xml.XmlSlurper().parse(f)
+            tests += (suite.@tests.text() as int)
+            failures += (suite.@failures.text() as int) + (suite.@errors.text() as int)
+        }
+        println()
+        println('=' * 78)
+        println("GATE: PASS  tests=${tests} failures=${failures} suites=${results.size()}"
+                + " ; demos=${gateDemos.size()} ; scenarios=${gateCompares.size()} ; replay --strict ; javadoc")
+        println('=' * 78)
+    }
 }
 
 
