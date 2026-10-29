@@ -121,6 +121,7 @@ public class EffectSpec {
         copy.blocks = this.blocks;
         copy.oncePerTurn = this.oncePerTurn;
         copy.memospriteName = this.memospriteName;
+        copy.anotherInstance = this.anotherInstance;
         copy.critRate = this.critRate;
         copy.critDamage = this.critDamage;
         copy.element = this.element;
@@ -859,6 +860,15 @@ public class EffectSpec {
      */
     @SerializedName("memosprite_name")
     private String memospriteName;
+
+    /**
+     * {@code SUMMON} brings <b>one more instance</b> of the character's memosprite instead of "the one".
+     *
+     * <p>Reader: 1512 知更鸟•晴歌, whose 「晴空乐手」 stand one, two and three at a time as the gauge crosses 6 and 12 -
+     * 「当「晴空乐手」全员登台后…」 is a sentence about the COUNT of the same memosprite, not about several kinds.
+     */
+    @SerializedName("another_instance")
+    private Boolean anotherInstance;
 
     /**
      * "暂时<b>延后</b>陷入无法战斗状态": the state this effect applies does not let its carrier die (140's Sanctuary of Mooncocoon (月茧之庇)).

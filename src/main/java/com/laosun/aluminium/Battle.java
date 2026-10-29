@@ -3217,6 +3217,16 @@ public class Battle {
         return summons.memosprite(master, name);
     }
 
+    /**
+     * Summons one more <b>instance</b> of the master's memosprite (1512's 「晴空乐手」 stand 1/2/3 at a time).
+     *
+     * @param master the summoning character
+     * @return the new instance
+     */
+    public Summon summonAnotherMemosprite(Character master) {
+        return summons.memospriteInstance(master);
+    }
+
     public Summon summonServant(Character master) {
         return summons.servant(master);
     }

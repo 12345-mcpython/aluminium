@@ -841,6 +841,10 @@ public final class TriggerInterpreter {
                 // 「若任意「晴空乐手」已在场…」 (1512): a kit may own SEVERAL memosprites, and "which one" is data. Without
                 // the name the op keeps its old meaning (the character's first / its only one).
                 var owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+                if (Boolean.TRUE.equals(effect.getAnotherInstance())) {
+                    battle.summonAnotherMemosprite(owner);
+                    break;
+                }
                 if (effect.getMemospriteName() == null || effect.getMemospriteName().isBlank()) {
                     battle.summonMemosprite(owner);
                 } else {
