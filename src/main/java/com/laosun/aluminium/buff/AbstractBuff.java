@@ -53,6 +53,21 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     private CanHit tickOwner;
 
     /**
+     * What this state suppresses while it is on the holder - see {@link Buff#blocks()}. Set by the effect that creates
+     * the state ({@code APPLY_BUFF}'s {@code "blocks"}), never by the unit carrying it.
+     */
+    private java.util.Set<String> blocks = java.util.Set.of();
+
+    @Override
+    public java.util.Set<String> blocks() {
+        return blocks;
+    }
+
+    public void setBlocks(java.util.Set<String> blocks) {
+        this.blocks = blocks == null ? java.util.Set.of() : java.util.Set.copyOf(blocks);
+    }
+
+    /**
      * Whether {@code who}'s turn boundary ticks this buff.
      *
      * @param who the unit whose turn is beginning or ending

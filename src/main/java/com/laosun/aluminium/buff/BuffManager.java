@@ -488,6 +488,22 @@ public class BuffManager {
         return removed;
     }
 
+    /**
+     * Whether any state on this unit suppresses the given action
+     * (see {@link Buff#blocks()} - 「无法使其他友方目标获得行动提前效果」).
+     *
+     * @param what the action, in the engine's own vocabulary ({@code advance_to_others})
+     * @return whether one of the holder's states bans it
+     */
+    public boolean suppresses(String what) {
+        for (Buff buff : buffs) {
+            if (buff.blocks().contains(what)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean canAct() {
         if (blocked) {
             return false;
