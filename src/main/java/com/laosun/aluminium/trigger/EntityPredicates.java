@@ -177,6 +177,17 @@ final class EntityPredicates {
             return subject + " " + written;
         }
 
+        /**
+         * A threshold the way {@code TriggerConditionParser} spells it: an integral one carries a decimal point
+         * ({@code 4.0}), so a log line and a test that pins the spelling keep reading the same string.
+         */
+        private static String number(com.google.gson.JsonElement value) {
+            double parsed = value.getAsDouble();
+            return parsed == Math.rint(parsed)
+                    ? String.format(java.util.Locale.ROOT, "%.1f", parsed)
+                    : String.valueOf(parsed);
+        }
+
         private String spell(String key, com.google.gson.JsonElement value) {
             return switch (key) {
                 case "same_as" -> subject + " == " + value.getAsString();
@@ -188,23 +199,51 @@ final class EntityPredicates {
                     var named = value.getAsJsonObject();
                     String name = named.get("name").getAsString();
                     if (named.has("min")) {
-                        yield subject + "_stacks:" + name + " >= " + named.get("min").getAsString();
+                        yield subject + "_stacks:" + name + " >= " + number(named.get("min"));
                     }
-                    yield subject + "_stacks:" + name + " <= " + named.get("max").getAsString();
+                    yield subject + "_stacks:" + name + " <= " + number(named.get("max"));
+                }
+                case "resource" -> {
+                    var named = value.getAsJsonObject();
+                    String prefix = "summon".equals(subject) ? "summon_resource:" : "self_resource:";
+                    String name = named.get("name").getAsString();
+                    if (named.has("min")) {
+                        yield prefix + name + " >= " + number(named.get("min"));
+                    }
+                    yield prefix + name + " <= " + number(named.get("max"));
+                }
+                case "summon_count", "enemy_count" -> {
+                    String name = "summon_count".equals(key) ? "self_summon_count" : "enemy_count";
+                    var range = value.getAsJsonObject();
+                    if (range.has("min") && range.has("max")
+                            && range.get("min").getAsDouble() == range.get("max").getAsDouble()) {
+                        yield name + " == " + number(range.get("min"));
+                    }
+                    yield name + (range.has("min") ? " >= " : " <= ")
+                            + number(range.has("min") ? range.get("min") : range.get("max"));
+                }
+                case "energy_pct" -> {
+                    var range = value.getAsJsonObject();
+                    yield "self_energy_percent " + (range.has("min") ? ">= " : "<= ")
+                            + number(range.has("min") ? range.get("min") : range.get("max"));
+                }
+                case "debuff_count" -> {
+                    var range = value.getAsJsonObject();
+                    yield "target_debuff_count " + (range.has("min") ? ">= " : "<= ")
+                            + number(range.has("min") ? range.get("min") : range.get("max"));
                 }
                 case "attribute" -> {
                     var named = value.getAsJsonObject();
                     String name = named.get("name").getAsString();
                     if (named.has("min")) {
-                        yield "self_attr:" + name + " >= " + named.get("min").getAsString();
+                        yield "self_attr:" + name + " >= " + number(named.get("min"));
                     }
-                    yield "self_attr:" + name + " <= " + named.get("max").getAsString();
+                    yield "self_attr:" + name + " <= " + number(named.get("max"));
                 }
                 case "hp_pct" -> {
                     var range = value.getAsJsonObject();
-                    yield "target_hp_percent "
-                            + (range.has("min") ? ">= " : "<= ")
-                            + (range.has("min") ? range.get("min") : range.get("max")).getAsString();
+                    yield "target_hp_percent " + (range.has("min") ? ">= " : "<= ")
+                            + number(range.has("min") ? range.get("min") : range.get("max"));
                 }
                 default -> null;
             };
