@@ -143,6 +143,18 @@ public class ContentDuplicateGuardTest {
             Collections.sort(conditions);
             out.append(" when=").append(conditions);
         }
+        // The structured conditions are part of the signature too: a rule's `when_predicates` is the same statement as
+        // `when` in the new spelling, and a signature that ignored it would call two rules identical the moment one of
+        // them was migrated - weakening the guard exactly when the data changes shape.
+        JsonElement predicates = rule.get("when_predicates");
+        if (predicates != null && predicates.isJsonArray()) {
+            List<String> rendered = new ArrayList<>();
+            for (JsonElement predicate : predicates.getAsJsonArray()) {
+                rendered.add(predicate.toString());
+            }
+            Collections.sort(rendered);
+            out.append(" predicates=").append(rendered);
+        }
         JsonElement effects = rule.get("do");
         if (effects != null && effects.isJsonArray()) {
             for (JsonElement effect : effects.getAsJsonArray()) {

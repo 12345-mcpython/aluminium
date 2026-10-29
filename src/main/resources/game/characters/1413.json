@@ -3,7 +3,7 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_consumes_hp",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "CONSUME_HP", "scale": "owner_max_hp", "percent": 0.1, "target": "self" }
       ],
@@ -13,7 +13,7 @@
     {
       "on": "HP_CONSUMED",
       "id": "talent_hp_cost_raises_her_crit_damage",
-      "when": ["target == self"],
+      "when_predicates": [{"type": "entity", "entity": "target", "json": { "same_as": "self" }}],
       "do": [
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "amount": 0.6, "turns": 2, "target": "self" },
         { "op": "GAIN_RESOURCE", "resource": "亿质", "amount": 2 }
@@ -48,7 +48,7 @@
     },
     {
       "on": "SUMMONED",
-      "when": ["actor == summon"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
       "do": [
         { "op": "ADVANCE", "percent": 1.0, "target": "summon" }
       ],
@@ -57,7 +57,7 @@
     },
     {
       "on": "SUMMONED",
-      "when": ["actor == summon"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
       "do": [
         { "op": "RESIST_DEBUFF", "kind": "control", "percent": 1.0, "permanent": true, "target": "summon" }
       ],
@@ -67,7 +67,7 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_taunt_aggro",
-      "when": ["actor == summon"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
       "do": [
         { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 3, "permanent": true, "target": "summon" }
       ],
@@ -76,7 +76,7 @@
     },
     {
       "on": "ULT_CAST",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "SUMMON" },
         { "op": "COMMAND_SUMMON", "skill": "ULTRA", "damage_param": 0, "attribute": "HEALTH" },
@@ -92,7 +92,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_4",
-      "when": ["enemy_count >= 4", "actor == summon"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 4 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.2 }
       ],
@@ -102,7 +102,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_3",
-      "when": ["enemy_count == 3", "actor == summon"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 3, "max": 3 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.25 }
       ],
@@ -112,7 +112,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_2",
-      "when": ["enemy_count == 2", "actor == summon"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 2, "max": 2 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.3 }
       ],
@@ -122,7 +122,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_memosprite_damage_enemy_count_1",
-      "when": ["enemy_count == 1", "actor == summon"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "enemy_count": { "min": 1, "max": 1 } }}, {"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.5 }
       ],

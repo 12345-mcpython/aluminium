@@ -316,8 +316,15 @@ final class EntityPredicates {
             case "same_as" -> {
                 // "the actor IS me": identity, not a property of the unit, and the condition `actor == self` has 1,238
                 // uses in the content - the single most common condition there is.
-                CanHit other = unitOf(value.getAsString().trim(), ctx);
-                yield other != null && other == unit;
+                String other = value.getAsString().trim();
+                if ("summon".equals(other)) {
+                    // ⚠ NOT `battle.summonOf(owner)`: a rule on SUMMON_LEFT fires while the memosprite is LEAVING, and by
+                    // then it is no longer the one on the field (measured: summonOf returns null and the rule never
+                    // fires). "The actor is my memosprite" is therefore a fact about ownership, not about who is out.
+                    yield unit instanceof Summon summon && (ctx.owner() == null || summon.getMaster() == ctx.owner());
+                }
+                CanHit party = unitOf(other, ctx);
+                yield party != null && party == unit;
             }
             case "summon_count" -> {
                 // "the owner has a memosprite on the field" is `{ "summon_count": { "min": 1 } }`.
