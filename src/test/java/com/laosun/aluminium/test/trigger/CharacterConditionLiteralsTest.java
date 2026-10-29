@@ -332,7 +332,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1414, "SKILL_CAST", "skill_bondmate_and_shield", List.of("actor == self"));
         assertRule(1414, "ULT_CAST", "ult_party_shield", List.of("actor == self"));
         assertRule(1414, "BATTLE_START", "level_convention", List.of());
-        assertRule(1415, "BASIC_ATTACK", "basic_recollection", List.of("actor == self"));
+        assertRule(1415, "BASIC_ATTACK", "basic_recollection", List.of("actor == self", "!self has_state 往昔的涟漪"));
         assertRule(1415, "SKILL_CAST", "skill_recollection", List.of("actor == self"));
         assertRule(1415, "BATTLE_START", "talent_party_damage", List.of());
         assertRule(1415, "BATTLE_START", "level_convention", List.of());
