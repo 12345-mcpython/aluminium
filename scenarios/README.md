@@ -443,7 +443,10 @@ gradlew run --args="replay scenarios/veritas-085418.replay.json --detail"  # 再
 | `base-ok` | 值、实例数都对上 |
 | `base-ok/count` | 值对上了，实例数不同 —— 通常是捕获里别的敌人已经倒了，而重放场上它们还活着 |
 | `base-n/a` | 捕获那一发的 `damage_percentage == 0`：基数是**计数**（1409 的累计治疗），不是行份额 ⇒ 窗口前缀不在，判不了 |
-| `DIFFERS` / `DIFFERS-x0.67` | 值不同；带倍数说明**每个实例都恰好差同一个倍数**（例：cast 4 是 0.06 vs 0.09 —— 游戏把「每 3 点【忆质】额外 #2%」折进了同一发，见 `AGENT.md` §3.7h）|
+| `DIFFERS` / `DIFFERS-x0.67` | 值不同；带倍数说明**每个实例都恰好差同一个倍数**（这是**回归信号**：提交的 fixture 上这一列必须为空）|
+
+> ✅ 提交的 fixture 上 `--strict` 是**绿**的：所有有可比 `base` 的发都对上，`base-n/a` 与 `not drivable` 各自**指名**而不是混进差集。
+> cast 4 那发曾经差 ×0.67 —— 「每 3 点【忆质】额外 #2%」折进同一发（折叠已落地，见 `AGENT.md` §3.7h）；它的 10 点忆质是**窗口前缀**，由计划用 `resources` 声明（工具打印 `seeded:`）。
 
 **计划文件**（`scenarios/<fixture>.replay.json`）的形状：
 
@@ -452,12 +455,15 @@ gradlew run --args="replay scenarios/veritas-085418.replay.json --detail"  # 再
 | `capture` | 要重放的捕获，相对工作目录 |
 | `party[]` | 每个攻方 uid：`owner`（捕获用的 uid）/ `cid` / `level` / `eidolon` / `memosprite`（是否先把它摆在场上）/ `attributes`（**绝对**面板，未按发覆盖时用） |
 | `enemies[]` | 捕获里的目标：`health` / `defence` / `level` / `speed` / `resistance`（元素名 → 抗性） |
-| `casts[]` | 一次施放：`cast`（**捕获 flow 里的序号**，连接键）/ `actor`（uid）/ `caster`（`character` 或 `memosprite`）/ `slot`（角色用 `SkillType` 名，忆灵用**数据槽**）/ `level`（这一发读的那一行；省略 = 技能自己的等级，忆灵一律 10）/ `target`（`enemies` 的 1 基下标）/ `repeat`（连放几次）/ `note`（为什么是这个槽） |
+| `casts[]` | 一次施放：`cast`（**捕获 flow 里的序号**，连接键）/ `actor`（uid）/ `caster`（`character` 或 `memosprite`）/ `slot`（角色用 `SkillType` 名，忆灵用**数据槽**）/ `level`（这一发读的那一行；省略 = 技能自己的等级，忆灵一律 10）/ `target`（`enemies` 的 1 基下标）/ `repeat`（连放几次）/ `resources`（**窗口前缀**：这一发开始时该角色已持有的计数器，`{资源: 值}`）/ `note`（为什么是这个槽、前缀那个数从哪反解出来） |
+
+⚠ `resources` 只写**从捕获算术反解得出的数**（cast 4 的 10 点 = `(0.09 − 0.06) × 4 / 0.12`），不写"看着差不多"的值；工具会把它打印成
+`seeded: …`，所以读的人分得清**复现出来的**和**声明出来的**。
 
 ⚠ 计划**不能**跟捕获打架：驱动会核对每一发的 `actor` 与**第一发的 `target_max_hp`**，不一致就退 2（`BattleReplayTest`
 有一条反向用例钉它）。⚠ 一次施放驱动不了时（数据里没有那一槽），工具**指名**它，不静默跳过。
 
-⚠ **`--strict`** 现在的判据是**有没有 `DIFFERS`**（`base-n/a` 不算）—— 差额的原因登记在 `AGENT.md` §3.7zb。
+⚠ **`--strict`** 的判据是**有没有 `DIFFERS`**（`base-n/a` 不算）；它现在在提交的 fixture 上返回 **0**，所以能当闸门用 ✓。判据的边界与仍开项登记在 `AGENT.md` §3.7zb。
 
 ### 为什么需要 `attributes` 覆盖
 
