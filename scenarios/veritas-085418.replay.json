@@ -1,13 +1,13 @@
 {
   "name": "veritas-085418 — the captured fight, cast by cast",
   "capture": "src/test/resources/captures/veritas-085418.json",
-  "note": "⚠ The capture is a WINDOW of a fight already in progress, not a fight from its start: 1409's 「雨过天晴」 is up before event 0 (1415's 生命上限 10320.4433 already carries it, per AGENT.md §3.7k), and 1413's own 生命面板 moves inside the window (2960.0287 → 4526.4984 → 4309.8792). Those prefix states are NOT reproducible by driving this window, so they are declared missing in AGENT.md rather than invented here. What this plan states is what the payload itself states: each enemy's 生命上限 / 防御 / 抗性, and which skill slot each captured cast used. ⚠ The party's panels are NOT written here any more: each member states its `cid` + the light cone it wears, and the panel is COMPUTED by the engine (base row + level + cone + the account dump's relics + traces) - that derivation is itself part of what the replay proves (judge `PanelFromDumpTest`: the computed ATTACK/DEFENCE equal the capture's own panel to 1e-6 relative). The capture's per-cast panel is still installed at each cast, because it moves inside the window (1413's life 2960 → 4526 → 4309) and no replay can earn that. The cast → slot table is the manual part ( §4 of the handover ): attack_type 12 is a 忆灵's skill, and a 忆灵's skills live by DATA SLOT, so each entry names the slot and the memosprite it belongs to.",
+  "note": "⚠ The capture is a WINDOW of a fight already in progress, not a fight from its start: 1409's 「雨过天晴」 is up before event 0 (1415's 生命上限 10320.4433 already carries it, per AGENT.md §3.7k), and 1413's own 生命面板 moves inside the window (2960.0287 → 4526.4984 → 4309.8792). Those prefix states are NOT reproducible by driving this window, so they are declared missing in AGENT.md rather than invented here. What this plan states is what the payload itself states: each enemy's 生命上限 / 防御 / 抗性, and which skill slot each captured cast used. ⚠ The party's panels are NOT written here any more: each member states its `cid` + the light cone it wears, and the panel is COMPUTED by the engine (base row + level + cone + the account dump's relics + traces) - that derivation is itself part of what the replay proves (judge `PanelFromDumpTest`: the computed ATTACK/DEFENCE equal the capture's own panel to 1e-6 relative). The capture's per-cast panel is still installed at each cast, because it moves inside the window (1413's life 2960 → 4526 → 4309) and no replay can earn that. The 星魂 ranks are the account's own (1409 E6 / 1413 E1 / 1415 E2 / 1512 E0, from the 2026-10-18 archive), not the payload's - the payload carries none. The cast → slot table is the manual part ( §4 of the handover ): attack_type 12 is a 忆灵's skill, and a 忆灵's skills live by DATA SLOT, so each entry names the slot and the memosprite it belongs to.",
   "party": [
     {
       "owner": 1409,
       "cid": 1409,
       "level": 80,
-      "eidolon": 0,
+      "eidolon": 6,
       "memosprite": true,
       "cone": { "id": 23042, "level": 80, "rank": 1 }
     },
@@ -15,7 +15,7 @@
       "owner": 1413,
       "cid": 1413,
       "level": 80,
-      "eidolon": 0,
+      "eidolon": 1,
       "memosprite": true,
       "cone": { "id": 21050, "level": 80, "rank": 5 }
     },
@@ -23,7 +23,7 @@
       "owner": 1415,
       "cid": 1415,
       "level": 80,
-      "eidolon": 0,
+      "eidolon": 2,
       "memosprite": true,
       "cone": { "id": 23042, "level": 80, "rank": 1 }
     },
