@@ -290,8 +290,12 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `add` / `mul` / `min` / `max` / `avg` | `inputs` | 逐项求值后归约（`add` 空表=0 ✓、`mul` 空表=1 ✓；`min`/`max`/`avg` 空表在装载期被拒 ✗）|
 | `sub` / `div` | `left` + `right` | 二元运算（`div` 除零在**结算期**报错 ✓）|
 | `negate` / `abs` | `input` | 相反数 / 绝对值 |
+| `attr` | `attribute`（+ `whose` / `above`）| 单位的属性（= `self_attr:` ✓；`whose: target` 读事件目标 ✓；`above` 只算超出部分，= `self_attr_above:` ✓）|
+| `stacks` | `buff`（+ `whose`）| 层数（= `self_stacks:` / `target_stacks:` ✓）|
+| `uniform` | `min` + `max` | 区间内均匀随机（**用战斗自己的 RNG** ✓ ⇒ 同种子可复现 ✓，`max` 开区间）|
+| `weighted_list` | `distribution: [{weight, value}]` | 按权重随机（权重是**相对**的 ✓、`0` 权重的项**永远不中** ✓ —— 用作"兜底"）|
 
-⚠ **装载期就拒绝**：`type` 不在上表 ✓、`const` 缺 `value` ✓、`skill_param` 缺 `skill` ✓、`*_param` 缺 `index` ✓、`summon_param` 缺 `slot` ✓、`add` 族缺 `inputs` ✓、`sub`/`div` 缺操作数 ✓、以及与对应字段拼法同时写 ✓。
+⚠ **装载期就拒绝**：`type` 不在上表 ✓、`const` 缺 `value` ✓、`skill_param` 缺 `skill` ✓、`*_param` 缺 `index` ✓、`summon_param` 缺 `slot` ✓、`add` 族缺 `inputs` ✓、`sub`/`div` 缺操作数 ✓、`attr` 缺 `attribute` ✓、`stacks` 缺 `buff` ✓、`uniform` 缺 `min`/`max` ✓、`weighted_list` 没有正权重 ✓，以及与对应字段拼法同时写 ✓。
 ⚠ **provider 不做分支** ✗ —— `conditional` 一类**故意没有** ✓：要不要执行是**条件**（`when`）的事 ✓，一个数字里再分一套执行模型是第二条路 ✓。
 
 | 字段 | 读的是 | 哪些 op 读 |
