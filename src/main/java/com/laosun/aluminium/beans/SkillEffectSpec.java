@@ -123,6 +123,27 @@ public class SkillEffectSpec {
     private PerResourceShare perResourceShare;
 
     /**
+     * Conditions a cast of this skill must meet, spelled exactly as a rule's {@code when} is.
+     *
+     * <p><b>Why a skill needs this at all.</b> Most castability is the engine's own (energy, skill points, a turn);
+     * but a sentence can gate a cast on a <b>resource</b>: 「长夜月的【忆质】大于等于 #3 点，且…时施放」 (1141307). Without a
+     * spelling for it the cast simply happened with whatever the counter held, which for a per-point price means
+     * "0 points, 0 damage" - a wrong number with no symptom.
+     *
+     * <p>Checked by {@code SkillCastability} at the one cast gate ({@code CastService.useSkill}); a failed condition
+     * makes the cast be <b>refused</b>, exactly as an empty energy bar does.
+     */
+    @SerializedName("castable_when")
+    private List<String> castableWhen;
+
+    /**
+     * The parsed form of {@link #castableWhen}, filled on first use so a cast does not reparse its spelled conditions.
+     * Not part of the JSON (Gson ignores the absence of a setter-free field).
+     */
+    @lombok.Setter
+    private transient List<com.laosun.aluminium.trigger.TriggerTable.Condition> castableConditions;
+
+    /**
      * {@code share = parameter[main or other] x (points held)}, both read at the cast's level.
      */
     @Getter

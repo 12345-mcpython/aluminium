@@ -633,7 +633,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 「**施放后**，消耗全部【忆质】和生命值，并使「长夜」消失」在**规则侧** ✓（`characters/1413.json`，`ATTACK_FINISHED` + `from_skill_id == 7`）：`SPEND_RESOURCE spendAll` ✓ ＋ `CONSUME_HP percent 1.0`（op 内部**下限 1 点** ✓）＋ `DISMISS_SUMMON` ✓。⚠ 挂 `ATTACK_FINISHED` 而不是 `CAST_SETUP`：伤害要按**这一发开始时**的点数算 ✓，先清零就会打出 0 ✗。
 
-⚠ **未实现的门**：「【忆质】≥ #3（16）才可施放」✗ —— 引擎没有「可施放谓词」；点数不足时按当时点数结算（0 ⇒ 0 伤害），不冒充 ✓。
+✅ **门已落地**（2026-10-29）：「【忆质】≥ #3（16）才可施放」用 `skill_effects.json` 的新字段 **`castable_when`**（拼法与规则的 `when` 完全一致 ✓），由 `SkillCastability` 在**两个施放入口**（`CastService.useSkill` / `Battle.castImmediate`）把关 ✓ —— 不足时**拒绝施放**（消耗为零 ✓），不再按当时点数结算 ✗。主语是**召唤者的**计数器（忆灵的门读 1413 的【忆质】✓，与 `Summon.damageBase` 同一主体 ✓）。
 
 【已把守：`EvernightDreamDumpTest`（50 点 ⇒ 主/其他 `3.0`/`1.5` ✓；0 点 ⇒ 0 ✓；施放后忆质清空、**又被她自己的天赋退回 2 点**（同一条「消耗生命值」触发 ✓）、她降到 **1 点生命**且**没有倒下** ✓、长夜**离场** ✓）、`BattleReplayTest`（**13/13** 可驱动 ✓）】
 
