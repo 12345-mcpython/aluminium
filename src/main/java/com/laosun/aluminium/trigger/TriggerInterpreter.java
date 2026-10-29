@@ -2142,12 +2142,26 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * The whole steps a {@code "<counter>:<step>"} spelling has reached, for the {@code steps} number provider.
+     *
+     * <p>Same reader as {@code per_steps} ({@link CounterSteps#wholeSteps}), so a rule that repeats an effect per
+     * milestone and one that states the count as a provider agree by construction.
+     *
+     * @param written the spelling ({@code "<counter>:<step>"})
+     * @param ctx     the firing context
+     * @return {@code floor(value / step)}
+     */
+    static int stepsOfCounter(String written, TriggerContext ctx) {
+        return parseCounterSteps(written, "steps provider").wholeSteps(ctx);
+    /**
      * One parsed {@code "<counter>:<step>"} specification: which counter is read, and how wide one step is.
      *
      * <p>Three spellings share this shape and therefore this parser - the {@code steps:} scale ("every N points of a
      * counter", as a magnitude), {@code per_steps} (the same count, as a repeat count) and {@code SPEND_STEPS}'s
      * {@code steps} (the same count, consumed). One string, one meaning.
      */
+    }
+
     private record CounterSteps(String counter, double step) {
 
         /**
