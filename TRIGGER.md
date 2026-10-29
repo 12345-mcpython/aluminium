@@ -201,23 +201,26 @@
 
 ## 5. 效果（`do` 里的一项）
 
-### 5.1 引擎能执行的操作（**51 个**，`TriggerOperator` 里 `wired = true`）
+### 5.1 引擎能执行的操作（**52 个**，`TriggerOperator` 里 `wired = true`）
 
 ```
 ABSORB_DAMAGE          ADD_DAMAGE             ADD_ELEMENTAL_WEAKNESS ADD_STACK
 ADVANCE                APPLY_BUFF             APPLY_CONTROL          APPLY_DOT
 APPLY_REGEN            BOOST_DAMAGE           BOOST_TOUGHNESS        CAST_SKILL
 COMMAND_SUMMON         CONSUME_HP             DAMAGE                 DELEGATE_DAMAGE
-DISPEL                 EXTEND_BUFF            EXTRA_TURN             GAIN_ENERGY
-GAIN_RESOURCE          GAIN_SKILL_POINT       HEAL                   INSERT_ACTION
-MODIFY_ATTR            MODIFY_DAMAGE_TAKEN    MODIFY_RULE            RAISE_ENERGY_TO
-RAISE_RESOURCE_CAP     RAISE_SKILL_HITS       RAISE_SKILL_LEVEL      RAISE_SKILL_POINT_CAP
-REGISTER_HEAL_BONUS    REMOVE_BUFF            REMOVE_RESOURCE        REMOVE_STACK
-REMOVE_STATE           REPLACE_SKILL          RESET_RESOURCE_CAP     RESET_RULE_CHANCE
-RESET_TRIGGER_LIMIT    RESIST_DEBUFF          SHIELD                 SPEND_RESOURCE
-SPEND_STEPS            START_COUNTDOWN        SUMMON                 SUMMON_SERVANT
-SUPER_BREAK            TAUNT                  TICK_DOT
+DISMISS_SUMMON         DISPEL                 EXTEND_BUFF            EXTRA_TURN
+GAIN_ENERGY            GAIN_RESOURCE          GAIN_SKILL_POINT       HEAL
+INSERT_ACTION          MODIFY_ATTR            MODIFY_DAMAGE_TAKEN    MODIFY_RULE
+RAISE_ENERGY_TO        RAISE_RESOURCE_CAP     RAISE_SKILL_HITS       RAISE_SKILL_LEVEL
+RAISE_SKILL_POINT_CAP  REGISTER_HEAL_BONUS    REMOVE_BUFF            REMOVE_RESOURCE
+REMOVE_STACK           REMOVE_STATE           REPLACE_SKILL          RESET_RESOURCE_CAP
+RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF          SHIELD
+SPEND_RESOURCE         SPEND_STEPS            START_COUNTDOWN        SUMMON
+SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 ```
+
+⚠ **`DISMISS_SUMMON`** 是「忆灵**离场**，不是死亡」的那一半 ✓（读者：11413 忆灵技2「迷梦，流失，如露」的「并使「长夜」消失」✓）。
+它走 `perish()`，随后 `SUMMON_LEFT` 照常公告 ✓ —— 不另开一条移除路径 ✓；目标不是召唤物时**报错**而不是静默 ✓。
 
 ⚠ **只有 `REDUCE_TOUGHNESS` 是"声明了但还没实现"** ✓ —— 写它会**在加载期**报错并说明原因 ✓
 
