@@ -292,10 +292,14 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `negate` / `abs` | `input` | 相反数 / 绝对值 |
 | `attr` | `attribute`（+ `whose` / `above`）| 单位的属性（= `self_attr:` ✓；`whose: target` 读事件目标 ✓；`above` 只算超出部分，= `self_attr_above:` ✓）|
 | `stacks` | `buff`（+ `whose`）| 层数（= `self_stacks:` / `target_stacks:` ✓）|
+| `original_damage` | — | **触发这一发本身**的伤害（= `scale: original_damage` ✓，真伤不做系数折算 ✓）|
+| `settled_damage_this_event` | — | **本次触发已结算的总伤害**（= `scale: settled_damage_this_event` ✓）|
+| `elation_base` | — | 欢愉体系的基础值（= `scale: elation_base` ✓）|
+| `cast_applied` | `state` | **本次施放实际施加了该状态的次数**（= `scale: cast_applied:<状态>` ✓）|
 | `uniform` | `min` + `max` | 区间内均匀随机（**用战斗自己的 RNG** ✓ ⇒ 同种子可复现 ✓，`max` 开区间）|
 | `weighted_list` | `distribution: [{weight, value}]` | 按权重随机（权重是**相对**的 ✓、`0` 权重的项**永远不中** ✓ —— 用作"兜底"）|
 
-⚠ **装载期就拒绝**：`type` 不在上表 ✓、`const` 缺 `value` ✓、`skill_param` 缺 `skill` ✓、`*_param` 缺 `index` ✓、`summon_param` 缺 `slot` ✓、`add` 族缺 `inputs` ✓、`sub`/`div` 缺操作数 ✓、`attr` 缺 `attribute` ✓、`stacks` 缺 `buff` ✓、`uniform` 缺 `min`/`max` ✓、`weighted_list` 没有正权重 ✓，以及与对应字段拼法同时写 ✓。
+⚠ **装载期就拒绝**：`type` 不在上表 ✓、`const` 缺 `value` ✓、`skill_param` 缺 `skill` ✓、`*_param` 缺 `index` ✓、`summon_param` 缺 `slot` ✓、`add` 族缺 `inputs` ✓、`sub`/`div` 缺操作数 ✓、`attr` 缺 `attribute` ✓、`stacks` 缺 `buff` ✓、`uniform` 缺 `min`/`max` ✓、`weighted_list` 没有正权重 ✓、`cast_applied` 缺 `state` ✓，以及与对应字段拼法同时写 ✓。
 ⚠ **provider 不做分支** ✗ —— `conditional` 一类**故意没有** ✓：要不要执行是**条件**（`when`）的事 ✓，一个数字里再分一套执行模型是第二条路 ✓。
 
 | 字段 | 读的是 | 哪些 op 读 |

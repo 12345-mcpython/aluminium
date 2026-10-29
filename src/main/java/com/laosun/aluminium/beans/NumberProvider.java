@@ -97,6 +97,10 @@ public final class NumberProvider {
     @SerializedName("buff")
     private String buff;
 
+    /** {@code cast_applied}: the state's name, as the documents spell it ({@code 冻结}). */
+    @SerializedName("state")
+    private String state;
+
     /** {@code uniform}: the interval's low end (inclusive). */
     @SerializedName("min")
     private NumberProvider min;

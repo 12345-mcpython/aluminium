@@ -102,25 +102,10 @@ final class TriggerMagnitudes {
                         "a DAMAGE scaled by \"" + TriggerInterpreter.SETTLED_DAMAGE_THIS_EVENT + "\" needs the battle whose firing it is "
                                 + "summing, and this rule was evaluated without one");
             }
-            return ctx.battle().settledDamageThisEvent() * share + flat;
+            return settledDamageOf(ctx) * share + flat;
         }
         if ("original_damage".equals(scale)) {
-            if (ctx == null || ctx.damage() == null) {
-                throw new IllegalStateException(
-                        "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
-                                + "evaluated without one (it must hang on DAMAGE_SETTLED)");
-            }
-            // Note: The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
-            // correction at all: true damage (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
-            // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured: a 24% rider landed as
-            // 44% -- .43 where 42.01 was due). 1415 Cyrene (昔涟)'s zone rider is the reader.
-            if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
-                return ctx.amount() * share + flat;
-            }
-            double factor = ctx.damage().getSkillBaseValue() == 0
-                    ? 1.0
-                    : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
-            return ctx.amount() / factor * share + flat;
+            return originalDamageOf(effect, ctx) * share + flat;
         }
         // ? The state-holder's own attribute (`holder_attr:<STATE>:<ATTRIBUTE>`, 1503's "该次欢愉伤害使用【美学底本】的属性值计算").
         // Routed to `derivedMagnitude` rather than copied here: that reader is where the share/flat arithmetic for a
@@ -1067,5 +1052,45 @@ final class TriggerMagnitudes {
                     + ", which is outside that skill parameter row (size=" + values.size() + ")");
         }
         return values.get(index);
+    }
+
+    /**
+     * The <b>instance that triggered this event</b>, before the zones: what {@code scale: "original_damage"} reads.
+     *
+     * <p>Extracted so the scale and the {@code original_damage} number provider share one reader - a second copy is
+     * where the true-damage correction below would drift from the provider's.
+     */
+    static double originalDamageOf(EffectSpec effect, TriggerContext ctx) {
+        if (ctx == null || ctx.damage() == null) {
+            throw new IllegalStateException(
+                    "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
+                            + "evaluated without one (it must hang on DAMAGE_SETTLED)");
+        }
+        // Note: The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
+        // correction at all: true damage (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
+        // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured: a 24% rider landed as
+        // 44% -- .43 where 42.01 was due). 1415 Cyrene (昔涟)'s zone rider is the reader.
+        if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
+            return ctx.amount();
+        }
+        double factor = ctx.damage().getSkillBaseValue() == 0
+                ? 1.0
+                : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
+        return ctx.amount() / factor;
+    }
+
+    /**
+     * The <b>sum settled so far by the firing in progress</b>: what {@code scale: "settled_damage_this_event"} reads.
+     *
+     * <p>Only the battle holds it (a group action settles one instance per victim, so no single event carries the
+     * total), which is why this reader takes nothing but the context.
+     */
+    static double settledDamageOf(TriggerContext ctx) {
+        if (ctx == null || ctx.battle() == null) {
+            throw new IllegalStateException(
+                    "a DAMAGE scaled by \"" + TriggerInterpreter.SETTLED_DAMAGE_THIS_EVENT + "\" needs the battle whose firing it is "
+                            + "summing, and this rule was evaluated without one");
+        }
+        return ctx.battle().settledDamageThisEvent();
     }
 }
