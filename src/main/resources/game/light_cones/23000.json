@@ -4,13 +4,7 @@
       "on": "BREAK",
       "id": "cone23000_damage_up_on_break",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.3,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.3, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
       "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
@@ -18,9 +12,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23000_attack_per_enemy",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -42,13 +34,7 @@
       "on": "BREAK",
       "id": "cone23000_damage_up_on_break",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.35,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.35, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
       "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
@@ -56,9 +42,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23000_attack_per_enemy",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -80,13 +64,7 @@
       "on": "BREAK",
       "id": "cone23000_damage_up_on_break",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.4,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.4, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
       "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
@@ -94,9 +72,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23000_attack_per_enemy",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -118,13 +94,7 @@
       "on": "BREAK",
       "id": "cone23000_damage_up_on_break",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.45,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.45, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
       "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
@@ -132,9 +102,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23000_attack_per_enemy",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -156,13 +124,7 @@
       "on": "BREAK",
       "id": "cone23000_damage_up_on_break",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.5,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.5, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
       "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
@@ -170,9 +132,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23000_attack_per_enemy",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",

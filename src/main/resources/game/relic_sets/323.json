@@ -2,13 +2,9 @@
   "2": [
     {
       "on": "SUMMONED",
-      "on_any": [
-        "BATTLE_START"
-      ],
+      "on_any": ["BATTLE_START"],
       "id": "relic323_allies_speed_with_memosprite",
-      "when": [
-        "self_summon_count >= 1"
-      ],
+      "when": ["self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",

@@ -3,18 +3,9 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23014_eclipse_on_teammate_hit",
-      "when": [
-        "target is_ally"
-      ],
+      "when": ["target is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友受到攻击后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -22,18 +13,9 @@
     {
       "on": "HP_CONSUMED",
       "id": "cone23014_eclipse_on_teammate_cost",
-      "when": [
-        "actor is_ally"
-      ],
+      "when": ["actor is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友…消耗生命值后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -41,10 +23,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -62,10 +41,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_full_ignore",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 3"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 3"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -82,16 +58,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23014_eclipse_spent",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "月蚀",
-          "amount": 3,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "月蚀", "amount": 3, "target": "self" }
       ],
       "source": "光锥 23014: 「该效果在装备者施放攻击后解除。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -101,18 +70,9 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23014_eclipse_on_teammate_hit",
-      "when": [
-        "target is_ally"
-      ],
+      "when": ["target is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友受到攻击后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -120,18 +80,9 @@
     {
       "on": "HP_CONSUMED",
       "id": "cone23014_eclipse_on_teammate_cost",
-      "when": [
-        "actor is_ally"
-      ],
+      "when": ["actor is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友…消耗生命值后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -139,10 +90,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -160,10 +108,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_full_ignore",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 3"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 3"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -180,16 +125,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23014_eclipse_spent",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "月蚀",
-          "amount": 3,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "月蚀", "amount": 3, "target": "self" }
       ],
       "source": "光锥 23014: 「该效果在装备者施放攻击后解除。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -199,18 +137,9 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23014_eclipse_on_teammate_hit",
-      "when": [
-        "target is_ally"
-      ],
+      "when": ["target is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友受到攻击后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -218,18 +147,9 @@
     {
       "on": "HP_CONSUMED",
       "id": "cone23014_eclipse_on_teammate_cost",
-      "when": [
-        "actor is_ally"
-      ],
+      "when": ["actor is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友…消耗生命值后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -237,10 +157,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -258,10 +175,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_full_ignore",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 3"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 3"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -278,16 +192,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23014_eclipse_spent",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "月蚀",
-          "amount": 3,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "月蚀", "amount": 3, "target": "self" }
       ],
       "source": "光锥 23014: 「该效果在装备者施放攻击后解除。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -297,18 +204,9 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23014_eclipse_on_teammate_hit",
-      "when": [
-        "target is_ally"
-      ],
+      "when": ["target is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友受到攻击后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -316,18 +214,9 @@
     {
       "on": "HP_CONSUMED",
       "id": "cone23014_eclipse_on_teammate_cost",
-      "when": [
-        "actor is_ally"
-      ],
+      "when": ["actor is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友…消耗生命值后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -335,10 +224,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -356,10 +242,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_full_ignore",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 3"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 3"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -376,16 +259,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23014_eclipse_spent",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "月蚀",
-          "amount": 3,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "月蚀", "amount": 3, "target": "self" }
       ],
       "source": "光锥 23014: 「该效果在装备者施放攻击后解除。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -395,18 +271,9 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23014_eclipse_on_teammate_hit",
-      "when": [
-        "target is_ally"
-      ],
+      "when": ["target is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友受到攻击后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -414,18 +281,9 @@
     {
       "on": "HP_CONSUMED",
       "id": "cone23014_eclipse_on_teammate_cost",
-      "when": [
-        "actor is_ally"
-      ],
+      "when": ["actor is_ally"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "月蚀",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "月蚀", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23014: 「当队友…消耗生命值后，装备者获得1层【月蚀】。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"
@@ -433,10 +291,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -454,10 +309,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23014_eclipse_full_ignore",
-      "when": [
-        "actor == self",
-        "self_stacks:月蚀 >= 3"
-      ],
+      "when": ["actor == self", "self_stacks:月蚀 >= 3"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -474,16 +326,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23014_eclipse_spent",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "月蚀",
-          "amount": 3,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "月蚀", "amount": 3, "target": "self" }
       ],
       "source": "光锥 23014: 「该效果在装备者施放攻击后解除。」",
       "note": "⭐ **现成词汇** ✓：「当**队友**受到攻击或消耗生命值后」= **`TAKING_HIT`** ✓ + **`HP_CONSUMED`** ✓（两个事件都已有 ✓）+ **`is_ally`** ✓（受害者是我方 ✓）⇒ `ADD_STACK 月蚀 max 3` ✓；「**每层**使装备者**下一次攻击**造成的伤容提高#3[f1]%」= `DEALING_DAMAGE` + `self_stacks:月蚀 >= 1` ✓ ⇒ 实例 `ALL_DAMAGE_TYPE_BOOST` + **`per_stack: self_stacks:`** ✓；「**叠满 3 层**时额外使该次攻击**无视 12% 防御**」= 同一事件 + `self_stacks:月蚀 >= 3` ✓ ⇒ 实例 `DEFENCE_IGNORE` ✓；「该效果在装备者**施放攻击后解除**」= `ALLY_ATTACK` + `actor == self` ⇒ `REMOVE_STACK` ✓。"

@@ -4,14 +4,7 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "焚灼",
-          "base_chance": 1,
-          "turns": 2,
-          "target": "target",
-          "max_stacks": 2
-        },
+        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.18,
@@ -31,14 +24,7 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "焚灼",
-          "base_chance": 1,
-          "turns": 2,
-          "target": "target",
-          "max_stacks": 2
-        },
+        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.21,
@@ -58,14 +44,7 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "焚灼",
-          "base_chance": 1,
-          "turns": 2,
-          "target": "target",
-          "max_stacks": 2
-        },
+        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.24,
@@ -85,14 +64,7 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "焚灼",
-          "base_chance": 1,
-          "turns": 2,
-          "target": "target",
-          "max_stacks": 2
-        },
+        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.27,
@@ -112,14 +84,7 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "焚灼",
-          "base_chance": 1,
-          "turns": 2,
-          "target": "target",
-          "max_stacks": 2
-        },
+        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.3,

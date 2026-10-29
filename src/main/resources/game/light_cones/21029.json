@@ -3,18 +3,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
-      "when": [
-        "actor == self",
-        "from_category NORMAL"
-      ],
+      "when": ["actor == self", "from_category NORMAL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.48,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.48, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -22,18 +14,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.48,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.48, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -43,18 +27,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
-      "when": [
-        "actor == self",
-        "from_category NORMAL"
-      ],
+      "when": ["actor == self", "from_category NORMAL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.6,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.6, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -62,18 +38,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.6,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.6, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -83,18 +51,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
-      "when": [
-        "actor == self",
-        "from_category NORMAL"
-      ],
+      "when": ["actor == self", "from_category NORMAL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.72,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.72, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -102,18 +62,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.72,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.72, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -123,18 +75,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
-      "when": [
-        "actor == self",
-        "from_category NORMAL"
-      ],
+      "when": ["actor == self", "from_category NORMAL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.84,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.84, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -142,18 +86,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.84,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.84, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -163,18 +99,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
-      "when": [
-        "actor == self",
-        "from_category NORMAL"
-      ],
+      "when": ["actor == self", "from_category NORMAL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.96,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.96, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
@@ -182,18 +110,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "per_attack": 1,
       "do": [
-        {
-          "op": "ADD_DAMAGE",
-          "percent": 0.96,
-          "scale": "self_attr:ATTACK",
-          "target": "random_hit_enemy"
-        }
+        { "op": "ADD_DAMAGE", "percent": 0.96, "scale": "self_attr:ATTACK", "target": "random_hit_enemy" }
       ],
       "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
       "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"

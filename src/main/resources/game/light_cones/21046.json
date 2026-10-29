@@ -10,9 +10,7 @@
           "percent": 0.16,
           "permanent": true,
           "target": "all_allies",
-          "target_when": [
-            "shares_path_with_an_ally"
-          ]
+          "target_when": ["shares_path_with_an_ally"]
         }
       ],
       "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
@@ -30,9 +28,7 @@
           "percent": 0.2,
           "permanent": true,
           "target": "all_allies",
-          "target_when": [
-            "shares_path_with_an_ally"
-          ]
+          "target_when": ["shares_path_with_an_ally"]
         }
       ],
       "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
@@ -50,9 +46,7 @@
           "percent": 0.24,
           "permanent": true,
           "target": "all_allies",
-          "target_when": [
-            "shares_path_with_an_ally"
-          ]
+          "target_when": ["shares_path_with_an_ally"]
         }
       ],
       "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
@@ -70,9 +64,7 @@
           "percent": 0.28,
           "permanent": true,
           "target": "all_allies",
-          "target_when": [
-            "shares_path_with_an_ally"
-          ]
+          "target_when": ["shares_path_with_an_ally"]
         }
       ],
       "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",
@@ -90,9 +82,7 @@
           "percent": 0.32,
           "permanent": true,
           "target": "all_allies",
-          "target_when": [
-            "shares_path_with_an_ally"
-          ]
+          "target_when": ["shares_path_with_an_ally"]
         }
       ],
       "source": "光锥 21046: 「进入战斗时，若有**两名及以上我方角色拥有任意相同命途**，使**这些角色**的暴击伤容提高#2[i]%。」",

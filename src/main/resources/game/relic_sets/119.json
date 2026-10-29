@@ -3,10 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "relic119_4_break_ignores_defence",
-      "when": [
-        "actor == self",
-        "self_attr:BREAKING_EFFECT >= 1.5"
-      ],
+      "when": ["actor == self", "self_attr:BREAKING_EFFECT >= 1.5"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -25,10 +22,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "relic119_4_super_break_ignores_more_defence",
-      "when": [
-        "actor == self",
-        "self_attr:BREAKING_EFFECT >= 2.5"
-      ],
+      "when": ["actor == self", "self_attr:BREAKING_EFFECT >= 2.5"],
       "do": [
         {
           "op": "MODIFY_ATTR",

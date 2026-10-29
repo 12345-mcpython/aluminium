@@ -3,17 +3,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone23058_elation_cast_damage_taken",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.15,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.15, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
       "note": "「施放欢愉技时，使**敌方全体**受到的伤害提高 15%，持续 2 回合，同类不叠加」—— `CAST_SETUP` ＋ `from_category ElationDamage` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓（15/… ✓）。暴击伤害 +60% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：两句**没有** ✗ —— ① 「能量恢复效率提高 #4%」；② 「**能量上限 > 120** 时，每超出 10 点额外使能量恢复效率提高 #6%，**最多计入 360 点**超出」。引擎能读 `self_max_energy` ✓，但「按上限超出量分段」的份额要与固定份额**相加** ✗（两条同属性修饰会互相替换 ✗）⇒ 等价缺口，登记 ✓。"
@@ -23,17 +15,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone23058_elation_cast_damage_taken",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.1875,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.1875, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
       "note": "「施放欢愉技时，使**敌方全体**受到的伤害提高 15%，持续 2 回合，同类不叠加」—— `CAST_SETUP` ＋ `from_category ElationDamage` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓（15/… ✓）。暴击伤害 +60% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：两句**没有** ✗ —— ① 「能量恢复效率提高 #4%」；② 「**能量上限 > 120** 时，每超出 10 点额外使能量恢复效率提高 #6%，**最多计入 360 点**超出」。引擎能读 `self_max_energy` ✓，但「按上限超出量分段」的份额要与固定份额**相加** ✗（两条同属性修饰会互相替换 ✗）⇒ 等价缺口，登记 ✓。"
@@ -43,17 +27,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone23058_elation_cast_damage_taken",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.225,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.225, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
       "note": "「施放欢愉技时，使**敌方全体**受到的伤害提高 15%，持续 2 回合，同类不叠加」—— `CAST_SETUP` ＋ `from_category ElationDamage` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓（15/… ✓）。暴击伤害 +60% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：两句**没有** ✗ —— ① 「能量恢复效率提高 #4%」；② 「**能量上限 > 120** 时，每超出 10 点额外使能量恢复效率提高 #6%，**最多计入 360 点**超出」。引擎能读 `self_max_energy` ✓，但「按上限超出量分段」的份额要与固定份额**相加** ✗（两条同属性修饰会互相替换 ✗）⇒ 等价缺口，登记 ✓。"
@@ -63,17 +39,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone23058_elation_cast_damage_taken",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.2625,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.2625, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
       "note": "「施放欢愉技时，使**敌方全体**受到的伤害提高 15%，持续 2 回合，同类不叠加」—— `CAST_SETUP` ＋ `from_category ElationDamage` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓（15/… ✓）。暴击伤害 +60% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：两句**没有** ✗ —— ① 「能量恢复效率提高 #4%」；② 「**能量上限 > 120** 时，每超出 10 点额外使能量恢复效率提高 #6%，**最多计入 360 点**超出」。引擎能读 `self_max_energy` ✓，但「按上限超出量分段」的份额要与固定份额**相加** ✗（两条同属性修饰会互相替换 ✗）⇒ 等价缺口，登记 ✓。"
@@ -83,17 +51,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone23058_elation_cast_damage_taken",
-      "when": [
-        "actor == self",
-        "from_category ElationDamage"
-      ],
+      "when": ["actor == self", "from_category ElationDamage"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.3,
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.3, "turns": 2, "target": "all_enemies" }
       ],
       "source": "光锥 23058: 「装备者施放欢愉技时，使敌方全体受到的伤容提高#2[f1]%，持续#3[i]回合，同类效果无法叠加。」",
       "note": "「施放欢愉技时，使**敌方全体**受到的伤害提高 15%，持续 2 回合，同类不叠加」—— `CAST_SETUP` ＋ `from_category ElationDamage` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓（15/… ✓）。暴击伤害 +60% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：两句**没有** ✗ —— ① 「能量恢复效率提高 #4%」；② 「**能量上限 > 120** 时，每超出 10 点额外使能量恢复效率提高 #6%，**最多计入 360 点**超出」。引擎能读 `self_max_energy` ✓，但「按上限超出量分段」的份额要与固定份额**相加** ✗（两条同属性修饰会互相替换 ✗）⇒ 等价缺口，登记 ✓。"

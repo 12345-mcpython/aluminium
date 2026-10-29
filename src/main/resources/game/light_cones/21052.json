@@ -3,10 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_wearer_while_summoned",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -23,9 +20,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_summon_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -44,10 +39,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_wearer_while_summoned",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -64,9 +56,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_summon_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -85,10 +75,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_wearer_while_summoned",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -105,9 +92,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_summon_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -126,10 +111,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_wearer_while_summoned",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -146,9 +128,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_summon_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -167,10 +147,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_wearer_while_summoned",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -187,9 +164,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21052_summon_damage",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
         {
           "op": "MODIFY_ATTR",

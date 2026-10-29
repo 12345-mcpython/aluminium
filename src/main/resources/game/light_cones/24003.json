@@ -3,18 +3,9 @@
     {
       "on": "CAST_SETUP",
       "id": "cone24003_ult_dot",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DOT_DAMAGE_BOOST",
-          "percent": 0.24,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "DOT_DAMAGE_BOOST", "percent": 0.24, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤容提高#2[i]%，持续#3[i]回合。」",
       "note": "「当装备者施放终结技时，使装备者造成的**持续伤害**提高 **24%**，持续 2 回合」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `MODIFY_ATTR DOT_DAMAGE_BOOST{turns: 2}` ✓；「击破特攻提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的数**：原先写 **0.48** ✗（那是叠影 5 的值）⇒ 本档应为 **0.24** ✓。\n⛔ **仍开（已登记 §4.3）**：「**陷入装备者施加的持续伤害**的敌方目标被消灭时，装备者恢复 4 点能量」**整句没有** ✗ —— 需要「击杀时检查目标身上是不是**她**的 DoT」✗（`target_dot_count` 数得到 ✓，但问不了「是谁的」✗）⇒ 等价缺口。"

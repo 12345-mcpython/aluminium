@@ -4,11 +4,7 @@
       "on": "BATTLE_START",
       "id": "cone23033_energy_at_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 30,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 30, "target": "self" }
       ],
       "source": "光锥 23033: 「进入战斗时立即恢复#2[f1]点能量。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -16,24 +12,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23033_mine_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "雷遁", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23033: 「装备者施放终结技后获得【雷遁】…装备者施放终结技后会**重置**【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。⭐⚠ **状态改成计数器** ✓：`APPLY_BUFF` + `permanent` **无法被移除** ✗（`REMOVE_BUFF` 只能移除**临时的正向增益** ✗）⇒ 用 `ADD_STACK` / `REMOVE_STACK` 同名计数器 ✓，发放时真的能清掉 ✓（实测 ✓）。"
@@ -41,20 +23,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_basic_count",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 < 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "普攻计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "普攻计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -62,29 +33,11 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_mine_pays_out",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 >= 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 >= 2"],
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.5,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "ADVANCE", "percent": 0.5, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "雷遁", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -95,11 +48,7 @@
       "on": "BATTLE_START",
       "id": "cone23033_energy_at_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 32.5,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 32.5, "target": "self" }
       ],
       "source": "光锥 23033: 「进入战斗时立即恢复#2[f1]点能量。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -107,24 +56,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23033_mine_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "雷遁", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23033: 「装备者施放终结技后获得【雷遁】…装备者施放终结技后会**重置**【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。⭐⚠ **状态改成计数器** ✓：`APPLY_BUFF` + `permanent` **无法被移除** ✗（`REMOVE_BUFF` 只能移除**临时的正向增益** ✗）⇒ 用 `ADD_STACK` / `REMOVE_STACK` 同名计数器 ✓，发放时真的能清掉 ✓（实测 ✓）。"
@@ -132,20 +67,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_basic_count",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 < 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "普攻计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "普攻计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -153,29 +77,11 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_mine_pays_out",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 >= 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 >= 2"],
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.55,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "ADVANCE", "percent": 0.55, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "雷遁", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -186,11 +92,7 @@
       "on": "BATTLE_START",
       "id": "cone23033_energy_at_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 35,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 35, "target": "self" }
       ],
       "source": "光锥 23033: 「进入战斗时立即恢复#2[f1]点能量。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -198,24 +100,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23033_mine_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "雷遁", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23033: 「装备者施放终结技后获得【雷遁】…装备者施放终结技后会**重置**【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。⭐⚠ **状态改成计数器** ✓：`APPLY_BUFF` + `permanent` **无法被移除** ✗（`REMOVE_BUFF` 只能移除**临时的正向增益** ✗）⇒ 用 `ADD_STACK` / `REMOVE_STACK` 同名计数器 ✓，发放时真的能清掉 ✓（实测 ✓）。"
@@ -223,20 +111,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_basic_count",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 < 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "普攻计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "普攻计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -244,29 +121,11 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_mine_pays_out",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 >= 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 >= 2"],
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.6,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "ADVANCE", "percent": 0.6, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "雷遁", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -277,11 +136,7 @@
       "on": "BATTLE_START",
       "id": "cone23033_energy_at_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 37.5,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 37.5, "target": "self" }
       ],
       "source": "光锥 23033: 「进入战斗时立即恢复#2[f1]点能量。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -289,24 +144,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23033_mine_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "雷遁", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23033: 「装备者施放终结技后获得【雷遁】…装备者施放终结技后会**重置**【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。⭐⚠ **状态改成计数器** ✓：`APPLY_BUFF` + `permanent` **无法被移除** ✗（`REMOVE_BUFF` 只能移除**临时的正向增益** ✗）⇒ 用 `ADD_STACK` / `REMOVE_STACK` 同名计数器 ✓，发放时真的能清掉 ✓（实测 ✓）。"
@@ -314,20 +155,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_basic_count",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 < 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "普攻计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "普攻计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -335,29 +165,11 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_mine_pays_out",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 >= 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 >= 2"],
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.65,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "ADVANCE", "percent": 0.65, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "雷遁", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -368,11 +180,7 @@
       "on": "BATTLE_START",
       "id": "cone23033_energy_at_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 40,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 40, "target": "self" }
       ],
       "source": "光锥 23033: 「进入战斗时立即恢复#2[f1]点能量。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -380,24 +188,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23033_mine_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "雷遁", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23033: 「装备者施放终结技后获得【雷遁】…装备者施放终结技后会**重置**【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。⭐⚠ **状态改成计数器** ✓：`APPLY_BUFF` + `permanent` **无法被移除** ✗（`REMOVE_BUFF` 只能移除**临时的正向增益** ✗）⇒ 用 `ADD_STACK` / `REMOVE_STACK` 同名计数器 ✓，发放时真的能清掉 ✓（实测 ✓）。"
@@ -405,20 +199,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_basic_count",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 < 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "普攻计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "普攻计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"
@@ -426,29 +209,11 @@
     {
       "on": "ALLY_ATTACK",
       "id": "cone23033_mine_pays_out",
-      "when": [
-        "actor == self",
-        "from_category Normal",
-        "self_stacks:普攻计数 >= 2"
-      ],
+      "when": ["actor == self", "from_category Normal", "self_stacks:普攻计数 >= 2"],
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.7,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "普攻计数",
-          "amount": 2,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "雷遁",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "ADVANCE", "percent": 0.7, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "普攻计数", "amount": 2, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "雷遁", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23033: 「…施放2次普攻后，装备者行动提前#3[i]%，并移除【雷遁】。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `breaking_effect` ✓ ⇒ 击破特攻那句**未重写** ✗。⭐ 两句：① `BATTLE_START` ⇒ `GAIN_ENERGY amount 30` ✓；② `ULT_CAST` ⇒ 获得【雷遁】**并重置计数** ✓；③ `ALLY_ATTACK` + `from_category Normal` + **`self_stacks:普攻计数 < 2`** ⇒ +1 ✓；④ 同事件 + `>= 2` ⇒ `ADVANCE 50%` + 移除【雷遁】 ✓—— 与 23057 / 23064 / 23021 同一套\"先加满、再按满值判断\"的写法 ✓（纪律 184 ✓）。"

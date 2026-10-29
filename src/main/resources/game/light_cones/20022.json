@@ -3,26 +3,10 @@
     {
       "on": "TURN_START",
       "id": "cone20022_memorial_on_memosprite_turn",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "summon"
-        },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "summon" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -38,22 +22,10 @@
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
-      "when": [
-        "actor is_summon"
-      ],
+      "when": ["actor is_summon"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "summon"
-        }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
       "note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
@@ -63,26 +35,10 @@
     {
       "on": "TURN_START",
       "id": "cone20022_memorial_on_memosprite_turn",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "summon"
-        },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "summon" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -98,22 +54,10 @@
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
-      "when": [
-        "actor is_summon"
-      ],
+      "when": ["actor is_summon"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "summon"
-        }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
       "note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
@@ -123,26 +67,10 @@
     {
       "on": "TURN_START",
       "id": "cone20022_memorial_on_memosprite_turn",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "summon"
-        },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "summon" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -158,22 +86,10 @@
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
-      "when": [
-        "actor is_summon"
-      ],
+      "when": ["actor is_summon"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "summon"
-        }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
       "note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
@@ -183,26 +99,10 @@
     {
       "on": "TURN_START",
       "id": "cone20022_memorial_on_memosprite_turn",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "summon"
-        },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "summon" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -218,22 +118,10 @@
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
-      "when": [
-        "actor is_summon"
-      ],
+      "when": ["actor is_summon"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "summon"
-        }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
       "note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
@@ -243,26 +131,10 @@
     {
       "on": "TURN_START",
       "id": "cone20022_memorial_on_memosprite_turn",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "ADD_STACK",
-          "buff": "缅怀",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "summon"
-        },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "缅怀", "amount": 1, "max_stacks": 4, "permanent": true, "target": "summon" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -278,22 +150,10 @@
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
-      "when": [
-        "actor is_summon"
-      ],
+      "when": ["actor is_summon"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "self"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "缅怀",
-          "amount": 4,
-          "target": "summon"
-        }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
       "note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"

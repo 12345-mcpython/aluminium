@@ -3,18 +3,9 @@
     {
       "on": "SKILL_CAST",
       "id": "relic133_skill_raises_the_targets_elation",
-      "when": [
-        "actor == self",
-        "target is_other_ally"
-      ],
+      "when": ["actor == self", "target is_other_ally"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ELATION_DAMAGE_BOOST",
-          "percent": 0.16,
-          "turns": 3,
-          "target": "target"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "percent": 0.16, "turns": 3, "target": "target" }
       ],
       "source": "遗器 133 戏梦点星的伶人 4 件套 (Ability51331): 「当装备者对我方其他单体目标施放战技或终结技时，使技能目标的欢愉度提高 #1[i]%，持续 #2[i] 回合，若装备者持有的好活当赏大于等于 #3[i] 点，则额外使我方全体目标的暴击伤害提高 #4[i]%，持续 #5[i] 回合。」 param = [0.16, 3, 10, 0.12, 3]",
       "note": "「使**技能目标**的欢愉度提高 #1(16)%，持续 #2(3) 回合」—— ① 事件两种：句子点名**战技或终结技** ⇒ 两条规则（`SKILL_CAST` / `ULT_CAST`）✓（一条规则只挂一个事件 ✓）。② 目标限定用 `target is_other_ally` ✓= 「我方**其他**单体目标」✓（不含自己 ✓）。③ 「欢愉度」= `ELATION_DAMAGE_BOOST` ✓（1503 的行迹用同一属性 ✓），份额 0.16 = #1 ✓、`turns: 3` = #2 ✓、`target: target` ✓（技能目标 ✓）。"
@@ -22,18 +13,9 @@
     {
       "on": "ULT_CAST",
       "id": "relic133_ult_raises_the_targets_elation",
-      "when": [
-        "actor == self",
-        "target is_other_ally"
-      ],
+      "when": ["actor == self", "target is_other_ally"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ELATION_DAMAGE_BOOST",
-          "percent": 0.16,
-          "turns": 3,
-          "target": "target"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "percent": 0.16, "turns": 3, "target": "target" }
       ],
       "source": "遗器 133 戏梦点星的伶人 4 件套 (Ability51331): 「当装备者对我方其他单体目标施放战技或终结技时，使技能目标的欢愉度提高 #1[i]%，持续 #2[i] 回合，若装备者持有的好活当赏大于等于 #3[i] 点，则额外使我方全体目标的暴击伤害提高 #4[i]%，持续 #5[i] 回合。」 param = [0.16, 3, 10, 0.12, 3]",
       "note": "「使**技能目标**的欢愉度提高 #1(16)%，持续 #2(3) 回合」—— ① 事件两种：句子点名**战技或终结技** ⇒ 两条规则（`SKILL_CAST` / `ULT_CAST`）✓（一条规则只挂一个事件 ✓）。② 目标限定用 `target is_other_ally` ✓= 「我方**其他**单体目标」✓（不含自己 ✓）。③ 「欢愉度」= `ELATION_DAMAGE_BOOST` ✓（1503 的行迹用同一属性 ✓），份额 0.16 = #1 ✓、`turns: 3` = #2 ✓、`target: target` ✓（技能目标 ✓）。"
@@ -41,18 +23,9 @@
     {
       "on": "SKILL_CAST",
       "id": "relic133_skill_raises_party_crit_damage_at_ten_banger",
-      "when": [
-        "actor == self",
-        "self_resource:好活当赏 >= 10"
-      ],
+      "when": ["actor == self", "self_resource:好活当赏 >= 10"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.12,
-          "turns": 3,
-          "target": "all_allies"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "turns": 3, "target": "all_allies" }
       ],
       "source": "遗器 133 戏梦点星的伶人 4 件套 (Ability51331): 「当装备者对我方其他单体目标施放战技或终结技时，使技能目标的欢愉度提高 #1[i]%，持续 #2[i] 回合，若装备者持有的好活当赏大于等于 #3[i] 点，则额外使我方全体目标的暴击伤害提高 #4[i]%，持续 #5[i] 回合。」 param = [0.16, 3, 10, 0.12, 3]",
       "note": "「若装备者持有的**好活当赏** ≥ #3(10) 点，则**额外**使**我方全体**目标的暴击伤害提高 #4(12)%，持续 #5(3) 回合」—— ① 条件 `self_resource:好活当赏 >= 10` ✓（与 1503 自己规则里同一个拼法 ✓）。② 「暴击伤害」= `CRIT_ATTACK` ✓（份额型 ⇒ 0.12 是 **+12 个百分点** ✓）。③ 「我方全体」= `target: all_allies` ✓。④ 它是**额外**的一段 ⇒ 与上面那条**分开** ✓（同一个事件两条规则 ✓，条件不同就不能合并 ✓）。"
@@ -60,18 +33,9 @@
     {
       "on": "ULT_CAST",
       "id": "relic133_ult_raises_party_crit_damage_at_ten_banger",
-      "when": [
-        "actor == self",
-        "self_resource:好活当赏 >= 10"
-      ],
+      "when": ["actor == self", "self_resource:好活当赏 >= 10"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.12,
-          "turns": 3,
-          "target": "all_allies"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "turns": 3, "target": "all_allies" }
       ],
       "source": "遗器 133 戏梦点星的伶人 4 件套 (Ability51331): 「当装备者对我方其他单体目标施放战技或终结技时，使技能目标的欢愉度提高 #1[i]%，持续 #2[i] 回合，若装备者持有的好活当赏大于等于 #3[i] 点，则额外使我方全体目标的暴击伤害提高 #4[i]%，持续 #5[i] 回合。」 param = [0.16, 3, 10, 0.12, 3]",
       "note": "「若装备者持有的**好活当赏** ≥ #3(10) 点，则**额外**使**我方全体**目标的暴击伤害提高 #4(12)%，持续 #5(3) 回合」—— ① 条件 `self_resource:好活当赏 >= 10` ✓（与 1503 自己规则里同一个拼法 ✓）。② 「暴击伤害」= `CRIT_ATTACK` ✓（份额型 ⇒ 0.12 是 **+12 个百分点** ✓）。③ 「我方全体」= `target: all_allies` ✓。④ 它是**额外**的一段 ⇒ 与上面那条**分开** ✓（同一个事件两条规则 ✓，条件不同就不能合并 ✓）。"

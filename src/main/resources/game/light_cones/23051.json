@@ -3,30 +3,11 @@
     {
       "on": "CAST_SETUP",
       "id": "cone23051_ult_heal",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
-        {
-          "op": "HEAL",
-          "amountFromAttr": "ATTACK",
-          "amountPercent": 0.1,
-          "target": "all_allies"
-        },
-        {
-          "op": "HEAL",
-          "amountFromAttr": "ATTACK",
-          "amountPercent": 0.1,
-          "target": "lowest_hp_ally"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.24,
-          "turns": 3,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.1, "target": "all_allies" },
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.1, "target": "lowest_hp_ally" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.24, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23051：「装备者施放终结技时，为我方全体回复等同于装备者攻击力#5[i]%的生命值，额外为当前生命值最低的角色回复等同于装备者攻击力#6[i]%的生命值，并使我方全体获得【卫戍】，【卫戍】持续#4[i]回合。获得【卫戍】的目标，造成的伤容提高#2[i]%。」",
       "note": "「终结技时为我方全体回复等同于**装备者攻击力 10%** 的生命，**额外**为生命最低的角色回复 10%，并使我方全体获得【卫戍】3 回合：造成的伤害 +24%，**若目标拥有召唤物**再 +12%」—— 两条 `HEAL{amountFromAttr: ATTACK, amountPercent: 10/12.5/15/17.5/20%}`（`all_allies` ＋ `lowest_hp_ally` ✓）＋ `MODIFY_ATTR{percent: 24/30/36/42/48%, turns: 3, target: all_allies}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 两条治疗的份额原先都写 **0.2** ✗（应各是 #5 = 10% ✓）；② 卫戍那条原先写 **0.48** ✗（那是叠影 5 的 #2，本档应为 24% ✓）；③「**有召唤物**再 +12%」**整块没有** ✗ （需要「目标有召唤物」的 per-target 条件 ✗ ⇒ 登记）。\n⛔ **仍开（已登记 §4.3）**：卫戍的「**若目标拥有召唤物**则伤害额外 +12%」✗。"

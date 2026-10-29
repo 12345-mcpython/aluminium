@@ -3,18 +3,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21061_vulnerability",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "chance": 1.0,
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.1,
-          "turns": 2,
-          "base_chance": 1.0,
-          "target": "target"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.1, "turns": 2, "base_chance": 1.0, "target": "target" }
       ],
       "source": "光锥 21061：「装备者攻击后，有#2[i]%基础概率使受到攻击的目标陷入**易伤**状态，受到的伤容提高#3[i]%，持续#4[i]回合。同类效果无法叠加。」",
       "note": "「装备者**攻击后**，有 #2% **基础概率**使受到攻击的目标陷入**易伤**状态，受到的伤害提高 #3%，持续 #4 回合。**同类效果无法叠加**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_DAMAGE_TAKEN{percent: 10/11.5/13/14.5/16%, turns: 2, base_chance: 1.0, target: target}` ✓（叠影 1 的基础概率就是 **100%** ✓）；「同类不叠加」= 同一修饰身份会替换（默认 ✓，同一回合再打只是刷新 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① **删掉 `cone21061_damage_up`** ✗ —— 「造成的伤害提高 #1%」**就是光锥自己的** `all_damage_type_boost` 属性（16/20/24/28/32% ✓），而那条规则写的是 **0.32** ⇒ 会读成 +48% ✗✗；② 易伤份额从 **0.16 改成各档的 10/11.5/13/14.5/16%** ✓（原文件五档都写 0.16 ✗）；③ 补 **`base_chance: 1.0`** ✓。"

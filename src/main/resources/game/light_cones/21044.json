@@ -3,10 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_defence_down",
-      "when": [
-        "actor == self",
-        "target_debuff:DEFENCE"
-      ],
+      "when": ["actor == self", "target_debuff:DEFENCE"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -23,10 +20,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_slowed",
-      "when": [
-        "actor == self",
-        "target_debuff:SPEED"
-      ],
+      "when": ["actor == self", "target_debuff:SPEED"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -45,10 +39,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_defence_down",
-      "when": [
-        "actor == self",
-        "target_debuff:DEFENCE"
-      ],
+      "when": ["actor == self", "target_debuff:DEFENCE"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -65,10 +56,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_slowed",
-      "when": [
-        "actor == self",
-        "target_debuff:SPEED"
-      ],
+      "when": ["actor == self", "target_debuff:SPEED"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -87,10 +75,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_defence_down",
-      "when": [
-        "actor == self",
-        "target_debuff:DEFENCE"
-      ],
+      "when": ["actor == self", "target_debuff:DEFENCE"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -107,10 +92,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_slowed",
-      "when": [
-        "actor == self",
-        "target_debuff:SPEED"
-      ],
+      "when": ["actor == self", "target_debuff:SPEED"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -129,10 +111,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_defence_down",
-      "when": [
-        "actor == self",
-        "target_debuff:DEFENCE"
-      ],
+      "when": ["actor == self", "target_debuff:DEFENCE"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -149,10 +128,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_slowed",
-      "when": [
-        "actor == self",
-        "target_debuff:SPEED"
-      ],
+      "when": ["actor == self", "target_debuff:SPEED"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -171,10 +147,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_defence_down",
-      "when": [
-        "actor == self",
-        "target_debuff:DEFENCE"
-      ],
+      "when": ["actor == self", "target_debuff:DEFENCE"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -191,10 +164,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21044_crit_vs_slowed",
-      "when": [
-        "actor == self",
-        "target_debuff:SPEED"
-      ],
+      "when": ["actor == self", "target_debuff:SPEED"],
       "do": [
         {
           "op": "MODIFY_ATTR",

@@ -3,20 +3,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_count",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "终结计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "终结计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23003: 「…该效果**每施放 2 次终结技可触发 1 次**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。"
@@ -24,22 +13,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_pays_out",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "终结计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "终结计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23003: 「并在**对我方目标施放终结技时恢复 1 个战技点**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。"
@@ -47,17 +24,9 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23003_next_ally_boost",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.3,
-          "turns": 1,
-          "target": "next_ally"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.3, "turns": 1, "target": "next_ally" }
       ],
       "source": "光锥 23003 但战斗还未结束: 「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #2%，持续 #3 回合。」",
       "note": "「当装备者施放战技后，使**下一个行动的我方其他目标**造成的伤害提高 #2%，持续 1 回合」—— `SKILL_CAST` ＋ `actor == self` ＋ `target: next_ally` ✓ ＋ `turns: 1` ✓（30/35/40/45/50% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技计数那一半** ✗，这一句**整块没有** ✗。\n⛔ `next_ally` 目标选择器**尚未配判据**（21025 同形，实测两边都读到 0 ✗）⇒ 状态表记「形状已有、行为未测」✓。"
@@ -67,20 +36,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_count",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "终结计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "终结计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23003: 「…该效果**每施放 2 次终结技可触发 1 次**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。"
@@ -88,22 +46,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_pays_out",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "终结计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "终结计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23003: 「并在**对我方目标施放终结技时恢复 1 个战技点**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。"
@@ -111,17 +57,9 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23003_next_ally_boost",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.35,
-          "turns": 1,
-          "target": "next_ally"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.35, "turns": 1, "target": "next_ally" }
       ],
       "source": "光锥 23003 但战斗还未结束: 「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #2%，持续 #3 回合。」",
       "note": "「当装备者施放战技后，使**下一个行动的我方其他目标**造成的伤害提高 #2%，持续 1 回合」—— `SKILL_CAST` ＋ `actor == self` ＋ `target: next_ally` ✓ ＋ `turns: 1` ✓（30/35/40/45/50% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技计数那一半** ✗，这一句**整块没有** ✗。\n⛔ `next_ally` 目标选择器**尚未配判据**（21025 同形，实测两边都读到 0 ✗）⇒ 状态表记「形状已有、行为未测」✓。"
@@ -131,20 +69,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_count",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "终结计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "终结计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23003: 「…该效果**每施放 2 次终结技可触发 1 次**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。"
@@ -152,22 +79,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_pays_out",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "终结计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "终结计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23003: 「并在**对我方目标施放终结技时恢复 1 个战技点**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。"
@@ -175,17 +90,9 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23003_next_ally_boost",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.4,
-          "turns": 1,
-          "target": "next_ally"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.4, "turns": 1, "target": "next_ally" }
       ],
       "source": "光锥 23003 但战斗还未结束: 「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #2%，持续 #3 回合。」",
       "note": "「当装备者施放战技后，使**下一个行动的我方其他目标**造成的伤害提高 #2%，持续 1 回合」—— `SKILL_CAST` ＋ `actor == self` ＋ `target: next_ally` ✓ ＋ `turns: 1` ✓（30/35/40/45/50% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技计数那一半** ✗，这一句**整块没有** ✗。\n⛔ `next_ally` 目标选择器**尚未配判据**（21025 同形，实测两边都读到 0 ✗）⇒ 状态表记「形状已有、行为未测」✓。"
@@ -195,20 +102,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_count",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "终结计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "终结计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23003: 「…该效果**每施放 2 次终结技可触发 1 次**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。"
@@ -216,22 +112,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_pays_out",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "终结计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "终结计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23003: 「并在**对我方目标施放终结技时恢复 1 个战技点**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。"
@@ -239,17 +123,9 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23003_next_ally_boost",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.45,
-          "turns": 1,
-          "target": "next_ally"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.45, "turns": 1, "target": "next_ally" }
       ],
       "source": "光锥 23003 但战斗还未结束: 「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #2%，持续 #3 回合。」",
       "note": "「当装备者施放战技后，使**下一个行动的我方其他目标**造成的伤害提高 #2%，持续 1 回合」—— `SKILL_CAST` ＋ `actor == self` ＋ `target: next_ally` ✓ ＋ `turns: 1` ✓（30/35/40/45/50% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技计数那一半** ✗，这一句**整块没有** ✗。\n⛔ `next_ally` 目标选择器**尚未配判据**（21025 同形，实测两边都读到 0 ✗）⇒ 状态表记「形状已有、行为未测」✓。"
@@ -259,20 +135,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_count",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 < 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 < 2"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "终结计数",
-          "amount": 1,
-          "max_stacks": 2,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "终结计数", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23003: 「…该效果**每施放 2 次终结技可触发 1 次**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。⭐⭐ **阈值放在 2** ✓：实测发现规则是**按顺序求值**的 ✓ —— 计数规则先加层 ✓，紧接着发放规则的条件就为真了 ✗ （实测：每次都发 ✗）⇒ 把阈值放到 **2** ✓，同一趟求值因此无害 ✓。"
@@ -280,22 +145,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23003_ult_pays_out",
-      "when": [
-        "actor == self",
-        "target is_ally",
-        "self_stacks:终结计数 >= 2"
-      ],
+      "when": ["actor == self", "target is_ally", "self_stacks:终结计数 >= 2"],
       "do": [
-        {
-          "op": "GAIN_SKILL_POINT",
-          "amount": 1
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "终结计数",
-          "amount": 2,
-          "target": "self"
-        }
+        { "op": "GAIN_SKILL_POINT", "amount": 1 },
+        { "op": "REMOVE_STACK", "buff": "终结计数", "amount": 2, "target": "self" }
       ],
       "source": "光锥 23003: 「并在**对我方目标施放终结技时恢复 1 个战技点**。」",
       "note": "⭐ **计数器对，零引擎改动** ✓：「对**我方目标**施放终结技时」= `ULT_CAST` + `actor == self` ✓ + **`target is_ally`** ✓（施放类事件会把**被指定的目标**传下来 ✓）；「每施放 **2** 次终结技可触发 1 次」= **先加满、再按满值判断**（纪律 184 ✓）：第一次只记数 ✓，第二次发 1 点并清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。⭐ 与计数规则同一个阈值（**2** ✓），发放后清零 ✓。"
@@ -303,17 +156,9 @@
     {
       "on": "SKILL_CAST",
       "id": "cone23003_next_ally_boost",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.5,
-          "turns": 1,
-          "target": "next_ally"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.5, "turns": 1, "target": "next_ally" }
       ],
       "source": "光锥 23003 但战斗还未结束: 「当装备者施放战技后，使下一个行动的我方其他目标造成的伤害提高 #2%，持续 #3 回合。」",
       "note": "「当装备者施放战技后，使**下一个行动的我方其他目标**造成的伤害提高 #2%，持续 1 回合」—— `SKILL_CAST` ＋ `actor == self` ＋ `target: next_ally` ✓ ＋ `turns: 1` ✓（30/35/40/45/50% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技计数那一半** ✗，这一句**整块没有** ✗。\n⛔ `next_ally` 目标选择器**尚未配判据**（21025 同形，实测两边都读到 0 ✗）⇒ 状态表记「形状已有、行为未测」✓。"

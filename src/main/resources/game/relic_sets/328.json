@@ -2,10 +2,7 @@
   "2": [
     {
       "on": "BATTLE_START",
-      "when": [
-        "self_max_energy >= 200",
-        "self_max_energy < 360"
-      ],
+      "when": ["self_max_energy >= 200", "self_max_energy < 360"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -21,16 +18,9 @@
     },
     {
       "on": "BATTLE_START",
-      "when": [
-        "self_max_energy >= 360"
-      ],
+      "when": ["self_max_energy >= 360"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.32,
-          "permanent": true
-        }
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.32, "permanent": true }
       ],
       "source": "relic set 328 (生命的翁法罗斯 / Amphoreus, the Eternal Land), 2-piece: 「…每超过1点使装备者造成的伤害提高#2[f1]%，最多提高#3[i]%。」 param = [200, 0.0019999999, 0.32] → the cap is 0.32",
       "note": "The capped tier: a flat 32%. ⚠ 360 is arithmetic, not a number from the document: `0.002 x (x - 200) >= 0.32` ⟺ `x >= 360`, so the cap starts to bite exactly there and the two rules are disjoint. ⚠ That is the documented technique for two-tier thresholds (engine.md 4.6: the lower tier carries the upper bound) rather than two overlapping rules -- which would grant a 400-energy wearer both 0.4 and 0.32, and since the engine's same-kind rule REPLACES rather than adds, which one won would depend on rule order."

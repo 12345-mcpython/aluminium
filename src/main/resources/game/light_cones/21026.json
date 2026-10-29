@@ -3,16 +3,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_burning",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.16,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.16, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -20,17 +13,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_wounded",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤",
-        "!target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 裂伤", "!target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.16,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.16, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -40,16 +25,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_burning",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.2,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.2, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -57,17 +35,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_wounded",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤",
-        "!target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 裂伤", "!target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.2,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.2, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -77,16 +47,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_burning",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.24,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.24, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -94,17 +57,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_wounded",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤",
-        "!target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 裂伤", "!target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.24,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.24, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -114,16 +69,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_burning",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.28,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.28, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -131,17 +79,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_wounded",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤",
-        "!target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 裂伤", "!target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.28,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.28, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -151,16 +91,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_burning",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.32,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.32, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（灼烧分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"
@@ -168,17 +101,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21026_boost_vs_wounded",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤",
-        "!target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 裂伤", "!target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.32,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.32, "target": "self" }
       ],
       "source": "光锥 21026 汪！散步时间！（裂伤分支）: 使装备者的攻击力提高#1[i]%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` ✓（16/20/24/28/32% ✓）。两条规则按「灼烧**优先**、否则裂伤」分工 ✓（`!target has_state 灼烧` 保证只加一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21026_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022 ✓）。"

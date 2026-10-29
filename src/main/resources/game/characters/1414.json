@@ -3,21 +3,10 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_bondmate_and_shield",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "同袍",
-          "target": "all_allies"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "同袍",
-          "turns": 3,
-          "target": "target"
-        },
+        { "op": "REMOVE_STATE", "buff": "同袍", "target": "all_allies" },
+        { "op": "APPLY_BUFF", "buff": "同袍", "turns": 3, "target": "target" },
         {
           "op": "SHIELD",
           "scale": "owner_attack",
@@ -33,9 +22,7 @@
     {
       "on": "SKILL_CAST",
       "id": "trace_empyreanity_buffs_the_bondmate",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -52,9 +39,7 @@
     {
       "on": "ULT_CAST",
       "id": "ult_party_shield",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "SHIELD",
@@ -71,16 +56,9 @@
     {
       "on": "BATTLE_START",
       "id": "technique_grants_bondmate",
-      "when": [
-        "self has_state 秘技"
-      ],
+      "when": ["self has_state 秘技"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "同袍",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "APPLY_BUFF", "buff": "同袍", "permanent": true, "target": "self" }
       ],
       "source": "1414 丹恒•腾荒 秘技 地坼 (141407, Maze): 「使用秘技后获得【同袍】并使一定区域内的敌人陷入10秒的晕眩状态…切换行动角色时【同袍】转移至当前行动角色。」",
       "note": "「**使用秘技后获得【同袍】**」—— ① 门用 `self has_state 秘技` ✓（引擎在 `startBattle` 之前把\"用过秘技\"落成一个具名状态 ✓，见 `Battle.applyTechniqueStates` ✓）；② 状态用 `APPLY_BUFF 同袍` ✓ + **`permanent: true`** ✓ —— 文档只给了一个\"什么时候失去它\"（下一次战技把它移走 / 切换角色 ✓），没有回合数 ✓ ⇒ 这里不编回合 ✓，摘除交给战技那条的 `REMOVE_STATE` ✓（顺序即语义 ✓）。⚠ **登记**：① 「使一定区域内的敌人陷入 **10 秒**晕眩」✗（**10 秒**是地图上的时长 ✗，战斗里没有\"秒\"这个刻度 ✓，而\"晕眩状态下敌人不会主动攻击\"是秘技的**地图**效果 ✓）；② 「切换行动角色时【同袍】**转移至当前行动角色**」✗（引擎没有\"切换行动角色\"这件事 ✓ ⇒ 同袍在开战时就停在**使用者自己**身上 ✓；⚠ 这正是下一轮那条\"对持有【同袍】的角色施放\"的**瞄准**所要的输入 ✓）。⚠ 本条的**唯一读者**是 `holder_of:同袍` 这个新选择器 ✓（外加下面那条葳蕤的后半句 ✓）—— 没有它，那两条规则会瞄到\"名单第一个\"，而文档说的是\"持有者\" ✗。"
@@ -89,11 +67,7 @@
       "on": "BATTLE_START",
       "id": "trace_sylvanity_advances_him",
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.4,
-          "target": "self"
-        }
+        { "op": "ADVANCE", "percent": 0.4, "target": "self" }
       ],
       "source": "1414 丹恒•腾荒 行迹 葳蕤 (1414102, skill_traces.json param [0.4, 6, 0.15]): 「战斗开始时，丹恒•腾荒行动提前40%。…」",
       "note": "「**战斗开始时**，丹恒•腾荒**行动提前 40%**」—— ① `BATTLE_START` ✓（入场即结算 ✓，与 1210 桂乃芬那条\"战斗开始时行动提前 25%\"同形同源 ✓）；② `ADVANCE percent: 0.4` ✓（`#1` = 0.4 ✓；按 1101/1210 的先例，「行动提前 X%」⇒ `percent: X/100` ✓，跳的是**剩余等待**的 40% ✓）；③ 目标是**他自己** ✓。⚠ **登记**：同一条行迹的后半「【同袍】施放攻击时，丹恒•腾荒恢复 **6** 点能量，使【龙灵】**行动提前 15%**」—— 回能那半已出货（下一条 ✓），**龙灵**那半 ✗（召唤物未写，见 `level_convention` 的登记 ✓）。"
@@ -101,15 +75,9 @@
     {
       "on": "ALLY_ATTACK",
       "id": "trace_sylvanity_energy_when_the_bondmate_attacks",
-      "when": [
-        "actor has_state 同袍"
-      ],
+      "when": ["actor has_state 同袍"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 6,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 6, "target": "self" }
       ],
       "source": "1414 丹恒•腾荒 行迹 葳蕤 (1414102) 后半: 「【同袍】施放攻击时，丹恒•腾荒恢复6点能量…」",
       "note": "「**【同袍】施放攻击时**，丹恒•腾荒恢复 **6 点能量**」—— ① 事件 `ALLY_ATTACK` ✓（我方任一次攻击 ✓，带 `actor` = 攻击者 ✓）；② 条件 `actor has_state 同袍` ✓ —— ⚠ **这里问的是 `actor`（这次攻击的发动者）**，不是 `self` ✗：句子的主语是\"【同袍】\" ✓；③ 受益者是**他自己** ✓（`target: self` ✓）；④ 数值 `#2` = **6** ✓（`skill_traces.json` 的 param ✓）。⚠ 本条与 1309 知更鸟那类\"队友攻击后回能\"同形 ✓，区别只在于门是**具名状态**而不是\"别的队友\" ✓（同袍可以是自己吗？文档的\"施放攻击时\"没有排除他自己 ✓ ⇒ 不加 `actor != self` ✗ 以免多写一个文档没说的限制 ✓）。"
@@ -118,26 +86,10 @@
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
       ],
       "source": "1414 丹恒•腾荒 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技/终结技 20% 攻击力+400 护盾、天赋 龙灵 10% 攻击力+200 护盾）",
       "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **【龙灵】**召唤物（战斗开始时为【同袍】**召唤**龙灵 ✓、`SPEED` **165** ✓ 文档给了 ✓、它行动时**解除我方全体 1 个负面效果** ✓ 可用 `DISPEL` ✓、并给 **10.00% 攻击力 + 200** 的护盾 ✓、「**丹恒•腾荒和龙灵的护盾量可以叠加，最高不超过战技护盾量的 300%**」✗（叠加上限 ✗）、「丹恒•腾荒或【同袍】陷入无法战斗状态时龙灵消失」✗（召唤物随主人/同袍死亡消失 ✗））—— 整块**未写** ✗：`SUMMON` 需要 `resources/memosprites/1414.json` ✓（1402/1413 有先例 ✓），但**龙灵的面板只给了速度** ✗ （攻击/防御/生命上限都没有 ✗），而且\"行动时\"的时机与忆灵自己的技能都还没接线 ✓ ⇒ 待数据齐备再写 ✓；② 行迹 神秀「施放战技时使【同袍】攻击力提高，数值等同于丹恒•腾荒 **15% 攻击力**」✓ 形状可写 ✓（`MODIFY_ATTR` + `scale self_attr:ATTACK` ✓）—— 但\"给**最新同袍**\"需要那个不变量 ✗ ⇒ 一并登记 ✓；③ 行迹 葳蕤「战斗开始时自身**行动提前 40%**」✓ 可写（`ADVANCE` ✓）与「【同袍】施放攻击时，丹恒•腾荒恢复 6 点能量、使【龙灵】行动提前 15%」✗（需要龙灵 ✓）；④ 行迹 峥嵘（龙灵行动时的额外护盾与附加伤害 ✗）；⑤ 秘技（【同袍】+ 入场自动施放 1 次战技且不消耗战技点 ✗）；⑥ 星魂未读 ✗。"
@@ -145,16 +97,9 @@
     {
       "on": "BATTLE_START",
       "id": "technique_autocasts_skill_on_the_bondmate",
-      "when": [
-        "self has_state 秘技"
-      ],
+      "when": ["self has_state 秘技"],
       "do": [
-        {
-          "op": "CAST_SKILL",
-          "skill": "SKILL",
-          "target": "self",
-          "cast_target": "holder_of:同袍"
-        }
+        { "op": "CAST_SKILL", "skill": "SKILL", "target": "self", "cast_target": "holder_of:同袍" }
       ],
       "source": "1414 丹恒•腾荒 秘技 地坼 (141407, Maze) 后半: 「…下一次战斗开始时自动对持有【同袍】的角色施放1次战技，此次战技不消耗战技点。」",
       "note": "「**下一次战斗开始时自动对持有【同袍】的角色施放 1 次战技**，此次战技**不消耗战技点**」—— ⚠ **这句话有两个角色，所以是两个字段** ✓（2026-10-02 新加 `cast_target` ✓）：**施放的是他** ✓（`target: self` ✓），**瞄准的是持有者** ✓（`cast_target: holder_of:同袍` ✓）—— 合成一个字段不行 ✗：战技自己那句是「使**指定我方单体**角色成为【同袍】」✓，**瞄准谁就决定同袍落到谁身上** ✓，而\"由持有者来施放\"是另一句话 ✓。② ⚠ **顺序有两处要求，本条因此排在文件最后** ✓：`technique_grants_bondmate` 必须先跑 ✓（否则解析\"持有者\"时没人持有 ⇒ **响亮报错** ✓，不会静默瞄空 ✓），`level_convention` 也必须先跑 ✓（否则读的是**Lv1 那一行**：护盾 `0.14×攻击力+100` 而不是文档的 `20%+400` ✗ —— 判据里把**这个数**钉住了 ✓）。③ `CAST_SKILL` 现在交付**非伤害技能** ✓（`skill.execute` 那条引擎自己的路 ✓ → `SkillExecutor.dispatchNonDamaging` ✓ → `skill_effects.json` 里 `1414` 的 `Defence` 定义 ✓）：**护盾给全体我方** ✓（由技能自己的定义决定 ✓），而【同袍】的**重新指定**由本文件那条 `SKILL_CAST` 规则顺手完成 ✓（指令施放会广播 `SKILL_CAST` ✓，它的 `target` 正是**这次施放瞄准的那个** ✓）⇒ 一次指令施放，两半都落地 ✓。④ 「**不消耗战技点**」是**免费**的 ✓：花技能点是**调用方**的事 ✓（判据里钉住 ✓）。⚠ **登记**：① 「**切换行动角色时【同袍】转移至当前行动角色**」✗（引擎没有\"切换行动角色\"✓ ⇒ 开战时它停在**使用者自己**身上 ✓，本条因此瞄到自己 ✓ —— 文档自己写着「使用秘技后**获得**【同袍】」✓）；② 「使一定区域内的敌人陷入 **10 秒**晕眩」✗（地图效果 +\"秒\"这个刻度 ✓）。"
@@ -162,18 +107,9 @@
     {
       "id": "memosprite_ode_of_earth_marks_dan_heng",
       "on": "CAST_SETUP",
-      "when": [
-        "target == self",
-        "actor is_summon",
-        "from_skill_id == 25"
-      ],
+      "when": ["target == self", "actor is_summon", "from_skill_id == 25"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "献予「大地」之诗",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "APPLY_BUFF", "buff": "献予「大地」之诗", "permanent": true, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 25 「献予「大地」之诗」（SkillID 1141525，`SkillCY13`，参数 `[0.12, 2, 3, 0.4, 1.5]`）：「**德谬歌施放忆灵技时，使丹恒•腾荒获得【献予「大地」之诗】**…」",
       "note": "⭐ 形状同已出货的天空之诗：**规则写在被指名角色自己的文件**里（`1414.json`），`when` 用 `target == self`。⭐ 而本条只落**“获得状态”这一句**：后面的【龙灵】与【同袍】各自缺词汇（已登记）。"
@@ -181,17 +117,9 @@
     {
       "id": "memosprite_ode_of_earth_advances_the_dragon_soul",
       "on": "CAST_SETUP",
-      "when": [
-        "target == self",
-        "actor is_summon",
-        "from_skill_id == 25"
-      ],
+      "when": ["target == self", "actor is_summon", "from_skill_id == 25"],
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 1.0,
-          "target": "all_summons"
-        }
+        { "op": "ADVANCE", "percent": 1.0, "target": "all_summons" }
       ],
       "source": "同上：「…并使**龙灵行动提前 100%**，…」",
       "note": "⭐ `ADVANCE{percent: 1.0}` 已出货的语义：**当前行动值的份额** ⇒ 1.0 就是“立即行动”。⚠ 目标用 `all_summons`（丹恒•腾荒在战斗中只有【龙灵】一个召唤物）—— 已登记：它是“所有召唤物”，不是“名字叫龙灵的那一个”。"
@@ -199,11 +127,7 @@
     {
       "id": "earth_ode_raises_the_bondmates_damage",
       "on": "CAST_SETUP",
-      "when": [
-        "target == self",
-        "actor is_summon",
-        "from_skill_id == 25"
-      ],
+      "when": ["target == self", "actor is_summon", "from_skill_id == 25"],
       "do": [
         {
           "op": "MODIFY_ATTR",

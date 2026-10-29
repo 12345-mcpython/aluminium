@@ -3,15 +3,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "loop_against_slowed",
-      "when": [
-        "actor == self",
-        "target is_slowed"
-      ],
+      "when": ["actor == self", "target is_slowed"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.24
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.24 }
       ],
       "source": "light cone 20011 (Loop), rank 1: 「使装备者对减速状态下的敌方目标造成的伤害提高24%」",
       "note": "⚠⚠ **`减速` 不是一个状态** ✗（2026-10-19 逐句核时的错法：本文件原写 `target has_state 减速` ✗）：引擎把「减速」建模成 **SPEED 上的负修饰** ✓，条件词表里的拼法是 **`is_slowed`** ✓（出货读者：1002 ✓，判据 `SlowedConditionTest` ✓）—— `has_state` 只认**真有那个状态**的 buff（1013 的冻结 / 1103 的触电 ✓），写 `has_state 减速` 匹配不到任何 buff ⇒ **整条规则永远不会触发** ✗（静默无效）。⇒ 改成 `target is_slowed` ✓。\n⭐ 形状沿用 20009 ✓（`DEALING_DAMAGE` ＋ 目标条件 ＋ `BOOST_DAMAGE` ✓），幅度取 `weapons.json` 第 1 档 ✓（24/30/36/42/48% ✓）。判据**两面都做** ✓：减速时增伤区 ×1.24 ✓、未减速时**恰好 1.00** ✓。"
@@ -21,15 +15,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "loop_against_slowed",
-      "when": [
-        "actor == self",
-        "target is_slowed"
-      ],
+      "when": ["actor == self", "target is_slowed"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.3
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.3 }
       ],
       "source": "light cone 20011 (Loop), rank 2: 「使装备者对减速状态下的敌方目标造成的伤害提高30%」",
       "note": "⚠⚠ **`减速` 不是一个状态** ✗（2026-10-19 逐句核时的错法：本文件原写 `target has_state 减速` ✗）：引擎把「减速」建模成 **SPEED 上的负修饰** ✓，条件词表里的拼法是 **`is_slowed`** ✓（出货读者：1002 ✓，判据 `SlowedConditionTest` ✓）—— `has_state` 只认**真有那个状态**的 buff（1013 的冻结 / 1103 的触电 ✓），写 `has_state 减速` 匹配不到任何 buff ⇒ **整条规则永远不会触发** ✗（静默无效）。⇒ 改成 `target is_slowed` ✓。\n⭐ 形状沿用 20009 ✓（`DEALING_DAMAGE` ＋ 目标条件 ＋ `BOOST_DAMAGE` ✓），幅度取 `weapons.json` 第 1 档 ✓（24/30/36/42/48% ✓）。判据**两面都做** ✓：减速时增伤区 ×1.24 ✓、未减速时**恰好 1.00** ✓。"
@@ -39,15 +27,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "loop_against_slowed",
-      "when": [
-        "actor == self",
-        "target is_slowed"
-      ],
+      "when": ["actor == self", "target is_slowed"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.36
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.36 }
       ],
       "source": "light cone 20011 (Loop), rank 3: 「使装备者对减速状态下的敌方目标造成的伤害提高36%」",
       "note": "⚠⚠ **`减速` 不是一个状态** ✗（2026-10-19 逐句核时的错法：本文件原写 `target has_state 减速` ✗）：引擎把「减速」建模成 **SPEED 上的负修饰** ✓，条件词表里的拼法是 **`is_slowed`** ✓（出货读者：1002 ✓，判据 `SlowedConditionTest` ✓）—— `has_state` 只认**真有那个状态**的 buff（1013 的冻结 / 1103 的触电 ✓），写 `has_state 减速` 匹配不到任何 buff ⇒ **整条规则永远不会触发** ✗（静默无效）。⇒ 改成 `target is_slowed` ✓。\n⭐ 形状沿用 20009 ✓（`DEALING_DAMAGE` ＋ 目标条件 ＋ `BOOST_DAMAGE` ✓），幅度取 `weapons.json` 第 1 档 ✓（24/30/36/42/48% ✓）。判据**两面都做** ✓：减速时增伤区 ×1.24 ✓、未减速时**恰好 1.00** ✓。"
@@ -57,15 +39,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "loop_against_slowed",
-      "when": [
-        "actor == self",
-        "target is_slowed"
-      ],
+      "when": ["actor == self", "target is_slowed"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.42
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.42 }
       ],
       "source": "light cone 20011 (Loop), rank 4: 「使装备者对减速状态下的敌方目标造成的伤害提高42%」",
       "note": "⚠⚠ **`减速` 不是一个状态** ✗（2026-10-19 逐句核时的错法：本文件原写 `target has_state 减速` ✗）：引擎把「减速」建模成 **SPEED 上的负修饰** ✓，条件词表里的拼法是 **`is_slowed`** ✓（出货读者：1002 ✓，判据 `SlowedConditionTest` ✓）—— `has_state` 只认**真有那个状态**的 buff（1013 的冻结 / 1103 的触电 ✓），写 `has_state 减速` 匹配不到任何 buff ⇒ **整条规则永远不会触发** ✗（静默无效）。⇒ 改成 `target is_slowed` ✓。\n⭐ 形状沿用 20009 ✓（`DEALING_DAMAGE` ＋ 目标条件 ＋ `BOOST_DAMAGE` ✓），幅度取 `weapons.json` 第 1 档 ✓（24/30/36/42/48% ✓）。判据**两面都做** ✓：减速时增伤区 ×1.24 ✓、未减速时**恰好 1.00** ✓。"
@@ -75,15 +51,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "loop_against_slowed",
-      "when": [
-        "actor == self",
-        "target is_slowed"
-      ],
+      "when": ["actor == self", "target is_slowed"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.48
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.48 }
       ],
       "source": "light cone 20011 (Loop), rank 5: 「使装备者对减速状态下的敌方目标造成的伤害提高48%」",
       "note": "⚠⚠ **`减速` 不是一个状态** ✗（2026-10-19 逐句核时的错法：本文件原写 `target has_state 减速` ✗）：引擎把「减速」建模成 **SPEED 上的负修饰** ✓，条件词表里的拼法是 **`is_slowed`** ✓（出货读者：1002 ✓，判据 `SlowedConditionTest` ✓）—— `has_state` 只认**真有那个状态**的 buff（1013 的冻结 / 1103 的触电 ✓），写 `has_state 减速` 匹配不到任何 buff ⇒ **整条规则永远不会触发** ✗（静默无效）。⇒ 改成 `target is_slowed` ✓。\n⭐ 形状沿用 20009 ✓（`DEALING_DAMAGE` ＋ 目标条件 ＋ `BOOST_DAMAGE` ✓），幅度取 `weapons.json` 第 1 档 ✓（24/30/36/42/48% ✓）。判据**两面都做** ✓：减速时增伤区 ×1.24 ✓、未减速时**恰好 1.00** ✓。"

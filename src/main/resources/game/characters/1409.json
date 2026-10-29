@@ -3,13 +3,9 @@
     {
       "on": "ULT_CAST",
       "id": "ult_summons_ica",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "SUMMON"
-        }
+        { "op": "SUMMON" }
       ],
       "source": "1409 风堇 终结技 飞入晨昏的我们 (141303): 「召唤忆灵小伊卡，为我方全体目标回复…为小伊卡回复…」",
       "note": "「**召唤忆灵小伊卡**」⇒ `SUMMON` ✓（无参数 ✓，面板在 `memosprites/1409.json` ✓）。⚠ 与战技那条同名不同事件 ✓：终结技也能召唤 ✓（文档明写 ✓）。"
@@ -17,10 +13,7 @@
     {
       "on": "ULT_CAST",
       "id": "ult_heals_party_and_ikachi",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
         {
           "op": "HEAL",
@@ -43,16 +36,9 @@
     {
       "on": "ULT_CAST",
       "id": "ult_state_and_max_hp",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "雨过天晴",
-          "turns": 3,
-          "target": "self"
-        },
+        { "op": "APPLY_BUFF", "buff": "雨过天晴", "turns": 3, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
@@ -70,24 +56,10 @@
       "on": "ULT_CAST",
       "id": "eidolon_one_raises_max_hp_while_rain_clear",
       "min_eidolon": 1,
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "雨过天晴",
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.5,
-          "max_stacks": 2,
-          "turns": 3,
-          "target": "all_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "雨过天晴", "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 0.5, "max_stacks": 2, "turns": 3, "target": "all_allies" }
       ],
       "source": "1409 风堇 星魂1（E:/code/blog/hsr/1409_风堇.md「星魂 1：呵护黑夜中的烛火」）：「风堇处于【雨过天晴】状态时，我方全体目标生命上限额外提高 50%」",
       "note": "⭐ 捕获的「83% + 667」= 0.33（140903 Lv12 的 #3，孪生规则）+ 0.50（**星魂1**，不是星魂2 —— 2026-10-18 按文档更正）+ 667.5（Lv12 的 #4）✓。两条 HEALTH% 都用 `max_stacks: 2` ⇒ 相加 ✓；固定项只在孪生规则里加一次 ✓。"
@@ -97,34 +69,11 @@
       "id": "eidolon_five_raises_skill_and_talent",
       "min_eidolon": 5,
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 2
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 2
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "memosprite": true,
-          "skill_id": 3,
-          "amount": 1
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "memosprite": true,
-          "skill_id": 5,
-          "amount": 1
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "memosprite": true,
-          "skill_id": 6,
-          "amount": 1
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "memosprite": true, "skill_id": 3, "amount": 1 },
+        { "op": "RAISE_SKILL_LEVEL", "memosprite": true, "skill_id": 5, "amount": 1 },
+        { "op": "RAISE_SKILL_LEVEL", "memosprite": true, "skill_id": 6, "amount": 1 }
       ],
       "source": "1409 风堇 星魂5（1409_风堇.md「星魂 5：红霞映入海的背面」）：「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级；忆灵天赋等级+1，最多不超过10级」",
       "note": "⭐ 与星魂3 同形；忆灵那三半按数据槽 3/5/6（小伊卡的辅助/增益技能）各 +1 ✓。⚠ 「忆灵**天赋**等级」按忆灵技能表的数据槽落。"
@@ -133,17 +82,9 @@
       "on": "ALLY_ATTACK",
       "id": "eidolon_one_heals_after_an_attack_while_rain_clear",
       "min_eidolon": 1,
-      "when": [
-        "self has_state 雨过天晴",
-        "actor is_ally"
-      ],
+      "when": ["self has_state 雨过天晴", "actor is_ally"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.08,
-          "target": "attacker"
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.08, "target": "attacker" }
       ],
       "source": "1409 风堇 星魂1（1409_风堇.md「星魂 1：呵护黑夜中的烛火」）：「风堇处于【雨过天晴】状态时…并且施放攻击后立即回复等同于风堇 8% 生命上限的生命值」",
       "note": "⭐ 「**施放攻击后**」= `ALLY_ATTACK`（任何我方攻击），回血对象是**攻击者**（`target: attacker`）✓；8% 取 `owner_max_hp`（风堇的生命上限，不是攻击者的）✓。"
@@ -153,13 +94,7 @@
       "id": "eidolon_two_speed_on_hp_loss",
       "min_eidolon": 2,
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.3,
-          "turns": 2,
-          "target": "target"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.3, "turns": 2, "target": "target" }
       ],
       "source": "1409 风堇 星魂2（1409_风堇.md「星魂 2：请来我的庭院坐坐」）：「我方目标生命值降低时，速度提高 30%，持续 2 回合」 param = [0.3, 2]",
       "note": "⭐ `HP_LOST` 的 `target` 就是掉血的那位 ✓；SPEED 的 30% 是**基础速度的 30%**（`percent`）✓。⚠ 登记：「我方目标」含忆灵 ✓（HP_LOST 双阵营都会发，忆灵掉血也吃）。"
@@ -169,22 +104,9 @@
       "id": "eidolon_three_raises_the_ult",
       "min_eidolon": 3,
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 2
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 1
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "memosprite": true,
-          "skill_id": 1,
-          "amount": 1
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 },
+        { "op": "RAISE_SKILL_LEVEL", "memosprite": true, "skill_id": 1, "amount": 1 }
       ],
       "source": "1409 风堇 星魂3（E:/code/blog/hsr/1409_风堇.md:366）：「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级；忆灵技等级+1，最多不超过10级」",
       "note": "⭐ 引擎的 `eidolonRank` 只开规则、**不抬技能等级** —— 本次用 `min_eidolon: 3` + `RAISE_SKILL_LEVEL` 补上；「忆灵技等级+1」用 `memosprite: true` + `skill_id: 1`（小伊卡的数据槽 1）✓。"
@@ -193,10 +115,7 @@
       "on": "SUMMONED",
       "id": "eidolon_six_gives_the_party_all_type_resistance_penetration",
       "min_eidolon": 6,
-      "when": [
-        "actor == summon",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == summon", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -213,9 +132,7 @@
     {
       "on": "SUMMONED",
       "id": "eidolon_six_aura_covers_later_arrivals",
-      "when": [
-        "self_summon_count >= 1"
-      ],
+      "when": ["self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -233,24 +150,10 @@
     {
       "on": "BATTLE_START",
       "id": "technique_heals_and_raises_max_hp",
-      "when": [
-        "self has_state 秘技"
-      ],
+      "when": ["self has_state 秘技"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.3,
-          "amount": 600,
-          "target": "all_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.2,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.3, "amount": 600, "target": "all_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 0.2, "turns": 2, "target": "all_allies" }
       ],
       "source": "1409 风堇 秘技【天气正好，万物可爱！】(140907, Maze/Restore): 「下一次战斗开始时，为我方全体回复等同于风堇 #1(30)% 生命上限 + #2(600) 的生命值并使生命上限提高 #3(20)%，持续 #4(2) 回合」 param = [0.3, 600, 0.2, 2]（单行，各等级一致）",
       "note": "⭐ 秘技在引擎里是「战前已使用」的标记（`Battle.markTechniqueUsed` ⇒ `self has_state 秘技`），所以挂 `BATTLE_START` + 该条件 ✓。数值取 140907 的唯一一行（0.3/600/0.2/2）✓；生命上限走 `MODIFY_ATTR HEALTH`（与雨过天晴同一条路径）✓，治疗走 `HEAL owner_max_hp` ✓。"
@@ -258,10 +161,7 @@
     {
       "on": "HEALED",
       "id": "talent_healing_raises_ikachis_damage",
-      "when": [
-        "actor is_ally",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor is_ally", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -280,16 +180,9 @@
     {
       "on": "HEALED",
       "id": "tally_counts_hyacines_own_healing",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "小伊卡累计治疗",
-          "amountFromEvent": true,
-          "target": "self"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "小伊卡累计治疗", "amountFromEvent": true, "target": "self" }
       ],
       "source": "1409 风堇 忆灵技1 乌云乌云快走开！（数据槽位 1）：「对敌方全体造成等同于**本场战斗风堇与小伊卡累计治疗数值** #1% 的风属性伤害…」—— 本条只做**计量**的那一半。",
       "note": "「**本场战斗风堇与小伊卡累计治疗数值**」= 这条资源 ✓ —— 它是忆灵技1 的**被乘数** ✓，而在此之前它只被 1415 昔涟那条「额外提高」写过 ✓（`sky_ode_adds_a_share_of_each_heal_to_ikachis_total`），**总治疗**从来没人记 ✗。① 事件 `HEALED` ✓（带**实际回复量** ✓）；② 门 `actor == self` ✓ = 治疗者是风堇 ✓（`HEALED` 的 `actor` 就是治疗者 ✓）；③ `amountFromEvent: true` ✓ = 把**这次回复的量**原样记进去 ✓（与 1415 那条同一个字段 ✓）；④ 目标 `self` ✓ —— 计量挂在**她**身上 ✓（忆灵技1 要读的就是它 ✓）。⚠ 与 1415 那条**不冲突、不是重复** ✓：那条记的是「**额外**提高」的那一份 ✓ ⇒ 两者相加才是「计入忆灵技1 的治疗数值」✓。⚠ 满血治疗**不发** `HEALED` ✓（引擎既有约定 ✓）⇒ 计量按“**实际**回复量”算 ✓，与游戏口径一致 ✓。⚠⚠ **精度**：`Resource` 是**整数**计数器 ✓ ⇒ 计量只保留**整点生命** ✓（实测：治了 `255.6229…`、读数是 `256` ✓）—— 误差 < 1 点治疗，落到忆灵技1 的伤害上是 < `0.28` 点 ✓（Lv10 的 `#1` ✓）；**登记**：若日后需要逐位对齐（例如与捕获的伤害数对账），改成**千分之一**存储即可（1415 的 `天空之诗的治疗份额` 用的就是 `percent: 10000` 那种换算 ✓），读取端把系数除以同一个数就行 ✓。"
@@ -297,16 +190,9 @@
     {
       "on": "HEALED",
       "id": "tally_counts_ikachis_healing_too",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "小伊卡累计治疗",
-          "amountFromEvent": true,
-          "target": "self"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "小伊卡累计治疗", "amountFromEvent": true, "target": "self" }
       ],
       "source": "1409 风堇 忆灵技1：「…**风堇与小伊卡**累计治疗数值…」—— 忆灵那一半",
       "note": "「风堇**与小伊卡**」—— 与上一条**同一条资源、同一个字段** ✓，只是门换成 `actor == summon` ✓（忆灵治疗时 `HEALED` 的 `actor` 是它 ✓，与天赋那条「风堇**或小伊卡**提供治疗时」同一个读法 ✓）。⚠ 与上一条**必须是两条规则** ✓：条件是 AND 的，而「她**或**忆灵」是 OR ✓ ⇒ 一个门写不了两句话 ✓。"
@@ -314,10 +200,7 @@
     {
       "on": "CAST_SETUP",
       "id": "memosprite_rainclouds_deals_a_share_of_the_tally",
-      "when": [
-        "actor == summon",
-        "from_skill_id == 1"
-      ],
+      "when": ["actor == summon", "from_skill_id == 1"],
       "do": [
         {
           "op": "DAMAGE",
@@ -335,18 +218,9 @@
       "on": "CAST_SETUP",
       "id": "memosprite_rainclouds_clears_half_the_tally",
       "max_eidolon": 5,
-      "when": [
-        "actor == summon",
-        "from_skill_id == 1"
-      ],
+      "when": ["actor == summon", "from_skill_id == 1"],
       "do": [
-        {
-          "op": "REMOVE_RESOURCE",
-          "resource": "小伊卡累计治疗",
-          "scale": "self_resource:小伊卡累计治疗",
-          "percent": 0.5,
-          "target": "self"
-        }
+        { "op": "REMOVE_RESOURCE", "resource": "小伊卡累计治疗", "scale": "self_resource:小伊卡累计治疗", "percent": 0.5, "target": "self" }
       ],
       "source": "1409 风堇 忆灵技1：「…并清空累计治疗数值的 50%」param = [0.1…0.28, 0.5]",
       "note": "「清空累计治疗数值的 **50%**」—— ① `REMOVE_RESOURCE` 按「能扣多少扣多少」**夹取** ✓；② 份额是新词汇 `scale: \"self_resource:小伊卡累计治疗\"` + `percent: 0.5` ✓（本轮给它开了 REMOVE_RESOURCE 的口子 ✓，§3.7r）；③ 必须排在伤害那条**之后** ✓（伤害读的是**扣之前**的计量 ✓）；④ `max_eidolon: 5` ✓ —— 星魂6 改成 12%，两条孪生各开一条 ✓。"
@@ -355,18 +229,9 @@
       "on": "CAST_SETUP",
       "id": "eidolon_six_clears_twelve_percent_instead",
       "min_eidolon": 6,
-      "when": [
-        "actor == summon",
-        "from_skill_id == 1"
-      ],
+      "when": ["actor == summon", "from_skill_id == 1"],
       "do": [
-        {
-          "op": "REMOVE_RESOURCE",
-          "resource": "小伊卡累计治疗",
-          "scale": "self_resource:小伊卡累计治疗",
-          "percent": 0.12,
-          "target": "self"
-        }
+        { "op": "REMOVE_RESOURCE", "resource": "小伊卡累计治疗", "scale": "self_resource:小伊卡累计治疗", "percent": 0.12, "target": "self" }
       ],
       "source": "1409 风堇 星魂6（1409_风堇.md:382）：「小伊卡施放忆灵技清空累计治疗数值改为 12%」param = [0.12, 0.2]",
       "note": "「**改为 12%**」—— 与上一条同形孪生 ✓：`min_eidolon: 6` 开、上一条 `max_eidolon: 5` 关 ✓ ⇒ 一次施放只有一条在跑 ✓（不会 50% + 12% 扣两次 ✗）。第二个参数 `0.2` 是抗性穿透，已在 §3.7l 那条规则里 ✓。"
@@ -374,18 +239,9 @@
     {
       "on": "BATTLE_START",
       "id": "trace_windstorm_raises_her_max_hp_above_200_speed",
-      "when": [
-        "self_attr:SPEED > 200"
-      ],
+      "when": ["self_attr:SPEED > 200"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.2,
-          "permanent": true,
-          "coexist": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 0.2, "permanent": true, "coexist": true, "target": "self" }
       ],
       "source": "1409 风堇 行迹 暴风停歇 (1409103，E:/code/blog/hsr/1409_风堇.md:339)：「风堇的速度大于 200 时，她与小伊卡的生命上限提高 20%…」",
       "note": "「**速度大于 200** 时，她**与小伊卡**的生命上限提高 **20%**」—— ① 门用 **`self_attr:SPEED > 200`** ✓：`>` 是既有运算符 ✓，而文档写的是「**大于**」⇒ 不用 `>=` ✗（200 整点不该吃这 20% ✓）；② `MODIFY_ATTR HEALTH percent 0.2 permanent` ✓。③ ⚠ 「**与小伊卡**」**不另写一条** ✗：忆灵的生命上限是 `memosprites/1409.json` 的 `HEALTH percent 0.5` ✓，而 `SummonFactory` 读的是召唤者**已解析**的面板（`share * master.getAttribute(attribute).get()` ✓）⇒ 她这 20% **已经通过 50% 继承落到小伊卡身上** ✓；再给小伊卡写一条 +20% 就是**双重计算** ✗（判据同时钉住「她 +20%」与「小伊卡 = 她的 50%」✓）。④ **必须带 `coexist: true`** ✓，且这是**量出来的**（不是照抄 1503）：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)**、**名字不参与** ✓ ⇒ 同一个主人身上的两条 `HEALTH` 修饰会互相驱逐 ✓。**实测两例**：㈠ **秘技**那条 `HEALTH 0.2`（同为 `BATTLE_START`、无 `max_stacks`）**会被本条顶掉** ✗ —— 去掉 `coexist` 后 `theTraceStacksWithTheTechniquesOwnMaxHpRaise` 立刻红 ✓，带上则两条**相加**（`0.20 + 0.20`）✓；㈡ **终结技**那条**不受影响** ✓ —— 它自己带 `max_stacks: 2`（走的是叠加而非驱逐 ✓），去掉 `coexist` 时 `theRaisedMaxHpSurvivesTheUltimate…` **仍然绿** ✓。⇒ 这条字段守的是**秘技**那一对，判据钉的也是它 ✓。"
@@ -410,10 +266,7 @@
     {
       "on": "SUMMONED",
       "id": "trace_windstorm_raises_ikachis_healing_too",
-      "when": [
-        "actor == summon",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == summon", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -450,10 +303,7 @@
       "on": "SUMMONED",
       "id": "eidolon_four_adds_ikachis_crit_damage_too",
       "min_eidolon": 4,
-      "when": [
-        "actor == summon",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == summon", "self_summon_count >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -472,26 +322,10 @@
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
       ],
       "source": "1409 风堇 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 50% 生命上限、战技 8%+160 / 10%+200、终结技 10%+200 / 12%+240 + 生命上限 +30%、天赋 忆灵 50% 生命上限 / 伤害 +80%）",
       "note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **重要（第 165–166 轮实测 ✓）**：**技能自身的数据就会治疗** ✓ —— 在**完全不装规则**时施放她的战技，队友仍被回复 **87.81145600000002** ✓；而**纯规则**治疗（手工触发 `TURN_START` + `lowest_hp_ally`）则**逐位精确**地等于 `owner_max_hp × 份额 + 固定值` ✓（219.52864 vs 219.52864000000002，比值 0.9999999999999999 ✓）。⇒ **治疗角色的规则不要重复写治疗** ✗（会**双重计算** ✗，这正是第 163–165 轮那些\"不可能的读数\"的来源 ✓：304.87 = 技能数据的 87.81 + 规则的 217.06 ✓）。引擎的 `HEAL` 本身**没有**问题 ✓。⚠ **登记**：① **忆灵小伊卡**的全部条款（召唤、它的治疗 10.00%+200 / 12.00%+240、它 50% 生命上限的初始面板、天赋「风堇**或小伊卡**提供治疗时小伊卡的伤害提高 80%，2 回合，最多 3 层」）✗ —— 阻塞点是忆灵文件**必须**声明 `SPEED` ✗ 而文档未给 ✓、数据集 `Servant*` 里也没定位到属性表 ✓；② 普攻「50% 生命上限的量子伤害」✗（`DAMAGE` 倍率取自技能数据行 ✓）；③ 秘技（缺门槛 ✗）；④ 星魂未读 ✗。"
@@ -499,13 +333,9 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_summons_ica",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "SUMMON"
-        }
+        { "op": "SUMMON" }
       ],
       "source": "1409 风堇 战技 彩虹尽头的… (140902): 「召唤忆灵 小伊卡，为除小伊卡以外的我方全体目标回复等同于风堇 8.00% 生命上限+ 160 的生命值。」",
       "note": "「**召唤忆灵 小伊卡**」⇒ `SKILL_CAST` ⇒ **`SUMMON`** ✓（无参数 ✓：忆灵属于召唤者 ✓）；面板在 `resources/memosprites/1409.json` ✓。⚠ 同句的**治疗部分**：**主治疗已由技能数据交付** ✓ —— `skill_effects.json` 的 `1409/2` 是 `Restore`（`healer_max_hp`，`#1` 份额 + `#2` 固定项，Lv10 = `0.08 × 上限 + 160` ✓），且**技能数据的治疗会发 `HEALED`** ✓（实测，`AGENT.md` §3.7f：`HyacineTalentTest` 先扣血再施放，每治疗一次小伊卡增伤 +0.8 ✓）。⚠ **仍差两半** ✗：① 范围是「我方**全体**」，而现在由**调用方**选目标（`Restore` 只治传进来的那些 ✓，演示只治一人 ✗）—— 缺的是「施放者自己决定打全体」的目标词汇 ✓；② 「**小伊卡自己** 10% 生命上限 + 200」是参数 `#3` / `#4`，`1409/2` 的 `params` 只收了 `#1` / `#2` ✓ ⇒ 那一半没有读者 ✓。两条都登记 ✓，不近似 ✓。"
@@ -513,9 +343,7 @@
     {
       "on": "SKILL_CAST",
       "id": "the_skill_heals_every_ally",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "HEAL",
@@ -531,10 +359,7 @@
     {
       "on": "SKILL_CAST",
       "id": "the_skill_also_heals_ikachi_itself",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
         {
           "op": "HEAL",
@@ -550,14 +375,9 @@
     {
       "on": "SUMMON_LEFT",
       "id": "memosprite_fall_advances_her_action",
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.3
-        }
+        { "op": "ADVANCE", "percent": 0.3 }
       ],
       "source": "1409 风堇 忆灵技4 坠落，然后飞翔（数据槽位 6）：「**消失时**，使风堇**行动提前 30%**」param = [0.3]（全等级一致）",
       "note": "「**消失时**，使风堇**行动提前 30%**」—— ① 事件用本轮新增的 **`SUMMON_LEFT`** ✓（`Battle.removeDeadCombatants` 在忆灵真的离开名册时发 ✓，**一次一单位** ✓）：它**不是** `DEATH` ✓ —— 忆灵可以「走了、没人杀它」（`CanHit.perish()` ✓），那种走法今天**没有任何事件** ✗；② `ADVANCE percent: 0.3` ✓（不写 `target` ⇒ 默认是**规则持有人**风堇 ✓，与 1210 桂乃芬同形 ✓）；③ 门 `actor == summon` ✓（**不是** `is_summon` —— 理由见 `memosprite_rainclouds_deals_a_share_of_the_tally` 的注记 ✓：`is_summon` 会把**别人**的忆灵离场也算进来，于是别人的忆灵一走就拉着风堇提前 ✗）—— ⚠ **不能**写 `target == summon` ✗：那个选择器会拒绝「已经不在场上的召唤物」（它按 `isDeath()` 过滤 ✓）。"
@@ -566,15 +386,9 @@
       "on": "SUMMON_LEFT",
       "id": "eidolon_six_aura_ends_when_ikachi_leaves",
       "min_eidolon": 6,
-      "when": [
-        "actor == summon"
-      ],
+      "when": ["actor == summon"],
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "天空应我的祈愿",
-          "target": "all_allies"
-        }
+        { "op": "REMOVE_STATE", "buff": "天空应我的祈愿", "target": "all_allies" }
       ],
       "source": "1409 风堇 星魂6：「**小伊卡在场时**，我方全体目标的全属性抗性穿透提高 20%」—— 「在场时」的另一半：不在场就该撤下",
       "note": "这条补的是 §3.7l 登记的那个缺口 ✓：那条光环**没有时长** ✓（`permanent: true`），所以忆灵一离场它**不会自己撤下** ✗。⇒ 现在由 `SUMMON_LEFT` 按**名字**摘掉 ✓（`REMOVE_STATE` 认的就是 `buff` 名 ✓，名字在上一条规则里给过 ✓）。⚠ 仍是**按单位**而非真光环 ✓：之后才登场的**别的**忆灵不会补拿到它 ✓（那条登记仍未消 ✓）。"
@@ -582,24 +396,10 @@
     {
       "on": "HP_LOST",
       "id": "ikachi_pays_and_heals_whoever_lost_hp",
-      "when": [
-        "target is_ally",
-        "self_summon_count >= 1"
-      ],
+      "when": ["target is_ally", "self_summon_count >= 1"],
       "do": [
-        {
-          "op": "CONSUME_HP",
-          "scale": "target_max_hp",
-          "percent": 0.04,
-          "target": "summon"
-        },
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.02,
-          "amount": 20,
-          "target": "all_allies_lost_hp_this_action"
-        }
+        { "op": "CONSUME_HP", "scale": "target_max_hp", "percent": 0.04, "target": "summon" },
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.02, "amount": 20, "target": "all_allies_lost_hp_this_action" }
       ],
       "source": "1409 风堇 忆灵技2 牵起晴空的手（数据槽位 3）：「若除小伊卡外的我方目标生命值降低，小伊卡会…消耗自身 4% 生命上限的生命值，并为我方生命值降低的目标回复等同于风堇 2.00% 生命上限 + 20 的生命值」 param Lv10 = [0.04, 0.028, 28, …]",
       "note": "「**生命值降低**时，小伊卡消耗**自身** 4% 生命上限，并为我方**生命值降低的目标**回复等同于风堇 **2%** 生命上限 + **20**」—— ① 事件 `HP_LOST` ✓ + `target is_ally` ✓；② 治疗对象 = **本轮新加的选择器** `all_allies_lost_hp_this_action` ✓（回答「刚掉过血的那位」✓，**不是** `lowest_hp_ally` ✗）；③ 自耗用 **`target_max_hp`** ✓（是**小伊卡自己**的上限 ✓，`owner_max_hp` 会读成风堇的 ✗），代价走 `CONSUME_HP` ✓（不吃护盾、不发 `HP_LOST` ✓）；④ 治疗用 `owner_max_hp` ✓（原文是「等同于**风堇** X% 生命上限」✓）；⑤ 数字是**字面量** ✓，取自数据行 Lv10 ✓（这条是**被动**、没有“这一发施放”可读 ✗，且忆灵技等级被 `memosprites/1409.json` 钉在 10 ✓）；⚠ **登记**：星魂5 给忆灵天赋 +1，而该表只到 10 ✗。⚠ **不加 `target != summon`** ✗：父句已写「**除小伊卡外**」✓，而 `CONSUME_HP` 走的是 `HP_CONSUMED` ✓、**不**发 `HP_LOST` ✓ ⇒ 不会自我递归 ✓（实测：一次结算这条只付一次 ✓）。"
@@ -607,21 +407,10 @@
     {
       "on": "SKILL_CAST",
       "id": "ikachi_acts_right_after_she_uses_a_skill_in_the_rain",
-      "when": [
-        "actor == self",
-        "self has_state 雨过天晴",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self has_state 雨过天晴", "self_summon_count >= 1"],
       "do": [
-        {
-          "op": "INSERT_ACTION",
-          "target": "summon"
-        },
-        {
-          "op": "CAST_SKILL",
-          "skill_id": 1,
-          "target": "summon"
-        }
+        { "op": "INSERT_ACTION", "target": "summon" },
+        { "op": "CAST_SKILL", "skill_id": 1, "target": "summon" }
       ],
       "source": "1409 风堇 忆灵技2：「风堇处于【雨过天晴】状态时，小伊卡会在风堇施放技能后立即获得 1 个额外回合并自动施放【乌云乌云快走开！】」",
       "note": "「施放技能后小伊卡**立即**获得 1 个额外回合**并自动施放**【乌云乌云快走开！】」—— ① 回合用 **`INSERT_ACTION`** ✓（`EXTRA_TURN` 会拒绝 Speed 0、不在行动序列的忆灵 ✗）；② 施放用 **`CAST_SKILL skill_id: 1`** ✓ —— 忆灵的技能按**数据槽**存 ✓（`skillAt` ✓），`CAST_SKILL` 现在认这个字段 ✓。⚠ 两半**必须成对** ✓：只插回合时那一回合是**空转**的（实测没有伤害实例 ✓）。"
@@ -629,17 +418,9 @@
     {
       "on": "CAST_SETUP",
       "id": "ikachi_shortens_its_own_effects_after_it_acts",
-      "when": [
-        "actor == summon",
-        "from_skill_id == 1"
-      ],
+      "when": ["actor == summon", "from_skill_id == 1"],
       "do": [
-        {
-          "op": "EXTEND_BUFF",
-          "kind": "all",
-          "turns": -1,
-          "target": "summon"
-        }
+        { "op": "EXTEND_BUFF", "kind": "all", "turns": -1, "target": "summon" }
       ],
       "source": "1409 风堇 忆灵技2：「…小伊卡施放技能后使自身所有持续效果持续回合数减 1」",
       "note": "「施放技能后使**自身所有**持续效果回合数**减 1**」⇒ `EXTEND_BUFF` + **`kind: \"all\"`** ✓ + **负** `turns` ✓（两点都是既有能力 ✓）；事件 `CAST_SETUP` + `from_skill_id == 1` ✓、门 `actor == summon` ✓（**不是** `is_summon` ✓：否则别人的忆灵放槽位 1 也会扣小伊卡的时长 ✗，理由见 `memosprite_rainclouds_deals_a_share_of_the_tally` 的注记 ✓）。"
@@ -647,17 +428,9 @@
     {
       "on": "SUMMONED",
       "id": "ikachi_is_immune_to_negative_effects",
-      "when": [
-        "actor == summon",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == summon", "self_summon_count >= 1"],
       "do": [
-        {
-          "op": "RESIST_DEBUFF",
-          "percent": 1.0,
-          "permanent": true,
-          "target": "summon"
-        }
+        { "op": "RESIST_DEBUFF", "percent": 1.0, "permanent": true, "target": "summon" }
       ],
       "source": "1409 风堇 忆灵技2 牵起晴空的手（数据槽位 3）：「小伊卡的速度保持为0，**免疫负面效果**，并且不会出现在行动序列上」",
       "note": "「**免疫负面效果**」⇒ `RESIST_DEBUFF` + `percent: 1.0`，**不写 `kind`** —— 省略即「任意负面状态」，覆盖引擎的**全部类别**（CONTROL / DOT）**以及不带类别的负面 buff**（降属性、易伤一类，`AbstractBuff.debuffClass()` 返回 null）✓。⚠ 这是本轮**新开的引擎口径**：`ClassResistBuff` 允许 null 类别 = 「任意」，`BuffManager.debuffResistOf` 不再对 null 类别早退返回 0。原先这里是**两条**（`control` + `dot`），因为当时 null 类别没有拼法；那两条**漏掉了**不带类别的负面状态。判据：`BuffAnyClassResistTest`（引擎级：null 类别抵抗对 CONTROL / DOT / 无类别三问都答 1，而具名类别只覆盖自己那一档）、`HyacineNegativeImmunityTest`（数据级：小伊卡身上挂的就是这条）✓。"
@@ -665,16 +438,9 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_soaring_gives_her_energy_when_it_arrives",
-      "when": [
-        "actor == summon",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == summon", "self_summon_count >= 1"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 15,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 15, "target": "self" }
       ],
       "source": "1409 风堇 忆灵技3 展翼，奔向日辉（数据槽位 5，ServantID 11409）：「被召唤时，为风堇恢复 15 点能量」 param = [15, 30]（全等级一致）",
       "note": "「**被召唤时**，为风堇恢复 **15** 点能量」—— ① 事件用 **`SUMMONED`** ✓（忆灵真的进场那一刻 ✓，与星魂6 光环同一个事件 ✓）；② `actor == summon` + `self_summon_count >= 1` ✓（**只有自己的忆灵**进场才算 ✓ —— `SUMMONED` 对两方的召唤都发 ✓）；③ 数值取数据行 `#1 = 15` ✓（**全等级恒定** ✓ ⇒ 字面量 + 与行对得上的判据 ✓，同「2 回合」那类 ✓）；④ `target: self` ✓ = 风堇自己 ✓（`GAIN_ENERGY` 的 `target` 就是收能量的单位 ✓）。"
@@ -682,17 +448,10 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_soaring_gives_thirty_more_on_its_first_arrival",
-      "when": [
-        "actor == summon",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == summon", "self_summon_count >= 1"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 30,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 30, "target": "self" }
       ],
       "source": "1409 风堇 忆灵技3 展翼，奔向日辉：「…**首次被召唤时**，额外恢复 **30** 点能量」 param = [15, 30]",
       "note": "「**首次**被召唤时，额外恢复 **30** 点能量」—— 「首次」= **`once_per_battle: true`** ✓，这正是这个词在仓库里的既有拼法 ✓（8006 星魂1 的「**首次**施放战技」用的就是它 ✓，注记原话「『首次』is `once_per_battle: true`, which is exactly \"the first one, once\"」✓）；⚠ 不用 `cooldown` ✗（这句话讲的是**整场战斗**，不是回合 ✓）。⚠ 它与上一条**必须是两条规则** ✓：一条每次召唤都给 ✓、一条只给一次 ✓ —— 合成一条就得给 `amount` 一个「第一次才加」的开关，而那种开关不存在 ✓。⚠ 顺序无关 ✓（两条同事件、互不影响 ✓）。"
@@ -700,18 +459,9 @@
     {
       "id": "memosprite_ode_of_sky_gives_her_energy",
       "on": "CAST_SETUP",
-      "when": [
-        "target == self",
-        "actor is_summon",
-        "from_skill_id == 19"
-      ],
+      "when": ["target == self", "actor is_summon", "from_skill_id == 19"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "scale": "cast_skill_param:1",
-          "percent": 1.0,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "scale": "cast_skill_param:1", "percent": 1.0, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**对风堇施放时，为风堇恢复 #2 点能量**。」",
       "note": "⭐ `#2` **随等级变**（**实测**：12 → 33.6）→ 走 `cast_skill_param:1`。⭐ 而 `GAIN_ENERGY` 本来**只收** `amount` 或 `target_max_energy` 的份额（**实测**：`ENERGY_SCALES = Set.of(\"target_max_energy\")`）—— **本轮给它加了第三种拼法**。"
@@ -719,17 +469,9 @@
     {
       "id": "casting_a_skill_spends_one_layer_of_the_sky_ode",
       "on": "SKILL_CAST",
-      "when": [
-        "self has_state 献予「天空」之诗",
-        "from_skill_id == 2"
-      ],
+      "when": ["self has_state 献予「天空」之诗", "from_skill_id == 2"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "献予「天空」之诗",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "献予「天空」之诗", "amount": 1, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放战技后，消耗1层【献予「天空」之诗】**。」",
       "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。"
@@ -737,17 +479,9 @@
     {
       "id": "casting_the_ultimate_spends_one_layer_of_the_sky_ode",
       "on": "ULT_CAST",
-      "when": [
-        "self has_state 献予「天空」之诗",
-        "from_skill_id == 3"
-      ],
+      "when": ["self has_state 献予「天空」之诗", "from_skill_id == 3"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "献予「天空」之诗",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "献予「天空」之诗", "amount": 1, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**风堇施放终结技后，消耗1层【献予「天空」之诗】**。」",
       "note": "⭐ 「战技/终结技」→ **两条规则**（槽位 2 与 3）：`from_skill_id` 比的是 `ctx.skillId()`，而它是**单值**（**实测**：出货读者 `1111.json` 写 `\"from_skill_id == 8\"`）—— 不发明一个“任一”拼法。⭐ 状态在**她自己**身上（上一轮出货），所以 `target: \"self\"`。  ⚠ 终结技要挂 `ULT_CAST`（2026-10-02 实测：`SkillExecutor` 里 `case ULTRA` 发的是 `ULT_CAST`，而战技才发 `SKILL_CAST`）。"
@@ -755,18 +489,9 @@
     {
       "id": "sky_ode_captures_its_healing_share",
       "on": "CAST_SETUP",
-      "when": [
-        "target == self",
-        "from_skill_id == 19"
-      ],
+      "when": ["target == self", "from_skill_id == 19"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "天空之诗的治疗份额",
-          "scale": "cast_skill_param:0",
-          "percent": 10000,
-          "target": "self"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "天空之诗的治疗份额", "scale": "cast_skill_param:0", "percent": 10000, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19）：「…提高数值等同于本次治疗数值的 #1%」—— 本条只做捕获。",
       "note": "⭐ `#1` 随等级变（0.36 → 1.008）且住在忆灵行里 ⇒ 施放时捕获成基点。"
@@ -774,9 +499,7 @@
     {
       "id": "sky_ode_adds_a_share_of_each_heal_to_ikachis_total",
       "on": "HEALED",
-      "when": [
-        "actor has_state 献予「天空」之诗"
-      ],
+      "when": ["actor has_state 献予「天空」之诗"],
       "do": [
         {
           "op": "GAIN_RESOURCE",
@@ -791,15 +514,7 @@
     }
   ],
   "resources": [
-    {
-      "id": "天空之诗的治疗份额",
-      "max": 2147483647,
-      "source": "⚠ **不是数据里的名字** —— 「本次治疗数值的 #1%」的那个 #1（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。"
-    },
-    {
-      "id": "小伊卡累计治疗",
-      "max": 2147483647,
-      "source": "⚠ **不是数据里的名字** —— “计入小伊卡忆灵技的治疗数值”（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。"
-    }
+    { "id": "天空之诗的治疗份额", "max": 2147483647, "source": "⚠ **不是数据里的名字** —— 「本次治疗数值的 #1%」的那个 #1（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。" },
+    { "id": "小伊卡累计治疗", "max": 2147483647, "source": "⚠ **不是数据里的名字** —— “计入小伊卡忆灵技的治疗数值”（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。" }
   ]
 }

@@ -3,17 +3,11 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21031_dispel_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "chance": 0.16,
       "once_per_attack": true,
       "do": [
-        {
-          "op": "REMOVE_BUFF",
-          "amount": 1,
-          "target": "target"
-        }
+        { "op": "REMOVE_BUFF", "amount": 1, "target": "target" }
       ],
       "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
       "note": "「**暴击后**有 #2% 的**固定概率**解除被攻击敌方目标所持有的 1 个增益效果，该效果**每次攻击只可触发 1 次**」—— 触发 `CRIT_DEALT` ＋ `actor == self` ✓、`REMOVE_BUFF amount: 1 target: target` ✓（「解除 1 个增益」✓）、16/20/24/28/32% ✓；「暴击率提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的两处** ✓：① 规则级的 **`chance: 0.16`** ✓（「固定概率」= 不吃效果命中 ✓）；② **`once_per_attack: true`** ✓（一次攻击多次暴击也只驱散 1 次 ✓）。"
@@ -23,17 +17,11 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21031_dispel_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "chance": 0.16,
       "once_per_attack": true,
       "do": [
-        {
-          "op": "REMOVE_BUFF",
-          "amount": 1,
-          "target": "target"
-        }
+        { "op": "REMOVE_BUFF", "amount": 1, "target": "target" }
       ],
       "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
       "note": "「**暴击后**有 #2% 的**固定概率**解除被攻击敌方目标所持有的 1 个增益效果，该效果**每次攻击只可触发 1 次**」—— 触发 `CRIT_DEALT` ＋ `actor == self` ✓、`REMOVE_BUFF amount: 1 target: target` ✓（「解除 1 个增益」✓）、16/20/24/28/32% ✓；「暴击率提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的两处** ✓：① 规则级的 **`chance: 0.16`** ✓（「固定概率」= 不吃效果命中 ✓）；② **`once_per_attack: true`** ✓（一次攻击多次暴击也只驱散 1 次 ✓）。"
@@ -43,17 +31,11 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21031_dispel_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "chance": 0.16,
       "once_per_attack": true,
       "do": [
-        {
-          "op": "REMOVE_BUFF",
-          "amount": 1,
-          "target": "target"
-        }
+        { "op": "REMOVE_BUFF", "amount": 1, "target": "target" }
       ],
       "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
       "note": "「**暴击后**有 #2% 的**固定概率**解除被攻击敌方目标所持有的 1 个增益效果，该效果**每次攻击只可触发 1 次**」—— 触发 `CRIT_DEALT` ＋ `actor == self` ✓、`REMOVE_BUFF amount: 1 target: target` ✓（「解除 1 个增益」✓）、16/20/24/28/32% ✓；「暴击率提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的两处** ✓：① 规则级的 **`chance: 0.16`** ✓（「固定概率」= 不吃效果命中 ✓）；② **`once_per_attack: true`** ✓（一次攻击多次暴击也只驱散 1 次 ✓）。"
@@ -63,17 +45,11 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21031_dispel_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "chance": 0.16,
       "once_per_attack": true,
       "do": [
-        {
-          "op": "REMOVE_BUFF",
-          "amount": 1,
-          "target": "target"
-        }
+        { "op": "REMOVE_BUFF", "amount": 1, "target": "target" }
       ],
       "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
       "note": "「**暴击后**有 #2% 的**固定概率**解除被攻击敌方目标所持有的 1 个增益效果，该效果**每次攻击只可触发 1 次**」—— 触发 `CRIT_DEALT` ＋ `actor == self` ✓、`REMOVE_BUFF amount: 1 target: target` ✓（「解除 1 个增益」✓）、16/20/24/28/32% ✓；「暴击率提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的两处** ✓：① 规则级的 **`chance: 0.16`** ✓（「固定概率」= 不吃效果命中 ✓）；② **`once_per_attack: true`** ✓（一次攻击多次暴击也只驱散 1 次 ✓）。"
@@ -83,17 +59,11 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21031_dispel_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "chance": 0.16,
       "once_per_attack": true,
       "do": [
-        {
-          "op": "REMOVE_BUFF",
-          "amount": 1,
-          "target": "target"
-        }
+        { "op": "REMOVE_BUFF", "amount": 1, "target": "target" }
       ],
       "source": "光锥 21031: 「暴击后有#1[i]%的固定概率解除被攻击敌方目标所持有的1个增益效果，该效果每次攻击只可触发1次」",
       "note": "「**暴击后**有 #2% 的**固定概率**解除被攻击敌方目标所持有的 1 个增益效果，该效果**每次攻击只可触发 1 次**」—— 触发 `CRIT_DEALT` ＋ `actor == self` ✓、`REMOVE_BUFF amount: 1 target: target` ✓（「解除 1 个增益」✓）、16/20/24/28/32% ✓；「暴击率提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的两处** ✓：① 规则级的 **`chance: 0.16`** ✓（「固定概率」= 不吃效果命中 ✓）；② **`once_per_attack: true`** ✓（一次攻击多次暴击也只驱散 1 次 ✓）。"

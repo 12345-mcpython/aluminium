@@ -3,28 +3,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.12,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: 装备者施放普攻、战技、终结技后，有#2[i]%的基础概率对随机1个未持有【以太编码】的受击目标施加【以太编码】。持有【以太编码】的目标受到的伤害提高#3[i]%，持续1回合。",
@@ -33,28 +26,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_ultra",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.12,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: 装备者施放普攻、战技、终结技后，有#2[i]%的基础概率对随机1个未持有【以太编码】的受击目标施加【以太编码】。持有【以太编码】的目标受到的伤害提高#3[i]%，持续1回合。",
@@ -63,18 +49,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23007_crit_vs_debuffed",
-      "when": [
-        "actor == self",
-        "target_debuff_count >= 3"
-      ],
+      "when": ["actor == self", "target_debuff_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.12,
-          "instance": true,
-          "permanent": true
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "instance": true, "permanent": true }
       ],
       "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone23007_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（24/28/32/36/40% ✓）⇒ 再写一条会读成两倍 ✗。\n其余两句：⭐ 「施放普攻/**战技**/**终结技**后，有 100% 基础概率对随机 1 个**未持有**【以太编码】的受击目标施加，持有者受到的伤害提高 #3%，持续 1 回合」用 `ATTACK_FINISHED` ＋ `from_category BPSKILL`/`ULTRA` ＋ `APPLY_BUFF{target: random_hit_enemy, target_when: [!target has_state 以太编码]}` ＋ `MODIFY_DAMAGE_TAKEN{turns: 1}` ✓；「对同时处于 ≥ 3 个负面效果的敌方目标造成伤害时暴击率 +12%」用 `DEALING_DAMAGE` ＋ `target_debuff_count >= 3` ＋ **`instance: true`** ✓。"
@@ -84,28 +61,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.14,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
@@ -114,28 +84,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_ultra",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.14,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
@@ -144,18 +107,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23007_crit_vs_debuffed",
-      "when": [
-        "actor == self",
-        "target_debuff_count >= 3"
-      ],
+      "when": ["actor == self", "target_debuff_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.14,
-          "instance": true,
-          "permanent": true
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.14, "instance": true, "permanent": true }
       ],
       "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone23007_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（24/28/32/36/40% ✓）⇒ 再写一条会读成两倍 ✗。\n其余两句：⭐ 「施放普攻/**战技**/**终结技**后，有 100% 基础概率对随机 1 个**未持有**【以太编码】的受击目标施加，持有者受到的伤害提高 #3%，持续 1 回合」用 `ATTACK_FINISHED` ＋ `from_category BPSKILL`/`ULTRA` ＋ `APPLY_BUFF{target: random_hit_enemy, target_when: [!target has_state 以太编码]}` ＋ `MODIFY_DAMAGE_TAKEN{turns: 1}` ✓；「对同时处于 ≥ 3 个负面效果的敌方目标造成伤害时暴击率 +12%」用 `DEALING_DAMAGE` ＋ `target_debuff_count >= 3` ＋ **`instance: true`** ✓。"
@@ -165,28 +119,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.16,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
@@ -195,28 +142,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_ultra",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.16,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
@@ -225,18 +165,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23007_crit_vs_debuffed",
-      "when": [
-        "actor == self",
-        "target_debuff_count >= 3"
-      ],
+      "when": ["actor == self", "target_debuff_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.16,
-          "instance": true,
-          "permanent": true
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.16, "instance": true, "permanent": true }
       ],
       "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone23007_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（24/28/32/36/40% ✓）⇒ 再写一条会读成两倍 ✗。\n其余两句：⭐ 「施放普攻/**战技**/**终结技**后，有 100% 基础概率对随机 1 个**未持有**【以太编码】的受击目标施加，持有者受到的伤害提高 #3%，持续 1 回合」用 `ATTACK_FINISHED` ＋ `from_category BPSKILL`/`ULTRA` ＋ `APPLY_BUFF{target: random_hit_enemy, target_when: [!target has_state 以太编码]}` ＋ `MODIFY_DAMAGE_TAKEN{turns: 1}` ✓；「对同时处于 ≥ 3 个负面效果的敌方目标造成伤害时暴击率 +12%」用 `DEALING_DAMAGE` ＋ `target_debuff_count >= 3` ＋ **`instance: true`** ✓。"
@@ -246,28 +177,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.18,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
@@ -276,28 +200,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_ultra",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.18,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
@@ -306,18 +223,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23007_crit_vs_debuffed",
-      "when": [
-        "actor == self",
-        "target_debuff_count >= 3"
-      ],
+      "when": ["actor == self", "target_debuff_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.18,
-          "instance": true,
-          "permanent": true
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.18, "instance": true, "permanent": true }
       ],
       "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone23007_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（24/28/32/36/40% ✓）⇒ 再写一条会读成两倍 ✗。\n其余两句：⭐ 「施放普攻/**战技**/**终结技**后，有 100% 基础概率对随机 1 个**未持有**【以太编码】的受击目标施加，持有者受到的伤害提高 #3%，持续 1 回合」用 `ATTACK_FINISHED` ＋ `from_category BPSKILL`/`ULTRA` ＋ `APPLY_BUFF{target: random_hit_enemy, target_when: [!target has_state 以太编码]}` ＋ `MODIFY_DAMAGE_TAKEN{turns: 1}` ✓；「对同时处于 ≥ 3 个负面效果的敌方目标造成伤害时暴击率 +12%」用 `DEALING_DAMAGE` ＋ `target_debuff_count >= 3` ＋ **`instance: true`** ✓。"
@@ -327,28 +235,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_bpskill",
-      "when": [
-        "actor == self",
-        "from_category BPSKILL"
-      ],
+      "when": ["actor == self", "from_category BPSKILL"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.2,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: 装备者施放普攻、战技后…",
@@ -357,28 +258,21 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23007_mark_ultra",
-      "when": [
-        "actor == self",
-        "from_category ULTRA"
-      ],
+      "when": ["actor == self", "from_category ULTRA"],
       "do": [
         {
           "op": "APPLY_BUFF",
           "buff": "以太编码",
           "turns": 1,
           "target": "random_hit_enemy",
-          "target_when": [
-            "!target has_state 以太编码"
-          ]
+          "target_when": ["!target has_state 以太编码"]
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.2,
           "turns": 1,
           "target": "target",
-          "target_when": [
-            "target has_state 以太编码"
-          ]
+          "target_when": ["target has_state 以太编码"]
         }
       ],
       "source": "光锥 23007 雨一直下: …终结技后…",
@@ -387,18 +281,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23007_crit_vs_debuffed",
-      "when": [
-        "actor == self",
-        "target_debuff_count >= 3"
-      ],
+      "when": ["actor == self", "target_debuff_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "percent": 0.2,
-          "instance": true,
-          "permanent": true
-        }
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.2, "instance": true, "permanent": true }
       ],
       "source": "光锥 23007 雨一直下: 当装备者对同时处于大于等于3个负面效果的敌方目标造成伤害时，暴击率提高#5[i]%。",
       "note": "⚠⚠ **2026-10-19 逐句核时删掉了 `cone23007_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（24/28/32/36/40% ✓）⇒ 再写一条会读成两倍 ✗。\n其余两句：⭐ 「施放普攻/**战技**/**终结技**后，有 100% 基础概率对随机 1 个**未持有**【以太编码】的受击目标施加，持有者受到的伤害提高 #3%，持续 1 回合」用 `ATTACK_FINISHED` ＋ `from_category BPSKILL`/`ULTRA` ＋ `APPLY_BUFF{target: random_hit_enemy, target_when: [!target has_state 以太编码]}` ＋ `MODIFY_DAMAGE_TAKEN{turns: 1}` ✓；「对同时处于 ≥ 3 个负面效果的敌方目标造成伤害时暴击率 +12%」用 `DEALING_DAMAGE` ＋ `target_debuff_count >= 3` ＋ **`instance: true`** ✓。"

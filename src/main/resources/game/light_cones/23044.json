@@ -3,9 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_defence_ignore",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -22,18 +20,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23044_sun_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "烈阳", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23044: 「装备者施放终结技后，获得【烈阳】。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -41,16 +30,9 @@
     {
       "on": "TURN_START",
       "id": "cone23044_sun_off_at_turn_start",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "烈阳", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23044: 「【烈阳】…**回合开始时移除**。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -58,10 +40,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_sun_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:烈阳 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:烈阳 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -80,9 +59,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_defence_ignore",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -99,18 +76,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23044_sun_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "烈阳", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23044: 「装备者施放终结技后，获得【烈阳】。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -118,16 +86,9 @@
     {
       "on": "TURN_START",
       "id": "cone23044_sun_off_at_turn_start",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "烈阳", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23044: 「【烈阳】…**回合开始时移除**。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -135,10 +96,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_sun_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:烈阳 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:烈阳 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -157,9 +115,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_defence_ignore",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -176,18 +132,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23044_sun_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "烈阳", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23044: 「装备者施放终结技后，获得【烈阳】。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -195,16 +142,9 @@
     {
       "on": "TURN_START",
       "id": "cone23044_sun_off_at_turn_start",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "烈阳", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23044: 「【烈阳】…**回合开始时移除**。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -212,10 +152,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_sun_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:烈阳 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:烈阳 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -234,9 +171,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_defence_ignore",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -253,18 +188,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23044_sun_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "烈阳", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23044: 「装备者施放终结技后，获得【烈阳】。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -272,16 +198,9 @@
     {
       "on": "TURN_START",
       "id": "cone23044_sun_off_at_turn_start",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "烈阳", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23044: 「【烈阳】…**回合开始时移除**。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -289,10 +208,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_sun_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:烈阳 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:烈阳 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -311,9 +227,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_defence_ignore",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -330,18 +244,9 @@
     {
       "on": "ULT_CAST",
       "id": "cone23044_sun_on_ult",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "ADD_STACK", "buff": "烈阳", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23044: 「装备者施放终结技后，获得【烈阳】。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -349,16 +254,9 @@
     {
       "on": "TURN_START",
       "id": "cone23044_sun_off_at_turn_start",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "烈阳",
-          "amount": 1,
-          "target": "self"
-        }
+        { "op": "REMOVE_STACK", "buff": "烈阳", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23044: 「【烈阳】…**回合开始时移除**。」",
       "note": "⭐ **四句全部用现成词汇** ✓：① 基础速度 +12 是 `props` ✓（**未重写** ✗）；② 「造成伤害时无视目标#2[i]%防御力」= `DEALING_DAMAGE` + `actor == self` ⇒ **实例** `MODIFY_ATTR DEFENCE_IGNORE` ✓（无门槛 ✓）；③ 「施放终结技后获得【烈阳】，**回合开始时移除**」= `ULT_CAST` ⇒ `ADD_STACK` ✓ + **`TURN_START`** ⇒ `REMOVE_STACK` ✓；④ 「**持有【烈阳】时**，造成的伤容提高 60%」= 同一事件 + **`self_stacks:烈阳 >= 1`** ⇒ 实例 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ ② 与 ④ 都是**实例**修饰器 ✓（只管这一击 ✓），与 21043 / 22004 同一写法 ✓。"
@@ -366,10 +264,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23044_sun_damage",
-      "when": [
-        "actor == self",
-        "self_stacks:烈阳 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:烈阳 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",

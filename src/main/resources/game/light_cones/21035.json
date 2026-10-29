@@ -2,19 +2,10 @@
   "1": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21035_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.02,
-          "target": "self",
-          "amount": 800.0
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.02, "target": "self", "amount": 800.0 }
       ],
       "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
       "note": "「**施放普攻后**，装备者回复等同于 #2% 生命上限 **+ #3 点**的生命值」—— `BASIC_ATTACK` ✓、`HEAL{scale: owner_max_hp, percent: 0.02, amount: 800}` ✓（份额 ＋ 常数项 ✓）、2/2.5/3/3.5/4% ＋ 800 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21035_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022/21026/21033 ✓ —— 这已经是第九次）。"
@@ -23,19 +14,10 @@
   "2": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21035_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.025,
-          "target": "self",
-          "amount": 800.0
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.025, "target": "self", "amount": 800.0 }
       ],
       "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
       "note": "「**施放普攻后**，装备者回复等同于 #2% 生命上限 **+ #3 点**的生命值」—— `BASIC_ATTACK` ✓、`HEAL{scale: owner_max_hp, percent: 0.02, amount: 800}` ✓（份额 ＋ 常数项 ✓）、2/2.5/3/3.5/4% ＋ 800 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21035_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022/21026/21033 ✓ —— 这已经是第九次）。"
@@ -44,19 +26,10 @@
   "3": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21035_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.03,
-          "target": "self",
-          "amount": 800.0
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.03, "target": "self", "amount": 800.0 }
       ],
       "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
       "note": "「**施放普攻后**，装备者回复等同于 #2% 生命上限 **+ #3 点**的生命值」—— `BASIC_ATTACK` ✓、`HEAL{scale: owner_max_hp, percent: 0.02, amount: 800}` ✓（份额 ＋ 常数项 ✓）、2/2.5/3/3.5/4% ＋ 800 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21035_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022/21026/21033 ✓ —— 这已经是第九次）。"
@@ -65,19 +38,10 @@
   "4": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21035_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.035,
-          "target": "self",
-          "amount": 800.0
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.035, "target": "self", "amount": 800.0 }
       ],
       "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
       "note": "「**施放普攻后**，装备者回复等同于 #2% 生命上限 **+ #3 点**的生命值」—— `BASIC_ATTACK` ✓、`HEAL{scale: owner_max_hp, percent: 0.02, amount: 800}` ✓（份额 ＋ 常数项 ✓）、2/2.5/3/3.5/4% ＋ 800 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21035_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022/21026/21033 ✓ —— 这已经是第九次）。"
@@ -86,19 +50,10 @@
   "5": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21035_heal",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_max_hp",
-          "percent": 0.04,
-          "target": "self",
-          "amount": 800.0
-        }
+        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.04, "target": "self", "amount": 800.0 }
       ],
       "source": "光锥 21035 何物为真: 「施放普攻后，装备者恢复等同于#2%生命上限+#3点的生命值」",
       "note": "「**施放普攻后**，装备者回复等同于 #2% 生命上限 **+ #3 点**的生命值」—— `BASIC_ATTACK` ✓、`HEAL{scale: owner_max_hp, percent: 0.02, amount: 800}` ✓（份额 ＋ 常数项 ✓）、2/2.5/3/3.5/4% ＋ 800 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21035_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014/21019/21022/21026/21033 ✓ —— 这已经是第九次）。"

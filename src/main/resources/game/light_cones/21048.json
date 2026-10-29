@@ -2,21 +2,11 @@
   "1": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": [
-        "actor == self",
-        "target has_state 弱点击破"
-      ],
+      "when": ["actor == self", "target has_state 弱点击破"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 3.0,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 3.0, "target": "self" }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
       "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
@@ -26,21 +16,11 @@
   "2": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": [
-        "actor == self",
-        "target has_state 弱点击破"
-      ],
+      "when": ["actor == self", "target has_state 弱点击破"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 3.5,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 3.5, "target": "self" }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
       "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
@@ -50,21 +30,11 @@
   "3": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": [
-        "actor == self",
-        "target has_state 弱点击破"
-      ],
+      "when": ["actor == self", "target has_state 弱点击破"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 4.0,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 4.0, "target": "self" }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
       "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
@@ -74,21 +44,11 @@
   "4": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": [
-        "actor == self",
-        "target has_state 弱点击破"
-      ],
+      "when": ["actor == self", "target has_state 弱点击破"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 4.5,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 4.5, "target": "self" }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
       "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
@@ -98,21 +58,11 @@
   "5": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": [
-        "SKILL_CAST",
-        "ULT_CAST"
-      ],
+      "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": [
-        "actor == self",
-        "target has_state 弱点击破"
-      ],
+      "when": ["actor == self", "target has_state 弱点击破"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 5.0,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 5.0, "target": "self" }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
       "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",

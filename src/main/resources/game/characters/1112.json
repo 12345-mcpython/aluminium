@@ -3,16 +3,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "trace_damage_vs_fire_weakness",
-      "when": [
-        "actor == self",
-        "target has_weakness Fire"
-      ],
+      "when": ["actor == self", "target has_weakness Fire"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.15,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.15, "target": "self" }
       ],
       "source": "1112 托帕&账账 行迹「金融动荡」(1112102): 「托帕和账账对拥有火属性弱点的敌方目标造成的伤害提高 #1[i]%」",
       "note": "数值取自 `data/skill_traces.json` 的 **1112102 行**（`param = [0.15]` ✓）。⭐ 条件用 **`target has_weakness Fire`** ✓（既有写法 ✓，遗器 108/4 同款 ✓）；⚠ `BOOST_DAMAGE` 不带持续期 ✓。"
@@ -20,28 +13,11 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_proof_of_debt",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "负债证明",
-          "target": "all_enemies"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "负债证明",
-          "turns": 2,
-          "target": "target"
-        },
-        {
-          "op": "DAMAGE",
-          "scale": "self_attr:ATTACK",
-          "percent": 1.5,
-          "element": "Fire",
-          "target": "target"
-        },
+        { "op": "REMOVE_STATE", "buff": "负债证明", "target": "all_enemies" },
+        { "op": "APPLY_BUFF", "buff": "负债证明", "turns": 2, "target": "target" },
+        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 1.5, "element": "Fire", "target": "target" },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.5,
@@ -59,26 +35,10 @@
       "id": "level_convention",
       "when": null,
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
       ],
       "source": "项目约定：面板按满级给出 ⇒ 与其余角色文件一致地在开局把技能等级抬高",
       "note": "与所有已出货角色一致的约定 ✓。"

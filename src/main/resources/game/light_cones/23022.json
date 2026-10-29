@@ -3,20 +3,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": [
-        "actor == self",
-        "target has_state 风化"
-      ],
+      "when": ["actor == self", "target has_state 风化"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -32,20 +22,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -61,20 +41,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -90,20 +60,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤"
-      ],
+      "when": ["actor == self", "target has_state 裂伤"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -119,10 +79,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": [
-        "actor == self",
-        "self_stacks:先知 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:先知 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -143,20 +100,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": [
-        "actor == self",
-        "target has_state 风化"
-      ],
+      "when": ["actor == self", "target has_state 风化"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -172,20 +119,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -201,20 +138,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -230,20 +157,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤"
-      ],
+      "when": ["actor == self", "target has_state 裂伤"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -259,10 +176,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": [
-        "actor == self",
-        "self_stacks:先知 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:先知 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -283,20 +197,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": [
-        "actor == self",
-        "target has_state 风化"
-      ],
+      "when": ["actor == self", "target has_state 风化"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -312,20 +216,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -341,20 +235,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -370,20 +254,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤"
-      ],
+      "when": ["actor == self", "target has_state 裂伤"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -399,10 +273,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": [
-        "actor == self",
-        "self_stacks:先知 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:先知 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -423,20 +294,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": [
-        "actor == self",
-        "target has_state 风化"
-      ],
+      "when": ["actor == self", "target has_state 风化"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -452,20 +313,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -481,20 +332,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -510,20 +351,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤"
-      ],
+      "when": ["actor == self", "target has_state 裂伤"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -539,10 +370,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": [
-        "actor == self",
-        "self_stacks:先知 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:先知 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -563,20 +391,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": [
-        "actor == self",
-        "target has_state 风化"
-      ],
+      "when": ["actor == self", "target has_state 风化"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -592,20 +410,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": [
-        "actor == self",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "target has_state 灼烧"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -621,20 +429,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -650,20 +448,10 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": [
-        "actor == self",
-        "target has_state 裂伤"
-      ],
+      "when": ["actor == self", "target has_state 裂伤"],
       "once_per_battle": true,
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "先知",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -679,10 +467,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": [
-        "actor == self",
-        "self_stacks:先知 >= 1"
-      ],
+      "when": ["actor == self", "self_stacks:先知 >= 1"],
       "do": [
         {
           "op": "MODIFY_ATTR",

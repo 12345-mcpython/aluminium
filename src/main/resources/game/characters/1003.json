@@ -1,29 +1,13 @@
 {
-  "resources": [
-    {
-      "id": "充能",
-      "max": 3
-    }
-  ],
+  "resources": [{ "id": "充能", "max": 3 }],
   "rules": [
     {
       "on": "DAMAGE_SETTLED",
       "id": "eidolon6_two_extra_random_hits",
-      "when": [
-        "actor == self",
-        "damage_is_attack",
-        "from_skill ULTRA"
-      ],
+      "when": ["actor == self", "damage_is_attack", "from_skill ULTRA"],
       "min_eidolon": 6,
       "do": [
-        {
-          "op": "DAMAGE",
-          "times": 2,
-          "scale": "original_damage",
-          "percent": 0.4,
-          "element": "Fire",
-          "target": "random_enemy"
-        }
+        { "op": "DAMAGE", "times": 2, "scale": "original_damage", "percent": 0.4, "element": "Fire", "target": "random_enemy" }
       ],
       "source": "1003 姬子 星魂 6 开拓！ (Trailblaze!): 「终结技额外造成2次伤害，对随机敌方单体各造成等同于原伤害40%的火属性伤害。」 参数 [0.4]",
       "note": "「终结技额外造成 **2** 次伤害…等同于**原伤害 40%**」—— ① 事件 `DAMAGE_SETTLED` ✓（结算**之后**、**施加侧**、双阵营 ✓）；② `scale: original_damage` ✓（= amount ÷ 触发实例自己的因子 ✓）；③ `target: random_enemy` ✓（该选择器的**第一个读者** ✓）；④ `times: 2` ✓；⑤ **`damage_is_attack`** ✓ 与 ⑥ **`from_skill ULTRA`** ✓ —— ⭐ **两条都是必需的护栏** ✓，而本轮把它们的**实际效果**量准了 ✓：这条规则最终只对**她终结技自己那一发**（实测 amount **718.255731** ✓）生效 ✓ ⇒ 额外伤害 **2 × 0.4 × 718.255731 = 574.6045848** ✓（实测 **574.604585** ✓ 逐位吻合 ✓）；⚠ 而**同场里另有一发 10764.438828** 的实例 ✓（来自她**文件里别的规则** ✓，不是终结技）⇒ 它**必须不被本句缩放** ✓ —— 这正是「原伤害」指的是**这一发技能**而不是「整场掉血」 ✓，也是**为什么不能拿星魂 0 的总掉血当分母** ✗（那一发会把它抬到 11482.69 ✗ ⇒ 0.8 × 那个数就是错的期望 ✗，我为此白跑了两轮 ✓）。⑦ `min_eidolon: 6` ✓。⚠ **登记**：不区分「那 2 次是否打中同一个敌人」✗；也不处理「敌人不足 2 个」（随机取同一只 ✓）。"
@@ -31,11 +15,7 @@
     {
       "on": "BATTLE_START",
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
       ],
       "source": "1003 姬子 天赋 乘胜追击 (100304) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（row Lv10 = [1.4, 3]，即「140%攻击力」）",
       "note": "This is the file stating **which level its own numbers were quoted at** (M-32), replacing the `damage_level: 10` that the follow-up rule used to carry. ⚠ The two are not the same statement: `damage_level` pins ONE effect to a row, while a level is a fact about the skill — every effect that reads it sees the same level, and a 星魂's raise composes with it instead of being ignored. ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is +9. ⚠ It is unconditional and is not a mechanic (no `min_eidolon`, no `when`). ⚠ Her talent's table has 15 rows, so a later raise stays inside it; a raise past the table fails loudly at fire time instead of reading nothing."
@@ -43,11 +23,7 @@
     {
       "on": "BATTLE_START",
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "充能",
-          "amount": 1
-        }
+        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 1 }
       ],
       "source": "1003 姬子 天赋 乘胜追击 (100304) 第3句: 「战斗开始时获得1点充能。」",
       "note": "No `when`: BATTLE_START is fired once to every character's table with no actor and no target (TriggerTable refuses a carried-party condition on it), and this sentence has no condition. No `target` either -- GAIN_RESOURCE defaults to the rule's owner, which is the only unit the sentence names. ⚠ The op is fired through ResourceManager.gain, whose default overflow is 0, so 「上限3点」 is enforced by the declaration above rather than by the rule."
@@ -55,27 +31,16 @@
     {
       "on": "BREAK",
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "充能",
-          "amount": 1
-        }
+        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 1 }
       ],
       "source": "1003 姬子 天赋 乘胜追击 (100304) 第1句: 「当有敌方目标的弱点被击破时，姬子获得充能，上限3点。」",
       "note": "No condition: BREAK is fired with the broken enemy as the event's subject and is only ever emitted for an enemy (Battle.reduceStance → enemy.breakEnemy), so 「敌方目标的弱点被击破」 is what the event already is. ⚠ Deliberately NOT gated on `actor == self`: the text pays for a break by anyone (which is also why the rule lives on her own table and nobody else's). Set 111's 「装备者击破敌方目标弱点后」 is the same event read the other way, with `actor == self` -- both spellings are pinned by their own tests. ⚠ This is the only rule of hers that can push 充能 to 3 without her acting: an ally's break charges her follow-up."
     },
     {
       "on": "BREAK",
-      "when": [
-        "actor == self",
-        "from_skill SKILL"
-      ],
+      "when": ["actor == self", "from_skill SKILL"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "充能",
-          "amount": 1
-        }
+        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 1 }
       ],
       "min_eidolon": 4,
       "source": "1003 姬子 星魂 4 坚守的心 (Avatar_Himeko_Rank04) 第二句: 「施放<u>战技</u>对敌方目标造成弱点击破时，姬子额外获得1点充能。」",
@@ -83,36 +48,19 @@
     },
     {
       "on": "KILL",
-      "when": [
-        "actor == self",
-        "from_skill ULTRA"
-      ],
+      "when": ["actor == self", "from_skill ULTRA"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 5
-        }
+        { "op": "GAIN_ENERGY", "amount": 5 }
       ],
       "source": "1003 姬子 终结技 留待残烬 (100303, AoEAttack/Ultra) 第二句: 「每消灭1个敌方目标额外恢复姬子5点能量。」 param Lv10 = [1.38, 5] → #2 = 5",
       "note": "「每消灭1个敌方目标**额外**恢复姬子5点能量」 — 「额外」 is why this is a rule at all, and the reading is not a guess: ① the skill's own `param_list` Lv10 is `[1.38, 5]`, i.e. the document states this 5; ② the engine's **general** kill credit (`Constant.ENERGY_GAIN_KILL`, `StandardEnergyProvider.onKill`) is folded into the attack's own energy (`Battle.grantHitAndKillEnergy`: one attack grants energy once), so it is not this sentence's 5; ③ the text says 「**额外**恢复」. Measured 2026-09-28 (`HimekoKillEnergyTest`): a 1-HP enemy killed by her ultimate pays **10** against **5** for the same cast that does not kill — the difference is exactly this rule — and a kill caused by an ally pays her **0**. ⚠ `from_skill ULTRA` keeps it to kills **her ultimate** caused: `actor == self` alone would also pay for a kill from her 普攻/战技/天赋 follow-up, and the sentence names the ultimate. ⚠ No `target`: 「为姬子恢复」 is GAIN_ENERGY's default. ⚠ No `min_eidolon`: this is the ultimate's own sentence (base kit), unlike 星魂 4 above. ⚠ `KILL` carries the killer as `actor`, the victim as the subject, and the causing instance's cast category."
     },
     {
       "on": "ALLY_ATTACK",
-      "when": [
-        "self_resource:充能 >= 3"
-      ],
+      "when": ["self_resource:充能 >= 3"],
       "do": [
-        {
-          "op": "DAMAGE",
-          "skill": "TALENT",
-          "damage_param": 0,
-          "target": "all_enemies"
-        },
-        {
-          "op": "SPEND_RESOURCE",
-          "resource": "充能",
-          "amount": 3
-        }
+        { "op": "DAMAGE", "skill": "TALENT", "damage_param": 0, "target": "all_enemies" },
+        { "op": "SPEND_RESOURCE", "resource": "充能", "amount": 3 }
       ],
       "source": "1003 姬子 天赋 乘胜追击 (100304) 第2句: 「当我方目标施放攻击后，若姬子的充能达到上限则立即发动1次追加攻击，对敌方全体目标造成等同于姬子140%攻击力的火属性伤害，并消耗全部充能。」",
       "note": "Three things are stated here and one is not, on purpose. ① The trigger 「当我方目标施放攻击后」 is ALLY_ATTACK (fired by SkillExecutor for every one of our attacks, its own included); ② the gate 「充能达到上限」 is `self_resource:充能 >= 3` -- the cap, read from the declaration above rather than repeated as a literal nobody could check, and `>=` rather than `==` because 「达到上限」 is a threshold, not an equality; ③ the swing's numbers are NOT written here: `skill: \"TALENT\"` + `damage_param: 0` + `damage_level: 10` reads 1.4 out of skill 100304's own parameter row (index 0 = the multiplier; the row is [0.7, 3] at Lv1 and [1.4, 3] at Lv10 -- use `damage_param: 1` and the rule would read the *cap*, 3, which happens to equal 3.0, i.e. a wrong number that looks right), and the Fire element and the all-enemy shape come from the same skill data. ⚠ `damage_level: 10` is required rather than decorative: a character's skills are all at level 1 in this engine, so the skill's own level would read the Lv1 row (0.7) while the text quotes the Lv10 row (1.4) -- half the damage, with nothing to report. ⚠ `target: \"all_enemies\"` is the enemy-side group selector (added for this sentence): every other group selector reads `battle.allies`, so 「敌方全体」 had no spelling and DAMAGE reached one unit at a time. ⚠ The follow-up is settled by `Battle.applyAdditionalDamage`, which is the engine's one notion of a follow-up attack and emits FOLLOW_UP; it does not count as an attack, so this rule cannot re-trigger itself. ⚠ 「消耗全部充能」 is `amount: 3` and that is not an approximation of \"all\": the rule only runs at the cap, and the cap IS 3. ⚠ ✅ 两处曾经登记的句子都已出货（2026-09-28），各有自己的规则与测试：① 终结技「每消灭1个敌方目标额外恢复姬子5点能量」→ 本文件下面的 `KILL` 规则（`actor == self` + `from_skill ULTRA` + `+5`；「额外」的依据是技能 `param_list` 自己写着 5、通则击杀回能被折进这次攻击的自身能量、以及「额外」这个词；`HimekoKillEnergyTest` 2 条）；② 星魂 4 「施放战技对敌方目标造成弱点击破时，姬子额外获得1点充能」→ 本文件上面的 `BREAK` 规则（`actor == self` + `from_skill SKILL` + `+1` 充能；`SkillAttributionTest` 11 条）。⚠ 这两句当初都卡在同一个缺口上——「这件事**是哪条技能**造成的」——它由 `from_skill` 条件在 2026-09-28 补上（见 `engine.md`）。③ 星魂 3/5 are the skill-level gap (M-32)."
@@ -120,15 +68,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "starhunt_low_hp_damage",
-      "when": [
-        "actor == self",
-        "target_hp_percent <= 0.5"
-      ],
+      "when": ["actor == self", "target_hp_percent <= 0.5"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.15
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.15 }
       ],
       "source": "1003 姬子 星魂 2 邂逅: 「对当前生命值百分比小于等于 50% 的敌方目标造成的伤害提高 15%。」 param = [0.5, 0.15]",
       "note": "「对**当前生命值 ≤50%** 的敌方目标造成的伤害提高 15%」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target_hp_percent <= 0.5` ＋ `BOOST_DAMAGE(0.15)` ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `min_eidolon: 2`** ✗ —— 这句是**星魂 2** 的，原先当成行迹、没有星魂门 ⇒ 0 星也生效 ✗。",
@@ -137,26 +79,16 @@
     {
       "on": "BATTLE_START",
       "id": "technique_incomplete_combustion",
-      "when": [
-        "self has_state 秘技"
-      ],
+      "when": ["self has_state 秘技"],
       "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.1,
-          "scope_element": "Fire",
-          "turns": 2,
-          "target": "all_enemies"
-        }
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.1, "scope_element": "Fire", "turns": 2, "target": "all_enemies" }
       ],
       "source": "1003 姬子 秘技 不完全燃烧 (Incomplete Combustion, 100307, Maze/Impair): 「使用秘技后，制造1片持续15秒的特殊领域。与处于特殊领域内的敌人进入战斗后，有100%的基础概率使敌方目标受到的火属性伤害提高10%，持续2回合。我方制造的领域效果最多存在1个。」param = [1, 0.1, 2, 15] → #1 = 1（100% 基础概率）、#2 = 0.1（受到的/**火属性**伤害 +10%）、#3 = 2（持续回合）、#4 = 15（领域持续秒数）",
       "note": "「使用秘技后…进入战斗后，有 **100% 的基础概率**使敌方目标受到的**火属性**伤害提高 **10%**，持续 **2 回合**」—— ① 「使用秘技后/进入战斗后」 = `on: BATTLE_START` + `when: self has_state 秘技` ✓，引擎那一半是 `Battle.applyTechniqueStates()` 在**任何** `BATTLE_START` 规则**之前**打上状态 ✓（与 1001 的 `technique_freeze` 同一道门 ✓）；② 「**火属性**伤害提高」 = `scope_element: Fire` ✓ —— ⚠ **这是本轮为它新加的参数** ✓，而且**是独立字段** ✓：`MODIFY_DAMAGE_TAKEN` 原有作用域只有 `damage_type`（DOT / BREAK / ADDITIONAL / ULTRA…）✗，而「受到的**火属性**伤害」要的是**元素**作用域 ✗；属性表里也只有 `ALL_TYPE_RESISTANCE`（全属性）✗。⭐ 若省略这一项写成全属性易伤，就是**把「火」悄悄放宽成「所有属性」** ✗ —— 一个不对的数，且**没有症状** ✗；⚠ 用 `scope_element` 而**不是**已有的 `element` ✓：`element` 是 `DAMAGE` / `APPLY_DOT` / `APPLY_CONTROL` 用来表示**它们产生的东西**的元素 ✓，把易伤的作用域写进同一个字段会让那三个的语义被改写 ✗；③ 「**100% 的基础概率**」 —— ⚠ **故意不写 `base_chance`** ✓，理由量过：`attachRolled` 会把声明了 `base_chance` 的 zone 送上 `tryApplyDebuff` ✓，于是**乘上 (1−效果抵抗)** ✓（实测同一对组合 `hitChance(1.0) = 0.7` ✓ —— 姬子效果命中 0、该敌人效果抵抗 30% ✓）⇒ 写了它这条规则**每次都有 30% 概率静默失效** ✗；而引擎里**不写** `base_chance` 即「直接附着、不判定」✓ ⇒ 与句子「100%」的结果一致 ✓。⚠ **登记**：因此这条**不吃效果命中、也不被效果抵抗** ✗；引擎无法表达「100% 基础概率**且**仍可抵抗」这个组合 ✗（写了被抵抗 30% ✗、不写完全不可抵抗 ✓），选了与句子结果一致的那一种 ✓；④ 「持续 2 回合」 = `turns: 2` ✓（易伤是**受击方**的 debuff ✓，`VulnerabilityBuff.isDebuff()` 本就说自己是负面效果 ✓）；⑤ `target: all_enemies` ✓ —— 「敌方目标」是**所有**敌人 ✓（她的领域包住整片区域 ✓，与 1001 那条单体冻结不同 ✓）；⚠ **登记**：`#4 = 15`（领域持续 15 秒）**没有写** ✗ —— 那是**地图层**的事实 ✓，「与处于领域内的敌人进入战斗」由调用方决定**谁用了秘技**来表达 ✓（`Techniques.released(1003)`），引擎不建模秒数 ✓；「我方制造的领域效果最多存在1个」同理是地图层规则 ✓。"
     },
     {
       "on": "ATTACK_FINISHED",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "APPLY_DOT",
@@ -175,16 +107,9 @@
     },
     {
       "on": "DEALING_DAMAGE",
-      "when": [
-        "actor == self",
-        "from_skill SKILL",
-        "target has_state 灼烧"
-      ],
+      "when": ["actor == self", "from_skill SKILL", "target has_state 灼烧"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.2
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.2 }
       ],
       "source": "1003 姬子 行迹 灼热 (1003102): 「战技对灼烧状态下的敌方目标造成的伤害提高 #1%。」 param = [0.2]",
       "note": "「**战技**对**灼烧**状态下的敌方目标造成的伤害提高 20%」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `from_skill SKILL` ＋ `target has_state 灼烧` ＋ `BOOST_DAMAGE(0.2)` ✓。",
@@ -192,10 +117,7 @@
     },
     {
       "on": "DEALING_DAMAGE",
-      "when": [
-        "actor == self",
-        "hp_percent >= 0.8"
-      ],
+      "when": ["actor == self", "hp_percent >= 0.8"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -212,17 +134,9 @@
     },
     {
       "on": "FOLLOW_UP",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.2,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.2, "turns": 2, "target": "self" }
       ],
       "min_eidolon": 1,
       "source": "1003 姬子 星魂 1 童年: 「【乘胜追击】触发后，姬子的速度提高 #1%，持续 #2 回合。」 param = [0.2, 2]",
@@ -232,16 +146,8 @@
     {
       "on": "BATTLE_START",
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 2
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 1
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
       ],
       "min_eidolon": 3,
       "source": "1003 姬子 星魂 3 自我: 「战技等级+2，最多不超过 15 级；普攻等级+1，最多不超过 10 级。」",
@@ -251,16 +157,8 @@
     {
       "on": "BATTLE_START",
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 2
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 2
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
       ],
       "min_eidolon": 5,
       "source": "1003 姬子 星魂 5 梦想: 「终结技等级+2，最多不超过 15 级；天赋等级+2，最多不超过 15 级。」",

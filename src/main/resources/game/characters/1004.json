@@ -2,85 +2,44 @@
   {
     "on": "ULT_CAST",
     "id": "ult_imprison",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "APPLY_CONTROL",
-        "control": "禁锢",
-        "turns": 1,
-        "base_chance": 1.0,
-        "target": "all_enemies"
-      }
+      { "op": "APPLY_CONTROL", "control": "禁锢", "turns": 1, "base_chance": 1.0, "target": "all_enemies" }
     ],
     "source": "1004 瓦尔特 终结技 拟似黑洞 (100403, Ultra/AOEAttack): 「对敌方全体造成等同于瓦尔特150%攻击力的虚数属性伤害，有100%的基础概率使受到攻击的敌方目标陷入禁锢状态，持续1回合。禁锢状态下，敌方目标行动延后40.00%，速度降低10%。」",
     "note": "「有 **100% 的基础概率**使受到攻击的敌方目标陷入**禁锢**状态，持续 1 回合。**禁锢状态下**，敌方目标**行动延后 40.00%，速度降低 10%**」—— 一句话三件事，其中两件由**控制状态自己**承担：`control: 禁锢`（引擎三种控制状态之一 ✓，它的\"行动延后\"与\"减速\"由引擎内建 ✓）、`turns: 1`、`base_chance: 1.0`。⚠ 「基础概率」照旧过骰子 ✓（效果命中/效果抵抗 ✓），所以 100% 只是**基础**值 ✓。⚠ 目标用 `all_enemies` 因为「敌方全体」 ✓。⚠ **登记**：① ~~战技的弹射~~ ✅ **已于第 170 轮修复** ✓：Bounce 现在从**描述的占位符**取伤害份额与命中数 ✓（他的行是 [0.36, 0.65, 0.1, 2] ✓），不再依赖固定下标 ✗；验收用例 WeltTest.hisSkillActuallyDealsDamage ✓；② 战技「命中时 **75% 基础概率**使受到攻击的敌方目标速度降低 10%，持续 2 回合」—— 需要\"给**属性修正**也掷一次骰子\"的写法（`MODIFY_ATTR` 上没有 `base_chance` ✗）；③ 终结技的第二形态「施放终结技后使敌方全体陷入【失重】状态…该效果每个目标每回合内最多触发 8 次」—— 需要\"每回合触发上限 + 受击时行动延后\" ✗；④ ~~天赋「击中处于**减速**状态的敌方目标时，额外造成 1 次 60% 攻击力的虚数附加伤害」~~ ✅ 已写（`talent_additional_damage_on_slowed`：`target is_slowed` + `damage_is_attack` 防递归；判据 `WeltTest.hisTalentAddsAnInstanceOnASlowedTarget`）；⑤ 行迹与星魂（未读 ✗）。"
   },
+
   {
     "on": "BATTLE_START",
     "id": "level_convention",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
     ],
     "source": "1004 瓦尔特 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 72%×3 段、终结技 150%、天赋 60%/100%）",
     "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **这条不是可有可无的**：第 142 轮实测过，缺了它技能会停在 Lv1，而 Lv1 行若参数为空则整次施放**一点伤害都没有** ✓（引擎自己的注释写着 `param_list = [[]]` 存在 ✗）。"
   },
+
   {
     "on": "SKILL_CAST",
     "id": "skill_speed_down",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "SPEED",
-        "percent": -0.1,
-        "base_chance": 0.75,
-        "turns": 2,
-        "target": "target"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": -0.1, "base_chance": 0.75, "turns": 2, "target": "target" }
     ],
     "source": "1004 瓦尔特 战技 虚空断界: 「…攻击命中时有75%的基础概率使受到攻击的敌方目标速度降低10%，持续2回合。」（强化前/强化后同值；param Lv1 = [0.36, 0.65, 0.1, 2] ⇒ 概率列 0.65→0.75 于 Lv10、0.1 = 减速、2 = 回合）",
     "note": "「**攻击命中时**有 **75%** 的基础概率使受到攻击的敌方目标**速度降低 10%**，持续 **2 回合**」—— ⭐ **本文件此前把它登记为受阻** ✗，理由是「**`MODIFY_ATTR` 上没有 `base_chance`**」✗ —— 那在第 13/270 轮之前是对的 ✓，之后就是错的 ✓（**第六次推翻过时/过宽的登记** ✓，纪律 33 ✓）⇒ 现在一条规则即可 ✓。① 概率 **75%** ⇒ `base_chance: 0.75` ✓（参数行的概率列 0.65 → 0.75 随等级增长 ✓，正文引用的是 Lv10 ✓）；② 减速 10% ⇒ `SPEED percent: -0.1` ✓（平值属性 ⇒ percent 是基数的份额 ✓，与 1106 的 `DEFENCE: -0.2` 同约定 ✓）；③ 时长 `turns: 2` ✓；④ ⚠ **强化前/后这一句同值** ✓（都是 75% / 10% / 2 回合 ✓）⇒ 没有\"写哪一版\"的问题 ✓。⚠ **登记（本条的一处范围差）**：该战技是**弹射** ✓ ⇒ 「**受到攻击的**敌方目标」指**实际被命中的每一个** ✓，而 `target` 只覆盖**施放时瞄准的那一个** ✓（它是其中之一 ✓）；**弹射到的那几个**没有任何选择器能取到 ✗ ⇒ 只登记 ✓（**不写 `all_enemies`** ✗ —— 那会把**没被命中**的敌人也减速 ✗）。⚠ 另：天赋「击中处于**减速**状态的敌方目标时额外造成 60% 攻击力虚数附加伤害」✗ —— 需要一个\"**处于减速**\"的**可问状态** ✗（目前速度降低只是属性修正 ✓）⇒ 登记 ✓。"
-  }
-,
+  },
+
   {
     "on": "DEALING_DAMAGE",
     "id": "talent_additional_damage_on_slowed",
-    "when": [
-      "actor == self",
-      "target is_slowed",
-      "damage_is_attack"
-    ],
+    "when": ["actor == self", "target is_slowed", "damage_is_attack"],
     "do": [
-      {
-        "op": "DAMAGE",
-        "scale": "self_attr:ATTACK",
-        "percent": 0.6,
-        "element": "Imaginary",
-        "target": "target"
-      }
+      { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.6, "element": "Imaginary", "target": "target" }
     ],
     "source": "1004 瓦尔特 天赋 时空扭曲 (100404, Enhance): 「击中处于减速状态的敌方目标时，额外造成1次等同于瓦尔特60%攻击力的虚数属性附加伤害。」",
     "note": "「击中处于**减速**状态的敌方目标时，额外造成 **1 次**等同于瓦尔特 **60% 攻击力**的虚数属性**附加伤害**」—— ① 事件 `DEALING_DAMAGE` ✓（每一次真正落地的伤害实例都经过这里 ✓）；② `actor == self` ✓（只有瓦尔特自己的实例 ✓）；③ `target is_slowed` ✓（减速 = SPEED 上的负修饰，`is_slowed` 正是这个问题的词 ✓）；④ `damage_is_attack` **不可省** ✓ —— 附加伤害本身也会发 `DEALING_DAMAGE`，而它是 `notCountsAsAttack` ✓ ⇒ 该条件为假 ⇒ 不会自我递归 ✓（同 1109 的护栏）；⑤ `DAMAGE` + `scale: self_attr:ATTACK` + `percent: 0.6` ✓（附加伤害，不走 `damage_param`，因为原文写的是 60% 而非某个技能行）；⑥ 元素 `Imaginary` ✓。⚠ 本句写的是**强化前**的 60%；强化后的 100% 与【失重】、行迹、星魂仍未写（登记）。"

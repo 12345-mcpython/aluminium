@@ -4,11 +4,7 @@
       "on": "TURN_START",
       "id": "cone23041_turn_energy",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 10,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 10, "target": "self" }
       ],
       "source": "光锥 23041：「装备者回合开始时恢复#5[i]点能量。」",
       "note": "「装备者回合开始时恢复 10 点能量」—— `TURN_START` ＋ `GAIN_ENERGY(10)` ✓（10 ✓）。"
@@ -16,17 +12,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23041_defence_down",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DEFENCE",
-          "percent": -0.24,
-          "turns": 2,
-          "target": "target"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "DEFENCE", "percent": -0.24, "turns": 2, "target": "target" }
       ],
       "source": "光锥 23041：「当敌方目标受到装备者攻击时，装备者使其防御力降低#2[i]%，持续#4[i]回合。同类效果无法叠加。」",
       "note": "「当敌方目标受到装备者攻击时，使其防御力降低 24%，持续 2 回合，**同类无法叠加**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE{-24%, turns: 2, target: target}` ✓（12/15/18/21/24% ✓，「不叠加」= 同修饰替换 ✓）。\n⛔ **仍开（已登记 §4.3）**：「若敌方目标拥有**装备者添加的弱点**，对其造成的伤害提高 60%」**整句没有** ✗ —— 引擎能问「目标有几个弱点」✓，但问不了「这个弱点是不是**她**加的」✗ ⇒ 等价缺口 ✓。"

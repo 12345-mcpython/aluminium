@@ -3,18 +3,9 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21037_luck_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "好运",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "好运", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -30,16 +21,9 @@
     {
       "on": "TURN_END",
       "id": "cone21037_luck_expires",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "好运",
-          "amount": 4,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "好运", "amount": 4, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -57,18 +41,9 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21037_luck_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "好运",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "好运", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -84,16 +59,9 @@
     {
       "on": "TURN_END",
       "id": "cone21037_luck_expires",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "好运",
-          "amount": 4,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "好运", "amount": 4, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -111,18 +79,9 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21037_luck_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "好运",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "好运", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -138,16 +97,9 @@
     {
       "on": "TURN_END",
       "id": "cone21037_luck_expires",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "好运",
-          "amount": 4,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "好运", "amount": 4, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -165,18 +117,9 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21037_luck_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "好运",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "好运", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -192,16 +135,9 @@
     {
       "on": "TURN_END",
       "id": "cone21037_luck_expires",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "好运",
-          "amount": 4,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "好运", "amount": 4, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -219,18 +155,9 @@
     {
       "on": "CRIT_DEALT",
       "id": "cone21037_luck_on_crit",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "好运",
-          "amount": 1,
-          "max_stacks": 4,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "好运", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
@@ -246,16 +173,9 @@
     {
       "on": "TURN_END",
       "id": "cone21037_luck_expires",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "REMOVE_STACK",
-          "buff": "好运",
-          "amount": 4,
-          "target": "self"
-        },
+        { "op": "REMOVE_STACK", "buff": "好运", "amount": 4, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",

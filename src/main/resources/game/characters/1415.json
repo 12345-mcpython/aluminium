@@ -27,18 +27,9 @@
     {
       "id": "true_self_counts_a_new_allies_recollection_first",
       "on": "TURN_START",
-      "when": [
-        "self_summon_count >= 1",
-        "actor has_state 未来",
-        "!actor has_state 从这位队友处得到过【追忆】"
-      ],
+      "when": ["self_summon_count >= 1", "actor has_state 未来", "!actor has_state 从这位队友处得到过【追忆】"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "忆灵技的额外一击",
-          "amount": 1,
-          "target": "summon"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "忆灵技的额外一击", "amount": 1, "target": "summon" }
       ],
       "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」：「**昔涟每从 1 个除德谬歌以外不同的队友处获得【追忆】后**，德谬歌施放【花与箭的舞曲】时额外对敌方随机单体造成 1 次同等于德谬歌 0.3% 生命上限的冰属性伤害」。  （本条只管**计数**：还没有标记的队友算一次。）",
       "note": "⭐ **2026-10-02 实测两条**：① 同一事件内的规则**按文件顺序**执行（探针读到 24）；② 而【未来】的**消耗**规则也在同一个 `TURN_START` 上、且排在前面 ⇒ 若本条排在它后面，【未来】**已经被消耗**、条件恒假（实测：`mark=false counter=0`，而昔涟的【追忆】已为 1）。⭐ **所以本条必须插在最前面**。⭐ 计数器在**忆灵**身上（`target: \"summon\"`）。⛔ 同句的**额外冰伤本身**仍登记（需 `times_from: resource` 与“施放者的生命上限”）。"
@@ -46,16 +37,9 @@
     {
       "id": "true_self_marks_the_allies_that_gave_one",
       "on": "TURN_START",
-      "when": [
-        "actor has_state 未来"
-      ],
+      "when": ["actor has_state 未来"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "从这位队友处得到过【追忆】",
-          "permanent": true,
-          "target": "attacker"
-        }
+        { "op": "APPLY_BUFF", "buff": "从这位队友处得到过【追忆】", "permanent": true, "target": "attacker" }
       ],
       "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」：「**昔涟每从 1 个除德谬歌以外不同的队友处获得【追忆】后**，德谬歌施放【花与箭的舞曲】时额外对敌方随机单体造成 1 次同等于德谬歌 0.3% 生命上限的冰属性伤害」。  （本条只管**打标记**。）",
       "note": "⭐ **2026-10-02 实测两条**：① 同一事件内的规则**按文件顺序**执行（探针读到 24）；② 而【未来】的**消耗**规则也在同一个 `TURN_START` 上、且排在前面 ⇒ 若本条排在它后面，【未来】**已经被消耗**、条件恒假（实测：`mark=false counter=0`，而昔涟的【追忆】已为 1）。⭐ **所以本条必须插在最前面**。⭐ 计数器在**忆灵**身上（`target: \"summon\"`）。⛔ 同句的**额外冰伤本身**仍登记（需 `times_from: resource` 与“施放者的生命上限”）。  ⭐ 本条在计数**之后**、在消耗**之前**。"
@@ -63,15 +47,9 @@
     {
       "on": "BASIC_ATTACK",
       "id": "basic_recollection",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "追忆",
-          "amount": 1
-        }
+        { "op": "GAIN_RESOURCE", "resource": "追忆", "amount": 1 }
       ],
       "source": "1415 昔涟 普攻 看，希望的起始！ (141501, Normal/SingleAttack): 「获得1点【追忆】并对指定敌方单体造成等同于昔涟50%生命上限的冰属性伤害。」",
       "note": "「获得 **1 点【追忆】**」—— `BASIC_ATTACK` + `actor == self` ✓ + `GAIN_RESOURCE 1` ✓。⚠ 普攻自身的 **50% 生命上限**伤害由**技能数据**结算 ✓ ⇒ 不写规则 ✓。"
@@ -79,22 +57,10 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_recollection",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "追忆",
-          "amount": 3
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "结界",
-          "turns": 2,
-          "ticks_on": "self",
-          "target": "self"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "追忆", "amount": 3 },
+        { "op": "APPLY_BUFF", "buff": "结界", "turns": 2, "ticks_on": "self", "target": "self" }
       ],
       "source": "1415 昔涟 战技 盛放吧，来世的乐土 (141502, BPSkill/Support): 「获得3点【追忆】并展开结界，持续2回合，昔涟每回合开始时结界持续回合数减1。结界持续期间，我方全体目标每造成1次伤害，都会再额外造成1次等同于原伤害24%的真实伤害。当昔涟陷入无法战斗状态时，结界也会被解除。」",
       "note": "「获得 **3 点【追忆】**」✓（`GAIN_RESOURCE 3` ✓，与上限 24 那处同一个资源 ✓）＋「**并展开结界，持续 2 回合，昔涟每回合开始时结界持续回合数减 1**」✓ ⇒ **具名状态 ＋ `turns: 2` ＋ `ticks_on: \"self\"`** ✓（`self` = **规则主人** ✓，正是「**昔涟**每回合开始时减 1」✓ —— 与 1321 大丽花／1403 缇宝同一条写法 ✓）。⭐ **而同句的「当昔涟陷入无法战斗状态时，结界也会被解除」是免费的** ✓ —— `ticks_on` **就是锚点** ✓（`BuffManager.removeBuffsAnchoredTo` 判的是 `ticksOn` ✓，而 `releaseBuffsAnchoredToTheDead` 已经在扫**两个阵营** ✓）⇒ **她一倒，结界自己走** ✓，不需要额外一条规则 ✓。⚠ **登记**：「达到上限后还可最多溢出至 27 点」✗（资源被钳位 ✓，与第 222 轮同一条 ✓）。"
@@ -102,11 +68,7 @@
     {
       "on": "DAMAGE_SETTLED",
       "id": "zone_true_damage_rider",
-      "when": [
-        "self has_state 结界",
-        "actor is_ally",
-        "damage_is_attack"
-      ],
+      "when": ["self has_state 结界", "actor is_ally", "damage_is_attack"],
       "do": [
         {
           "op": "DAMAGE",
@@ -140,26 +102,10 @@
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
       ],
       "source": "1415 昔涟 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 50% 生命上限、战技 24% 真实伤害、终结技 50% 暴击率、天赋 20.00% 与 24/27 点）",
       "note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **登记（本角色的核心是\"忆灵 + 结界\"）**：① **终结技**「**召唤忆灵德谬歌**，使其**立即获得 1 个额外回合**并**激活全体队友的终结技**，随后进入【往昔的涟漪】状态，普攻**强化为**【向着爱与明天♪】且**仅能使用该普攻**，昔涟和德谬歌的**暴击率提高 50%**，展开战技的结界并使**战技的结界没有持续时间**。**单场战斗中只能施放 1 次**。德谬歌初始拥有**等同于昔涟 100% 生命上限的生命上限**」✗ —— **召唤忆灵** ✗（引擎有 `SUMMON` ✓，但需要一份**声明完整的忆灵文件** ✓，其**面板这里是\"等于她的生命上限\"** ✗ —— 第 221 轮【新蕊】那类 ✓，**面板依赖另一个单位** ✗）+ **激活全体队友的终结技** ✗ + **技能替换** ✗ + **战技结界无限期** ✗ + **单场 1 次** ✗；② **天赋的其余部分** ✗ —— 「【追忆】达到 24 点时可**激活终结技并解除自身所有负面效果**」✗（⭐ 阈值形式**是有的** ✓ `self_resource:追忆 >= 24` ✓，但它**解锁一次施放并附带 DISPEL** ✗ ⇒ 写不出来 ✓）与「处于【往昔的涟漪】状态时在【追忆】达到 **12 点**时可激活终结技」✗（**两个不同阈值** ✗）；③ **秘技**✗（未读，文档列在**结界/大地图**一段 ✓）；④ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；⑤ **星魂**未读 ✗。"
@@ -167,9 +113,7 @@
     {
       "on": "TURN_START",
       "id": "trace_party_damage_at_speed_180",
-      "when": [
-        "self_attr:SPEED >= 180"
-      ],
+      "when": ["self_attr:SPEED >= 180"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -186,13 +130,9 @@
     {
       "on": "ULT_CAST",
       "id": "ult_summons_demiurge",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "SUMMON"
-        }
+        { "op": "SUMMON" }
       ],
       "source": "1415 昔涟 终结技 诗的「◦」誓约的「∞」 (141503/141504): 「召唤忆灵 德谬歌…单场战斗中只能施放 1 次。」",
       "note": "「**召唤忆灵 德谬歌**」⇒ `ULT_CAST` ⇒ **`SUMMON`** ✓；面板在 `resources/memosprites/1415.json` ✓。⚠ 同句还说「使其立即获得 1 个**额外回合**✗、激活全体队友的终结技 ✗、进入【往昔的涟漪】✗、展开战技结界 ✗、双方暴击率 +50% ✗、单场一次 ✓（`once_per_battle` ✓ 可写 ✓）」⇒ 除召唤外**逐条登记** ✓。"
@@ -201,12 +141,7 @@
       "on": "INSERTED_CAST_END",
       "id": "memosprite_ode_to_law_pays_charge",
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "充能",
-          "amount": 1,
-          "target": "target"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 1, "target": "target" }
       ],
       "source": "1415 昔涟 忆灵技能 15 献予「律法」之诗 / Ode to Law (141505, effect 10000023): 「整场生效，对刻律德菈施放后，持有【军功】的角色暴击伤害提高 30%，**奇袭结束后**，使刻律德菈获得 **1** 点充能。」",
       "note": "「**奇袭结束后，使刻律德菈获得 1 点充能**」⇒ `INSERTED_CAST_END` ⇒ `GAIN_RESOURCE{充能, 1, target: target}` ✓。⚠ **为何 `target` 就是刻律德菈** ✓：游戏里「奇袭」由【爵位】持有者施放战技时触发 ✓，而 `1412` 的 `coup_de_main` 写的是 `CAST_SKILL{skill: SKILL, **target: \"attacker\"**}` ✓ —— 即被命令的那次施放**瞄准的就是触发它的那位** ✓，而本件（第 66 件）正好让该时刻的 `target` 携带它 ✓✓。⚠ 条件 `actor has_state 爵位` ✓ 保证只在奇袭真正发生时结算 ✓。⚠ 登记：同句的**暴击伤害 +30%**（针对持有【军功】者 ✗）与「对刻律德菈施放后**整场生效**」的持续性 ✗ 尚未写 ✓。 ⚠ **条件已删（同日实测 ✓）**：事件本身就是条件 ✓（只有被命令的施放结束才会触发 ✓），而 `1412` 自己的订阅者**在同一事件上摘掉【爵位】** ✗ ⇒ 两条规则的**先后顺序**会决定条件是否成立 ✗ ⇒ 删掉条件只是去掉这个**不确定性** ✓，不减弱句子的意思 ✓。 ⚠ **条件已删（同日实测 ✓）**：事件本身就是条件 ✓（只有被命令的施放结束才会触发 ✓），而 `1412` 自己的订阅者**在同一事件上摘掉【爵位】** ✗ ⇒ 两条规则的**先后顺序**会决定条件是否成立 ✗ ⇒ 删掉条件只是去掉这个**不确定性** ✓，不减弱句子的意思 ✓。"
@@ -214,15 +149,9 @@
     {
       "id": "summoned_clears_every_control",
       "on": "SUMMONED",
-      "when": [
-        "actor is_summon"
-      ],
+      "when": ["actor is_summon"],
       "do": [
-        {
-          "op": "DISPEL",
-          "kind": "control",
-          "target": "all_allies"
-        }
+        { "op": "DISPEL", "kind": "control", "target": "all_allies" }
       ],
       "source": "1415 昔涟 忆灵技能 05 「你好，世界♪」（数据槽位 05，SkillID 1141505）：「德谬歌被召唤时，**解除我方全体控制类负面状态**。」",
       "note": "⭐ 原句**没有任何数值**（参数表是空的）。⭐ 门是 `actor is_summon`（**实测**：`SUMMONED` 的 `actor` 是**被召唤者**，而本文件的 `self` 是它的**主人** —— 所以 `actor == self` 永远不成立）。⭐ “**所有**控制类”是**按类别扫**（`AbstractBuff.debuffClass()`）。"
@@ -230,16 +159,9 @@
     {
       "id": "after_it_casts_every_ongoing_effect_shortens_by_one",
       "on": "CAST_SETUP",
-      "when": [
-        "actor is_summon"
-      ],
+      "when": ["actor is_summon"],
       "do": [
-        {
-          "op": "EXTEND_BUFF",
-          "kind": "all",
-          "turns": -1,
-          "target": "self"
-        }
+        { "op": "EXTEND_BUFF", "kind": "all", "turns": -1, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 03 「等待，在所有的过去」（数据槽位 03，SkillID 1141503）：「**德谬歌施放技能后使自身所有持续效果持续回合数减 1**。」",
       "note": "⭐ **所有**→ `EXTEND_BUFF` + `\"kind\": \"all\"`；**减 1** → `turns: -1`（`requireSignedTurns` 允许负数）；`self` 在本文件里是**主人**（**实测**）。⭐ **挂 `CAST_SETUP` 而不是 `SKILL_CAST`**：**实测**（探针）—— 忆灵的施放会发 `CAST_SETUP`（主人 DEFENCE +291.06）但**不发** `SKILL_CAST`（主人 ATTACK +0.0）。⚠ 而“施放**后**”这个顺序**不可观测**：效果只改已有持续效果的剩余回合，而施放本身的结算不读它们。"
@@ -247,10 +169,7 @@
     {
       "id": "memosprite_ode_of_sky_stacks_hyacine_when_it_casts",
       "on": "CAST_SETUP",
-      "when": [
-        "actor is_summon",
-        "from_skill_id == 19"
-      ],
+      "when": ["actor is_summon", "from_skill_id == 19"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -267,18 +186,9 @@
     {
       "id": "true_self_ode_marks_cyrene",
       "on": "CAST_SETUP",
-      "when": [
-        "target == self",
-        "actor is_summon",
-        "from_skill_id == 26"
-      ],
+      "when": ["target == self", "actor is_summon", "from_skill_id == 26"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "献予「真我」之诗",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "APPLY_BUFF", "buff": "献予「真我」之诗", "permanent": true, "target": "self" }
       ],
       "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526，`SkillCY14`，参数 `[0.3, 3]`）的整句：「昔涟每从1个除德谬歌以外不同的队友处获得【追忆】后，德谬歌施放【花与箭的舞曲】时额外对敌方随机单体造成1次同等于德谬歌0.3%生命上限的冰属性伤害。**昔涟施放终结技后或德谬歌被召唤时，使德谬歌获得 1 点【故事】**，当【故事】达到 3 点时，德谬歌消耗全部【故事】立即获得 1 个额外回合自动施放【花与箭的舞曲】」",
       "note": "⭐ 与其他诗同形：读到自己被选中时打标记，后续两个触发靠它限定。"
@@ -286,17 +196,9 @@
     {
       "id": "true_self_ode_gives_story_on_her_ultimate",
       "on": "ULT_CAST",
-      "when": [
-        "actor == self",
-        "self has_state 献予「真我」之诗"
-      ],
+      "when": ["actor == self", "self has_state 献予「真我」之诗"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "故事",
-          "amount": 1,
-          "target": "summon"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "故事", "amount": 1, "target": "summon" }
       ],
       "source": "同上：「**昔涟施放终结技后**…使德谬歌获得 1 点【故事】」。",
       "note": "⭐ 两个触发之一。⚠ 资源落在**忆灵自己的声明处**（`memosprites/1415.json` 的 `resources`）—— 这正是本轮新开的能力。"
@@ -304,17 +206,9 @@
     {
       "id": "true_self_ode_gives_story_when_the_memosprite_arrives",
       "on": "SUMMONED",
-      "when": [
-        "actor == summon",
-        "self has_state 献予「真我」之诗"
-      ],
+      "when": ["actor == summon", "self has_state 献予「真我」之诗"],
       "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "故事",
-          "amount": 1,
-          "target": "summon"
-        }
+        { "op": "GAIN_RESOURCE", "resource": "故事", "amount": 1, "target": "summon" }
       ],
       "source": "同上：「…或**德谬歌被召唤时**，使德谬歌获得 1 点【故事】」。",
       "note": "⭐ 另一个触发。⚠ **2026-10-02 实测**：门从 `actor is_summon` 换成 `actor == summon`——探针在整个判据运行里**只看到一次**【故事】规则被应用（而那一次的 `actor` 是昔涟自己，即终结技那条）⇒ `actor is_summon` 在 `SUMMONED` 上**从未命中**；而 `1413.json` 已有同样的记录。"
@@ -322,27 +216,11 @@
     {
       "id": "true_self_ode_spends_three_story",
       "on": "RESOURCE_CHANGED",
-      "when": [
-        "summon_resource:故事 >= 3",
-        "self has_state 献予「真我」之诗"
-      ],
+      "when": ["summon_resource:故事 >= 3", "self has_state 献予「真我」之诗"],
       "do": [
-        {
-          "op": "SPEND_RESOURCE",
-          "resource": "故事",
-          "spendAll": true,
-          "target": "summon"
-        },
-        {
-          "op": "INSERT_ACTION",
-          "target": "summon"
-        },
-        {
-          "op": "CAST_SKILL",
-          "skill": "SKILL",
-          "skill_id": 1,
-          "target": "summon"
-        }
+        { "op": "SPEND_RESOURCE", "resource": "故事", "spendAll": true, "target": "summon" },
+        { "op": "INSERT_ACTION", "target": "summon" },
+        { "op": "CAST_SKILL", "skill": "SKILL", "skill_id": 1, "target": "summon" }
       ],
       "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526）：「**当【故事】达到 3 点时，德谬歌消耗全部【故事】立即获得 1 个额外回合自动施放【花与箭的舞曲】**」。",
       "note": "⭐ **2026-10-02**：⭐ **新词汇 `summon_resource:`**—— 实测 `fireResourceChanged` 是 `CanHit holder = ctx.owner()`（**规则主人**），而【故事】在**忆灵**身上 ⇒ 条件必须从主人**伸到它的召唤物**。⭐ 「立即获得 1 个额外回合」用 **`INSERT_ACTION`**：本忆灵的速度**据数据就是 0**，而 `Queue.addCombatant` 的注释写明这种单位**不会出现在行动条上、也不会轮到它**（“skipped rather than refused”）⇒ 所以「**立即**…」的语义是“**立即行动**”（`INSERT_ACTION` 的自述：“makes X act now”），而不是排程意义的额外回合。⭐ 「花与箭的舞曲」= `SkillID 1141501`（忆灵槽位 1）。"
@@ -352,12 +230,7 @@
       "on": "BATTLE_START",
       "when": null,
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "未来",
-          "permanent": true,
-          "target": "other_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "未来", "permanent": true, "target": "other_allies" }
       ],
       "source": "1415 昔涟 天赋 众愿啊，汇流如歌 (141504, Enhance)：「**战斗开始时或昔涟行动后，我方任意状态的其他角色及其忆灵获得【未来】**」。",
       "note": "⭐ **2026-10-02**：原话说**其他**角色 ⇒ 用 `target_when: [\"target != self\"]` 排除昔涟自己；⭐ `max_stacks: 1`：「获得【未来】」是**刷新**而不是叠加。⛔ 同句的**消耗部分**（「持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】」）仍登记：它要读**行动者自己**的计数器。  ⭐ 排除她自己的方式：`target_when` 在 `BATTLE_START` 上被拒（该事件**无目标**）⇒ 改用**后置的一条回收**（见 `talent_keeps_future_off_herself`）。"
@@ -365,16 +238,9 @@
     {
       "id": "talent_grants_future_after_she_acts",
       "on": "TURN_END",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "未来",
-          "permanent": true,
-          "target": "other_allies"
-        }
+        { "op": "APPLY_BUFF", "buff": "未来", "permanent": true, "target": "other_allies" }
       ],
       "source": "1415 昔涟 天赋 众愿啊，汇流如歌 (141504, Enhance)：「**战斗开始时或昔涟行动后，我方任意状态的其他角色及其忆灵获得【未来】**」。",
       "note": "⭐ **2026-10-02**：原话说**其他**角色 ⇒ 用 `target_when: [\"target != self\"]` 排除昔涟自己；⭐ `max_stacks: 1`：「获得【未来】」是**刷新**而不是叠加。⛔ 同句的**消耗部分**（「持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】」）仍登记：它要读**行动者自己**的计数器。  ⭐ 「昔涟行动后」= 她自己的 `TURN_END`。  ⭐ 排除她自己的方式：`target_when` 在 `BATTLE_START` 上被拒（该事件**无目标**）⇒ 改用**后置的一条回收**（见 `talent_keeps_future_off_herself`）。"
@@ -382,20 +248,10 @@
     {
       "id": "talent_spends_future_for_recollection",
       "on": "TURN_START",
-      "when": [
-        "actor has_state 未来"
-      ],
+      "when": ["actor has_state 未来"],
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "未来",
-          "target": "attacker"
-        },
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "追忆",
-          "amount": 1
-        }
+        { "op": "REMOVE_STATE", "buff": "未来", "target": "attacker" },
+        { "op": "GAIN_RESOURCE", "resource": "追忆", "amount": 1 }
       ],
       "source": "1415 昔涟 天赋 141504：「**持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】**」。",
       "note": "⭐ **2026-10-02 实测三条**：① 本条对**队友的 `TURN_START`** 会发（去掉条件后读数 `【追忆】 0.0 -> 1.0`）；② 门必须是 **`actor has_state 未来`**，因为 `actor_stacks:未来` 读的是**计数器**、对状态**恒假**；③ 而 `REMOVE_STACK{buff, amount}` 没能拿掉它 ⇒ 改用 **`REMOVE_STATE`**（该 arm 自述：“`REMOVE_STATE` takes all of them off”，而 `BuffManager.removeNamedStacks` **并不看 `permanent`**）。  ⚠ 目标用 **`attacker`**：`target` 在**不带目标的 `TURN_START`** 上会报“Effect targets \\\"target\\\" but this event has no such party”（实测：三个旧判据因此挂掉）。"
@@ -403,20 +259,10 @@
     {
       "id": "talent_cleanses_at_a_full_recollection",
       "on": "RESOURCE_CHANGED",
-      "when": [
-        "self_resource:追忆 >= 24"
-      ],
+      "when": ["self_resource:追忆 >= 24"],
       "do": [
-        {
-          "op": "DISPEL",
-          "kind": "control",
-          "target": "self"
-        },
-        {
-          "op": "DISPEL",
-          "kind": "dot",
-          "target": "self"
-        }
+        { "op": "DISPEL", "kind": "control", "target": "self" },
+        { "op": "DISPEL", "kind": "dot", "target": "self" }
       ],
       "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时可激活终结技并**解除自身所有负面效果**」。  （本条只管 **control** 类的负面状态。）",
       "note": "⭐ **2026-10-02**：事件用 `RESOURCE_CHANGED` —— 实测它的 holder **就是规则主人**（即昔涟），所以 `self_resource:追忆` 正好读她自己的计数器。⭐ `DISPEL{kind: \"all\"}`：该词汇只能由**显式**的 `kind` 到达（`BuffManager` 的注记）。⛔ 仍登记：**12 点**那一档（需要【往昔的涟漪】状态，套装尚未建模）与「**可激活终结技**」本身。  ⭐ 本条只管 **control** 一类：`DISPEL` 的 `kind` **只收 `control` / `dot`**（实测：`\"all\"` 会被拒）⇒「**所有**负面效果」写成**按类各一条**。  ⭐ 两个类别写在**同一条**里：`DISPEL` 的 `kind` **只收 `control` / `dot`**（实测：`\"all\"` 会被拒），而拆成两条会被**重复句子守卫**判为同一句写了两遍。"
@@ -424,10 +270,7 @@
     {
       "id": "true_self_ode_extra_ice_hit",
       "on": "CAST_SETUP",
-      "when": [
-        "actor is_summon",
-        "from_skill_id == 1"
-      ],
+      "when": ["actor is_summon", "from_skill_id == 1"],
       "do": [
         {
           "op": "DAMAGE",
@@ -444,16 +287,9 @@
     {
       "id": "ult_enters_the_ripple_and_sharpens",
       "on": "ULT_CAST",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "往昔的涟漪",
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "APPLY_BUFF", "buff": "往昔的涟漪", "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
@@ -463,33 +299,10 @@
           "coexist": true,
           "max_stacks": 1
         },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "终结技已激活",
-          "permanent": true,
-          "target": "other_allies"
-        },
-        {
-          "op": "REPLACE_SKILL",
-          "skill": "COMMON",
-          "skill_id": 8,
-          "target": "self",
-          "permanent": true
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "结界",
-          "permanent": true,
-          "ticks_on": "self",
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_CHANCE",
-          "amount": 0.5,
-          "permanent": true,
-          "target": "summon"
-        }
+        { "op": "APPLY_BUFF", "buff": "终结技已激活", "permanent": true, "target": "other_allies" },
+        { "op": "REPLACE_SKILL", "skill": "COMMON", "skill_id": 8, "target": "self", "permanent": true },
+        { "op": "APPLY_BUFF", "buff": "结界", "permanent": true, "ticks_on": "self", "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "amount": 0.5, "permanent": true, "target": "summon" }
       ],
       "source": "1415 昔涟 终结技 诗的「◦」誓约的「∞」 (141503/141504)：「召唤忆灵德谬歌，使其立即获得 1 个额外回合并激活全体队友的终结技，随后**进入【往昔的涟漪】状态**，获得强化普攻。昔涟和德谬歌的**暴击率提高**，展开战技的结界并使其没有持续时间」。",
       "note": "⭐ **2026-10-02：审计发现整个终结技只有 `SUMMON` 一条**（`ult_summons_demiurge`），而原话还包含本条的**进入【往昔的涟漪】**与**暴击率提高**。⭐ 【往昔的涟漪】正是槽位 26 那一档（「叙述【追忆】达到 12 点时可激活终结技」）的前提。⛔ 仍登记：「使德谬歌**立即获得 1 个额外回合**」、「**激活全体队友的终结技**」（引擎有 `Battle.isUltraReady`，但没有把它置位的 op）、「使结界没有持续时间」。  ⭐ **2026-10-02**：本条还落了原句的「激活**全体队友**的终结技」—— 给其他队友 `APPLY_BUFF{终结技已激活}`，而 `Battle.isUltraReady` 认这个状态（引擎侧新增）。  ⭐ **2026-10-02**：本条还落了原句的「**获得强化普攻**…普攻强化为【向着爱与明天♪】且仅能使用该普攻」（`REPLACE_SKILL{skill: COMMON, skill_id: 8}`；⭐ 数据测得：强化普攻 = `SkillID 141508`，槽位 8）。  ⭐ **2026-10-02**：本条还落了原句的「**展开战技的结界并使其没有持续时间**」—— 按 `AbstractBuff` 自己的说法，“没有时长”就是 **`permanent`**（“永不计时”）；同时它也就是句子里的“**展开**结界”。 || 2026-10-18：「**昔涟和德谬歌**的暴击率提高 50%」的**忆灵那一半**补上了 ✓ —— `target: summon` + **`amount: 0.5`**（忆灵的 `CRIT_CHANCE` 基础是 0 ⇒ 写 `percent` 会被当\"基础的百分比\"、得到 0 ✗；实测：不写这条时德谬歌暴击率 0.0 ✓）。她本人那条 `percent: 0.5` 是对的（`CRIT_CHANCE` 的 base 是 1.0 ⇒ 份额与点数同值 ✓，判据实测 +0.5 ✓）。"
@@ -497,21 +310,10 @@
     {
       "id": "talent_cleanses_in_the_ripple_at_twelve",
       "on": "RESOURCE_CHANGED",
-      "when": [
-        "self has_state 往昔的涟漪",
-        "self_resource:追忆 >= 12"
-      ],
+      "when": ["self has_state 往昔的涟漪", "self_resource:追忆 >= 12"],
       "do": [
-        {
-          "op": "DISPEL",
-          "kind": "control",
-          "target": "self"
-        },
-        {
-          "op": "DISPEL",
-          "kind": "dot",
-          "target": "self"
-        }
+        { "op": "DISPEL", "kind": "control", "target": "self" },
+        { "op": "DISPEL", "kind": "dot", "target": "self" }
       ],
       "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时可激活终结技并解除自身所有负面效果，**处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技**」。",
       "note": "⭐ **2026-10-02**：阈值由数据确认 —— `141503` 的 **Lv10** 行是 `[1, 24, 0.5, 12]`，即 `#4` = **12**、`#2` = **24**（两档阈值都在同一行里）。⭐ 「可激活终结技」本身仍登记：引擎有 `Battle.isUltraReady`，但**没有把它置位的 op**（能量满才能放）。"
@@ -519,16 +321,9 @@
     {
       "id": "talent_activates_the_ultimate_at_twenty_four",
       "on": "RESOURCE_CHANGED",
-      "when": [
-        "self_resource:追忆 >= 24"
-      ],
+      "when": ["self_resource:追忆 >= 24"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "终结技已激活",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "APPLY_BUFF", "buff": "终结技已激活", "permanent": true, "target": "self" }
       ],
       "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时**可激活终结技**，处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技」。",
       "note": "⭐ **2026-10-02 实测**：`isUltraReady` 对她在 **0 / 12 / 12+涟漪 / 24** 四种情形下**都是 false** —— 原因是结构性的：`CharacterFactory` 给她 `NoConventionalEnergyProvider`，而那个类**没有覆盖 `canCastUltra`**，默认实现要求她**没有的能量条** ⇒ 她永远不可放。⭐ 而上一轮刚好把 `ULTIMATE_ACTIVATED_STATE`（`终结技已激活`）加进了引擎且 `isUltraReady` 认它 ⇒ 这两句**不需要再改引擎**。  ⭐ 满点档。"
@@ -536,17 +331,9 @@
     {
       "id": "talent_activates_the_ultimate_at_twelve_inside_the_ripple",
       "on": "RESOURCE_CHANGED",
-      "when": [
-        "self has_state 往昔的涟漪",
-        "self_resource:追忆 >= 12"
-      ],
+      "when": ["self has_state 往昔的涟漪", "self_resource:追忆 >= 12"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "终结技已激活",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "APPLY_BUFF", "buff": "终结技已激活", "permanent": true, "target": "self" }
       ],
       "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时**可激活终结技**，处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技」。",
       "note": "⭐ **2026-10-02 实测**：`isUltraReady` 对她在 **0 / 12 / 12+涟漪 / 24** 四种情形下**都是 false** —— 原因是结构性的：`CharacterFactory` 给她 `NoConventionalEnergyProvider`，而那个类**没有覆盖 `canCastUltra`**，默认实现要求她**没有的能量条** ⇒ 她永远不可放。⭐ 而上一轮刚好把 `ULTIMATE_ACTIVATED_STATE`（`终结技已激活`）加进了引擎且 `isUltraReady` 认它 ⇒ 这两句**不需要再改引擎**。  ⭐ 涟漪档（阈值 12 由数据确认：`141503` 的 Lv10 行 `[1, 24, 0.5, 12]`）。"

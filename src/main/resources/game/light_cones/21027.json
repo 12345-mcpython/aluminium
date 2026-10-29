@@ -3,18 +3,9 @@
     {
       "on": "KILL",
       "id": "cone21027_attack_stack_on_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "早餐层数",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -32,18 +23,9 @@
     {
       "on": "KILL",
       "id": "cone21027_attack_stack_on_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "早餐层数",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -61,18 +43,9 @@
     {
       "on": "KILL",
       "id": "cone21027_attack_stack_on_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "早餐层数",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -90,18 +63,9 @@
     {
       "on": "KILL",
       "id": "cone21027_attack_stack_on_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "早餐层数",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -119,18 +83,9 @@
     {
       "on": "KILL",
       "id": "cone21027_attack_stack_on_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "早餐层数",
-          "amount": 1,
-          "max_stacks": 3,
-          "permanent": true,
-          "target": "self"
-        },
+        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",

@@ -3,10 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21011_same_element",
-      "when": [
-        "actor is_ally",
-        "damage_element_is_self"
-      ],
+      "when": ["actor is_ally", "damage_element_is_self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -25,10 +22,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21011_same_element",
-      "when": [
-        "actor is_ally",
-        "damage_element_is_self"
-      ],
+      "when": ["actor is_ally", "damage_element_is_self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -47,10 +41,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21011_same_element",
-      "when": [
-        "actor is_ally",
-        "damage_element_is_self"
-      ],
+      "when": ["actor is_ally", "damage_element_is_self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -69,10 +60,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21011_same_element",
-      "when": [
-        "actor is_ally",
-        "damage_element_is_self"
-      ],
+      "when": ["actor is_ally", "damage_element_is_self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -91,10 +79,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21011_same_element",
-      "when": [
-        "actor is_ally",
-        "damage_element_is_self"
-      ],
+      "when": ["actor is_ally", "damage_element_is_self"],
       "do": [
         {
           "op": "MODIFY_ATTR",

@@ -4,18 +4,11 @@
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.12,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.12, "target": "self" }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
       "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "2": [
@@ -23,18 +16,11 @@
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.12,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.12, "target": "self" }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
       "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "3": [
@@ -42,18 +28,11 @@
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.12,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.12, "target": "self" }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
       "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "4": [
@@ -61,18 +40,11 @@
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.12,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.12, "target": "self" }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
       "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "5": [
@@ -80,18 +52,11 @@
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.12,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.12, "target": "self" }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
       "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ]
 }

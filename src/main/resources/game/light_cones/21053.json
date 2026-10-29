@@ -4,13 +4,7 @@
       "on": "BATTLE_START",
       "id": "cone21053_shield_boost",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SHIELD_BOOST",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SHIELD_BOOST", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
       "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
@@ -18,16 +12,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21053_damage_up_while_shielded",
-      "when": [
-        "actor is_ally",
-        "actor has_shield"
-      ],
+      "when": ["actor is_ally", "actor has_shield"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.12,
-          "target": "actor"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.12, "target": "actor" }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
       "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
@@ -38,13 +25,7 @@
       "on": "BATTLE_START",
       "id": "cone21053_shield_boost",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SHIELD_BOOST",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SHIELD_BOOST", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
       "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
@@ -52,16 +33,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21053_damage_up_while_shielded",
-      "when": [
-        "actor is_ally",
-        "actor has_shield"
-      ],
+      "when": ["actor is_ally", "actor has_shield"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.14,
-          "target": "actor"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.14, "target": "actor" }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
       "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
@@ -72,13 +46,7 @@
       "on": "BATTLE_START",
       "id": "cone21053_shield_boost",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SHIELD_BOOST",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SHIELD_BOOST", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
       "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
@@ -86,16 +54,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21053_damage_up_while_shielded",
-      "when": [
-        "actor is_ally",
-        "actor has_shield"
-      ],
+      "when": ["actor is_ally", "actor has_shield"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.16,
-          "target": "actor"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.16, "target": "actor" }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
       "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
@@ -106,13 +67,7 @@
       "on": "BATTLE_START",
       "id": "cone21053_shield_boost",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SHIELD_BOOST",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SHIELD_BOOST", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
       "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
@@ -120,16 +75,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21053_damage_up_while_shielded",
-      "when": [
-        "actor is_ally",
-        "actor has_shield"
-      ],
+      "when": ["actor is_ally", "actor has_shield"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.18,
-          "target": "actor"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.18, "target": "actor" }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
       "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
@@ -140,13 +88,7 @@
       "on": "BATTLE_START",
       "id": "cone21053_shield_boost",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SHIELD_BOOST",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SHIELD_BOOST", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
       "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
@@ -154,16 +96,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21053_damage_up_while_shielded",
-      "when": [
-        "actor is_ally",
-        "actor has_shield"
-      ],
+      "when": ["actor is_ally", "actor has_shield"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.2,
-          "target": "actor"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.2, "target": "actor" }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
       "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"

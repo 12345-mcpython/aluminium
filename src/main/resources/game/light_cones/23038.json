@@ -4,53 +4,21 @@
       "on": "FOLLOW_UP",
       "id": "cone23038_after_follow_up",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 12,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.48,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.48, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
       "note": "「装备者施放**追加攻击**后额外恢复 12 点能量，并获得【谕示】2 回合；持有【谕示】时**我方全体**暴击伤害 +48%」—— `FOLLOW_UP` ＋ **`actor == self`** ✓ ＋ `GAIN_ENERGY(12)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{target: all_allies, turns: 2}` ✓（12 与 48/60/72/84/96% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✗：原先**没有门** ⇒ **任何队友**的追加攻击都会给她回能并发【谕示】✗（同形：20007/20014/20020/20013/21004/23033 —— 本审计第十一次 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     },
     {
       "on": "BATTLE_START",
       "id": "cone23038_at_battle_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 21,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.48,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.48, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
       "note": "「进入战斗时恢复 21 点能量并获得【谕示】2 回合」—— `BATTLE_START` ＋ `GAIN_ENERGY(21)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{all_allies}` ✓（21 ✓）。"
@@ -61,53 +29,21 @@
       "on": "FOLLOW_UP",
       "id": "cone23038_after_follow_up",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 12,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.6,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.6, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
       "note": "「装备者施放**追加攻击**后额外恢复 12 点能量，并获得【谕示】2 回合；持有【谕示】时**我方全体**暴击伤害 +48%」—— `FOLLOW_UP` ＋ **`actor == self`** ✓ ＋ `GAIN_ENERGY(12)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{target: all_allies, turns: 2}` ✓（12 与 48/60/72/84/96% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✗：原先**没有门** ⇒ **任何队友**的追加攻击都会给她回能并发【谕示】✗（同形：20007/20014/20020/20013/21004/23033 —— 本审计第十一次 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     },
     {
       "on": "BATTLE_START",
       "id": "cone23038_at_battle_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 21,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.6,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.6, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
       "note": "「进入战斗时恢复 21 点能量并获得【谕示】2 回合」—— `BATTLE_START` ＋ `GAIN_ENERGY(21)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{all_allies}` ✓（21 ✓）。"
@@ -118,53 +54,21 @@
       "on": "FOLLOW_UP",
       "id": "cone23038_after_follow_up",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 12,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.72,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.72, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
       "note": "「装备者施放**追加攻击**后额外恢复 12 点能量，并获得【谕示】2 回合；持有【谕示】时**我方全体**暴击伤害 +48%」—— `FOLLOW_UP` ＋ **`actor == self`** ✓ ＋ `GAIN_ENERGY(12)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{target: all_allies, turns: 2}` ✓（12 与 48/60/72/84/96% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✗：原先**没有门** ⇒ **任何队友**的追加攻击都会给她回能并发【谕示】✗（同形：20007/20014/20020/20013/21004/23033 —— 本审计第十一次 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     },
     {
       "on": "BATTLE_START",
       "id": "cone23038_at_battle_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 21,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.72,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.72, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
       "note": "「进入战斗时恢复 21 点能量并获得【谕示】2 回合」—— `BATTLE_START` ＋ `GAIN_ENERGY(21)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{all_allies}` ✓（21 ✓）。"
@@ -175,53 +79,21 @@
       "on": "FOLLOW_UP",
       "id": "cone23038_after_follow_up",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 12,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.84,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.84, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
       "note": "「装备者施放**追加攻击**后额外恢复 12 点能量，并获得【谕示】2 回合；持有【谕示】时**我方全体**暴击伤害 +48%」—— `FOLLOW_UP` ＋ **`actor == self`** ✓ ＋ `GAIN_ENERGY(12)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{target: all_allies, turns: 2}` ✓（12 与 48/60/72/84/96% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✗：原先**没有门** ⇒ **任何队友**的追加攻击都会给她回能并发【谕示】✗（同形：20007/20014/20020/20013/21004/23033 —— 本审计第十一次 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     },
     {
       "on": "BATTLE_START",
       "id": "cone23038_at_battle_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 21,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.84,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.84, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
       "note": "「进入战斗时恢复 21 点能量并获得【谕示】2 回合」—— `BATTLE_START` ＋ `GAIN_ENERGY(21)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{all_allies}` ✓（21 ✓）。"
@@ -232,53 +104,21 @@
       "on": "FOLLOW_UP",
       "id": "cone23038_after_follow_up",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 12,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.96,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.96, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
       "note": "「装备者施放**追加攻击**后额外恢复 12 点能量，并获得【谕示】2 回合；持有【谕示】时**我方全体**暴击伤害 +48%」—— `FOLLOW_UP` ＋ **`actor == self`** ✓ ＋ `GAIN_ENERGY(12)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{target: all_allies, turns: 2}` ✓（12 与 48/60/72/84/96% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `actor == self`** ✗：原先**没有门** ⇒ **任何队友**的追加攻击都会给她回能并发【谕示】✗（同形：20007/20014/20020/20013/21004/23033 —— 本审计第十一次 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     },
     {
       "on": "BATTLE_START",
       "id": "cone23038_at_battle_start",
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 21,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "谕示",
-          "turns": 2,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "CRIT_ATTACK",
-          "percent": 0.96,
-          "turns": 2,
-          "target": "all_allies"
-        }
+        { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.96, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
       "note": "「进入战斗时恢复 21 点能量并获得【谕示】2 回合」—— `BATTLE_START` ＋ `GAIN_ENERGY(21)` ＋ `APPLY_BUFF{谕示, turns: 2}` ＋ `MODIFY_ATTR{all_allies}` ✓（21 ✓）。"

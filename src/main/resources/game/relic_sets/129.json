@@ -3,9 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "relic129_elation_ignores_defence",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",

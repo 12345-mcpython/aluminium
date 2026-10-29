@@ -3,16 +3,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.16,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.16, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -20,17 +13,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": [
-        "actor == self",
-        "target has_state 风化",
-        "!target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.16,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.16, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -40,16 +25,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.2,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.2, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -57,17 +35,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": [
-        "actor == self",
-        "target has_state 风化",
-        "!target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.2,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.2, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -77,16 +47,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.24,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.24, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -94,17 +57,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": [
-        "actor == self",
-        "target has_state 风化",
-        "!target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.24,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.24, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -114,16 +69,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.28,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.28, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -131,17 +79,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": [
-        "actor == self",
-        "target has_state 风化",
-        "!target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.28,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.28, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -151,16 +91,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": [
-        "actor == self",
-        "target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.32,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.32, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（触电分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"
@@ -168,17 +101,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": [
-        "actor == self",
-        "target has_state 风化",
-        "!target has_state 触电"
-      ],
+      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
       "do": [
-        {
-          "op": "BOOST_DAMAGE",
-          "percent": 0.32,
-          "target": "self"
-        }
+        { "op": "BOOST_DAMAGE", "percent": 0.32, "target": "self" }
       ],
       "source": "光锥 21022 延长记号（风化分支）: 使装备者的击破特攻提高#1[i]%，对处于触电或风化状态的敌方目标造成的伤害提高#2[i]%，该效果对持续伤害也会生效。",
       "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（16/20/24/28/32% ✓）。两条规则按「触电**优先**、否则风化」分工 ✓（`!target has_state 触电` 保证同时有两种状态时**只加一次** ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone21022_break_effect`** ✗ —— 「击破特攻提高 #1%」**就是光锥自己的** `breaking_effect` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗（同形：20003/21007/21008/21014 ✓）。\n⚠ 「该效果**对持续伤害也会生效**」✓：`BOOST_DAMAGE` 作用在 `DEALING_DAMAGE` 上，DOT 实例也走这条事件 ✓。"

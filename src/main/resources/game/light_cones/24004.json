@@ -3,18 +3,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone24004_speed_on_wide_hit",
-      "when": [
-        "actor == self",
-        "hit_count >= 3"
-      ],
+      "when": ["actor == self", "hit_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.08,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.08, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
       "note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.08 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
@@ -24,18 +15,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone24004_speed_on_wide_hit",
-      "when": [
-        "actor == self",
-        "hit_count >= 3"
-      ],
+      "when": ["actor == self", "hit_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.1,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.1, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
       "note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.1 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
@@ -45,18 +27,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone24004_speed_on_wide_hit",
-      "when": [
-        "actor == self",
-        "hit_count >= 3"
-      ],
+      "when": ["actor == self", "hit_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.12,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
       "note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.12 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
@@ -66,18 +39,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone24004_speed_on_wide_hit",
-      "when": [
-        "actor == self",
-        "hit_count >= 3"
-      ],
+      "when": ["actor == self", "hit_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.14,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.14, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
       "note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.14 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
@@ -87,18 +51,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone24004_speed_on_wide_hit",
-      "when": [
-        "actor == self",
-        "hit_count >= 3"
-      ],
+      "when": ["actor == self", "hit_count >= 3"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.16,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.16, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
       "note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.16 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"

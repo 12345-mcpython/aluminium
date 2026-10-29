@@ -2,19 +2,11 @@
   "1": [
     {
       "on": "BATTLE_START",
-      "on_any": [
-        "BREAK"
-      ],
+      "on_any": ["BREAK"],
       "id": "cone21047_speed",
       "per_turn": 1,
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.08,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.08, "turns": 2, "target": "self" }
       ],
       "source": "光锥 21047 黑夜如影随行: 「进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次」",
       "note": "「**进入战斗时或造成击破伤害后**，速度提高 #2%，持续 2 回合，该效果**每回合只可触发 1 次**」—— `on: BATTLE_START` ＋ **`on_any: [BREAK]`** ✓（「造成击破伤害后」= 引擎的 `BREAK` 事件 ✓）、**`per_turn: 1`** ✓（「每回合 1 次」✓）、8/9/10/11/12% ＋ 2 回合 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 补了 `on_any: [BREAK]` 与 `per_turn: 1` ✗（原先只有开战那一半 ✗）；② 删掉 `cone21047_break_effect` ✗ —— 击破特攻 +28% 是光锥自己的 `breaking_effect` 属性 ✓。"
@@ -23,19 +15,11 @@
   "2": [
     {
       "on": "BATTLE_START",
-      "on_any": [
-        "BREAK"
-      ],
+      "on_any": ["BREAK"],
       "id": "cone21047_speed",
       "per_turn": 1,
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.09,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.09, "turns": 2, "target": "self" }
       ],
       "source": "光锥 21047 黑夜如影随行: 「进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次」",
       "note": "「**进入战斗时或造成击破伤害后**，速度提高 #2%，持续 2 回合，该效果**每回合只可触发 1 次**」—— `on: BATTLE_START` ＋ **`on_any: [BREAK]`** ✓（「造成击破伤害后」= 引擎的 `BREAK` 事件 ✓）、**`per_turn: 1`** ✓（「每回合 1 次」✓）、8/9/10/11/12% ＋ 2 回合 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 补了 `on_any: [BREAK]` 与 `per_turn: 1` ✗（原先只有开战那一半 ✗）；② 删掉 `cone21047_break_effect` ✗ —— 击破特攻 +28% 是光锥自己的 `breaking_effect` 属性 ✓。"
@@ -44,19 +28,11 @@
   "3": [
     {
       "on": "BATTLE_START",
-      "on_any": [
-        "BREAK"
-      ],
+      "on_any": ["BREAK"],
       "id": "cone21047_speed",
       "per_turn": 1,
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.1,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.1, "turns": 2, "target": "self" }
       ],
       "source": "光锥 21047 黑夜如影随行: 「进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次」",
       "note": "「**进入战斗时或造成击破伤害后**，速度提高 #2%，持续 2 回合，该效果**每回合只可触发 1 次**」—— `on: BATTLE_START` ＋ **`on_any: [BREAK]`** ✓（「造成击破伤害后」= 引擎的 `BREAK` 事件 ✓）、**`per_turn: 1`** ✓（「每回合 1 次」✓）、8/9/10/11/12% ＋ 2 回合 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 补了 `on_any: [BREAK]` 与 `per_turn: 1` ✗（原先只有开战那一半 ✗）；② 删掉 `cone21047_break_effect` ✗ —— 击破特攻 +28% 是光锥自己的 `breaking_effect` 属性 ✓。"
@@ -65,19 +41,11 @@
   "4": [
     {
       "on": "BATTLE_START",
-      "on_any": [
-        "BREAK"
-      ],
+      "on_any": ["BREAK"],
       "id": "cone21047_speed",
       "per_turn": 1,
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.11,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.11, "turns": 2, "target": "self" }
       ],
       "source": "光锥 21047 黑夜如影随行: 「进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次」",
       "note": "「**进入战斗时或造成击破伤害后**，速度提高 #2%，持续 2 回合，该效果**每回合只可触发 1 次**」—— `on: BATTLE_START` ＋ **`on_any: [BREAK]`** ✓（「造成击破伤害后」= 引擎的 `BREAK` 事件 ✓）、**`per_turn: 1`** ✓（「每回合 1 次」✓）、8/9/10/11/12% ＋ 2 回合 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 补了 `on_any: [BREAK]` 与 `per_turn: 1` ✗（原先只有开战那一半 ✗）；② 删掉 `cone21047_break_effect` ✗ —— 击破特攻 +28% 是光锥自己的 `breaking_effect` 属性 ✓。"
@@ -86,19 +54,11 @@
   "5": [
     {
       "on": "BATTLE_START",
-      "on_any": [
-        "BREAK"
-      ],
+      "on_any": ["BREAK"],
       "id": "cone21047_speed",
       "per_turn": 1,
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.12,
-          "turns": 2,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "turns": 2, "target": "self" }
       ],
       "source": "光锥 21047 黑夜如影随行: 「进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次」",
       "note": "「**进入战斗时或造成击破伤害后**，速度提高 #2%，持续 2 回合，该效果**每回合只可触发 1 次**」—— `on: BATTLE_START` ＋ **`on_any: [BREAK]`** ✓（「造成击破伤害后」= 引擎的 `BREAK` 事件 ✓）、**`per_turn: 1`** ✓（「每回合 1 次」✓）、8/9/10/11/12% ＋ 2 回合 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 补了 `on_any: [BREAK]` 与 `per_turn: 1` ✗（原先只有开战那一半 ✗）；② 删掉 `cone21047_break_effect` ✗ —— 击破特攻 +28% 是光锥自己的 `breaking_effect` 属性 ✓。"

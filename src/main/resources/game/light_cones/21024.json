@@ -4,20 +4,8 @@
       "on": "BATTLE_START",
       "id": "cone21024_battle_start",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.08,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.08, "permanent": true, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
       "note": "「进入战斗后，使装备者速度提高 #1%、造成的伤害提高 #2%。**当装备者受到伤害后该效果失效，下个回合结束时该效果恢复**」—— 前半已写 ✓（`BATTLE_START` ＋ 两条 `permanent` 修饰 ✓，8/9/10/11/12% 与 12/15/18/21/24% ✓）。\n⛔ **仍开（已登记 §4.3）**：后半**整句没有** ✗ —— 它要求「受击 → 撤掉这两条修饰 → 下一个回合结束时再装回去」✓，而引擎没有「把一条装备修饰临时撤下再装回」的拼法 ✓（`MODIFY_RULE` 只改幅度/层数上限 ✓，不能停用 ✓）；用一个状态 ＋ 两条重装规则也会因为**同一属性修饰互相替换**而读错 ✗。⇒ 先不写，登记 ✓；缺口见证：`ConeAuditBatchNineTest` 钉住「受击后数值**不变**」✓（能力落地时它会红 ✓）。"
@@ -28,20 +16,8 @@
       "on": "BATTLE_START",
       "id": "cone21024_battle_start",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.09,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.15,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.09, "permanent": true, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.15, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
       "note": "「进入战斗后，使装备者速度提高 #1%、造成的伤害提高 #2%。**当装备者受到伤害后该效果失效，下个回合结束时该效果恢复**」—— 前半已写 ✓（`BATTLE_START` ＋ 两条 `permanent` 修饰 ✓，8/9/10/11/12% 与 12/15/18/21/24% ✓）。\n⛔ **仍开（已登记 §4.3）**：后半**整句没有** ✗ —— 它要求「受击 → 撤掉这两条修饰 → 下一个回合结束时再装回去」✓，而引擎没有「把一条装备修饰临时撤下再装回」的拼法 ✓（`MODIFY_RULE` 只改幅度/层数上限 ✓，不能停用 ✓）；用一个状态 ＋ 两条重装规则也会因为**同一属性修饰互相替换**而读错 ✗。⇒ 先不写，登记 ✓；缺口见证：`ConeAuditBatchNineTest` 钉住「受击后数值**不变**」✓（能力落地时它会红 ✓）。"
@@ -52,20 +28,8 @@
       "on": "BATTLE_START",
       "id": "cone21024_battle_start",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.1,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.18,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.1, "permanent": true, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.18, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
       "note": "「进入战斗后，使装备者速度提高 #1%、造成的伤害提高 #2%。**当装备者受到伤害后该效果失效，下个回合结束时该效果恢复**」—— 前半已写 ✓（`BATTLE_START` ＋ 两条 `permanent` 修饰 ✓，8/9/10/11/12% 与 12/15/18/21/24% ✓）。\n⛔ **仍开（已登记 §4.3）**：后半**整句没有** ✗ —— 它要求「受击 → 撤掉这两条修饰 → 下一个回合结束时再装回去」✓，而引擎没有「把一条装备修饰临时撤下再装回」的拼法 ✓（`MODIFY_RULE` 只改幅度/层数上限 ✓，不能停用 ✓）；用一个状态 ＋ 两条重装规则也会因为**同一属性修饰互相替换**而读错 ✗。⇒ 先不写，登记 ✓；缺口见证：`ConeAuditBatchNineTest` 钉住「受击后数值**不变**」✓（能力落地时它会红 ✓）。"
@@ -76,20 +40,8 @@
       "on": "BATTLE_START",
       "id": "cone21024_battle_start",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.11,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.21,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.11, "permanent": true, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.21, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
       "note": "「进入战斗后，使装备者速度提高 #1%、造成的伤害提高 #2%。**当装备者受到伤害后该效果失效，下个回合结束时该效果恢复**」—— 前半已写 ✓（`BATTLE_START` ＋ 两条 `permanent` 修饰 ✓，8/9/10/11/12% 与 12/15/18/21/24% ✓）。\n⛔ **仍开（已登记 §4.3）**：后半**整句没有** ✗ —— 它要求「受击 → 撤掉这两条修饰 → 下一个回合结束时再装回去」✓，而引擎没有「把一条装备修饰临时撤下再装回」的拼法 ✓（`MODIFY_RULE` 只改幅度/层数上限 ✓，不能停用 ✓）；用一个状态 ＋ 两条重装规则也会因为**同一属性修饰互相替换**而读错 ✗。⇒ 先不写，登记 ✓；缺口见证：`ConeAuditBatchNineTest` 钉住「受击后数值**不变**」✓（能力落地时它会红 ✓）。"
@@ -100,20 +52,8 @@
       "on": "BATTLE_START",
       "id": "cone21024_battle_start",
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.24,
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "permanent": true, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.24, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21024: 「进入战斗后，使装备者速度提高#1[i]%，造成的伤容提高#2[i]%。」",
       "note": "「进入战斗后，使装备者速度提高 #1%、造成的伤害提高 #2%。**当装备者受到伤害后该效果失效，下个回合结束时该效果恢复**」—— 前半已写 ✓（`BATTLE_START` ＋ 两条 `permanent` 修饰 ✓，8/9/10/11/12% 与 12/15/18/21/24% ✓）。\n⛔ **仍开（已登记 §4.3）**：后半**整句没有** ✗ —— 它要求「受击 → 撤掉这两条修饰 → 下一个回合结束时再装回去」✓，而引擎没有「把一条装备修饰临时撤下再装回」的拼法 ✓（`MODIFY_RULE` 只改幅度/层数上限 ✓，不能停用 ✓）；用一个状态 ＋ 两条重装规则也会因为**同一属性修饰互相替换**而读错 ✗。⇒ 先不写，登记 ✓；缺口见证：`ConeAuditBatchNineTest` 钉住「受击后数值**不变**」✓（能力落地时它会红 ✓）。"

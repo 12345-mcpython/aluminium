@@ -2,9 +2,7 @@
   {
     "on": "SKILL_CAST",
     "id": "skill_shield",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
       {
         "op": "SHIELD",
@@ -18,132 +16,82 @@
     "source": "1001 三月七 战技 可爱即是正义 (100102, BPSkill/Defence): 「为指定我方单体提供能够抵消等同于三月七#1[i]%防御力+#4[i]伤害的护盾，持续#2[i]回合。」 param Lv10 = [0.57, 3, 0.3, 760, 5] → #1 = 0.57, #2 = 3, #4 = 760",
     "note": "The shield: 「抵消等同于三月七 **57% 防御力 + 760** 伤害的护盾，持续 3 回合」。 ⚠ `scale: owner_def` + `amount` is the 「share plus a constant」 shape (added 2026-09-27 for this sentence): `percent` of the **rule owner's** DEFENCE plus the flat 760, computed when the rule fires and then held by the shield. The engine stores one shield value and a new shield **overwrites** it instead of stacking, which is what 「提供…护盾」 means. ⚠ Both numbers come from the Skill's own row at its **current level** (`percent_from_skill_param: SKILL:0` = #1, `amount_from_skill_param: SKILL:3` = #4), so the shield moves with the Skill's level instead of freezing one row: the file's `level_convention` rule puts every slot at the row the prose quotes (Lv10), which is why the shield reads 0.57 x DEF + 760 at 星魂 0 and 0.608 x DEF + 845.5 at 星魂 5 (SKILL +2 -> row 12). ⚠ **CORRECTED (2026-10-17)**: this note used to say the numbers were literal Lv10 constants, 「registered as a data gap」 because 「the engine's characters are all at skill level 1, so reading the skill's own level would give 0.38 + 190」. The premise was right and the conclusion was wrong: the engine could not read a level-dependent share on HEAL/SHIELD -- `grantAmount` read the raw `percent` and the scale family was a closed set with no skill-row spelling -- but that is a **missing capability**, not an unwritable sentence, so it was added (`percent_from_skill_param` on the share, `amount_from_skill_param` for the constant, one reader for both) and the rule uses it. ⚠ Anything NOT written from this Skill (and the historical wording) is registered in the `DISPEL` rule's note below. ⚠ NOT written from this Skill: the taunt clause 「若该目标当前生命值百分比大于等于 30%，被敌方攻击的概率大幅提高」 -- `target_hp_percent` and the `TAUNT` op both exist now, and it is STILL not written, for a reason that is not about vocabulary: the sentence raises a **probability** (「被敌方攻击的概率大幅提高」) and the document states **no magnitude anywhere**, while `TAUNT` is a hard constraint (while it is up, a single-target attack can only pick the taunter). Using it would replace a soft weight with a hard lock -- a different mechanic, not a different number -- so it stayed registered -- ⚠ ⚠ **WRITTEN on 2026-09-29**: the magnitude was in the data all along (the skill's fifth parameter, unclaimed by the prose) and the mechanic is `AGGRO_ADDED_RATIO`, not `TAUNT`. See the `skill_soft_aggro` rule below for the evidence chain. ⚠ `turns: 3` **is** honoured now: the shield is a timed `ShieldBuff` and its duration is counted in the **shielded ally's** own turns, which is what 「持续3回合」 means. Before 2026-09-27 that field was read, validated, and then silently dropped (nothing ever took the shield off), which also made every 「持有护盾的」 clause true for the rest of the battle. ⚠ Still not written from this Skill: 行迹「加护」 (「战技提供的护盾持续时间增加<1>回合」) -- lengthening a buff that is already up has no spelling (a rule can create a shield, not extend one), and 星魂 6's 「在**战技提供的**护盾保护下」 needs the shield's provider to be askable."
   },
+
   {
     "on": "SKILL_CAST",
     "id": "skill_soft_aggro",
-    "when": [
-      "actor == self",
-      "target_hp_percent >= 0.3"
-    ],
+    "when": ["actor == self", "target_hp_percent >= 0.3"],
     "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "AGGRO_ADDED_RATIO",
-        "percent": 5,
-        "turns": 3,
-        "target": "target"
-      }
+      { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "turns": 3, "target": "target" }
     ],
     "source": "1001 三月七 战技 可爱即是正义 (100102, BPSkill/Defence) 第三句: 「若该目标当前生命值百分比大于等于30%，被敌方攻击的概率大幅提高。」param Lv10 = [0.57, 3, 0.3, 760, 5] → #3 = 0.3（门槛）、#5 = 5（正文未引用的第 5 个参数）",
     "note": "「若该目标当前生命值百分比大于等于30%，被敌方攻击的概率大幅提高」 -- the one clause of hers that was registered as a **data gap** because \"the document states no magnitude\". It is not a gap: the magnitude is the skill's **fifth parameter**, and the mechanic is `AggroAddedRatio`, not a taunt. Evidence, all of it read out of turnbasedgamedata rather than inferred: ① 100102's `param_list` has **five** slots per level while the prose names only four (#1 = 0.57 of her DEF, #2 = 3 turns, #3 = the 30% gate, #4 = the flat 760), so **#5 = 5** is the only value left unclaimed; ② the game's own ability config (`Config/ConfigAbility/Avatar/Avatar_Mar_7th_00_Ability.json`, `Skill02_Phase02`) attaches the shield modifier with the property **`AggroAddedRatio`** on the shield's **owner** -- the ally, which is what 「该目标」 names; ③ that same task is guarded by `ByCompareHPRatio` against param #3, and its two branches are the sentence: `SuccessTaskList` (HP% >= 30%) carries the fifth value **dynamically** while `FailedTaskList` (HP% < 30%) pins `MDF_AggroUp` to **0** -- so below the gate there is silence rather than a smaller number, which is why this rule's condition is `target_hp_percent >= 0.3`; ④ ⚠ the raise belongs to the **Skill's** shield and to nothing else of hers: `Avatar_March7th_Rank02` (星魂 2) attaches `MAvatar_March7th_00_Rank02_Shield`, a DIFFERENT modifier with no `MDF_AggroUp` at all, so 星魂 2's battle-start shield does **not** raise aggro -- and this rule fires on the Skill cast only, which is exactly that distinction rather than a coincidence. ⚠ `percent: 5` is the ratio in the engine's own units: a ratio attribute is written as a fraction, so +500% is `5`, and `Battle.aggroOf` reads it as ×(1 + 5) = **×6** on her weight. `AggroAddedRatio` is a *ratio* by name, and 「大幅提高」 is what ×6 looks like. ⚠ It is **not** `TAUNT`: a taunt is the hard \"can only be selected\" and would replace a soft weight with a hard lock -- a different mechanic, not a different number -- which is the whole reason this clause stayed out until the data settled it. ⚠ `turns: 3` matches the shield's own 3 turns, because in the game the ratio is written BY the shield modifier and therefore ends with it. ⚠ **Registered divergence**: 行迹「加护」 extends the Skill's shield by one turn (`EXTEND_BUFF`), and in the game that lengthens the aggro raise too since it lives on the shield; here the ratio is its own modifier with its own 3 turns, so 加护 lengthens the shield but not this. The magnitude and the gate are exact; only that interaction differs."
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "DISPEL",
-        "amount": 1,
-        "target": "target"
-      }
+      { "op": "DISPEL", "amount": 1, "target": "target" }
     ],
     "source": "1001 三月七 行迹 纯洁 (1001101): 「施放战技时，解除指定我方单体的1个负面效果。」",
     "note": "「纯洁：施放战技时，解除指定我方单体的 1 个负面效果」⇒ `SKILL_CAST` + `DISPEL`（按类别扫 `debuffClass()`）。⚠ 解除**几个**：`1 个` 是引擎 `DISPEL` 的默认个数；「指定我方单体」由施放目标承载（战技本来就是单目标）。",
     "id": "skill_cleanses_one_debuff"
   },
+
   {
     "on": "TAKING_HIT",
     "id": "counter",
-    "when": [
-      "target has_shield",
-      "!actor is_ally"
-    ],
+    "when": ["target has_shield", "!actor is_ally"],
     "do": [
-      {
-        "op": "DAMAGE",
-        "skill": "TALENT",
-        "damage_param": 0,
-        "target": "attacker"
-      }
+      { "op": "DAMAGE", "skill": "TALENT", "damage_param": 0, "target": "attacker" }
     ],
     "per_turn": 2,
     "source": "1001 三月七 天赋 少女的特权 (100104, 单体攻击/Ice): 「当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击，对其造成等同于三月七100%攻击力的冰属性伤害，该效果每回合可触发2次。」 param Lv10 = [1, 2] → #1 = 1（伤害倍率），#2 = 2（每回合可触发次数）",
     "note": "Every clause of this sentence is carried by one piece of vocabulary, and each piece is the one that makes a *different* wrong reading impossible. ① 「受到…攻击后」 is `TAKING_HIT`, not `HP_LOST`: TAKING_HIT fires whenever an incoming damage instance lands, **including when the shield absorbs all of it** (hpLoss == 0), and this talent is precisely about a shielded ally -- gating it on HP loss would have skipped the case it exists for. ② 「持有护盾的我方目标」 is `target has_shield`, read from the alive shield value (a shield that has been used up no longer qualifies). ⚠ 「我方」 is not a condition: TAKING_HIT is only ever delivered for a subject on our side (Battle.fireTriggersForAlly), which is why the event is the right one for this sentence and `HP_LOST` (either side) would not be. ③ 「受到**敌方目标**攻击」 is `!actor is_ally` -- the event's `actor` is the attacker, and without the condition a friendly-fire instance would be countered as well. ④ 「向攻击者发起反击」 is `target: \"attacker\"`. ⑤ 「每回合可触发2次」 is `per_turn: 2` (param #2), counted in **三月七's own** turns, exactly like `cooldown`: without it the counter would fire on every hit of a three-hit attack -- a wrong number with nothing to report. ⚠ It is the first user of both `has_shield` and `per_turn`. ⑥ The numbers are not written here: `skill: \"TALENT\"` + `damage_param: 0` reads the row the TALENT's **current level** names (row 10 = 1, i.e. 100% ATK) and the Ice element and single-target shape come from 100104's own data. ⚠ It used to carry `damage_level: 10`, a per-effect row pin; the `level_convention` rule above states the file's level **once**, so 星魂 5's 「天赋等级+2」 raises this counter to row 12 (110% ATK) instead of the number staying pinned at row 10 (M-32). ⚠ 「反击也属于追加攻击」 holds automatically: `DAMAGE` settles through `Battle.applyAdditionalDamage`, the engine's one notion of a follow-up attack, which is also what emits FOLLOW_UP. ⚠ ⚠ 星魂 4 BOTH sentences SHIPPED on 2026-09-28: the cap as a `MODIFY_RULE` amendment (and the DEF-derived addend as `ADD_DAMAGE`), and the old 「NOT authored」 wording here was replaced -- a second rule with `per_turn: 3` would *add* firings rather than raise this rule's cap (there is no \"modify another rule's limit\" mechanism), and the damage addend is a derived flat value no op can express; 星魂 1 (energy per frozen target) and 行迹「冰咒」 (+15% freeze chance) need the freeze control state; 星魂 2 needs a 「生命值百分比最低的队友」 selector; 星魂 6 and 行迹「加护」 need the shield's provider / a way to lengthen a shield that is already up."
   },
+
   {
     "on": "BATTLE_START",
     "id": "level_convention",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 9
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 9
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
     ],
     "source": "1001 三月七 技能表的**等级口径**（不是一句技能文本，而是「这条文档引的是哪一行」）: 战技 / 终结技 / 天赋的正文都按 Lv10 引用（战技 param Lv10 = [0.57, 3, 0.3, 760, 5]、终结技 param Lv10 = [1.5, 0.5, 1, 0.6]、天赋 param Lv10 = [1, 2]），普攻按全库统一的 Lv10 口径；所以本场把四个槽位都读在第 10 行",
     "note": "This is the file stating **which level its own numbers were quoted at** (M-32). ⚠ Why a rule and not a rule field: `damage_level` answers 「read THIS row」 for one effect, while a level is a fact about the skill — every effect that reads that skill must see the same one, and a raise from a 星魂 has to compose with it (`CanHit.skillLevel` = base + this battle's raises, one resolver for all read sites). ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is spelled as +9. ⚠ **All four slots and one rule**, not one rule per slot: 「which row the document quotes」 is one fact about the file, and her shield (#1 and #4 of the Skill) plus her ultimate (#1 damage, #4 the freeze DOT) now read their rows at the CURRENT level, so a slot left at 1 would have produced a mix of Lv1 and Lv10 numbers inside one sentence. It replaces the single-slot TALENT-only rule this file used to carry. ⚠ It is unconditional (no `min_eidolon`, no `when`): it is not a mechanic, it is the level the document was written at. ⚠ Unconditional rules like this one and the 星魂 rules BELOW it sum: at 星魂 5 the talent is 10 + 2 = **12** and the Skill is 12 too, which is what the game's own 「+2」 means — both tables have 15 rows, so 12 is a row that exists (a raise past the table fails loudly at fire time rather than reading nothing)."
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "ULTRA",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "COMMON",
-        "amount": 1
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
     ],
     "min_eidolon": 3,
     "source": "1001 三月七 星魂 3 记忆中的一切 (Avatar_March7th_Rank03): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'100103': 2, '100101': 1}",
     "note": "星魂3「终结技等级+2、普攻等级+1」⇒ 两条 `RAISE_SKILL_LEVEL`（上限由表的行数夹取，§4.3）。",
     "id": "eidolon_three_raises_the_ult_and_basic"
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "SKILL",
-        "amount": 2
-      },
-      {
-        "op": "RAISE_SKILL_LEVEL",
-        "skill": "TALENT",
-        "amount": 2
-      }
+      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
     ],
     "min_eidolon": 5,
     "source": "1001 三月七 星魂 5 不想再忘却 (Avatar_March7th_Rank05): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'100102': 2, '100104': 2}",
     "note": "星魂5「战技等级+2、天赋等级+2」⇒ 同形两条 `RAISE_SKILL_LEVEL`。",
     "id": "eidolon_five_raises_the_skill_and_talent"
   },
+
   {
     "on": "ULT_CAST",
     "id": "ultimate_freeze",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
       {
         "op": "APPLY_CONTROL",
@@ -159,127 +107,90 @@
     "source": "1001 三月七 终结技 冰刻箭雨之时 (100103, 全体攻击/Ice) 第二句: 「受到攻击的敌方目标有50%基础概率陷入冻结状态，持续1回合。冻结状态下，敌方目标不能行动同时每回合开始时受到等同于三月七60%攻击力的冰属性附加伤害。」 param Lv10 = [1.5, 0.5, 1, 0.6] → #2 = 0.5（基础概率），#3 = 1（持续回合），#4 = 0.6（每回合冰属性附加伤害 = 60% 攻击力）",
     "note": "The FIRST sentence of this ultimate (「对敌方全体造成等同于三月七150%攻击力的冰属性伤害」) needs no rule at all -- it is the engine's ordinary AoE path, reading 100103's own Lv10 row. This rule is the second sentence, and every clause of it is stated: ① 「受到攻击的敌方目标」 is `target: \"all_enemies\"` (the ultimate hits every enemy, so 'the ones hit' IS the enemy camp); ② 「有50%**基础**概率」 is `base_chance: 0.5` -- a *base* chance, rolled **per target** through the real pipeline (Battle.hitChance: base × (1 + 三月七's 效果命中) × (1 − the victim's 效果抵抗) × (1 − its STAT_CTRL_Frozen resistance)), which is why it is not the rule-level `chance` (that one is a single fixed roll for the whole rule, and could never let one of three enemies freeze and another not); ③ 「陷入冻结状态」 is `control: 冻结` -- the state's own name, the same spelling `has_state` reads, and the same state an Ice **break** leaves behind (both paths now attach one `ControlBuff`, so 「冻结状态」 cannot answer differently depending on what froze the victim); ④ 「持续1回合」 is `turns: 1`, required rather than defaulted (a control with no duration would be a permanent lock); ⑤ 「冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加伤害」 is the state's OWN per-turn damage: `element: Ice` + `scale: self_attr:ATTACK` + `percent_from_skill_param: \"ULTRA:3\"` (param #4, read at the ULTIMATE's current level rather than frozen at 0.6). ⚠ It rides WITH the state -- the `ControlBuff` attaches the `DotBuff` in its `applyEffect` and takes it off in its `removeBuff`, and it is only created on the units the roll let through, so 「冻结状态下」 is not an approximation: a resisted freeze deals no ice damage either. ⚠ The magnitude is read **once, when it lands** and frozen into the DOT -- 「等同于三月七60%攻击力」 means her attack at that moment (the snapshot rule every derived value follows); the level is likewise the level at that moment (0.6 at row 10, 0.66 at row 12 after 星魂 3). ⚠ `base_chance: 0.5` stays a LITERAL on purpose, and it is exact rather than an approximation: #2 is 0.5 in **every** one of 100103's rows, so a level-aware spelling would read the same number (there is no `base_chance_from_*` spelling, and adding one for a constant column would be vocabulary for nothing). ⚠ Also ⚠ BOTH of these SHIPPED on 2026-09-28 and the old wording (「no vocabulary expresses yet」) is kept here only as history: 行迹「冰咒」 is a `MODIFY_RULE` amendment of this rule's own `base_chance` (0.5 -> 0.65), and 星魂 1 is a `GAIN_ENERGY` rule reading `scale: cast_applied:冻结` -- the per-cast count of victims the state actually landed on, which `tryApplyDebuff` now records."
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "SHIELD",
-        "scale": "owner_def",
-        "percent": 0.24,
-        "amount": 320,
-        "turns": 3,
-        "target": "lowest_hp_ally"
-      }
+      { "op": "SHIELD", "scale": "owner_def", "percent": 0.24, "amount": 320, "turns": 3, "target": "lowest_hp_ally" }
     ],
     "min_eidolon": 2,
     "source": "1001 三月七 星魂 2 记忆中的它 (Avatar_March7th_Rank02): 「进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+320的护盾，持续3回合。」 param = [0.24, 3, 320]",
     "note": "星魂2「进入战斗时，为当前生命值百分比最低的我方目标提供 24% 防御力+320 的护盾，持续 3 回合」⇒ `BATTLE_START` + `SHIELD`，目标 `lowest_hp_ally`，份额 `self_attr:DEFENCE` × 0.24 + 320。",
     "id": "eidolon_two_shields_the_lowest_hp_ally_at_battle_start"
   },
+
   {
     "on": "SKILL_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "EXTEND_BUFF",
-        "buff": "护盾",
-        "turns": 1,
-        "target": "target"
-      }
+      { "op": "EXTEND_BUFF", "buff": "护盾", "turns": 1, "target": "target" }
     ],
     "source": "1001 三月七 行迹 加护 (1001102): 「战技提供的护盾持续时间增加1回合。」",
     "note": "行迹「加护：战技提供的护盾持续时间增加 1 回合」⇒ `SKILL_CAST` + `EXTEND_BUFF` 点名「护盾」+1 回合（**必须点名**：`kind: all` 会把她身上别的持续效果也加长）。",
     "id": "trace_grace_adds_one_turn_to_the_shield"
   },
+
   {
     "on": "ULT_CAST",
-    "when": [
-      "actor == self"
-    ],
+    "when": ["actor == self"],
     "do": [
-      {
-        "op": "GAIN_ENERGY",
-        "scale": "cast_applied:冻结",
-        "percent": 6
-      }
+      { "op": "GAIN_ENERGY", "scale": "cast_applied:冻结", "percent": 6 }
     ],
     "min_eidolon": 1,
     "source": "1001 三月七 星魂 1 记忆中的你 (Avatar_March7th_Rank01): 「终结技每冻结1个目标，为三月七恢复6点能量。」 param = [6]",
     "note": "星魂1「终结技每冻结 1 个目标，为三月七恢复 6 点能量」⇒ scale: cast_applied:冻结 × percent 6 —— 数的是**这一发真的冻住了几个**（她的终结技按目标各掷 50%，所以可能是 0/1/2/3 次），不是瞄准了几个；⚠ 不能用 per_target（那会按**瞄准**的目标数乘，被抵抗的目标也计数）。",
     "id": "eidolon_one_gives_energy_per_frozen_target"
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "MODIFY_RULE",
-        "rule": "counter",
-        "amount": 1
-      }
+      { "op": "MODIFY_RULE", "rule": "counter", "amount": 1 }
     ],
     "min_eidolon": 4,
     "source": "1001 三月七 星魂 4 不愿再失去 (Avatar_March7th_Rank04) 第一句: 「天赋的<u>反击</u>效果每回合可触发的次数增加1次。」 param = [1, 0.3]",
     "note": "星魂4 第一句「天赋的反击每回合可触发次数增加 1 次」⇒ `MODIFY_RULE counter amount 1`（`per_turn` 2 → 3）；这也是 `MODIFY_RULE` 存在的原因：改造一条既有规则的**上限**，不是再写一条规则。",
     "id": "eidolon_four_allows_one_more_counter"
   },
+
   {
     "on": "DEALING_DAMAGE",
-    "when": [
-      "actor == self",
-      "from_skill TALENT"
-    ],
+    "when": ["actor == self", "from_skill TALENT"],
     "do": [
-      {
-        "op": "ADD_DAMAGE",
-        "scale": "self_attr:DEFENCE",
-        "percent": 0.3
-      }
+      { "op": "ADD_DAMAGE", "scale": "self_attr:DEFENCE", "percent": 0.3 }
     ],
     "min_eidolon": 4,
     "source": "1001 三月七 星魂 4 不愿再失去 (Avatar_March7th_Rank04) 第二句: 「使<u>反击</u>造成的伤害值提高，提高数值等同于三月七防御力的<strong>30%</strong>。」 param = [1, 0.3]",
     "note": "星魂4 第二句「使反击造成的伤害值提高，提高数值等同于三月七防御力的 30%」⇒ `ADD_DAMAGE 0.3 × 自身防御` （加在**基数层**，与倍率同吃增伤/暴击/防御/抗性；写成 `BOOST_DAMAGE` 只有在基数恰等于防御力时才相等）。",
     "id": "eidolon_four_adds_defence_scaled_counter_damage"
   },
+
   {
     "on": "BATTLE_START",
     "do": [
-      {
-        "op": "MODIFY_RULE",
-        "rule": "ultimate_freeze",
-        "percent": 0.15
-      }
+      { "op": "MODIFY_RULE", "rule": "ultimate_freeze", "percent": 0.15 }
     ],
     "source": "1001 三月七 行迹 冰咒 (1001103): 「施放终结技时，冻结敌方目标的<u>基础概率</u>提高15%。」",
     "note": "行迹「冰咒：施放终结技时，冻结敌方目标的基础概率提高 15%」⇒ `MODIFY_RULE ultimate_freeze`，把那条的基础概率 0.5 改成 0.65；**不是**另写一条冻结规则（那会掷两次骰）。",
     "id": "trace_ice_curse_raises_the_freeze_chance"
   },
+
   {
     "on": "TURN_START",
-    "when": [
-      "target has_shield from_rule skill_shield"
-    ],
+    "when": ["target has_shield from_rule skill_shield"],
     "do": [
-      {
-        "op": "HEAL",
-        "scale": "target_max_hp",
-        "percent": 0.04,
-        "amount": 106,
-        "target": "target"
-      }
+      { "op": "HEAL", "scale": "target_max_hp", "percent": 0.04, "amount": 106, "target": "target" }
     ],
     "min_eidolon": 6,
     "source": "1001 三月七 星魂 6 就这样，一直… (Avatar_March7th_Rank06): 「在<u>战技提供的</u>护盾保护下的我方目标，每回合开始时回复等同于各自4%生命上限+106的生命值。」 param = [0.04, 106]",
     "note": "星魂6「在战技护盾保护下的我方目标，每回合开始时回复各自 4% 生命上限+106」⇒ `TURN_START` + `HEAL`，份额 `target_max_hp` × 0.04 + 106，门 `target has_shield from_rule skill_shield`（只认**她这条战技**给的盾）。",
     "id": "eidolon_six_heals_shielded_allies_each_turn"
   },
+
   {
     "on": "BATTLE_START",
     "id": "technique_freeze",
-    "when": [
-      "self has_state 秘技"
-    ],
+    "when": ["self has_state 秘技"],
     "do": [
       {
         "op": "APPLY_CONTROL",

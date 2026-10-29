@@ -4,16 +4,11 @@
       "on": "BASIC_ATTACK",
       "id": "cone20015_advance_after_basic",
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.12
-        }
+        { "op": "ADVANCE", "percent": 0.12 }
       ],
       "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
       "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/14/16/18/20% ✓）。⭐ 写法照抄已出货内容 ✓（`relic_sets/110.json`、`308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 `target` ⇒ 作用于**规则拥有者** ✓）。⚠ **触发用 `BASIC_ATTACK`** ✓；`ADVANCE` 在**普攻结算之后**跑 ⇒ 提前的是**她自己的下一次行动** ✓（实测：剩余行动值 ×0.88 ✓）。\n⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件**没有任何条件** ✗）：引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友**的同类事件也会给装备者这份收益 ✗（本文件的 note 早先声称「有 `when: actor == self` ✓」，而当时**并没有** ✗ —— 本次补上 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "2": [
@@ -21,16 +16,11 @@
       "on": "BASIC_ATTACK",
       "id": "cone20015_advance_after_basic",
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.14
-        }
+        { "op": "ADVANCE", "percent": 0.14 }
       ],
       "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
       "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/14/16/18/20% ✓）。⭐ 写法照抄已出货内容 ✓（`relic_sets/110.json`、`308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 `target` ⇒ 作用于**规则拥有者** ✓）。⚠ **触发用 `BASIC_ATTACK`** ✓；`ADVANCE` 在**普攻结算之后**跑 ⇒ 提前的是**她自己的下一次行动** ✓（实测：剩余行动值 ×0.88 ✓）。\n⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件**没有任何条件** ✗）：引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友**的同类事件也会给装备者这份收益 ✗（本文件的 note 早先声称「有 `when: actor == self` ✓」，而当时**并没有** ✗ —— 本次补上 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "3": [
@@ -38,16 +28,11 @@
       "on": "BASIC_ATTACK",
       "id": "cone20015_advance_after_basic",
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.16
-        }
+        { "op": "ADVANCE", "percent": 0.16 }
       ],
       "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
       "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/14/16/18/20% ✓）。⭐ 写法照抄已出货内容 ✓（`relic_sets/110.json`、`308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 `target` ⇒ 作用于**规则拥有者** ✓）。⚠ **触发用 `BASIC_ATTACK`** ✓；`ADVANCE` 在**普攻结算之后**跑 ⇒ 提前的是**她自己的下一次行动** ✓（实测：剩余行动值 ×0.88 ✓）。\n⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件**没有任何条件** ✗）：引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友**的同类事件也会给装备者这份收益 ✗（本文件的 note 早先声称「有 `when: actor == self` ✓」，而当时**并没有** ✗ —— 本次补上 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "4": [
@@ -55,16 +40,11 @@
       "on": "BASIC_ATTACK",
       "id": "cone20015_advance_after_basic",
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.18
-        }
+        { "op": "ADVANCE", "percent": 0.18 }
       ],
       "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
       "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/14/16/18/20% ✓）。⭐ 写法照抄已出货内容 ✓（`relic_sets/110.json`、`308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 `target` ⇒ 作用于**规则拥有者** ✓）。⚠ **触发用 `BASIC_ATTACK`** ✓；`ADVANCE` 在**普攻结算之后**跑 ⇒ 提前的是**她自己的下一次行动** ✓（实测：剩余行动值 ×0.88 ✓）。\n⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件**没有任何条件** ✗）：引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友**的同类事件也会给装备者这份收益 ✗（本文件的 note 早先声称「有 `when: actor == self` ✓」，而当时**并没有** ✗ —— 本次补上 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ],
   "5": [
@@ -72,16 +52,11 @@
       "on": "BASIC_ATTACK",
       "id": "cone20015_advance_after_basic",
       "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.2
-        }
+        { "op": "ADVANCE", "percent": 0.2 }
       ],
       "source": "光锥 20015 蕃息: 当装备者施放普攻后，使下一次行动提前#1[i]%。",
       "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/14/16/18/20% ✓）。⭐ 写法照抄已出货内容 ✓（`relic_sets/110.json`、`308.json` 都是 `{\"op\": \"ADVANCE\", \"percent\": …}` ✓，不带 `target` ⇒ 作用于**规则拥有者** ✓）。⚠ **触发用 `BASIC_ATTACK`** ✓；`ADVANCE` 在**普攻结算之后**跑 ⇒ 提前的是**她自己的下一次行动** ✓（实测：剩余行动值 ×0.88 ✓）。\n⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件**没有任何条件** ✗）：引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友**的同类事件也会给装备者这份收益 ✗（本文件的 note 早先声称「有 `when: actor == self` ✓」，而当时**并没有** ✗ —— 本次补上 ✓）。",
-      "when": [
-        "actor == self"
-      ]
+      "when": ["actor == self"]
     }
   ]
 }

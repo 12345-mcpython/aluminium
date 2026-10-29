@@ -3,24 +3,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23037_skill_and_ult_damage_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SKILL_DAMAGE_BOOST",
-          "percent": 0.6,
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ULTIMATE_DAMAGE_BOOST",
-          "percent": 0.6,
-          "turns": 3,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.6, "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.6, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
       "note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
@@ -30,24 +16,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23037_skill_and_ult_damage_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SKILL_DAMAGE_BOOST",
-          "percent": 0.7,
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ULTIMATE_DAMAGE_BOOST",
-          "percent": 0.7,
-          "turns": 3,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.7, "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.7, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
       "note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
@@ -57,24 +29,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23037_skill_and_ult_damage_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SKILL_DAMAGE_BOOST",
-          "percent": 0.8,
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ULTIMATE_DAMAGE_BOOST",
-          "percent": 0.8,
-          "turns": 3,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.8, "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.8, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
       "note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
@@ -84,24 +42,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23037_skill_and_ult_damage_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SKILL_DAMAGE_BOOST",
-          "percent": 0.9,
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ULTIMATE_DAMAGE_BOOST",
-          "percent": 0.9,
-          "turns": 3,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.9, "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.9, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
       "note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
@@ -111,24 +55,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23037_skill_and_ult_damage_up",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SKILL_DAMAGE_BOOST",
-          "percent": 1,
-          "turns": 3,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ULTIMATE_DAMAGE_BOOST",
-          "percent": 1,
-          "turns": 3,
-          "target": "self"
-        }
+        { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 1, "turns": 3, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 1, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
       "note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"

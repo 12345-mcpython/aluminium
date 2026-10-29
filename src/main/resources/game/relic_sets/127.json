@@ -2,17 +2,9 @@
   "4": [
     {
       "on": "BASIC_ATTACK",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.24,
-          "until": ["next_attack", "next_skill"]
-        },
+        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 0.24, "until": ["next_attack", "next_skill"] },
         {
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
@@ -33,17 +25,9 @@
     },
     {
       "on": "SKILL_CAST",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
+      "when": ["actor == self", "self_summon_count >= 1"],
       "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.24,
-          "until": ["next_attack", "next_skill"]
-        },
+        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 0.24, "until": ["next_attack", "next_skill"] },
         {
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",

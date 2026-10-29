@@ -3,21 +3,10 @@
     {
       "on": "TURN_START",
       "id": "cone23059_wave_energy",
-      "when": [
-        "!self has_state 23059_wave_energy"
-      ],
+      "when": ["!self has_state 23059_wave_energy"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 20.0,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "23059_wave_energy",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 20.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "23059_wave_energy", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「装备者回合开始时，固定恢复 #2[i]=20 点能量，该效果**每个波次可触发 1 次**」—— 用**单向标记 + 每波次重置**（与遗器 325 的\"首次\"同一模式）：本规则只在**没有标记**时给能量并打上标记；`WAVE_START` 那条把标记清掉，于是每个波次又能触发一次。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -26,11 +15,7 @@
       "on": "WAVE_START",
       "id": "cone23059_wave_reset",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "23059_wave_energy",
-          "target": "self"
-        }
+        { "op": "REMOVE_STATE", "buff": "23059_wave_energy", "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -38,16 +23,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
-      "when": [
-        "from_category BPSKILL"
-      ],
+      "when": ["from_category BPSKILL"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "炼狱",
-          "turns": 2,
-          "target": "target"
-        }
+        { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
@@ -57,21 +35,10 @@
     {
       "on": "TURN_START",
       "id": "cone23059_wave_energy",
-      "when": [
-        "!self has_state 23059_wave_energy"
-      ],
+      "when": ["!self has_state 23059_wave_energy"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 20.0,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "23059_wave_energy",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 20.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "23059_wave_energy", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「装备者回合开始时，固定恢复 #2[i]=20 点能量，该效果**每个波次可触发 1 次**」—— 用**单向标记 + 每波次重置**（与遗器 325 的\"首次\"同一模式）：本规则只在**没有标记**时给能量并打上标记；`WAVE_START` 那条把标记清掉，于是每个波次又能触发一次。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -80,11 +47,7 @@
       "on": "WAVE_START",
       "id": "cone23059_wave_reset",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "23059_wave_energy",
-          "target": "self"
-        }
+        { "op": "REMOVE_STATE", "buff": "23059_wave_energy", "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -92,16 +55,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
-      "when": [
-        "from_category BPSKILL"
-      ],
+      "when": ["from_category BPSKILL"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "炼狱",
-          "turns": 2,
-          "target": "target"
-        }
+        { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
@@ -111,21 +67,10 @@
     {
       "on": "TURN_START",
       "id": "cone23059_wave_energy",
-      "when": [
-        "!self has_state 23059_wave_energy"
-      ],
+      "when": ["!self has_state 23059_wave_energy"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 20.0,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "23059_wave_energy",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 20.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "23059_wave_energy", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「装备者回合开始时，固定恢复 #2[i]=20 点能量，该效果**每个波次可触发 1 次**」—— 用**单向标记 + 每波次重置**（与遗器 325 的\"首次\"同一模式）：本规则只在**没有标记**时给能量并打上标记；`WAVE_START` 那条把标记清掉，于是每个波次又能触发一次。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -134,11 +79,7 @@
       "on": "WAVE_START",
       "id": "cone23059_wave_reset",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "23059_wave_energy",
-          "target": "self"
-        }
+        { "op": "REMOVE_STATE", "buff": "23059_wave_energy", "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -146,16 +87,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
-      "when": [
-        "from_category BPSKILL"
-      ],
+      "when": ["from_category BPSKILL"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "炼狱",
-          "turns": 2,
-          "target": "target"
-        }
+        { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
@@ -165,21 +99,10 @@
     {
       "on": "TURN_START",
       "id": "cone23059_wave_energy",
-      "when": [
-        "!self has_state 23059_wave_energy"
-      ],
+      "when": ["!self has_state 23059_wave_energy"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 20.0,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "23059_wave_energy",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 20.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "23059_wave_energy", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「装备者回合开始时，固定恢复 #2[i]=20 点能量，该效果**每个波次可触发 1 次**」—— 用**单向标记 + 每波次重置**（与遗器 325 的\"首次\"同一模式）：本规则只在**没有标记**时给能量并打上标记；`WAVE_START` 那条把标记清掉，于是每个波次又能触发一次。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -188,11 +111,7 @@
       "on": "WAVE_START",
       "id": "cone23059_wave_reset",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "23059_wave_energy",
-          "target": "self"
-        }
+        { "op": "REMOVE_STATE", "buff": "23059_wave_energy", "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -200,16 +119,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
-      "when": [
-        "from_category BPSKILL"
-      ],
+      "when": ["from_category BPSKILL"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "炼狱",
-          "turns": 2,
-          "target": "target"
-        }
+        { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
@@ -219,21 +131,10 @@
     {
       "on": "TURN_START",
       "id": "cone23059_wave_energy",
-      "when": [
-        "!self has_state 23059_wave_energy"
-      ],
+      "when": ["!self has_state 23059_wave_energy"],
       "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 20.0,
-          "target": "self"
-        },
-        {
-          "op": "APPLY_BUFF",
-          "buff": "23059_wave_energy",
-          "permanent": true,
-          "target": "self"
-        }
+        { "op": "GAIN_ENERGY", "amount": 20.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "23059_wave_energy", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「装备者回合开始时，固定恢复 #2[i]=20 点能量，该效果**每个波次可触发 1 次**」—— 用**单向标记 + 每波次重置**（与遗器 325 的\"首次\"同一模式）：本规则只在**没有标记**时给能量并打上标记；`WAVE_START` 那条把标记清掉，于是每个波次又能触发一次。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -242,11 +143,7 @@
       "on": "WAVE_START",
       "id": "cone23059_wave_reset",
       "do": [
-        {
-          "op": "REMOVE_STATE",
-          "buff": "23059_wave_energy",
-          "target": "self"
-        }
+        { "op": "REMOVE_STATE", "buff": "23059_wave_energy", "target": "self" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "每个波次开始时清掉标记 ⇒ 「每个波次可触发 1 次」成立。\n⚠⚠ **2026-10-19 逐句核时删掉了 cone23059_hp** ✗ —— 「生命上限提高 #1%」**就是光锥自己的** health_percent 属性（30% ✓）⇒ 重复会读成两倍 ✗。"
@@ -254,16 +151,9 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "cone23059_purgatory",
-      "when": [
-        "from_category BPSKILL"
-      ],
+      "when": ["from_category BPSKILL"],
       "do": [
-        {
-          "op": "APPLY_BUFF",
-          "buff": "炼狱",
-          "turns": 2,
-          "target": "target"
-        }
+        { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
       "note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"

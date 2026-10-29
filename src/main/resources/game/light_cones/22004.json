@@ -3,9 +3,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone22004_damage_per_weakness",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -26,9 +24,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone22004_damage_per_weakness",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -49,9 +45,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone22004_damage_per_weakness",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -72,9 +66,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone22004_damage_per_weakness",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -95,9 +87,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone22004_damage_per_weakness",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
         {
           "op": "MODIFY_ATTR",

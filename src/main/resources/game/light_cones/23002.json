@@ -3,23 +3,10 @@
     {
       "on": "KILL",
       "id": "cone23002_after_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.08,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.24,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.08, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.24, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 8% 的生命值**，同时造成的伤害提高 24%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -28,23 +15,10 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23002_after_being_hit",
-      "when": [
-        "target == self"
-      ],
+      "when": ["target == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.08,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.24,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.08, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.24, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 8% 的生命值**，同时造成的伤害提高 24%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -55,23 +29,10 @@
     {
       "on": "KILL",
       "id": "cone23002_after_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.09,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.28,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.09, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.28, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 9% 的生命值**，同时造成的伤害提高 28%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -80,23 +41,10 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23002_after_being_hit",
-      "when": [
-        "target == self"
-      ],
+      "when": ["target == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.09,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.28,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.09, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.28, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 9% 的生命值**，同时造成的伤害提高 28%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -107,23 +55,10 @@
     {
       "on": "KILL",
       "id": "cone23002_after_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.1,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.32,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.1, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.32, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 10% 的生命值**，同时造成的伤害提高 32%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -132,23 +67,10 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23002_after_being_hit",
-      "when": [
-        "target == self"
-      ],
+      "when": ["target == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.1,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.32,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.1, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.32, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 10% 的生命值**，同时造成的伤害提高 32%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -159,23 +81,10 @@
     {
       "on": "KILL",
       "id": "cone23002_after_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.11,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.36,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.11, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.36, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 11% 的生命值**，同时造成的伤害提高 36%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -184,23 +93,10 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23002_after_being_hit",
-      "when": [
-        "target == self"
-      ],
+      "when": ["target == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.11,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.36,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.11, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.36, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 11% 的生命值**，同时造成的伤害提高 36%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -211,23 +107,10 @@
     {
       "on": "KILL",
       "id": "cone23002_after_kill",
-      "when": [
-        "actor == self"
-      ],
+      "when": ["actor == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.12,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.4,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.12, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.4, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 12% 的生命值**，同时造成的伤害提高 40%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
@@ -236,23 +119,10 @@
     {
       "on": "TAKING_HIT",
       "id": "cone23002_after_being_hit",
-      "when": [
-        "target == self"
-      ],
+      "when": ["target == self"],
       "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.12,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.4,
-          "turns": 1,
-          "target": "self"
-        }
+        { "op": "HEAL", "scale": "owner_attack", "percent": 0.12, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.4, "turns": 1, "target": "self" }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
       "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 12% 的生命值**，同时造成的伤害提高 40%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
