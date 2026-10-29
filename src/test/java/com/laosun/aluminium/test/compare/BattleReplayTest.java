@@ -93,36 +93,37 @@ public class BattleReplayTest {
     }
 
     /**
-     * The reconciliation compares the <b>base</b>, and every cast it can settle agrees - except the one whose number
-     * depends on state the window did not observe.
+     * The reconciliation compares the <b>base</b>, and on the committed fixture every cast it can settle agrees - so
+     * {@code --strict} is <b>green</b>, which is what makes this tool a gate rather than a report.
      *
      * <p><b>What this case used to say</b> (until 2026-10-27): every memosprite row was the servant's share of the
      * capture's base (`DIFFERS-x0.50` / `x0.70`), because the engine read the servant's own Max HP. The recorded fight
      * said the game reads the summoner's, the engine now does too ({@code Summon.damageBase}), and those factors are
      * gone - a run that starts printing them again has regressed the rule.
      *
-     * <p><b>The one difference left is cast 4</b>, and it is the <b>unobserved prefix</b>: the game's cast reads ten
-     * points of 【忆质】 ({@code 0.6 + (10/4) x 0.12 = 0.9} vs the row's 0.6), while the replayed window starts empty and
-     * has only the one point its first cast granted. The fold itself is judged by {@code EvernightMemoryFoldTest}; this
-     * case only says the replay must not be expected to invent state it never saw. Rows whose base came from a tally say
-     * {@code base-n/a} rather than claiming a verdict.
+     * <p><b>Cast 4 used to be the one difference</b>, and it was the window's <b>unobserved prefix</b>: the game's cast
+     * reads ten points of 【忆质】 ({@code 0.6 + (10/4) x 0.12 = 0.9} against the row's 0.6), which a replay starting from
+     * zero cannot earn. The plan now <b>declares</b> those ten points on that cast ({@code resources}), the tool prints
+     * a {@code seeded:} line so a declared number is never mistaken for a reproduced one, and the row agrees. The fold
+     * that turns a count into share is judged by {@code EvernightMemoryFoldTest}; this case judges the reconciliation.
      */
     @Test
-    public void theOnlyComparisonLeftIsTheUnobservedPrefix() {
-        String out = run(PLAN).out;
+    public void theReplayAgreesWhereTheCaptureCanBeCompared() {
+        Run run = runStrict(PLAN);
+        String out = run.out;
+        Assertions.assertEquals(0, run.exit,
+                "--strict must be green on the committed plan: every comparable cast's base agrees; output was:\n" + out);
         Assertions.assertTrue(out.contains("bases: capture"),
                 "every driven cast prints both sides' per-instance bases; output was:\n" + out);
         Assertions.assertTrue(out.contains("base-ok"),
                 "the memosprite and basic-attack rows are driven at the capture's own panel and level, so their bases "
                         + "agree; output was:\n" + out);
-        java.util.List<String> differing = out.lines()
-                .filter(line -> line.contains("DIFFERS"))
-                .toList();
-        Assertions.assertEquals(1, differing.size(),
-                "exactly one driven cast still differs - a second one would be a new gap; output was:\n" + out);
-        Assertions.assertTrue(differing.get(0).startsWith(String.format(java.util.Locale.ROOT, "%-4d ", 4)),
-                "and it is cast 4, the 【忆质】 one whose 10 points the window never observed; the row was:\n"
-                        + differing.get(0));
+        Assertions.assertTrue(out.lines().noneMatch(line -> line.contains("DIFFERS")),
+                "no cast may still differ; a factor coming back means either the Max-HP rule or the fold regressed; "
+                        + "output was:\n" + out);
+        Assertions.assertTrue(out.contains("seeded: {亿质=10}"),
+                "cast 4's prefix is declared and printed as such - a reader must be able to tell it from a number the "
+                        + "engine reproduced; output was:\n" + out);
         Assertions.assertTrue(out.contains("base-n/a"),
                 "1409's tally-delivered hits have damage_percentage 0, so there is no share to compare - they must say "
                         + "so instead of claiming a verdict; output was:\n" + out);
@@ -175,12 +176,23 @@ public class BattleReplayTest {
      * Runs the tool with {@code System.out} captured, the way the other diagnostics' judges do.
      */
     private static Run run(String plan) {
+        return run(plan, false);
+    }
+
+    /**
+     * The same run with {@code --strict}, whose exit code is the gate: {@code 1} when any comparable cast's base differs.
+     */
+    private static Run runStrict(String plan) {
+        return run(plan, true);
+    }
+
+    private static Run run(String plan, boolean strict) {
         PrintStream original = System.out;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         int exit;
         try (PrintStream capture = new PrintStream(buffer, true, StandardCharsets.UTF_8)) {
             System.setOut(capture);
-            exit = BattleReplay.run("replay", plan);
+            exit = strict ? BattleReplay.run("replay", plan, "--strict") : BattleReplay.run("replay", plan);
         } finally {
             System.setOut(original);
         }

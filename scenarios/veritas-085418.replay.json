@@ -127,7 +127,10 @@
       "slot": 1,
       "level": 8,
       "target": 1,
-      "note": "Same slot as cast 1. The capture's per-instance base is 0.09 x 生命上限 = 0.9 for the whole cast, i.e. 0.6 + the 「每有 #3 点【忆质】额外造成 #2%」 the game folds into the same six instances (registered gap, AGENT.md §3.7h)."
+      "resources": {
+        "亿质": 10
+      },
+      "note": "Same slot as cast 1. The capture's per-instance base is 0.09 x 生命上限 = 0.9 for the whole cast, i.e. 0.6 + the 「每有 #3 点【忆质】额外造成 #2%」 the game folds into the same six instances (AGENT.md §3.7h; the fold is now implemented - skill_effects.json's resource_share). The ten points are DERIVED, not guessed: (0.09 - 0.06) x 4 / 0.12 = 10 at the Lv8 row. They are declared here because a replay that starts from zero only earns the one point cast 1 granted - the window's prefix is state the payload never carries."
     },
     {
       "cast": 5,
