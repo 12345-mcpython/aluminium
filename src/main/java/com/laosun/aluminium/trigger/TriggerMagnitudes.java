@@ -412,7 +412,9 @@ final class TriggerMagnitudes {
                             + " without an owner to read it from");
         }
         if (owner.getResources() != null && owner.getResources().has(counter)) {
-            return owner.getResources().value(counter);
+            // The EXACT value: a tally like 「本场战斗累计治疗数值」 is a sum of heals, and its fraction is part of the
+            // number the sentence multiplies (1409's 小伊卡). `value()` would floor it away.
+            return owner.getResources().get(counter).exactValue();
         }
         if (ctx.battle() != null && ctx.battle().partyResource(counter) != null) {
             return ctx.battle().partyResourceValue(counter);

@@ -204,7 +204,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
 
     @Override
     public int getValue() {
-        return resource.getValue();
+        return resource.value();
     }
 
     @Override

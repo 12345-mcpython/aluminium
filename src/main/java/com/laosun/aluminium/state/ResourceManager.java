@@ -175,7 +175,7 @@ public class ResourceManager {
      */
     public int value(String id) {
         Resource resource = resources.get(id);
-        return resource == null ? 0 : resource.getValue();
+        return resource == null ? 0 : resource.value();
     }
 
     /**

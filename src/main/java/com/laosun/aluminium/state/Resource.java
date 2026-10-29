@@ -87,8 +87,19 @@ public class Resource {
         return getMax();
     }
 
-    @Getter
-    private int value;
+    /**
+     * The value, kept at the precision the GAME uses.
+     *
+     * <p>⚠ <b>Why double, when every shipped counter is whole.</b> One number in the payloads is not: 1409's
+     * 「本场战斗累计治疗数值」 is a sum of heals (36907.2364 in the captured fight), and a rule prices a damage instance
+     * off it ({@code scale: "self_resource:小伊卡累计治疗"}). Stored as an int, that tally loses the fraction on every
+     * gain - the rule then computes a base that no capture can reproduce, with nothing to report.
+     *
+     * <p>{@link #value()} still answers an {@code int} for the counters that are whole (skill points, stacks,
+     * milestones), so the two hundred call sites that treat a counter as a count are untouched; {@link #exactValue()}
+     * is the reader a magnitude uses.
+     */
+    private double value;
 
     /**
      * Maximum overflow amount (default 0 = overflow not allowed). See point 2 of the class docs.
@@ -148,6 +159,15 @@ public class Resource {
      * How far the current value is from the normal cap (0 when full or overflowing).
      */
     public int missingToMax() {
+        return (int) Math.floor(missingToMaxExact());
+    }
+
+    /**
+     * How far the current value is from the cap, at the stored precision - the reader for "top up a tally".
+     *
+     * @return the room left before the normal cap
+     */
+    public double missingToMaxExact() {
         return Math.max(0, getMax() - value);
     }
 
@@ -180,13 +200,23 @@ public class Resource {
      * @return the amount actually added (smaller than {@code delta} when capped; may be 0)
      */
     public int gainClamped(int delta) {
+        return (int) Math.floor(gainClampedExact(delta));
+    }
+
+    /**
+     * The same, at the stored precision: what a fractional gain ("healing that counts toward a tally") needs.
+     *
+     * @param delta the amount to add
+     * @return the amount actually credited, fraction included
+     */
+    public double gainClampedExact(double delta) {
         if (delta <= 0) {
             return 0;
         }
         boolean wasFull = isFull();
-        int before = value;
+        double before = value;
         value = Math.min(getMax(), value + delta);
-        int gained = value - before;
+        double gained = value - before;
         fireIfJustBecameFull(wasFull, gained);
         return gained;
     }
@@ -201,13 +231,23 @@ public class Resource {
      * team) can ever be stored above its cap.
      */
     public int gain(int delta) {
+        return (int) Math.floor(gainExact(delta));
+    }
+
+    /**
+     * The same, at the stored precision.
+     *
+     * @param delta the amount to add
+     * @return the amount actually credited, fraction included
+     */
+    public double gainExact(double delta) {
         if (delta <= 0) {
             return 0;
         }
         boolean wasFull = isFull();
-        int before = value;
+        double before = value;
         value = Math.min(absoluteMax(), value + delta);
-        int gained = value - before;
+        double gained = value - before;
         fireIfJustBecameFull(wasFull, gained);
         return gained;
     }
@@ -222,9 +262,9 @@ public class Resource {
         if (delta <= 0) {
             return 0;
         }
-        int before = value;
+        double before = value;
         value = Math.max(0, value - delta);
-        return before - value;
+        return (int) Math.floor(before - value);
     }
 
     /**
@@ -283,10 +323,39 @@ public class Resource {
      * {@link Resource} objects directly, so the accessor belongs here next to {@code setValue}.
      */
     public int value() {
+        return (int) Math.floor(value);
+    }
+
+    /**
+     * The whole-number view, kept because a counter is read as a count in a hundred places.
+     *
+     * @return {@link #value()}
+     */
+    public int getValue() {
+        return value();
+    }
+
+    /**
+     * The value at the precision it is stored: the reader a <b>magnitude</b> uses ("a share of the tally"), as opposed
+     * to {@link #value()}, which answers the counter an op spends.
+     *
+     * @return the stored value, fraction included
+     */
+    public double exactValue() {
         return value;
     }
 
     public void setValue(int newValue) {
+        this.value = clamp(newValue);
+    }
+
+    /**
+     * Sets the value without rounding it to a whole number - the seed a replay states for a tally, and the write a
+     * fractional gain would use.
+     *
+     * @param newValue the value to store
+     */
+    public void setExactValue(double newValue) {
         this.value = clamp(newValue);
     }
 
@@ -328,13 +397,13 @@ public class Resource {
      *       clamped away is not "arriving at the cap", it is "already there and nothing happened".</li>
      * </ul>
      */
-    private void fireIfJustBecameFull(boolean wasFull, int gained) {
+    private void fireIfJustBecameFull(boolean wasFull, double gained) {
         if (!wasFull && gained > 0 && isFull()) {
             onBecameFull.accept(this);
         }
     }
 
-    private int clamp(int raw) {
+    private double clamp(double raw) {
         return Math.clamp(raw, 0, absoluteMax());
     }
 
