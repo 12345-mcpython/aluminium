@@ -416,6 +416,8 @@ public final class BattleReplay {
         int undrivable = 0;
         int differed = 0;
         int notComparable = 0;
+        int foldedMatched = 0;
+        int foldedUnmatched = 0;
         for (Row row : rows) {
             String captureCell = row.hits + "h/" + row.targets + "t";
             if (row.spec == null) {
@@ -450,6 +452,32 @@ public final class BattleReplay {
                     .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
                     .toList();
             BaseVerdict verdict = compareBases(row.group, engineBases);
+            // The folded groups (derived hits, breaks) carry their own bases: match each against the engine instances
+            // this cast settled, so "18 groups" means 18 numbers checked rather than 13 checked and 5 summed.
+            List<Double> spare = new ArrayList<>(engineBases);
+            row.group().hitBases().forEach(spare::remove);
+            int derivedOk = 0;
+            int derivedMissing = 0;
+            for (CaptureFlow.Cast derived : row.derived()) {
+                int found = -1;
+                double tolerance = Math.max(1e-6, Math.abs(derived.base()) * 1e-9);
+                for (int i = 0; i < spare.size(); i++) {
+                    if (Math.abs(spare.get(i) - derived.base()) <= tolerance) {
+                        found = i;
+                        break;
+                    }
+                }
+                if (found >= 0) {
+                    spare.remove(found);
+                    derivedOk++;
+                    foldedMatched++;
+                } else {
+                    derivedMissing++;
+                    foldedUnmatched++;
+                    System.out.printf(Locale.ROOT, "     %-9s %-10s capture base %-14.6f -> no engine instance (engine had %s)%n",
+                            derived.classification(), derived.kind(), derived.base(), describeBases(spare));
+                }
+            }
             if (verdict.agrees()) {
                 matched++;
             } else if (verdict.comparable()) {
@@ -485,8 +513,10 @@ public final class BattleReplay {
                 rows.size(), driven, undrivable, matched);
         System.out.printf(Locale.ROOT, "bases: %d agree, %d differ, %d not comparable, of %d driven%n",
                 matched, differed, notComparable, driven);
-        System.out.printf(Locale.ROOT, "groups: %d of %d capture groups accounted for (casts, derived hits, breaks)%n",
-                rows.size(), flow.size());
+        System.out.printf(Locale.ROOT, "groups: %d in the capture = %d cast rows (%d base-ok, %d n/a) + %d folded "
+                        + "(derived/break: %d matched, %d without a comparable engine base)%n",
+                flow.size(), rows.size(), matched, notComparable, flow.size() - rows.size(),
+                foldedMatched, foldedUnmatched);
         System.out.println();
         System.out.println("What is compared is the BASE (pre-zone), not the settled total: the capture is a window of a "
                 + "fight already in progress and the plan deliberately installs no crit/boost, so a settled total is "
@@ -496,6 +526,13 @@ public final class BattleReplay {
         System.out.println("  · the row is read at a level the plan does not state (a memosprite's spec says 10);");
         System.out.println("  · the base did not come from a row at all (damage_percentage 0: a tally the window "
                 + "does not carry) - those rows say \"base n/a\" instead of pretending to compare.");
+        System.out.println("A folded group (derived hit / break) is matched by BASE against the engine's own instances "
+                + "of the same cast. None matches yet, and the two causes are different:");
+        System.out.println("  · an \"Additional\" group is damage a RULE delivered, and the engine books that base as 0 "
+                + "(the number enters through the rule's own scale, not through a skill row) - so there is nothing to "
+                + "match until that path records its base;");
+        System.out.println("  · a \"Break\" group's number is a break instance, whose base the engine derives from "
+                + "toughness/level; the capture's 10883.71 sits between the engine's 6464.82 and 12929.64.");
         return strict && differed > 0 ? 1 : 0;
     }
 
@@ -504,7 +541,7 @@ public final class BattleReplay {
      * names it, the entry that drives it.
      */
     private record Row(int cast, long actor, String kind, double base, int hits, int targets, double captureDamage,
-                       CaptureFlow.Cast group, CastSpec spec) {
+                       CaptureFlow.Cast group, CastSpec spec, List<CaptureFlow.Cast> derived) {
     }
 
     /**
@@ -528,10 +565,12 @@ public final class BattleReplay {
         long actor = 0;
         String kind = "";
         CaptureFlow.Cast last = null;
+        List<CaptureFlow.Cast> folded = new ArrayList<>();
         for (CaptureFlow.Cast group : flow) {
             if ("cast".equals(group.classification())) {
                 if (cast != 0) {
-                    rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast)));
+                    rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast),
+                            List.copyOf(folded)));
                 }
                 cast = group.index();
                 actor = group.actor();
@@ -541,6 +580,7 @@ public final class BattleReplay {
                 targets = group.targets();
                 damage = group.damage() + group.companion();
                 last = group;
+                folded.clear();
                 continue;
             }
             if (cast == 0) {
@@ -548,9 +588,13 @@ public final class BattleReplay {
                 continue;
             }
             damage += group.damage() + group.companion();
+            // Kept rather than only summed: each folded group carries its OWN base, and a base is exactly what this
+            // tool exists to check. Folding the money while dropping the number would leave those groups unverified.
+            folded.add(group);
         }
         if (cast != 0) {
-            rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast)));
+            rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast),
+                    List.copyOf(folded)));
         }
         return rows;
     }
