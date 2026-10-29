@@ -101,6 +101,18 @@ public final class NumberProvider {
     @SerializedName("state")
     private String state;
 
+    /** {@code steps}: the counter that is counted, as {@code per_steps} spells it (an attribute, a resource, or the SP). */
+    @SerializedName("counter")
+    private String counter;
+
+    /** {@code steps}: the size of one step; the count is {@code floor(value / step)}. */
+    @SerializedName("step")
+    private Double step;
+
+    /** {@code energy}: {@code current} (default) or {@code max}. */
+    @SerializedName("relation")
+    private String relation;
+
     /** {@code uniform}: the interval's low end (inclusive). */
     @SerializedName("min")
     private NumberProvider min;

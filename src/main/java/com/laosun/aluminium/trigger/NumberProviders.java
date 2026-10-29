@@ -37,6 +37,7 @@ public final class NumberProviders {
     static final Set<String> TYPES = Set.of(
             "const", "skill_param", "cast_param", "summon_param", "resource", "attr", "stacks",
             "original_damage", "settled_damage_this_event", "elation_base", "cast_applied",
+            "party_resource", "energy", "skill_point", "steps",
             "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg",
             "uniform", "weighted_list");
 
@@ -92,6 +93,15 @@ public final class NumberProviders {
             case "settled_damage_this_event" -> TriggerMagnitudes.settledDamageOf(ctx);
             case "elation_base" -> TriggerMagnitudes.elationBase(ctx);
             case "cast_applied" -> castAppliedOf(provider, ctx);
+            case "party_resource" -> partyResourceOf(provider, ctx);
+            case "energy" -> energyOf(provider, ctx);
+            case "skill_point" -> {
+                if (ctx.battle() == null) {
+                    throw new IllegalStateException("a \"skill_point\" provider needs the battle whose points it reads");
+                }
+                yield ctx.battle().getSkillPoints();
+            }
+            case "steps" -> stepsOf(provider, ctx);
 
             case "uniform" -> {
                 double low = resolve(requireOperand(provider.getMin(), "uniform", "min"), effect, ctx);
@@ -198,6 +208,35 @@ public final class NumberProviders {
             case "cast_applied" -> {
                 if (provider.getState() == null || provider.getState().isBlank()) {
                     throw new IllegalArgumentException("\"" + field + "\" of type \"cast_applied\" needs \"state\""
+                            + where);
+                }
+            }            case "party_resource" -> {
+                if (provider.getResource() == null || provider.getResource().isBlank()) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"party_resource\" needs \"resource\""
+                            + where);
+                }
+            }
+            case "energy" -> {
+                if (provider.getWhose() != null && !provider.getWhose().equals("owner")
+                        && !provider.getWhose().equals("target")) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"energy\" names whose \""
+                            + provider.getWhose() + "\"; it is owner or target" + where);
+                }
+                if (provider.getRelation() != null && !provider.getRelation().equals("current")
+                        && !provider.getRelation().equals("max")) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"energy\" names relation \""
+                            + provider.getRelation() + "\"; it is current or max" + where);
+                }
+            }
+            case "skill_point" -> {
+                // No fields: the battle has exactly one skill-point pool.
+            }
+            case "steps" -> {
+                if (provider.getCounter() == null || provider.getCounter().isBlank()) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"steps\" needs \"counter\"" + where);
+                }
+                if (provider.getStep() == null || provider.getStep() <= 0) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"steps\" needs a positive \"step\""
                             + where);
                 }
             }            case "uniform" -> {
@@ -415,6 +454,70 @@ public final class NumberProviders {
     }
 
     /**
+     * A <b>party counter</b> (a battle-scoped resource such as the Aha moment's 笑点): the provider form of the
+     * {@code party_resource:<name>} scale.
+     *
+     * <p>A counter a file never declares is loud, exactly as the scale is: a counter that answers 0 turns "a share of
+     * the tally" into "a share of nothing", which is a wrong number with no symptom.
+     */
+    private static double partyResourceOf(NumberProvider provider, TriggerContext ctx) {
+        if (provider.getResource() == null || provider.getResource().isBlank()) {
+            throw new IllegalStateException("a \"party_resource\" provider needs \"resource\"");
+        }
+        if (ctx.battle() == null || ctx.battle().partyResource(provider.getResource().trim()) == null) {
+            throw new IllegalStateException("a \"party_resource\" provider reads the counter '"
+                    + provider.getResource().trim() + "', which no file declares or which has no battle to live on");
+        }
+        return ctx.battle().partyResourceValue(provider.getResource().trim());
+    }
+
+    /**
+     * A unit's energy bar: {@code {"type": "energy", "whose": "owner", "relation": "max"}}.
+     *
+     * <p>{@code current} is the default because that is the number the documents usually mean ("restore energy equal
+     * to 30% of the current energy"), and {@code max} is the cap a threshold sentence compares against.
+     */
+    private static double energyOf(NumberProvider provider, TriggerContext ctx) {
+        String whose = provider.getWhose() == null ? "owner" : provider.getWhose();
+        CanHit unit;
+        if ("owner".equals(whose)) {
+            unit = ctx.owner();
+        } else if ("target".equals(whose)) {
+            unit = ctx.target();
+        } else {
+            throw new IllegalStateException("an \"energy\" provider names whose \"" + whose + "\"; it is owner or target");
+        }
+        if (unit == null) {
+            throw new IllegalStateException("an \"energy\" provider with whose \"" + whose + "\" has no such unit in this"
+                    + " event");
+        }
+        String relation = provider.getRelation() == null ? "current" : provider.getRelation();
+        return switch (relation) {
+            case "current" -> unit.getCurrentEnergy();
+            case "max" -> unit.getMaxEnergy();
+            default -> throw new IllegalStateException("an \"energy\" provider names relation \"" + relation
+                    + "\"; it is current or max");
+        };
+    }
+
+    /**
+     * How many whole steps a counter has reached: {@code {"type": "steps", "counter": "里程碑配额", "step": 120}} is the
+     * provider form of {@code per_steps}.
+     *
+     * <p>Same reader ({@code TriggerInterpreter.stepsOfCounter} to {@code CounterSteps.wholeSteps}), which is why the
+     * counter may be an attribute, one of the owner's own resources, or the battle's skill points.
+     */
+    private static double stepsOf(NumberProvider provider, TriggerContext ctx) {
+        if (provider.getCounter() == null || provider.getCounter().isBlank()) {
+            throw new IllegalStateException("a \"steps\" provider needs \"counter\"");
+        }
+        if (provider.getStep() == null || provider.getStep() <= 0) {
+            throw new IllegalStateException("a \"steps\" provider needs a positive \"step\"");
+        }
+        return TriggerInterpreter.stepsOfCounter(provider.getCounter().trim() + ":" + provider.getStep(), ctx);
+    }
+
+    /**
      * The battle's random source, so a seeded battle reproduces and a test can pin the draw.
      */
     private static java.util.Random random(TriggerContext ctx) {
@@ -467,6 +570,9 @@ public final class NumberProviders {
         copy.setAbove(provider.getAbove());
         copy.setBuff(provider.getBuff());
         copy.setState(provider.getState());
+        copy.setCounter(provider.getCounter());
+        copy.setStep(provider.getStep());
+        copy.setRelation(provider.getRelation());
         copy.setMin(copyOf(provider.getMin()));
         copy.setMax(copyOf(provider.getMax()));
         if (provider.getDistribution() != null) {
