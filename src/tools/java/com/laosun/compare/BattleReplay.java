@@ -230,6 +230,10 @@ public final class BattleReplay {
          * ({@code 0.6 + (10/4) x 0.12 = 0.9} against the row's 0.6), while a replay that starts from zero earns only the
          * single point its first cast granted. The number is <b>derived from the capture's own arithmetic</b>, not
          * guessed - which is why it may be written here and why the tool prints it (see the row's `seeded:` line).
+         *
+         * <p>⚠ {@code int}, and it cannot be seeded fractionally: the engine's {@code Resource} is an integer counter,
+         * while one of the captures' tallies (1409's 「本场战斗累计治疗数值」) is a float - 36907.2364 for cast 2. That
+         * is why the four 小伊卡 rows stay {@code base-n/a}, and it is registered rather than hidden.
          */
         private Map<String, Integer> resources;
 
