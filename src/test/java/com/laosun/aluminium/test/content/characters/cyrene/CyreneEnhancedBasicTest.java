@@ -38,9 +38,13 @@ import java.util.List;
  *
  * <p>Targets are the shared 1,000,000-HP dummy rather than the standard monster: the question here is "how many
  * instances and with which numbers", and a target that dies half-way would make the hit count depend on the crit
- * rolls. ⚠ The per-part toughness is read by the same column convention the engine uses for every single-shape skill
- * (see the table entry's own {@code note}: the game's ConfigAbility states 15 for the first hit, which is <b>not</b>
- * stronger evidence than the stance columns - registered as 待核, not silently adopted).
+ * rolls.
+ *
+ * <p><b>✅ The per-part toughness is settled (2026-10-29).</b> The game's own
+ * {@code AvatarSkillConfig.ShowStanceList} for 141508 — the same at every level — is {@code [30, 15, 0]}, and the data
+ * generator reads those three slots as {@code {single, all, spread}}. So the single-target part carries 30 and the AoE
+ * part 15 per victim, which is exactly what this judge asserts. The older note that "the ConfigAbility states 15 for the
+ * first hit" was a misreading; it has no standing against the skill's own display table.
  */
 public class CyreneEnhancedBasicTest {
 
