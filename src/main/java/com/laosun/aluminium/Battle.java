@@ -3206,6 +3206,17 @@ public class Battle {
         return summons.memosprite(master);
     }
 
+    /**
+     * Summons one <b>named</b> memosprite (1512's three 「晴空乐手」); see {@code SummonService#memosprite(Character, String)}.
+     *
+     * @param master the summoning character
+     * @param name   which of its memosprites, by name
+     * @return the memosprite on the field
+     */
+    public Summon summonMemosprite(Character master, String name) {
+        return summons.memosprite(master, name);
+    }
+
     public Summon summonServant(Character master) {
         return summons.servant(master);
     }

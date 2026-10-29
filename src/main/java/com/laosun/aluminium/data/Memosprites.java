@@ -93,6 +93,56 @@ public final class Memosprites {
     }
 
     /**
+     * <b>Every</b> memosprite this character can summon, in file order.
+     *
+     * <p><b>Why a list.</b> 1512 知更鸟•晴歌 summons three (贝茜 / 啾米 / 派丁), each with its own panel and skills, and
+     * the older one-spec-per-file shape could only ever describe the first. A file may therefore hold a single object
+     * (every other character) or an <b>array</b> of objects; {@link #of(int)} keeps answering the first, so the callers
+     * that never needed more are untouched.
+     *
+     * @param ownerCid the summoning character's id
+     * @return the specs (empty when this character has no memosprite file)
+     * @throws IllegalStateException when a file exists but cannot be parsed
+     */
+    public static java.util.List<MemospriteSpec> allOf(int ownerCid) {
+        String path = resourceFor(ownerCid);
+        if (path == null) {
+            return java.util.List.of();
+        }
+        try (InputStream stream = Memosprites.class.getResourceAsStream(path)) {
+            if (stream == null) {
+                return java.util.List.of();
+            }
+            synchronized (CACHE) {
+                loadCount++;
+            }
+            com.google.gson.JsonElement root;
+            try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                root = com.google.gson.JsonParser.parseReader(reader);
+            }
+            if (root == null || root.isJsonNull()) {
+                throw new IllegalStateException(
+                        "Memosprite file " + path + " parsed to null (an empty file?): a file that exists "
+                                + "must describe a memosprite");
+            }
+            java.util.List<MemospriteSpec> specs = new java.util.ArrayList<>();
+            if (root.isJsonArray()) {
+                for (com.google.gson.JsonElement each : root.getAsJsonArray()) {
+                    specs.add(validate(GSON.fromJson(each, MemospriteSpec.class), path));
+                }
+            } else {
+                specs.add(validate(GSON.fromJson(root, MemospriteSpec.class), path));
+            }
+            return java.util.List.copyOf(specs);
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException("Failed to read memosprite spec for cid " + ownerCid, e);
+        } catch (RuntimeException e) {
+            throw new IllegalStateException(
+                    "Invalid memosprite spec for cid " + ownerCid + " (" + path + "): " + e.getMessage(), e);
+        }
+    }
+
+    /**
      * Whether this character has a memosprite file at all (one classpath lookup, then cached via {@link #of}).
      */
     public static boolean exists(int ownerCid) {
@@ -348,7 +398,14 @@ public final class Memosprites {
             }
             MemospriteSpec spec;
             try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                spec = GSON.fromJson(reader, MemospriteSpec.class);
+                // A file may state ONE memosprite (every other character) or an ARRAY (1512's three). `of` is the
+                // "the one" reader, so it answers the first element of an array - see `allOf` for the whole list.
+                com.google.gson.JsonElement root = com.google.gson.JsonParser.parseReader(reader);
+                if (root != null && root.isJsonArray() && !root.getAsJsonArray().isEmpty()) {
+                    spec = GSON.fromJson(root.getAsJsonArray().get(0), MemospriteSpec.class);
+                } else {
+                    spec = GSON.fromJson(root, MemospriteSpec.class);
+                }
             }
             if (spec == null) {
                 throw new IllegalStateException(
@@ -381,7 +438,14 @@ public final class Memosprites {
             }
             MemospriteSpec spec;
             try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                spec = GSON.fromJson(reader, MemospriteSpec.class);
+                // A file may state ONE memosprite (every other character) or an ARRAY (1512's three). `of` is the
+                // "the one" reader, so it answers the first element of an array - see `allOf` for the whole list.
+                com.google.gson.JsonElement root = com.google.gson.JsonParser.parseReader(reader);
+                if (root != null && root.isJsonArray() && !root.getAsJsonArray().isEmpty()) {
+                    spec = GSON.fromJson(root.getAsJsonArray().get(0), MemospriteSpec.class);
+                } else {
+                    spec = GSON.fromJson(root, MemospriteSpec.class);
+                }
             }
             if (spec == null) {
                 throw new IllegalStateException(

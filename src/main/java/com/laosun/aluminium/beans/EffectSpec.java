@@ -120,6 +120,7 @@ public class EffectSpec {
         copy.suspendsTurns = this.suspendsTurns;
         copy.blocks = this.blocks;
         copy.oncePerTurn = this.oncePerTurn;
+        copy.memospriteName = this.memospriteName;
         copy.critRate = this.critRate;
         copy.critDamage = this.critDamage;
         copy.element = this.element;
@@ -845,6 +846,19 @@ public class EffectSpec {
      */
     @SerializedName("once_per_turn")
     private String oncePerTurn;
+
+    /**
+     * <b>Which</b> of the character's memosprites a {@code SUMMON} brings out, by the name its file states.
+     *
+     * <p>Reader: 1512 知更鸟•晴歌, whose 「晴空乐手」 are three (贝茜 / 啾米 / 派丁) summoned at gauge thresholds
+     * (≥6 / ≥12). Without a name the op can only mean "the character's memosprite", which is the single-one shape her
+     * kit does not have.
+     *
+     * <p>⚠ Not the existing {@code memosprite} boolean: that one already means "this summon IS a memosprite", a
+     * different question.
+     */
+    @SerializedName("memosprite_name")
+    private String memospriteName;
 
     /**
      * "暂时<b>延后</b>陷入无法战斗状态": the state this effect applies does not let its carrier die (140's Sanctuary of Mooncocoon (月茧之庇)).
