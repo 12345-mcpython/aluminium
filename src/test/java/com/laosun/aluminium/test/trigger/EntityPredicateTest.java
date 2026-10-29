@@ -204,6 +204,37 @@ public class EntityPredicateTest {
     }
 
     /**
+     * {@code same_as} is <b>identity</b>, and it is the condition the content states most: {@code actor == self} has
+     * 1,238 uses, and a property cannot express "this unit is that one".
+     */
+    @Test
+    public void sameAsComparesIdentity() {
+        Context scene = context(true);
+
+        Assertions.assertTrue(test(entity("self", "{\"same_as\": \"self\"}"), scene), "a unit is itself");
+        Assertions.assertTrue(test(entity("actor", "{\"same_as\": \"self\"}"), scene), "the actor here is the owner");
+        Assertions.assertFalse(test(entity("target", "{\"same_as\": \"self\"}"), scene), "the monster is not");
+    }
+
+    /**
+     * The compiled condition still <b>reads as the file spelled it</b>: a log line, an error message and a test that
+     * pins "this rule's guard" keep seeing {@code actor == self} rather than a JSON body.
+     */
+    @Test
+    public void theConditionRendersBackToItsSpelling() {
+        TriggerSpec rule = TriggerSpecs.rule("TAKING_HIT", null);
+        var compiled = com.laosun.aluminium.trigger.Predicates.compile(entity("actor", "{\"same_as\": \"self\"}"), rule, null);
+        Assertions.assertEquals("actor == self", compiled.source());
+
+        var ally = com.laosun.aluminium.trigger.Predicates.compile(entity("target", "{\"is_ally\": true}"), rule, null);
+        Assertions.assertEquals("target is_ally", ally.source());
+
+        var stacks = com.laosun.aluminium.trigger.Predicates.compile(
+                entity("self", "{\"stacks\": {\"name\": \"充能\", \"min\": 3}}"), rule, null);
+        Assertions.assertEquals("self_stacks:充能 >= 3", stacks.source());
+    }
+
+    /**
      * The shapes that mean nothing are refused at load.
      */
     @Test

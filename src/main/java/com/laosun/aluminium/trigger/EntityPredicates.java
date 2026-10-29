@@ -52,6 +52,7 @@ final class EntityPredicates {
     /** Every accepted sub-predicate, in one place so the loader's error can list it. */
     static final Set<String> KEYS = Set.of(
             "is_ally", "is_enemy", "is_dead", "is_summon",
+            "same_as",
             "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "has_shield", "shield_from",
             "level", "cid", "speed", "eidolon", "skill_level", "state_turns",
             "attribute", "stacks", "state", "path", "element", "camp", "team");
@@ -104,6 +105,13 @@ final class EntityPredicates {
                     }
                 }
                 case "state", "path", "element" -> requireStrings(key, entry.getValue(), where);
+                case "same_as" -> {
+                    String other = requireString(key, entry.getValue(), where).trim();
+                    if (!SUBJECTS.contains(other)) {
+                        throw new IllegalArgumentException("the sub-predicate \"same_as\" names \"" + other
+                                + "\"; it is self / actor / target" + where);
+                    }
+                }
                 case "attribute", "stacks" -> {
                     requireNamedRange(key, entry.getValue(), where);
                     if ("attribute".equals(key)) {
@@ -148,9 +156,56 @@ final class EntityPredicates {
             return true;
         }
 
+        /**
+         * The condition as a <b>rule author would spell it</b>, so an error message, a log line and a test that pins
+         * "this rule's guard" keep reading the same string the file used to state: this model replaced a spelling, not a
+         * meaning.
+         *
+         * <p>A body with more than one sub-predicate (or one this cannot render) falls back to its JSON, because such a
+         * body has no single-spelling form.
+         */
         @Override
         public String source() {
+            if (checks.size() == 1) {
+                String spelled = spell(checks.getFirst().getKey(), checks.getFirst().getValue());
+                if (spelled != null) {
+                    return spelled;
+                }
+            }
             return subject + " " + written;
+        }
+
+        private String spell(String key, com.google.gson.JsonElement value) {
+            return switch (key) {
+                case "same_as" -> subject + " == " + value.getAsString();
+                case "is_ally" -> value.getAsBoolean() ? subject + " is_ally" : "!" + subject + " is_ally";
+                case "is_summon" -> value.getAsBoolean() ? subject + " is_summon" : "!" + subject + " is_summon";
+                case "is_dead" -> value.getAsBoolean() ? subject + " is_dead" : "!" + subject + " is_dead";
+                case "state" -> subject + " has_state " + value.getAsString();
+                case "stacks" -> {
+                    var named = value.getAsJsonObject();
+                    String name = named.get("name").getAsString();
+                    if (named.has("min")) {
+                        yield subject + "_stacks:" + name + " >= " + named.get("min").getAsString();
+                    }
+                    yield subject + "_stacks:" + name + " <= " + named.get("max").getAsString();
+                }
+                case "attribute" -> {
+                    var named = value.getAsJsonObject();
+                    String name = named.get("name").getAsString();
+                    if (named.has("min")) {
+                        yield "self_attr:" + name + " >= " + named.get("min").getAsString();
+                    }
+                    yield "self_attr:" + name + " <= " + named.get("max").getAsString();
+                }
+                case "hp_pct" -> {
+                    var range = value.getAsJsonObject();
+                    yield "target_hp_percent "
+                            + (range.has("min") ? ">= " : "<= ")
+                            + (range.has("min") ? range.get("min") : range.get("max")).getAsString();
+                }
+                default -> null;
+            };
         }
     }
 
@@ -213,6 +268,12 @@ final class EntityPredicates {
                         && character.getSkillLevel() != null
                         && character.getSkillLevel().containsKey(skillSlot(slot))
                         && inRange(character.getSkillLevel().get(skillSlot(slot)), named);
+            }
+            case "same_as" -> {
+                // "the actor IS me": identity, not a property of the unit, and the condition `actor == self` has 1,238
+                // uses in the content - the single most common condition there is.
+                CanHit other = unitOf(value.getAsString().trim(), ctx);
+                yield other != null && other == unit;
             }
             case "camp" -> anyOf(value, name -> unit.getCamp() != null
                     && unit.getCamp().name().equalsIgnoreCase(name.trim()));

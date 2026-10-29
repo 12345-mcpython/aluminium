@@ -2,7 +2,7 @@
   {
     "on": "SKILL_CAST",
     "id": "skill_shield",
-    "when": ["actor == self"],
+    "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
     "do": [
       {
         "op": "SHIELD",
@@ -20,7 +20,7 @@
   {
     "on": "SKILL_CAST",
     "id": "skill_soft_aggro",
-    "when": ["actor == self", "target_hp_percent >= 0.3"],
+    "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "entity", "entity": "target", "json": { "hp_pct": { "min": 0.3 } }}],
     "do": [
       { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "turns": 3, "target": "target" }
     ],
@@ -30,7 +30,7 @@
 
   {
     "on": "SKILL_CAST",
-    "when": ["actor == self"],
+    "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
     "do": [
       { "op": "DISPEL", "amount": 1, "target": "target" }
     ],
@@ -91,7 +91,7 @@
   {
     "on": "ULT_CAST",
     "id": "ultimate_freeze",
-    "when": ["actor == self"],
+    "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
     "do": [
       {
         "op": "APPLY_CONTROL",
@@ -121,7 +121,7 @@
 
   {
     "on": "SKILL_CAST",
-    "when": ["actor == self"],
+    "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
     "do": [
       { "op": "EXTEND_BUFF", "buff": "护盾", "turns": 1, "target": "target" }
     ],
@@ -132,7 +132,7 @@
 
   {
     "on": "ULT_CAST",
-    "when": ["actor == self"],
+    "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
     "do": [
       { "op": "GAIN_ENERGY", "scale": "cast_applied:冻结", "percent": 6 }
     ],
@@ -190,7 +190,7 @@
   {
     "on": "BATTLE_START",
     "id": "technique_freeze",
-    "when": ["self has_state 秘技"],
+    "when_predicates": [{"type": "entity", "entity": "self", "json": { "state": "秘技" }}],
     "do": [
       {
         "op": "APPLY_CONTROL",

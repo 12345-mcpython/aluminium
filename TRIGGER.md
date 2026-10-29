@@ -105,6 +105,8 @@
 | `ref` | `ref` | `game/data/predicates.json` 里的**具名谓词** ✓ —— `{"name": {"type": ...}}` ✓ |
 
 **实体子谓词**（`json` 的键；未列出的键、类型不对的值，**装载期就拒绝** ✓）：
+⚠ **迁移进度**（2026-10-29）：内容里的 2947 条 `when` 条件中，**1280 条**可由本表表达（215 个文件各至少一条）；已迁 **1001 三月七** 作试点 ✓（8 条，`actor == self` → `same_as`），其余按角色逐批迁 —— 一次只迁一个文件，让该角色的判据兜住 ✓。**不能迁的**：事件级条件（`from_skill` / `from_category` / `from_skill_id` / `damage_is_attack`，共 167 条）留在 `when` ✓；以及尚无子谓词的那些（`is_other_ally`、`debuff_count`、`energy_percent`、`enemy_count`、`is_slowed`、`self_summon_count`）。⚠ 迁移**只改形状不改语义**：编译后的 `source()` 会**还原成原来的拼法** ✓，所以钉「这条规则的守卫」的判据照旧通过 ✓。
+
 
 | 键 | 值 | 读什么 |
 |---|---|---|
@@ -117,6 +119,7 @@
 | `hp_pct` / `shield_pct` | 同上 | **百分比** `当前/上限` ✓（盾的份额 = 盾 / 生命上限 ✓）|
 | `state_turns` | `{"name": "充能", "min"?: n, "max"?: n}` | **剩余回合** ✓（多个同名取最大 ✓，没有 = 0 ✓）|
 | `camp` | `PLAYER` / `ENEMY` / `NEUTRAL`（或数组 = 任一）| **阵营** ✓（绝对）|
+| `same_as` | `self` / `actor` / `target` | **同一性**：这一方就是那一方 ✓（`actor == self` 在内容里有 1238 处，是出现最多的条件 ✓）|
 | `team` | `own` / `other` | **相对规则主人**的阵营 ✓（"我方 / 对方" ✓）|
 | `attribute` | `{"name": "SPEED", "min"?: n, "max"?: n}` | 任意属性 ✓（名字在装载期校验 ✓）|
 | `stacks` | `{"name": "充能", "min"?: n, "max"?: n}` | 层数 ✓（= `self_stacks:` ✓）|
