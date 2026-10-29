@@ -1,8 +1,8 @@
 package com.laosun.aluminium.battle;
 
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.DamageElement;
 
 /**
  * Observes a driven battle, one turn at a time, without being able to change it.

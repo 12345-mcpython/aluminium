@@ -1,11 +1,11 @@
 package com.laosun.aluminium.battle;
 
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.buff.DotBuff;
 import com.laosun.aluminium.buff.RegenBuff;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
 
 import java.util.HashMap;
 import java.util.Map;

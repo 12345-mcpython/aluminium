@@ -1,11 +1,10 @@
 package com.laosun.aluminium.buff;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.DoubleValue.Modifier.ModifierSource;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.event.DamageEvent;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * Reduction: the damage the target takes is lowered by {@code ratio} (0.3 = -30%, entering the

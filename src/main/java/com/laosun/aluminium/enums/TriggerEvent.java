@@ -2,10 +2,6 @@ package com.laosun.aluminium.enums;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.entity.Countdown;
-import com.laosun.aluminium.battle.WaveManager;
-import com.laosun.aluminium.state.ResourceManager;
 
 /**
  * The trigger sources a character mechanic can subscribe to.

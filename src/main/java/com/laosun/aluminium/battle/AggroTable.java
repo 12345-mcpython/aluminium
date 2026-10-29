@@ -1,9 +1,9 @@
 package com.laosun.aluminium.battle;
 
-import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
-import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enums.AttributeType;
 
 import java.util.LinkedHashMap;
 import java.util.List;

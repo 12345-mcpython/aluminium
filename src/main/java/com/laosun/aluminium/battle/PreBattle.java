@@ -1,7 +1,7 @@
 package com.laosun.aluminium.battle;
 
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.entity.CanHit;
 
 import java.util.ArrayList;
 import java.util.List;

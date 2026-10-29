@@ -5,11 +5,6 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.entity.Summon;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.equipment.Relic;
-import com.laosun.aluminium.damage.BreakDamageCalculator;
 
 /**
  * All character and equipment attribute types used in combat stat calculation.

@@ -1,17 +1,8 @@
 package com.laosun.aluminium;
 
 import com.google.gson.reflect.TypeToken;
+import com.laosun.aluminium.beans.*;
 import com.laosun.aluminium.beans.CharacterData;
-import com.laosun.aluminium.beans.EnemySkillData;
-import com.laosun.aluminium.beans.HardLevelGroup;
-import com.laosun.aluminium.beans.MonsterConfig;
-import com.laosun.aluminium.beans.MonsterTemplate;
-import com.laosun.aluminium.beans.RelicMainAttribute;
-import com.laosun.aluminium.beans.RelicSet;
-import com.laosun.aluminium.beans.RelicSubAttribute;
-import com.laosun.aluminium.beans.Skill;
-import com.laosun.aluminium.beans.SkillTraceData;
-import com.laosun.aluminium.beans.WeaponData;
 import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
@@ -23,11 +14,7 @@ import com.laosun.aluminium.trigger.WeaponTriggerTableProvider;
 import com.laosun.aluminium.utils.JSONReader;
 import com.laosun.aluminium.utils.MapUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * One loaded copy of the generated game tables.

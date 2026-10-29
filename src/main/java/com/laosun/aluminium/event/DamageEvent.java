@@ -2,7 +2,6 @@ package com.laosun.aluminium.event;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Damage-settlement event, fired by {@code Battle.assemble} for both sides of a hit

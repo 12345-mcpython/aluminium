@@ -2,12 +2,15 @@ package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.*;
-import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.buff.*;
+import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.enemy.EnemySkill;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.Summon;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.skill.SkillExecutor;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
@@ -15,11 +18,6 @@ import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.equipment.RelicSuit;
-import com.laosun.aluminium.entity.Summon;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * Applies one effect of a rule: the {@code switch} arm bodies behind {@code applyOne}.

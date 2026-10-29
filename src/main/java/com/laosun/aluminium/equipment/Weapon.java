@@ -1,6 +1,7 @@
 package com.laosun.aluminium.equipment;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.beans.WeaponData;
 import com.laosun.aluminium.enums.AttributeType;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * A weapon (light cone) equipped by a character.

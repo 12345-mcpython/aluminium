@@ -18,7 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.laosun.aluminium.entity.Character;
 
 /**
  * Loads character trigger tables from {@code resources/game/characters/<cid>.json}.

@@ -4,7 +4,6 @@ import lombok.Getter;
 
 import java.util.Locale;
 import java.util.Map;
-import com.laosun.aluminium.damage.Damage;
 
 /**
  * The damage type of one damage instance (basic attack / skill / ultimate / break / DOT / true damage…).

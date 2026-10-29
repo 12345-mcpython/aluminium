@@ -1,9 +1,9 @@
 package com.laosun.aluminium.battle;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.AttributeType;
 
 /**
  * Effect hit chance and the seeded rolls.

@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import com.laosun.aluminium.equipment.Weapon;
 
 /**
  * Loads a light cone's trigger rules from {@code resources/game/light_cones/<weaponId>.json}.

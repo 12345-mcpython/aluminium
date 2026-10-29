@@ -1,9 +1,9 @@
 package com.laosun.aluminium.enemy;
 
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import lombok.Getter;

@@ -8,16 +8,15 @@ import com.laosun.aluminium.beans.MonsterTemplate;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillEffectType;
-import com.laosun.aluminium.utils.MapUtils;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.utils.AttributeBuilder;
+import com.laosun.aluminium.utils.MapUtils;
 
 import java.util.List;
 import java.util.Map;
 
 import static com.laosun.aluminium.enums.AttributeType.*;
-import com.laosun.aluminium.entity.Summon;
 
 /**
  * Builds an {@link Enemy} with a correct stat sheet from real monster data.

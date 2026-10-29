@@ -3,14 +3,14 @@ package com.laosun.aluminium.battle;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.StageBean;
-import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.trigger.TriggerPayload;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.enemy.EnemyFactory;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.trigger.TriggerPayload;
 import lombok.Getter;
 
 import java.util.List;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Stage wave management: spawns monsters in order, one entry of

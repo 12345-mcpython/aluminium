@@ -3,9 +3,6 @@ package com.laosun.aluminium.trigger;
 import com.laosun.aluminium.Battle;
 
 import java.util.Set;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.state.Resource;
 
 /**
  * The closed vocabularies of the trigger language.

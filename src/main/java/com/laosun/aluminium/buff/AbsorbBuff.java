@@ -1,7 +1,6 @@
 package com.laosun.aluminium.buff;
 
 import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.BattleDamage;
 
 /**
  * Absorbs part of an incoming hit by <b>spending another unit's resource</b> - the shape of 1503 Pearl (真珠)'s talent:

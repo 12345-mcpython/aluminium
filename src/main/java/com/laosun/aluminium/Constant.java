@@ -8,13 +8,10 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.utils.JSONReader;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import com.laosun.aluminium.equipment.RelicSuit;
-import com.laosun.aluminium.entity.Character;
-import com.laosun.aluminium.equipment.Relic;
-import com.laosun.aluminium.equipment.Weapon;
-import com.laosun.aluminium.damage.BreakDamageCalculator;
 
 /**
  * Global constants and static game data loaded at startup.

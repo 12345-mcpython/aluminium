@@ -4,12 +4,11 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.buff.BuffManager;
+import com.laosun.aluminium.enums.*;
 
 import java.util.Locale;
 import java.util.Set;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * The rules an effect must satisfy to be loadable -- checked once, when a character's table

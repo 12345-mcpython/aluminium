@@ -1,9 +1,9 @@
 package com.laosun.aluminium.battle;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.energy.EnergyGain;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.skill.Skill;
 
 import java.util.List;

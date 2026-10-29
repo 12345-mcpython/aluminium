@@ -1,5 +1,4 @@
 package com.laosun.aluminium.enums;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Represents the faction or alignment of a combatant in the action queue.

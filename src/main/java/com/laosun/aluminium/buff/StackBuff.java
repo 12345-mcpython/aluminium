@@ -1,5 +1,4 @@
 package com.laosun.aluminium.buff;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * A <b>named counter</b>: a buff that carries no modifier at all and exists only to be <b>counted</b>.

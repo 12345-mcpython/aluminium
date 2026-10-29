@@ -1,7 +1,7 @@
 package com.laosun.aluminium.state;
 
-import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.enums.AttributeType;
 
 /**
  * The combat attribute array, indexed by {@link AttributeType#ordinal()}.

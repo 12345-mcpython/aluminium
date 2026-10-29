@@ -1,5 +1,6 @@
 package com.laosun.aluminium.state;
 
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.ResourceScope;
 import lombok.Getter;
 
@@ -7,7 +8,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * Every {@link Resource} a combatant owns, keyed by id.

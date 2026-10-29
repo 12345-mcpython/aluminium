@@ -1,5 +1,4 @@
 package com.laosun.aluminium.enums;
-import com.laosun.aluminium.state.Resource;
 
 /**
  * Who a {@link com.laosun.aluminium.state.Resource} belongs to.

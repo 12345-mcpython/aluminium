@@ -5,7 +5,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 
 import java.util.Map;
-import com.laosun.aluminium.equipment.Relic;
 
 /**
  * Relic main attribute value tables deserialized from main_attribute.json.

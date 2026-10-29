@@ -4,7 +4,6 @@ import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 
 import java.util.Map;
-import com.laosun.aluminium.equipment.RelicSuit;
 
 /**
  * The six equipment slots on a character that can hold relics.

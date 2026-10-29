@@ -1,9 +1,8 @@
 package com.laosun.aluminium.skill;
 
-import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.utils.AttributeBuilder;
 
 import java.util.*;

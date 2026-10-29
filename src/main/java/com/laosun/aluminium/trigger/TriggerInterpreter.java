@@ -4,11 +4,11 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.*;
+import com.laosun.aluminium.buff.*;
+import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
-import com.laosun.aluminium.damage.Damage;
-import com.laosun.aluminium.buff.*;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.trigger.TriggerTable.CompiledRule;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
@@ -16,9 +16,6 @@ import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import com.laosun.aluminium.entity.Summon;
-import com.laosun.aluminium.state.Resource;
-import com.laosun.aluminium.state.ResourceManager;
 
 /**
  * Runs the effects of a {@link TriggerTable}. The only place in the trigger system that

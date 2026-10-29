@@ -1,8 +1,8 @@
 package com.laosun.aluminium.buff;
 
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.enums.AttributeType;
 
 public class BoostDamageBuff extends AbstractBuff {
     private final double rate;

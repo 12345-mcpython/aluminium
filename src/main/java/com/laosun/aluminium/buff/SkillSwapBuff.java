@@ -1,8 +1,8 @@
 package com.laosun.aluminium.buff;
 
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.skill.Skill;
 
 /**

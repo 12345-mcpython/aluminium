@@ -2,7 +2,6 @@ package com.laosun.aluminium.entity;
 
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * A <b>countdown</b>: a unit that exists on the action order and does nothing but <b>have a turn</b>.

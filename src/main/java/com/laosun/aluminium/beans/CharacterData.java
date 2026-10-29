@@ -1,7 +1,6 @@
 package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
-import com.laosun.aluminium.entity.Character;
 
 /**
  * Raw character data deserialized from the game's character_data.json.

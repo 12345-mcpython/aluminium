@@ -1,9 +1,9 @@
 package com.laosun.aluminium.trigger;
 
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.damage.Damage;
 
 import java.util.List;
 import java.util.Objects;

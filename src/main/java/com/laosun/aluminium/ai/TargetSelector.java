@@ -1,8 +1,8 @@
 package com.laosun.aluminium.ai;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.buff.TauntBuff;
+import com.laosun.aluminium.entity.CanHit;
 
 import java.util.List;
 import java.util.Random;

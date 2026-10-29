@@ -1,18 +1,18 @@
 package com.laosun.aluminium.damage;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.DoubleValue;
+import com.laosun.aluminium.DoubleValue.Modifier;
+import com.laosun.aluminium.DoubleValue.Modifier.ModifierSource;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.DoubleValue.Modifier;
-import com.laosun.aluminium.DoubleValue.Modifier.ModifierSource;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
-import com.laosun.aluminium.entity.CanHit;
-import com.laosun.aluminium.DoubleValue;
 
 /**
  * One damage instance - always a single hit on a single target (it has carried its own
