@@ -186,7 +186,7 @@
     {
       "on": "CAST_SETUP",
       "id": "memosprite_rainclouds_deals_a_share_of_the_tally",
-      "when": ["actor == summon", "from_skill_id == 1"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "event", "json": { "from_skill_id": 1 }}],
       "do": [
         {"op": "DAMAGE", "scale": "self_resource:小伊卡累计治疗", "percent_from": {"type": "cast_param", "index": 0}, "attacker": "summon", "element": "Wind", "target": "all_enemies"}
       ],
@@ -197,7 +197,7 @@
       "on": "CAST_SETUP",
       "id": "memosprite_rainclouds_clears_half_the_tally",
       "max_eidolon": 5,
-      "when": ["actor == summon", "from_skill_id == 1"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "event", "json": { "from_skill_id": 1 }}],
       "do": [
         {"op": "REMOVE_RESOURCE", "resource": "小伊卡累计治疗", "scale": "self_resource:小伊卡累计治疗", "percent": 0.5, "target": "self"}
       ],
@@ -208,7 +208,7 @@
       "on": "CAST_SETUP",
       "id": "eidolon_six_clears_twelve_percent_instead",
       "min_eidolon": 6,
-      "when": ["actor == summon", "from_skill_id == 1"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "event", "json": { "from_skill_id": 1 }}],
       "do": [
         {"op": "REMOVE_RESOURCE", "resource": "小伊卡累计治疗", "scale": "self_resource:小伊卡累计治疗", "percent": 0.12, "target": "self"}
       ],
@@ -218,7 +218,7 @@
     {
       "on": "BATTLE_START",
       "id": "trace_windstorm_raises_her_max_hp_above_200_speed",
-      "when": ["self_attr:SPEED > 200"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "attribute": { "name": "SPEED", "gt": 200.0 } }}],
       "do": [
         {"op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 0.2, "permanent": true, "coexist": true, "target": "self"}
       ],
@@ -381,7 +381,7 @@
     {
       "on": "CAST_SETUP",
       "id": "ikachi_shortens_its_own_effects_after_it_acts",
-      "when": ["actor == summon", "from_skill_id == 1"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "event", "json": { "from_skill_id": 1 }}],
       "do": [
         {"op": "EXTEND_BUFF", "kind": "all", "turns": -1, "target": "summon"}
       ],
@@ -422,7 +422,7 @@
     {
       "id": "memosprite_ode_of_sky_gives_her_energy",
       "on": "CAST_SETUP",
-      "when": ["target == self", "actor is_summon", "from_skill_id == 19"],
+      "when_predicates": [{"type": "entity", "entity": "target", "json": { "same_as": "self" }}, {"type": "entity", "entity": "actor", "json": { "is_summon": true }}, {"type": "event", "json": { "from_skill_id": 19 }}],
       "do": [
         {"op": "GAIN_ENERGY", "scale": "cast_skill_param:1", "percent": 1.0, "target": "self"}
       ],
@@ -432,7 +432,7 @@
     {
       "id": "casting_a_skill_spends_one_layer_of_the_sky_ode",
       "on": "SKILL_CAST",
-      "when": ["self has_state 献予「天空」之诗", "from_skill_id == 2"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "state": "献予「天空」之诗" }}, {"type": "event", "json": { "from_skill_id": 2 }}],
       "do": [
         {"op": "REMOVE_STACK", "buff": "献予「天空」之诗", "amount": 1, "target": "self"}
       ],
@@ -442,7 +442,7 @@
     {
       "id": "casting_the_ultimate_spends_one_layer_of_the_sky_ode",
       "on": "ULT_CAST",
-      "when": ["self has_state 献予「天空」之诗", "from_skill_id == 3"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "state": "献予「天空」之诗" }}, {"type": "event", "json": { "from_skill_id": 3 }}],
       "do": [
         {"op": "REMOVE_STACK", "buff": "献予「天空」之诗", "amount": 1, "target": "self"}
       ],
@@ -452,7 +452,7 @@
     {
       "id": "sky_ode_captures_its_healing_share",
       "on": "CAST_SETUP",
-      "when": ["target == self", "from_skill_id == 19"],
+      "when_predicates": [{"type": "entity", "entity": "target", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 19 }}],
       "do": [
         {"op": "GAIN_RESOURCE", "resource": "天空之诗的治疗份额", "scale": "cast_skill_param:0", "percent": 10000, "target": "self"}
       ],

@@ -39,7 +39,7 @@
     },
     {
       "on": "CAST_SETUP",
-      "when": ["actor == self", "from_skill_id == 3"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 3 }}],
       "do": [
         {"op": "DELEGATE_DAMAGE", "skill": "ULTRA"}
       ],
@@ -132,7 +132,7 @@
     {
       "id": "time_ode_captures_its_own_share",
       "on": "CAST_SETUP",
-      "when": ["target == self", "from_skill_id == 24"],
+      "when_predicates": [{"type": "entity", "entity": "target", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 24 }}],
       "do": [
         {"op": "GAIN_RESOURCE", "resource": "长夜的迷梦增伤", "scale": "cast_skill_param:0", "percent": 10000, "target": "self"}
       ],
@@ -142,7 +142,7 @@
     {
       "id": "time_ode_boosts_the_memosprite_dream_skill",
       "on": "DAMAGE_SETTLED",
-      "when": ["actor is_ally", "damage_skill_key == 7"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "is_ally": true }}, {"type": "event", "json": { "damage_skill_key": 7 }}],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -158,7 +158,7 @@
     {
       "id": "time_ode_captures_its_extra_point",
       "on": "CAST_SETUP",
-      "when": ["target == self", "from_skill_id == 24"],
+      "when_predicates": [{"type": "entity", "entity": "target", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 24 }}],
       "do": [
         {"op": "GAIN_RESOURCE", "resource": "岁月之诗的亿质点数", "scale": "cast_skill_param:1", "target": "self"}
       ],
@@ -168,7 +168,7 @@
     {
       "id": "time_ode_grants_memory_after_skill",
       "on": "SKILL_CAST",
-      "when": ["actor == self", "from_skill_id == 2"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 2 }}],
       "do": [
         {"op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self"}
       ],
@@ -178,7 +178,7 @@
     {
       "id": "time_ode_grants_memory_after_ult",
       "on": "ULT_CAST",
-      "when": ["actor == self", "from_skill_id == 3"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 3 }}],
       "do": [
         {"op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "resource", "resource": "岁月之诗的亿质点数"}, "target": "self"}
       ],
@@ -188,7 +188,7 @@
     {
       "id": "her_skill_raises_our_memosprites_crit_damage",
       "on": "SKILL_CAST",
-      "when": ["actor == self", "from_skill_id == 2"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 2 }}],
       "do": [
         {"op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "scale": "self_attr:crit_attack", "percent_from_skill_param": "SKILL:0", "turns": 2, "target": "all_summons"}
       ],
@@ -198,7 +198,7 @@
     {
       "id": "time_ode_raises_her_skill_crit",
       "on": "CAST_SETUP",
-      "when": ["target == self", "from_skill_id == 24"],
+      "when_predicates": [{"type": "entity", "entity": "target", "json": { "same_as": "self" }}, {"type": "event", "json": { "from_skill_id": 24 }}],
       "do": [
         {"op": "MODIFY_RULE", "rule": "her_skill_raises_our_memosprites_crit_damage", "effect_percent": 0.06}
       ],
@@ -208,7 +208,7 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "memosprite_skill_one_grants_memory",
-      "when": ["actor == summon", "from_skill_id == 1"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "event", "json": { "from_skill_id": 1 }}],
       "do": [
         {"op": "GAIN_RESOURCE", "resource": "亿质", "amount_from": {"type": "cast_param", "index": 3}, "target": "self"}
       ],
@@ -218,7 +218,7 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "memosprite_dream_dump_spends_everything",
-      "when": ["actor == summon", "from_skill_id == 7"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "event", "json": { "from_skill_id": 7 }}],
       "do": [
         {"op": "SPEND_RESOURCE", "resource": "亿质", "spendAll": true, "target": "self"},
         {"op": "CONSUME_HP", "scale": "owner_max_hp", "percent": 1.0, "target": "self"},
