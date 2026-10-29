@@ -94,6 +94,47 @@ public class SkillEffectSpec {
     private List<DamagePart> damageParts;
 
     /**
+     * A share that <b>grows with a resource</b>: 「每有 #3 点【X】，则额外造成 #2%」 - or {@code null} for the ordinary
+     * fixed row share.
+     *
+     * <p>Reader: 11413/1, 长夜's 忆灵技1. The sentence names two more parameters than the ordinary row and the game
+     * <b>folds the extra into the same instances</b> - the recorded fight's one cast reads 0.09 where the Lv8 row says
+     * 0.06, i.e. {@code (10 / 4) x 0.12} added, not two extra hits. That is why this is a share modifier and not an
+     * {@code ADD_DAMAGE} rule: extra instances would each roll their own crit and land their own events, and the game's
+     * payload shows six instances, not twelve.
+     *
+     * <p>Whose resource: the row says 「长夜月当前每有…」 - the <b>summoner's</b>, read through the same "who owns this
+     * sheet" rule the damage base uses ({@link com.laosun.aluminium.models.CanHit#damageBase}).
+     */
+    @SerializedName("resource_share")
+    private ResourceShare resourceShare;
+
+    /**
+     * How a resource turns into extra share: {@code (held / step) x share}, both terms read from the same level row.
+     */
+    @Getter
+    public static class ResourceShare {
+
+        /**
+         * The resource's id as the trigger tables spell it - 1413's 「**亿质**」 (the data's own spelling, not 「忆质」).
+         */
+        @SerializedName("resource")
+        private String resource;
+
+        /**
+         * Which parameter is the divisor (「每有 #3 点」 ⇒ 0-based {@code 2}), read at the cast's level.
+         */
+        @SerializedName("step_param")
+        private int stepParam;
+
+        /**
+         * Which parameter is the extra share (「额外造成 #2%」 ⇒ 0-based {@code 1}), read at the cast's level.
+         */
+        @SerializedName("share_param")
+        private int shareParam;
+    }
+
+    /**
      * One damage part of a multi-part row: which shape it reaches, and which parameter of the row it takes.
      */
     @Getter

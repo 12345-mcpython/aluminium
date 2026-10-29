@@ -93,35 +93,36 @@ public class BattleReplayTest {
     }
 
     /**
-     * The reconciliation compares the <b>base</b> - and after the memosprite rule landed, the memosprite casts reproduce
-     * it.
+     * The reconciliation compares the <b>base</b>, and every cast it can settle agrees - except the one whose number
+     * depends on state the window did not observe.
      *
      * <p><b>What this case used to say</b> (until 2026-10-27): every memosprite row was the servant's share of the
      * capture's base (`DIFFERS-x0.50` / `x0.70`), because the engine read the servant's own Max HP. The recorded fight
      * said the game reads the summoner's, the engine now does too ({@code Summon.damageBase}), and those factors are
-     * gone - which is exactly what this case now pins, in the negative: a run that starts printing them again has
-     * regressed the rule.
+     * gone - a run that starts printing them again has regressed the rule.
      *
-     * <p>The one comparable difference left is cast 4, and it is <b>named</b>: 「每有 #3 点【忆质】额外造成 #2%」 is folded
-     * into the same six instances by the game (0.09 vs the row's 0.06 ⇒ ×0.67) and is registered in {@code AGENT.md}
-     * §3.7h. Rows whose base came from a tally say {@code base-n/a} rather than claiming a verdict.
+     * <p><b>The one difference left is cast 4</b>, and it is the <b>unobserved prefix</b>: the game's cast reads ten
+     * points of 【忆质】 ({@code 0.6 + (10/4) x 0.12 = 0.9} vs the row's 0.6), while the replayed window starts empty and
+     * has only the one point its first cast granted. The fold itself is judged by {@code EvernightMemoryFoldTest}; this
+     * case only says the replay must not be expected to invent state it never saw. Rows whose base came from a tally say
+     * {@code base-n/a} rather than claiming a verdict.
      */
     @Test
-    public void theReportComparesTheBaseAndNamesWhatIsLeft() {
+    public void theOnlyComparisonLeftIsTheUnobservedPrefix() {
         String out = run(PLAN).out;
         Assertions.assertTrue(out.contains("bases: capture"),
                 "every driven cast prints both sides' per-instance bases; output was:\n" + out);
         Assertions.assertTrue(out.contains("base-ok"),
                 "the memosprite and basic-attack rows are driven at the capture's own panel and level, so their bases "
                         + "agree; output was:\n" + out);
-        Assertions.assertFalse(out.contains("DIFFERS-x0.5"),
-                "a memosprite row is no longer the servant's share of the capture's base - the engine reads the "
-                        + "summoner's Max HP now (Summon.damageBase); output was:\n" + out);
-        Assertions.assertFalse(out.contains("DIFFERS-x0.7"),
-                "…the same for 晴空乐手's 70% share; output was:\n" + out);
-        Assertions.assertTrue(out.contains("DIFFERS-x0.67"),
-                "the 【忆质】 half is still folded into cast 4 by the game (0.06 row vs 0.09 captured) and must be "
-                        + "reported as that factor, not as a bare difference; output was:\n" + out);
+        java.util.List<String> differing = out.lines()
+                .filter(line -> line.contains("DIFFERS"))
+                .toList();
+        Assertions.assertEquals(1, differing.size(),
+                "exactly one driven cast still differs - a second one would be a new gap; output was:\n" + out);
+        Assertions.assertTrue(differing.get(0).startsWith(String.format(java.util.Locale.ROOT, "%-4d ", 4)),
+                "and it is cast 4, the 【忆质】 one whose 10 points the window never observed; the row was:\n"
+                        + differing.get(0));
         Assertions.assertTrue(out.contains("base-n/a"),
                 "1409's tally-delivered hits have damage_percentage 0, so there is no share to compare - they must say "
                         + "so instead of claiming a verdict; output was:\n" + out);
