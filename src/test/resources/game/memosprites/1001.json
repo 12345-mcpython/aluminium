@@ -1,0 +1,34 @@
+[
+  {
+    "name": "贝茜",
+    "source": "fixture: a two-memosprite file for the multi-memosprite judge",
+    "panel": [
+      {
+        "attribute": "HEALTH",
+        "percent": 0.5
+      },
+      {
+        "attribute": "SPEED",
+        "flat": 0,
+        "by_ability": true
+      }
+    ],
+    "skills": []
+  },
+  {
+    "name": "啾米",
+    "source": "fixture: the second memosprite of the same character",
+    "panel": [
+      {
+        "attribute": "HEALTH",
+        "percent": 0.3
+      },
+      {
+        "attribute": "SPEED",
+        "flat": 0,
+        "by_ability": true
+      }
+    ],
+    "skills": []
+  }
+]

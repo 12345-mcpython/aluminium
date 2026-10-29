@@ -97,6 +97,49 @@ public final class SummonService {
     }
 
     /**
+     * Brings one <b>named</b> memosprite of a character onto the field - 1512 知更鸟•晴歌 summons three (贝茜 / 啾米 / 派丁)
+     * and 「「晴空乐手」全员登台」 is a state about <b>all three</b> being out, so "one memosprite per character" was the wrong
+     * shape for her.
+     *
+     * <p>Unlike {@link #memosprite(Character)}, this does not stop at the first one standing: each NAME is summoned at most
+     * once (a second call answers the one already out), and different names coexist.
+     *
+     * @param master the summoning character
+     * @param name   which of its memosprites, by the name its file states
+     * @return the memosprite that is now on the field
+     */
+    public Summon memosprite(Character master, String name) {
+        if (master == null) {
+            throw new IllegalArgumentException("A memosprite needs a summoner");
+        }
+        if (name == null || name.isBlank()) {
+            return memosprite(master);
+        }
+        var spec = com.laosun.aluminium.data.Memosprites.allOf(master.getCid()).stream()
+                .filter(each -> name.trim().equals(each.name()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Character " + master.getName() + " (" + master.getCid() + ") has no memosprite named \""
+                                + name + "\"; its file states "
+                                + com.laosun.aluminium.data.Memosprites.allOf(master.getCid()).stream()
+                                .map(com.laosun.aluminium.beans.MemospriteSpec::name).toList()));
+        for (CanHit each : summonsOf(master)) {
+            if (each instanceof Summon summon && name.trim().equals(summon.getName())) {
+                return summon;
+            }
+        }
+        if (master.isDeath()) {
+            throw new IllegalArgumentException(
+                    "A dead character cannot summon a memosprite (" + master.getName() + ")");
+        }
+        Summon summoned = SummonFactory.memosprite(master, spec);
+        summoned.setMaster(master);
+        battle.addCombatant(summoned);
+        onSummoned.accept(summoned);
+        return summoned;
+    }
+
+    /**
      * Brings a character's servant onto the field.
      *
      * @param master the summoning character

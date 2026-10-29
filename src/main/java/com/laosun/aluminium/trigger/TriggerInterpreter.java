@@ -837,7 +837,16 @@ public final class TriggerInterpreter {
             case SUPER_BREAK -> TriggerEffects.superBreak(battle, effect, ctx);
             case APPLY_REGEN -> TriggerEffects.applyRegen(battle, effect, ctx);
             case REGISTER_HEAL_BONUS -> registerHealBonus(effect, ctx);
-            case SUMMON -> battle.summonMemosprite(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
+            case SUMMON -> {
+                // 「若任意「晴空乐手」已在场…」 (1512): a kit may own SEVERAL memosprites, and "which one" is data. Without
+                // the name the op keeps its old meaning (the character's first / its only one).
+                var owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+                if (effect.getMemospriteName() == null || effect.getMemospriteName().isBlank()) {
+                    battle.summonMemosprite(owner);
+                } else {
+                    battle.summonMemosprite(owner, effect.getMemospriteName().trim());
+                }
+            }
             case COMMAND_SUMMON -> TriggerEffects.commandSummon(battle, effect, ctx);
             case CAST_SKILL -> TriggerEffects.castSkill(battle, effect, ctx);
             case SUMMON_SERVANT -> battle.summonServant(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
