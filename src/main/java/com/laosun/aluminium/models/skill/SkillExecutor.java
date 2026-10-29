@@ -484,6 +484,15 @@ public final class SkillExecutor {
             return;
         }
 
+        // A row whose share is a COUNT (「每持有 1 点【忆质】…」) prices each instance per point, and prices the main
+        // target differently. Only the area shape is supported today; anything else is a data error rather than a
+        // silent mis-reading.
+        SkillEffectSpec.PerResourceShare perResource = perResourceShareOf(skill);
+        if (perResource != null && effect != SkillEffectType.AOE_ATTACK) {
+            throw new IllegalStateException("skill_effects.json's per_resource_share is only read for AoEAttack rows ("
+                    + data.getSkillType() + " is " + effect + ")");
+        }
+
         // An ElationDamage row reads its params as [hits, per-hit share, final split share] (readers 8009/8010
         // slot 20, whose text is "deal #1 instances of damage, each dealing #2% to a random single enemy ... The last deals #3% ..., divided evenly among all enemies").
         // Note: The row's own `skill_effect` is AoEAttack, so without this branch the leading 8 is read as a MULTIPLIER -- 800% damage
@@ -548,7 +557,14 @@ public final class SkillExecutor {
             case AOE_ATTACK -> {
                 double stance = data.stanceFor(true);
                 for (CanHit target : battle.targetableEnemies()) {
-                    totalDamage += hit(battle, data, user, element, base, target, hitTargets, stance, skill.getSkillSlot());
+                    // 「当前每持有 1 点【忆质】对主目标造成 #1%、对其他敌方目标造成 #2%」: the share is a COUNT times a
+                    // per-point parameter, and the main target is priced differently from the rest. Both live in the
+                    // row, so nothing here is a second copy of the numbers.
+                    double instanceBase = perResource == null
+                            ? base
+                            : perResourceBase(user, baseAttribute, params, perResource, target == mainTarget);
+                    totalDamage += hit(battle, data, user, element, instanceBase, target, hitTargets, stance,
+                            skill.getSkillSlot());
                 }
             }
 
@@ -645,13 +661,45 @@ public final class SkillExecutor {
             throw new IllegalStateException("skill_effects.json's resource_share for " + skill.getCid() + "/"
                     + skill.getSkillSlot() + " divides by parameter #" + (shape.getStepParam() + 1) + " = " + step);
         }
+        return resourceHeld(user, shape.getResource()) / step * params.get(shape.getShareParam());
+    }
+
+    /**
+     * The "per point of a resource" share the row declares, or {@code null}.
+     */
+    private static SkillEffectSpec.PerResourceShare perResourceShareOf(Skill skill) {
+        SkillEffectSpec spec = SkillEffects.forSkill(skill);
+        return spec == null ? null : spec.getPerResourceShare();
+    }
+
+    /**
+     * The damage one instance of a "per point of a resource" row carries: {@code share x held x the owning attribute}.
+     *
+     * <p>Reader: 11413/7, 「迷梦，流失，如露」 - 「当前每持有 1 点【忆质】对主目标造成 #1% 生命上限的冰伤，对其他敌方目标造成
+     * #2%」. The recorded fight's cast reads 3.0 on the main and 1.5 on the other target, i.e. {@code 0.06 x 50} and
+     * {@code 0.03 x 50} at the Lv1 row: <b>fifty points</b>, and the 2:1 split is #1:#2.
+     *
+     * @param mainTarget whether this instance hits the skill's aimed target (the one priced at {@code main_param})
+     */
+    private static double perResourceBase(CanHit user, AttributeType baseAttribute, List<Double> params,
+                                          SkillEffectSpec.PerResourceShare shape, boolean mainTarget) {
+        int index = mainTarget ? shape.getMainParam() : shape.getOtherParam();
+        if (index < 0 || index >= params.size()) {
+            throw new IllegalStateException("skill_effects.json's per_resource_share points at parameter #"
+                    + (index + 1) + ", but the row has " + params.size());
+        }
+        return user.damageBase(baseAttribute) * resourceHeld(user, shape.getResource()) * params.get(index);
+    }
+
+    /**
+     * How many points of {@code id} the unit's <b>master</b> holds - a memosprite's rows say 「长夜月当前每有…」, so the
+     * counter lives on the summoner (same rule as {@link CanHit#damageBase}). Unregistered reads as 0.
+     */
+    private static int resourceHeld(CanHit user, String id) {
         CanHit holder = user instanceof com.laosun.aluminium.models.Summon summon && summon.getMaster() != null
                 ? summon.getMaster()
                 : user;
-        int held = holder.getResources().get(shape.getResource()) == null
-                ? 0
-                : holder.getResources().get(shape.getResource()).value();
-        return held / step * params.get(shape.getShareParam());
+        return holder.getResources().get(id) == null ? 0 : holder.getResources().get(id).value();
     }
 
     /**

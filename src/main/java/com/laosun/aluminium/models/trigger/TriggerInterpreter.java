@@ -788,6 +788,7 @@ public final class TriggerInterpreter {
             case BOOST_DAMAGE -> boostDamage(effect, ctx);
             case ADD_DAMAGE -> TriggerEffects.addDamageFlat(effect, ctx);
             case DISPEL -> TriggerEffects.dispel(battle, effect, ctx);
+            case DISMISS_SUMMON -> dismissSummon(battle, effect, ctx);
             case REMOVE_BUFF -> TriggerEffects.removeBuffs(battle, effect, ctx);
             case REPLACE_SKILL -> TriggerEffects.replaceSkill(battle, effect, ctx);
             case TICK_DOT -> TriggerEffects.tickDot(battle, effect, ctx);
@@ -1990,6 +1991,29 @@ public final class TriggerInterpreter {
             owner.addRuleCooldownDelta(target, effect.getCooldownDelta());
         } else {
             owner.addRuleBaseChanceBonus(target, effect.getPercent());
+        }
+    }
+
+    /**
+     * 「并使「长夜」消失」: takes a summon off the field <b>without a death</b>.
+     *
+     * <p>Reader: 11413/7 「迷梦，流失，如露」 - 「施放后，消耗全部【忆质】和生命值，并使「长夜」消失」. {@code perish()} is the
+     * engine's "it went away, nobody killed it" (its own javadoc), and the death sweep then announces
+     * {@link TriggerEvent#SUMMON_LEFT}, which is what 风堇's aura and 长夜's own departure rules listen for - so this op
+     * reuses that seam rather than inventing a second removal path.
+     *
+     * <p>⚠ A resolved target that is <b>not</b> a summon is a data error, not a silent no-op: "dismiss" applied to a
+     * character would read as working (nothing happens) while the sentence is about something else entirely.
+     */
+    private static void dismissSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+            if (!(target instanceof com.laosun.aluminium.models.Summon summon)) {
+                throw new IllegalStateException("DISMISS_SUMMON resolved "
+                        + (target == null ? "null" : target.getName()) + ", which is not a summon");
+            }
+            if (!summon.isDeath()) {
+                summon.perish();
+            }
         }
     }
 
