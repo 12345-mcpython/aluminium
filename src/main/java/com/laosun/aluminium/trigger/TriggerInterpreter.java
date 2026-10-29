@@ -959,6 +959,22 @@ public final class TriggerInterpreter {
         // Note: the model already had the two kinds side by side (`EnergyGain.fixed` / `.normal`); what was missing was a
         // way for a RULE to pick the fixed one. Measured before this: a fixed +10 became +15 at a 50% rate.
         if (Boolean.TRUE.equals(effect.getFixed())) {
+            // 「固定恢复等同于 #3% 能量上限的能量」 (1512's ultimate): fixed says the regen RATE does not touch it, and the
+            // share says how much - a share of THIS recipient's own maximum, which is why the two have to meet here
+            // rather than in the `scale` family (that one pays through the rate).
+            if (effect.getAmount() == null && (effect.getPercent() != null || effect.getPercentFrom() != null)) {
+                // The share comes from the row (`percent_from: cast_param 2`), so the number follows the skill's level
+                // instead of pinning the value one level happened to state.
+                double share = TriggerMagnitudes.shareOf(effect, ctx);
+                double ownMax = target.getMaxEnergy();
+                if (ownMax <= 0) {
+                    throw new IllegalStateException(
+                            "a fixed GAIN_ENERGY takes " + share + " of " + target.getName()
+                                    + "'s maximum energy, but that unit has no energy bar; a share of it is not a number");
+                }
+                battle.applyEnergyGain(target, com.laosun.aluminium.energy.EnergyGain.fixed(share * ownMax));
+                return;
+            }
             battle.applyEnergyGain(target, com.laosun.aluminium.energy.EnergyGain.fixed(effect.getAmount()));
             return;
         }

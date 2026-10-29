@@ -152,7 +152,15 @@ final class TriggerValidator {
             case GAIN_ENERGY -> {
                 // A cast parameter is a third spelling (reader: 1415's ode of sky, "restore #2 energy to Hyacine (风堇)", whose
                 // #2 runs 12 -> 33.6). `ENERGY_SCALES` holds only a share of max energy, so the op could not read a number out of the skill that produced it.
-                if (TriggerInterpreter.isCastParamScale(effect)) {
+                // 「固定恢复等同于 #3% 能量上限的能量」 (1512's ultimate): `fixed` + a bare `percent` is a complete statement -
+                // "the stated share of the RECIPIENT's own maximum, untouched by the regen rate" - so the generic
+                // "a share needs a scale" rule does not apply to this pair. Everything else keeps that rule.
+                boolean fixedShare = Boolean.TRUE.equals(effect.getFixed()) && effect.getAmount() == null
+                        && (effect.getPercent() != null || effect.getPercentFrom() != null)
+                        && (effect.getScale() == null || effect.getScale().isBlank());
+                if (fixedShare) {
+                    requireNoStackArguments(effect, op, spec);
+                } else if (TriggerInterpreter.isCastParamScale(effect)) {
                     requireNoStackArguments(effect, op, spec);
                 } else {
                     requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
@@ -161,7 +169,7 @@ final class TriggerValidator {
                 if (Boolean.TRUE.equals(effect.getFixed())) {
                     // 「固定恢复 N 点」 states a NUMBER, so it cannot also be a share: refusing the pair keeps "fixed" from
                     // silently deciding which of two magnitudes wins (the same rule `to_max` + `amount` follows).
-                    if (effect.getAmount() == null) {
+                    if (effect.getAmount() == null && !fixedShare) {
                         throw new IllegalArgumentException(
                                 "Op " + op + " states \"fixed\", so \"amount\" must be the stated number of points: got "
                                         + (effect.getScale() == null ? "nothing" : "\"scale\": \"" + effect.getScale()

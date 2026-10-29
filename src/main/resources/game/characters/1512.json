@@ -12,11 +12,33 @@
     {
       "on": "BATTLE_START",
       "id": "technique_advance_vibes_and_damage",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "state": "秘技" }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "state": "秘技"
+          }
+        }
+      ],
       "do": [
-        { "op": "ADVANCE", "percent": 0.2, "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "气氛值", "amount": 6 },
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.3, "turns": 2, "target": "all_allies" }
+        {
+          "op": "ADVANCE",
+          "percent": 0.2,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "气氛值",
+          "amount": 6
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "all_allies"
+        }
       ],
       "source": "1512 知更鸟•晴歌 秘技 我们自成旋律 (151207, Maze/Enhance): 「使用秘技后，使下一次战斗开始时行动提前20%，立即获得6点气氛值，并使我方全体造成的伤害提高30%，持续2回合。」",
       "note": "「**使用秘技后**，使下一次战斗开始时**行动提前 20%**，立即获得 **6 点气氛值**，并使我方全体造成的伤害**提高 30%**，持续 **2 回合**」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；② `ADVANCE percent: 0.2` ✓；③ 气氛值用 **`GAIN_RESOURCE`** ✓（资源词汇来自 1003 ✓，本文件另有**声明** ✓）；④ 增伤 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST percent 0.3 turns 2` + `target: all_allies` ✓（\"我方全体\" ✓，与 1213 的用法同形 ✓）。"
@@ -24,11 +46,30 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_summon_and_vibes",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "same_as": "self"
+          }
+        }
+      ],
       "do": [
-        { "op": "SUMMON" },
-        { "op": "HEAL", "scale": "target_max_hp", "percent": 1.0, "target": "summon" },
-        { "op": "GAIN_RESOURCE", "resource": "气氛值", "amount": 6 }
+        {
+          "op": "SUMMON"
+        },
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 1.0,
+          "target": "summon"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "气氛值",
+          "amount": 6
+        }
       ],
       "source": "1512 知更鸟•晴歌 战技 盛夏是灵魂的乐手 (151202, BPSkill/Summon): 「召唤忆灵「晴空乐手」贝茜。若任意「晴空乐手」已在场，为其回复等同于「晴空乐手」生命上限100%的生命值，并获得6点气氛值。」",
       "note": "「**召唤忆灵**「晴空乐手」贝茜。若任意「晴空乐手」**已在场**，为其回复等同于「晴空乐手」**生命上限 100%** 的生命值，并获得 **6 点气氛值**」—— ① `SUMMON` ✓（无参数 ✓，面板来自 `memosprites/1512.json` ✓ ——「已到场则解除控制」是引擎既有语义 ✓）；② 治疗用 `HEAL` + **`scale: target_max_hp`** + **`target: summon`** ✓（\"晴空乐手的生命上限\"，读的是**忆灵自己** ✓，与 8007 同形 ✓）；③ 气氛值 `GAIN_RESOURCE 6` ✓。⚠ **登记**：① 文档里**三只**忆灵（贝茜/啾米/派丁 ✓）与**按气氛值阈值召唤**（≥6 召唤啾米、≥12 召唤派丁 ✗）——阈值召唤需要\"按资源数值触发\" ✗ 且**一角色多忆灵** ✗ ⇒ 本文件只写**第一只**（战技那只 ✓，文档明确点名 ✓）；② 天赋「**我方目标施放攻击时**，或**在任意目标回合第一次提供治疗/护盾时**，获得 1 点气氛值，**上限 50 点**」✗ —— 前半可写 ✓（`ALLY_ATTACK` ✓ + `GAIN_RESOURCE 1` ✓），但后半需要\"**任意目标回合内的第一次**\"这个计数 ✗；   ⚠ 因此**没有**写出这条\"+1\"的规则 ✗ —— 只写一半会让气氛值的**数值口径**变成半真半假 ✗。"
@@ -36,7 +77,22 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "fever_aura_ignores_defence_by_vibes",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "is_ally": true }}, {"type": "entity", "entity": "self", "json": { "state": "Fever" }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "is_ally": true
+          }
+        },
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "state": "Fever"
+          }
+        }
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -56,7 +112,22 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "fever_boosts_her_and_her_memosprites_damage",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "entity", "entity": "self", "json": { "state": "Fever" }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "same_as": "self"
+          }
+        },
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "state": "Fever"
+          }
+        }
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -75,7 +146,22 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "fever_boosts_the_memosprites_own_damage",
-      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "entity", "entity": "self", "json": { "state": "Fever" }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "same_as": "summon"
+          }
+        },
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "state": "Fever"
+          }
+        }
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -94,9 +180,25 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_aura_vulnerability_at_1",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 1 } }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "summon_count": {
+              "min": 1
+            }
+          }
+        }
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.112, "permanent": true, "coexist": true, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.112,
+          "permanent": true,
+          "coexist": true,
+          "target": "all_enemies"
+        }
       ],
       "source": "1512 忆灵 11512 SkillP01 (1151203): 「「晴空乐手」在场时，根据成员数量使敌方全体受到的伤害分别提高#3/#4/#5` param = [0.84, 0.028, 0.112, 0.168, 0.224, ...]",
       "note": "「根据成员数量使敌方全体受到的伤害提高 0.112 / 0.168 / 0.224」，逐档累加 ✓（2 名 = 0.28、3 名 = 0.504）✓。`coexist: true` 是必需的：光锥 23042 那条 +36% 会覆盖本条的 +11.2%（实测比值 1.2230 正好是 1.36/1.112）✗。⚠ 登记：文档说「在场时」⇒ 离场应撤销，本文件是 permanent（离场不撤销）；人数后续变化不会重算。"
@@ -104,9 +206,25 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_aura_vulnerability_at_2",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 2 } }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "summon_count": {
+              "min": 2
+            }
+          }
+        }
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.168, "permanent": true, "coexist": true, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.168,
+          "permanent": true,
+          "coexist": true,
+          "target": "all_enemies"
+        }
       ],
       "source": "1512 忆灵 11512 SkillP01 (1151203): 「「晴空乐手」在场时，根据成员数量使敌方全体受到的伤害分别提高#3/#4/#5` param = [0.84, 0.028, 0.112, 0.168, 0.224, ...]",
       "note": "「根据成员数量使敌方全体受到的伤害提高 0.112 / 0.168 / 0.224」，逐档累加 ✓（2 名 = 0.28、3 名 = 0.504）✓。`coexist: true` 是必需的：光锥 23042 那条 +36% 会覆盖本条的 +11.2%（实测比值 1.2230 正好是 1.36/1.112）✗。⚠ 登记：文档说「在场时」⇒ 离场应撤销，本文件是 permanent（离场不撤销）；人数后续变化不会重算。"
@@ -114,21 +232,135 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_aura_vulnerability_at_3",
-      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 3 } }}],
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "summon_count": {
+              "min": 3
+            }
+          }
+        }
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.224, "permanent": true, "coexist": true, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.224,
+          "permanent": true,
+          "coexist": true,
+          "target": "all_enemies"
+        }
       ],
       "source": "1512 忆灵 11512 SkillP01 (1151203): 「「晴空乐手」在场时，根据成员数量使敌方全体受到的伤害分别提高#3/#4/#5` param = [0.84, 0.028, 0.112, 0.168, 0.224, ...]",
       "note": "「根据成员数量使敌方全体受到的伤害提高 0.112 / 0.168 / 0.224」，逐档累加 ✓（2 名 = 0.28、3 名 = 0.504）✓。`coexist: true` 是必需的：光锥 23042 那条 +36% 会覆盖本条的 +11.2%（实测比值 1.2230 正好是 1.36/1.112）✗。⚠ 登记：文档说「在场时」⇒ 离场应撤销，本文件是 permanent（离场不撤销）；人数后续变化不会重算。"
     },
     {
+      "on": "ULT_CAST",
+      "id": "ult_special_guest",
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "same_as": "self"
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "target"
+        },
+        {
+          "op": "GAIN_ENERGY",
+          "fixed": true,
+          "target": "target",
+          "percent_from": {
+            "type": "cast_param",
+            "index": 2
+          }
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "特邀嘉宾",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1512 知更鸟•晴歌 终结技 跃入这片蔚蓝狂想 (151203, Ultra/Support): 「使除知更鸟•晴歌外的指定我方单体角色行动提前 #1[i]% 并固定恢复等同于 #3[f1]% 能量上限的能量。随后使其获得【特邀嘉宾】效果…持续2回合。该角色每回合开始时持续回合数减1。」 param = [1, 2, 0.12…0.24, 0]",
+      "note": "「行动提前 #1%」= ADVANCE percent: 1.0（各行 #1 恒为 1 ⇒ 100%）✓，目标 = 终结技选中的那名队友（target）✓；「固定恢复等同于 #3% 能量上限的能量」= GAIN_ENERGY 的 fixed + percent（本轮新开：fixed 以前只收字面量 ⇒ 一个按上限百分比的固定值无处可写 ✗；现在 fixed + percent_from（cast_param 2）= 该目标自己上限的 #3% ✓，且不吃能量恢复效率 ✓ —— 这正是固定二字的意思）；「使其获得【特邀嘉宾】…持续 2 回合，该角色每回合开始时持续回合数减 1」= APPLY_BUFF turns: 2，不写 ticks_on ⇒ 时钟挂在持有人自己的回合 ✓（ticks_on 的两个拼法是 self / summon，都不对）。⚠ 登记：① 「无法使其他友方目标获得行动提前效果」✗ —— 需要一个抑制某类行为的能力，引擎没有；② 【特邀嘉宾】的 +2 气氛值分两条规则写在下面（角色本体 / 及其召唤物）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "guest_attack_grants_vibes",
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "state": "特邀嘉宾"
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "气氛值",
+          "amount": 2
+        }
+      ],
+      "source": "1512 知更鸟•晴歌 终结技 跃入这片蔚蓝狂想 (151203): 「持有【特邀嘉宾】的角色及其召唤物攻击时额外使知更鸟•晴歌获得 #2[i] 点气氛值」 param #2 = 2",
+      "note": "「持有【特邀嘉宾】的角色…攻击时额外使知更鸟•晴歌获得 2 点气氛值」—— ALLY_ATTACK + actor has_state 特邀嘉宾 ✓，GAIN_RESOURCE 2 给自 己（气氛值是她的队级计数器 ✓）。"
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "guest_summon_attack_grants_vibes",
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "is_summon": true,
+            "master_state": "特邀嘉宾"
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "气氛值",
+          "amount": 2
+        }
+      ],
+      "source": "1512 知更鸟•晴歌 终结技 跃入这片蔚蓝狂想 (151203): 「…及其召唤物攻击时额外使知更鸟•晴歌获得 #2[i] 点气氛值」",
+      "note": "「及其召唤物攻击时」—— 召唤物自己不带那个状态，状态在它的主人身上 ⇒ 新子谓词 master_state（本轮新开：is_summon 只说是个召唤物，问不到你主人的状态 ✗）。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
       ],
       "source": "1512 知更鸟•晴歌 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 50% 生命上限、忆灵技 150% 生命上限、天赋 70% 生命上限/180% 速度）",
       "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 终结技的【**特邀嘉宾**】✗ —— 「使除自身外的指定我方单体**行动提前 100%** 并固定恢复等同于 **20.00% 能量上限**的能量。随后使其获得【特邀嘉宾】…**持有者及其召唤物攻击时额外使自身获得 2 点气氛值**，且**无法使其他友方目标获得行动提前效果**，持续 2 回合，**该角色每回合开始时减 1**」—— 其中\"行动提前 100%\"✓、\"恢复 20% 能量上限\"✓（`GAIN_ENERGY` + `scale` 若支持 ✓ 需核实 ✗）**本可写** ✓，但**【特邀嘉宾】本身**（攻击时给**别人**回资源 ✗ +**禁止其他友方被行动提前**这种\"否决\" ✗）写不了 ✗ ⇒ 三句是一个整体 ✗，故整条**未写** ✗；② **【Fever】+ 结界** ✗：「全员登台后…进入【Fever】状态并**展开结界**，结界内我方目标造成伤害时**无视敌方目标（15.00% + 气氛值 × 0.50%）防御力**」✗ —— **结界/场** ✗ + **按资源数值缩放** ✗；③ 忆灵技 2 的整块 ✗（倒计时独立速度 **140** ✓ 与**气氛值扣除** ✗、`(60% + 气氛值×2.00%)` 的增伤 ✗、**按成员数量的 8.00%/12.00%/16.00% 易伤档位** ✗）；④ 忆灵技 3「被召唤时恢复 20 点能量」✓ 形状可写 ✓，但**多忆灵**未落地 ✗；⑤ 星魂未读 ✗。"

@@ -52,7 +52,7 @@ final class EntityPredicates {
     /** Every accepted sub-predicate, in one place so the loader's error can list it. */
     static final Set<String> KEYS = Set.of(
             "is_ally", "is_enemy", "is_dead", "is_summon",
-            "same_as", "summon_count", "enemy_count", "resource", "energy_pct", "debuff_count",
+            "same_as", "summon_count", "enemy_count", "resource", "energy_pct", "debuff_count", "master_state",
             "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "has_shield", "shield_from",
             "level", "cid", "speed", "eidolon", "skill_level", "state_turns",
             "attribute", "stacks", "state", "path", "element", "camp", "team");
@@ -106,7 +106,7 @@ final class EntityPredicates {
                                 + "\"; it is self / actor / target" + where);
                     }
                 }
-                case "state", "path", "element" -> requireStrings(key, entry.getValue(), where);
+                case "state", "path", "element", "master_state" -> requireStrings(key, entry.getValue(), where);
                 case "same_as" -> {
                     String other = requireString(key, entry.getValue(), where).trim();
                     if (!"summon".equals(other) && !SUBJECTS.contains(other)) {
@@ -349,6 +349,12 @@ final class EntityPredicates {
             case "energy_pct" -> inRange(unit.getMaxEnergy() <= 0 ? 0 : unit.getCurrentEnergy() / unit.getMaxEnergy(),
                     value);
             case "debuff_count" -> inRange(unit.getBuffManager().debuffCount(), value);
+            case "master_state" -> {
+                // 「持有【特邀嘉宾】的角色及其召唤物攻击时」 (1512's ultimate): the summon attacks, the STATE is on its master.
+                String name = value.getAsString();
+                yield unit instanceof Summon summon && summon.getMaster() != null
+                        && summon.getMaster().getBuffManager().hasState(name);
+            }
             case "camp" -> anyOf(value, name -> unit.getCamp() != null
                     && unit.getCamp().name().equalsIgnoreCase(name.trim()));
             case "team" -> {
