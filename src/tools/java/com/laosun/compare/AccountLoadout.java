@@ -1,4 +1,4 @@
-package com.laosun.aluminium.test.support;
+package com.laosun.compare;
 
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -10,6 +10,7 @@ import com.laosun.aluminium.equipment.Relic;
 import com.laosun.aluminium.equipment.RelicSuit;
 import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.utils.JSONReader;
 
 import java.util.List;
@@ -25,9 +26,9 @@ import java.util.Map;
  * carry: the <b>set name to set id</b> mapping (the dump names the set in English, the engine counts ids) and the
  * <b>light cone</b>, which the dump does not hold at all and the caller therefore states.
  *
- * <p>⚠ <b>This is a test fixture, not engine behaviour.</b> Nothing in the engine reads the account dump: it is one
- * player's equipment, not game data. A panel computed this way is only meaningful as "what the account's own build
- * gives", which is exactly what a capture comparison needs.
+ * <p>⚠ <b>This is a tool, not engine behaviour.</b> Nothing in the engine reads the account dump: it is one player's
+ * equipment, not game data. A panel computed this way is only meaningful as "what the account's own build gives",
+ * which is exactly what a replay or a capture comparison needs.
  */
 public final class AccountLoadout {
 

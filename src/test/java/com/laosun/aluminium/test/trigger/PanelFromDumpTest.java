@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.test.support.AccountLoadout;
+import com.laosun.compare.AccountLoadout;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

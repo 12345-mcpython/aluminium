@@ -140,8 +140,28 @@ public final class BattleReplay {
          */
         private Boolean memosprite;
 
-        /** Absolute attribute values, so both sides use the panel the capture's numbers came from. */
+        /**
+         * The light cone it wears. When stated, the character's panel is <b>computed</b> from it plus the account dump's
+         * relics - no absolute panel is written into the plan, so the panel itself is part of what the replay proves.
+         */
+        private ConeSpec cone;
+
+        /**
+         * Absolute attribute values, an <b>override</b> for a unit whose loadout is not in the dump. Superseded by
+         * {@link #cone} when both are stated.
+         */
         private Map<String, Double> attributes = new LinkedHashMap<>();
+    }
+
+    /**
+     * One light cone: the id, the level and the 叠影 rank.
+     */
+    @Getter
+    @Setter
+    public static class ConeSpec {
+        private Integer id;
+        private Integer level = 80;
+        private Integer rank = 1;
     }
 
     /**
@@ -331,11 +351,23 @@ public final class BattleReplay {
         List<Character> party = new ArrayList<>();
         Map<Integer, Character> byCid = new LinkedHashMap<>();
         System.out.println();
-        System.out.println("party (panels installed from the capture):");
+        System.out.println("party (panels derived from cid + cone + the account dump's relics):");
         for (MemberSpec member : plan.getParty()) {
-            Character character = CharacterFactory.create(member.getCid(), member.getLevel(), true, null, null,
-                    member.getEidolon() == null ? 0 : member.getEidolon());
-            applyOverrides(character, member.getAttributes());
+            Character character;
+            if (member.getCone() != null) {
+                character = AccountLoadout.assemble(new AccountLoadout.Build(
+                        member.getCid(),
+                        member.getLevel() == null ? 80 : member.getLevel(),
+                        member.getEidolon() == null ? 0 : member.getEidolon(),
+                        member.getCone().getId(),
+                        member.getCone().getLevel() == null ? 80 : member.getCone().getLevel(),
+                        member.getCone().getRank() == null ? 1 : member.getCone().getRank()));
+            } else {
+                character = CharacterFactory.create(member.getCid(),
+                        member.getLevel() == null ? 80 : member.getLevel(), true, null, null,
+                        member.getEidolon() == null ? 0 : member.getEidolon());
+                applyOverrides(character, member.getAttributes());
+            }
             party.add(character);
             byCid.put(member.getOwner(), character);
             System.out.printf(Locale.ROOT, "  %-6d %-8s ATK %-14.6f HP %-14.6f DEF %-14.6f%n",
