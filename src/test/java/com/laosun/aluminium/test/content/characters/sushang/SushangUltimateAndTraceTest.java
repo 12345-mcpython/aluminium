@@ -5,7 +5,7 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * 1206 Sushang: the ultimate's two clauses, and the trace that counts her own Sword Stance.
@@ -147,7 +147,7 @@ public class SushangUltimateAndTraceTest {
         }
 
         /** A unit's remaining wait, read off the action bar's own snapshot (the battle clock does not move). */
-        private double remainingWaitOf(com.laosun.aluminium.models.CanHit unit) {
+        private double remainingWaitOf(com.laosun.aluminium.models.entity.CanHit unit) {
             for (var signal : battle.queue().snapshot()) {
                 if (signal.getCanHit() == unit) {
                     return battle.queue().getTimeRemaining(signal);

@@ -2,6 +2,10 @@ package com.laosun.aluminium.enums;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Countdown;
+import com.laosun.aluminium.models.battle.WaveManager;
+import com.laosun.aluminium.models.state.ResourceManager;
 
 /**
  * The trigger sources a character mechanic can subscribe to.
@@ -423,7 +427,7 @@ public enum TriggerEvent {
      *
      * <p><b>Why the moment needs an event at all.</b> Robin (知更鸟)'s [协奏] lasts "until its countdown's turn arrives", which is a fact about
      * the <b>action order</b> rather than about anybody's turn count - so the state cannot be given a `turns` and the
-     * arrival has to be announced. The countdown is an ordinary {@link com.laosun.aluminium.models.Countdown} scheduled
+     * arrival has to be announced. The countdown is an ordinary {@link com.laosun.aluminium.models.entity.Countdown} scheduled
      * by the queue, which is what makes advances/breaks move it for free.
      *
      * <p>Note: <b>{@code actor} is the countdown, not the character whose state it ends.</b> The rule that reacts is

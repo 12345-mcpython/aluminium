@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Light cone 21011: damage of the WEARER'S OWN element, dealt by anyone on our side, is 12% stronger.
@@ -40,7 +41,7 @@ public class PlanetaryRendezvousTest {
         battle.startBattle();
     }
 
-    private double dealtBy(com.laosun.aluminium.models.CanHit attacker, DamageElement element) {
+    private double dealtBy(com.laosun.aluminium.models.entity.CanHit attacker, DamageElement element) {
         return battle.applyDamage(enemy, new Damage(attacker, enemy, element, DamageType.NORMAL, 1000));
     }
 

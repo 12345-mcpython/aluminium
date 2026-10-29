@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.ai;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import com.laosun.aluminium.models.buff.TauntBuff;
 
 import java.util.List;

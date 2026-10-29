@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Light cone 21002: with it equipped, the WHOLE party carries +8% all-type resistance, so an incoming hit lands for less.
@@ -41,7 +42,7 @@ public class DayOneOfMyNewLifeTest {
         battle.startBattle();
     }
 
-    private double incoming(com.laosun.aluminium.models.CanHit victim) {
+    private double incoming(com.laosun.aluminium.models.entity.CanHit victim) {
         return battle.applyDamage(victim, new Damage(enemy, victim, DamageElement.FIRE, DamageType.NORMAL, 1000));
     }
 

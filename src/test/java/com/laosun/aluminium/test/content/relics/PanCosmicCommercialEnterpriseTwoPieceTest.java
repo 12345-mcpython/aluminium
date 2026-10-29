@@ -8,6 +8,7 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Relic 303's two-piece: "使装备者的效果命中提高 10%。同时提高装备者等同于当前效果命中 25% 的攻击力，最多提高 25%".

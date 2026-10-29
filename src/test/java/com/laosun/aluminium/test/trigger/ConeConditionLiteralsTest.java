@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.Weapon;
 
 /**
  * Every light cone rule condition PER SUPERIMPOSITION RANK.

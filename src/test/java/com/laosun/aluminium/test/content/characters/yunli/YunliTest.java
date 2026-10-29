@@ -4,7 +4,7 @@ package com.laosun.aluminium.test.content.characters.yunli;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * 1221 Yunli, from her own file: the heal's derived-plus-flat amount, and the counter that reaches THE ATTACKER.
@@ -33,7 +34,7 @@ public class YunliTest {
         Battle battle = new Battle(List.of(yunli), List.of(enemy), fixed());
         battle.startBattle();
         // Spend some HP first, so the heal has room to show.
-        battle.applyDamage(yunli, new com.laosun.aluminium.models.Damage(enemy, yunli,
+        battle.applyDamage(yunli, new com.laosun.aluminium.models.damage.Damage(enemy, yunli,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL, com.laosun.aluminium.enums.DamageType.NORMAL, yunli.getMaxHp() * 0.5));
         double before = yunli.getCurrentHp();
         double expected = yunli.getAttribute(AttributeType.ATTACK).get() * 0.3 + 200;

@@ -3,7 +3,7 @@ package com.laosun.aluminium;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
@@ -21,7 +21,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.*;
-import java.util.function.Consumer;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Countdown;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.state.Resource;
+import com.laosun.aluminium.models.battle.WaveManager;
+import com.laosun.aluminium.models.state.ResourceManager;
+import com.laosun.aluminium.models.damage.BattleDamage;
+import com.laosun.aluminium.models.Signal;
 
 
 public class Battle {
@@ -424,7 +432,7 @@ public class Battle {
      * The <b>enemy camp's roster</b> - every combatant fighting against us, in battlefield order.
      *
      * <p>Note: <b>Deliberately {@code CanHit}, not {@code Enemy}</b>. Typing it as
-     * {@code List<Enemy>} would make an enemy-side {@link com.laosun.aluminium.models.Summon}
+     * {@code List<Enemy>} would make an enemy-side {@link com.laosun.aluminium.models.entity.Summon}
      * <b>structurally impossible to place</b>: the action bar accepts any {@code CanHit}
      * ({@code Queue.addCombatants} takes {@code List<? extends CanHit>}), and camp-agnostic code
      * ({@code TargetSelector}, {@code opposingCamp}) was already written against {@code CanHit},
@@ -1284,7 +1292,7 @@ public class Battle {
         return partyResources.value(id);
     }
 
-    public com.laosun.aluminium.models.Resource partyResource(String id) {
+    public com.laosun.aluminium.models.state.Resource partyResource(String id) {
         return partyResources.resource(id);
     }
 
@@ -2307,7 +2315,7 @@ public class Battle {
     /**
      * The shield amount after the provider's own boost ("the shield granted is increased by X%").
      *
-     * <p>A one-line delegate: the body lives in {@link com.laosun.aluminium.models.BattleDamage}
+     * <p>A one-line delegate: the body lives in {@link com.laosun.aluminium.models.damage.BattleDamage}
      * with the rest of the settlement arithmetic, but this name is public API that tests read
      * (measured as load-bearing by {@code JourneyForeverPeacefulTest}: it still returned the bare
      * 1000 until a battle had started), so it keeps its home and its signature.

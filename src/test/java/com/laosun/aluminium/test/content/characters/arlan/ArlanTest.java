@@ -5,7 +5,7 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.DebuffClass;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * 1008 Arlan, from his own file: his traces, and the blast shape his ultimate exposed.
@@ -61,7 +62,7 @@ public class ArlanTest {
         battle.startBattle();
         // The zones eat part of each instance, so damage him until the fraction is where the document says (bounded loop).
         for (int i = 0; i < 20 && arlan.getCurrentHp() / arlan.getMaxHp() > 0.3 && !arlan.isDeath(); i++) {
-            battle.applyDamage(arlan, new com.laosun.aluminium.models.Damage(enemy, arlan,
+            battle.applyDamage(arlan, new com.laosun.aluminium.models.damage.Damage(enemy, arlan,
                     com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                     com.laosun.aluminium.enums.DamageType.NORMAL, arlan.getMaxHp() * 0.25));
         }

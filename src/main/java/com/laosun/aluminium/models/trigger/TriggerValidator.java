@@ -9,6 +9,7 @@ import com.laosun.aluminium.models.buff.BuffManager;
 
 import java.util.Locale;
 import java.util.Set;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * The rules an effect must satisfy to be loadable -- checked once, when a character's table
@@ -1731,7 +1732,7 @@ final class TriggerValidator {
      * character finally takes the action that fires the rule.
      *
      * <p>The four builder-only {@code *_PERCENT} variants are rejected here as well, because
-     * {@link com.laosun.aluminium.models.CanHit#getAttribute(AttributeType)} returns {@code null}
+     * {@link com.laosun.aluminium.models.entity.CanHit#getAttribute(AttributeType)} returns {@code null}
      * for them: targeting one would raise a {@code NullPointerException} in the middle of a battle
      * instead of "this attribute cannot hold a buff".
      */

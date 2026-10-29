@@ -5,9 +5,9 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.buff.*;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.trigger.TriggerTable.CompiledRule;
@@ -16,6 +16,9 @@ import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.state.Resource;
+import com.laosun.aluminium.models.state.ResourceManager;
 
 /**
  * Runs the effects of a {@link TriggerTable}. The only place in the trigger system that
@@ -569,7 +572,7 @@ public final class TriggerInterpreter {
             case RESET_TRIGGER_LIMIT -> {
                 String wanted = effect.getRule().trim();
                 for (CanHit cleared : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    TriggerTable table = cleared instanceof com.laosun.aluminium.models.Character ch
+                    TriggerTable table = cleared instanceof com.laosun.aluminium.models.entity.Character ch
                             ? ch.getTriggerTable() : null;
                     String limitKey = table == null ? null : table.keyOf(wanted);
                     if (limitKey == null) {
@@ -897,7 +900,7 @@ public final class TriggerInterpreter {
                     "DELEGATE_DAMAGE ran with no cast in progress; CAST_SETUP is fired by SkillExecutor.execute "
                             + "with a cast token, so this is an engine fault rather than a content error");
         }
-        com.laosun.aluminium.models.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+        com.laosun.aluminium.models.entity.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
         if (cast.caster() != owner) {
             throw new IllegalStateException(
                     "DELEGATE_DAMAGE names the rule owner's own cast, but the cast in progress belongs to "
@@ -1001,7 +1004,7 @@ public final class TriggerInterpreter {
      */
     private static double eventShare(EffectSpec effect, TriggerContext ctx) {
         if (effect.getAmountPercentFromResource() != null) {
-            com.laosun.aluminium.models.Character holder = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+            com.laosun.aluminium.models.entity.Character holder = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
             return holder.getResources().value(effect.getAmountPercentFromResource().trim()) / 10000.0;
         }
         return effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
@@ -1021,7 +1024,7 @@ public final class TriggerInterpreter {
         CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
         // A PARTY-scoped resource has no home on the unit (the same fact `gainResource` records) -- [新蕊] is declared `scope: PARTY` -- so the fallback is the
         // battle-level counter, which is the SAME `Resource` object and therefore carries the settable overflow.
-        com.laosun.aluminium.models.Resource resource = holder.getResources().get(effect.getResource());
+        com.laosun.aluminium.models.state.Resource resource = holder.getResources().get(effect.getResource());
         if (resource == null) {
             resource = ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource());
         }
@@ -1061,7 +1064,7 @@ public final class TriggerInterpreter {
             amount = (int) Math.round(ctx.amount() * eventShare(effect, ctx));
         } else if (effect.getAmountFromResource() != null) {
             // The amount IS a resource's value: a number captured while an ode was cast, handed over when the character later casts.
-            com.laosun.aluminium.models.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+            com.laosun.aluminium.models.entity.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
             amount = owner.getResources().value(effect.getAmountFromResource().trim());
         } else if (isCastParamScale(effect)) {
             //  x percent: the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
@@ -1080,14 +1083,14 @@ public final class TriggerInterpreter {
         if (effect.getAmountCap() != null) {
             amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
         }
-        com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, effect.getResource());
+        com.laosun.aluminium.models.state.Resource party = partyCounterOrNull(ctx, holder, effect.getResource());
         // `to_max`: the counter is raised to its ceiling, so the amount becomes "however much it is short". Reader: 1503
         // Pearl (真珠)'s 充能 - the counter IS 【深度学习】's duration, so re-entering the state restores the FULL three
         // rather than adding three to the remainder. Note it is measured against the counter's MAXIMUM and not its
         // overflow ceiling: a plain gain on a counter that HAS an overflow allowance pours the spare on top, and the
         // state would then outlast the document by a use.
         if (Boolean.TRUE.equals(effect.getToMax())) {
-            com.laosun.aluminium.models.Resource counter = party != null ? party
+            com.laosun.aluminium.models.state.Resource counter = party != null ? party
                     : holder.getResources().get(effect.getResource());
             if (counter == null) {
                 throw new IllegalStateException("GAIN_RESOURCE to_max names the resource '"
@@ -1183,7 +1186,7 @@ public final class TriggerInterpreter {
      *
      * @return the unit's own counter, or {@code null} when it is a PARTY one (see the second return value's role)
      */
-    private static com.laosun.aluminium.models.Resource partyCounterOrNull(TriggerContext ctx, CanHit holder,
+    private static com.laosun.aluminium.models.state.Resource partyCounterOrNull(TriggerContext ctx, CanHit holder,
                                                                            String id) {
         if (id == null || holder == null || holder.getResources().has(id)) {
             return null;
@@ -1225,7 +1228,7 @@ public final class TriggerInterpreter {
         if (asked <= 0) {
             return 0;
         }
-        com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, id);
+        com.laosun.aluminium.models.state.Resource party = partyCounterOrNull(ctx, holder, id);
         if (party != null) {
             return party.spend(asked);
         }
@@ -1260,7 +1263,7 @@ public final class TriggerInterpreter {
         // A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
         // battle-level one -- measured: [笑点] is declared `scope: PARTY` ("Punchline (笑点) is shared by the whole team", glossary 1000002) and the holder's
         // own Resources does not have it, so "Aha consumes all 笑点 after acting" (10000026) could not be written at all.
-        com.laosun.aluminium.models.Resource partyCounter = partyCounterOrNull(ctx, holder, id);
+        com.laosun.aluminium.models.state.Resource partyCounter = partyCounterOrNull(ctx, holder, id);
         if (partyCounter != null) {
             // "consume all overflow" is the tier ABOVE the cap (reader: 114151) -- neither `spendAll` (everything) nor a stated amount says it.
             int spend = Boolean.TRUE.equals(effect.getOverflowOnly())
@@ -1317,8 +1320,8 @@ public final class TriggerInterpreter {
         CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
         // The STORE, wherever it lives: the unit's own counter, or the battle's PARTY-scoped one. An attribute is
         // neither, and a spend that kept the milestones would pay them again on the next change.
-        com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, counter.counter());
-        com.laosun.aluminium.models.Resource store = party != null ? party
+        com.laosun.aluminium.models.state.Resource party = partyCounterOrNull(ctx, holder, counter.counter());
+        com.laosun.aluminium.models.state.Resource store = party != null ? party
                 : holder.getResources().has(counter.counter()) ? holder.getResources().get(counter.counter())
                 : null;
         if (store == null) {
@@ -2007,7 +2010,7 @@ public final class TriggerInterpreter {
      */
     private static void dismissSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-            if (!(target instanceof com.laosun.aluminium.models.Summon summon)) {
+            if (!(target instanceof com.laosun.aluminium.models.entity.Summon summon)) {
                 throw new IllegalStateException("DISMISS_SUMMON resolved "
                         + (target == null ? "null" : target.getName()) + ", which is not a summon");
             }

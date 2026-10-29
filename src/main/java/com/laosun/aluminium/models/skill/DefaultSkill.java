@@ -2,7 +2,7 @@ package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.SkillData;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 import java.util.List;
 import java.util.Map;

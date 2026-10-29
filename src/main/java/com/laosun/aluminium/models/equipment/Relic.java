@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.equipment;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;

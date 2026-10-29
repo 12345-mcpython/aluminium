@@ -2,9 +2,10 @@ package com.laosun.aluminium.models.skillpoint;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Resource;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.state.Resource;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * Standard skill point (SP) policy: start at 3, cap 5, our side's basic attack +1,

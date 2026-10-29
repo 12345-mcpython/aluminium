@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.characters.hyacine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.entity.Summon;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * 1409 风堇's talent: 「风堇或小伊卡提供治疗时，小伊卡造成的伤害提高 80%，持续 2 回合，最多可叠加 3 层」 (140904,

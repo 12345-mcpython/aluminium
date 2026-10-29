@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.Path;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * acceptance: path aggro values, the aggro table, and "taunt does not change the numbers".
@@ -53,7 +54,7 @@ public class AggroTest {
         Character other = withAggro(100);
         Battle battle = new Battle(List.of(preservation, other), List.of(dummy()), BattleFixture.seeded());
 
-        Map<com.laosun.aluminium.models.CanHit, Double> table = battle.getAggroTable(List.of(preservation, other));
+        Map<com.laosun.aluminium.models.entity.CanHit, Double> table = battle.getAggroTable(List.of(preservation, other));
 
         Assertions.assertEquals(0.6, table.get(preservation), EPS, "150 / 250");
         Assertions.assertEquals(0.4, table.get(other), EPS, "100 / 250");
@@ -66,7 +67,7 @@ public class AggroTest {
         Assertions.assertEquals(100, battle.aggroOf(battle.enemies().getFirst()), EPS,
                 "an enemy has no path, so it uses the conventional tier");
 
-        Map<com.laosun.aluminium.models.CanHit, Double> table = battle.getAggroTable(List.of(withAggro(150)));
+        Map<com.laosun.aluminium.models.entity.CanHit, Double> table = battle.getAggroTable(List.of(withAggro(150)));
         Assertions.assertEquals(1.0, table.values().iterator().next(), EPS, "only one candidate → probability 1");
         Assertions.assertTrue(battle.getAggroTable(List.of()).isEmpty(), "empty list → empty table, no division by zero");
     }

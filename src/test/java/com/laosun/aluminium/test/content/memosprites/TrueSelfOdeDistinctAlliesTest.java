@@ -1,7 +1,7 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.Summon;
 
 /**
  * "每从 1 个除德谬歌以外不同的队友处获得[追忆]后".
@@ -53,7 +54,7 @@ public class TrueSelfOdeDistinctAlliesTest {
         battle.processRequests();
     }
 
-    private static int counter(com.laosun.aluminium.models.Summon dragon) {
+    private static int counter(com.laosun.aluminium.models.entity.Summon dragon) {
         return dragon.getResources().has(COUNTER) ? dragon.getResources().value(COUNTER) : 0;
     }
 }

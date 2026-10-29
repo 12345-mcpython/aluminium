@@ -15,9 +15,9 @@ import com.laosun.aluminium.utils.AttributeBuilder;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static com.laosun.aluminium.enums.AttributeType.*;
+import com.laosun.aluminium.models.entity.Summon;
 
 /**
  * Builds an {@link Enemy} with a correct stat sheet from real monster data.
@@ -36,7 +36,7 @@ import static com.laosun.aluminium.enums.AttributeType.*;
  * passed in by the caller.
  *
  * <p><b>Why the lookup is a separate step.</b> The same monster data also builds
- * {@link com.laosun.aluminium.models.Summon}s ({@code SummonFactory}), which need exactly "which config,
+ * {@link com.laosun.aluminium.models.entity.Summon}s ({@code SummonFactory}), which need exactly "which config,
  * which template, what does it scale to" and none of the {@link Enemy}-only fields. {@link #resolve} is
  * that shared half, so the two factories cannot drift apart on the scaling rules or the error messages.
  */

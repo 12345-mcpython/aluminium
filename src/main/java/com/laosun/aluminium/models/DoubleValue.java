@@ -7,6 +7,8 @@ import lombok.SneakyThrows;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * A numeric attribute value supporting compound modifier stacking.

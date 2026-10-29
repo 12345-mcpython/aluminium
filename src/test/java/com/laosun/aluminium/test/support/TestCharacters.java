@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.support;
 
 
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * A real character with <b>no trigger file of their own</b> - the "unregistered" control that the trigger-table

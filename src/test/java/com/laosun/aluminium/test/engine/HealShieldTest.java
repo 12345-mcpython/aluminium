@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * acceptance: the healing damage zone and shields.
@@ -181,11 +182,11 @@ public class HealShieldTest {
         return Character.fromAttributes(name, 3000, 100, 100, 100);
     }
 
-    private static Battle newBattle(com.laosun.aluminium.models.CanHit a,
-                                    com.laosun.aluminium.models.CanHit b) {
+    private static Battle newBattle(com.laosun.aluminium.models.entity.CanHit a,
+                                    com.laosun.aluminium.models.entity.CanHit b) {
         List<Character> characters = new java.util.ArrayList<>();
         List<Enemy> enemies = new java.util.ArrayList<>();
-        for (com.laosun.aluminium.models.CanHit c : List.of(a, b)) {
+        for (com.laosun.aluminium.models.entity.CanHit c : List.of(a, b)) {
             if (c instanceof Character character) {
                 characters.add(character);
             } else if (c instanceof Enemy enemy) {

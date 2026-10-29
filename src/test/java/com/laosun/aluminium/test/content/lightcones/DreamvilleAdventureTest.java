@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Light cone 21036: whichever of basic / skill / ultimate the wearer cast LAST decides which category the whole party's damage
@@ -43,7 +44,7 @@ public class DreamvilleAdventureTest {
     }
 
     private void cast(SkillCategory category) {
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wearer, (com.laosun.aluminium.models.CanHit) enemy, 0, 0,
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wearer, (com.laosun.aluminium.models.entity.CanHit) enemy, 0, 0,
                 category, 0, 0, java.util.List.of()));
     }
 
@@ -80,8 +81,8 @@ public class DreamvilleAdventureTest {
     @Test
     public void anAllyCastingDoesNotMatter() {
         build(true);
-        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, (com.laosun.aluminium.models.CanHit) ally,
-                (com.laosun.aluminium.models.CanHit) enemy, 0, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, (com.laosun.aluminium.models.entity.CanHit) ally,
+                (com.laosun.aluminium.models.entity.CanHit) enemy, 0, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         System.out.println("[21036] after an ALLY casts: " + boosts());
         Assertions.assertEquals("basic=0.0 skill=0.0 ult=0.0", boosts(), "actor == self (false case)");
     }

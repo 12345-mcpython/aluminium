@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.damage.Damage;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

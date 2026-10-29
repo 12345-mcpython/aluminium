@@ -1,4 +1,5 @@
 package com.laosun.aluminium.models.buff;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * A <b>named counter</b>: a buff that carries no modifier at all and exists only to be <b>counted</b>.
@@ -91,7 +92,7 @@ public class StackBuff extends AbstractBuff {
      * Note: Nothing happens on its owner's turn: a counter is only ever read (and removed) by the content that made it.
      */
     @Override
-    public void tickEffect(com.laosun.aluminium.models.CanHit owner) {
+    public void tickEffect(com.laosun.aluminium.models.entity.CanHit owner) {
         // deliberately nothing
     }
 
@@ -99,7 +100,7 @@ public class StackBuff extends AbstractBuff {
      * Note: Applying it does nothing either: the buff itself IS the count (see the class comment).
      */
     @Override
-    public void applyEffect(com.laosun.aluminium.models.CanHit owner) {
+    public void applyEffect(com.laosun.aluminium.models.entity.CanHit owner) {
         // deliberately nothing
     }
 
@@ -107,7 +108,7 @@ public class StackBuff extends AbstractBuff {
      * Note: And nothing happens when it comes off: the count is the buffs, so removing one is the whole effect.
      */
     @Override
-    public void removeBuff(com.laosun.aluminium.models.CanHit owner) {
+    public void removeBuff(com.laosun.aluminium.models.entity.CanHit owner) {
         // deliberately nothing
     }
 }

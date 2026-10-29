@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.data.SkillData;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;

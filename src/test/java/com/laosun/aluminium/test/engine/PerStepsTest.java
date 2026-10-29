@@ -5,7 +5,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.trigger.TriggerInterpreter;
 import com.laosun.aluminium.models.trigger.TriggerTable;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.laosun.aluminium.models.state.ResourceManager;
 
 /**
  * The milestone primitive's second half: {@code per_steps: "<counter>:<step>"} repeats ONE effect

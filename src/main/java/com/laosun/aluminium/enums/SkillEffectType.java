@@ -6,6 +6,8 @@ import lombok.Getter;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * The type of effect a skill produces, mapped from the {@code skill_effect} field
@@ -18,7 +20,7 @@ import java.util.Map;
  *
  * <p>The {@link Category} is the primary discriminator for skill execution:
  * only {@link Category#DAMAGE} effects construct and settle a
- * {@link com.laosun.aluminium.models.Damage Damage} object; all other categories
+ * {@link com.laosun.aluminium.models.damage.Damage Damage} object; all other categories
  * run side effects (healing, shielding, debuffs, summons...) and therefore must not
  * be fed into the damage pipeline.
  *
@@ -79,7 +81,7 @@ public enum SkillEffectType {
 
     /**
      * Summons an entity such as
-     * {@link com.laosun.aluminium.models.Summon}.
+     * {@link com.laosun.aluminium.models.entity.Summon}.
      */
     @SerializedName("Summon") SUMMON("Summon", Category.SUMMON);
 
@@ -124,7 +126,7 @@ public enum SkillEffectType {
 
     /**
      * Whether skills of this effect type deal damage. Only {@link Category#DAMAGE}
-     * effects construct a {@link com.laosun.aluminium.models.Damage} object.
+     * effects construct a {@link com.laosun.aluminium.models.damage.Damage} object.
      *
      * @return {@code true} if this is an attack effect
      */
@@ -153,7 +155,7 @@ public enum SkillEffectType {
          */
         CONTROL,
         /**
-         * Summons an entity (e.g. {@link com.laosun.aluminium.models.Summon}).
+         * Summons an entity (e.g. {@link com.laosun.aluminium.models.entity.Summon}).
          */
         SUMMON,
         /**

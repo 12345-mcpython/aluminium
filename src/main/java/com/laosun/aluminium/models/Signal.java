@@ -7,6 +7,7 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.atomic.AtomicLong;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * A combatant's position in the turn-based action queue.

@@ -8,7 +8,7 @@ import com.laosun.aluminium.enums.ResourceScope;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.energy.EnergyGain;
@@ -22,6 +22,11 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.state.Resource;
+import com.laosun.aluminium.models.state.ResourceManager;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Stack resources: the abstraction that lets "stack instead of an energy bar" characters work

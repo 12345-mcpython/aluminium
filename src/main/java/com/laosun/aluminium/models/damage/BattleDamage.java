@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.damage;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
@@ -8,6 +8,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Summon;
 
 /**
  * Assembles and settles one damage instance: the boost, crit, defence, toughness-reduction and

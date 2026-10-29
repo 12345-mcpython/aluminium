@@ -8,7 +8,7 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -19,6 +19,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Relic set abilities, end to end: a set whose bonus is an <em>ability</em> rather than stats now

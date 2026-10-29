@@ -1,8 +1,8 @@
 package com.laosun.aluminium.test.data;
 
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Test;
 

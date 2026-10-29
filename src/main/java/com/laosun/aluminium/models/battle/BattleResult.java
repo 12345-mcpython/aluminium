@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * The battle's status and outcome judgement.

@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.trigger;
 
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * The event-scoped facts a trigger context carries: how many targets were hit, the event's magnitude,

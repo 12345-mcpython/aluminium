@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.damage;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.DamageElement;
@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NonNull;
 
 import java.util.*;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * One damage instance - always a single hit on a single target (it has carried its own

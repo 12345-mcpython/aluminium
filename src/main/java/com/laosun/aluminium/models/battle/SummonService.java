@@ -3,9 +3,9 @@ package com.laosun.aluminium.models.battle;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.entity.Summon;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 
 import java.util.ArrayList;

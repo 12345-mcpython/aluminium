@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import com.laosun.aluminium.models.entity.Summon;
 
 /**
  * The whole-battle replay on the committed fixture: <b>what it is allowed to claim</b>, and what it is not.

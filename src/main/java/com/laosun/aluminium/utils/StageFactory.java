@@ -6,10 +6,10 @@ import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.beans.WeaponData;
 import com.laosun.aluminium.enums.Path;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.RelicSuit;
-import com.laosun.aluminium.models.WaveManager;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.battle.WaveManager;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 
 import java.util.ArrayList;

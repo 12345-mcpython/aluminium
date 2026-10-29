@@ -1,8 +1,8 @@
 package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
 
 import java.util.List;
 import java.util.Objects;

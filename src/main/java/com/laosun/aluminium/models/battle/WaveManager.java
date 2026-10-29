@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.GameData;
@@ -10,6 +10,7 @@ import com.laosun.aluminium.models.enemy.EnemyFactory;
 import lombok.Getter;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Stage wave management: spawns monsters in order, one entry of

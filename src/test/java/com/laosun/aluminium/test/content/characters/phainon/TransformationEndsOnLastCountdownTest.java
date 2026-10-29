@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.phainon;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Countdown;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.entity.Countdown;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.Signal;
 
 /**
  * 1408："最后 1 个倒计时回合…结束变身".

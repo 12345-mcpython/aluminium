@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.entity;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
@@ -30,6 +30,10 @@ import java.util.function.Function;
 
 import static com.laosun.aluminium.enums.AttributeType.*;
 import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BASE;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.equipment.ExtraBasicPromote;
+import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * A player-controlled character with full combat stats.

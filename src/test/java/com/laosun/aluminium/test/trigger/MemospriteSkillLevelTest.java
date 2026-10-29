@@ -7,8 +7,8 @@ import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.entity.Summon;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.trigger.TriggerTable;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * A <b>memosprite's</b> skill level: 「忆灵技等级+1」, and reading one of its rows from somebody else's event.
@@ -37,7 +38,7 @@ import java.util.List;
  * inherits the raise without a copy step.
  *
  * <p><b>Why a custom spec in one case.</b> Every shipped memosprite is declared at level 10 and every one of its tables
- * has ten rows - so a container-level raise clamps straight back to 10 ({@link com.laosun.aluminium.models.CanHit#skillLevel}
+ * has ten rows - so a container-level raise clamps straight back to 10 ({@link com.laosun.aluminium.models.entity.CanHit#skillLevel}
  * clamps to the table's row count, which IS the documented cap). To watch the number move, that case builds the same
  * spec at a lower declared level, i.e. the state a future 「忆灵技等级+1」 would move.
  */

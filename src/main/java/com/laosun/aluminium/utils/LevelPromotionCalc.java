@@ -1,4 +1,6 @@
 package com.laosun.aluminium.utils;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Weapon;
 
 /**
  * Character and weapon level/promotion scaling calculator.

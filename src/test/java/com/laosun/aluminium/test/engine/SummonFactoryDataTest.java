@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.entity.Summon;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

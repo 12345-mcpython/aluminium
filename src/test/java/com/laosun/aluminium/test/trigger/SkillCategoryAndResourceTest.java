@@ -1,7 +1,7 @@
 package com.laosun.aluminium.test.trigger;
 
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.models.Resource;
+import com.laosun.aluminium.models.state.Resource;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

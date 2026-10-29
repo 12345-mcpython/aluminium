@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.event;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Kill event: fired once after a unit is killed.

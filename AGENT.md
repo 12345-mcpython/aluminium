@@ -422,16 +422,32 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | 类 | 关键口子 |
 |---|---|
 | `Battle` | `applyDamage`（**唯一结算入口**）/ `performAction` / `useSkill` / `castUltra` / `startBattle` / `stepForward` / `beforeMove` / `afterMove` / `processRequests` / `grantExtraTurn` / `heal` / `grantShield` / `skillPointPolicy` |
-| `models.Damage` | `toValue()` / `breakdown()` / 7 个乘区 accessor / `addBoost` 等装配口 / `crit` / `trueDamage` / `notCountsAsAttack` |
-| `models.CanHit` | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel` / `getCamp` / `getEnergyProvider` / 事件转发 |
-| `models.Resource` | `gainClamped` / `gain`（显式溢出）/ `spend` / `spendExactly` / `setMaxOverflow` / `isFull` / `isCapped` |
+| `models.damage.Damage` | `toValue()` / `breakdown()` / 7 个乘区 accessor / `addBoost` 等装配口 / `crit` / `trueDamage` / `notCountsAsAttack` |
+| `models.entity.CanHit` | `getAttribute` / `takeDamage` / `heal` / `getBuffManager` / `getLevel` / `getCamp` / `getEnergyProvider` / 事件转发 |
+| `models.state.Resource` | `gainClamped` / `gain`（显式溢出）/ `spend` / `spendExactly` / `setMaxOverflow` / `isFull` / `isCapped` |
 | `models.skillpoint.*` | `SkillPointPolicy`（接口）/ `StandardSkillPointPolicy`（基础规则 + `gainForCast` 覆盖点） |
 | `SkillData` | `getElement()` / `getEffect()` / `getStanceList()` / `getSkills()`（倍率表）/ **`getCategory()`** / `getSpNeed()` |
 | `Queue` | `move` / `setTopZero` / `delayAction` / `advanceActionByPercent` / `refreshSpeed` / `grantExtraTurn` |
 | `utils.CharacterFactory` | `create(cid, level)` / `usesSpecialResource(cid)` / `exists` |
-| `models.EnemyFactory` | `create(monsterId, level, hardLevelGroup)` |
+| `models.enemy.EnemyFactory` | `create(monsterId, level, hardLevelGroup)` |
 | `utils.StageFactory` | `load(stageId)` |
 | `Constant` | `CHARACTERS` / `WEAPONS` / `SKILLS` / `SKILL_TRACES` / `MONSTERS` / `SKILL_SLOT` / `stages()`（懒加载） |
+
+**包 → 放什么**（2026-10-29 拆过一次，`models/` 不再是平铺的 ✓；找类先看这张表 ✓）：
+
+| 包 | 放什么 |
+|---|---|
+| `com.laosun.aluminium`（根） | `Battle` / `Queue` / `Constant` / `BattleEvents`（战斗与行动条的**门面**） |
+| `models.entity` | **会挨打的东西**：`CanHit`（抽象基类）· `Character` · `Summon` · `Countdown`（`Enemy` 在 `models.enemy`） |
+| `models.state` | **挂在单位身上的状态**：`AttributeSheet` · `EnergyState` · `HealthState` · `ShieldState` · `SkillSet` · `SkillBonuses` · `Resource` / `ResourceManager` · `TriggerCooldowns` · `RuleLimits` · `RuleAmendments` · `RuleChanceState` · `ConditionalHealBonuses` |
+| `models.damage` | **一发伤害**：`Damage` · `BattleDamage`（装配）· `BreakDamageCalculator` |
+| `models.equipment` | **装备**：`Relic` · `RelicSuit` · `Weapon` · `ExtraBasicPromote` |
+| `models.battle` | **从 `Battle` 拆出来的协作者**（39 个服务）＋ `WaveManager` |
+| `models.buff` | `AbstractBuff` 家族 ＋ `BuffManager` |
+| `models.trigger` | 触发器的五个协作者（词表 / 校验 / 解释 / 幅度 / 目标）＋ 表与解析器 |
+| `models.skill` / `models.enemy` / `models.event` / `models.energy` / `models.ai` / `models.skillpoint` | 按名字读 |
+| `models/` 根 | 只剩**跨包的值类型**：`DoubleValue`（数值＋修饰链）· `Signal`（行动条上的一项） |
+| `beans` / `data` / `enums` / `utils` / `exceptions` | JSON DTO / 装载与生成表 / 枚举 / 工厂与工具 / 异常 |
 
 ⚠ **拆分的刀口被不变量钉住**：`DEALING_DAMAGE` 公告**在装配中途**发射 ✓；
 `fireTriggers(…, Damage, …)` 与 `assemble` **必须保持 private** ✓

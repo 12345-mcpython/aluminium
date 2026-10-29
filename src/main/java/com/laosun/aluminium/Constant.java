@@ -10,6 +10,12 @@ import com.laosun.aluminium.utils.JSONReader;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.models.damage.BreakDamageCalculator;
+import com.laosun.aluminium.models.Signal;
 
 /**
  * Global constants and static game data loaded at startup.
@@ -206,9 +212,9 @@ public final class Constant {
     /**
      * The {@code setId} of a relic that belongs to no set.
      *
-     * <p>{@code 0} because that is what {@link com.laosun.aluminium.models.Relic} defaults to for relics
+     * <p>{@code 0} because that is what {@link com.laosun.aluminium.models.equipment.Relic} defaults to for relics
      * built by hand or from a setting (there is no set id in {@code Setting}), and because the game's own
-     * set ids all start above it. {@link com.laosun.aluminium.models.RelicSuit} skips relics with this id
+     * set ids all start above it. {@link com.laosun.aluminium.models.equipment.RelicSuit} skips relics with this id
      * when it counts pieces - without it, every hand-built relic in the tests would count as one piece of
      * "set 0" and the lookup would fail.
      */

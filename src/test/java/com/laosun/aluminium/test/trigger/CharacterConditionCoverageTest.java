@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.trigger;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

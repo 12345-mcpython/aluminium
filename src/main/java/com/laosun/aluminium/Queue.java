@@ -1,6 +1,6 @@
 package com.laosun.aluminium;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import com.laosun.aluminium.models.Signal;
 import lombok.Getter;
 import lombok.ToString;

@@ -14,6 +14,10 @@ import lombok.ToString;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.state.Resource;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * One effect inside a trigger: "do this".

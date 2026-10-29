@@ -1,6 +1,7 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.state;
 
 import com.laosun.aluminium.models.buff.AbstractBuff;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * The shield currently standing on a combatant, where it came from, and how much the last hit

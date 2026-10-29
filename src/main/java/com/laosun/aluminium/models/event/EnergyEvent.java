@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.event;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Energy credit event: fired once after someone actually gains energy.

@@ -3,9 +3,13 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.equipment.ExtraBasicPromote;
+import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.models.equipment.Weapon;
 
 public class CharacterTest {
     @Test

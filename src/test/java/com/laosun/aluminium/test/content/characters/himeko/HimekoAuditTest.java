@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.characters.himeko;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * Himeko (1003)'s 2026-10-19 audit: the three traces and Eidolon 1, read as battles.
@@ -142,7 +144,7 @@ public class HimekoAuditTest {
         Enemy victim = BattleFixture.monster();
         Battle battle = new Battle(List.of(her), List.of(victim), rolls);
         battle.startBattle();
-        java.util.List<com.laosun.aluminium.models.Damage> settled = new java.util.ArrayList<>();
+        java.util.List<com.laosun.aluminium.models.damage.Damage> settled = new java.util.ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         battle.castImmediate(her.getSkills().get(SkillType.COMMON), her, List.of(victim));
         battle.processRequests();
@@ -158,7 +160,7 @@ public class HimekoAuditTest {
         Enemy victim = BattleFixture.monster();
         Battle battle = new Battle(List.of(her), List.of(victim), always(0.99));
         battle.startBattle();
-        java.util.List<com.laosun.aluminium.models.Damage> settled = new java.util.ArrayList<>();
+        java.util.List<com.laosun.aluminium.models.damage.Damage> settled = new java.util.ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         battle.castImmediate(her.getSkills().get(SkillType.COMMON), her, List.of(victim));
         battle.processRequests();

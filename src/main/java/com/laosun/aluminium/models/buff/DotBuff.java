@@ -1,8 +1,10 @@
 package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import lombok.Getter;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * Damage over time attached to a weakness break: burn (Fire) / shock (Lightning) /

@@ -8,13 +8,15 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import lombok.Getter;
 
 import java.util.*;
+import com.laosun.aluminium.models.state.Resource;
+import com.laosun.aluminium.models.state.ResourceManager;
 
 /**
  * A character's compiled trigger table: the data form of its mechanics.
@@ -1756,7 +1758,7 @@ public class TriggerTable {
             }
             com.laosun.aluminium.enums.Path want = com.laosun.aluminium.enums.Path.fromName(pathName);
             return ctx.battle().allies().stream()
-                    .filter(unit -> unit instanceof com.laosun.aluminium.models.Character character
+                    .filter(unit -> unit instanceof com.laosun.aluminium.models.entity.Character character
                             && character.getPath() == want)
                     .count();
         }
@@ -1804,7 +1806,7 @@ public class TriggerTable {
                 // skillId, so `from_skill_id` reads 0 there -- measured, a rule that fires ungated stops firing the moment `from_skill_id == ` is added. The
                 // instance carries it (`Damage.getSkillKey()`, "the loader's slot"), so this reads it where the event provides nothing.
                 case "damage_skill_key" -> {
-                    com.laosun.aluminium.models.Damage hit = ctx.damage();
+                    com.laosun.aluminium.models.damage.Damage hit = ctx.damage();
                     yield hit == null ? 0 : hit.getSkillKey();
                 }
                 case "hp_percent" -> hpPercent(ctx.owner());
@@ -1847,7 +1849,7 @@ public class TriggerTable {
                 // The owner's Eidolon rank. Note: A non-character owner (a summon, a hand-built context) has no
                 // Eidolons, and 0 is the answer that unlocks nothing - the same convention `eidolonRankOf` uses on the
                 // rule-level gate, spelled once here as a value.
-                case "eidolon" -> ctx.owner() instanceof com.laosun.aluminium.models.Character owner
+                case "eidolon" -> ctx.owner() instanceof com.laosun.aluminium.models.entity.Character owner
                         ? owner.getEidolonRank()
                         : 0;
                 // "当前能量值等于其能量上限" / "当前能量百分比小于 50%" -- the same reasoning as the variable above,

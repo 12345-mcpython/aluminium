@@ -1,6 +1,6 @@
 package com.laosun.aluminium.models.battle;
 
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 
 import java.util.LinkedHashMap;

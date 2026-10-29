@@ -1,12 +1,13 @@
 package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * Raw character data deserialized from the game's character_data.json.
  *
  * <p>Contains static base stats for a character at level 1. Final combat stats
- * are computed by {@link com.laosun.aluminium.models.Character.Builder} using
+ * are computed by {@link com.laosun.aluminium.models.entity.Character.Builder} using
  * level scaling, equipment, and skill point bonuses on top of this data.
  *
  * <p>Use {@code Double} for {@code maxEnergy} because some characters may have

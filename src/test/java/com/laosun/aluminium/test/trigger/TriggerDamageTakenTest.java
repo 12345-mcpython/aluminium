@@ -8,9 +8,9 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.VulnerabilityBuff;
@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * The {@code MODIFY_DAMAGE_TAKEN} op: "受到的伤害提高 X%" (vulnerability, 易伤) and "受到的伤害降低 X%" (reduction, 减伤) as data.

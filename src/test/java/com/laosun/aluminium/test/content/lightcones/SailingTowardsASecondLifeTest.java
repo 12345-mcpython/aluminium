@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * Light cone 2302: break damage ignores 18% of the target's defence.
@@ -44,7 +45,7 @@ public class SailingTowardsASecondLifeTest {
     }
 
     private double normalHit() {
-        return battle.applyDamage(enemy, new com.laosun.aluminium.models.Damage(wearer, enemy, DamageElement.FIRE,
+        return battle.applyDamage(enemy, new com.laosun.aluminium.models.damage.Damage(wearer, enemy, DamageElement.FIRE,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 1000));
     }
 

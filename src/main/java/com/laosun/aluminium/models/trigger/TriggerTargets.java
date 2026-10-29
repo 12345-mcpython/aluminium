@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Path;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
 
 import java.util.ArrayList;
@@ -179,7 +179,7 @@ final class TriggerTargets {
                 // EVERY memosprite on our side, not just the rule owner's: the clause is "raise the CRIT DMG of all of our memosprites", and `summonsOf` is keyed
                 // by master -- so each of our characters is asked. `all_allies` answers "who is on that side" the same way.
                 List<CanHit> everySummon = new ArrayList<>();
-                for (com.laosun.aluminium.models.Character ally : battle.characters()) {
+                for (com.laosun.aluminium.models.entity.Character ally : battle.characters()) {
                     everySummon.addAll(battle.summonsOf(ally));
                 }
                 return List.copyOf(everySummon);
@@ -232,7 +232,7 @@ final class TriggerTargets {
             }
             List<CanHit> ofPath = new ArrayList<>();
             for (CanHit ally : battle.allies()) {
-                if (ally instanceof com.laosun.aluminium.models.Character character && character.getPath() == wanted) {
+                if (ally instanceof com.laosun.aluminium.models.entity.Character character && character.getPath() == wanted) {
                     ofPath.add(ally);
                 }
             }
@@ -370,7 +370,7 @@ final class TriggerTargets {
         }
         List<CanHit> selected = new ArrayList<>();
         for (CanHit ally : ctx.battle().allies()) {
-            if (ally instanceof com.laosun.aluminium.models.Character character && character.getPath() == wanted && !excluded.contains(ally)) {
+            if (ally instanceof com.laosun.aluminium.models.entity.Character character && character.getPath() == wanted && !excluded.contains(ally)) {
                 selected.add(ally);
             }
         }
@@ -393,7 +393,7 @@ final class TriggerTargets {
         if (ctx.battle() == null) {
             return null;
         }
-        for (com.laosun.aluminium.models.Character member : ctx.battle().characters()) {
+        for (com.laosun.aluminium.models.entity.Character member : ctx.battle().characters()) {
             if (member.getCid() == cid) {
                 return member;
             }

@@ -5,7 +5,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * The move of the "only the newest target it was applied to is affected" family: `REMOVE_STATE` first takes the name off everybody, then `APPLY_BUFF` gives it to the new target
@@ -50,7 +51,7 @@ public class NewestHolderOnlyTest {
         return TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), apply);
     }
 
-    private static boolean marked(Battle battle, com.laosun.aluminium.models.CanHit who) {
+    private static boolean marked(Battle battle, com.laosun.aluminium.models.entity.CanHit who) {
         // Note: APPLY_BUFF creates a StateBuff, and the query for it is hasState - - not stacksOf (that queries ADD_STACK's layer count).
         // TriggerTable:2899 is exactly `has_state`'s implementation: `who.getBuffManager().hasState(state)`.
         return who.getBuffManager().hasState(MARK);

@@ -7,8 +7,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Compares one scenario's numbers against the original game, <b>zone by zone</b>.
@@ -279,7 +280,7 @@ public final class DamageComparator {
      * Installs absolute attribute values, so the scenario's panel is the one the game's numbers came from (this engine's
      * sheet has no light cone / relics unless one is handed in).
      */
-    private static void applyOverrides(com.laosun.aluminium.models.CanHit unit, Map<String, Double> attributes) {
+    private static void applyOverrides(com.laosun.aluminium.models.entity.CanHit unit, Map<String, Double> attributes) {
         if (attributes == null) {
             return;
         }

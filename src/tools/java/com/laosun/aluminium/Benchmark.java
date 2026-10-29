@@ -4,7 +4,7 @@ import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.utils.JSONReader;
 import it.unimi.dsi.fastutil.objects.Object2DoubleOpenHashMap;
 
@@ -13,6 +13,10 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.equipment.ExtraBasicPromote;
+import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.models.equipment.Weapon;
 
 /**
  * Performance benchmark for character building and relic processing.

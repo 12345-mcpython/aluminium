@@ -3,7 +3,7 @@ package com.laosun.aluminium.models.trigger;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.trigger.TriggerTable.Condition;
 import com.laosun.aluminium.models.trigger.TriggerTable.PartyCondition;
 import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
@@ -13,6 +13,12 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Countdown;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.state.ResourceManager;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Compiles a rule's {@code when} text into a {@link Condition}: the condition half of the trigger
@@ -997,7 +1003,7 @@ final class TriggerConditionParser {
 
         @Override
         public boolean test(TriggerContext ctx) {
-            if (ctx.battle() == null || !(ctx.owner() instanceof com.laosun.aluminium.models.Character me)) {
+            if (ctx.battle() == null || !(ctx.owner() instanceof com.laosun.aluminium.models.entity.Character me)) {
                 return false;
             }
             com.laosun.aluminium.enums.Path mine = me.getPath();
@@ -1005,7 +1011,7 @@ final class TriggerConditionParser {
                 return false;
             }
             for (CanHit ally : ctx.battle().allies()) {
-                if (ally != me && !ally.isDeath() && ally instanceof com.laosun.aluminium.models.Character other && other.getPath() == mine) {
+                if (ally != me && !ally.isDeath() && ally instanceof com.laosun.aluminium.models.entity.Character other && other.getPath() == mine) {
                     return true;
                 }
             }
@@ -1189,7 +1195,7 @@ final class TriggerConditionParser {
                 case "target" -> ctx.target();
                 default -> null;
             };
-            return who instanceof com.laosun.aluminium.models.Summon;
+            return who instanceof com.laosun.aluminium.models.entity.Summon;
         }
 
         @Override
@@ -1373,7 +1379,7 @@ final class TriggerConditionParser {
 
         @Override
         public boolean test(TriggerContext ctx) {
-            if (ctx.battle() == null || !(ctx.target() instanceof com.laosun.aluminium.models.Character candidate)) {
+            if (ctx.battle() == null || !(ctx.target() instanceof com.laosun.aluminium.models.entity.Character candidate)) {
                 return false;
             }
             com.laosun.aluminium.enums.Path mine = candidate.getPath();
@@ -1382,7 +1388,7 @@ final class TriggerConditionParser {
             }
             for (CanHit ally : ctx.battle().allies()) {
                 if (ally != candidate && !ally.isDeath()
-                        && ally instanceof com.laosun.aluminium.models.Character other && other.getPath() == mine) {
+                        && ally instanceof com.laosun.aluminium.models.entity.Character other && other.getPath() == mine) {
                     return true;
                 }
             }
@@ -1434,11 +1440,11 @@ final class TriggerConditionParser {
         }
 
         private static com.laosun.aluminium.enums.DamageElement elementOf(CanHit unit) {
-            if (unit instanceof com.laosun.aluminium.models.Character character) {
+            if (unit instanceof com.laosun.aluminium.models.entity.Character character) {
                 return character.getElement();
             }
-            if (unit instanceof com.laosun.aluminium.models.Summon summon
-                    && summon.getMaster() instanceof com.laosun.aluminium.models.Character master) {
+            if (unit instanceof com.laosun.aluminium.models.entity.Summon summon
+                    && summon.getMaster() instanceof com.laosun.aluminium.models.entity.Character master) {
                 return master.getElement();
             }
             return null;
@@ -1493,10 +1499,10 @@ final class TriggerConditionParser {
                 return false;
             }
             CanHit owner = ctx.owner();
-            if (owner instanceof com.laosun.aluminium.models.Summon summon && summon.getMaster() != null) {
+            if (owner instanceof com.laosun.aluminium.models.entity.Summon summon && summon.getMaster() != null) {
                 owner = summon.getMaster();
             }
-            if (!(owner instanceof com.laosun.aluminium.models.Character character)) {
+            if (!(owner instanceof com.laosun.aluminium.models.entity.Character character)) {
                 return false;
             }
             return character.getElement() != null && character.getElement() == ctx.damage().getElement();
@@ -1683,7 +1689,7 @@ final class TriggerConditionParser {
         @Override
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
-            return who instanceof com.laosun.aluminium.models.Character character && character.getPath() == path;
+            return who instanceof com.laosun.aluminium.models.entity.Character character && character.getPath() == path;
         }
 
         @Override

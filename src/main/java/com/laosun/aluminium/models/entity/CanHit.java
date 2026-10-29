@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.entity;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,7 +10,6 @@ import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
-import com.laosun.aluminium.models.energy.StandardEnergyProvider;
 import com.laosun.aluminium.models.event.*;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.trigger.TriggerTable;
@@ -21,6 +20,22 @@ import lombok.ToString;
 
 import java.util.*;
 import java.util.function.Consumer;
+import com.laosun.aluminium.models.state.HealthState;
+import com.laosun.aluminium.models.state.RuleChanceState;
+import com.laosun.aluminium.models.state.ConditionalHealBonuses;
+import com.laosun.aluminium.models.state.TriggerCooldowns;
+import com.laosun.aluminium.models.state.ShieldState;
+import com.laosun.aluminium.models.state.AttributeSheet;
+import com.laosun.aluminium.models.state.SkillBonuses;
+import com.laosun.aluminium.models.state.EnergyState;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.state.Resource;
+import com.laosun.aluminium.models.state.SkillSet;
+import com.laosun.aluminium.models.state.RuleAmendments;
+import com.laosun.aluminium.models.state.ResourceManager;
+import com.laosun.aluminium.models.state.RuleLimits;
+import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Abstract base for all entities that can participate in combat.

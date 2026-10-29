@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.state.Resource;
 
 /**
  * {@code GAIN_RESOURCE} with {@code to_max} raises a counter to its declared maximum, and does NOT spill into overflow.
@@ -83,7 +84,7 @@ public class GainResourceToMaxTest {
 
         // The counter is the fixture's own, declared with an overflow allowance - the case is about the FIELD, so the
         // counter is built to have one. `setMaxOverflow` is the raw write the declaration path uses.
-        unit.getResources().register(new com.laosun.aluminium.models.Resource(COUNTER, 3, from));
+        unit.getResources().register(new com.laosun.aluminium.models.state.Resource(COUNTER, 3, from));
         unit.getResources().get(COUNTER).setMaxOverflow(overflow);
 
         EffectSpec effect = new EffectSpec();

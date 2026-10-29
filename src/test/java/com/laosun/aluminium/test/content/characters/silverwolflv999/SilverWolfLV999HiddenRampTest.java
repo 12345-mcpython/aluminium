@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * Character 1506 (Silver Wolf LV.999): her enhanced-basic ramp, pinned as the DECOMPOSITION it is.

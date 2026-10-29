@@ -1,13 +1,14 @@
 package com.laosun.aluminium.test.content.characters.castorice;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * The dragon's talent [灼掠幽墟的晦翼]: "造成 #2 次伤害，每次伤害对敌方随机单体造成等同于遐蝶 #1% 生命上限的量子属性伤害…".
@@ -53,7 +54,7 @@ public class DragonHollowWingTest {
         double herBefore = battle.characters().getFirst().getCurrentHp();
         // measure the enemy's mitigation with one plain 1000-damage hit of the same element, before the talent fires
         double probeBefore = battle.enemies().getFirst().getCurrentHp();
-        battle.applyDamage(battle.enemies().getFirst(), new com.laosun.aluminium.models.Damage(
+        battle.applyDamage(battle.enemies().getFirst(), new com.laosun.aluminium.models.damage.Damage(
                 battle.characters().getFirst(), battle.enemies().getFirst(),
                 com.laosun.aluminium.enums.DamageElement.QUANTUM,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 1000));

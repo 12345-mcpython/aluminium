@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.state;
 
 /**
  * HP, the death flag and the invulnerability flag.

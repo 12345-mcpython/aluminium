@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models.buff;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * Contract of a buff / debuff: {@link BuffManager} is only responsible

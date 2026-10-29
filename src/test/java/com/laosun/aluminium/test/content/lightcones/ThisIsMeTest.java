@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -14,6 +14,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Light cone 21030: the wearer's Ultimate carries extra damage equal to 60% of its own DEFENCE.
@@ -120,7 +122,7 @@ public class ThisIsMeTest {
     private double hit(Battle battle, SkillCategory category) {
         // The category rides on the Damage INSTANCE (measured: applyDamage has no (target, damage, category)
         // overload -- the third parameter is an EnergyGrant), which is also why a cast-scoped boost can be scoped at all.
-        return battle.applyDamage(enemy, new com.laosun.aluminium.models.Damage(wearer, enemy,
+        return battle.applyDamage(enemy, new com.laosun.aluminium.models.damage.Damage(wearer, enemy,
                 com.laosun.aluminium.enums.DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.NORMAL, 1000,
                 category));
     }

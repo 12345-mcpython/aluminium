@@ -7,7 +7,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * {@code RAISE_SKILL_LEVEL} and the one level resolver behind it: "战技等级+1""终结技等级+1" (Skill level +1, Ultimate level +1).

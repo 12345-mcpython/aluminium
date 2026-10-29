@@ -8,7 +8,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.exceptions.CharacterException;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
+import com.laosun.aluminium.models.state.ResourceManager;
 
 /**
  * A character's <b>declared resources</b> and the {@code self_resource:<NAME>} condition that reads them.

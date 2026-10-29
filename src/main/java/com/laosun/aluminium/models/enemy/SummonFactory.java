@@ -4,9 +4,9 @@ import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.entity.Summon;
 import com.laosun.aluminium.utils.AttributeBuilder;
 
 /**

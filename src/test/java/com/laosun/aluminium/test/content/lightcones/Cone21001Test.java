@@ -2,9 +2,9 @@ package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.buff.StunBuff;
