@@ -68,7 +68,7 @@
 2. **改引擎前先问：这是"能力"还是"某个角色的句子"** ✓ —— 是后者就回内容侧 ✓（§4.1 逃生舱表）。
 3. **新增一个词（事件 / 条件 / op）要同时做四件事** ✓：解析（`TriggerConditionParser` / `TriggerOperator`）、
    执行（`TriggerInterpreter`）、**校验**（`TriggerValidator`，未知词必须**报错**而不是静默 ✗）、以及一条**引擎侧判据** ✓（§3.4 的范式）。
-4. **改完必须过四道闸门** ✓（§3.3）：`test --rerun-tasks`、五种 demo 与基线 `MATCH`、`javadoc`、外加**变异验证**
+4. **改完必须过四道闸门** ✓（§3.3）：**一条命令 `gradlew gate`** ✓（全量测试 + 五种 demo + 每份捕获 `compare` + `replay --strict` + `javadoc` ✓）、demo 还要与**基线**逐行比 ✓、外加**变异验证**
    （把改动反向注入一次，确认**目标用例变红**、再按字节还原 ✓，§6.4）。
 5. **引擎与内容分开提交** ✓：回退粒度不同 ✓（§5.1）。
 6. **报告里写清「跑了什么 / 没跑什么」** ✓（§5.2）：`MATCH` 是跑出来的，不是推断出来的 ✓。
@@ -331,6 +331,13 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 改不动就是**层定错了**或**引擎缺能力** ✓ —— 两条路的做法完全不同 ✗。
 
 ### 3.3 四道闸门（**每一批都必须过**）
+
+⭐ **一条命令**：`.\gradlew.bat gate --console=plain` ✓ —— 跑「全量测试 ＋ 五个 demo ＋ 每份捕获的 `compare` ＋ `replay --strict` ＋ `javadoc`」✓，任何一步非零就**整条失败** ✓，末尾打印一行 `GATE: PASS tests=… failures=… suites=…` ✓。
+
+- ⚠ 它**强制** `:test` 真跑（`build.gradle` 的 `outputs.upToDateWhen` 在 `gate` 下返回 false ✓）—— 免得闸门自己踩 UP-TO-DATE 那个坑 ✓。
+- ⚠ 它**不做**两件事，别以为做了 ✗：与**基线**逐行比 demo 输出（那要人判断"这个改动是故意的" ✓，见下）、**变异验证**（§6.4 是按改动做的 ✓）。
+
+下面是它逐步做的事（要单跑某一步或要对比基线时用）✓：
 
 ```powershell
 # 1) 全量测试 —— 必须报出 套件数 / 用例数 / 失败数
