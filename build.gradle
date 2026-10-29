@@ -147,6 +147,19 @@ tasks.register('gateReplay', JavaExec) {
     args = ['replay', 'scenarios/veritas-085418.replay.json', '--strict']
 }
 
+// When `gate` is asked for, the compilers must run for real too - not just `:test`.
+//
+// ⚠ Measured 2026-10-29, and it is the reason this block exists: moving a class to a NEW PACKAGE left Gradle's
+// incremental compile state with no rule to compile it, so `compileTestJava` reported UP-TO-DATE while four moved test
+// classes had NO .class files at all. `:test` then ran a smaller suite and the gate printed PASS - a green that was
+// missing four suites. `--rerun-tasks` produced them. A gate that can silently test less is worse than no gate, so the
+// compilers are forced here exactly like `:test` is.
+['compileJava', 'compileTestJava', 'compileToolsJava', 'compileDemoJava'].each { name ->
+    tasks.named(name) {
+        outputs.upToDateWhen { !gradle.startParameter.taskNames.any { it == 'gate' || it.endsWith(':gate') } }
+    }
+}
+
 tasks.register('gate') {
     group = 'verification'
     description = 'All of AGENT.md \u00a73.3: full tests, every demo, every scenario comparison, the strict replay, javadoc.'

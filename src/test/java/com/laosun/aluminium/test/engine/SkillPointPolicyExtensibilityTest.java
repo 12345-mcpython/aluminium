@@ -5,7 +5,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
-import com.laosun.aluminium.buff.TestBuff;
+import com.laosun.aluminium.test.support.TestBuff;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.event.SkillPointEvent;

@@ -11,7 +11,7 @@ import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.skill.DefaultSkill;
 import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.skill.SkillExecutor;
-import com.laosun.aluminium.tests.TestSkillGroup1;
+import com.laosun.aluminium.test.support.TestSkillGroup1;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
