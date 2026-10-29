@@ -112,13 +112,18 @@
 | `is_dead` / `is_summon` / `has_shield` | `true`/`false` | 死亡 / 是忆灵 / 有护盾 ✓ |
 | `shield_from` | `self`/`actor`/`target` | 盾**是谁给的** ✓ |
 | `hp` / `max_hp` / `energy` / `shield` / `level` / `cid` / `speed` | 数字（= ≥）或 `{"min"/"max"}` | 绝对量 ✓（两端都是**闭区间** ✓）|
-| `hp_pct` | 同上 | **百分比** `当前/上限` ✓ |
+| `eidolon` | 同上 | **星魂数** ✓ |
+| `skill_level` | `{"name": "SKILL", "min"?: n, "max"?: n}` | **某个槽位的等级** ✓（槽位名装载期校验 ✓）|
+| `hp_pct` / `shield_pct` | 同上 | **百分比** `当前/上限` ✓（盾的份额 = 盾 / 生命上限 ✓）|
+| `state_turns` | `{"name": "充能", "min"?: n, "max"?: n}` | **剩余回合** ✓（多个同名取最大 ✓，没有 = 0 ✓）|
+| `camp` | `PLAYER` / `ENEMY` / `NEUTRAL`（或数组 = 任一）| **阵营** ✓（绝对）|
+| `team` | `own` / `other` | **相对规则主人**的阵营 ✓（"我方 / 对方" ✓）|
 | `attribute` | `{"name": "SPEED", "min"?: n, "max"?: n}` | 任意属性 ✓（名字在装载期校验 ✓）|
 | `stacks` | `{"name": "充能", "min"?: n, "max"?: n}` | 层数 ✓（= `self_stacks:` ✓）|
 | `state` / `path` / `element` | 字符串或字符串数组（数组 = **任一** ✓）| 状态 / 命途 / 属性 ✓ |
 
 ⚠ **缺主语就判否** ✓ —— 例如 `BATTLE_START` 没有 target，`{"entity": "target", ...}` 一律失败 ✓（与条件 DSL 同一条规则 ✓）；`not` 也**不会**把它翻成通过 ✓。
-⚠ **装载期就拒绝**：未知 `type` ✓、实体谓词的空 `json` ✓、未知子谓词 ✓、值形状不对 ✓、未知属性名 ✓、`all_of`/`any_of` 空 `terms` ✓、`not` 缺 `term` ✓、`ref` 未声明 ✓、**具名谓词成环** ✓（报错会打出环的路径 ✓）。
+⚠ **装载期就拒绝**：未知 `type` ✓、实体谓词的空 `json` ✓、未知子谓词 ✓、值形状不对 ✓、未知属性名 ✓、未知阵营 / 未知 `team` / 未知槽位 ✓、`all_of`/`any_of` 空 `terms` ✓、`not` 缺 `term` ✓、`ref` 未声明 ✓、**具名谓词成环** ✓（报错会打出环的路径 ✓）。
 ⚠ 谓词是**判定**（是否执行），不是**数值**（用哪个数）✗ —— 后者是 `percent_from` / `amount_from` 的数值提供器 ✓；两者在一条规则里各管一半 ✓。
 ## 3. 条件（`when` / `target_when`）
 

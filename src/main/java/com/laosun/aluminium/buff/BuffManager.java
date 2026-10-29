@@ -812,6 +812,30 @@ public class BuffManager {
         return false;
     }
 
+    /**
+     * How many turns a named state has left: the <b>largest</b> remaining duration among the buffs that carry that name,
+     * or {@code 0} when the unit has none.
+     *
+     * <p><b>Why the largest.</b> Two applications of the same state can coexist (the engine refreshes most, but a
+     * stackable counter keeps several marks), and "how many turns of 充能 are left" means the last one to expire - the
+     * number a rule asking 「remaining turns」 is about. With no such state the answer is 0, which is also the honest
+     * reading of "it has none".
+     *
+     * <p>Reader: the entity predicate's {@code state_turns}, and the trigger DSL's own remaining-duration questions.
+     */
+    public int remainingTurnsOf(String stateName) {
+        if (stateName == null || stateName.isBlank()) {
+            return 0;
+        }
+        int longest = 0;
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (stateName.trim().equals(buff.getBuffName())) {
+                longest = Math.max(longest, buff.duration());
+            }
+        }
+        return longest;
+    }
+
     public boolean hasState(String state) {
         if (state == null || state.isBlank()) {
             return false;
