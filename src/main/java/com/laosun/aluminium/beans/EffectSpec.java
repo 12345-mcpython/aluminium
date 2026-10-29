@@ -119,6 +119,7 @@ public class EffectSpec {
         copy.speed = this.speed;
         copy.suspendsTurns = this.suspendsTurns;
         copy.blocks = this.blocks;
+        copy.oncePerTurn = this.oncePerTurn;
         copy.critRate = this.critRate;
         copy.critDamage = this.critDamage;
         copy.element = this.element;
@@ -833,6 +834,17 @@ public class EffectSpec {
      */
     @SerializedName("blocks")
     private String blocks;
+
+    /**
+     * 「在任意目标回合<b>第一次</b>提供治疗/护盾时」 (1512's talent): the effect fires at most once per turn, keyed by this
+     * word - the first use in a turn goes through and every later one is skipped, and the window resets at each turn
+     * boundary ({@code Battle.firstThisTurn}).
+     *
+     * <p>An effect-level limit rather than a condition: "the first X this turn" is not a property of any unit, it is a
+     * fact about what has happened in the turn so far.
+     */
+    @SerializedName("once_per_turn")
+    private String oncePerTurn;
 
     /**
      * "暂时<b>延后</b>陷入无法战斗状态": the state this effect applies does not let its carrier die (140's Sanctuary of Mooncocoon (月茧之庇)).

@@ -107,8 +107,10 @@ public class SpecialGuestTest {
         scene.battle.castImmediate(scene.ally.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON),
                 scene.ally, List.of(scene.battle.enemies().getFirst()));
 
-        Assertions.assertEquals(before + 2, scene.battle.partyResourceValue(VIBES), 1e-9,
-                "「持有【特邀嘉宾】的角色…攻击时额外使知更鸟•晴歌获得 2 点气氛值」");
+        // 2 from the guest clause + 1 from her talent's 「我方目标施放攻击时」 - 额外 means the guest's 2 are ON TOP of the
+        // talent's 1, so the attack is worth 3 in total.
+        Assertions.assertEquals(before + 3, scene.battle.partyResourceValue(VIBES), 1e-9,
+                "guest 2 + talent 1: 「…额外使知更鸟•晴歌获得 2 点气氛值」");
     }
 
     /**
