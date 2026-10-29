@@ -1110,12 +1110,53 @@ public class Battle {
             return false;
         }
 
+        markSingleUseSpent(skill);
         skill.execute(this, user, targets);
 
         processRequests();
 
         removeDeadCombatants();
         return true;
+    }
+
+    /**
+     * Which skills a 「单场战斗中只能施放 1 次」 row has already spent, keyed by skill id.
+     *
+     * <p>Per battle, not per file: a new battle starts with every single-use cast available again.
+     */
+    private final java.util.Set<Integer> oncePerBattleSpent = new java.util.HashSet<>();
+
+    /**
+     * Whether this skill's single use is still available (always true for a row that does not state one).
+     *
+     * @param skill the skill about to be cast
+     * @return whether the one allowed cast has not happened yet
+     */
+    public boolean singleUseLeft(Skill skill) {
+        return skill == null || !Boolean.TRUE.equals(singleUseOf(skill)) || !oncePerBattleSpent.contains(slotKey(skill));
+    }
+
+    /**
+     * Records a committed cast of a single-use skill. Called at the two cast entries, after their gates pass, so a
+     * refused cast does not spend the one use.
+     *
+     * @param skill the skill that was cast
+     */
+    public void markSingleUseSpent(Skill skill) {
+        if (skill != null && Boolean.TRUE.equals(singleUseOf(skill))) {
+            oncePerBattleSpent.add(slotKey(skill));
+        }
+    }
+
+    /** A skill is identified by the pair (who, which slot): the row itself carries no unique id here. */
+    private static int slotKey(Skill skill) {
+        return skill.getCid() * 100 + skill.getSkillSlot();
+    }
+
+    private static Boolean singleUseOf(Skill skill) {
+        var data = skill.getData();
+        var effect = data == null ? null : com.laosun.aluminium.data.SkillEffects.forSkill(skill);
+        return effect == null ? null : effect.getOncePerBattle();
     }
 
     public boolean requestSkill(Skill skill, CanHit user, List<? extends CanHit> target) {

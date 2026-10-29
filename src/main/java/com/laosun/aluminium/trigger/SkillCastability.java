@@ -40,6 +40,10 @@ public final class SkillCastability {
      * @return {@code true} when the row states no gate, or every spelled condition holds
      */
     public static boolean allows(Skill skill, CanHit caster, Battle battle) {
+        // 「单场战斗中只能施放 1 次」: history, not a resource - the battle remembers whether the one cast was spent.
+        if (battle != null && !battle.singleUseLeft(skill)) {
+            return false;
+        }
         List<TriggerTable.Condition> conditions = conditionsOf(skill);
         if (conditions.isEmpty()) {
             return true;
