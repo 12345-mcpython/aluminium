@@ -1,4 +1,4 @@
-package com.laosun.aluminium.tests;
+package com.laosun.aluminium.test.support;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.SkillData;
