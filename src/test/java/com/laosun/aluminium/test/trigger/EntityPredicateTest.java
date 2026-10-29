@@ -235,6 +235,37 @@ public class EntityPredicateTest {
     }
 
     /**
+     * The four counts the replay party's own rules need: a memosprite on the field, the enemies left, a counter, and the
+     * two bars the condition DSL also spells ({@code self_energy_percent}, {@code target_debuff_count}).
+     */
+    @Test
+    public void theSidesAndCountersAreAskable() {
+        Context scene = context(true);
+        scene.owner.getBuffManager().addBuff(stacks());
+
+        Assertions.assertTrue(test(entity("self", "{\"summon_count\": {\"max\": 0}}"), scene),
+                "no memosprite has been summoned here");
+        Assertions.assertTrue(test(entity("self", "{\"enemy_count\": {\"min\": 1}}"), scene),
+                "the fixture's monster is alive");
+        Assertions.assertTrue(test(entity("self", "{\"stacks\": {\"name\": \"充能\", \"min\": 1}}"), scene),
+                "the stack counter reads 1 after one mark");
+        Assertions.assertTrue(test(entity("self", "{\"debuff_count\": {\"max\": 0}}"), scene),
+                "nothing debuffed it");
+        Assertions.assertTrue(test(entity("self", "{\"energy_pct\": {\"max\": 1}}"), scene),
+                "its energy is inside the bar");
+    }
+
+    /**
+     * A subject of {@code summon} is the rule owner's memosprite - and it fails, loudly-free, when none is out.
+     */
+    @Test
+    public void theSummonSubjectIsTheOwnersMemosprite() {
+        Context scene = context(true);
+        Assertions.assertFalse(test(entity("summon", "{\"is_summon\": true}"), scene),
+                "with no memosprite on the field every predicate about it is false");
+    }
+
+    /**
      * The shapes that mean nothing are refused at load.
      */
     @Test
