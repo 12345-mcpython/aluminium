@@ -281,7 +281,8 @@ final class TriggerMagnitudes {
      * the third.
      */
     static boolean statesShare(EffectSpec effect) {
-        return effect.getPercent() != null || effect.getPercentFromCastParam() != null
+        return effect.getPercent() != null || effect.getPercentFrom() != null
+                || effect.getPercentFromCastParam() != null
                 || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null
                 || effect.getPercentFromSummonParam() != null;
     }
@@ -304,6 +305,9 @@ final class TriggerMagnitudes {
      * @return the constant term, {@code 0} when neither spelling is stated
      */
     static double constantTerm(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getAmountFrom() != null) {
+            return NumberProviders.resolve(effect.getAmountFrom(), effect, ctx);
+        }
         if (effect.getAmount() != null) {
             return effect.getAmount();
         }
@@ -502,6 +506,12 @@ final class TriggerMagnitudes {
      */
     static double shareOf(EffectSpec effect, TriggerContext ctx) {
         Double fraction = effect.getPercent();
+        // A NUMBER PROVIDER, the general spelling: it names its source as a type and can compose two sources.
+        // Note: it sits first because it is the spelling the field-per-source ones are being retired into; `fraction`
+        // still multiplies, the same way it does beside a resource share below.
+        if (effect.getPercentFrom() != null) {
+            return fractionOf(NumberProviders.resolve(effect.getPercentFrom(), effect, ctx), fraction);
+        }
         // A share CARRIED IN A RESOURCE, in basis points: how a number captured at cast time is used later.
         if (effect.getPercentFromResource() != null) {
             com.laosun.aluminium.entity.Character holder = requireCharacterOwner(effect, ctx);

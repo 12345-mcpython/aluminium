@@ -270,6 +270,30 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 ⚠ **`percent` 不是唯一的"份额"写法** ✓ —— 份额也可以从**技能参数表**里读（五条拼法、各自的读者跑过代码核对）✓：
 
+⭐ **数值提供器**（`percent_from` / `amount_from`）：把"这个数字从哪来"写成一个对象 ✓，`amount_from` 同时也是**常数项**的来源 ✓。
+它**取代**下表五条字段拼法（两条拼法**互斥** ✓，同时写会在装载期被拒 ✗）：
+
+```json
+"percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 },
+"amount_from":  { "type": "add", "inputs": [
+                    { "type": "cast_param", "index": 1 },
+                    { "type": "const", "value": 2 } ] }
+```
+
+| `type` | 字段 | 读什么 |
+|---|---|---|
+| `const` | `value` | 字面量 |
+| `skill_param` | `skill` + `index` | 规则主人自己某个槽位、当前等级那一行的第 index 项（= `percent_from_skill_param` ✓）|
+| `cast_param` | `index` | 产生这次事件的技能当前等级那一行（= `percent_from_cast_param` ✓）|
+| `summon_param` | `slot` + `index` | 规则主人忆灵某个数据槽位（= `percent_from_summon_param` ✓）|
+| `resource` | `resource`（+ `basis_points`）| 规则主人的资源（= `percent_from_resource` ✓；`basis_points: true` 时 ÷10000 ✓）|
+| `add` / `mul` / `min` / `max` / `avg` | `inputs` | 逐项求值后归约（`add` 空表=0 ✓、`mul` 空表=1 ✓；`min`/`max`/`avg` 空表在装载期被拒 ✗）|
+| `sub` / `div` | `left` + `right` | 二元运算（`div` 除零在**结算期**报错 ✓）|
+| `negate` / `abs` | `input` | 相反数 / 绝对值 |
+
+⚠ **装载期就拒绝**：`type` 不在上表 ✓、`const` 缺 `value` ✓、`skill_param` 缺 `skill` ✓、`*_param` 缺 `index` ✓、`summon_param` 缺 `slot` ✓、`add` 族缺 `inputs` ✓、`sub`/`div` 缺操作数 ✓、以及与对应字段拼法同时写 ✓。
+⚠ **provider 不做分支** ✗ —— `conditional` 一类**故意没有** ✓：要不要执行是**条件**（`when`）的事 ✓，一个数字里再分一套执行模型是第二条路 ✓。
+
 | 字段 | 读的是 | 哪些 op 读 |
 |---|---|---|
 | `percent_from_skill_param: "<SKILLTYPE>:<index>"` | **持有者自己**某个槽位、**当前等级**那一行的第 index 项 | 伤害类 + `MODIFY_ATTR` + `HEAL` / `SHIELD`（+ `APPLY_DOT` / `APPLY_CONTROL` 的每回合伤害）✓ |

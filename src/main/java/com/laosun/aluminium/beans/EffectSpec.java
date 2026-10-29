@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.trigger.NumberProviders;
 import com.laosun.aluminium.trigger.TriggerInterpreter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -98,7 +99,9 @@ public class EffectSpec {
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
+        copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
         copy.amountFromSkillParam = this.amountFromSkillParam;
+        copy.amountFrom = NumberProviders.copyOf(this.amountFrom);
         copy.amountFromCastParam = this.amountFromCastParam;
         copy.percentFromSummonParam = this.percentFromSummonParam;
         copy.amountFromSummonParam = this.amountFromSummonParam;
@@ -922,6 +925,7 @@ public class EffectSpec {
      * <p>The sibling of {@link #percentFromCastParam}: that one reads the skill that produced the event, this one reads a slot the rule names -- which is
      * what "造成 1 次等同于缇宝 #3% 生命上限的…附加伤害" needs, since #3 belongs to his ULTIMATE while the rider hangs on somebody else's attack.
      */
+
     @SerializedName("percent_from_skill_param")
     private String percentFromSkillParam;
 
@@ -958,6 +962,23 @@ public class EffectSpec {
     private String amountFromSummonParam;
 
     /**
+     * The <b>number provider</b> form of the share: {@code {"type": "skill_param", "skill": "SKILL", "index": 1}}.
+     *
+     * <p>Replaces the four legacy field spellings ({@code percent_from_skill_param} / {@code percent_from_cast_param} /
+     * {@code percent_from_summon_param} / {@code percent_from_resource}) and adds composition ({@code add} / {@code mul}
+     * / ...). Exactly one of them is stated; the loader refuses two. See {@code NumberProviders}.
+     */
+    @SerializedName("percent_from")
+    private NumberProvider percentFrom;
+    /**
+     * The <b>number provider</b> form of the constant term: {@code {"type": "cast_param", "index": 2}}.
+     *
+     * <p>Replaces {@code amount} / {@code amount_from_skill_param} / {@code amount_from_cast_param} /
+     * {@code amount_from_summon_param} and adds composition. Exactly one source is stated; the loader refuses two.
+     */
+    @SerializedName("amount_from")
+    private NumberProvider amountFrom;
+    /**
      * Whether {@code skill_id} names a <b>memosprite data slot</b> instead of a character slot, for
      * {@code RAISE_SKILL_LEVEL}.
      *
@@ -981,6 +1002,7 @@ public class EffectSpec {
      * <p>Note: A single {@code amount} is either the literal or one of these spellings, never both - two answers to one
      * question is refused at load time (see {@code TriggerValidator.requireAmount}).
      */
+
     @SerializedName("amount_from_skill_param")
     private String amountFromSkillParam;
 
