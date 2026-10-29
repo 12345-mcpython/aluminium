@@ -12,7 +12,7 @@
     {
       "on": "BATTLE_START",
       "id": "technique_advance_vibes_and_damage",
-      "when": ["self has_state 秘技"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "state": "秘技" }}],
       "do": [
         { "op": "ADVANCE", "percent": 0.2, "target": "self" },
         { "op": "GAIN_RESOURCE", "resource": "气氛值", "amount": 6 },
@@ -24,7 +24,7 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_summon_and_vibes",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "SUMMON" },
         { "op": "HEAL", "scale": "target_max_hp", "percent": 1.0, "target": "summon" },
@@ -36,7 +36,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "fever_aura_ignores_defence_by_vibes",
-      "when": ["actor is_ally", "self has_state Fever"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "is_ally": true }}, {"type": "entity", "entity": "self", "json": { "state": "Fever" }}],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -56,7 +56,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "fever_boosts_her_and_her_memosprites_damage",
-      "when": ["actor == self", "self has_state Fever"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "entity", "entity": "self", "json": { "state": "Fever" }}],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -75,7 +75,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "fever_boosts_the_memosprites_own_damage",
-      "when": ["actor == summon", "self has_state Fever"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "entity", "entity": "self", "json": { "state": "Fever" }}],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -94,7 +94,7 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_aura_vulnerability_at_1",
-      "when": ["self_summon_count >= 1"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 1 } }}],
       "do": [
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.112, "permanent": true, "coexist": true, "target": "all_enemies" }
       ],
@@ -104,7 +104,7 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_aura_vulnerability_at_2",
-      "when": ["self_summon_count >= 2"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 2 } }}],
       "do": [
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.168, "permanent": true, "coexist": true, "target": "all_enemies" }
       ],
@@ -114,7 +114,7 @@
     {
       "on": "SUMMONED",
       "id": "memosprite_aura_vulnerability_at_3",
-      "when": ["self_summon_count >= 3"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 3 } }}],
       "do": [
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.224, "permanent": true, "coexist": true, "target": "all_enemies" }
       ],

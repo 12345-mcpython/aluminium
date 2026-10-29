@@ -27,7 +27,7 @@
     {
       "id": "true_self_counts_a_new_allies_recollection_first",
       "on": "TURN_START",
-      "when": ["self_summon_count >= 1", "actor has_state 未来", "!actor has_state 从这位队友处得到过【追忆】"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "summon_count": { "min": 1 } }}, {"type": "entity", "entity": "actor", "json": { "state": "未来" }}, {"type": "not", "term": {"type": "entity", "entity": "actor", "json": { "state": "从这位队友处得到过【追忆】" }}}],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "忆灵技的额外一击", "amount": 1, "target": "summon" }
       ],
@@ -37,7 +37,7 @@
     {
       "id": "true_self_marks_the_allies_that_gave_one",
       "on": "TURN_START",
-      "when": ["actor has_state 未来"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "state": "未来" }}],
       "do": [
         { "op": "APPLY_BUFF", "buff": "从这位队友处得到过【追忆】", "permanent": true, "target": "attacker" }
       ],
@@ -47,7 +47,7 @@
     {
       "on": "BASIC_ATTACK",
       "id": "basic_recollection",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "追忆", "amount": 1 }
       ],
@@ -57,7 +57,7 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_recollection",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "追忆", "amount": 3 },
         { "op": "APPLY_BUFF", "buff": "结界", "turns": 2, "ticks_on": "self", "target": "self" }
@@ -113,7 +113,7 @@
     {
       "on": "TURN_START",
       "id": "trace_party_damage_at_speed_180",
-      "when": ["self_attr:SPEED >= 180"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "attribute": { "name": "SPEED", "min": 180.0 } }}],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -130,7 +130,7 @@
     {
       "on": "ULT_CAST",
       "id": "ult_summons_demiurge",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "SUMMON" }
       ],
@@ -149,7 +149,7 @@
     {
       "id": "summoned_clears_every_control",
       "on": "SUMMONED",
-      "when": ["actor is_summon"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "is_summon": true }}],
       "do": [
         { "op": "DISPEL", "kind": "control", "target": "all_allies" }
       ],
@@ -159,7 +159,7 @@
     {
       "id": "after_it_casts_every_ongoing_effect_shortens_by_one",
       "on": "CAST_SETUP",
-      "when": ["actor is_summon"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "is_summon": true }}],
       "do": [
         { "op": "EXTEND_BUFF", "kind": "all", "turns": -1, "target": "self" }
       ],
@@ -196,7 +196,7 @@
     {
       "id": "true_self_ode_gives_story_on_her_ultimate",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self has_state 献予「真我」之诗"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}, {"type": "entity", "entity": "self", "json": { "state": "献予「真我」之诗" }}],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "故事", "amount": 1, "target": "summon" }
       ],
@@ -206,7 +206,7 @@
     {
       "id": "true_self_ode_gives_story_when_the_memosprite_arrives",
       "on": "SUMMONED",
-      "when": ["actor == summon", "self has_state 献予「真我」之诗"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "summon" }}, {"type": "entity", "entity": "self", "json": { "state": "献予「真我」之诗" }}],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "故事", "amount": 1, "target": "summon" }
       ],
@@ -216,7 +216,7 @@
     {
       "id": "true_self_ode_spends_three_story",
       "on": "RESOURCE_CHANGED",
-      "when": ["summon_resource:故事 >= 3", "self has_state 献予「真我」之诗"],
+      "when_predicates": [{"type": "entity", "entity": "summon", "json": { "resource": { "name": "故事", "min": 3.0 } }}, {"type": "entity", "entity": "self", "json": { "state": "献予「真我」之诗" }}],
       "do": [
         { "op": "SPEND_RESOURCE", "resource": "故事", "spendAll": true, "target": "summon" },
         { "op": "INSERT_ACTION", "target": "summon" },
@@ -238,7 +238,7 @@
     {
       "id": "talent_grants_future_after_she_acts",
       "on": "TURN_END",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "APPLY_BUFF", "buff": "未来", "permanent": true, "target": "other_allies" }
       ],
@@ -248,7 +248,7 @@
     {
       "id": "talent_spends_future_for_recollection",
       "on": "TURN_START",
-      "when": ["actor has_state 未来"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "state": "未来" }}],
       "do": [
         { "op": "REMOVE_STATE", "buff": "未来", "target": "attacker" },
         { "op": "GAIN_RESOURCE", "resource": "追忆", "amount": 1 }
@@ -259,7 +259,7 @@
     {
       "id": "talent_cleanses_at_a_full_recollection",
       "on": "RESOURCE_CHANGED",
-      "when": ["self_resource:追忆 >= 24"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "resource": { "name": "追忆", "min": 24.0 } }}],
       "do": [
         { "op": "DISPEL", "kind": "control", "target": "self" },
         { "op": "DISPEL", "kind": "dot", "target": "self" }
@@ -287,7 +287,7 @@
     {
       "id": "ult_enters_the_ripple_and_sharpens",
       "on": "ULT_CAST",
-      "when": ["actor == self"],
+      "when_predicates": [{"type": "entity", "entity": "actor", "json": { "same_as": "self" }}],
       "do": [
         { "op": "APPLY_BUFF", "buff": "往昔的涟漪", "permanent": true, "target": "self" },
         {
@@ -310,7 +310,7 @@
     {
       "id": "talent_cleanses_in_the_ripple_at_twelve",
       "on": "RESOURCE_CHANGED",
-      "when": ["self has_state 往昔的涟漪", "self_resource:追忆 >= 12"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "state": "往昔的涟漪" }}, {"type": "entity", "entity": "self", "json": { "resource": { "name": "追忆", "min": 12.0 } }}],
       "do": [
         { "op": "DISPEL", "kind": "control", "target": "self" },
         { "op": "DISPEL", "kind": "dot", "target": "self" }
@@ -321,7 +321,7 @@
     {
       "id": "talent_activates_the_ultimate_at_twenty_four",
       "on": "RESOURCE_CHANGED",
-      "when": ["self_resource:追忆 >= 24"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "resource": { "name": "追忆", "min": 24.0 } }}],
       "do": [
         { "op": "APPLY_BUFF", "buff": "终结技已激活", "permanent": true, "target": "self" }
       ],
@@ -331,7 +331,7 @@
     {
       "id": "talent_activates_the_ultimate_at_twelve_inside_the_ripple",
       "on": "RESOURCE_CHANGED",
-      "when": ["self has_state 往昔的涟漪", "self_resource:追忆 >= 12"],
+      "when_predicates": [{"type": "entity", "entity": "self", "json": { "state": "往昔的涟漪" }}, {"type": "entity", "entity": "self", "json": { "resource": { "name": "追忆", "min": 12.0 } }}],
       "do": [
         { "op": "APPLY_BUFF", "buff": "终结技已激活", "permanent": true, "target": "self" }
       ],
