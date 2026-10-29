@@ -97,6 +97,11 @@ test {
     // leaves `:test` UP-TO-DATE, so the guard does not run at all - measured: a probe line carrying counts passed
     // until `--rerun-tasks` was added.
     inputs.file('AGENT.md')
+    // Same trap, same fix: TRIGGER.md is read by TriggerVocabularyDriftTest (§3.5) and TriggerEventTableDriftTest (§4).
+    // Caught on 2026-10-29: mutating §4's table (dropping SUMMON_LEFT, changing the heading count) left `:test`
+    // UP-TO-DATE, so the new guard stayed green while the document was wrong - a guard that does not run is worse than
+    // none, because it is believed.
+    inputs.file('TRIGGER.md')
 }
 
 
