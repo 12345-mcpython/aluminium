@@ -36,6 +36,7 @@ public final class NumberProviders {
      */
     static final Set<String> TYPES = Set.of(
             "const", "skill_param", "cast_param", "summon_param", "resource", "attr", "stacks",
+            "original_damage", "settled_damage_this_event", "elation_base", "cast_applied",
             "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg",
             "uniform", "weighted_list");
 
@@ -87,6 +88,11 @@ public final class NumberProviders {
             case "abs" -> Math.abs(resolve(requireOperand(provider.getInput(), "abs", "input"), effect, ctx));
             case "attr" -> attributeOf(provider, ctx);
             case "stacks" -> stacksOf(provider, ctx);
+            case "original_damage" -> TriggerMagnitudes.originalDamageOf(effect, ctx);
+            case "settled_damage_this_event" -> TriggerMagnitudes.settledDamageOf(ctx);
+            case "elation_base" -> TriggerMagnitudes.elationBase(ctx);
+            case "cast_applied" -> castAppliedOf(provider, ctx);
+
             case "uniform" -> {
                 double low = resolve(requireOperand(provider.getMin(), "uniform", "min"), effect, ctx);
                 double high = resolve(requireOperand(provider.getMax(), "uniform", "max"), effect, ctx);
@@ -188,7 +194,13 @@ public final class NumberProviders {
                             + provider.getWhose() + "\"; it is owner or target" + where);
                 }
             }
-            case "uniform" -> {
+
+            case "cast_applied" -> {
+                if (provider.getState() == null || provider.getState().isBlank()) {
+                    throw new IllegalArgumentException("\"" + field + "\" of type \"cast_applied\" needs \"state\""
+                            + where);
+                }
+            }            case "uniform" -> {
                 if (provider.getMin() == null || provider.getMax() == null) {
                     throw new IllegalArgumentException("\"" + field + "\" of type \"uniform\" needs both \"min\" and "
                             + "\"max\"" + where);
@@ -386,6 +398,23 @@ public final class NumberProviders {
     }
 
     /**
+     * How many times this cast actually applied a state: {@code {"type": "cast_applied", "state": "冻结"}}.
+     *
+     * <p>Same counter as the {@code cast_applied:<state>} scale ({@code Battle.castAppliedCount}), so "for each target
+     * frozen" reads the same number whichever spelling a rule uses. A count of 0 is a legal answer - nothing landed.
+     */
+    private static double castAppliedOf(NumberProvider provider, TriggerContext ctx) {
+        if (provider.getState() == null || provider.getState().isBlank()) {
+            throw new IllegalStateException("a \"cast_applied\" provider needs \"state\"");
+        }
+        if (ctx.battle() == null) {
+            throw new IllegalStateException("a \"cast_applied\" provider needs the battle whose cast it counts, and this"
+                    + " event carries none");
+        }
+        return ctx.battle().castAppliedCount(provider.getState().trim());
+    }
+
+    /**
      * The battle's random source, so a seeded battle reproduces and a test can pin the draw.
      */
     private static java.util.Random random(TriggerContext ctx) {
@@ -437,6 +466,7 @@ public final class NumberProviders {
         copy.setWhose(provider.getWhose());
         copy.setAbove(provider.getAbove());
         copy.setBuff(provider.getBuff());
+        copy.setState(provider.getState());
         copy.setMin(copyOf(provider.getMin()));
         copy.setMax(copyOf(provider.getMax()));
         if (provider.getDistribution() != null) {
