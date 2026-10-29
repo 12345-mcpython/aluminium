@@ -71,7 +71,7 @@ public final class Predicates {
                 Condition inner = compile(spec.getTerm(), rule, registry, visiting);
                 // Note: the party rule is kept exactly as the `!` prefix keeps it - a missing party fails the
                 // condition BEFORE the negation is applied, never after.
-                yield inner instanceof PartyCondition party ? new TriggerConditionParser.Negated(party, "not(" + inner.source() + ")")
+                yield inner instanceof PartyCondition party ? new TriggerConditionParser.Negated(party, "!" + inner.source())
                         : new Not(inner);
             }
             case "ref" -> {
@@ -150,9 +150,14 @@ public final class Predicates {
             return !inner.test(ctx);
         }
 
+        /**
+         * The condition read as the file spells it: the DSL writes a negation as a leading {@code !}
+         * ({@code !target has_state 冻结}), so a log line and a test that pins "this rule's guard" keep reading the
+         * same string whether the negation came from {@code when} or from a {@code not} predicate.
+         */
         @Override
         public String source() {
-            return "!(" + inner.source() + ")";
+            return "!" + inner.source();
         }
     }
 }
