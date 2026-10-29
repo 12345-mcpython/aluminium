@@ -101,10 +101,24 @@
 |---|---|---|
 | `all_of` / `any_of` | `terms` | **全部** / **任一** 成立 ✓ |
 | `not` | `term` | 取反 ✓ —— ⚠ 对 **party 条件**（self / actor / target）**"没有这一方"仍然判否** ✓，与 `!` 前缀同一条规则 ✓ |
-| `condition` | `spell` | 复用 `when` 的**同一套**条件字符串 ✓（**同一个解析器** ✓，所以词表与报错完全一致 ✓）|
+| `entity` | `entity` + `json` | **实体谓词**：`entity` 是被问的那一方（`self` / `actor` / `target` ✓），`json` 是**子谓词 → 值**的映射 ✓（见下表 ✓）|
 | `ref` | `ref` | `game/data/predicates.json` 里的**具名谓词** ✓ —— `{"name": {"type": ...}}` ✓ |
 
-⚠ **装载期就拒绝**：未知 `type` ✓、`condition` 缺 `spell` ✓、`all_of`/`any_of` 空 `terms` ✓、`not` 缺 `term` ✓、`ref` 未声明 ✓、**具名谓词成环** ✓（报错会打出环的路径 ✓）。
+**实体子谓词**（`json` 的键；未列出的键、类型不对的值，**装载期就拒绝** ✓）：
+
+| 键 | 值 | 读什么 |
+|---|---|---|
+| `is_ally` / `is_enemy` | `true`/`false` | 阵营 ✓ |
+| `is_dead` / `is_summon` / `has_shield` | `true`/`false` | 死亡 / 是忆灵 / 有护盾 ✓ |
+| `shield_from` | `self`/`actor`/`target` | 盾**是谁给的** ✓ |
+| `hp` / `max_hp` / `energy` / `shield` / `level` / `cid` / `speed` | 数字（= ≥）或 `{"min"/"max"}` | 绝对量 ✓（两端都是**闭区间** ✓）|
+| `hp_pct` | 同上 | **百分比** `当前/上限` ✓ |
+| `attribute` | `{"name": "SPEED", "min"?: n, "max"?: n}` | 任意属性 ✓（名字在装载期校验 ✓）|
+| `stacks` | `{"name": "充能", "min"?: n, "max"?: n}` | 层数 ✓（= `self_stacks:` ✓）|
+| `state` / `path` / `element` | 字符串或字符串数组（数组 = **任一** ✓）| 状态 / 命途 / 属性 ✓ |
+
+⚠ **缺主语就判否** ✓ —— 例如 `BATTLE_START` 没有 target，`{"entity": "target", ...}` 一律失败 ✓（与条件 DSL 同一条规则 ✓）；`not` 也**不会**把它翻成通过 ✓。
+⚠ **装载期就拒绝**：未知 `type` ✓、实体谓词的空 `json` ✓、未知子谓词 ✓、值形状不对 ✓、未知属性名 ✓、`all_of`/`any_of` 空 `terms` ✓、`not` 缺 `term` ✓、`ref` 未声明 ✓、**具名谓词成环** ✓（报错会打出环的路径 ✓）。
 ⚠ 谓词是**判定**（是否执行），不是**数值**（用哪个数）✗ —— 后者是 `percent_from` / `amount_from` 的数值提供器 ✓；两者在一条规则里各管一半 ✓。
 ## 3. 条件（`when` / `target_when`）
 

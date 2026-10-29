@@ -46,7 +46,7 @@ public class PredicateTest {
      */
     @Test
     public void anyOfPassesWhenOneBranchPasses() {
-        PredicateSpec either = anyOf(condition("target == self"), condition("target is_ally"));
+        PredicateSpec either = anyOf(entity("target", "{\"is_ally\": true}"), entity("self", "{\"is_dead\": true}"));
 
         Assertions.assertTrue(test(either, context(true), null), "the first branch holds");
     }
@@ -56,7 +56,7 @@ public class PredicateTest {
      */
     @Test
     public void allOfFailsWhenOneBranchFails() {
-        PredicateSpec both = allOf(condition("actor is_ally"), condition("target == self"));
+        PredicateSpec both = allOf(entity("actor", "{\"is_ally\": true}"), entity("target", "{\"is_dead\": true}"));
 
         Assertions.assertFalse(test(both, context(false), null),
                 "the actor branch holds but the target is the monster, so the AND must fail");
@@ -72,7 +72,7 @@ public class PredicateTest {
                 CharacterFactory.create(OWNER, LEVEL), CharacterFactory.create(OWNER, LEVEL), null,
                 0, 0, null, null, SkillCategory.UNSPECIFIED);
 
-        PredicateSpec notAlly = not(condition("target is_ally"));
+        PredicateSpec notAlly = not(entity("target", "{\"is_ally\": true}"));
         Assertions.assertFalse(test(notAlly, withoutTarget, null),
                 "with no target the condition fails, and its negation must fail too - never match");
     }
@@ -83,7 +83,7 @@ public class PredicateTest {
     @Test
     public void aNamedPredicateResolvesAndUnknownNamesAreRefused() {
         Map<String, PredicateSpec> registry = new LinkedHashMap<>();
-        registry.put("is_self", condition("target == self"));
+        registry.put("is_self", entity("target", "{\"is_ally\": true}"));
 
         Assertions.assertTrue(test(ref("is_self"), context(true), registry));
 
@@ -140,10 +140,15 @@ public class PredicateTest {
         return new TriggerTable.TriggerContext(owner, owner, target, 0, 0, null, battle, SkillCategory.UNSPECIFIED);
     }
 
-    private static PredicateSpec condition(String spell) {
+    /**
+     * One entity predicate: which unit, and its sub-predicate map as JSON text (parsed by Gson, so the case reads the
+     * same shape the data files write).
+     */
+    private static PredicateSpec entity(String subject, String json) {
         PredicateSpec spec = new PredicateSpec();
-        TriggerSpecs.set(spec, "type", "condition");
-        TriggerSpecs.set(spec, "spell", spell);
+        TriggerSpecs.set(spec, "type", "entity");
+        TriggerSpecs.set(spec, "entity", subject);
+        TriggerSpecs.set(spec, "json", com.google.gson.JsonParser.parseString(json).getAsJsonObject());
         return spec;
     }
 

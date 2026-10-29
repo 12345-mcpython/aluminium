@@ -47,17 +47,11 @@ public final class Predicates {
                                      Set<String> visiting) {
         String where = " (source: " + rule.getSource() + ")";
         if (spec == null || spec.getType() == null || spec.getType().isBlank()) {
-            throw new IllegalArgumentException("a predicate needs a \"type\": all_of / any_of / not / condition / ref"
+            throw new IllegalArgumentException("a predicate needs a \"type\": all_of / any_of / not / entity / ref"
                     + where);
         }
         return switch (spec.getType().trim()) {
-            case "condition" -> {
-                if (spec.getSpell() == null || spec.getSpell().isBlank()) {
-                    throw new IllegalArgumentException("a \"condition\" predicate needs \"spell\" (one condition string,"
-                            + " as `when` spells it)" + where);
-                }
-                yield TriggerConditionParser.parseCondition(spec.getSpell(), rule);
-            }
+            case "entity" -> EntityPredicates.compile(spec, rule);
             case "all_of", "any_of" -> {
                 if (spec.getTerms() == null || spec.getTerms().isEmpty()) {
                     throw new IllegalArgumentException("an \"" + spec.getType() + "\" predicate needs a non-empty"
@@ -99,7 +93,7 @@ public final class Predicates {
                 yield compile(named, rule, registry, visiting);
             }
             default -> throw new IllegalArgumentException("unknown predicate type \"" + spec.getType()
-                    + "\"; known types: all_of / any_of / not / condition / ref" + where);
+                    + "\"; known types: all_of / any_of / not / entity / ref" + where);
         };
     }
 
