@@ -516,7 +516,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 #### 3.7i 两段式强化普攻（一行多段、各段自己的目标形状）
 落地：`skill_effects.json` 的 **`damage_parts`**（每段 `shape` ＋ `index` ✓，按表顺序结算 ✓，削韧各取自己的列 ✓）【已把守：`CyreneEnhancedBasicTest`、`CyreneEnhancedBasicPartsTest`】。
-**仍开**：① 各段**削韧**未核（`stance_list` 给 single 30 / all 15，游戏 `Phase02` 写死 15 ✓ 两种读法都无更强证据 ✗ 等含强化普攻的捕获 ✓）；② 强化普攻「获得 **3** 点【追忆】」现在由 `basic_recollection` 无条件给 **1** 点 ✓ ⇒ 需要按 `from_skill_id`（1 vs 8）分两条 ✗（没做 ✓）。
+**已收口**（2026-10-29）：① 各段**削韧** —— 游戏自己的 `AvatarSkillConfig.ShowStanceList`（141508，Lv1..Lv10 一致）= **`[30, 15, 0]`**，而生成器把它按 `{single: [0], all: [1], spread: [2]}` 读 ⇒ **单段 30、全体段每敌 15** 正是官方表 ✓（此前那句"`Phase02` 写死 15"是误读，没有 `ShowStanceList` 强 ✗）；② 强化普攻「获得 **3** 点【追忆】」现在由 `basic_recollection` 无条件给 **1** 点 ✓ ⇒ 需要按 `from_skill_id`（1 vs 8）分两条 ✗（没做 ✓）。
 
 #### 3.7j 复刻流程这条线
 | 面 | 证据 |
