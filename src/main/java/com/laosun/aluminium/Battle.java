@@ -1096,15 +1096,26 @@ public class Battle {
         currentMove = queue.getCurrentActor();       // the re-sort may have changed who is next
     }
 
-    public void castImmediate(Skill skill, CanHit user, List<? extends CanHit> targets) {
-        if (skill == null || user == null || targets == null) return;
-        if (user.isDeath()) return;
+    /**
+     * Casts outside the turn order (a replay, a scripted extra hit), subject to the row's own castability gate.
+     *
+     * @return whether it was cast; {@code false} when the skill's {@code castable_when} refuses it
+     */
+    public boolean castImmediate(Skill skill, CanHit user, List<? extends CanHit> targets) {
+        if (skill == null || user == null || targets == null) return false;
+        if (user.isDeath()) return false;
+        // The same gate the turn path applies: "【亿质】>= 16 to cast" must hold here too, or a scripted cast would
+        // produce the number a shorter counter deserves and call it a reproduction.
+        if (!com.laosun.aluminium.trigger.SkillCastability.allows(skill, user, this)) {
+            return false;
+        }
 
         skill.execute(this, user, targets);
 
         processRequests();
 
         removeDeadCombatants();
+        return true;
     }
 
     public boolean requestSkill(Skill skill, CanHit user, List<? extends CanHit> target) {

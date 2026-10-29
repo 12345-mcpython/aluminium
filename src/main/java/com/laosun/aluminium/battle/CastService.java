@@ -51,6 +51,11 @@ public final class CastService {
         if (user.isDeath()) {
             return false;
         }
+        // The row's own gate ("【忆质】≥ 16 才可施放"): refused exactly like an empty energy bar, so a cast that the
+        // sentence forbids cannot happen and then report a 0-damage instance.
+        if (!com.laosun.aluminium.trigger.SkillCastability.allows(skill, user, battle)) {
+            return false;
+        }
         if (skill == user.getSkills().get(SkillType.ULTRA)) {
             if (!ultimates.isReady(user)) {
                 return false;
