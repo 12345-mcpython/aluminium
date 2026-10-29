@@ -749,7 +749,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 | 任务 | 现状 | 验收 | 依赖 |
 |---|---|---|---|
-| **P10-4** 速度与行动条操纵 | 🚧 **只差"拉条"那一半** ✓。⚠ 计划里那句"公开 API 还没上移"**已过时** ✓ —— `Battle.delayMovePercent` **已经是 public** ✓ | `SpeedBuffTest`（**待写**）：speed 100 减速 30% → 下次行动间隔 ≈ 142.857；拉条 50% → 提前半圈 | P10-3 ✅、P7-1 |
+| **P10-4** 速度与行动条操纵 | ✅ **已完成**（2026-10-29 用判据核过）：减速走 `SpeedBoostBuff` → `Queue.refreshSpeed`（按**已走进度**换算 ✓）、拉条走 `ADVANCE` → `Queue.advanceActionByPercent` ✓、延迟走 `Battle.delayMovePercent`（public ✓） | ★`SpeedBuffTest`（3 例 ✓）：减速 30% ⇒ 下一圈 `10000/70 = 142.857` ✓；拉条 50% ⇒ 提前**半圈** ✓；拉条按**剩余**时间、不是整圈 ✓（两次 50% ⇒ 剩 1/4 ✓） | P10-3 ✅、P7-1 |
 | **P10-5** 终结技插入 | 未开始 | `UltraInsertTest`（**待写**）：满能量任意时点 `castUltra` true；行动条前后一致；能量 = 5 × (1+回能率) | P3-2、P7-2 |
 | **P10-6** Debuff 基础概率数据化 | ✅ **前半**（读得出几率 ✓；"**哪个** debuff"**仍缺数据** ✗） | ★`DebuffChanceDataTest`：标定样本全部对上 ✓ / 计划里那个 index 3 的数值**确实不是几率** ✓ | P6-1、P8-2 ✅（P10-2 ✅） |
 | **P10-7** 「按被治疗者的状态，加治疗者的治疗量」 | ✅ **已落地**（= 数据） | — | — |
@@ -843,7 +843,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 |---|---|---|---|
 | **A 层** | P8-6/7/8 + P8-3：角色机制 = 数据的总开关 | ✅ **已完成** | `models/trigger/*` ＋ `characters/*.json` |
 | **B 层** | P9：敌人技能与 AI | 🚧 进行中 | §4.2 |
-| **C 层** | P10：机制补完 | 🚧 差 P10-4 拉条 / P10-5 终结技插入 | §4.2 |
+| **C 层** | P10：机制补完 | 🚧 差 P10-5 终结技插入（P10-4 已完成 ✓） | §4.2 |
 | **D 层** | P11：演示与收尾 | 未开始 | §4.2 |
 | **远期** | 7.1 战斗拆分 | 第一小刀已落地 | §4.2 |
 
@@ -1296,6 +1296,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 规矩 | 守卫 |
 |---|---|
 | **文档与代码的闭集不许分叉**（`TRIGGER.md` §3.5 变量/前缀 ↔ 解析器；§4 事件 ↔ `TriggerEvent`，**双向 + 标题计数**） | `TriggerVocabularyDriftTest`、`TriggerEventTableDriftTest` |
+| **速度变化按已走进度重排；拉条按剩余时间**（P10-4） | `SpeedBuffTest` |
 | 伤害流水线的公共口子不变（只有 1 个公共方法收 `Damage`） | `DamagePipelineTest` |
 | 三层结构的可扩展性标准（不动引擎一行、只换策略） | `SkillPointPolicyExtensibilityTest` |
 | 内容里的数字必须用**引擎自己的单位** | `UnitDisciplineTest` |
@@ -1378,7 +1379,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 
 | 曾被当作守卫 | 实测 |
 |---|---|
-| `SpeedBuffTest`（P10-4 的验收） | ✗ **不存在** ✓ —— P10-4 的"拉条"还没做，它是**将来**的验收条件 |
+| `SpeedBuffTest`（P10-4 的验收） | ✅ **2026-10-29 写了**（3 例，见 §4.2）—— 这一行原先记的是"不存在，将来再说" ✓ |
 | `UltraInsertTest`（P10-5 的验收） | ✗ **不存在** ✓ —— 同上 |
 | `SkillSelectorTest`（P9-3 的验收） | ✗ **不存在** ✓ —— 同上 |
 | tui 一族用例（`anActionReportsTheDamageItDealt` / `extraHitsAreMarked` / `ChoiceFlow` / `scrollLog` / `PgUp`） | ✗ **本 checkout 里搜不到** ✓ —— `src/` 下**没有 tui/ui 包** ✓（**旧** `ROADMAP.md` 的 §3.11–§3.13 引用的是**另一棵树**的用例 ✓） |
