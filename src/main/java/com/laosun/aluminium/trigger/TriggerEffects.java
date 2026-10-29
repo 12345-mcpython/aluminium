@@ -515,11 +515,39 @@ final class TriggerEffects {
                 if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
                     buff.setSuspendsTurns(true);
                 }
+                // 「无法使其他友方目标获得行动提前效果」: the state carries the ban, and the ADVANCE op reads it. Parsed
+                // here so a misspelling is a load-time refusal instead of a ban that silently does nothing.
+                if (effect.getBlocks() != null && !effect.getBlocks().isBlank()) {
+                    buff.setBlocks(blocksOf(effect));
+                }
                 // "with a 100% base chance, make the enemy ... enter the [通解] state": when the rule states one, the state is ROLLED (effect resistance
                 // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
                 TriggerInterpreter.attachRolled(battle, target, buff, effect, ctx);
             }
         }
+    }
+
+    /**
+     * The engine's closed vocabulary of things a state can suppress (see {@link com.laosun.aluminium.buff.Buff#blocks()}).
+     * Comma-separated in the data, because one state may ban more than one action later.
+     *
+     * @param effect the applying effect
+     * @return the parsed set
+     */
+    private static java.util.Set<String> blocksOf(EffectSpec effect) {
+        java.util.Set<String> parsed = new java.util.LinkedHashSet<>();
+        for (String raw : effect.getBlocks().split(",")) {
+            String word = raw.trim();
+            if (word.isEmpty()) {
+                continue;
+            }
+            if (!"advance_to_others".equals(word)) {
+                throw new IllegalArgumentException("Op APPLY_BUFF has \"blocks\": \"" + raw + "\", which is not a word the"
+                        + " engine knows; the only one so far is \"advance_to_others\" (「无法使其他友方目标获得行动提前效果」)");
+            }
+            parsed.add(word);
+        }
+        return java.util.Set.copyOf(parsed);
     }
 
     /**

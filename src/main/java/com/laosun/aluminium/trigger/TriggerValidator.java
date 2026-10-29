@@ -46,6 +46,7 @@ final class TriggerValidator {
         }
 
         String op = TriggerInterpreter.normalizeOp(effect, spec);
+        requireBlocksOnlyOnStates(effect, op, spec);
         requireTargetSelector(effect, op, spec);
         // Note: `cast_target` (who a COMMANDED cast is aimed at) is read by CAST_SKILL and by nothing else, so stating it
         // anywhere else is refused rather than dropped silently -- the same shape as the `cap_scale` and `damage_type`
@@ -1030,7 +1031,22 @@ final class TriggerValidator {
      * so the buff ends</i>" - which is a sentence two documents actually write (1402's [至高之姿], and the
      * dead-dragon family). Read the <b>reason</b> a refusal was written, not just the code: what it was protecting against
      * may have stopped being true.
+     *
+     * <p>{@code "blocks"} belongs here for the same reason: it is a property of a STATE, so only the op that applies one
+     * may state it - a ban written on {@code MODIFY_ATTR} would be accepted and never read, which is exactly the silent
+     * hole the closed sets exist for.
      */
+    static void requireBlocksOnlyOnStates(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getBlocks() == null || effect.getBlocks().isBlank()) {
+            return;
+        }
+        if (!"APPLY_BUFF".equalsIgnoreCase(op)) {
+            throw new IllegalArgumentException("Op " + op + " states \"blocks\": \"" + effect.getBlocks()
+                    + "\"; only APPLY_BUFF applies a state, so only it can say what that state suppresses"
+                    + " (source: " + spec.getSource() + ")");
+        }
+    }
+
     static void requireTickOwner(EffectSpec effect, String op, TriggerSpec spec) {
         String ticksOn = effect.getTicksOn();
         if (ticksOn == null || ticksOn.isBlank()) {

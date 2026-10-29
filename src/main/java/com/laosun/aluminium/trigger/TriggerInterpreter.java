@@ -677,7 +677,15 @@ public final class TriggerInterpreter {
                 // One target or a group: "make that target act immediately" and "make the teammates other than oneself act immediately" are the same op, and
                 // the list resolver is what tells them apart (it is the one HEAL/SHIELD already use for "our
                 // side"). Advancing several units is what the group selectors were resolved for.
+                // 「无法使其他友方目标获得行动提前效果」 (1512's 【特邀嘉宾】): the ban lives on the state the GIVER holds, so it is
+                // read from the rule owner, and it only stops advances aimed at OTHERS - the holder may still be advanced.
+                CanHit giver = ctx.owner();
+                boolean banned = giver != null && giver.getBuffManager() != null
+                        && giver.getBuffManager().suppresses("advance_to_others");
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                    if (banned && target != giver) {
+                        continue;
+                    }
                     battle.queue().advanceActionByPercent(target, effect.getPercent());
                 }
             }

@@ -118,6 +118,7 @@ public class EffectSpec {
         copy.baseChance = this.baseChance;
         copy.speed = this.speed;
         copy.suspendsTurns = this.suspendsTurns;
+        copy.blocks = this.blocks;
         copy.critRate = this.critRate;
         copy.critDamage = this.critDamage;
         copy.element = this.element;
@@ -822,6 +823,16 @@ public class EffectSpec {
      */
     @SerializedName("buff")
     private String buff;
+
+    /**
+     * What the state this effect applies <b>suppresses</b> while it is on the holder - the engine's own vocabulary
+     * ({@code advance_to_others}), validated at load.
+     *
+     * <p>Reader: 1512's ultimate, 「…且<b>无法使其他友方目标获得行动提前效果</b>，持续 2 回合」. A suppression is not an
+     * attribute, so the state has to carry it and the op that would perform the action has to read it.
+     */
+    @SerializedName("blocks")
+    private String blocks;
 
     /**
      * "暂时<b>延后</b>陷入无法战斗状态": the state this effect applies does not let its carrier die (140's Sanctuary of Mooncocoon (月茧之庇)).

@@ -19,6 +19,21 @@ import com.laosun.aluminium.entity.CanHit;
  * For how the two are told apart, see {@link StateBuff} and {@link DotBuff}.
  */
 public interface Buff {
+
+    /**
+     * What this state <b>suppresses</b> while the holder carries it.
+     *
+     * <p><b>Why a closed set of words rather than a free field.</b> A suppression is not an attribute: 「无法使其他友方目标
+     * 获得行动提前效果」 (1512's 【特邀嘉宾】) is a ban on an <b>action</b>, so it has to be read by the op that would perform
+     * it. The vocabulary therefore belongs to the engine and is validated at load; {@code advance_to_others} is the only
+     * word so far.
+     *
+     * @return the suppressed actions ({@code empty} for the ordinary state)
+     */
+    default java.util.Set<String> blocks() {
+        return java.util.Set.of();
+    }
+
     CanHit getSource();
 
     void setSource(CanHit source);
