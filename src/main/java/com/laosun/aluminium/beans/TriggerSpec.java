@@ -51,6 +51,13 @@ public class TriggerSpec {
     private List<String> when;
 
     /**
+     * Structured conditions ANDed with {@link #when}: {@code all_of} / {@code any_of} / {@code not} / {@code condition}
+     * / {@code ref}. The OR and the nesting that {@code when} cannot state. See {@code Predicates}.
+     */
+    @SerializedName("when_predicates")
+    private List<com.laosun.aluminium.beans.PredicateSpec> whenPredicates;
+
+    /**
      * An optional <b>name for this rule</b>, so that another rule can raise one of its numbers
      * ({@code MODIFY_RULE}'s {@code "rule"} field).
      *

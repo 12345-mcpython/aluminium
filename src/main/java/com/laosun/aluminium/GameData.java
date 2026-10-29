@@ -48,6 +48,7 @@ public final class GameData {
     private final Map<Integer, MonsterConfig> monsterConfigs;
     private final Map<Integer, Double> breakingRate;
     private final Map<Integer, EnemySkillData> enemySkills;
+    private final Map<String, com.laosun.aluminium.beans.PredicateSpec> predicates;
     private final TriggerTableProvider triggerTables;
     private final RelicTriggerTableProvider relicTriggerTables;
     private final WeaponTriggerTableProvider weaponTriggerTables;
@@ -92,6 +93,11 @@ public final class GameData {
                 }.getType()));
         EnemySkillsFile enemySkillsFile = JSONReader.fromJSON("enemy_skills.json", EnemySkillsFile.class);
         enemySkills = Map.copyOf(enemySkillsFile.skills());
+        // The named predicates: one registry file, so a guard is written once and referenced by name. Shipped (not
+        // generated): hand-written data, the same shape a data pack would add, and `{}` is a legal empty registry.
+        predicates = frozen(JSONReader.fromJSON("predicates.json",
+                new TypeToken<Map<String, com.laosun.aluminium.beans.PredicateSpec>>() {
+                }.getType()));
         triggerTables = TriggerTables::of;
         relicTriggerTables = (setId, wornPieces) -> RelicTriggerTables.of(setId).at(wornPieces);
         weaponTriggerTables = (weaponId, rank) -> WeaponTriggerTables.has(weaponId)
@@ -214,6 +220,7 @@ public final class GameData {
         this.monsterConfigs = monsterConfigs == null ? base.monsterConfigs : frozen(monsterConfigs);
         breakingRate = base.breakingRate;
         enemySkills = base.enemySkills;
+        predicates = base.predicates;
         this.triggerTables = triggerTables == null ? base.triggerTables : triggerTables;
         this.relicTriggerTables = relicTriggerTables == null ? base.relicTriggerTables : relicTriggerTables;
         this.weaponTriggerTables = weaponTriggerTables == null
@@ -269,6 +276,13 @@ public final class GameData {
      */
     public Map<Integer, CharacterData> characters() {
         return characters;
+    }
+
+    /**
+     * @return the named predicates by name (the {@code predicates.json} registry)
+     */
+    public Map<String, com.laosun.aluminium.beans.PredicateSpec> predicates() {
+        return predicates;
     }
 
     /**

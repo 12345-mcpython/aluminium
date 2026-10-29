@@ -21,7 +21,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "relic128_4_crit_damage_while_shielded",
-      "when": ["actor is_ally", "actor has_shield from_provider self"],
+      "when_predicates": [{ "type": "ref", "ref": "ally_shielded_by_wearer" }],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.15, "target": "self" }
       ],

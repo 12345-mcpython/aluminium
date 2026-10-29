@@ -83,6 +83,29 @@
 
 ---
 
+### 3.0 谓词（`when_predicates`）—— OR、嵌套、具名复用
+
+`when` 只能表达"**全部成立**" ✓。谓词把条件写成**对象**，补上 `when` 表达不了的三件事 ✓：**任一成立**（OR）、**任意嵌套**、**具名复用** ✓。
+
+```json
+"when": ["actor is_ally"],
+"when_predicates": [
+  { "type": "any_of", "terms": [
+      { "type": "condition", "spell": "actor == self" },
+      { "type": "ref", "ref": "ally_shielded_by_wearer" } ] },
+  { "type": "not", "term": { "type": "condition", "spell": "target has_shield" } }
+]
+```
+
+| `type` | 字段 | 语义 |
+|---|---|---|
+| `all_of` / `any_of` | `terms` | **全部** / **任一** 成立 ✓ |
+| `not` | `term` | 取反 ✓ —— ⚠ 对 **party 条件**（self / actor / target）**"没有这一方"仍然判否** ✓，与 `!` 前缀同一条规则 ✓ |
+| `condition` | `spell` | 复用 `when` 的**同一套**条件字符串 ✓（**同一个解析器** ✓，所以词表与报错完全一致 ✓）|
+| `ref` | `ref` | `game/data/predicates.json` 里的**具名谓词** ✓ —— `{"name": {"type": ...}}` ✓ |
+
+⚠ **装载期就拒绝**：未知 `type` ✓、`condition` 缺 `spell` ✓、`all_of`/`any_of` 空 `terms` ✓、`not` 缺 `term` ✓、`ref` 未声明 ✓、**具名谓词成环** ✓（报错会打出环的路径 ✓）。
+⚠ 谓词是**判定**（是否执行），不是**数值**（用哪个数）✗ —— 后者是 `percent_from` / `amount_from` 的数值提供器 ✓；两者在一条规则里各管一半 ✓。
 ## 3. 条件（`when` / `target_when`）
 
 ### 3.1 语法

@@ -640,6 +640,13 @@ public class TriggerTable {
                 conditions.add(TriggerConditionParser.parseCondition(raw, spec));
             }
         }
+        // Structured predicates (`when_predicates`), ANDed with the flat list above: they add the OR and the nesting
+        // that a `when` list cannot state, and they may name a predicate declared in game/predicates.json.
+        if (spec.getWhenPredicates() != null) {
+            for (com.laosun.aluminium.beans.PredicateSpec predicate : spec.getWhenPredicates()) {
+                conditions.add(Predicates.compile(predicate, spec, com.laosun.aluminium.Constant.PREDICATES));
+            }
+        }
         List<EffectSpec> effects = spec.getDoEffects() == null ? List.of() : spec.getDoEffects();
         if (effects.isEmpty()) {
             throw new IllegalArgumentException(
