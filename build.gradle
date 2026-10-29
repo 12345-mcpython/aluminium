@@ -215,7 +215,16 @@ tasks.register('delombok', JavaExec) {
     args = ['delombok', 'src/main/java', '-d', "${buildDir}/delombok"]
     inputs.dir('src/main/java')
     outputs.dir("${buildDir}/delombok")
-    doFirst { file("${buildDir}/delombok").mkdirs() }
+    // ⚠ The output directory must be EMPTY before each run. Lombok's delombok only writes the files it is handed, so a
+    // file that was moved or renamed leaves its OLD copy behind - and `javadoc` builds every `**/*.java` under here, so
+    // the orphan is compiled as a second class of the same name in a package it no longer belongs to.
+    // Measured (2026-10-29, the `models` package split): 25 moved classes left their old copies under
+    // `build/delombok/.../models/`, and `:javadoc` failed on symbols it could not find while `:compileJava` was green -
+    // the stale copies were the only thing wrong. A `clean` fixes it, which is exactly why it would come back.
+    doFirst {
+        delete file("${buildDir}/delombok")
+        file("${buildDir}/delombok").mkdirs()
+    }
 }
 
 tasks.named('javadoc') {
