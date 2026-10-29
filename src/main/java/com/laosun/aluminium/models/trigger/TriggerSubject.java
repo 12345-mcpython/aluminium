@@ -1,6 +1,6 @@
 package com.laosun.aluminium.models.trigger;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Who a trigger firing is about: the table's owner ("self"), who caused the event, and the event's

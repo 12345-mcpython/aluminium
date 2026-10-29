@@ -6,7 +6,7 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -14,6 +14,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Light cone 23052: where the wearer's MEMOSPRITE aims its skill decides what the party gets -- at an ally it marks [空白] and

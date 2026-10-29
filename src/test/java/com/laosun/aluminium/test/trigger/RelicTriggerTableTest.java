@@ -9,8 +9,8 @@ import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.RelicSuit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.RelicSuit;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Relic-set trigger rules: the loader, the assembly point, and the registry of

@@ -5,7 +5,7 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
@@ -15,6 +15,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Sunday's (1313) Skill "纸醉金迷" (131302) - the shipped content the two conditions here were built for.

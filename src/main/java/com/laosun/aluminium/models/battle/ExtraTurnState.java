@@ -1,6 +1,6 @@
 package com.laosun.aluminium.models.battle;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * The extra turn currently being taken, if any.

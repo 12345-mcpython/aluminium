@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.state;
 
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;

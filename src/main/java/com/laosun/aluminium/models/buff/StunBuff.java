@@ -1,6 +1,6 @@
 package com.laosun.aluminium.models.buff;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 public class StunBuff extends AbstractBuff {
     public StunBuff(int duration) {

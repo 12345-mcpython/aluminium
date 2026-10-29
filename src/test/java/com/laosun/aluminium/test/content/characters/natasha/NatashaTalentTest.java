@@ -1,7 +1,7 @@
 package com.laosun.aluminium.test.content.characters.natasha;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Natasha's talent (天赋 生机焕发): +50% healing, but only on a recipient at 30% HP or lower.

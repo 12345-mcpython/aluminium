@@ -6,15 +6,17 @@ import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.exceptions.CharacterException;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.RelicSuit;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 
 import java.util.Set;
+import com.laosun.aluminium.models.state.Resource;
+import com.laosun.aluminium.models.state.ResourceManager;
 
 /**
  * Character factory: build a real character with one call.

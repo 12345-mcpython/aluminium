@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.battle.AutoPolicy;
 import com.laosun.aluminium.models.battle.BattleDriver;
 import com.laosun.aluminium.models.battle.BattleListener;
@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import com.laosun.aluminium.models.entity.Summon;
 
 /**
  * The driver's action branches are actually reached, with real characters and a real enemy.

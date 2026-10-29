@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * Light cone 23022: every damage-over-time TYPE the wearer strikes marks one layer of [先知], once per type per battle, up to four.
@@ -114,10 +115,10 @@ public class ReforgedRemembranceTest {
         // Measured: the DOT instance carries 0.02 while an ordinary hit of the same battle carries 0.0 (damage_type: DOT).
         build(true);
         plant(FIRE_NAME, DamageElement.FIRE);
-        com.laosun.aluminium.models.Damage dot = new com.laosun.aluminium.models.Damage(wearer, enemy,
+        com.laosun.aluminium.models.damage.Damage dot = new com.laosun.aluminium.models.damage.Damage(wearer, enemy,
                 DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.DOT, 1000);
         double dotValue = battle.applyDamage(enemy, dot);
-        com.laosun.aluminium.models.Damage normal = new com.laosun.aluminium.models.Damage(wearer, enemy,
+        com.laosun.aluminium.models.damage.Damage normal = new com.laosun.aluminium.models.damage.Damage(wearer, enemy,
                 DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.NORMAL, 1000);
         double normalValue = battle.applyDamage(enemy, normal);
         System.out.println("[23022] seer=" + wearer.getBuffManager().stacksOf(SEER) + " ; DOT value=" + dotValue
@@ -136,7 +137,7 @@ public class ReforgedRemembranceTest {
         // no ignore at all. Note: Measuring this in a battle that HAS a DoT planted does not work: the first DOT instance grants
         // the layer itself (discipline 212), which is exactly how the gap looked like an engine limitation.
         build(true);
-        com.laosun.aluminium.models.Damage dot = new com.laosun.aluminium.models.Damage(wearer, enemy,
+        com.laosun.aluminium.models.damage.Damage dot = new com.laosun.aluminium.models.damage.Damage(wearer, enemy,
                 DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.DOT, 1000);
         battle.applyDamage(enemy, dot);
         System.out.println("[23022] no DoT on the enemy: seer=" + wearer.getBuffManager().stacksOf(SEER)

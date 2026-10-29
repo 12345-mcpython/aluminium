@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.entity.Summon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.Countdown;
 
 /**
  * Aglaea (阿格莱雅) 1402's memosprite kit - "衣匠" ("Garmentmaker"), as data.

@@ -9,7 +9,7 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buff.CounterMechanic;
 import com.laosun.aluminium.models.buff.DotBuff;
@@ -28,6 +28,15 @@ import com.laosun.aluminium.utils.MapUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.equipment.ExtraBasicPromote;
+import com.laosun.aluminium.models.equipment.Relic;
+import com.laosun.aluminium.models.equipment.Weapon;
+import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * aluminium engine demo: one complete battle.

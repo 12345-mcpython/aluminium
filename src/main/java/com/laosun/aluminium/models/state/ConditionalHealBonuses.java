@@ -1,9 +1,10 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.state;
 
 import com.laosun.aluminium.models.trigger.TriggerTable;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Heal bonuses that depend on <b>who is being healed</b>, held by the healer.

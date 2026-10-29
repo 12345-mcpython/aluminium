@@ -3,7 +3,7 @@ package com.laosun.aluminium.models.battle;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buff.TauntBuff;
@@ -11,6 +11,7 @@ import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * The default computer opponent and ally: ultimate when ready, skill when it matters, basic attack otherwise.
@@ -128,7 +129,7 @@ public final class AutoPolicy implements SkillPolicy {
     public Decision choose(Battle battle, CanHit actor) {
         // Enemies and summons act on the opposing camp. A summon's camp is not the camp of its master by
         // assumption but by asking, so the same code drives an enemy minion and one of our memosprites.
-        if (!(actor instanceof com.laosun.aluminium.models.Character)) {
+        if (!(actor instanceof com.laosun.aluminium.models.entity.Character)) {
             return chooseForOpponent(battle, actor);
         }
         return chooseForAlly(battle, actor);

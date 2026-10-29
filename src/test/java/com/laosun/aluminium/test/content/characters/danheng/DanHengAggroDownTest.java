@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * 1002 Dan Heng (丹恒) 行迹 <b>潜龙</b>: 「若当前生命值百分比小于等于 50%，则被敌方目标攻击的概率降低。」

@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.ReductionBuff;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * -acceptance: buffs inject zones through {@code DamageEvent} during settlement.

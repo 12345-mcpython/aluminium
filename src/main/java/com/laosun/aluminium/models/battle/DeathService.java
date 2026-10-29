@@ -2,8 +2,8 @@ package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Summon;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Summon;
 import com.laosun.aluminium.models.trigger.TriggerPayload;
 
 import java.util.ArrayList;

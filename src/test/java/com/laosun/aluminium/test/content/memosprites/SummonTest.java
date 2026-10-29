@@ -7,7 +7,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.SpeedBoostBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -20,6 +20,11 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.battle.WaveManager;
+import com.laosun.aluminium.models.Signal;
 
 /**
  * a monster's summon roster becomes a combatant that can actually be put on the field.

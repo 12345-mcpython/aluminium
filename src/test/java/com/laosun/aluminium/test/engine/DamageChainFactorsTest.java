@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.damage.BattleDamage;
 
 /**
  * The multiplicative factors the game's damage chain has beside the additive DMG-boost bucket

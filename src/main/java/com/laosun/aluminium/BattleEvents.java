@@ -1,7 +1,7 @@
 package com.laosun.aluminium;
 
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;

@@ -11,7 +11,7 @@ import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -28,6 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * A memosprite's <b>attack</b>: its damage is a share of an attribute of its own, not of its summoner.
@@ -152,7 +156,7 @@ public class MemospriteAttackTest {
      * otherwise: every memosprite cast's base is {@code row share × the summoner's 生命上限} (长夜 0.06 × 2960.0287,
      * 晴空乐手 1.5 × 5249.7811), and the game's {@code ServantConfig.SyncPropertyExceptList} keeps a servant's Max HP
      * synced with its summoner's. So the panel share is what the servant's own HP <b>bar</b> starts at; it does not
-     * move this number (see {@link com.laosun.aluminium.models.Summon#damageBase}).
+     * move this number (see {@link com.laosun.aluminium.models.entity.Summon#damageBase}).
      */
     @Test
     public void theDamageIsProportionalToTheSummonersMaxHp() {

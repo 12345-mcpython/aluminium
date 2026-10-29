@@ -6,7 +6,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * {@code TAUNT} - "使目标陷入嘲讽状态，持续N回合" (make the target enter the taunted state for N turns).

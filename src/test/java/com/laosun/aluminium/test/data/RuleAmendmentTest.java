@@ -6,7 +6,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * "raise the number of times the talent's counter effect can trigger per turn by <b>1</b>" / "raise the <b>base chance</b> to freeze the enemy target by 15%" - a rule that raises a number on

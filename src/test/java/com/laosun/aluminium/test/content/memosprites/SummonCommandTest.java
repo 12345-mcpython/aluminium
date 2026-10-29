@@ -10,7 +10,7 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
@@ -22,6 +22,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * {@code COMMAND_SUMMON} - "make the memosprite deal damage equal to X% of the memosprite's Max HP to all enemies".
@@ -100,7 +104,7 @@ public class SummonCommandTest {
      * <p>⚠ <b>This case used to assert the mirror image</b> (the summon's own attribute), and that is what the engine
      * did until 2026-10-27. It flipped when the recorded fight was reconciled: a memosprite's 「%生命上限」 row is
      * {@code share × the summoner's 生命上限} to the last digit, and the game's {@code ServantConfig} keeps the
-     * servant's Max HP synced with its summoner's (see {@link com.laosun.aluminium.models.Summon#damageBase}).
+     * servant's Max HP synced with its summoner's (see {@link com.laosun.aluminium.models.entity.Summon#damageBase}).
      */
     @Test
     public void theBaseIsTheOwnersMaxHp() {

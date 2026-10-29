@@ -5,9 +5,9 @@ import com.laosun.aluminium.beans.SkillEffectSpec;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.data.SkillEffects;
 import com.laosun.aluminium.enums.*;
-import com.laosun.aluminium.models.BreakDamageCalculator;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.damage.BreakDamageCalculator;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.buff.SuperBreakBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerPayload;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import static java.lang.IO.println;
+import com.laosun.aluminium.models.entity.Summon;
 
 /**
  * Turns one skill activation into the right number of {@link Damage} objects.
@@ -114,7 +115,7 @@ public final class SkillExecutor {
             // `Summon.skillsByDataSlot`, cast through here) never raised it - and every clause of the form "when the
             // wearer's memosprite uses its skill" (cone 23042's vulnerability, 1512's own damage boost) was dead.
             // Measured: no firing site for a DefaultSkill cast by a Summon.
-            if (user instanceof com.laosun.aluminium.models.Summon && !hitTargets.isEmpty()) {
+            if (user instanceof com.laosun.aluminium.models.entity.Summon && !hitTargets.isEmpty()) {
                 battle.fire(TriggerPayload.Simple.of(
                         com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, user, null,
                         hitTargets.size(), 0));
@@ -696,7 +697,7 @@ public final class SkillExecutor {
      * counter lives on the summoner (same rule as {@link CanHit#damageBase}). Unregistered reads as 0.
      */
     private static int resourceHeld(CanHit user, String id) {
-        CanHit holder = user instanceof com.laosun.aluminium.models.Summon summon && summon.getMaster() != null
+        CanHit holder = user instanceof com.laosun.aluminium.models.entity.Summon summon && summon.getMaster() != null
                 ? summon.getMaster()
                 : user;
         return holder.getResources().get(id) == null ? 0 : holder.getResources().get(id).value();

@@ -1,8 +1,8 @@
 package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Countdown;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Countdown;
 
 import java.util.ArrayList;
 import java.util.Collections;

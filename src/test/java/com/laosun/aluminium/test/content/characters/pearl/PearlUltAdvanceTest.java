@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters.pearl;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;

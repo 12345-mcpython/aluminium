@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models.buff;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.BattleDamage;
 
 /**
  * Absorbs part of an incoming hit by <b>spending another unit's resource</b> - the shape of 1503 Pearl (真珠)'s talent:
@@ -24,7 +25,7 @@ import com.laosun.aluminium.models.CanHit;
  * outright. Because a point is worth 200 damage and the spend is deducted per whole point, a counter of 1 blocks up to
  * 200 and can leave a remainder smaller than one point's worth.
  *
- * <p>The hook is {@link com.laosun.aluminium.models.BattleDamage#absorbsInto}: absorption reads the SETTLED amount (after every
+ * <p>The hook is {@link com.laosun.aluminium.models.damage.BattleDamage#absorbsInto}: absorption reads the SETTLED amount (after every
  * damage zone, which is what "受到伤害时" means) and then lowers it, before the lethal check and before any HP moves.
  */
 public class AbsorbBuff extends AbstractBuff {

@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.Signal;
 
 /**
  * Light cone 23033: energy at the start of the battle, and the [雷遁] state machine -- an Ultimate arms it, two basic attacks

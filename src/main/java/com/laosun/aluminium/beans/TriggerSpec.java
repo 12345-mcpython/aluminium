@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * One trigger rule from {@code resources/game/characters/<cid>.json}:

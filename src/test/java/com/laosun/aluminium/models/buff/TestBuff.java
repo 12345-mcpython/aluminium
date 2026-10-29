@@ -1,6 +1,6 @@
 package com.laosun.aluminium.models.buff;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 public class TestBuff extends AbstractBuff {
     public TestBuff(int duration) {

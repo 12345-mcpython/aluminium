@@ -4,8 +4,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.StageBean;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.WaveManager;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.battle.WaveManager;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.data.StageLazyLoadTest;
@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import com.laosun.aluminium.models.Signal;
 
 /**
  * P-4 acceptance: stage data ({@code stage.json}) + waves.

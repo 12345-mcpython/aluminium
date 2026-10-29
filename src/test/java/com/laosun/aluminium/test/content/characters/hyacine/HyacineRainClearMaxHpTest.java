@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.characters.hyacine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -11,6 +11,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * 1409 风堇's ultimate 【雨过天晴】 with her eidolons: the Max-HP share is read from the <b>current</b> row, Rank 3 raises the
@@ -48,7 +50,7 @@ public class HyacineRainClearMaxHpTest {
         Battle battle = new Battle(List.of(hyacine), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        com.laosun.aluminium.models.Summon ikachi = battle.summonServant(hyacine);
+        com.laosun.aluminium.models.entity.Summon ikachi = battle.summonServant(hyacine);
         Assertions.assertNotNull(ikachi, "precondition: her talent summons 小伊卡");
         Assertions.assertEquals(1, hyacine.memospriteSkillLevelBonus(1),
                 "Rank 3: 「忆灵技等级+1」 is filed on the summoner at data slot 1");

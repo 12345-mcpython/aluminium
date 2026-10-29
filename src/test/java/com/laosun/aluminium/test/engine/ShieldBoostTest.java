@@ -4,7 +4,7 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.RelicSuit;
 
 /**
  * "increases the shield amount provided by <b>the wearer</b> by X%" - relic 103 (20%) / 128 (10% + 12%) and one light cone, four readers.
@@ -293,7 +294,7 @@ public class ShieldBoostTest {
      * The same with exactly the first two cavern pieces, which is what a 2-piece bonus needs.
      */
     private static Character wearingTwoPieces(int setId) {
-        com.laosun.aluminium.models.RelicSuit suit = new com.laosun.aluminium.models.RelicSuit();
+        com.laosun.aluminium.models.equipment.RelicSuit suit = new com.laosun.aluminium.models.equipment.RelicSuit();
         for (com.laosun.aluminium.enums.RelicType slot : List.of(
                 com.laosun.aluminium.enums.RelicType.HEAD, com.laosun.aluminium.enums.RelicType.HAND)) {
             suit.addToSuit(RelicFactory.piece(setId, slot, STAR, RELIC_LEVEL));

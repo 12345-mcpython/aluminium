@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.characters.phainon;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * 1408: "when Phainon (白厄) becomes the skill target of any other target, he gains 1 point of [火种] (Coreflame). If the caster is a teammate of Phainon, it also increases Phainon's

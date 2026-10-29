@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Cones 21051 and 21054 -- both grant their bonus to "装备者与忆灵", i.e. to the wearer AND its memosprite and to nobody else.
@@ -109,7 +110,7 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
     /**
      * Every effect of the one rule for that event: attribute, percent, turns, and the two targets exactly once each.
      */
-    private double pinOne(Battle battle, TriggerEvent event, com.laosun.aluminium.models.CanHit actor,
+    private double pinOne(Battle battle, TriggerEvent event, com.laosun.aluminium.models.entity.CanHit actor,
                           String ruleId, String attribute, double percent, int turns) {
         int effects = 0;
         double seen = 0;

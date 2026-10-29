@@ -7,7 +7,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * acceptance: break DOT (first applied first settled, settled at the start of the turn, goes
@@ -391,7 +392,7 @@ public class DotTest {
                 .setBase(AttributeType.SPEED, speed);
         return new Enemy("recorder", builder.build()) {
             @Override
-            public void onDamage(Battle battle, com.laosun.aluminium.models.Damage damage) {
+            public void onDamage(Battle battle, com.laosun.aluminium.models.damage.Damage damage) {
                 seen.add(damage.getElement());
                 super.onDamage(battle, damage);
             }

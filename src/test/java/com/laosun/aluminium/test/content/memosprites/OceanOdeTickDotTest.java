@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.memosprites;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;

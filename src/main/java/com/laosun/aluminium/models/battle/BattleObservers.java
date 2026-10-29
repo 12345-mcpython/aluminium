@@ -2,7 +2,7 @@ package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 import java.util.ArrayList;
 import java.util.List;

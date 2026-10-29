@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Relic set 325, 2-piece: the Elation thresholds, hung on every event that can raise it.

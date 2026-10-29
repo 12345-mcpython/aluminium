@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Relic 126: "成为其他我方目标的技能目标时，获得 1 层[助力]，最多 2 层；施放终结技时若持有 2 层，

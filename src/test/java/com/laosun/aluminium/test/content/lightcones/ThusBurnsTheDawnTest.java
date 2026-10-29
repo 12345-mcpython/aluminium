@@ -5,10 +5,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Light cone 23044: damage always ignores 18% of the target's defence, and while [烈阳] is up (granted by an Ultimate,
@@ -81,7 +82,7 @@ public class ThusBurnsTheDawnTest {
     @Test
     public void somebodyElsesUltimateDoesNotRaiseTheSun() {
         build(true);
-        com.laosun.aluminium.models.CanHit ally = battle.allies().get(1);
+        com.laosun.aluminium.models.entity.CanHit ally = battle.allies().get(1);
         battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, enemy, 0, 0));
         System.out.println("[23044] after the ALLY's ultimate: sun stacks=" + wearer.getBuffManager().stacksOf(SUN));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SUN), "the wearer's own Ultimate (false case)");

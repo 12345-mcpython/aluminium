@@ -1,7 +1,7 @@
 package com.laosun.aluminium.test.support;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Advances a battle until a named unit has <b>had one turn</b> - begun and finished.

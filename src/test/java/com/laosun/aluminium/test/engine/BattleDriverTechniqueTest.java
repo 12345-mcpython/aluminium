@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.battle.BattleDriver;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * A technique declared to the driver reaches a technique rule, end to end.
@@ -110,7 +111,7 @@ public class BattleDriverTechniqueTest {
         int[] seen = {-1};
         driver.withListener(new com.laosun.aluminium.models.battle.BattleListener() {
             @Override
-            public void onTurnStart(com.laosun.aluminium.models.CanHit actor, int turn) {
+            public void onTurnStart(com.laosun.aluminium.models.entity.CanHit actor, int turn) {
                 if (turn == 1) {
                     seen[0] = battle.getSkillPoints();
                 }

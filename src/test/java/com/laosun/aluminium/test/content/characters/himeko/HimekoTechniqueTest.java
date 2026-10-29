@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters.himeko;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * Himeko's 秘技 「不完全燃烧」: the gate, the magnitude, and that it is <b>Fire-only</b>.

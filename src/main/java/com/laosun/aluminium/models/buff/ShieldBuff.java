@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models.buff;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.BattleDamage;
 
 /**
  * A <b>timed</b> shield: "提供能够抵消等同于三月七5%防御力+60伤害的护盾，<b>持续3回合</b>".
@@ -55,7 +56,7 @@ public class ShieldBuff extends AbstractBuff {
         setSource(source);
         // Note: The boost is read HERE rather than inside applyEffect: applyEffect only receives the carrier, and the
         // number has to be frozen at grant time anyway (see Battle.boostedShield).
-        this.amount = com.laosun.aluminium.models.BattleDamage.boostedShield(source, amount);
+        this.amount = com.laosun.aluminium.models.damage.BattleDamage.boostedShield(source, amount);
     }
 
     /**

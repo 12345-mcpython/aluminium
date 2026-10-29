@@ -6,7 +6,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * "在<b>战技提供的</b>护盾保护下的我方目标 ..." (an ally <b>under the shield the Skill provides</b>) - a shield is asked about

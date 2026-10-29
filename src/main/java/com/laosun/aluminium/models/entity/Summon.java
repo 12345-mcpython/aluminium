@@ -1,10 +1,11 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.entity;
 
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * A summoned entity that participates in combat.

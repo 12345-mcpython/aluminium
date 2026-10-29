@@ -2,8 +2,8 @@ package com.laosun.aluminium.models.trigger;
 
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
 
 import java.util.List;
 import java.util.Objects;

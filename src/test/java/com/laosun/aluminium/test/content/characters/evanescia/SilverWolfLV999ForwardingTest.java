@@ -3,13 +3,14 @@ package com.laosun.aluminium.test.content.characters.evanescia;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.state.Resource;
 
 /**
  * Resource-change forwarding: 1506 Silver Wolf LV.999 (银狼LV.999)'s "when gaining a laugh, gains an equal amount of [隐藏分]".

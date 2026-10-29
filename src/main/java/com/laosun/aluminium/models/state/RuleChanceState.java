@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.state;
 
 import java.util.HashMap;
 import java.util.Map;

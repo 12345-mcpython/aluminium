@@ -6,17 +6,17 @@ import com.laosun.aluminium.beans.Skill.StanceList;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillEffectType;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * A Bounce skill's share and hit count come out of its row <b>at the level it is cast at</b>.

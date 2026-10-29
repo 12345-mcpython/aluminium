@@ -2,7 +2,7 @@ package com.laosun.aluminium.models.enemy;
 
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.AttributeBuilder;

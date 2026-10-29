@@ -1,6 +1,6 @@
 package com.laosun.aluminium.models.battle;
 
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.skill.Skill;
 

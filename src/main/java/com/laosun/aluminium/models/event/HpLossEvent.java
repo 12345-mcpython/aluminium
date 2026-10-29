@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.event;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 
 /**
  * HP loss event: fired once after someone's HP really decreased.

@@ -8,6 +8,7 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Relic 113's four-piece: "当装备者受到攻击或被我方目标消耗生命值后，暴击率提高 8%，持续 2 回合，最多 2 层".

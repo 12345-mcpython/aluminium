@@ -2,9 +2,9 @@ package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.enums.ResourceScope;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Resource;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.state.Resource;
 
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;

@@ -12,6 +12,9 @@ import lombok.Getter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.entity.Character;
 
 /**
  * Runtime view of a skill loaded from {@code skills.json}, resolved for a
@@ -238,7 +241,7 @@ public class SkillData {
      * chance twice (130/4 Black Swan) both spellings point at the same placeholder.
      *
      * @param level the level the row is read at - the caller resolves it through
-     *              {@link com.laosun.aluminium.models.CanHit#skillLevel}, the one resolver every read site uses
+     *              {@link com.laosun.aluminium.models.entity.CanHit#skillLevel}, the one resolver every read site uses
      * @return the chance at that row, or {@code null} when the description states
      * no chance at all - which is a real answer, not a failure: 14 of the 28 {@code Impair}
      * skills (e.g. 1315/2 Boothill (波提欧)'s [Standoff (绝命对峙)]) apply their effect unconditionally
@@ -356,7 +359,7 @@ public class SkillData {
      * references immediately before a `%`, read the same way {@link #debuffChance(int)} reads its own.
      *
      * @param level the level whose row is read - resolved by the caller through
-     *              {@link com.laosun.aluminium.models.CanHit#skillLevel}
+     *              {@link com.laosun.aluminium.models.entity.CanHit#skillLevel}
      * @return the share at that row, or {@code null} when the description does not state one
      */
     public Double bounceDamageShare(int level) {

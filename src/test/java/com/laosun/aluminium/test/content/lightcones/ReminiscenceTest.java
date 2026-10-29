@@ -1,13 +1,10 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.Weapon;
+import com.laosun.aluminium.models.entity.Character;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.equipment.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Relic 130, 4-piece: "SPD >= 120/160 so CRIT Rate +10%/18%".

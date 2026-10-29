@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.characters.hyacine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -10,6 +10,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * 1409 风堇's Rank 1 and Rank 2 clauses:
@@ -61,7 +63,7 @@ public class HyacineEidolonOneTwoTest {
         //   ① the rule's target is `target` = the unit that LOST HP, not 风堇 -- the old assertion read the wrong unit;
         //   ② `ally.takeDamage(...)` bypasses Battle, so HP_LOST was never emitted. Only Battle.applyDamage settles a
         //      hit and pays out the event (CanHit.takeDamage's own javadoc says so).
-        battle.applyDamage(ally, new com.laosun.aluminium.models.Damage(hypotheticalAttacker(battle), ally,
+        battle.applyDamage(ally, new com.laosun.aluminium.models.damage.Damage(hypotheticalAttacker(battle), ally,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.1));
         battle.processRequests();
@@ -72,7 +74,7 @@ public class HyacineEidolonOneTwoTest {
                         + ", base=" + base + ")");
     }
 
-    private static com.laosun.aluminium.models.CanHit hypotheticalAttacker(Battle battle) {
+    private static com.laosun.aluminium.models.entity.CanHit hypotheticalAttacker(Battle battle) {
         return battle.enemies().getFirst();
     }
 }

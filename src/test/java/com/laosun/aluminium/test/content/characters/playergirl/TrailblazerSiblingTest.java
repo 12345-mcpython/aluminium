@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
+import com.laosun.aluminium.models.damage.Damage;
 
 /**
  * 8002, the sibling id of 8001: the same Trailblazer (Destruction) kit, verified number by number.
@@ -58,7 +59,7 @@ public class TrailblazerSiblingTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.markTechniqueUsed(tb);
-        battle.applyDamage(ally, new com.laosun.aluminium.models.Damage(enemy, ally,
+        battle.applyDamage(ally, new com.laosun.aluminium.models.damage.Damage(enemy, ally,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.5));
         double hurt = ally.getCurrentHp();
@@ -80,7 +81,7 @@ public class TrailblazerSiblingTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
-        battle.applyDamage(ally, new com.laosun.aluminium.models.Damage(enemy, ally,
+        battle.applyDamage(ally, new com.laosun.aluminium.models.damage.Damage(enemy, ally,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.5));
         double hurt = ally.getCurrentHp();

@@ -5,7 +5,7 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.*;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.Skill;
@@ -15,6 +15,11 @@ import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.equipment.RelicSuit;
+import com.laosun.aluminium.models.entity.Summon;
+import com.laosun.aluminium.models.damage.Damage;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Applies one effect of a rule: the {@code switch} arm bodies behind {@code applyOne}.
@@ -797,7 +802,7 @@ final class TriggerEffects {
      * the buff restores whatever each target had in that slot.
      */
     static void replaceSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        com.laosun.aluminium.models.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+        com.laosun.aluminium.models.entity.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
         SkillType slot;
         try {
             slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(java.util.Locale.ROOT));
@@ -812,7 +817,7 @@ final class TriggerEffects {
         int level = current == null ? 1 : Math.max(1, current.getLevel());
         Skill replacement = new com.laosun.aluminium.models.skill.DefaultSkill(owner.getCid(), effect.getSkillId(), level);
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-            if (target instanceof com.laosun.aluminium.models.Character character) {
+            if (target instanceof com.laosun.aluminium.models.entity.Character character) {
                 character.getBuffManager().addBuff(TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
                         new com.laosun.aluminium.models.buff.SkillSwapBuff(slot, replacement), effect), ctx));
             }

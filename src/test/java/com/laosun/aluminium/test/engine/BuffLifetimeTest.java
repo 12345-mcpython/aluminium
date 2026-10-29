@@ -7,8 +7,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
@@ -21,6 +21,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * {@code "until"} - a buff that ends when its <b>owner does something</b> instead of after N turns.

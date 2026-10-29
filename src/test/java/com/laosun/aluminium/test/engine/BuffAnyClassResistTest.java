@@ -1,7 +1,7 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.enums.DebuffClass;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.buff.ClassResistBuff;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;

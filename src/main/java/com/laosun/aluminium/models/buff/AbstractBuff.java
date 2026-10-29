@@ -2,7 +2,7 @@ package com.laosun.aluminium.models.buff;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import com.laosun.aluminium.models.event.AttackEvent;
 import com.laosun.aluminium.models.event.SkillCastEvent;
 import com.laosun.aluminium.models.skill.Skill;

@@ -2,7 +2,7 @@ package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.entity.CanHit;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;

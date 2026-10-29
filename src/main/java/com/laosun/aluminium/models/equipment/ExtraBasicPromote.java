@@ -1,8 +1,9 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.equipment;
 
 
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.utils.AttributeBuilder;
+import com.laosun.aluminium.models.DoubleValue;
 
 /**
  * Extra flat and percentage bonuses added to a character's base stats.

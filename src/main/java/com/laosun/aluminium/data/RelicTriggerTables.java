@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Loads relic-set trigger rules from {@code resources/game/relic_sets/<setId>.json}.

@@ -1,10 +1,11 @@
 package com.laosun.aluminium.models.energy;
 
-import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.entity.CanHit;
+import com.laosun.aluminium.models.damage.Damage;
 import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.Set;
+import com.laosun.aluminium.models.state.Resource;
 
 /**
  * The {@link EnergyProvider} for characters that do not use conventional energy: all 5

@@ -3,7 +3,7 @@ package com.laosun.aluminium.test.content.relics;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.entity.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import com.laosun.aluminium.models.equipment.Relic;
 
 /**
  * Relic 31's CONDITION half: "若装备者不是队伍第一名".
