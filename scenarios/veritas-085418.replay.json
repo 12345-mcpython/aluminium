@@ -146,7 +146,7 @@
       "caster": "memosprite",
       "slot": 8,
       "target": 1,
-      "note": "⚠ NOT DRIVABLE: 长夜's 强化普攻 (skill_segments.json servants.11413 Skill11/Skill12, slot_guess 8) has NO row in skills.json - the servant's slots imported there are [1, 3, 5, 6, 7]. The capture proves the slot exists (two targets, 3.0 x 生命上限 on the main and 1.5 on the other = the 2:1 blast split). Registered, not guessed."
+      "note": "⚠ NOT DRIVABLE, and 2026-10-29 found out why: upstream the servant's data slots come from SkillID % 100 (generate_data.py: skill['SkillID'] % 100), and 11413's rows are 1141301/1141303/1141305/1141306/1141307 ⇒ slots [1, 3, 5, 6, 7]. **Slot 8 does not exist upstream** - the old 'slot_guess 8' was the guess, not a generator omission. The candidate row for this cast is 1141307 (SkillTriggerKey Skill11), and driving it as slot 7 does work, but it disagrees with the capture in two ways at once: its Lv10 row is [0.168, 0.084] against the capture's 3.0 / 1.5 (17.86x), and its SkillEffect is AoEAttack while the capture is a 2:1 blast on two targets. So that row is NOT this cast's number - registered, not approximated, and the plan keeps the cast out of the gate."
     },
     {
       "cast": 8,
