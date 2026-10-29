@@ -94,6 +94,14 @@ public final class Constant {
     public static final Map<Integer, EnemySkillData> ENEMY_SKILLS;
 
     /**
+     * Named predicates ({@code predicates.json}): a predicate name to its tree. Read by {@code Predicates} when a rule
+     * says {@code {"type": "ref", "ref": "<name>"}}, so one guard can be declared once and referenced everywhere.
+     *
+     * <p>Shipped with the data, not with the code: the same file a data pack would add.
+     */
+    public static final Map<String, com.laosun.aluminium.beans.PredicateSpec> PREDICATES;
+
+    /**
      * Stage table ({@code stage.json}): {@code stage_id to }{@link StageBean}. Lazily loaded.
      *
      * <p>Why it is not shoved into the static block like the other data tables: {@code stage.json} is
@@ -664,6 +672,7 @@ public final class Constant {
         HARD_LEVEL_GROUPS = data.hardLevelGroups();
         MONSTER_CONFIGS = data.monsterConfigs();
         BREAKING_RATE = data.breakingRate();
+        PREDICATES = data.predicates();
         ENEMY_SKILLS = data.enemySkills();
     }
 }
