@@ -337,6 +337,10 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 #    ⚠⚠ 必须带 --rerun-tasks：不带它时 Gradle 会报 `Task :test UP-TO-DATE` 并把**上一次的
 #    XML 原样写回**（几秒就结束）⇒ 你读到的是一份**看起来全新**的旧结果。
 #    判据是 Gradle 那一行写着 executed（真跑要十几秒），不是 XML 的文件时间。
+#    ⚠ **读文档的守卫要把文档声明成输入**（`build.gradle`：`inputs.file('AGENT.md')` / `inputs.file('TRIGGER.md')`）✓
+#    —— 否则**只改文档**时 `:test` 是 UP-TO-DATE，守卫**根本不跑** ✓。2026-10-29 实测：改坏 `TRIGGER.md` §4 的表，
+#    新守卫仍然绿 ✓；补上 `inputs.file` 后同一处改动**三例全红** ✓。⚠ 这也意味着旧的那条 `TriggerVocabularyDriftTest`
+#    此前在"只改 TRIGGER.md"的情形下一直是**没跑**的 ✗。
 .\gradlew.bat test --rerun-tasks --console=plain
 
 # 2) 全部 demo 输出，与基线**内容级**对比（不是哈希，见 §6.3）
@@ -1267,6 +1271,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 
 | 规矩 | 守卫 |
 |---|---|
+| **文档与代码的闭集不许分叉**（`TRIGGER.md` §3.5 变量/前缀 ↔ 解析器；§4 事件 ↔ `TriggerEvent`，**双向 + 标题计数**） | `TriggerVocabularyDriftTest`、`TriggerEventTableDriftTest` |
 | 伤害流水线的公共口子不变（只有 1 个公共方法收 `Damage`） | `DamagePipelineTest` |
 | 三层结构的可扩展性标准（不动引擎一行、只换策略） | `SkillPointPolicyExtensibilityTest` |
 | 内容里的数字必须用**引擎自己的单位** | `UnitDisciplineTest` |
