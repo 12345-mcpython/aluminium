@@ -1151,9 +1151,19 @@ public final class BattleReplay {
             } else {
                 spec.setLevel(accountLevel(spec.getActor(), spec.getCaster(), slot));
             }
-            Integer pool = resourcePoolOf(skillId == 0 ? -1 : cid, slot, spec.getLevel(), percentage);
+            // A `per_resource_share` row states its share as `parameter x points`, so the capture's own percentage is the
+            // points divided by the parameter - and the LEVEL is whichever row makes that a whole number. Both are read
+            // off the capture; a row that states nothing leaves them alone.
+            int[] pool = perResourcePoolOf(skillId == 0 ? -1 : cid, slot, percentage);
             if (pool != null) {
-                spec.setResources(java.util.Map.of(resourceNameOf(skillId == 0 ? -1 : cid, slot), (double) pool));
+                spec.setLevel(pool[0]);
+                spec.setResources(java.util.Map.of(resourceNameOf(skillId == 0 ? -1 : cid, slot), (double) pool[1]));
+            } else {
+                Integer stepped = resourcePoolOf(skillId == 0 ? -1 : cid, slot, spec.getLevel(), percentage);
+                if (stepped != null) {
+                    spec.setResources(java.util.Map.of(resourceNameOf(skillId == 0 ? -1 : cid, slot),
+                            (double) stepped));
+                }
             }
             spec.setTarget(group.firstTarget() > 0 ? enemyByHealth(plan, group.firstTarget()) : null);
             spec.setNote("derived from cast_index " + group.index() + " (" + group.kind() + ") / skill " + skillId);
@@ -1581,7 +1591,54 @@ public final class BattleReplay {
      */
     private static String resourceNameOf(int cid, int slot) {
         com.google.gson.JsonObject spec = skillEffectOf(cid, slot);
-        return spec.getAsJsonObject("resource_share").get("resource").getAsString();
+        com.google.gson.JsonObject share = spec.has("resource_share")
+                ? spec.getAsJsonObject("resource_share")
+                : spec.getAsJsonObject("per_resource_share");
+        return share.get("resource").getAsString();
+    }
+
+
+    /**
+     * The {@code (level, points)} a {@code per_resource_share} row implies, or {@code null} when the row is not that shape
+     * or no level makes the points a whole number.
+     *
+     * <p>Why the level comes from here: the share is {@code parameter x points}, so a level whose parameter divides the
+     * capture's percentage into an integer is a candidate, and the capture's three casts of 11413's slot 7 all land on
+     * Lv1 (25 / 34 / 60 points) - the account's memosprite level 6 would need 12.5 points for cast 18, which is not a
+     * number of points the game can hold.
+     *
+     * @param cid        the row's character or servant id
+     * @param slot       the data slot
+     * @param percentage the capture's instance share
+     * @return {@code {level, points}}, or {@code null}
+     */
+    private static int[] perResourcePoolOf(int cid, int slot, double percentage) {
+        com.google.gson.JsonObject spec = skillEffectOf(cid, slot);
+        if (spec == null || !spec.has("per_resource_share") || percentage <= 0) {
+            return null;
+        }
+        com.google.gson.JsonObject share = spec.getAsJsonObject("per_resource_share");
+        int main = share.get("main_param").getAsInt();
+        com.google.gson.JsonArray rows = parameterRows(cid, slot);
+        if (rows == null) {
+            return null;
+        }
+        for (int level = 1; level <= rows.size(); level++) {
+            com.google.gson.JsonArray row = rows.get(level - 1).getAsJsonArray();
+            if (main >= row.size()) {
+                return null;
+            }
+            double param = row.get(main).getAsDouble();
+            if (param <= 0) {
+                continue;
+            }
+            double points = percentage / param;
+            double rounded = Math.rint(points);
+            if (rounded >= 1 && Math.abs(points - rounded) <= 1e-6) {
+                return new int[]{level, (int) Math.round(rounded)};
+            }
+        }
+        return null;
     }
 
 }
