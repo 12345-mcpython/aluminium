@@ -746,6 +746,16 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 > ⚠ **`验收` 里提到的测试，有的是"已经写好的守卫"、有的是"做了这件事时才该出现的验收条件"** ✓ ——
 > 两者别混 ✗。★ 标的是**现在真的存在**的守卫（2026-10-16 逐个 `Get-ChildItem` 核过 ✓）。
 
+#### 🚧 1413 的「忆灵离场后再召唤」路径未走通（2026-10-30 实测，**内容缺口**）
+
+在 2026-10-30 那份捕获里，「长夜」在战斗中**离场后又被重新召唤**（cast 69 之前它不在场，而捕获显示它又开始行动）。工具按捕获把它重新召唤时，引擎报错：
+
+```
+Effect targets "summon" but Evernight has no summon on the field;
+gate the rule with `self_summon_count >= 1` so it only fires when there is one
+```
+
+⇒ **不是驱动器的 bug**：她有一条规则的 `target` 指向 `summon` 而没有 `self_summon_count >= 1` 的门；重新召唤的瞬间（召唤物尚未落场）它就开火了。引擎的报错是对的。修法明确：给那条规则加门，并补一条「离场→再召唤」的判据；在那之前该 cast 记为 **not drivable**（不猜）。
 #### B 层：敌人（只有少数怪有技能，其余全是平 A）
 
 | 任务 | 现状 | 验收 | 依赖 |
