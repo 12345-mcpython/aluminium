@@ -1,7 +1,7 @@
 {
   "name": "veritas 2026-10-30 — derived from the payload",
   "capture": "src/test/resources/captures/veritas-2026-10-30.json",
-  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。  ⚠ 事实（2026-10-30 由录屏者确认）：角色 Lv80、怪物 Lv95、**四个人都开了秘技**，战斗由 1409 进入 ⇒ 四人按 `states` 种入 `秘技`，让各自的 BATTLE_START 秘技规则开火。⚠ 「行号」不再手写：由**账号存档**给出（`game/data/account.json`：角色 `skills.basic/skill/ult/talent`、忆灵 `memosprite.skill` —— 四人都是 6/10 那档）。payload 不携带行号（它只给 `damage_percentage`，那是\"行参数 × 分裂比 × 资源台阶\"的有效份额）。",
+  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。  ⚠ 事实（2026-10-30 由录屏者确认）：角色 Lv80、怪物 Lv95、**四个人都开了秘技**，战斗由 1409 进入 ⇒ 四人按 `states` 种入 `秘技`，让各自的 BATTLE_START 秘技规则开火。⚠ 「行号」不再手写：由**账号存档**给出（`game/data/account.json`：角色 `skills.basic/skill/ult/talent`、忆灵 `memosprite.skill` —— 四人都是 6/10 那档）。payload 不携带行号（它只给 `damage_percentage`，那是\"行参数 × 分裂比 × 资源台阶\"的有效份额）。 ⚠ `levels` 只写**捕获反推出来的**那几发：工具会打印 `level: the capture reads this row at N, not M`（引擎对行参数线性 ⇒ 一次实测即可定行）。1409 的 E6 抬技能等级由引擎自己的 `level_convention` 处理 ✓；忆灵技能是否被抬是**逐角色**的（1413 的「长夜」= 8、1415 的「德谬歌」= 6，一个\"6+2\"的统一规则会修好前者、弄坏后者 ✗ ⇒ 不猜，照反推写）。",
   "party": [
     {
       "owner": 1409,
@@ -63,5 +63,9 @@
         "秘技"
       ]
     }
-  ]
+  ],
+  "levels": {
+    "1": 8,
+    "16": 8
+  }
 }

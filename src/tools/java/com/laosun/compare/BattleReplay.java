@@ -1285,6 +1285,10 @@ public final class BattleReplay {
         if (key == null || !levels.has(key)) {
             return null;
         }
+        // The archive's number is the BASE level. Whether the game reads higher (1413's 「长夜」 is 6 in the archive
+        // while the capture reads its row at 8, and 1415's 「德谬歌」 is 6 and the capture reads 6) is per character and
+        // per slot, so the tool does not guess: it prints the level the capture implies (see `levelThatFits`) and the
+        // plan states it. Measured the hard way - a blanket "+2 for ascension 6" fixed 1413 and broke 1415.
         return levels.get(key).getAsInt();
     }
 
@@ -1369,6 +1373,21 @@ public final class BattleReplay {
             case "TALENT" -> 4;
             default -> 0;
         };
+    }
+
+
+    /**
+     * The levels a character's ascension bonuses add to its 忆灵's skill rows: 0 at ascension 0-1, then one per unlocked
+     * node, i.e. 2 at ascension 6.
+     *
+     * <p>Measured, not assumed: 1413's archive level is 6 and the capture's row is 8 (level 8 reproduces the cast, level 6
+     * is 0.83x off), and her ascension is 6.
+     *
+     * @param ascension the character's ascension
+     * @return the bonus
+     */
+    private static int ascensionBonus(int ascension) {
+        return Math.min(2, Math.max(0, ascension / 2));
     }
 
 }
