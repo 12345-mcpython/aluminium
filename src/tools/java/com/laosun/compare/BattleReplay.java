@@ -950,8 +950,20 @@ public final class BattleReplay {
      * two readings produced it; a run that reports "differs" leaves the next reader to re-derive it.
      */
     private static BaseVerdict compareBases(CaptureFlow.Cast group, List<Double> engineBases) {
-        if (group == null || group.percentage() == 0) {
+        if (group == null) {
             return new BaseVerdict("base-n/a", false, false);
+        }
+        if (group.percentage() == 0) {
+            // A rule-delivered instance states NO share (`damage_percentage` is 0), but it states the absolute base it was
+            // built from - `damage_value`, which equals `raw_damage_before_modifiers` on every such event. The engine books
+            // that same absolute amount as the instance's base (Battle.applyAdditionalDamage hands it to `Damage`), so the
+            // two can be compared directly; this used to be skipped as "no share to compare".
+            if (group.hitBases().isEmpty() || engineBases.isEmpty()) {
+                return new BaseVerdict("base-n/a", false, false);
+            }
+            return sameValues(group.hitBases(), engineBases)
+                    ? new BaseVerdict("base-ok (rule absolute)", true, true)
+                    : new BaseVerdict("DIFFERS (rule absolute)", false, true);
         }
         List<Double> capture = group.hitBases();
         if (capture.isEmpty() || engineBases.isEmpty()) {
