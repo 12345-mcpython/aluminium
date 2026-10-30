@@ -809,6 +809,8 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 **变体清单（tbgd，`Servant_CyreneServant_00_Skill02_Phase02` 的 OnStart[9..18]）**：`_Hyacine` / `_Harscyline(+_Sub)` / `_Evernight` / `_DanHengPT` / `_Castorice` / `_Phainon` / `_Player` / `_Tribbie` / `_Mydeimos` / `_Aglaea(+_Sub)`，各自由 `ByCompareCharacterID` 选中对应 cid 的角色后 `AddModifier`。⇒ 「获得增益效果」是**每人一个专属变体**，4 人队里出现 3 个，正是因为队里只有 3 个 cid 有对应变体。
 
+**2026-10-30 已落地一半（可数标记）**：`memosprite_ode_marks_the_allies_it_buffs` —— 德谬歌忆灵技（数据槽 1）给 **1409 / 1413 / 1415（self）** 施加可数标记 `德谬歌忆灵技增益`，**不给 1512**（他没有变体，这正是捕获里 3/4 的原因）。判据 `CyreneOdeMarksTheAlliesTest`：直接放德谬歌的忆灵技后，三人有标记、第四人没有 ⇒ 星魂 2 数到的 n = 3 ✓。⚠ 标记是"谁拿到过"，**不是**那三个变体各自的效果（各自效果仍缺）。
+
 **收口条件（两步）**：① 引擎要能"数持有某 buff 的我方单位"（现有谓词只有 `debuff_count`，没有队伍侧的 `ally_buff_count`）；② `DAMAGE` 的 `percent` 要能加一项 `per_count × n`（上限 0.24）。有了这两样，`zone_true_damage_rider` 就写成 `0.24 + 0.06 × n`，19~21 条 0.42 rider 一次性进对账。补法：按"持有德谬歌增益的我方角色数"上调该规则的 `percent`，上限 +0.24；1415 在本账号是 **E2** ✓，所以这条在实战里一直生效。
 
 #### ⏳ 最后 3 行 differ 是「这一发能选中谁」，而 payload 的 `field.targetable` 还不能直接用（2026-10-30 实测）

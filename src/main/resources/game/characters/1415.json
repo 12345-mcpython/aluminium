@@ -831,6 +831,47 @@
       ],
       "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时**可激活终结技**，处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技」。",
       "note": "⭐ **2026-10-02 实测**：`isUltraReady` 对她在 **0 / 12 / 12+涟漪 / 24** 四种情形下**都是 false** —— 原因是结构性的：`CharacterFactory` 给她 `NoConventionalEnergyProvider`，而那个类**没有覆盖 `canCastUltra`**，默认实现要求她**没有的能量条** ⇒ 她永远不可放。⭐ 而上一轮刚好把 `ULTIMATE_ACTIVATED_STATE`（`终结技已激活`）加进了引擎且 `isUltraReady` 认它 ⇒ 这两句**不需要再改引擎**。  ⭐ 涟漪档（阈值 12 由数据确认：`141503` 的 Lv10 行 `[1, 24, 0.5, 12]`）。"
+    },
+    {
+      "id": "memosprite_ode_marks_the_allies_it_buffs",
+      "on": "CAST_SETUP",
+      "when_predicates": [
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "is_summon": true
+          }
+        },
+        {
+          "type": "event",
+          "json": {
+            "from_skill_id": 1
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "德谬歌忆灵技增益",
+          "permanent": true,
+          "target": "ally_cid:1409"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "德谬歌忆灵技增益",
+          "permanent": true,
+          "target": "ally_cid:1413"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "德谬歌忆灵技增益",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 星魂 2:「每有 1 名不同的我方角色获得德谬歌忆灵技的增益效果，我方目标通过战技的结界造成的真实伤害倍率提高 6%，最多提高 24%」。「增益效果」按文档定义是「对战斗有增益效果的所有持续状态」，游戏里它按 cid 分变体（tbgd：`MServant_CyreneServant_00_AmazingBuff_*`，`ByCompareCharacterID` 选中对应角色）。捕获里恰好三人持有：1409(`_Hyacine`)、1413(`_Evernight`)、1415(通用 `AmazingBuff`)，**1512 没有变体**。",
+      "note": "⚠ 这是**可数标记**，不是那三个变体各自的真实效果（各自效果是独立内容，尚未建模）。它只服务于星魂 2 的「有几名拿到」，所以按捕获的三人名单施加：1409 / 1413 / 1415（self）。⚠ 不要用 `all_allies`：那会把 1512 也算进去（他没变体），n 会从 3 变 4、倍率从 0.42 变 0.48 —— 捕获里 21 条 rider 都写着 0.42。"
     }
   ]
 }
