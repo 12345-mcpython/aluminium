@@ -651,6 +651,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | `stage.json` | `stage_id → {type, hard_level_group, level, monster:[...]}`（**懒加载**） | `103201`：level 29 |
 | `monster_attack_modify_ratio.json` | **本项目补丁**（相当一部分怪 ≠1，要数就现数） | 见 §6.1(e) 陷阱 2 |
 | `enemy_skills.json` | **自建**，只覆盖演示怪，倍率是猜的 | 见 §6.1(e) 陷阱 7 |
+| `account.json` | **本机生成**（`game/data/` 被 gitignore，与 `dump_data.json` 同）：账号存档 `archive_output-*.json` 的摘要 —— `characters[cid] = {level, ascension, eidolon, skills{basic,skill,ult,talent}, memosprite{skill,talent}, traces}`、`light_cones[cid] = {rank, level}` | 四人 `skills` / `memosprite`：1409 `{6,10,10,10}` / `{6,6}`、1413 `{2,10,10,10}` / `{6,6}`、1415 `{6,10,10,10}` / `{6,6}`、1512 `{1,6,10,10}` / `{6,6}`。**行号从此读它**（`BattleReplay.accountLevel`），不再手写；捕获不携带行号 |
 | `skill_effects.json` | **自建**：非伤害技能怎么读参数（`effect` / `scale` / `params` / `turns_param`），外加伤害**段数** `segments` | §4.3 的段数条目 |
 | `dump_data.json` | `Benchmark` 用的预计算遗器套表（**唯一读者**，不在 `Constant` 的加载链里） | — |
 
