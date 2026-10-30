@@ -571,8 +571,11 @@ public final class BattleReplay {
                 + "already matched as the row's own hit), and it is NOT the 24% rider of any hit the capture lists: the "
                 + "engine's rider follows only instances that count as attacks, and rule-delivered damage does not "
                 + "(which is what the game does too). Its parent is therefore a hit the payload does not carry;");
-        System.out.println("  · a \"Break\" group's number is a break instance, whose base the engine derives from "
-                + "toughness/level; the capture's 10883.71 sits between the engine's 6464.82 and 12929.64.");
+        System.out.println("  · a \"Break\" group's number is NOT a formula gap: fed the toughness the bar actually gave "
+                + "(25 points, level 80, break effect 0.15552 from the payload itself) the engine answers 10883.708573 "
+                + "against the capture's 10883.708128 - 4e-8 relative, pinned by BreakBaseAgainstCaptureTest. The payload "
+                + "carries no toughness bar, so the window's BAR STATE is what cannot be reproduced: the replay's own "
+                + "breaks land at 30 and 15 consumed because that is where its bars empty.");
         return strict && differed > 0 ? 1 : 0;
     }
 
