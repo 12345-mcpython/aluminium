@@ -3069,6 +3069,27 @@ public class Battle {
     }
 
     /**
+     * Puts one more unit on the enemy side, mid-fight - a reinforcement, or a recorded fight's later arrival.
+     *
+     * <p><b>Why it exists.</b> The enemy camp used to be fixed at construction: {@link #enemies} is an unmodifiable view of
+     * the roster, so a caller could read it but not grow it. A capture, though, states WHEN each enemy first takes a hit -
+     * measured on the 2026-10-30 fight, its nine enemies arrive over six moments (cast 1, 9, 52, 58, 85, 87) - and an AoE's
+     * share depends on how many targets exist when it lands. Laying them all out at turn one is what made those casts
+     * disagree with the recorded numbers.
+     *
+     * <p>Deliberately minimal: this adds the unit to the camp and nothing else. It does not announce a wave, does not fire
+     * {@code WAVE_START} and does not rebuild the turn order - a caller that needs the wave bookkeeping calls
+     * {@link #noteWaveMonster(CanHit)} the way {@code WaveManager} does.
+     *
+     * @param enemy the newcomer; it joins at the end of the camp, so the existing indices stay put
+     */
+    public void addEnemy(CanHit enemy) {
+        if (enemy != null) {
+            enemyRoster.add(enemy);
+        }
+    }
+
+    /**
      * The enemies that entered with the current wave.
      *
      * @return the wave's monsters
