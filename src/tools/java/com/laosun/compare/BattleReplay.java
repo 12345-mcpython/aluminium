@@ -538,9 +538,10 @@ public final class BattleReplay {
                         row.cast, row.actor, row.kind, captureCell, row.captureDamage, "-", "-", "not in plan");
                 continue;
             }
-            // A 忆灵 that left the field and comes back: the ENGINE can do it (EvernightResummonTest), but driving 1413's
-            // cast 69 still trips `memosprite_taunt_aggro` - a SUMMONED rule whose `target: summon` cannot see the summon it
-            // is celebrating. Named in AGENT.md; the row stays "not drivable" rather than being papered over.
+            // A 忆灵 that left the field and comes back: the ENGINE can do it (EvernightResummonTest), but a re-summon in a
+            // fight that has already run trips 1413's arrival rule `memosprite_advances_when_it_arrives` - its `target:
+            // summon` resolves to nothing even though the unit was just admitted (measured, named by the engine's own
+            // message). Registered in AGENT.md; the row stays "not drivable" rather than being papered over.
             for (Enemy latecomer : latecomers) {
                 int index = enemies.indexOf(latecomer);
                 Integer arrivesAt = index < 0 ? null : plan.getEnemies().get(index).getArrivesAt();
