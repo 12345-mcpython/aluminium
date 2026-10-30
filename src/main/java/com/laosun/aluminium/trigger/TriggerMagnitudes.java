@@ -488,6 +488,36 @@ final class TriggerMagnitudes {
     }
 
     /**
+     * The share term of "per ally holding a state": {@code percentPerAllyState x min(cap, count)}, or 0.
+     *
+     * <p>Reader: 1415's Eidolon 2 - 「每有 1 名不同的我方角色获得德谬歌忆灵技的增益效果，我方目标通过战技的结界造成的真实伤害倍率
+     * 提高 6%，最多提高 24%」. Measured on the 2026-10-30 fight: three allies held it (1409 / 1413 / 1415, and NOT 1512) and the
+     * recorded rider reads 0.42 where the row says 0.24 - {@code 0.24 + 3 x 0.06}, additive; a multiplicative reading would give
+     * 0.24 x 1.24 = 0.2976, which no cast shows.
+     *
+     * @param effect the effect, which states the per-ally share, the state and the cap
+     * @param ctx    the trigger context (its battlefield is scanned)
+     * @return the term to add to the share, in the same units
+     */
+    public static double allyStateTerm(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getPercentPerAllyState() == null || effect.getAllyState() == null
+                || effect.getAllyState().isBlank() || ctx == null || ctx.battle() == null) {
+            return 0;
+        }
+        int count = 0;
+        for (com.laosun.aluminium.entity.Character ally : ctx.battle().characters()) {
+            if (ally.isDeath() || ally.getBuffManager() == null) {
+                continue;
+            }
+            if (ally.getBuffManager().hasState(effect.getAllyState().trim())) {
+                count++;
+            }
+        }
+        int cap = effect.getAllyStateCap() == null ? 4 : effect.getAllyStateCap();
+        return effect.getPercentPerAllyState() * Math.min(cap, count);
+    }
+
+    /**
      * The magnitude's share: a literal {@code percent}, or one of the four spellings that read it off a skill row / a
      * counter - <b>and, when both kinds are stated, the product</b> ("that share's X%").
      *
