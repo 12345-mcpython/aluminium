@@ -223,6 +223,19 @@ public class SkillEffectSpec {
          */
         @SerializedName("index")
         private int index;
+
+        /**
+         * Shares of this part's own multiplier, when the part is dealt in several instances - {@code [0.3, 0.7]} reads as
+         * "this part's share is split 30% / 70% over the same targets".
+         *
+         * <p>Reader: 1415's enhanced basic (slot 8) at Lv6, whose row is 0.30. The capture deals it as one 0.30 on the aimed
+         * enemy, then 0.09 on every enemy, then 0.21 on every enemy - the area half split 30/70 - which is seven instances
+         * against three enemies and three against one.
+         *
+         * <p>Absent / empty = one instance carrying the whole share, which is every row that existed before this field.
+         */
+        @SerializedName("ratios")
+        private java.util.List<Double> ratios;
     }
 
     /**

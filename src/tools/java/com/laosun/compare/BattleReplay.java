@@ -601,6 +601,10 @@ public final class BattleReplay {
                             latecomer.getName(), row.cast);
                 }
             }
+            // The preludes run BEFORE the skill is resolved: 1415's ultimate installs her enhanced basic into the COMMON
+            // slot, and a skill looked up first would still be the plain one (measured: cast 59 drove slot 1 while cast 76,
+            // later, drove slot 8 - the replacement from 59's own prelude only showed up on the next cast).
+            runPreludes(row, battle, byCid, plan, enemies);
             Skill skill = skillOf(row.spec, battle, byCid);
             if (skill == null) {
                 undrivable++;
@@ -612,7 +616,6 @@ public final class BattleReplay {
             CanHit caster = casterOf(row.spec, battle, byCid);
             // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
             // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
-            runPreludes(row, battle, byCid, plan, enemies);
             applyStates(row, battle, byCid, plan);
             applyCastPanel(row, battle, byCid);
             // The bars are put where the capture had them BEFORE this cast, not only after it: an add that left the field
@@ -1399,7 +1402,8 @@ public final class BattleReplay {
         String key = "memosprite".equals(caster)
                 ? (slot == 4 ? "talent" : "skill")
                 : switch (slot) {
-                    case 1 -> "basic";
+                    // Slot 8 is the enhanced basic: same row, raised by the ultimate - so the basic level is its level.
+                    case 1, 8 -> "basic";
                     case 2 -> "skill";
                     case 3 -> "ult";
                     case 4 -> "talent";
@@ -2041,6 +2045,10 @@ public final class BattleReplay {
             CanHit target = prelude.getTarget() == null || prelude.getTarget() < 1
                     || prelude.getTarget() > enemies.size() ? null : enemies.get(prelude.getTarget() - 1);
             battle.castImmediate(skill, actor, target == null ? List.of() : List.of(target));
+            // Its effects must be IN PLACE before the compared cast: 1415's ultimate installs her enhanced basic into the
+            // COMMON slot, and that lands with the request queue - without this settle the very next cast still read the
+            // plain basic (measured: cast 59 drove slot 1 while cast 76, later, drove slot 8).
+            battle.processRequests();
             System.out.printf(Locale.ROOT, "     prelude:  %d casts %s before cast %d (settles no damage, so the capture "
                     + "cannot name it) - not compared%n", prelude.getActor(), prelude.getSlot(), row.cast);
         }
