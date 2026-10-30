@@ -538,10 +538,18 @@ public final class BattleReplay {
                         row.cast, row.actor, row.kind, captureCell, row.captureDamage, "-", "-", "not in plan");
                 continue;
             }
-            // A 忆灵 that left the field and comes back: the ENGINE can do it (EvernightResummonTest), but a re-summon in a
-            // fight that has already run trips 1413's arrival rule `memosprite_advances_when_it_arrives` - its `target:
-            // summon` resolves to nothing even though the unit was just admitted (measured, named by the engine's own
-            // message). Registered in AGENT.md; the row stays "not drivable" rather than being papered over.
+            // A 忆灵 can leave the field and come back (1413's slot 7 dismisses 长夜, and the capture shows it acting again
+            // before cast 69), so a memosprite cast whose summon is missing summons it first. The arrival event is buffered
+            // until the next settle, so `Battle.fireSummoned` now skips an arrival whose unit already left - without that,
+            // this re-summon fired "when summoned" for a corpse and every rule naming `summon` threw.
+            if ("memosprite".equalsIgnoreCase(row.spec.getCaster())) {
+                Character owner = byCid.get(row.spec.getActor());
+                if (owner != null && battle.memospriteOf(owner) == null) {
+                    battle.summonMemosprite(owner);
+                    System.out.println("     re-summoned: the 忆灵 of " + row.spec.getActor()
+                            + " had left the field, and the capture shows it acting again before cast " + row.cast);
+                }
+            }
             for (Enemy latecomer : latecomers) {
                 int index = enemies.indexOf(latecomer);
                 Integer arrivesAt = index < 0 ? null : plan.getEnemies().get(index).getArrivesAt();
@@ -1777,7 +1785,10 @@ public final class BattleReplay {
             if (delta > 0) {
                 enemy.heal(delta);
             } else if (delta < 0) {
-                enemy.takeDamage(-delta, false);
+                // `mayDie: true`: the capture's `hp_after` is 0 for what it KILLED, and a bar that is merely set to 0 while
+                // the unit stays on the field would keep it in every later cast's target list (measured: cast 69 faced 3
+                // enemies in the replay and 1 in the capture).
+                enemy.takeDamage(-delta, true);
             }
         }
     }

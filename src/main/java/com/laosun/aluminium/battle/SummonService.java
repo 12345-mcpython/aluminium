@@ -92,7 +92,7 @@ public final class SummonService {
         Summon memosprite = SummonFactory.memosprite(master, battle::partyResourceValue);
         memosprite.setMaster(master);
         battle.addCombatant(memosprite);
-        onSummoned.accept(memosprite);
+onSummoned.accept(memosprite);
         return memosprite;
     }
 
