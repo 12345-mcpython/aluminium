@@ -191,6 +191,14 @@ public final class BattleReplay {
 
         /** Element name ({@code FIRE}) to the payload's {@code resistance} entry. */
         private Map<String, Double> resistance = new LinkedHashMap<>();
+
+        /**
+         * The payload's {@code enemies[uid].properties.MaxStance} - the bar a break empties.
+         *
+         * <p>Absent = 0, i.e. no bar: an enemy that cannot be broken. The older payload carried no toughness at all,
+         * which is why break damage could only be checked by back-solving its number.
+         */
+        private Double toughness;
     }
 
     /**
@@ -259,11 +267,14 @@ public final class BattleReplay {
         Path planPath = null;
         boolean strict = false;
         boolean detail = false;
+        boolean derive = false;
         for (String arg : args) {
             if ("--strict".equals(arg)) {
                 strict = true;
             } else if ("--detail".equals(arg)) {
                 detail = true;
+            } else if ("--derive".equals(arg)) {
+                derive = true;
             } else if (!"replay".equals(arg) && !arg.startsWith("--")) {
                 planPath = Path.of(arg);
             }
@@ -279,12 +290,12 @@ public final class BattleReplay {
             System.out.println("replay: cannot read " + planPath.toAbsolutePath() + " (" + e + ")");
             return 2;
         }
-        if (plan == null || plan.getCapture() == null || plan.getCasts().isEmpty()) {
-            System.out.println("replay: " + planPath + " needs a capture and at least one cast");
+        if (plan == null || plan.getCapture() == null || (plan.getCasts().isEmpty() && !derive)) {
+            System.out.println("replay: " + planPath + " needs a capture and at least one cast (or --derive)");
             return 2;
         }
         try {
-            return replay(plan, planPath, strict, detail);
+            return replay(plan, planPath, strict, detail, derive);
         } catch (RuntimeException e) {
             System.out.println("replay: the plan could not be driven: " + e);
             return 2;
@@ -305,6 +316,19 @@ public final class BattleReplay {
      * @return see {@link #run}
      */
     static int replay(Plan plan, Path planPath, boolean strict, boolean detail) {
+        return replay(plan, planPath, strict, detail, false);
+    }
+
+    /**
+     * The same, optionally deriving the cast table (and the enemy list) from the payload instead of the plan.
+     *
+     * <p>Why: a payload that states {@code cast_index} and {@code skill_id} already names every cast and the row it used
+     * ({@code DerivedCasts}), and one that states each enemy's {@code properties} already names its panel and its toughness.
+     * The plan then only has to say WHO is fighting - the party - and what the tool drives is a read of the capture.
+     *
+     * @param derive whether to derive {@code casts} (and, when the plan names none, the enemies) from the payload
+     */
+    static int replay(Plan plan, Path planPath, boolean strict, boolean detail, boolean derive) {
         JsonObject capture = readCapture(plan.getCapture());
         List<CaptureFlow.Cast> flow = CaptureFlow.group(capture.getAsJsonArray("damage_events"));
         System.out.println("capture:  " + plan.getCapture());
@@ -314,6 +338,14 @@ public final class BattleReplay {
             System.out.println("note:     " + plan.getNote());
         }
 
+        if (derive) {
+            deriveEnemies(plan, capture);
+            deriveCasts(plan, flow, capture);
+            System.out.println("derived:  " + plan.getCasts().size() + " cast(s) from the payload's cast_index; "
+                    + plan.getEnemies().size() + " enemy(ies) from its enemy map");
+        }
+
+        java.util.Set<Integer> seenGroups = new java.util.LinkedHashSet<>();
         Map<Integer, CastSpec> byCast = new LinkedHashMap<>();
         for (CastSpec spec : plan.getCasts()) {
             if (spec.getCast() == null) {
@@ -350,7 +382,11 @@ public final class BattleReplay {
                         + group.firstTarget() + ", which is none of the plan's enemies");
                 return 2;
             }
-            if (spec.getTarget() != null && spec.getTarget() != captured) {
+            // One plan entry names one cast; a payload that states cast_index may still settle SEVERAL cast-classified
+            // groups under one index (1413's ultimate: the servant's swing, then the ultimate's own hit). The entry's
+            // target belongs to the first of them, so the check only applies there - the others are driven at the same
+            // enemy, and a mismatch on them would compare two different groups against one number.
+            if (seenGroups.add(group.index()) && spec.getTarget() != null && spec.getTarget() != captured) {
                 System.out.println("replay: cast " + group.index() + " was aimed at enemy " + captured
                         + " in the capture but at " + spec.getTarget() + " in the plan");
                 return 2;
@@ -395,6 +431,12 @@ public final class BattleReplay {
                     100, spec.getSpeed() == null ? 100 : spec.getSpeed());
             enemy.setLevel(spec.getLevel() == null ? 95 : spec.getLevel());
             enemy.setDamageResist(resistances(spec.getResistance()));
+            if (spec.getToughness() != null) {
+                // The bar a break empties: the newer payload states it per enemy (properties.MaxStance), and without it a
+                // break can only be checked by back-solving the number the capture reports.
+                enemy.setStance(spec.getToughness());
+                enemy.setMaxStance(spec.getToughness());
+            }
             enemy.heal(enemy.getMaxHp());
             enemies.add(enemy);
             System.out.printf(Locale.ROOT, "  %-18s HP %-16.6f DEF %-14.6f level %d%n",
@@ -963,4 +1005,153 @@ public final class BattleReplay {
             throw new IllegalArgumentException("cannot read " + path + ": " + e, e);
         }
     }
+
+    // ==================================================================
+    // Derivation: the payload states the cast table and the enemy panels
+    // ==================================================================
+
+    /**
+     * Fills the plan's enemies from the payload's own {@code enemies} map, for the ones that were actually fought.
+     *
+     * <p>Only enemies a damage event names are used: the map also lists units that never took a hit, and a plan that
+     * carried them would make the action bar fight a crowd the capture never engaged.
+     *
+     * @param plan    the plan to fill
+     * @param capture the parsed capture
+     */
+    private static void deriveEnemies(Plan plan, com.google.gson.JsonObject capture) {
+        com.google.gson.JsonObject enemies = capture.getAsJsonObject("enemies");
+        if (enemies == null) {
+            return;
+        }
+        java.util.LinkedHashMap<Long, EnemySpec> derived = new java.util.LinkedHashMap<>();
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            long uid = element.getAsJsonObject().getAsJsonObject("target").get("uid").getAsLong();
+            if (derived.containsKey(uid) || !enemies.has(String.valueOf(uid))) {
+                continue;
+            }
+            com.google.gson.JsonObject unit = enemies.getAsJsonObject(String.valueOf(uid));
+            com.google.gson.JsonObject properties = unit.getAsJsonObject("properties");
+            EnemySpec spec = new EnemySpec();
+            spec.setName(unit.has("name") ? unit.get("name").getAsString() : "enemy " + uid);
+            spec.setHealth(numberOr(properties, "MaxHP", 0));
+            spec.setDefence(numberOr(properties, "Defence", 0));
+            spec.setSpeed(numberOr(properties, "Speed", 100));
+            spec.setLevel((int) numberOr(properties, "Level", 95));
+            spec.setToughness(numberOr(properties, "MaxStance", 0));
+            for (String name : new String[]{"Physical", "Fire", "Ice", "Thunder", "Wind", "Quantum", "Imaginary"}) {
+                double value = numberOr(properties, name + "Resistance", 0);
+                if (value != 0) {
+                    spec.getResistance().put(name.toUpperCase(java.util.Locale.ROOT), value);
+                }
+            }
+            derived.put(uid, spec);
+        }
+        plan.setEnemies(new java.util.ArrayList<>(derived.values()));
+        // A cast's "target" is an index into this list, so keep the uids in the same order for {@link #deriveCasts}.
+        TARGET_UIDS.clear();
+        TARGET_UIDS.addAll(derived.keySet());
+    }
+
+    /** The order {@link #deriveCasts} turns a target uid into a 1-based index (filled by {@link #deriveEnemies}). */
+    private static final java.util.List<Long> TARGET_UIDS = new java.util.ArrayList<>();
+
+    /**
+     * Fills the plan's casts from the payload: {@code cast_index} says which cast, {@code skill_id} names the row, and the
+     * row's {@code (cid, slot)} says whether it is the character's own slot or its memosprite's data slot.
+     *
+     * @param plan    the plan to fill
+     * @param capture the parsed capture
+     */
+    private static void deriveCasts(Plan plan, List<CaptureFlow.Cast> flow, com.google.gson.JsonObject capture) {
+        java.util.Map<Integer, Integer> servantOwner = servantOwners(plan);
+        // The target is read off the GROUP the replay compares against, not off the cast's first event: a cast's value
+        // of "which enemy was aimed at" is its group's first hit, and an AoE cast's first event may hit a different one.
+        java.util.Map<Integer, Double> firstTargetByCast = new java.util.HashMap<>();
+        for (CaptureFlow.Cast cast : flow) {
+            if ("cast".equals(cast.classification())) {
+                firstTargetByCast.putIfAbsent(cast.index(), cast.firstTarget());
+            }
+        }
+        java.util.List<CastSpec> casts = new java.util.ArrayList<>();
+        for (DerivedCasts.Entry entry : DerivedCasts.of(capture)) {
+            CastSpec spec = new CastSpec();
+            spec.setCast(entry.castIndex());
+            boolean servant = servantOwner.containsKey(entry.cid());
+            // A cast that names no skill row (the payload states skill_id 0 for 1413's ultimate) still names its caster;
+            // the slot is then inferred from the event's own kind, which is what the payload does state.
+            spec.setActor(servant ? servantOwner.get(entry.cid())
+                    : entry.cid() != 0 ? entry.cid() : (int) entry.actor());
+            spec.setCaster(servant ? "memosprite" : "character");
+            if (servant) {
+                spec.setSlotNumber(entry.slot());
+                spec.setSlot(String.valueOf(entry.slot()));
+            } else {
+                int slot = entry.slot();
+                if (slot < 1) {
+                    slot = switch (entry.kind() == null ? "" : entry.kind()) {
+                        case "Ultimate" -> 3;
+                        case "Basic" -> 1;
+                        case "Skill" -> 2;
+                        default -> 0;
+                    };
+                }
+                spec.setSlot(switch (slot) {
+                    case 1 -> "COMMON";
+                    case 2 -> "SKILL";
+                    case 3 -> "ULTRA";
+                    case 4 -> "TALENT";
+                    default -> null;                        // an unknown slot is refused by the driver, loudly
+                });
+            }
+            Double firstTarget = firstTargetByCast.get(entry.castIndex());
+            spec.setTarget(firstTarget == null ? null : enemyByHealth(plan, firstTarget));
+            spec.setNote("derived from cast_index " + entry.castIndex() + " / skill " + entry.skillId());
+            casts.add(spec);
+        }
+        plan.setCasts(casts);
+    }
+
+    /**
+     * The 1-based plan index of the enemy whose 生命上限 the capture used, or {@code null} when none matches.
+     *
+     * @param plan  the plan
+     * @param health the capture's {@code target_max_hp}
+     * @return the 1-based index, or {@code null}
+     */
+    private static Integer enemyByHealth(Plan plan, double health) {
+        for (int i = 0; i < plan.getEnemies().size(); i++) {
+            Double stated = plan.getEnemies().get(i).getHealth();
+            if (stated != null && Math.abs(stated - health) <= Math.max(1e-6, Math.abs(health) * 1e-9)) {
+                return i + 1;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Which of the party's memosprites each servant id belongs to - read off the memosprite specs, so a servant row is
+     * attributed to its summoner without a hand-written table.
+     *
+     * @param plan the plan
+     * @return servant id to owner cid
+     */
+    private static java.util.Map<Integer, Integer> servantOwners(Plan plan) {
+        java.util.Map<Integer, Integer> owners = new java.util.LinkedHashMap<>();
+        for (MemberSpec member : plan.getParty()) {
+            var spec = com.laosun.aluminium.data.Memosprites.of(member.getCid());
+            if (spec != null && spec.servantId() != null) {
+                owners.put(spec.servantId(), member.getCid());
+            }
+        }
+        return owners;
+    }
+
+    private static double numberOr(com.google.gson.JsonObject object, String key, double fallback) {
+        if (object == null || !object.has(key) || object.get(key).isJsonNull()) {
+            return fallback;
+        }
+        return object.get(key).getAsDouble();
+    }
+
 }

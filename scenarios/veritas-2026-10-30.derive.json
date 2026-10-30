@@ -1,0 +1,55 @@
+{
+  "name": "veritas 2026-10-30 — derived from the payload",
+  "capture": "src/test/resources/captures/veritas-2026-10-30.json",
+  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。",
+  "party": [
+    {
+      "owner": 1409,
+      "cid": 1409,
+      "level": 80,
+      "eidolon": 6,
+      "memosprite": true,
+      "cone": {
+        "id": 23042,
+        "level": 80,
+        "rank": 1
+      }
+    },
+    {
+      "owner": 1413,
+      "cid": 1413,
+      "level": 80,
+      "eidolon": 1,
+      "memosprite": true,
+      "cone": {
+        "id": 21050,
+        "level": 80,
+        "rank": 5
+      }
+    },
+    {
+      "owner": 1415,
+      "cid": 1415,
+      "level": 80,
+      "eidolon": 2,
+      "memosprite": true,
+      "cone": {
+        "id": 23042,
+        "level": 80,
+        "rank": 1
+      }
+    },
+    {
+      "owner": 1512,
+      "cid": 1512,
+      "level": 80,
+      "eidolon": 0,
+      "memosprite": true,
+      "cone": {
+        "id": 24005,
+        "level": 80,
+        "rank": 5
+      }
+    }
+  ]
+}
