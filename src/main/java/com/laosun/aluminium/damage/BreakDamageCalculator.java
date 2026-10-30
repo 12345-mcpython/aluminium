@@ -37,7 +37,7 @@ public final class BreakDamageCalculator {
      * Break base for the given level (already {@code /10} in project units).
      *
      * @param attacker the attacker (its level is used)
-     * @return break base (level 80 = 36.5535)
+     * @return break base (level 80 = 376.75535 - the table holds 3767.5535 and this is the {@code /10} convention it divides by; a captured break pins the number, see {@code BreakBaseAgainstCaptureTest})
      * @throws IllegalArgumentException no data for that level (fail fast, never silently compute 0)
      */
     public static double breakBaseOf(CanHit attacker) {
