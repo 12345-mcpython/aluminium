@@ -751,6 +751,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | **P9-1** `enemy_skills.json` 扩充 | 自建表只覆盖少数演示怪，**倍率是猜的**（每条 `guessed=true`） | ★`EnemySkillTest`：条目数 / 倍率 / 削韧值与表一致 ✓；无条目的怪走兜底普攻 | — |
 | **P9-2** `EnemySkill` 全效果 | 🚧 形状分派已落地 | ★`EnemySkillFullTest`：冰锋战技打 3 人 → 每敌 `attack × 倍率 × 防区` ✓；按 bean 削韧 | P9-1、P5-3、P1-8 |
 | **P9-3** 敌方 AI 技能选择器 | 未开始 | `SkillSelectorTest`（**待写**）：权重 1.0/1.2 两技能跑 1000 次 → 次数比 ≈ 1:1.2（±3%） | P9-2、P5-5 |
+| **P9-6** `multi_target_rule`（每目标每段倍率 = 行倍率 ÷ N）| **未实现，且暂时没有消费者**：`skill_segments.json` 全表只有 **8 条**段实例用到它（`1/命中目标数` ×5、`1/敌方存活数` ×3），分布在 **1321 大丽花**（终结技）、**1408 白厄**（强化战技·追加 / 强化终结技）、**1506 银狼LV.999**（强化普攻四段）；**复刻的四人（1409/1413/1415/1512 及四只忆灵）一条都没有** | `MultiTargetRuleTest`（**待写**）：3 敌时每敌 = 行倍率 ÷ 3；单体场景 ≡ ÷ 1 | P5-3、P1-8 |
 | **P9-5** Boss 机制（phase 换招 / 受击反击 / 控制免疫） | 控制免疫已是 P6-1 的一部分，**不需要新代码** ✓ | ★`BossMechanicTest`：HP 降到 50% 以下换招 ✓；受击反击段 `getCountsAsAttack() == false` ✓ | P9-2、P1-7、P6-1 |
 
 > ⚠ P9-5 那段的原结论：`Battle.hitChance(caster, target, baseChance, specificResistKey)` 里
