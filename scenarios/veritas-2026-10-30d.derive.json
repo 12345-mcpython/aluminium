@@ -1,0 +1,84 @@
+{
+  "name": "veritas 2026-10-30 (第四份录制，parent/field/level 齐备) — derived from the payload",
+  "capture": "src/test/resources/captures/veritas-2026-10-30d.json",
+  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。  ⚠ 事实（2026-10-30 由录屏者确认）：角色 Lv80、怪物 Lv95、**四个人都开了秘技**，战斗由 1409 进入 ⇒ 四人按 `states` 种入 `秘技`，让各自的 BATTLE_START 秘技规则开火。⚠ 「行号」不再手写：由**账号存档**给出（`game/data/account.json`：角色 `skills.basic/skill/ult/talent`、忆灵 `memosprite.skill` —— 四人都是 6/10 那档）。payload 不携带行号（它只给 `damage_percentage`，那是\"行参数 × 分裂比 × 资源台阶\"的有效份额）。 ⚠ 忆质等**资源前缀**由工具从捕获的 `damage_percentage` 反解：带 `resource_share` 的行满足 `pct/分裂比 = 参数0 + 台阶×份额`、`点数 = 台阶×步长`（实测 1413 忆灵技1、存档 Lv6：cast 1 的 0.06 ⇒ **4 点**、cast 16 的 0.09 ⇒ **16 点**，都是整数）⇒ 同一行在战斗中出现两种基值，就是这个计数器在涨。 ⚠ 敌人**分批到场**（实测首伤时刻）：100015 @ cast1(t1)、100013 @ cast9(t2)、100029 @ cast52(t7)、100032/100035 @ cast58(t10)、100041/100044 @ cast85(t21)、100051/100053 @ cast87(t22)。⇒ 现在把 9 个敌人一次性摆上场会算错 AoE 的\"其他目标\"份额（cast 18 抓到 2 个目标、引擎摆 9 个 ⇒ 主/其他份额对不上，实测 x0.50）；下一步需要\"按首次受伤的 cast 分批入场\"。 ⚠ 59/76（1415 强化普攻）仍未对上：种上【往昔的涟漪】不够 —— 强化普攻是把**槽 8 的行换进 COMMON**，而这件事由她的**终结技**做（`REPLACE_SKILL`），状态只负责\"可用\"。她的终结技**不造成伤害**，所以捕获里没有对应事件、派生表里也没有那一发 ⇒ 需要一个\"只施放、不对账\"的**前奏**声明（工具的下一步）。",
+  "party": [
+    {
+      "owner": 1409,
+      "cid": 1409,
+      "level": 80,
+      "eidolon": 6,
+      "memosprite": true,
+      "cone": {
+        "id": 23042,
+        "level": 80,
+        "rank": 1
+      },
+      "states": [
+        "秘技"
+      ]
+    },
+    {
+      "owner": 1413,
+      "cid": 1413,
+      "level": 80,
+      "eidolon": 1,
+      "memosprite": true,
+      "cone": {
+        "id": 21050,
+        "level": 80,
+        "rank": 5
+      },
+      "states": [
+        "秘技"
+      ]
+    },
+    {
+      "owner": 1415,
+      "cid": 1415,
+      "level": 80,
+      "eidolon": 2,
+      "memosprite": true,
+      "cone": {
+        "id": 23042,
+        "level": 80,
+        "rank": 1
+      },
+      "states": [
+        "秘技"
+      ]
+    },
+    {
+      "owner": 1512,
+      "cid": 1512,
+      "level": 80,
+      "eidolon": 0,
+      "memosprite": true,
+      "cone": {
+        "id": 24005,
+        "level": 80,
+        "rank": 5
+      },
+      "states": [
+        "秘技"
+      ]
+    }
+  ],
+  "preludes": [
+    {
+      "before": 59,
+      "actor": 1415,
+      "slot": "ULTRA",
+      "target": 1,
+      "note": "她的终结技不造成伤害 ⇒ 捕获里没有它的事件；但它把槽 8 的强化普攻装进 COMMON。"
+    }
+  ],
+  "statesAt": {
+    "59": [
+      "往昔的涟漪"
+    ],
+    "76": [
+      "往昔的涟漪"
+    ]
+  }
+}
