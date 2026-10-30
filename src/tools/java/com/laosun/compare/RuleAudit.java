@@ -149,7 +149,65 @@ public final class RuleAudit {
         if (!report.impliedCounters().isEmpty()) {
             System.out.println("counters a HEAL_TALLY row implies (cast -> value): " + report.impliedCounters());
         }
+        Map<String, java.util.TreeSet<Double>> rates = parentRates(capture);
+        if (!rates.isEmpty()) {
+            System.out.println("each derived instance's rate against its parent (type|rule -> distinct base/parent):");
+            for (Map.Entry<String, java.util.TreeSet<Double>> each : rates.entrySet()) {
+                System.out.printf(Locale.ROOT, "  %-40s %s%n", each.getKey(), each.getValue());
+            }
+        }
         return report.problems().isEmpty() ? 0 : 1;
+    }
+
+    /**
+     * What every derived instance is a fraction of, keyed by {@code type|source}.
+     *
+     * <p>{@code parent_event} names the instance a rider was derived from, so {@code base / parent.damage} is the rate that
+     * rule applied. A rule's rate is a constant - it comes from a parameter row - so a group with two different rates is
+     * either a mis-stated parent or a rate that moves; both are worth knowing before a replay tries to reproduce them.
+     *
+     * @param capture the parsed capture
+     * @return {@code key -> distinct rates}, rounded to 1e-9
+     */
+    public static Map<String, java.util.TreeSet<Double>> parentRates(JsonObject capture) {
+        Map<String, java.util.TreeSet<Double>> rates = new LinkedHashMap<>();
+        JsonArray events = capture.getAsJsonArray("damage_events");
+        if (events == null) {
+            return rates;
+        }
+        for (JsonElement element : events) {
+            JsonObject event = element.getAsJsonObject();
+            if (!event.has("parent_event") || event.get("parent_event").isJsonNull()) {
+                continue;
+            }
+            int parent = event.get("parent_event").getAsInt();
+            JsonObject source = null;
+            for (JsonElement candidate : events) {
+                JsonObject each = candidate.getAsJsonObject();
+                if (each.has("event_index") && each.get("event_index").getAsInt() == parent) {
+                    source = each;
+                    break;
+                }
+            }
+            if (source == null) {
+                continue;
+            }
+            double parentDamage = source.has("damage") ? source.get("damage").getAsDouble() : 0;
+            if (parentDamage == 0) {
+                continue;
+            }
+            JsonObject zones = event.getAsJsonObject("zones");
+            double base = zones.has("damage_value") ? zones.get("damage_value").getAsDouble()
+                    : zones.get("raw_damage_before_modifiers").getAsDouble();
+            String kind = event.has("type") ? event.get("type").getAsString() : "?";
+            JsonObject rule = event.has("rule") && !event.get("rule").isJsonNull()
+                    ? event.getAsJsonObject("rule") : null;
+            String named = rule != null && rule.has("source") && !rule.get("source").isJsonNull()
+                    ? rule.get("source").getAsString() : "-";
+            rates.computeIfAbsent(kind + "|" + named, key -> new java.util.TreeSet<>())
+                    .add(Math.round(base / parentDamage * 1e9) / 1e9);
+        }
+        return rates;
     }
 
     /**
