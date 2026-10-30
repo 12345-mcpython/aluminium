@@ -538,6 +538,10 @@ public final class BattleReplay {
                         row.cast, row.actor, row.kind, captureCell, row.captureDamage, "-", "-", "not in plan");
                 continue;
             }
+            // A 忆灵 that has left the field cannot be driven yet: re-summoning 1413's 长夜 mid-fight makes one of her rules
+            // fire while no summon exists ("Effect targets \"summon\" but Evernight has no summon on the field"), which is a
+            // CONTENT gap (the rule needs a `self_summon_count >= 1` gate), not a driver bug. Measured, registered, not
+            // papered over: the row is reported as not drivable and the gap is named.
             for (Enemy latecomer : latecomers) {
                 int index = enemies.indexOf(latecomer);
                 Integer arrivesAt = index < 0 ? null : plan.getEnemies().get(index).getArrivesAt();
@@ -1180,6 +1184,9 @@ public final class BattleReplay {
                     case 2 -> "SKILL";
                     case 3 -> "ULTRA";
                     case 4 -> "TALENT";
+                    // Slot 8 is 1415's 强化普攻: her ultimate REPLACE_SKILLs it into COMMON, which is the slot the engine
+                    // finds it in while 【往昔的涟漪】 is up. The capture reads it at the character's basic level.
+                    case 8 -> "COMMON";
                     default -> null;
                 });
             }
