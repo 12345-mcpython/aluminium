@@ -335,6 +335,12 @@ public final class TriggerInterpreter {
                     // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
                     // only reader, so the sign carried no information anyone used.
                     previousCredited = Math.abs(creditedAfter - creditedBefore);
+                } else if ("CONSUME_HP".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())) {
+                    // 「消耗我方全体当前生命值 1%…额外造成 1 次数值为消耗总量 2.5% 的附加伤害」 (cone 23042): the NEXT effect needs
+                    // to know how much the consumption took, so the same `amount_from_previous` channel is filled here.
+                    double hpBefore = totalHp(battle);
+                    applyOne(battle, effect, effectCtx, previousCredited);
+                    previousCredited = Math.abs(hpBefore - totalHp(battle));
                 } else {
                     applyOne(battle, effect, effectCtx, previousCredited);
                 }
@@ -2430,4 +2436,21 @@ public final class TriggerInterpreter {
     static final String SETTLED_DAMAGE_THIS_EVENT = "settled_damage_this_event";
 
     static final String ATTACKER_ELEMENT = "attacker";
+
+    /**
+     * Every combatant's current HP, added up - the measure {@code amountFromPrevious} uses after a {@code CONSUME_HP}.
+     *
+     * @param battle the battle
+     * @return the summed current HP
+     */
+    private static double totalHp(com.laosun.aluminium.Battle battle) {
+        double total = 0;
+        for (CanHit unit : battle.allies()) {
+            total += unit.getCurrentHp();
+        }
+        for (CanHit unit : battle.enemies()) {
+            total += unit.getCurrentHp();
+        }
+        return total;
+    }
 }

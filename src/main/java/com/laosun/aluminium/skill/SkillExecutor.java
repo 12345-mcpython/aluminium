@@ -116,7 +116,7 @@ public final class SkillExecutor {
             // Measured: no firing site for a DefaultSkill cast by a Summon.
             if (user instanceof com.laosun.aluminium.entity.Summon && !hitTargets.isEmpty()) {
                 battle.fire(TriggerPayload.Simple.of(
-                        com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, user, null,
+                        com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, user, hitTargets.iterator().next(),
                         hitTargets.size(), 0));
             }
             battle.grantSkillEnergy(user, skill, hitTargets);

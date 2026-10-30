@@ -145,6 +145,18 @@ final class TriggerMagnitudes {
                 }
                 return victim.getMaxHp() * share + flat;
             }
+            case "target_current_hp" -> {
+                if (victim == null) {
+                    throw new IllegalStateException("a magnitude scaled by target_current_hp has no unit to read it from");
+                }
+                return victim.getCurrentHp() * share + flat;
+            }
+            case "owner_current_hp" -> {
+                if (ctx == null || ctx.owner() == null) {
+                    throw new IllegalStateException("a magnitude scaled by owner_current_hp has no owner to read it from");
+                }
+                return ctx.owner().getCurrentHp() * share + flat;
+            }
             default -> {
                 // fall through to the attribute family below
             }

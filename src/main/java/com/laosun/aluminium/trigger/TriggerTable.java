@@ -444,14 +444,19 @@ public class TriggerTable {
         if (hasNothing()) {
             return other;
         }
-        if (!resources.isEmpty() && !other.resources.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Cannot merge two trigger tables that both declare resources (cid " + cid + "): "
-                            + "declarations come from the character's own file, and a merge of two sets of "
-                            + "them has no defined owner");
+        // Two files may each own a counter (the character's 充能, the light cone's 虹光累计消耗), so the declarations
+        // MERGE - but an id declared twice has no defined owner, and that is still refused.
+        java.util.List<com.laosun.aluminium.beans.ResourceSpec> declarations = new java.util.ArrayList<>(resources);
+        for (com.laosun.aluminium.beans.ResourceSpec declared : other.resources) {
+            boolean duplicate = declarations.stream().anyMatch(each -> each.id().equals(declared.id()));
+            if (duplicate) {
+                throw new IllegalArgumentException(
+                        "Cannot merge two trigger tables that both declare the resource \"" + declared.id() + "\" (cid "
+                                + cid + "): one id, one owner - a second declaration would silently decide the cap");
+            }
+            declarations.add(declared);
         }
-        TriggerTable merged = new TriggerTable(cid, List.of(),
-                resources.isEmpty() ? other.resources : resources);
+        TriggerTable merged = new TriggerTable(cid, List.of(), declarations);
         copyRulesInto(merged);
         other.copyRulesInto(merged);
         merged.referencedResources.addAll(referencedResources);

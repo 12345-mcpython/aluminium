@@ -94,8 +94,11 @@ public class BattleReplayTest {
         assertRow(out, 1, 6, "长夜's 忆灵技1 is a six-instance row (skill_effects.json 11413/1 segments)");
         assertRow(out, 2, 3, "「小伊卡对敌方全体造成…」 is delivered by the rule table, so it reaches all three "
                 + "living enemies (the capture shows two because one was already down)");
-        assertRow(out, 16, 12, "1415's 德谬歌 casts a ONE-hit skill four times in a row (the capture groups them as "
-                + "one cast), against three living enemies");
+        // 12 = four casts × three living enemies (the capture groups them as one cast); the 13th is cone 23042's 2.5%
+        // burst, booked under the same cast. Riders are counted in this column and EXCLUDED from the base comparison
+        // (see {@code compareBases}), which is why the row still reads base-ok/count.
+        assertRow(out, 16, 13, "1415's 德谬歌 casts a ONE-hit skill four times in a row (the capture groups them as "
+                + "one cast), against three living enemies, plus the cone's burst");
     }
 
     /**
