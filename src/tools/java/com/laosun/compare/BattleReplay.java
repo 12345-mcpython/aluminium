@@ -110,6 +110,15 @@ public final class BattleReplay {
         /** The captured targets, in the order the plan's casts index them (1-based). */
         private List<EnemySpec> enemies = new ArrayList<>();
 
+        /**
+         * Cast index to the row level the capture used, for the casts whose row is NOT the skill's own level.
+         *
+         * <p>Read off the capture the way the plan used to state it: the row a cast was read at. The payload cannot supply
+         * this one - its {@code damage_percentage} is the instance's effective share (see {@code deriveCasts}) - so it is
+         * declared here instead of scattered over hand-written cast entries.
+         */
+        private Map<Integer, Integer> levels = new LinkedHashMap<>();
+
         /** The cast table: one entry per captured {@code cast} group. */
         private List<CastSpec> casts = new ArrayList<>();
     }
@@ -1104,6 +1113,13 @@ public final class BattleReplay {
                     default -> null;                        // an unknown slot is refused by the driver, loudly
                 });
             }
+            // The ROW LEVEL stays DECLARED, and this is why: the payload's `damage_percentage` is the instance's
+            // effective share, not the row's parameter - measured on 11413's slot 1, the capture states 0.06 where the
+            // Lv8 row's parameter is 0.12 (the 0.5 segment halves it). Solving a level from it would therefore pick the
+            // wrong row, so the level comes from the plan's `levels` map when it names one.
+            if (plan.getLevels() != null && plan.getLevels().containsKey(entry.castIndex())) {
+                spec.setLevel(plan.getLevels().get(entry.castIndex()));
+            }
             Double firstTarget = firstTargetByCast.get(entry.castIndex());
             spec.setTarget(firstTarget == null ? null : enemyByHealth(plan, firstTarget));
             spec.setNote("derived from cast_index " + entry.castIndex() + " / skill " + entry.skillId());
@@ -1153,5 +1169,70 @@ public final class BattleReplay {
         }
         return object.get(key).getAsDouble();
     }
+
+
+    /**
+     * Which level of a skill row carries the multiplier the capture used.
+     *
+     * <p>Read from {@code skills.json}'s per-level parameter rows: a level whose row states the capture's
+     * {@code damage_percentage} is the level the game read. Ambiguity (a parameter identical across levels) keeps the
+     * lowest level, and no match at all leaves {@code null} - the driver then uses the skill's own level, as before.
+     *
+     * @param cid        the character or servant id
+     * @param slot       the data slot
+     * @param percentage the capture's multiplier for this cast
+     * @return the 1-based level, or {@code null} when no row states that number
+     */
+    private static Integer rowLevelOf(int cid, int slot, double percentage) {
+        if (percentage <= 0) {
+            return null;
+        }
+        com.google.gson.JsonArray rows = parameterRows(cid, slot);
+        if (rows == null) {
+            return null;
+        }
+        for (int level = 1; level <= rows.size(); level++) {
+            for (com.google.gson.JsonElement value : rows.get(level - 1).getAsJsonArray()) {
+                double stated = value.getAsDouble();
+                if (Math.abs(stated - percentage) <= Math.max(1e-9, Math.abs(percentage) * 1e-6)) {
+                    return level;
+                }
+            }
+        }
+        return null;
+    }
+
+    /** The per-level parameter rows of one skill, or {@code null}. */
+    private static com.google.gson.JsonArray parameterRows(int cid, int slot) {
+        com.google.gson.JsonObject root = SKILLS.get();
+        if (root == null || !root.has(String.valueOf(cid))) {
+            return null;
+        }
+        com.google.gson.JsonObject slots = root.getAsJsonObject(String.valueOf(cid));
+        if (!slots.has(String.valueOf(slot))) {
+            return null;
+        }
+        com.google.gson.JsonElement params = slots.getAsJsonObject(String.valueOf(slot)).get("param_list");
+        return params == null || !params.isJsonArray() ? null : params.getAsJsonArray();
+    }
+
+    /** {@code skills.json}, read once. */
+    private static final class SkillsHolder {
+        private static final com.google.gson.JsonObject VALUE = load();
+
+        private static com.google.gson.JsonObject load() {
+            try (java.io.InputStream stream = BattleReplay.class.getResourceAsStream("/game/data/skills.json")) {
+                if (stream == null) {
+                    return null;
+                }
+                return com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(stream,
+                        java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            } catch (java.io.IOException e) {
+                return null;
+            }
+        }
+    }
+
+    private static final java.util.function.Supplier<com.google.gson.JsonObject> SKILLS = () -> SkillsHolder.VALUE;
 
 }

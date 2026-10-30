@@ -47,7 +47,7 @@ public final class DerivedCasts {
      * @param hits       how many real (non-companion) instances the cast settled
      */
     public record Entry(int castIndex, long actor, String kind, long skillId, int cid, int slot, long target,
-                        int hits) {
+                        int hits, double percentage) {
     }
 
     /**
@@ -84,14 +84,15 @@ public final class DerivedCasts {
                 cid = resolved.get("cid");
                 slot = resolved.get("slot");
             }
+            double percentage = zones.has("damage_percentage") ? zones.get("damage_percentage").getAsDouble() : 0;
             out.put(castIndex, new Entry(castIndex, event.getAsJsonObject("attacker").get("uid").getAsLong(),
                     event.get("type").getAsString(), skillId, cid, slot,
-                    event.getAsJsonObject("target").get("uid").getAsLong(), 1));
+                    event.getAsJsonObject("target").get("uid").getAsLong(), 1, percentage));
         }
         List<Entry> entries = new ArrayList<>();
         for (Entry entry : out.values()) {
             entries.add(new Entry(entry.castIndex(), entry.actor(), entry.kind(), entry.skillId(), entry.cid(),
-                    entry.slot(), entry.target(), hits.getOrDefault(entry.castIndex(), 0)));
+                    entry.slot(), entry.target(), hits.getOrDefault(entry.castIndex(), 0), entry.percentage()));
         }
         return entries;
     }
@@ -158,8 +159,8 @@ public final class DerivedCasts {
             return 2;
         }
         List<Entry> entries = of(capture);
-        System.out.printf(Locale.ROOT, "%-5s %-8s %-11s %-9s %-6s %-5s %-8s %5s%n",
-                "cast", "actor", "kind", "skill_id", "cid", "slot", "target", "hits");
+        System.out.printf(Locale.ROOT, "%-5s %-8s %-11s %-9s %-6s %-5s %-8s %5s %10s%n",
+                "cast", "actor", "kind", "skill_id", "cid", "slot", "target", "hits", "percentage");
         System.out.println("-".repeat(70));
         int unresolved = 0;
         for (Entry entry : entries) {
@@ -167,11 +168,11 @@ public final class DerivedCasts {
             if (!resolved && entry.skillId() != 0) {
                 unresolved++;
             }
-            System.out.printf(Locale.ROOT, "%-5d %-8d %-11s %-9d %-6s %-5s %-8d %5d%n",
+            System.out.printf(Locale.ROOT, "%-5d %-8d %-11s %-9d %-6s %-5s %-8d %5d %10.6f%n",
                     entry.castIndex(), entry.actor(), entry.kind(), entry.skillId(),
                     resolved ? String.valueOf(entry.cid()) : "-",
                     resolved ? String.valueOf(entry.slot()) : "-",
-                    entry.target(), entry.hits());
+                    entry.target(), entry.hits(), entry.percentage());
         }
         System.out.println("-".repeat(70));
         System.out.printf(Locale.ROOT, "casts: %d ; every skill row resolved: %s%n",

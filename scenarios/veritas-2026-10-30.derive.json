@@ -1,7 +1,7 @@
 {
   "name": "veritas 2026-10-30 — derived from the payload",
   "capture": "src/test/resources/captures/veritas-2026-10-30.json",
-  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。",
+  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。 ⚠ `levels` 是唯一仍手写的一列：payload 的 `damage_percentage` 是**这一发实例的有效份额**，不是行的参数（实测 11413/1 捕获写 0.06、而 Lv8 行参数是 0.12，差在 0.5 那段的分裂比上）⇒ 无法从它反解行号。",
   "party": [
     {
       "owner": 1409,
@@ -51,5 +51,12 @@
         "rank": 5
       }
     }
-  ]
+  ],
+  "levels": {
+    "1": 8,
+    "16": 8,
+    "18": 1,
+    "51": 6,
+    "59": 6
+  }
 }
