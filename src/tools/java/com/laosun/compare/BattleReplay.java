@@ -1269,6 +1269,14 @@ public final class BattleReplay {
             CastSpec spec = new CastSpec();
             spec.setCast(group.index());
             spec.setKind(group.kind());
+            // A captured type says WHOSE row it is: `Servant` is the 忆灵's, `Ultimate`/`Basic`/`Skill` are the
+            // character's. The payload can inherit a cast's first skill onto its later instances (measured: 1413's
+            // ultimate carries `skill_id` 1141301 / 1141306, her servant's rows, and 141303 never appears), so a servant row
+            // under a character type is re-resolved from the attacker - the kind is the stronger fact.
+            if (servantOwner.containsKey(cid) && !"Servant".equals(group.kind())) {
+                cid = (int) group.actor();
+                slot = -1;
+            }
             boolean servant = servantOwner.containsKey(cid);
             spec.setActor(servant ? servantOwner.get(cid) : cid != 0 ? cid : (int) group.actor());
             spec.setCaster(servant ? "memosprite" : "character");
