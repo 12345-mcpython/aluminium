@@ -1188,10 +1188,12 @@ public final class BattleReplay {
             } else {
                 spec.setLevel(accountLevel(spec.getActor(), spec.getCaster(), slot));
             }
+            Long main = mainTargetOf(capture, group);
+            double mainPercentage = mainPercentageOf(capture, group, main);
             // A `per_resource_share` row states its share as `parameter x points`, so the capture's own percentage is the
             // points divided by the parameter - and the LEVEL is whichever row makes that a whole number. Both are read
             // off the capture; a row that states nothing leaves them alone.
-            int[] pool = perResourcePoolOf(skillId == 0 ? -1 : cid, slot, percentage);
+            int[] pool = perResourcePoolOf(skillId == 0 ? -1 : cid, slot, mainPercentage, spec.getLevel());
             if (pool != null) {
                 spec.setLevel(pool[0]);
                 spec.setResources(java.util.Map.of(resourceNameOf(skillId == 0 ? -1 : cid, slot), (double) pool[1]));
@@ -1205,7 +1207,6 @@ public final class BattleReplay {
             // The cast is DRIVEN at the enemy the capture dealt the most to - its "main" target. For a row whose shares
             // differ per target (11413's slot 7 pays the main target double), driving at an underling halves every base,
             // measured on cast 58.
-            Long main = mainTargetOf(capture, group);
             Integer targetIndex = main == null ? null : TARGET_UIDS.indexOf(main);
             spec.setTarget(targetIndex == null || targetIndex < 0 || targetIndex >= plan.getEnemies().size()
                     ? null : targetIndex + 1);
@@ -1331,8 +1332,10 @@ public final class BattleReplay {
             return null;
         }
         com.google.gson.JsonObject levels = who.getAsJsonObject(group);
+        // The archive names two memosprite rows - `skill` and `talent` - and every damaging 忆灵 row (1 and 7 alike) is
+        // read at the `skill` level; only slot 4 is the talent.
         String key = "memosprite".equals(caster)
-                ? (slot == 1 ? "skill" : slot == 4 ? "talent" : null)
+                ? (slot == 4 ? "talent" : "skill")
                 : switch (slot) {
                     case 1 -> "basic";
                     case 2 -> "skill";
@@ -1655,30 +1658,56 @@ public final class BattleReplay {
      * @param percentage the capture's instance share
      * @return {@code {level, points}}, or {@code null}
      */
-    private static int[] perResourcePoolOf(int cid, int slot, double percentage) {
+    private static int[] perResourcePoolOf(int cid, int slot, double percentage, Integer preferred) {
         com.google.gson.JsonObject spec = skillEffectOf(cid, slot);
         if (spec == null || !spec.has("per_resource_share") || percentage <= 0) {
             return null;
         }
         com.google.gson.JsonObject share = spec.getAsJsonObject("per_resource_share");
         int main = share.get("main_param").getAsInt();
+        int other = share.get("other_param").getAsInt();
         com.google.gson.JsonArray rows = parameterRows(cid, slot);
         if (rows == null) {
             return null;
         }
+        // The capture's event may be the MAIN target's instance or another one's: the row prices them differently
+        // (11413's slot 7 pays #1 on the main and #2 on the rest), so both parameters are candidates. The account's level is
+        // tried first - it is the game's own number - and only then the rest, because a level other than the one the game
+        // read can also divide the share into a whole number of points.
+        java.util.List<Integer> order = new java.util.ArrayList<>();
+        if (preferred != null && preferred >= 1 && preferred <= rows.size()) {
+            order.add(preferred);
+        }
         for (int level = 1; level <= rows.size(); level++) {
+            if (!order.contains(level)) {
+                order.add(level);
+            }
+        }
+        for (int level : order) {
             com.google.gson.JsonArray row = rows.get(level - 1).getAsJsonArray();
-            if (main >= row.size()) {
-                return null;
+            if (level == order.getFirst()) {
+                // The share came from the MAIN instance, so the row's main parameter is the reading to try first.
+                if (main < row.size() && row.get(main).getAsDouble() > 0) {
+                    double points = percentage / row.get(main).getAsDouble();
+                    double rounded = Math.rint(points);
+                    if (rounded >= 1 && Math.abs(points - rounded) <= 1e-6) {
+                        return new int[]{level, (int) Math.round(rounded)};
+                    }
+                }
             }
-            double param = row.get(main).getAsDouble();
-            if (param <= 0) {
-                continue;
-            }
-            double points = percentage / param;
-            double rounded = Math.rint(points);
-            if (rounded >= 1 && Math.abs(points - rounded) <= 1e-6) {
-                return new int[]{level, (int) Math.round(rounded)};
+            for (int index : new int[]{main, other}) {
+                if (index < 0 || index >= row.size()) {
+                    continue;
+                }
+                double param = row.get(index).getAsDouble();
+                if (param <= 0) {
+                    continue;
+                }
+                double points = percentage / param;
+                double rounded = Math.rint(points);
+                if (rounded >= 1 && Math.abs(points - rounded) <= 1e-6) {
+                    return new int[]{level, (int) Math.round(rounded)};
+                }
             }
         }
         return null;
@@ -1801,6 +1830,39 @@ public final class BattleReplay {
             }
         }
         return lives;
+    }
+
+
+    /**
+     * The capture's {@code damage_percentage} on the instance that hit the row's main target - the one the row prices with
+     * its {@code main_param}.
+     *
+     * <p>Why the main instance: a {@code per_resource_share} row prices the main and the rest differently, so the share of
+     * an arbitrary event can be read two ways (measured on cast 58, 2.04 is either {@code 0.06 x 34} as an underling or
+     * {@code 0.12 x 17} as the main). Taking the main instance's share and dividing by {@code main_param} leaves one reading.
+     *
+     * @param capture the parsed capture
+     * @param group   the capture group
+     * @param main    the main target's uid, or {@code null}
+     * @return the main instance's percentage, or {@code 0} when it cannot be found
+     */
+    private static double mainPercentageOf(com.google.gson.JsonObject capture, CaptureFlow.Cast group, Long main) {
+        if (main == null) {
+            return 0;
+        }
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null || event.get("cast_index").getAsInt() != group.index()
+                    || !group.kind().equals(event.get("type").getAsString())
+                    || event.getAsJsonObject("target").get("uid").getAsLong() != main) {
+                continue;
+            }
+            com.google.gson.JsonObject zones = event.getAsJsonObject("zones");
+            if (zones.has("damage_percentage")) {
+                return zones.get("damage_percentage").getAsDouble();
+            }
+        }
+        return 0;
     }
 
 }
