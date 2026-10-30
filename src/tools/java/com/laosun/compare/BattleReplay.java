@@ -128,6 +128,16 @@ public final class BattleReplay {
          */
         private Map<Integer, List<String>> statesAt = new LinkedHashMap<>();
 
+        /**
+         * Casts the fight performed that the capture cannot show, because they deal no damage - run before a named cast and
+         * <b>not</b> compared.
+         *
+         * <p>Reader: 1415's ultimate. It installs her enhanced basic into the {@code COMMON} slot ({@code REPLACE_SKILL}) and
+         * opens 【往昔的涟漪】, and it settles no damage, so no event names it - yet the capture's casts 59/76 use the row it
+         * installs. Seeding the state alone is not enough (measured: still one instance where the capture has seven).
+         */
+        private List<PreludeSpec> preludes = new ArrayList<>();
+
         /** The cast table: one entry per captured {@code cast} group. */
         private List<CastSpec> casts = new ArrayList<>();
     }
@@ -225,6 +235,29 @@ public final class BattleReplay {
          * 2026-10-30 one over six moments - and an AoE's share depends on how many targets exist when it lands.
          */
         private Integer arrivesAt;
+    }
+
+    /**
+     * A cast to perform before another one, without comparing it - see {@link Plan#getPreludes()}.
+     */
+    @Getter
+    @Setter
+    public static class PreludeSpec {
+
+        /** The cast index this runs before. */
+        private Integer before;
+
+        /** The character that casts it. */
+        private Integer actor;
+
+        /** A {@link com.laosun.aluminium.enums.SkillType} name. */
+        private String slot;
+
+        /** Which of the plan's enemies to aim at, 1-based; absent = no target (a buff/install cast). */
+        private Integer target;
+
+        /** Why the capture cannot show this cast. */
+        private String note;
     }
 
     /**
@@ -579,6 +612,7 @@ public final class BattleReplay {
             CanHit caster = casterOf(row.spec, battle, byCid);
             // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
             // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
+            runPreludes(row, battle, byCid, plan, enemies);
             applyStates(row, battle, byCid, plan);
             applyCastPanel(row, battle, byCid);
             // The bars are put where the capture had them BEFORE this cast, not only after it: an add that left the field
@@ -1977,6 +2011,39 @@ public final class BattleReplay {
             holder.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(state, 99));
         }
         System.out.println("     states:   " + states + " up for cast " + row.cast);
+    }
+
+
+    /**
+     * Performs the casts that precede this one and are not compared.
+     *
+     * @param row     the cast about to be driven
+     * @param battle  the battle
+     * @param byCid   the party
+     * @param plan    the plan, which declares them
+     * @param enemies the enemies, so a prelude may name a target
+     */
+    private static void runPreludes(Row row, Battle battle, Map<Integer, Character> byCid, Plan plan, List<Enemy> enemies) {
+        if (plan.getPreludes() == null) {
+            return;
+        }
+        for (PreludeSpec prelude : plan.getPreludes()) {
+            if (prelude.getBefore() == null || prelude.getBefore() != row.cast) {
+                continue;
+            }
+            Character actor = byCid.get(prelude.getActor());
+            Skill skill = actor == null || prelude.getSlot() == null ? null
+                    : actor.getSkills().get(com.laosun.aluminium.enums.SkillType.valueOf(prelude.getSlot()));
+            if (skill == null) {
+                System.out.println("     prelude:  SKIPPED - " + prelude.getActor() + " has no " + prelude.getSlot());
+                continue;
+            }
+            CanHit target = prelude.getTarget() == null || prelude.getTarget() < 1
+                    || prelude.getTarget() > enemies.size() ? null : enemies.get(prelude.getTarget() - 1);
+            battle.castImmediate(skill, actor, target == null ? List.of() : List.of(target));
+            System.out.printf(Locale.ROOT, "     prelude:  %d casts %s before cast %d (settles no damage, so the capture "
+                    + "cannot name it) - not compared%n", prelude.getActor(), prelude.getSlot(), row.cast);
+        }
     }
 
 }
