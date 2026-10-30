@@ -1113,12 +1113,13 @@ public final class BattleReplay {
                     default -> null;                        // an unknown slot is refused by the driver, loudly
                 });
             }
-            // The ROW LEVEL stays DECLARED, and this is why: the payload's `damage_percentage` is the instance's
-            // effective share, not the row's parameter - measured on 11413's slot 1, the capture states 0.06 where the
-            // Lv8 row's parameter is 0.12 (the 0.5 segment halves it). Solving a level from it would therefore pick the
-            // wrong row, so the level comes from the plan's `levels` map when it names one.
+            // The ROW LEVEL comes from the ACCOUNT, not from the payload: a capture never states which row level a hit
+            // was read at, while the archive does (`skills` for the character's own slots, `memosprite` for its 忆灵's).
+            // The plan's `levels` map still wins when it names one - a plan may know better than the archive.
             if (plan.getLevels() != null && plan.getLevels().containsKey(entry.castIndex())) {
                 spec.setLevel(plan.getLevels().get(entry.castIndex()));
+            } else {
+                spec.setLevel(accountLevel(spec.getActor(), spec.getCaster(), entry.slot()));
             }
             Double firstTarget = firstTargetByCast.get(entry.castIndex());
             spec.setTarget(firstTarget == null ? null : enemyByHealth(plan, firstTarget));
@@ -1234,5 +1235,64 @@ public final class BattleReplay {
     }
 
     private static final java.util.function.Supplier<com.google.gson.JsonObject> SKILLS = () -> SkillsHolder.VALUE;
+
+
+    /**
+     * The row level the account states for this slot: {@code skills.basic/skill/ult/talent} for a character's own slot,
+     * {@code memosprite.skill} for its 忆灵's data slots.
+     *
+     * <p>Read from {@code game/data/account.json} (a digest of the account archive). {@code null} when the account does not
+     * name the character - the driver then uses the skill's own level, as before.
+     *
+     * @param actor  the casting character's cid
+     * @param caster {@code character} or {@code memosprite}
+     * @param slot   the row's slot
+     * @return the level, or {@code null}
+     */
+    private static Integer accountLevel(Integer actor, String caster, int slot) {
+        com.google.gson.JsonObject account = ACCOUNT.get();
+        if (account == null || actor == null || !account.has("characters")
+                || !account.getAsJsonObject("characters").has(String.valueOf(actor))) {
+            return null;
+        }
+        com.google.gson.JsonObject who = account.getAsJsonObject("characters").getAsJsonObject(String.valueOf(actor));
+        String group = "memosprite".equals(caster) ? "memosprite" : "skills";
+        if (!who.has(group) || !who.getAsJsonObject(group).isJsonObject()) {
+            return null;
+        }
+        com.google.gson.JsonObject levels = who.getAsJsonObject(group);
+        String key = "memosprite".equals(caster)
+                ? (slot == 1 ? "skill" : slot == 4 ? "talent" : null)
+                : switch (slot) {
+                    case 1 -> "basic";
+                    case 2 -> "skill";
+                    case 3 -> "ult";
+                    case 4 -> "talent";
+                    default -> null;
+                };
+        if (key == null || !levels.has(key)) {
+            return null;
+        }
+        return levels.get(key).getAsInt();
+    }
+
+    /** {@code account.json}, read once. */
+    private static final class AccountHolder {
+        private static final com.google.gson.JsonObject VALUE = load();
+
+        private static com.google.gson.JsonObject load() {
+            try (java.io.InputStream stream = BattleReplay.class.getResourceAsStream("/game/data/account.json")) {
+                if (stream == null) {
+                    return null;
+                }
+                return com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(stream,
+                        java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            } catch (java.io.IOException e) {
+                return null;
+            }
+        }
+    }
+
+    private static final java.util.function.Supplier<com.google.gson.JsonObject> ACCOUNT = () -> AccountHolder.VALUE;
 
 }
