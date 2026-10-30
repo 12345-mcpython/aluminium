@@ -208,6 +208,14 @@ public final class BattleReplay {
          * which is why break damage could only be checked by back-solving its number.
          */
         private Double toughness;
+
+        /**
+         * The capture cast index at or after which this enemy is on the field; absent = it is there from the start.
+         *
+         * <p>Read off the capture (the first cast that hits it), because a recorded fight brings its enemies in waves - the
+         * 2026-10-30 one over six moments - and an AoE's share depends on how many targets exist when it lands.
+         */
+        private Integer arrivesAt;
     }
 
     /**
@@ -464,7 +472,19 @@ public final class BattleReplay {
                     enemy.getAttribute(AttributeType.DEFENCE).get(), enemy.getLevel());
         }
 
-        Battle battle = new Battle(party, enemies, new Random(0L));
+        // Only the enemies that were there on the capture's first cast; the rest join before the cast they first appear in.
+        List<Enemy> present = new ArrayList<>();
+        List<Enemy> latecomers = new ArrayList<>();
+        int firstCast = flow.isEmpty() ? 0 : flow.get(0).index();
+        for (int i = 0; i < enemies.size(); i++) {
+            Integer arrivesAt = plan.getEnemies().get(i).getArrivesAt();
+            if (arrivesAt == null || arrivesAt <= firstCast) {
+                present.add(enemies.get(i));
+            } else {
+                latecomers.add(enemies.get(i));
+            }
+        }
+        Battle battle = new Battle(party, present, new Random(0L));
         battle.startBattle();
         for (MemberSpec member : plan.getParty()) {
             if (member.getStates() == null || member.getStates().isEmpty()) {
@@ -511,6 +531,15 @@ public final class BattleReplay {
                 System.out.printf(Locale.ROOT, "%-4d %-6d %-10s %-10s %16.2f %16s %16s %10s%n",
                         row.cast, row.actor, row.kind, captureCell, row.captureDamage, "-", "-", "not in plan");
                 continue;
+            }
+            for (Enemy latecomer : latecomers) {
+                int index = enemies.indexOf(latecomer);
+                Integer arrivesAt = index < 0 ? null : plan.getEnemies().get(index).getArrivesAt();
+                if (arrivesAt != null && arrivesAt <= row.cast && !battle.enemyUnits().contains(latecomer)) {
+                    battle.addEnemy(latecomer);
+                    System.out.printf(Locale.ROOT, "     arrived: %s joins before cast %d (the capture first hits it here)%n",
+                            latecomer.getName(), row.cast);
+                }
             }
             Skill skill = skillOf(row.spec, battle, byCid);
             if (skill == null) {
@@ -1077,6 +1106,7 @@ public final class BattleReplay {
                     spec.getResistance().put(name.toUpperCase(java.util.Locale.ROOT), value);
                 }
             }
+            spec.setArrivesAt(firstHitCast(capture, uid));
             derived.put(uid, spec);
         }
         plan.setEnemies(new java.util.ArrayList<>(derived.values()));
@@ -1636,6 +1666,27 @@ public final class BattleReplay {
             double rounded = Math.rint(points);
             if (rounded >= 1 && Math.abs(points - rounded) <= 1e-6) {
                 return new int[]{level, (int) Math.round(rounded)};
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * The cast index of the first event that lands on one enemy - when it joined the fight, as far as the capture can say.
+     *
+     * @param capture the parsed capture
+     * @param uid     the enemy's uid
+     * @return the 1-based cast index, or {@code null} when the payload never hits it
+     */
+    private static Integer firstHitCast(com.google.gson.JsonObject capture, long uid) {
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null) {
+                return null;
+            }
+            if (event.getAsJsonObject("target").get("uid").getAsLong() == uid) {
+                return event.get("cast_index").getAsInt();
             }
         }
         return null;
