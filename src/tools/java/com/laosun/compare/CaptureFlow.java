@@ -73,7 +73,7 @@ public final class CaptureFlow {
      */
     record Cast(int index, long actor, String kind, String classification, double base, int hits, int targets,
                 double damage, double companion, int covered, double firstTarget, List<Double> hitBases,
-                double percentage, double attack, double health, double defence) {
+                double percentage, double attack, double health, double defence, long skillId) {
     }
 
     /**
@@ -98,6 +98,7 @@ public final class CaptureFlow {
         private double companion;
         private int covered;
         private double firstTarget;
+        private long skillId;
 
         private Group(int index, long actor, String kind, String classification, int attackType) {
             this.index = index;
@@ -109,7 +110,7 @@ public final class CaptureFlow {
 
         private Cast toCast() {
             return new Cast(index, actor, kind, classification, base, hits, targets.size(), damage, companion, covered,
-                    firstTarget, List.copyOf(hitBases), percentage, attack, health, defence);
+                    firstTarget, List.copyOf(hitBases), percentage, attack, health, defence, skillId);
         }
     }
 
@@ -201,6 +202,9 @@ public final class CaptureFlow {
      * Groups the flat event list into casts (see the class comment for the rule).
      */
     static List<Cast> group(JsonArray events) {
+        if (!events.isEmpty() && events.get(0).getAsJsonObject().has("cast_index")) {
+            return groupByCastIndex(events);
+        }
         List<Group> groups = new ArrayList<>();
         // Hits still waiting for their True companion, oldest first: companions arrive in the hits' own order, and a
         // hit's companion may arrive after the next cast has already started (measured: break, basic, break-companion,
@@ -230,6 +234,67 @@ public final class CaptureFlow {
                 current.firstTarget = numberOr(zones, "target_max_hp", 0);
                 // The panel the game itself used for this hit: BattleReplay installs it before driving the cast, so a
                 // window whose panel moved mid-fight is replayed at the panel the capture's own arithmetic used.
+                current.percentage = numberOr(zones, "damage_percentage", 0);
+                current.attack = numberOr(zones, "attacker_attack_lp", 0);
+                current.health = numberOr(zones, "attacker_hp_lp", 0);
+                current.defence = numberOr(zones, "attacker_defence", 0);
+            }
+            current.hits++;
+            current.hitBases.add(base);
+            current.damage += numberOr(event, "damage", 0);
+            current.targets.add(numberOr(zones, "target_max_hp", 0));
+            current.covered++;
+            pending.add(current);
+        }
+        List<Cast> casts = new ArrayList<>(groups.size());
+        for (Group group : groups) {
+            casts.add(group.toCast());
+        }
+        return casts;
+    }
+
+    /**
+     * Groups by the payload's OWN cast identity - {@code cast_index} - instead of inferring it from adjacency.
+     *
+     * <p>Why it exists: the older capture had no cast identity, so a cast was "the events whose actor and attack type
+     * did not change", and a rider delivered after the next cast had started was folded into the wrong one. The newer
+     * payload states the index, so the grouping is a partition of the payload rather than a guess. Within one index the
+     * old split still applies (a cast's own hits are one group, its rule-delivered hits and its break another), because
+     * {@code BattleReplay} compares a cast row against the skill's own instances only.
+     *
+     * @param events the payload's damage events, in payload order
+     * @return one {@link Cast} per (cast_index, actor, attack type) run, carrying the payload's index
+     */
+    static List<Cast> groupByCastIndex(JsonArray events) {
+        List<Group> groups = new ArrayList<>();
+        ArrayDeque<Group> pending = new ArrayDeque<>();
+        Group current = null;
+        int currentCast = Integer.MIN_VALUE;
+        for (int i = 0; i < events.size(); i++) {
+            JsonObject event = events.get(i).getAsJsonObject();
+            JsonObject zones = event.getAsJsonObject("zones");
+            long actor = event.getAsJsonObject("attacker").get("uid").getAsLong();
+            int attackType = (int) Math.rint(numberOr(zones, "attack_type", 0));
+            int castIndex = (int) Math.rint(numberOr(event, "cast_index", 0));
+            if (attackType == 13) {
+                Group waiting = pending.poll();
+                if (waiting != null) {
+                    waiting.companion += numberOr(event, "damage", 0);
+                    waiting.covered++;
+                }
+                continue;
+            }
+            if (current == null || currentCast != castIndex || current.actor != actor
+                    || current.attackType != attackType) {
+                current = new Group(castIndex, actor, text(event, "type"), classify(attackType), attackType);
+                current.skillId = (long) numberOr(event, "skill_id", 0);
+                groups.add(current);
+                currentCast = castIndex;
+            }
+            double base = numberOr(zones, "raw_damage_before_modifiers", 0);
+            if (current.hits == 0) {
+                current.base = base;
+                current.firstTarget = numberOr(zones, "target_max_hp", 0);
                 current.percentage = numberOr(zones, "damage_percentage", 0);
                 current.attack = numberOr(zones, "attacker_attack_lp", 0);
                 current.health = numberOr(zones, "attacker_hp_lp", 0);
