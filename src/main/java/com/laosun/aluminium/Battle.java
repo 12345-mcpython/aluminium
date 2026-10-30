@@ -1866,6 +1866,13 @@ public class Battle {
             return;
         }
         for (CanHit summon : summoned.drain()) {
+            if (summon.isDeath()) {
+                // It arrived and left before this settle: 1413's slot 7 summons nothing, but her 长夜 comes back and can be
+                // dismissed inside the same cast (measured: a re-summon followed by 「并使「长夜」消失」). Firing "when
+                // summoned" for a unit that is already gone makes every arrival rule that names `summon` resolve to
+                // nothing - the engine's own guard says so, and this is where the stale arrival comes from.
+                continue;
+            }
             fire(TriggerPayload.Simple.of(TriggerEvent.SUMMONED, summon, null, 0, 0));
         }
     }
