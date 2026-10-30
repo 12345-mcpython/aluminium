@@ -577,6 +577,18 @@ public final class BattleReplay {
             System.out.printf(Locale.ROOT, "%-4d %-6d %-10s %-10s %16.2f %16d %16.2f %10s%n",
                     row.cast, row.actor, row.kind, captureCell, row.captureDamage, window.size(), settled,
                     verdict.label());
+            if (verdict.comparable() && !verdict.agrees() && row.spec.getLevel() != null
+                    && !row.group.hitBases().isEmpty() && !engineBases.isEmpty()) {
+                // The factor is measured, not read off the verdict's label: that one is rounded to two decimals, which is
+                // too coarse to tell two adjacent row levels apart.
+                double factor = row.group.hitBases().getFirst() / engineBases.getFirst();
+                Integer hint = levelThatFits(row.spec, factor);
+                if (hint != null && !hint.equals(row.spec.getLevel())) {
+                    System.out.printf(Locale.ROOT, "     level:  the capture reads this row at %d, not %d (the engine is "
+                            + "linear in the row's parameter, so one measured base is enough to say which level fits)%n",
+                            hint, row.spec.getLevel());
+                }
+            }
             System.out.printf(Locale.ROOT, "     bases: capture %s%n", describeBases(row.group.hitBases()));
             System.out.printf(Locale.ROOT, "            engine  %s%s%n", describeBases(engineBases),
                     ruleInstances == 0 ? "" : "  (+" + ruleInstances + " rule instance(s))");
@@ -1294,5 +1306,69 @@ public final class BattleReplay {
     }
 
     private static final java.util.function.Supplier<com.google.gson.JsonObject> ACCOUNT = () -> AccountHolder.VALUE;
+
+
+    /**
+     * The row level whose parameter explains the capture's base, given that the engine is <b>linear</b> in that parameter
+     * (every other factor - the panel, the segment ratios, the zones - is the same at any level).
+     *
+     * <p>Measured, not assumed: the engine's own base at the level it used gives {@code K = base / param(level)}, and the
+     * capture's base divided by {@code K} is the parameter the row must have had. That is how 1413's 忆灵技1 is pinned to
+     * Lv8 in the recorded fight even though the account archive states 6 - the two disagree, and the capture decides.
+     *
+     * @param spec   the cast being driven
+     * @param factor the capture's first base divided by the engine's first base
+     * @return the level that would fit, or {@code null} when the numbers cannot say
+     */
+    private static Integer levelThatFits(CastSpec spec, double factor) {
+        if (factor <= 0 || Math.abs(factor - 1) < 1e-9) {
+            return null;
+        }
+        // A memosprite's row lives under its own servant id, not under its summoner's: read the servant id off the
+        // memosprite spec, the same way the casts were attributed.
+        int rowCid = spec.getActor() == null ? 0 : spec.getActor();
+        if ("memosprite".equals(spec.getCaster())) {
+            var summon = com.laosun.aluminium.data.Memosprites.of(rowCid);
+            if (summon == null || summon.servantId() == null) {
+                return null;
+            }
+            rowCid = summon.servantId();
+        }
+        com.google.gson.JsonArray rows = parameterRows(rowCid,
+                spec.getSlotNumber() != null ? spec.getSlotNumber() : slotNumber(spec.getSlot()));
+        if (rows == null || spec.getLevel() == null || spec.getLevel() < 1 || spec.getLevel() > rows.size()) {
+            return null;
+        }
+        double usedParam = rows.get(spec.getLevel() - 1).getAsJsonArray().get(0).getAsDouble();
+        if (usedParam <= 0) {
+            return null;
+        }
+        // The capture's base is `factor` times what this level produced, and the row's parameter scales that base
+        // linearly, so the parameter it used is `usedParam * factor`.
+        double needed = usedParam * factor;
+        for (int level = 1; level <= rows.size(); level++) {
+            double stated = rows.get(level - 1).getAsJsonArray().get(0).getAsDouble();
+            if (Math.abs(stated - needed) <= Math.max(1e-9, needed * 1e-6)) {
+                return level;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The data slot a {@link SkillType} name stands for, or {@code 0} for an unknown spelling.
+     */
+    private static int slotNumber(String slot) {
+        if (slot == null) {
+            return 0;
+        }
+        return switch (slot) {
+            case "COMMON" -> 1;
+            case "SKILL" -> 2;
+            case "ULTRA" -> 3;
+            case "TALENT" -> 4;
+            default -> 0;
+        };
+    }
 
 }
