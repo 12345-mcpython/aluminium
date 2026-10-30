@@ -805,6 +805,8 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 **上限**：录制者确认「n 实际封顶 4」（对应 +24%）⇒ `0.24 + 0.06 × min(4, n)`，最大 0.48。
 
+**tbgd 实证（2026-10-30，德谬歌能力文件）**：那个「增益」是**按 cid 分变体**的——`Servant_CyreneServant_00_Skill01_Phase02` 的 `OnStart[12]` 加 `MServant_CyreneServant_00_AmazingBuff_Hyacine`、`OnStart[13]` 加 `…_DanHengPT`；`Skill02_Phase02` 与 `PassiveSkill01` 里同样是"`Predicate` 比较 cid → `TaskList` 加变体"的结构。⇒ **n = 队伍里"有对应变体"的角色数**，这正好解释了捕获里的 **3/4**（1512 那一档没有变体）。我们内容目前只建模了一档（`ally_cid:1409` 的「献予「天空」之诗」）。⚠ 试过把标记规则挂 `from_skill_id: 19` 和 `1`，重放里都**没触发**（同一个字段在两条既有规则里分别是"能力 id"与"数据槽"，语义已分叉）⇒ 这一层要按 cid 变体逐条建模，不能靠一个"全体标记"糊过去（那样任何召唤物的 1 号技能都会误触发）。
+
 **收口条件（两步）**：① 引擎要能"数持有某 buff 的我方单位"（现有谓词只有 `debuff_count`，没有队伍侧的 `ally_buff_count`）；② `DAMAGE` 的 `percent` 要能加一项 `per_count × n`（上限 0.24）。有了这两样，`zone_true_damage_rider` 就写成 `0.24 + 0.06 × n`，19~21 条 0.42 rider 一次性进对账。补法：按"持有德谬歌增益的我方角色数"上调该规则的 `percent`，上限 +0.24；1415 在本账号是 **E2** ✓，所以这条在实战里一直生效。
 
 #### 🚧 1413 的「忆灵离场后再召唤」路径未走通（2026-10-30 实测，**内容缺口**）
