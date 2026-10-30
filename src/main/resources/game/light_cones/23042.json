@@ -3,60 +3,558 @@
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": ["actor == summon"],
+      "when": [
+        "actor == summon"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.18, "turns": 2, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.18,
+          "turns": 2,
+          "target": "all_enemies"
+        }
       ],
       "source": "光锥 23042（叠影 1）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.18、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23042_consume_on_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「普攻时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23042_consume_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「战技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23042_consume_on_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「终结技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone23042_next_memosprite_attack_pays_it_out",
+      "when": [
+        "actor == summon",
+        "self_resource:虹光累计消耗 > 0"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:虹光累计消耗",
+          "percent": 0.025,
+          "attacker": "summon",
+          "element": "Physical",
+          "target": "target"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "虹光累计消耗",
+          "spendAll": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「…并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「忆灵的**下一次**攻击**后**额外造成 1 次…**2.5%**」—— `SUMMON_ATTACK` 上的一条：`DAMAGE` 取 `self_resource:虹光累计消耗 × 0.025` ✓、打**这次攻击的目标** ✓、随后 `SPEND_RESOURCE spendAll` 清空 ✓（先伤害、后清空 —— 顺序就是规则的顺序 ✓）。⚠ 门里那句 `self_resource:虹光累计消耗 > 0` 是必要的：清空之后再攻击时，没有它就会照旧结算一发**0 基数**的附加伤害（引擎会给 1 点地板）✗ —— 实测红过一次 ✓。"
     }
   ],
   "2": [
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": ["actor == summon"],
+      "when": [
+        "actor == summon"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.225, "turns": 2, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.225,
+          "turns": 2,
+          "target": "all_enemies"
+        }
       ],
       "source": "光锥 23042（叠影 2）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.225、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23042_consume_on_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「普攻时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23042_consume_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「战技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23042_consume_on_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「终结技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone23042_next_memosprite_attack_pays_it_out",
+      "when": [
+        "actor == summon",
+        "self_resource:虹光累计消耗 > 0"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:虹光累计消耗",
+          "percent": 0.025,
+          "attacker": "summon",
+          "element": "Physical",
+          "target": "target"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "虹光累计消耗",
+          "spendAll": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「…并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「忆灵的**下一次**攻击**后**额外造成 1 次…**2.5%**」—— `SUMMON_ATTACK` 上的一条：`DAMAGE` 取 `self_resource:虹光累计消耗 × 0.025` ✓、打**这次攻击的目标** ✓、随后 `SPEND_RESOURCE spendAll` 清空 ✓（先伤害、后清空 —— 顺序就是规则的顺序 ✓）。⚠ 门里那句 `self_resource:虹光累计消耗 > 0` 是必要的：清空之后再攻击时，没有它就会照旧结算一发**0 基数**的附加伤害（引擎会给 1 点地板）✗ —— 实测红过一次 ✓。"
     }
   ],
   "3": [
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": ["actor == summon"],
+      "when": [
+        "actor == summon"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.27, "turns": 2, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.27,
+          "turns": 2,
+          "target": "all_enemies"
+        }
       ],
       "source": "光锥 23042（叠影 3）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.27、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23042_consume_on_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「普攻时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23042_consume_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「战技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23042_consume_on_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「终结技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone23042_next_memosprite_attack_pays_it_out",
+      "when": [
+        "actor == summon",
+        "self_resource:虹光累计消耗 > 0"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:虹光累计消耗",
+          "percent": 0.025,
+          "attacker": "summon",
+          "element": "Physical",
+          "target": "target"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "虹光累计消耗",
+          "spendAll": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「…并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「忆灵的**下一次**攻击**后**额外造成 1 次…**2.5%**」—— `SUMMON_ATTACK` 上的一条：`DAMAGE` 取 `self_resource:虹光累计消耗 × 0.025` ✓、打**这次攻击的目标** ✓、随后 `SPEND_RESOURCE spendAll` 清空 ✓（先伤害、后清空 —— 顺序就是规则的顺序 ✓）。⚠ 门里那句 `self_resource:虹光累计消耗 > 0` 是必要的：清空之后再攻击时，没有它就会照旧结算一发**0 基数**的附加伤害（引擎会给 1 点地板）✗ —— 实测红过一次 ✓。"
     }
   ],
   "4": [
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": ["actor == summon"],
+      "when": [
+        "actor == summon"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.315, "turns": 2, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.315,
+          "turns": 2,
+          "target": "all_enemies"
+        }
       ],
       "source": "光锥 23042（叠影 4）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.315、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23042_consume_on_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「普攻时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23042_consume_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「战技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23042_consume_on_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「终结技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone23042_next_memosprite_attack_pays_it_out",
+      "when": [
+        "actor == summon",
+        "self_resource:虹光累计消耗 > 0"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:虹光累计消耗",
+          "percent": 0.025,
+          "attacker": "summon",
+          "element": "Physical",
+          "target": "target"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "虹光累计消耗",
+          "spendAll": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「…并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「忆灵的**下一次**攻击**后**额外造成 1 次…**2.5%**」—— `SUMMON_ATTACK` 上的一条：`DAMAGE` 取 `self_resource:虹光累计消耗 × 0.025` ✓、打**这次攻击的目标** ✓、随后 `SPEND_RESOURCE spendAll` 清空 ✓（先伤害、后清空 —— 顺序就是规则的顺序 ✓）。⚠ 门里那句 `self_resource:虹光累计消耗 > 0` 是必要的：清空之后再攻击时，没有它就会照旧结算一发**0 基数**的附加伤害（引擎会给 1 点地板）✗ —— 实测红过一次 ✓。"
     }
   ],
   "5": [
     {
       "on": "SUMMON_ATTACK",
       "id": "cone23042_vulnerability_on_memosprite_skill",
-      "when": ["actor == summon"],
+      "when": [
+        "actor == summon"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.36, "turns": 2, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.36,
+          "turns": 2,
+          "target": "all_enemies"
+        }
       ],
       "source": "光锥 23042（叠影 5）: 「装备者的忆灵施放忆灵技时，使敌方全体受到的伤害提高#4[f1]%，持续#5[i]回合。同类效果无法叠加。」 `EquipmentSkillConfig` 的 ParamList #4 = 0.36、#5 = 2",
       "note": "「装备者的**忆灵施放忆灵技**时，使敌方全体受到的伤害提高 18%，持续 2 回合，同类不叠加」—— `SUMMON_ATTACK` ＋ `actor == summon` ＋ `MODIFY_DAMAGE_TAKEN{target: all_enemies, turns: 2}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23042_stat`** ✗ —— 「速度提高 #1%」**就是光锥自己的** `speed_percent` 属性（18% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：整句「施放普攻/战技/终结技时**消耗我方全体当前生命值 1%**，并使装备者的**忆灵下一次攻击后额外造成 1 次、数值为消耗总量 2.5% 的附加伤害**，随后清空」**没有** ✗ —— 需要「把消耗总量记下来、在下一次忆灵攻击后按它结算一次附加伤害并清零」✗（没有「累计量」资源，也没有「下一次某单位攻击后」的窗口 ✗）⇒ 等价缺口。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23042_consume_on_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「普攻时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23042_consume_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「战技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23042_consume_on_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.01,
+          "target": "all_allies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "虹光累计消耗",
+          "amountFromPrevious": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「施放普攻/战技/终结技时，消耗我方全体当前生命值 1%，并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「终结技时**消耗我方全体当前生命值 1%**」—— ① `CONSUME_HP` + **`target_current_hp`**（本轮新开的 scale ✓：原先只有 `*_max_hp`，而句子要的是**当前**值 ✓）＋ `percent: 0.01` ＋ `target: all_allies` ✓；② 「消耗**总量**」= 同一条规则的下一条 `GAIN_RESOURCE amountFromPrevious`（本轮让 `CONSUME_HP` 也填这条通道 ✓：量法是**全战场 HP 的前后差** ✓ ⇒ 谁被扣都算得到 ✓）。"
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "cone23042_next_memosprite_attack_pays_it_out",
+      "when": [
+        "actor == summon",
+        "self_resource:虹光累计消耗 > 0"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:虹光累计消耗",
+          "percent": 0.025,
+          "attacker": "summon",
+          "element": "Physical",
+          "target": "target"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "虹光累计消耗",
+          "spendAll": true
+        }
+      ],
+      "source": "23042 愿虹光永驻天空: 「…并使忆灵的下一次攻击后额外造成 1 次数值为消耗总量 2.5% 的附加伤害，随后清空。」",
+      "note": "「忆灵的**下一次**攻击**后**额外造成 1 次…**2.5%**」—— `SUMMON_ATTACK` 上的一条：`DAMAGE` 取 `self_resource:虹光累计消耗 × 0.025` ✓、打**这次攻击的目标** ✓、随后 `SPEND_RESOURCE spendAll` 清空 ✓（先伤害、后清空 —— 顺序就是规则的顺序 ✓）。⚠ 门里那句 `self_resource:虹光累计消耗 > 0` 是必要的：清空之后再攻击时，没有它就会照旧结算一发**0 基数**的附加伤害（引擎会给 1 点地板）✗ —— 实测红过一次 ✓。"
+    }
+  ],
+  "resources": [
+    {
+      "id": "虹光累计消耗",
+      "max": 1000000,
+      "source": "23042 愿虹光永驻天空: 「消耗总量」—— 这只计数器装的是**上一次普攻/战技/终结技**消耗掉的我方全体生命值之和。",
+      "note": "上限只是容量（生命值是几千到几万点，100 万足够 ✓）。计数器由**光锥文件**声明 ✓ —— 本轮把 `TriggerTable.plus` 从「两侧都声明就拒绝」放宽成「**id 不冲突就合并**」✓，所以角色自己的计数器与光锥的可以并存 ✓。"
     }
   ]
 }

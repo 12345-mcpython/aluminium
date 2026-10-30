@@ -360,18 +360,24 @@ public class CharacterResourceTest {
     }
 
     /**
-     * Two sets of declarations have no defined owner, so the merge refuses rather than picking one.
+     * Two files may each own <b>different</b> counters - the character's own and the light cone's - so the merge keeps
+     * both; only a name declared on both sides is refused, because that one would have two owners.
      */
     @Test
-    public void mergingTwoDeclaringTablesIsRefused() {
+    public void mergingTwoDeclaringTablesKeepsBothUnlessTheNamesClash() {
         TriggerTable one = new TriggerTable(HIMEKO, List.of(chargeThresholdRule()),
                 List.of(new ResourceSpec(CHARGE, 3)));
         TriggerTable two = new TriggerTable(HIMEKO, List.of(chargeThresholdRule()),
                 List.of(new ResourceSpec("残梦", 9)));
 
+        TriggerTable merged = one.plus(two);
+        Assertions.assertEquals(2, merged.resources().size(),
+                "two disjoint declarations both survive: " + merged.resources());
+
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> one.plus(two));
-        Assertions.assertTrue(rejected.getMessage().contains("declare resources"), rejected.getMessage());
+                () -> one.plus(new TriggerTable(HIMEKO, List.of(chargeThresholdRule()),
+                        List.of(new ResourceSpec(CHARGE, 9)))));
+        Assertions.assertTrue(rejected.getMessage().contains("one id, one owner"), rejected.getMessage());
     }
 
     /**

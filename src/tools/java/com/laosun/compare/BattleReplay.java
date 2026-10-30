@@ -451,9 +451,16 @@ public final class BattleReplay {
             }
             driven++;
             double settled = window.stream().mapToDouble(Settled::applied).sum();
+            // The capture's group lists what the SKILL's row dealt; a rule-delivered rider (an ADDITIONAL instance, e.g.
+            // cone 23042's 2.5%-of-consumed-HP burst) is booked by the engine under the same cast but is not one of the
+            // skill's own hits, so it must not turn a matching row into DIFFERS. It is counted and printed instead.
             List<Double> engineBases = window.stream()
+                    .filter(each -> each.damage().getType() != com.laosun.aluminium.enums.DamageType.ADDITIONAL)
                     .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
                     .toList();
+            long ruleInstances = window.stream()
+                    .filter(each -> each.damage().getType() == com.laosun.aluminium.enums.DamageType.ADDITIONAL)
+                    .count();
             BaseVerdict verdict = compareBases(row.group, engineBases);
             // The folded groups (derived hits, breaks) carry their own bases: match each against the engine instances
             // this cast settled, so "18 groups" means 18 numbers checked rather than 13 checked and 5 summed.
@@ -492,7 +499,8 @@ public final class BattleReplay {
                     row.cast, row.actor, row.kind, captureCell, row.captureDamage, window.size(), settled,
                     verdict.label());
             System.out.printf(Locale.ROOT, "     bases: capture %s%n", describeBases(row.group.hitBases()));
-            System.out.printf(Locale.ROOT, "            engine  %s%n", describeBases(engineBases));
+            System.out.printf(Locale.ROOT, "            engine  %s%s%n", describeBases(engineBases),
+                    ruleInstances == 0 ? "" : "  (+" + ruleInstances + " rule instance(s))");
             if (detail) {
                 // Which row the engine actually read: the first thing a reconciliation has to know, because a
                 // multiplier that disagrees is either the wrong row or the wrong attribute and the two look alike.

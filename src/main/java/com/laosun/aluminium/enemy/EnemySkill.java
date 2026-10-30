@@ -164,7 +164,7 @@ public class EnemySkill extends Skill {
         // to the rule owner's own. Not raised when nothing was hit: "an attack happened" is not "a unit
         // existed".
         if (!hitTargets.isEmpty()) {
-            battle.fire(TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, user, null,
+            battle.fire(TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, user, hitTargets.iterator().next(),
                     hitTargets.size(), 0));
             // ...and the enemy's own half of the same fact. An enemy action runs its own path, so before this a
             // clause of the form "when an enemy attacks" had no event at all. The victim is passed as the target
