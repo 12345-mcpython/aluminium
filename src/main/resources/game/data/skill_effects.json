@@ -740,6 +740,11 @@
   "1413": {
     "2": {
       "note": "⭐ 2026-10-02：战技的**全体忆灵暴伤**已成句（它也是 1141524 第三句要“额外提高”的那个效果）。"
+    },
+    "3": {
+      "executor": "summon",
+      "source": "2026-10-30（tbgd 实证）：`Avatar_Evernight_00_Skill03_Servant_Damage` 的 `AttackProperty.AttackType = \"Ultra\"`、`OnStart[0].TargetType = Caster.GetSummoner` ⇒ **行是终结技的、打出去的是忆灵「长夜」**。`AvatarServantConfig`：`HPInherit: \"#5\"`、`HPSkill: 141304`，而 1413/4 的 Lv10 param#5 = 0.5 ⇒ 长夜生命 = 主人 50%；200% × 50% = 100% 主人面板，与捕获 `base/pct = 4526.4984 = attacker_hp_lp` 逐位一致 ✓。⚠ 这一行原本没有条目（只有 `1413/2` 和 `11413/1`、`11413/7`），份额仍由 `param_list` 提供。",
+      "note": "⚠ 只声明\"谁打出去\"，不改份额/分段：`damage_percentage` 在捕获里是 2.0（终结技 Lv10 的 param[0]），而攻击者记在忆灵名下 —— 这样「长夜造成的伤害提高 60%」与 1415 结界的 24% rider 就都落到长夜身上 ✓。"
     }
   },
   "1407": {

@@ -459,14 +459,27 @@ public final class SkillExecutor {
         AttributeType baseAttribute = data.damageBaseAttribute();
         // A row may state a share that GROWS with a resource: 11413/1's 「长夜月当前每有 #3 点【忆质】，则额外造成 #2%」,
         // which the game folds into the same six instances (the capture's one cast reads 0.09 where the row says 0.06).
+        // Who DEALS this row's damage. A skill row may state that its damage is executed by the caster's summon (1413's
+        // ultimate: 「使忆灵「长夜」对敌方全体造成等同于「长夜」200%生命上限的冰属性伤害」 - the ability's own AttackType is Ultra, so
+        // the ROW is the ultimate's while the HIT is the servant's). Attribution matters: 「长夜造成的伤害提高 60%」 and the
+        // 24% zone rider key off the attacker, and the recorded fight stamps these instances with the servant as attacker.
+        CanHit attacker = user;
+        com.laosun.aluminium.beans.SkillEffectSpec rowSpec = com.laosun.aluminium.data.SkillEffects.forSkill(skill);
+        if (rowSpec != null && "summon".equalsIgnoreCase(rowSpec.getExecutor())) {
+            CanHit executedBy = battle.summonOf(user);
+            // No summon on the field: the cast is DELEGATED (1415's ultimate activates another unit's ultimate) and such a
+            // cast deals nothing of its own - a witness pins that. Falling back to the caster keeps that behaviour instead
+            // of turning a delegated cast into an engine fault.
+            attacker = executedBy == null ? user : executedBy;
+        }
         double rowShare = params.getFirst() + resourceShareOf(skill, user, params);
-        double base = user.damageBase(baseAttribute) * rowShare;
+        double base = attacker.damageBase(baseAttribute) * rowShare;
         // Note: A blast states TWO multipliers: the centre and the neighbours. 1008's ultimate row is
         // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%...and 160% to enemies adjacent to it".
         // Applying the centre value to the neighbours too would double the documented damage on every
         // blast skill in the corpus.
         double neighbourBase = params.size() > 1
-                ? user.damageBase(baseAttribute) * params.get(1)
+                ? attacker.damageBase(baseAttribute) * params.get(1)
                 : base;
         CanHit mainTarget = targets.getFirst();
 
@@ -506,7 +519,7 @@ public final class SkillExecutor {
                 || "ELATION_SKILL".equalsIgnoreCase(elationKind))) {
             int elationHits = (int) Math.round(params.getFirst());
             double perHit = params.size() > 1 ? params.get(1) : params.getFirst();
-            double perHitBase = user.damageBase(baseAttribute) * perHit;
+            double perHitBase = attacker.damageBase(baseAttribute) * perHit;
             // The rule, applied here too: the row's stance value is the WHOLE skill's toughness reduction, so it is spread
             // evenly over the instances this row settles (the hits plus the one final split instance).
             double elationStance = data.stanceFor(true) / Math.max(1, elationHits + 1);
@@ -516,15 +529,15 @@ public final class SkillExecutor {
                 if (victim == null) {
                     break;
                 }
-                totalDamage += hit(battle, data, user, element, perHitBase, victim, hitTargets, elationStance,
+                totalDamage += hit(battle, data, attacker, element, perHitBase, victim, hitTargets, elationStance,
                         skill.getSkillSlot());
             }
             if (params.size() > 2) {
                 List<CanHit> everyone = battle.targetableEnemies();
                 if (!everyone.isEmpty()) {
-                    double share = user.damageBase(baseAttribute) * params.get(2) / everyone.size();
+                    double share = attacker.damageBase(baseAttribute) * params.get(2) / everyone.size();
                     for (CanHit victim : everyone) {
-                        totalDamage += hit(battle, data, user, element, share, victim, hitTargets, elationStance,
+                        totalDamage += hit(battle, data, attacker, element, share, victim, hitTargets, elationStance,
                                 skill.getSkillSlot());
                     }
                 }
@@ -543,12 +556,12 @@ public final class SkillExecutor {
                 List<Double> segments = segmentsOf(skill);
                 double stance = data.getStanceList().single();
                 if (segments.size() <= 1) {
-                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, stance,
+                    totalDamage += hit(battle, data, attacker, element, base, mainTarget, hitTargets, stance,
                             skill.getSkillSlot());
                 } else {
                     double perInstanceStance = stance / segments.size();
                     for (Double ratio : segments) {
-                        totalDamage += hit(battle, data, user, element, base * ratio, mainTarget, hitTargets,
+                        totalDamage += hit(battle, data, attacker, element, base * ratio, mainTarget, hitTargets,
                                 perInstanceStance, skill.getSkillSlot());
                     }
                 }
@@ -563,7 +576,7 @@ public final class SkillExecutor {
                     double instanceBase = perResource == null
                             ? base
                             : perResourceBase(user, baseAttribute, params, perResource, target == mainTarget);
-                    totalDamage += hit(battle, data, user, element, instanceBase, target, hitTargets, stance,
+                    totalDamage += hit(battle, data, attacker, element, instanceBase, target, hitTargets, stance,
                             skill.getSkillSlot());
                 }
             }
@@ -574,15 +587,15 @@ public final class SkillExecutor {
                 double centreStance = data.stanceFor(true);
                 double neighbourStance = data.stanceFor(false);
                 if (center < 0) {
-                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, centreStance, skill.getSkillSlot());
+                    totalDamage += hit(battle, data, attacker, element, base, mainTarget, hitTargets, centreStance, skill.getSkillSlot());
                 } else {
-                    totalDamage += hit(battle, data, user, element, base, alive.get(center), hitTargets, centreStance, skill.getSkillSlot());
+                    totalDamage += hit(battle, data, attacker, element, base, alive.get(center), hitTargets, centreStance, skill.getSkillSlot());
                     if (center > 0) {
-                        totalDamage += hit(battle, data, user, element, neighbourBase, alive.get(center - 1),
+                        totalDamage += hit(battle, data, attacker, element, neighbourBase, alive.get(center - 1),
                                 hitTargets, neighbourStance, skill.getSkillSlot());
                     }
                     if (center < alive.size() - 1) {
-                        totalDamage += hit(battle, data, user, element, neighbourBase, alive.get(center + 1),
+                        totalDamage += hit(battle, data, attacker, element, neighbourBase, alive.get(center + 1),
                                 hitTargets, neighbourStance, skill.getSkillSlot());
                     }
                 }
@@ -595,7 +608,7 @@ public final class SkillExecutor {
                 Double bounceShare = data.bounceDamageShare(user.skillLevel(skill));
                 double bounceBase = bounceShare == null
                         ? base
-                        : user.damageBase(baseAttribute) * bounceShare;
+                        : attacker.damageBase(baseAttribute) * bounceShare;
                 Integer additional = data.bounceAdditionalHits(bounceShare, user.skillLevel(skill));
                 int hits = (additional == null ? 0 : additional) + 1;
                 // plus whatever a rule has granted this slot.
@@ -610,7 +623,7 @@ public final class SkillExecutor {
                     if (alive.isEmpty()) {
                         break;                                     // all dead to the remaining hits are forfeited
                     }
-                    totalDamage += hit(battle, data, user, element, bounceBase,
+                    totalDamage += hit(battle, data, attacker, element, bounceBase,
                             alive.get(battle.getRng().nextInt(alive.size())), hitTargets, perHitStance, skill.getSkillSlot());
                 }
             }
