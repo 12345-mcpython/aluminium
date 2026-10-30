@@ -105,6 +105,8 @@
 | `ref` | `ref` | `game/data/predicates.json` 里的**具名谓词** ✓ —— `{"name": {"type": ...}}` ✓ |
 
 **实体子谓词**（`json` 的键；未列出的键、类型不对的值，**装载期就拒绝** ✓）：
+⚠ **分段的两个边界**（2026-10-30，读 `skill_segments_fields_zh.md` 后核过）：① `segments` 是**同一批目标**的份额序列（`HitSplitRatio` = 乘性份额 ✓），所以"同一发打不同目标类别、各自吃满"（`[1.0, 1.0]`，如 11415/1、11413/8）**不能**写成 `segments`，要写 `damage_parts` ✓；② **`multi_target_rule`（每目标每段 = 行倍率 ÷ N）引擎还没有** —— 全表只有 8 条段实例用到，且**都不在复刻的四人身上**（见 `AGENT.md` P9-6 ✓）。
+
 ⚠ **`event` 谓词**（2026-10-29）：有些条件说的是**这次施放**而不是任何单位 —— `{"type": "event", "json": {"from_skill_id": 1}}`、`{"type": "event", "json": {"from_skill": "SKILL"}}`、`{"type": "event", "json": {"damage_is_attack": true}}`。它**不新开文法**：把事实渲染成条件文字后交给 `TriggerConditionParser` 编译 ✓ ⇒ 语义与拼法都只有一份 ✓（`source()` 就是那句话本身 ✓）。配合**开区间** `{"gt": 200}` / `{"lt": 200}`（「速度**大于** 200」没有闭区间写法 ✓），四人文件里的字符串 `when` 已经**清零** ✓。`n`n⚠ **`memosprite_name`**（2026-10-29）：`SUMMON` 可以指出**召唤哪一只**忆灵（1512 的三只「晴空乐手」✓）。忆灵文件可写**一个对象**（绝大多数角色）或**数组**（一角色多忆灵 ✓）；`Memosprites.of` 仍答第一个 ⇒ 老调用方不用改 ✓。
 
 ⚠ **`once_per_turn`**（2026-10-29）：效果级「本回合第一次」—— `{"op": "GAIN_RESOURCE", "amount": 1, "once_per_turn": "heal_or_shield"}`（1512 天赋 ✓）。窗口是**回合**、key 由作者给 ⇒ 两条规则可以用**同一个 key** 表示"同一件事"（治疗与护盾 ✓）；窗口在 **`TURN_START` 事件**上打开 ✓（不是"自己的回合"，句子说的是「任意目标回合」✓）。
