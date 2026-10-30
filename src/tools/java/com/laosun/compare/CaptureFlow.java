@@ -286,7 +286,10 @@ public final class CaptureFlow {
             }
             if (current == null || currentCast != castIndex || current.actor != actor
                     || current.attackType != attackType) {
-                current = new Group(castIndex, actor, text(event, "type"), classify(attackType), attackType);
+                String kind = text(event, "type");
+                current = new Group(castIndex, actor, kind,
+                        isDerivedType(kind) ? ("Break".equals(kind) ? "break" : "derived") : classify(attackType),
+                        attackType);
                 current.skillId = (long) numberOr(event, "skill_id", 0);
                 groups.add(current);
                 currentCast = castIndex;
@@ -323,6 +326,21 @@ public final class CaptureFlow {
             case 10 -> "break";
             default -> "cast";
         };
+    }
+
+    /**
+     * Whether an event's own {@code type} says it is not a cast of its own - a periodic tick or a rule-delivered rider
+     * rather than a skill being cast.
+     *
+     * <p>{@code DoT} is the one this project met late: a damage-over-time tick has a {@code cast_index} and a target, but no
+     * skill row, so treating it as a cast made the replay report "the character has no null slot" for a cast that never
+     * existed. It belongs with the derived instances: printed, matched against the engine's own instances, not driven.
+     *
+     * @param type the payload's {@code type}
+     * @return whether it is a derived instance
+     */
+    private static boolean isDerivedType(String type) {
+        return "DoT".equals(type) || "True".equals(type) || "Additional".equals(type) || "Break".equals(type);
     }
 
     private static String text(JsonObject object, String key) {
