@@ -413,8 +413,13 @@ public final class BattleReplay {
             // groups under one index (1413's ultimate: the servant's swing, then the ultimate's own hit). The entry's
             // target belongs to the first of them, so the check only applies there - the others are driven at the same
             // enemy, and a mismatch on them would compare two different groups against one number.
+            // The plan's target must be one the cast actually hit - not necessarily the FIRST one: an AoE's row can pay
+            // its main target double, and the tool drives such a row at the enemy the capture dealt the most to.
+            boolean hit = spec.getTarget() != null && spec.getTarget() >= 1 && spec.getTarget() <= plan.getEnemies().size()
+                    && groupHitHealths(capture, group)
+                    .contains(plan.getEnemies().get(spec.getTarget() - 1).getHealth());
             if (seenGroups.add(specKey(group.index(), group.kind()))
-                    && spec.getTarget() != null && spec.getTarget() != captured) {
+                    && spec.getTarget() != null && !hit && spec.getTarget() != captured) {
                 System.out.println("replay: cast " + group.index() + " was aimed at enemy " + captured
                         + " in the capture but at " + spec.getTarget() + " in the plan");
                 return 2;
@@ -485,6 +490,7 @@ public final class BattleReplay {
             }
         }
         Battle battle = new Battle(party, present, new Random(0L));
+        CURRENT_BATTLE = battle;
         battle.startBattle();
         for (MemberSpec member : plan.getParty()) {
             if (member.getStates() == null || member.getStates().isEmpty()) {
@@ -562,6 +568,7 @@ public final class BattleReplay {
             for (int i = 0; i < repeat; i++) {
                 battle.castImmediate(skill, caster, target == null ? List.of() : List.of(target));
             }
+            syncBars(row, capture, enemies, plan);
             driven++;
             double settled = window.stream().mapToDouble(Settled::applied).sum();
             // The capture's group lists what the SKILL's row dealt; a rule-delivered rider (an ADDITIONAL instance such as
@@ -1195,7 +1202,13 @@ public final class BattleReplay {
                             (double) stepped));
                 }
             }
-            spec.setTarget(group.firstTarget() > 0 ? enemyByHealth(plan, group.firstTarget()) : null);
+            // The cast is DRIVEN at the enemy the capture dealt the most to - its "main" target. For a row whose shares
+            // differ per target (11413's slot 7 pays the main target double), driving at an underling halves every base,
+            // measured on cast 58.
+            Long main = mainTargetOf(capture, group);
+            Integer targetIndex = main == null ? null : TARGET_UIDS.indexOf(main);
+            spec.setTarget(targetIndex == null || targetIndex < 0 || targetIndex >= plan.getEnemies().size()
+                    ? null : targetIndex + 1);
             spec.setNote("derived from cast_index " + group.index() + " (" + group.kind() + ") / skill " + skillId);
             casts.add(spec);
             seenGroups.add(specKey(group.index(), group.kind()));
@@ -1690,6 +1703,104 @@ public final class BattleReplay {
             }
         }
         return null;
+    }
+
+
+    /**
+     * Moves every enemy the capture's cast touched to the bar the capture states afterwards.
+     *
+     * <p>Why: the payload carries {@code hp_before} / {@code hp_after} per event, so a replay can keep the recorded fight's
+     * casualties instead of producing its own. Measured on 1413's AoE (cast 18 / 58): with all nine enemies laid out at turn
+     * one the row faced nine targets while the capture faced two.
+     *
+     * @param row     the cast that was just driven
+     * @param capture the parsed capture
+     * @param enemies the plan's enemies, in plan order
+     * @param plan    the plan
+     */
+    private static void syncBars(Row row, com.google.gson.JsonObject capture, List<Enemy> enemies, Plan plan) {
+        java.util.Map<Long, Double> after = new java.util.HashMap<>();
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null || event.get("cast_index").getAsInt() != row.cast
+                    || !event.has("hp_after") || event.get("hp_after").isJsonNull()) {
+                continue;
+            }
+            after.put(event.getAsJsonObject("target").get("uid").getAsLong(), event.get("hp_after").getAsDouble());
+        }
+        for (java.util.Map.Entry<Long, Double> entry : after.entrySet()) {
+            int index = TARGET_UIDS.indexOf(entry.getKey());
+            if (index < 0 || index >= enemies.size() || index >= plan.getEnemies().size()) {
+                continue;
+            }
+            Enemy enemy = enemies.get(index);
+            if (CURRENT_BATTLE == null || !CURRENT_BATTLE.enemyUnits().contains(enemy)) {
+                continue;                               // it has not joined yet
+            }
+            double delta = entry.getValue() - enemy.getCurrentHp();
+            if (delta > 0) {
+                enemy.heal(delta);
+            } else if (delta < 0) {
+                enemy.takeDamage(-delta, false);
+            }
+        }
+    }
+
+    /** The battle the loop is driving, so {@link #syncBars} can tell which enemies have joined. */
+    private static Battle CURRENT_BATTLE;
+
+
+    /**
+     * The uid of the enemy the capture's cast hit hardest - the row's main target.
+     *
+     * @param capture the parsed capture
+     * @param group   the capture group
+     * @return the uid, or {@code null} when no event of the group carries a base
+     */
+    private static Long mainTargetOf(com.google.gson.JsonObject capture, CaptureFlow.Cast group) {
+        Long best = null;
+        double most = Double.NEGATIVE_INFINITY;
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null || event.get("cast_index").getAsInt() != group.index()
+                    || !group.kind().equals(event.get("type").getAsString())) {
+                continue;
+            }
+            com.google.gson.JsonObject zones = event.getAsJsonObject("zones");
+            if (!zones.has("raw_damage_before_modifiers")) {
+                continue;
+            }
+            double base = zones.get("raw_damage_before_modifiers").getAsDouble();
+            if (base > most) {
+                most = base;
+                best = event.getAsJsonObject("target").get("uid").getAsLong();
+            }
+        }
+        return best;
+    }
+
+
+    /**
+     * Every target the capture's group hit, identified by 生命上限 - the payload's only per-target identity.
+     *
+     * @param capture the parsed capture
+     * @param group   the capture group
+     * @return the lives it touched
+     */
+    private static java.util.Set<Double> groupHitHealths(com.google.gson.JsonObject capture, CaptureFlow.Cast group) {
+        java.util.Set<Double> lives = new java.util.LinkedHashSet<>();
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null || event.get("cast_index").getAsInt() != group.index()
+                    || !group.kind().equals(event.get("type").getAsString())) {
+                continue;
+            }
+            com.google.gson.JsonObject zones = event.getAsJsonObject("zones");
+            if (zones.has("target_max_hp")) {
+                lives.add(zones.get("target_max_hp").getAsDouble());
+            }
+        }
+        return lives;
     }
 
 }
