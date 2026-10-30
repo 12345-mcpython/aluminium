@@ -100,6 +100,9 @@ public class EffectSpec {
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
         copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
+        copy.percentPerAllyState = this.percentPerAllyState;
+        copy.allyState = this.allyState;
+        copy.allyStateCap = this.allyStateCap;
         copy.amountFromSkillParam = this.amountFromSkillParam;
         copy.amountFrom = NumberProviders.copyOf(this.amountFrom);
         copy.amountFromCastParam = this.amountFromCastParam;
@@ -1007,6 +1010,24 @@ public class EffectSpec {
      */
     @SerializedName("amount_from_summon_param")
     private String amountFromSummonParam;
+
+    /**
+     * A share that GROWS with how many of the owner's allies hold a named state: {@code percent + per x count}, capped.
+     *
+     * <p>Reader: 1415's Eidolon 2 - 「每有 1 名不同的我方角色获得德谬歌忆灵技的增益效果，我方目标通过战技的结界造成的真实伤害倍率
+     * 提高 6%，最多提高 24%」. Measured on the 2026-10-30 fight: three allies held it (1409 / 1413 / 1415, and NOT 1512), and the
+     * recorded rider reads 0.42 where the row says 0.24 - i.e. {@code 0.24 + 3 x 0.06}, additive, not multiplicative.
+     */
+    @SerializedName("percent_per_ally_state")
+    private Double percentPerAllyState;
+
+    /** The state counted by {@link #percentPerAllyState}: one ally character counts once, however many stacks it has. */
+    @SerializedName("ally_state")
+    private String allyState;
+
+    /** The cap on the count above (the Eidolon states four allies = +24%). */
+    @SerializedName("ally_state_cap")
+    private Integer allyStateCap;
 
     /**
      * The <b>number provider</b> form of the share: {@code {"type": "skill_param", "skill": "SKILL", "index": 1}}.

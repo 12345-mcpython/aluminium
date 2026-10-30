@@ -2413,6 +2413,18 @@ public final class TriggerInterpreter {
         if (damageType == null && "TALENT".equalsIgnoreCase(effect.getSkill())) {
             damageType = DamageType.TALENT;
         }
+        // A share that grows with how many allies hold a state: `percent + per x count`. Expressed as a factor on the BASE
+        // because that is where `percent` has already been multiplied in (the base is `percent x the source magnitude`), so
+        // `base x (percent + term) / percent` is exactly the share the sentence describes - and it leaves every other row
+        // (no `percent_per_ally_state`) untouched.
+        Double perAlly = effect.getPercentPerAllyState();
+        if (perAlly != null && effect.getAllyState() != null && !effect.getAllyState().isBlank()
+                && base != 0 && effect.getPercent() != null && effect.getPercent() > 0) {
+            double term = TriggerMagnitudes.allyStateTerm(effect, ctx);
+            if (term != 0) {
+                base *= 1 + term / effect.getPercent();
+            }
+        }
         double settledBase = damageType == DamageType.ELATION
                 ? base * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get()) * laughFactor(ctx, effect)
                 : base;
