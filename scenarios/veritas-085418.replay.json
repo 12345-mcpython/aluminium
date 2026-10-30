@@ -9,7 +9,11 @@
       "level": 80,
       "eidolon": 6,
       "memosprite": true,
-      "cone": { "id": 23042, "level": 80, "rank": 1 }
+      "cone": {
+        "id": 23042,
+        "level": 80,
+        "rank": 1
+      }
     },
     {
       "owner": 1413,
@@ -17,7 +21,11 @@
       "level": 80,
       "eidolon": 1,
       "memosprite": true,
-      "cone": { "id": 21050, "level": 80, "rank": 5 }
+      "cone": {
+        "id": 21050,
+        "level": 80,
+        "rank": 5
+      }
     },
     {
       "owner": 1415,
@@ -25,7 +33,15 @@
       "level": 80,
       "eidolon": 2,
       "memosprite": true,
-      "cone": { "id": 23042, "level": 80, "rank": 1 }
+      "cone": {
+        "id": 23042,
+        "level": 80,
+        "rank": 1
+      },
+      "states": [
+        "结界"
+      ],
+      "note": " ⚠ 结界（1415 战技展开的 24% 真伤区域）在窗口开始时**已经在场**：捕获里每一次施放的 folded「Additional」组基值恰是那一次总伤害的 24% ✓ ⇒ 声明为 seeded state ✓（工具会以 `seeded states for 1415: [结界]` 打印，读者能分辨\"捕获已有\"与\"重放挣来的\"）。"
     },
     {
       "owner": 1512,
@@ -33,7 +49,11 @@
       "level": 80,
       "eidolon": 0,
       "memosprite": true,
-      "cone": { "id": 24005, "level": 80, "rank": 5 }
+      "cone": {
+        "id": 24005,
+        "level": 80,
+        "rank": 5
+      }
     }
   ],
   "enemies": [
@@ -102,7 +122,10 @@
       "caster": "memosprite",
       "slot": 1,
       "target": 2,
-      "note": "小伊卡's 忆灵技1「乌云乌云快走开！」: the damage is DELIVERED BY RULES (11409/1 is effect Rules -> 1409's own rule reads the 累计治疗 tally), which expands to every living enemy - the capture shows two targets because the rule/attack reaches all of them."
+      "note": "小伊卡's 忆灵技1「乌云乌云快走开！」: the damage is DELIVERED BY RULES (11409/1 is effect Rules -> 1409's own rule reads the 累计治疗 tally), which expands to every living enemy - the capture shows two targets because the rule/attack reaches all of them. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：10334.0262 ÷ #1（技能 Lv10 行 0.28）= 36907.2364 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
+      "resources": {
+        "小伊卡累计治疗": 36907.2364
+      }
     },
     {
       "cast": 4,
@@ -151,7 +174,10 @@
       "caster": "memosprite",
       "slot": 1,
       "target": 2,
-      "note": "小伊卡 again, after more healing raised the tally."
+      "note": "小伊卡 again, after more healing raised the tally. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：17299.796 ÷ #1（技能 Lv10 行 0.28）= 61784.9857 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
+      "resources": {
+        "小伊卡累计治疗": 61784.9857
+      }
     },
     {
       "cast": 11,
@@ -159,7 +185,10 @@
       "caster": "memosprite",
       "slot": 1,
       "target": 2,
-      "note": "小伊卡 again."
+      "note": "小伊卡 again. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：24000.0592 ÷ #1（技能 Lv10 行 0.28）= 85714.4971 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
+      "resources": {
+        "小伊卡累计治疗": 85714.4971
+      }
     },
     {
       "cast": 13,
@@ -175,7 +204,10 @@
       "caster": "memosprite",
       "slot": 1,
       "target": 1,
-      "note": "小伊卡, one living target."
+      "note": "小伊卡, one living target. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：29927.8128 ÷ #1（技能 Lv10 行 0.28）= 106885.0457 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
+      "resources": {
+        "小伊卡累计治疗": 106885.0457
+      }
     },
     {
       "cast": 16,
