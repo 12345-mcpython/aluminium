@@ -106,6 +106,7 @@ public class Main {
             case "compare" -> System.exit(com.laosun.compare.DamageComparator.run(args));
             case "compare-capture" -> System.exit(com.laosun.compare.CaptureComparator.run(args));
             case "capture-flow" -> System.exit(com.laosun.compare.CaptureFlow.run(args));
+            case "derive-casts" -> System.exit(com.laosun.compare.DerivedCasts.run(args));
             // Drives a whole captured fight through `Battle`, one cast at a time. Like `compare`, this is a
             // diagnostic with an exit code, not a demo, so it is not part of `all` either.
             case "replay" -> System.exit(com.laosun.compare.BattleReplay.run(args));
