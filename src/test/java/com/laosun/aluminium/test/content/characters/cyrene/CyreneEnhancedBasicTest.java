@@ -77,23 +77,36 @@ public class CyreneEnhancedBasicTest {
         battle.processRequests();
 
         List<Damage> hits = settled.stream().filter(d -> d.getType() == DamageType.NORMAL).toList();
-        Assertions.assertEquals(3, hits.size(),
+        // 1 + 2 x enemies: the area half is dealt in TWO instances of its own share, split 30% / 70% - measured on the
+        // 2026-10-30 capture, whose cast against three enemies settles 1 + 3 + 3 = 7 instances (0.30 on the aimed enemy,
+        // then 0.09 on every enemy, then 0.21 on every enemy) and whose cast against one settles 3.
+        Assertions.assertEquals(5, hits.size(),
                 "one single-target instance + one area instance per enemy; settled stances were "
                         + hits.stream().map(Damage::getStance).toList());
 
-        double expectedBase = LV10_SHARE * cyrene.getAttribute(AttributeType.HEALTH).get();
-        for (Damage hit : hits) {
-            Assertions.assertEquals(expectedBase, hit.breakdown().get("base"), 1e-6,
-                    "each part takes its own #3 / #1 share from the current level row (at Lv10 both are 0.42 Max HP)");
+        double health = cyrene.getAttribute(AttributeType.HEALTH).get();
+        double single = LV10_SHARE * health;
+        // The area half's two instances carry 30% and 70% of the same row share.
+        List<Double> area = List.of(0.3 * LV10_SHARE * health, 0.7 * LV10_SHARE * health);
+        Assertions.assertEquals(single, hits.get(0).breakdown().get("base"), 1e-6,
+                "the single-target half keeps the whole row share (0.42 Max HP at Lv10)");
+        for (int i = 1; i < hits.size(); i++) {
+            double expected = area.get((i - 1) / 2);
+            Assertions.assertEquals(expected, hits.get(i).breakdown().get("base"), 1e-6,
+                    "area instance " + i + " carries its ratio of the row share");
         }
 
         CanHit aimed = battle.enemies().get(0);
         Assertions.assertSame(aimed, hits.get(0).getDefender(), "the single-target half goes to the aimed enemy first");
-        Assertions.assertSame(aimed, hits.get(1).getDefender(), "the area half reaches the aimed enemy too");
-        Assertions.assertSame(battle.enemies().get(1), hits.get(2).getDefender(), "and the second enemy");
+        for (int i = 1; i < hits.size(); i++) {
+            Assertions.assertSame(battle.enemies().get((i - 1) % 2), hits.get(i).getDefender(),
+                    "the area instances reach every enemy, in the roster's order");
+        }
 
         Assertions.assertEquals(30, hits.get(0).getStance(), 1e-6, "the single part reads stance_list.single");
-        Assertions.assertEquals(15, hits.get(1).getStance(), 1e-6, "the area part reads stance_list.all, per victim");
-        Assertions.assertEquals(15, hits.get(2).getStance(), 1e-6, "the area part reads stance_list.all, per victim");
+        Assertions.assertEquals(7.5, hits.get(1).getStance(), 1e-6,
+                "the area part's stance is shared by its two instances (15 / 2), per victim");
+        Assertions.assertEquals(7.5, hits.get(2).getStance(), 1e-6,
+                "and the same share applies to the other enemy's instance");
     }
 }

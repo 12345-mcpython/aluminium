@@ -743,14 +743,25 @@ public final class SkillExecutor {
                         + part.getShape() + "'");
             }
             double partBase = user.damageBase(baseAttribute) * params.get(index);
+            // A part may be dealt in SEVERAL instances of its own share (1415's enhanced basic splits its area half 30/70):
+            // each ratio is one instance reaching the same shape, and the part's toughness is spread over them, so the bar
+            // moves by the column's value in total rather than once per instance.
+            List<Double> ratios = part.getRatios() == null || part.getRatios().isEmpty()
+                    ? List.of(1.0) : part.getRatios();
             switch (shape) {
-                case SINGLE_ATTACK -> total += hit(battle, data, user, element, partBase, mainTarget, hitTargets,
-                        data.getStanceList().single(), skill.getSkillSlot());
+                case SINGLE_ATTACK -> {
+                    for (Double ratio : ratios) {
+                        total += hit(battle, data, user, element, partBase * ratio, mainTarget, hitTargets,
+                                data.getStanceList().single() / ratios.size(), skill.getSkillSlot());
+                    }
+                }
                 case AOE_ATTACK -> {
-                    double stance = data.stanceFor(true);      // an area hit's per-victim column
-                    for (CanHit target : battle.targetableEnemies()) {
-                        total += hit(battle, data, user, element, partBase, target, hitTargets, stance,
-                                skill.getSkillSlot());
+                    double stance = data.stanceFor(true) / ratios.size();   // an area hit's per-victim column
+                    for (Double ratio : ratios) {
+                        for (CanHit target : battle.targetableEnemies()) {
+                            total += hit(battle, data, user, element, partBase * ratio, target, hitTargets, stance,
+                                    skill.getSkillSlot());
+                        }
                     }
                 }
                 default -> throw new IllegalStateException("skill_effects.json's damage part shape '" + shape
