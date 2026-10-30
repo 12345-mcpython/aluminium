@@ -119,6 +119,15 @@ public final class BattleReplay {
          */
         private Map<Integer, Integer> levels = new LinkedHashMap<>();
 
+        /**
+         * Cast index to the states that were already up when it was cast, as {@code {cast: [state, ...]}}.
+         *
+         * <p>Why per cast and not per member: a state's window is a fact about the moment. 1415's 【往昔的涟漪】 is up only
+         * after she has cast her ultimate, and the capture shows her normal basic before that and the enhanced one after;
+         * a battle-start seed would give her the enhanced row from turn one.
+         */
+        private Map<Integer, List<String>> statesAt = new LinkedHashMap<>();
+
         /** The cast table: one entry per captured {@code cast} group. */
         private List<CastSpec> casts = new ArrayList<>();
     }
@@ -570,6 +579,7 @@ public final class BattleReplay {
             CanHit caster = casterOf(row.spec, battle, byCid);
             // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
             // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
+            applyStates(row, battle, byCid, plan);
             applyCastPanel(row, battle, byCid);
             // The bars are put where the capture had them BEFORE this cast, not only after it: an add that left the field
             // between two casts must be gone from this cast's target list, and only a pre-cast sync can say that.
@@ -1938,6 +1948,35 @@ public final class BattleReplay {
             }
         }
         return 0;
+    }
+
+
+    /**
+     * Seeds the states the capture says were up when this cast happened.
+     *
+     * @param row   the cast being driven
+     * @param battle the battle
+     * @param byCid  the party
+     * @param plan   the plan, which declares them per cast
+     */
+    private static void applyStates(Row row, Battle battle, Map<Integer, Character> byCid, Plan plan) {
+        if (plan.getStatesAt() == null) {
+            return;
+        }
+        List<String> states = plan.getStatesAt().get(row.cast);
+        if (states == null || states.isEmpty()) {
+            return;
+        }
+        CanHit caster = casterOf(row.spec, battle, byCid);
+        CanHit holder = caster == null ? byCid.get(row.actor) : caster;
+        if (holder == null) {
+            return;
+        }
+        for (String state : states) {
+            // A duration past the window's end: the capture says the state was up, not when it expires.
+            holder.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(state, 99));
+        }
+        System.out.println("     states:   " + states + " up for cast " + row.cast);
     }
 
 }
