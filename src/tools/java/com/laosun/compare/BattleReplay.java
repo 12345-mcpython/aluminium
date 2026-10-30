@@ -566,10 +566,11 @@ public final class BattleReplay {
         System.out.println("  · the base did not come from a row at all (damage_percentage 0: a tally the window "
                 + "does not carry) - those rows say \"base n/a\" instead of pretending to compare.");
         System.out.println("A folded group (derived hit / break) is matched by BASE against the engine's own instances "
-                + "of the same cast. None matches yet, and the two causes are different:");
-        System.out.println("  · an \"Additional\" group is damage a RULE delivered, and the engine books that base as 0 "
-                + "(the number enters through the rule's own scale, not through a skill row) - so there is nothing to "
-                + "match until that path records its base;");
+                + "of the same cast. None matches yet, and what has been RULED OUT is worth more than what is left:");
+        System.out.println("  · an \"Additional\" group is NOT the rule damage the cast itself dealt (that instance is "
+                + "already matched as the row's own hit), and it is NOT the 24% rider of any hit the capture lists: the "
+                + "engine's rider follows only instances that count as attacks, and rule-delivered damage does not "
+                + "(which is what the game does too). Its parent is therefore a hit the payload does not carry;");
         System.out.println("  · a \"Break\" group's number is a break instance, whose base the engine derives from "
                 + "toughness/level; the capture's 10883.71 sits between the engine's 6464.82 and 12929.64.");
         return strict && differed > 0 ? 1 : 0;
