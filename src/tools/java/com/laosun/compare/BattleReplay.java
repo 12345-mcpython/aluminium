@@ -1133,6 +1133,14 @@ public final class BattleReplay {
             } else {
                 spec.setLevel(accountLevel(spec.getActor(), spec.getCaster(), entry.slot()));
             }
+            // A row that states a `resource_share` ("每有 N 点 → 额外 X") lets the capture's own multiplier say how many
+            // points the fight held: `pct / segmentRatio = param0 + steps x share`, and `points = steps x step`. Measured
+            // on 1413's 忆灵技1 at the account's Lv6: cast 1 states 0.06 -> 4 points, cast 16 states 0.09 -> 16 points,
+            // both integers. That is why the same row produced two different bases in one fight.
+            Integer pool = resourcePoolOf(entry, spec);
+            if (pool != null) {
+                spec.setResources(java.util.Map.of(resourceNameOf(entry), (double) pool));
+            }
             Double firstTarget = firstTargetByCast.get(entry.castIndex());
             spec.setTarget(firstTarget == null ? null : enemyByHealth(plan, firstTarget));
             spec.setNote("derived from cast_index " + entry.castIndex() + " / skill " + entry.skillId());
@@ -1389,5 +1397,94 @@ public final class BattleReplay {
     private static int ascensionBonus(int ascension) {
         return Math.min(2, Math.max(0, ascension / 2));
     }
+
+
+    /**
+     * The points of the row's own counter that the capture's multiplier implies, or {@code null} when the row states no
+     * {@code resource_share} or the arithmetic is not an integer.
+     *
+     * @param entry the derived cast (its {@code percentage} is the capture's instance share)
+     * @param spec  the cast being built (its level is the row level to read)
+     * @return the points, or {@code null}
+     */
+    private static Integer resourcePoolOf(DerivedCasts.Entry entry, CastSpec spec) {
+        com.google.gson.JsonObject spec0 = skillEffectOf(entry.cid(), entry.slot());
+        if (spec0 == null || !spec0.has("resource_share") || spec.getLevel() == null) {
+            return null;
+        }
+        com.google.gson.JsonObject shareSpec = spec0.getAsJsonObject("resource_share");
+        com.google.gson.JsonArray rows = parameterRows(entry.cid(), entry.slot());
+        if (rows == null || spec.getLevel() < 1 || spec.getLevel() > rows.size()) {
+            return null;
+        }
+        com.google.gson.JsonArray row = rows.get(spec.getLevel() - 1).getAsJsonArray();
+        int stepIndex = shareSpec.get("step_param").getAsInt();
+        int shareIndex = shareSpec.get("share_param").getAsInt();
+        if (stepIndex >= row.size() || shareIndex >= row.size()) {
+            return null;
+        }
+        double base = row.get(0).getAsDouble();
+        double stepSize = row.get(stepIndex).getAsDouble();
+        double share = row.get(shareIndex).getAsDouble();
+        if (stepSize <= 0 || share <= 0) {
+            return null;
+        }
+        double ratio = spec0.has("segments") ? 1.0 : 1.0;
+        if (spec0.has("segments")) {
+            for (com.google.gson.JsonElement each : spec0.getAsJsonArray("segments")) {
+                ratio = Math.min(ratio, each.getAsDouble());
+            }
+        }
+        if (entry.percentage() <= 0) {
+            return null;
+        }
+        double steps = (entry.percentage() / ratio - base) / share;
+        double rounded = Math.rint(steps);
+        if (rounded < 0 || Math.abs(steps - rounded) > 1e-6) {
+            return null;
+        }
+        return (int) Math.round(rounded * stepSize);
+    }
+
+    /**
+     * The name of the counter a row's {@code resource_share} reads.
+     *
+     * @param entry the derived cast
+     * @return the counter's id
+     */
+    private static String resourceNameOf(DerivedCasts.Entry entry) {
+        com.google.gson.JsonObject spec = skillEffectOf(entry.cid(), entry.slot());
+        return spec.getAsJsonObject("resource_share").get("resource").getAsString();
+    }
+
+    /** The {@code skill_effects.json} row of one skill, or {@code null}. */
+    private static com.google.gson.JsonObject skillEffectOf(int cid, int slot) {
+        com.google.gson.JsonObject root = EFFECTS.get();
+        if (root == null || cid <= 0 || slot <= 0 || !root.has(String.valueOf(cid))) {
+            return null;
+        }
+        com.google.gson.JsonObject slots = root.getAsJsonObject(String.valueOf(cid));
+        return slots.has(String.valueOf(slot)) ? slots.getAsJsonObject(String.valueOf(slot)) : null;
+    }
+
+    /** {@code skill_effects.json}, read once. */
+    private static final class EffectsHolder {
+        private static final com.google.gson.JsonObject VALUE = load();
+
+        private static com.google.gson.JsonObject load() {
+            try (java.io.InputStream stream =
+                         BattleReplay.class.getResourceAsStream("/game/data/skill_effects.json")) {
+                if (stream == null) {
+                    return null;
+                }
+                return com.google.gson.JsonParser.parseReader(new java.io.InputStreamReader(stream,
+                        java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
+            } catch (java.io.IOException e) {
+                return null;
+            }
+        }
+    }
+
+    private static final java.util.function.Supplier<com.google.gson.JsonObject> EFFECTS = () -> EffectsHolder.VALUE;
 
 }
