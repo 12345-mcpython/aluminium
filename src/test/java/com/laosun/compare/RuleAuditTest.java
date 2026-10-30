@@ -73,6 +73,25 @@ public class RuleAuditTest {
     }
 
     /**
+     * With {@code parent_event}, each derived instance's rate against its parent is measurable - and a rule's rate is a
+     * constant, so two values for one rule means the parent or the state changed.
+     */
+    @Test
+    public void aDerivedInstancesRateAgainstItsParentIsMeasurable() throws IOException {
+        java.util.Map<String, java.util.TreeSet<Double>> rates =
+                RuleAudit.parentRates(RuleAudit.fromResource("/captures/veritas-2026-10-30d.json"));
+
+        Assertions.assertFalse(rates.isEmpty(), "the capture states parent_event, so the rates exist");
+        Assertions.assertTrue(rates.containsKey("True|追忆，蹁跹，如雨"),
+                "and are grouped by the rule that produced the rider: " + rates.keySet());
+        Assertions.assertTrue(rates.get("True|看，希望的起始！").contains(0.24),
+                "1415's zone pays 24% of the parent hit: " + rates.get("True|看，希望的起始！"));
+        Assertions.assertTrue(rates.get("True|叽叽啾啾四重奏").contains(0.42),
+                "and another state pays 42% - the two are distinct facts, not one drifting rate: "
+                        + rates.get("True|叽叽啾啾四重奏"));
+    }
+
+    /**
      * The captures the project holds do not all state a rule block; the audit says so instead of failing.
      */
     @Test
