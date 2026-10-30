@@ -571,6 +571,9 @@ public final class BattleReplay {
             // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
             // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
             applyCastPanel(row, battle, byCid);
+            // The bars are put where the capture had them BEFORE this cast, not only after it: an add that left the field
+            // between two casts must be gone from this cast's target list, and only a pre-cast sync can say that.
+            syncBars(row, capture, enemies, plan, true);
             seedResources(row, battle, byCid);
             CanHit target = row.spec.getTarget() == null || row.spec.getTarget() < 1
                     || row.spec.getTarget() > enemies.size()
@@ -1763,18 +1766,45 @@ public final class BattleReplay {
      * @param plan    the plan
      */
     private static void syncBars(Row row, com.google.gson.JsonObject capture, List<Enemy> enemies, Plan plan) {
+        syncBars(row, capture, enemies, plan, false);
+    }
+
+    /**
+     * The same, optionally reading the bars as they stood <b>before</b> this cast.
+     *
+     * <p>Why both sides: a bar the capture takes to 0 <em>during</em> this cast must not be emptied before it - that would
+     * leave the cast with no target (measured: cast 51 lost its victim and settled nothing) - while a unit whose recorded
+     * bars stop earlier has left the field and must be gone before it.
+     *
+     * @param beforeCast whether to read the bars strictly before this cast
+     */
+    private static void syncBars(Row row, com.google.gson.JsonObject capture, List<Enemy> enemies, Plan plan,
+                                 boolean beforeCast) {
         for (java.util.Map.Entry<Long, java.util.TreeMap<Integer, Double>> each : timeline(capture).entrySet()) {
             int index = TARGET_UIDS.indexOf(each.getKey());
             if (index < 0 || index >= enemies.size() || index >= plan.getEnemies().size()) {
                 continue;
             }
-            java.util.Map.Entry<Integer, Double> bar = each.getValue().floorEntry(row.cast);
+            java.util.Map.Entry<Integer, Double> bar = beforeCast
+                    ? each.getValue().lowerEntry(row.cast)
+                    : each.getValue().floorEntry(row.cast);
             if (bar == null) {
                 continue;                               // it had not been hit yet
             }
             Enemy enemy = enemies.get(index);
             if (CURRENT_BATTLE == null || !CURRENT_BATTLE.enemyUnits().contains(enemy)) {
                 continue;                               // it has not joined yet
+            }
+            if (row.cast > each.getValue().lastKey() && bar.getValue() > 0) {
+                // The capture HIT it for the last time before this cast and never brings it back, with its bar still above
+                // zero: it left the field (an add that retreats, not a corpse). Keeping it alive would put it in this
+                // cast's target list - measured: cast 69 hit 1 enemy in the capture and 3 in the replay, the extra two
+                // being 100032 / 100035, whose recorded bars stop at cast 59 with 313916 / 337805 left. It is retired the
+                // same way the replay retires anything else, by emptying its bar, so every later target list leaves it out.
+                if (!enemy.isDeath()) {
+                    enemy.takeDamage(enemy.getCurrentHp(), true);
+                }
+                continue;
             }
             double delta = bar.getValue() - enemy.getCurrentHp();
             if (delta > 0) {
