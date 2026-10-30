@@ -616,6 +616,7 @@ public final class BattleReplay {
             CanHit caster = casterOf(row.spec, battle, byCid);
             // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
             // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
+            applyRuleCounters(row, battle, byCid, capture);
             applyStates(row, battle, byCid, plan);
             applyCastPanel(row, battle, byCid);
             // The bars are put where the capture had them BEFORE this cast, not only after it: an add that left the field
@@ -626,9 +627,22 @@ public final class BattleReplay {
                     || row.spec.getTarget() > enemies.size()
                     ? null : enemies.get(row.spec.getTarget() - 1);
             window.clear();
+            // A memosprite's rule reads the SUMMON's own skill by slot when it needs the row (`cast_param`), so the level the
+            // plan states is installed for this cast too - measured as exactly the Lv10 row (0.28) against the Lv6 one
+            // (0.22) the hit itself used. It is put back right after: a plan states a level per cast, and a leaked one would
+            // silently re-level every later cast that declares none.
+            Summon summon = "memosprite".equalsIgnoreCase(row.spec.getCaster()) && row.spec.getSlotNumber() != null
+                    && row.spec.getLevel() != null ? battle.memospriteOf(byCid.get(row.spec.getActor())) : null;
+            Skill previous = summon == null ? null : summon.skillAt(row.spec.getSlotNumber());
+            if (summon != null && previous != null && previous.getLevel() != skill.getLevel()) {
+                summon.setSkillAt(row.spec.getSlotNumber(), skill);
+            }
             int repeat = row.spec.getRepeat() == null ? 1 : Math.max(1, row.spec.getRepeat());
             for (int i = 0; i < repeat; i++) {
                 battle.castImmediate(skill, caster, target == null ? List.of() : List.of(target));
+            }
+            if (summon != null && previous != null) {
+                summon.setSkillAt(row.spec.getSlotNumber(), previous);
             }
             syncBars(row, capture, enemies, plan);
             driven++;
@@ -649,7 +663,10 @@ public final class BattleReplay {
             List<Double> allBases = window.stream()
                     .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
                     .toList();
-            BaseVerdict verdict = compareBases(row.group, engineBases);
+            // A rule-delivered row states no share, and the engine books it as ADDITIONAL rather than NORMAL - so it is
+            // compared against EVERY instance of the cast, not just the NORMAL ones.
+            BaseVerdict verdict = compareBases(row.group,
+                    row.group != null && row.group.percentage() == 0 ? allBases : engineBases);
             // The folded groups (derived hits, breaks) carry their own bases: match each against the engine instances
             // this cast settled, so "18 groups" means 18 numbers checked rather than 13 checked and 5 summed.
             List<Double> spare = new ArrayList<>(allBases);
@@ -838,8 +855,11 @@ public final class BattleReplay {
         if (atSpecLevel == null || spec.getLevel() == null) {
             return atSpecLevel;
         }
-        // The plan states the level the capture's numbers were taken at; the row is read at THAT level, not at the one
-        // the spec happens to declare (a memosprite's all say 10).
+        // The plan states the level the capture's numbers were taken at; the row is read at THAT level, not at the one the
+        // spec happens to declare (a memosprite's all say 10). The same skill is installed on the summon, because a rule's
+        // `cast_param` reads the summon's OWN skill by slot (`TriggerMagnitudes.castParamValue` -> `skillAt`): a bespoke
+        // object alone leaves the rule on the spec's level - measured as exactly the Lv10 row (0.28) against the Lv6 one
+        // (0.22) the hit itself used.
         return new DefaultSkill(atSpecLevel.getCid(), atSpecLevel.getSkillSlot(), Math.max(1, spec.getLevel()));
     }
 
@@ -962,8 +982,8 @@ public final class BattleReplay {
                 return new BaseVerdict("base-n/a", false, false);
             }
             return sameValues(group.hitBases(), engineBases)
-                    ? new BaseVerdict("base-ok (rule absolute)", true, true)
-                    : new BaseVerdict("DIFFERS (rule absolute)", false, true);
+                    ? new BaseVerdict("base-ok/rule-absolute", true, true)
+                    : new BaseVerdict("DIFFERS/rule-absolute", false, true);
         }
         List<Double> capture = group.hitBases();
         if (capture.isEmpty() || engineBases.isEmpty()) {
@@ -2063,6 +2083,62 @@ public final class BattleReplay {
             battle.processRequests();
             System.out.printf(Locale.ROOT, "     prelude:  %d casts %s before cast %d (settles no damage, so the capture "
                     + "cannot name it) - not compared%n", prelude.getActor(), prelude.getSlot(), row.cast);
+        }
+    }
+
+
+    /**
+     * The game's own name for a counter, mapped to the id the content files declare.
+     *
+     * <p>The payload's {@code rule.counter_name} is the engine-internal hash name ({@code _ServantHealValueTotalNew}); a
+     * character file declares its resources in the document's spelling (「小伊卡累计治疗」). Reading one as the other would
+     * silently seed nothing, so the pair is stated here with the capture that measured it.
+     */
+    private static final Map<String, String> RULE_COUNTER_NAMES = Map.of(
+            "_ServantHealValueTotalNew", "小伊卡累计治疗");
+
+    /** Which counter an unnamed {@code HEAL_TALLY} row reads, by the character that owns it. */
+    private static final Map<Integer, String> OWNER_RULE_COUNTER = Map.of(1409, "小伊卡累计治疗");
+
+    /**
+     * Seeds the counters a capture's {@code HEAL_TALLY} rule rows name, at the value the payload reports.
+     *
+     * <p>Why the payload can now say it: those rows carry {@code rule.counter} and {@code rule.counter_name}, i.e. the exact
+     * tally the rule read - measured on the 2026-10-30 (12:18) recording, whose eight such casts report a tally that only
+     * grows (46972.85 -> 236116.49), which is what a running heal total must do.
+     *
+     * @param row     the cast about to be driven
+     * @param battle  the battle
+     * @param byCid   the party
+     * @param capture the parsed capture
+     */
+    private static void applyRuleCounters(Row row, Battle battle, Map<Integer, Character> byCid,
+                                          com.google.gson.JsonObject capture) {
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null || event.get("cast_index").getAsInt() != row.cast
+                    || !event.has("rule") || event.get("rule").isJsonNull()) {
+                continue;
+            }
+            com.google.gson.JsonObject rule = event.getAsJsonObject("rule");
+            if (!"HEAL_TALLY".equals(rule.has("share_of") ? rule.get("share_of").getAsString() : null)) {
+                continue;
+            }
+            if (!rule.has("counter") || rule.get("counter").isJsonNull()
+                    || !rule.has("counter_name") || rule.get("counter_name").isJsonNull()) {
+                continue;
+            }
+            String name = rule.get("counter_name").getAsString();
+            String resource = RULE_COUNTER_NAMES.get(name);
+            long actorUid = event.getAsJsonObject("attacker").get("uid").getAsLong();
+            Character owner = byCid.get((int) actorUid);
+            if (resource == null || owner == null || owner.getResources().get(resource) == null) {
+                continue;
+            }
+            double value = rule.get("counter").getAsDouble();
+            owner.getResources().get(resource).setExactValue(value);
+            System.out.printf(Locale.ROOT, "     counter:  %s = %.4f (the payload's own %s)%n", resource, value, name);
+            return;
         }
     }
 

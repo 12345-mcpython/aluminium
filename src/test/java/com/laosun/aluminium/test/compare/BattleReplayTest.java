@@ -134,9 +134,13 @@ public class BattleReplayTest {
         Assertions.assertTrue(out.contains("seeded: {亿质=10.0}"),
                 "cast 4's prefix is declared and printed as such - a reader must be able to tell it from a number the "
                         + "engine reproduced; output was:\n" + out);
-        Assertions.assertTrue(out.contains("base-n/a"),
-                "1409's tally-delivered hits have damage_percentage 0, so there is no share to compare - they must say "
-                        + "so instead of claiming a verdict; output was:\n" + out);
+        // 1409's tally-delivered hits state no SHARE (damage_percentage is 0), but they do state the base the rule built
+        // from - `damage_value` - and the engine books that same absolute amount. They are compared on it now, which is
+        // strictly stronger than the "no share to compare" this used to assert.
+        Assertions.assertTrue(out.contains("base-ok/rule-absolute"),
+                "a rule-delivered row is compared on its absolute base rather than skipped; output was:\n" + out);
+        Assertions.assertFalse(out.contains("base-n/a"),
+                "and nothing is left un-compared in this fight; output was:\n" + out);
     }
 
     /**
