@@ -1,7 +1,7 @@
 {
   "name": "veritas 2026-10-30 — derived from the payload",
   "capture": "src/test/resources/captures/veritas-2026-10-30.json",
-  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。 ⚠ `levels` 是唯一仍手写的一列：payload 的 `damage_percentage` 是**这一发实例的有效份额**，不是行的参数（实测 11413/1 捕获写 0.06、而 Lv8 行参数是 0.12，差在 0.5 那段的分裂比上）⇒ 无法从它反解行号。",
+  "note": "队伍只声明「谁在打」：cid + 光锥 + 忆灵；敌人与施放表都由 payload 派生（--derive）：敌人来自 enemies[uid].properties（含 MaxStance），施放来自 cast_index + skill_id ⇒ skills.json 的 (cid, slot)。  ⚠ 事实（2026-10-30 由录屏者确认）：角色 Lv80、怪物 Lv95、**四个人都开了秘技**，战斗由 1409 进入 ⇒ 四人按 `states` 种入 `秘技`，让各自的 BATTLE_START 秘技规则开火。⚠ 「行号」仍是**声明**的一列（`levels`）：payload 的 `damage_percentage` 是**这一发实例的有效份额** = 行参数 × 该段分裂比（实测 11413/1：0.06 = 0.6 × 0.1、0.09 = 0.9 × 0.1 ⇒ Lv8 与 Lv14），所以它**可以**反解行号，但 `skills.json` 的行参数里有跨等级重复值，必须只比 `param[0]` 且要求唯一匹配才安全 —— 那一步还没做。",
   "party": [
     {
       "owner": 1409,
@@ -13,7 +13,10 @@
         "id": 23042,
         "level": 80,
         "rank": 1
-      }
+      },
+      "states": [
+        "秘技"
+      ]
     },
     {
       "owner": 1413,
@@ -25,7 +28,10 @@
         "id": 21050,
         "level": 80,
         "rank": 5
-      }
+      },
+      "states": [
+        "秘技"
+      ]
     },
     {
       "owner": 1415,
@@ -37,7 +43,10 @@
         "id": 23042,
         "level": 80,
         "rank": 1
-      }
+      },
+      "states": [
+        "秘技"
+      ]
     },
     {
       "owner": 1512,
@@ -49,7 +58,10 @@
         "id": 24005,
         "level": 80,
         "rank": 5
-      }
+      },
+      "states": [
+        "秘技"
+      ]
     }
   ],
   "levels": {
