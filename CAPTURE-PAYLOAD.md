@@ -81,7 +81,8 @@
 | 字段 | 类型 | 语义 |
 |---|---|---|
 | `field.alive` | int[]（uid）| 发始仍存活且在场 |
-| `field.targetable` | int[]（uid）| 发始可被技能选中（`alive` 的子集；缺省时可视为等于 `alive`）|
+| `field.targetable` | int[]（uid）| **这一发瞄准的目标**（AoE 时只有 1 个）。实测：逐发与"实际打到的 uid 集合"比对，e/f/d 里 12/17、6/10、10/12 相等——相等的全是单体发；不等的全是 AoE 发（例：cast 16 `targetable=[100015]`，实际打到 `[100013, 100015]`）⇒ **它不能用来收窄 AoE 目标** |
+| `field.on_stage` | int[]（uid）| **建议新增**：那一刻仍在场、可被 AoE 波及的 uid。`alive` 不行（cast 65 的 `alive` 有 6 个含已撤离单位，而实打只有 1 个）；这正是最后 3 行 differ 缺的那一项 |
 | `field.toughness` | map uid→number | 发始韧性条（我们目前用 `target_toughness_current`，这条可以只在首条给）|
 
 ### 解锁什么
