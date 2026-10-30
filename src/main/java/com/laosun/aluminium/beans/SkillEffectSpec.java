@@ -76,6 +76,20 @@ public class SkillEffectSpec {
     private List<Double> segments;
 
     /**
+     * Who DEALS this row's damage, when it is not the caster: {@code "summon"}.
+     *
+     * <p>Reader: 1413's ultimate. Its ability ({@code Avatar_Evernight_00_Skill03_Servant_Damage}) states
+     * {@code AttackProperty.AttackType = "Ultra"} - the ROW is the ultimate's - while its text says 「使忆灵「长夜」对敌方全体造成
+     * 等同于「长夜」200%生命上限的…伤害」, so the HIT is the servant's. The recorded fight stamps those instances with the
+     * servant as attacker, and the per-attacker bonuses ("长夜造成的伤害提高 60%", the zone's 24% rider) follow the attacker.
+     *
+     * <p>Absent = the caster deals it, which is every other row.
+     */
+    @SerializedName("executor")
+    private String executor;
+
+
+    /**
      * The damage <b>parts</b> one parameter row states, in the order the sentence settles them, each reaching its own
      * target shape - or {@code null} for the ordinary reading (the whole row is one shape, taken from
      * {@code skills.json}'s {@code skill_effect}).
