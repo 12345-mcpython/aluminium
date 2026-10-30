@@ -208,6 +208,29 @@ public final class TriggerInterpreter {
      * @param ctx    the context the rule was matched with
      */
     public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
+        // Every effect of every rule passes through here, so this is the one seam that can name the rule a failure came
+        // from: the context's own rule id is empty on the paths that resolve a target before a rule scope exists
+        // (measured: the summon guard reported `rule ""`), and a message without the id leaves the author to hunt for it.
+        try {
+            applyUnchecked(battle, rule, ctx);
+        } catch (IllegalStateException failure) {
+            String message = failure.getMessage() == null ? "" : failure.getMessage();
+            String id = rule == null ? null : rule.id();
+            if (id == null || id.isBlank() || message.contains("[rule: ")) {
+                throw failure;
+            }
+            throw new IllegalStateException(message + " [rule: " + id + "]", failure);
+        }
+    }
+
+    /**
+     * The effect dispatch itself; {@link #apply} wraps it so a failure names its rule.
+     *
+     * @param battle the battlefield
+     * @param rule   the rule being applied
+     * @param ctx    the trigger context
+     */
+    private static void applyUnchecked(Battle battle, CompiledRule rule, TriggerContext ctx) {
         int effectIndex = 0;
         double previousCredited = 0;
         // `one_of`: ONE of the rule's effects runs, picked at random. Rolled HERE, once per firing, and not inside the

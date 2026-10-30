@@ -486,10 +486,17 @@ final class TriggerTargets {
                     "Effect targets \"summon\" but this rule was evaluated without a battlefield, so the "
                             + "owner's summon cannot be identified");
         }
+        // A rule owned by the SUMMON itself ("the summon's own arrival"): `summon` is that unit, not "its master's summon".
+        // Without this the arrival rules of 1413's 长夜 threw on their own arrival - measured: `memosprite_taunt_aggro`
+        // fires on SUMMONED with `must be the summon` and its owner is the arriving summon.
+        if (ctx.owner() instanceof com.laosun.aluminium.entity.Summon ownSummon) {
+            return ownSummon;
+        }
         CanHit summon = ctx.battle().summonOf(ctx.owner());
         if (summon == null) {
             throw new IllegalStateException(
-                    "Effect targets \"summon\" but " + ctx.owner().getName() + " has no summon on the field; "
+                    "Effect targets \"summon\" but " + ctx.owner().getName() + " has no summon on the field"
+                            + (ctx.ruleId() == null ? "" : " (rule \"" + ctx.ruleId() + "\")") + "; "
                             + "gate the rule with `self_summon_count >= 1` so it only fires when there is one "
                             + "(the summon perishes with its master, so a stale rule would otherwise fire "
                             + "every time)");

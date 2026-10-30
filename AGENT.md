@@ -755,7 +755,7 @@ Effect targets "summon" but Evernight has no summon on the field;
 gate the rule with `self_summon_count >= 1` so it only fires when there is one
 ```
 
-⇒ **不是驱动器的 bug**：她有一条规则的 `target` 指向 `summon` 而没有 `self_summon_count >= 1` 的门；重新召唤的瞬间（召唤物尚未落场）它就开火了。引擎的报错是对的。修法明确：给那条规则加门，并补一条「离场→再召唤」的判据；在那之前该 cast 记为 **not drivable**（不猜）。
+⇒ **不是驱动器的 bug**：她有一条规则的 `target` 指向 `summon`，而那一刻 `summonOf(1413)` 还是空。**报错现在会点名规则**（`TriggerInterpreter.apply` 包了一层），实测点出来是 **`memosprite_taunt_aggro`**（`on: SUMMONED`、`actor == summon`、`MODIFY_ATTR target: summon`）。⚠ 试过两种修法都被否掉：① 给该规则加 `self_summon_count >= 1` 门 —— 会让「登场的瞬间就把行动提前」**失效**（门读的正是那个为空的查找）✗，而且顶红了 `SummonEntryTest`（它钉着该规则的形状）；② 让「召唤物自己的规则」把 `summon` 解析成自己 —— 无效，因为这条规则的 owner 是 1413 而不是召唤物（改动保留：本身语义正确 ✓）。⇒ 真正待查：**`addCombatant` 之后、`onSummoned` 触发之前，`summonOf(1413)` 为什么仍为空**。该 cast 记 **not drivable**（不猜）。
 #### B 层：敌人（只有少数怪有技能，其余全是平 A）
 
 | 任务 | 现状 | 验收 | 依赖 |
