@@ -65,6 +65,15 @@ public class Damage {
     private final double skillBaseValue;
 
     /**
+     * Which cast of the battle settled this instance - {@code 0} when it was settled outside any cast.
+     *
+     * <p>Why: a rule may schedule a second action that settles inside the first one's window (1415's ultimate leaves an
+     * extra basic). A caller comparing a recorded cast against the engine needs to know which settlements were the cast's
+     * own, and the number is the only place that says so.
+     */
+    private long castSequence;
+
+    /**
      * Which kind of cast produced this instance - the fact behind "basic attack / Skill / Ultimate DMG Boost".
      *
      * <p>It cannot be derived from {@link #type}: a basic attack and a skill are both
@@ -681,6 +690,24 @@ public class Damage {
     public Damage trueDamage() {
         this.trueDamage = true;
         return this;
+    }
+
+    /**
+     * Records which cast settled this instance.
+     *
+     * @param sequence the battle's cast sequence
+     */
+    public void stampCast(long sequence) {
+        this.castSequence = sequence;
+    }
+
+    /**
+     * The cast that settled this instance, or {@code 0}.
+     *
+     * @return the sequence number
+     */
+    public long castSequence() {
+        return castSequence;
     }
 
     public Damage notCountsAsAttack() {

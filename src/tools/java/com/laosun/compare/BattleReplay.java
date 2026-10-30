@@ -627,6 +627,7 @@ public final class BattleReplay {
                     || row.spec.getTarget() > enemies.size()
                     ? null : enemies.get(row.spec.getTarget() - 1);
             window.clear();
+            long castBefore = battle.castSequence();
             // A memosprite's rule reads the SUMMON's own skill by slot when it needs the row (`cast_param`), so the level the
             // plan states is installed for this cast too - measured as exactly the Lv10 row (0.28) against the Lv6 one
             // (0.22) the hit itself used. It is put back right after: a plan states a level per cast, and a leaked one would
@@ -644,14 +645,26 @@ public final class BattleReplay {
             if (summon != null && previous != null) {
                 summon.setSkillAt(row.spec.getSlotNumber(), previous);
             }
+            // Only the settlements of the cast that was ASKED for: a rule that schedules a second action settles inside the
+            // same window (1415's ultimate leaves an extra basic), and its damage is not this cast's.
+            long castAfter = battle.castSequence();
+            List<Settled> own = window.stream()
+                    .filter(each -> each.damage().castSequence() > castBefore
+                            && each.damage().castSequence() == castBefore + 1)
+                    .toList();
+            if (!own.isEmpty() && own.size() != window.size()) {
+                System.out.printf(Locale.ROOT, "     isolated: %d of %d settlements belong to cast %d; the rest came from "
+                        + "an extra action it scheduled%n", own.size(), window.size(), row.cast);
+            }
             syncBars(row, capture, enemies, plan);
             driven++;
-            double settled = window.stream().mapToDouble(Settled::applied).sum();
+            List<Settled> counted = own.isEmpty() ? window : own;
+            double settled = counted.stream().mapToDouble(Settled::applied).sum();
             // The capture's group lists what the SKILL's row dealt; a rule-delivered rider (an ADDITIONAL instance such as
             // cone 23042's burst, or a TRUE one such as 1415's zone) is booked by the engine under the same cast but is not
             // one of the skill's own hits, so it must not turn a matching row into DIFFERS. It is counted, printed, and
             // matched separately as the folded groups are.
-            List<Double> engineBases = window.stream()
+            List<Double> engineBases = counted.stream()
                     .filter(each -> each.damage().getType() == com.laosun.aluminium.enums.DamageType.NORMAL)
                     .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
                     .toList();
@@ -660,7 +673,7 @@ public final class BattleReplay {
                     .count();
             // The folded groups (derived hits, breaks) are matched against EVERY instance: they ARE the rule-delivered
             // ones the row comparison just excluded.
-            List<Double> allBases = window.stream()
+            List<Double> allBases = counted.stream()
                     .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
                     .toList();
             // A rule-delivered row states no share, and the engine books it as ADDITIONAL rather than NORMAL - so it is

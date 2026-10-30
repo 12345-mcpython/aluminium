@@ -1111,6 +1111,10 @@ public class Battle {
         }
 
         markSingleUseSpent(skill);
+        // Which cast a settlement belongs to. A cast can settle damage that comes from ANOTHER action - 1415's ultimate
+        // leaves an extra basic that runs inside the next cast's window - and without this number a caller that collects
+        // settlements cannot tell the two apart (measured: seven instances against the capture's seven, reported as 14).
+        castSequence++;
         skill.execute(this, user, targets);
 
         processRequests();
@@ -1125,6 +1129,21 @@ public class Battle {
      * <p>Per battle, not per file: a new battle starts with every single-use cast available again.
      */
     private final java.util.Set<Integer> oncePerBattleSpent = new java.util.HashSet<>();
+
+    /** Bumped once per cast; every settlement made during it carries the number (see {@code Damage.castSequence}). */
+    private long castSequence;
+
+    /**
+     * The cast currently running, or the last one that ran - {@code 0} before any cast.
+     *
+     * <p>Read by a caller that must attribute settlements to the action that produced them: a rule can schedule a second
+     * action, and that action's damage would otherwise be counted as part of the first.
+     *
+     * @return the sequence number
+     */
+    public long castSequence() {
+        return castSequence;
+    }
 
     /**
      * Whether this skill's single use is still available (always true for a row that does not state one).
@@ -1896,6 +1915,9 @@ public class Battle {
      * @return the settled damage, or {@code 0} if the target was already dead
      */
     public double applyDamage(CanHit target, Damage damage) {
+        if (damage != null) {
+            damage.stampCast(castSequence);
+        }
         return damageService.applyDamage(target, damage);
     }
 
