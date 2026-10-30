@@ -124,6 +124,12 @@ public final class BattleReplay {
         /** The uid the capture uses for this unit - the character's own cid here. */
         private Integer owner;
 
+        /**
+         * States the member already holds when the window opens, by name (e.g. 1415's 【结界】) - the same
+         * "unobserved prefix" idea as {@link CastSpec#getResources()}, for a buff rather than a counter.
+         */
+        private java.util.List<String> states;
+
         /** The character id to build. Separate from {@link #owner} so a stand-in could be named. */
         private Integer cid;
 
@@ -399,6 +405,22 @@ public final class BattleReplay {
         Battle battle = new Battle(party, enemies, new Random(0L));
         battle.startBattle();
         for (MemberSpec member : plan.getParty()) {
+            if (member.getStates() == null || member.getStates().isEmpty()) {
+                continue;
+            }
+            Character unit = byCid.get(member.getOwner());
+            if (unit == null) {
+                continue;
+            }
+            for (String state : member.getStates()) {
+                // A duration past the window's end: the capture says the state was up, not when it expires.
+                unit.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(state, 99));
+            }
+            // Printed like a seeded counter: a reader must be able to tell a state the capture already had from one the
+            // replay earned.
+            System.out.println("seeded states for " + member.getOwner() + ": " + member.getStates());
+        }
+        for (MemberSpec member : plan.getParty()) {
             if (Boolean.TRUE.equals(member.getMemosprite())) {
                 battle.summonMemosprite(byCid.get(member.getOwner()));
             }
@@ -451,20 +473,26 @@ public final class BattleReplay {
             }
             driven++;
             double settled = window.stream().mapToDouble(Settled::applied).sum();
-            // The capture's group lists what the SKILL's row dealt; a rule-delivered rider (an ADDITIONAL instance, e.g.
-            // cone 23042's 2.5%-of-consumed-HP burst) is booked by the engine under the same cast but is not one of the
-            // skill's own hits, so it must not turn a matching row into DIFFERS. It is counted and printed instead.
+            // The capture's group lists what the SKILL's row dealt; a rule-delivered rider (an ADDITIONAL instance such as
+            // cone 23042's burst, or a TRUE one such as 1415's zone) is booked by the engine under the same cast but is not
+            // one of the skill's own hits, so it must not turn a matching row into DIFFERS. It is counted, printed, and
+            // matched separately as the folded groups are.
             List<Double> engineBases = window.stream()
-                    .filter(each -> each.damage().getType() != com.laosun.aluminium.enums.DamageType.ADDITIONAL)
+                    .filter(each -> each.damage().getType() == com.laosun.aluminium.enums.DamageType.NORMAL)
                     .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
                     .toList();
             long ruleInstances = window.stream()
-                    .filter(each -> each.damage().getType() == com.laosun.aluminium.enums.DamageType.ADDITIONAL)
+                    .filter(each -> each.damage().getType() != com.laosun.aluminium.enums.DamageType.NORMAL)
                     .count();
+            // The folded groups (derived hits, breaks) are matched against EVERY instance: they ARE the rule-delivered
+            // ones the row comparison just excluded.
+            List<Double> allBases = window.stream()
+                    .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
+                    .toList();
             BaseVerdict verdict = compareBases(row.group, engineBases);
             // The folded groups (derived hits, breaks) carry their own bases: match each against the engine instances
             // this cast settled, so "18 groups" means 18 numbers checked rather than 13 checked and 5 summed.
-            List<Double> spare = new ArrayList<>(engineBases);
+            List<Double> spare = new ArrayList<>(allBases);
             row.group().hitBases().forEach(spare::remove);
             int derivedOk = 0;
             int derivedMissing = 0;
