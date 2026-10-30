@@ -223,6 +223,15 @@ public final class BattleReplay {
         /** The uid that cast it (the character's cid). */
         private Integer actor;
 
+        /**
+         * The payload's {@code type} of this group ({@code Servant} / {@code Ultimate} / {@code Basic} / ...).
+         *
+         * <p>Why it is part of the key: one {@code cast_index} may settle MORE than one skill - 1413's cast 16 is her
+         * servant's swing and her ultimate in the same index - and a plan keyed by the index alone could only state one.
+         * Absent = the entry matches any kind, which is what every older plan does.
+         */
+        private String kind;
+
         /** {@code character} (the actor's own slot) or {@code memosprite} (its 忆灵's data slot). */
         private String caster = "character";
 
@@ -354,15 +363,16 @@ public final class BattleReplay {
                     + plan.getEnemies().size() + " enemy(ies) from its enemy map");
         }
 
-        java.util.Set<Integer> seenGroups = new java.util.LinkedHashSet<>();
-        Map<Integer, CastSpec> byCast = new LinkedHashMap<>();
+        java.util.Set<String> seenGroups = new java.util.LinkedHashSet<>();
+        Map<String, CastSpec> byCast = new LinkedHashMap<>();
         for (CastSpec spec : plan.getCasts()) {
             if (spec.getCast() == null) {
                 System.out.println("replay: a plan cast has no \"cast\" index");
                 return 2;
             }
-            if (byCast.put(spec.getCast(), spec) != null) {
-                System.out.println("replay: cast " + spec.getCast() + " is named twice");
+            if (byCast.put(specKey(spec.getCast(), spec.getKind()), spec) != null) {
+                System.out.println("replay: cast " + spec.getCast()
+                        + (spec.getKind() == null ? "" : " (" + spec.getKind() + ")") + " is named twice");
                 return 2;
             }
         }
@@ -372,12 +382,12 @@ public final class BattleReplay {
             if (!"cast".equals(group.classification())) {
                 continue;
             }
-            if (!byCast.containsKey(group.index())) {
+            CastSpec spec = specFor(byCast, group);
+            if (spec == null) {
                 System.out.println("replay: the plan has no entry for cast " + group.index()
                         + " (actor " + group.actor() + ", " + group.kind() + ", " + group.hits() + " hit(s))");
                 return 2;
             }
-            CastSpec spec = byCast.get(group.index());
             if (spec.getActor() == null || spec.getActor() != group.actor()) {
                 System.out.println("replay: cast " + group.index() + " is actor " + group.actor()
                         + " in the capture but " + spec.getActor() + " in the plan");
@@ -395,7 +405,8 @@ public final class BattleReplay {
             // groups under one index (1413's ultimate: the servant's swing, then the ultimate's own hit). The entry's
             // target belongs to the first of them, so the check only applies there - the others are driven at the same
             // enemy, and a mismatch on them would compare two different groups against one number.
-            if (seenGroups.add(group.index()) && spec.getTarget() != null && spec.getTarget() != captured) {
+            if (seenGroups.add(specKey(group.index(), group.kind()))
+                    && spec.getTarget() != null && spec.getTarget() != captured) {
                 System.out.println("replay: cast " + group.index() + " was aimed at enemy " + captured
                         + " in the capture but at " + spec.getTarget() + " in the plan");
                 return 2;
@@ -661,7 +672,7 @@ public final class BattleReplay {
      * before it - that is what it is (damage the previous cast produced), and keeping it as its own row would compare
      * an engine cast against a number the engine never books as a cast.
      */
-    private static List<Row> rowsOf(List<CaptureFlow.Cast> flow, Map<Integer, CastSpec> byCast) {
+    private static List<Row> rowsOf(List<CaptureFlow.Cast> flow, Map<String, CastSpec> byCast) {
         List<Row> rows = new ArrayList<>();
         int hits = 0;
         int targets = 0;
@@ -675,8 +686,8 @@ public final class BattleReplay {
         for (CaptureFlow.Cast group : flow) {
             if ("cast".equals(group.classification())) {
                 if (cast != 0) {
-                    rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast),
-                            List.copyOf(folded)));
+                    rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last,
+                            specFor(byCast, last), List.copyOf(folded)));
                 }
                 cast = group.index();
                 actor = group.actor();
@@ -699,7 +710,7 @@ public final class BattleReplay {
             folded.add(group);
         }
         if (cast != 0) {
-            rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast),
+            rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, specFor(byCast, last),
                     List.copyOf(folded)));
         }
         return rows;
@@ -1086,84 +1097,70 @@ public final class BattleReplay {
      */
     private static void deriveCasts(Plan plan, List<CaptureFlow.Cast> flow, com.google.gson.JsonObject capture) {
         java.util.Map<Integer, Integer> servantOwner = servantOwners(plan);
-        // The target is read off the GROUP the replay compares against, not off the cast's first event: a cast's value
-        // of "which enemy was aimed at" is its group's first hit, and an AoE cast's first event may hit a different one.
-        java.util.Map<Integer, Double> firstTargetByCast = new java.util.HashMap<>();
-        for (CaptureFlow.Cast cast : flow) {
-            if ("cast".equals(cast.classification())) {
-                firstTargetByCast.putIfAbsent(cast.index(), cast.firstTarget());
-            }
+        // One entry per GROUP, not per cast index: a single index may settle two different skills (1413's cast 16 is her
+        // servant's swing and her ultimate), and the entry is keyed by (cast, kind) so both can be driven.
+        java.util.Map<String, com.google.gson.JsonObject> firstEvent = new java.util.HashMap<>();
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            firstEvent.putIfAbsent(event.get("cast_index").getAsInt() + "|" + event.get("type").getAsString(), event);
         }
+        java.util.Set<String> seenGroups = new java.util.LinkedHashSet<>();
+        java.util.Map<Integer, CastSpec> byCast = new java.util.LinkedHashMap<>();
         java.util.List<CastSpec> casts = new java.util.ArrayList<>();
-        for (DerivedCasts.Entry entry : DerivedCasts.of(capture)) {
+        for (CaptureFlow.Cast group : flow) {
+            if (!"cast".equals(group.classification())) {
+                continue;
+            }
+            com.google.gson.JsonObject event = firstEvent.get(group.index() + "|" + group.kind());
+            if (event == null) {
+                continue;
+            }
+            long skillId = event.has("skill_id") ? event.get("skill_id").getAsLong() : 0;
+            int[] row = skillId == 0 ? null : DerivedCasts.resolve(skillId);
+            int cid = row == null ? 0 : row[0];
+            int slot = row == null ? -1 : row[1];
+            com.google.gson.JsonObject zones = event.getAsJsonObject("zones");
+            double percentage = zones.has("damage_percentage") ? zones.get("damage_percentage").getAsDouble() : 0;
+
             CastSpec spec = new CastSpec();
-            spec.setCast(entry.castIndex());
-            boolean servant = servantOwner.containsKey(entry.cid());
-            // A cast that names no skill row (the payload states skill_id 0 for 1413's ultimate) still names its caster;
-            // the slot is then inferred from the event's own kind, which is what the payload does state.
-            spec.setActor(servant ? servantOwner.get(entry.cid())
-                    : entry.cid() != 0 ? entry.cid() : (int) entry.actor());
+            spec.setCast(group.index());
+            spec.setKind(group.kind());
+            boolean servant = servantOwner.containsKey(cid);
+            spec.setActor(servant ? servantOwner.get(cid) : cid != 0 ? cid : (int) group.actor());
             spec.setCaster(servant ? "memosprite" : "character");
             if (servant) {
-                spec.setSlotNumber(entry.slot());
-                spec.setSlot(String.valueOf(entry.slot()));
+                spec.setSlotNumber(slot);
+                spec.setSlot(String.valueOf(slot));
             } else {
-                int slot = entry.slot();
-                if (slot < 1) {
-                    slot = switch (entry.kind() == null ? "" : entry.kind()) {
-                        case "Ultimate" -> 3;
-                        case "Basic" -> 1;
-                        case "Skill" -> 2;
-                        default -> 0;
-                    };
-                }
-                spec.setSlot(switch (slot) {
+                int resolved = slot >= 1 ? slot : switch (group.kind() == null ? "" : group.kind()) {
+                    case "Ultimate" -> 3;
+                    case "Basic" -> 1;
+                    case "Skill" -> 2;
+                    default -> 0;
+                };
+                spec.setSlot(switch (resolved) {
                     case 1 -> "COMMON";
                     case 2 -> "SKILL";
                     case 3 -> "ULTRA";
                     case 4 -> "TALENT";
-                    default -> null;                        // an unknown slot is refused by the driver, loudly
+                    default -> null;
                 });
             }
-            // The ROW LEVEL comes from the ACCOUNT, not from the payload: a capture never states which row level a hit
-            // was read at, while the archive does (`skills` for the character's own slots, `memosprite` for its 忆灵's).
-            // The plan's `levels` map still wins when it names one - a plan may know better than the archive.
-            if (plan.getLevels() != null && plan.getLevels().containsKey(entry.castIndex())) {
-                spec.setLevel(plan.getLevels().get(entry.castIndex()));
+            if (plan.getLevels() != null && plan.getLevels().containsKey(group.index())) {
+                spec.setLevel(plan.getLevels().get(group.index()));
             } else {
-                spec.setLevel(accountLevel(spec.getActor(), spec.getCaster(), entry.slot()));
+                spec.setLevel(accountLevel(spec.getActor(), spec.getCaster(), slot));
             }
-            // A row that states a `resource_share` ("每有 N 点 → 额外 X") lets the capture's own multiplier say how many
-            // points the fight held: `pct / segmentRatio = param0 + steps x share`, and `points = steps x step`. Measured
-            // on 1413's 忆灵技1 at the account's Lv6: cast 1 states 0.06 -> 4 points, cast 16 states 0.09 -> 16 points,
-            // both integers. That is why the same row produced two different bases in one fight.
-            Integer pool = resourcePoolOf(entry, spec);
+            Integer pool = resourcePoolOf(skillId == 0 ? -1 : cid, slot, spec.getLevel(), percentage);
             if (pool != null) {
-                spec.setResources(java.util.Map.of(resourceNameOf(entry), (double) pool));
+                spec.setResources(java.util.Map.of(resourceNameOf(skillId == 0 ? -1 : cid, slot), (double) pool));
             }
-            Double firstTarget = firstTargetByCast.get(entry.castIndex());
-            spec.setTarget(firstTarget == null ? null : enemyByHealth(plan, firstTarget));
-            spec.setNote("derived from cast_index " + entry.castIndex() + " / skill " + entry.skillId());
+            spec.setTarget(group.firstTarget() > 0 ? enemyByHealth(plan, group.firstTarget()) : null);
+            spec.setNote("derived from cast_index " + group.index() + " (" + group.kind() + ") / skill " + skillId);
             casts.add(spec);
+            seenGroups.add(specKey(group.index(), group.kind()));
         }
         plan.setCasts(casts);
-    }
-
-    /**
-     * The 1-based plan index of the enemy whose 生命上限 the capture used, or {@code null} when none matches.
-     *
-     * @param plan  the plan
-     * @param health the capture's {@code target_max_hp}
-     * @return the 1-based index, or {@code null}
-     */
-    private static Integer enemyByHealth(Plan plan, double health) {
-        for (int i = 0; i < plan.getEnemies().size(); i++) {
-            Double stated = plan.getEnemies().get(i).getHealth();
-            if (stated != null && Math.abs(stated - health) <= Math.max(1e-6, Math.abs(health) * 1e-9)) {
-                return i + 1;
-            }
-        }
-        return null;
     }
 
     /**
@@ -1486,5 +1483,105 @@ public final class BattleReplay {
     }
 
     private static final java.util.function.Supplier<com.google.gson.JsonObject> EFFECTS = () -> EffectsHolder.VALUE;
+
+
+    /**
+     * The key one cast entry is stored under: the index plus the group's kind when the entry names one.
+     *
+     * @param cast the payload's cast index
+     * @param kind the entry's kind, or {@code null}
+     * @return the key
+     */
+    private static String specKey(int cast, String kind) {
+        return kind == null || kind.isBlank() ? String.valueOf(cast) : cast + "|" + kind.trim();
+    }
+
+    /**
+     * The plan entry for one capture group: its own kind first, then the kind-less entry every older plan uses.
+     *
+     * @param byCast the plan's entries
+     * @param group  the capture's group
+     * @return the entry, or {@code null}
+     */
+    private static CastSpec specFor(Map<String, CastSpec> byCast, CaptureFlow.Cast group) {
+        CastSpec exact = byCast.get(specKey(group.index(), group.kind()));
+        return exact != null ? exact : byCast.get(specKey(group.index(), null));
+    }
+
+
+    /**
+     * The 1-based plan index of the enemy whose 生命上限 the capture used, or {@code null} when none matches.
+     *
+     * @param plan   the plan
+     * @param health the capture's {@code target_max_hp}
+     * @return the 1-based index, or {@code null}
+     */
+    private static Integer enemyByHealth(Plan plan, double health) {
+        for (int i = 0; i < plan.getEnemies().size(); i++) {
+            Double stated = plan.getEnemies().get(i).getHealth();
+            if (stated != null && Math.abs(stated - health) <= Math.max(1e-6, Math.abs(health) * 1e-9)) {
+                return i + 1;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * The points of the row's own counter that the capture's multiplier implies, or {@code null} when the row states no
+     * {@code resource_share} or the arithmetic is not an integer.
+     *
+     * @param cid        the row's character or servant id
+     * @param slot       the data slot
+     * @param level      the row level, or {@code null}
+     * @param percentage the capture's instance share
+     * @return the points, or {@code null}
+     */
+    private static Integer resourcePoolOf(int cid, int slot, Integer level, double percentage) {
+        com.google.gson.JsonObject spec = skillEffectOf(cid, slot);
+        if (spec == null || !spec.has("resource_share") || level == null || percentage <= 0) {
+            return null;
+        }
+        com.google.gson.JsonObject shareSpec = spec.getAsJsonObject("resource_share");
+        com.google.gson.JsonArray rows = parameterRows(cid, slot);
+        if (rows == null || level < 1 || level > rows.size()) {
+            return null;
+        }
+        com.google.gson.JsonArray row = rows.get(level - 1).getAsJsonArray();
+        int stepIndex = shareSpec.get("step_param").getAsInt();
+        int shareIndex = shareSpec.get("share_param").getAsInt();
+        if (stepIndex >= row.size() || shareIndex >= row.size()) {
+            return null;
+        }
+        double base = row.get(0).getAsDouble();
+        double stepSize = row.get(stepIndex).getAsDouble();
+        double share = row.get(shareIndex).getAsDouble();
+        if (stepSize <= 0 || share <= 0) {
+            return null;
+        }
+        double ratio = 1.0;
+        if (spec.has("segments")) {
+            for (com.google.gson.JsonElement each : spec.getAsJsonArray("segments")) {
+                ratio = Math.min(ratio, each.getAsDouble());
+            }
+        }
+        double steps = (percentage / ratio - base) / share;
+        double rounded = Math.rint(steps);
+        if (rounded < 0 || Math.abs(steps - rounded) > 1e-6) {
+            return null;
+        }
+        return (int) Math.round(rounded * stepSize);
+    }
+
+    /**
+     * The name of the counter a row's {@code resource_share} reads.
+     *
+     * @param cid  the row's character or servant id
+     * @param slot the data slot
+     * @return the counter's id
+     */
+    private static String resourceNameOf(int cid, int slot) {
+        com.google.gson.JsonObject spec = skillEffectOf(cid, slot);
+        return spec.getAsJsonObject("resource_share").get("resource").getAsString();
+    }
 
 }

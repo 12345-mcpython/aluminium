@@ -98,6 +98,18 @@ public final class DerivedCasts {
     }
 
     /**
+     * Which {@code (cid, slot)} one {@code skill_id} belongs to - the same index the entries are built from, exposed so a
+     * caller that groups by something else (the replay groups by cast AND kind) can resolve a single row.
+     *
+     * @param skillId the payload's {@code skill_id}
+     * @return {@code {cid, slot}}, or {@code null} when the id is unknown
+     */
+    public static int[] resolve(long skillId) {
+        Map<String, Integer> found = skillIndex().get(String.valueOf(skillId));
+        return found == null ? null : new int[]{found.get("cid"), found.get("slot")};
+    }
+
+    /**
      * {@code skill_id} to its {@code (cid, slot)} - read from {@code skills.json}, which keys rows the way the engine
      * addresses them.
      *
