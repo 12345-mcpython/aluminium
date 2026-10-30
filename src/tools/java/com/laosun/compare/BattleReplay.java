@@ -1763,35 +1763,62 @@ public final class BattleReplay {
      * @param plan    the plan
      */
     private static void syncBars(Row row, com.google.gson.JsonObject capture, List<Enemy> enemies, Plan plan) {
-        java.util.Map<Long, Double> after = new java.util.HashMap<>();
-        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
-            com.google.gson.JsonObject event = element.getAsJsonObject();
-            if (event.get("cast_index") == null || event.get("cast_index").getAsInt() != row.cast
-                    || !event.has("hp_after") || event.get("hp_after").isJsonNull()) {
-                continue;
-            }
-            after.put(event.getAsJsonObject("target").get("uid").getAsLong(), event.get("hp_after").getAsDouble());
-        }
-        for (java.util.Map.Entry<Long, Double> entry : after.entrySet()) {
-            int index = TARGET_UIDS.indexOf(entry.getKey());
+        for (java.util.Map.Entry<Long, java.util.TreeMap<Integer, Double>> each : timeline(capture).entrySet()) {
+            int index = TARGET_UIDS.indexOf(each.getKey());
             if (index < 0 || index >= enemies.size() || index >= plan.getEnemies().size()) {
                 continue;
+            }
+            java.util.Map.Entry<Integer, Double> bar = each.getValue().floorEntry(row.cast);
+            if (bar == null) {
+                continue;                               // it had not been hit yet
             }
             Enemy enemy = enemies.get(index);
             if (CURRENT_BATTLE == null || !CURRENT_BATTLE.enemyUnits().contains(enemy)) {
                 continue;                               // it has not joined yet
             }
-            double delta = entry.getValue() - enemy.getCurrentHp();
+            double delta = bar.getValue() - enemy.getCurrentHp();
             if (delta > 0) {
                 enemy.heal(delta);
             } else if (delta < 0) {
-                // `mayDie: true`: the capture's `hp_after` is 0 for what it KILLED, and a bar that is merely set to 0 while
-                // the unit stays on the field would keep it in every later cast's target list (measured: cast 69 faced 3
-                // enemies in the replay and 1 in the capture).
+                // `mayDie: true`: the capture's `hp_after` is 0 for what it KILLED, and a bar merely set to 0 while the unit
+                // stays on the field would keep it in every later cast's target list (measured: cast 69 faced 3 enemies in
+                // the replay and 1 in the capture).
                 enemy.takeDamage(-delta, true);
             }
         }
     }
+
+    /**
+     * Every enemy's bar over the recorded fight: uid to {@code (cast index -> hp_after)}.
+     *
+     * <p><b>Why the whole timeline, not just the cast that was driven.</b> A cast only touches the enemies it hits, so a
+     * replay that moves only those bars lets units the capture had already killed live on - and every later AoE then faces
+     * a crowd the capture did not have. Reading each enemy's latest recorded bar at every cast keeps "who is on the field"
+     * a fact of the capture.
+     *
+     * @param capture the parsed capture
+     * @return the timelines
+     */
+    private static java.util.Map<Long, java.util.TreeMap<Integer, Double>> timeline(com.google.gson.JsonObject capture) {
+        if (TIMELINE != null) {
+            return TIMELINE;
+        }
+        java.util.Map<Long, java.util.TreeMap<Integer, Double>> lines = new java.util.HashMap<>();
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null || !event.has("hp_after") || event.get("hp_after").isJsonNull()) {
+                continue;
+            }
+            long uid = event.getAsJsonObject("target").get("uid").getAsLong();
+            lines.computeIfAbsent(uid, key -> new java.util.TreeMap<>())
+                    .put(event.get("cast_index").getAsInt(), event.get("hp_after").getAsDouble());
+        }
+        TIMELINE = lines;
+        return lines;
+    }
+
+    /** The capture's bar timelines, computed once per run. */
+    private static java.util.Map<Long, java.util.TreeMap<Integer, Double>> TIMELINE;
 
     /** The battle the loop is driving, so {@link #syncBars} can tell which enemies have joined. */
     private static Battle CURRENT_BATTLE;
