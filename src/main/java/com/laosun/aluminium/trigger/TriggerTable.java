@@ -1807,6 +1807,21 @@ public class TriggerTable {
                 return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
+                case "target_dots_from_self" -> {
+                    // 「若目标处于**装备者施加的**持续伤害状态」 (light cone 23029): DoTs on the target whose source is the owner.
+                    if (ctx.target() == null || ctx.target().getBuffManager() == null) {
+                        yield Double.NaN;
+                    }
+                    int mine = 0;
+                    for (com.laosun.aluminium.buff.AbstractBuff carried
+                            : ctx.target().getBuffManager().activeBuffs()) {
+                        if (carried instanceof com.laosun.aluminium.buff.DotBuff
+                                && carried.getSource() == ctx.owner()) {
+                            mine++;
+                        }
+                    }
+                    yield mine;
+                }
                 case "weakness_hit_count" -> ctx.weakHitCount();   // how many hit targets share the attack's weakness
                 case "hit_count" -> ctx.hitCount();
                 // "强化普攻命中…": the DATA ROW of the skill that produced this event (0 = the event named none, which
