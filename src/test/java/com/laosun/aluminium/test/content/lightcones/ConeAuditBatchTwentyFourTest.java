@@ -119,7 +119,7 @@ public class ConeAuditBatchTwentyFourTest {
         JsonObject down = effect(23041, "cone23041_defence_down", 0);
         System.out.println("[23041] 降防: percent=" + down.get("percent") + " turns=" + down.get("turns")
                 + " target=" + down.get("target"));
-        Assertions.assertEquals(-0.24, down.get("percent").getAsDouble(), 1e-12, "「防御力降低 24%」（叠影 1）");
+        Assertions.assertEquals(-0.12, down.get("percent").getAsDouble(), 1e-12, "「防御力降低 12%」（叠影 1；数据行 rank 1 = 0.12，旧文件误用了 rank 5 的 0.24）");
         Assertions.assertEquals(2, down.get("turns").getAsInt(), "「持续 2 回合」");
         Assertions.assertEquals("target", down.get("target").getAsString(), "落在被打的目标身上");
     }

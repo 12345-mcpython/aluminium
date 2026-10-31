@@ -235,6 +235,19 @@ public class Enemy extends CanHit {
     }
 
     /**
+     * Whether this enemy carries a weakness an <b>effect</b> inserted - as opposed to one its data gave it.
+     *
+     * <p>The distinction is the engine's already: {@link #stanceWeak} is DATA from {@code monster_config.json} and never
+     * expires, while {@code timedWeak} holds exactly the weaknesses a rule added. Reader: light cone 23041's 「若敌方目标拥有
+     * <b>装备者添加的</b>弱点」, where "added" is the only thing the sentence needs - a data weakness is not added by anyone.
+     *
+     * @return {@code true} when at least one effect-inserted weakness is still running
+     */
+    public boolean hasAddedWeakness() {
+        return !timedWeak.isEmpty();
+    }
+
+    /**
      * One of the target's own turns has ended: run every timed weakness down, dropping the expired.
      */
     public void tickTimedWeaknesses() {
