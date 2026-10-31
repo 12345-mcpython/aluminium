@@ -1815,6 +1815,14 @@ public class TriggerTable {
                 return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
+                case "last_elation_skill_id" -> {
+                    // 「与上一次施放的欢愉技不同」 (light cone 23064): the slot of the owner is previous Elation-damage cast
+                    // (0 before the first one). Compared against `from_skill_id` in the same condition.
+                    if (ctx.owner() == null) {
+                        yield Double.NaN;
+                    }
+                    yield ctx.owner().getLastElationSkillId();
+                }
                 case "map_attacker_count" -> {
                     // 「若不存在开战的队友」 (light cone 23050): how many of OUR units other than the rule owner declared a
                     // map attack on the way in. Zero is the fallback branch, not an error.

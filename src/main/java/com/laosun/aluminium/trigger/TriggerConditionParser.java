@@ -506,6 +506,12 @@ final class TriggerConditionParser {
             // reported it as "compares two variables" (found by a test that needed `== 0`). Fall
             // through to the numeric path; a comparison between two *names* still gets the clearer message.
             if (!isNumeric(left) && !isNumeric(right)) {
+                // Two NUMERIC variables are a numeric comparison, not an identity one: `from_skill_id !=
+                // last_elation_skill_id` (light cone 23064) asks whether this cast differs from the previous one,
+                // and both sides are numbers. Anything else still gets the clearer message.
+                if (isNumericVariable(left) && isNumericVariable(right)) {
+                    return numericComparison(left, right, operator, raw, spec);
+                }
                 throw new IllegalArgumentException(
                         "Condition '" + raw + "' compares two variables; only comparisons against a party ("
                                 + String.join(", ", IDENTITY_TERMS.stream().sorted().toList())
@@ -527,12 +533,7 @@ final class TriggerConditionParser {
         } else if (isNumericVariable(left) && isNumericVariable(right)) {
             // Two variables (light cone 21012). The left one keeps the existing slots and the right
             // one gets its own, so `target_hp_percent >= self_hp_percent` reads exactly as it is written.
-            return new TriggerTable.Numeric(left, selfAttributeOf(left, raw, spec), selfResourceOf(left, raw, spec),
-                    stacksNameOf(left, raw, spec), left.startsWith(TARGET_STACKS_PREFIX),
-                    left.startsWith(ACTOR_STACKS_PREFIX), operator, 0, false, right,
-                    selfAttributeOf(right, raw, spec), selfResourceOf(right, raw, spec),
-                    stacksNameOf(right, raw, spec), right.startsWith(TARGET_STACKS_PREFIX),
-                    right.startsWith(ACTOR_STACKS_PREFIX), pathOf(left, raw, spec), pathOf(right, raw, spec));
+            return numericComparison(left, right, operator, raw, spec);
         } else {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' has no numeric literal on either side (source: "
@@ -828,6 +829,21 @@ final class TriggerConditionParser {
                             + "(source: " + spec.getSource() + ")");
         }
         return party;
+    }
+
+    /**
+     * A comparison whose two sides are both numeric variables: the left keeps the existing slots, the right gets its own
+     * ({@code target_hp_percent >= self_hp_percent}, light cone 21012; {@code from_skill_id != last_elation_skill_id},
+     * light cone 23064).
+     */
+    private static TriggerTable.Numeric numericComparison(String left, String right, String operator, String raw,
+                                                          TriggerSpec spec) {
+        return new TriggerTable.Numeric(left, selfAttributeOf(left, raw, spec), selfResourceOf(left, raw, spec),
+                stacksNameOf(left, raw, spec), left.startsWith(TARGET_STACKS_PREFIX),
+                left.startsWith(ACTOR_STACKS_PREFIX), operator, 0, false, right,
+                selfAttributeOf(right, raw, spec), selfResourceOf(right, raw, spec),
+                stacksNameOf(right, raw, spec), right.startsWith(TARGET_STACKS_PREFIX),
+                right.startsWith(ACTOR_STACKS_PREFIX), pathOf(left, raw, spec), pathOf(right, raw, spec));
     }
 
     private static boolean containsOperator(String text) {
@@ -2090,6 +2106,10 @@ final class TriggerConditionParser {
                     "skill_point",
                     // 「若不存在开战的队友」 (light cone 23050): our OTHER units that declared a map attack before the battle.
                     "map_attacker_count",
+                    // 「与上一次施放的欢愉技不同」 (light cone 23064): the slot of the previous Elation-damage cast, recorded
+                    // by SkillExecutor after each such cast. `from_skill_id` is the CURRENT one, so the comparison is
+                    // `from_skill_id != last_elation_skill_id`.
+                    "last_elation_skill_id",
                     // The owner's Eidolon rank, as a condition. Note: `min_eidolon` already gates a whole RULE on it, and that
                     // is enough when the clause IS the Eidolon's ("【深度学习】时 ... 抗性穿透提高 20%"). It is not enough when an
                     // Eidolon clause MODIFIES an effect the base kit also has at the same event: the two rules then carry
