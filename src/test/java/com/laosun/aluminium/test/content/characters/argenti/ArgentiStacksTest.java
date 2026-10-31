@@ -32,9 +32,10 @@ import java.util.Random;
  * Eidolon 2's "3 or more enemies" is the existing {@code enemy_count} variable (it landed after the old note here said
  * no such variable existed). Eidolon 2 is the clause this round added.
  *
- * <p><b>Two witnesses, not claims.</b> Eidolon 1 is a flat +4% crit damage instead of per layer, and the talent grants
- * one layer per cast instead of one per enemy hit. Both are measured and registered in the file's {@code _gaps}; the
- * two tests at the bottom pin today's reading so that fixing them turns them red.
+ * <p><b>One witness, one fix.</b> Eidolon 1 is still a flat +4% crit damage instead of per layer; it is measured and
+ * registered in the file's {@code _gaps}, and the witness at the bottom pins today's reading so that a fix turns it red.
+ * The talent's "for each enemy hit, gain 1 layer" is fixed: {@code times_from: "hit_count"} makes the stack follow the
+ * attack's hit count, and {@code threeEnemiesGiveThreeStacks} pins both the three-hit and the one-hit case.
  */
 public class ArgentiStacksTest {
     private static final int ARGENTI = 1302;
@@ -240,21 +241,24 @@ public class ArgentiStacksTest {
     }
 
     /**
-     * Registered shortfall: the talent grants ONE layer per cast, while the sentence says 「每击中 1 个敌方目标」.
+     * The talent's stack follows the attack: 「每击中 1 个敌方目标，…获得 1 层【升格】」.
      *
-     * <p>The witness: a three-target cast adds one layer today. When the per-hit form lands (the engine's
-     * {@code times_from: "hit_count"} already repeats a non-{@code DAMAGE} effect - {@code EffectTimesTest}), this
-     * becomes three and the test goes red on purpose.
+     * <p>Three targets hit give three layers, one target gives one - the effect repeats on the event's hit count
+     * ({@code times_from: "hit_count"}), not once per cast.
      */
     @Test
-    public void aThreeTargetCastStillAddsOneStack() {
+    public void threeEnemiesGiveThreeStacks() {
         Fixture f = new Fixture(0, 3);
         f.fireCast(TriggerEvent.BASIC_ATTACK, 3);
 
-        Assertions.assertEquals(1, f.argenti.getBuffManager().stacksOf("升格"),
-                "today: one layer for three enemies hit; the sentence wants three");
-        Assertions.assertEquals(0.075, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
-                "…and the attribute shows the same single layer");
+        Assertions.assertEquals(3, f.argenti.getBuffManager().stacksOf("升格"),
+                "three enemies hit: three layers, not one");
+        Assertions.assertEquals(0.05 + 3 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
+                "…and the attribute shows all three");
+
+        f.fireCast(TriggerEvent.SKILL_CAST, 1);
+        Assertions.assertEquals(4, f.argenti.getBuffManager().stacksOf("升格"),
+                "a single-target cast adds one more, not three");
     }
 
     // ==================================================================
@@ -319,4 +323,3 @@ public class ArgentiStacksTest {
         return BattleFixture.alwaysRoll(0.0);
     }
 }
-
