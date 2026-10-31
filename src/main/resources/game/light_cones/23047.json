@@ -3,60 +3,230 @@
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_ensnare",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "魂迷", "turns": 3, "base_chance": 0.8, "target": "target" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "魂迷",
+          "turns": 3,
+          "base_chance": 0.8,
+          "target": "target"
+        }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
       "note": "「当有敌方目标陷入**装备者施加的**负面效果时，有 **80% 基础概率**使其陷入【魂迷】3 回合，同类不叠加」—— `DEBUFF_APPLIED` ＋ `actor == self` ＋ `APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23047_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（40/45/50/55/60% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：【魂迷】的三条内部效果**整块没有** ✗ —— ① 「**每有 1 个装备者施加的负面效果**，受到的**持续伤害** +5%，最多 6 层」（需要「按施加者归属过滤的目标负面计数」✗）；② 「受到我方目标攻击时，使**攻击者**速度 +10%，3 回合」（需要「被击时给对方上修饰」✗）；③ 「装备者陷入无法战斗时移除所有【魂迷】」✗。"
+    },
+    {
+      "on": "DEBUFF_APPLIED",
+      "id": "cone23047_dot_taken_per_my_debuff",
+      "when": [
+        "target has_state 魂迷"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "魂迷之债",
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.05,
+          "damage_type": "DOT",
+          "per_steps": "target_debuffs_from_self:1",
+          "per_steps_cap": 6,
+          "buff": "魂迷之债",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
+      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     }
   ],
   "2": [
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_ensnare",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "魂迷", "turns": 3, "base_chance": 0.8, "target": "target" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "魂迷",
+          "turns": 3,
+          "base_chance": 0.8,
+          "target": "target"
+        }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
       "note": "「当有敌方目标陷入**装备者施加的**负面效果时，有 **80% 基础概率**使其陷入【魂迷】3 回合，同类不叠加」—— `DEBUFF_APPLIED` ＋ `actor == self` ＋ `APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23047_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（40/45/50/55/60% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：【魂迷】的三条内部效果**整块没有** ✗ —— ① 「**每有 1 个装备者施加的负面效果**，受到的**持续伤害** +5%，最多 6 层」（需要「按施加者归属过滤的目标负面计数」✗）；② 「受到我方目标攻击时，使**攻击者**速度 +10%，3 回合」（需要「被击时给对方上修饰」✗）；③ 「装备者陷入无法战斗时移除所有【魂迷】」✗。"
+    },
+    {
+      "on": "DEBUFF_APPLIED",
+      "id": "cone23047_dot_taken_per_my_debuff",
+      "when": [
+        "target has_state 魂迷"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "魂迷之债",
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.0625,
+          "damage_type": "DOT",
+          "per_steps": "target_debuffs_from_self:1",
+          "per_steps_cap": 6,
+          "buff": "魂迷之债",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
+      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     }
   ],
   "3": [
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_ensnare",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "魂迷", "turns": 3, "base_chance": 0.8, "target": "target" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "魂迷",
+          "turns": 3,
+          "base_chance": 0.8,
+          "target": "target"
+        }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
       "note": "「当有敌方目标陷入**装备者施加的**负面效果时，有 **80% 基础概率**使其陷入【魂迷】3 回合，同类不叠加」—— `DEBUFF_APPLIED` ＋ `actor == self` ＋ `APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23047_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（40/45/50/55/60% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：【魂迷】的三条内部效果**整块没有** ✗ —— ① 「**每有 1 个装备者施加的负面效果**，受到的**持续伤害** +5%，最多 6 层」（需要「按施加者归属过滤的目标负面计数」✗）；② 「受到我方目标攻击时，使**攻击者**速度 +10%，3 回合」（需要「被击时给对方上修饰」✗）；③ 「装备者陷入无法战斗时移除所有【魂迷】」✗。"
+    },
+    {
+      "on": "DEBUFF_APPLIED",
+      "id": "cone23047_dot_taken_per_my_debuff",
+      "when": [
+        "target has_state 魂迷"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "魂迷之债",
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.075,
+          "damage_type": "DOT",
+          "per_steps": "target_debuffs_from_self:1",
+          "per_steps_cap": 6,
+          "buff": "魂迷之债",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
+      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     }
   ],
   "4": [
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_ensnare",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "魂迷", "turns": 3, "base_chance": 0.8, "target": "target" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "魂迷",
+          "turns": 3,
+          "base_chance": 0.8,
+          "target": "target"
+        }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
       "note": "「当有敌方目标陷入**装备者施加的**负面效果时，有 **80% 基础概率**使其陷入【魂迷】3 回合，同类不叠加」—— `DEBUFF_APPLIED` ＋ `actor == self` ＋ `APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23047_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（40/45/50/55/60% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：【魂迷】的三条内部效果**整块没有** ✗ —— ① 「**每有 1 个装备者施加的负面效果**，受到的**持续伤害** +5%，最多 6 层」（需要「按施加者归属过滤的目标负面计数」✗）；② 「受到我方目标攻击时，使**攻击者**速度 +10%，3 回合」（需要「被击时给对方上修饰」✗）；③ 「装备者陷入无法战斗时移除所有【魂迷】」✗。"
+    },
+    {
+      "on": "DEBUFF_APPLIED",
+      "id": "cone23047_dot_taken_per_my_debuff",
+      "when": [
+        "target has_state 魂迷"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "魂迷之债",
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.0875,
+          "damage_type": "DOT",
+          "per_steps": "target_debuffs_from_self:1",
+          "per_steps_cap": 6,
+          "buff": "魂迷之债",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
+      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     }
   ],
   "5": [
     {
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_ensnare",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "魂迷", "turns": 3, "base_chance": 0.8, "target": "target" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "魂迷",
+          "turns": 3,
+          "base_chance": 0.8,
+          "target": "target"
+        }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
       "note": "「当有敌方目标陷入**装备者施加的**负面效果时，有 **80% 基础概率**使其陷入【魂迷】3 回合，同类不叠加」—— `DEBUFF_APPLIED` ＋ `actor == self` ＋ `APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23047_effect_hit`** ✗ —— 「效果命中提高 #1%」**就是光锥自己的** `effect_hit_rate` 属性（40/45/50/55/60% ✓）⇒ 再写一条会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：【魂迷】的三条内部效果**整块没有** ✗ —— ① 「**每有 1 个装备者施加的负面效果**，受到的**持续伤害** +5%，最多 6 层」（需要「按施加者归属过滤的目标负面计数」✗）；② 「受到我方目标攻击时，使**攻击者**速度 +10%，3 回合」（需要「被击时给对方上修饰」✗）；③ 「装备者陷入无法战斗时移除所有【魂迷】」✗。"
+    },
+    {
+      "on": "DEBUFF_APPLIED",
+      "id": "cone23047_dot_taken_per_my_debuff",
+      "when": [
+        "target has_state 魂迷"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "魂迷之债",
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.1,
+          "damage_type": "DOT",
+          "per_steps": "target_debuffs_from_self:1",
+          "per_steps_cap": 6,
+          "buff": "魂迷之债",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
+      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     }
   ]
 }
