@@ -65,6 +65,7 @@ public class EffectSpec {
         copy.countedLaughs = countedLaughs;
         copy.castCountedLaughs = castCountedLaughs;
         copy.perSteps = perSteps;
+        copy.perStepsCap = this.perStepsCap;
         copy.steps = steps;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
@@ -389,6 +390,15 @@ public class EffectSpec {
      */
     @com.google.gson.annotations.SerializedName("per_steps")
     private String perSteps;
+
+    /**
+     * A cap on the stairs {@link #perSteps} pays - 「最多 10 层」.
+     *
+     * <p>Reader: relic 129 (闪耀功勋的魔法少女)'s 4-piece - 「我方每累计获得 5 点笑点，造成的欢愉伤害额外无视 1% 防御，最多 10 层」.
+     * Without the cap the stair count would keep paying past the sentence's ceiling.
+     */
+    @com.google.gson.annotations.SerializedName("per_steps_cap")
+    private Integer perStepsCap;
 
     /**
      * The milestones a {@code SPEND_STEPS} gives up, written {@code "<counter>:<step>"} - the spelling

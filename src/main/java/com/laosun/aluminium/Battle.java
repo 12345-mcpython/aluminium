@@ -1259,6 +1259,9 @@ public class Battle {
 
     private void registerPartyResources() {
         partyResources.registerFrom(allies);
+        // Counters that belong to the BATTLE, declared once for every party (`battle_resources.json`) - before this, a
+        // party-scoped counter existed only in parties that carried its declaring character.
+        partyResources.registerGlobal(com.laosun.aluminium.data.BattleResources.declared());
     }
 
     /*

@@ -3,7 +3,9 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "relic129_elation_ignores_defence",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -17,6 +19,28 @@
       ],
       "source": "遗器 129 四件套：「装备者及其忆灵造成的**欢愉伤容**无视目标 10% 防御」",
       "note": "「装备者**及其忆灵**造成的**欢愉伤害**无视 10% 防御」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `DEFENCE_IGNORE{damage_type: ELATION}` ✓。\n⛔ **仍开（已登记 §4.3）**：「我方每累计获得 **5 点笑点**，造成的欢愉伤害**额外无视 1%** 防御，**最多 10 层**」**整句没有** ✗ —— `counted_laughs` 变量读得到笑点数 ✓，但这条要的是 **÷5 取整** 的层数 ✗（`per_stack` 是「每 1 点一层」✗，没有除数 ✗）⇒ 等价缺口。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic129_every_five_laughs_adds_one_percent",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.01,
+          "instance": true,
+          "damage_type": "ELATION",
+          "permanent": true,
+          "per_steps": "笑点:5",
+          "per_steps_cap": 10,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 129 四件套第二句：「我方每累计获得 5 点笑点，造成的欢愉伤害额外无视 1% 防御，最多 10 层」。笑点是**战斗级**计数器（`game/battle_resources.json` 全局声明，初值 0、无上限），「每 5 点」= `per_steps: \"笑点:5\"`，「最多 10 层」= `per_steps_cap: 10`。",
+      "note": "⚠ `per_steps` 按引擎既有语义**重复整条效果** `floor(笑点/5)` 次（`per_steps_cap` 封顶 10 次），所以每次 +0.01 ⇒ 最多 +10%，与「最多 10 层」一致。⚠ `instance: true` 与第一句同口径（只作用于这一发）。判据 `RelicLaughStairTest`。"
     }
   ]
 }

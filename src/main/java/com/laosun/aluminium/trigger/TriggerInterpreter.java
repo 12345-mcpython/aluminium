@@ -179,6 +179,11 @@ public final class TriggerInterpreter {
         if (owner.getResources() != null && owner.getResources().has(name)) {
             return owner.getResources().value(name);
         }
+        // A counter that belongs to the BATTLE (reader: 笑点, 「每累计获得 5 点笑点」 - relic 129's 4-piece). Declared in
+        // `game/battle_resources.json`, so every party has it; a unit's own counter still wins above.
+        if (ctx != null && ctx.battle() != null && ctx.battle().partyResource(name) != null) {
+            return ctx.battle().partyResourceValue(name);
+        }
         throw new IllegalStateException("a weight step reads \"" + name + "\", which is neither an attribute of "
                 + owner.getName() + ", one of its counters, nor the battle's skill points");
     }
@@ -2286,7 +2291,9 @@ public final class TriggerInterpreter {
         if (written == null || written.isBlank()) {
             return 1;
         }
-        return parseCounterSteps(written.trim(), "per_steps").wholeSteps(ctx);
+        int steps = parseCounterSteps(written.trim(), "per_steps").wholeSteps(ctx);
+        Integer cap = effect.getPerStepsCap();
+        return cap == null ? steps : Math.min(cap, steps);
     }
 
 
