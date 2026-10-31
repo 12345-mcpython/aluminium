@@ -81,8 +81,9 @@ public class ConeAuditBatchNineteenTest {
         Assertions.assertTrue(f.attribute(AttributeType.HEALTH) > bare.attribute(AttributeType.HEALTH), "「生命上限提高 18%」");
         Assertions.assertTrue(f.attribute(AttributeType.OUTGOING_HEALING_BOOST)
                 > bare.attribute(AttributeType.OUTGOING_HEALING_BOOST), "「治疗量提高 12%」");
-        System.out.println("[23013] 规则数 " + rules(23013) + "（记录治疗量那一句没有拼法）");
-        Assertions.assertEquals(0, rules(23013), "缺口见证：没有规则（见状态表）");
+        // 2026-10-31: the RECORDING half landed (one resource fed from HEALED). The payment half is still open, because
+        // 「该伤害不受加成影响」 has no expression - see the status row.
+        Assertions.assertEquals(1, rules(23013), "the heal-recording rule");
     }
 
     /**
