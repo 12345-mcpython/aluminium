@@ -62,14 +62,16 @@ public class TribbieTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TRIBBIE);
-        // 4 since: `ult_zone_state` joins the three -- "结界持续期间" had no state to name,
-        // and 1415's ode of passage needs one ("缇宝的结界的附加伤害").
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the follow-up trigger, and (2026-09-29) the zone's 「敌方目标受到的伤害提高30%」 (enemy targets take 30% more DMG)" + " with `ticks_on: self` for the zone's own clock");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "Numinosity");
+        // 6 since: `ult_zone_state` joins the three, and Eidolon 6 adds its own-ult follow-up plus the
+        // boosted other-ally follow-up. "结界持续期间" had no state to name, and 1415's ode of passage
+        // needs one ("缇宝的结界的附加伤害").
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the follow-up trigger, the zone, the reset, Eidolon 6's two follow-up rules, and the zone's "
+                        + "「敌方目标受到的伤害提高30%」 with `ticks_on: self` for the zone's own clock");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "Numinosity and Eidolon 4's penetration");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.FOLLOW_UP), "the damage boost");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the energy trace (pre-existing), the technique and the level convention");
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the energy trace, the technique, the level convention, Eidolons 3/5 and Eidolon 4's technique branch");
     }
 
     /**
@@ -131,3 +133,4 @@ public class TribbieTest {
         return BattleFixture.alwaysRoll(1.0);
     }
 }
+

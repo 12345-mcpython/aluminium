@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "character": 9018,
+  "resources": [
+    {
+      "id": "probe",
+      "max": 10,
+      "initial": 0
+    }
+  ],
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "value_counts",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "probe_stack",
+          "value": {
+            "type": "const",
+            "value": 3
+          },
+          "max_stacks": 5,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "probe_stack",
+          "value": {
+            "type": "const",
+            "value": 1
+          },
+          "target": "self"
+        },
+        {
+          "op": "RAISE_RESOURCE_CAP",
+          "resource": "probe",
+          "value": {
+            "type": "const",
+            "value": 5
+          },
+          "target": "self"
+        },
+        {
+          "op": "GAIN_SKILL_POINT",
+          "value": {
+            "type": "const",
+            "value": 2
+          }
+        },
+        {
+          "op": "RAISE_SKILL_POINT_CAP",
+          "value": {
+            "type": "const",
+            "value": 1
+          }
+        },
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill_id": 1,
+          "value": {
+            "type": "const",
+            "value": 1
+          }
+        }
+      ]
+    }
+  ]
+}

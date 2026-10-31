@@ -57,7 +57,9 @@ public class LiteralDamageCensusTest {
         String path = "/game/characters/" + cid + ".json";
         try (InputStream stream = LiteralDamageCensusTest.class.getResourceAsStream(path)) {
             Assertions.assertNotNull(stream, "missing resource " + path);
-            JsonArray rules = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonArray();
+            JsonElement root = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+            JsonArray rules = root.isJsonArray() ? root.getAsJsonArray()
+                    : root.getAsJsonObject().getAsJsonArray("rules");
             for (JsonElement rule : rules) {
                 JsonObject object = rule.getAsJsonObject();
                 if (object.get("id") == null || !ruleId.equals(object.get("id").getAsString())) {

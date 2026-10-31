@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "character": 9021,
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "status_ok",
+      "_status": "partial",
+      "_gaps": [
+        "the second clause has no op yet"
+      ],
+      "_divergences": [
+        "trace value differs from the document"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}

@@ -165,9 +165,9 @@ public class CastTargetTest {
         TriggerTable.TriggerContext aimed =
                 new TriggerTable.TriggerContext(bronya, bronya, ally, 0, 0, null, battle);
         List<TriggerTable.CompiledRule> onAlly = rulesFor(table, aimed);
-        Assertions.assertEquals(4, onAlly.size(),
-                "her Eidolon 1 rule matches a skill cast too, and so does eidolon 6 (which lengthens the boost below); "
-                        + "the two below are the skill's own sentences");
+        Assertions.assertEquals(5, onAlly.size(),
+                "her Eidolon 1 rule, Eidolon 2 (speed on the aimed ally) and Eidolon 6 (which lengthens the boost) "
+                        + "all match a skill cast; the two below are the skill's own sentences");
         EffectSpec advance = ruleWithCondition(onAlly, "target != self").effects().getFirst();
         Assertions.assertEquals("ADVANCE", advance.getOp());
         Assertions.assertEquals(1.0, advance.getPercent(), EPS, "on the aimed ally, not on herself");
@@ -182,10 +182,14 @@ public class CastTargetTest {
         Assertions.assertEquals(0.66, boost.getPercent(), EPS, "skill 110102's #1 at Lv10 (the prose's row)");
         Assertions.assertEquals(1, boost.getTurns(), "skill 110102's #3");
 
+        Assertions.assertTrue(onAlly.stream().anyMatch(rule -> rule.effects().stream().anyMatch(effect ->
+                        "MODIFY_ATTR".equals(effect.getOp()) && "SPEED".equals(effect.getAttribute()))),
+                "Eidolon 2 puts +30% SPD on the aimed ally for 2 turns");
+
         TriggerTable.TriggerContext self =
                 new TriggerTable.TriggerContext(bronya, bronya, bronya, 0, 0, null, battle);
-        Assertions.assertEquals(3, rulesFor(table, self).size(),
-                "aimed at herself the advance rule drops out (Eidolon 1 and eidolon 6 still match): the gate is a "
+        Assertions.assertEquals(4, rulesFor(table, self).size(),
+                "aimed at herself the advance rule drops out (Eidolon 1, Eidolon 2 and Eidolon 6 still match): the gate is a "
                         + "condition, not a branch");
     }
 

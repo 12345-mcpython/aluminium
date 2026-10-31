@@ -583,8 +583,8 @@ public class RelicTriggerTableTest {
         Character tribbie = CharacterFactory.create(TRIBBIE, 80, true, null,
                 RelicFactory.suit(PASSERBY, STAR, LEVEL));
 
-        Assertions.assertEquals(4, tribbie.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
-                "1403's own trace (30 energy at battle start) plus set 101's 4-piece rule");
+        Assertions.assertEquals(7, tribbie.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
+                "1403's six battle-start rules (trace, technique, convention, Eidolons 3/4/5) plus set 101's 4-piece rule");
         Assertions.assertEquals(1, tribbie.getTriggerTable().ruleCount(TriggerEvent.ALLY_ATTACK),
                 "her ALLY_ATTACK rule must survive the merge");
     }

@@ -1,0 +1,26 @@
+{
+  // TriggerFormatSkeletonTest fixture: comments are part of the source format, and annotations
+  // document the file without becoming runtime fields.
+  "schema": 1,
+  "character": 9007,
+  "_note": "the file-level annotation never reaches a bean",
+  "_status": "implemented",
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "annotated_rule",
+      "_status": "implemented",
+      "_note": "the rule-level annotation never reaches a bean either",
+      "_gaps": [],
+      "_divergences": [],
+      "source": "legacy source stays readable",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1,
+          "_note": "and neither does an effect-level one"
+        }
+      ]
+    }
+  ]
+}

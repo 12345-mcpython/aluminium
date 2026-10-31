@@ -800,12 +800,6 @@ public class TriggerTableTest {
      * through reflection rather than widening the production API just for tests.
      */
     private static void set(Object target, String field, Object value) {
-        try {
-            var f = target.getClass().getDeclaredField(field);
-            f.setAccessible(true);
-            f.set(target, value);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("cannot set " + field, e);
-        }
+        com.laosun.aluminium.test.support.TriggerSpecs.set(target, field, value);
     }
 }

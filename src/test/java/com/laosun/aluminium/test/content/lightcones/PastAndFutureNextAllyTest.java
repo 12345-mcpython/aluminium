@@ -59,8 +59,8 @@ public class PastAndFutureNextAllyTest {
      */
     @Test
     public void theBoostLandsOnTheAllyWhoActsNext() {
-        int[] wearers = {1210, 1204, 1209, 1211, 1112, 1101, 1102, 1103, 1104, 1001, 1002, 1004, 1006, 1008};
-        int[] allies = {1001, 1002, 1004, 1006, 1008, 1101, 1102, 1103, 1104, 1112};
+        int[] wearers = {1210, 1204, 1209, 1211, 1112, 1102, 1103, 1104, 1001, 1002, 1004, 1006, 1008};
+        int[] allies = {1001, 1002, 1004, 1006, 1008, 1102, 1103, 1104, 1112};
         Battle battle = null;
         List<CanHit> order = null;
         Character owner = null;

@@ -4,6 +4,7 @@ package com.laosun.aluminium.test.support;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -284,12 +285,38 @@ public final class TriggerSpecs {
      *                               loudly, rather than leave a test silently asserting nothing
      */
     public static void set(Object target, String field, Object value) {
+        Object stored = "when".equals(field) ? asJsonConditions(value) : value;
         try {
             var declared = target.getClass().getDeclaredField(field);
             declared.setAccessible(true);
-            declared.set(target, value);
+            declared.set(target, stored);
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException("cannot set " + field + " on " + target.getClass(), e);
         }
+    }
+
+    /**
+     * The bean's {@code when} is a list of JSON entries because one array holds both DSL strings and predicate
+     * objects; a test builds the DSL half as plain strings, so this converts them at the one reflective boundary.
+     *
+     * <p>Objects are already {@link com.google.gson.JsonElement}s and pass through, which is how a test can write
+     * the structured half too.
+     */
+    private static Object asJsonConditions(Object value) {
+        if (!(value instanceof List<?> list)) {
+            return value;
+        }
+        List<com.google.gson.JsonElement> entries = new ArrayList<>();
+        for (Object entry : list) {
+            if (entry instanceof String text) {
+                entries.add(new com.google.gson.JsonPrimitive(text));
+            } else if (entry instanceof com.google.gson.JsonElement json) {
+                entries.add(json);
+            } else {
+                throw new IllegalStateException(
+                        "a test condition must be a String or a JsonElement, got " + entry);
+            }
+        }
+        return entries;
     }
 }

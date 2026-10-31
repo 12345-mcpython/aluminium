@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "character": 9012,
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "COMMON",
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        }
+      ]
+    }
+  ]
+}

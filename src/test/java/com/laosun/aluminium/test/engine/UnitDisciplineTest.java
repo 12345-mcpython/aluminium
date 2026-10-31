@@ -89,13 +89,19 @@ public class UnitDisciplineTest {
                 }
                 String id = rule.has("id") ? rule.get("id").getAsString() : "(no id)";
                 for (JsonElement condition : rule.getAsJsonArray("when")) {
-                    Matcher matcher = COMPARISON.matcher(condition.getAsString());
+                    // One `when` array holds both the DSL strings and structured predicate objects. The second half
+                    // has no "variable <op> literal" text to discipline, so it is not this guard's subject.
+                    if (!condition.isJsonPrimitive() || !condition.getAsJsonPrimitive().isString()) {
+                        continue;
+                    }
+                    String clause = condition.getAsString();
+                    Matcher matcher = COMPARISON.matcher(clause);
                     if (!matcher.matches()) {
                         continue;
                     }
                     String variable = matcher.group(1);
                     double literal = Double.parseDouble(matcher.group(3));
-                    String where = file.getFileName() + " " + id + ": \"" + condition.getAsString() + "\"";
+                    String where = file.getFileName() + " " + id + ": \"" + clause + "\"";
                     if (!KNOWN.contains(variable)) {
                         problems.add("unknown numeric variable -> " + where);
                     } else if (FRACTION.contains(variable) && literal > 1) {

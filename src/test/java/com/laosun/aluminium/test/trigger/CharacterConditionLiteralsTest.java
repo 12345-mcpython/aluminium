@@ -69,7 +69,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1101, "ULT_CAST", "ult_party_crit_damage", List.of("actor == self"));
         assertRule(1102, "HP_LOST", "trace_low_hp_aggro_down", List.of("target == self", "hp_percent <= 0.5"));
         assertRule(1102, "HEALED", "trace_low_hp_aggro_down_cleanup", List.of("target == self", "hp_percent > 0.5"));
-        assertRule(1103, "SKILL_CAST", "skill_shock", List.of("actor == self"));
+        assertRule(1103, "ATTACK_FINISHED", "skill_shock", List.of("actor == self", "from_skill SKILL"));
         assertRule(1104, "SKILL_CAST", "skill_daunting_smite", List.of("actor == self"));
         assertRule(1104, "ULT_CAST", "ult_enduring_bulwark", List.of("actor == self"));
         assertRule(1104, "BATTLE_START", "trace_steadfast_aggro", List.of());

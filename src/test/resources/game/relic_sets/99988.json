@@ -1,0 +1,1 @@
+{ "schema": 1, "relic_set": 12345, "2": [ { "on": "BATTLE_START", "do": [ { "op": "GAIN_SKILL_POINT", "amount": 1 } ] } ] }

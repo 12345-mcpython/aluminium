@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "character": 9023,
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "status_partial_without_gap",
+      "_status": "partial",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}

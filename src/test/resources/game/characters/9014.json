@@ -1,0 +1,36 @@
+{
+  "schema": 1,
+  "character": 9014,
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "value_shield",
+      "do": [
+        {
+          "op": "SHIELD",
+          "value": {
+            "type": "const",
+            "value": 123
+          },
+          "target": "self"
+        }
+      ]
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "value_modifier",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "value": {
+            "type": "const",
+            "value": 50
+          },
+          "permanent": true,
+          "target": "self"
+        }
+      ]
+    }
+  ]
+}

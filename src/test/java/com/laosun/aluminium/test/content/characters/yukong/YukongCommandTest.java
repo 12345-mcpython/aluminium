@@ -1,6 +1,7 @@
 package com.laosun.aluminium.test.content.characters.yukong;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.buff.StateBuff;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
@@ -97,6 +98,22 @@ public class YukongCommandTest {
         with.castUltimate();
         Assertions.assertTrue(with.ally.getAttribute(AttributeType.CRIT_CHANCE).get() > before,
                 "…and with a layer up, the party gets +28% crit and +65% crit damage");
+    }
+
+    /**
+     * 襄尺: the first debuff is refused outright, the next one is not (the charge is spent).
+     */
+    @Test
+    public void herTraceRefusesExactlyOneDebuffThenSpendsTheCharge() {
+        Fixture f = new Fixture();
+        Assertions.assertFalse(f.battle.tryApplyDebuff(f.enemy, f.yukong, new StateBuff("测试负面一", 1), 1.0, null),
+                "「可抵抗1次负面效果」 -- the first application is refused before any roll");
+        Assertions.assertFalse(f.yukong.getBuffManager().hasState("测试负面一"),
+                "a refused application leaves no state behind");
+
+        Assertions.assertTrue(f.battle.tryApplyDebuff(f.enemy, f.yukong, new StateBuff("测试负面二", 1), 1.0, null),
+                "the one charge is spent, so the next application lands normally");
+        Assertions.assertTrue(f.yukong.getBuffManager().hasState("测试负面二"));
     }
 
     /**
