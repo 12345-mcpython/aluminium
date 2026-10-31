@@ -10,7 +10,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n✅ 已写：`cone23050_break_damage_wearer`（装备者）+ `_partner`（`other_map_attackers`，即战前用地图攻击开战的队友）+ `_fallback`（`map_attacker_count == 0` 时取 `highest_break_effect_ally`）✓ —— 引擎的战前声明已经记录「谁开战」✓。"
     },
     {
       "on": "ULT_CAST",
@@ -20,6 +20,35 @@
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
       "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_wearer",
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.32, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%。」 param Lv1 #2 = 0.32",
+      "_note": "「**装备者**和另一位开战的队友造成的**击破伤害**提高 #2%」—— BREAK_DAMAGE_BOOST ✓（引擎自己的「击破伤害提高」属性）；本档 0.32 ✓。另一半见下面两条（开战队友 / 兜底）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_partner",
+      "when": ["map_attacker_count >= 1"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.32, "permanent": true, "target": "other_map_attackers" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高#2[i]%。」 param Lv1 #2 = 0.32",
+      "_note": "「**另一位开战的队友**」= other_map_attackers ✓ —— 引擎在战前记录谁的地图攻击开战（Battle.declareMapAttack 的 PreBattle.MapAttack），「开战」因此是事实而不是猜测；**除装备者外** ✓（装备者自己由 cone23050_break_damage_wearer 付）。⚠ 没有声明过地图攻击时这个选择器是**空集** ⇒ 本条什么都不做 ✓，由 cone23050_break_damage_fallback 接住。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_fallback",
+      "when": ["map_attacker_count == 0"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.32, "permanent": true, "target": "highest_break_effect_ally" }
+      ],
+      "source": "光锥 23050: 「…若不存在开战的队友则对装备者和**击破特攻最高的队友**生效，同类效果无法叠加。」 param Lv1 #2 = 0.32",
+      "_note": "「若**不存在开战的队友**则对装备者和**击破特攻最高的队友**生效」—— 门用 map_attacker_count == 0 ✓；选择器 highest_break_effect_ally = **除装备者外**击破特攻最高的存活队友（并列取名册顺序）✓；没有别的队友时是空集（不报错）✓。「同类效果无法叠加」⇒ 两条分支不会同时开火（门槛互斥）✓。"
     }
   ],
   "2": [
@@ -31,7 +60,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n✅ 已写：`cone23050_break_damage_wearer`（装备者）+ `_partner`（`other_map_attackers`，即战前用地图攻击开战的队友）+ `_fallback`（`map_attacker_count == 0` 时取 `highest_break_effect_ally`）✓ —— 引擎的战前声明已经记录「谁开战」✓。"
     },
     {
       "on": "ULT_CAST",
@@ -41,6 +70,35 @@
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
       "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_wearer",
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.42, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%。」 param Lv2 #2 = 0.42",
+      "_note": "「**装备者**和另一位开战的队友造成的**击破伤害**提高 #2%」—— BREAK_DAMAGE_BOOST ✓（引擎自己的「击破伤害提高」属性）；本档 0.42 ✓。另一半见下面两条（开战队友 / 兜底）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_partner",
+      "when": ["map_attacker_count >= 1"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.42, "permanent": true, "target": "other_map_attackers" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高#2[i]%。」 param Lv2 #2 = 0.42",
+      "_note": "「**另一位开战的队友**」= other_map_attackers ✓ —— 引擎在战前记录谁的地图攻击开战（Battle.declareMapAttack 的 PreBattle.MapAttack），「开战」因此是事实而不是猜测；**除装备者外** ✓（装备者自己由 cone23050_break_damage_wearer 付）。⚠ 没有声明过地图攻击时这个选择器是**空集** ⇒ 本条什么都不做 ✓，由 cone23050_break_damage_fallback 接住。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_fallback",
+      "when": ["map_attacker_count == 0"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.42, "permanent": true, "target": "highest_break_effect_ally" }
+      ],
+      "source": "光锥 23050: 「…若不存在开战的队友则对装备者和**击破特攻最高的队友**生效，同类效果无法叠加。」 param Lv2 #2 = 0.42",
+      "_note": "「若**不存在开战的队友**则对装备者和**击破特攻最高的队友**生效」—— 门用 map_attacker_count == 0 ✓；选择器 highest_break_effect_ally = **除装备者外**击破特攻最高的存活队友（并列取名册顺序）✓；没有别的队友时是空集（不报错）✓。「同类效果无法叠加」⇒ 两条分支不会同时开火（门槛互斥）✓。"
     }
   ],
   "3": [
@@ -52,7 +110,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n✅ 已写：`cone23050_break_damage_wearer`（装备者）+ `_partner`（`other_map_attackers`，即战前用地图攻击开战的队友）+ `_fallback`（`map_attacker_count == 0` 时取 `highest_break_effect_ally`）✓ —— 引擎的战前声明已经记录「谁开战」✓。"
     },
     {
       "on": "ULT_CAST",
@@ -62,6 +120,35 @@
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
       "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_wearer",
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.52, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%。」 param Lv3 #2 = 0.52",
+      "_note": "「**装备者**和另一位开战的队友造成的**击破伤害**提高 #2%」—— BREAK_DAMAGE_BOOST ✓（引擎自己的「击破伤害提高」属性）；本档 0.52 ✓。另一半见下面两条（开战队友 / 兜底）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_partner",
+      "when": ["map_attacker_count >= 1"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.52, "permanent": true, "target": "other_map_attackers" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高#2[i]%。」 param Lv3 #2 = 0.52",
+      "_note": "「**另一位开战的队友**」= other_map_attackers ✓ —— 引擎在战前记录谁的地图攻击开战（Battle.declareMapAttack 的 PreBattle.MapAttack），「开战」因此是事实而不是猜测；**除装备者外** ✓（装备者自己由 cone23050_break_damage_wearer 付）。⚠ 没有声明过地图攻击时这个选择器是**空集** ⇒ 本条什么都不做 ✓，由 cone23050_break_damage_fallback 接住。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_fallback",
+      "when": ["map_attacker_count == 0"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.52, "permanent": true, "target": "highest_break_effect_ally" }
+      ],
+      "source": "光锥 23050: 「…若不存在开战的队友则对装备者和**击破特攻最高的队友**生效，同类效果无法叠加。」 param Lv3 #2 = 0.52",
+      "_note": "「若**不存在开战的队友**则对装备者和**击破特攻最高的队友**生效」—— 门用 map_attacker_count == 0 ✓；选择器 highest_break_effect_ally = **除装备者外**击破特攻最高的存活队友（并列取名册顺序）✓；没有别的队友时是空集（不报错）✓。「同类效果无法叠加」⇒ 两条分支不会同时开火（门槛互斥）✓。"
     }
   ],
   "4": [
@@ -73,7 +160,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n✅ 已写：`cone23050_break_damage_wearer`（装备者）+ `_partner`（`other_map_attackers`，即战前用地图攻击开战的队友）+ `_fallback`（`map_attacker_count == 0` 时取 `highest_break_effect_ally`）✓ —— 引擎的战前声明已经记录「谁开战」✓。"
     },
     {
       "on": "ULT_CAST",
@@ -83,6 +170,35 @@
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
       "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_wearer",
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.62, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%。」 param Lv4 #2 = 0.62",
+      "_note": "「**装备者**和另一位开战的队友造成的**击破伤害**提高 #2%」—— BREAK_DAMAGE_BOOST ✓（引擎自己的「击破伤害提高」属性）；本档 0.62 ✓。另一半见下面两条（开战队友 / 兜底）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_partner",
+      "when": ["map_attacker_count >= 1"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.62, "permanent": true, "target": "other_map_attackers" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高#2[i]%。」 param Lv4 #2 = 0.62",
+      "_note": "「**另一位开战的队友**」= other_map_attackers ✓ —— 引擎在战前记录谁的地图攻击开战（Battle.declareMapAttack 的 PreBattle.MapAttack），「开战」因此是事实而不是猜测；**除装备者外** ✓（装备者自己由 cone23050_break_damage_wearer 付）。⚠ 没有声明过地图攻击时这个选择器是**空集** ⇒ 本条什么都不做 ✓，由 cone23050_break_damage_fallback 接住。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_fallback",
+      "when": ["map_attacker_count == 0"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.62, "permanent": true, "target": "highest_break_effect_ally" }
+      ],
+      "source": "光锥 23050: 「…若不存在开战的队友则对装备者和**击破特攻最高的队友**生效，同类效果无法叠加。」 param Lv4 #2 = 0.62",
+      "_note": "「若**不存在开战的队友**则对装备者和**击破特攻最高的队友**生效」—— 门用 map_attacker_count == 0 ✓；选择器 highest_break_effect_ally = **除装备者外**击破特攻最高的存活队友（并列取名册顺序）✓；没有别的队友时是空集（不报错）✓。「同类效果无法叠加」⇒ 两条分支不会同时开火（门槛互斥）✓。"
     }
   ],
   "5": [
@@ -94,7 +210,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n✅ 已写：`cone23050_break_damage_wearer`（装备者）+ `_partner`（`other_map_attackers`，即战前用地图攻击开战的队友）+ `_fallback`（`map_attacker_count == 0` 时取 `highest_break_effect_ally`）✓ —— 引擎的战前声明已经记录「谁开战」✓。"
     },
     {
       "on": "ULT_CAST",
@@ -104,6 +220,35 @@
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
       "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_wearer",
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.72, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和另一位开战的队友造成的击破伤害提高#2[i]%。」 param Lv5 #2 = 0.72",
+      "_note": "「**装备者**和另一位开战的队友造成的**击破伤害**提高 #2%」—— BREAK_DAMAGE_BOOST ✓（引擎自己的「击破伤害提高」属性）；本档 0.72 ✓。另一半见下面两条（开战队友 / 兜底）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_partner",
+      "when": ["map_attacker_count >= 1"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.72, "permanent": true, "target": "other_map_attackers" }
+      ],
+      "source": "光锥 23050: 「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害提高#2[i]%。」 param Lv5 #2 = 0.72",
+      "_note": "「**另一位开战的队友**」= other_map_attackers ✓ —— 引擎在战前记录谁的地图攻击开战（Battle.declareMapAttack 的 PreBattle.MapAttack），「开战」因此是事实而不是猜测；**除装备者外** ✓（装备者自己由 cone23050_break_damage_wearer 付）。⚠ 没有声明过地图攻击时这个选择器是**空集** ⇒ 本条什么都不做 ✓，由 cone23050_break_damage_fallback 接住。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23050_break_damage_fallback",
+      "when": ["map_attacker_count == 0"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "BREAK_DAMAGE_BOOST", "percent": 0.72, "permanent": true, "target": "highest_break_effect_ally" }
+      ],
+      "source": "光锥 23050: 「…若不存在开战的队友则对装备者和**击破特攻最高的队友**生效，同类效果无法叠加。」 param Lv5 #2 = 0.72",
+      "_note": "「若**不存在开战的队友**则对装备者和**击破特攻最高的队友**生效」—— 门用 map_attacker_count == 0 ✓；选择器 highest_break_effect_ally = **除装备者外**击破特攻最高的存活队友（并列取名册顺序）✓；没有别的队友时是空集（不报错）✓。「同类效果无法叠加」⇒ 两条分支不会同时开火（门槛互斥）✓。"
     }
   ]
 }
