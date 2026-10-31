@@ -59,6 +59,24 @@ public final class PartyResources {
     }
 
     /**
+     * Registers the counters that belong to the BATTLE, stated once for every party.
+     *
+     * <p>Reader: 笑点, declared in {@code game/data/battle_resources.json} because three kits and one relic read it and a party
+     * without the one character that used to declare it had no such counter at all.
+     *
+     * @param declared the battle-scoped declarations
+     */
+    public void registerGlobal(Iterable<com.laosun.aluminium.beans.ResourceSpec> declared) {
+        for (com.laosun.aluminium.beans.ResourceSpec spec : declared) {
+            resources.putIfAbsent(spec.id(), new Resource(spec.id(), ResourceScope.PARTY, spec.max(),
+                    spec.initial() == null ? 0 : spec.initial()));
+            if (spec.overflow() != null) {
+                resources.get(spec.id()).setMaxOverflow(spec.overflow());
+            }
+        }
+    }
+
+    /**
      * @param id the counter name
      * @return the counter's current value, or {@code 0} when the battle has no such counter
      */
