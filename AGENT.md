@@ -820,6 +820,21 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 **收口条件（两步）**：① 引擎要能"数持有某 buff 的我方单位"（现有谓词只有 `debuff_count`，没有队伍侧的 `ally_buff_count`）；② `DAMAGE` 的 `percent` 要能加一项 `per_count × n`（上限 0.24）。有了这两样，`zone_true_damage_rider` 就写成 `0.24 + 0.06 × n`，19~21 条 0.42 rider 一次性进对账。补法：按"持有德谬歌增益的我方角色数"上调该规则的 `percent`，上限 +0.24；1415 在本账号是 **E2** ✓，所以这条在实战里一直生效。
 
+#### ⛔ 23047 的【魂迷】触发会自我递归（2026-10-31 实测，已回退）
+
+写法本身合规（`DEBUFF_APPLIED` + `actor == self` + `!target has_state 魂迷` + `APPLY_BUFF{base_chance: 0.8}`），
+但一跑就抛：
+
+```
+Trigger recursion exceeded 8 levels while firing DEBUFF_APPLIED; a trigger table is probably reacting to its own effect [rule: cone23047_ensnare]
+```
+
+⇒ 施加【魂迷】这一动作**本身**又发了一次 `DEBUFF_APPLIED`，而门 `!target has_state 魂迷` 在嵌套调用里没有变假
+（要么状态还没落地就被再触发，要么嵌套上下文的 `target` 不是那一位）。**要收这条必须先弄清**：
+`APPLY_BUFF` 在什么条件下会发 `DEBUFF_APPLIED`，以及嵌套时 `ctx.target()` 是谁。
+
+本次改动**已整体回退**（规则与判据都不留），23047 保持"三条已落地、触发与清理仍开"。
+
 #### ⛔ 129 的笑点阶梯：计数器是队级的，但**没有"全局声明"的地方**（2026-10-31 实测）
 
 录制者确认：**笑点是全局的、无上限**。数据侧已经有一半：`1502.json` 里 `{"id": "笑点", "max": 2147483647, "scope": "PARTY"}` ✓
