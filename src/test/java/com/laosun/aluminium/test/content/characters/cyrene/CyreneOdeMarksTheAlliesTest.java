@@ -62,10 +62,16 @@ public class CyreneOdeMarksTheAlliesTest {
         SkillExecutor.execute(battle, demiurge.skillAt(1), demiurge, List.of(battle.enemyUnits().get(0)));
         battle.processRequests();
 
-        Assertions.assertTrue(hyacine.getBuffManager().hasState("德谬歌忆灵技增益"), "风堇 has a variant");
-        Assertions.assertTrue(evernight.getBuffManager().hasState("德谬歌忆灵技增益"), "长夜月 has a variant");
-        Assertions.assertTrue(cyrene.getBuffManager().hasState("德谬歌忆灵技增益"), "昔涟 carries the generic one");
-        Assertions.assertFalse(robin.getBuffManager().hasState("德谬歌忆灵技增益"),
-                "知更鸟•晴歌 has NO variant, so the count her Eidolon reads is three, not four");
+        Assertions.assertTrue(hyacine.getBuffManager().hasState("献予「天空」之诗")
+                        || hyacine.getBuffManager().stacksOf("献予「天空」之诗") > 0,
+                "风堇 holds 「献予「天空」之诗」 (two stacks per grant)");
+        Assertions.assertTrue(evernight.getBuffManager().hasState("献予「岁月」之诗"),
+                "长夜月 holds 「献予「岁月」之诗」");
+        Assertions.assertTrue(cyrene.getBuffManager().hasState("献予「真我」之诗"),
+                "昔涟 holds 「献予「真我」之诗」");
+        Assertions.assertFalse(robin.getBuffManager().hasState("献予「天空」之诗")
+                        || robin.getBuffManager().hasState("献予「岁月」之诗")
+                        || robin.getBuffManager().hasState("献予「真我」之诗"),
+                "知更鸟•晴歌 has NO ode of its own, so the count her Eidolon reads is three, not four");
     }
 }

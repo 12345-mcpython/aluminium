@@ -69,10 +69,10 @@ public class CyreneZoneBonusPerAllyTest {
         for (int marked = 0; marked <= 4; marked++) {
             if (marked > 0) {
                 allies.get(marked - 1).getBuffManager()
-                        .addBuff(new com.laosun.aluminium.buff.StateBuff("德谬歌忆灵技增益", 99));
+                        .addBuff(new com.laosun.aluminium.buff.StateBuff("献予「天空」之诗", 99));
             }
             Assertions.assertTrue(allies.get(Math.max(0, marked - 1)).getBuffManager()
-                            .hasState("德谬歌忆灵技增益") == (marked > 0),
+                            .hasState("献予「天空」之诗") == (marked > 0),
                     "the mark is visible to hasState at marked=" + marked);
             List<Damage> settled = new ArrayList<>();
             battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
