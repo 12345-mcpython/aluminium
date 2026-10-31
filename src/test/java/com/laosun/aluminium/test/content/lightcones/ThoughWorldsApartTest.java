@@ -16,7 +16,7 @@ public class ThoughWorldsApartTest {
     private static final int LEVEL = 80;
 
     @Test
-    public void theShippedRuleCarriesItsThreeEffects() {
+    public void theShippedRuleCarriesItsFourEffects() {
         Character c = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(WEAPON_ID, LEVEL));
         var rules = c.getTriggerTable().rulesFor(TriggerEvent.CAST_SETUP).stream()
                 .filter(r -> r.id().startsWith("cone23051_")).toList();
@@ -24,7 +24,8 @@ public class ThoughWorldsApartTest {
         var effects = rules.getFirst().effects();
         System.out.println("[23051] effects=" + effects.size()
                 + " ops=" + effects.stream().map(e -> e.getOp() + "@" + e.getTarget()).toList());
-        Assertions.assertEquals(3, effects.size(), "two heals and the damage boost");
+        Assertions.assertEquals(4, effects.size(),
+                "two heals, the damage boost, and the extra share for a summon owner");
         // me: assert the SELECTORS too -- a mutation of lowest_hp_ally to self stayed green without this.
         var healTargets = effects.stream().filter(e -> "HEAL".equals(e.getOp()))
                 .map(e -> e.getTarget()).toList();
@@ -37,5 +38,9 @@ public class ThoughWorldsApartTest {
         Assertions.assertEquals(0.24, boost.getPercent(), 1e-9, "48% damage");
         Assertions.assertEquals(3.0, boost.getTurns(), 1e-9, "for three turns");
         Assertions.assertEquals("all_allies", boost.getTarget(), "for the party");
+        var extra = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp())).toList().get(1);
+        System.out.println("[23051] extra boost percent=" + extra.getPercent() + " target=" + extra.getTarget());
+        Assertions.assertEquals(0.12, extra.getPercent(), 1e-9, "「若目标拥有召唤物则额外提高 12%」");
+        Assertions.assertEquals("allies_with_summons", extra.getTarget(), "only the allies that own a memosprite");
     }
 }
