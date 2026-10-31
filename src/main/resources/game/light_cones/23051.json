@@ -9,10 +9,151 @@
       "do": [
         { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.1, "target": "all_allies" },
         { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.1, "target": "lowest_hp_ally" },
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.24, "turns": 3, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "allies_with_summons"
+        }
       ],
-      "source": "光锥 23051：「装备者施放终结技时，为我方全体回复等同于装备者攻击力#5[i]%的生命值，额外为当前生命值最低的角色回复等同于装备者攻击力#6[i]%的生命值，并使我方全体获得【卫戍】，【卫戍】持续#4[i]回合。获得【卫戍】的目标，造成的伤容提高#2[i]%。」",
-      "_note": "「终结技时为我方全体回复等同于**装备者攻击力 10%** 的生命，**额外**为生命最低的角色回复 10%，并使我方全体获得【卫戍】3 回合：造成的伤害 +24%，**若目标拥有召唤物**再 +12%」—— 两条 `HEAL{amountFromAttr: ATTACK, amountPercent: 10/12.5/15/17.5/20%}`（`all_allies` ＋ `lowest_hp_ally` ✓）＋ `MODIFY_ATTR{percent: 24/30/36/42/48%, turns: 3, target: all_allies}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 两条治疗的份额原先都写 **0.2** ✗（应各是 #5 = 10% ✓）；② 卫戍那条原先写 **0.48** ✗（那是叠影 5 的 #2，本档应为 24% ✓）；③「**有召唤物**再 +12%」**整块没有** ✗ （需要「目标有召唤物」的 per-target 条件 ✗ ⇒ 登记）。\n⛔ **仍开（已登记 §4.3）**：卫戍的「**若目标拥有召唤物**则伤害额外 +12%」✗。"
+      "source": "光锥 23051：「装备者施放终结技时，为我方全体回复等同于装备者攻击力#5[i]%的生命值，额外为当前生命值最低的角色回复等同于装备者攻击力#6[i]%的生命值，并使我方全体获得【卫戍】，【卫戍】持续#4[i]回合。获得【卫戍】的目标，造成的伤害提高#2[i]%，若目标拥有召唤物则造成的伤害额外提高#3[i]%。」 param Lv1 = [0.64, 0.24, 0.12, 3, 0.1, 0.1]",
+      "_note": "「终结技时为我方全体回复等同于**装备者攻击力 10%** 的生命，**额外**为生命最低的角色回复 10%，并使我方全体获得【卫戍】3 回合：造成的伤害 +24%，**若目标拥有召唤物**再 +12%」—— 两条 `HEAL{amountFromAttr: ATTACK, amountPercent: 10/12.5/15/17.5/20%}`（`all_allies` ＋ `lowest_hp_ally` ✓）＋ **两条** `MODIFY_ATTR{percent: 24/30/36/42/48% 与 12/15/18/21/24%, turns: 3}` ✓。⚠ 两条加成必须**相加**：同属性同身份的修饰会互相替换（实测 ✓），所以两条都带 `buff: \"卫戍\"` + `max_stacks: 2` ⇒ 有召唤物的目标拿到**两个可叠层实例**（+36%）、其余只拿到第一条（+24%）✓。⚠ 「有召唤物」= 选择器 **`allies_with_summons`** ✓（本轮新增 ✓）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23051_ult_heal",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.125, "target": "all_allies" },
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.125, "target": "lowest_hp_ally" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "allies_with_summons"
+        }
+      ],
+      "source": "光锥 23051：「…」 param Lv2 = [0.8, 0.3, 0.15, 3, 0.125, 0.125]",
+      "_note": "同第 1 档，数值按 Lv2 行：治疗 12.5%、卫戍 30%、有召唤物 +15% ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23051_ult_heal",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.15, "target": "all_allies" },
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.15, "target": "lowest_hp_ally" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.36,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.18,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "allies_with_summons"
+        }
+      ],
+      "source": "光锥 23051：「…」 param Lv3 = [0.96, 0.36, 0.18, 3, 0.15, 0.15]",
+      "_note": "同第 1 档，数值按 Lv3 行：治疗 15%、卫戍 36%、有召唤物 +18% ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23051_ult_heal",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.175, "target": "all_allies" },
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.175, "target": "lowest_hp_ally" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.42,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.21,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "allies_with_summons"
+        }
+      ],
+      "source": "光锥 23051：「…」 param Lv4 = [1.12, 0.42, 0.21, 3, 0.175, 0.175]",
+      "_note": "同第 1 档，数值按 Lv4 行：治疗 17.5%、卫戍 42%、有召唤物 +21% ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23051_ult_heal",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.2, "target": "all_allies" },
+        { "op": "HEAL", "amountFromAttr": "ATTACK", "amountPercent": 0.2, "target": "lowest_hp_ally" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.48,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.24,
+          "buff": "卫戍",
+          "max_stacks": 2,
+          "turns": 3,
+          "target": "allies_with_summons"
+        }
+      ],
+      "source": "光锥 23051：「…」 param Lv5 = [1.28, 0.48, 0.24, 3, 0.2, 0.2]",
+      "_note": "同第 1 档，数值按 Lv5 行：治疗 20%、卫戍 48%、有召唤物 +24% ✓。"
     }
   ]
 }
