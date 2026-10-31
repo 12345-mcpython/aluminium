@@ -26,7 +26,7 @@ import java.util.List;
  * {@code ability_property} values, and each was stated again as a rule. Two clauses that also needed a trigger or a cap had it
  * missing - 21047's "after dealing break damage" and its per-turn cap, 21048's any-attack trigger and its "twice a turn".
  *
- * <p>21043 and 21046 are registered: the "number of shielded allies" and "two allies sharing a Path" conditions have no
+ * <p>21043 is registered: "the number of shielded allies" has no
  * spelling. Their cases read the FILE, because the missing half is a condition that does not exist rather than a wrong number.
  */
 public class ConeAuditBatchTwelveTest {
@@ -120,13 +120,20 @@ public class ConeAuditBatchTwelveTest {
     }
 
     /**
-     * 21046: the crit-damage rule carries no condition at all - the Path pairing does not exist.
+     * 21046: the Path pairing lives in {@code target_when} (a per-target filter), not in the rule's {@code when} - judging
+     * only {@code when} is what made the old witness false. Behaviour is judged in {@code PoisedToBloomTest}.
      */
     @Test
-    public void coneTwoInnocentFourSixHasNoPathPairingCondition() {
+    public void coneTwoInnocentFourSixPairsPathsThroughATargetFilter() {
         JsonObject rule = read(21046, "1", "cone21046_path_twins");
-        System.out.println("[21046] conditions: " + rule.get("when"));
-        Assertions.assertNull(rule.get("when"), "witness: not even a condition (see the status row)");
+        JsonObject effect = rule.getAsJsonArray("do").get(0).getAsJsonObject();
+        System.out.println("[21046] when=" + rule.get("when") + " target=" + effect.get("target")
+                + " target_when=" + effect.get("target_when"));
+        Assertions.assertNull(rule.get("when"), "no rule-level condition");
+        Assertions.assertEquals("all_allies", effect.get("target").getAsString(),
+                "the pool is the party; the filter narrows it");
+        Assertions.assertTrue(effect.getAsJsonArray("target_when").toString().contains("shares_path_with_an_ally"),
+                "「两名及以上我方角色拥有任意相同命途」 as a per-target filter");
     }
 
     // ==================================================================
