@@ -174,6 +174,20 @@ final class TriggerTargets {
                 }
                 return battle.waveMonsters();
             }
+            case "allies_with_summons" -> {
+                // 「若目标拥有召唤物」 (light cone 23051): every living ally of ours that OWNS at least one memosprite.
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets \"allies_with_summons\" but no battle was supplied to read the summons");
+                }
+                java.util.List<CanHit> owners = new ArrayList<>();
+                for (CanHit ally : battle.allies()) {
+                    if (!ally.isDeath() && !battle.summonsOf(ally).isEmpty()) {
+                        owners.add(ally);
+                    }
+                }
+                return java.util.List.copyOf(owners);
+            }
             case "other_map_attackers" -> {
                 // 「另一位开战的队友」 (light cone 23050): our units that declared a map attack before the battle, minus the
                 // rule owner. An empty list is an ordinary answer (nobody triggered it, or the wearer did).
