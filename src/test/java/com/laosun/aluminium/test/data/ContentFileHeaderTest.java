@@ -18,13 +18,15 @@ import java.util.List;
 import java.util.stream.Stream;
 
 /**
- * The file header of a light cone / relic set: {@code schema} and {@code light_cone} / {@code relic_set}.
+ * The file header of every shipped trigger file: {@code schema} and the owning id
+ * ({@code character} / {@code light_cone} / {@code relic_set}).
  *
  * <p><b>The shape decided 2026-10-31.</b> A cone or relic file keeps its rank / piece-count keys exactly where they
  * were; the header sits beside them, the same two keys a character file states as {@code schema} and
  * {@code character}. The alternative - wrapping the rows in a {@code "ranks": { ... }} object - would have re-indented
- * every one of the 229 files to say nothing new, and the existing shape already has a precedent for metadata beside
- * rows ({@code resources} on a cone).
+ * every cone and relic file to say nothing new, and the existing shape already has a precedent for metadata beside
+ * rows ({@code resources} on a cone). A character file already had the object form; it was the last kind without the
+ * header on every file.
  *
  * <p>Both keys are <b>optional</b> at the loader (a file written before the header stays readable) but <b>required by
  * this guard</b> on the shipped content, so "we forgot one" is a red test rather than a silently legacy file. A stated
@@ -36,8 +38,24 @@ import java.util.stream.Stream;
  */
 public class ContentFileHeaderTest {
 
+    private static final Path CHARACTERS = Path.of("src", "main", "resources", "game", "characters");
     private static final Path CONES = Path.of("src", "main", "resources", "game", "light_cones");
     private static final Path RELICS = Path.of("src", "main", "resources", "game", "relic_sets");
+
+    /**
+     * Every shipped character states {@code schema: 1} and its own {@code character} id.
+     *
+     * <p>The loader still accepts a bare array (a file with nothing but rules), but <b>shipped</b> content is the
+     * object form: without it there is nowhere to state the version or the owner, and the other two kinds cannot be
+     * checked the same way. A new character file is therefore expected to be an object.
+     */
+    @Test
+    public void everyCharacterStatesItsHeader() throws Exception {
+        List<String> problems = check(CHARACTERS, "character");
+        Assertions.assertEquals(List.of(), problems,
+                "a character file is missing its header or names the wrong owner:\n  "
+                        + String.join("\n  ", problems));
+    }
 
     /**
      * Every shipped cone states {@code schema: 1} and its own {@code light_cone} id.
@@ -133,3 +151,4 @@ public class ContentFileHeaderTest {
         return problems;
     }
 }
+
