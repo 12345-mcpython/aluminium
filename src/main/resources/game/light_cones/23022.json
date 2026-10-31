@@ -3,10 +3,20 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": ["actor == self", "target has_state 风化"],
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -17,15 +27,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": ["actor == self", "target has_state 灼烧"],
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -36,15 +56,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -55,15 +85,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": ["actor == self", "target has_state 裂伤"],
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -74,12 +114,15 @@
         }
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": ["actor == self", "self_stacks:先知 >= 1"],
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -88,22 +131,32 @@
           "instance": true,
           "damage_type": "DOT",
           "permanent": true,
-          "per_stack": "self_stacks:先知",
-          "target": "self"
+          "target": "self",
+          "per_stack": "self_stacks:先知"
         }
       ],
       "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
-      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     }
   ],
   "2": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": ["actor == self", "target has_state 风化"],
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -114,15 +167,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": ["actor == self", "target has_state 灼烧"],
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -133,15 +196,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -152,15 +225,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": ["actor == self", "target has_state 裂伤"],
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -171,12 +254,15 @@
         }
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": ["actor == self", "self_stacks:先知 >= 1"],
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -185,22 +271,32 @@
           "instance": true,
           "damage_type": "DOT",
           "permanent": true,
-          "per_stack": "self_stacks:先知",
-          "target": "self"
+          "target": "self",
+          "per_stack": "self_stacks:先知"
         }
       ],
       "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
-      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     }
   ],
   "3": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": ["actor == self", "target has_state 风化"],
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -211,15 +307,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": ["actor == self", "target has_state 灼烧"],
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -230,15 +336,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -249,15 +365,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": ["actor == self", "target has_state 裂伤"],
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -268,12 +394,15 @@
         }
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": ["actor == self", "self_stacks:先知 >= 1"],
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -282,22 +411,32 @@
           "instance": true,
           "damage_type": "DOT",
           "permanent": true,
-          "per_stack": "self_stacks:先知",
-          "target": "self"
+          "target": "self",
+          "per_stack": "self_stacks:先知"
         }
       ],
       "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
-      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     }
   ],
   "4": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": ["actor == self", "target has_state 风化"],
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -308,15 +447,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": ["actor == self", "target has_state 灼烧"],
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -327,15 +476,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -346,15 +505,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": ["actor == self", "target has_state 裂伤"],
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -365,12 +534,15 @@
         }
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": ["actor == self", "self_stacks:先知 >= 1"],
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -379,22 +551,32 @@
           "instance": true,
           "damage_type": "DOT",
           "permanent": true,
-          "per_stack": "self_stacks:先知",
-          "target": "self"
+          "target": "self",
+          "per_stack": "self_stacks:先知"
         }
       ],
       "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
-      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     }
   ],
   "5": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_1",
-      "when": ["actor == self", "target has_state 风化"],
+      "when": [
+        "actor == self",
+        "target has_state 风化"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -405,15 +587,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入风化状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_2",
-      "when": ["actor == self", "target has_state 灼烧"],
+      "when": [
+        "actor == self",
+        "target has_state 灼烧"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -424,15 +616,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入灼烧状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_3",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": [
+        "actor == self",
+        "target has_state 触电"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -443,15 +645,25 @@
         }
       ],
       "source": "光锥 23022: 「对陷入触电状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_seer_from_dot_4",
-      "when": ["actor == self", "target has_state 裂伤"],
+      "when": [
+        "actor == self",
+        "target has_state 裂伤"
+      ],
       "once_per_battle": true,
       "do": [
-        { "op": "ADD_STACK", "buff": "先知", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        {
+          "op": "ADD_STACK",
+          "buff": "先知",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -462,12 +674,15 @@
         }
       ],
       "source": "光锥 23022: 「对陷入裂伤状态的敌方目标造成伤容时，获得1层【先知】（每种类型仅 1 次）；每层使攻击力提高 5%。」",
-      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。"
+      "note": "「装备者对陷入**风化/灼烧/触电/裂伤**的敌方目标造成伤害时，分别获得 1 层【先知】，**最多 4 层**；**单场战斗中每种持续伤害状态类型仅可叠加 1 次**」—— 四条规则按四种状态分别触发 ✓、`ADD_STACK{max_stacks: 4}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的**：`MODIFY_ATTR ATTACK` 原先写 `max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只有 +5%）⇒ 改 **`per_stack: self_stacks:先知`** ✓（现在按层数乘 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**每种状态类型仅可叠加 1 次**」✗ —— 四条规则只要目标还挂着那个状态，**每一发**都会再加一层 ✗；引擎没有「按状态类型记一个旗标」的拼法 ✗（`max_stacks` 是**总数**上限 ✓，不是每类一次 ✗）。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23022_dot_ignores_defence",
-      "when": ["actor == self", "self_stacks:先知 >= 1"],
+      "when": [
+        "actor == self",
+        "self_stacks:先知 >= 1"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -476,12 +691,12 @@
           "instance": true,
           "damage_type": "DOT",
           "permanent": true,
-          "per_stack": "self_stacks:先知",
-          "target": "self"
+          "target": "self",
+          "per_stack": "self_stacks:先知"
         }
       ],
       "source": "光锥 23022: 「每层【先知】使装备者造成的持续伤容无视目标 7.2% 的防御力。」",
-      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。"
+      "note": "⭐ **实例修饰器 + `damage_type: DOT` + `per_stack: self_stacks:先知`** ✓；⭐⭐ **为什么它看起来\"没生效\"** ✗：**同一个 `DEALING_DAMAGE` 事件上的规则按序求值、且彼此可见** ✓（纪律 212 ✓）⇒ 一个\"没有层\"的基准战斗里 ✓，**第一个 DOT 实例自己就会先打上层** ✓（纪律 224 ✓）。引擎侧已用三处读数确证：实例分支运行 ✓、`defence()` 收到 `total=0.072` ✓、`breakdown` 里 `DefenceArea` 被抬高 ✓。 ⚠ 2026-10-31 实测：`per_stack` 两层读到 ×1.078125、换成 `per_stack_live` 读到 ×1.03906 —— **两个都不是 1.10**，所以这一条**先保持原样**并把两个数记在状态表里（不拿一个更差的换上去）。"
     }
   ]
 }
