@@ -37,7 +37,8 @@ public class ConeAuditBatchTwentySixTest {
                 - bare.wearer.getAttribute(AttributeType.HEALTH).get()) + " ; 规则数 " + rules(23049));
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.HEALTH).get()
                 > bare.wearer.getAttribute(AttributeType.HEALTH).get(), "「生命上限提高 30%」");
-        Assertions.assertEquals(0, rules(23049), "缺口见证：没有规则（【夜色】没有拼法）");
+        Assertions.assertEquals(5, rules(23049),
+                "the [夜色] grant, the memosprite defence ignore, the two damage boosts and the departure energy");
     }
 
     /**
@@ -191,3 +192,4 @@ public class ConeAuditBatchTwentySixTest {
         }
     }
 }
+
