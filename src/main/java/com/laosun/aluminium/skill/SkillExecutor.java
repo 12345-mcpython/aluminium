@@ -125,6 +125,11 @@ public final class SkillExecutor {
             // rule firing later must not read this cast's counts as if they were its own (see Battle.endCastOutcome).
             battle.endCastOutcome();
         }
+        // 「与上一次施放的欢愉技不同」 (light cone 23064): recorded AFTER the cast's events, so a CAST_SETUP rule still sees
+        // the previous value while it runs. The key is the slot, the same number `from_skill_id` reports.
+        if (category == SkillCategory.ELATION_DAMAGE && skill != null) {
+            user.setLastElationSkillId(skill.getSkillSlot());
+        }
     }
 
     /**

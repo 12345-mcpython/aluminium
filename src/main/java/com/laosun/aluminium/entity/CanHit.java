@@ -309,6 +309,16 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final RuleChanceState ruleChances = new RuleChanceState();
 
     /**
+     * The slot of the last <b>Elation-damage skill</b> this combatant finished casting ({@code 0} = none yet).
+     *
+     * <p>「若施放的欢愉技与上一次施放的不同」 (light cone 23064) needs the previous cast of that category, while
+     * {@code from_skill_id} / {@code damage_skill_key} describe only the <b>current</b> one. Written by
+     * {@code SkillExecutor} after the cast has completed, so a rule firing on {@code CAST_SETUP} still reads the
+     * previous value; read by the condition variable {@code last_elation_skill_id}.
+     */
+    private int lastElationSkillId;
+
+    /**
      * Per-battle <b>skill level raises</b>, keyed by slot: "战技等级+1""终结技等级+1" (1001 Eidolon (星魂) 3/5, and the
      * same sentence in most characters' kits).
      *
@@ -793,6 +803,22 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         ruleAmendments.clearForNewBattle();
         ruleChances.clear();
         skillBonuses.clearLevels();
+    }
+
+    /**
+     * The slot of the last Elation-damage skill this combatant finished casting, or {@code 0} before the first one.
+     */
+    public int getLastElationSkillId() {
+        return lastElationSkillId;
+    }
+
+    /**
+     * Records the Elation-damage skill that has just finished, for the next cast to compare against.
+     *
+     * @param slot the skill slot (the same number {@code from_skill_id} reports)
+     */
+    public void setLastElationSkillId(int slot) {
+        lastElationSkillId = slot;
     }
 
     /**
