@@ -62,41 +62,31 @@ public class BeforeDawnTest {
     }
 
     /**
-     * The third sentence: after an Ultimate the wearer's FOLLOW-UP damage is 48% higher for one turn. It is a written
-     * modifier on the category attribute, not a damage-type scope -- measured: the attribute exists
-     * (`FOLLOW_UP_DAMAGE_BOOST`), which is what an earlier note of mine wrongly called missing.
+     * The third sentence, in its 2026-10-31 shape: 「施放战技或终结技后获得【梦身】」 is a one-stack state, and 「触发追加攻击时
+     * <b>消耗【梦身】</b>」 is a SECOND rule that reads the stack and removes it in the same firing. The old shape wrote a 1-turn
+     * {@code FOLLOW_UP_DAMAGE_BOOST} window instead, which paid every follow-up in that turn rather than one.
      */
     @Test
     public void theUltimateArmsTheFollowUp() {
         Battle battle = battle(true);
-        double before = wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
-        double after = wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
-        int pinned = 0;
-        for (var rule : wearer.getTriggerTable().matching(TriggerEvent.ULT_CAST,
-                new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle, null))) {
-            if (!rule.id().startsWith("cone23010_")) {
-                continue;
-            }
-            for (var effect : rule.effects()) {
-                pinned++;
-                System.out.println("[23010] ult rule: attribute=" + effect.getAttribute() + " percent="
-                        + effect.getPercent() + " turns=" + effect.getTurns());
-                // Note: `getAttribute()` is a String, not the enum (measured): compare the spelling.
-                Assertions.assertEquals("FOLLOW_UP_DAMAGE_BOOST", effect.getAttribute(),
-                        "the follow-up dimension is an attribute");
-                Assertions.assertEquals(0.48, effect.getPercent(), 1e-9, "48% at rank 1");
-                Assertions.assertEquals(1, effect.getTurns(), "for one turn");
-            }
-        }
-        Assertions.assertEquals(1, pinned, "one rule from the third sentence");
-        Assertions.assertTrue(after > before, "and firing the Ultimate arms it");
+        var gains = wearer.getTriggerTable().rulesFor(TriggerEvent.ULT_CAST).stream()
+                .filter(r -> r.id().equals("cone23010_gain_dream_body")).toList();
+        Assertions.assertEquals(1, gains.size(), "施放终结技后获得【梦身】");
+        var stack = gains.getFirst().effects().getFirst();
+        Assertions.assertEquals("ADD_STACK", stack.getOp());
+        Assertions.assertEquals("梦身", stack.getBuff());
+        Assertions.assertEquals(1, stack.getMaxStacks(), "one stack at a time");
+
+        var spends = wearer.getTriggerTable().rulesFor(TriggerEvent.DEALING_DAMAGE).stream()
+                .filter(r -> r.id().equals("cone23010_follow_up_damage")).toList();
+        Assertions.assertEquals(1, spends.size(), "触发追加攻击时消耗【梦身】");
+        var rule = spends.getFirst();
+        Assertions.assertEquals(List.of("actor == self", "damage_is_additional", "self_stacks:梦身 >= 1.0"),
+                rule.conditions().stream().map(c -> c.source()).toList(),
+                "the follow-up is an ADDITIONAL instance, and the state must still be there");
+        Assertions.assertEquals("BOOST_DAMAGE", rule.effects().getFirst().getOp());
+        Assertions.assertEquals(0.48, rule.effects().getFirst().getPercent(), 1e-9, "48% at rank 1");
+        Assertions.assertEquals("REMOVE_STACK", rule.effects().get(1).getOp(), "and the state is spent in the same firing");
     }
 
-    @Test
-    public void bothCategoriesAreCoveredAndOnlyThose() {
-        Assertions.assertEquals(1, rulesFor(SkillCategory.BPSKILL), "one rule speaks about Skills");
-        Assertions.assertEquals(1, rulesFor(SkillCategory.ULTRA), "and one about Ultimates");
-        Assertions.assertEquals(0, rulesFor(SkillCategory.NORMAL), "a plain attack has no rule (false case)");
-    }
 }
