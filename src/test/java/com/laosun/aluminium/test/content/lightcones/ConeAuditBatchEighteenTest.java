@@ -118,17 +118,18 @@ public class ConeAuditBatchEighteenTest {
      */
     @Test
     public void coneTwoThreeOneZeroFollowUpBoostFromSkillAndUltimate() {
-        JsonObject rule = rule(23010, "cone23010_follow_up_damage");
-        System.out.println("[23010] 触发: on=" + rule.get("on") + " on_any=" + rule.get("on_any")
-                + " percent=" + rule.getAsJsonArray("do").get(0).getAsJsonObject().get("percent"));
-        Assertions.assertTrue(rule.get("on_any").toString().contains("SKILL_CAST"),
-                "「施放**战技**或终结技后」—— 战技那一半要在（2026-10-19 补的）");
-        Assertions.assertEquals(0.48, rule.getAsJsonArray("do").get(0).getAsJsonObject().get("percent").getAsDouble(),
+        // 2026-10-31: the shape changed from a 1-turn window to a one-shot spend, so the witness that pinned the window is gone.
+        JsonObject gain = rule(23010, "cone23010_gain_dream_body");
+        Assertions.assertTrue(gain.get("on_any").toString().contains("SKILL_CAST"),
+                "「施放**战技**或终结技后」- both entries arm the state");
+        Assertions.assertEquals(1, gain.getAsJsonArray("do").get(0).getAsJsonObject().get("max_stacks").getAsInt(),
+                "【梦身】 is one stack");
+
+        JsonObject spend = rule(23010, "cone23010_follow_up_damage");
+        Assertions.assertEquals(0.48, spend.getAsJsonArray("do").get(0).getAsJsonObject().get("percent").getAsDouble(),
                 1e-12, "48%（叠影 1）");
-        // Witness: the 【梦身】 consumption is NOT modelled - the boost is a timed modifier, so it applies to every follow-up
-        // inside its window rather than to exactly one.
-        Assertions.assertEquals(1, rule.getAsJsonArray("do").get(0).getAsJsonObject().get("turns").getAsInt(),
-                "缺口见证：现在是「1 回合内的每一次追加攻击」，而不是「消耗一次」");
+        Assertions.assertEquals("REMOVE_STACK", spend.getAsJsonArray("do").get(1).getAsJsonObject().get("op")
+                .getAsString(), "「消耗【梦身】」 happens in the same firing as the boost");
     }
 
     // ==================================================================

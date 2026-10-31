@@ -743,19 +743,29 @@ public class ConeConditionLiteralsTest {
         assertRule(23009, 5, "HP_CONSUMED", "cone23009_damage_up_after_price", List.of("target == self"));
         assertRule(23010, 1, "DEALING_DAMAGE", "cone23010_skill_damage", List.of("actor == self", "from_category BPSKILL"));
         assertRule(23010, 1, "DEALING_DAMAGE", "cone23010_ult_damage", List.of("actor == self", "from_category ULTRA"));
-        assertRule(23010, 1, "ULT_CAST", "cone23010_follow_up_damage", List.of("actor == self"));
+        assertRule(23010, 1, "ULT_CAST", "cone23010_gain_dream_body", List.of("actor == self"));
+        assertRule(23010, 1, "DEALING_DAMAGE", "cone23010_follow_up_damage",
+                List.of("actor == self", "damage_is_additional", "self_stacks:梦身 >= 1.0"));
         assertRule(23010, 2, "DEALING_DAMAGE", "cone23010_skill_damage", List.of("actor == self", "from_category BPSKILL"));
         assertRule(23010, 2, "DEALING_DAMAGE", "cone23010_ult_damage", List.of("actor == self", "from_category ULTRA"));
-        assertRule(23010, 2, "ULT_CAST", "cone23010_follow_up_damage", List.of("actor == self"));
+        assertRule(23010, 2, "ULT_CAST", "cone23010_gain_dream_body", List.of("actor == self"));
+        assertRule(23010, 2, "DEALING_DAMAGE", "cone23010_follow_up_damage",
+                List.of("actor == self", "damage_is_additional", "self_stacks:梦身 >= 1.0"));
         assertRule(23010, 3, "DEALING_DAMAGE", "cone23010_skill_damage", List.of("actor == self", "from_category BPSKILL"));
         assertRule(23010, 3, "DEALING_DAMAGE", "cone23010_ult_damage", List.of("actor == self", "from_category ULTRA"));
-        assertRule(23010, 3, "ULT_CAST", "cone23010_follow_up_damage", List.of("actor == self"));
+        assertRule(23010, 3, "ULT_CAST", "cone23010_gain_dream_body", List.of("actor == self"));
+        assertRule(23010, 3, "DEALING_DAMAGE", "cone23010_follow_up_damage",
+                List.of("actor == self", "damage_is_additional", "self_stacks:梦身 >= 1.0"));
         assertRule(23010, 4, "DEALING_DAMAGE", "cone23010_skill_damage", List.of("actor == self", "from_category BPSKILL"));
         assertRule(23010, 4, "DEALING_DAMAGE", "cone23010_ult_damage", List.of("actor == self", "from_category ULTRA"));
-        assertRule(23010, 4, "ULT_CAST", "cone23010_follow_up_damage", List.of("actor == self"));
+        assertRule(23010, 4, "ULT_CAST", "cone23010_gain_dream_body", List.of("actor == self"));
+        assertRule(23010, 4, "DEALING_DAMAGE", "cone23010_follow_up_damage",
+                List.of("actor == self", "damage_is_additional", "self_stacks:梦身 >= 1.0"));
         assertRule(23010, 5, "DEALING_DAMAGE", "cone23010_skill_damage", List.of("actor == self", "from_category BPSKILL"));
         assertRule(23010, 5, "DEALING_DAMAGE", "cone23010_ult_damage", List.of("actor == self", "from_category ULTRA"));
-        assertRule(23010, 5, "ULT_CAST", "cone23010_follow_up_damage", List.of("actor == self"));
+        assertRule(23010, 5, "ULT_CAST", "cone23010_gain_dream_body", List.of("actor == self"));
+        assertRule(23010, 5, "DEALING_DAMAGE", "cone23010_follow_up_damage",
+                List.of("actor == self", "damage_is_additional", "self_stacks:梦身 >= 1.0"));
         assertRule(23011, 1, "HP_LOST", "cone23011_party_damage_up_when_wearer_hurt", List.of("target == self"));
         assertRule(23011, 1, "WAVE_START", "cone23011_heal_lost_hp_per_wave", List.of());
         assertRule(23011, 2, "HP_LOST", "cone23011_party_damage_up_when_wearer_hurt", List.of("target == self"));

@@ -3,9 +3,15 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_skill_damage",
-      "when": ["actor == self", "from_category BPSKILL"],
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.18 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.18
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
@@ -13,32 +19,78 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_ult_damage",
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.18 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.18
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
     },
     {
       "on": "ULT_CAST",
-      "id": "cone23010_follow_up_damage",
-      "when": ["actor == self"],
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.48, "turns": 1, "target": "self" }
+      "on_any": [
+        "SKILL_CAST"
       ],
-      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⛔ **仍开（已登记 §4.3）**：「施放**战技或终结技**后，获得【梦身】。**触发追加攻击时，消耗【梦身】**，使追加攻击造成的伤害提高 #3%」—— 本文件用 `ULT_CAST` ＋ `on_any: [SKILL_CAST]` 把**获得那一半**接上了 ✓，`FOLLOW_UP_DAMAGE_BOOST{turns: 1}` 也写在光锥自己身上 ✓，但「**消耗【梦身】**」这层语义**没有** ✗ —— 引擎没有「追加强击到来时先看状态、再撤掉它」的一次性消费拼法 ✗（`REMOVE_STACK` 只能挂在事件上 ✓，而追加攻击的伤害事件与状态判定是两拍 ✗）⇒ 现在只要放过战技/终结技，之后**每一次**追加攻击都吃 +48% ✓（句子只给一次 ✗）。⚠⚠ **2026-10-19 逐句核时补的 `on_any: [SKILL_CAST]`** ✗（原先只有终结技那一半 ✗）。缺口见证：`ConeAuditBatchEighteenTest` ✓。",
-      "on_any": ["SKILL_CAST"]
+      "id": "cone23010_gain_dream_body",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「获得【梦身】」= 一个最多 1 层的标记（turns: 1）；战技与终结技两条入口共用它。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self",
+        "damage_is_additional",
+        "self_stacks:梦身 >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.48
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「触发追加攻击时**消耗**【梦身】」= 同一条规则里先读层数（`self_stacks:梦身 >= 1`）再 `REMOVE_STACK` ⇒ **一次消耗、只付一次**（旧写法给的是 1 回合窗口，每次追加攻击都吃 ✗）。「追加攻击」用 `damage_is_additional`（引擎的追加攻击就是 ADDITIONAL 伤害类型）。"
     }
   ],
   "2": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_skill_damage",
-      "when": ["actor == self", "from_category BPSKILL"],
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.21 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.21
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
@@ -46,32 +98,78 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_ult_damage",
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.21 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.21
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
     },
     {
       "on": "ULT_CAST",
-      "id": "cone23010_follow_up_damage",
-      "when": ["actor == self"],
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.48, "turns": 1, "target": "self" }
+      "on_any": [
+        "SKILL_CAST"
       ],
-      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⛔ **仍开（已登记 §4.3）**：「施放**战技或终结技**后，获得【梦身】。**触发追加攻击时，消耗【梦身】**，使追加攻击造成的伤害提高 #3%」—— 本文件用 `ULT_CAST` ＋ `on_any: [SKILL_CAST]` 把**获得那一半**接上了 ✓，`FOLLOW_UP_DAMAGE_BOOST{turns: 1}` 也写在光锥自己身上 ✓，但「**消耗【梦身】**」这层语义**没有** ✗ —— 引擎没有「追加强击到来时先看状态、再撤掉它」的一次性消费拼法 ✗（`REMOVE_STACK` 只能挂在事件上 ✓，而追加攻击的伤害事件与状态判定是两拍 ✗）⇒ 现在只要放过战技/终结技，之后**每一次**追加攻击都吃 +48% ✓（句子只给一次 ✗）。⚠⚠ **2026-10-19 逐句核时补的 `on_any: [SKILL_CAST]`** ✗（原先只有终结技那一半 ✗）。缺口见证：`ConeAuditBatchEighteenTest` ✓。",
-      "on_any": ["SKILL_CAST"]
+      "id": "cone23010_gain_dream_body",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「获得【梦身】」= 一个最多 1 层的标记（turns: 1）；战技与终结技两条入口共用它。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self",
+        "damage_is_additional",
+        "self_stacks:梦身 >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.48
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「触发追加攻击时**消耗**【梦身】」= 同一条规则里先读层数（`self_stacks:梦身 >= 1`）再 `REMOVE_STACK` ⇒ **一次消耗、只付一次**（旧写法给的是 1 回合窗口，每次追加攻击都吃 ✗）。「追加攻击」用 `damage_is_additional`（引擎的追加攻击就是 ADDITIONAL 伤害类型）。"
     }
   ],
   "3": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_skill_damage",
-      "when": ["actor == self", "from_category BPSKILL"],
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.24 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
@@ -79,32 +177,78 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_ult_damage",
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.24 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.24
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
     },
     {
       "on": "ULT_CAST",
-      "id": "cone23010_follow_up_damage",
-      "when": ["actor == self"],
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.48, "turns": 1, "target": "self" }
+      "on_any": [
+        "SKILL_CAST"
       ],
-      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⛔ **仍开（已登记 §4.3）**：「施放**战技或终结技**后，获得【梦身】。**触发追加攻击时，消耗【梦身】**，使追加攻击造成的伤害提高 #3%」—— 本文件用 `ULT_CAST` ＋ `on_any: [SKILL_CAST]` 把**获得那一半**接上了 ✓，`FOLLOW_UP_DAMAGE_BOOST{turns: 1}` 也写在光锥自己身上 ✓，但「**消耗【梦身】**」这层语义**没有** ✗ —— 引擎没有「追加强击到来时先看状态、再撤掉它」的一次性消费拼法 ✗（`REMOVE_STACK` 只能挂在事件上 ✓，而追加攻击的伤害事件与状态判定是两拍 ✗）⇒ 现在只要放过战技/终结技，之后**每一次**追加攻击都吃 +48% ✓（句子只给一次 ✗）。⚠⚠ **2026-10-19 逐句核时补的 `on_any: [SKILL_CAST]`** ✗（原先只有终结技那一半 ✗）。缺口见证：`ConeAuditBatchEighteenTest` ✓。",
-      "on_any": ["SKILL_CAST"]
+      "id": "cone23010_gain_dream_body",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「获得【梦身】」= 一个最多 1 层的标记（turns: 1）；战技与终结技两条入口共用它。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self",
+        "damage_is_additional",
+        "self_stacks:梦身 >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.48
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「触发追加攻击时**消耗**【梦身】」= 同一条规则里先读层数（`self_stacks:梦身 >= 1`）再 `REMOVE_STACK` ⇒ **一次消耗、只付一次**（旧写法给的是 1 回合窗口，每次追加攻击都吃 ✗）。「追加攻击」用 `damage_is_additional`（引擎的追加攻击就是 ADDITIONAL 伤害类型）。"
     }
   ],
   "4": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_skill_damage",
-      "when": ["actor == self", "from_category BPSKILL"],
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.27 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.27
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
@@ -112,32 +256,78 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_ult_damage",
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.27 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.27
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
     },
     {
       "on": "ULT_CAST",
-      "id": "cone23010_follow_up_damage",
-      "when": ["actor == self"],
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.48, "turns": 1, "target": "self" }
+      "on_any": [
+        "SKILL_CAST"
       ],
-      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⛔ **仍开（已登记 §4.3）**：「施放**战技或终结技**后，获得【梦身】。**触发追加攻击时，消耗【梦身】**，使追加攻击造成的伤害提高 #3%」—— 本文件用 `ULT_CAST` ＋ `on_any: [SKILL_CAST]` 把**获得那一半**接上了 ✓，`FOLLOW_UP_DAMAGE_BOOST{turns: 1}` 也写在光锥自己身上 ✓，但「**消耗【梦身】**」这层语义**没有** ✗ —— 引擎没有「追加强击到来时先看状态、再撤掉它」的一次性消费拼法 ✗（`REMOVE_STACK` 只能挂在事件上 ✓，而追加攻击的伤害事件与状态判定是两拍 ✗）⇒ 现在只要放过战技/终结技，之后**每一次**追加攻击都吃 +48% ✓（句子只给一次 ✗）。⚠⚠ **2026-10-19 逐句核时补的 `on_any: [SKILL_CAST]`** ✗（原先只有终结技那一半 ✗）。缺口见证：`ConeAuditBatchEighteenTest` ✓。",
-      "on_any": ["SKILL_CAST"]
+      "id": "cone23010_gain_dream_body",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「获得【梦身】」= 一个最多 1 层的标记（turns: 1）；战技与终结技两条入口共用它。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self",
+        "damage_is_additional",
+        "self_stacks:梦身 >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.48
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「触发追加攻击时**消耗**【梦身】」= 同一条规则里先读层数（`self_stacks:梦身 >= 1`）再 `REMOVE_STACK` ⇒ **一次消耗、只付一次**（旧写法给的是 1 回合窗口，每次追加攻击都吃 ✗）。「追加攻击」用 `damage_is_additional`（引擎的追加攻击就是 ADDITIONAL 伤害类型）。"
     }
   ],
   "5": [
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_skill_damage",
-      "when": ["actor == self", "from_category BPSKILL"],
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.3 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.3
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
@@ -145,23 +335,63 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23010_ult_damage",
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "BOOST_DAMAGE", "percent": 0.3 }
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.3
+        }
       ],
       "source": "光锥 23010: 「使装备者战技和终结技造成的伤容提高#2[i]%。」",
       "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_attack` ✓ ⇒ 暴击伤害那句**未重写** ✗。⭐ 第二句用 **条件** `from_category` ✓（与 23061 同一做法 ✓）：`DEALING_DAMAGE` + `from_category BPSKILL` / `from_category ULTRA` ⇒ `BOOST_DAMAGE` ✓ —— **两条规则**，因为 `from_category` 是**单值**条件 ✓。⚠ **第三句已登记** ✗：「施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合」—— 「追加攻击」是**伤害类型**(✓ `ADDITIONAL`)但需要\"持续一回合的按类型加成\" ✗ —— 写下的 `MODIFY_ATTR` **不按伤害类型**，而实例路径**只管这一击** ✗。"
     },
     {
       "on": "ULT_CAST",
-      "id": "cone23010_follow_up_damage",
-      "when": ["actor == self"],
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.48, "turns": 1, "target": "self" }
+      "on_any": [
+        "SKILL_CAST"
       ],
-      "source": "光锥 23010: 「当装备者施放终结技后，使装备者的**追加攻击**造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⛔ **仍开（已登记 §4.3）**：「施放**战技或终结技**后，获得【梦身】。**触发追加攻击时，消耗【梦身】**，使追加攻击造成的伤害提高 #3%」—— 本文件用 `ULT_CAST` ＋ `on_any: [SKILL_CAST]` 把**获得那一半**接上了 ✓，`FOLLOW_UP_DAMAGE_BOOST{turns: 1}` 也写在光锥自己身上 ✓，但「**消耗【梦身】**」这层语义**没有** ✗ —— 引擎没有「追加强击到来时先看状态、再撤掉它」的一次性消费拼法 ✗（`REMOVE_STACK` 只能挂在事件上 ✓，而追加攻击的伤害事件与状态判定是两拍 ✗）⇒ 现在只要放过战技/终结技，之后**每一次**追加攻击都吃 +48% ✓（句子只给一次 ✗）。⚠⚠ **2026-10-19 逐句核时补的 `on_any: [SKILL_CAST]`** ✗（原先只有终结技那一半 ✗）。缺口见证：`ConeAuditBatchEighteenTest` ✓。",
-      "on_any": ["SKILL_CAST"]
+      "id": "cone23010_gain_dream_body",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「获得【梦身】」= 一个最多 1 层的标记（turns: 1）；战技与终结技两条入口共用它。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23010_follow_up_damage",
+      "when": [
+        "actor == self",
+        "damage_is_additional",
+        "self_stacks:梦身 >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.48
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "梦身",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23010 拂晓之前:「施放战技或终结技后获得【梦身】，触发追加攻击时消耗【梦身】，使追加攻击造成的伤害提高 #3%，持续 1 回合。」",
+      "note": "「触发追加攻击时**消耗**【梦身】」= 同一条规则里先读层数（`self_stacks:梦身 >= 1`）再 `REMOVE_STACK` ⇒ **一次消耗、只付一次**（旧写法给的是 1 回合窗口，每次追加攻击都吃 ✗）。「追加攻击」用 `damage_is_additional`（引擎的追加攻击就是 ADDITIONAL 伤害类型）。"
     }
   ]
 }
