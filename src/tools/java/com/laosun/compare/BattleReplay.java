@@ -616,6 +616,11 @@ public final class BattleReplay {
             CanHit caster = casterOf(row.spec, battle, byCid);
             // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
             // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
+            // Who this cast could REACH (`field.on_stage`): the payload's own statement of what an AoE would iterate. It is
+            // not `alive` (that keeps units that left the stage with a positive bar) and not `targetable` (that is the
+            // aim point). Enemies outside it are marked untargetable for this cast, so the engine's target selection
+            // matches the recorded one.
+            applyOnStage(row, capture, enemies, plan);
             applyRuleCounters(row, battle, byCid, capture);
             applyStates(row, battle, byCid, plan);
             applyCastPanel(row, battle, byCid);
@@ -2160,6 +2165,43 @@ public final class BattleReplay {
             owner.getResources().get(resource).setExactValue(value);
             System.out.printf(Locale.ROOT, "     counter:  %s = %.4f (the payload's own %s)%n", resource, value, name);
             return;
+        }
+    }
+
+
+    /**
+     * Marks the enemies outside {@code field.on_stage} as untargetable for this cast, and clears the mark on the rest.
+     *
+     * <p>Silent when the payload states no {@code on_stage} - every capture before 2026-10-31 - so the old behaviour (the
+     * bar-based inference) is unchanged.
+     *
+     * @param row     the cast about to be driven
+     * @param capture the parsed capture
+     * @param enemies the plan's enemies, in plan order
+     * @param plan    the plan
+     */
+    private static void applyOnStage(Row row, com.google.gson.JsonObject capture, List<Enemy> enemies, Plan plan) {
+        java.util.Set<Long> reachable = null;
+        for (com.google.gson.JsonElement element : capture.getAsJsonArray("damage_events")) {
+            com.google.gson.JsonObject event = element.getAsJsonObject();
+            if (event.get("cast_index") == null || event.get("cast_index").getAsInt() != row.cast
+                    || !event.has("field") || event.get("field").isJsonNull()) {
+                continue;
+            }
+            com.google.gson.JsonObject field = event.getAsJsonObject("field");
+            if (field.has("on_stage") && field.get("on_stage").isJsonArray()) {
+                reachable = new java.util.LinkedHashSet<>();
+                for (com.google.gson.JsonElement uid : field.getAsJsonArray("on_stage")) {
+                    reachable.add(uid.getAsLong());
+                }
+                break;
+            }
+        }
+        if (reachable == null) {
+            return;                                     // the payload does not state it for this cast
+        }
+        for (int i = 0; i < enemies.size() && i < TARGET_UIDS.size(); i++) {
+            enemies.get(i).setUntargetable(!reachable.contains(TARGET_UIDS.get(i)));
         }
     }
 

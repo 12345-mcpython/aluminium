@@ -54,7 +54,7 @@ public final class Battlefield {
     public List<CanHit> targetableEnemies() {
         List<CanHit> targets = new ArrayList<>();
         for (CanHit enemy : battle.enemies()) {
-            if (!enemy.isDeath()) {
+            if (!enemy.isDeath() && !enemy.isUntargetable()) {
                 targets.add(enemy);
             }
         }
