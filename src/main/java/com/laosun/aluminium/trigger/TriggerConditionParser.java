@@ -582,7 +582,7 @@ final class TriggerConditionParser {
         if (name.isEmpty()) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' writes \"" + ALLIES_WITH_PATH_PREFIX + "\" with no Path after it; "
-                            + "give one, e.g. \"allies_with_path:elation >= 2\" (source: " + spec.getSource() + ")");
+                            + "give one, e.g. \"allies_with_path:欢愉 >= 2\" (source: " + spec.getSource() + ")");
         }
         requirePath(name, raw, spec);
         return name;
