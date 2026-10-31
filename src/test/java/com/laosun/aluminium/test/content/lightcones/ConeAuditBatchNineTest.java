@@ -64,22 +64,51 @@ public class ConeAuditBatchNineTest {
     }
 
     /**
-     * 21024 春水初生: today the two shares stay after being hit - the witness for the missing second sentence.
+     * 21024 春水初生: 「受到伤害后该效果失效，下个回合结束时该效果恢复」.
+     *
+     * <p>Landed 2026-10-31 as an equal-and-opposite pair of modifiers carried by one named buff: a second hit REFRESHES that buff
+     * instead of stacking negatives, and its expiry restores the shares without re-applying anything.
+     *
+     * <p>The two turns are the sentence's own: the pair is spent at her turn boundaries (the engine's early clock), so it is absent
+     * through her next turn and back once that turn is over - 「下个回合结束时该效果恢复」, measured in the loop below.
      */
     @Test
-    public void coneTwoInnocentTwoFourKeepsItsSharesAfterBeingHitToday() {
+    public void coneTwoInnocentTwoFourSuspendsItsSharesWhenHit() {
         Fixture f = new Fixture(21024, true);
-        double speedBefore = f.attribute(AttributeType.SPEED);
-        double boostBefore = f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST);
+        Fixture bare = new Fixture(null, true);
+        double speedBefore = f.attribute(AttributeType.SPEED) - bare.attribute(AttributeType.SPEED);
+        double boostBefore = f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST)
+                - bare.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST);
+        Assertions.assertTrue(speedBefore > 0 && boostBefore > 0, "precondition: the cone's two shares are on");
+
         Enemy enemy = f.battle.enemyUnits().getFirst();
         f.battle.applyDamage(f.wearer, new Damage(enemy, f.wearer, DamageElement.PHYSICAL, DamageType.NORMAL, 10));
         f.battle.processRequests();
-        System.out.println("[21024] 受击后: 速度 " + speedBefore + " -> " + f.attribute(AttributeType.SPEED)
-                + " ; 增伤 " + boostBefore + " -> " + f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST)
-                + "（句子要求失效 —— 今天不失效，见状态表）");
-        Assertions.assertEquals(speedBefore, f.attribute(AttributeType.SPEED), 1e-9, "缺口见证：受击后速度没有失效");
-        Assertions.assertEquals(boostBefore, f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST), 1e-9,
-                "缺口见证：受击后增伤没有失效");
+        double speedAfter = f.attribute(AttributeType.SPEED) - bare.attribute(AttributeType.SPEED);
+        double boostAfter = f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST)
+                - bare.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST);
+        System.out.println("[21024] 受击后: 速度 +" + speedBefore + " -> +" + speedAfter
+                + " ; 增伤 +" + boostBefore + " -> +" + boostAfter);
+        Assertions.assertEquals(0.0, speedAfter, 1e-9, "「受到伤害后该效果失效」 - the speed share is gone");
+        Assertions.assertEquals(0.0, boostAfter, 1e-9, "and so is the damage share");
+
+        // 「下个回合结束时该效果恢复」: the negative pair expires on the wearer's own turn boundaries, so the shares return on
+        // their own - nothing is re-applied.
+        for (int turn = 1; turn <= 2; turn++) {
+            f.battle.setCurrentMove(f.battle.queue().snapshot().stream()
+                    .filter(signal -> signal.getCanHit() == f.wearer).findFirst().orElseThrow());
+            f.battle.beforeMove();
+            f.battle.afterMove();
+            System.out.println("[21024] 她第 " + turn + " 个回合结束后: 速度 +"
+                    + (f.attribute(AttributeType.SPEED) - bare.attribute(AttributeType.SPEED)) + " ; 增伤 +"
+                    + (f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST)
+                    - bare.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST)));
+        }
+        Assertions.assertEquals(speedBefore, f.attribute(AttributeType.SPEED) - bare.attribute(AttributeType.SPEED), 1e-9,
+                "「下个回合结束时该效果恢复」 - the speed share is back");
+        Assertions.assertEquals(boostBefore,
+                f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST) - bare.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST), 1e-9,
+                "and the damage share with it");
     }
 
     /**
