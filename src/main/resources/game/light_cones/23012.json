@@ -1,9 +1,124 @@
 {
   "schema": 1,
   "light_cone": 23012,
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-  "5": []
+  "1": [
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_basic",
+      "when": ["actor == self", "from_category Normal", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.36, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv1 #2 = 0.36",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.36，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category Normal ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_skill",
+      "when": ["actor == self", "from_category BPSkill", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.36, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv1 #2 = 0.36",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.36，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category BPSkill ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_basic",
+      "when": ["actor == self", "from_category Normal", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.42, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv2 #2 = 0.42",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.42，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category Normal ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_skill",
+      "when": ["actor == self", "from_category BPSkill", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.42, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv2 #2 = 0.42",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.42，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category BPSkill ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_basic",
+      "when": ["actor == self", "from_category Normal", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.48, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv3 #2 = 0.48",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.48，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category Normal ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_skill",
+      "when": ["actor == self", "from_category BPSkill", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.48, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv3 #2 = 0.48",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.48，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category BPSkill ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_basic",
+      "when": ["actor == self", "from_category Normal", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.54, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv4 #2 = 0.54",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.54，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category Normal ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_skill",
+      "when": ["actor == self", "from_category BPSkill", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.54, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv4 #2 = 0.54",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.54，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category BPSkill ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_basic",
+      "when": ["actor == self", "from_category Normal", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.6, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv5 #2 = 0.6",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.6，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category Normal ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cone23012_missed_crit_on_skill",
+      "when": ["actor == self", "from_category BPSkill", "damage_did_not_crit"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.6, "turns": 1, "target": "self" }
+      ],
+      "cooldown": 3,
+      "source": "光锥 23012: 「当装备者的普攻或战技伤害未造成暴击时，使自身暴击率提高#2[i]%，持续#3[i]回合。该效果每#4[i]回合可以触发1次。」 param Lv5 #2 = 0.6",
+      "_note": "「普攻或战技伤害**未造成暴击**时，暴击率 +0.6，1 回合，**每 3 回合 1 次**」—— ① 事件 **DAMAGE_SETTLED** ✓：只有**结算之后**才知道这一发有没有暴击（DEALING_DAMAGE 在掷骰之前 ✓ 所以那里问不到）；② 新关键词 **damage_did_not_crit** ✓（读 Damage.isCrit()，装载期只接受 DAMAGE_SETTLED ✓）；③ rom_category BPSkill ✓（普攻/战技各一条规则，条件语言没有 ||）；④ cooldown: 3 ✓。"
+    }
+  ]
 }
