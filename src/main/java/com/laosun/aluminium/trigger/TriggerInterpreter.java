@@ -890,8 +890,12 @@ public final class TriggerInterpreter {
                         double spent = spender.consumeHp(grantAmount(effect, spender, ctx));
                         if (spent > 0) {
                             // "take damage <b>or</b> consume HP": the second half gets its own event.
-                            battle.fire(TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, spender, spender,
-                                    (int) Math.round(spent), 0));
+                            // Note: the spent amount goes in the AMOUNT slot. It used to be passed as the HIT COUNT
+                            // (`Simple.of(event, actor, target, (int) round(spent), 0)`), so every `event_amount`
+                            // condition on this event read 0 -- measured: 23039's `event_amount > 500` never fired
+                            // even when 1000 HP was paid. The signature is (event, actor, target, hitCount, amount);
+                            // a hit count is "how many targets", which this event does not have.
+                            battle.fire(TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, spender, spender, 0, spent));
                         }
                     }
                 }
