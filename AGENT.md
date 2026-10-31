@@ -835,6 +835,13 @@ Trigger recursion exceeded 8 levels while firing DEBUFF_APPLIED; a trigger table
 
 本次改动**已整体回退**（规则与判据都不留），23047 保持"三条已落地、触发与清理仍开"。
 
+**根因探测（同日第二轮）**：`DEBUFF_APPLIED` **只**由 `DebuffService.tryApply` 发出（全仓只有一处 `bus.fire(...DEBUFF_APPLIED...)`），
+而 `APPLY_BUFF` 带 `base_chance` 时正是走 `tryApply` ⇒ **"对 DEBUFF_APPLIED 的反应是再施加一个带概率的负面"必然自我递归**。
+两道候选门都试过、都**没挡住**：
+- `!target has_state 魂迷`（`tryApply` 里 `addBuff` 在 `bus.fire` **之前**，理论上该变假）⇒ 仍然递归；
+- 再加 `once_per_turn: 1` ⇒ 仍然递归（说明该上限的登记发生在效果执行**之后**，拦不住同一链内的重入）。
+⇒ 下一步要查的是 `applyState` 的这条路：`addBuff` 是否真的把 `魂迷` 挂到了 `ctx.target()` 上、以及嵌套时 `ctx.target()` 是谁。
+
 #### ⛔ 129 的笑点阶梯：计数器是队级的，但**没有"全局声明"的地方**（2026-10-31 实测）
 
 录制者确认：**笑点是全局的、无上限**。数据侧已经有一半：`1502.json` 里 `{"id": "笑点", "max": 2147483647, "scope": "PARTY"}` ✓
