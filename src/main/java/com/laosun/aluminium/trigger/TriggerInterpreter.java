@@ -168,6 +168,20 @@ public final class TriggerInterpreter {
         if (SKILL_POINT.equals(name) && ctx != null) {
             return ctx.battle() == null ? 0 : ctx.battle().getSkillPoints();
         }
+        if ("target_debuffs_from_self".equals(name)) {
+            // 「每有 1 个装备者施加的负面效果」 (light cone 23047): the NEGATIVE effects on the unit the rule is aimed at whose
+            // source is the rule's owner. A buff keeps its source, so "I applied it" is a fact, not a guess.
+            if (ctx == null || ctx.target() == null || ctx.target().getBuffManager() == null) {
+                return 0;
+            }
+            int mine = 0;
+            for (com.laosun.aluminium.buff.AbstractBuff carried : ctx.target().getBuffManager().activeBuffs()) {
+                if (carried.isDebuff() && carried.getSource() == ctx.owner()) {
+                    mine++;
+                }
+            }
+            return mine;
+        }
         if (owner == null) {
             return 0;
         }
@@ -351,10 +365,20 @@ public final class TriggerInterpreter {
         // because the engine replaces a same-kind modifier instead of stacking it (measured on 23001's speed stair: three
         // layers read as one). Only the plain `percent` form is folded here; a stated `amount` or a derived `scale` keeps the
         // repeat loop, where each repetition is a fresh write.
-        if (perStepsStairs > 1 && "MODIFY_ATTR".equals(normalizeOp(effect, null))
-                && effect.getPercent() != null && effect.getAmount() == null && effect.getScale() == null) {
-            TriggerEffects.modifyAttr(battle, effect.withPercent(effect.getPercent() * (perStepsStairs - 1)), effectCtx);
-            return;
+        if (perStepsStairs > 1 && effect.getPercent() != null && effect.getAmount() == null
+                && effect.getScale() == null) {
+            EffectSpec folded = effect.withPercent(effect.getPercent() * (perStepsStairs - 1));
+            String folding = normalizeOp(effect, null);
+            if ("MODIFY_ATTR".equals(folding)) {
+                TriggerEffects.modifyAttr(battle, folded, effectCtx);
+                return;
+            }
+            if ("MODIFY_DAMAGE_TAKEN".equals(folding)) {
+                // A zone is ONE buff: repeating it would replace itself (same kind), so N layers are folded into one zone of
+                // N x the share - exactly as the attribute route above does.
+                modifyDamageTaken(battle, folded, effectCtx);
+                return;
+            }
         }
         for (int repeat = perStepsStairs; repeat > 0; repeat--) {
                 if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
