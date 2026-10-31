@@ -11,7 +11,23 @@
         { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.6, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
-      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
+      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n✅ **「若本次终结技消耗的能量 ≥ 140 点，恢复 1 个战技点」已写**：`cone23037_energy_threshold_restores_skill_point`（`ULT_CAST` + `event_amount >= 140` + `GAIN_SKILL_POINT`，判据 `ConeTwentyThreeThousandThirtySevenTest`）✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_energy_threshold_restores_skill_point",
+      "when": [
+        "actor == self",
+        "event_amount >= 140"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23037 向着不可追问处: 「装备者施放终结技后，若本次终结技消耗的能量大于等于140点，恢复1个战技点。」 param Lv1 = [0.12, 2, 140, 0.6, 3] → #3 = 140",
+      "_note": "「施放终结技**后**，若**本次终结技消耗的能量**大于等于 140 点，恢复 1 个战技点」. ⚠ 事件 `ULT_CAST`：它在伤害结算之后发出，正对「施放后」✓；它带的数值就是**这次施放消耗的能量**（`TriggerPayload.Cast` 的 amount ← `battle.getLastUltEnergySpent()`；实测 140 上限的角色施放后 `event_amount >= 140` 成立 ✓）。⚠ 用条件变量 **`event_amount`** 而不是 `cast_energy_spent`：后者是**伤害实例上的量**（23062 的「每消耗 1 点能量」读的是 `DEALING_DAMAGE` 的 instance），在 cast 事件上读不到 ✓。⚠ 140 是数据行 #3，五档都是 140 ⇒ 本规则五档逐字相同（`ContentDuplicateGuardTest` 的签名含档位作用域，跨档重复是允许的 ✓）。⚠ 「恢复」不是「获得」：`GAIN_SKILL_POINT` 会在上限处截断，这是引擎对「恢复 1 点」的既有口径 ✓。"
     }
   ],
   "2": [
@@ -24,7 +40,23 @@
         { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.7, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
-      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
+      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n✅ **「若本次终结技消耗的能量 ≥ 140 点，恢复 1 个战技点」已写**：`cone23037_energy_threshold_restores_skill_point`（`ULT_CAST` + `event_amount >= 140` + `GAIN_SKILL_POINT`，判据 `ConeTwentyThreeThousandThirtySevenTest`）✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_energy_threshold_restores_skill_point",
+      "when": [
+        "actor == self",
+        "event_amount >= 140"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23037 向着不可追问处: 「装备者施放终结技后，若本次终结技消耗的能量大于等于140点，恢复1个战技点。」 param Lv1 = [0.12, 2, 140, 0.6, 3] → #3 = 140",
+      "_note": "「施放终结技**后**，若**本次终结技消耗的能量**大于等于 140 点，恢复 1 个战技点」. ⚠ 事件 `ULT_CAST`：它在伤害结算之后发出，正对「施放后」✓；它带的数值就是**这次施放消耗的能量**（`TriggerPayload.Cast` 的 amount ← `battle.getLastUltEnergySpent()`；实测 140 上限的角色施放后 `event_amount >= 140` 成立 ✓）。⚠ 用条件变量 **`event_amount`** 而不是 `cast_energy_spent`：后者是**伤害实例上的量**（23062 的「每消耗 1 点能量」读的是 `DEALING_DAMAGE` 的 instance），在 cast 事件上读不到 ✓。⚠ 140 是数据行 #3，五档都是 140 ⇒ 本规则五档逐字相同（`ContentDuplicateGuardTest` 的签名含档位作用域，跨档重复是允许的 ✓）。⚠ 「恢复」不是「获得」：`GAIN_SKILL_POINT` 会在上限处截断，这是引擎对「恢复 1 点」的既有口径 ✓。"
     }
   ],
   "3": [
@@ -37,7 +69,23 @@
         { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.8, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
-      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
+      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n✅ **「若本次终结技消耗的能量 ≥ 140 点，恢复 1 个战技点」已写**：`cone23037_energy_threshold_restores_skill_point`（`ULT_CAST` + `event_amount >= 140` + `GAIN_SKILL_POINT`，判据 `ConeTwentyThreeThousandThirtySevenTest`）✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_energy_threshold_restores_skill_point",
+      "when": [
+        "actor == self",
+        "event_amount >= 140"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23037 向着不可追问处: 「装备者施放终结技后，若本次终结技消耗的能量大于等于140点，恢复1个战技点。」 param Lv1 = [0.12, 2, 140, 0.6, 3] → #3 = 140",
+      "_note": "「施放终结技**后**，若**本次终结技消耗的能量**大于等于 140 点，恢复 1 个战技点」. ⚠ 事件 `ULT_CAST`：它在伤害结算之后发出，正对「施放后」✓；它带的数值就是**这次施放消耗的能量**（`TriggerPayload.Cast` 的 amount ← `battle.getLastUltEnergySpent()`；实测 140 上限的角色施放后 `event_amount >= 140` 成立 ✓）。⚠ 用条件变量 **`event_amount`** 而不是 `cast_energy_spent`：后者是**伤害实例上的量**（23062 的「每消耗 1 点能量」读的是 `DEALING_DAMAGE` 的 instance），在 cast 事件上读不到 ✓。⚠ 140 是数据行 #3，五档都是 140 ⇒ 本规则五档逐字相同（`ContentDuplicateGuardTest` 的签名含档位作用域，跨档重复是允许的 ✓）。⚠ 「恢复」不是「获得」：`GAIN_SKILL_POINT` 会在上限处截断，这是引擎对「恢复 1 点」的既有口径 ✓。"
     }
   ],
   "4": [
@@ -50,7 +98,23 @@
         { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 0.9, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
-      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
+      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n✅ **「若本次终结技消耗的能量 ≥ 140 点，恢复 1 个战技点」已写**：`cone23037_energy_threshold_restores_skill_point`（`ULT_CAST` + `event_amount >= 140` + `GAIN_SKILL_POINT`，判据 `ConeTwentyThreeThousandThirtySevenTest`）✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_energy_threshold_restores_skill_point",
+      "when": [
+        "actor == self",
+        "event_amount >= 140"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23037 向着不可追问处: 「装备者施放终结技后，若本次终结技消耗的能量大于等于140点，恢复1个战技点。」 param Lv1 = [0.12, 2, 140, 0.6, 3] → #3 = 140",
+      "_note": "「施放终结技**后**，若**本次终结技消耗的能量**大于等于 140 点，恢复 1 个战技点」. ⚠ 事件 `ULT_CAST`：它在伤害结算之后发出，正对「施放后」✓；它带的数值就是**这次施放消耗的能量**（`TriggerPayload.Cast` 的 amount ← `battle.getLastUltEnergySpent()`；实测 140 上限的角色施放后 `event_amount >= 140` 成立 ✓）。⚠ 用条件变量 **`event_amount`** 而不是 `cast_energy_spent`：后者是**伤害实例上的量**（23062 的「每消耗 1 点能量」读的是 `DEALING_DAMAGE` 的 instance），在 cast 事件上读不到 ✓。⚠ 140 是数据行 #3，五档都是 140 ⇒ 本规则五档逐字相同（`ContentDuplicateGuardTest` 的签名含档位作用域，跨档重复是允许的 ✓）。⚠ 「恢复」不是「获得」：`GAIN_SKILL_POINT` 会在上限处截断，这是引擎对「恢复 1 点」的既有口径 ✓。"
     }
   ],
   "5": [
@@ -63,7 +127,23 @@
         { "op": "MODIFY_ATTR", "attribute": "ULTIMATE_DAMAGE_BOOST", "percent": 1, "turns": 3, "target": "self" }
       ],
       "source": "光锥 23037: 「装备者施放终结技时，使装备者造成的**战技和终结技**伤害提高#4[i]%，持续#5[i]回合」",
-      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n⛔ **仍开（已登记 §4.3）**：「若**本次终结技消耗的能量 ≥ 140 点**，恢复 1 个战技点」**整句没有** ✗ —— 引擎没有「这次施放花了多少能量」这个变量 ✗（`self_max_energy` 是上限 ✓，不是**消耗量** ✗）⇒ 等价缺口 ✓。"
+      "_note": "「终结技时战技与终结技伤害 +60%，3 回合」—— 两条 `MODIFY_ATTR`（`SKILL_DAMAGE_BOOST` / `ULTIMATE_DAMAGE_BOOST`）＋ `turns: 3` ✓（60/70/80/90/100% ✓）；暴击率 +12% 由光锥属性给 ✓。\n✅ **「若本次终结技消耗的能量 ≥ 140 点，恢复 1 个战技点」已写**：`cone23037_energy_threshold_restores_skill_point`（`ULT_CAST` + `event_amount >= 140` + `GAIN_SKILL_POINT`，判据 `ConeTwentyThreeThousandThirtySevenTest`）✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23037_energy_threshold_restores_skill_point",
+      "when": [
+        "actor == self",
+        "event_amount >= 140"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "光锥 23037 向着不可追问处: 「装备者施放终结技后，若本次终结技消耗的能量大于等于140点，恢复1个战技点。」 param Lv1 = [0.12, 2, 140, 0.6, 3] → #3 = 140",
+      "_note": "「施放终结技**后**，若**本次终结技消耗的能量**大于等于 140 点，恢复 1 个战技点」. ⚠ 事件 `ULT_CAST`：它在伤害结算之后发出，正对「施放后」✓；它带的数值就是**这次施放消耗的能量**（`TriggerPayload.Cast` 的 amount ← `battle.getLastUltEnergySpent()`；实测 140 上限的角色施放后 `event_amount >= 140` 成立 ✓）。⚠ 用条件变量 **`event_amount`** 而不是 `cast_energy_spent`：后者是**伤害实例上的量**（23062 的「每消耗 1 点能量」读的是 `DEALING_DAMAGE` 的 instance），在 cast 事件上读不到 ✓。⚠ 140 是数据行 #3，五档都是 140 ⇒ 本规则五档逐字相同（`ContentDuplicateGuardTest` 的签名含档位作用域，跨档重复是允许的 ✓）。⚠ 「恢复」不是「获得」：`GAIN_SKILL_POINT` 会在上限处截断，这是引擎对「恢复 1 点」的既有口径 ✓。"
     }
   ]
 }
