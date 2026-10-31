@@ -24,8 +24,8 @@ import java.util.List;
  * the cone's own {@code ability_property} already carried (attack percent twice, break effect twice); and 21019/21020's kill
  * rules had no gate, so a teammate's kill paid the wearer.
  *
- * <p>⛔ <b>21021 is registered, not fixed</b>: it needs 「随机 1 个能量百分比低于阈值的我方其他目标」, a selector the engine has no
- * spelling for. Today its energy lands on the WEARER, which is the wrong target and is pinned here as the witness.
+ * <p>✅ <b>21021 landed on 2026-10-31</b>: 「随机 1 个能量百分比低于阈值的我方其他目标」 is the selector
+ * {@code random_ally_below_half_energy}, resolved in the plural path so an empty pool does nothing instead of failing.
  */
 public class ConeAuditBatchEightTest {
     private static final int LEVEL = 80;
@@ -105,22 +105,34 @@ public class ConeAuditBatchEightTest {
     }
 
     /**
-     * 21021 等价交换: the witness - today the energy lands on the WEARER, because the selector it needs does not exist.
+     * 21021 等价交换: 「当装备者的回合开始时，随机为 1 个当前能量百分比小于 50% 的我方其他目标恢复 8 点能量」.
+     *
+     * <p>The clause landed in 2026-10-31: the selector {@code random_ally_below_half_energy} exists, and it is resolved in the
+     * PLURAL path so that an empty pool means "nobody qualifies, nothing happens" rather than an error. Two halves are pinned
+     * here: the energy goes to a low-energy OTHER ally (never the wearer), and it does NOT go to an ally already above half.
      */
     @Test
-    public void coneTwoInnocentTwoOneEnergyLandsOnTheWrongUnitToday() {
+    public void coneTwoInnocentTwoOnePoursEnergyIntoOneLowAlly() {
         Fixture f = new Fixture(21021, true);
-        f.wearer.setCurrentEnergy(0);
+        f.wearer.setCurrentEnergy(f.wearer.getMaxEnergy() / 2);
         f.ally.setCurrentEnergy(0);
         f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
         System.out.println("[21021] 她的回合开始后: 自己 " + f.wearer.getCurrentEnergy()
-                + " ; 队友 " + f.ally.getCurrentEnergy()
-                + "（今天落在队友身上、不是那个随机的低能量目标 —— 见状态表）");
-        // Measured today: the grant carries no target, so it lands on everyone EXCEPT the wearer (`other_allies`) - which is not
-        // what the sentence says either (it wants ONE random ally below 50% energy). Pinned as the witness.
-        Assertions.assertEquals(0.0, f.wearer.getCurrentEnergy(), 1e-9, "缺口见证：她自己没拿到");
+                + " ; 队友 " + f.ally.getCurrentEnergy());
         Assertions.assertEquals(8.0, f.ally.getCurrentEnergy(), 1e-9,
-                "缺口见证：队友拿到 8 点（句子要的是「随机 1 个低能量我方其他目标」）");
+                "「随机为 1 个…我方其他目标」—— the low ally gets it");
+        Assertions.assertEquals(f.wearer.getMaxEnergy() / 2, f.wearer.getCurrentEnergy(), 1e-9,
+                "and never the wearer: the sentence says 我方其他目标");
+
+        Fixture full = new Fixture(21021, true);
+        full.wearer.setCurrentEnergy(full.wearer.getMaxEnergy() / 2);
+        full.ally.setCurrentEnergy(full.ally.getMaxEnergy());
+        full.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START,
+                full.wearer, full.wearer, 0, 0));
+        Assertions.assertEquals(full.ally.getMaxEnergy(), full.ally.getCurrentEnergy(), 1e-9,
+                "an ally already above half is not a candidate, and an empty pool is not an error");
+        Assertions.assertEquals(full.wearer.getMaxEnergy() / 2, full.wearer.getCurrentEnergy(), 1e-9,
+                "nor does it fall back to the wearer");
     }
 
     // ==================================================================
