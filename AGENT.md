@@ -1036,14 +1036,30 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ⚠ 旧记录里那条「把清零挪到 `Battle.endCastOutcome` 会让后续伤害被打上上一发的能量」**仍然成立、不要撤销** ——
 它防的是**全局字段**被读晚；本条的新结论只是「事件里本来就拿得到」，不需要挪动任何代码 ✓。
 
-#### ⛔ 23039 的「消耗 > 500」那条规则不开火（2026-10-31 实测）
+#### ✅ CORRECTED 23039 的「消耗 > 500」：事件**发了**，但数字在错误的槽里（2026-10-31 同日收回）
 
-为了「若该效果消耗的生命值高于 500 点，可使伤害额外提高 30%」加了数值变量 **`event_amount`**（= `ctx.amount()`，已在位、
-`TRIGGER.md` 同步），写法也合规（`on: HP_CONSUMED` + `actor == self` + `event_amount > 500`），
-但**手发一记 `HP_CONSUMED(1000)` 都没能触发它**（探针打印 `烈燃=0`）。
+旧记录说「手发一记 `HP_CONSUMED(1000)` 都触发不了」—— 事件确实发了，问题在**载荷**：
 
-⇒ 那两条规则**已删除**（不留永不触发的死规则），23039 记"前半已落地、500 分支仍开"。
-下一步要查的是：`HP_CONSUMED` 究竟发给了哪些表（是不是只发给"造成伤害的一方"，而 `CONSUME_HP` 的 spender 与表主不是同一位）。
+```java
+// 修前：付出的生命值被放进 HIT_COUNT 槽
+Simple.of(HP_CONSUMED, spender, spender, (int) Math.round(spent), 0)
+// 修后：放进 AMOUNT 槽
+Simple.of(HP_CONSUMED, spender, spender, 0, spent)
+```
+
+`event_amount` 读的是 `ctx.amount()`，所以它恒为 0 —— 任何 `event_amount > 500` 的规则都不可能开火。
+修的是**一个参数位置**（`TriggerInterpreter` 的 `CONSUME_HP` 分支），不是新词汇 ✓。
+
+- 判据 `HpConsumedAmountTest`：60% 生命上限（> 500）触发、30%（< 500）不触发，
+  并且另有一条 `hit_count > 500` 的规则必须**保持沉默**（它钉住「数字不在旧槽里」这件事）。
+- 23039 的句子因此落地：`HP_CONSUMED` + `event_amount > 500` 贴一个 1 回合的 `血火超额` 标记，
+  两条 `DEALING_DAMAGE` 再按同一档 #5 加伤；每个付血规则**开头先 `REMOVE_STATE 血火超额`**，
+  免得同一回合的第二次施放继承上一发的超额 ✓。判据 `ConeTwentyThreeThousandThirtyNineTest`
+  （> 500 → 0.60；< 500 → 0.30；价格与 1 HP 保底照旧）。
+
+⚠ 教训（与 5.2 / 5.3 同族，但这次**真是代码错**）：连续三条"读不到"里，两条是读数时机错、一条是**参数位置错**。
+共同点都是「**假设事件里的那个数与字段同名**」；验证办法不是再读一次全局字段，而是在规则里断言
+`event_amount` 的门**开/不开** ✓。
 
 #### ⛔ 23047 的【魂迷】触发会自我递归（2026-10-31 实测，已回退）
 
