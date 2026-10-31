@@ -110,8 +110,9 @@ public class RuleAuditTest {
                 + "\"field\":{\"on_stage\":[100013]}}]}").getAsJsonObject();
         java.util.Map<String, Object> report = RuleAudit.onStageCheck(shaped);
         Assertions.assertEquals(2, report.get("castsWithField"));
-        Assertions.assertEquals(2, report.get("matching"), "both casts' fields equal what they hit: " + report);
-        Assertions.assertEquals(0, report.get("mismatching"));
+        Assertions.assertEquals(2, report.get("exact"), "both casts' fields equal what they hit: " + report);
+        Assertions.assertEquals(0, report.get("missingFromField"),
+                "and the field never omits a unit the cast hit: " + report);
     }
 
     /**

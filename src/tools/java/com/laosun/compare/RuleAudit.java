@@ -249,21 +249,29 @@ public final class RuleAudit {
                 }
             }
         }
-        int matching = 0;
-        java.util.List<String> examples = new java.util.ArrayList<>();
+        int exact = 0;
+        int reachableOnly = 0;
+        java.util.List<String> missing = new java.util.ArrayList<>();
         for (Map.Entry<Integer, java.util.Set<Long>> each : onStage.entrySet()) {
             java.util.Set<Long> actually = hit.getOrDefault(each.getKey(), java.util.Set.of());
+            boolean covered = each.getValue().containsAll(actually);
             if (each.getValue().equals(actually)) {
-                matching++;
-            } else if (examples.size() < 4) {
-                examples.add("cast " + each.getKey() + " on_stage=" + each.getValue() + " hit=" + actually);
+                exact++;
+            } else if (covered) {
+                // Reachable but not hit: legitimate (a target that died first, or a skill that picks fewer than it could).
+                reachableOnly++;
+            } else if (missing.size() < 4) {
+                java.util.Set<Long> lost = new java.util.LinkedHashSet<>(actually);
+                lost.removeAll(each.getValue());
+                missing.add("cast " + each.getKey() + " hit " + lost + " but on_stage=" + each.getValue());
             }
         }
         Map<String, Object> report = new LinkedHashMap<>();
         report.put("castsWithField", onStage.size());
-        report.put("matching", matching);
-        report.put("mismatching", onStage.size() - matching);
-        report.put("examples", examples);
+        report.put("exact", exact);
+        report.put("reachableButNotHit", reachableOnly);
+        report.put("missingFromField", missing.size());
+        report.put("examples", missing);
         return report;
     }
 

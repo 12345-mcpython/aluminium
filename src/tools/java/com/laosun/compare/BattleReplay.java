@@ -399,6 +399,10 @@ public final class BattleReplay {
     static int replay(Plan plan, Path planPath, boolean strict, boolean detail, boolean derive) {
         JsonObject capture = readCapture(plan.getCapture());
         List<CaptureFlow.Cast> flow = CaptureFlow.group(capture.getAsJsonArray("damage_events"));
+        CAST_INDICES.clear();
+        for (CaptureFlow.Cast each : flow) {
+            CAST_INDICES.add(each.index());
+        }
         System.out.println("capture:  " + plan.getCapture());
         System.out.println("plan:     " + planPath.getFileName());
         System.out.println("scenario: " + (plan.getName() == null ? "(unnamed)" : plan.getName()));
@@ -2090,7 +2094,24 @@ public final class BattleReplay {
             return;
         }
         for (PreludeSpec prelude : plan.getPreludes()) {
-            if (prelude.getBefore() == null || prelude.getBefore() != row.cast) {
+            if (prelude.getBefore() == null) {
+                continue;
+            }
+            // A prelude names the cast it precedes. When a capture holds no such cast (each recording covers a different
+            // window), it runs before the NEXT cast that exists - otherwise it silently never runs, and its absence shows
+            // up as a mystery row (measured: the 2026-10-31 recording has no cast 59, so 1415's ultimate never fired and
+            // cast 64 was driven as her plain basic where the capture has the enhanced one).
+            int planned = prelude.getBefore();
+            int target = planned;
+            if (!CAST_INDICES.contains(planned)) {
+                target = Integer.MAX_VALUE;
+                for (int each : CAST_INDICES) {
+                    if (each > planned && each < target) {
+                        target = each;
+                    }
+                }
+            }
+            if (target != row.cast) {
                 continue;
             }
             Character actor = byCid.get(prelude.getActor());
@@ -2100,9 +2121,9 @@ public final class BattleReplay {
                 System.out.println("     prelude:  SKIPPED - " + prelude.getActor() + " has no " + prelude.getSlot());
                 continue;
             }
-            CanHit target = prelude.getTarget() == null || prelude.getTarget() < 1
+            CanHit aim = prelude.getTarget() == null || prelude.getTarget() < 1
                     || prelude.getTarget() > enemies.size() ? null : enemies.get(prelude.getTarget() - 1);
-            battle.castImmediate(skill, actor, target == null ? List.of() : List.of(target));
+            battle.castImmediate(skill, actor, aim == null ? List.of() : List.of(aim));
             // Its effects must be IN PLACE before the compared cast: 1415's ultimate installs her enhanced basic into the
             // COMMON slot, and that lands with the request queue - without this settle the very next cast still read the
             // plain basic (measured: cast 59 drove slot 1 while cast 76, later, drove slot 8).
@@ -2205,4 +2226,7 @@ public final class BattleReplay {
         }
     }
 
+
+    /** The cast indices the capture actually holds - used to place a prelude whose named cast is absent. */
+    private static final java.util.Set<Integer> CAST_INDICES = new java.util.TreeSet<>();
 }
