@@ -349,6 +349,20 @@ final class TriggerConditionParser {
             return new DamageIsAdditional(raw);
         }
 
+        // 「普攻或战技伤害**未造成暴击**时」 (light cone 23012): the instance crit roll is decided during settlement, so this
+        // keyword is only honest on DAMAGE_SETTLED -- on the pre-settlement events the answer would always be "did not",
+        // which is a false reading of every hit that does crit.
+        if (text.trim().equalsIgnoreCase(DAMAGE_DID_NOT_CRIT)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event != TriggerEvent.DAMAGE_SETTLED) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance did NOT crit, but " + spec.getOn()
+                                + " does not carry a SETTLED instance: the roll happens during settlement, so this "
+                                + "belongs on " + TriggerEvent.DAMAGE_SETTLED + " (source: " + spec.getSource() + ")");
+            }
+            return new DamageDidNotCrit(raw);
+        }
+
         // And whether the instance names a cast at all.
         if (text.trim().equalsIgnoreCase(DAMAGE_HAS_NO_CAST)) {
             TriggerEvent event = TriggerEvent.fromString(spec.getOn());
@@ -1629,6 +1643,23 @@ final class TriggerConditionParser {
         }
     }
 
+    static final class DamageDidNotCrit implements Condition {
+        private final String raw;
+
+        DamageDidNotCrit(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.damage() != null && !ctx.damage().isCrit();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
     static final class DamageIsAttack implements Condition {
         private final String raw;
 
@@ -2456,6 +2487,12 @@ final class TriggerConditionParser {
      * the rule states. `from_skill` cannot express this -- it parses a {@code SkillType}, so `from_skill UNSPECIFIED` is refused -- and without a discriminator the rule recurses.
      */
     static final String DAMAGE_HAS_NO_CAST = "damage_has_no_cast";
+
+    /**
+     * The bare keyword {@code damage_did_not_crit}: 「普攻或战技伤害**未造成暴击**时」 (light cone 23012). Only on
+     * {@code DAMAGE_SETTLED}, where the crit roll has already happened; the Reader is the condition of the same name.
+     */
+    static final String DAMAGE_DID_NOT_CRIT = "damage_did_not_crit";
 
     /**
      * The bare keyword "造成与装备者相同属性的伤容" (readers: light cone 21011 and
