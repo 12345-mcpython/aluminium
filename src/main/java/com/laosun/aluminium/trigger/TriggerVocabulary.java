@@ -109,7 +109,14 @@ final class TriggerVocabulary {
                     "highest_hp_enemy",
                     // "raise the CRIT DMG of all of our memosprites" (reader: 1413 Evernight (长夜月)'s skill "白昼悄然离去").
                     // `summon` says only "the owner's OWN summon", so a clause that speaks of the whole side needs its own name.
-                    "all_summons");
+                    "all_summons",
+                    // EVERY enemy this attack actually hit (the frozen hit set of ATTACK_FINISHED). Reader: 1103
+                    // Serval's Skill shock, whose sentence says "the enemy target(s) hit" and whose blast therefore
+                    // includes the neighbours the engine's own damage row already struck.
+                    "all_hit_enemies",
+                    // One living enemy ADJACENT (roster order) to the current target, chosen with the
+                    // battle's seeded RNG. Reader: 1103 Serval's Eidolon 1 ("one random adjacent target").
+                    "random_adjacent_enemy");
     /**
      * The two spellings of "every one of our characters".
      */

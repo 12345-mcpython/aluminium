@@ -1,6 +1,9 @@
 package com.laosun.aluminium.data;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.RelicSet;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -70,9 +73,9 @@ public final class RelicTriggerTables {
     public static final String UNMODELLED_RESOURCE = "/" + DIR + "/_unmodelled.json";
 
     /**
-     * One set file is {@code {"<piece count>": [ ...rules... ]}}.
+     * One threshold row is {@code [ ...rules... ]}.
      */
-    private static final Type FILE_SHAPE = new TypeToken<Map<String, List<TriggerSpec>>>() {
+    private static final Type RULE_LIST = new TypeToken<List<TriggerSpec>>() {
     }.getType();
 
     /**
@@ -321,6 +324,46 @@ public final class RelicTriggerTables {
         return set.effects().stream().map(effect -> String.valueOf(effect.require())).toList().toString();
     }
 
+    /**
+     * The set file split into its threshold rows, after the shared header and vocabulary checks.
+     *
+     * <p>The file may now state {@code schema} and {@code relic_set} next to its piece-count keys - the same pair a
+     * character file states as {@code schema} / {@code character}. Both are optional (files written before the header
+     * stay readable) and validated when present; a key that is neither a piece count nor an accepted header key is
+     * <b>refused</b> instead of being parsed as a threshold. Each row's rules run the same vocabulary guards a
+     * character file gets, because until 2026-10-31 this loader parsed them straight into {@code TriggerSpec} and a
+     * mistyped key was silently dropped.
+     */
+    private static Map<String, List<TriggerSpec>> parseFile(int setId, JsonElement root, String origin) {
+        if (!root.isJsonObject()) {
+            throw new IllegalStateException(origin + ": a relic rule file must be an object keyed by piece count");
+        }
+        JsonObject object = root.getAsJsonObject();
+        Set<String> annotations = TriggerTables.annotationKeys();
+        Map<String, List<TriggerSpec>> parsed = new LinkedHashMap<>();
+        for (String key : object.keySet()) {
+            if (HEADER_KEYS.contains(key) || annotations.contains(key)) {
+                continue;
+            }
+            if (key == null || key.isEmpty() || !key.chars().allMatch(Character::isDigit)) {
+                throw new IllegalStateException(origin + ": unknown key \"" + key
+                        + "\"; a relic file is keyed by piece count (\"2\" / \"4\") and may state "
+                        + HEADER_KEYS.stream().sorted().toList() + " plus annotations");
+            }
+            JsonElement rules = object.get(key);
+            TriggerTables.requireRuleVocabulary(rules, "relic set " + setId + " [" + key + "]");
+            parsed.put(key, GSON.fromJson(rules, RULE_LIST));
+        }
+        TriggerTables.requireFileHeader(object, "relic_set", setId, "relic set " + setId);
+        TriggerTables.requireFileStatus(object, "relic set " + setId);
+        return parsed;
+    }
+
+    /**
+     * Top-level keys that are metadata rather than piece-count rows.
+     */
+    private static final Set<String> HEADER_KEYS = Set.of("schema", "relic_set");
+
     private static Rules load(int setId) {
         String path = pathFor(setId);
         try (InputStream stream = RelicTriggerTables.class.getResourceAsStream(path)) {
@@ -332,7 +375,8 @@ public final class RelicTriggerTables {
             }
             Map<String, List<TriggerSpec>> parsed;
             try (Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                parsed = GSON.fromJson(reader, FILE_SHAPE);
+                JsonElement root = JsonParser.parseReader(reader);
+                parsed = parseFile(setId, root, path);
             }
             return parse(setId, parsed, path);
         } catch (IOException e) {
@@ -415,3 +459,5 @@ public final class RelicTriggerTables {
         return "/" + DIR + "/" + setId + ".json";
     }
 }
+
+

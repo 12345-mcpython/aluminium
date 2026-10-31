@@ -1,6 +1,9 @@
 package com.laosun.aluminium.data;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.trigger.TriggerTable;
@@ -12,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Loads a light cone's trigger rules from {@code resources/game/light_cones/<weaponId>.json}.
@@ -45,6 +49,13 @@ public final class WeaponTriggerTables {
     /**
      * The light cone's rules, or an empty table when it has none -- "no file" is the ordinary case, not an error, which is
      * the same reading {@code RelicTriggerTables} takes for a set with no rules.
+     *
+     * <p><b>The file header.</b> A cone file may state {@code schema} and {@code light_cone}, the same pair a character
+     * file states as {@code schema} / {@code character}: the version this engine reads, and the id the file belongs to.
+     * Both are optional (a file written before the header existed stays readable), both are validated when present, and
+     * every key that is neither a rank, {@code rules}, {@code resources} nor an annotation is <b>refused</b> -- until
+     * 2026-10-31 an unknown top-level key here was silently ignored, which is the one failure shape this loader was
+     * supposed to prevent.
      */
     public static synchronized TriggerTable of(int weaponId, int rank) {
         int key = weaponId * 10 + Math.max(1, Math.min(9, rank));
@@ -52,10 +63,11 @@ public final class WeaponTriggerTables {
         if (cached != null) {
             return cached;
         }
+        JsonObject file = file(weaponId);
         // A light cone may DECLARE resources: its file allows a top-level "resources" array next to the
         // rank keys, the same declaration shape a character's file uses. Note: The merged table refuses two declaring
         // sides, so this is a cone-side declaration only while no character declares the same name.
-        TriggerTable table = new TriggerTable(weaponId, read(weaponId, rank), readResources(weaponId));
+        TriggerTable table = new TriggerTable(weaponId, rules(weaponId, rank, file), resources(weaponId, file));
         CACHE.put(key, table);
         return table;
     }
@@ -66,26 +78,18 @@ public final class WeaponTriggerTables {
      * <p>The resource shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
      * {@code CharacterFactory} already registers whatever the merged table declares -- so the only missing piece was a
      * loader that reads them.
-     *
-     * @param weaponId the light cone id
-     * @return the declarations, or an empty list
      */
-    private static List<com.laosun.aluminium.beans.ResourceSpec> readResources(int weaponId) {
-        String path = pathFor(weaponId);
-        if (WeaponTriggerTables.class.getResource(path) == null) {
+    private static List<com.laosun.aluminium.beans.ResourceSpec> resources(int weaponId, JsonObject file) {
+        if (file == null || !file.has("resources") || file.get("resources").isJsonNull()) {
             return List.of();
         }
-        try (InputStream stream = WeaponTriggerTables.class.getResourceAsStream(path)) {
-            com.google.gson.JsonElement root = com.google.gson.JsonParser.parseString(
-                    new String(stream.readAllBytes(), java.nio.charset.StandardCharsets.UTF_8));
-            if (!root.isJsonObject() || !root.getAsJsonObject().has("resources")) {
-                return List.of();
-            }
+        try {
             List<com.laosun.aluminium.beans.ResourceSpec> declared =
-                    GSON.fromJson(root.getAsJsonObject().get("resources"), RESOURCE_LIST);
+                    GSON.fromJson(file.get("resources"), RESOURCE_LIST);
             return declared == null ? List.of() : declared;
-        } catch (Exception unreadable) {
-            throw new IllegalStateException("Failed to read resource declarations of light cone " + weaponId, unreadable);
+        } catch (RuntimeException unreadable) {
+            throw new IllegalStateException("light cone " + weaponId + ": unreadable \"resources\": "
+                    + unreadable.getMessage(), unreadable);
         }
     }
 
@@ -93,45 +97,87 @@ public final class WeaponTriggerTables {
             new com.google.gson.reflect.TypeToken<List<com.laosun.aluminium.beans.ResourceSpec>>() {
             }.getType();
 
-    private static List<TriggerSpec> read(int weaponId, int rank) {
-        Map<String, com.google.gson.JsonElement> file = parse(weaponId);
+    private static List<TriggerSpec> rules(int weaponId, int rank, JsonObject file) {
         if (file == null || file.isEmpty()) {
             return List.of();
         }
-        com.google.gson.JsonElement flat = file.get("rules");
-        if (flat != null) {
+        JsonElement flat = file.get("rules");
+        if (flat != null && !flat.isJsonNull()) {
             return GSON.fromJson(flat, new TypeToken<List<TriggerSpec>>() {
             }.getType());                            // one set of rules for every rank
         }
         // Note: The EXACT rank, not "the highest threshold met": a light cone's superimposition does not accumulate the way a
         // relic set's piece count does. A rank with no row falls back to the lowest one that exists, so a file with fewer
         // rows than the game's five still works.
-        com.google.gson.JsonElement exact = file.get(String.valueOf(rank));
-        if (exact == null) {
+        JsonElement exact = file.get(String.valueOf(rank));
+        if (exact == null || exact.isJsonNull()) {
             // Only NUMERIC keys are ranks: a cone's file may also carry a top-level "resources" declaration, and
             // parsing that as a rank would throw. (Measured: the shape is new, the fallback was written before it.)
             String lowest = file.keySet().stream()
-                    .filter(key -> !key.isEmpty() && key.chars().allMatch(Character::isDigit))
+                    .filter(WeaponTriggerTables::isRankKey)
                     .min(java.util.Comparator.comparingInt(Integer::parseInt))
-                    .orElseThrow();
+                    .orElseThrow(() -> new IllegalStateException("light cone " + weaponId
+                            + " has no rank rows and no \"rules\" array, so it declares nothing"
+                            + " (write \"1\": [...] or \"rules\": [...])"));
             exact = file.get(lowest);
         }
         return GSON.fromJson(exact, new TypeToken<List<TriggerSpec>>() {
         }.getType());
     }
 
-    private static Map<String, com.google.gson.JsonElement> parse(int weaponId) {
+    /**
+     * Parses and validates one cone file.
+     *
+     * <p>The allowed top level is: numeric rank keys, {@code rules}, {@code resources}, {@code schema},
+     * {@code light_cone} and the annotation keys. Every other key is refused rather than ignored, and each rules array
+     * runs the same vocabulary guards a character file gets (rule keys, effect keys, condition keys, status
+     * annotations), so a typo fails at load in all three content kinds alike.
+     *
+     * @return the file, or {@code null} when the cone has no file
+     */
+    private static JsonObject file(int weaponId) {
         String path = pathFor(weaponId);
         if (WeaponTriggerTables.class.getResource(path) == null) {
             return null;
         }
         try (InputStream stream = WeaponTriggerTables.class.getResourceAsStream(path);
              Reader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            return GSON.fromJson(reader, new TypeToken<Map<String, com.google.gson.JsonElement>>() {
-            }.getType());
-        } catch (Exception error) {
+            JsonElement root = JsonParser.parseReader(reader);
+            if (!root.isJsonObject()) {
+                throw new IllegalArgumentException("a light cone rule file must be an object keyed by rank");
+            }
+            JsonObject object = root.getAsJsonObject();
+            Set<String> annotations = TriggerTables.annotationKeys();
+            for (String key : object.keySet()) {
+                if (isRankKey(key) || HEADER_KEYS.contains(key) || annotations.contains(key)) {
+                    continue;
+                }
+                throw new IllegalArgumentException("unknown key \"" + key + "\"; a light cone file is keyed by rank"
+                        + " and may state " + HEADER_KEYS.stream().sorted().toList() + " plus annotations");
+            }
+            TriggerTables.requireFileHeader(object, "light_cone", weaponId, "light cone " + weaponId);
+            TriggerTables.requireFileStatus(object, "light cone " + weaponId);
+            for (String key : object.keySet()) {
+                if ("rules".equals(key) || isRankKey(key)) {
+                    TriggerTables.requireRuleVocabulary(object.get(key), "light cone " + weaponId + " [" + key + "]");
+                }
+            }
+            return object;
+        } catch (java.io.IOException error) {
             throw new IllegalStateException("light cone " + weaponId + " has an unreadable rule file " + path, error);
+        } catch (RuntimeException refusal) {
+            throw new IllegalStateException("Invalid trigger rules for light cone " + weaponId + " in " + path
+                    + ": " + refusal.getMessage(), refusal);
         }
+    }
+
+    /**
+     * Top-level keys that are metadata rather than rank rows.
+     */
+    private static final Set<String> HEADER_KEYS = Set.of("schema", "light_cone", "rules", "resources");
+
+    private static boolean isRankKey(String key) {
+        return key != null && !key.isEmpty() && key.chars().allMatch(Character::isDigit);
     }
 
     private static String pathFor(int weaponId) {
@@ -139,3 +185,4 @@ public final class WeaponTriggerTables {
     }
 
 }
+

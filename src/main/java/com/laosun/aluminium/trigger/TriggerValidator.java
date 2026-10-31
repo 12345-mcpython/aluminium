@@ -3,6 +3,7 @@ package com.laosun.aluminium.trigger;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.NumberProvider;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.buff.BuffManager;
 import com.laosun.aluminium.enums.*;
@@ -33,6 +34,109 @@ final class TriggerValidator {
     private TriggerValidator() {
     }
 
+    /**
+     * The ops that read a number and therefore accept {@code value}: the magnitude readers
+     * ({@code TriggerMagnitudes.magnitudeOf} / {@code derivedMagnitude} / {@code literalBase} / {@code grantAmount} /
+     * {@code constantTerm} / {@code dotMagnitude}), the share readers ({@code shareOf}, where the value is the
+     * fraction), and the count readers (rounded to a whole count). An op that reads no number
+     * ({@code MODIFY_RULE}) refuses {@code value} at load time - silently ignoring it would be the failure mode this
+     * validator exists for.
+     */
+    private static final Set<String> VALUE_OPS = Set.of(
+            "DAMAGE", "ADD_DAMAGE", "HEAL", "SHIELD", "MODIFY_ATTR", "APPLY_DOT", "APPLY_CONTROL",
+            "GAIN_ENERGY", "GAIN_RESOURCE", "SPEND_RESOURCE", "REMOVE_RESOURCE", "CONSUME_HP",
+            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "ADVANCE", "BOOST_TOUGHNESS", "SUPER_BREAK",
+            "TICK_DOT", "RAISE_ENERGY_TO",
+            "GAIN_SKILL_POINT", "ADD_STACK", "REMOVE_STACK", "REMOVE_BUFF", "DISPEL",
+            "RAISE_RESOURCE_CAP", "RAISE_SKILL_HITS", "RAISE_SKILL_POINT_CAP",
+            "ABSORB_DAMAGE", "RESIST_DEBUFF");
+
+    /**
+     * Every legacy magnitude field. Stating one beside {@code value} would be two answers to one question; the pair
+     * is refused rather than silently preferring either.
+     */
+    private static void rejectValueWithLegacyMagnitude(EffectSpec effect, String op, TriggerSpec spec) {
+        java.util.List<String> stated = new java.util.ArrayList<>();
+        if (effect.getScale() != null && !effect.getScale().isBlank()) {
+            stated.add("scale");
+        }
+        if (effect.getSkill() != null && !effect.getSkill().isBlank()) {
+            stated.add("skill");
+        }
+        if (effect.getDamageParam() != null) {
+            stated.add("damage_param");
+        }
+        if (effect.getDamageLevel() != null) {
+            stated.add("damage_level");
+        }
+        if (effect.getElationFrom() != null && !effect.getElationFrom().isBlank()) {
+            stated.add("elation_from");
+        }
+        if (effect.getPercent() != null) {
+            stated.add("percent");
+        }
+        if (effect.getRatio() != null) {
+            stated.add("ratio");
+        }
+        if (effect.getAmount() != null) {
+            stated.add("amount");
+        }
+        if (effect.getPercentFrom() != null) {
+            stated.add("percent_from");
+        }
+        if (effect.getAmountFrom() != null) {
+            stated.add("amount_from");
+        }
+        if (effect.getPercentFromCastParam() != null) {
+            stated.add("percent_from_cast_param");
+        }
+        if (effect.getPercentFromSkillParam() != null) {
+            stated.add("percent_from_skill_param");
+        }
+        if (effect.getPercentFromSummonParam() != null) {
+            stated.add("percent_from_summon_param");
+        }
+        if (effect.getPercentFromResource() != null) {
+            stated.add("percent_from_resource");
+        }
+        if (effect.getAmountFromCastParam() != null) {
+            stated.add("amount_from_cast_param");
+        }
+        if (effect.getAmountFromSkillParam() != null) {
+            stated.add("amount_from_skill_param");
+        }
+        if (effect.getAmountFromSummonParam() != null) {
+            stated.add("amount_from_summon_param");
+        }
+        if (effect.getAmountFromAttr() != null) {
+            stated.add("amount_from_attr");
+        }
+        if (effect.getAmountFromResource() != null) {
+            stated.add("amount_from_resource");
+        }
+        if (effect.getAmountPercent() != null) {
+            stated.add("amount_percent");
+        }
+        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+            stated.add("amount_from_event");
+        }
+        if (Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
+            stated.add("amount_from_previous");
+        }
+        if (Boolean.TRUE.equals(effect.getSpendAll())) {
+            stated.add("spendAll");
+        }
+        if (Boolean.TRUE.equals(effect.getOverflowOnly())) {
+            stated.add("overflowOnly");
+        }
+        if (!stated.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"value\" (one whole magnitude) together with "
+                            + String.join(" / ", stated) + ": value replaces the scale/percent/amount family, and "
+                            + "two spellings of one number have no reading (source: " + spec.getSource() + ")");
+        }
+    }
+
 
     static void validateOne(EffectSpec effect, TriggerSpec spec) {
         // Note: A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
@@ -46,6 +150,31 @@ final class TriggerValidator {
         }
 
         String op = TriggerInterpreter.normalizeOp(effect, spec);
+        // `times` repeats the effect itself; DAMAGE states its own number below (a settlement repeated N times), and
+        // every other op is repeated by the interpreter's effect loop. A count of nothing is a typo, not a shorthand:
+        // 0 repetitions would make the whole effect disappear without a word (the "silently ignored" family).
+        if (effect.getTimes() != null && effect.getTimes() < 1 && !"DAMAGE".equals(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"times\" = " + effect.getTimes() + ", which runs nothing: the effect would "
+                            + "disappear silently (source: " + spec.getSource() + ")");
+        }
+        if (effect.getRatio() != null && !"MODIFY_ATTR".equals(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"ratio\", which only MODIFY_ATTR reads: a ratio names one of the rule "
+                            + "owner's attributes and how much of it a modifier adds (source: " + spec.getSource() + ")");
+        }
+        // `value` is the one-expression spelling of a whole magnitude. Validate it here, once, and refuse the ops
+        // whose reader only wants a share (they would silently ignore it otherwise).
+        if (effect.getValue() != null) {
+            if (!VALUE_OPS.contains(op)) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states \"value\", which only " + VALUE_OPS + " read: an op that reads a bare "
+                                + "share or a count has no place for a whole magnitude "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            NumberProviders.validate(effect.getValue(), "value", op, spec);
+            rejectValueWithLegacyMagnitude(effect, op, spec);
+        }
         requireBlocksOnlyOnStates(effect, op, spec);
         requireTargetSelector(effect, op, spec);
         // Note: `cast_target` (who a COMMANDED cast is aimed at) is read by CAST_SKILL and by nothing else, so stating it
@@ -78,6 +207,13 @@ final class TriggerValidator {
                     "Op " + op + " states \"scope_element\", but only " + TriggerVocabulary.SCOPE_ELEMENT_READERS
                             + " read it; an op that ignores it would silently apply to every element "
                             + "(source: " + spec.getSource() + ")");
+        }
+        // `skills` is RAISE_SKILL_LEVEL's plural spelling; on every other op it would be dropped silently, which is
+        // the same failure the two scope guards above close.
+        if (effect.getSkills() != null && !"RAISE_SKILL_LEVEL".equals(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"skills\", but only RAISE_SKILL_LEVEL reads it: it names the skill slots "
+                            + "whose levels a battle raises (source: " + spec.getSource() + ")");
         }
         // `per_steps` and `SPEND_STEPS` are the two halves of one primitive - "every N points of a counter" as a repeat
         // COUNT and as a SPEND - so both spellings are checked here, at LOAD time, for every op that may state them.
@@ -157,7 +293,8 @@ final class TriggerValidator {
                 // "the stated share of the RECIPIENT's own maximum, untouched by the regen rate" - so the generic
                 // "a share needs a scale" rule does not apply to this pair. Everything else keeps that rule.
                 boolean fixedShare = Boolean.TRUE.equals(effect.getFixed()) && effect.getAmount() == null
-                        && (effect.getPercent() != null || effect.getPercentFrom() != null)
+                        && (effect.getPercent() != null || effect.getPercentFrom() != null
+                        || effect.getValue() != null)
                         && (effect.getScale() == null || effect.getScale().isBlank());
                 if (fixedShare) {
                     requireNoStackArguments(effect, op, spec);
@@ -187,10 +324,11 @@ final class TriggerValidator {
                 // A plain share, because the handler reads it directly: accepting the
                 // percent_from_* spellings here would leave the share unresolved at run time.
                 requirePercent(effect, op, spec);
-                if (effect.getPercent() == null) {
+                if (effect.getPercent() == null && effect.getValue() == null) {
                     throw new IllegalArgumentException(
-                            "Op " + op + " names the level to raise energy TO, so it needs a plain \"percent\": got a share"
-                                    + " from a cast parameter or a resource instead (source: " + spec.getSource() + ")");
+                            "Op " + op + " names the level to raise energy TO, so it needs a plain \"percent\" or "
+                                    + "\"value\": got a share from a cast parameter or a resource instead "
+                                    + "(source: " + spec.getSource() + ")");
                 }
                 requireNoStackArguments(effect, op, spec);
             }
@@ -201,7 +339,7 @@ final class TriggerValidator {
             case RAISE_SKILL_POINT_CAP -> {
                 // Unlike GAIN_SKILL_POINT, a negative amount is meaningful here: it takes a granted bonus
                 // back. Zero is not, because it would silently do nothing.
-                if (effect.getAmount() == null || effect.getAmount() == 0) {
+                if (effect.getValue() == null && (effect.getAmount() == null || effect.getAmount() == 0)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " changes the skill point cap, so \"amount\" is a non-zero number of points"
                                     + " (negative takes a bonus away): got "
@@ -233,6 +371,10 @@ final class TriggerValidator {
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
+            case DELAY -> {
+                requirePercent(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
             case RAISE_RESOURCE_CAP -> {
                 // A resource the owner DECLARES, and how far to widen its overflow.
                 requireResource(effect, op, spec);
@@ -240,12 +382,13 @@ final class TriggerValidator {
                     // 「【火种】的可溢出点数不再拥有上限」 (1408's Eidolon 6): removing the allowance is not "raising it
                     // by N", so the two spellings are refused together - a count beside "no limit" reads as a bound the
                     // sentence denies.
-                    if (effect.getAmount() != null) {
+                    if (effect.getAmount() != null || effect.getValue() != null) {
                         throw new IllegalArgumentException(
-                                "Op " + op + " states both \"unbounded\" and \"amount\": \"no upper limit\" and \"by this "
-                                        + "many more\" are different claims (source: " + spec.getSource() + ")");
+                                "Op " + op + " states both \"unbounded\" and a count (\"amount\" / \"value\"): "
+                                        + "\"no upper limit\" and \"by this many more\" are different claims "
+                                        + "(source: " + spec.getSource() + ")");
                     }
-                } else if (effect.getAmount() == null || effect.getAmount() <= 0) {
+                } else if (effect.getValue() == null && (effect.getAmount() == null || effect.getAmount() <= 0)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " widens a resource's overflow, so \"amount\" is a positive count of points: got "
                                     + (effect.getAmount() == null ? "nothing" : effect.getAmount())
@@ -440,11 +583,36 @@ final class TriggerValidator {
                 }
 
                 requireAttribute(effect, op, spec);
+                if (effect.getRatio() != null) {
+                    AttributeType ratioAttribute = AttributeType.fromString(effect.getAttribute().trim());
+                    if (!ratioAttribute.isPercent) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"ratio\": " + effect.getRatio() + " on the flat attribute "
+                                        + effect.getAttribute() + "; ratio is only for ratio attributes "
+                                        + "(CRIT_CHANCE / DAMAGE_BOOST / ...). A flat attribute uses \"amount\" "
+                                        + "(points) or \"percent\" (a share of its base) "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    if (effect.getPercent() != null || effect.getAmount() != null
+                            || (effect.getScale() != null && !effect.getScale().isBlank())
+                            || effect.getPercentFrom() != null || effect.getPercentFromCastParam() != null
+                            || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null
+                            || effect.getPercentFromSummonParam() != null || effect.getValue() != null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"ratio\" beside another magnitude spelling; ratio is the whole "
+                                        + "number for a ratio attribute (5 = +500%), so state it alone "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                }
                 // ? A FLAT boost as well as a share. "raise SPD by 50 points" states points, not a percentage; 1documents do this (for SPD alone).
                 // The rule is "exactly one": a DERIVED modifier reads `percent x attribute + amount`, while a plain one is either a share or a flat value,
                 // and writing both there would silently let one win.
                 boolean derivedModifier = effect.getScale() != null && !effect.getScale().isBlank();
-                if (derivedModifier) {
+                if (effect.getRatio() != null) {
+                    // Validated above: one absolute fraction for a ratio attribute.
+                } else if (effect.getValue() != null) {
+                    // One whole magnitude, validated centrally; no legacy share/flat field may sit beside it.
+                } else if (derivedModifier) {
                     requirePercent(effect, op, spec);
                     // Note: `percent_from_cast_param` is a SECOND way to state the share: a share from the cast skill with
                     // no `scale` is exactly as well-formed as one with `percent`, and this check calls it "neither".
@@ -489,9 +657,9 @@ final class TriggerValidator {
                         throw new IllegalArgumentException(
                                 "Op " + op + " states BOTH \"scale\" and \"per_stack\" (source: " + spec.getSource() + ")");
                     }
-                    if (effect.getPercent() == null) {
+                    if (effect.getPercent() == null && effect.getValue() == null && effect.getRatio() == null) {
                         throw new IllegalArgumentException(
-                                "Op " + op + " states \"per_stack\" without \"percent\" (source: " + spec.getSource() + ")");
+                                "Op " + op + " states \"per_stack\" without \"percent\", \"ratio\" or \"value\" (source: " + spec.getSource() + ")");
                     }
                 }
                 requireDuration(effect, op, spec);
@@ -537,7 +705,11 @@ final class TriggerValidator {
                 requireBaseChance(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
-                requireDuration(effect, op, spec);
+                // A one-shot vulnerability/reduction on the instance being settled ("this hit takes 12% more")
+                // needs no lifetime; every persistent zone still requires one.
+                if (!Boolean.TRUE.equals(effect.getInstance())) {
+                    requireDuration(effect, op, spec);
+                }
                 requireNoStackArguments(effect, op, spec);
             }
             case ABSORB_DAMAGE -> {
@@ -558,7 +730,8 @@ final class TriggerValidator {
                                     + effect.getUnitAmount() + " (source: " + spec.getSource() + ")");
                 }
                 requirePercent(effect, op, spec);
-                if (effect.getPercent() > 1) {
+                requireValueFraction(effect, op, spec);
+                if (effect.getPercent() != null && effect.getPercent() > 1) {
                     throw new IllegalArgumentException(
                             "Op ABSORB_DAMAGE takes \"percent\" as the SHARE of the hit that may be blocked, in (0, 1]"
                                     + " - not a number out of 100; got " + effect.getPercent()
@@ -743,10 +916,28 @@ final class TriggerValidator {
                 requireExtendFilter(effect, op, spec);
             }
             case RESIST_DEBUFF -> {
+                // 「抵抗 1 次负面效果，2 回合后可再次触发」 (1207's 襄尺): a charge shield has no
+                // percentage and no duration of its own - the cooldown is its clock.
+                if (effect.getCharges() != null) {
+                    if (effect.getCharges() < 1) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " has \"charges\": " + effect.getCharges()
+                                        + ", but a charge shield must refuse at least one application (source: "
+                                        + spec.getSource() + ")");
+                    }
+                    if (effect.getCooldown() == null || effect.getCooldown() < 0) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"charges\" but no non-negative \"cooldown\" (the turns "
+                                        + "before the charge comes back) (source: " + spec.getSource() + ")");
+                    }
+                    requireNoStackArguments(effect, op, spec);
+                    return;
+                }
                 // "raise the chance to resist control-class negative states by 35%" / "immune to control-class negative states": a class resistance the CARRIER holds, so
                 // it is a buff on the target (timed, or permanent for a trace).
                 requireDebuffClass(effect, op, spec);
                 requirePercent(effect, op, spec);
+                requireValueFraction(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireTickOwner(effect, op, spec);
@@ -762,7 +953,7 @@ final class TriggerValidator {
                                     + "the state); it has no amount / scale / attribute / skill / element / control / "
                                     + "base_chance (source: " + spec.getSource() + ")");
                 }
-                if (effect.getPercent() <= 0 || effect.getPercent() > 1) {
+                if (effect.getPercent() != null && (effect.getPercent() <= 0 || effect.getPercent() > 1)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " has \"percent\": " + effect.getPercent() + ", but a class resistance is "
                                     + "a fraction of 1 in (0, 1] (0.35 = \"raise the chance to resist ... by 35%\", 1.0 = \"immune\"); a "
@@ -844,6 +1035,12 @@ final class TriggerValidator {
                     // 「忆灵技等级+1」: the OWNER's memosprite, addressed by its DATA SLOT. Both halves are stated here
                     // because each one is a different mistake: a `skill` would name a character slot (a different
                     // skill), and no `skill_id` would raise nothing at all.
+                    if (effect.getSkills() != null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"memosprite\" and \"skills\": a memosprite's slots are data "
+                                        + "slots, stated one at a time as \"skill_id\"; \"skills\" lists character "
+                                        + "SkillType slots (source: " + spec.getSource() + ")");
+                    }
                     if (effect.getSkill() != null && !effect.getSkill().isBlank()) {
                         throw new IllegalArgumentException(
                                 "Op " + op + " states both \"skill\" and \"memosprite\": a memosprite's skills are "
@@ -857,6 +1054,21 @@ final class TriggerValidator {
                                         + "SLOT there (a positive number, e.g. 1) "
                                         + "(source: " + spec.getSource() + ")");
                     }
+                } else if (effect.getSkills() != null) {
+                    // One fact ("every slot is at Lv10"), one amount: the list is the same statement as several
+                    // identical effects without repeating the number that can drift.
+                    if (effect.getSkill() != null && !effect.getSkill().isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states both \"skill\" and \"skills\": state one slot as \"skill\" or "
+                                        + "several as \"skills\" (source: " + spec.getSource() + ")");
+                    }
+                    if (effect.getSkillId() != null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"skill_id\" without \"memosprite\": that field names one of a "
+                                        + "memosprite's data slots; character slots are stated as \"skill\" or "
+                                        + "\"skills\" (source: " + spec.getSource() + ")");
+                    }
+                    requireSkillSlots(effect.getSkills(), op, spec);
                 } else {
                     if (effect.getSkillId() != null) {
                         throw new IllegalArgumentException(
@@ -1081,6 +1293,9 @@ final class TriggerValidator {
      */
     static void requireAmountOrScale(EffectSpec effect, String op, TriggerSpec spec,
                                      Set<String> scales, String what) {
+        if (effect.getValue() != null) {
+            return;
+        }
         // The flat half is validated here too: this family's scaled path never calls `requireAmount`.
         requireSingleFlatSource(effect, op, spec);
         String scale = effect.getScale() == null ? null : effect.getScale().trim();
@@ -1261,6 +1476,9 @@ final class TriggerValidator {
      */
     static void requireDerivedScale(EffectSpec effect, String op, TriggerSpec spec, boolean allowFlat,
                                     boolean percentMayScaleRow) {
+        if (effect.getValue() != null || effect.getRatio() != null) {
+            return;
+        }
         boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
         if (!derived) {
             if (effect.getAmount() != null && !allowFlat) {
@@ -1447,6 +1665,9 @@ final class TriggerValidator {
     }
 
     static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getValue() != null) {
+            return;
+        }
         requireSingleFlatSource(effect, op, spec);
         if (effect.getAmount() == null && effect.getAmountFrom() == null
                 && effect.getAmountFromAttr() == null
@@ -1474,6 +1695,9 @@ final class TriggerValidator {
      * nothing to say which won.
      */
     static void requireSingleFlatSource(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getValue() != null) {
+            return;
+        }
         java.util.List<String> stated = new java.util.ArrayList<>();
         if (effect.getAmount() != null) {
             stated.add("amount");
@@ -1556,10 +1780,37 @@ final class TriggerValidator {
      */
     static void requirePositiveAmount(EffectSpec effect, String op, TriggerSpec spec) {
         requireAmount(effect, op, spec);
+        if (effect.getValue() != null) {
+            // The provider is the count; a literal `amount` is absent by construction. A constant zero is caught
+            // by the value's own validation only if it is a literal; a provider cannot be inspected at load time.
+            return;
+        }
         if (effect.getAmount() <= 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " needs a positive \"amount\" but has " + effect.getAmount()
                             + "; a removal of 0 would load and silently do nothing "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * A {@code value} that is a literal fraction must be in {@code (0, 1]} for the ops that take a share.
+     * A non-literal provider cannot be read before the battle exists; it is accepted and its reader decides.
+     */
+    static void requireValueFraction(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getValue() == null) {
+            return;
+        }
+        NumberProvider provider = effect.getValue();
+        if (!"const".equalsIgnoreCase(String.valueOf(provider.getType()).trim())) {
+            return;
+        }
+        Double written = provider.getValue();
+        double value = written == null ? Double.NaN : written;
+        if (!(value > 0 && value <= 1)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " takes a share in (0, 1], but \"value\" is the constant " + written
+                            + " (0.35 = 35%, 1.0 = 100%); a share of 0 would provably do nothing "
                             + "(source: " + spec.getSource() + ")");
         }
     }
@@ -1634,6 +1885,9 @@ final class TriggerValidator {
      * @param percentMayScaleRow {@code true} to accept {@code percent} as a multiplier on the single row share
      */
     static void requirePercent(EffectSpec effect, String op, TriggerSpec spec, boolean percentMayScaleRow) {
+        if (effect.getValue() != null) {
+            return;
+        }
         // Note: All five spellings are collected before anything is refused, so the message can name them and the
         // "exactly one" rule is stated once. The earlier version was a chain of ifs, and each new spelling had to
         // remember to check the ones before it -- which is how `percent_from_resource` once slipped through.
@@ -2078,7 +2332,7 @@ final class TriggerValidator {
                             + "\"buff\" (source: " + spec.getSource() + ")");
         }
         boolean anyMagnitude = effect.getAmount() != null || effect.getScale() != null
-                || effect.getPercent() != null;
+                || effect.getPercent() != null || effect.getValue() != null;
         if (effect.getElement() == null || effect.getElement().isBlank()) {
             if (anyMagnitude) {
                 throw new IllegalArgumentException(
@@ -2176,6 +2430,9 @@ final class TriggerValidator {
      * derived values follow (a later buff on the applier must not change damage that is already burning).
      */
     static void requireDotMagnitude(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getValue() != null) {
+            return;
+        }
         // The flat spelling is shared with every other magnitude: one source, and a `<SKILLTYPE>:<index>` spelling that
         // is checked here rather than when the DOT fires. Note: this family used to REFUSE the level-aware constant
         // because `dotMagnitude` read only a literal; that reader now goes through `constantTerm`, which is the same
@@ -2325,8 +2582,8 @@ final class TriggerValidator {
                 || effect.getCritRate() != null || effect.getCritDamage() != null
                 || effect.getRule() != null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " raises one skill slot's level and states nothing else: \"skill\" (which slot) "
-                            + "and \"amount\" (how many levels), and it reads no other field "
+                    "Op " + op + " raises skill slots' levels and states nothing else: \"skill\" (one slot) or "
+                            + "\"skills\" (several) and \"amount\" (how many levels), and it reads no other field "
                             + "(source: " + spec.getSource() + ")");
         }
     }
@@ -2398,6 +2655,43 @@ final class TriggerValidator {
             throw new IllegalArgumentException(
                     "Op " + op + " names an unknown skill slot '" + effect.getSkill()
                             + "' (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates a {@code skills} list: at least one slot, every name a {@link SkillType}, and no slot twice.
+     *
+     * <p>A duplicate is refused because each entry raises the same slot again: {@code ["SKILL", "SKILL"]} with
+     * {@code amount: 9} would raise it by 18, which is not "the file's slots are nine levels up" but a counting
+     * accident that looks exactly like the intended line.
+     */
+    static void requireSkillSlots(java.util.List<String> skills, String op, TriggerSpec spec) {
+        if (skills.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states an empty \"skills\": list at least one slot, or omit the field to raise "
+                            + "one \"skill\" (source: " + spec.getSource() + ")");
+        }
+        java.util.Set<String> seen = new java.util.LinkedHashSet<>();
+        for (String raw : skills) {
+            if (raw == null || raw.isBlank()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " has a blank entry in \"skills\"; every entry must name a skill slot "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            String slot = raw.trim().toUpperCase(Locale.ROOT);
+            try {
+                SkillType.valueOf(slot);
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " names an unknown skill slot '" + raw + "' in \"skills\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            if (!seen.add(slot)) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " names the skill slot '" + raw + "' twice in \"skills\"; each entry raises "
+                                + "that slot, so the duplicate would raise it twice "
+                                + "(source: " + spec.getSource() + ")");
+            }
         }
     }
 

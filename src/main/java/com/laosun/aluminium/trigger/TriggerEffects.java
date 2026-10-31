@@ -155,11 +155,15 @@ final class TriggerEffects {
         // `percent_from_skill_param: "TECHNIQUE:0"`, produced a modifier of `ATTACK PURE_VALUE 0.4` - i.e. +0.4 attack
         // instead of +40% - while the literal `percent: 0.4` it replaced produced `add_percent` and the right thing.
         boolean scaled = effect.getScale() != null && !effect.getScale().isBlank();
-        boolean derived = scaled || effect.getPercent() == null;
+        boolean unified = effect.getValue() != null;
+        boolean ratio = effect.getRatio() != null;
+        boolean derived = scaled || (effect.getPercent() == null && !ratio && !unified);
         // Whether the magnitude is already ABSOLUTE in the attribute's units: a flat `amount` ("raise SPEED by 50
         // points", 艾丝妲's ultimate) or a scaled product ("equal to X% of DEF"). A bare share - a literal `percent` or
-        // one of its spellings with no scale - is a fraction of the target's base instead.
-        boolean absolute = !TriggerMagnitudes.statesShare(effect) || scaled;
+        // one of its spellings with no scale - is a fraction of the target's base instead. A `value` expression is
+        // already absolute by construction (the provider states the number in the attribute's own units), and `ratio`
+        // is a ratio attribute's absolute fraction (5 = +500%).
+        boolean absolute = unified || ratio || !TriggerMagnitudes.statesShare(effect) || scaled;
         // ? A plain modifier is a share OR a flat value: `amount` alone means "raise the attribute by this many points", which the
         // validator enforces as exactly one of the two.
         // Note: The share may come from the skill parameter now, so "is a share stated" is NOT `percent != null`:
@@ -171,7 +175,11 @@ final class TriggerEffects {
         // Note: The fork now asks the magnitude reader's own predicate (`TriggerMagnitudes.statesShare`), which is the
         // list of spellings `shareOf` actually reads - a copy here is the thing that kept falling one spelling behind
         // (cast_param, then skill_param, then summon_param).
-        if (TriggerMagnitudes.statesShare(effect)) {
+        if (unified) {
+            magnitude = TriggerMagnitudes.valueOf(effect, ctx);
+        } else if (ratio) {
+            magnitude = effect.getRatio();
+        } else if (TriggerMagnitudes.statesShare(effect)) {
             // Note: `scaled`, not `derived` - a no-scale share is the magnitude ITSELF; its constant term (if any) is a
             // separate absolute modifier, added below (`1409`'s 「30% + 600」). Folding the constant in here turned
             // "30% + 600" into "600.3 x base" (measured: 652,900 instead of 926).
@@ -541,9 +549,11 @@ final class TriggerEffects {
             if (word.isEmpty()) {
                 continue;
             }
-            if (!"advance_to_others".equals(word)) {
+            if (!"advance_to_others".equals(word) && !"skill".equals(word)
+                    && !"ultimate".equals(word) && !"energy_gain".equals(word)) {
                 throw new IllegalArgumentException("Op APPLY_BUFF has \"blocks\": \"" + raw + "\", which is not a word the"
-                        + " engine knows; the only one so far is \"advance_to_others\" (「无法使其他友方目标获得行动提前效果」)");
+                        + " engine knows; the words so far are \"advance_to_others\", \"skill\", \"ultimate\" and "
+                        + "\"energy_gain\"");
             }
             parsed.add(word);
         }
@@ -614,7 +624,9 @@ final class TriggerEffects {
         // FIFTEEN at once, and `amount` alone would grant one. The readers are the "gain N stacks" family --
         // 1314 alone states 5 (its talent's follow-up), 15 (its technique), 1 and 3 (its traces). One application still
         // means one mark unless it says otherwise, so no existing file changes.
-        int wanted = effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
+        int wanted = effect.getValue() != null
+                ? Math.max(1, (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx)))
+                : effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
         // "for each 1 skill point restored, gain 1 stack of [彩焰]" (cone 23021): the marks follow the EVENT's own amount, not the
         // number of times the event fired -- `Battle.gainSkillPoint(2)` raises one event carrying 2, and "each 1" means two
         // marks. `scale: event_amount` + `percent: 1` is the same "share of a live quantity" shape HEAL/SHIELD already use.
@@ -744,7 +756,9 @@ final class TriggerEffects {
         com.laosun.aluminium.enums.DebuffClass kind = effect.getKind() == null || effect.getKind().isBlank()
                 ? null
                 : com.laosun.aluminium.enums.DebuffClass.fromString(effect.getKind().trim());
-        int amount = effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
+        int amount = effect.getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
+                : effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (kind == null) {
                 target.getBuffManager().removeDebuffs(amount);
@@ -772,7 +786,9 @@ final class TriggerEffects {
      * @param ctx    the context
      */
     static void removeStacks(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        int amount = (int) Math.round(effect.getAmount());
+        int amount = effect.getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
+                : (int) Math.round(effect.getAmount());
         boolean byName = effect.getBuff() != null && !effect.getBuff().isBlank();
         AttributeType attribute = byName ? null : AttributeType.fromString(effect.getAttribute());
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
@@ -809,7 +825,9 @@ final class TriggerEffects {
      * them apart is also what lets each one be validated and tested on its own.
      */
     static void removeBuffs(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        int amount = (int) Math.round(effect.getAmount());
+        int amount = effect.getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
+                : (int) Math.round(effect.getAmount());
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (target != null) {
                 target.getBuffManager().removeBuffs(amount);
@@ -917,7 +935,7 @@ final class TriggerEffects {
         if (source == null || source.getStance() <= 0) {
             return;                                   // nothing to convert: an instance that reduces no toughness
         }
-        double converted = source.getStance() * effect.getPercent();
+        double converted = source.getStance() * TriggerMagnitudes.shareOf(effect, ctx);
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
                 continue;
@@ -942,7 +960,7 @@ final class TriggerEffects {
                 continue;
             }
             AbstractBuff boost = TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
-                    new com.laosun.aluminium.buff.ToughnessBoostBuff(effect.getPercent(), effect.getTurns()),
+                    new com.laosun.aluminium.buff.ToughnessBoostBuff(TriggerMagnitudes.shareOf(effect, ctx), effect.getTurns()),
                     effect), ctx);
             target.getBuffManager().addBuff(boost);
         }

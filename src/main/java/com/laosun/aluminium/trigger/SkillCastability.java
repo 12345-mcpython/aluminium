@@ -44,6 +44,18 @@ public final class SkillCastability {
         if (battle != null && !battle.singleUseLeft(skill)) {
             return false;
         }
+        // 「无法施放战技 / 终结技」: a state on the caster bans the slot. Reader: 1315 Boothill's
+        // 【绝命对峙】 ("cannot cast Skill while in it").
+        if (caster != null && caster.getBuffManager() != null) {
+            String banned = switch (skill.getSkillSlot()) {
+                case 2 -> "skill";
+                case 3 -> "ultimate";
+                default -> null;
+            };
+            if (banned != null && caster.getBuffManager().suppresses(banned)) {
+                return false;
+            }
+        }
         List<TriggerTable.Condition> conditions = conditionsOf(skill);
         if (conditions.isEmpty()) {
             return true;

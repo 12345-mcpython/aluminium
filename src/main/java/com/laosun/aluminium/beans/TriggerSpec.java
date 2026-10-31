@@ -1,5 +1,6 @@
 package com.laosun.aluminium.beans;
 
+import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
 import com.laosun.aluminium.trigger.TriggerTable;
 import lombok.Getter;
@@ -43,19 +44,18 @@ public class TriggerSpec {
     private java.util.List<String> onAny;
 
     /**
-     * Conditions that must all hold, in the small DSL understood by
-     * {@link TriggerTable}. An empty or absent list means
-     * "always".
+     * Conditions that must all hold. Each entry is either <b>a string in the small DSL</b> understood by
+     * {@link TriggerTable} ({@code "actor == self"}) or <b>a structured predicate object</b>
+     * ({@code {"type": "entity", ...}}) - both compile to the same {@code Condition} and are executed by the same
+     * reader. An empty or absent list means "always".
+     *
+     * <p><b>Why mixed.</b> The DSL is the shortest spelling of the common "subject predicate value" clause, and the
+     * predicate objects add the OR / nesting / named reuse the flat list cannot state. Keeping them in ONE array
+     * means a rule has one list of conditions in file order; the legacy {@code when_predicates} key is no longer
+     * accepted (the shipped content was migrated on 2026-10-31).
      */
     @SerializedName("when")
-    private List<String> when;
-
-    /**
-     * Structured conditions ANDed with {@link #when}: {@code all_of} / {@code any_of} / {@code not} / {@code condition}
-     * / {@code ref}. The OR and the nesting that {@code when} cannot state. See {@code Predicates}.
-     */
-    @SerializedName("when_predicates")
-    private List<com.laosun.aluminium.beans.PredicateSpec> whenPredicates;
+    private List<com.google.gson.JsonElement> when;
 
     /**
      * An optional <b>name for this rule</b>, so that another rule can raise one of its numbers
@@ -323,19 +323,13 @@ public class TriggerSpec {
     private Boolean deferUntilWave;
 
     /**
-     * Where the rule came from (trace id, talent name, character-doc reference).
+     * Where the rule came from: the document's sentence, a parameter row, or both.
      *
-     * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing
-     * test -- can trace a number back to its source document. The project's rule is that every
-     * effect states its origin.
+     * <p>It may be written as the legacy string, or as an object with {@code text} (required) plus {@code skill},
+     * {@code row} and {@code params} for readers. The engine keeps only {@link SourceTextAdapter}'s text: load failures
+     * quote it, and no engine path reads the structured half.
      */
     @SerializedName("source")
+    @JsonAdapter(SourceTextAdapter.class)
     private String source;
-
-    /**
-     * Free-form note, typically "why this number" or a {@code TODO data} marker when a value is a
-     * placeholder rather than a measured one.
-     */
-    @SerializedName("note")
-    private String note;
 }

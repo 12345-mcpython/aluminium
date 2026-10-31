@@ -51,6 +51,13 @@ public enum SkillType {
      */
     TECHNIQUE,
     /**
+     * Enhanced basic attack (data slot 8), e.g. 1415's 「向着爱与明天♪」.
+     *
+     * <p>It is a form the character enters, not a permanent intrinsic skill; the data's attack type is
+     * {@code Normal}, so this is a separate slot rather than {@link #COMMON}.
+     */
+    ENHANCED_BASIC,
+    /**
      * Active skill of a summoned entity.
      */
     SUMMON_SKILL,

@@ -47,6 +47,7 @@ public enum TriggerOperator {
     CONSUME_HP(true),
     DAMAGE(true),
     DELEGATE_DAMAGE(true),
+    DELAY(true),
     DISMISS_SUMMON(true),
     DISPEL(true),
     EXTEND_BUFF(true),

@@ -285,6 +285,23 @@ public class BuffManager {
     }
 
     /**
+     * Spend one charge of a {@link DebuffShieldBuff}, if one is up.
+     *
+     * <p>Asked by {@code DebuffService} <b>before</b> the chance roll: "resist 1 application" is not a
+     * probability, so a shield that is up refuses the application outright.
+     *
+     * @return {@code true} when a charge was spent and the incoming debuff must be refused
+     */
+    public boolean consumeDebuffShield() {
+        for (DebuffShieldBuff shield : allBuffsOf(DebuffShieldBuff.class)) {
+            if (shield.consume()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Adds turns to every <b>timed</b> buff on this unit that {@code source} applied <b>and that the rule named</b>,
      * and reports how many.
      *

@@ -641,15 +641,23 @@ public class TriggerTable {
     private static List<CompiledRule> compile(TriggerSpec spec, TriggerEvent event, int index) {
         List<Condition> conditions = new ArrayList<>();
         if (spec.getWhen() != null) {
-            for (String raw : spec.getWhen()) {
-                conditions.add(TriggerConditionParser.parseCondition(raw, spec));
-            }
-        }
-        // Structured predicates (`when_predicates`), ANDed with the flat list above: they add the OR and the nesting
-        // that a `when` list cannot state, and they may name a predicate declared in game/predicates.json.
-        if (spec.getWhenPredicates() != null) {
-            for (com.laosun.aluminium.beans.PredicateSpec predicate : spec.getWhenPredicates()) {
-                conditions.add(Predicates.compile(predicate, spec, com.laosun.aluminium.Constant.PREDICATES));
+            for (com.google.gson.JsonElement raw : spec.getWhen()) {
+                if (raw == null || raw.isJsonNull()) {
+                    throw new IllegalArgumentException(
+                            "A \"when\" entry is null; write a condition string or a predicate object "
+                                    + "(source: " + spec.getSource() + ")");
+                }
+                if (raw.isJsonPrimitive() && raw.getAsJsonPrimitive().isString()) {
+                    conditions.add(TriggerConditionParser.parseCondition(raw.getAsString(), spec));
+                } else if (raw.isJsonObject()) {
+                    // One array, two forms: the object form is a predicate and goes through the same compiler and the
+                    // same closed vocabulary (see Predicates).
+                    conditions.add(Predicates.compile(raw, spec, Constant.PREDICATES));
+                } else {
+                    throw new IllegalArgumentException(
+                            "A \"when\" entry must be a condition string or a predicate object, got " + raw
+                                    + " (source: " + spec.getSource() + ")");
+                }
             }
         }
         List<EffectSpec> effects = spec.getDoEffects() == null ? List.of() : spec.getDoEffects();
