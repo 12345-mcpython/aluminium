@@ -39,14 +39,15 @@ public class MutualDemiseTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
+        double base = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
         int guard = 0;
         while (fraction > 0 && unit.getCurrentHp() / unit.getMaxHp() >= fraction && guard++ < 80) {
             battle.applyDamage(unit, new Damage(enemy, unit, DamageElement.PHYSICAL, DamageType.NORMAL,
                     unit.getMaxHp() * 0.15));
         }
-        double before = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
-        battle.setCurrentMove(new Signal(unit));
-        battle.beforeMove();
-        return unit.getAttribute(AttributeType.CRIT_CHANCE).get() - before;
+        // 2026-10-31: the clause is a CONTINUOUS condition and the rule now listens on HP_LOST too, so the reading is taken
+        // right after the hit that crosses the threshold - which is the turn it matters. The old version measured the delta ACROSS
+        // her turn start, which is where the bonus used to appear late.
+        return unit.getAttribute(AttributeType.CRIT_CHANCE).get() - base;
     }
 }
