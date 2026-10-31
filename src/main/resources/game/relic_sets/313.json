@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "relic_set": 313,
   "2": [
     {
       "on": "KILL",
@@ -14,7 +16,7 @@
         }
       ],
       "source": "遗器 313 无主荒星茨冈尼亚 2 件套: 「当敌方目标被消灭时，暴击伤害提高#1%，最多叠加#2层」",
-      "note": "「敌方目标被消灭时，装备者暴击伤害 +4%，**最多 10 层**」—— `KILL` ＋ `MODIFY_ATTR CRIT_ATTACK{max_stacks: 10}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `sigonia_crit_rate`** ✗ —— 「暴击率提高 4%」**是两件套的** `properties` （`CriticalChanceBase 0.04` ✓）⇒ 再写一条会读成两倍 ✗。"
+      "_note": "「敌方目标被消灭时，装备者暴击伤害 +4%，**最多 10 层**」—— `KILL` ＋ `MODIFY_ATTR CRIT_ATTACK{max_stacks: 10}` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `sigonia_crit_rate`** ✗ —— 「暴击率提高 4%」**是两件套的** `properties` （`CriticalChanceBase 0.04` ✓）⇒ 再写一条会读成两倍 ✗。"
     }
   ]
 }

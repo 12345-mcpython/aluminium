@@ -1,4 +1,8 @@
 {
+  "_status": "partial",
+  "_gaps": [
+    "见 CONTENT-STATUS.md 的逐角色登记"
+  ],
   "resources": [
     {
       "id": "充能",
@@ -12,38 +16,90 @@
     {
       "on": "ALLY_ATTACK",
       "id": "talent_reaction_to_bait",
-      "when": ["actor is_other_ally", "target has_state 饲饵"],
+      "when": [
+        "actor is_other_ally",
+        "target has_state 饲饵"
+      ],
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 8 },
-        { "op": "SPEND_RESOURCE", "resource": "充能", "amount": 1 },
-        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 2.0, "element": "Thunder", "target": "target" },
-        { "op": "ADD_STACK", "buff": "婪酣", "amount": 1, "max_stacks": 12, "permanent": true, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 8
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 2.0,
+          "element": "Thunder",
+          "target": "target"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "婪酣",
+          "amount": 1,
+          "max_stacks": 12,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1504 不死途 天赋 宿怨，切齿奉还 (150404, Enhance/FollowUp): 「不死途初始拥有2点充能，最多拥有3点充能。【饲饵】受到我方其他目标攻击后，不死途固定恢复8点能量，随后消耗1点充能对【饲饵】发动追加攻击，造成等同于不死途200%攻击力的雷属性伤害，随后获得2层【婪酣】，最多叠加12层。」",
-      "note": "「【饲饵】受到**我方其他目标**攻击后，不死途**固定恢复 8 点能量**，随后**消耗 1 点充能**对【饲饵】发动**追加攻击**，造成等同于不死途 **200% 攻击力**的雷属性伤害，随后获得 **2 层【婪酣】**，最多叠加 **12 层**」—— ① 事件 `ALLY_ATTACK` ✓（每次施放只发一次 ✓）+ 两条条件都承重 ✓：`actor is_other_ally` ✓（\"**其他**目标\" ✓ —— 她自己打不算 ✓）与 `target has_state 饲饵` ✓（**被打的必须是饲饵** ✓）；② 回能 `GAIN_ENERGY 8` ✓；③ 充能 `SPEND_RESOURCE 充能 amount: 1` ✓；④ 追加伤害用**字面倍率** ✓（第 186 轮 ✓）+ `self_attr:ATTACK` ✓（读结算后属性 ✓）；⑤ 层数 `ADD_STACK` + **`max_stacks: 12`** ✓。⚠ **登记**：① 「消耗 1 点充能」的**前置条件**（有充能才消耗/才触发 ✗）—— 引擎的 `SPEND_RESOURCE` 会**钳位** ✓，所以本条的**触发本身不依赖**是否有充能 ✗（文档读起来是依赖的 ✓）⇒ 差异写在注释里、不藏起来 ✓；② 文档「获得 **2 层**」与 `amount: 1` 的差别 ✗ —— ⚠ `ADD_STACK` 的 `amount` **不是层数** ✓（第 172 轮已登记 ✓：**一次触发就是一层** ✓）⇒ 本条的 2 层被写成**一层** ✗ ⇒ **不一致已登记** ✓（若要真写 2 层需要\"每触发加两层\"的写法 ✗）。"
+      "_note": "「【饲饵】受到**我方其他目标**攻击后，不死途**固定恢复 8 点能量**，随后**消耗 1 点充能**对【饲饵】发动**追加攻击**，造成等同于不死途 **200% 攻击力**的雷属性伤害，随后获得 **2 层【婪酣】**，最多叠加 **12 层**」—— ① 事件 `ALLY_ATTACK` ✓（每次施放只发一次 ✓）+ 两条条件都承重 ✓：`actor is_other_ally` ✓（\"**其他**目标\" ✓ —— 她自己打不算 ✓）与 `target has_state 饲饵` ✓（**被打的必须是饲饵** ✓）；② 回能 `GAIN_ENERGY 8` ✓；③ 充能 `SPEND_RESOURCE 充能 amount: 1` ✓；④ 追加伤害用**字面倍率** ✓（第 186 轮 ✓）+ `self_attr:ATTACK` ✓（读结算后属性 ✓）；⑤ 层数 `ADD_STACK` + **`max_stacks: 12`** ✓。⚠ **登记**：① 「消耗 1 点充能」的**前置条件**（有充能才消耗/才触发 ✗）—— 引擎的 `SPEND_RESOURCE` 会**钳位** ✓，所以本条的**触发本身不依赖**是否有充能 ✗（文档读起来是依赖的 ✓）⇒ 差异写在注释里、不藏起来 ✓；② 文档「获得 **2 层**」与 `amount: 1` 的差别 ✗ —— ⚠ `ADD_STACK` 的 `amount` **不是层数** ✓（第 172 轮已登记 ✓：**一次触发就是一层** ✓）⇒ 本条的 2 层被写成**一层** ✗ ⇒ **不一致已登记** ✓（若要真写 2 层需要\"每触发加两层\"的写法 ✗）。"
     },
     {
       "on": "BATTLE_START",
       "id": "technique_opening_aoe",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "do": [
-        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 1.0, "element": "Thunder", "target": "all_enemies" },
-        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 1 }
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.0,
+          "element": "Thunder",
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
       ],
       "source": "1504 不死途 秘技 吃吧，可憎的手 (150407, Maze/MazeAttack): 「…若主动攻击陷入晕眩状态的敌人，进入战斗时，对敌方全体造成等同于不死途攻击力100%的雷属性伤害，且不死途获得1点充能。」",
-      "note": "「进入战斗时，对敌方全体造成等同于不死途攻击力 **100%** 的雷属性伤害，且不死途获得 **1 点充能**」—— 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；伤害**字面倍率** ✓；充能 `GAIN_RESOURCE 1` ✓（有声明 ✓ ⇒ 不是静默空操作 ✓）。"
+      "_note": "「进入战斗时，对敌方全体造成等同于不死途攻击力 **100%** 的雷属性伤害，且不死途获得 **1 点充能**」—— 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；伤害**字面倍率** ✓；充能 `GAIN_RESOURCE 1` ✓（有声明 ✓ ⇒ 不是静默空操作 ✓）。"
     },
     {
       "on": "SKILL_CAST",
       "id": "skill_marks_the_bait",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "饲饵", "target": "all_enemies" },
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.4, "permanent": true, "buff": "饲饵", "target": "all_enemies" },
-        { "op": "APPLY_BUFF", "buff": "饲饵", "permanent": true, "target": "target" }
+        {
+          "op": "REMOVE_STATE",
+          "buff": "饲饵",
+          "target": "all_enemies"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.4,
+          "permanent": true,
+          "buff": "饲饵",
+          "target": "all_enemies"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "饲饵",
+          "permanent": true,
+          "target": "target"
+        }
       ],
       "source": "1504 不死途 战技 鞭哨，逐尽恶兽 (150402, BPSkill/SingleAttack): 「使指定敌方单体成为【饲饵】，对其造成等同于不死途200%攻击力的雷属性伤害。…【饲饵】状态仅对最新被施加的目标生效。」",
-      "note": "「使**指定敌方单体**成为【饲饵】」—— `APPLY_BUFF` + **`permanent: true`** ✓：文档**没有给时长** ✗，而「【饲饵】状态**仅对最新被施加的目标生效**」✓ 说明它是\"**直到被替换**\" ✓ ⇒ `permanent` 是文档自己说的语义 ✓，不是偷懒的默认值 ✓。⚠ **登记**：① 「场上**存在**【饲饵】**时**，敌方全体**防御力降低 40%**」✗ —— 这是**场条件**（\"存在\"是持续判断 ✓），而引擎的修饰是**施加那一瞬间**算好就固定下来 ✗ ⇒ 写成\"施加时给全体 -40% 防御\"会在**饲饵被替换/死亡后仍留着** ✗（没有症状的错误 ✗）；② 「场上不存在【饲饵】时，不死途**立即使当前场上生命值最低的敌方单体**成为【饲饵】」✗（\"不存在\"的持续判断 ✗ + `lowest_hp` 选择器 ✓ 有，但\"立即\"需要一个观察点 ✗）；③ 战技「若该目标**为【饲饵】**，则额外造成 100% 攻击力雷伤，并**恢复 1 点战技点**」✗（\"already the bait\"这个条件 ✗ —— ⭐ 其实 `target has_state 饲饵` 可写 ✓，但**它必须在\"施加之前\"判断** ✗，而本条规则会在**施加之后**求值 ✗ ⇒ 次序不可表达 ✗）；④ 「【饲饵】**仅对最新**被施加的目标生效」✗（\"只保留最新一个\"的不变量 ✗，与 1414/1112 登记过的是同一件事 ✓）。\n\n⭐ 2026-09-30 转正：「【饲饵】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 饲饵 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。\n\n⭐ 2026-09-30 转正 ✓：「【饲饼】存在时，敌方全体目标防御力降低 40%」—— ⚠ 不需要新能力 ✓：给那个修饰器**同名** \buff: 饲饼，而本条已有的 REMOVE_STATE 饲饼 会**同时摘掉它** ✓（⚠ “名字相同”就是这里的机制 —— 与族一“仅保留最新”同一招 ✓），于是“存在时”的语义成立。"
+      "_note": "「使**指定敌方单体**成为【饲饵】」—— `APPLY_BUFF` + **`permanent: true`** ✓：文档**没有给时长** ✗，而「【饲饵】状态**仅对最新被施加的目标生效**」✓ 说明它是\"**直到被替换**\" ✓ ⇒ `permanent` 是文档自己说的语义 ✓，不是偷懒的默认值 ✓。⚠ **登记**：① 「场上**存在**【饲饵】**时**，敌方全体**防御力降低 40%**」✗ —— 这是**场条件**（\"存在\"是持续判断 ✓），而引擎的修饰是**施加那一瞬间**算好就固定下来 ✗ ⇒ 写成\"施加时给全体 -40% 防御\"会在**饲饵被替换/死亡后仍留着** ✗（没有症状的错误 ✗）；② 「场上不存在【饲饵】时，不死途**立即使当前场上生命值最低的敌方单体**成为【饲饵】」✗（\"不存在\"的持续判断 ✗ + `lowest_hp` 选择器 ✓ 有，但\"立即\"需要一个观察点 ✗）；③ 战技「若该目标**为【饲饵】**，则额外造成 100% 攻击力雷伤，并**恢复 1 点战技点**」✗（\"already the bait\"这个条件 ✗ —— ⭐ 其实 `target has_state 饲饵` 可写 ✓，但**它必须在\"施加之前\"判断** ✗，而本条规则会在**施加之后**求值 ✗ ⇒ 次序不可表达 ✗）；④ 「【饲饵】**仅对最新**被施加的目标生效」✗（\"只保留最新一个\"的不变量 ✗，与 1414/1112 登记过的是同一件事 ✓）。\n\n⭐ 2026-09-30 转正：「【饲饵】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 饲饵 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。\n\n⭐ 2026-09-30 转正 ✓：「【饲饼】存在时，敌方全体目标防御力降低 40%」—— ⚠ 不需要新能力 ✓：给那个修饰器**同名** \buff: 饲饼，而本条已有的 REMOVE_STATE 饲饼 会**同时摘掉它** ✓（⚠ “名字相同”就是这里的机制 —— 与族一“仅保留最新”同一招 ✓），于是“存在时”的语义成立。"
     },
     {
       "on": "BATTLE_START",
@@ -51,32 +107,59 @@
       "when": [],
       "min_eidolon": 1,
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.24, "permanent": true, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "all_enemies"
+        }
       ],
       "source": "1504 不死途 星魂 1 小心，满月不可外出: 「不死途在场时，敌方全体受到的伤害提高24%。…」",
-      "note": "「不死途**在场时**，敌方全体受到的伤害**提高 24%**」—— `MODIFY_DAMAGE_TAKEN` + `all_enemies` ✓ + `permanent: true` ✓（\"在场时\"= 不撤下 ✓，她倒下时规则的主人已不在场 ✓）。`min_eidolon: 1` ✓（星魂 1 的从句 ✓）。⚠ **登记**：同一条星魂的后半「当敌方目标**当前生命值百分比小于等于 50%** 时，其受到的伤害**提高至 36%**」✗ —— 修饰是**一次性算好**的 ✗，无法\"随目标当前血量分档\" ✗（若写成两条规则也会**同时生效**、变成 60% ✗ ⇒ **只写 24% 这一半** ✓）。"
+      "_note": "「不死途**在场时**，敌方全体受到的伤害**提高 24%**」—— `MODIFY_DAMAGE_TAKEN` + `all_enemies` ✓ + `permanent: true` ✓（\"在场时\"= 不撤下 ✓，她倒下时规则的主人已不在场 ✓）。`min_eidolon: 1` ✓（星魂 1 的从句 ✓）。⚠ **登记**：同一条星魂的后半「当敌方目标**当前生命值百分比小于等于 50%** 时，其受到的伤害**提高至 36%**」✗ —— 修饰是**一次性算好**的 ✗，无法\"随目标当前血量分档\" ✗（若写成两条规则也会**同时生效**、变成 60% ✗ ⇒ **只写 24% 这一半** ✓）。"
     },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
       ],
       "source": "1504 不死途 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 200%/100%、终结技 400%、天赋 200%）",
-      "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **终结技** ✗ —— 「使指定敌方单体成为【饲饵】，对其造成 400% 攻击力雷伤，随后**立即对【饲饵】发动 1 次获得强化的天赋追加攻击**，且获得 **3 点充能**。强化天赋追加攻击**不消耗充能**，拥有【婪酣】时，**每消耗 4 层**【婪酣】**可额外造成 1 次** 200% 攻击力雷伤，且本次追加攻击过程中**对目标造成致命攻击时，会继续对新的【饲饵】造成伤害**，直至【婪酣】**小于 4 层**。若当前场上的**所有敌方目标都受到致命攻击**后强化天赋追加攻击会立即结束」✗ —— **立即施放一次技能** ✗ + **按层数阈值消耗并追加** ✗ + **击杀后改打新目标** ✗ + **按全场死亡状态结束** ✗（四样都缺 ✓）；② **星魂 2**「【婪酣】叠加上限提高至 **18 层**，每当不死途发动强化天赋追加攻击后，**返还**所移除【婪酣】层数的 **35%**」✗（**改写另一个规则的上限** ✗ + 返还 ✗）；③ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **终结技** ✗ —— 「使指定敌方单体成为【饲饵】，对其造成 400% 攻击力雷伤，随后**立即对【饲饵】发动 1 次获得强化的天赋追加攻击**，且获得 **3 点充能**。强化天赋追加攻击**不消耗充能**，拥有【婪酣】时，**每消耗 4 层**【婪酣】**可额外造成 1 次** 200% 攻击力雷伤，且本次追加攻击过程中**对目标造成致命攻击时，会继续对新的【饲饵】造成伤害**，直至【婪酣】**小于 4 层**。若当前场上的**所有敌方目标都受到致命攻击**后强化天赋追加攻击会立即结束」✗ —— **立即施放一次技能** ✗ + **按层数阈值消耗并追加** ✗ + **击杀后改打新目标** ✗ + **按全场死亡状态结束** ✗（四样都缺 ✓）；② **星魂 2**「【婪酣】叠加上限提高至 **18 层**，每当不死途发动强化天赋追加攻击后，**返还**所移除【婪酣】层数的 **35%**」✗（**改写另一个规则的上限** ✗ + 返还 ✗）；③ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓。"
     },
     {
       "on": "BATTLE_START",
       "id": "trace_party_crit_damage_aura",
       "when": null,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.4, "permanent": true, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "all_allies"
+        }
       ],
       "source": "1504 不死途 行迹「头狼」(1504103): 「不死途在场时，我方目标造成的暴击伤害提高 40%」",
-      "note": "⭐ **\"我方全体\"不需要新能力** ✓：`fireTriggers` 本就遍历全队 ✓（`Battle:2136` ✓），而**修饰类**效果直接挂到 `all_allies` ✓ 即可 ✓；⭐「**在场**」由 `Battle:2137` 的 `isDead()` 跳过天然保证 ✓（本人阵亡则该规则不再被问 ✓）。⭐ 数值 **40%** 取自数据行 ✓（`1504103 param=[0.4, 0.8]` 的 `#1[i]` ✓）。"
+      "_note": "⭐ **\"我方全体\"不需要新能力** ✓：`fireTriggers` 本就遍历全队 ✓（`Battle:2136` ✓），而**修饰类**效果直接挂到 `all_allies` ✓ 即可 ✓；⭐「**在场**」由 `Battle:2137` 的 `isDead()` 跳过天然保证 ✓（本人阵亡则该规则不再被问 ✓）。⭐ 数值 **40%** 取自数据行 ✓（`1504103 param=[0.4, 0.8]` 的 `#1[i]` ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -93,8 +176,10 @@
       ],
       "source": "1504 不死途 行迹「头狼」(1504103): 「我方目标追加攻击造成的暴击伤害额外提高 80%」",
       "id": "trace_followup_crit_damage_extra_self",
-      "when": ["actor == self"],
-      "note": "⭐⭐ 「我方目标」拆成**两条互相排斥**的规则 ✓：`actor == self`（自己 ✓）—— ⚠ 这里**不用** `actor is_ally` ✗：它虽然语义正确（javadoc 说\"含自己\" ✓），但**在 `matching` 里读不到** ✗（队伍谓词需要的东西 `TriggerContext` 似乎没有 ✓），而 `actor == self` 与 `actor is_other_ally` 都已被实测可用 ✓ （后者见 1223 的同族写法 ✓）。两条合起来**正好**是\"我方目标\" ✓，并且**天然排除敌方** ✓。⭐ 数值 **80%** 取自同一数据行 `1504103 param=[0.4, 0.8]` 的 `#2[i]` ✓；⚠ 存活期仅为过校验 ✓。"
+      "when": [
+        "actor == self"
+      ],
+      "_note": "⭐⭐ 「我方目标」拆成**两条互相排斥**的规则 ✓：`actor == self`（自己 ✓）—— ⚠ 这里**不用** `actor is_ally` ✗：它虽然语义正确（javadoc 说\"含自己\" ✓），但**在 `matching` 里读不到** ✗（队伍谓词需要的东西 `TriggerContext` 似乎没有 ✓），而 `actor == self` 与 `actor is_other_ally` 都已被实测可用 ✓ （后者见 1223 的同族写法 ✓）。两条合起来**正好**是\"我方目标\" ✓，并且**天然排除敌方** ✓。⭐ 数值 **80%** 取自同一数据行 `1504103 param=[0.4, 0.8]` 的 `#2[i]` ✓；⚠ 存活期仅为过校验 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -111,17 +196,25 @@
       ],
       "source": "1504 不死途 行迹「头狼」(1504103): 「我方目标追加攻击造成的暴击伤害额外提高 80%」",
       "id": "trace_followup_crit_damage_extra_other_ally",
-      "when": ["actor is_other_ally"],
-      "note": "⭐⭐ 「我方目标」拆成**两条互相排斥**的规则 ✓：`actor == self`（队友 ✓）—— ⚠ 这里**不用** `actor is_ally` ✗：它虽然语义正确（javadoc 说\"含自己\" ✓），但**在 `matching` 里读不到** ✗（队伍谓词需要的东西 `TriggerContext` 似乎没有 ✓），而 `actor == self` 与 `actor is_other_ally` 都已被实测可用 ✓ （后者见 1223 的同族写法 ✓）。两条合起来**正好**是\"我方目标\" ✓，并且**天然排除敌方** ✓。⭐ 数值 **80%** 取自同一数据行 `1504103 param=[0.4, 0.8]` 的 `#2[i]` ✓；⚠ 存活期仅为过校验 ✓。"
+      "when": [
+        "actor is_other_ally"
+      ],
+      "_note": "⭐⭐ 「我方目标」拆成**两条互相排斥**的规则 ✓：`actor == self`（队友 ✓）—— ⚠ 这里**不用** `actor is_ally` ✗：它虽然语义正确（javadoc 说\"含自己\" ✓），但**在 `matching` 里读不到** ✗（队伍谓词需要的东西 `TriggerContext` 似乎没有 ✓），而 `actor == self` 与 `actor is_other_ally` 都已被实测可用 ✓ （后者见 1223 的同族写法 ✓）。两条合起来**正好**是\"我方目标\" ✓，并且**天然排除敌方** ✓。⭐ 数值 **80%** 取自同一数据行 `1504103 param=[0.4, 0.8]` 的 `#2[i]` ✓；⚠ 存活期仅为过校验 ✓。"
     },
     {
       "on": "ULT_CAST",
       "id": "ults_immediate_talent",
-      "when": ["actor == self"],
-      "do": [
-        { "op": "CAST_SKILL", "skill": "TALENT", "target": "target" }
+      "when": [
+        "actor == self"
       ],
-      "note": "⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `TALENT` ✓ —— ⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；⚠ 它不经过战技点消耗 ✓。"
+      "do": [
+        {
+          "op": "CAST_SKILL",
+          "skill": "TALENT",
+          "target": "target"
+        }
+      ],
+      "_note": "⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `TALENT` ✓ —— ⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；⚠ 它不经过战技点消耗 ✓。"
     }
   ]
 }

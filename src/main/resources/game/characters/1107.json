@@ -1,53 +1,92 @@
-[
-  {
-    "on": "HP_LOST",
-    "when": ["target == self"],
-    "do": [
-      { "op": "DAMAGE", "skill": "TALENT", "damage_param": 1, "as_attack": false, "target": "attacker" }
-    ],
-    "source": "1107 克拉拉 talent 因为我们是家人 (Svarog's counter)",
-    "note": "Doc: 「攻击克拉拉的敌方目标会被史瓦罗标上【反击标记】，并遭到史瓦罗的反击，对其造成等同于克拉拉160%攻击力的物理属性伤害。」 The talent data carries the attack itself (单体攻击 / Physical / 削韧 30, params [1, 0.8, 0.1] -> [1, 2, 0.1]); the multiplier sits at index 1 (NOT 0 like basic attacks). 160% is the level-10 value: params[1][9] = 1.6, verified. Because the engine reads the row for the skill's own level, a level-1 talent correctly yields 80%. 'target == self' means 'the HP loss happened to me'; the actor is the enemy that hit her, which the effect's target:'attacker' sends the counter back to."
-  },
-
-  {
-    "on": "TAKING_HIT",
-    "when": ["target == self"],
-    "chance": 0.35,
-    "do": [
-      { "op": "DISPEL", "amount": 1 }
-    ],
-    "source": "1107 克拉拉 trace 家人: 「受到攻击时有35%的固定概率解除自身1个负面效果。」 param = [0.35]",
-    "note": "Three engine pieces have to exist together for this one sentence: an event that fires on every hit she takes (TAKING_HIT, which fires even when a shield ate the hit -- '受到攻击时' is not 'HP really dropped', so it must not be HP_LOST), a rule-level probability ('chance': 0.35 -- rolled against the battle's injected generator, and a failed roll costs nothing, not even a cooldown), and an op that removes a negative effect (DISPEL, which asks each buff class whether it is one). No 'target' on the effect: 自身 is the rule's owner, which is the default. ⚠ TAKING_HIT rather than HP_LOST is deliberate: a fully shielded hit still counts as 受到攻击, while HP_LOST would silently skip it."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "RESIST_DEBUFF", "kind": "control", "percent": 0.35, "permanent": true }
-    ],
-    "source": "1107 克拉拉 trace 守护 (1107102): 「抵抗控制类负面状态的概率提高35%。」",
-    "note": "「永久」 is the shape every 行迹 has: the trace is unconditional, so this is applied once at BATTLE_START and never ticked ('permanent': true means the duration is not even counted). ⚠ The document states the class itself -- 「控制类负面状态：冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身」 -- which is why the op names a CLASS and not twelve keys: a control written tomorrow is covered by this rule without an edit, and the engine never has to keep a list in sync with the game's patch notes. ⚠ No 'target': 自身 is the rule's owner. ⚠ This is the RESIST direction, not immunity -- 35% of the controls that would have landed do not, and the roll itself is in Battle.tryApplyDebuff (the op installs the number, it does not decide anything by itself)."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "technique_taunt_aggro",
-    "when": ["self has_state 秘技"],
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "AGGRO_ADDED_RATIO", "percent": 5, "turns": 2, "target": "self" }
-    ],
-    "source": "1107 克拉拉 秘技 胜利的小小代价 (110707, Maze/Attack): 「立即攻击敌人，进入战斗后克拉拉受到敌方攻击的概率提高，持续2回合。」参数（全部等级）Lv1 = [2, 5] ⇒ 2 = 持续回合（正文点名）、5 = 未被正文引用的参数（软仇恨比率）",
-    "note": "「立即攻击敌人，**进入战斗后**克拉拉**受到敌方攻击的概率提高**，持续 **2 回合**」—— 数值在**未被正文引用的那个参数**里 ✓：① 该秘技的参数表是 `[2, 5]` ✓，正文只点名「持续 **2** 回合」✓ ⇒ 剩下的 **5** 就是比率 ✓（与 1001 战技\"5 个参数、正文只用 4 个\"**同一条方法** ✓）；② 上游 `Config/ConfigAbility/Avatar/Avatar_Klara_00_Ability.json` 里 `MAvatar_Klara_00_MazeSkill_AggroUP` （`MazeSkill` = 秘技 ✓）的 `OnStack` 写属性 **`AggroAddedRatio`** ✓，挂载点由 **`ByIsMazeSkillAffectCurrentWave` + 「第一波」** 守卫 ✓ —— 正是\"**进入战斗后**\"这一句 ✓；③ 门槛用**已有**的 `self has_state 秘技` ✓（`Battle.markTechniqueUsed` 在 `startBattle()` 之前把\"用过秘技\"变成状态 ✓，1104 的秘技盾就是这个写法 ✓）；④ 时长 `turns: 2` 就是正文点名的 2 回合 ✓。⚠ `percent: 5` 是引擎单位下的比率（比率属性按分数写 ✓）⇒ 权重 **×(1+5) = ×6** ✓，持续 2 回合 ✓。⚠ **登记（一个反向案例：数据有、正文没有 ✗）**：她的**终结技** modifier `MAvatar_Klara_00_Ultra_WarriorMode` **也**写 `AggroAddedRatio` ✓（另有 `MAvatar_Klara_00_Rank06_Passive` 也写 ✓），但她文档的终结技正文**根本不提概率** ✗ ⇒ 不写进内容 ✓（否则就是给正文没有的效果编内容 ✗），只在此登记 ✓。⚠ 秘技的\"立即攻击敌人\"那一半由地图攻击结算 ✓，规则只写\"进入战斗后\"的那一半 ✓。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "eidolon2_attack_after_ult",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.3, "turns": 2, "target": "self" }
-    ],
-    "source": "1107 星魂 2 紧紧的拥抱: 「施放终结技后攻击力提高#1[i]%，持续2回合」（param = [0.3, 2]）",
-    "note": "「**施放终结技后**，**攻击力提高 #1%**，持续 **2 回合**」—— ① 触发 **`ULT_CAST`** ✓、作用域 **`self`** ✓、时长 **2 回合** ✓；② ⭐ **数值经数据核实** ✓：`data/eidolons.json` 的 **1107 → rank \"2\"** 行自带 `param = [0.3, 2]` ✓（不是从散文里抄 ✗）；③ ⚠ **攻击力是平值型** ✓ ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，基准取**规则生效后** ✓，第 133/270 轮 ✓）；④ ⚠ **星魂内容按\"已激活\"写成普通规则** ✓（先例：1013 的 `eidolon4_*` ✓、1222 的星魂 2 ✓）。"
-  }
-]
+{
+  "schema": 1,
+  "character": 1107,
+  "_status": "partial",
+  "_gaps": [
+    "星魂 1 / 3 / 4 / 5 / 6：未读、未写",
+    "终结技 / 星魂 6 的数据 modifier 也写 AggroAddedRatio，但正文未提，按约定不写（数据与正文差异）"
+  ],
+  "rules": [
+    {
+      "on": "HP_LOST",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "skill": "TALENT",
+          "damage_param": 1,
+          "as_attack": false,
+          "target": "attacker"
+        }
+      ],
+      "source": "1107 克拉拉 talent 因为我们是家人 (Svarog's counter)",
+      "_note": "Doc: 「攻击克拉拉的敌方目标会被史瓦罗标上【反击标记】，并遭到史瓦罗的反击，对其造成等同于克拉拉160%攻击力的物理属性伤害。」 The talent data carries the attack itself (单体攻击 / Physical / 削韧 30, params [1, 0.8, 0.1] -> [1, 2, 0.1]); the multiplier sits at index 1 (NOT 0 like basic attacks). 160% is the level-10 value: params[1][9] = 1.6, verified. Because the engine reads the row for the skill's own level, a level-1 talent correctly yields 80%. 'target == self' means 'the HP loss happened to me'; the actor is the enemy that hit her, which the effect's target:'attacker' sends the counter back to."
+    },
+    {
+      "on": "TAKING_HIT",
+      "when": [
+        "target == self"
+      ],
+      "chance": 0.35,
+      "do": [
+        {
+          "op": "DISPEL",
+          "amount": 1
+        }
+      ],
+      "source": "1107 克拉拉 trace 家人: 「受到攻击时有35%的固定概率解除自身1个负面效果。」 param = [0.35]",
+      "_note": "Three engine pieces have to exist together for this one sentence: an event that fires on every hit she takes (TAKING_HIT, which fires even when a shield ate the hit -- '受到攻击时' is not 'HP really dropped', so it must not be HP_LOST), a rule-level probability ('chance': 0.35 -- rolled against the battle's injected generator, and a failed roll costs nothing, not even a cooldown), and an op that removes a negative effect (DISPEL, which asks each buff class whether it is one). No 'target' on the effect: 自身 is the rule's owner, which is the default. ⚠ TAKING_HIT rather than HP_LOST is deliberate: a fully shielded hit still counts as 受到攻击, while HP_LOST would silently skip it."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RESIST_DEBUFF",
+          "kind": "control",
+          "percent": 0.35,
+          "permanent": true
+        }
+      ],
+      "source": "1107 克拉拉 trace 守护 (1107102): 「抵抗控制类负面状态的概率提高35%。」",
+      "_note": "「永久」 is the shape every 行迹 has: the trace is unconditional, so this is applied once at BATTLE_START and never ticked ('permanent': true means the duration is not even counted). ⚠ The document states the class itself -- 「控制类负面状态：冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身」 -- which is why the op names a CLASS and not twelve keys: a control written tomorrow is covered by this rule without an edit, and the engine never has to keep a list in sync with the game's patch notes. ⚠ No 'target': 自身 is the rule's owner. ⚠ This is the RESIST direction, not immunity -- 35% of the controls that would have landed do not, and the roll itself is in Battle.tryApplyDebuff (the op installs the number, it does not decide anything by itself)."
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_taunt_aggro",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "AGGRO_ADDED_RATIO",
+          "percent": 5,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1107 克拉拉 秘技 胜利的小小代价 (110707, Maze/Attack): 「立即攻击敌人，进入战斗后克拉拉受到敌方攻击的概率提高，持续2回合。」参数（全部等级）Lv1 = [2, 5] ⇒ 2 = 持续回合（正文点名）、5 = 未被正文引用的参数（软仇恨比率）",
+      "_note": "「立即攻击敌人，**进入战斗后**克拉拉**受到敌方攻击的概率提高**，持续 **2 回合**」—— 数值在**未被正文引用的那个参数**里 ✓：① 该秘技的参数表是 `[2, 5]` ✓，正文只点名「持续 **2** 回合」✓ ⇒ 剩下的 **5** 就是比率 ✓（与 1001 战技\"5 个参数、正文只用 4 个\"**同一条方法** ✓）；② 上游 `Config/ConfigAbility/Avatar/Avatar_Klara_00_Ability.json` 里 `MAvatar_Klara_00_MazeSkill_AggroUP` （`MazeSkill` = 秘技 ✓）的 `OnStack` 写属性 **`AggroAddedRatio`** ✓，挂载点由 **`ByIsMazeSkillAffectCurrentWave` + 「第一波」** 守卫 ✓ —— 正是\"**进入战斗后**\"这一句 ✓；③ 门槛用**已有**的 `self has_state 秘技` ✓（`Battle.markTechniqueUsed` 在 `startBattle()` 之前把\"用过秘技\"变成状态 ✓，1104 的秘技盾就是这个写法 ✓）；④ 时长 `turns: 2` 就是正文点名的 2 回合 ✓。⚠ `percent: 5` 是引擎单位下的比率（比率属性按分数写 ✓）⇒ 权重 **×(1+5) = ×6** ✓，持续 2 回合 ✓。⚠ **登记（一个反向案例：数据有、正文没有 ✗）**：她的**终结技** modifier `MAvatar_Klara_00_Ultra_WarriorMode` **也**写 `AggroAddedRatio` ✓（另有 `MAvatar_Klara_00_Rank06_Passive` 也写 ✓），但她文档的终结技正文**根本不提概率** ✗ ⇒ 不写进内容 ✓（否则就是给正文没有的效果编内容 ✗），只在此登记 ✓。⚠ 秘技的\"立即攻击敌人\"那一半由地图攻击结算 ✓，规则只写\"进入战斗后\"的那一半 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon2_attack_after_ult",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1107 星魂 2 紧紧的拥抱: 「施放终结技后攻击力提高#1[i]%，持续2回合」（param = [0.3, 2]）",
+      "_note": "「**施放终结技后**，**攻击力提高 #1%**，持续 **2 回合**」—— ① 触发 **`ULT_CAST`** ✓、作用域 **`self`** ✓、时长 **2 回合** ✓；② ⭐ **数值经数据核实** ✓：`data/eidolons.json` 的 **1107 → rank \"2\"** 行自带 `param = [0.3, 2]` ✓（不是从散文里抄 ✗）；③ ⚠ **攻击力是平值型** ✓ ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，基准取**规则生效后** ✓，第 133/270 轮 ✓）；④ ⚠ **星魂内容按\"已激活\"写成普通规则** ✓（先例：1013 的 `eidolon4_*` ✓、1222 的星魂 2 ✓）。"
+    }
+  ]
+}

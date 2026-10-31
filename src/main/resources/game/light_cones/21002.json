@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21002,
   "1": [
     {
       "on": "BATTLE_START",
@@ -7,7 +9,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_TYPE_RESISTANCE", "percent": 0.08, "permanent": true, "target": "all_allies" }
       ],
       "source": "光锥 21002: 「进入战斗后，使我方全体的**全属性抗性**提高#2[i]%。」",
-      "note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
+      "_note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
     }
   ],
   "2": [
@@ -18,7 +20,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_TYPE_RESISTANCE", "percent": 0.09, "permanent": true, "target": "all_allies" }
       ],
       "source": "光锥 21002: 「进入战斗后，使我方全体的**全属性抗性**提高#2[i]%。」",
-      "note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
+      "_note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
     }
   ],
   "3": [
@@ -29,7 +31,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_TYPE_RESISTANCE", "percent": 0.1, "permanent": true, "target": "all_allies" }
       ],
       "source": "光锥 21002: 「进入战斗后，使我方全体的**全属性抗性**提高#2[i]%。」",
-      "note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
+      "_note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
     }
   ],
   "4": [
@@ -40,7 +42,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_TYPE_RESISTANCE", "percent": 0.11, "permanent": true, "target": "all_allies" }
       ],
       "source": "光锥 21002: 「进入战斗后，使我方全体的**全属性抗性**提高#2[i]%。」",
-      "note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
+      "_note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
     }
   ],
   "5": [
@@ -51,7 +53,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_TYPE_RESISTANCE", "percent": 0.12, "permanent": true, "target": "all_allies" }
       ],
       "source": "光锥 21002: 「进入战斗后，使我方全体的**全属性抗性**提高#2[i]%。」",
-      "note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
+      "_note": "⭐ **新能力（读者：本卡 ✓）** ✓：**`ALL_TYPE_RESISTANCE`** ✓ —— 它是 `RESISTANCE_REDUCTION` 的**受击方孪生** ✓：后者写在攻击者身上、降低目标抗性 ✓，前者写在**被打的一方**身上、提高自身抗性 ✓ ⇒ 两者共用抗性区的同一次减法 ✓（`Battle` 抗性区 ✓）。⚠ 不折进穿透 ✓（负抗性要**完全有效** ✓，所以不能被那个 clamp 吃掉 ✓）。"
     }
   ]
 }

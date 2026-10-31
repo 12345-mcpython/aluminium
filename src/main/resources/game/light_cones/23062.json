@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23062,
   "1": [
     {
       "on": "BATTLE_START",
@@ -8,7 +10,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.24, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.24。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.24。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     },
     {
       "on": "ULT_CAST",
@@ -18,7 +20,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.24, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
+      "_note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
       "when": ["actor == self"]
     },
     {
@@ -29,7 +31,7 @@
         { "op": "BOOST_DAMAGE", "scale": "cast_energy_spent", "percent": 0.002, "cap_amount": 0.72 }
       ],
       "source": "光锥 23062 随心: 「使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。…」",
-      "note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 1 消耗 50 点 ⇒ ⚠ 10.0% ✓（⚠ 上限 72% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 1 消耗 50 点 ⇒ ⚠ 10.0% ✓（⚠ 上限 72% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     }
   ],
   "2": [
@@ -41,7 +43,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.3, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.3。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.3。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     },
     {
       "on": "ULT_CAST",
@@ -51,7 +53,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.3, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
+      "_note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
       "when": ["actor == self"]
     },
     {
@@ -62,7 +64,7 @@
         { "op": "BOOST_DAMAGE", "scale": "cast_energy_spent", "percent": 0.0025, "cap_amount": 0.9 }
       ],
       "source": "光锥 23062 随心: 「使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。…」",
-      "note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 2 消耗 50 点 ⇒ ⚠ 12.5% ✓（⚠ 上限 90% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 2 消耗 50 点 ⇒ ⚠ 12.5% ✓（⚠ 上限 90% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     }
   ],
   "3": [
@@ -74,7 +76,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.36, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.36。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.36。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     },
     {
       "on": "ULT_CAST",
@@ -84,7 +86,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.36, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
+      "_note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
       "when": ["actor == self"]
     },
     {
@@ -95,7 +97,7 @@
         { "op": "BOOST_DAMAGE", "scale": "cast_energy_spent", "percent": 0.003, "cap_amount": 1.08 }
       ],
       "source": "光锥 23062 随心: 「使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。…」",
-      "note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 3 消耗 50 点 ⇒ ⚠ 15.0% ✓（⚠ 上限 108% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 3 消耗 50 点 ⇒ ⚠ 15.0% ✓（⚠ 上限 108% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     }
   ],
   "4": [
@@ -107,7 +109,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.42, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.42。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.42。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     },
     {
       "on": "ULT_CAST",
@@ -117,7 +119,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.42, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
+      "_note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
       "when": ["actor == self"]
     },
     {
@@ -128,7 +130,7 @@
         { "op": "BOOST_DAMAGE", "scale": "cast_energy_spent", "percent": 0.0035, "cap_amount": 1.26 }
       ],
       "source": "光锥 23062 随心: 「使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。…」",
-      "note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 4 消耗 50 点 ⇒ ⚠ 17.5% ✓（⚠ 上限 126% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 4 消耗 50 点 ⇒ ⚠ 17.5% ✓（⚠ 上限 126% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     }
   ],
   "5": [
@@ -140,7 +142,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.48, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.48。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "「进入战斗或施放终结技时获得【王之娱乐】，持续 #4[i]=3 回合。持有【王之娱乐】时，我方全体暴击伤害提高 #5[i]%」—— ① 两个触发条件**拆成两条规则**（条件 DSL 没有 OR，与 1215/23047 同做法）；② 状态与加成同写一条规则、**同为 3 回合**（引擎没有\"随状态存续\"的写法，用同回合数等价表达）；③ 加成目标是 all_allies（我方全体）；数值 #5 = 0.48。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     },
     {
       "on": "ULT_CAST",
@@ -150,7 +152,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.48, "turns": 3, "target": "all_allies" }
       ],
       "source": "光锥 23062 随心: 使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。装备者进入战斗或施放终结技时，使装备者获得【王之娱乐】，持续#4[i]回合。当装备者持有【王之娱乐】时，我方全体暴击伤害提高#5[i]%，同类效果无法叠加。",
-      "note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
+      "_note": "「**进入战斗或施放终结技时**获得【王之娱乐】3 回合；持有期间**我方全体**暴击伤害 +24%」—— 两处触发（`BATTLE_START` / `ULT_CAST`）＋ `APPLY_BUFF{turns: 3}` ＋ `MODIFY_ATTR{target: all_allies, turns: 3}` ✓。",
       "when": ["actor == self"]
     },
     {
@@ -161,7 +163,7 @@
         { "op": "BOOST_DAMAGE", "scale": "cast_energy_spent", "percent": 0.004, "cap_amount": 1.44 }
       ],
       "source": "光锥 23062 随心: 「使装备者的攻击力提高#1[i]%，能量恢复效率提高#2[f1]%。装备者施放终结技时，每消耗1点能量值，使本次造成的终结技伤害提高#3[f2]%，最多提高#6[i]%。…」",
-      "note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 5 消耗 50 点 ⇒ ⚠ 20.0% ✓（⚠ 上限 144% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
+      "_note": "⭐ **第 4 句已出货** ✓（2026-09-30 ✓）：⚠ 「每消耗 1 点能量值…最多 #6%」✗ ⇒ ⚠ 三条现有词汇合起来 ✓：⚠ `scale: cast_energy_spent` ✗（⚠ 「每**消耗** 1 点」✓ —— ⚠ 本段新增的量纲 ✓，⚠ 值由 `ULT_CAST` 携带 ✓ ⇒ ⚠ `Damage.castEnergySpent` ✓ ⇒ ⚠ 结算时读 ✓）＋ ⚠ `from_skill ULTRA` ✗（⚠ 「本次**终结技**」✓ —— ⚠ 事件的第 7 个参数就是施放类别 ✓）＋ ⚠ `cap_amount` ✗（⚠ 「**最多** #6%」✓ —— ⚠ **绝对量** ✓，⚠ 不是 `cap_scale`／`cap_percent` 那套\"某属性的份额\"✗）。⚠ 而 ⚠ 它**必须挂 `DEALING_DAMAGE`** ✗：⚠ `BOOST_DAMAGE` 改的是**正在结算的那个实例** ✓，⚠ 装载器原话 *\"that is the event that hands over what it changes\"* ✓。⚠ 算式 ⚠ `percent × scale + amount` ✗ ⇒ ⚠ 阶 5 消耗 50 点 ⇒ ⚠ 20.0% ✓（⚠ 上限 144% ✓）。⚠ 数值取自 ⚠ `aluminium_texts\\llms-full.txt` ✗（⚠ 光锥**没有**单独文本文件 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23062_stat`** ✗ —— 「攻击力提高 #1%」与「能量恢复效率提高 #2%」**都是光锥自己的**属性（`attack_percent` / `energy_regeneration_rate` ✓）⇒ 重复会读成两倍 ✗。"
     }
   ]
 }

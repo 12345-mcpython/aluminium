@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21065,
   "1": [
     {
       "on": "CAST_SETUP",
@@ -16,7 +18,7 @@
         }
       ],
       "source": "光锥 21065: 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
     }
   ],
   "2": [
@@ -36,7 +38,7 @@
         }
       ],
       "source": "光锥 21065: 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
     }
   ],
   "3": [
@@ -56,7 +58,7 @@
         }
       ],
       "source": "光锥 21065: 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
     }
   ],
   "4": [
@@ -76,7 +78,7 @@
         }
       ],
       "source": "光锥 21065: 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
     }
   ],
   "5": [
@@ -96,7 +98,7 @@
         }
       ],
       "source": "光锥 21065: 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `crit_chance` ✓ ⇒ 那句**未重写** ✗。⭐ 「装备者施放欢愉技时，欢愉度提高#2[i]%，该效果最多叠加#3[i]次」⇒ `CAST_SETUP` + **`from_category ElationDamage`** ✓ + **`ADD_STACK`** ✓ + `MODIFY_ATTR ELATION_DAMAGE_BOOST per_stack` ✓。⭐⭐ **叠层的寿命：上游没有给** ✓ —— 这正是目标里“文档没给数值≠数据里没有”的反向用法 ✓：`Config/ConfigAbility/Equip/Equip40.json` 里 `Ability21065` 作用的 `MEquip_21065_Sub` 只有 `Stacking: ReplaceByCaster` ✓、`Layer/MaxLayer` ✓，**没有 `Duration` / `LifeTime`** ✗ ⇒ 该叠层**无期限 = 持续存在** ✓ ⇒ 写 `permanent: true` ✓。⚠ **一处配置与文案不一致（已登记 ✓）**：配置里 `Layer/MaxLayer = 5` ✗，而**正文与 param 说 2** ✓ ⇒ 我们按**正文/param** 写 2 ✓（与本项目一贯做法一致 ✓）。"
     }
   ]
 }

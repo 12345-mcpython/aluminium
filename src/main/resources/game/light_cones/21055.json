@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21055,
   "1": [
     {
       "on": "DEALING_DAMAGE",
@@ -15,7 +17,7 @@
         }
       ],
       "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
-      "note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
+      "_note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
     }
   ],
   "2": [
@@ -34,7 +36,7 @@
         }
       ],
       "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
-      "note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
+      "_note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
     }
   ],
   "3": [
@@ -53,7 +55,7 @@
         }
       ],
       "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
-      "note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
+      "_note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
     }
   ],
   "4": [
@@ -72,7 +74,7 @@
         }
       ],
       "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
-      "note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
+      "_note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
     }
   ],
   "5": [
@@ -91,7 +93,7 @@
         }
       ],
       "source": "光锥 21055: 「我方目标当前生命值百分比大于等于#2[i]%时，造成的伤容提高#3[i]%。」",
-      "note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
+      "_note": "「**我方目标当前生命值百分比 ≥ 50%** 时，造成的伤害提高 #1%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor_hp_percent >= 0.5` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗）；12/14/16/18/20% ✓。⚠ 「治疗量提高 #1%」由光锥自己的 `outgoing_healing_boost` 属性给 ✓（不重写 ✓）。"
     }
   ]
 }

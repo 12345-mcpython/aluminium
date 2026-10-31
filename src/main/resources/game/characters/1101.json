@@ -1,85 +1,281 @@
-[
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "DEFENCE", "percent": 0.2, "turns": 2, "target": "all_allies" }
-    ],
-    "source": "1101 布洛妮娅 trace 阵地: 「战斗开始时，我方全体的防御力提高#2[i]%，持续#1[i]回合。」 param = [2, 0.2]",
-    "note": "The trace's own numbers, and the reading order is worth checking rather than trusting: param[0] = 2 is the turn count and param[1] = 0.2 the DEF share, while the text names them the other way round (#2[i]% then #1[i] turns). 'target: all_allies' is 「我方全体」 — without it the effect would default to the rule's owner and buff only Bronya. Same shape as the Passerby 4-piece and 知更鸟's 军势: a battle-start party buff."
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "when": ["actor == self"],
-    "min_eidolon": 1,
-    "chance": 0.5,
-    "cooldown": 1,
-    "do": [
-      { "op": "GAIN_SKILL_POINT", "amount": 1 }
-    ],
-    "source": "1101 布洛妮娅 星魂 1 养精蓄锐: 「施放战技时，有#1[i]%固定概率恢复1个战技点，该效果有1回合的触发冷却。」 param = [0.5]",
-    "note": "Three of the vocabularies added on 2026-09-27 meet in one sentence: min_eidolon (it IS an Eidolon, so the rank gate sits next to the mechanic rather than in a loader), chance (50%, rolled against the battle's injected generator) and cooldown ('1 回合的触发冷却' = at most once per own turn). 'actor == self' is 「施放战技时」: the cast has to be hers. This is the case engine.md §9 and SkillPointGameParityTest had registered as 'not implemented' since long before the trigger table existed — the missing part was never one hook but these three."
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "when": ["actor == self", "target != self"],
-    "do": [
-      { "op": "ADVANCE", "percent": 1.0, "target": "target" }
-    ],
-    "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support) 第二句: 「并使该目标立即行动…当对自身施放该技能时，无法触发立即行动效果。」",
-    "note": "「使该目标立即行动」 -- `target` is the unit this cast was AIMED at, which is what M-35 added to the cast events (before it, `ctx.target()` was null for every cast and this sentence was unexpressible). ⚠ The second half of the sentence is the condition: 「当对自身施放该技能时，无法触发立即行动效果」 is exactly `target != self`, and it is why this is a SEPARATE rule from the dispel/damage one below -- casting it on herself still dispels and still grants the damage boost, it just does not give her a second action."
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "DISPEL", "amount": 1, "target": "target" },
-      { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.66, "turns": 1, "target": "target" }
-    ],
-    "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support): 「解除指定我方单体的1个负面效果，并使该目标立即行动，造成的伤害提高#1[i]%，持续#3[i]回合。」 param Lv10 = [0.66, 0, 1, 1]",
-    "note": "「解除指定我方单体的1个负面效果」 + 「造成的伤害提高 66%，持续 1 回合」, both on the aimed ally (`target: \"target\"`). ⚠ 0.66 is written here because MODIFY_ATTR takes a literal; it is the Lv10 row the prose quotes (Lv1 = 0.33, Lv15 = 0.825) -- the same 「which row」 question `damage_level` answers for the ops that read a table (M-32). ⚠ `DISPEL` on a target with nothing to remove is not an error (the op's contract: 「取不到不算错」). ⚠ No condition on the aimed unit beyond `actor == self`, because this half applies in BOTH cases -- only the immediate action is barred for a self-cast, which is why that one is gated `target != self`."
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "EXTEND_BUFF", "attribute": "ALL_DAMAGE_TYPE_BOOST", "turns": 1, "target": "target" }
-    ],
-    "min_eidolon": 6,
-    "source": "1101 布洛妮娅 星魂 6 气贯长虹 (Avatar_Bronya_Rank06): 「战技对指定我方目标造成的伤害提高效果的持续时间增加1回合。」 param = [1]",
-    "note": "「战技对指定我方目标造成的**伤害提高效果**的持续时间增加1回合」: the sentence names an <b>effect</b> rather than a state, and the engine's handle for it is the attribute the modifier sits on (`ALL_DAMAGE_TYPE_BOOST`) -- which is the Skill rule's own `MODIFY_ATTR` in the rule above. ⚠ `min_eidolon: 6` is the whole of what makes this an Eidolon (the engine knows nothing else about 星魂). ⚠ Why the filter is stated rather than \"lengthen everything I applied\": her 「作战再部署」 trace gives the whole party +20% DEFENCE for 2 turns at BATTLE_START, and that buff can still be ticking when she casts her Skill -- a filter that said \"all of mine\" would silently add a turn to it as well. That is the case the attribute/name axis exists to prevent (`ExtendBuffTest.itDoesNotLengthenTheOwnersOtherBuffs`). ⚠ NOT authored from this Eidolon: nothing else -- it is a one-sentence Eidolon."
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "ult_party_attack",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.55, "turns": 2, "target": "all_allies" }
-    ],
-    "source": "1101 布洛妮娅 终结技（数据出处 skill_id 110102）: 「使我方全体攻击力提高55%…持续2回合」",
-    "note": "「使我方全体**攻击力提高 55%**…持续 **2 回合**」—— `MODIFY_ATTR ATTACK` + `percent: 0.55` ✓ + `turns: 2` ✓ + `all_allies` ✓；⭐ **数据核实（强检查）** ✓：她的终结技就是 **`skill_id 110102`（The Belobog March / 贝洛伯格进行曲 ✓）**，其 **`param_list` 第 10 行（Lv10 ✓）同时含 `0.55` / `0.16` / `0.2` / `2`** ✓ （⚠ 走过的弯路如实记：先找 **`param`** 字段 ✗ —— **本文件叫 `param_list`** ✓；再按\"值反查 skill_id\"定位到 `110102` ✓ 却**读成了首行（Lv1）** ✗ ⇒ 现按 **Lv10 行**核实 ✓）。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "ult_party_crit_damage",
-    "when": ["actor == self"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_ATTACK",
-        "scale": "self_attr:CRIT_ATTACK",
-        "percent": 0.16,
-        "amount": 0.2,
-        "turns": 2,
-        "target": "all_allies"
-      }
-    ],
-    "source": "1101 布洛妮娅 终结技: 「同时提高等同于布洛妮娅16.00%暴击伤害+20.00%的暴击伤害，持续2回合」",
-    "note": "「提高**等同于布洛妮娅 16.00% 暴击伤害 + 20.00%** 的暴击伤害，持续 2 回合」—— **派生量** ✓：`scale: \"self_attr:CRIT_ATTACK\"` + `percent: 0.16` + `amount: 0.20` ✓（与大丽花行迹同族 ✓）；⭐ 比率型属性用派生量是对的 ✓；⚠ **快照语义** ✓（触发瞬间读取并冻结 ✓）。"
-  }
-]
+{
+  "schema": 1,
+  "character": 1101,
+  "_status": "implemented",
+  "_gaps": [],
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.2,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1101 布洛妮娅 trace 阵地: 「战斗开始时，我方全体的防御力提高#2[i]%，持续#1[i]回合。」 param = [2, 0.2]",
+      "_note": "The trace's own numbers, and the reading order is worth checking rather than trusting: param[0] = 2 is the turn count and param[1] = 0.2 the DEF share, while the text names them the other way round (#2[i]% then #1[i] turns). 'target: all_allies' is 「我方全体」 — without it the effect would default to the rule's owner and buff only Bronya. Same shape as the Passerby 4-piece and 知更鸟's 军势: a battle-start party buff."
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "min_eidolon": 1,
+      "chance": 0.5,
+      "cooldown": 1,
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "1101 布洛妮娅 星魂 1 养精蓄锐: 「施放战技时，有#1[i]%固定概率恢复1个战技点，该效果有1回合的触发冷却。」 param = [0.5]",
+      "_note": "Three of the vocabularies added on 2026-09-27 meet in one sentence: min_eidolon (it IS an Eidolon, so the rank gate sits next to the mechanic rather than in a loader), chance (50%, rolled against the battle's injected generator) and cooldown ('1 回合的触发冷却' = at most once per own turn). 'actor == self' is 「施放战技时」: the cast has to be hers. This is the case engine.md §9 and SkillPointGameParityTest had registered as 'not implemented' since long before the trigger table existed — the missing part was never one hook but these three."
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self",
+        "target != self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "target"
+        }
+      ],
+      "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support) 第二句: 「并使该目标立即行动…当对自身施放该技能时，无法触发立即行动效果。」",
+      "_note": "「使该目标立即行动」 -- `target` is the unit this cast was AIMED at, which is what M-35 added to the cast events (before it, `ctx.target()` was null for every cast and this sentence was unexpressible). ⚠ The second half of the sentence is the condition: 「当对自身施放该技能时，无法触发立即行动效果」 is exactly `target != self`, and it is why this is a SEPARATE rule from the dispel/damage one below -- casting it on herself still dispels and still grants the damage boost, it just does not give her a second action."
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.66,
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support): 「解除指定我方单体的1个负面效果，并使该目标立即行动，造成的伤害提高#1[i]%，持续#3[i]回合。」 param Lv10 = [0.66, 0, 1, 1]",
+      "_note": "「解除指定我方单体的1个负面效果」 + 「造成的伤害提高 66%，持续 1 回合」, both on the aimed ally (`target: \"target\"`). ⚠ 0.66 is written here because MODIFY_ATTR takes a literal; it is the Lv10 row the prose quotes (Lv1 = 0.33, Lv15 = 0.825) -- the same 「which row」 question `damage_level` answers for the ops that read a table (M-32). ⚠ `DISPEL` on a target with nothing to remove is not an error (the op's contract: 「取不到不算错」). ⚠ No condition on the aimed unit beyond `actor == self`, because this half applies in BOTH cases -- only the immediate action is barred for a self-cast, which is why that one is gated `target != self`."
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "EXTEND_BUFF",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "min_eidolon": 6,
+      "source": "1101 布洛妮娅 星魂 6 气贯长虹 (Avatar_Bronya_Rank06): 「战技对指定我方目标造成的伤害提高效果的持续时间增加1回合。」 param = [1]",
+      "_note": "「战技对指定我方目标造成的**伤害提高效果**的持续时间增加1回合」: the sentence names an <b>effect</b> rather than a state, and the engine's handle for it is the attribute the modifier sits on (`ALL_DAMAGE_TYPE_BOOST`) -- which is the Skill rule's own `MODIFY_ATTR` in the rule above. ⚠ `min_eidolon: 6` is the whole of what makes this an Eidolon (the engine knows nothing else about 星魂). ⚠ Why the filter is stated rather than \"lengthen everything I applied\": her 「作战再部署」 trace gives the whole party +20% DEFENCE for 2 turns at BATTLE_START, and that buff can still be ticking when she casts her Skill -- a filter that said \"all of mine\" would silently add a turn to it as well. That is the case the attribute/name axis exists to prevent (`ExtendBuffTest.itDoesNotLengthenTheOwnersOtherBuffs`). ⚠ NOT authored from this Eidolon: nothing else -- it is a one-sentence Eidolon."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_party_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.55,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1101 布洛妮娅 终结技（数据出处 skill_id 110102）: 「使我方全体攻击力提高55%…持续2回合」",
+      "_note": "「使我方全体**攻击力提高 55%**…持续 **2 回合**」—— `MODIFY_ATTR ATTACK` + `percent: 0.55` ✓ + `turns: 2` ✓ + `all_allies` ✓；⭐ **数据核实（强检查）** ✓：她的终结技就是 **`skill_id 110102`（The Belobog March / 贝洛伯格进行曲 ✓）**，其 **`param_list` 第 10 行（Lv10 ✓）同时含 `0.55` / `0.16` / `0.2` / `2`** ✓ （⚠ 走过的弯路如实记：先找 **`param`** 字段 ✗ —— **本文件叫 `param_list`** ✓；再按\"值反查 skill_id\"定位到 `110102` ✓ 却**读成了首行（Lv1）** ✗ ⇒ 现按 **Lv10 行**核实 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_party_crit_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "scale": "self_attr:CRIT_ATTACK",
+          "percent": 0.16,
+          "amount": 0.2,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1101 布洛妮娅 终结技: 「同时提高等同于布洛妮娅16.00%暴击伤害+20.00%的暴击伤害，持续2回合」",
+      "_note": "「提高**等同于布洛妮娅 16.00% 暴击伤害 + 20.00%** 的暴击伤害，持续 2 回合」—— **派生量** ✓：`scale: \"self_attr:CRIT_ATTACK\"` + `percent: 0.16` + `amount: 0.20` ✓（与大丽花行迹同族 ✓）；⭐ 比率型属性用派生量是对的 ✓；⚠ **快照语义** ✓（触发瞬间读取并冻结 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon2_speed_on_skill_target",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "min_eidolon": 2,
+      "source": "1101 布洛妮娅 星魂 2: 「施放战技时，使目标速度提高30%，持续2回合。」",
+      "_note": "战技目标的速度 +30%、2 回合：`MODIFY_ATTR SPEED` + `percent: 0.3` + `turns: 2` + `target: target`（被瞄准的队友），`min_eidolon: 2`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_ultra_and_talent_levels",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "min_eidolon": 3,
+      "source": "1101 布洛妮娅 星魂 3: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'110103': 2, '110104': 2}",
+      "_note": "星魂 3 的两项等级提升：`ULTRA` +2、`TALENT` +2；上限由各自技能表的行数承担。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_skill_and_common_levels",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "min_eidolon": 5,
+      "source": "1101 布洛妮娅 星魂 5: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110102': 2, '110101': 1}",
+      "_note": "星魂 5 的两项等级提升：`SKILL` +2、`COMMON` +1；上限由各自技能表的行数承担（普攻 10 行会把 +1 夹住）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_party_attack",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.15,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1101 布洛妮娅 秘技: 「使用秘技后，下一次战斗开始时我方全体攻击力提高15%，持续2回合。」",
+      "_note": "秘技门槛用 `self has_state 秘技`（引擎在战斗开始前把“用过秘技”落成状态）；`MODIFY_ATTR ATTACK` + `percent: 0.15` + `turns: 2` + `all_allies`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_military_power",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1101 布洛妮娅 行迹 军势: 「布洛妮娅在场时，我方全体造成的伤害提高10%。」",
+      "_note": "行迹「军势」：`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` +0.1、`all_allies`、`permanent`。修饰的来源是布洛妮娅，因此她倒下时由 `removeBuffsAnchoredTo` 一并摘除，符合「在场时」。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "talent_advance_after_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.3,
+          "target": "self"
+        }
+      ],
+      "source": "1101 布洛妮娅 天赋 先人一步: 「施放普攻后，布洛妮娅的下一次行动提前30%。」 param Lv10 = [0.3]",
+      "_note": "天赋「先人一步」：`BASIC_ATTACK` + `actor == self` + `ADVANCE percent: 0.3` + `target: self`；0.3 取 Lv10 行。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "eidolon4_followup_on_wind_weak_basic",
+      "when": [
+        "actor is_other_ally",
+        "from_skill COMMON",
+        "target has_weakness Wind"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "event_amount",
+          "percent": 0.8,
+          "element": "Wind",
+          "target": "target",
+          "cast_category": "FOLLOW_UP"
+        }
+      ],
+      "min_eidolon": 4,
+      "per_turn": 1,
+      "source": "1101 布洛妮娅 星魂 4: 「我方其他角色对弱点为风属性的敌方目标施放普攻后，布洛妮娅立即进行1次追加攻击，对该目标造成等同于普攻伤害80%的风属性伤害，该效果每回合可触发1次。」",
+      "_note": "星魂 4：`ATTACK_FINISHED` 的 `event_amount` 是本次普攻的已结算总伤害，取其 80%；条件为“其他角色 + 普攻 + 目标有风弱点”，`per_turn: 1` 对应“每回合 1 次”。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_command_full_crit_on_basic",
+      "when": [
+        "actor == self",
+        "damage_skill_key == 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 1.0,
+          "instance": true,
+          "target": "self",
+          "until": "next_attack"
+        }
+      ],
+      "source": "1101 布洛妮娅 行迹 号令: 「普攻的暴击率提高至100%。」",
+      "_note": "行迹「号令」：`DEALING_DAMAGE` 在暴击判定之前发出，`damage_skill_key == 1` 限定普攻；`MODIFY_ATTR CRIT_CHANCE` + `instance: true` + `percent: 1.0`，只改这一发。"
+    }
+  ]
+}

@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21066,
   "1": [
     {
       "on": "CAST_SETUP",
@@ -8,7 +10,7 @@
         { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.08, "until": "cast_end", "target": "self" }
       ],
       "source": "光锥 21066: 「装备者施放欢愉技期间无视目标#2[i]%的防御力。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
     }
   ],
   "2": [
@@ -20,7 +22,7 @@
         { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.1, "until": "cast_end", "target": "self" }
       ],
       "source": "光锥 21066: 「装备者施放欢愉技期间无视目标#2[i]%的防御力。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
     }
   ],
   "3": [
@@ -32,7 +34,7 @@
         { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.12, "until": "cast_end", "target": "self" }
       ],
       "source": "光锥 21066: 「装备者施放欢愉技期间无视目标#2[i]%的防御力。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
     }
   ],
   "4": [
@@ -44,7 +46,7 @@
         { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.14, "until": "cast_end", "target": "self" }
       ],
       "source": "光锥 21066: 「装备者施放欢愉技期间无视目标#2[i]%的防御力。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
     }
   ],
   "5": [
@@ -56,7 +58,7 @@
         { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.16, "until": "cast_end", "target": "self" }
       ],
       "source": "光锥 21066: 「装备者施放欢愉技期间无视目标#2[i]%的防御力。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
+      "_note": "⭐ 常数归引擎 ✓：`props` 写了 `elation_damage_boost` ✓ ⇒ 那句**未重写** ✗。⭐ 「**施放欢愉技期间**」恰好是第 11 轮做的 **`CAST_END` 寿命** ✓：`CAST_SETUP` + **`from_category ElationDamage`** ✓（第 12 轮新增 ✓）上升一个`MODIFY_ATTR DEFENCE_IGNORE` ✓，到施放结束被清扫 ✓。⚠ 不用实例路径 ✗：那一路只作用于**单个伤害实例** ✓，而本句要的是**整个施放期** ✓（施放中的每一次伤害都算 ✓）。"
     }
   ]
 }

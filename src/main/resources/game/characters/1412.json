@@ -1,4 +1,13 @@
 {
+  "_status": "partial",
+  "_gaps": [
+    "【军功】仅最新目标生效、目标改变时充能重置为 0 未写",
+    "充能达 6 点自动升级【爵位】+ 解除控制类负面未写",
+    "【爵位】效果：战技暴伤 +72% / 全属性抗性穿透 +10% / 奇袭 / 消耗 6 点回【军功】未写",
+    "秘技：【军功】转移、自动施放 1 次战技、不消耗战技点未写",
+    "天赋附加伤害「最多 20 次、终结技重置」未写",
+    "终结技：无【军功】时优先给队伍第一位角色；星魂 1 第二句与星魂 2 等未读"
+  ],
   "resources": [
     {
       "id": "充能",
@@ -11,22 +20,50 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_grants_military_merit",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "军功", "target": "all_allies" },
-        { "op": "APPLY_BUFF", "buff": "军功", "permanent": true, "target": "target" },
-        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 1 },
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.16, "permanent": true, "target": "target" }
+        {
+          "op": "REMOVE_STATE",
+          "buff": "军功",
+          "target": "all_allies"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "军功",
+          "permanent": true,
+          "target": "target"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "target"
+        }
       ],
       "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202, BPSkill/Support): 「使指定我方单体角色获得【军功】并使刻律德菈获得1点充能。充能上限8点。当充能达到6点时，自动使角色的【军功】升级为【爵位】…」",
-      "note": "「使指定我方单体角色获得【**军功**】并使刻律德菈获得 **1 点充能**。**充能上限 8 点**」—— ① 标记 `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）；② 充能 `GAIN_RESOURCE 1` ✓（有声明 ✓ ⇒ 不是静默空操作 ✓）。⚠ **登记**：① 「当充能**达到 6 点**时，**自动**使角色的【军功】**升级为【爵位】**并解除其控制类负面状态」✗（**按资源阈值触发** ✗ + 状态升级 ✗ + 解除控制 ✗）；② 「持有【爵位】的角色被视为**同时持有**【军功】」✗（一个状态蕴含另一个 ✗）；③ 「持有【爵位】的角色造成的**战技伤害**的暴击伤害提高 **72%**、**全属性抗性穿透**提高 **10.00%**，对敌方目标施放战技时**触发奇袭**。**奇袭结束后，消耗 6 点充能**使【爵位】变回【军功】」✗（**只作用于战技伤害**的作用域 ✗ + **全属性**抗性穿透 ✗ + 奇袭 ✗ + 消耗并降级 ✗）。\n\n⭐ 2026-09-30 转正：「【军功】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 军功 target: all_allies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。\n⭐ 2026-10-02：文档 `:105`「持有【军功】的角色造成伤害时**无视目标 16% 的防御力**」✓ ⇒ 加在**授予【军功】的那条规则**里 ✓（目标就是领到军功的那位 ✓）。⚠ **已登记**：同句的「若已升为【爵位】…额外无视 20%」需“**该角色的战技伤害**”这个限定 ✗。"
+      "_note": "「使指定我方单体角色获得【**军功**】并使刻律德菈获得 **1 点充能**。**充能上限 8 点**」—— ① 标记 `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）；② 充能 `GAIN_RESOURCE 1` ✓（有声明 ✓ ⇒ 不是静默空操作 ✓）。⚠ **登记**：① 「当充能**达到 6 点**时，**自动**使角色的【军功】**升级为【爵位】**并解除其控制类负面状态」✗（**按资源阈值触发** ✗ + 状态升级 ✗ + 解除控制 ✗）；② 「持有【爵位】的角色被视为**同时持有**【军功】」✗（一个状态蕴含另一个 ✗）；③ 「持有【爵位】的角色造成的**战技伤害**的暴击伤害提高 **72%**、**全属性抗性穿透**提高 **10.00%**，对敌方目标施放战技时**触发奇袭**。**奇袭结束后，消耗 6 点充能**使【爵位】变回【军功】」✗（**只作用于战技伤害**的作用域 ✗ + **全属性**抗性穿透 ✗ + 奇袭 ✗ + 消耗并降级 ✗）。\n\n⭐ 2026-09-30 转正：「【军功】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 军功 target: all_allies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。\n⭐ 2026-10-02：文档 `:105`「持有【军功】的角色造成伤害时**无视目标 16% 的防御力**」✓ ⇒ 加在**授予【军功】的那条规则**里 ✓（目标就是领到军功的那位 ✓）。⚠ **已登记**：同句的「若已升为【爵位】…额外无视 20%」需“**该角色的战技伤害**”这个限定 ✗。"
     },
     {
       "on": "SKILL_CAST",
       "id": "talent_attack_share_on_marked_ally",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "军功-攻击力", "kind": "own", "target": "target" },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "军功-攻击力",
+          "kind": "own",
+          "target": "target"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
@@ -38,67 +75,119 @@
         }
       ],
       "source": "1412 刻律德菈 天赋 荣光属于凯撒 (141204, Enhance): 「持有【军功】的角色攻击力提高，提高数值等同于刻律德菈攻击力的24.00%，施放普攻或战技时使刻律德菈获得1点充能，奇袭期间无法使刻律德菈获得充能。持有【军功】的角色施放攻击后刻律德菈额外造成1次等同于刻律德菈60%攻击力的风属性附加伤害，该效果最多触发20次，刻律德菈每次施放终结技时重置可触发次数。【军功】仅对最新被施加的目标生效，目标改变时使刻律德菈充能重置为0点。」",
-      "note": "「**持有【军功】的角色**攻击力提高，提高数值**等同于刻律德菈攻击力的 24.00%**」—— ① 派生量 `scale: self_attr:ATTACK` + `percent: 0.24` ✓ ⇒ **绝对值** = 刻律德菈攻击力 × 0.24 ✓（引擎的派生语义 ✓）；② 目标是**被标记的那个队友** ✓（与标记**同一次施放**、**同一个单位** ✓）⇒ `permanent: true` ✓。⭐ **与第 190 轮的判断如何区分（已想清楚 ✓）**：那里登记的是「**当缇宝拥有【神启】时**，我方全体…」✗ —— 条件是**另一个单位**（她自己）身上的状态 ✗；这里**状态与修饰落在同一个单位**、且**由同一条规则同时施加** ✓ ⇒ **文档给的寿命就是\"军功存在期间\"** ✓ ⇒ `permanent` 是文档自己的语义 ✓，不是近似 ✗。⚠ 但**\"目标改变时\"** ✗（旧的标记与修饰不会随之撤下 ✗）已登记 ✓ —— 这是本写法**唯一**与文档不同之处 ✓。"
+      "_note": "「**持有【军功】的角色**攻击力提高，提高数值**等同于刻律德菈攻击力的 24.00%**」—— ① 派生量 `scale: self_attr:ATTACK` + `percent: 0.24` ✓ ⇒ **绝对值** = 刻律德菈攻击力 × 0.24 ✓（引擎的派生语义 ✓）；② 目标是**被标记的那个队友** ✓（与标记**同一次施放**、**同一个单位** ✓）⇒ `permanent: true` ✓。⭐ **与第 190 轮的判断如何区分（已想清楚 ✓）**：那里登记的是「**当缇宝拥有【神启】时**，我方全体…」✗ —— 条件是**另一个单位**（她自己）身上的状态 ✗；这里**状态与修饰落在同一个单位**、且**由同一条规则同时施加** ✓ ⇒ **文档给的寿命就是\"军功存在期间\"** ✓ ⇒ `permanent` 是文档自己的语义 ✓，不是近似 ✗。⚠ 但**\"目标改变时\"** ✗（旧的标记与修饰不会随之撤下 ✗）已登记 ✓ —— 这是本写法**唯一**与文档不同之处 ✓。"
     },
     {
       "on": "ALLY_ATTACK",
       "id": "talent_charge_from_marked_ally",
-      "when": ["actor has_state 军功"],
+      "when": [
+        "actor has_state 军功"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 1 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
       ],
       "source": "1412 刻律德菈 天赋 荣光属于凯撒 (141204, Enhance): 「持有【军功】的角色攻击力提高，提高数值等同于刻律德菈攻击力的24.00%，施放普攻或战技时使刻律德菈获得1点充能，奇袭期间无法使刻律德菈获得充能。持有【军功】的角色施放攻击后刻律德菈额外造成1次等同于刻律德菈60%攻击力的风属性附加伤害，该效果最多触发20次，刻律德菈每次施放终结技时重置可触发次数。【军功】仅对最新被施加的目标生效，目标改变时使刻律德菈充能重置为0点。」",
-      "note": "「**持有【军功】的角色**施放普攻或战技时使刻律德菈获得 **1 点充能**」—— 事件 `ALLY_ATTACK` ✓（每次施放只发一次 ✓）+ 条件 **`actor has_state 军功`** ✓（**攻击者**是持有者 ✓）。⚠ **登记**：「**奇袭期间无法使刻律德菈获得充能**」✗（奇袭是一个未实现的状态 ✗ ⇒ 这条禁令也写不了 ✓）。"
+      "_note": "「**持有【军功】的角色**施放普攻或战技时使刻律德菈获得 **1 点充能**」—— 事件 `ALLY_ATTACK` ✓（每次施放只发一次 ✓）+ 条件 **`actor has_state 军功`** ✓（**攻击者**是持有者 ✓）。⚠ **登记**：「**奇袭期间无法使刻律德菈获得充能**」✗（奇袭是一个未实现的状态 ✗ ⇒ 这条禁令也写不了 ✓）。"
     },
     {
       "on": "ALLY_ATTACK",
       "id": "talent_additional_damage_after_marked_attack",
-      "when": ["actor has_state 军功"],
+      "when": [
+        "actor has_state 军功"
+      ],
       "do": [
-        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.6, "element": "Wind", "target": "target" }
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.6,
+          "element": "Wind",
+          "target": "target"
+        }
       ],
       "source": "1412 刻律德菈 天赋 荣光属于凯撒 (141204, Enhance): 「持有【军功】的角色攻击力提高，提高数值等同于刻律德菈攻击力的24.00%，施放普攻或战技时使刻律德菈获得1点充能，奇袭期间无法使刻律德菈获得充能。持有【军功】的角色施放攻击后刻律德菈额外造成1次等同于刻律德菈60%攻击力的风属性附加伤害，该效果最多触发20次，刻律德菈每次施放终结技时重置可触发次数。【军功】仅对最新被施加的目标生效，目标改变时使刻律德菈充能重置为0点。」",
-      "note": "「持有【军功】的角色**施放攻击后**刻律德菈额外造成 1 次等同于刻律德菈 **60% 攻击力**的风属性**附加伤害**」—— `ALLY_ATTACK` + `actor has_state 军功` ✓；伤害用**字面倍率** ✓ + `Wind` ✓（附加伤害正是 `DAMAGE` 的语义 ✓，不计为一次攻击 ✓）。⚠ **登记**：「该效果**最多触发 20 次**，刻律德菈**每次施放终结技时重置**可触发次数」✗（**计数 + 重置** ✗）⇒ 本条**没有次数上限** ✗（差异已写明 ✓，不装作等价 ✓）。"
+      "_note": "「持有【军功】的角色**施放攻击后**刻律德菈额外造成 1 次等同于刻律德菈 **60% 攻击力**的风属性**附加伤害**」—— `ALLY_ATTACK` + `actor has_state 军功` ✓；伤害用**字面倍率** ✓ + `Wind` ✓（附加伤害正是 `DAMAGE` 的语义 ✓，不计为一次攻击 ✓）。⚠ **登记**：「该效果**最多触发 20 次**，刻律德菈**每次施放终结技时重置**可触发次数」✗（**计数 + 重置** ✗）⇒ 本条**没有次数上限** ✗（差异已写明 ✓，不装作等价 ✓）。"
     },
     {
       "on": "ULT_CAST",
       "id": "ult_charge",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "充能", "amount": 2 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 2
+        }
       ],
       "source": "1412 刻律德菈 终结技 世事如棋，四步堪杀 (141203, Ultra/AoEAttack): 「获得2点充能。对敌方全体造成等同于刻律德菈240%攻击力的风属性伤害。…」",
-      "note": "「**获得 2 点充能**」—— `ULT_CAST` + `actor == self` ✓ + `GAIN_RESOURCE 2` ✓。⚠ 终结技自身的伤害不写规则 ✓（由技能数据结算 ✓）；**登记**：「若场上**不存在**持有【军功】的角色，**优先使当前队伍中的第一位角色**获得【军功】」✗（\"不存在\"的持续判断 ✗ + **按队伍顺序取第一个** ✗）。"
+      "_note": "「**获得 2 点充能**」—— `ULT_CAST` + `actor == self` ✓ + `GAIN_RESOURCE 2` ✓。⚠ 终结技自身的伤害不写规则 ✓（由技能数据结算 ✓）；**登记**：「若场上**不存在**持有【军功】的角色，**优先使当前队伍中的第一位角色**获得【军功】」✗（\"不存在\"的持续判断 ✗ + **按队伍顺序取第一个** ✗）。"
     },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
       ],
       "source": "1412 刻律德菈 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 军功 + 1 充能、终结技 240%、天赋 24.00% 与 60%）",
-      "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 「【军功】**仅对最新被施加的目标生效**，**目标改变时**使刻律德菈**充能重置为 0 点**」✗（\"只保留最新一个\"的不变量 ✗ + **改目标即重置资源** ✗ —— 后者是本文件写法**唯一**与文档不同之处 ✓，已在上面的注释里写明 ✓）；② **秘技**「使用秘技后获得【军功】，切换行动角色时【军功】**转移**至当前行动角色。下一次战斗开始时**自动对持有【军功】的角色施放 1 次战技**，此次战技**不消耗战技点**」✗（大地图转移 ✗ + **自动施放技能** ✗ + 免战技点 ✗）；③ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；④ **星魂 1**（无视防御 16%/20% ✗ + 施放战技时为目标回能 2 点 ✓ 形状可写 ✓ 但依赖【爵位】✗）、**星魂 2**（【军功】持有者伤害 +40% ✗ 与\"场上有队友持有【军功】\"时她自己 +160% ✗ —— 后者是**按场上条件**缩放 ✗）⇒ 一并登记 ✓。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 「【军功】**仅对最新被施加的目标生效**，**目标改变时**使刻律德菈**充能重置为 0 点**」✗（\"只保留最新一个\"的不变量 ✗ + **改目标即重置资源** ✗ —— 后者是本文件写法**唯一**与文档不同之处 ✓，已在上面的注释里写明 ✓）；② **秘技**「使用秘技后获得【军功】，切换行动角色时【军功】**转移**至当前行动角色。下一次战斗开始时**自动对持有【军功】的角色施放 1 次战技**，此次战技**不消耗战技点**」✗（大地图转移 ✗ + **自动施放技能** ✗ + 免战技点 ✗）；③ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；④ **星魂 1**（无视防御 16%/20% ✗ + 施放战技时为目标回能 2 点 ✓ 形状可写 ✓ 但依赖【爵位】✗）、**星魂 2**（【军功】持有者伤害 +40% ✗ 与\"场上有队友持有【军功】\"时她自己 +160% ✗ —— 后者是**按场上条件**缩放 ✗）⇒ 一并登记 ✓。"
     },
     {
       "on": "SKILL_CAST",
       "id": "eidolon1_defence_ignore_for_marked",
       "min_eidolon": 1,
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.16, "target": "target", "permanent": true }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.16,
+          "target": "target",
+          "permanent": true
+        }
       ],
       "source": "1412 星魂 1: 「持有【军功】的角色造成伤害时无视目标16%的防御力」",
-      "note": "「持有【军功】的角色造成伤害时无视目标16%的防御力」—— ① 「无视…防御」= **`DEFENCE_IGNORE`** ✓（防御区读**攻击方**的该属性 ✓）；② ⚠ **目标与时长一律\"镜像\"它自己的门槛** ✓：本条与 `skill_grants_military_merit` 挂在**同一个事件** ✓、**同一个 `target`**（target ✓）、**同一段时长** ✓⇒ 将来门槛改了，本条**跟着走** ✓（不重复陈述 ✓）；③ 门槛 `min_eidolon: 1` ✓。⚠ **登记（同文件）**：第二句「若【军功】已升级为【爵位】，则该角色造成**战技伤害**时额外无视目标 20% 的防御力」✗ —— 需要【爵位】状态 ✗ 与**按伤害类型**的无视 ✗ ⇒ 精确登记 ✓。"
+      "_note": "「持有【军功】的角色造成伤害时无视目标16%的防御力」—— ① 「无视…防御」= **`DEFENCE_IGNORE`** ✓（防御区读**攻击方**的该属性 ✓）；② ⚠ **目标与时长一律\"镜像\"它自己的门槛** ✓：本条与 `skill_grants_military_merit` 挂在**同一个事件** ✓、**同一个 `target`**（target ✓）、**同一段时长** ✓⇒ 将来门槛改了，本条**跟着走** ✓（不重复陈述 ✓）；③ 门槛 `min_eidolon: 1` ✓。⚠ **登记（同文件）**：第二句「若【军功】已升级为【爵位】，则该角色造成**战技伤害**时额外无视目标 20% 的防御力」✗ —— 需要【爵位】状态 ✗ 与**按伤害类型**的无视 ✗ ⇒ 精确登记 ✓。"
     },
     {
       "on": "RESOURCE_CHANGED",
       "id": "peerage_upgrade_at_six_charge",
-      "when": ["actor == self", "self_resource:充能 >= 6"],
+      "when": [
+        "actor == self",
+        "self_resource:充能 >= 6"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "爵位", "target": "holder_of:军功", "permanent": true },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爵位",
+          "target": "holder_of:军功",
+          "permanent": true
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "DAMAGE_PENETRATION",
@@ -107,26 +196,77 @@
           "max_stacks": 2,
           "target": "holder_of:军功"
         },
-        { "op": "REMOVE_STATE", "buff": "冻结", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "缠绕", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "禁锢", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "支配", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "怒噪", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "强烈震荡", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "异梦", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "缠禁", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "恐惧", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "行动锁定", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "幸福傀儡", "target": "holder_of:军功" },
-        { "op": "REMOVE_STATE", "buff": "怨火灼身", "target": "holder_of:军功" }
+        {
+          "op": "REMOVE_STATE",
+          "buff": "冻结",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "缠绕",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "禁锢",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "支配",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "怒噪",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "强烈震荡",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "异梦",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "缠禁",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "恐惧",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "行动锁定",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "幸福傀儡",
+          "target": "holder_of:军功"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "怨火灼身",
+          "target": "holder_of:军功"
+        }
       ],
       "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202, BPSkill/Support): 「当充能达到 6 点时，自动使角色的【军功】升级为【爵位】并解除其控制类负面状态」\n⭐ 2026-10-02（文档 `:67`）：「持有【爵位】的角色…全属性**抗性穿透提高 10.00%**」✓\n⭐ 2026-10-02（文档 `:67`）：「当充能达到 6 点时，自动使角色的【军功】升级为【爵位】**并解除其控制类负面状态**」✓",
-      "note": "「当充能达到 **6** 点时，自动使角色的【军功】升级为【爵位】」—— 事件 `RESOURCE_CHANGED` ✓ （已存在）＋ `self_resource:充能 >= 6` ✓ （条件已支持资源读取）＋ `holder_of:军功` ✓ （选择器已出货）；【爵位】**不写时长** ✓ （文档没给，与【军功】同为充能驱动）。⚠ **登记**：同句的「并解除其**控制类负面状态**」✗ —— 引擎今天没有“按**类**清除负面”的能力（`DISPEL` 是摘敌方增益、`RESIST_DEBUFF` 是抗性、`REMOVE_BUFF` 是按**数**不是按类）。⚠ **另一处登记**：文档说「持有【爵位】的角色**被视为同时持有【军功】**」✓ —— 本条只**加【爵位】、不摘【军功】** ✓，那句话因此**自然成立** （两个状态同时在）✓。⚠ 装载器**拒绝不写时长的 APPLY_BUFF** ✓ （“没有默认” ✓）⇒ 本条写 **permanent: true** ✓ （【爵位】直到被“消耗 6 点充能变回【军功】”摘掉 ✓ ）；⚠ 那条“变回来”的规则**尚未出货** ✗ —— 它要等「奇袭结束」那个时刻 ✗，已登记。\n⭐ 2026-10-02：加上**全属性抗性穿透 +10%** ✓ —— 形状照拄同一条规则里已有的写法（`target: \"holder_of:军功\"` ✓），而 `DAMAGE_PENETRATION` 对应文档 `:68` 的「抗性穿透」定义 ✓（同拼写已在 1502 出货过 ✓）。⚠ **仍登记**：同句的“**战技伤害的爆伤 +72%**”（带“战技”限定 ✗）与“**奇袭**”及其结束时的“消耗 6 点充能、爵位变回【军功】”。\n⭐ 2026-10-02：**逐名解除** 12 个状态 ✓（名单逐字取自文档 `:68` 的术语表 ✓）。⚠ **为何不用 `DISPEL`** ✗：它的落地是 `removeDebuffs(amount)` ✗，“移除最多 N 个**负面效果**”**没有任何过滤** ✗ —— 写在这里会连目标身上的**持续伤害或其他减益**一并洗掉 ✗，那不是这句话说的事 ✗。"
+      "_note": "「当充能达到 **6** 点时，自动使角色的【军功】升级为【爵位】」—— 事件 `RESOURCE_CHANGED` ✓ （已存在）＋ `self_resource:充能 >= 6` ✓ （条件已支持资源读取）＋ `holder_of:军功` ✓ （选择器已出货）；【爵位】**不写时长** ✓ （文档没给，与【军功】同为充能驱动）。⚠ **登记**：同句的「并解除其**控制类负面状态**」✗ —— 引擎今天没有“按**类**清除负面”的能力（`DISPEL` 是摘敌方增益、`RESIST_DEBUFF` 是抗性、`REMOVE_BUFF` 是按**数**不是按类）。⚠ **另一处登记**：文档说「持有【爵位】的角色**被视为同时持有【军功】**」✓ —— 本条只**加【爵位】、不摘【军功】** ✓，那句话因此**自然成立** （两个状态同时在）✓。⚠ 装载器**拒绝不写时长的 APPLY_BUFF** ✓ （“没有默认” ✓）⇒ 本条写 **permanent: true** ✓ （【爵位】直到被“消耗 6 点充能变回【军功】”摘掉 ✓ ）；⚠ 那条“变回来”的规则**尚未出货** ✗ —— 它要等「奇袭结束」那个时刻 ✗，已登记。\n⭐ 2026-10-02：加上**全属性抗性穿透 +10%** ✓ —— 形状照拄同一条规则里已有的写法（`target: \"holder_of:军功\"` ✓），而 `DAMAGE_PENETRATION` 对应文档 `:68` 的「抗性穿透」定义 ✓（同拼写已在 1502 出货过 ✓）。⚠ **仍登记**：同句的“**战技伤害的爆伤 +72%**”（带“战技”限定 ✗）与“**奇袭**”及其结束时的“消耗 6 点充能、爵位变回【军功】”。\n⭐ 2026-10-02：**逐名解除** 12 个状态 ✓（名单逐字取自文档 `:68` 的术语表 ✓）。⚠ **为何不用 `DISPEL`** ✗：它的落地是 `removeDebuffs(amount)` ✗，“移除最多 N 个**负面效果**”**没有任何过滤** ✗ —— 写在这里会连目标身上的**持续伤害或其他减益**一并洗掉 ✗，那不是这句话说的事 ✗。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "peerage_skill_extra_pierce",
-      "when": ["actor has_state 爵位", "from_category BPSKILL"],
+      "when": [
+        "actor has_state 爵位",
+        "from_category BPSKILL"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -138,33 +278,54 @@
         }
       ],
       "source": "1412 刻律德菈 行迹（文档 `:105`）：「若当前【军功】已升级为【爵位】，则该角色**造成战技伤害时额外无视目标 20%** 的防御力」",
-      "note": "⭐ 2026-10-02：走 **instance 路由** ✓（`instance: true` ✓ —— 引擎文档：“`MODIFY_ATTR` with instance=true supports DEFENCE_IGNORE” ✓），⚠ 但仍需时长 ✗（装载器逐字：*requires \"turns\" … \"permanent\": true*）。⚠ **判据不再问属性表** ✓（属性探针已量出：16% 恒在、两个单位都看不到 20% ✗）而是**比伤害** ✓（同一场戏、只换“有没有爵位” ✓）。"
+      "_note": "⭐ 2026-10-02：走 **instance 路由** ✓（`instance: true` ✓ —— 引擎文档：“`MODIFY_ATTR` with instance=true supports DEFENCE_IGNORE” ✓），⚠ 但仍需时长 ✗（装载器逐字：*requires \"turns\" … \"permanent\": true*）。⚠ **判据不再问属性表** ✓（属性探针已量出：16% 恒在、两个单位都看不到 20% ✗）而是**比伤害** ✓（同一场戏、只换“有没有爵位” ✓）。"
     },
     {
       "on": "CAST_SETUP",
       "id": "coup_de_main",
-      "when": ["actor has_state 爵位", "from_category BPSKILL"],
+      "when": [
+        "actor has_state 爵位",
+        "from_category BPSKILL"
+      ],
       "do": [
-        { "op": "CAST_SKILL", "skill": "SKILL", "target": "attacker" }
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "attacker"
+        }
       ],
       "source": "1412 刻律德菈（文档 `:67`/`:68`）：「…对敌方目标施放战技时触发**奇袭**」＋定义「**奇袭**：复制一次即将施放的技能并**提前施放**，随后施放原技能」",
-      "note": "⭐ 2026-10-02：`CAST_SETUP`（引擎自述的**前置钩子** ✓）＋`CAST_SKILL`（“**使其立即施放 1 次**” ✓）。⚠ 防递归在**引擎侧** ✓（`castSkill` 看施放栈：`currentCast().outer() != null` ⇒ 跳过 ✓）—— 因为条件 DSL 的 `!` **只能否定队伍条件** ✗，内容侧写不出来 ✗。"
+      "_note": "⭐ 2026-10-02：`CAST_SETUP`（引擎自述的**前置钩子** ✓）＋`CAST_SKILL`（“**使其立即施放 1 次**” ✓）。⚠ 防递归在**引擎侧** ✓（`castSkill` 看施放栈：`currentCast().outer() != null` ⇒ 跳过 ✓）—— 因为条件 DSL 的 `!` **只能否定队伍条件** ✗，内容侧写不出来 ✗。"
     },
     {
       "on": "INSERTED_CAST_END",
       "id": "coup_de_main_ends",
-      "when": ["actor has_state 爵位", "self_resource:充能 >= 6"],
+      "when": [
+        "actor has_state 爵位",
+        "self_resource:充能 >= 6"
+      ],
       "do": [
-        { "op": "SPEND_RESOURCE", "resource": "充能", "amount": 6 },
-        { "op": "REMOVE_STATE", "buff": "爵位", "target": "attacker" }
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "充能",
+          "amount": 6
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "爵位",
+          "target": "attacker"
+        }
       ],
       "source": "1412 刻律德菈（文档 `:67`）：「**奇袭结束后，消耗 6 点充能使【爵位】变回【军功】**」",
-      "note": "⭐ 2026-10-02：触发用**新建的 `INSERTED_CAST_END`** ✓（“被命令的施放结束” ✓）；“变回【军功】”就是**取消【爵位】** ✓（文档：「持有【爵位】的角色**被视为同时持有【军功】**」 ✓）；门槛 `self_resource:充能 >= 6` ✓ 保证不会花不起 ✗。"
+      "_note": "⭐ 2026-10-02：触发用**新建的 `INSERTED_CAST_END`** ✓（“被命令的施放结束” ✓）；“变回【军功】”就是**取消【爵位】** ✓（文档：「持有【爵位】的角色**被视为同时持有【军功】**」 ✓）；门槛 `self_resource:充能 >= 6` ✓ 保证不会花不起 ✗。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "peerage_skill_crit_damage",
-      "when": ["actor has_state 爵位", "from_category BPSKILL"],
+      "when": [
+        "actor has_state 爵位",
+        "from_category BPSKILL"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -176,50 +337,74 @@
         }
       ],
       "source": "1412 刻律德菈 行迹（文档 `:67`）：「持有【爵位】的角色…造成的**战技伤害的暴击伤害提高 72%**」",
-      "note": "⭐ 2026-10-02：`CRIT_ATTACK` 就是暴击伤害 ✓（数据：`1412` 的 `crit_chance 0.05` ⾏ `crit_attack 0.5` ✓）；而 instance 路由**按名支持它** ✓（`ctx.damage().addCritDamage(...)` ✓）。“战技伤害的”由 `from_category BPSKILL` 表达 ✓。"
+      "_note": "⭐ 2026-10-02：`CRIT_ATTACK` 就是暴击伤害 ✓（数据：`1412` 的 `crit_chance 0.05` ⾏ `crit_attack 0.5` ✓）；而 instance 路由**按名支持它** ✓（`ctx.damage().addCritDamage(...)` ✓）。“战技伤害的”由 `from_category BPSKILL` 表达 ✓。"
     },
     {
       "id": "memosprite_ode_of_law_raises_the_meritorious",
       "on": "CAST_SETUP",
-      "when": ["target == self", "actor is_summon", "from_skill_id == 23"],
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 23"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "percent_from": {"type": "cast_param", "index": 0},
+          "percent_from": {
+            "type": "cast_param",
+            "index": 0
+          },
           "permanent": true,
           "target": "all_allies",
-          "target_when": ["target has_state 军功"]
+          "target_when": [
+            "target has_state 军功"
+          ]
         }
       ],
       "source": "1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23，SkillID 1141523）：「整场生效，对刻律德菈施放后，**持有【军功】的角色暴击伤害提高 #1%**。」",
-      "note": "⭐ 六轮单变量实验后，形状与引擎行为都已验证：`all_allies` 好、`target_when` 在已出货词汇里、字面量与**派生**份额都能落地（实测：字面量 +0.25、派生 +0.4199999999999591）。⭐ 占比是**施放技能的第 0 参数**（随等级变：0.15 → 0.42）。"
+      "_note": "⭐ 六轮单变量实验后，形状与引擎行为都已验证：`all_allies` 好、`target_when` 在已出货词汇里、字面量与**派生**份额都能落地（实测：字面量 +0.25、派生 +0.4199999999999591）。⭐ 占比是**施放技能的第 0 参数**（随等级变：0.15 → 0.42）。"
     },
     {
       "id": "capture_reader_cast_param",
       "on": "CAST_SETUP",
-      "when": ["target == self", "from_skill_id == 23"],
+      "when": [
+        "target == self",
+        "from_skill_id == 23"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "充能", "scale": "cast_skill_param:1", "target": "self", "percent": 10000 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "scale": "cast_skill_param:1",
+          "target": "self",
+          "percent": 10000
+        }
       ],
       "source": "⚠ 本条**不是数据里的句子** —— 它是能力 `GAIN_RESOURCE{scale: \"cast_skill_param:\"}` 的**常驻读者**（2026-10-02）。⭐ 先例：`1415.json` 的 `level_convention` 也是同类“非句子”内容。",
-      "note": "⭐ 为什么需要它：忆灵的技能行**任何份额拼法都读不到**（`Summon` 按 `int` 数据槽位存，而份额走 `Character.getSkills()`），但**施放那一刻**读得到（`castParamValue` 走事件的 actor）⇒ 先把数**捕获**进一个资源，以后再用。⛐ 实测：两个前提缺一不可 —— 规则必须在**被矄准者**的表上（忆灵的施放不送它自己的表），且资源必须**由内容声明**（战前 `setTriggerTable` 不会登记）；而读数要读**角色自己的 store**（队伍 store 是另一份）。"
+      "_note": "⭐ 为什么需要它：忆灵的技能行**任何份额拼法都读不到**（`Summon` 按 `int` 数据槽位存，而份额走 `Character.getSkills()`），但**施放那一刻**读得到（`castParamValue` 走事件的 actor）⇒ 先把数**捕获**进一个资源，以后再用。⛐ 实测：两个前提缺一不可 —— 规则必须在**被矄准者**的表上（忆灵的施放不送它自己的表），且资源必须**由内容声明**（战前 `setTriggerTable` 不会登记）；而读数要读**角色自己的 store**（队伍 store 是另一份）。"
     },
     {
       "id": "share_from_resource_reader",
       "on": "TURN_START",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent_from": {"type": "resource", "resource": "充能", "basis_points": true},
+          "percent_from": {
+            "type": "resource",
+            "resource": "充能",
+            "basis_points": true
+          },
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "⚠ 本条**不是数据里的句子** —— 它是能力 `percent_from_resource` 的**常驻读者**（2026-10-02），与 `level_convention` 同一先例。",
-      "note": "⭐ 读的是「充能」的**基点**：值 / 10000 = 份额。"
+      "_note": "⭐ 读的是「充能」的**基点**：值 / 10000 = 份额。"
     }
   ]
 }

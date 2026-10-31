@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23063,
   "1": [
     {
       "on": "CAST_SETUP",
@@ -8,7 +10,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23063：「装备者施放终结技后，为我方恢复1点战技点。」",
-      "note": "「装备者施放终结技后，为我方恢复 1 点战技点」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `GAIN_SKILL_POINT(1)` ✓；「**进入战斗时**行动提前 **30%** 并获得【新声】2 回合；持有期间**我方全体**速度 +30%」—— `BATTLE_START` ＋ `ADVANCE{percent: 0.3}` ＋ `APPLY_BUFF{turns: 2}` ＋ `MODIFY_ATTR SPEED{percent: 0.3, target: all_allies, turns: 2}` ✓（3 档都是 0.3 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：`ADVANCE` 与 `SPEED` 原先都写 **0.4** ✗（#2/#3 是 30% ✗）⇒ 改 **0.3** ✓。"
+      "_note": "「装备者施放终结技后，为我方恢复 1 点战技点」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `GAIN_SKILL_POINT(1)` ✓；「**进入战斗时**行动提前 **30%** 并获得【新声】2 回合；持有期间**我方全体**速度 +30%」—— `BATTLE_START` ＋ `ADVANCE{percent: 0.3}` ＋ `APPLY_BUFF{turns: 2}` ＋ `MODIFY_ATTR SPEED{percent: 0.3, target: all_allies, turns: 2}` ✓（3 档都是 0.3 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：`ADVANCE` 与 `SPEED` 原先都写 **0.4** ✗（#2/#3 是 30% ✗）⇒ 改 **0.3** ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -19,7 +21,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.3, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23063：「进入战斗时，使装备者的行动提前#2[i]%，并使装备者获得【新声】，持续#4[i]回合。」",
-      "note": "「装备者施放终结技后，为我方恢复 1 点战技点」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `GAIN_SKILL_POINT(1)` ✓；「**进入战斗时**行动提前 **30%** 并获得【新声】2 回合；持有期间**我方全体**速度 +30%」—— `BATTLE_START` ＋ `ADVANCE{percent: 0.3}` ＋ `APPLY_BUFF{turns: 2}` ＋ `MODIFY_ATTR SPEED{percent: 0.3, target: all_allies, turns: 2}` ✓（3 档都是 0.3 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：`ADVANCE` 与 `SPEED` 原先都写 **0.4** ✗（#2/#3 是 30% ✗）⇒ 改 **0.3** ✓。"
+      "_note": "「装备者施放终结技后，为我方恢复 1 点战技点」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `GAIN_SKILL_POINT(1)` ✓；「**进入战斗时**行动提前 **30%** 并获得【新声】2 回合；持有期间**我方全体**速度 +30%」—— `BATTLE_START` ＋ `ADVANCE{percent: 0.3}` ＋ `APPLY_BUFF{turns: 2}` ＋ `MODIFY_ATTR SPEED{percent: 0.3, target: all_allies, turns: 2}` ✓（3 档都是 0.3 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：`ADVANCE` 与 `SPEED` 原先都写 **0.4** ✗（#2/#3 是 30% ✗）⇒ 改 **0.3** ✓。"
     }
   ]
 }

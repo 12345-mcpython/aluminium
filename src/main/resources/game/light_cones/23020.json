@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23020,
   "1": [
     {
       "on": "DEALING_DAMAGE",
@@ -16,7 +18,7 @@
         }
       ],
       "source": "光锥 23020: 「敌方目标每承受1个负面效果，装备者对其造成的暴击伤害额外提高#2[i]%，最多叠加#3[i]层」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "ULT_CAST",
@@ -27,7 +29,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.36, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -45,7 +47,7 @@
         }
       ],
       "source": "光锥 23020: 「…**追加攻击无视目标#5[i]%的防御力**，该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     }
   ],
   "2": [
@@ -65,7 +67,7 @@
         }
       ],
       "source": "光锥 23020: 「敌方目标每承受1个负面效果，装备者对其造成的暴击伤害额外提高#2[i]%，最多叠加#3[i]层」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "ULT_CAST",
@@ -76,7 +78,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.42, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -94,7 +96,7 @@
         }
       ],
       "source": "光锥 23020: 「…**追加攻击无视目标#5[i]%的防御力**，该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     }
   ],
   "3": [
@@ -114,7 +116,7 @@
         }
       ],
       "source": "光锥 23020: 「敌方目标每承受1个负面效果，装备者对其造成的暴击伤害额外提高#2[i]%，最多叠加#3[i]层」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "ULT_CAST",
@@ -125,7 +127,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.48, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -143,7 +145,7 @@
         }
       ],
       "source": "光锥 23020: 「…**追加攻击无视目标#5[i]%的防御力**，该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     }
   ],
   "4": [
@@ -163,7 +165,7 @@
         }
       ],
       "source": "光锥 23020: 「敌方目标每承受1个负面效果，装备者对其造成的暴击伤害额外提高#2[i]%，最多叠加#3[i]层」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "ULT_CAST",
@@ -174,7 +176,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.54, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -192,7 +194,7 @@
         }
       ],
       "source": "光锥 23020: 「…**追加攻击无视目标#5[i]%的防御力**，该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     }
   ],
   "5": [
@@ -212,7 +214,7 @@
         }
       ],
       "source": "光锥 23020: 「敌方目标每承受1个负面效果，装备者对其造成的暴击伤害额外提高#2[i]%，最多叠加#3[i]层」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "ULT_CAST",
@@ -223,7 +225,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.6, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -241,7 +243,7 @@
         }
       ],
       "source": "光锥 23020: 「…**追加攻击无视目标#5[i]%的防御力**，该效果持续#6[i]回合」",
-      "note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
+      "_note": "⭐ 三句都能表达 ✓：① 常数（暴伤）归引擎 ✓；② 「每承受 1 个负面效果…最多 3 层」⇒ `instance: true` 的 **`CRIT_ATTACK`** ✓+ **`per_stack: target_debuff_count`** ✓ + 上限条件 ✓（同 21001 的写法 ✓）；③ 「获得【论辩】…追加攻击**无视目标 24% 防御力**」⇒ **`instance: true` + `damage_type: \"ADDITIONAL\"`** ✓（第 248 轮建的实例路径 ✓）。"
     }
   ]
 }

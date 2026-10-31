@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "relic_set": 127,
   "4": [
     {
       "on": "BASIC_ATTACK",
@@ -21,7 +23,7 @@
         }
       ],
       "source": "relic set 127 (再创天地的救世主 / Hero of the Shattered World), 4-piece: 「装备者施放普攻或战技后，若装备者的忆灵在场，使装备者及其忆灵生命上限提高#1[i]%，我方全体造成的伤害提高#2[i]%，持续至装备者下次施放普攻或战技后。」 param = [0.24, 0.15]",
-      "note": "The Basic-ATK half of the disjunction, as three effects in one rule (the wearer's Max HP, the memosprite's, and the party's damage). ⚠ `self_summon_count >= 1` is 「若装备者的忆灵在场」 AND it is what makes the `target: \"summon\"` effect legal: that selector fails loudly when nothing is out, so the condition is load-bearing rather than decorative. ⚠ The duration names BOTH events -- 「持续至装备者下次施放普攻或战技后」 is a disjunction, and `until` takes a list, so the buff ends at the first of the two (M-38, closed 2026-09-28: the earlier single-name version let a support Skill leave it standing). ⚠ 「我方全体造成的伤害」 is ALL_DAMAGE_TYPE_BOOST on `all_allies`, which reads the camp, so the memosprite gets it too (and it is not double-granted: the memosprite's own Max HP effect above is a different attribute)."
+      "_note": "The Basic-ATK half of the disjunction, as three effects in one rule (the wearer's Max HP, the memosprite's, and the party's damage). ⚠ `self_summon_count >= 1` is 「若装备者的忆灵在场」 AND it is what makes the `target: \"summon\"` effect legal: that selector fails loudly when nothing is out, so the condition is load-bearing rather than decorative. ⚠ The duration names BOTH events -- 「持续至装备者下次施放普攻或战技后」 is a disjunction, and `until` takes a list, so the buff ends at the first of the two (M-38, closed 2026-09-28: the earlier single-name version let a support Skill leave it standing). ⚠ 「我方全体造成的伤害」 is ALL_DAMAGE_TYPE_BOOST on `all_allies`, which reads the camp, so the memosprite gets it too (and it is not double-granted: the memosprite's own Max HP effect above is a different attribute)."
     },
     {
       "on": "SKILL_CAST",
@@ -44,7 +46,7 @@
         }
       ],
       "source": "relic set 127 (再创天地的救世主 / Hero of the Shattered World), 4-piece: 「装备者施放普攻或战技后，若装备者的忆灵在场，…持续至装备者下次施放普攻或战技后。」 param = [0.24, 0.15]",
-      "note": "The Skill half, identical in effects to the Basic-ATK one: 「普攻或战技」 is a disjunction over two CASTS, and the engine splits those two at the emitter (BASIC_ATTACK / SKILL_CAST), so granting it takes two rules while ENDING it takes one list. Both carry `actor == self` because both events reach every character's table. ⚠ The cast that grants the buff does not consume it: `SkillExecutor.execute` settles the landed attack (`resolveHits` → `fireAfterAttack`) and the buff-level cast notification (`broadcastSkillCast`) BEFORE it delivers these trigger events, so 「施放战技后…持续至下次施放…后」 lasts a whole interval instead of being granted and taken away by the same cast."
+      "_note": "The Skill half, identical in effects to the Basic-ATK one: 「普攻或战技」 is a disjunction over two CASTS, and the engine splits those two at the emitter (BASIC_ATTACK / SKILL_CAST), so granting it takes two rules while ENDING it takes one list. Both carry `actor == self` because both events reach every character's table. ⚠ The cast that grants the buff does not consume it: `SkillExecutor.execute` settles the landed attack (`resolveHits` → `fireAfterAttack`) and the buff-level cast notification (`broadcastSkillCast`) BEFORE it delivers these trigger events, so 「施放战技后…持续至下次施放…后」 lasts a whole interval instead of being granted and taken away by the same cast."
     }
   ]
 }

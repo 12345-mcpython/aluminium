@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21041,
   "1": [
     {
       "on": "DEBUFF_APPLIED",
@@ -16,7 +18,7 @@
         }
       ],
       "source": "光锥 21041: 「装备者对敌方目标施加负面状态后，获得一层【戏法】，每层使装备者造成的伤害提高#1[i]%，最多叠加#2[i]层，持续#3[i]回合」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     },
     {
       "on": "BATTLE_START",
@@ -26,7 +28,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     }
   ],
   "2": [
@@ -46,7 +48,7 @@
         }
       ],
       "source": "光锥 21041: 「装备者对敌方目标施加负面状态后，获得一层【戏法】，每层使装备者造成的伤害提高#1[i]%，最多叠加#2[i]层，持续#3[i]回合」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     },
     {
       "on": "BATTLE_START",
@@ -56,7 +58,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.24, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     }
   ],
   "3": [
@@ -76,7 +78,7 @@
         }
       ],
       "source": "光锥 21041: 「装备者对敌方目标施加负面状态后，获得一层【戏法】，每层使装备者造成的伤害提高#1[i]%，最多叠加#2[i]层，持续#3[i]回合」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     },
     {
       "on": "BATTLE_START",
@@ -86,7 +88,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.28, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     }
   ],
   "4": [
@@ -106,7 +108,7 @@
         }
       ],
       "source": "光锥 21041: 「装备者对敌方目标施加负面状态后，获得一层【戏法】，每层使装备者造成的伤害提高#1[i]%，最多叠加#2[i]层，持续#3[i]回合」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     },
     {
       "on": "BATTLE_START",
@@ -116,7 +118,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.32, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     }
   ],
   "5": [
@@ -136,7 +138,7 @@
         }
       ],
       "source": "光锥 21041: 「装备者对敌方目标施加负面状态后，获得一层【戏法】，每层使装备者造成的伤害提高#1[i]%，最多叠加#2[i]层，持续#3[i]回合」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     },
     {
       "on": "BATTLE_START",
@@ -146,7 +148,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.36, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21041: 「当装备者的效果命中大于等于#4[i]%时，攻击力提高#5[i]%」",
-      "note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
+      "_note": "⭐ 用 **`DEBUFF_APPLIED`** ✓（**已有事件** ✓）+ **`ADD_STACK` → `per_stack` 加成** ✓（顺序同 21005/23015 ✓）；⭐ 第二半用 **`self_attr:EFFECT_HIT_RATE >= 0.8`** ✓（阈值条件 ✓）。⚠ 两半都是条件半 ✓（常数半归引擎 ✓）。"
     }
   ]
 }

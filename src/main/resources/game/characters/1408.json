@@ -1,4 +1,13 @@
 {
+  "_status": "partial",
+  "_gaps": [
+    "秘技：毁伤无上限未声明、每波 200% 物理、秘技点上限 +3、大地图效果未写",
+    "变身/终结技：境界【时墟铁墓】、其他队友离场且无法行动、敌方始终拥有物理弱点未写",
+    "终结技：毁伤门槛换额外回合、结束时的溢出奖励未写",
+    "星魂 3 第三项 140808（强化普攻）无 SkillType",
+    "星魂 5 的 140805 / 140809 / 140811 无 SkillType；槽 5 的 0.8 / 2.7 会漂移",
+    "其余变身子项与仓库技 / 星魂未读部分"
+  ],
   "resources": [
     {
       "id": "火种",
@@ -23,67 +32,139 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_coreflame",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "火种", "amount": 2 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 2
+        }
       ],
       "source": "1408 白厄 战技 黎明创世，地辟天开 (140802, BPSkill/Blast): 「获得2点【火种】，对指定敌方单体造成等同于白厄300%攻击力的物理属性伤害，对相邻目标造成等同于白厄120%攻击力的物理属性伤害。」",
-      "note": "「获得 **2 点【火种】**」—— `SKILL_CAST` + `actor == self` ✓ + `GAIN_RESOURCE 2` ✓（数量确定 ✓，上限由**声明**承担 ✓ —— 第 209 轮的区分 ✓）。⚠ 战技的 **300%/120%** 伤害由技能数据结算 ✓ ⇒ 不写规则 ✓。"
+      "_note": "「获得 **2 点【火种】**」—— `SKILL_CAST` + `actor == self` ✓ + `GAIN_RESOURCE 2` ✓（数量确定 ✓，上限由**声明**承担 ✓ —— 第 209 轮的区分 ✓）。⚠ 战技的 **300%/120%** 伤害由技能数据结算 ✓ ⇒ 不写规则 ✓。"
     },
     {
       "on": "BATTLE_START",
       "id": "technique_energy_and_skill_point",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 25, "target": "other_allies" },
-        { "op": "GAIN_SKILL_POINT", "amount": 1 }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 25,
+          "target": "other_allies"
+        },
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
       ],
       "source": "1408 白厄 秘技 终结之始 (140807, Maze/Enhance): 「…进入战斗后，为我方队友恢复25点能量，获得2点【毁伤】和1个战技点，并且每个波次开始时对敌方全体造成等同于白厄200%攻击力的物理属性伤害。若攻击普通敌人则立即将其消灭，不会进入战斗。未击中敌人时不消耗秘技点。」",
-      "note": "「进入战斗后，为我方**队友**恢复 **25 点能量**，获得 2 点【毁伤】和 **1 个战技点**」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；② 回能用 **`GAIN_ENERGY 25` + `target: other_allies`** ✓（\"为我方**队友**\" ✓ —— 与她**自己**相对 ✓）；③ 战技点 `GAIN_SKILL_POINT 1` ✓。⚠ **登记**：① 「获得 **2 点【毁伤】**」✗（**第二个资源** ✗ 且文档**通篇没给它上限** ✗ ⇒ 不可声明 ✓ —— 与【火种】**相反** ✓，⭐ **同一句里两个资源，一个能声明一个不能** ✓，第 218 轮那次对照的翻版 ✓）；② 「**每个波次开始时**对敌方全体造成 200% 攻击力物理伤害」✗（**按波次** ✗）；③ 「使**秘技点上限**提高 3 点」✗（没有这个 op ✗）；「若攻击普通敌人则立即将其消灭 / 未击中时不消耗秘技点」✗（大地图 ✗）。"
+      "_note": "「进入战斗后，为我方**队友**恢复 **25 点能量**，获得 2 点【毁伤】和 **1 个战技点**」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；② 回能用 **`GAIN_ENERGY 25` + `target: other_allies`** ✓（\"为我方**队友**\" ✓ —— 与她**自己**相对 ✓）；③ 战技点 `GAIN_SKILL_POINT 1` ✓。⚠ **登记**：① 「获得 **2 点【毁伤】**」✗（**第二个资源** ✗ 且文档**通篇没给它上限** ✗ ⇒ 不可声明 ✓ —— 与【火种】**相反** ✓，⭐ **同一句里两个资源，一个能声明一个不能** ✓，第 218 轮那次对照的翻版 ✓）；② 「**每个波次开始时**对敌方全体造成 200% 攻击力物理伤害」✗（**按波次** ✗）；③ 「使**秘技点上限**提高 3 点」✗（没有这个 op ✗）；「若攻击普通敌人则立即将其消灭 / 未击中时不消耗秘技点」✗（大地图 ✗）。"
     },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
       ],
       "source": "1408 白厄 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 300%/120%、终结技 960%、天赋 12 点与 30% 暴伤）",
-      "note": "本文件说明自己的数字来自哪一行（M-32）。⭐⭐ **CORRECTED（2026-10-19 逐句核）这张登记表曾经整片过时** ✗ —— 它写于那几批出货**之前**，而其中多项此后**已经落地** ✓（各条 note 里都记着 ✓）⇒ 现在按**逐项核过的现状**重写 ✓：点了规则 id 的 = 已出货 ✓，没点的 = **仍开** ✓。① **变身** ✓ 已出货（`ult_transformation`：`APPLY_BUFF 变身` ＋ 倒计时 ＋ 属性块 ＋ 免疫控制 ✓）—— ⚠ 仍开：境界【时墟铁墓】✗、**其他队友离场且无法行动** ✗、**敌方全体始终拥有物理属性弱点** ✗。② **额外回合** ✓ 已出货：「**8 个**」由**资源「额外回合计数」（上限 8）** ＋ `countdown_turn_counts` 数它 ＋ `last_countdown_turn_ends_the_transformation` 在第 8 次结束变身表达 ✓（⚠ 「永续的燃烧」在场时不结束 ✓，见那条的否定门 ✓）—— ⚠ 仍开：「**不会进入自己的回合**」✗、**速度基数可改写** ✗（现在是字面量 `speed: 59.4` ＝ 面板 99 × 60% ✓，而星魂 1 要抬到 66% ⇒ **不跟随** ✗）。③ **最后一击** ✗ 仍开（960% 均分 ✗ ＋ 触发时机 ✗ ＋ 「每剩余 1 个额外回合减少原倍率的 12.50%」✗）。④ **天赋的进入条件** ✓ 两半都已出货（`talent_coreflame_on_being_targeted` ＋ `talent_crit_damage_when_ally_targets_her` ✓）—— ⚠ **近似**：「成为技能目标」用 `SKILL_CAST` ＋ `target == self` ✓（引擎**没有**「我被某个技能指为目标」这个事件 ✗）。⑤ **强化天赋** ✓ 已出货：攻击力 +80% ／ 生命上限 +270% ／ 穿透 +20% ／ 免疫控制（`ult_transformation` ✓）、施放攻击后回复 20% 生命上限（`transformation_heals_on_attack` ✓）、**受到致命攻击时回复 25%**（`transformation_survives_a_lethal_hit` ✓ —— 数值由**本会话**从 20% 订正为 25% ✓）、变身结束时我方全体速度 +15% 持续 1 回合（`transformation_end_speeds_the_party` ✓）—— ⚠ 仍开：「**并立即发动最后一击**」✗、12.50% 的衰减 ✗。⑥ **行迹**：文档列了**三条** ✓（`:376`~`:378`）—— 1408101 【行向世界终点】✓ 已出货（`trace_worlds_end_one_seed_at_battle_start` ＋ `trace_worlds_end_three_seeds` ✓）、1408103 【照见英雄本色】✓ 已出货（`trace_hero_true_colors_*` 两条 ✓）、1408102 【身承炎炬万千】**前半** ✓ 已出货（`trace_bide_in_flames_raises_his_damage`，2026-10-19 补 ✓）、**后半**（受队友回能时获得 1 点火种）✗ 仍开 —— `ENERGY_GAINED` 不带「谁给的」✓，见那条的 note ✓。⑦ **星魂**（2026-10-19 第三批：E1~E6 逐条核过 ✓；点了规则 id 的 = 已出货，没点的 = **仍开**）：\n  · **E1 后半** ✓ 已出货（`ult_transformation` 的暴伤效果，效果级 `min_eidolon: 1` ✓ —— **本会话**补的，此前 0 星魂也白拿 +50% ✗）；**E1 前半** ✗ 仍开（倒计时速度继承比例 66% 起、每消灭 1 个敌方目标 +1.5%、上限 84% —— 倒计时的速度是**字面量** ✓，词表没有「倒计时速度 = 基础速度 × 一个会变的份额」✗）。\n  · **E2 前半** ✓ 已出货（`ult_transformation` 的穿透效果，效果级 `min_eidolon: 2` ✓ —— **本批次**补的，此前记成行迹 ⇒ 0 星魂白拿 +20% ✗）；**E2 后半** ✗ 仍开（「单次施放【支柱•死星天裁】消耗【毁伤】达到 4 点时获得 1 个额外回合」—— 引擎没有「这次施放花掉多少【毁伤】」这个读数 ✗）。\n  · **E3** ✓ 已出货（`eidolon3_ultra_and_common_levels`）；`140808`（槽 8 强化普攻 +1）**写不了** ✗ （槽 8 没有 `SkillType` ✗）。\n  · **E4** ✗ **仍开，且不是「少一句」而是整条依赖未建模** ✓：「施放【灾厄•弑魂焚诏】时，额外获得 #1 = 4 层【弑魂之炽】」—— 【弑魂之炽】本身（`skills.json` 140809 那一句的四条从句：受伤 -75%、每次敌方行动 +1 层、行动完毕的反击与其额外 4 次伤害、解除）**一条规则都没有** ✗，全库**一次**都没出现过「弑魂之炽」这个名字 ✓（`characters/` 与 `memosprites/` 全扫 ✓）⇒ 「额外获得 4 层」无处可加 ✓，**如实登记** ✓。\n  · **E5** ✓ 已出货（`eidolon5_skill_and_talent_levels`）；`140805`／`140809`／`140811` **写不了** ✗（三者都没有 `SkillType` ✗）。\n  · **E6** ✓ **三句全部已出货**（`eidolon6_unbounded_coreflame_overflow` ／ `eidolon6_six_coreflame_at_battle_start` ／ `eidolon6_stardeath_verdict_true_damage`）—— 判据 `PhainonEidolonSixTest`（三条各一端 ＋ 变异验证 ✓）。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⭐⭐ **CORRECTED（2026-10-19 逐句核）这张登记表曾经整片过时** ✗ —— 它写于那几批出货**之前**，而其中多项此后**已经落地** ✓（各条 note 里都记着 ✓）⇒ 现在按**逐项核过的现状**重写 ✓：点了规则 id 的 = 已出货 ✓，没点的 = **仍开** ✓。① **变身** ✓ 已出货（`ult_transformation`：`APPLY_BUFF 变身` ＋ 倒计时 ＋ 属性块 ＋ 免疫控制 ✓）—— ⚠ 仍开：境界【时墟铁墓】✗、**其他队友离场且无法行动** ✗、**敌方全体始终拥有物理属性弱点** ✗。② **额外回合** ✓ 已出货：「**8 个**」由**资源「额外回合计数」（上限 8）** ＋ `countdown_turn_counts` 数它 ＋ `last_countdown_turn_ends_the_transformation` 在第 8 次结束变身表达 ✓（⚠ 「永续的燃烧」在场时不结束 ✓，见那条的否定门 ✓）—— ⚠ 仍开：「**不会进入自己的回合**」✗、**速度基数可改写** ✗（现在是字面量 `speed: 59.4` ＝ 面板 99 × 60% ✓，而星魂 1 要抬到 66% ⇒ **不跟随** ✗）。③ **最后一击** ✗ 仍开（960% 均分 ✗ ＋ 触发时机 ✗ ＋ 「每剩余 1 个额外回合减少原倍率的 12.50%」✗）。④ **天赋的进入条件** ✓ 两半都已出货（`talent_coreflame_on_being_targeted` ＋ `talent_crit_damage_when_ally_targets_her` ✓）—— ⚠ **近似**：「成为技能目标」用 `SKILL_CAST` ＋ `target == self` ✓（引擎**没有**「我被某个技能指为目标」这个事件 ✗）。⑤ **强化天赋** ✓ 已出货：攻击力 +80% ／ 生命上限 +270% ／ 穿透 +20% ／ 免疫控制（`ult_transformation` ✓）、施放攻击后回复 20% 生命上限（`transformation_heals_on_attack` ✓）、**受到致命攻击时回复 25%**（`transformation_survives_a_lethal_hit` ✓ —— 数值由**本会话**从 20% 订正为 25% ✓）、变身结束时我方全体速度 +15% 持续 1 回合（`transformation_end_speeds_the_party` ✓）—— ⚠ 仍开：「**并立即发动最后一击**」✗、12.50% 的衰减 ✗。⑥ **行迹**：文档列了**三条** ✓（`:376`~`:378`）—— 1408101 【行向世界终点】✓ 已出货（`trace_worlds_end_one_seed_at_battle_start` ＋ `trace_worlds_end_three_seeds` ✓）、1408103 【照见英雄本色】✓ 已出货（`trace_hero_true_colors_*` 两条 ✓）、1408102 【身承炎炬万千】**前半** ✓ 已出货（`trace_bide_in_flames_raises_his_damage`，2026-10-19 补 ✓）、**后半**（受队友回能时获得 1 点火种）✗ 仍开 —— `ENERGY_GAINED` 不带「谁给的」✓，见那条的 note ✓。⑦ **星魂**（2026-10-19 第三批：E1~E6 逐条核过 ✓；点了规则 id 的 = 已出货，没点的 = **仍开**）：\n  · **E1 后半** ✓ 已出货（`ult_transformation` 的暴伤效果，效果级 `min_eidolon: 1` ✓ —— **本会话**补的，此前 0 星魂也白拿 +50% ✗）；**E1 前半** ✗ 仍开（倒计时速度继承比例 66% 起、每消灭 1 个敌方目标 +1.5%、上限 84% —— 倒计时的速度是**字面量** ✓，词表没有「倒计时速度 = 基础速度 × 一个会变的份额」✗）。\n  · **E2 前半** ✓ 已出货（`ult_transformation` 的穿透效果，效果级 `min_eidolon: 2` ✓ —— **本批次**补的，此前记成行迹 ⇒ 0 星魂白拿 +20% ✗）；**E2 后半** ✗ 仍开（「单次施放【支柱•死星天裁】消耗【毁伤】达到 4 点时获得 1 个额外回合」—— 引擎没有「这次施放花掉多少【毁伤】」这个读数 ✗）。\n  · **E3** ✓ 已出货（`eidolon3_ultra_and_common_levels`）；`140808`（槽 8 强化普攻 +1）**写不了** ✗ （槽 8 没有 `SkillType` ✗）。\n  · **E4** ✗ **仍开，且不是「少一句」而是整条依赖未建模** ✓：「施放【灾厄•弑魂焚诏】时，额外获得 #1 = 4 层【弑魂之炽】」—— 【弑魂之炽】本身（`skills.json` 140809 那一句的四条从句：受伤 -75%、每次敌方行动 +1 层、行动完毕的反击与其额外 4 次伤害、解除）**一条规则都没有** ✗，全库**一次**都没出现过「弑魂之炽」这个名字 ✓（`characters/` 与 `memosprites/` 全扫 ✓）⇒ 「额外获得 4 层」无处可加 ✓，**如实登记** ✓。\n  · **E5** ✓ 已出货（`eidolon5_skill_and_talent_levels`）；`140805`／`140809`／`140811` **写不了** ✗（三者都没有 `SkillType` ✗）。\n  · **E6** ✓ **三句全部已出货**（`eidolon6_unbounded_coreflame_overflow` ／ `eidolon6_six_coreflame_at_battle_start` ／ `eidolon6_stardeath_verdict_true_damage`）—— 判据 `PhainonEidolonSixTest`（三条各一端 ＋ 变异验证 ✓）。"
     },
     {
       "on": "BATTLE_START",
       "id": "eidolon3_ultra_and_common_levels",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "source": "1408 白厄 星魂 3 几重寂静深埋归墟: 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」（`eidolons.json` 1408 E3 的 `skill_add_level` = `{'140803': 2, '140801': 1, '140808': 1}`）",
-      "note": "⭐⭐ **这一条此前整条缺失** ✓（2026-10-19 逐句核补上 ✓）—— 症状是**沉默的**：星魂 3 的等级提升**什么都没做** ✗（技能等级停在等级口径给的那一行 ✓），而判据此前只读「变身有没有开」✗。⭐ 数值直接量自 `eidolons.json` 的 `skill_add_level` ✓，**技能 id → 槽位**由 `skills.json` 确认 ✓（140803 → 槽 3 = 终结技 ✓、140801 → 槽 1 = 普攻 ✓）。⚠ **上界不用写** ✓：引擎把等级夹在该技能表自己的行数上 ✓（`CanHit.skillLevel` 的 `min(level, rows)` ✓）⇒ 原文的「最多不超过 15 级」**由数据行自动成立** ✓ —— ⚠ 而且普攻那一半**恰好被夹掉** ✓（10 行表 +9+1 = 11 ⇒ 仍是第 10 行 ✓，判据钉住这一点 ✓）。⚠⚠ **E3 的第三项 `140808` 写不了** ✗：它是**槽 8（强化普攻）** ✓，而 `SkillType` 词表里**没有槽 8** ✗（`SkillSlotMappingTest` 钉住的表只有 1/2/3/4/6/7/20/21 ✓）⇒ 照实登记 ✓（⚠ 1506 的槽 8/10/12/18 与 1408 的槽 5/9/11 是**同一个缺口** ✓）。"
+      "_note": "⭐⭐ **这一条此前整条缺失** ✓（2026-10-19 逐句核补上 ✓）—— 症状是**沉默的**：星魂 3 的等级提升**什么都没做** ✗（技能等级停在等级口径给的那一行 ✓），而判据此前只读「变身有没有开」✗。⭐ 数值直接量自 `eidolons.json` 的 `skill_add_level` ✓，**技能 id → 槽位**由 `skills.json` 确认 ✓（140803 → 槽 3 = 终结技 ✓、140801 → 槽 1 = 普攻 ✓）。⚠ **上界不用写** ✓：引擎把等级夹在该技能表自己的行数上 ✓（`CanHit.skillLevel` 的 `min(level, rows)` ✓）⇒ 原文的「最多不超过 15 级」**由数据行自动成立** ✓ —— ⚠ 而且普攻那一半**恰好被夹掉** ✓（10 行表 +9+1 = 11 ⇒ 仍是第 10 行 ✓，判据钉住这一点 ✓）。⚠⚠ **E3 的第三项 `140808` 写不了** ✗：它是**槽 8（强化普攻）** ✓，而 `SkillType` 词表里**没有槽 8** ✗（`SkillSlotMappingTest` 钉住的表只有 1/2/3/4/6/7/20/21 ✓）⇒ 照实登记 ✓（⚠ 1506 的槽 8/10/12/18 与 1408 的槽 5/9/11 是**同一个缺口** ✓）。"
     },
     {
       "on": "BATTLE_START",
       "id": "eidolon5_skill_and_talent_levels",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "source": "1408 白厄 星魂 5 永劫时针，三千万转: 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」（`eidolons.json` 1408 E5 的 `skill_add_level` = `{'140802': 2, '140804': 2, '140805': 2, '140809': 2, '140811': 2}`）",
-      "note": "⭐⭐ **与星魂 3 同一条缺口** ✓（本会话补齐 ✓）：战技 → `SKILL` ✓（140802 → 槽 2 ✓）、天赋 → `TALENT` ✓（140804 → 槽 4 ✓）。⚠⚠ **三项写不了** ✗：`140805`（**槽 5 = 天赋·强化** ✓）、`140809` 与 `140811`（**两个强化战技** ✓）—— 三者都**没有对应的 `SkillType`** ✗ ⇒ 照实登记 ✓。⚠⚠ **连带效应（本会话一起处理）**：天赋升到 **12 行**之后，`talent_crit_damage_when_ally_targets_her` 里那个字面量 **0.3** 不再等于当前行 ✗（第 12 行 = **0.33** ✓）⇒ 那一条已改读 `TALENT:0` ✓；而**槽 5** 的 **0.8 / 2.7**（`ult_transformation` 的攻击力与生命上限）**改不了** ✗（槽 5 不可读 ✓）⇒ 从「今天不漂移」变成**真的会漂移** ✓，登记在 `ult_transformation` 的 note 里 ✓。"
+      "_note": "⭐⭐ **与星魂 3 同一条缺口** ✓（本会话补齐 ✓）：战技 → `SKILL` ✓（140802 → 槽 2 ✓）、天赋 → `TALENT` ✓（140804 → 槽 4 ✓）。⚠⚠ **三项写不了** ✗：`140805`（**槽 5 = 天赋·强化** ✓）、`140809` 与 `140811`（**两个强化战技** ✓）—— 三者都**没有对应的 `SkillType`** ✗ ⇒ 照实登记 ✓。⚠⚠ **连带效应（本会话一起处理）**：天赋升到 **12 行**之后，`talent_crit_damage_when_ally_targets_her` 里那个字面量 **0.3** 不再等于当前行 ✗（第 12 行 = **0.33** ✓）⇒ 那一条已改读 `TALENT:0` ✓；而**槽 5** 的 **0.8 / 2.7**（`ult_transformation` 的攻击力与生命上限）**改不了** ✗（槽 5 不可读 ✓）⇒ 从「今天不漂移」变成**真的会漂移** ✓，登记在 `ult_transformation` 的 note 里 ✓。"
     },
     {
       "on": "ULT_CAST",
       "id": "ult_transformation",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "变身", "permanent": true, "target": "self" },
-        { "op": "START_COUNTDOWN", "buff": "卡厄斯兰那的额外回合", "speed": 59.4 },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.8, "permanent": true, "buff": "变身", "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "percent": 2.7, "permanent": true, "buff": "变身", "target": "self" },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "变身",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "START_COUNTDOWN",
+          "buff": "卡厄斯兰那的额外回合",
+          "speed": 59.4
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.8,
+          "permanent": true,
+          "buff": "变身",
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 2.7,
+          "permanent": true,
+          "buff": "变身",
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "DAMAGE_PENETRATION",
@@ -93,107 +174,186 @@
           "min_eidolon": 2,
           "target": "self"
         },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.5, "turns": 3, "min_eidolon": 1, "target": "self" },
-        { "op": "RESIST_DEBUFF", "kind": "control", "percent": 1.0, "buff": "变身", "permanent": true, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.5,
+          "turns": 3,
+          "min_eidolon": 1,
+          "target": "self"
+        },
+        {
+          "op": "RESIST_DEBUFF",
+          "kind": "control",
+          "percent": 1.0,
+          "buff": "变身",
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄 终结技（文档 `:77`）：「**变身为卡厄斯兰那**，变身期间展开境界【时墟铁墓】」\n⭐ 2026-10-02（文档，卡厄斯兰那的天赋）：「…变身期间**攻击力提高 80%**，**生命上限提高 270%**」✓\n⭐ 2026-10-19（**星魂 2**，`eidolons.json` 1408 的 rank 140802，param `[4, 0.2]`）：「卡厄斯兰那的物理属性**抗性穿透提高 #2 = 20%**」✓ —— ⚠ 上一版把这一句记成**行迹** ✗（见 note ✓；卡厄斯兰那就是**变身形态** ✓ ⇒ 作用域是“变身期间” ✓）\n⭐ 2026-10-19（**星魂 1**，`eidolons.json` 1408 的 rank 140801，param `[0.015, 0.5, 3, 0.84, 0.66]`）：「施放终结技时，暴击伤害提高 **#2 = 50%**，持续 **#3 = 3** 回合」✓ —— ⚠ 上一版把这一句记成**行迹** ✗，于是那个效果**没有星魂门** ✗（见 note ✓）\n⭐ 2026-10-02（文档，卡厄斯兰那的天赋）：「卡厄斯兰那**免疫控制类负面状态**」✓",
-      "note": "⭐ 2026-10-02：变身建成**永久状态** ✓（因为它的结束**不是时长** ✓：文档 `:120` 说是「最后 1 个倒计时回合…结束变身」 ✓，而**显式移除现在会公告 `STATE_ENDED`** ✓ —— 本段第 20 件 ✓）。⚠ **已登记、本条不猜** ✗：【毁伤】的上限（它是 `SetPhainonChargePoint`，上限是**编译表达式** ✗）；**8 个倒计时回合与速度 60%** ✗；**【毁伤】门槛换额外回合** ✗；**结束时的溢出奖励** ✗。\n⭐ 2026-10-02：加上**倒计时** ✓ —— 文档 `:77` 「拥有 **8** 个额外回合，**速度固定为卡厄斯兰那基础速度的 60%**」✓。写法照拄**在树的两例** ✓（`1309` 的 `speed: 90` ✓／`1507` 的 `speed: 70` ✓）；**数是量出来的** ✓：她面板 **SPEED = 99.0** ✓（一次性探针判据报的 ✓）⇒ 60% = **59.4** ✓。⚠ 仍缺（已登记）：**结束时的溢出奖励** ✗。\n⭐ 2026-10-02：变身的**属性块** ✓（`ATTACK +80%` ✓／`HEALTH +270%` ✓）—— 形状同第 22⾋29 件（`MODIFY_ATTR` 随授予规则一起落下 ✓）。⚠ 仍登记：“正在变身”的其余句子（见 `source` 里的清单 ✗）。\n⭐ 2026-10-02：三条属性都**绑到【变身】** ✓（`\"buff\": \"变身\"` ✓ —— ⚠ 第 34 件当时**漏了这个绑定** ✗ ⇒ “变身期间”会默默变成“本场战斗剩下的时间” ✗）。⚠ **仍登记**：同句后半“单次施放【支柱•死星天裁】消耗【毁伤】达到 **4** 点时获得 1 个额外回合” ✗。\n⭐ 2026-10-02：行迹的**临时暴伤** ✓（`MODIFY_ATTR{CRIT_ATTACK, 0.50, turns: 3}` ✓）—— ❗ **刻意不绑【变身】** ✓（它是“持续 3 回合”的独立时长 ✓，不是“变身期间” ✓）。⭐⭐ **CORRECTED（2026-10-19 逐句核）那一句的归属与门** ✓：它是**星魂 1** 的后半句 ✓（`rank_id 140801`，param 的 #2/#3 = 0.5/3 ✓），而上一版把它记成**行迹** ✗ ⇒ 效果上**没有 `min_eidolon`** ✗ ⇒ **0 星魂也拿到 +50% 暴伤** ✓（症状：沉默 ✓）。现在门写在**效果层** ✓（`\"min_eidolon\": 1` ✓ —— 规则层会让整条规则消失 ✗，而变身本身与星魂无关 ✓，与 1506 星魂 1 保留隐藏分那条同一个理由 ✓）。判据 `PhainonEidolonOneTest` 钉**两端** ✓（E0 不涨 ✓、E1 涨 0.5 ✓）。⚠⚠ **仍开（同一条星魂的前半句）**：「卡厄斯兰那的额外回合的基础速度继承比例**提高至 #5 = 66%**」＋「单场战斗中每有 1 个敌方目标被消灭使其额外提高 **#1 = 1.5%**，最多提高至 **#4 = 84%**」✗ —— 倒计时的速度现在是**字面量** `speed: 59.4` ✓（实测 = 她的面板速度 99 × 60% ✓），而那个比例**随星魂变** ✗ ⇒ 词表没有「倒计时速度 = 基础速度 × 一个会变的份额」的拼法 ✗，**如实登记** ✓。⭐⭐ **CORRECTED（2026-10-19 第二批）槽 5 的两个数** ✓：**0.8 / 2.7 从「今天不漂移」变成「真的会漂移」** ✗ —— 因为星魂 5 现在**落地了** ✓（`eidolon5_skill_and_talent_levels` ✓），它把 `140805`（**槽 5 = 这份属性块所在的那一行** ✓）**+2 级** ⇒ 有效等级 12 ⇒ 第 12 行是 **0.88 / 2.97** ✓ 而不是 0.8 / 2.7 ✗。⚠ **改不了**：槽 5 **没有 `SkillType`** ✗（`SkillSlotMappingTest` 的表只有 1/2/3/4/6/7/20/21 ✓）⇒ 没有「读它那一行」的拼法 ✗，只能登记 ✓（与 `140808`／`140809`／`140811` 同一个缺口 ✓）。⚠ 同块的 **穿透 0.2 是全行恒定** ✓ ⇒ 不漂移 ✓。\n⭐ 2026-10-02：免疫用 **`RESIST_DEBUFF{kind: control, percent: 1.0}`** ✓ —— ⚠ **拼法逐字抄自 `1309`** ✓（它的终结技里就是 `percent: 1.0` ⾋ `buff: \"协奏\"` ✓，源文正是「**免疫**控制类负面状态」 ✓）；⾋`1013` 用同一 op 的 **0.35** 做“抵抗” ✓⇒ 所以 `1.0` 就是免疫 ✓。⚠ **绑到【变身】** ✓（`buff:` ✓）⇒ “**卡厄斯兰那**免疫”的作用域 ✓。\n⭐⭐ **CORRECTED（2026-10-19 第三批）穿透 0.2 的归属** ✓：它是**星魂 2** 的前半句 ✓（`rank_id 140802`，param `[4, 0.2]` 的 **#2 = 0.2** ✓），而上一版把它记成**行迹** ✗ ⇒ 效果上**没有星魂门** ✗ ⇒ **0 星魂也白拿 +20% 物理抗性穿透** ✓（症状：沉默 ✓ —— 与星魂 1 的暴伤那一句**同一个错法** ✓）。⚠ 两条独立证据：① `skill_traces.json` 里 1408 只有**三条**行迹（1408101 / 1408102 / 1408103 ✓，原文分别是「火种 / 受伤增伤 / 攻击力」✓），**没有一条**提抗性穿透 ✓；② 文档 §行迹（`:375`~`:378`）同样只列那三条 ✓，而 `:402`（星魂 2）逐字写着「卡厄斯兰那的物理属性**抗性穿透**提高 20%」✓。现在门写在**效果层** ✓（`\"min_eidolon\": 2` ✓ —— 与星魂 1 同一个理由：变身本身与星魂无关 ✓）。判据 `PhainonEidolonTwoTest` 钉**两端** ✓（E0 = 0 ✓、E2 = 0.2 ✓）。⚠ **同一条星魂的后半句仍开** ✗：「单次施放【支柱•死星天裁】消耗【毁伤】点数达到 #1 = 4 点时，获得 1 个额外回合」 —— 理由见本 note 上一处登记（引擎没有「**这次施放花掉了多少【毁伤】**」这个读数 ✓；事件表里唯一的「花掉」事件是`SKILL_POINT_SPENT` ✓，没有单位计数器的那个 ✓；而 1408 的【毁伤】**至今没有任何消费者** ✓）⇒ **不**拿 `self_resource:毁伤 >= 4` 冒充 ✓（那是「持有 4 点就送回合」✗，与「单次施放消耗达到 4 点」是两件事 ✓）。"
+      "_note": "⭐ 2026-10-02：变身建成**永久状态** ✓（因为它的结束**不是时长** ✓：文档 `:120` 说是「最后 1 个倒计时回合…结束变身」 ✓，而**显式移除现在会公告 `STATE_ENDED`** ✓ —— 本段第 20 件 ✓）。⚠ **已登记、本条不猜** ✗：【毁伤】的上限（它是 `SetPhainonChargePoint`，上限是**编译表达式** ✗）；**8 个倒计时回合与速度 60%** ✗；**【毁伤】门槛换额外回合** ✗；**结束时的溢出奖励** ✗。\n⭐ 2026-10-02：加上**倒计时** ✓ —— 文档 `:77` 「拥有 **8** 个额外回合，**速度固定为卡厄斯兰那基础速度的 60%**」✓。写法照拄**在树的两例** ✓（`1309` 的 `speed: 90` ✓／`1507` 的 `speed: 70` ✓）；**数是量出来的** ✓：她面板 **SPEED = 99.0** ✓（一次性探针判据报的 ✓）⇒ 60% = **59.4** ✓。⚠ 仍缺（已登记）：**结束时的溢出奖励** ✗。\n⭐ 2026-10-02：变身的**属性块** ✓（`ATTACK +80%` ✓／`HEALTH +270%` ✓）—— 形状同第 22⾋29 件（`MODIFY_ATTR` 随授予规则一起落下 ✓）。⚠ 仍登记：“正在变身”的其余句子（见 `source` 里的清单 ✗）。\n⭐ 2026-10-02：三条属性都**绑到【变身】** ✓（`\"buff\": \"变身\"` ✓ —— ⚠ 第 34 件当时**漏了这个绑定** ✗ ⇒ “变身期间”会默默变成“本场战斗剩下的时间” ✗）。⚠ **仍登记**：同句后半“单次施放【支柱•死星天裁】消耗【毁伤】达到 **4** 点时获得 1 个额外回合” ✗。\n⭐ 2026-10-02：行迹的**临时暴伤** ✓（`MODIFY_ATTR{CRIT_ATTACK, 0.50, turns: 3}` ✓）—— ❗ **刻意不绑【变身】** ✓（它是“持续 3 回合”的独立时长 ✓，不是“变身期间” ✓）。⭐⭐ **CORRECTED（2026-10-19 逐句核）那一句的归属与门** ✓：它是**星魂 1** 的后半句 ✓（`rank_id 140801`，param 的 #2/#3 = 0.5/3 ✓），而上一版把它记成**行迹** ✗ ⇒ 效果上**没有 `min_eidolon`** ✗ ⇒ **0 星魂也拿到 +50% 暴伤** ✓（症状：沉默 ✓）。现在门写在**效果层** ✓（`\"min_eidolon\": 1` ✓ —— 规则层会让整条规则消失 ✗，而变身本身与星魂无关 ✓，与 1506 星魂 1 保留隐藏分那条同一个理由 ✓）。判据 `PhainonEidolonOneTest` 钉**两端** ✓（E0 不涨 ✓、E1 涨 0.5 ✓）。⚠⚠ **仍开（同一条星魂的前半句）**：「卡厄斯兰那的额外回合的基础速度继承比例**提高至 #5 = 66%**」＋「单场战斗中每有 1 个敌方目标被消灭使其额外提高 **#1 = 1.5%**，最多提高至 **#4 = 84%**」✗ —— 倒计时的速度现在是**字面量** `speed: 59.4` ✓（实测 = 她的面板速度 99 × 60% ✓），而那个比例**随星魂变** ✗ ⇒ 词表没有「倒计时速度 = 基础速度 × 一个会变的份额」的拼法 ✗，**如实登记** ✓。⭐⭐ **CORRECTED（2026-10-19 第二批）槽 5 的两个数** ✓：**0.8 / 2.7 从「今天不漂移」变成「真的会漂移」** ✗ —— 因为星魂 5 现在**落地了** ✓（`eidolon5_skill_and_talent_levels` ✓），它把 `140805`（**槽 5 = 这份属性块所在的那一行** ✓）**+2 级** ⇒ 有效等级 12 ⇒ 第 12 行是 **0.88 / 2.97** ✓ 而不是 0.8 / 2.7 ✗。⚠ **改不了**：槽 5 **没有 `SkillType`** ✗（`SkillSlotMappingTest` 的表只有 1/2/3/4/6/7/20/21 ✓）⇒ 没有「读它那一行」的拼法 ✗，只能登记 ✓（与 `140808`／`140809`／`140811` 同一个缺口 ✓）。⚠ 同块的 **穿透 0.2 是全行恒定** ✓ ⇒ 不漂移 ✓。\n⭐ 2026-10-02：免疫用 **`RESIST_DEBUFF{kind: control, percent: 1.0}`** ✓ —— ⚠ **拼法逐字抄自 `1309`** ✓（它的终结技里就是 `percent: 1.0` ⾋ `buff: \"协奏\"` ✓，源文正是「**免疫**控制类负面状态」 ✓）；⾋`1013` 用同一 op 的 **0.35** 做“抵抗” ✓⇒ 所以 `1.0` 就是免疫 ✓。⚠ **绑到【变身】** ✓（`buff:` ✓）⇒ “**卡厄斯兰那**免疫”的作用域 ✓。\n⭐⭐ **CORRECTED（2026-10-19 第三批）穿透 0.2 的归属** ✓：它是**星魂 2** 的前半句 ✓（`rank_id 140802`，param `[4, 0.2]` 的 **#2 = 0.2** ✓），而上一版把它记成**行迹** ✗ ⇒ 效果上**没有星魂门** ✗ ⇒ **0 星魂也白拿 +20% 物理抗性穿透** ✓（症状：沉默 ✓ —— 与星魂 1 的暴伤那一句**同一个错法** ✓）。⚠ 两条独立证据：① `skill_traces.json` 里 1408 只有**三条**行迹（1408101 / 1408102 / 1408103 ✓，原文分别是「火种 / 受伤增伤 / 攻击力」✓），**没有一条**提抗性穿透 ✓；② 文档 §行迹（`:375`~`:378`）同样只列那三条 ✓，而 `:402`（星魂 2）逐字写着「卡厄斯兰那的物理属性**抗性穿透**提高 20%」✓。现在门写在**效果层** ✓（`\"min_eidolon\": 2` ✓ —— 与星魂 1 同一个理由：变身本身与星魂无关 ✓）。判据 `PhainonEidolonTwoTest` 钉**两端** ✓（E0 = 0 ✓、E2 = 0.2 ✓）。⚠ **同一条星魂的后半句仍开** ✗：「单次施放【支柱•死星天裁】消耗【毁伤】点数达到 #1 = 4 点时，获得 1 个额外回合」 —— 理由见本 note 上一处登记（引擎没有「**这次施放花掉了多少【毁伤】**」这个读数 ✓；事件表里唯一的「花掉」事件是`SKILL_POINT_SPENT` ✓，没有单位计数器的那个 ✓；而 1408 的【毁伤】**至今没有任何消费者** ✓）⇒ **不**拿 `self_resource:毁伤 >= 4` 冒充 ✓（那是「持有 4 点就送回合」✗，与「单次施放消耗达到 4 点」是两件事 ✓）。"
     },
     {
       "on": "ALLY_ATTACK",
       "id": "transformation_heals_on_attack",
-      "when": ["actor == self", "self has_state 变身"],
+      "when": [
+        "actor == self",
+        "self has_state 变身"
+      ],
       "do": [
-        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.2, "target": "self" }
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.2,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄（文档，卡厄斯兰那的天赋）：「…变身期间…**施放攻击后回复等同于自身生命上限 20%** 的生命值」",
-      "note": "⭐ 2026-10-02：三件都是本段已验的形状 ✓：“变身期间”用**状态条件** ✓（`self has_state 变身` ✓—— 本句是**规则效果**而非修饰 ✓ ⇒ 不涉及 `buff:` 绑定 ✓）；“施放攻击后”用 `ATTACK_FINISHED` ✓；“回 20% 生命上限”用 `HEAL{scale: \"owner_max_hp\", percent: 0.20}` ✓。⚠ 受量取**当时的**生命上限 ✓（而变身把它提高了 270% ✓ ⇒ 治疗量也随之变大 ✓）。"
+      "_note": "⭐ 2026-10-02：三件都是本段已验的形状 ✓：“变身期间”用**状态条件** ✓（`self has_state 变身` ✓—— 本句是**规则效果**而非修饰 ✓ ⇒ 不涉及 `buff:` 绑定 ✓）；“施放攻击后”用 `ATTACK_FINISHED` ✓；“回 20% 生命上限”用 `HEAL{scale: \"owner_max_hp\", percent: 0.20}` ✓。⚠ 受量取**当时的**生命上限 ✓（而变身把它提高了 270% ✓ ⇒ 治疗量也随之变大 ✓）。"
     },
     {
       "on": "SKILL_CAST",
       "id": "talent_coreflame_on_being_targeted",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "火种", "amount": 1 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 1
+        }
       ],
       "source": "1408 白厄（文档，白厄的天赋）：「当白厄成为**其他任意目标**的技能目标时，**获得 1 点【火种】**」",
-      "note": "⭐ 2026-10-02：形状**逐字取自已出货的 `1002.talent_wind_pen`** ✓（`SKILL_CAST` 是**带被瞄准单位**的施放事件 ✓ ⇒ “成为目标”＝`target == self` ✓）。⚠ “其他任意目标”（敌或友）无需额外条件 ✓，因为她无法把自己的技能瞄自己 ✓。"
+      "_note": "⭐ 2026-10-02：形状**逐字取自已出货的 `1002.talent_wind_pen`** ✓（`SKILL_CAST` 是**带被瞄准单位**的施放事件 ✓ ⇒ “成为目标”＝`target == self` ✓）。⚠ “其他任意目标”（敌或友）无需额外条件 ✓，因为她无法把自己的技能瞄自己 ✓。"
     },
     {
       "on": "SKILL_CAST",
       "id": "talent_crit_damage_when_ally_targets_her",
-      "when": ["actor is_ally", "target == self"],
+      "when": [
+        "actor is_ally",
+        "target == self"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 0},
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 0
+          },
           "turns": 3,
           "target": "self"
         }
       ],
       "source": "1408 白厄（文档，白厄的天赋）：「**若施放者为白厄的队友**，还会使白厄的**暴击伤害提高 30%**，持续 **3** 回合」—— 数值读**天赋那一行的第 1 项**（`TALENT:0` ✓）：Lv10 显示行 = **0.3** ✓、星魂 5 之后的第 12 行 = **0.33** ✓（`skills.json` 1408 槽 4 的 Lv10 = `[0.3, 3, 3, 12]` ✓）",
-      "note": "⭐ 2026-10-02：第二半的条件**比第一半窄** ✓（`actor is_ally` ✓ —— 与 `8007` 已出货的骑手同拼写 ✓）⇒ 所以**它是单独一条规则** ✓；❗ **不绑状态** ✓（“持续 3 回合”是它自己的时长 ✓—— 第 36 件已立的区分 ✓）。"
+      "_note": "⭐ 2026-10-02：第二半的条件**比第一半窄** ✓（`actor is_ally` ✓ —— 与 `8007` 已出货的骑手同拼写 ✓）⇒ 所以**它是单独一条规则** ✓；❗ **不绑状态** ✓（“持续 3 回合”是它自己的时长 ✓—— 第 36 件已立的区分 ✓）。"
     },
     {
       "on": "COUNTDOWN_TURN",
       "id": "countdown_turn_counts",
-      "when": ["actor == countdown"],
+      "when": [
+        "actor == countdown"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "额外回合计数", "amount": 1 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "额外回合计数",
+          "amount": 1
+        }
       ],
       "source": "1408 白厄（文档，卡厄斯兰那的额外回合）：「卡厄斯兰那拥有 **8** 个卡厄斯兰那的额外回合」✓",
-      "note": "⭐ 2026-10-02：⭐ **倒计时**自己没有剩余回合计数器** ✓（读了 `Countdown` 全文 ✓ 与 `Battle` 的倒计时回合处 ✓）⇒ “钟走完了”**不是引擎时刻** ✗，必须由**内容自己数** ✓（用一个**资源** ✓ —— 它可在条件里读 ✓）。"
+      "_note": "⭐ 2026-10-02：⭐ **倒计时**自己没有剩余回合计数器** ✓（读了 `Countdown` 全文 ✓ 与 `Battle` 的倒计时回合处 ✓）⇒ “钟走完了”**不是引擎时刻** ✗，必须由**内容自己数** ✓（用一个**资源** ✓ —— 它可在条件里读 ✓）。"
     },
     {
       "on": "COUNTDOWN_TURN",
       "id": "last_countdown_turn_ends_the_transformation",
-      "when": ["actor == countdown", "self_resource:额外回合计数 >= 8", "!self has_state 永续的燃烧"],
+      "when": [
+        "actor == countdown",
+        "self_resource:额外回合计数 >= 8",
+        "!self has_state 永续的燃烧"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "变身", "target": "self" }
+        {
+          "op": "REMOVE_STATE",
+          "buff": "变身",
+          "target": "self"
+        }
       ],
       "source": "1408 白厄（文档）：「最后 1 个倒计时回合…**结束变身**」✓（同句的“960% 由敌方全体**均分**”已登记 ✗）",
-      "note": "⭐ 2026-10-02：用 **`REMOVE_STATE`** ✓ —— 它是**显式移除**那条路 ✓，⭐ **会公告 `STATE_ENDED`** ✓（第 1619 轮实测 ✓）⇒ 所以目标 ① 的“**1408 变身结束**”读者到这里**真正接上** ✓。⚠ 本条规则**必须在计数规则之后** ✓（同一事件上按文件顺序 ✓），否则第 8 次读不到 8 ✗。  ⭐ **2026-10-02 补上的否定门**：「在卡厄斯兰那的额外回合耗尽后**不会结束变身**」。"
+      "_note": "⭐ 2026-10-02：用 **`REMOVE_STATE`** ✓ —— 它是**显式移除**那条路 ✓，⭐ **会公告 `STATE_ENDED`** ✓（第 1619 轮实测 ✓）⇒ 所以目标 ① 的“**1408 变身结束**”读者到这里**真正接上** ✓。⚠ 本条规则**必须在计数规则之后** ✓（同一事件上按文件顺序 ✓），否则第 8 次读不到 8 ✗。  ⭐ **2026-10-02 补上的否定门**：「在卡厄斯兰那的额外回合耗尽后**不会结束变身**」。"
     },
     {
       "on": "CAST_SETUP",
       "id": "transformation_dispels_own_debuffs",
-      "when": ["actor == self", "self has_state 变身"],
+      "when": [
+        "actor == self",
+        "self has_state 变身"
+      ],
       "do": [
-        { "op": "DISPEL", "amount": 99, "target": "self" }
+        {
+          "op": "DISPEL",
+          "amount": 99,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄（文档，卡厄斯兰那的强化攻击）：「**解除自身所有负面效果**，随后造成最多等同于卡厄斯兰那 1170% 攻击力的物理属性伤害」",
-      "note": "⭐ 2026-10-02：⭐ **这里 `DISPEL` 是**对的**** ✓（与第 33 件相反 ✓）—— 那句名了**类别**（「控制类」✗），而 `DISPEL` 落地是 `removeDebuffs(amount)` ✓（**无类别过滤** ✗）；本句说的是「**所有**负面效果」✓ ⇒ 正是它 ✓。⚠ `amount: 99` **逐字抄自 `1310`** ✓（同句先例：「当能量恢复至上限时解除自身所有负面效果」 ✓）。❗ 用 **`CAST_SETUP`** ✓ —— 句子的顺序是“**先解除、后造伤**” ✓，而 `CAST_SETUP` 是**施放前**的钩子 ✓。"
+      "_note": "⭐ 2026-10-02：⭐ **这里 `DISPEL` 是**对的**** ✓（与第 33 件相反 ✓）—— 那句名了**类别**（「控制类」✗），而 `DISPEL` 落地是 `removeDebuffs(amount)` ✓（**无类别过滤** ✗）；本句说的是「**所有**负面效果」✓ ⇒ 正是它 ✓。⚠ `amount: 99` **逐字抄自 `1310`** ✓（同句先例：「当能量恢复至上限时解除自身所有负面效果」 ✓）。❗ 用 **`CAST_SETUP`** ✓ —— 句子的顺序是“**先解除、后造伤**” ✓，而 `CAST_SETUP` 是**施放前**的钩子 ✓。"
     },
     {
       "on": "LETHAL_DAMAGE",
       "id": "transformation_survives_a_lethal_hit",
-      "when": ["target == self", "self has_state 变身"],
+      "when": [
+        "target == self",
+        "self has_state 变身"
+      ],
       "do": [
-        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.25, "target": "self" }
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.25,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄（文档 `:189`，卡厄斯兰那的天赋）：「卡厄斯兰那受到**致命攻击**时不会陷入**无法战斗状态**，而是**回复等同于自身生命上限 25%** 的生命值**并立即发动最后一击**。每剩余 1 个卡厄斯兰那的额外回合，最后一击的伤害倍率减少原倍率的 **12.50%**。」—— ⚠ 25% 与数据对上 ✓：强化天赋那一行（`skills.json` 1408 槽 5）的 **#2 = 0.25** ✓，而 **#7 = 0.2** 是**另一句**（「施放攻击后回复 20%」✓，由 `transformation_heals_on_attack` 出货 ✓）",
-      "note": "⭐ 2026-10-02：触发用**新建的 `LETHAL_DAMAGE`** ✓（它在 `Battle.applyDamage` 里发 ✓，❗ **而且目标先被扣到 0 但**不判死**** ✓ —— 否则满血时回血是空操作 ✗）。⚠ **绑到【变身】** ✓⇒“卡厄斯兰那”的作用域 ✓。⭐⭐ **CORRECTED（2026-10-19 逐句核）20% → 25%** ✓：文档 `:189` 写的是 **25%** ✓，而上一版把原文**引成了 20%** ✗（那一版把强化天赋那一行的 **#7 = 0.2**（「施放攻击后回复 20%」✓，属于 `transformation_heals_on_attack` ✓）当成了这一句的数 ✓，**两句的数字对调了** ✗）。数据对得上 ✓：同一行的 **#2 = 0.25** ✓ 就是这一句 ✓。判据 `PhainonEidolonOneTest` 钉住**致命一击后她回到生命上限的 25%** ✓（变异回 0.2 会红 ✓）。⚠⚠ **仍开（同句的后半）**：「**并立即发动最后一击**」✗ 与「每剩余 1 个额外回合，最后一击倍率减少原倍率的 **12.50%**」✗ —— 最后一击本身（960% 均分）也**没有落地** ✗，见 `level_convention` 的登记 ✓。"
+      "_note": "⭐ 2026-10-02：触发用**新建的 `LETHAL_DAMAGE`** ✓（它在 `Battle.applyDamage` 里发 ✓，❗ **而且目标先被扣到 0 但**不判死**** ✓ —— 否则满血时回血是空操作 ✗）。⚠ **绑到【变身】** ✓⇒“卡厄斯兰那”的作用域 ✓。⭐⭐ **CORRECTED（2026-10-19 逐句核）20% → 25%** ✓：文档 `:189` 写的是 **25%** ✓，而上一版把原文**引成了 20%** ✗（那一版把强化天赋那一行的 **#7 = 0.2**（「施放攻击后回复 20%」✓，属于 `transformation_heals_on_attack` ✓）当成了这一句的数 ✓，**两句的数字对调了** ✗）。数据对得上 ✓：同一行的 **#2 = 0.25** ✓ 就是这一句 ✓。判据 `PhainonEidolonOneTest` 钉住**致命一击后她回到生命上限的 25%** ✓（变异回 0.2 会红 ✓）。⚠⚠ **仍开（同句的后半）**：「**并立即发动最后一击**」✗ 与「每剩余 1 个额外回合，最后一击倍率减少原倍率的 **12.50%**」✗ —— 最后一击本身（960% 均分）也**没有落地** ✗，见 `level_convention` 的登记 ✓。"
     },
     {
       "on": "STATE_ENDED",
       "id": "transformation_end_speeds_the_party",
-      "when": ["self state_ended 变身"],
+      "when": [
+        "self state_ended 变身"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.15, "turns": 1, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.15,
+          "turns": 1,
+          "target": "all_allies"
+        }
       ],
       "source": "1408 白厄 天赋：「变身结束时，使我方全体速度提高 **15%**，持续 **1** 回合」",
-      "note": "「变身结束时…我方全体速度 +15%，持续 1 回合」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ⇒ `MODIFY_ATTR{SPEED, 15%, turns: 1, all_allies}` ✓。"
+      "_note": "「变身结束时…我方全体速度 +15%，持续 1 回合」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ⇒ `MODIFY_ATTR{SPEED, 15%, turns: 1, all_allies}` ✓。"
     },
     {
       "on": "STATE_ENDED",
       "id": "trace_worlds_end_three_seeds",
-      "when": ["self state_ended 变身"],
+      "when": [
+        "self state_ended 变身"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "火种", "amount": 3, "target": "self" }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 3,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄 行迹 行向世界终点 (1408101)：「战斗开始时，获得 1 点【火种】。变身结束时，获得 **3** 点【火种】」",
-      "note": "「变身结束时获得 **3** 点【火种】」⇒ `STATE_ENDED` ⇒ `GAIN_RESOURCE{火种, 3}` ✓。"
+      "_note": "「变身结束时获得 **3** 点【火种】」⇒ `STATE_ENDED` ⇒ `GAIN_RESOURCE{火种, 3}` ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -210,12 +370,14 @@
         }
       ],
       "source": "1408 白厄 行迹 照见英雄本色 (1408103): 「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」",
-      "note": "⚠ 两个事件写成**两条规则** ✓（实测 `on_any` **不是** JSON 键 ✗：装载器报 *\"Unknown trigger event 'null'\"* ✓）。⭐ **`coexist: true`** ✓：她的变身同样给 `ATTACK` 加成 ✗，而语料说两者**同时生效** ✓（合计 +130% ✓）；⚠ “不同规则一律共存”已实测**破坏 7 例** ✗ ⇒ 挤出仍是默认 ✓。"
+      "_note": "⚠ 两个事件写成**两条规则** ✓（实测 `on_any` **不是** JSON 键 ✗：装载器报 *\"Unknown trigger event 'null'\"* ✓）。⭐ **`coexist: true`** ✓：她的变身同样给 `ATTACK` 加成 ✗，而语料说两者**同时生效** ✓（合计 +130% ✓）；⚠ “不同规则一律共存”已实测**破坏 7 例** ✗ ⇒ 挤出仍是默认 ✓。"
     },
     {
       "on": "STATE_ENDED",
       "id": "trace_hero_true_colors_on_transformation_end",
-      "when": ["self state_ended 变身"],
+      "when": [
+        "self state_ended 变身"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -228,42 +390,60 @@
         }
       ],
       "source": "1408 白厄 行迹 照见英雄本色 (1408103): 「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」",
-      "note": "同上的另一半：「**变身结束时**…攻击力 +50%，最多 2 层」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ✓（两条共用 `max_stacks: 2` ✓ 与 `coexist` ✓）。"
+      "_note": "同上的另一半：「**变身结束时**…攻击力 +50%，最多 2 层」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ✓（两条共用 `max_stacks: 2` ✓ 与 `coexist` ✓）。"
     },
     {
       "on": "BATTLE_START",
       "id": "trace_worlds_end_one_seed_at_battle_start",
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "火种", "amount": 1, "target": "self" }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 1,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄 行迹 行向世界终点 (1408101)：「**战斗开始时，获得 1 点【火种】**。变身结束时，获得 3 点【火种】」",
-      "note": "「**战斗开始时**，获得 **1** 点【火种】」⇒ `BATTLE_START` ⇒ `GAIN_RESOURCE{火种, 1}` ✓。⚠ 与同句的另一半（变身结束 +3 ✓）是**两条规则** ✓：两个事件、两套条件（一个无条件 ✓、一个 `self state_ended 变身` ✓）—— ⚠ 实测：`on_any` **是**可用的（`@SerializedName(\"on_any\")` ✓、`TriggerTable` 会读 ✓），但它只能**追加事件**、**共用同一套条件** ✗ ⇒ 本句用不上 ✓。"
+      "_note": "「**战斗开始时**，获得 **1** 点【火种】」⇒ `BATTLE_START` ⇒ `GAIN_RESOURCE{火种, 1}` ✓。⚠ 与同句的另一半（变身结束 +3 ✓）是**两条规则** ✓：两个事件、两套条件（一个无条件 ✓、一个 `self state_ended 变身` ✓）—— ⚠ 实测：`on_any` **是**可用的（`@SerializedName(\"on_any\")` ✓、`TriggerTable` 会读 ✓），但它只能**追加事件**、**共用同一套条件** ✗ ⇒ 本句用不上 ✓。"
     },
     {
       "on": "BATTLE_START",
       "id": "eidolon6_unbounded_coreflame_overflow",
       "min_eidolon": 6,
       "do": [
-        { "op": "RAISE_RESOURCE_CAP", "resource": "火种", "unbounded": true, "target": "self" }
+        {
+          "op": "RAISE_RESOURCE_CAP",
+          "resource": "火种",
+          "unbounded": true,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄 星魂 6 亘古长升，蚀火残阳：「【火种】的**可溢出点数不再拥有上限**。」（`eidolons.json` 140806，正文 `:428`）\n⭐ 声明在 `resources` 里是 `\"max\": 12` ＋ `\"overflow\": 3` ✓（文档 `:158`：「达到上限后还可最多溢出 3 点」✓）⇒ 这一句就是把**第二层**整个拆掉 ✓。",
-      "note": "⭐ 用 `RAISE_RESOURCE_CAP` ＋ **`unbounded: true`** ✓（本批次新开的拼法 ✓）：`Resource` 的溢出是**一个数** ✓，而「不再拥有上限」不是一个数 ✗ —— 写任何数字都是文档否认的上限 ✓，而「够大」的那个数（`Integer.MAX_VALUE - 3`）反而会在 `getMaxOverflow() + raise` 里**溢出成负数** ✓（`setMaxOverflow` 于是把额度夹回 **0** ✗，症状是「星魂 6 让溢变更小」✓ —— 一个没有症状的错数 ✓）。⇒ 引擎新增 `unbounded` ✓：额度直接置 `Integer.MAX_VALUE` ✓，而 `Resource.absoluteMax()` 本来就**饱和** ✓（`min(MAX, max + overflow)` ✓）⇒ 值域不变量仍成立 ✓。⚠ 口径：「无上限」= **引擎能表示的最大上限** ✓ —— 与同文件【毁伤】的 `\"max\": 2147483647`（数据没给上限 ✓，声明里已写明）**同一个约定** ✓。判据 `PhainonEidolonSixTest` 钉**两端** ✓（E0 的溢出到 **15** 就停 ✓；星魂 6 之后继续涨到远超 15 ✓）。"
+      "_note": "⭐ 用 `RAISE_RESOURCE_CAP` ＋ **`unbounded: true`** ✓（本批次新开的拼法 ✓）：`Resource` 的溢出是**一个数** ✓，而「不再拥有上限」不是一个数 ✗ —— 写任何数字都是文档否认的上限 ✓，而「够大」的那个数（`Integer.MAX_VALUE - 3`）反而会在 `getMaxOverflow() + raise` 里**溢出成负数** ✓（`setMaxOverflow` 于是把额度夹回 **0** ✗，症状是「星魂 6 让溢变更小」✓ —— 一个没有症状的错数 ✓）。⇒ 引擎新增 `unbounded` ✓：额度直接置 `Integer.MAX_VALUE` ✓，而 `Resource.absoluteMax()` 本来就**饱和** ✓（`min(MAX, max + overflow)` ✓）⇒ 值域不变量仍成立 ✓。⚠ 口径：「无上限」= **引擎能表示的最大上限** ✓ —— 与同文件【毁伤】的 `\"max\": 2147483647`（数据没给上限 ✓，声明里已写明）**同一个约定** ✓。判据 `PhainonEidolonSixTest` 钉**两端** ✓（E0 的溢出到 **15** 就停 ✓；星魂 6 之后继续涨到远超 15 ✓）。"
     },
     {
       "on": "BATTLE_START",
       "id": "eidolon6_six_coreflame_at_battle_start",
       "min_eidolon": 6,
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "火种", "amount": 6, "target": "self" }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 6,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄 星魂 6 亘古长升，蚀火残阳：「**战斗开始时，获得 #2 = 6 点【火种】**。」（`eidolons.json` 140806 的 param `[0.36, 6]`，正文 `:428`）",
-      "note": "⭐ 门写在**规则层** ✓（`min_eidolon: 6` ✓）：这一条**整句**都属于星魂 6 ✓（与变身那条不同 —— 那里同一个事件上还有**与星魂无关**的效果 ✓）。⚠ 它与行迹【行向世界终点】（`trace_worlds_end_one_seed_at_battle_start`，开场 **1** 点 ✓）**相加** ✓ ⇒ 星魂 6 的开场是 **1 + 6 = 7 点** ✓（判据钉的就是这两端 ✓）。⚠ 顺序：两条都在 `BATTLE_START` ✓，而这一条排在**溢出解限之后** ✓ —— 7 点在 15 以内、今天无所谓 ✓，但把解限放前面是**不必再想**的那个顺序 ✓。"
+      "_note": "⭐ 门写在**规则层** ✓（`min_eidolon: 6` ✓）：这一条**整句**都属于星魂 6 ✓（与变身那条不同 —— 那里同一个事件上还有**与星魂无关**的效果 ✓）。⚠ 它与行迹【行向世界终点】（`trace_worlds_end_one_seed_at_battle_start`，开场 **1** 点 ✓）**相加** ✓ ⇒ 星魂 6 的开场是 **1 + 6 = 7 点** ✓（判据钉的就是这两端 ✓）。⚠ 顺序：两条都在 `BATTLE_START` ✓，而这一条排在**溢出解限之后** ✓ —— 7 点在 15 以内、今天无所谓 ✓，但把解限放前面是**不必再想**的那个顺序 ✓。"
     },
     {
       "on": "ATTACK_FINISHED",
       "id": "eidolon6_stardeath_verdict_true_damage",
       "min_eidolon": 6,
-      "when": ["actor == self", "from_skill_id == 11"],
+      "when": [
+        "actor == self",
+        "from_skill_id == 11"
+      ],
       "do": [
         {
           "op": "DAMAGE",
@@ -275,34 +455,56 @@
         }
       ],
       "source": "1408 白厄 星魂 6 亘古长升，蚀火残阳：「**施放【支柱•死星天裁】的攻击后**，对生命值最高的敌方目标额外造成等同于**本次攻击总伤害值 #1 = 36%** 的**真实伤害**。」（`eidolons.json` 140806 的 param `[0.36, 6]`，正文 `:428`）\n⭐ 【支柱•死星天裁】= `skills.json` 1408 的**槽 11**（`140811`，effect `Bounce` ✓，`max_level` 15 ✓）⇒ 「施放它的**攻击后**」= `ATTACK_FINISHED` ＋ `from_skill_id == 11` ✓。",
-      "note": "⭐⭐ **两处引擎缺口，本批次各补一处** ✓：① `ATTACK_FINISHED` **不告诉任何规则「这是哪一招的攻击」** ✗（它传的 `skillId` 是 **0** ✓）⇒ `Battle.fireAfterAttack` 新增一个**带槽位的重载** ✓，`SkillExecutor` 把 `skill.getSkillSlot()` 传下去 ✓（四个参数的旧口子保留 ✓ —— 判据与 `EnemySkill` 都还在用它 ✓，它表示**未知** ✓ 而不是槽位 0 ✓，而槽位不会真的是 0 ✓ ⇒ 不会误命中 ✓）；② 「本次攻击总伤害值」**没有读者** ✗ —— `settled_damage_this_event` 在**最外层 firing 开始时清零** ✓（`Battle.fireTriggers` 里 `triggerDepth == 0` 那一行 ✓），而 `ATTACK_FINISHED` **自己就是**一次最外层 firing ✓ ⇒ 拿它写这条规则读到的**永远是 0** ✗（实测：先按 `settled_damage_this_event` 写了一遍，真伤恒为 0 ✓）。⇒ 改用**事件自己的 `amount`** ✓（`ATTACK_FINISHED` 传的就是这一发**已结算的总和** ✓）＋ 已有的 `amountFromEvent` ＋ `percent` ✓ —— ⚠ **不是**新造 `scale: \"event_amount\"` ✗（那个拼法**撤回**过 ✓，理由在 `EventAmountTest`：`amountFromEvent` 本来就够 ✓）；本批次补的是它在 **DAMAGE 路径上的读者** ✓。⚠ 装载期约束（与 `settled_damage_this_event` **同一条理由** ✓）：这个数**已经过完所有区** ✓ ⇒ 这个拼法**只准配真伤害** ✓，写别的 `damage_type` 会在装载期报错 ✓。⚠ `element` 仍必填 ✓（没有技能行借出元素 ✓），而真伤害**不吃抗性** ✓ ⇒ `Physical`（她的元素 ✓）只是占位 ✓。判据 `PhainonEidolonSixTest` ✓：同一次施放里真伤 = **本次普伤之和的 36%** ✓（观察者是 `addDamageObserver` ✓），且 **E0 不上真伤** ✓、**别的槽位（槽 1 普攻）不上真伤** ✓。⚠ **登记**：`highest_hp_enemy` 取的是**结算完之后**的最高生命 ✓（与 1506【超超超大剑】同一个选择器 ✓）；【支柱•死星天裁】自己的**倍率与段数**仍属数据侧 ✓（它依赖【毁伤】消耗，而那一半**还没建模** ✓，见 `level_convention` 的登记 ✓）。"
+      "_note": "⭐⭐ **两处引擎缺口，本批次各补一处** ✓：① `ATTACK_FINISHED` **不告诉任何规则「这是哪一招的攻击」** ✗（它传的 `skillId` 是 **0** ✓）⇒ `Battle.fireAfterAttack` 新增一个**带槽位的重载** ✓，`SkillExecutor` 把 `skill.getSkillSlot()` 传下去 ✓（四个参数的旧口子保留 ✓ —— 判据与 `EnemySkill` 都还在用它 ✓，它表示**未知** ✓ 而不是槽位 0 ✓，而槽位不会真的是 0 ✓ ⇒ 不会误命中 ✓）；② 「本次攻击总伤害值」**没有读者** ✗ —— `settled_damage_this_event` 在**最外层 firing 开始时清零** ✓（`Battle.fireTriggers` 里 `triggerDepth == 0` 那一行 ✓），而 `ATTACK_FINISHED` **自己就是**一次最外层 firing ✓ ⇒ 拿它写这条规则读到的**永远是 0** ✗（实测：先按 `settled_damage_this_event` 写了一遍，真伤恒为 0 ✓）。⇒ 改用**事件自己的 `amount`** ✓（`ATTACK_FINISHED` 传的就是这一发**已结算的总和** ✓）＋ 已有的 `amountFromEvent` ＋ `percent` ✓ —— ⚠ **不是**新造 `scale: \"event_amount\"` ✗（那个拼法**撤回**过 ✓，理由在 `EventAmountTest`：`amountFromEvent` 本来就够 ✓）；本批次补的是它在 **DAMAGE 路径上的读者** ✓。⚠ 装载期约束（与 `settled_damage_this_event` **同一条理由** ✓）：这个数**已经过完所有区** ✓ ⇒ 这个拼法**只准配真伤害** ✓，写别的 `damage_type` 会在装载期报错 ✓。⚠ `element` 仍必填 ✓（没有技能行借出元素 ✓），而真伤害**不吃抗性** ✓ ⇒ `Physical`（她的元素 ✓）只是占位 ✓。判据 `PhainonEidolonSixTest` ✓：同一次施放里真伤 = **本次普伤之和的 36%** ✓（观察者是 `addDamageObserver` ✓），且 **E0 不上真伤** ✓、**别的槽位（槽 1 普攻）不上真伤** ✓。⚠ **登记**：`highest_hp_enemy` 取的是**结算完之后**的最高生命 ✓（与 1506【超超超大剑】同一个选择器 ✓）；【支柱•死星天裁】自己的**倍率与段数**仍属数据侧 ✓（它依赖【毁伤】消耗，而那一半**还没建模** ✓，见 `level_convention` 的登记 ✓）。"
     },
     {
       "on": "HEALED",
-      "on_any": ["SHIELD_GRANTED"],
+      "on_any": [
+        "SHIELD_GRANTED"
+      ],
       "id": "trace_bide_in_flames_raises_his_damage",
-      "when": ["target == self", "actor is_other_ally"],
+      "when": [
+        "target == self",
+        "actor is_other_ally"
+      ],
       "per_turn": 1,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.45, "turns": 4, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.45,
+          "turns": 4,
+          "target": "self"
+        }
       ],
       "source": "1408 白厄 行迹 身承炎炬万千 (1408102)：「**受到队友提供的治疗效果或护盾时，造成的伤害提高 #1 = 45%，持续 #2 = 4 回合**。该效果单个回合内不可重复触发。」（`skill_traces.json` 1408102 的 param `[0.45, 4, 1]`，正文 `:377`）\n⚠ 同一条行迹还有第二句：「受到队友提供的**能量恢复的技能效果**时，获得 #3 = 1 点【火种】」—— **没有写** ✗，理由见 note ✓。",
-      "note": "⭐⭐ **为什么是「一条规则、两个事件」** ✓：`per_turn` 是**规则级**的 ✓ ⇒ 拆成两条会变成「一次治疗 ＋ 一次护盾 = 两次触发」✗，而原句是「该效果**单个回合内不可重复触发**」✓ ⇒ `on: HEALED` ＋ `on_any: [SHIELD_GRANTED]` ✓（`on_any` 的现成用法：1205 星魂 2 ✓），两个事件的 `actor` / `target` 含义一致 ✓（`HEALED` 的 actor = 治疗者 ✓、`SHIELD_GRANTED` 的 actor = 提供者 ✓，两处的 target 都是接受者 ✓）。⚠ **门 `actor is_other_ally`** = 「我方且**不是**自己」✓ —— 少了它，白厄**自己**的治疗/护盾也会触发 ✓（原句是「队友提供的」✗）；⚠ 口径：我方**忆灵也在 `battle.allies` 里** ✓ ⇒ 队友的忆灵给的东西也算「队友提供的」✓（这一条是**选择**，不是数据说的 ✓）；同理，敌人给的护盾不会触发 ✓（不在我方 ✓）。⚠ 数值 **0.45 / 4** 直接取自**行迹参数行** `[0.45, 4, 1]` ✓ —— 行迹没有 `SkillType` ⇒ 只能写常量 ✓（与 `trace_hero_true_colors_*` 同一手法 ✓）。⚠⚠ **`coexist` 的取舍（故意的）** ✓：不加它 ⇒ 同属性的**其它来源**会被这条顶掉 ✗（§3.7l 那一族的已知形状 ✓）；加它 ⇒ 这条**自己**会叠成 0.90 ✗（`keepsSiblings` 连自己的扫除也跳过 ✓），而原句是**刷新**不是叠层 ⇒ 选**默认（刷新）** ✓。⚠⚠ **`per_turn: 1` 在本条上不可观测** ✓：同一回合的第二次施加是**同值刷新** ✓ ⇒ 读数一模一样 ✓。⇒ 该字段的判据是**引擎级**的 `TriggerLimitTest` ✓，本条的判据钉的是「真的加了 0.45 ✓／持续 4 回合 ✓／自己治自己不算 ✓／护盾也算 ✓」（`PhainonTraceBideInFlamesTest` ✓）。⚠⚠ **第二句「受到队友提供的能量恢复的技能效果时，获得 1 点【火种】」没有写** ✗：`ENERGY_GAINED` 的 `actor` **就是收能量的那位**（`Battle.applyEnergyGain` → `fireTriggersForAlly(ENERGY_GAINED, target, target, added)` ✓），**事件不带「谁给的」** ✗（`EnergyGain` 只有 `amount` ＋ `affectedByEfficiency` ✓，`applyEnergyGain` 也不收授予者 ✓）⇒ 「来自队友的技能」这一半**今天判不了** ✓，**不拿**「任何人给我回能」冒充 ✗（那会连自己的普攻回能一起算 ✓）。⚠ 要开这个口子得先给事件加一个「授予者」事实 ✓，而 **4 条出货规则都押在 `actor = 收能量的那位`** 上 ✓（1207 星魂 2 `actor is_ally`、1310 天赋 `actor == self`、1505 两条无条件 ✓）⇒ 那是**另一批**的改动 ✓。"
+      "_note": "⭐⭐ **为什么是「一条规则、两个事件」** ✓：`per_turn` 是**规则级**的 ✓ ⇒ 拆成两条会变成「一次治疗 ＋ 一次护盾 = 两次触发」✗，而原句是「该效果**单个回合内不可重复触发**」✓ ⇒ `on: HEALED` ＋ `on_any: [SHIELD_GRANTED]` ✓（`on_any` 的现成用法：1205 星魂 2 ✓），两个事件的 `actor` / `target` 含义一致 ✓（`HEALED` 的 actor = 治疗者 ✓、`SHIELD_GRANTED` 的 actor = 提供者 ✓，两处的 target 都是接受者 ✓）。⚠ **门 `actor is_other_ally`** = 「我方且**不是**自己」✓ —— 少了它，白厄**自己**的治疗/护盾也会触发 ✓（原句是「队友提供的」✗）；⚠ 口径：我方**忆灵也在 `battle.allies` 里** ✓ ⇒ 队友的忆灵给的东西也算「队友提供的」✓（这一条是**选择**，不是数据说的 ✓）；同理，敌人给的护盾不会触发 ✓（不在我方 ✓）。⚠ 数值 **0.45 / 4** 直接取自**行迹参数行** `[0.45, 4, 1]` ✓ —— 行迹没有 `SkillType` ⇒ 只能写常量 ✓（与 `trace_hero_true_colors_*` 同一手法 ✓）。⚠⚠ **`coexist` 的取舍（故意的）** ✓：不加它 ⇒ 同属性的**其它来源**会被这条顶掉 ✗（§3.7l 那一族的已知形状 ✓）；加它 ⇒ 这条**自己**会叠成 0.90 ✗（`keepsSiblings` 连自己的扫除也跳过 ✓），而原句是**刷新**不是叠层 ⇒ 选**默认（刷新）** ✓。⚠⚠ **`per_turn: 1` 在本条上不可观测** ✓：同一回合的第二次施加是**同值刷新** ✓ ⇒ 读数一模一样 ✓。⇒ 该字段的判据是**引擎级**的 `TriggerLimitTest` ✓，本条的判据钉的是「真的加了 0.45 ✓／持续 4 回合 ✓／自己治自己不算 ✓／护盾也算 ✓」（`PhainonTraceBideInFlamesTest` ✓）。⚠⚠ **第二句「受到队友提供的能量恢复的技能效果时，获得 1 点【火种】」没有写** ✗：`ENERGY_GAINED` 的 `actor` **就是收能量的那位**（`Battle.applyEnergyGain` → `fireTriggersForAlly(ENERGY_GAINED, target, target, added)` ✓），**事件不带「谁给的」** ✗（`EnergyGain` 只有 `amount` ＋ `affectedByEfficiency` ✓，`applyEnergyGain` 也不收授予者 ✓）⇒ 「来自队友的技能」这一半**今天判不了** ✓，**不拿**「任何人给我回能」冒充 ✗（那会连自己的普攻回能一起算 ✓）。⚠ 要开这个口子得先给事件加一个「授予者」事实 ✓，而 **4 条出货规则都押在 `actor = 收能量的那位`** 上 ✓（1207 星魂 2 `actor is_ally`、1310 天赋 `actor == self`、1505 两条无条件 ✓）⇒ 那是**另一批**的改动 ✓。"
     },
     {
       "id": "world_ode_grants_fire_seed",
       "on": "CAST_SETUP",
-      "when": ["target == self", "from_skill_id == 21"],
+      "when": [
+        "target == self",
+        "from_skill_id == 21"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "火种", "amount": 6, "target": "self" }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "火种",
+          "amount": 6,
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 21 「献予「负世」之诗」（数据槽位 21，SkillID 1141521）：「整场生效，对白厄施放后，**使白厄获得 #8 点【火种】**…」（#8 = 6）。",
-      "note": "⭐ 形态同第 89 轮的【亿质】那条：资源存在**被矄准者**身上，在他被施放那一刻入账（实测：忆灵的施放只送到被矄e者的表）。⭐ 数值 6 来自数据行 21 的 `#8`，写成字面是因为它不随等级变（ParamList 里是常量 6）。"
+      "_note": "⭐ 形态同第 89 轮的【亿质】那条：资源存在**被矄准者**身上，在他被施放那一刻入账（实测：忆灵的施放只送到被矄e者的表）。⭐ 数值 6 来自数据行 21 的 `#8`，写成字面是因为它不随等级变（ParamList 里是常量 6）。"
     },
     {
       "id": "world_ode_fire_seed_crit_step_1",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self_resource:火种 >= 13"],
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 13"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -315,12 +517,15 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 1 级台阶。",
-      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 13` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+      "_note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 13` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     },
     {
       "id": "world_ode_fire_seed_crit_step_2",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self_resource:火种 >= 14"],
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 14"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -333,12 +538,15 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 2 级台阶。",
-      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 14` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+      "_note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 14` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     },
     {
       "id": "world_ode_fire_seed_crit_step_3",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self_resource:火种 >= 15"],
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 15"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -351,12 +559,15 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 3 级台阶。",
-      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 15` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+      "_note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 15` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     },
     {
       "id": "world_ode_fire_seed_crit_step_4",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self_resource:火种 >= 16"],
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 16"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -369,12 +580,15 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 4 级台阶。",
-      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 16` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+      "_note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 16` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     },
     {
       "id": "world_ode_fire_seed_crit_step_5",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self_resource:火种 >= 17"],
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 17"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -387,12 +601,15 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 5 级台阶。",
-      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 17` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+      "_note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 17` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     },
     {
       "id": "world_ode_fire_seed_crit_step_6",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self_resource:火种 >= 18"],
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 18"
+      ],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -405,22 +622,35 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 6 级台阶。",
-      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 18` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+      "_note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 18` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     },
     {
       "id": "world_ode_everburning_raises_his_crit_rate",
       "on": "ULT_CAST",
-      "when": ["actor == self", "self has_state 永续的燃烧"],
+      "when": [
+        "actor == self",
+        "self has_state 永续的燃烧"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.08, "permanent": true, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.08,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…且在**变身时获得【永续的燃烧】**，…**持有【永续的燃烧】时，卡厄斯兰那的暴击率提高 #1%**」（#1 = 0.08）。",
-      "note": "⭐ **2026-10-02 修正**：状态的**授予**已移到诗的施放（原话里它是「整场生效，对白厄施放后…且在变身时获得【永续的燃烧】」的一部分）；本条只管**它带来的暴击率**，并由状态把门。"
+      "_note": "⭐ **2026-10-02 修正**：状态的**授予**已移到诗的施放（原话里它是「整场生效，对白厄施放后…且在变身时获得【永续的燃烧】」的一部分）；本条只管**它带来的暴击率**，并由状态把门。"
     },
     {
       "id": "world_ode_adds_five_fire_hits",
       "on": "DAMAGE_SETTLED",
-      "when": ["actor == self", "damage_is_attack", "self has_state 永续的燃烧"],
+      "when": [
+        "actor == self",
+        "damage_is_attack",
+        "self has_state 永续的燃烧"
+      ],
       "do": [
         {
           "op": "DAMAGE",
@@ -432,38 +662,70 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…**施放攻击后，造成 #3 次附加伤害，每次伤害对敌方随机单体造成等同于卡厄斯兰那 #4% 攻击力的火属性附加伤害**」（#3 = 5、#4 = 0.05）。",
-      "note": "⭐ **为何用 `DAMAGE` 而不是 `ADD_DAMAGE`**（实测）：`ADD_DAMAGE` 自己拒绝 `times`，原话是“「额外造成 #1 次附加伤害」counts INSTANCES, and this op adds ONE amount to the damage being settled”。⭐ 而 `DAMAGE` 的出货读者是 1003 姬子星魂 6：`times` + `target: random_enemy` + `element`。⭐ 门里的 `self has_state 永续的燃烧` 就是**同段原文的前一句**（第 96 轮出货）。"
+      "_note": "⭐ **为何用 `DAMAGE` 而不是 `ADD_DAMAGE`**（实测）：`ADD_DAMAGE` 自己拒绝 `times`，原话是“「额外造成 #1 次附加伤害」counts INSTANCES, and this op adds ONE amount to the damage being settled”。⭐ 而 `DAMAGE` 的出货读者是 1003 姬子星魂 6：`times` + `target: random_enemy` + `element`。⭐ 门里的 `self has_state 永续的燃烧` 就是**同段原文的前一句**（第 96 轮出货）。"
     },
     {
       "id": "world_ode_refreshes_the_extra_turns",
       "on": "COUNTDOWN_TURN",
-      "when": ["actor == countdown", "self has_state 永续的燃烧", "self_resource:额外回合计数 >= 8"],
+      "when": [
+        "actor == countdown",
+        "self has_state 永续的燃烧",
+        "self_resource:额外回合计数 >= 8"
+      ],
       "do": [
-        { "op": "SPEND_RESOURCE", "resource": "额外回合计数", "spendAll": true, "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "毁伤", "amount": 4, "target": "self" }
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "额外回合计数",
+          "spendAll": true,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "毁伤",
+          "amount": 4,
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 21：「在卡厄斯兰那的额外回合耗尽后**不会结束变身、刷新全部额外回合并获得 #9 点【毁伤】**」（#9 = 4）。",
-      "note": "⭐ 三件事：① “不结束变身” 由**上一条的否定门**；② “刷新” = `SPEND_RESOURCE` + `spendAll`；③ “获得 4 点【毁伤】”。⭐ 本条必须在**计数规则之后**。"
+      "_note": "⭐ 三件事：① “不结束变身” 由**上一条的否定门**；② “刷新” = `SPEND_RESOURCE` + `spendAll`；③ “获得 4 点【毁伤】”。⭐ 本条必须在**计数规则之后**。"
     },
     {
       "id": "world_ode_grants_everburning",
       "on": "CAST_SETUP",
-      "when": ["target == self", "from_skill_id == 21"],
+      "when": [
+        "target == self",
+        "from_skill_id == 21"
+      ],
       "do": [
-        { "op": "ADD_STACK", "buff": "永续的燃烧", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "永续的燃烧",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 21：「整场生效，对白厄施放后，使白厄获得 #8 点【火种】，**且在变身时获得【永续的燃烧】**…」—— 它是**诗的一部分**，所以由诗的落下授予。",
-      "note": "⭐ **修正的理由**：原话里该句属于诗的句子，而不是他自己变身的一部分 ⇒ 没有诗就没有这个状态（**实测**：旧实现把它挂在他的 `ULT_CAST` 上，结果弄坏了已出货的 `TransformationEndsOnLastCountdownTest`）。"
+      "_note": "⭐ **修正的理由**：原话里该句属于诗的句子，而不是他自己变身的一部分 ⇒ 没有诗就没有这个状态（**实测**：旧实现把它挂在他的 `ULT_CAST` 上，结果弄坏了已出货的 `TransformationEndsOnLastCountdownTest`）。"
     },
     {
       "id": "world_ode_extra_turn_costs_hp",
       "on": "COUNTDOWN_TURN",
-      "when": ["actor == countdown", "self has_state 永续的燃烧"],
+      "when": [
+        "actor == countdown",
+        "self has_state 永续的燃烧"
+      ],
       "do": [
-        { "op": "CONSUME_HP", "scale": "target_current_hp", "percent": 0.15, "target": "self" }
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.15,
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 21：「**额外回合开始时，卡厄斯兰那消耗等同于当前生命值 #2% 的生命值**」（#2 = 0.15）。",
-      "note": "⭐ “**当前**生命值”⇒ `scale` 用**主人自己的当前生命**（已出货的同类写法是 `owner_max_hp`）；⭐ 而“额外回合开始时”就是 `COUNTDOWN_TURN`（第 99 轮已确定它怎么驱动）。  ⭐ **2026-10-02 实测修正**：`owner_current_hp` **通过校验但没有实现**（读到 *\"Scale 'owner_current_hp' passed validation but has no implementation\"*）；而已出货的 `target_current_hp` 的注释原话就是“for CONSUME_HP, the spender” ⇒ 它正是“消耗者自己的当前生命”。"
+      "_note": "⭐ “**当前**生命值”⇒ `scale` 用**主人自己的当前生命**（已出货的同类写法是 `owner_max_hp`）；⭐ 而“额外回合开始时”就是 `COUNTDOWN_TURN`（第 99 轮已确定它怎么驱动）。  ⭐ **2026-10-02 实测修正**：`owner_current_hp` **通过校验但没有实现**（读到 *\"Scale 'owner_current_hp' passed validation but has no implementation\"*）；而已出货的 `target_current_hp` 的注释原话就是“for CONSUME_HP, the spender” ⇒ 它正是“消耗者自己的当前生命”。"
     }
   ]
 }

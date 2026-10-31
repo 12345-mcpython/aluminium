@@ -1,92 +1,161 @@
-[
-  {
-    "on": "ULT_CAST",
-    "id": "ult_tipsy",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "APPLY_BUFF", "buff": "酩酊", "turns": 2, "target": "all_enemies" },
-      {
-        "op": "MODIFY_DAMAGE_TAKEN",
-        "percent": 0.12,
-        "damage_type": "BREAK",
-        "turns": 2,
-        "buff": "酩酊",
-        "target": "all_enemies"
-      },
-      { "op": "REPLACE_SKILL", "skill": "COMMON", "skill_id": 8, "until": "next_attack", "target": "self" }
-    ],
-    "source": "1301 加拉赫 终结技 香槟仪礼 (130103, 全体攻击/Fire): 「使敌方全体陷入【酩酊】状态，持续2回合，同时对敌方全体造成等同于加拉赫150%攻击力的火属性伤害…」 强化普攻【酒花奔涌】= 数据行 130108（Normal/SingleAttack）。",
-    "note": "「使敌方全体陷入【酩酊】状态，持续 2 回合」 — the state half of the ultimate; the 150% AoE damage is the engine's own skill path. ⚠ No `base_chance`: the sentence states none, and for an `APPLY_BUFF` state that means applied directly (the convention every file in this repo follows — `APPLY_DOT`/`APPLY_CONTROL` instead default to a 100% *base* chance, which is the documented difference). ⚠ 【酩酊】 is a plain named state, so nothing about it is judged by `isDebuff()` — the clauses that read it are registered below, because they need vocabulary this engine does not have yet. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。 ⚠ **2026-09-28 登记**：「并将**下一次普攻强化**为【酒花奔涌】」本轮试写后**整块回滚**：引擎侧能力（REPLACE_SKILL + SkillSwapBuff）已实现并有用例，但**该句在装载期被拒绝**（具体原因见提交说明与 ROADMAP）⇒ 先保留引擎能力，语法对齐后再出货。 ⚠ **2026-09-28 登记**：「并将**下一次普攻强化**为【酒花奔涌】」本轮两次试写后仍被**装载期拒绝**（错误原文已记入 ROADMAP）⇒ 整块回滚；引擎侧 REPLACE_SKILL + SkillSwapBuff 已实现并有 SkillSwapTest 3 条，只差该句的语法对齐。 ⚠ **2026-09-28 撤回**：「并将**下一次普攻强化**为【酒花奔涌】」已写出 —— `REPLACE_SKILL` 把 `COMMON` 槽临时换成数据行 **130108**（强化普攻是**独立行**、不属于任何槽位），换技能由 `SkillSwapBuff` 承载 ⇒ 「下一次普攻」直接复用既有的 `until: next_attack` 寿命机制。⚠ 生命周期语义（\"用掉后还原\"与\"攻击时还原\"的先后）**尚未用行为用例钉住**，已记为待办。 ⚠ **2026-09-28 正式补齐**：「并将**下一次普攻强化**为【酒花奔涌】」已写出，换入的是 **槽位 8**的技能（数据行 130108；装载器索引的是槽位而非行 id，这一点曾写错并导致一次空操作，已由 `EnhancedSkillDataProbeTest` 守住）。 ⚠ **2026-09-28 撤回（精确原因）**：「并使目标攻击力降低 15.00%」本轮试写后整块嚤回。它需要同时拥有\"被瞄准的单位\"与\"技能键\"，而 `ALLY_ATTACK` **刻意不携带被瞄准的单位**（`SkillExecutor` 的原话：我们自己的攻击，目标总在对面，\"没有规则会问它\"）⇒ 执行时报 `Effect targets \"target\" but this event has no such party` ✗。可选路径：`DEALING_DAMAGE` 有目标但今天不带技能键；`BASIC_ATTACK` 有目标也不带。⇒ 需要给其中一个事件补上技能键（与 `from_skill_id` 同一条通道）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "APPLY_BUFF", "buff": "酩酊", "turns": 2, "target": "all_enemies" },
-      {
-        "op": "MODIFY_DAMAGE_TAKEN",
-        "percent": 0.12,
-        "damage_type": "BREAK",
-        "turns": 2,
-        "buff": "酩酊",
-        "target": "all_enemies"
-      }
-    ],
-    "source": "1301 加拉赫 秘技 亲启佳酿: 「…与处于特殊领域内的敌人进入战斗后，使敌方全体陷入【酩酊】状态，持续2回合，并对敌方全体造成等同于加拉赫50%攻击力的火属性伤害。」",
-    "note": "The 秘技's **in-battle half**: 「进入战斗后使敌方全体陷入【酩酊】状态，持续 2 回合」 is a `BATTLE_START` fact, which is exactly how this engine models 「进入战斗后」. ⚠ The 50% AoE damage that follows in the same sentence is **not** written: the technique's damage is a separate mechanic with its own place in the pre-battle flow, and the engine settles battle-start effects without an instance. ⚠ The 20-second special field the sentence opens with is a map mechanic, out of in-battle scope. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "ADVANCE", "percent": 1.0, "target": "self" }
-    ],
-    "source": "1301 加拉赫 行迹 天然酵母 (1301102): 「施放终结技后，立刻使自己行动提前100%。」",
-    "note": "「施放终结技后，**立刻**使自己**行动提前 100%**」 — `ADVANCE` with `percent: 1.0` is that quantity (100% of an action), and 「自己」 is the rule's owner. ⚠ It sits on the same event as the 酩酊 rule above; both are unconditional, so their order does not matter (the ordering trap in 1211's file is about a filter that reads the state another effect of the same rule has just applied — there is none here)."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "GAIN_ENERGY", "amount": 20 },
-      { "op": "MODIFY_ATTR", "attribute": "EFFECT_RESISTANCE", "percent": 0.5, "permanent": true, "target": "self" }
-    ],
-    "min_eidolon": 1,
-    "source": "1301 加拉赫 星魂 1 盐与犬 (Avatar_Gallagher_Rank01): 「加拉赫进入战斗后会恢复20点能量，效果抵抗提高50%。」 param = [20, 0.5]",
-    "note": "星魂 1's two halves: 「进入战斗后恢复 20 点能量」 and 「效果抵抗提高 50%」 — the first is `GAIN_ENERGY` at battle start, the second the existing `EFFECT_RESISTANCE` attribute with no stated duration (「进入战斗后」 = a loadout fact ⇒ `permanent: true`). ⚠ Both numbers come from the eidolon's own row ([20, 0.5]), which is why the data is read rather than the prose alone."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
-    ],
-    "source": "1301 加拉赫 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、终结技 150%、强化普攻 250%、战技 1600 点都是该行）",
-    "note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing and damage (his Skill is a `Restore` skill and his ultimate an AoE, both read from rows). ⚠ **Not classified yet** — the rest of his document, each with its blocker: 终结技「并将**下一次普攻强化**为【酒花奔涌】」 (a skill *replacement* — 「强化普攻」 is a different skill object, and the engine has no vocabulary for \"the next basic attack becomes X\"), 天赋「【酩酊】使目标**受到的击破伤害**提高 12.00%」 (a **taken-side** vulnerability scoped to one damage type: `BREAKING_EFFECT` is the dealer side and there is no \"break damage taken\" spelling — the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」), ⚠ **2026-09-28 补齐**：天赋的「回复**攻击者** 640 点生命值」已写出（`HEAL … target: \"attacker\"`，见本文件最后一条规则）—— 此前那条\"没有拼写能指向攻击者\"的登记是**读错了文件**（选择器表在 `TriggerInterpreter`，不在 `TargetSelector.java`）。行迹 崭新配方「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，**最多使提供的治疗量提高 75%**」 (the derived half is expressible with `scale: self_attr:BREAKING_EFFECT`, but the **cap** is not: shipping without it would over-heal exactly in the break-effect builds this trace is for — the clamp gap is registered), 行迹 敬请干杯 (rides on 酒花奔涌), and 星魂 2–6 (not yet read clause by clause)."
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "when": ["target has_state 酩酊"],
-    "do": [
-      { "op": "HEAL", "amount": 640, "target": "attacker" }
-    ],
-    "source": "1301 加拉赫 天赋 鏖战正酣 (130104, Enhance/Restore): 「【酩酊】使目标受到的击破伤害提高12.00%。陷入【酩酊】状态的目标每次受到我方角色攻击后，会回复攻击者640点生命值。」",
-    "note": "「陷入【酩酊】状态的目标**每次受到我方角色攻击后**，会回复**攻击者** 640 点生命值」 — `ALLY_ATTACK` is 「我方角色攻击后」 (once per attack, not per hit) and `target: \"attacker\"` is 「攻击者」: ⚠ **`attacker` is a legal selector** and always was (`TriggerInterpreter.TARGET_SELECTORS`) — the earlier registration in this file claimed no spelling names the attacker for a heal, which was a **wrong assumption read off `TargetSelector.java`** (the selector table lives in the interpreter, and that class is a different thing). Corrections of exactly this kind are why the ledger is re-verified against the source rather than trusted. ⚠ The heal carries no `scale`: 「640 点」 is a flat number in the row, not a share of anything. ⚠ The other half of the same talent sentence — 「【酩酊】使目标**受到的击破伤害**提高 12%」 — stays registered: it is a **taken-side** vulnerability scoped to break damage (`BREAKING_EFFECT` is the dealer side, the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」)."
-  },
-
-  {
-    "on": "DEALING_DAMAGE",
-    "id": "enhanced_attack_down",
-    "when": ["actor == self", "from_skill_id == 8"],
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": -0.15, "turns": 2, "target": "target" }
-    ],
-    "source": "1301 加拉赫 强化普攻 酒花奔涌 (130108 的技能描述): 「对指定敌方单体造成等同于加拉赫250%攻击力的火属性伤害。并使目标攻击力降低15.00%，持续2回合。」",
-    "note": "「并使目标攻击力降低 15.00%，持续 2 回合」—— 这句必须挂在 DEALING_DAMAGE 上：ALLY_ATTACK 刻意不带被瞄准的单位（执行时会报 Effect targets target but this event has no such party），而 DEALING_DAMAGE 既有目标、现在也带技能键（Damage.skillKey）。⚠ from_skill_id 的取值是装载键（强化普攻 = 槽位 8），不是数据行 130108。 ⚠ 条件里不写 target == target（装载器会拒绝：它只支持与队伍或数值字面量的比较）；目标由效果自己的 target 选择器决定。"
-  }
-]
+{
+  "schema": 1,
+  "character": 1301,
+  "_status": "partial",
+  "_gaps": [
+    "终结技「下一次普攻强化为【酒花奔涌】」：技能替换未写",
+    "行迹 崭新配方：治疗量 +击破特攻 50%、上限 +75% 未写",
+    "行迹 敬请干杯：依赖【酒花奔涌】，未写",
+    "星魂 2–6：未逐句读、未写"
+  ],
+  "rules": [
+    {
+      "on": "ULT_CAST",
+      "id": "ult_tipsy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "酩酊",
+          "turns": 2,
+          "target": "all_enemies"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.12,
+          "damage_type": "BREAK",
+          "turns": 2,
+          "buff": "酩酊",
+          "target": "all_enemies"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "until": "next_attack",
+          "target": "self"
+        }
+      ],
+      "source": "1301 加拉赫 终结技 香槟仪礼 (130103, 全体攻击/Fire): 「使敌方全体陷入【酩酊】状态，持续2回合，同时对敌方全体造成等同于加拉赫150%攻击力的火属性伤害…」 强化普攻【酒花奔涌】= 数据行 130108（Normal/SingleAttack）。",
+      "_note": "「使敌方全体陷入【酩酊】状态，持续 2 回合」 — the state half of the ultimate; the 150% AoE damage is the engine's own skill path. ⚠ No `base_chance`: the sentence states none, and for an `APPLY_BUFF` state that means applied directly (the convention every file in this repo follows — `APPLY_DOT`/`APPLY_CONTROL` instead default to a 100% *base* chance, which is the documented difference). ⚠ 【酩酊】 is a plain named state, so nothing about it is judged by `isDebuff()` — the clauses that read it are registered below, because they need vocabulary this engine does not have yet. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。 ⚠ **2026-09-28 登记**：「并将**下一次普攻强化**为【酒花奔涌】」本轮试写后**整块回滚**：引擎侧能力（REPLACE_SKILL + SkillSwapBuff）已实现并有用例，但**该句在装载期被拒绝**（具体原因见提交说明与 ROADMAP）⇒ 先保留引擎能力，语法对齐后再出货。 ⚠ **2026-09-28 登记**：「并将**下一次普攻强化**为【酒花奔涌】」本轮两次试写后仍被**装载期拒绝**（错误原文已记入 ROADMAP）⇒ 整块回滚；引擎侧 REPLACE_SKILL + SkillSwapBuff 已实现并有 SkillSwapTest 3 条，只差该句的语法对齐。 ⚠ **2026-09-28 撤回**：「并将**下一次普攻强化**为【酒花奔涌】」已写出 —— `REPLACE_SKILL` 把 `COMMON` 槽临时换成数据行 **130108**（强化普攻是**独立行**、不属于任何槽位），换技能由 `SkillSwapBuff` 承载 ⇒ 「下一次普攻」直接复用既有的 `until: next_attack` 寿命机制。⚠ 生命周期语义（\"用掉后还原\"与\"攻击时还原\"的先后）**尚未用行为用例钉住**，已记为待办。 ⚠ **2026-09-28 正式补齐**：「并将**下一次普攻强化**为【酒花奔涌】」已写出，换入的是 **槽位 8**的技能（数据行 130108；装载器索引的是槽位而非行 id，这一点曾写错并导致一次空操作，已由 `EnhancedSkillDataProbeTest` 守住）。 ⚠ **2026-09-28 撤回（精确原因）**：「并使目标攻击力降低 15.00%」本轮试写后整块嚤回。它需要同时拥有\"被瞄准的单位\"与\"技能键\"，而 `ALLY_ATTACK` **刻意不携带被瞄准的单位**（`SkillExecutor` 的原话：我们自己的攻击，目标总在对面，\"没有规则会问它\"）⇒ 执行时报 `Effect targets \"target\" but this event has no such party` ✗。可选路径：`DEALING_DAMAGE` 有目标但今天不带技能键；`BASIC_ATTACK` 有目标也不带。⇒ 需要给其中一个事件补上技能键（与 `from_skill_id` 同一条通道）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "酩酊",
+          "turns": 2,
+          "target": "all_enemies"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.12,
+          "damage_type": "BREAK",
+          "turns": 2,
+          "buff": "酩酊",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1301 加拉赫 秘技 亲启佳酿: 「…与处于特殊领域内的敌人进入战斗后，使敌方全体陷入【酩酊】状态，持续2回合，并对敌方全体造成等同于加拉赫50%攻击力的火属性伤害。」",
+      "_note": "The 秘技's **in-battle half**: 「进入战斗后使敌方全体陷入【酩酊】状态，持续 2 回合」 is a `BATTLE_START` fact, which is exactly how this engine models 「进入战斗后」. ⚠ The 50% AoE damage that follows in the same sentence is **not** written: the technique's damage is a separate mechanic with its own place in the pre-battle flow, and the engine settles battle-start effects without an instance. ⚠ The 20-second special field the sentence opens with is a map mechanic, out of in-battle scope. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。"
+    },
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "self"
+        }
+      ],
+      "source": "1301 加拉赫 行迹 天然酵母 (1301102): 「施放终结技后，立刻使自己行动提前100%。」",
+      "_note": "「施放终结技后，**立刻**使自己**行动提前 100%**」 — `ADVANCE` with `percent: 1.0` is that quantity (100% of an action), and 「自己」 is the rule's owner. ⚠ It sits on the same event as the 酩酊 rule above; both are unconditional, so their order does not matter (the ordering trap in 1211's file is about a filter that reads the state another effect of the same rule has just applied — there is none here)."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 20
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.5,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "min_eidolon": 1,
+      "source": "1301 加拉赫 星魂 1 盐与犬 (Avatar_Gallagher_Rank01): 「加拉赫进入战斗后会恢复20点能量，效果抵抗提高50%。」 param = [20, 0.5]",
+      "_note": "星魂 1's two halves: 「进入战斗后恢复 20 点能量」 and 「效果抵抗提高 50%」 — the first is `GAIN_ENERGY` at battle start, the second the existing `EFFECT_RESISTANCE` attribute with no stated duration (「进入战斗后」 = a loadout fact ⇒ `permanent: true`). ⚠ Both numbers come from the eidolon's own row ([20, 0.5]), which is why the data is read rather than the prose alone."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1301 加拉赫 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、终结技 150%、强化普攻 250%、战技 1600 点都是该行）",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing and damage (his Skill is a `Restore` skill and his ultimate an AoE, both read from rows). ⚠ **Not classified yet** — the rest of his document, each with its blocker: 终结技「并将**下一次普攻强化**为【酒花奔涌】」 (a skill *replacement* — 「强化普攻」 is a different skill object, and the engine has no vocabulary for \"the next basic attack becomes X\"), 天赋「【酩酊】使目标**受到的击破伤害**提高 12.00%」 (a **taken-side** vulnerability scoped to one damage type: `BREAKING_EFFECT` is the dealer side and there is no \"break damage taken\" spelling — the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」), ⚠ **2026-09-28 补齐**：天赋的「回复**攻击者** 640 点生命值」已写出（`HEAL … target: \"attacker\"`，见本文件最后一条规则）—— 此前那条\"没有拼写能指向攻击者\"的登记是**读错了文件**（选择器表在 `TriggerInterpreter`，不在 `TargetSelector.java`）。行迹 崭新配方「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，**最多使提供的治疗量提高 75%**」 (the derived half is expressible with `scale: self_attr:BREAKING_EFFECT`, but the **cap** is not: shipping without it would over-heal exactly in the break-effect builds this trace is for — the clamp gap is registered), 行迹 敬请干杯 (rides on 酒花奔涌), and 星魂 2–6 (not yet read clause by clause)."
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "when": [
+        "target has_state 酩酊"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "amount": 640,
+          "target": "attacker"
+        }
+      ],
+      "source": "1301 加拉赫 天赋 鏖战正酣 (130104, Enhance/Restore): 「【酩酊】使目标受到的击破伤害提高12.00%。陷入【酩酊】状态的目标每次受到我方角色攻击后，会回复攻击者640点生命值。」",
+      "_note": "「陷入【酩酊】状态的目标**每次受到我方角色攻击后**，会回复**攻击者** 640 点生命值」 — `ALLY_ATTACK` is 「我方角色攻击后」 (once per attack, not per hit) and `target: \"attacker\"` is 「攻击者」: ⚠ **`attacker` is a legal selector** and always was (`TriggerInterpreter.TARGET_SELECTORS`) — the earlier registration in this file claimed no spelling names the attacker for a heal, which was a **wrong assumption read off `TargetSelector.java`** (the selector table lives in the interpreter, and that class is a different thing). Corrections of exactly this kind are why the ledger is re-verified against the source rather than trusted. ⚠ The heal carries no `scale`: 「640 点」 is a flat number in the row, not a share of anything. ⚠ The other half of the same talent sentence — 「【酩酊】使目标**受到的击破伤害**提高 12%」 — stays registered: it is a **taken-side** vulnerability scoped to break damage (`BREAKING_EFFECT` is the dealer side, the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」)."
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "enhanced_attack_down",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": -0.15,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1301 加拉赫 强化普攻 酒花奔涌 (130108 的技能描述): 「对指定敌方单体造成等同于加拉赫250%攻击力的火属性伤害。并使目标攻击力降低15.00%，持续2回合。」",
+      "_note": "「并使目标攻击力降低 15.00%，持续 2 回合」—— 这句必须挂在 DEALING_DAMAGE 上：ALLY_ATTACK 刻意不带被瞄准的单位（执行时会报 Effect targets target but this event has no such party），而 DEALING_DAMAGE 既有目标、现在也带技能键（Damage.skillKey）。⚠ from_skill_id 的取值是装载键（强化普攻 = 槽位 8），不是数据行 130108。 ⚠ 条件里不写 target == target（装载器会拒绝：它只支持与队伍或数值字面量的比较）；目标由效果自己的 target 选择器决定。"
+    }
+  ]
+}

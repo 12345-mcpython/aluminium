@@ -1,166 +1,271 @@
-[
-  {
-    "on": "SKILL_CAST",
-    "id": "skill_weakness_and_attack",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "APPLY_BUFF", "buff": "虚弱", "turns": 2, "target": "target" },
-      { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": -0.1, "turns": 2, "target": "target" },
-      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.3, "turns": 2, "target": "self" }
-    ],
-    "source": "1406 赛飞儿 战技 嘿，空手套白银 (140602, BPSkill/Blast): 「有120%的基础概率使指定敌方单体及其相邻目标陷入虚弱状态，造成的伤害降低10%，使赛飞儿的攻击力提高30%，持续2回合，并对指定敌方单体造成等同于赛飞儿200%攻击力的量子属性伤害，对相邻目标造成等同于赛飞儿100%攻击力的量子属性伤害。」",
-    "note": "「有 120% 的基础概率使指定敌方单体…陷入**虚弱**状态，**造成的伤害降低 10%**，使赛飞儿的**攻击力提高 30%**，持续 **2 回合**」—— ① 状态 `APPLY_BUFF 虚弱 turns 2` ✓；② 「造成的伤害降低 10%」用 **`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST percent: -0.1`** ✓（负值即降低 ✓）；③ 「使赛飞儿的攻击力提高 30%」⇒ `MODIFY_ATTR ATTACK percent: 0.3` + **`target: self`** ✓（加成在她**自己**身上 ✓，与减益的目标**不同** ✓ —— 这是本条的要点 ✓）。⚠ **登记**：① 「及**其相邻目标**」✗ —— **相邻**是伤害的**形状**（BLAST ✓），而 `APPLY_BUFF` 走**选择器** ✗ ⇒ 状态只落在**被指定**的那一个 ✓（精确的一半 ✓）；② 「**120% 的基础概率**」未写 ✗ —— 与 1218/1305 同一判断 ✓（\"基础概率\"要过效果命中×效果抵抗 ✓，不拿\"120% = 必中\"近似 ✗）。"
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "id": "talent_patron_on_skill",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "REMOVE_STATE", "buff": "老主顾", "target": "all_enemies" },
-      { "op": "APPLY_BUFF", "buff": "老主顾", "permanent": true, "target": "target" }
-    ],
-    "source": "1406 赛飞儿 天赋 热情好客的多洛斯人 (140604, Enhance/FollowUp): 「…施放战技和终结技时，使主目标成为【老主顾】。【老主顾】状态仅对最新被施加的目标生效。【老主顾】受到我方其他目标攻击后，赛飞儿立即对【老主顾】发动追加攻击，造成等同于赛飞儿150%攻击力的量子属性伤害。该效果每回合最多触发1次，赛飞儿回合开始时重置可触发次数。赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
-    "note": "「**施放战技**…时，使**主目标**成为【老主顾】」—— `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）。\n\n⭐ 2026-09-30 转正：「【老主顾】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 老主顾 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "talent_patron_on_ult",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "APPLY_BUFF", "buff": "老主顾", "permanent": true, "target": "target" }
-    ],
-    "source": "1406 赛飞儿 天赋 热情好客的多洛斯人 (140604, Enhance/FollowUp): 「…施放战技和终结技时，使主目标成为【老主顾】。【老主顾】状态仅对最新被施加的目标生效。【老主顾】受到我方其他目标攻击后，赛飞儿立即对【老主顾】发动追加攻击，造成等同于赛飞儿150%攻击力的量子属性伤害。该效果每回合最多触发1次，赛飞儿回合开始时重置可触发次数。赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
-    "note": "「施放…**终结技**时，使主目标成为【老主顾】」—— 与上一条**成对** ✓（文档把战技与终结技并列 ✓）。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "talent_reaction_followup",
-    "when": ["actor is_other_ally", "target has_state 老主顾"],
-    "per_turn": 1,
-    "do": [
-      { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 1.5, "element": "Quantum", "target": "target" }
-    ],
-    "source": "1406 赛飞儿 天赋 热情好客的多洛斯人 (140604, Enhance/FollowUp): 「…施放战技和终结技时，使主目标成为【老主顾】。【老主顾】状态仅对最新被施加的目标生效。【老主顾】受到我方其他目标攻击后，赛飞儿立即对【老主顾】发动追加攻击，造成等同于赛飞儿150%攻击力的量子属性伤害。该效果每回合最多触发1次，赛飞儿回合开始时重置可触发次数。赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
-    "note": "「【老主顾】受到**我方其他目标**攻击后，赛飞儿立即对【老主顾】发动**追加攻击**，造成等同于赛飞儿 **150% 攻击力**的量子属性伤害。该效果**每回合最多触发 1 次**，赛飞儿**回合开始时重置**可触发次数」—— ① 事件 `ALLY_ATTACK` ✓ + 两条条件承重 ✓（`actor is_other_ally` ✓ + `target has_state 老主顾` ✓）；② 伤害**字面倍率** ✓ + `Quantum` ✓；③ ⭐ **`per_turn: 1`** ✓ —— 引擎**已有**的规则级限制器 ✓（1005 的规则用过 ✓），语义正是\"**在规则主人自己的回合内最多 N 次、其回合开始时重置**\" ✓ ⇒ 与文档这句**逐字对应** ✓。⚠ **登记**：「赛飞儿会**记录**我方目标对【老主顾】造成的非真实伤害的 **12%**，**不记录溢出伤害**，施放终结技后**清空记录值**」✗（一个**全场累计的记录器** ✗ + 不记溢出 ✗ + 清空 ✗）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "technique_opening_aoe",
-    "when": ["self has_state 秘技"],
-    "do": [
-      { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 1.0, "element": "Quantum", "target": "all_enemies" }
-    ],
-    "source": "1406 赛飞儿 秘技 穿靴子的猫 (140607, Maze/Enhance): 「…持有【扎格列斯的祝福】期间进入战斗时，对敌方全体造成等同于赛飞儿100%攻击力的量子属性伤害，赛飞儿因该次伤害获得的记录值提高200%。」",
-    "note": "「持有【扎格列斯的祝福】期间进入战斗时，对敌方全体造成等同于赛飞儿 **100% 攻击力**的量子属性伤害」—— 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；伤害**字面倍率** ✓。⚠ **登记**：「赛飞儿因该次伤害获得的**记录值提高 200%**」✗（记录器 ✗）与秘技的**大地图**部分 ✗。"
-  },
-
-  {
-    "on": "DEALING_DAMAGE",
-    "id": "eidolon2_damage_taken",
-    "when": ["actor == self"],
-    "min_eidolon": 2,
-    "do": [
-      { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.3, "turns": 2, "target": "target" }
-    ],
-    "source": "1406 赛飞儿 星魂 2 焦头烂额顺手牵: 「赛飞儿击中敌方目标时，有120%的基础概率使其受到的伤害提高30%，持续2回合。」",
-    "note": "「赛飞儿**击中敌方目标时**，有 120% 的基础概率使其**受到的伤害提高 30%**，持续 **2 回合**」—— 事件 `DEALING_DAMAGE` ✓（**携带伤害实例**的事件 ✓，\"击中\"正是它 ✓）+ `actor == self` ✓；`MODIFY_DAMAGE_TAKEN` ✓ + `turns 2` ✓；`min_eidolon: 2` ✓（星魂 2 的从句 ✓）。⚠ **登记**：「**120% 的基础概率**」未写 ✗（同上 ✓）；⚠ 另注意：本条挂在**逐段**的 `DEALING_DAMAGE` 上 ✓ ⇒ 多段技能会**多次施加** ✗（文档说\"击中时\" ✓，一次施放可含多段 ✓）—— 差异写在注释里 ✓。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "level_convention",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
-    ],
-    "source": "1406 赛飞儿 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 200%/100%、终结技 120%/40% + 记录值、天赋 追加攻击 150%）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **终结技**「对指定敌方单体造成等同于**当前天赋记录值** 25% 的**真实伤害**，并对…造成 40% 攻击力量子伤害和**总计**等同于当前记录值 **75%** 的**真实伤害**，该真实伤害由**所有技能目标均分**」✗（**记录器** ✗ + **真实伤害** ✗ + **均分** ✗）；② 天赋的「场上**不存在**陷入【老主顾】状态的敌方目标时，立即使**当前场上生命上限最高**的敌方单体目标成为【老主顾】」✗（\"不存在\"的持续判断 ✗ + `highest_max_hp` 选择器 ✗）；③ 「【老主顾】状态**仅对最新被施加的目标生效**」✗（\"只保留最新一个\"的不变量 ✗）；④ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；⑤ **星魂 1**「记录的伤害值为原记录值的 **150%**。施放天赋的追加攻击时，赛飞儿的攻击力提高 **80%**，持续 2 回合」✗（记录器 ✗ + 后半**形状可写** ✓ 但依赖\"天赋的追加攻击\"这一事件 ✗）⇒ 一并登记 ✓。"
-  },
-
-  {
-    "on": "DEALING_DAMAGE",
-    "id": "trace_followup_crit_damage",
-    "when": ["actor == self"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_ATTACK",
-        "percent": 1.0,
-        "instance": true,
-        "damage_type": "ADDITIONAL",
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1406 赛飞儿 行迹「偷天换日」(1406103): 「天赋的追加攻击造成的暴击伤害提高 100%」",
-    "note": "⭐⭐ 实例路径 + 伤害类型域 ✓（`instance: true` + `damage_type: \"ADDITIONAL\"` ✓）⇒ 只给**追加攻击那一次伤害**加暴击伤害 ✓。⭐ 数值 **100%** 取自**数据行** ✓（`1406103 param=[0.4, 1]` ⇒ `#2[i] = 1` ✓，第 106 条 ✓）。⚠ 存活期 `permanent: true` 仅为过加载器校验 ✓。⚠ **登记同句后半** ✗：「赛飞儿在场时，敌方全体目标**受到的伤害提高 40%**」—— 那是**队伍/在场光环** ✗（需要\"某角色在场时对全体敌方生效\"的通道 ✗），与 1309/1504 同族 ✓。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "aura_damage_taken_while_present",
-    "do": [
-      { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.4, "permanent": true, "target": "all_enemies" }
-    ],
-    "note": "「赛飞儿**在场时**，敌方全体目标**受到的伤害提高 40%**」—— ⭐ 2026-09-30 转正 ✓：⚠ 旧登记写“需要某角色在场时对全体敌方生效的通道”✗ —— 而那个通道**已经存在** ✓：withSource 给每个 buff 记下 source = ctx.owner()，而 BuffManager.removeBuffsAnchoredTo 由 Battle.removeDeadCombatants 调用 ⇒ **她倒下时它自动被摘** ✓，正是“在场”的语义。⚠ 判据必须断言**两件**：伤害 +40% ✓，以及**她倒下后它消失** ✗。"
-  },
-
-  {
-    "id": "memosprite_ode_of_trickery_raises_her_damage",
-    "on": "CAST_SETUP",
-    "when": ["target == self", "actor is_summon", "from_skill_id == 20"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ALL_DAMAGE_TYPE_BOOST",
-        "percent_from": {"type": "cast_param", "index": 0},
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 20 「献予「诡计」之诗」（数据槽位 20，SkillID 1141520）：「整场生效，对赛飞儿施放时，**使赛飞儿造成的伤害提高 #1%**。」",
-    "note": "⭐ 形状照 1414 的浪漫之诗（同一属性 `ALL_DAMAGE_TYPE_BOOST`，`target: \"self\"`，永久）。⭐ `#1` 随等级变（**实测**：0.18 → 0.504）→ `percent_from_cast_param: 0`。⛔ 同句的两句降防**已登记**：【老主顾】我们没建模，而「【老主顾】**以外**的敌方目标」需要一个**否定过滤**，`target_when` 没有。"
-  },
-
-  {
-    "id": "trick_ode_lowers_the_patrons_defence",
-    "on": "CAST_SETUP",
-    "when": ["target == self", "actor is_summon", "from_skill_id == 20"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "DEFENCE",
-        "percent": -0.1,
-        "permanent": true,
-        "target": "all_enemies",
-        "target_when": ["target has_state 老主顾"]
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 20 「献予「诡计」之诗」（SkillID 1141520）：「…并使**【老主顾】的防御力降低 #2%**」（#2 = 0.10）。",
-    "note": "⭐ 规则写在**赛飞儿自己的文件**里（已出货的 `memosprite_ode_of_trickery_raises_her_damage` 就在这里）；⭐ 而“只对带【老主顾】的目标”用 **`target_when`**（形状抄自 `1106.json` 的降防）。"
-  },
-
-  {
-    "id": "trick_ode_lowers_everyone_elses_defence",
-    "on": "CAST_SETUP",
-    "when": ["target == self", "actor is_summon", "from_skill_id == 20"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "DEFENCE",
-        "percent": -0.06,
-        "permanent": true,
-        "target": "all_enemies",
-        "target_when": ["!target has_state 老主顾"]
-      }
-    ],
-    "source": "同上：「**【老主顾】以外的敌方目标的防御力降低 #3%**」（#3 = 0.06）。",
-    "note": "⭐ 否定条件 `!target has_state 老主顾`（已出货的写法）。"
-  }
-]
+{
+  "schema": 1,
+  "character": 1406,
+  "_status": "partial",
+  "_gaps": [
+    "战技：相邻目标虚弱 + 120% 基础概率未写",
+    "天赋：记录我方对老主顾非真实伤害的 12%、不记溢出、终结技后清空未写",
+    "终结技：按记录值 25% / 75% 真实伤害、多个目标均分未写",
+    "天赋：无老主顾时选生命上限最高目标；仅最新老主顾未写",
+    "秘技：记录值提高 200%、大地图效果未写",
+    "星魂 1（记录 150% / 追击时攻击 +80%）、星魂 2（120% 基础概率 / 逐段差异）未写；其余星魂未读"
+  ],
+  "rules": [
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_weakness_and_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "虚弱",
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": -0.1,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1406 赛飞儿 战技 嘿，空手套白银 (140602, BPSkill/Blast): 「有120%的基础概率使指定敌方单体及其相邻目标陷入虚弱状态，造成的伤害降低10%，使赛飞儿的攻击力提高30%，持续2回合，并对指定敌方单体造成等同于赛飞儿200%攻击力的量子属性伤害，对相邻目标造成等同于赛飞儿100%攻击力的量子属性伤害。」",
+      "_note": "「有 120% 的基础概率使指定敌方单体…陷入**虚弱**状态，**造成的伤害降低 10%**，使赛飞儿的**攻击力提高 30%**，持续 **2 回合**」—— ① 状态 `APPLY_BUFF 虚弱 turns 2` ✓；② 「造成的伤害降低 10%」用 **`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST percent: -0.1`** ✓（负值即降低 ✓）；③ 「使赛飞儿的攻击力提高 30%」⇒ `MODIFY_ATTR ATTACK percent: 0.3` + **`target: self`** ✓（加成在她**自己**身上 ✓，与减益的目标**不同** ✓ —— 这是本条的要点 ✓）。⚠ **登记**：① 「及**其相邻目标**」✗ —— **相邻**是伤害的**形状**（BLAST ✓），而 `APPLY_BUFF` 走**选择器** ✗ ⇒ 状态只落在**被指定**的那一个 ✓（精确的一半 ✓）；② 「**120% 的基础概率**」未写 ✗ —— 与 1218/1305 同一判断 ✓（\"基础概率\"要过效果命中×效果抵抗 ✓，不拿\"120% = 必中\"近似 ✗）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "talent_patron_on_skill",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "老主顾",
+          "target": "all_enemies"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "老主顾",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "1406 赛飞儿 天赋 热情好客的多洛斯人 (140604, Enhance/FollowUp): 「…施放战技和终结技时，使主目标成为【老主顾】。【老主顾】状态仅对最新被施加的目标生效。【老主顾】受到我方其他目标攻击后，赛飞儿立即对【老主顾】发动追加攻击，造成等同于赛飞儿150%攻击力的量子属性伤害。该效果每回合最多触发1次，赛飞儿回合开始时重置可触发次数。赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
+      "_note": "「**施放战技**…时，使**主目标**成为【老主顾】」—— `APPLY_BUFF` + **`permanent: true`** ✓（文档只给\"仅对最新目标生效\" ✓ ⇒ 直到被替换 ✓）。\n\n⭐ 2026-09-30 转正：「【老主顾】**仅对最新被施加的目标生效**」—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: 老主顾 target: all_enemies` 先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "talent_patron_on_ult",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "老主顾",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "1406 赛飞儿 天赋 热情好客的多洛斯人 (140604, Enhance/FollowUp): 「…施放战技和终结技时，使主目标成为【老主顾】。【老主顾】状态仅对最新被施加的目标生效。【老主顾】受到我方其他目标攻击后，赛飞儿立即对【老主顾】发动追加攻击，造成等同于赛飞儿150%攻击力的量子属性伤害。该效果每回合最多触发1次，赛飞儿回合开始时重置可触发次数。赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
+      "_note": "「施放…**终结技**时，使主目标成为【老主顾】」—— 与上一条**成对** ✓（文档把战技与终结技并列 ✓）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_reaction_followup",
+      "when": [
+        "actor is_other_ally",
+        "target has_state 老主顾"
+      ],
+      "per_turn": 1,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.5,
+          "element": "Quantum",
+          "target": "target"
+        }
+      ],
+      "source": "1406 赛飞儿 天赋 热情好客的多洛斯人 (140604, Enhance/FollowUp): 「…施放战技和终结技时，使主目标成为【老主顾】。【老主顾】状态仅对最新被施加的目标生效。【老主顾】受到我方其他目标攻击后，赛飞儿立即对【老主顾】发动追加攻击，造成等同于赛飞儿150%攻击力的量子属性伤害。该效果每回合最多触发1次，赛飞儿回合开始时重置可触发次数。赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
+      "_note": "「【老主顾】受到**我方其他目标**攻击后，赛飞儿立即对【老主顾】发动**追加攻击**，造成等同于赛飞儿 **150% 攻击力**的量子属性伤害。该效果**每回合最多触发 1 次**，赛飞儿**回合开始时重置**可触发次数」—— ① 事件 `ALLY_ATTACK` ✓ + 两条条件承重 ✓（`actor is_other_ally` ✓ + `target has_state 老主顾` ✓）；② 伤害**字面倍率** ✓ + `Quantum` ✓；③ ⭐ **`per_turn: 1`** ✓ —— 引擎**已有**的规则级限制器 ✓（1005 的规则用过 ✓），语义正是\"**在规则主人自己的回合内最多 N 次、其回合开始时重置**\" ✓ ⇒ 与文档这句**逐字对应** ✓。⚠ **登记**：「赛飞儿会**记录**我方目标对【老主顾】造成的非真实伤害的 **12%**，**不记录溢出伤害**，施放终结技后**清空记录值**」✗（一个**全场累计的记录器** ✗ + 不记溢出 ✗ + 清空 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_opening_aoe",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.0,
+          "element": "Quantum",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1406 赛飞儿 秘技 穿靴子的猫 (140607, Maze/Enhance): 「…持有【扎格列斯的祝福】期间进入战斗时，对敌方全体造成等同于赛飞儿100%攻击力的量子属性伤害，赛飞儿因该次伤害获得的记录值提高200%。」",
+      "_note": "「持有【扎格列斯的祝福】期间进入战斗时，对敌方全体造成等同于赛飞儿 **100% 攻击力**的量子属性伤害」—— 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；伤害**字面倍率** ✓。⚠ **登记**：「赛飞儿因该次伤害获得的**记录值提高 200%**」✗（记录器 ✗）与秘技的**大地图**部分 ✗。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon2_damage_taken",
+      "when": [
+        "actor == self"
+      ],
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1406 赛飞儿 星魂 2 焦头烂额顺手牵: 「赛飞儿击中敌方目标时，有120%的基础概率使其受到的伤害提高30%，持续2回合。」",
+      "_note": "「赛飞儿**击中敌方目标时**，有 120% 的基础概率使其**受到的伤害提高 30%**，持续 **2 回合**」—— 事件 `DEALING_DAMAGE` ✓（**携带伤害实例**的事件 ✓，\"击中\"正是它 ✓）+ `actor == self` ✓；`MODIFY_DAMAGE_TAKEN` ✓ + `turns 2` ✓；`min_eidolon: 2` ✓（星魂 2 的从句 ✓）。⚠ **登记**：「**120% 的基础概率**」未写 ✗（同上 ✓）；⚠ 另注意：本条挂在**逐段**的 `DEALING_DAMAGE` 上 ✓ ⇒ 多段技能会**多次施加** ✗（文档说\"击中时\" ✓，一次施放可含多段 ✓）—— 差异写在注释里 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1406 赛飞儿 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 200%/100%、终结技 120%/40% + 记录值、天赋 追加攻击 150%）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **终结技**「对指定敌方单体造成等同于**当前天赋记录值** 25% 的**真实伤害**，并对…造成 40% 攻击力量子伤害和**总计**等同于当前记录值 **75%** 的**真实伤害**，该真实伤害由**所有技能目标均分**」✗（**记录器** ✗ + **真实伤害** ✗ + **均分** ✗）；② 天赋的「场上**不存在**陷入【老主顾】状态的敌方目标时，立即使**当前场上生命上限最高**的敌方单体目标成为【老主顾】」✗（\"不存在\"的持续判断 ✗ + `highest_max_hp` 选择器 ✗）；③ 「【老主顾】状态**仅对最新被施加的目标生效**」✗（\"只保留最新一个\"的不变量 ✗）；④ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；⑤ **星魂 1**「记录的伤害值为原记录值的 **150%**。施放天赋的追加攻击时，赛飞儿的攻击力提高 **80%**，持续 2 回合」✗（记录器 ✗ + 后半**形状可写** ✓ 但依赖\"天赋的追加攻击\"这一事件 ✗）⇒ 一并登记 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_followup_crit_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 1.0,
+          "instance": true,
+          "damage_type": "ADDITIONAL",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1406 赛飞儿 行迹「偷天换日」(1406103): 「天赋的追加攻击造成的暴击伤害提高 100%」",
+      "_note": "⭐⭐ 实例路径 + 伤害类型域 ✓（`instance: true` + `damage_type: \"ADDITIONAL\"` ✓）⇒ 只给**追加攻击那一次伤害**加暴击伤害 ✓。⭐ 数值 **100%** 取自**数据行** ✓（`1406103 param=[0.4, 1]` ⇒ `#2[i] = 1` ✓，第 106 条 ✓）。⚠ 存活期 `permanent: true` 仅为过加载器校验 ✓。⚠ **登记同句后半** ✗：「赛飞儿在场时，敌方全体目标**受到的伤害提高 40%**」—— 那是**队伍/在场光环** ✗（需要\"某角色在场时对全体敌方生效\"的通道 ✗），与 1309/1504 同族 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "aura_damage_taken_while_present",
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "all_enemies"
+        }
+      ],
+      "_note": "「赛飞儿**在场时**，敌方全体目标**受到的伤害提高 40%**」—— ⭐ 2026-09-30 转正 ✓：⚠ 旧登记写“需要某角色在场时对全体敌方生效的通道”✗ —— 而那个通道**已经存在** ✓：withSource 给每个 buff 记下 source = ctx.owner()，而 BuffManager.removeBuffsAnchoredTo 由 Battle.removeDeadCombatants 调用 ⇒ **她倒下时它自动被摘** ✓，正是“在场”的语义。⚠ 判据必须断言**两件**：伤害 +40% ✓，以及**她倒下后它消失** ✗。"
+    },
+    {
+      "id": "memosprite_ode_of_trickery_raises_her_damage",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 20"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent_from": {
+            "type": "cast_param",
+            "index": 0
+          },
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 20 「献予「诡计」之诗」（数据槽位 20，SkillID 1141520）：「整场生效，对赛飞儿施放时，**使赛飞儿造成的伤害提高 #1%**。」",
+      "_note": "⭐ 形状照 1414 的浪漫之诗（同一属性 `ALL_DAMAGE_TYPE_BOOST`，`target: \"self\"`，永久）。⭐ `#1` 随等级变（**实测**：0.18 → 0.504）→ `percent_from_cast_param: 0`。⛔ 同句的两句降防**已登记**：【老主顾】我们没建模，而「【老主顾】**以外**的敌方目标」需要一个**否定过滤**，`target_when` 没有。"
+    },
+    {
+      "id": "trick_ode_lowers_the_patrons_defence",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 20"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.1,
+          "permanent": true,
+          "target": "all_enemies",
+          "target_when": [
+            "target has_state 老主顾"
+          ]
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 20 「献予「诡计」之诗」（SkillID 1141520）：「…并使**【老主顾】的防御力降低 #2%**」（#2 = 0.10）。",
+      "_note": "⭐ 规则写在**赛飞儿自己的文件**里（已出货的 `memosprite_ode_of_trickery_raises_her_damage` 就在这里）；⭐ 而“只对带【老主顾】的目标”用 **`target_when`**（形状抄自 `1106.json` 的降防）。"
+    },
+    {
+      "id": "trick_ode_lowers_everyone_elses_defence",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 20"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.06,
+          "permanent": true,
+          "target": "all_enemies",
+          "target_when": [
+            "!target has_state 老主顾"
+          ]
+        }
+      ],
+      "source": "同上：「**【老主顾】以外的敌方目标的防御力降低 #3%**」（#3 = 0.06）。",
+      "_note": "⭐ 否定条件 `!target has_state 老主顾`（已出货的写法）。"
+    }
+  ]
+}

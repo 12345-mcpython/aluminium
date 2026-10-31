@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23047,
   "1": [
     {
       "on": "DEBUFF_APPLIED",
@@ -18,7 +20,7 @@
         }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
-      "note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
+      "_note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
     },
     {
       "on": "DEBUFF_APPLIED",
@@ -44,7 +46,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
-      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+      "_note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     },
     {
       "on": "TAKING_HIT",
@@ -63,7 +65,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
-      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
+      "_note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "2": [
@@ -85,7 +87,7 @@
         }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
-      "note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
+      "_note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
     },
     {
       "on": "DEBUFF_APPLIED",
@@ -111,7 +113,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
-      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+      "_note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     },
     {
       "on": "TAKING_HIT",
@@ -130,7 +132,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
-      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
+      "_note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "3": [
@@ -152,7 +154,7 @@
         }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
-      "note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
+      "_note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
     },
     {
       "on": "DEBUFF_APPLIED",
@@ -178,7 +180,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
-      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+      "_note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     },
     {
       "on": "TAKING_HIT",
@@ -197,7 +199,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
-      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
+      "_note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "4": [
@@ -219,7 +221,7 @@
         }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
-      "note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
+      "_note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
     },
     {
       "on": "DEBUFF_APPLIED",
@@ -245,7 +247,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
-      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+      "_note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     },
     {
       "on": "TAKING_HIT",
@@ -264,7 +266,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
-      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
+      "_note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "5": [
@@ -286,7 +288,7 @@
         }
       ],
       "source": "光锥 23047 独奏: 使装备者的效果命中提高#1[i]%，当有敌方目标陷入装备者施加的负面效果时，有#2[i]%的基础概率使其陷入【魂迷】状态，持续#3[i]回合，同类效果无法叠加。【魂迷】状态下，每有1个装备者施加的负面效果，受到的持续伤害提高#4[f1]%，该效果最多叠加#5[i]层，受到我方目标攻击时，使攻击者速度提高#6[f1]%，持续#7[i]回合。当装备者陷入无法战斗状态时，移除所有【魂迷】。",
-      "note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
+      "_note": "「当敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】3 回合，同类不叠加」—— DEBUFF_APPLIED + actor == self + APPLY_BUFF{魂迷, base_chance: 0.8, turns: 3}。⚠⚠ 2026-10-31：**必须加 `!target has_state 魂迷`** —— APPLY_BUFF 带 base_chance 时走 DebuffService.tryApply，而那里在 addBuff 之后会再发一次 DEBUFF_APPLIED（全仓唯一一处），所以没有这道门时这条规则会接住自己发出的那一发，实测抛 Trigger recursion exceeded 8 levels。「同类效果无法叠加」也正是这一句的门。 ⚠ 2026-10-31：另加 `ticks_on: \"self\"` —— 那一句「当装备者陷入无法战斗状态时，移除所有【魂迷】」在引擎里正是\"锚点死亡即清\"：`DeathService.releaseBuffsAnchoredToTheDead` 会对**每一个**载体调用 `removeBuffsAnchoredTo(死去的单位)`，所以把【魂迷】的时钟挂在装备者（`ticks_on: self`）上，她倒下时敌方身上所有【魂迷】自动被清 ✓。副作用是持续时间按**她的**回合数，与\"由她维持的负面\"一致。"
     },
     {
       "on": "DEBUFF_APPLIED",
@@ -312,7 +314,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
-      "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+      "_note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
     },
     {
       "on": "TAKING_HIT",
@@ -331,7 +333,7 @@
         }
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
-      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
+      "_note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ]
 }

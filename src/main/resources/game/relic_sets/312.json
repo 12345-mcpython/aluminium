@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "relic_set": 312,
   "2": [
     {
       "on": "BATTLE_START",
@@ -16,7 +18,7 @@
         }
       ],
       "source": "relic set 312 (2-piece) Ability53121: \"Increases the wearer's Energy Regeneration Rate by 5%. Increases the DMG dealt by other allies with the same Type as the wearer by 10%.\" — the ERR is the properties stat; the DMG half is BATTLE_START + a per-target filter.",
-      "note": "「能量恢复效率 +5%」由 `properties` 给 ✓（`SPRatioBase 0.05` ✓）；「**与装备者属性相同**的我方其他角色造成的伤害提高 10%」—— 现在是 `target: all_allies` ✗（**全队**都吃 ✗）。\n⛔ **仍开（已登记 §4.3）**：需要「只给**同属性**的队友」✗ —— 引擎有 `ally_cid`/`is_ally` ✓，但**没有「按属性比较两个单位」**的拼法 ✗（21011 的同属性加成也是靠判据手算的 ✓）⇒ 等价缺口。"
+      "_note": "「能量恢复效率 +5%」由 `properties` 给 ✓（`SPRatioBase 0.05` ✓）；「**与装备者属性相同**的我方其他角色造成的伤害提高 10%」—— 现在是 `target: all_allies` ✗（**全队**都吃 ✗）。\n⛔ **仍开（已登记 §4.3）**：需要「只给**同属性**的队友」✗ —— 引擎有 `ally_cid`/`is_ally` ✓，但**没有「按属性比较两个单位」**的拼法 ✗（21011 的同属性加成也是靠判据手算的 ✓）⇒ 等价缺口。"
     }
   ]
 }

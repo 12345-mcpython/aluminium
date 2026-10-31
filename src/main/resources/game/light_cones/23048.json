@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23048,
   "1": [
     {
       "on": "ULT_CAST",
@@ -7,7 +9,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1.0, "target": "self" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
+      "_note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
     },
     {
       "on": "CAST_SETUP",
@@ -17,7 +19,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.54, "turns": 3, "target": "target" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
+      "_note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
     }
   ],
   "2": [
@@ -28,7 +30,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1.0, "target": "self" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
+      "_note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
     },
     {
       "on": "CAST_SETUP",
@@ -38,7 +40,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.675, "turns": 3, "target": "target" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
+      "_note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
     }
   ],
   "3": [
@@ -49,7 +51,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1.0, "target": "self" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
+      "_note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
     },
     {
       "on": "CAST_SETUP",
@@ -59,7 +61,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.81, "turns": 3, "target": "target" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
+      "_note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
     }
   ],
   "4": [
@@ -70,7 +72,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1.0, "target": "self" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
+      "_note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
     },
     {
       "on": "CAST_SETUP",
@@ -80,7 +82,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 0.945, "turns": 3, "target": "target" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
+      "_note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
     }
   ],
   "5": [
@@ -91,7 +93,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1.0, "target": "self" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
+      "_note": "「施放终结技攻击后恢复 1 个战技点」—— `ULT_CAST` ＋ `GAIN_SKILL_POINT(1)` ✓（#3 = 1 ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23048_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（64/80/96/112/128% ✓）⇒ 再写一条会读成两倍 ✗。"
     },
     {
       "on": "CAST_SETUP",
@@ -101,7 +103,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SKILL_DAMAGE_BOOST", "percent": 1.08, "turns": 3, "target": "target" }
       ],
       "source": "光锥 23048 征服: 使装备者的攻击力提高#1[i]%。施放终结技攻击后恢复#3[i]个战技点，装备者对我方单体角色施放战技后，使目标造成的战技伤害提高#4[f1]%，持续#5[i]回合。",
-      "note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
+      "_note": "「装备者对我方**单体**角色施放战技后，使**目标**造成的**战技伤害**提高 54%，持续 3 回合」—— `CAST_SETUP` ＋ **`actor == self`** ＋ `from_category BPSKILL` ＋ `target is_ally` ＋ `MODIFY_ATTR SKILL_DAMAGE_BOOST{percent: 54/67.5/81/94.5/108%, turns: 3, target: target}` ✓。\n⚠⚠ **2026-10-19 逐句核时补的门** ✗：原先没有 `actor == self`、也没有 `target is_ally` ⇒ **任何队友**放战技都会给自己的目标 +54% ✗。"
     }
   ]
 }
