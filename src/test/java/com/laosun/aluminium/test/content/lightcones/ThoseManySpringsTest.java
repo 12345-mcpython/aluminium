@@ -22,7 +22,7 @@ public class ThoseManySpringsTest {
         var rules = c.getTriggerTable().rulesFor(TriggerEvent.BASIC_ATTACK).stream()
                 .filter(r -> r.id().startsWith("cone23029_")).toList();
         System.out.println("[23029] rules=" + rules.size());
-        Assertions.assertEquals(1, rules.size(), "the armour-break clause");
+        Assertions.assertEquals(2, rules.size(), "the armour-break clause and its upgrade");
         var effect = rules.getFirst().effects().getFirst();
         System.out.println("[23029] spec op=" + effect.getOp() + " percent=" + effect.getPercent()
                 + " turns=" + effect.getTurns() + " target=" + effect.getTarget());

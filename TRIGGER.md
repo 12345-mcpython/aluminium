@@ -212,6 +212,7 @@
 | `self_energy_percent` / `self_max_energy` | 我的能量百分比 / 上限 |
 | `hit_count` / `weakness_hit_count` / `target_weakness_count` | 命中数 / 弱点命中数 / 目标弱点数 |
 | `target_debuff_count` / `target_dot_count` | 目标身上的负面数 / 持续伤害数 |
+| `target_dots_from_self` | 目标身上**由规则拥有者施加的**持续伤害数（23029 的「装备者施加的持续伤害」）|
 | `self_summon_count` / `target_summon_count` | 召唤物数量 |
 | `enemy_count` / `ally_count` | 场上敌我数量 |
 | `skill_point_max` | 战技点上限 |
