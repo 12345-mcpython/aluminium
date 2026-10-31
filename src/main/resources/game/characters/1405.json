@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "character": 1405,
   "_status": "partial",
   "_gaps": [
     "星魂 1「首次施放战技后恢复 1 个战技点」：缺「首次」计数",

@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "character": 1308,
   "_status": "partial",
   "_gaps": [
     "无上限层数无法表达：不写 max_stacks 时层数只读到 1",

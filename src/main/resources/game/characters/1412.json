@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "character": 1412,
   "_status": "partial",
   "_gaps": [
     "【军功】仅最新目标生效、目标改变时充能重置为 0 未写",

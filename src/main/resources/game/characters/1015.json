@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "character": 1015,
   "_status": "partial",
   "_gaps": [
     "战技「本回合不会结束」：引擎没有「回合不结束」开关，回合由 afterMove 收尾",

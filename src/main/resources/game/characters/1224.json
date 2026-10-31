@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "character": 1224,
   "_status": "partial",
   "_gaps": [
     "战技：「除自身以外」目标限制与「仅最新施放目标」的不变量未写",
