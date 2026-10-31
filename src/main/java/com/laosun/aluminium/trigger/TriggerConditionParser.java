@@ -2074,6 +2074,9 @@ final class TriggerConditionParser {
                     // 「若目标处于**装备者施加的**持续伤害状态」 (light cone 23029): `target_dot_count` counts every DoT, this one
                     // counts only the ones whose source is the rule's owner - a DoT keeps its source, so the applier is a fact.
                     "target_dots_from_self",
+                    // 「若该效果消耗的生命值高于 500 点」 (light cone 23039): the AMOUNT the triggering event carries - for
+                    // `HP_CONSUMED` that is the HP actually paid, which is the number the sentence branches on.
+                    "event_amount",
                     "actor_hp_percent",
                     // "when entering combat, if the allies' Skill Points limit is #2 or higher" (reader: light cone 23046):
                     // the cap is not a field of the unit -- it belongs to the battle's skill point policy -- so the value

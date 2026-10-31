@@ -82,8 +82,10 @@ public class ConeAuditBatchTwentyFourTest {
                 > bare.wearer.getAttribute(AttributeType.HEALTH).get(), "「生命上限提高 18%」");
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.HEAL_TAKEN_RATIO).get()
                 > bare.wearer.getAttribute(AttributeType.HEAL_TAKEN_RATIO).get(), "「受到的治疗量提高 20%」");
-        System.out.println("[23039] 规则数 " + rules(23039) + "（支付生命那一句没有拼法）");
-        Assertions.assertEquals(0, rules(23039), "缺口见证：没有规则（见状态表）");
+        // 2026-10-31: the payment clause landed (pay 6% Max HP at CAST_SETUP and raise the same attack by 30%); the
+        // 500-point branch is still open, so this pins the rules that exist rather than "none".
+        Assertions.assertEquals(4, rules(23039),
+                "two payment rules (skill / ultimate) and the two boosts that read their marker");
     }
 
     /**

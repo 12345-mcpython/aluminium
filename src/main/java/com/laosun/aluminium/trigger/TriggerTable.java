@@ -1834,6 +1834,8 @@ public class TriggerTable {
                     com.laosun.aluminium.damage.Damage hit = ctx.damage();
                     yield hit == null ? 0 : hit.getSkillKey();
                 }
+                // 「若该效果消耗的生命值高于 500 点」 (light cone 23039): the amount the event itself carries.
+                case "event_amount" -> ctx.amount();
                 case "hp_percent" -> hpPercent(ctx.owner());
                 // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102): the laugh points
                 // that Elation damage is computed from - the merged, frozen snapshots of 【好活当赏】, NOT the party's live
