@@ -71,7 +71,8 @@ public class ConeAuditBatchTwentyNineTest {
                 - bare.wearer.getAttribute(AttributeType.ATTACK).get()) + " ; 规则数 " + rules(24004));
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.ATTACK).get()
                 > bare.wearer.getAttribute(AttributeType.ATTACK).get(), "「攻击力提高 8%」—— 属性给一次");
-        Assertions.assertEquals(1, rules(24004), "只剩速度那一条（重复的攻击规则已删）");
+        Assertions.assertEquals(3, rules(24004),
+                "the speed rule plus the per-hit ATK pair (a live aura and the stacking rule that feeds it)");
 
         JsonObject speed = effect(24004, "cone24004_speed_on_wide_hit", 0);
         System.out.println("[24004] 速度: percent=" + speed.get("percent") + " turns=" + speed.get("turns"));
@@ -167,3 +168,4 @@ public class ConeAuditBatchTwentyNineTest {
         }
     }
 }
+
