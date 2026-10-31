@@ -346,7 +346,17 @@ public final class TriggerInterpreter {
             String movingOp = normalizeOp(effect, null);
             // Match the RAW op too: `normalizeOp` derives its name and a spend spelled `overflow_only` did not reach this branch, so the capture of a spend read 0.
             String rawOp = effect.getOp() == null ? "" : effect.getOp().trim().toUpperCase(java.util.Locale.ROOT);
-            for (int repeat = perStepsRepeat(effect, effectCtx); repeat > 0; repeat--) {
+            int perStepsStairs = perStepsRepeat(effect, effectCtx);
+        // An additive PERCENTAGE modifier applied N times is one modifier of N x the value - and repeating it would be WRONG,
+        // because the engine replaces a same-kind modifier instead of stacking it (measured on 23001's speed stair: three
+        // layers read as one). Only the plain `percent` form is folded here; a stated `amount` or a derived `scale` keeps the
+        // repeat loop, where each repetition is a fresh write.
+        if (perStepsStairs > 1 && "MODIFY_ATTR".equals(normalizeOp(effect, null))
+                && effect.getPercent() != null && effect.getAmount() == null && effect.getScale() == null) {
+            TriggerEffects.modifyAttr(battle, effect.withPercent(effect.getPercent() * (perStepsStairs - 1)), effectCtx);
+            return;
+        }
+        for (int repeat = perStepsStairs; repeat > 0; repeat--) {
                 if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
                         || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
                     //: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
@@ -2240,14 +2250,17 @@ public final class TriggerInterpreter {
      */
     }
 
-    private record CounterSteps(String counter, double step) {
+    private record CounterSteps(String counter, double step, double threshold) {
 
         /**
          * How many WHOLE steps the counter has reached: {@code floor(value / step)}, read through the resolution
          * {@code weight_steps} uses - the rule owner's attribute, one of its own counters, or the battle's skill points.
+         *
+         * <p>A stated THRESHOLD makes it {@code floor(max(0, value - threshold) / step)}: 「速度高于 100 时，每超过 10 点」 counts the
+         * steps ABOVE the line, so 110 is one layer and 100 is none (light cone 23001 于夜色中).
          */
         int wholeSteps(TriggerContext ctx) {
-            return (int) Math.floor(counterValue(counter, ctx) / step);
+            return (int) Math.floor(Math.max(0, counterValue(counter, ctx) - threshold) / step);
         }
     }
 
@@ -2273,7 +2286,23 @@ public final class TriggerInterpreter {
             throw new IllegalArgumentException(spelling + " divides by " + step
                     + "; a step must be greater than zero (\"" + written + "\")");
         }
-        return new CounterSteps(written.substring(0, colon).trim(), step);
+        String head = written.substring(0, colon).trim();
+        // 「速度高于 100 时，每超过 10 点」 - the counter may carry a threshold: `"SPEED-100:10"`.
+        double threshold = 0;
+        int minus = head.lastIndexOf('-', head.length() - 1);
+        if (minus > 0) {
+            try {
+                threshold = Double.parseDouble(head.substring(minus + 1).trim());
+                head = head.substring(0, minus).trim();
+            } catch (NumberFormatException notAThreshold) {
+                // No threshold then: a name may legitimately contain a dash, and a non-numeric tail is part of the name.
+                threshold = 0;
+            }
+        }
+        if (head.isEmpty()) {
+            throw new IllegalArgumentException(spelling + " names no counter: \"" + written + "\"");
+        }
+        return new CounterSteps(head, step, threshold);
     }
 
 

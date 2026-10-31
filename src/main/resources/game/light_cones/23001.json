@@ -1,7 +1,142 @@
 {
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-  "5": []
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23001_speed_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.06,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.06,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.18（光锥属性）、步长 10、每层普攻/战技 +0.06、叠加上限 6。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23001_speed_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.07,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.07,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.21（光锥属性）、步长 10、每层普攻/战技 +0.07、叠加上限 6。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23001_speed_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.08,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.08,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.24（光锥属性）、步长 10、每层普攻/战技 +0.08、叠加上限 6。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23001_speed_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.09,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.09,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.27（光锥属性）、步长 10、每层普攻/战技 +0.09、叠加上限 6。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23001_speed_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.1,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.1,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.30（光锥属性）、步长 10、每层普攻/战技 +0.10、叠加上限 6。"
+    }
+  ]
 }

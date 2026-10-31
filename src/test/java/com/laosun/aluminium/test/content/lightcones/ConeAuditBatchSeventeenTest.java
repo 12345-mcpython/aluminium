@@ -79,16 +79,17 @@ public class ConeAuditBatchSeventeenTest {
 
 
     /**
-     * 23001 于夜色中: the crit share is the property - and the speed clause has NO rules at all (registered, no variable).
+     * 23001 于夜色中: the crit share is the property, and the speed stair landed on 2026-10-31 as {@code per_steps: "SPEED-100:10"}
+     * (the threshold form). The stair itself is judged in {@code ConeTwentyThreeThousandOneTest}; what this pins is that the file
+     * now carries a rule AND that the crit share is still exactly the property's.
      */
     @Test
-    public void coneTwoThreeZeroOneOnlyTheCritShareIsSpelled() {
+    public void coneTwoThreeZeroOneCarriesBothHalvesItCanSpell() {
         Fixture f = new Fixture(23001, 1);
         Fixture bare = new Fixture(null, 1);
         double crit = f.attribute(AttributeType.CRIT_CHANCE) - bare.attribute(AttributeType.CRIT_CHANCE);
-        System.out.println("[23001] crit share " + crit + " (the speed clause has no rule at all)");
         Assertions.assertEquals(0.18, crit, 1e-9, "the crit share comes from the property, once");
-        Assertions.assertEquals(0, ruleCount(23001), "witness: the speed clause has no spelling (see the status row)");
+        Assertions.assertEquals(1, ruleCount(23001), "the speed stair is spelled now");
     }
 
     /**
