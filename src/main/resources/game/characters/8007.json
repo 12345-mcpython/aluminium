@@ -1,123 +1,263 @@
-[
-  {
-    "on": "SKILL_CAST",
-    "id": "skill_summon_mem",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "SUMMON" },
-      { "op": "HEAL", "scale": "target_max_hp", "percent": 0.6, "target": "summon" },
-      { "op": "ADVANCE", "percent": 1.0, "target": "target" },
-      { "op": "APPLY_BUFF", "buff": "迷迷的声援", "turns": 3, "target": "target" }
-    ],
-    "source": "8007 开拓者•记忆 战技 就决定是你了！ (800702, BPSkill/Summon): 「召唤忆灵迷迷。若迷迷已在场，为迷迷回复等同于迷迷生命上限60%的生命值，并且使迷迷获得10%充能。」\n⭐ 2026-10-02（文档 `:143`）：「使指定我方单体**行动提前 100%**并附上【**迷迷的声援**】，持续 **3** 回合」✓",
-    "note": "「**召唤忆灵迷迷**。若迷迷已在场，为迷迷回复等同于**迷迷生命上限 60%** 的生命值」—— ① 召唤用 `SUMMON` ✓（无参数 ✓，面板来自 `memosprites/8007.json` ✓ —— **文档给了 130 速度** ✓，这正是第 163 轮 1409 卡住的地方 ✓）；② 治疗用 `HEAL` + **`scale: target_max_hp`** + `target: summon` ✓ —— \"迷迷生命上限的 60%\"读的是**忆灵自己**的上限 ✓；③ 同一技能**先召唤再治疗** ✓（首次施放时忆灵刚到场、满血 ⇒ 治疗量为 0 ✓，这是文档的语序 ✓）。⚠ **登记**：「使迷迷获得 **10% 充能**」✗ —— 充能是**忆灵身上的百分比资源** ✗，不是引擎的层数 ✓（`ADD_STACK` 的 `amount` 也不是层数 ✓，第 172 轮已登记 ✓）。\n⭐ 2026-10-02：把“提前 + 声援”**并进本条** ✓ —— ❗ 第一版另加了一条 `SKILL_CAST`，判据绿了但**全量红**：`RemembranceTrailblazerTest.hisFileCarriesTheClauses` 是一条**普查**（按事件计数）✓，而它恰好指向正确做法：**文档那一句就是这个战技的效果** ✓。⛐ **已登记**：“等同于原伤害 28% 的真实伤害” ✗。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "ult_summon_mem",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "SUMMON" }
-    ],
-    "source": "8007 开拓者•记忆 终结技 一起上吧，迷迷！ (800703, Ultra/AoEAttack): 「召唤忆灵迷迷。使迷迷获得40%充能，随后使迷迷对敌方全体造成等同于迷迷240%攻击力的冰属性伤害。」",
-    "note": "「**召唤忆灵迷迷**」—— 用 `SUMMON` ✓（\"忆灵已在场则解除其控制\"是引擎 `SUMMON` 的既有语义 ✓）。⚠ **登记**：① 「使迷迷获得 **40% 充能**」✗（同战技那条 ✓）；② 「**使迷迷**对敌方全体造成等同于**迷迷 240% 攻击力**的冰属性伤害」✗ —— 这是\"**以另一个单位为攻击者造成伤害**\" ✗，`DAMAGE` 以**规则主人**为攻击者 ✓（与停云【赐福】那条同一限制 ✓）；③ 本条的**伤害不写** ✗（技能数据里若有则由数据结算 ✓）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "level_convention",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
-    ],
-    "source": "8007 开拓者•记忆 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 召唤/治疗 60%、终结技 迷迷 240%、天赋 忆灵面板 130 速度 / 80%生命上限+640）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本文件与 8008 是同一套技能** ✓（记忆开拓者的两版 ✓）：天赋与秘技的**英文原句逐字相同** ✓（尤其是「130 点速度、80% 生命上限+640」与 Formula 那句 ✓）⇒ 按同一份文档出货 ✓。⚠ **登记**：① **忆灵面板**已写进 `memosprites/8007.json` ✓（速度 130 ✓、80% 生命上限 + 640 ✓）；② 天赋「我方全体**每累计恢复 10 点能量**，迷迷获得 1% 充能」✗ —— 需要一个**全队累计能量**的计数 ✗；③ 秘技「制造**特殊领域**，敌人陷入**时停**；入场后使敌方全体**行动延后 50%** 并造成 100% 攻击力冰伤」✗ —— **场/领域** ✗ 与 **时停** ✗，但其中「行动延后 50%」**可写** ✓（`ADVANCE` 的反向 ✗ hmm：需要\"延后\"的写法 ✗ ⇒ 一并登记 ✓）；④ 强化普攻（【史诗】层数 + 与迷迷的**连携攻击** ✗）；⑤ 星魂未读 ✗。"
-  },
-
-  {
-    "on": "DAMAGE_SETTLED",
-    "id": "cheer_true_damage_rider",
-    "when": ["actor has_state 迷迷的声援", "actor is_ally", "damage_is_attack"],
-    "do": [
-      {
-        "op": "DAMAGE",
-        "scale": "original_damage",
-        "percent": 0.28,
-        "element": "Ice",
-        "damage_type": "TRUE",
-        "target": "target"
-      }
-    ],
-    "source": "8007 开拓者 战技（文档 `:143`）：「持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次**等同于原伤害 28%**的真实伤害」",
-    "note": "⭐ 2026-10-02：写法逐字照拄 **`1415.json` 的 `zone_true_damage_rider`** ✓（`DAMAGE_SETTLED` ✓／`scale: \"original_damage\"` ✓／`damage_type: \"TRUE\"` ✓）；`percent: 0.28` ✓ 与 `element: \"Ice\"` ✓ 均出自数据（他的 `attribute` 是 `ice` ✓）。⚠ 无属性在引擎里是“**跳过全部伤害区**”实现的 ✓，`element` 只是随行标签 ✓。"
-  },
-
-  {
-    "id": "memosprite_ode_of_genesis_raises_his_attack_and_crit",
-    "on": "CAST_SETUP",
-    "when": ["target == self", "actor is_summon", "from_skill_id == 13"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ATTACK",
-        "scale": "actor_attr:HEALTH",
-        "percent_from": {"type": "cast_param", "index": 0},
-        "permanent": true,
-        "target": "self"
-      },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "scale": "actor_attr:CRIT_CHANCE",
-        "percent_from": {"type": "cast_param", "index": 1},
-        "permanent": true,
-        "target": "self"
-      },
-      { "op": "APPLY_BUFF", "buff": "献予「创世」之诗", "permanent": true, "target": "self" }
-    ],
-    "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
-    "note": "⭐ 两个主体各自取自哪里，都是**量过**的：占比 #1/#2 来自**施放技能的参数**（`percent_from_cast_param`，按施放者的**当前等级**取行）；而它们所**乘**的属性来自**动作方**（`actor_attr:`，即德谬歌自己）——`self_attr:` 读的是持有者、`summon_attr:` 读的是持有者的忆灵（对 8007 而言是迷迷），两者都不是德谬歌。"
-  },
-
-  {
-    "id": "memosprite_ode_of_genesis_also_reaches_his_memosprite",
-    "on": "CAST_SETUP",
-    "when": ["target == self", "actor is_summon", "from_skill_id == 13", "self_summon_count >= 1"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "ATTACK",
-        "scale": "actor_attr:HEALTH",
-        "percent_from": {"type": "cast_param", "index": 0},
-        "permanent": true,
-        "target": "summon"
-      },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "scale": "actor_attr:CRIT_CHANCE",
-        "percent_from": {"type": "cast_param", "index": 1},
-        "permanent": true,
-        "target": "summon"
-      }
-    ],
-    "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
-    "note": "「**该效果对迷迷也生效。**」—— ⭐ 它是**独立一句**，所以也是**独立一条规则**：「对迷迷」只在**持有者身边确实有忆灵**时才成立，而检查它的就是 `self_summon_count >= 1`（引擎在目标落空时**自己报出这个门控的名字**）。"
-  },
-
-  {
-    "id": "memosprite_ode_of_genesis_gives_it_an_extra_turn_after_the_reinforced_basic_attack",
-    "on": "CAST_SETUP",
-    "when": ["self has_state 献予「创世」之诗", "actor == self", "from_skill_id == 4"],
-    "do": [
-      { "op": "INSERT_ACTION", "target": "attacker" },
-      { "op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": 1, "turns": 1, "target": "attacker" },
-      { "op": "CAST_SKILL", "skill": "SKILL", "skill_id": 1, "target": "attacker" }
-    ],
-    "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13）：「本场战斗中，**开拓者•记忆施放强化普攻后，德谬歌立即获得 1 个额外回合并自动施放【花与箭的舞曲】」。",
-    "note": "⭐ 三个效果各自对应原句的一部分：「立即获得 1 个额外回合」⇒ `INSERT_ACTION`（**不是** `EXTRA_TURN`：游戏用 `SpeedOverride = 0` 把忆灵的速度钉在 0，它在行动顺序里**没有位置**）；「自动施放【花与箭的舞曲】」⇒ `skill_id = 1`（忆灵自己的**数据槽位**）。 TWO subjects again, and the same trap as `summon_attr:`: the effects are aimed at `attacker` (德谬歌, the unit casting the memosprite skill), NOT at `summon` -- that one resolves the RULE OWNER's memosprite, which for 8007 is 迷迷. Measured: with `summon` the inserted action went to 迷迷."
-  }
-]
+{
+  "schema": 1,
+  "character": 8007,
+  "_status": "partial",
+  "_gaps": [
+    "天赋：我方每累计恢复 10 点能量使迷迷获得 1% 充能未写（缺全队累计能量计数）",
+    "秘技：大地图的特殊领域 / 时停未写（战斗层的延后 50% + 100% 冰伤已补；终结技 240% 冰伤已补）",
+    "忆灵 ATK 面板文档未给，按召唤者 100% 攻击力建模（假设）"
+  ],
+  "resources": [
+    {
+      "id": "充能",
+      "max": 100,
+      "source": "8007 开拓者•记忆 战技 / 终结技: 「使迷迷获得10%充能」/「使迷迷获得40%充能」；规则目标是 `summon`，资源声明在此以通过装配期检查。"
+    }
+  ],
+  "rules": [
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_summon_mem",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "SUMMON"
+        },
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.6,
+          "target": "summon"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 10,
+          "target": "summon"
+        },
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "target"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "迷迷的声援",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "8007 开拓者•记忆 战技 就决定是你了！ (800702, BPSkill/Summon): 「召唤忆灵迷迷。若迷迷已在场，为迷迷回复等同于迷迷生命上限60%的生命值，并且使迷迷获得10%充能。」\n⭐ 2026-10-02（文档 `:143`）：「使指定我方单体**行动提前 100%**并附上【**迷迷的声援**】，持续 **3** 回合」✓",
+      "_note": "「**召唤忆灵迷迷**。若迷迷已在场，为迷迷回复等同于**迷迷生命上限 60%** 的生命值，并且使迷迷获得 **10% 充能**」—— ① 召唤用 `SUMMON` ✓（无参数 ✓，面板来自 `memosprites/8007.json` ✓）；② 治疗用 `HEAL` + **`scale: target_max_hp`** + `target: summon` ✓；③ 充能用 `GAIN_RESOURCE` + `target: summon`（忆灵的资源在 `memosprites/8007.json` 声明，上限 100）。⭐ 2026-10-02：把“提前 + 声援”并进本条。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_summon_mem",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "SUMMON"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 40,
+          "target": "summon"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "summon_attr:ATTACK",
+          "percent": 2.4,
+          "attacker": "summon",
+          "element": "Ice",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "8007 开拓者•记忆 终结技 一起上吧，迷迷！ (800703, Ultra/AoEAttack): 「召唤忆灵迷迷。使迷迷获得40%充能，随后使迷迷对敌方全体造成等同于迷迷240%攻击力的冰属性伤害。」",
+      "_note": "「**召唤忆灵迷迷**」—— 用 `SUMMON` ✓（\"忆灵已在场则解除其控制\"是引擎 `SUMMON` 的既有语义 ✓）；「使迷迷获得 **40% 充能**」用 `GAIN_RESOURCE` + `target: summon`；「使迷迷对敌方全体造成等同于迷迷 **240% 攻击力**的冰伤」用 `DAMAGE` + `attacker: summon` + `scale: summon_attr:ATTACK` + `percent: 2.4`。忆灵的 ATTACK 面板在 `memosprites/8007.json` 里按召唤者攻击力的 100% 派生。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "8007 开拓者•记忆 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 召唤/治疗 60%、终结技 迷迷 240%、天赋 忆灵面板 130 速度 / 80%生命上限+640）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本文件与 8008 是同一套技能** ✓（记忆开拓者的两版 ✓）：天赋与秘技的**英文原句逐字相同** ✓（尤其是「130 点速度、80% 生命上限+640」与 Formula 那句 ✓）⇒ 按同一份文档出货 ✓。⚠ **登记**：① **忆灵面板**已写进 `memosprites/8007.json` ✓（速度 130 ✓、80% 生命上限 + 640 ✓）；② 天赋「我方全体**每累计恢复 10 点能量**，迷迷获得 1% 充能」✗ —— 需要一个**全队累计能量**的计数 ✗；③ 秘技「制造**特殊领域**，敌人陷入**时停**；入场后使敌方全体**行动延后 50%** 并造成 100% 攻击力冰伤」✗ —— **场/领域** ✗ 与 **时停** ✗，但其中「行动延后 50%」**可写** ✓（`ADVANCE` 的反向 ✗ hmm：需要\"延后\"的写法 ✗ ⇒ 一并登记 ✓）；④ 强化普攻（【史诗】层数 + 与迷迷的**连携攻击** ✗）；⑤ 星魂未读 ✗。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "cheer_true_damage_rider",
+      "when": [
+        "actor has_state 迷迷的声援",
+        "actor is_ally",
+        "damage_is_attack"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "original_damage",
+          "percent": 0.28,
+          "element": "Ice",
+          "damage_type": "TRUE",
+          "target": "target"
+        }
+      ],
+      "source": "8007 开拓者 战技（文档 `:143`）：「持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次**等同于原伤害 28%**的真实伤害」",
+      "_note": "⭐ 2026-10-02：写法逐字照拄 **`1415.json` 的 `zone_true_damage_rider`** ✓（`DAMAGE_SETTLED` ✓／`scale: \"original_damage\"` ✓／`damage_type: \"TRUE\"` ✓）；`percent: 0.28` ✓ 与 `element: \"Ice\"` ✓ 均出自数据（他的 `attribute` 是 `ice` ✓）。⚠ 无属性在引擎里是“**跳过全部伤害区**”实现的 ✓，`element` 只是随行标签 ✓。"
+    },
+    {
+      "id": "memosprite_ode_of_genesis_raises_his_attack_and_crit",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 13"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "scale": "actor_attr:HEALTH",
+          "percent_from": {
+            "type": "cast_param",
+            "index": 0
+          },
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "scale": "actor_attr:CRIT_CHANCE",
+          "percent_from": {
+            "type": "cast_param",
+            "index": 1
+          },
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "献予「创世」之诗",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
+      "_note": "⭐ 两个主体各自取自哪里，都是**量过**的：占比 #1/#2 来自**施放技能的参数**（`percent_from_cast_param`，按施放者的**当前等级**取行）；而它们所**乘**的属性来自**动作方**（`actor_attr:`，即德谬歌自己）——`self_attr:` 读的是持有者、`summon_attr:` 读的是持有者的忆灵（对 8007 而言是迷迷），两者都不是德谬歌。"
+    },
+    {
+      "id": "memosprite_ode_of_genesis_also_reaches_his_memosprite",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 13",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "scale": "actor_attr:HEALTH",
+          "percent_from": {
+            "type": "cast_param",
+            "index": 0
+          },
+          "permanent": true,
+          "target": "summon"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "scale": "actor_attr:CRIT_CHANCE",
+          "percent_from": {
+            "type": "cast_param",
+            "index": 1
+          },
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
+      "_note": "「**该效果对迷迷也生效。**」—— ⭐ 它是**独立一句**，所以也是**独立一条规则**：「对迷迷」只在**持有者身边确实有忆灵**时才成立，而检查它的就是 `self_summon_count >= 1`（引擎在目标落空时**自己报出这个门控的名字**）。"
+    },
+    {
+      "id": "memosprite_ode_of_genesis_gives_it_an_extra_turn_after_the_reinforced_basic_attack",
+      "on": "CAST_SETUP",
+      "when": [
+        "self has_state 献予「创世」之诗",
+        "actor == self",
+        "from_skill_id == 4"
+      ],
+      "do": [
+        {
+          "op": "INSERT_ACTION",
+          "target": "attacker"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "skill_id": 1,
+          "turns": 1,
+          "target": "attacker"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "skill_id": 1,
+          "target": "attacker"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13）：「本场战斗中，**开拓者•记忆施放强化普攻后，德谬歌立即获得 1 个额外回合并自动施放【花与箭的舞曲】」。",
+      "_note": "⭐ 三个效果各自对应原句的一部分：「立即获得 1 个额外回合」⇒ `INSERT_ACTION`（**不是** `EXTRA_TURN`：游戏用 `SpeedOverride = 0` 把忆灵的速度钉在 0，它在行动顺序里**没有位置**）；「自动施放【花与箭的舞曲】」⇒ `skill_id = 1`（忆灵自己的**数据槽位**）。 TWO subjects again, and the same trap as `summon_attr:`: the effects are aimed at `attacker` (德谬歌, the unit casting the memosprite skill), NOT at `summon` -- that one resolves the RULE OWNER's memosprite, which for 8007 is 迷迷. Measured: with `summon` the inserted action went to 迷迷."
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_delay_and_ice_damage",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "DELAY",
+          "percent": 0.5,
+          "target": "all_enemies"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.0,
+          "element": "Ice",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "8007 开拓者•记忆 秘技: 「…入场后使敌方全体行动延后50%并造成100%攻击力冰伤。」",
+      "_note": "秘技的战斗层：`DELAY 0.5` + `DAMAGE 100% 攻击力、冰、全体`。⚠ 仍登记：大地图的「特殊领域 / 时停」不在引擎层。"
+    }
+  ]
+}

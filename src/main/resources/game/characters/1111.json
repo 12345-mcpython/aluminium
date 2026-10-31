@@ -1,123 +1,217 @@
-[
-  {
-    "on": "ULT_CAST",
-    "id": "ult_coup",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "ADD_STACK", "buff": "斗志", "amount": 2, "max_stacks": 4, "target": "self", "permanent": true },
-      { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.2, "base_chance": 1.0, "turns": 3, "target": "target" }
-    ],
-    "source": "1111 卢卡 终结技 制胜一击 (111103, Ultra/SingleAttack): 「获得2层【斗志】，并有100%的基础概率使指定敌方单体受到的伤害提高20.00%，持续3回合，随后对该目标造成等同于卢卡330%攻击力的物理属性伤害。」 param = [2, 1, 0.2, 3, 3.3]",
-    "note": "Three things happen in one sentence: 「获得 **2 层**【斗志】」（`ADD_STACK`, capped at the 4 the talent states）、「有 **100% 的基础概率**使指定敌方单体受到的伤害提高 20.00%，持续 3 回合」（`MODIFY_DAMAGE_TAKEN` with `base_chance` — ⚠ **not** \"always\": a base chance is the number **before** effect resistance, so it goes through the same resist pipeline a DOT does）、以及 330% 物理伤害（引擎自己的技能行）。 ⚠ The two effects are ordered by the file: the layer is granted first, matching the sentence. ⚠ 星魂 1/2/3/6 also raise 【斗志】(「最多持有 4 层」→ 6), which is a cap change this file cannot yet express — see the registrations at the end. ⚠ **实测纠正（2026-09-28）**：「获得 **2 层**【斗志】」这半句**写不出** —— `ADD_STACK` 的 `amount` **不是**\"一次加几层\"：实测每次触发**只加 1 层**（用例先写成 1+2=3、读到 2；六次施放停在 4 ⇒ **上限是真的**）。⇒ 登记：需要一个\"一次给 N 层\"的拼写（当前 `amount` 对 `ADD_STACK` 无意义）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "talent_start",
-    "do": [
-      { "op": "ADD_STACK", "buff": "斗志", "amount": 1, "max_stacks": 4, "target": "self", "permanent": true }
-    ],
-    "source": "1111 卢卡 天赋 火花四溅 (111104, Enhance) 最后一句: 「战斗开始时，卢卡持有1层【斗志】。」",
-    "note": "「**战斗开始时**，卢卡持有 1 层【斗志】」 — a battle-start fact, which is exactly how this engine models 「战斗开始时」. ⚠ The cap is stated here as well as on the ultimate's rule: `ADD_STACK` carries `max_stacks` per effect, and both applications must obey the same 「最多可持有 4 层」."
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "talent_after_basic",
-    "when": ["actor == self", "from_skill COMMON"],
-    "do": [
-      { "op": "ADD_STACK", "buff": "斗志", "amount": 1, "max_stacks": 4, "target": "self", "permanent": true }
-    ],
-    "source": "1111 卢卡 天赋: 「卢卡在施放普攻【直冲拳】和战技【裂伤拳】后，获得1层【斗志】，最多可持有4层【斗志】。」",
-    "note": "「施放**普攻**【直冲拳】…后，获得 1 层【斗志】」 — ⚠ `from_skill COMMON` is what narrows this to the basic attack: the sentence grants a layer for the **basic attack and the Skill only**, so the ultimate's 2 layers (its own rule) must not be joined by a third. ⚠ One rule per cast category, because `from_skill` names exactly one."
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "talent_enhance_basic",
-    "when": ["actor == self", "self_stacks:斗志 >= 2"],
-    "do": [
-      { "op": "REPLACE_SKILL", "skill": "COMMON", "skill_id": 8, "permanent": true, "target": "self" }
-    ],
-    "once_per_battle": true,
-    "source": "1111 卢卡 天赋: 「当持有的【斗志】大于等于2层时，普攻【直冲拳】强化为【直冲碎天拳】。」 强化普攻 = 槽位 8（数据行 111108，末位即槽位）。",
-    "note": "「≥ 2 层时普攻强化为【直冲碎天拳】」— `REPLACE_SKILL` 把 `COMMON` 槽位换成 **槽位 8** 的技能。⚠ **这里一度写错过**：先前传的是**数据行 id 111108**，而装载器索引的是**槽位**（`data/skills.json` 内层键 1,2,3,4,6,7,8）⇒ 装入空技能、攻击什么都不做，而所有\"身份类\"断言照样通过 ✗（`EnhancedSkillDataProbeTest` 就是为此常驻的）。⚠ 数据行的**末位就是槽位**（111108 → 8）——但那是数据带来的巧合，不是可依赖的规则（已核对 `skills.json` 的键）。⚠ `once_per_battle` 是必要的：重复应用会叠多个 `SkillSwapBuff`。⚠ 顺序依赖：这条排在加层规则**之后** ⇒ 同一次普攻里阈值已成立。✅ **这两句其实已经写好** ✓（见本档 `from_skill_id == 8` 的两条规则 ✓，以及它们各自的注记 ✓）—— 本条注记此前与之矛盾 ✗，**2026-09-30 修订** ✓。⚠ 以下为**修订前**的记录，保留以便对照："
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "talent_enhanced_laceration",
-    "when": ["actor == self", "from_skill_id == 8", "target has_state 裂伤"],
-    "do": [
-      { "op": "TICK_DOT", "element": "Physical", "percent": 0.85, "target": "target" }
-    ],
-    "source": "1111 卢卡 天赋 火花四溅: 「当强化普攻的【碎天拳】击中陷入裂伤状态下的敌方目标后，则使其当前承受的裂伤状态立即产生1次相当于原伤害85%的伤害。」",
-    "note": "「当**强化普攻**的【碎天拳】击中陷入**裂伤**状态下的敌方目标后，则使其当前承受的裂伤状态**立即产生 1 次**相当于原伤害 **85%** 的伤害」 — ⚠ 三个拼写缺一不可：`from_skill_id == 8`（**强化**普攻是独立数据行，普通普攻是 111101 ⇒ 只有行号能区分二者，施放类别同为 `Normal` ✗）、`target has_state 裂伤`（「陷入裂伤状态下的敌方目标」）、以及 `TICK_DOT`（\"立即产生 1 次\"= 让该状态**再结算一次**，不改寿命、按当前伤害的 85% 结算，带上限的 DOT 跳的是封顶后的总量）。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "enhanced_costs_two_layers",
-    "when": ["actor == self", "from_skill_id == 8"],
-    "do": [
-      { "op": "REMOVE_STACK", "buff": "斗志", "amount": 2, "target": "self" }
-    ],
-    "source": "1111 卢卡 强化普攻 直冲碎天拳 (111108 的技能描述): 「消耗2层【斗志】，先使用【直冲拳】施放3段攻击…再使用【碎天拳】施放1段攻击…」",
-    "note": "「**消耗 2 层**【斗志】」 — 这句写在**强化普攻自己的技能行**里（不在天赋里），所以触发点正是 `from_skill_id == 8`。⚠ 顺序：本条与天赋的加层规则同在 `ALLY_ATTACK` 上，文件顺序决定先后 —— 加层规则在前（普攻/战技各加 1 层），本条在后 ⇒ 同一次强化普攻先加层再扣 2 层（净 −1，与\"强化普攻消耗 2 层\"一致：那 1 层是这次攻击**自己**的普攻收入）。⚠ `REMOVE_STACK` 移除不存在/不足的层数不是错误（其余下部分照扣），与既有约定一致。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "talent_after_skill",
-    "when": ["actor == self", "from_skill SKILL"],
-    "do": [
-      { "op": "ADD_STACK", "buff": "斗志", "amount": 1, "max_stacks": 4, "target": "self", "permanent": true }
-    ],
-    "source": "1111 卢卡 天赋: 「卢卡在施放普攻【直冲拳】和战技【裂伤拳】后，获得1层【斗志】…」",
-    "note": "The Skill half of the same sentence (see the basic-attack rule): `from_skill SKILL`."
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "id": "trace_overload",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "REMOVE_BUFF", "amount": 1, "target": "target" }
-    ],
-    "source": "1111 卢卡 行迹 动能过载 (1111101): 「施放战技时，立即解除敌方目标1个增益效果。」",
-    "note": "「施放战技时，立即**解除敌方目标 1 个增益效果**」 — `REMOVE_BUFF` is the mirror of `DISPEL` (that one cleans our own side's debuffs; this strips the enemy's benefits) and ⚠ **permanent buffs are skipped**, so a relic bonus is never removed: nobody's Skill dispels a loadout. ⚠ The Skill's damage and its 裂伤 are not written here — see the registrations."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
-    ],
-    "source": "1111 卢卡 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 120%、终结技 330%、强化普攻 20%/80% 都是该行）",
-    "note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: ⚠ **2026-09-28 补齐**：战技的裂伤已写出（见本文件最后一条规则）—— 它此前整句登记，因为「自身 24% 生命上限」需要**目标侧份额**、而「最多不超过 338%」是 **min_of_two**（两个派生值取小）。两者都已落地。 ⚠ **仍登记**：天赋的强化普攻替换与\"裂伤立即结算\"、秘技的随机单体、星魂 1–6。"
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "id": "skill_lacerate",
-    "when": ["actor == self"],
-    "do": [
-      {
-        "op": "APPLY_DOT",
-        "element": "Physical",
-        "base_chance": 1.0,
-        "scale": "target_max_hp",
-        "percent": 0.24,
-        "cap_scale": "self_attr:ATTACK",
-        "cap_percent": 3.38,
-        "turns": 3,
-        "target": "target"
-      }
-    ],
-    "source": "1111 卢卡 战技 裂伤拳 (111102, BPSkill/SingleAttack): 「对指定敌方单体造成等同于卢卡120%攻击力的物理属性伤害，随后有100%的基础概率使目标陷入裂伤状态，持续3回合。裂伤状态下，敌方目标每回合开始时受到等同于自身24.00%生命上限的物理属性持续伤害，最多不超过卢卡攻击力的338%。」",
-    "note": "「随后有 **100% 的基础概率**使目标陷入**裂伤**状态，持续 3 回合；裂伤状态下…受到等同于**自身 24.00% 生命上限**的物理属性持续伤害，**最多不超过卢卡攻击力的 338%**」 — the 120% damage is the engine's own skill path. ⚠ Three spellings, each load-bearing: `base_chance: 1.0` (a roll, so it meets effect resistance), `scale: target_max_hp` (⚠ 「**自身**」 is the VICTIM's maximum, and every other DOT scale in this engine is the rule OWNER's — this spelling was added for this sentence; it is read when the DOT LANDS, so a later change to the victim's Max HP does not move a DOT that is already ticking), and `cap_scale`/`cap_percent` (⚠ 「最多不超过…338%」 is a **min of two derived values**: the engine takes the smaller, so a low-HP victim keeps its small share and only an excessive one is brought down. Shipping the DOT without the ceiling would over-damage exactly the high-HP targets it is built for — a wrong number that only shows up against bosses, which is why this clause stayed registered until the ceiling existed)."
-  }
-]
+{
+  "schema": 1,
+  "character": 1111,
+  "_status": "partial",
+  "_gaps": [
+    "终结技「获得 2 层【斗志】」：ADD_STACK 的 amount 不支持一次加多层",
+    "天赋：强化普攻替换与「裂伤立即结算」未写",
+    "秘技：随机单体选择器未写",
+    "星魂 1–6：未读、未写（含【斗志】上限 4→6）"
+  ],
+  "rules": [
+    {
+      "on": "ULT_CAST",
+      "id": "ult_coup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "斗志",
+          "amount": 2,
+          "max_stacks": 4,
+          "target": "self",
+          "permanent": true
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
+          "base_chance": 1.0,
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "1111 卢卡 终结技 制胜一击 (111103, Ultra/SingleAttack): 「获得2层【斗志】，并有100%的基础概率使指定敌方单体受到的伤害提高20.00%，持续3回合，随后对该目标造成等同于卢卡330%攻击力的物理属性伤害。」 param = [2, 1, 0.2, 3, 3.3]",
+      "_note": "Three things happen in one sentence: 「获得 **2 层**【斗志】」（`ADD_STACK`, capped at the 4 the talent states）、「有 **100% 的基础概率**使指定敌方单体受到的伤害提高 20.00%，持续 3 回合」（`MODIFY_DAMAGE_TAKEN` with `base_chance` — ⚠ **not** \"always\": a base chance is the number **before** effect resistance, so it goes through the same resist pipeline a DOT does）、以及 330% 物理伤害（引擎自己的技能行）。 ⚠ The two effects are ordered by the file: the layer is granted first, matching the sentence. ⚠ 星魂 1/2/3/6 also raise 【斗志】(「最多持有 4 层」→ 6), which is a cap change this file cannot yet express — see the registrations at the end. ⚠ **实测纠正（2026-09-28）**：「获得 **2 层**【斗志】」这半句**写不出** —— `ADD_STACK` 的 `amount` **不是**\"一次加几层\"：实测每次触发**只加 1 层**（用例先写成 1+2=3、读到 2；六次施放停在 4 ⇒ **上限是真的**）。⇒ 登记：需要一个\"一次给 N 层\"的拼写（当前 `amount` 对 `ADD_STACK` 无意义）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "talent_start",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "斗志",
+          "amount": 1,
+          "max_stacks": 4,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "1111 卢卡 天赋 火花四溅 (111104, Enhance) 最后一句: 「战斗开始时，卢卡持有1层【斗志】。」",
+      "_note": "「**战斗开始时**，卢卡持有 1 层【斗志】」 — a battle-start fact, which is exactly how this engine models 「战斗开始时」. ⚠ The cap is stated here as well as on the ultimate's rule: `ADD_STACK` carries `max_stacks` per effect, and both applications must obey the same 「最多可持有 4 层」."
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_after_basic",
+      "when": [
+        "actor == self",
+        "from_skill COMMON"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "斗志",
+          "amount": 1,
+          "max_stacks": 4,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "1111 卢卡 天赋: 「卢卡在施放普攻【直冲拳】和战技【裂伤拳】后，获得1层【斗志】，最多可持有4层【斗志】。」",
+      "_note": "「施放**普攻**【直冲拳】…后，获得 1 层【斗志】」 — ⚠ `from_skill COMMON` is what narrows this to the basic attack: the sentence grants a layer for the **basic attack and the Skill only**, so the ultimate's 2 layers (its own rule) must not be joined by a third. ⚠ One rule per cast category, because `from_skill` names exactly one."
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_enhance_basic",
+      "when": [
+        "actor == self",
+        "self_stacks:斗志 >= 2"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "once_per_battle": true,
+      "source": "1111 卢卡 天赋: 「当持有的【斗志】大于等于2层时，普攻【直冲拳】强化为【直冲碎天拳】。」 强化普攻 = 槽位 8（数据行 111108，末位即槽位）。",
+      "_note": "「≥ 2 层时普攻强化为【直冲碎天拳】」— `REPLACE_SKILL` 把 `COMMON` 槽位换成 **槽位 8** 的技能。⚠ **这里一度写错过**：先前传的是**数据行 id 111108**，而装载器索引的是**槽位**（`data/skills.json` 内层键 1,2,3,4,6,7,8）⇒ 装入空技能、攻击什么都不做，而所有\"身份类\"断言照样通过 ✗（`EnhancedSkillDataProbeTest` 就是为此常驻的）。⚠ 数据行的**末位就是槽位**（111108 → 8）——但那是数据带来的巧合，不是可依赖的规则（已核对 `skills.json` 的键）。⚠ `once_per_battle` 是必要的：重复应用会叠多个 `SkillSwapBuff`。⚠ 顺序依赖：这条排在加层规则**之后** ⇒ 同一次普攻里阈值已成立。✅ **这两句其实已经写好** ✓（见本档 `from_skill_id == 8` 的两条规则 ✓，以及它们各自的注记 ✓）—— 本条注记此前与之矛盾 ✗，**2026-09-30 修订** ✓。⚠ 以下为**修订前**的记录，保留以便对照："
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_enhanced_laceration",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8",
+        "target has_state 裂伤"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Physical",
+          "percent": 0.85,
+          "target": "target"
+        }
+      ],
+      "source": "1111 卢卡 天赋 火花四溅: 「当强化普攻的【碎天拳】击中陷入裂伤状态下的敌方目标后，则使其当前承受的裂伤状态立即产生1次相当于原伤害85%的伤害。」",
+      "_note": "「当**强化普攻**的【碎天拳】击中陷入**裂伤**状态下的敌方目标后，则使其当前承受的裂伤状态**立即产生 1 次**相当于原伤害 **85%** 的伤害」 — ⚠ 三个拼写缺一不可：`from_skill_id == 8`（**强化**普攻是独立数据行，普通普攻是 111101 ⇒ 只有行号能区分二者，施放类别同为 `Normal` ✗）、`target has_state 裂伤`（「陷入裂伤状态下的敌方目标」）、以及 `TICK_DOT`（\"立即产生 1 次\"= 让该状态**再结算一次**，不改寿命、按当前伤害的 85% 结算，带上限的 DOT 跳的是封顶后的总量）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "enhanced_costs_two_layers",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "斗志",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1111 卢卡 强化普攻 直冲碎天拳 (111108 的技能描述): 「消耗2层【斗志】，先使用【直冲拳】施放3段攻击…再使用【碎天拳】施放1段攻击…」",
+      "_note": "「**消耗 2 层**【斗志】」 — 这句写在**强化普攻自己的技能行**里（不在天赋里），所以触发点正是 `from_skill_id == 8`。⚠ 顺序：本条与天赋的加层规则同在 `ALLY_ATTACK` 上，文件顺序决定先后 —— 加层规则在前（普攻/战技各加 1 层），本条在后 ⇒ 同一次强化普攻先加层再扣 2 层（净 −1，与\"强化普攻消耗 2 层\"一致：那 1 层是这次攻击**自己**的普攻收入）。⚠ `REMOVE_STACK` 移除不存在/不足的层数不是错误（其余下部分照扣），与既有约定一致。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_after_skill",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "斗志",
+          "amount": 1,
+          "max_stacks": 4,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "1111 卢卡 天赋: 「卢卡在施放普攻【直冲拳】和战技【裂伤拳】后，获得1层【斗志】…」",
+      "_note": "The Skill half of the same sentence (see the basic-attack rule): `from_skill SKILL`."
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "trace_overload",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_BUFF",
+          "amount": 1,
+          "target": "target"
+        }
+      ],
+      "source": "1111 卢卡 行迹 动能过载 (1111101): 「施放战技时，立即解除敌方目标1个增益效果。」",
+      "_note": "「施放战技时，立即**解除敌方目标 1 个增益效果**」 — `REMOVE_BUFF` is the mirror of `DISPEL` (that one cleans our own side's debuffs; this strips the enemy's benefits) and ⚠ **permanent buffs are skipped**, so a relic bonus is never removed: nobody's Skill dispels a loadout. ⚠ The Skill's damage and its 裂伤 are not written here — see the registrations."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1111 卢卡 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 120%、终结技 330%、强化普攻 20%/80% 都是该行）",
+      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: ⚠ **2026-09-28 补齐**：战技的裂伤已写出（见本文件最后一条规则）—— 它此前整句登记，因为「自身 24% 生命上限」需要**目标侧份额**、而「最多不超过 338%」是 **min_of_two**（两个派生值取小）。两者都已落地。 ⚠ **仍登记**：天赋的强化普攻替换与\"裂伤立即结算\"、秘技的随机单体、星魂 1–6。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_lacerate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_DOT",
+          "element": "Physical",
+          "base_chance": 1.0,
+          "scale": "target_max_hp",
+          "percent": 0.24,
+          "cap_scale": "self_attr:ATTACK",
+          "cap_percent": 3.38,
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "1111 卢卡 战技 裂伤拳 (111102, BPSkill/SingleAttack): 「对指定敌方单体造成等同于卢卡120%攻击力的物理属性伤害，随后有100%的基础概率使目标陷入裂伤状态，持续3回合。裂伤状态下，敌方目标每回合开始时受到等同于自身24.00%生命上限的物理属性持续伤害，最多不超过卢卡攻击力的338%。」",
+      "_note": "「随后有 **100% 的基础概率**使目标陷入**裂伤**状态，持续 3 回合；裂伤状态下…受到等同于**自身 24.00% 生命上限**的物理属性持续伤害，**最多不超过卢卡攻击力的 338%**」 — the 120% damage is the engine's own skill path. ⚠ Three spellings, each load-bearing: `base_chance: 1.0` (a roll, so it meets effect resistance), `scale: target_max_hp` (⚠ 「**自身**」 is the VICTIM's maximum, and every other DOT scale in this engine is the rule OWNER's — this spelling was added for this sentence; it is read when the DOT LANDS, so a later change to the victim's Max HP does not move a DOT that is already ticking), and `cap_scale`/`cap_percent` (⚠ 「最多不超过…338%」 is a **min of two derived values**: the engine takes the smaller, so a low-HP victim keeps its small share and only an excessive one is brought down. Shipping the DOT without the ceiling would over-damage exactly the high-HP targets it is built for — a wrong number that only shows up against bosses, which is why this clause stayed registered until the ceiling existed)."
+    }
+  ]
+}

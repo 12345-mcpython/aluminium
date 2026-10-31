@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "relic_set": 316,
   "2": [
     {
       "on": "DEALING_DAMAGE",
@@ -7,7 +9,7 @@
         { "op": "MODIFY_ATTR", "attribute": "BREAKING_EFFECT", "percent": 0.4, "turns": 1 }
       ],
       "source": "relic set 316 (盗贼公国塔利亚 / Talia - Kingdom of Banditry), 2-piece: 「使装备者的速度提高#1[i]%。当装备者命中具有火属性弱点的敌方目标时，使装备者的击破特攻提高#2[i]%，持续#3[i]回合。」 param = [0.06, 0.2, 2]",
-      "note": "「击中**拥有火属性弱点**的敌方目标时，击破特攻提高 **40%**，持续 **1** 回合」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target has_weakness Fire` ＋ `MODIFY_ATTR BREAKING_EFFECT{percent: 0.4, turns: 1}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：份额原先写 **0.2** ✗（#2 是 40% ✓）、持续原先写 **2 回合** ✗（#3 是 1 ✓）。"
+      "_note": "「击中**拥有火属性弱点**的敌方目标时，击破特攻提高 **40%**，持续 **1** 回合」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `target has_weakness Fire` ＋ `MODIFY_ATTR BREAKING_EFFECT{percent: 0.4, turns: 1}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：份额原先写 **0.2** ✗（#2 是 40% ✓）、持续原先写 **2 回合** ✗（#3 是 1 ✓）。"
     }
   ]
 }

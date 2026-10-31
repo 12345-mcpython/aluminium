@@ -1,84 +1,129 @@
-[
-  {
-    "on": "ULT_CAST",
-    "id": "ult_shock_and_tick",
-    "when": ["actor == self"],
-    "do": [
-      {
-        "op": "APPLY_DOT",
-        "element": "Thunder",
-        "base_chance": 1.0,
-        "scale": "self_attr:ATTACK",
-        "percent": 2.9,
-        "turns": 2,
-        "target": "all_enemies"
-      },
-      { "op": "TICK_DOT", "element": "Thunder", "percent": 1.0, "target": "target" }
-    ],
-    "source": "1005 卡芙卡 终结技 悲剧尽头的颤音 (100503, Ultra/AOEAttack): 「对敌方全体造成等同于卡芙卡80%攻击力的雷属性伤害，有100%的基础概率使受到攻击的敌方目标陷入触电状态，并使其当前承受的触电状态立即产生相当于原伤害100%的伤害。触电状态持续2回合。触电状态下，敌方目标每回合开始时受到等同于卡芙卡290%攻击力的雷属性持续伤害。」",
-    "note": "「有 **100% 的基础概率**使其陷入**触电**状态，**并使其当前承受的触电状态立即产生相当于原伤害 100% 的伤害**。触电持续 **2 回合**；触电状态下每回合开始受到等同于卡芙卡 **290% 攻击力**的雷属性持续伤害」—— 一句话里两个已出货能力对接：① `APPLY_DOT`（元素 = 触电 ✓、`base_chance` ✓、`turns` ✓、倍率用 `scale: self_attr:ATTACK` + `percent: 2.9` ✓）；② `TICK_DOT`（第 105 轮出货的\"让该状态**立即再结算一次**\" ✓，份额 100% ✓）。⚠ 顺序有意义：`TICK_DOT` 让**当时已存在**的触电再结算一次 ✓，而本规则前一个效果刚施加的那层是否参与结算，取决于引擎在同一效果序列里的可见性 ✓ —— 本句文档的语义是\"（在施放之前）其当前承受的触电状态立即产生…\" ✓，与 `TICK_DOT` 的\"当前承受\"一致 ✓。⚠ **登记**：战技的**相邻目标**（位置轴 ✗）与「若指定敌方单体处于**持续伤害状态**，其当前承受的**所有**持续伤害立即产生 75%」（`TICK_DOT` 只按**一个元素**结算 ✗，\"所有持续伤害\"这个整体尚无写法 ✓）；天赋的**追加攻击**（伤害与触电都可写 ✓，但「**每回合只能触发 1 次**」需要规则级限制字段 ✗ —— 引擎里确有 `cooldownTurns`/`per_turn` 一类 ✓，但**拼写与语义未确认（⚠ **2026-09-30 修订**：该字段**当时即已确认** ✓ —— 见本档 `per_turn: 1` 及其注记 ✓，⚠ 第 146 轮读 `TriggerSpec` 已核实 ✓）**；⚠ **该从句现已写出** ✓，详见本档 `per_turn: 1` 那条规则与其注记 ✓）；以及全部「**强化后**」形态、行迹与星魂 ✓。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "level_convention",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
-    ],
-    "source": "1005 卡芙卡 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 160%/60%、终结技 80% + 触电 290%、天赋 140%）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 她的**战技**里有「若指定敌方单体处于持续伤害状态…立即产生 75%」与**相邻目标**两处未分类内容 ✓；**天赋**的追加攻击也未写（缺\"每回合至多一次\"的确认 ✗）。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "talent_followup",
-    "when": ["actor is_other_ally", "from_skill COMMON"],
-    "per_turn": 1,
-    "do": [
-      { "op": "DAMAGE", "skill": "TALENT", "damage_param": 0, "element": "Thunder", "target": "target" },
-      {
-        "op": "APPLY_DOT",
-        "element": "Thunder",
-        "base_chance": 1.0,
-        "scale": "self_attr:ATTACK",
-        "percent": 2.9,
-        "turns": 2,
-        "target": "target"
-      }
-    ],
-    "source": "1005 卡芙卡 天赋 温柔亦同残酷 (100504, Enhance/SingleAttack): 「当卡芙卡的队友对敌方目标施放普攻后，卡芙卡立即发动追加攻击，对该目标造成等同于卡芙卡140%攻击力的雷属性伤害，并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的触电状态，持续2回合，该效果每回合只能触发1次。」",
-    "note": "「当卡芙卡的**队友**对敌方目标施放普攻后，卡芙卡**立即发动追加攻击**，对该目标造成等同于卡芙卡 **140% 攻击力**的雷属性伤害，并有 **100% 基础概率**使其陷入与终结技相同的**触电**状态，持续 2 回合；该效果**每回合只能触发 1 次**」—— ① 触发：`DEALING_DAMAGE`（**携带伤害实例**的事件 ✓）+ `from_skill COMMON`（普攻 ✓）+ **`actor is_other_ally`**（是**队友而不是自己** ✓ —— 这是第 147 轮为此新增的谓词，因为 `actor is_ally` 会把自己算进去 ✗、而 `!actor == self` 被装载器拒绝 ✗）；② 追加伤害：`DAMAGE skill TALENT damage_param 0` ✓（攻击者是**规则主人**=卡芙卡 ✓，读的正是她天赋那一行 ✓）；③ 触电：与终结技同一个 `APPLY_DOT` ✓；④ 限制：`per_turn: 1` ✓（规则级字段 ✓，第 146 轮读 `TriggerSpec` 确认 ✓）。⚠ 触发条件里**不写**目标是否已触电：文档的触发是\"队友施放普攻后\" ✓，与目标状态无关 ✓。⚠ 本规则不会自我触发：追加实例由**卡芙卡**结算 ⇒ `actor is_other_ally` 为假 ✓（`per_turn: 1` 是第二道保险 ✓）。 ⚠ **2026-09-29 改挂事件**：本条从 `DEALING_DAMAGE`（**逐段伤害** ✗）改到 **`ALLY_ATTACK`**（**每次施放只发一次** ✓）。原因：文档读作「队友**施放普攻后**」✓，而逐段事件会让多段技能**过度触发** ✗；从前 `ALLY_ATTACK` 刻意不带目标 ✗，而本条要用目标（追加伤害与触电都需要 ✓）⇒ 第 154 轮让它带上了**每次施放只发一次**且**带目标** ✓。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "trace_shock_lasts_one_more_turn",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "EXTEND_BUFF", "buff": "触电", "turns": 1, "target": "target" }
-    ],
-    "source": "1005 卡芙卡 行迹: 「…使触电状态的持续时间增加1回合」",
-    "note": "「…使**触电状态**的持续时间增加 1 回合」—— ① 状态名正是 `EXTEND_BUFF` 的 `buff` 拼写 ✓（实测：DOT 的 `getBuffName()` 是**空的** ✓，但 `isNamed(buff, \"触电\", null)` 答 **true** ✓ —— 引擎**按状态名**匹配 DOT ✓）；② 事件与**施加触电的那条**相同 ✓（她的终结技 ✓）并排在它之后 ✓；③ 门槛：行迹 ⇒ **不写 `min_eidolon`** ✓。⚠ 倍率那一半（\"伤害倍率提高 156%\" ✗）**登记** ✓。"
-  },
-
-  {
-    "on": "FOLLOW_UP",
-    "id": "talent_dot_taken_on_followup",
-    "when": ["actor == self"],
-    "do": [
-      {
-        "op": "MODIFY_DAMAGE_TAKEN",
-        "percent": 0.3,
-        "damage_type": "DOT",
-        "base_chance": 1.0,
-        "turns": 2,
-        "target": "target"
-      }
-    ],
-    "source": "1005 卡芙卡 天赋: 「天赋触发追加攻击时，有 100% 的基础概率使目标受到的持续伤害提高 30%，持续 2 回合」",
-    "note": "⭐ 这用的是**既有的\"伤害类型域\"** ✓（`MODIFY_DAMAGE_TAKEN` + `damage_type: \"DOT\"` ✓）—— 与 `characters/1108.json` 完全同款 ✓。⚠ **数值绑定到该从句的原文** ✓（同文档另有「我方全体**造成的**持续伤害提高 25%」✗ 与「强化后：**施放攻击时**…」✗ —— 两者**都不是**本条 ✓，本轮按第 106 条纪律**逐条绑定** ✓）。⚠ 触发用 **`FOLLOW_UP`** ✓（原文\"天赋触发追加攻击时\" ✓）；`base_chance: 1.0` ✓（原文\"100% 的基础概率\" ✓）；`turns: 2` ✓。"
-  }
-]
+{
+  "schema": 1,
+  "character": 1005,
+  "_status": "partial",
+  "_gaps": [
+    "天赋追加攻击未写"
+  ],
+  "rules": [
+    {
+      "on": "ULT_CAST",
+      "id": "ult_shock_and_tick",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_DOT",
+          "element": "Thunder",
+          "base_chance": 1.0,
+          "scale": "self_attr:ATTACK",
+          "percent": 2.9,
+          "turns": 2,
+          "target": "all_enemies"
+        },
+        {
+          "op": "TICK_DOT",
+          "element": "Thunder",
+          "percent": 1.0,
+          "target": "target"
+        }
+      ],
+      "source": "1005 卡芙卡 终结技 悲剧尽头的颤音 (100503, Ultra/AOEAttack): 「对敌方全体造成等同于卡芙卡80%攻击力的雷属性伤害，有100%的基础概率使受到攻击的敌方目标陷入触电状态，并使其当前承受的触电状态立即产生相当于原伤害100%的伤害。触电状态持续2回合。触电状态下，敌方目标每回合开始时受到等同于卡芙卡290%攻击力的雷属性持续伤害。」",
+      "_note": "「有 **100% 的基础概率**使其陷入**触电**状态，**并使其当前承受的触电状态立即产生相当于原伤害 100% 的伤害**。触电持续 **2 回合**；触电状态下每回合开始受到等同于卡芙卡 **290% 攻击力**的雷属性持续伤害」—— 一句话里两个已出货能力对接：① `APPLY_DOT`（元素 = 触电 ✓、`base_chance` ✓、`turns` ✓、倍率用 `scale: self_attr:ATTACK` + `percent: 2.9` ✓）；② `TICK_DOT`（第 105 轮出货的\"让该状态**立即再结算一次**\" ✓，份额 100% ✓）。⚠ 顺序有意义：`TICK_DOT` 让**当时已存在**的触电再结算一次 ✓，而本规则前一个效果刚施加的那层是否参与结算，取决于引擎在同一效果序列里的可见性 ✓ —— 本句文档的语义是\"（在施放之前）其当前承受的触电状态立即产生…\" ✓，与 `TICK_DOT` 的\"当前承受\"一致 ✓。⚠ **登记**：战技的**相邻目标**（位置轴 ✗）与「若指定敌方单体处于**持续伤害状态**，其当前承受的**所有**持续伤害立即产生 75%」（`TICK_DOT` 只按**一个元素**结算 ✗，\"所有持续伤害\"这个整体尚无写法 ✓）；天赋的**追加攻击**（伤害与触电都可写 ✓，但「**每回合只能触发 1 次**」需要规则级限制字段 ✗ —— 引擎里确有 `cooldownTurns`/`per_turn` 一类 ✓，但**拼写与语义未确认（⚠ **2026-09-30 修订**：该字段**当时即已确认** ✓ —— 见本档 `per_turn: 1` 及其注记 ✓，⚠ 第 146 轮读 `TriggerSpec` 已核实 ✓）**；⚠ **该从句现已写出** ✓，详见本档 `per_turn: 1` 那条规则与其注记 ✓）；以及全部「**强化后**」形态、行迹与星魂 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1005 卡芙卡 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 160%/60%、终结技 80% + 触电 290%、天赋 140%）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 她的**战技**里有「若指定敌方单体处于持续伤害状态…立即产生 75%」与**相邻目标**两处未分类内容 ✓；**天赋**的追加攻击也未写（缺\"每回合至多一次\"的确认 ✗）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_followup",
+      "when": [
+        "actor is_other_ally",
+        "from_skill COMMON"
+      ],
+      "per_turn": 1,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "skill": "TALENT",
+          "damage_param": 0,
+          "element": "Thunder",
+          "target": "target"
+        },
+        {
+          "op": "APPLY_DOT",
+          "element": "Thunder",
+          "base_chance": 1.0,
+          "scale": "self_attr:ATTACK",
+          "percent": 2.9,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1005 卡芙卡 天赋 温柔亦同残酷 (100504, Enhance/SingleAttack): 「当卡芙卡的队友对敌方目标施放普攻后，卡芙卡立即发动追加攻击，对该目标造成等同于卡芙卡140%攻击力的雷属性伤害，并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的触电状态，持续2回合，该效果每回合只能触发1次。」",
+      "_note": "「当卡芙卡的**队友**对敌方目标施放普攻后，卡芙卡**立即发动追加攻击**，对该目标造成等同于卡芙卡 **140% 攻击力**的雷属性伤害，并有 **100% 基础概率**使其陷入与终结技相同的**触电**状态，持续 2 回合；该效果**每回合只能触发 1 次**」—— ① 触发：`DEALING_DAMAGE`（**携带伤害实例**的事件 ✓）+ `from_skill COMMON`（普攻 ✓）+ **`actor is_other_ally`**（是**队友而不是自己** ✓ —— 这是第 147 轮为此新增的谓词，因为 `actor is_ally` 会把自己算进去 ✗、而 `!actor == self` 被装载器拒绝 ✗）；② 追加伤害：`DAMAGE skill TALENT damage_param 0` ✓（攻击者是**规则主人**=卡芙卡 ✓，读的正是她天赋那一行 ✓）；③ 触电：与终结技同一个 `APPLY_DOT` ✓；④ 限制：`per_turn: 1` ✓（规则级字段 ✓，第 146 轮读 `TriggerSpec` 确认 ✓）。⚠ 触发条件里**不写**目标是否已触电：文档的触发是\"队友施放普攻后\" ✓，与目标状态无关 ✓。⚠ 本规则不会自我触发：追加实例由**卡芙卡**结算 ⇒ `actor is_other_ally` 为假 ✓（`per_turn: 1` 是第二道保险 ✓）。 ⚠ **2026-09-29 改挂事件**：本条从 `DEALING_DAMAGE`（**逐段伤害** ✗）改到 **`ALLY_ATTACK`**（**每次施放只发一次** ✓）。原因：文档读作「队友**施放普攻后**」✓，而逐段事件会让多段技能**过度触发** ✗；从前 `ALLY_ATTACK` 刻意不带目标 ✗，而本条要用目标（追加伤害与触电都需要 ✓）⇒ 第 154 轮让它带上了**每次施放只发一次**且**带目标** ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "trace_shock_lasts_one_more_turn",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "EXTEND_BUFF",
+          "buff": "触电",
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "1005 卡芙卡 行迹: 「…使触电状态的持续时间增加1回合」",
+      "_note": "「…使**触电状态**的持续时间增加 1 回合」—— ① 状态名正是 `EXTEND_BUFF` 的 `buff` 拼写 ✓（实测：DOT 的 `getBuffName()` 是**空的** ✓，但 `isNamed(buff, \"触电\", null)` 答 **true** ✓ —— 引擎**按状态名**匹配 DOT ✓）；② 事件与**施加触电的那条**相同 ✓（她的终结技 ✓）并排在它之后 ✓；③ 门槛：行迹 ⇒ **不写 `min_eidolon`** ✓。⚠ 倍率那一半（\"伤害倍率提高 156%\" ✗）**登记** ✓。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "talent_dot_taken_on_followup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.3,
+          "damage_type": "DOT",
+          "base_chance": 1.0,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1005 卡芙卡 天赋: 「天赋触发追加攻击时，有 100% 的基础概率使目标受到的持续伤害提高 30%，持续 2 回合」",
+      "_note": "⭐ 这用的是**既有的\"伤害类型域\"** ✓（`MODIFY_DAMAGE_TAKEN` + `damage_type: \"DOT\"` ✓）—— 与 `characters/1108.json` 完全同款 ✓。⚠ **数值绑定到该从句的原文** ✓（同文档另有「我方全体**造成的**持续伤害提高 25%」✗ 与「强化后：**施放攻击时**…」✗ —— 两者**都不是**本条 ✓，本轮按第 106 条纪律**逐条绑定** ✓）。⚠ 触发用 **`FOLLOW_UP`** ✓（原文\"天赋触发追加攻击时\" ✓）；`base_chance: 1.0` ✓（原文\"100% 的基础概率\" ✓）；`turns: 2` ✓。"
+    }
+  ]
+}

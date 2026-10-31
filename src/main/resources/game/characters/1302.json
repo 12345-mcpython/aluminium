@@ -1,182 +1,291 @@
-[
-  {
-    "on": "BASIC_ATTACK",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "GAIN_ENERGY", "amount": 3, "per_target": true, "target": "self" },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "percent": 0.025,
-        "max_stacks": 10,
-        "buff": "升格",
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1302 银枝 天赋 崇高的客体 (130204, Enhance): 「施放普攻、战技、终结技时，每击中1个敌方目标，为银枝恢复3点能量并获得1层【升格】，使银枝暴击率提高2.50%，该效果最多叠加10层。」 数据行 Lv10 = [3, 0.025, 10] → #1 = 3 能量、#2 = 0.025、#3 = 10 层",
-    "note": "The talent, on the 普攻 half of its three slots. ⚠ `per_target: true` is 「**每击中 1 个**敌方目标…恢复 3 点能量」 — the energy multiplies by the event's hit count, which is exactly what that field is for (and the count is the attack's, not one instance's). ⚠ 【升格】 is spelled as a **stackable named modifier** rather than a separate counter plus a buff: `max_stacks: 10` on the crit-rate modifier gives 「最多叠加10层」 for free, and `buff: 升格` gives the name every other clause needs — `self_stacks:升格` (星魂 4 reads it? see below) and any removal by name. One mechanism, not two. ⚠ The value is her talent row's #2 (Lv10 = 0.025), not a literal somebody typed.",
-    "id": "talent_stack_basic"
-  },
+{
+  "schema": 1,
+  "character": 1302,
+  "_status": "partial",
+  "_gaps": [
+    "行迹 慷慨「在敌方目标进入战斗时，自身立即恢复 #1 点能量」未写：引擎没有「敌方入场」事件（`SUMMONED` 只由召唤物发出，`addCombatant` 不发；`WAVE_START` 也不数这一波新入场的敌人）",
+    "强化终结技（数据槽 14，130214）整段未接入：引擎的施放路径没有这个槽（`SkillType` 的映射不含 14），所以「消耗 180 能量、336% 全体、再造成 6 次随机单体 114%」在本引擎里放不出来",
+    "星魂 1「每层【升格】额外使暴击伤害提高 4%」现在是战斗开始时贴一次的固定 +4%：0 层也有、10 层也只有一次。见证：`ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks`（修好时它会红）",
+    "天赋「每击中 1 个敌方目标…获得 1 层【升格】」现在每次施放只加 1 层：3 个目标的 AoE 也只加 1 层。引擎的 `times_from: \"hit_count\"` 已经能给非 `DAMAGE` 效果按命中数重复（`EffectTimesTest`），但实测打开后单目标的战技/终结技一次会加 2 层（原因未查明：可能是那些事件的 hit_count 报 2，也可能是同一次施放被派发两次），所以先不打开。见证：`ArgentiStacksTest.aThreeTargetCastStillAddsOneStack`"
+  ],
+  "rules": [
+    {
+      "on": "BASIC_ATTACK",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 3,
+          "per_target": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.025,
+          "max_stacks": 10,
+          "buff": "升格",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1302 银枝 天赋 崇高的客体 (130204, Enhance): 「施放普攻、战技、终结技时，每击中1个敌方目标，为银枝恢复3点能量并获得1层【升格】，使银枝暴击率提高2.50%，该效果最多叠加10层。」 数据行 Lv10 = [3, 0.025, 10] → #1 = 3 能量、#2 = 0.025、#3 = 10 层",
+      "_note": "The talent, on the 普攻 half of its three slots. ⚠ `per_target: true` is 「**每击中 1 个**敌方目标…恢复 3 点能量」 — the energy multiplies by the event's hit count. ⚠【升格】 is a **stackable named modifier** rather than a separate counter plus a buff: `max_stacks: 10` on the crit-rate modifier gives 「最多叠加10层」 for free, and `buff: 升格` gives the name every other clause needs. ⚠ **KNOWN SHORTFALL, registered** (2026-10-31 measured): the stack is granted **once per cast**, while the sentence says 「每击中 1 个敌方目标」 - an AoE that hits three targets adds one layer, not three. The engine can express the per-hit count (`times_from: \"hit_count\"` on a non-`DAMAGE` effect now repeats it - `EffectTimesTest` pins that), but turning it on here makes a single-target 战技/终结技 cast add **two** layers, which is a second defect in how those cast events report their hits; the witness `ArgentiStacksTest.aThreeTargetCastStillAddsOneStack` pins today's reading until both halves are understood together. ⚠ The value is her talent row's #2 (Lv10 = 0.025), not a literal somebody typed.",
+      "id": "talent_stack_basic"
+    },
+    {
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 3,
+          "per_target": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.025,
+          "max_stacks": 10,
+          "buff": "升格",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之二（战技）",
+      "_note": "The 战技 third of the same sentence — three rules because 「普攻、战技、终结技」 are three cast events, and a rule fires on one. ⚠ They cannot be one rule: [the DSL has no OR], and the events themselves are split at the emitter (see 1215's shock marks for the same shape). ⚠ The per-hit half is the registered shortfall the 普攻 rule describes; it is the same sentence, so it is wrong in the same way here.",
+      "id": "talent_stack_skill"
+    },
+    {
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 3,
+          "per_target": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.025,
+          "max_stacks": 10,
+          "buff": "升格",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之三（终结技）",
+      "_note": "The 终结技 third — see the 普攻 rule for why there are three and for the per-hit shortfall registered there. ⚠ It fires for the **强化终结技** as well in the game (both are the Ultra slot), but this engine only casts 130203: data slot 14 is not in the `SkillType` map, which is registered in `_gaps`. ⚠ The per-hit half is the registered shortfall the 普攻 rule describes.",
+      "id": "talent_stack_ultra"
+    },
+    {
+      "on": "TURN_START",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.025,
+          "max_stacks": 10,
+          "buff": "升格",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1302 银枝 行迹 虔诚 (1302101): 「回合开始时，立即获得1层【升格】。」",
+      "_note": "「**回合开始时**，立即获得 1 层【升格】」 — `TURN_START` with `actor == self` (the event is delivered to the character whose turn begins; every other table evaluates it with `target` and `actor` other than the owner, so `actor == self` is what keeps it to her own turns). ⚠ The energy half is deliberately absent: this trace grants a stack, not energy."
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "when": [
+        "actor == self",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.15
+        }
+      ],
+      "source": "1302 银枝 行迹 勇气 (1302103): 「对当前生命值百分比小于等于50%的敌方目标造成的伤害提高15%。」",
+      "_note": "「对**当前生命值百分比小于等于 50% 的**敌方目标造成的伤害提高 15%」. ⚠ `target_hp_percent` is the existing variable that reads the **event's target** — the unit being hit — which is exactly the sentence's subject, so no new vocabulary was needed; `actor == self` keeps it to her damage. ⚠ `BOOST_DAMAGE` raises this instance only, which is 就是「对某类目标造成的伤害」这类条件句的意思. ⚠ This is the first shipped reader of `target_hp_percent` in a *damage* rule (it was added for 1001's shield clause)."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.04,
+          "max_stacks": 10,
+          "buff": "升格",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "min_eidolon": 1,
+      "source": "1302 银枝 星魂 1 审美王国的缺口 (Avatar_Argenti_00_Rank01): 「每层【升格】额外使暴击伤害提高4%。」 param = [0.04]",
+      "_note": "「**每层**【升格】额外使暴击伤害提高 4%」 — one stackable crit-damage modifier on the same name and cap as the talent's crit-rate one. ⚠ **This clause is KNOWN WRONG and registered, not papered over** (2026-10-31 measured): the modifier is attached **once at battle start**, so the crit damage is a flat **+0.04** at every stack count, including zero - the sentence says per layer, and 0 layers must give 0. The engine's per-stack arms are the ones that turned out not to line up (see the registration in `_gaps`); the fix is the same shape as the talent's stacks (one modifier re-applied whenever a layer is gained), and `ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks` is the witness that goes red when it lands."
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "eidolon2_attack_with_three_enemies",
+      "when": [
+        "actor == self",
+        "from_category ULTRA",
+        "enemy_count >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.4,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "min_eidolon": 2,
+      "source": "1302 银枝 星魂 2 玛瑙石的谦卑 (Avatar_Argenti_00_Rank02): 「施放终结技时，若敌方目标数量大于等于3个时，攻击力提高40%，持续1回合。」 param = [3, 0.4, 1] → #1 = 3 个、#2 = 0.4、#3 = 1 回合",
+      "_note": "「**施放终结技时**，若敌方目标数量**大于等于 3 个**时，攻击力提高 40%，持续 1 回合」. ⚠ `CAST_SETUP`, not `ULT_CAST`: the latter fires **after** the ultimate's damage has settled, while the sentence ties the raise to the cast it is used with (the same reason 23039 pays its HP there). ⚠ `enemy_count` is the existing variable (`TriggerTable`'s `enemyCount`, living enemies only) — the earlier note here said \"no enemy-count variable\", which was true when it was written and is **corrected** by this rule, not by a new word. ⚠ `from_category ULTRA` keeps it to the ultimate. ⚠ `percent` and not `ratio`: ATTACK is a flat attribute and `ratio` is refused for those at load. ⚠ `turns: 1` is 「持续 1 回合」 on the engine's clock: applied during her own turn, it survives to her next turn start."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.025,
+          "max_stacks": 10,
+          "buff": "升格",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.025,
+          "max_stacks": 10,
+          "buff": "升格",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_stack_basic",
+          "effect_max_stacks": 2
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_stack_skill",
+          "effect_max_stacks": 2
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_stack_ultra",
+          "effect_max_stacks": 2
+        }
+      ],
+      "min_eidolon": 4,
+      "source": "1302 银枝 星魂 4 号角的奉献 (Avatar_Argenti_00_Rank04): 「战斗开始时，获得2层【升格】，并使天赋的效果可叠加上限提高2层。」 param = [2, 2] + 后半「并使天赋的效果可叠加上限提高2层」（用 `effect_max_stacks: 2` 抬三条天赋规则的上限）",
+      "_note": "「**战斗开始时，获得 2 层**【升格】」 — two effects because one stack is one buff: stating the same modifier twice at battle start attaches two of them, which is what 「2 层」 means and is the same shape 遗器's stacking bonuses use. ⚠ **Registered, not written**: the second half 「使天赋的效果**可叠加上限提高 2 层**」 would raise a `max_stacks` field on another rule's effect, which is `MODIFY_RULE`'s family but a **fourth** form (it raises a count of firings, a probability, a value and a duration today — not a cap). Filing it as two extra stacks instead would be wrong in the one case that matters: they must be able to exceed 10. ⚠ **2026-09-28 补齐**：后半「使天赋的效果**可叠加上限提高 2 层**」现在写出来了 —— `MODIFY_RULE` 的**第四形态**（`effect_max_stacks: 2`），三条天赋规则各抬一次（一条规则抬一条规则）。⚠ 写成\"再补两层\"是**错的**：它必须能**超过 10 层**，而补两层仍受 10 层上限约束。⚠ 修正案在战斗开始时就登记，而层数是之后一次次命中才叠上去的，所以新上限**来得及**生效（`max_stacks` 是 buff 实例上的值，事后抬没用）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1302 银枝 技能表的**等级口径**: 文档引用的是 Lv10 行（130201 = 1.4、130202 = 1.2、130203 = [1.6, 90]、130214 = [2.8, 6, 0.95, 180]、130204 = [3, 0.025, 10]）",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "min_eidolon": 3,
+      "source": "1302 银枝 星魂 3 荆棘路的荣光 (Avatar_Argenti_00_Rank03): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'130202': 2, '130204': 2}",
+      "_note": "星魂 3's two raises (M-32). ⚠ They compose with the base-level rule by addition (the same arithmetic 1103/1215 use)."
+    },
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "min_eidolon": 5,
+      "source": "1302 银枝 星魂 5 宇宙某处的雪 (Avatar_Argenti_00_Rank05): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'130203': 2, '130201': 1, '130214': 2}",
+      "_note": "星魂 5's two raises. ⚠ The data line names **three** skill ids (130203, 130201 and 130214 — the enhanced ultimate too), while the sentence names two slots: the ULTRA raise covers both ultimate ids because a slot is what the engine reads (`SkillType.ULTRA`), which is why the third id needs no rule of its own. ⚠ **已写**：星魂 2（`eidolon2_attack_with_three_enemies`）与星魂 6（下面那条 `DEALING_DAMAGE`）原先记在这里说\"写不了\"，两条都已在文件里 —— `enemy_count` 与 `DEFENCE_IGNORE` 后来都落地了。⚠ **仍开、已登记在 `_gaps`**：行迹 慷慨「在敌方目标进入战斗时…」（没有敌方入场事件）与强化终结技整段（引擎的施放路径没有数据槽 14，所以「额外 6 次随机单体」与 336% 那一行都放不出来）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.3,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "min_eidolon": 6,
+      "source": "1302 银枝 星魂 6 「你」的光芒 (Avatar_Argenti_00_Rank06): 「施放终结技时，无视敌方目标30%的防御力。」 param = [0.3]",
+      "_note": "「施放终结技时，无视敌方目标 30% 的防御力」 — the attribute exists (`DEFENCE_IGNORE`) and so does the shape: the buff is granted on `DEALING_DAMAGE` **before** the zones are assembled, so it applies to the very instance it was granted for (the same trick 知更鸟【协奏】的附加伤害 uses). ⚠ `from_skill ULTRA` keeps it to the ultimate (both ultimate ids are that slot) and `actor == self` keeps it to her damage. ⚠ `min_eidolon: 6` is the gate."
+    }
+  ]
+}
 
-  {
-    "on": "SKILL_CAST",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "GAIN_ENERGY", "amount": 3, "per_target": true, "target": "self" },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "percent": 0.025,
-        "max_stacks": 10,
-        "buff": "升格",
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之二（战技）",
-    "note": "The 战技 third of the same sentence — three rules because 「普攻、战技、终结技」 are three cast events, and a rule fires on one. ⚠ They cannot be one rule: [the DSL has no OR], and the events themselves are split at the emitter (see 1215's shock marks for the same shape).",
-    "id": "talent_stack_skill"
-  },
 
-  {
-    "on": "ULT_CAST",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "GAIN_ENERGY", "amount": 3, "per_target": true, "target": "self" },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "percent": 0.025,
-        "max_stacks": 10,
-        "buff": "升格",
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之三（终结技）",
-    "note": "The 终结技 third — see the 普攻 rule for why there are three. ⚠ It fires for the **强化终结技** as well (both are the Ultra slot, 130203 and 130214), which is what 「终结技」 means.",
-    "id": "talent_stack_ultra"
-  },
 
-  {
-    "on": "TURN_START",
-    "when": ["actor == self"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "percent": 0.025,
-        "max_stacks": 10,
-        "buff": "升格",
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "source": "1302 银枝 行迹 虔诚 (1302101): 「回合开始时，立即获得1层【升格】。」",
-    "note": "「**回合开始时**，立即获得 1 层【升格】」 — `TURN_START` with `actor == self` (the event is delivered to the character whose turn begins; every other table evaluates it with `target` and `actor` other than the owner, so `actor == self` is what keeps it to her own turns). ⚠ The energy half is deliberately absent: this trace grants a stack, not energy."
-  },
 
-  {
-    "on": "DEALING_DAMAGE",
-    "when": ["actor == self", "target_hp_percent <= 0.5"],
-    "do": [
-      { "op": "BOOST_DAMAGE", "percent": 0.15 }
-    ],
-    "source": "1302 银枝 行迹 勇气 (1302103): 「对当前生命值百分比小于等于50%的敌方目标造成的伤害提高15%。」",
-    "note": "「对**当前生命值百分比小于等于 50% 的**敌方目标造成的伤害提高 15%」. ⚠ `target_hp_percent` is the existing variable that reads the **event's target** — the unit being hit — which is exactly the sentence's subject, so no new vocabulary was needed; `actor == self` keeps it to her damage. ⚠ `BOOST_DAMAGE` raises this instance only, which is 就是「对某类目标造成的伤害」这类条件句的意思. ⚠ This is the first shipped reader of `target_hp_percent` in a *damage* rule (it was added for 1001's shield clause)."
-  },
 
-  {
-    "on": "BATTLE_START",
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_ATTACK",
-        "percent": 0.04,
-        "max_stacks": 10,
-        "buff": "升格",
-        "permanent": true,
-        "target": "self"
-      }
-    ],
-    "min_eidolon": 1,
-    "source": "1302 银枝 星魂 1 审美王国的缺口 (Avatar_Argenti_00_Rank01): 「每层【升格】额外使暴击伤害提高4%。」 param = [0.04]",
-    "note": "「**每层**【升格】额外使暴击伤害提高 4%」 — the second stackable modifier, on the same name and the same cap: two modifiers that each stack up to 10 give 「每层」 its meaning (per stack of 升格, +4% crit damage), and no rule has to read the count. ⚠ `min_eidolon: 1` is the gate, and as a loadout fact it is filed at battle start like the rest."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "percent": 0.025,
-        "max_stacks": 10,
-        "buff": "升格",
-        "permanent": true,
-        "target": "self"
-      },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "CRIT_CHANCE",
-        "percent": 0.025,
-        "max_stacks": 10,
-        "buff": "升格",
-        "permanent": true,
-        "target": "self"
-      },
-      { "op": "MODIFY_RULE", "rule": "talent_stack_basic", "effect_max_stacks": 2 },
-      { "op": "MODIFY_RULE", "rule": "talent_stack_skill", "effect_max_stacks": 2 },
-      { "op": "MODIFY_RULE", "rule": "talent_stack_ultra", "effect_max_stacks": 2 }
-    ],
-    "min_eidolon": 4,
-    "source": "1302 银枝 星魂 4 号角的奉献 (Avatar_Argenti_00_Rank04): 「战斗开始时，获得2层【升格】，并使天赋的效果可叠加上限提高2层。」 param = [2, 2] + 后半「并使天赋的效果可叠加上限提高2层」（用 `effect_max_stacks: 2` 抬三条天赋规则的上限）",
-    "note": "「**战斗开始时，获得 2 层**【升格】」 — two effects because one stack is one buff: stating the same modifier twice at battle start attaches two of them, which is what 「2 层」 means and is the same shape 遗器's stacking bonuses use. ⚠ **Registered, not written**: the second half 「使天赋的效果**可叠加上限提高 2 层**」 would raise a `max_stacks` field on another rule's effect, which is `MODIFY_RULE`'s family but a **fourth** form (it raises a count of firings, a probability, a value and a duration today — not a cap). Filing it as two extra stacks instead would be wrong in the one case that matters: they must be able to exceed 10. ⚠ **2026-09-28 补齐**：后半「使天赋的效果**可叠加上限提高 2 层**」现在写出来了 —— `MODIFY_RULE` 的**第四形态**（`effect_max_stacks: 2`），三条天赋规则各抬一次（一条规则抬一条规则）。⚠ 写成\"再补两层\"是**错的**：它必须能**超过 10 层**，而补两层仍受 10 层上限约束。⚠ 修正案在战斗开始时就登记，而层数是之后一次次命中才叠上去的，所以新上限**来得及**生效（`max_stacks` 是 buff 实例上的值，事后抬没用）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
-    ],
-    "source": "1302 银枝 技能表的**等级口径**: 文档引用的是 Lv10 行（130201 = 1.4、130202 = 1.2、130203 = [1.6, 90]、130214 = [2.8, 6, 0.95, 180]、130204 = [3, 0.025, 10]）",
-    "note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
-    ],
-    "min_eidolon": 3,
-    "source": "1302 银枝 星魂 3 荆棘路的荣光 (Avatar_Argenti_00_Rank03): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'130202': 2, '130204': 2}",
-    "note": "星魂 3's two raises (M-32). ⚠ They compose with the base-level rule by addition (the same arithmetic 1103/1215 use)."
-  },
-
-  {
-    "on": "BATTLE_START",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
-    ],
-    "min_eidolon": 5,
-    "source": "1302 银枝 星魂 5 宇宙某处的雪 (Avatar_Argenti_00_Rank05): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'130203': 2, '130201': 1, '130214': 2}",
-    "note": "星魂 5's two raises. ⚠ The data line names **three** skill ids (130203, 130201 and 130214 — the enhanced ultimate too), while the sentence names two slots: the ULTRA raise covers both ultimate ids because a slot is what the engine reads (`SkillType.ULTRA`), which is why the third id needs no rule of its own. ⚠ **Not written in this file** (each with its blocker, in ROADMAP): 行迹 慷慨「在敌方目标进入战斗时…」(no event for an *enemy* entering the battle), 星魂 2「若敌方目标数量大于等于 3 个时…」(no enemy-count variable), 星魂 6「施放终结技时，无视敌方目标 30% 的防御力」(no defence-ignore on a damage instance), and the enhanced ultimate's 「额外造成 6 次伤害，每次对敌方随机单体」(the engine's own path covers the 280%, the six random hits are a 弹射 shape no rule can name)."
-  },
-
-  {
-    "on": "DEALING_DAMAGE",
-    "when": ["actor == self", "from_skill ULTRA"],
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.3, "turns": 1, "target": "self" }
-    ],
-    "min_eidolon": 6,
-    "source": "1302 银枝 星魂 6 「你」的光芒 (Avatar_Argenti_00_Rank06): 「施放终结技时，无视敌方目标30%的防御力。」 param = [0.3]",
-    "note": "「施放终结技时，无视敌方目标 30% 的防御力」 — the attribute exists (`DEFENCE_IGNORE`) and so does the shape: the buff is granted on `DEALING_DAMAGE` **before** the zones are assembled, so it applies to the very instance it was granted for (the same trick 知更鸟【协奏】的附加伤害 uses). ⚠ `from_skill ULTRA` keeps it to the ultimate (both ultimate ids are that slot) and `actor == self` keeps it to her damage. ⚠ `min_eidolon: 6` is the gate."
-  }
-]

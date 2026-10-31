@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23046,
   "1": [
     {
       "on": "CAST_SETUP",
@@ -9,7 +11,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.1, "per_stack": "技能层", "permanent": true, "target": "self" }
       ],
       "source": "light cone 23046: \"After each use of the wearer's Skill, increases the wearer's ATK by #4%, stacking up to #5 = 4 times\" (tbgd Ability23046). This file carries the MAX-RANK numbers under one key, which is what its judge pins (0.2 = ParamList #4 at rank 5).",
-      "note": "「装备者**每次施放战技后**，攻击力提高 #4%，**最多叠加 4 次**」—— `CAST_SETUP` ＋ `from_category BPSKILL` ＋ `actor == self` ＋ ⭐ `ADD_STACK{max_stacks: 4}` ＋ `MODIFY_ATTR ATTACK{per_stack: 技能层}` ✓（10/12.5/15/17.5/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只 +10% ✗）。"
+      "_note": "「装备者**每次施放战技后**，攻击力提高 #4%，**最多叠加 4 次**」—— `CAST_SETUP` ＋ `from_category BPSKILL` ＋ `actor == self` ＋ ⭐ `ADD_STACK{max_stacks: 4}` ＋ `MODIFY_ATTR ATTACK{per_stack: 技能层}` ✓（10/12.5/15/17.5/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只 +10% ✗）。"
     },
     {
       "on": "BATTLE_READY",
@@ -19,7 +21,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.8, "permanent": true, "target": "self" }
       ],
       "source": "light cone 23046: \"When entering combat, if the allies' Skill Points limit is 6 or higher, increases the wearer's ATK by #3%\" (tbgd Ability23046, ParamList #2 = 6 at every rank, #3 = 0.8 at rank 5). It hangs off BATTLE_READY rather than BATTLE_START because the cap can be raised by another battle-start rule (Sparkle's talent), and BATTLE_START rules run in team order -- a gate on BATTLE_START fired or not depending on where she stood in the team.",
-      "note": "「进入战斗时，若**我方的战技点上限 ≥ 6 点**，装备者攻击力提高 #3%」—— `BATTLE_READY` ＋ `skill_point_max >= 6` ＋ `MODIFY_ATTR ATTACK` ✓（40/50/60/70/80% ✓；`skill_point_max` 正是为这类句子加的变量 ✓）。"
+      "_note": "「进入战斗时，若**我方的战技点上限 ≥ 6 点**，装备者攻击力提高 #3%」—— `BATTLE_READY` ＋ `skill_point_max >= 6` ＋ `MODIFY_ATTR ATTACK` ✓（40/50/60/70/80% ✓；`skill_point_max` 正是为这类句子加的变量 ✓）。"
     }
   ]
 }

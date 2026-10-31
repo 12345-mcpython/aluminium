@@ -1,4 +1,8 @@
 {
+  "_status": "partial",
+  "_gaps": [
+    "见 CONTENT-STATUS.md 的逐角色登记"
+  ],
   "resources": [
     {
       "id": "隐藏分",
@@ -7,14 +11,25 @@
       "overflow": 240,
       "source": "1506 银狼LV.999 天赋 有我在，把把都是顺风局: 「【隐藏分】达到 60 点后可激活终结技，达到上限后还可溢出 240 点」。"
     },
-    { "id": "笑点", "max": 2147483647, "initial": 0, "scope": "PARTY", "source": "1506 银狼LV.999 战技／终结技: 「笑点为全队共享」⇒ 队伍级计数。" },
+    {
+      "id": "笑点",
+      "max": 2147483647,
+      "initial": 0,
+      "scope": "PARTY",
+      "source": "1506 银狼LV.999 战技／终结技: 「笑点为全队共享」⇒ 队伍级计数。"
+    },
     {
       "id": "好活当赏",
       "max": 2147483647,
       "initial": 0,
       "source": "1506 银狼LV.999 天赋: 「持有【好活当赏】时，施放普攻、战技对受到攻击的敌方目标造成 40% 的虚数属性欢愉伤害」；终结技的盲盒从句也以它为门。⚠ 文档**没有给她的【好活当赏】上限** ✗ —— 数据里只有名字 / 图标（与 1505／8009 同一判断 ✓）⇒ `max` 用 `Integer.MAX_VALUE` 表示「游戏从未说过会满」✓。⚠ 它是**计数**不是状态 ✓：本项目的口径见下方两条骑手规则的 note 与 1503 的注记 ✓。"
     },
-    { "id": "强化普攻次数", "max": 3, "initial": 0, "source": "1506 银狼LV.999 天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」—— 计数即时长。" },
+    {
+      "id": "强化普攻次数",
+      "max": 3,
+      "initial": 0,
+      "source": "1506 银狼LV.999 天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」—— 计数即时长。"
+    },
     {
       "id": "里程碑配额",
       "max": 300,
@@ -27,98 +42,210 @@
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 14 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 14 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 14 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ELATION_SKILL", "amount": 14 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ELATION_EXTRA", "amount": 14 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 14
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 14
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 14
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_SKILL",
+          "amount": 14
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_EXTRA",
+          "amount": 14
+        }
       ],
       "source": "1506 银狼LV.999 技能等级口径：普攻最高 10 级（`skills.json` 槽1 有 10 行）、战技／终结技／天赋／欢愉技最高 15 级（各 15 行）；本项目一律取满级（与 1002／1004／1005 等 63 个角色的 `level_convention` 同一口径）。",
-      "note": "⚠⚠ **这一条是补的，而它修的是一个比她其余缺口都严重的缺陷** ✓ —— **实测**：全库 **63/94** 个角色都带 `level_convention` ✓，而**她此前没有** ✓ ⇒ **她的技能等级一直是 1** ✓（技能**默认 1 级** ✓，没有别的规则会抬它 ✓）⇒ ⚠ **她的战技读 `0.8` 而不是 `2.0`** ✓、**强化普攻读 `1.2` 而不是 `3.36`** ✓、**欢愉技·强化读 `0.45` 而不是 `1.125`** ✓ —— **倍率、伤害、治疗全部按 Lv1 在算** ✓，而且**没有任何症状** ✓（判据此前只读状态与计数 ✓，不读倍率 ✓）。⭐⭐ **CORRECTED（本会话）两处：id 与位置** ✓ —— ① 它的 id 原先是 `p1506_level_convention` ✗，而 `LevelConventionOrderTest` 按**词表里的名字** `level_convention` 找它 ✓ ⇒ 带前缀时那条守卫**找不到它**（`conventionAt = -1` ✓）⇒ **守卫对她一直是瞎的** ✗（本会话给 WAVE_START 那条加了读行之后，它才报出来 ✓）；② 它原先排在第 20 条 ✓，现在按 `AGENT.md` §6.5 的口径**放在文件第一条** ✓（「它是**这个文件引的是哪一行** ✓，不是机制 ✓」）。⚠ 位置**对今天的行为没有影响** ✓（同事件的 `RAISE_SKILL_LEVEL` 是**相加**的 ✓，先后无关 ✓），但它让「早于约定的规则不得读行」这条不变量**由结构保证** ✓ 而不只靠守卫 ✓。⚠ 上界不用写第二个 op ✓：引擎把等级夹在该技能表自己的**行数**上 ✓（`CanHit.skillLevel` 的 `min(level, rows)` ✓）⇒ 给 15 行的技能写 `+9` 会停在 **10** ✓，所以这里**按各自行数写**（10 行写 9 ✓、15 行写 14 ✓）✓。⚠⚠ **槽 8／10／12／18 够不着** ✓（强化普攻与它的盲盒子技能 ✓，各 10 行 ✓）—— `RAISE_SKILL_LEVEL` 收的是 **`SkillType` 名字** ✓，而那四个槽**没有对应的 `SkillType`** ✓ ⇒ **照实登记** ✓（⚠ 这也是她星魂 3 里 `150608`／`150610`／`150612`／`150618` 四项**无处可去**的同一个原因 ✓）。⚠⚠ **还有一条同族的缺口，但它不在等级这一层** ✓：**槽 21（欢愉技·强化）的行布局与引擎读的那一种相反** ✗ —— 她的行是 `[份额, 次数]`（满级 `[1.125, 6]` ✓，正文「造成 **6** 次伤害，每次…**90%**」✓），而 `SkillExecutor` 的欢愉行分支按 `[次数, 每次份额, 最后一段份额]` 读 ✓（读者 8009／8010 ✓）⇒ 她被读成 **1 次 600%**（**实测**一发 **878.17** ✓，而正文的六次是 **987.94** ✓）。⚠ 已登记在 `AGENT.md` §4.3 ✓，并由缺口见证 `SilverWolfLV999ElationRowTest` 钉住 ✓（**不许猜**哪个整数是次数 ✗ —— 三条行里整数的位置各不相同 ✓）。"
+      "_note": "⚠⚠ **这一条是补的，而它修的是一个比她其余缺口都严重的缺陷** ✓ —— **实测**：全库 **63/94** 个角色都带 `level_convention` ✓，而**她此前没有** ✓ ⇒ **她的技能等级一直是 1** ✓（技能**默认 1 级** ✓，没有别的规则会抬它 ✓）⇒ ⚠ **她的战技读 `0.8` 而不是 `2.0`** ✓、**强化普攻读 `1.2` 而不是 `3.36`** ✓、**欢愉技·强化读 `0.45` 而不是 `1.125`** ✓ —— **倍率、伤害、治疗全部按 Lv1 在算** ✓，而且**没有任何症状** ✓（判据此前只读状态与计数 ✓，不读倍率 ✓）。⭐⭐ **CORRECTED（本会话）两处：id 与位置** ✓ —— ① 它的 id 原先是 `p1506_level_convention` ✗，而 `LevelConventionOrderTest` 按**词表里的名字** `level_convention` 找它 ✓ ⇒ 带前缀时那条守卫**找不到它**（`conventionAt = -1` ✓）⇒ **守卫对她一直是瞎的** ✗（本会话给 WAVE_START 那条加了读行之后，它才报出来 ✓）；② 它原先排在第 20 条 ✓，现在按 `AGENT.md` §6.5 的口径**放在文件第一条** ✓（「它是**这个文件引的是哪一行** ✓，不是机制 ✓」）。⚠ 位置**对今天的行为没有影响** ✓（同事件的 `RAISE_SKILL_LEVEL` 是**相加**的 ✓，先后无关 ✓），但它让「早于约定的规则不得读行」这条不变量**由结构保证** ✓ 而不只靠守卫 ✓。⚠ 上界不用写第二个 op ✓：引擎把等级夹在该技能表自己的**行数**上 ✓（`CanHit.skillLevel` 的 `min(level, rows)` ✓）⇒ 给 15 行的技能写 `+9` 会停在 **10** ✓，所以这里**按各自行数写**（10 行写 9 ✓、15 行写 14 ✓）✓。⚠⚠ **槽 8／10／12／18 够不着** ✓（强化普攻与它的盲盒子技能 ✓，各 10 行 ✓）—— `RAISE_SKILL_LEVEL` 收的是 **`SkillType` 名字** ✓，而那四个槽**没有对应的 `SkillType`** ✓ ⇒ **照实登记** ✓（⚠ 这也是她星魂 3 里 `150608`／`150610`／`150612`／`150618` 四项**无处可去**的同一个原因 ✓）。⚠⚠ **还有一条同族的缺口，但它不在等级这一层** ✓：**槽 21（欢愉技·强化）的行布局与引擎读的那一种相反** ✗ —— 她的行是 `[份额, 次数]`（满级 `[1.125, 6]` ✓，正文「造成 **6** 次伤害，每次…**90%**」✓），而 `SkillExecutor` 的欢愉行分支按 `[次数, 每次份额, 最后一段份额]` 读 ✓（读者 8009／8010 ✓）⇒ 她被读成 **1 次 600%**（**实测**一发 **878.17** ✓，而正文的六次是 **987.94** ✓）。⚠ 已登记在 `AGENT.md` §4.3 ✓，并由缺口见证 `SilverWolfLV999ElationRowTest` 钉住 ✓（**不许猜**哪个整数是次数 ✗ —— 三条行里整数的位置各不相同 ✓）。"
     },
     {
       "on": "CAST_SETUP",
       "id": "p1506_ult_advance",
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "ADVANCE", "percent": 1.0, "target": "self" }
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "self"
+        }
       ],
       "source": "银狼LV.999 终结技 无敌玩家，启动！：「进入【无敌玩家】状态并且**行动提前 100%**。」",
-      "note": "⭐ 只写这一句 ✓（**行动提前 100%** ✓ = `ADVANCE percent: 1.0` ✓，与 1210 桂乃芬的开场提前 25% 同一个 op ✓）。⚠ **结界**那一半已登记 ✗（需要区域机制 ✗）；【无敌玩家】状态本身**现在有读者了** ✓（天赋的强化普攻计数 ✓、退出时清空隐藏分 ✓、星魂 2 的两半 ✓）⇒ 已出货 ✓。"
+      "_note": "⭐ 只写这一句 ✓（**行动提前 100%** ✓ = `ADVANCE percent: 1.0` ✓，与 1210 桂乃芬的开场提前 25% 同一个 op ✓）。⚠ **结界**那一半已登记 ✗（需要区域机制 ✗）；【无敌玩家】状态本身**现在有读者了** ✓（天赋的强化普攻计数 ✓、退出时清空隐藏分 ✓、星魂 2 的两半 ✓）⇒ 已出货 ✓。"
     },
     {
       "on": "RESOURCE_CHANGED",
       "id": "p1506_laughs_to_hidden",
-      "when": ["resource_changed:笑点"],
+      "when": [
+        "resource_changed:笑点"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "隐藏分", "amountFromEvent": true }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "隐藏分",
+          "amountFromEvent": true
+        }
       ],
       "source": "银狼LV.999 天赋：「获得笑点时，获得等量【隐藏分】。」",
-      "note": "⭐ 新能力**资源变化可转发** ✓（`resource_changed:<NAME>` + `amountFromEvent` ✓）。"
+      "_note": "⭐ 新能力**资源变化可转发** ✓（`resource_changed:<NAME>` + `amountFromEvent` ✓）。"
     },
     {
       "on": "SKILL_CAST",
       "id": "p1506_skill_grants_laughs",
-      "when": ["actor == self", "from_skill_id == 2.0"],
+      "when": [
+        "actor == self",
+        "from_skill_id == 2.0"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "笑点", "amount": 5 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "笑点",
+          "amount": 5
+        }
       ],
       "source": "1506 银狼LV.999 战技 Shoot属性大爆发 (150602): 「获得 5 个笑点，对敌方全体造成等同于 160% 攻击力的虚数属性伤害」—— #2 = 5（全等级固定）。",
-      "note": "⭐ 数值 `5` 取自**数据行**（`skills.json` 1506 槽位 2 的 `param_list` 全等级为 `[0.8,5]`…`[2,5]`）✓ —— ⚠ 这是**数据驱动**、不是我推的 ✓。⚠ 伤害那一半由技能行自己做 ✓，本条**只写获得笑点** ✓。"
+      "_note": "⭐ 数值 `5` 取自**数据行**（`skills.json` 1506 槽位 2 的 `param_list` 全等级为 `[0.8,5]`…`[2,5]`）✓ —— ⚠ 这是**数据驱动**、不是我推的 ✓。⚠ 伤害那一半由技能行自己做 ✓，本条**只写获得笑点** ✓。"
     },
     {
       "on": "CAST_SETUP",
       "id": "p1506_elation_skill_grants_hidden",
-      "when": ["actor == self", "from_skill_id == 20.0"],
+      "when": [
+        "actor == self",
+        "from_skill_id == 20.0"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "隐藏分", "amount": 15 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "隐藏分",
+          "amount": 15
+        }
       ],
       "source": "1506 银狼LV.999 欢愉技 殿堂级操作回放 (150620): 「获得 15 点【隐藏分】」—— 全等级固定 15。",
-      "note": "⭐ 欢愉技的**施放事件**沿用既有写法 ✓（`CAST_SETUP` ＋ 条件 ✓，与 1503 的 `elation_skill_arms_*` 同形 ✓）✓；⚠ 但这里用 **`from_skill_id == 20`** ✓ 而不是 `from_category` ✓ —— 因为**收益只属于这一个技能** ✓，而分类会连槽位 21 一起命中 ✓。"
+      "_note": "⭐ 欢愉技的**施放事件**沿用既有写法 ✓（`CAST_SETUP` ＋ 条件 ✓，与 1503 的 `elation_skill_arms_*` 同形 ✓）✓；⚠ 但这里用 **`from_skill_id == 20`** ✓ 而不是 `from_category` ✓ —— 因为**收益只属于这一个技能** ✓，而分类会连槽位 21 一起命中 ✓。"
     },
     {
       "on": "CAST_SETUP",
       "id": "p1506_e2_extends_her_buffs_on_entering_godmode",
       "min_eidolon": 2,
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "EXTEND_BUFF", "kind": "all", "turns": 1, "target": "self" }
+        {
+          "op": "EXTEND_BUFF",
+          "kind": "all",
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 星魂 2 用这副躯壳，抵达真理的尽头: 「进入【无敌玩家】状态后，使自身所有增益效果延长 1 回合。」（同句后半「本次【无敌玩家】状态下每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数」**由另一条规则出货** ✓ —— `p1506_e2_milestones_while_in_godmode` ✓：`RESOURCE_CHANGED` ＋ `里程碑配额` 记账 ✓，额外回合与强化普攻次数各按档一次 ✓。）",
-      "note": "⭐ **星魂 2 的前半，用的是现成词汇** ✓：`EXTEND_BUFF` ＋ `kind: all` ＋ `turns: 1` ＋ `target: self` ✓ —— 「使自身**所有**增益效果延长 1 回合」✓（与 1415 那条 −1 的规则同形 ✓，符号相反 ✓）。⚠ **门与进状态那条完全相同** ✓（`CAST_SETUP` ＋ `actor == self` ＋ `from_category ULTRA` ✓）且**排在它之后** ✓ ⇒ 触发时【无敌玩家】已在身上 ✓，「进入后」的时序成立 ✓。⚠ `min_eidolon: 2` ✓ 是这句自己的门槛 ✓ —— 别加进进状态那条 ✗（那是本体技能 ✓）。"
+      "_note": "⭐ **星魂 2 的前半，用的是现成词汇** ✓：`EXTEND_BUFF` ＋ `kind: all` ＋ `turns: 1` ＋ `target: self` ✓ —— 「使自身**所有**增益效果延长 1 回合」✓（与 1415 那条 −1 的规则同形 ✓，符号相反 ✓）。⚠ **门与进状态那条完全相同** ✓（`CAST_SETUP` ＋ `actor == self` ＋ `from_category ULTRA` ✓）且**排在它之后** ✓ ⇒ 触发时【无敌玩家】已在身上 ✓，「进入后」的时序成立 ✓。⚠ `min_eidolon: 2` ✓ 是这句自己的门槛 ✓ —— 别加进进状态那条 ✗（那是本体技能 ✓）。"
     },
     {
       "on": "CAST_SETUP",
       "id": "p1506_ult_enters_godmode",
-      "when": ["actor == self", "from_category ULTRA"],
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "无敌玩家", "permanent": true, "target": "self" },
-        { "op": "SPEND_RESOURCE", "resource": "里程碑配额", "spendAll": true, "min_eidolon": 2, "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "里程碑配额", "amount_from": {"type": "resource", "resource": "隐藏分"}, "min_eidolon": 2, "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "强化普攻次数", "amount": 3, "to_max": true },
-        { "op": "GAIN_RESOURCE", "resource": "隐藏分", "amount": 20 }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "无敌玩家",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "里程碑配额",
+          "spendAll": true,
+          "min_eidolon": 2,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "里程碑配额",
+          "amount_from": {
+            "type": "resource",
+            "resource": "隐藏分"
+          },
+          "min_eidolon": 2,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "强化普攻次数",
+          "amount": 3,
+          "to_max": true
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "隐藏分",
+          "amount": 20
+        }
       ],
       "source": "1506 银狼LV.999 终结技 无敌玩家，启动！ (150603): 「进入【无敌玩家】状态并且行动提前 100%」＋ 行迹 隐藏关卡全成就 (1506103): 「进入【无敌玩家】状态后，获得 20 点【隐藏分】」",
-      "note": "⭐ **【无敌玩家】就是让这个角色成为她自己的那个状态** ✓ —— 本会话之前它**只是被登记**（「状态若无任何规则读它就没有读者」）✓，而现在它有读者了 ✓：天赋的强化普攻计数 ✓、退出时清空隐藏分 ✓、星魂 2 ✓ ⇒ **读者数过线，可以建** ✓。⚠ 行迹 (1506103) 与本条**同轮出货** ✓ —— 它挂在**状态的施加点**上 ✓，而那个点就是这里 ✓。⚠ `to_max` 把强化普攻次数补满到 3 ✓（与 1503 的充能同一个词汇 ✓）✓。⚠⚠ **登记（本会话逐句核过，只有这一句仍写不了）**：「【无敌玩家】状态下…**无法施放终结技**」 ✗ —— 词表里**没有**「这个单位不能施放终结技」这种 op ✓（`Battle.castUltra` 的门只有能量与状态 ✓，没有「被封印」这一层 ✓）；⚠ 同句的**另两半都已出货** ✓：「免疫控制类负面状态」⇒ `p1506_godmode_immunity_to_control` ✓、「拥有强化普攻**和**强化欢愉技」⇒ 两条 `REPLACE_SKILL` ✓（⚠ 那两条一起出货时**发现了一个引擎缺陷** ✓：`SkillSwapBuff` 原先按**类**判同类 ⇒ 第二个交换把第一个**挤掉**了 ✓ —— 已修（按**槽位**判同类 ✓，`SkillSwapTest.twoSwapsOfDifferentSlotsCoexist` ✓）；⚠ **如实登记影响**：「无法施放终结技」期间她仍能施放大招 ✗（能量够就行 ✓）。"
+      "_note": "⭐ **【无敌玩家】就是让这个角色成为她自己的那个状态** ✓ —— 本会话之前它**只是被登记**（「状态若无任何规则读它就没有读者」）✓，而现在它有读者了 ✓：天赋的强化普攻计数 ✓、退出时清空隐藏分 ✓、星魂 2 ✓ ⇒ **读者数过线，可以建** ✓。⚠ 行迹 (1506103) 与本条**同轮出货** ✓ —— 它挂在**状态的施加点**上 ✓，而那个点就是这里 ✓。⚠ `to_max` 把强化普攻次数补满到 3 ✓（与 1503 的充能同一个词汇 ✓）✓。⚠⚠ **登记（本会话逐句核过，只有这一句仍写不了）**：「【无敌玩家】状态下…**无法施放终结技**」 ✗ —— 词表里**没有**「这个单位不能施放终结技」这种 op ✓（`Battle.castUltra` 的门只有能量与状态 ✓，没有「被封印」这一层 ✓）；⚠ 同句的**另两半都已出货** ✓：「免疫控制类负面状态」⇒ `p1506_godmode_immunity_to_control` ✓、「拥有强化普攻**和**强化欢愉技」⇒ 两条 `REPLACE_SKILL` ✓（⚠ 那两条一起出货时**发现了一个引擎缺陷** ✓：`SkillSwapBuff` 原先按**类**判同类 ⇒ 第二个交换把第一个**挤掉**了 ✓ —— 已修（按**槽位**判同类 ✓，`SkillSwapTest.twoSwapsOfDifferentSlotsCoexist` ✓）；⚠ **如实登记影响**：「无法施放终结技」期间她仍能施放大招 ✗（能量够就行 ✓）。"
     },
     {
       "on": "ULT_CAST",
       "id": "p1506_godmode_immunity_to_control",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "RESIST_DEBUFF", "kind": "control", "percent": 1.0, "permanent": true, "buff": "无敌玩家-免疫控制", "target": "self" }
+        {
+          "op": "RESIST_DEBUFF",
+          "kind": "control",
+          "percent": 1.0,
+          "permanent": true,
+          "buff": "无敌玩家-免疫控制",
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 天赋 有我在，把把都是顺风局 (150604): 「【无敌玩家】状态下，「银狼LV.999」免疫控制类负面状态」—— 「控制类负面状态」的官方定义（关联解释 10000011）：冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身。",
-      "note": "⭐⭐ **「免疫」在这个项目里是一个词，不是一个布尔** ✓：`RESIST_DEBUFF` ＋ `kind: control` ＋ `percent: 1.0` ✓ —— 引擎自己的注释写着「⚠ `percent: 1` **就是免疫**，这是刻意的：『免疫控制类负面状态』与『抵抗…提高35%』是同一机制的两个强度」✓。⚠ 形状与 **1309 知更鸟的【协奏】**、**1408 白厄的变身**逐字同形 ✓（`ULT_CAST` ＋ `kind` ✓ ＋ `buff` 名 ✓ ＋ `permanent` ✓ ＋ `target: self` ✓）。⚠⚠ **寿命由状态自己决定** ✓：`buff` 这个名字**被读** ✓（`RESIST_DEBUFF` 的注释原话：a class resistance the CARRIER holds … an optional `buff` name so a state's own effect can be removed with the state ✓）⇒ 退出【无敌玩家】那条按**名字**摘掉它 ✓（见 `p1506_leaving_godmode_clears_hidden` 的最后一个效果 ✓）—— 这就是【协奏】那一位的做法 ✓（`buff` 与状态同名 ✓），而这里**不同名** ✓（`无敌玩家-免疫控制` vs `无敌玩家` ✓）⇒ 必须在退出那条里**显式**摘 ✓，否则【无敌玩家】没了而免疫留着 ✗。"
+      "_note": "⭐⭐ **「免疫」在这个项目里是一个词，不是一个布尔** ✓：`RESIST_DEBUFF` ＋ `kind: control` ＋ `percent: 1.0` ✓ —— 引擎自己的注释写着「⚠ `percent: 1` **就是免疫**，这是刻意的：『免疫控制类负面状态』与『抵抗…提高35%』是同一机制的两个强度」✓。⚠ 形状与 **1309 知更鸟的【协奏】**、**1408 白厄的变身**逐字同形 ✓（`ULT_CAST` ＋ `kind` ✓ ＋ `buff` 名 ✓ ＋ `permanent` ✓ ＋ `target: self` ✓）。⚠⚠ **寿命由状态自己决定** ✓：`buff` 这个名字**被读** ✓（`RESIST_DEBUFF` 的注释原话：a class resistance the CARRIER holds … an optional `buff` name so a state's own effect can be removed with the state ✓）⇒ 退出【无敌玩家】那条按**名字**摘掉它 ✓（见 `p1506_leaving_godmode_clears_hidden` 的最后一个效果 ✓）—— 这就是【协奏】那一位的做法 ✓（`buff` 与状态同名 ✓），而这里**不同名** ✓（`无敌玩家-免疫控制` vs `无敌玩家` ✓）⇒ 必须在退出那条里**显式**摘 ✓，否则【无敌玩家】没了而免疫留着 ✗。"
     },
     {
       "on": "STATE_ENDED",
       "id": "p1506_leaving_godmode_clears_hidden",
-      "when": ["actor state_ended 无敌玩家"],
+      "when": [
+        "actor state_ended 无敌玩家"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "隐藏分", "amount": 0, "target": "self" },
-        { "op": "SPEND_RESOURCE", "resource": "隐藏分", "spendAll": true, "target": "self" },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "隐藏分",
+          "amount": 0,
+          "target": "self"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "隐藏分",
+          "spendAll": true,
+          "target": "self"
+        },
         {
           "op": "GAIN_RESOURCE",
           "resource": "隐藏分",
@@ -127,126 +254,221 @@
           "min_eidolon": 1,
           "target": "self"
         },
-        { "op": "SPEND_RESOURCE", "resource": "里程碑配额", "spendAll": true, "min_eidolon": 2, "target": "self" },
-        { "op": "REMOVE_STATE", "buff": "无敌玩家-免疫控制", "target": "self" }
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "里程碑配额",
+          "spendAll": true,
+          "min_eidolon": 2,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "无敌玩家-免疫控制",
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 天赋: 「退出【无敌玩家】状态时【隐藏分】会被清空」＋ 同句「【无敌玩家】状态下…免疫控制类负面状态」（后者由 `p1506_godmode_immunity_to_control` 施加 ✓，这里**随状态一起摘掉** ✓）",
-      "note": "⚠⚠ **清空与「星魂 1 保留 20%」必须在同一条规则里** ✓ —— **实测**：`previousCredited` **是每条规则独立、从 0 开始** ✓（`TriggerInterpreter.apply` 里 `double previousCredited = 0;` ✓，它只遍历**一条规则**的效果 ✓）⇒ 拆成两条规则时，保留那条**看不到**清空那条花掉了多少 ✓ ⇒ 它按 **0.2 × 0** 恢复 ✓（判据读到 **0** 而非 **12** ✓）。⭐ 现在这一条**一次做完**：先按**资源当前值**取走，再按**前一个效果实际入账的量**恢复五分之一 ✓ —— `previousCredited` **在同一条规则内是通的** ✓。⚠ 星魂门**写在效果上**（`min_eidolon` 在效果层 ✓），**不是规则层** ✓ —— 规则层的门会让整条规则消失 ✓，而基础清空必须**始终**发生 ✓。⭐ **本会话加的最后一个效果**：按名字摘掉【无敌玩家】的免疫 ✓ —— 免疫是**另一个 buff** ✓（名字 `无敌玩家-免疫控制` ✓，不与状态同名 ⇒ 引擎**不会**替我摘 ✗）⇒ 「【无敌玩家】状态下」这句寿命**必须在退出这条里兑现** ✓，否则她退出之后仍然免疫控制 ✓（`DebuffResistTest` 那条「名字就是寿命」的先例 ✓）。"
+      "_note": "⚠⚠ **清空与「星魂 1 保留 20%」必须在同一条规则里** ✓ —— **实测**：`previousCredited` **是每条规则独立、从 0 开始** ✓（`TriggerInterpreter.apply` 里 `double previousCredited = 0;` ✓，它只遍历**一条规则**的效果 ✓）⇒ 拆成两条规则时，保留那条**看不到**清空那条花掉了多少 ✓ ⇒ 它按 **0.2 × 0** 恢复 ✓（判据读到 **0** 而非 **12** ✓）。⭐ 现在这一条**一次做完**：先按**资源当前值**取走，再按**前一个效果实际入账的量**恢复五分之一 ✓ —— `previousCredited` **在同一条规则内是通的** ✓。⚠ 星魂门**写在效果上**（`min_eidolon` 在效果层 ✓），**不是规则层** ✓ —— 规则层的门会让整条规则消失 ✓，而基础清空必须**始终**发生 ✓。⭐ **本会话加的最后一个效果**：按名字摘掉【无敌玩家】的免疫 ✓ —— 免疫是**另一个 buff** ✓（名字 `无敌玩家-免疫控制` ✓，不与状态同名 ⇒ 引擎**不会**替我摘 ✗）⇒ 「【无敌玩家】状态下」这句寿命**必须在退出这条里兑现** ✓，否则她退出之后仍然免疫控制 ✓（`DebuffResistTest` 那条「名字就是寿命」的先例 ✓）。"
     },
     {
       "on": "BASIC_ATTACK",
       "id": "p1506_godmode_basic_spends_a_charge",
-      "when": ["actor == self", "from_skill_id == 8.0"],
+      "when": [
+        "actor == self",
+        "from_skill_id == 8.0"
+      ],
       "do": [
-        { "op": "REMOVE_RESOURCE", "resource": "强化普攻次数", "amount": 1, "target": "self" }
+        {
+          "op": "REMOVE_RESOURCE",
+          "resource": "强化普攻次数",
+          "amount": 1,
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」—— #5 = 3。",
-      "note": "⚠ 用**夹取**（`REMOVE_RESOURCE`）而不是严格花费 ✓ —— 与 1503 的充能同一个理由 ✓：计数是**状态的时长** ✓，不是**施放强化普攻的门票** ✓。⚠ 挂在 `BASIC_ATTACK` ✓（**施放事件** ✓）✓。"
+      "_note": "⚠ 用**夹取**（`REMOVE_RESOURCE`）而不是严格花费 ✓ —— 与 1503 的充能同一个理由 ✓：计数是**状态的时长** ✓，不是**施放强化普攻的门票** ✓。⚠ 挂在 `BASIC_ATTACK` ✓（**施放事件** ✓）✓。"
     },
     {
       "on": "ATTACK_FINISHED",
       "id": "p1506_three_enhanced_basics_end_godmode",
-      "when": ["actor == self", "self_resource:强化普攻次数 <= 0", "self has_state 无敌玩家"],
+      "when": [
+        "actor == self",
+        "self_resource:强化普攻次数 <= 0",
+        "self has_state 无敌玩家"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "无敌玩家", "target": "self" }
+        {
+          "op": "REMOVE_STATE",
+          "buff": "无敌玩家",
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」",
-      "note": "⭐ 「**施放完 3 次之后**」的落点是 `ATTACK_FINISHED` ✓（攻击结算完 ✓）。⚠⚠ **这里不能写 `from_skill_id`** ✓ —— **实测**：`Battle` 发 `ATTACK_FINISHED` 时 **skillId 传的是 null** ✓⇒ `from_skill_id == 8.0` **永不成立** ✓，而症状是**沉默的**：状态一直在 ✓、计数已归零 ✓，两条规则各自看都对 ✓。⇒ 改用**状态本身**作为「她在打强化普攻」的标记 ✓（该状态正是强化普攻的授予者 ✓），⭐ 与 1503 的 `deep_study_ends_when_the_charges_run_out` 同一个形状 ✓。"
+      "_note": "⭐ 「**施放完 3 次之后**」的落点是 `ATTACK_FINISHED` ✓（攻击结算完 ✓）。⚠⚠ **这里不能写 `from_skill_id`** ✓ —— **实测**：`Battle` 发 `ATTACK_FINISHED` 时 **skillId 传的是 null** ✓⇒ `from_skill_id == 8.0` **永不成立** ✓，而症状是**沉默的**：状态一直在 ✓、计数已归零 ✓，两条规则各自看都对 ✓。⇒ 改用**状态本身**作为「她在打强化普攻」的标记 ✓（该状态正是强化普攻的授予者 ✓），⭐ 与 1503 的 `deep_study_ends_when_the_charges_run_out` 同一个形状 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "p1506_banger_basic_rider",
-      "when": ["actor == self", "self_resource:好活当赏 >= 1", "from_skill_id == 1.0"],
+      "when": [
+        "actor == self",
+        "self_resource:好活当赏 >= 1",
+        "from_skill_id == 1.0"
+      ],
       "do": [
         {
           "op": "ADD_DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 2},
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 2
+          },
           "element": "Imaginary",
           "damage_type": "ELATION"
         }
       ],
       "source": "1506 银狼LV.999 天赋: 「持有【好活当赏】时，施放普攻、战技对受到攻击的敌方目标造成 40% 的虚数属性欢愉伤害」—— 数值读**参数表第 3 项**（`TALENT:2` ✓）：Lv10 显示行 = **0.4**、满级行（Lv15）= **0.5**（`skills.json` 1506 槽 4 的第 15 行 = `[60, 240, 0.5, 0.005, 3, 0.01]` ✓）。",
-      "note": "⭐⭐ **CORRECTED（本会话）门：`has_state 好活当赏` → `self_resource:好活当赏 >= 1`** ✓ —— ⚠ 此前这条从句写的是 `self has_state 好活当赏` ✗，而**实测**：全库唯一打上这个**状态**的地方是 `1513.json` 的 `elation_moment_reward` ✓，它的 `target` 是 **self**（只给 1513 自己 ✓）⇒ **1506 永远拿不到那个状态** ⇒ 两条骑手规则**永不触发** ✓，而症状是**沉默的**（判据此前自己 `new StateBuff(好活当赏, …)` 造了一个出来 ✓）—— 这正是「夹具把前提造出来」的形状 ✓。⭐ 口径来自 1503 的注记（「【好活当赏】是**一个计数**，本项目用 `资源` 表达 ✓」「**`>= 1` 就是「持有」** ✓」）与 1505 的**同一句**（「当绯英持有【好活当赏】时」= `self_resource:好活当赏 >= 1` ✓）。⚠⚠ **登记**：她**自己没有任何规则**获得【好活当赏】✗ —— 授予它的是**阿哈时刻**（引擎里没有这个阶段 ✗）⇒ 调用方不往她的池里加时，本条与盲盒那条都**不会触发** ✓（如实登记，不近似 ✓）。⚠ 40% **攻击力**的**虚数欢愉**伤害 ✓（`scale self_attr:ATTACK` ✓、`element Imaginary` ✓、`damage_type ELATION` ✓）；⚠ 基数用 **ATK** ✓ 而不是欢愉基础值 ✓，因为原文写的是「**等同于 40%**」（承接同页普攻的「等同于 100% **攻击力**」）✓。⚠ 三个读数都由判据分别钉住 ✓。⭐⭐ **CORRECTED（本会话）数值：0.4 是「Lv10 显示行」的字面量，不是她的数** ✓ —— ⚠ 文档正文印的「40%」来自**文档自己的显示口径** ✗：`export_battle.py` 把占位符代入 `min(6, 行数)`（`Normal`／`MazeNormal`）或 `min(10, 行数)`（其余）那一行 ✓（**实测**：`lv_target = min(6, len(param_list)) if attack_type in (Normal, MazeNormal) else min(10, len(param_list))` ✓）⇒ 文档正文**从来不印满级行** ✗。⭐ 而本项目的等级口径是**取满级** ✓（`level_convention` ✓ —— ⚠ 本会话把它的 id 从 `p1506_level_convention` 改成了词表认得的 `level_convention` ✓：`LevelConventionOrderTest` 按**这个名字**找它 ✓，而带前缀时它**根本没被找到**（`conventionAt = -1`）✗ ⇒ 那条守卫此前对她**是瞎的** ✓；并把它移到**文件第一条** ✓，见它的 note ✓），与全库 63/94 个角色同一口径 ✓）⇒ 她的天赋**永远读第 15 行** ✓ ⇒ 正确的数是 **0.5** ✓ 而不是 0.4 ✓（同一形状：1409 与 1503 都犯过「写 Lv10 字面量」✓，见 AGENT.md §4.5/§6.6 ✓）。⚠ 判据钉住**满级行**这个数 ✓ ⇒ 改回字面量 0.4 会红 ✓。"
+      "_note": "⭐⭐ **CORRECTED（本会话）门：`has_state 好活当赏` → `self_resource:好活当赏 >= 1`** ✓ —— ⚠ 此前这条从句写的是 `self has_state 好活当赏` ✗，而**实测**：全库唯一打上这个**状态**的地方是 `1513.json` 的 `elation_moment_reward` ✓，它的 `target` 是 **self**（只给 1513 自己 ✓）⇒ **1506 永远拿不到那个状态** ⇒ 两条骑手规则**永不触发** ✓，而症状是**沉默的**（判据此前自己 `new StateBuff(好活当赏, …)` 造了一个出来 ✓）—— 这正是「夹具把前提造出来」的形状 ✓。⭐ 口径来自 1503 的注记（「【好活当赏】是**一个计数**，本项目用 `资源` 表达 ✓」「**`>= 1` 就是「持有」** ✓」）与 1505 的**同一句**（「当绯英持有【好活当赏】时」= `self_resource:好活当赏 >= 1` ✓）。⚠⚠ **登记**：她**自己没有任何规则**获得【好活当赏】✗ —— 授予它的是**阿哈时刻**（引擎里没有这个阶段 ✗）⇒ 调用方不往她的池里加时，本条与盲盒那条都**不会触发** ✓（如实登记，不近似 ✓）。⚠ 40% **攻击力**的**虚数欢愉**伤害 ✓（`scale self_attr:ATTACK` ✓、`element Imaginary` ✓、`damage_type ELATION` ✓）；⚠ 基数用 **ATK** ✓ 而不是欢愉基础值 ✓，因为原文写的是「**等同于 40%**」（承接同页普攻的「等同于 100% **攻击力**」）✓。⚠ 三个读数都由判据分别钉住 ✓。⭐⭐ **CORRECTED（本会话）数值：0.4 是「Lv10 显示行」的字面量，不是她的数** ✓ —— ⚠ 文档正文印的「40%」来自**文档自己的显示口径** ✗：`export_battle.py` 把占位符代入 `min(6, 行数)`（`Normal`／`MazeNormal`）或 `min(10, 行数)`（其余）那一行 ✓（**实测**：`lv_target = min(6, len(param_list)) if attack_type in (Normal, MazeNormal) else min(10, len(param_list))` ✓）⇒ 文档正文**从来不印满级行** ✗。⭐ 而本项目的等级口径是**取满级** ✓（`level_convention` ✓ —— ⚠ 本会话把它的 id 从 `p1506_level_convention` 改成了词表认得的 `level_convention` ✓：`LevelConventionOrderTest` 按**这个名字**找它 ✓，而带前缀时它**根本没被找到**（`conventionAt = -1`）✗ ⇒ 那条守卫此前对她**是瞎的** ✓；并把它移到**文件第一条** ✓，见它的 note ✓），与全库 63/94 个角色同一口径 ✓）⇒ 她的天赋**永远读第 15 行** ✓ ⇒ 正确的数是 **0.5** ✓ 而不是 0.4 ✓（同一形状：1409 与 1503 都犯过「写 Lv10 字面量」✓，见 AGENT.md §4.5/§6.6 ✓）。⚠ 判据钉住**满级行**这个数 ✓ ⇒ 改回字面量 0.4 会红 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "p1506_banger_skill_rider",
-      "when": ["actor == self", "self_resource:好活当赏 >= 1", "from_skill_id == 2.0"],
+      "when": [
+        "actor == self",
+        "self_resource:好活当赏 >= 1",
+        "from_skill_id == 2.0"
+      ],
       "do": [
         {
           "op": "ADD_DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent_from": {"type": "skill_param", "skill": "TALENT", "index": 2},
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 2
+          },
           "element": "Imaginary",
           "damage_type": "ELATION"
         }
       ],
       "source": "1506 银狼LV.999 天赋: 「持有【好活当赏】时，施放普攻、战技对受到攻击的敌方目标造成 40% 的虚数属性欢愉伤害」—— 同一句的另一个槽位（战技 2）✓；数值同样读 `TALENT:2` ✓（满级行 = 0.5 ✓，理由见普攻那条的 note ✓）。",
-      "note": "⚠ **按槽拆成两条** ✓，与条件 DSL 无「或」的既有做法一致 ✓（1503 的形态 A／B 同样如此 ✓）。⚠ 两条的**数值完全相同** ✓ ⇒ 判据必须**分别**读两个槽位 ✓，否则删掉任意一条都不会被发现 ✓。⚠⚠ 门也在本会话改成了 `self_resource:好活当赏 >= 1` ✓ —— 原因与证据见普攻那条的 note（同一个错法 ✓）；⚠ 两条的**资源门也相同** ✓ ⇒ 判据同样要**两个槽位都读** ✓。"
+      "_note": "⚠ **按槽拆成两条** ✓，与条件 DSL 无「或」的既有做法一致 ✓（1503 的形态 A／B 同样如此 ✓）。⚠ 两条的**数值完全相同** ✓ ⇒ 判据必须**分别**读两个槽位 ✓，否则删掉任意一条都不会被发现 ✓。⚠⚠ 门也在本会话改成了 `self_resource:好活当赏 >= 1` ✓ —— 原因与证据见普攻那条的 note（同一个错法 ✓）；⚠ 两条的**资源门也相同** ✓ ⇒ 判据同样要**两个槽位都读** ✓。"
     },
     {
       "on": "CAST_SETUP",
       "id": "p1506_trace_true_ending_at_20_laughs",
-      "when": ["actor == self", "from_category ElationDamage", "counted_laughs >= 20"],
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "counted_laughs >= 20"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "隐藏分", "amount": 20 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "隐藏分",
+          "amount": 20
+        }
       ],
       "source": "1506 银狼LV.999 行迹 真结局解锁条件 (1506102): 「若施放欢愉技计入的笑点大于等于 20 个，额外获得 20 点【隐藏分】（若大于等于 40 个，再额外获得 20 点）」",
-      "note": "⭐⭐ 这一条是**新读取者 `counted_laughs` 的建库理由** ✓ —— 原文说的是「**计入的**笑点」✓，⚠ **不是**池子的当前值 ✓：两者在**池子自【好活当赏】到手后又涨过**时**不相等** ✓，而那正是那个状态存在的意义 ✓（本会话刚为此更正过引擎 ✓）。⚠ 目标**不限于槽位 20／21** ✓ —— 原文说的是「施放**欢愉技**」✓ ⇒ 用**分类** ✓、不用槽位 ✓（与上面那条相反 ✓）。"
+      "_note": "⭐⭐ 这一条是**新读取者 `counted_laughs` 的建库理由** ✓ —— 原文说的是「**计入的**笑点」✓，⚠ **不是**池子的当前值 ✓：两者在**池子自【好活当赏】到手后又涨过**时**不相等** ✓，而那正是那个状态存在的意义 ✓（本会话刚为此更正过引擎 ✓）。⚠ 目标**不限于槽位 20／21** ✓ —— 原文说的是「施放**欢愉技**」✓ ⇒ 用**分类** ✓、不用槽位 ✓（与上面那条相反 ✓）。"
     },
     {
       "on": "CAST_SETUP",
       "id": "p1506_trace_true_ending_at_40_laughs",
-      "when": ["actor == self", "from_category ElationDamage", "counted_laughs >= 40"],
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "counted_laughs >= 40"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "隐藏分", "amount": 20 }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "隐藏分",
+          "amount": 20
+        }
       ],
       "source": "1506 银狼LV.999 行迹 真结局解锁条件 (1506102): 「（若大于等于 40 个，再额外获得 20 点）」",
-      "note": "⚠ 与 20 点那条**并存** ✓（40 点时两条都跑 ⇒ 共 40 点 ✓，与原文的「**再**额外」一致 ✓）。⚠ 两条**数值相同** ✓ ⇒ 判据必须**分别**用 20／40 两个门槛夹出来 ✓（39 点只给 20 ✓、40 点给 40 ✓）。"
+      "_note": "⚠ 与 20 点那条**并存** ✓（40 点时两条都跑 ⇒ 共 40 点 ✓，与原文的「**再**额外」一致 ✓）。⚠ 两条**数值相同** ✓ ⇒ 判据必须**分别**用 20／40 两个门槛夹出来 ✓（39 点只给 20 ✓、40 点给 40 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "p1506_e4_demo_counts_five_times_the_laughs",
       "min_eidolon": 4,
-      "when": ["actor == self", "from_skill_id == 21.0"],
+      "when": [
+        "actor == self",
+        "from_skill_id == 21.0"
+      ],
       "do": [
-        { "op": "ADD_DAMAGE", "scale": "counted_laughs", "percent": 5.0, "element": "Imaginary", "damage_type": "ELATION" }
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "counted_laughs",
+          "percent": 5.0,
+          "element": "Imaginary",
+          "damage_type": "ELATION"
+        }
       ],
       "source": "1506 银狼LV.999 星魂 4 我来，我见，我..秒了: 「【崩坏级伤害演示】造成的欢愉伤害额外计入 5 倍的【笑点】」—— #1 = 5。",
-      "note": "⚠ 「**额外计入 5 倍的笑点**」读作**加算**（「再计入 5 倍那么多」✓），不是「把计入量乘 5」✓ —— ⚠ 这是一个**读法选择** ✓，写在 note 里而不是埋着 ✓。⚠ `scale counted_laughs percent 5.0` ✓ 表达的就是「5 倍的笑点数」✓。"
+      "_note": "⚠ 「**额外计入 5 倍的笑点**」读作**加算**（「再计入 5 倍那么多」✓），不是「把计入量乘 5」✓ —— ⚠ 这是一个**读法选择** ✓，写在 note 里而不是埋着 ✓。⚠ `scale counted_laughs percent 5.0` ✓ 表达的就是「5 倍的笑点数」✓。"
     },
     {
       "on": "ULT_CAST",
       "id": "p1506_ult_installs_the_enhanced_basic",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "REPLACE_SKILL", "skill": "COMMON", "skill_id": 8, "turns": 3, "target": "self" }
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "turns": 3,
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 天赋: 「【无敌玩家】状态下…拥有强化普攻和强化欢愉技，完整施放 3 次强化普攻后退出【无敌玩家】状态」—— 强化普攻是槽位 8（`skills.json` 1506 槽位 8 = 奖励关：「狼尊时刻」）。",
-      "note": "⚠⚠ **这一条是我第一版漏掉的** ✓ —— 而漏掉它的**症状是沉默的** ✓：槽 8 的两条规则（消耗次数 ✓、满 3 次退出 ✓）**永远不会触发** ✓，判据只看到「状态一直在」✓。⇒ ⭐ 这正是「**从句对着规则读**」存在的理由 ✓：规则各自都对 ✓，**缺的是把它们连起来的那一句** ✓。⚠ `turns: 3` 与【无敌玩家】的寿命一致 ✓（3 次强化普攻 ✓）；⚠ 真正的退出仍由计数驱动 ✓，`turns` 只是替换的**外层时限** ✓。"
+      "_note": "⚠⚠ **这一条是我第一版漏掉的** ✓ —— 而漏掉它的**症状是沉默的** ✓：槽 8 的两条规则（消耗次数 ✓、满 3 次退出 ✓）**永远不会触发** ✓，判据只看到「状态一直在」✓。⇒ ⭐ 这正是「**从句对着规则读**」存在的理由 ✓：规则各自都对 ✓，**缺的是把它们连起来的那一句** ✓。⚠ `turns: 3` 与【无敌玩家】的寿命一致 ✓（3 次强化普攻 ✓）；⚠ 真正的退出仍由计数驱动 ✓，`turns` 只是替换的**外层时限** ✓。"
     },
     {
       "on": "ULT_CAST",
       "id": "p1506_ult_installs_the_enhanced_elation_skill",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "REPLACE_SKILL", "skill": "ELATION_SKILL", "skill_id": 21, "turns": 3, "target": "self" }
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "ELATION_SKILL",
+          "skill_id": 21,
+          "turns": 3,
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 天赋: 「【无敌玩家】状态下…拥有强化普攻和强化欢愉技」—— 强化欢愉技是槽位 21（`skills.json` 1506 槽位 21 = 崩坏级伤害演示，`attack_type` = ElationDamage ✓；`SkillSlotMappingTest` 钉住 `ELATION_EXTRA = 21` ✓）。",
-      "note": "⭐⭐ **同句的另一半，与上面那条逐字同形** ✓（`REPLACE_SKILL` ＋ `turns: 3` ✓）：原文说的是「拥有强化普攻**和**强化欢愉技」✓ —— 上一版只装了普攻那一半 ✗，而**症状是沉默的** ✓（槽 21 与她星魂 4 的那条骑手——门是 `from_skill_id == 21` ✓——都**永远不可达** ✓）。⭐ 词表里有先例 ✓：1513 用 `REPLACE_SKILL` ＋ `skill: ELATION_SKILL` ＋ `skill_id: 21` ✓（她用 `until: next_elation_skill` ✓，而这里用 `turns: 3` 与【无敌玩家】的寿命一致 ✓ —— 与强化普攻那条**同一个登记在案的近似** ✓）。⚠⚠ **一个承重的副作用**：换到槽 21 之后，`p1506_elation_skill_grants_hidden`（门是 `from_skill_id == 20.0` ✓）在【无敌玩家】期间**不再触发** ✓ —— 这是**对的** ✓：强化版的正文只写伤害与重置概率 ✓，**没有**「获得 15 点【隐藏分】」那半句 ✓。⚠ 两个事件（这条与 `p1506_ult_installs_the_enhanced_basic`）**都在 `ULT_CAST`** ✓，互不干扰 ✓（不同槽 ✓）。"
+      "_note": "⭐⭐ **同句的另一半，与上面那条逐字同形** ✓（`REPLACE_SKILL` ＋ `turns: 3` ✓）：原文说的是「拥有强化普攻**和**强化欢愉技」✓ —— 上一版只装了普攻那一半 ✗，而**症状是沉默的** ✓（槽 21 与她星魂 4 的那条骑手——门是 `from_skill_id == 21` ✓——都**永远不可达** ✓）。⭐ 词表里有先例 ✓：1513 用 `REPLACE_SKILL` ＋ `skill: ELATION_SKILL` ＋ `skill_id: 21` ✓（她用 `until: next_elation_skill` ✓，而这里用 `turns: 3` 与【无敌玩家】的寿命一致 ✓ —— 与强化普攻那条**同一个登记在案的近似** ✓）。⚠⚠ **一个承重的副作用**：换到槽 21 之后，`p1506_elation_skill_grants_hidden`（门是 `from_skill_id == 20.0` ✓）在【无敌玩家】期间**不再触发** ✓ —— 这是**对的** ✓：强化版的正文只写伤害与重置概率 ✓，**没有**「获得 15 点【隐藏分】」那半句 ✓。⚠ 两个事件（这条与 `p1506_ult_installs_the_enhanced_basic`）**都在 `ULT_CAST`** ✓，互不干扰 ✓（不同槽 ✓）。"
     },
     {
       "on": "BATTLE_START",
       "id": "p1506_e3_raises_skill_levels",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ELATION_SKILL", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_SKILL",
+          "amount": 1
+        }
       ],
       "source": "1506 银狼LV.999 星魂 3 只有15级？谁填的: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级；欢愉技等级+1，最多不超过15级。」（eidolons.json 1506 E3 的 skill_add_level：150602+2、150601+1、150620+1…）",
-      "note": "⭐ **数值直接量自 `eidolons.json` 的 `skill_add_level`** ✓，而**技能 id → 槽位**由 `skills.json` 的 `skill_id` 字段确认 ✓（150602→槽 2 = 战技 ✓、150601→槽 1 = 普攻 ✓、150620→槽 20 = 欢愉技 ✓）。⚠ **上界不用写** ✓：引擎把等级夹在该技能表自己的行数上 ✓（`CanHit.skillLevel` 的 `min(level, rows)` ✓）⇒ 原文的「最多不超过 15 级」**由数据行自动成立** ✓。⚠⚠ **E3 还有 4 项在这条之外** ✓（`150608`／`150610`／`150612`／`150618` = **强化普攻与其盲盒子技能** ✓）—— 它们住在**自己的槽位**（8／10／12／18 ✓），而**等级词表没有「`SkillType` 没命名的槽」的写法** ✓ ⇒ 照实**登记**、不近似 ✓。",
+      "_note": "⭐ **数值直接量自 `eidolons.json` 的 `skill_add_level`** ✓，而**技能 id → 槽位**由 `skills.json` 的 `skill_id` 字段确认 ✓（150602→槽 2 = 战技 ✓、150601→槽 1 = 普攻 ✓、150620→槽 20 = 欢愉技 ✓）。⚠ **上界不用写** ✓：引擎把等级夹在该技能表自己的行数上 ✓（`CanHit.skillLevel` 的 `min(level, rows)` ✓）⇒ 原文的「最多不超过 15 级」**由数据行自动成立** ✓。⚠⚠ **E3 还有 4 项在这条之外** ✓（`150608`／`150610`／`150612`／`150618` = **强化普攻与其盲盒子技能** ✓）—— 它们住在**自己的槽位**（8／10／12／18 ✓），而**等级词表没有「`SkillType` 没命名的槽」的写法** ✓ ⇒ 照实**登记**、不近似 ✓。",
       "when": []
     },
     {
@@ -254,21 +476,45 @@
       "id": "p1506_e5_raises_skill_levels",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ELATION_SKILL", "amount": 1 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ELATION_EXTRA", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_SKILL",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_EXTRA",
+          "amount": 1
+        }
       ],
       "source": "1506 银狼LV.999 星魂 5 平A即是大招: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级；欢愉技等级+1，最多不超过15级。」（E5 的 skill_add_level：150603+2、150604+2、150620+1、150621+1）",
-      "note": "⚠ E5 的「欢愉技」在数据里是**两项** ✓（`150620` = 槽 20 欢愉技 ✓、`150621` = 槽 21 欢愉技·强化 ✓）⇒ **两条都要写** ✓，用 `ELATION_SKILL` 与 `ELATION_EXTRA` **两个不同的 SkillType** ✓。⚠ 与 E3 那条**同事件但内容不同** ✓（E3 不碰终结技／天赋 ✓、E5 不碰战技／普攻 ✓）⇒ 不会被重复守卫拒绝 ✓。",
+      "_note": "⚠ E5 的「欢愉技」在数据里是**两项** ✓（`150620` = 槽 20 欢愉技 ✓、`150621` = 槽 21 欢愉技·强化 ✓）⇒ **两条都要写** ✓，用 `ELATION_SKILL` 与 `ELATION_EXTRA` **两个不同的 SkillType** ✓。⚠ 与 E3 那条**同事件但内容不同** ✓（E3 不碰终结技／天赋 ✓、E5 不碰战技／普攻 ✓）⇒ 不会被重复守卫拒绝 ✓。",
       "when": []
     },
     {
       "on": "BATTLE_START",
       "id": "p1506_trace_speed_becomes_elation",
-      "when": ["self_attr:speed >= 160"],
+      "when": [
+        "self_attr:speed >= 160"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "amount": 0.5, "permanent": true, "target": "self" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "amount": 0.5,
+          "permanent": true,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
@@ -281,26 +527,46 @@
         }
       ],
       "source": "1506 银狼LV.999 行迹 假结局速通攻略 (1506101): 「速度大于等于 160 时，使自身欢愉度提高 50%，之后每超过 1 点速度使自身欢愉度提高 2%，最多计入 100 点超出的速度。」",
-      "note": "⭐⭐ **整条写出，两半都在** ✓：「速度 ≥ 160 ⇒ 欢愉度 +50%」✓ **＋** 「之后每超过 1 点 +2%，**最多计入 100 点**」✓ —— 写成**两个效果** ✓（一个平的 ✓、一个按超出的速度缩放 ✓），两者相加 ✓。⚠⚠ **上限是这一条此前写不出来的唯一原因** ✓：没有它就只能**二选一** —— 要么丢掉上界 ✓（速度 300 时给出 **280%** ✓，而原文是 **200%** ✓ ⇒ **一个安静的错数** ✓），要么近似 ✓。⇒ 引擎为此新增 **`EffectSpec.maxPoints`**（`max_points` ✓），⚠ **它限制的是「点数」、不是最终份额** ✓ —— 但在这里**两者等价** ✓（份额 = 点数 × 正常数 ✓），而**写在点数上是原文的写法** ✓ ⇒ 读者可以拿字段对着句子核 ✓。⚠ `self_attr_above:<属性>:<阈值>` 这个拼法**本来就存在** ✓（每个词汇都是先有读者才建的 ✓），缺的只是给它一个上限 ✓。"
+      "_note": "⭐⭐ **整条写出，两半都在** ✓：「速度 ≥ 160 ⇒ 欢愉度 +50%」✓ **＋** 「之后每超过 1 点 +2%，**最多计入 100 点**」✓ —— 写成**两个效果** ✓（一个平的 ✓、一个按超出的速度缩放 ✓），两者相加 ✓。⚠⚠ **上限是这一条此前写不出来的唯一原因** ✓：没有它就只能**二选一** —— 要么丢掉上界 ✓（速度 300 时给出 **280%** ✓，而原文是 **200%** ✓ ⇒ **一个安静的错数** ✓），要么近似 ✓。⇒ 引擎为此新增 **`EffectSpec.maxPoints`**（`max_points` ✓），⚠ **它限制的是「点数」、不是最终份额** ✓ —— 但在这里**两者等价** ✓（份额 = 点数 × 正常数 ✓），而**写在点数上是原文的写法** ✓ ⇒ 读者可以拿字段对着句子核 ✓。⚠ `self_attr_above:<属性>:<阈值>` 这个拼法**本来就存在** ✓（每个词汇都是先有读者才建的 ✓），缺的只是给它一个上限 ✓。"
     },
     {
       "on": "ULT_CAST",
       "id": "p1506_e6_amp_while_in_godmode",
       "min_eidolon": 6,
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_AMP", "percent": 0.5, "turns": 3, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_AMP",
+          "percent": 0.5,
+          "turns": 3,
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 星魂 6 我独自满级！: 「强化普攻期间造成的欢愉伤害增笑 50%。」—— #2 = 0.5。「强化普攻期间」= 【无敌玩家】状态期间，而该状态由本条所在事件授予。",
-      "note": "⭐ **「增笑」就是 `ELATION_DAMAGE_AMP`** ✓ —— 与 1503 真珠的增笑**同一个词汇** ✓（`AttributeType` 的注释写明它是「欢愉伤害自己的放大器，与欢愉度 `ELATION_DAMAGE_BOOST` 不同」✓）。⚠ 时长用 `turns: 3` ✓，与【无敌玩家】的寿命一致 ✓（**3 次**强化普攻 ✓）—— ⚠ 这是**登记在案的近似** ✓：真正的边界是那个状态 ✓，而**状态时长与回合数在这里重合** ✓（她每次行动都放强化普攻 ✓），但**不保证**总是重合 ✓。⚠ 星魂 6 的**后半**（敌方获【禁限弱点】✓）**未出货** ✓ —— 需要**对敌方写入弱点与基础抗性** ✓，引擎没有那种写入 ✓。"
+      "_note": "⭐ **「增笑」就是 `ELATION_DAMAGE_AMP`** ✓ —— 与 1503 真珠的增笑**同一个词汇** ✓（`AttributeType` 的注释写明它是「欢愉伤害自己的放大器，与欢愉度 `ELATION_DAMAGE_BOOST` 不同」✓）。⚠ 时长用 `turns: 3` ✓，与【无敌玩家】的寿命一致 ✓（**3 次**强化普攻 ✓）—— ⚠ 这是**登记在案的近似** ✓：真正的边界是那个状态 ✓，而**状态时长与回合数在这里重合** ✓（她每次行动都放强化普攻 ✓），但**不保证**总是重合 ✓。⚠ 星魂 6 的**后半**（敌方获【禁限弱点】✓）**未出货** ✓ —— 需要**对敌方写入弱点与基础抗性** ✓，引擎没有那种写入 ✓。"
     },
     {
       "on": "RESOURCE_CHANGED",
       "id": "p1506_talent_hidden_becomes_crit",
-      "when": ["resource_changed:隐藏分"],
+      "when": [
+        "resource_changed:隐藏分"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "1506天赋-暴击率", "kind": "own", "target": "self" },
-        { "op": "REMOVE_STATE", "buff": "1506天赋-暴击伤害", "kind": "own", "target": "self" },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506天赋-暴击率",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506天赋-暴击伤害",
+          "kind": "own",
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
@@ -323,17 +589,40 @@
         }
       ],
       "source": "1506 银狼LV.999 天赋: 「每点【隐藏分】使暴击率提高 0.4%。暴击率达到 100% 后，其余每点【隐藏分】改为使暴击伤害提高 0.8%。」",
-      "note": "⭐⭐ **两半都不需要新引擎词汇** ✓ —— 第一半是 `self_attr_above:隐藏分:0` × `0.004` ✓（每点 +0.4% ✓，**不夹上界** ✓：暴击率超过 1.0 在引擎里就是「必定暴击」✓，而**上界正是第二半要读的量** ✓ ⇒ 夹住它反而会让第二半永远读到 0 ✗）。⭐ 第二半把它写成**暴击率的溢出** ✓：`self_attr_above:CRIT_CHANCE:1.0` × `2` ✓ —— ⚠ 换算：每点【隐藏分】给 0.004 暴击率 ✓，而「每**溢出 1%** 暴击率 ⇒ +2% 暴击伤害」✓ ⇒ 每点 = 0.008 暴击伤害 ✓ = 正文的 0.8% ✓✓（`percent: 2` × 0.004 = 0.008 ✓）。⚠ **两条必须按文件顺序** ✓：第二条读的 `CRIT_CHANCE` 是**第一条刚写进去的**那个值 ✓ ⇒ 顺序反了就永远读不到溢出 ✓（判据里两个读数分别钉住 ✓）。⚠ 事件用 `RESOURCE_CHANGED` ✓：每次【隐藏分】变化都要重算 ✓（与 `p1506_laughs_to_hidden` 同一事件 ✓），⚠⚠ **重算必须靠「先移除自己」** ✓ —— **实测**：`coexist: true` 的语义是 `setKeepsSiblings` ✓（**与同属性的兄弟修饰器共存** ✗），**不是**「替换自己上一次的贡献」✗ ⇒ 少了那两条 `REMOVE_STATE`（按**名字** ✓、`kind: own` ✓）时，每次【隐藏分】变化都会**再叠一层** ✗（实测：夹具「每点触发一次」时 100 点读出 **20.44** ✓，正好是 `0.004 × (1+2+…+100)` ✓）。⚠ 而 `coexist: true` **仍要保留** ✓：移除的是**自己** ✓，保留它才能让**别的来源**（光锥／遗器／队友）挂在同一属性上的修饰器不被顶掉 ✓。"
+      "_note": "⭐⭐ **两半都不需要新引擎词汇** ✓ —— 第一半是 `self_attr_above:隐藏分:0` × `0.004` ✓（每点 +0.4% ✓，**不夹上界** ✓：暴击率超过 1.0 在引擎里就是「必定暴击」✓，而**上界正是第二半要读的量** ✓ ⇒ 夹住它反而会让第二半永远读到 0 ✗）。⭐ 第二半把它写成**暴击率的溢出** ✓：`self_attr_above:CRIT_CHANCE:1.0` × `2` ✓ —— ⚠ 换算：每点【隐藏分】给 0.004 暴击率 ✓，而「每**溢出 1%** 暴击率 ⇒ +2% 暴击伤害」✓ ⇒ 每点 = 0.008 暴击伤害 ✓ = 正文的 0.8% ✓✓（`percent: 2` × 0.004 = 0.008 ✓）。⚠ **两条必须按文件顺序** ✓：第二条读的 `CRIT_CHANCE` 是**第一条刚写进去的**那个值 ✓ ⇒ 顺序反了就永远读不到溢出 ✓（判据里两个读数分别钉住 ✓）。⚠ 事件用 `RESOURCE_CHANGED` ✓：每次【隐藏分】变化都要重算 ✓（与 `p1506_laughs_to_hidden` 同一事件 ✓），⚠⚠ **重算必须靠「先移除自己」** ✓ —— **实测**：`coexist: true` 的语义是 `setKeepsSiblings` ✓（**与同属性的兄弟修饰器共存** ✗），**不是**「替换自己上一次的贡献」✗ ⇒ 少了那两条 `REMOVE_STATE`（按**名字** ✓、`kind: own` ✓）时，每次【隐藏分】变化都会**再叠一层** ✗（实测：夹具「每点触发一次」时 100 点读出 **20.44** ✓，正好是 `0.004 × (1+2+…+100)` ✓）。⚠ 而 `coexist: true` **仍要保留** ✓：移除的是**自己** ✓，保留它才能让**别的来源**（光锥／遗器／队友）挂在同一属性上的修饰器不被顶掉 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "p1506_enhanced_basic_hidden_ramp",
-      "when": ["actor == self", "from_skill_id == 8.0"],
+      "when": [
+        "actor == self",
+        "from_skill_id == 8.0"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "1506行迹-强化普攻隐藏分1", "kind": "own", "target": "self" },
-        { "op": "REMOVE_STATE", "buff": "1506行迹-强化普攻隐藏分2", "kind": "own", "target": "self" },
-        { "op": "REMOVE_STATE", "buff": "1506行迹-强化普攻隐藏分3", "kind": "own", "target": "self" },
-        { "op": "REMOVE_STATE", "buff": "1506行迹-强化普攻隐藏分4", "kind": "own", "target": "self" },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分1",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分2",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分3",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分4",
+          "kind": "own",
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
@@ -376,50 +665,79 @@
         }
       ],
       "source": "1506 银狼LV.999 强化普攻 奖励关：「狼尊时刻」: 「每拥有 60 点【隐藏分】，强化普攻期间造成的伤害提高原伤害的15%，最多叠加 2 层」—— #6 = 60、#8 = 0.15、#7 = 2。",
-      "note": "⭐⭐ **分段函数用四个线性项拼出来** ✓ —— `min(floor(隐藏分/60), 2) × 15%` **不是线性的** ✓，而词汇表里**只有线性** ✓ ⇒ 四个阈值项相加 ✓ 恰好复现它 ✓：⚠ <60 无 ✓；60–119 得 **0.15** ✓；120–179 得 `−0.075 + 0.075 = 0.15` ✓（**平台**：120 那个 `+0.075` 恰好抵消仍在跑的 `+0.075` ✓）；≥180 得 `−0.075 + 0.075 + 0.15 = 0.30` ✓（**封顶**：180 那个 `+0.15` 之后**再没有项** ✓）。⚠ 每一项都是 `self_attr_above:<资源>:<阈值>` ✓ —— **阈值拼法是既有的** ✓，而 `self_resource:` 是它接受的读数之一 ✓。⚠ 载体用 `ALL_DAMAGE_TYPE_BOOST` ✓（**按伤害实例读** ✓ ⇒ 只落在那次强化普攻上 ✓），门用 `from_skill_id == 8.0` ✓（**强化普攻自己的槽位** ✓）—— ⚠ 与退出【无敌玩家】那条**不同** ✓：那条挂在 `ATTACK_FINISHED` 上 ✗ 而**该事件不携带槽位** ✓；这条挂在**伤害路径**上 ✓，槽位在那里是有的 ✓。⚠ 四个项**必须都带 `coexist`** ✓ —— 同属性同目标的两个修正器会被判同类而互相驱逐 ✓（速度行迹那条踩过 ✓）。⚠⚠ **登记（本会话逐句核过，这一条仍是「强化普攻」整句里最不完整的一处）**：① 「强化普攻的**技能伤害改为相同倍率的欢愉伤害**」 ✗ —— 需要**把一个槽位的伤害类型从普通改成欢愉** ✓（词表里没有「改写另一个技能自己的伤害类型」这种 op ✗；`ADD_DAMAGE` 只**加**一笔 ✓ 不能**改**那一笔 ✓）；② 「**每弹射一定段数**，暂停弹射并触发 1 次【头号补给盲盒】，**总计可触发 3 次**」 ✗（需要「按段数触发」＋「本次施放内的次数上限」✓ 而弹射的段数本身**尚未导出** ✗ —— 见 §4.3 的「分裂比仍只能从文档来」✓）；③ 「若对场上所有敌方造成了致命伤害则结束本次技能，当存在可攻击的敌方目标后**获得 1 个额外回合并基于剩余弹射段数和盲盒次数再次施放**」 ✗（需要「还有剩余段数就再施放一次」＋「额外回合的插入点」✓）；④ 「**每回合首次**触发该效果时，使自身所有增益效果延长 1 回合」 ✗（需要「本次施放是这一回合的第一次」这个标记 ✓，机制本身是现成的 `EXTEND_BUFF kind: all` ✓，星魂 2 已在用 ✓）。⚠ 同句的「每拥有 60 点【隐藏分】…最多 2 层」**就是上面这条** ✓（已出货 ✓）、「最后一击…由敌方全体均分」由技能行承担 ✓、「**强化普攻无法恢复战技点**」由**数据**承担 ✓（`skills.json` 槽 8 的 `bp_add` = 0 ✓，实测 ✓）。"
+      "_note": "⭐⭐ **分段函数用四个线性项拼出来** ✓ —— `min(floor(隐藏分/60), 2) × 15%` **不是线性的** ✓，而词汇表里**只有线性** ✓ ⇒ 四个阈值项相加 ✓ 恰好复现它 ✓：⚠ <60 无 ✓；60–119 得 **0.15** ✓；120–179 得 `−0.075 + 0.075 = 0.15` ✓（**平台**：120 那个 `+0.075` 恰好抵消仍在跑的 `+0.075` ✓）；≥180 得 `−0.075 + 0.075 + 0.15 = 0.30` ✓（**封顶**：180 那个 `+0.15` 之后**再没有项** ✓）。⚠ 每一项都是 `self_attr_above:<资源>:<阈值>` ✓ —— **阈值拼法是既有的** ✓，而 `self_resource:` 是它接受的读数之一 ✓。⚠ 载体用 `ALL_DAMAGE_TYPE_BOOST` ✓（**按伤害实例读** ✓ ⇒ 只落在那次强化普攻上 ✓），门用 `from_skill_id == 8.0` ✓（**强化普攻自己的槽位** ✓）—— ⚠ 与退出【无敌玩家】那条**不同** ✓：那条挂在 `ATTACK_FINISHED` 上 ✗ 而**该事件不携带槽位** ✓；这条挂在**伤害路径**上 ✓，槽位在那里是有的 ✓。⚠ 四个项**必须都带 `coexist`** ✓ —— 同属性同目标的两个修正器会被判同类而互相驱逐 ✓（速度行迹那条踩过 ✓）。⚠⚠ **登记（本会话逐句核过，这一条仍是「强化普攻」整句里最不完整的一处）**：① 「强化普攻的**技能伤害改为相同倍率的欢愉伤害**」 ✗ —— 需要**把一个槽位的伤害类型从普通改成欢愉** ✓（词表里没有「改写另一个技能自己的伤害类型」这种 op ✗；`ADD_DAMAGE` 只**加**一笔 ✓ 不能**改**那一笔 ✓）；② 「**每弹射一定段数**，暂停弹射并触发 1 次【头号补给盲盒】，**总计可触发 3 次**」 ✗（需要「按段数触发」＋「本次施放内的次数上限」✓ 而弹射的段数本身**尚未导出** ✗ —— 见 §4.3 的「分裂比仍只能从文档来」✓）；③ 「若对场上所有敌方造成了致命伤害则结束本次技能，当存在可攻击的敌方目标后**获得 1 个额外回合并基于剩余弹射段数和盲盒次数再次施放**」 ✗（需要「还有剩余段数就再施放一次」＋「额外回合的插入点」✓）；④ 「**每回合首次**触发该效果时，使自身所有增益效果延长 1 回合」 ✗（需要「本次施放是这一回合的第一次」这个标记 ✓，机制本身是现成的 `EXTEND_BUFF kind: all` ✓，星魂 2 已在用 ✓）。⚠ 同句的「每拥有 60 点【隐藏分】…最多 2 层」**就是上面这条** ✓（已出货 ✓）、「最后一击…由敌方全体均分」由技能行承担 ✓、「**强化普攻无法恢复战技点**」由**数据**承担 ✓（`skills.json` 槽 8 的 `bp_add` = 0 ✓，实测 ✓）。"
     },
     {
       "on": "ULT_CAST",
       "id": "p1506_ult_deploys_the_zone",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "结界", "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "结界",
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 终结技 无敌玩家，启动！ (150603): 「【无敌玩家】状态下展开结界。」",
-      "note": "⚠⚠ 此前把这一条登记成「不可实现」，那是错的 —— 结界在本项目里是一个命名状态标记，不是需要新建的区域容器。实测：1203 的天赋 talent_zone_opens_at_two_stacks 就是 APPLY_BUFF buff 结界，而它下一条从句用 target has_state 结界 读它；1410 的 ult_zone_opens_and_lowers 还带 buff 结界 加 ticks_on self；1513 同样在用。⭐ 教训：写下「需要 X 机制」之前，先搜 X 在已出货内容里怎么出现 —— 我凭「引擎里没有 Zone 类」就下了结论，而内容是按名字与状态表达它的。"
+      "_note": "⚠⚠ 此前把这一条登记成「不可实现」，那是错的 —— 结界在本项目里是一个命名状态标记，不是需要新建的区域容器。实测：1203 的天赋 talent_zone_opens_at_two_stacks 就是 APPLY_BUFF buff 结界，而它下一条从句用 target has_state 结界 读它；1410 的 ult_zone_opens_and_lowers 还带 buff 结界 加 ticks_on self；1513 同样在用。⭐ 教训：写下「需要 X 机制」之前，先搜 X 在已出货内容里怎么出现 —— 我凭「引擎里没有 Zone 类」就下了结论，而内容是按名字与状态表达它的。"
     },
     {
       "on": "ULT_CAST",
       "id": "p1506_e1_zone_raises_damage_taken",
       "min_eidolon": 1,
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.2, "buff": "结界", "permanent": true, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
+          "buff": "结界",
+          "permanent": true,
+          "target": "all_enemies"
+        }
       ],
       "source": "1506 银狼LV.999 星魂 1 以太编辑：星魂+1: 「结界中的敌方目标受到的伤害提高 20%」—— 参数 `[0.2, 0.2]` 的 #1 = 0.2（#2 = 退出时保留的 20% ✓，由 `p1506_leaving_godmode_clears_hidden` 出货 ✓）。",
-      "note": "⭐⭐ **「受到的伤害提高」不是属性** ✓ ⇒ `MODIFY_DAMAGE_TAKEN` ✓（`percent > 0` 就是**易伤** ✓，引擎的注释写着这半边是「damage taken is raised」，是**加在防守方身上的减益** ✓）。⚠ 与 1410 的结界同形 ✓（它在 `ULT_CAST` 上给 `all_enemies` 挂了一组带 `buff: 结界` 的修正器 ✓）。⚠⚠ **为什么是两条规则** ✓：结界是**永久的** ✓（见展开那条 ✓）而敌人是**逐波换的** ✗ ⇒ 只写在施放那一刻的话，**后入场的敌人**根本不在易伤里 ✓（漏掉它**没有症状** ✗）；第二条挂在 `WAVE_START` 上、门是 `self has_state 结界` ✓ ⇒ 每一波的新敌人都被覆盖 ✓。⚠ 两条同属性、同名字 ⇒ 第二条**替换**第一条 ✓（`MODIFY_DAMAGE_TAKEN` 的同类驱逐口径 ✓）⇒ **不会叠成 40%** ✓（判据钉住 1.2 倍 ✓）。"
+      "_note": "⭐⭐ **「受到的伤害提高」不是属性** ✓ ⇒ `MODIFY_DAMAGE_TAKEN` ✓（`percent > 0` 就是**易伤** ✓，引擎的注释写着这半边是「damage taken is raised」，是**加在防守方身上的减益** ✓）。⚠ 与 1410 的结界同形 ✓（它在 `ULT_CAST` 上给 `all_enemies` 挂了一组带 `buff: 结界` 的修正器 ✓）。⚠⚠ **为什么是两条规则** ✓：结界是**永久的** ✓（见展开那条 ✓）而敌人是**逐波换的** ✗ ⇒ 只写在施放那一刻的话，**后入场的敌人**根本不在易伤里 ✓（漏掉它**没有症状** ✗）；第二条挂在 `WAVE_START` 上、门是 `self has_state 结界` ✓ ⇒ 每一波的新敌人都被覆盖 ✓。⚠ 两条同属性、同名字 ⇒ 第二条**替换**第一条 ✓（`MODIFY_DAMAGE_TAKEN` 的同类驱逐口径 ✓）⇒ **不会叠成 40%** ✓（判据钉住 1.2 倍 ✓）。"
     },
     {
       "on": "WAVE_START",
       "id": "p1506_e1_zone_covers_later_arrivals",
       "min_eidolon": 1,
-      "when": ["self has_state 结界"],
+      "when": [
+        "self has_state 结界"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.2, "buff": "结界", "permanent": true, "target": "all_enemies" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
+          "buff": "结界",
+          "permanent": true,
+          "target": "all_enemies"
+        }
       ],
       "source": "1506 银狼LV.999 星魂 1: 「结界中的敌方目标受到的伤害提高 20%」—— 同一个数，挂在**每一波的开头**，覆盖后入场的敌人。",
-      "note": "⚠ 与上一条**同值同名** ✓，理由是「结界**中的**」是一个**场**上的状态 ✓ 而不是一次性事件 ✓；⚠ 门 `self has_state 结界` ✓ 保证它在结界**还没展开**的波次里什么都不做 ✓（第一波即开战时她还没放大招 ✓ ⇒ 这条不生效 ✓，由施放那条负责 ✓）。⚠ 两条一起构成「结界在 ⇒ 场上的敌人都在易伤里」 ✓，这是这句从句的**全部**意思 ✓。"
+      "_note": "⚠ 与上一条**同值同名** ✓，理由是「结界**中的**」是一个**场**上的状态 ✓ 而不是一次性事件 ✓；⚠ 门 `self has_state 结界` ✓ 保证它在结界**还没展开**的波次里什么都不做 ✓（第一波即开战时她还没放大招 ✓ ⇒ 这条不生效 ✓，由施放那条负责 ✓）。⚠ 两条一起构成「结界在 ⇒ 场上的敌人都在易伤里」 ✓，这是这句从句的**全部**意思 ✓。"
     },
     {
       "on": "WAVE_START",
       "id": "p1506_technique_box_each_wave",
       "one_of": true,
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "do": [
         {
           "op": "DAMAGE",
           "scale": "elation_base",
-          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 2},
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 2
+          },
           "element": "Imaginary",
           "damage_type": "ELATION",
           "target": "all_enemies",
@@ -442,7 +760,10 @@
           "amount": 2,
           "target": "self",
           "weight": 1,
-          "weight_steps": ["战技点:4:-0.9", "战技点:5:-0.099"]
+          "weight_steps": [
+            "战技点:4:-0.9",
+            "战技点:5:-0.099"
+          ]
         },
         {
           "op": "GAIN_RESOURCE",
@@ -450,16 +771,24 @@
           "amount": 3,
           "target": "self",
           "weight": 10,
-          "weight_steps": ["隐藏分:60:-9", "隐藏分:120:-0.9", "隐藏分:300:-0.099"]
+          "weight_steps": [
+            "隐藏分:60:-9",
+            "隐藏分:120:-0.9",
+            "隐藏分:300:-0.099"
+          ]
         }
       ],
       "source": "1506 银狼LV.999 秘技 朋友，这才是T0级秘技: 「【怪怪怪味豆】在场时，进入战斗后每个波次开始时触发 1 次【怪怪怪味豆】对应的【头号补给盲盒】，本次造成的欢愉伤害固定计入 99 点【好活当赏】。」—— 盲盒的份额与它的三选一都读**大招那一行** ✓（`ULTRA:2` ✓、满级 = 1.125 ✓，理由见 `p1506_zone_loot_box_on_a_spent_point` 的 note ✓）；99 直接取自**秘技自己的**参数行（槽 7 = `[99]` ✓）。",
-      "note": "⭐⭐ **波次这一路是确定性的** ✓（原文「触发 1 次」✓，**没有**固定概率那句话 ✓）⇒ 本规则**不写** `chance`／`chance_decay`／`defer_until_wave` ✓ —— 引擎的**概率与衰减是按规则存的** ✓ ⇒ 两条触发源（消耗战技点 ✓ 与每波一次 ✓）**在构造上就不会互相扰动** ✓。⚠ 门用**现成词汇** ✓：`applyTechniqueStates()` 在**每条 `BATTLE_START` 之前**把秘技变成名为「秘技」的普通状态 ✓（作者裁决：秘技在构造 `Battle` 前配置 ✓）。⭐ 「固定计入 99 点」用本轮新落的 `counted_laughs` ✓（**实例级** ✓，不看队伍池 ✓）。⚠ 这次施放的**伤害份额**读 `ULTRA:2` ✓（与消耗战技点那条**同一个数** ✓，理由见那条的 note ✓）。⚠⚠ **登记（本会话逐句核过）**：秘技那一整句里**只有这一半在战斗层** ✓；① 「召唤【怪怪怪味豆】，**再次使用则解除召唤**…秘技点为 0 时解除召唤」 ✗ 与 ② 「使一定范围内的普通敌人陷入**恐惧**状态，同时自动搜寻并攻击普通敌人，**消耗 1 个秘技点立即将其消灭，不会进入战斗**」 ✗ **都是地图层** ✓（本引擎没有那一层 ✓ —— 与 1003 的秘技领域同一取舍 ✓）；⚠ 战斗层这一半的**门**是「【怪怪怪味豆】**在场**」✓，而项目用 `self has_state 秘技` 表达「用过秘技」✓（`applyTechniqueStates` ✓）⇒ **「再次使用则解除召唤」这个开关表达不出来** ✗（调用方不提供「用了两次」这个事实 ✓）—— **如实登记** ✓。"
+      "_note": "⭐⭐ **波次这一路是确定性的** ✓（原文「触发 1 次」✓，**没有**固定概率那句话 ✓）⇒ 本规则**不写** `chance`／`chance_decay`／`defer_until_wave` ✓ —— 引擎的**概率与衰减是按规则存的** ✓ ⇒ 两条触发源（消耗战技点 ✓ 与每波一次 ✓）**在构造上就不会互相扰动** ✓。⚠ 门用**现成词汇** ✓：`applyTechniqueStates()` 在**每条 `BATTLE_START` 之前**把秘技变成名为「秘技」的普通状态 ✓（作者裁决：秘技在构造 `Battle` 前配置 ✓）。⭐ 「固定计入 99 点」用本轮新落的 `counted_laughs` ✓（**实例级** ✓，不看队伍池 ✓）。⚠ 这次施放的**伤害份额**读 `ULTRA:2` ✓（与消耗战技点那条**同一个数** ✓，理由见那条的 note ✓）。⚠⚠ **登记（本会话逐句核过）**：秘技那一整句里**只有这一半在战斗层** ✓；① 「召唤【怪怪怪味豆】，**再次使用则解除召唤**…秘技点为 0 时解除召唤」 ✗ 与 ② 「使一定范围内的普通敌人陷入**恐惧**状态，同时自动搜寻并攻击普通敌人，**消耗 1 个秘技点立即将其消灭，不会进入战斗**」 ✗ **都是地图层** ✓（本引擎没有那一层 ✓ —— 与 1003 的秘技领域同一取舍 ✓）；⚠ 战斗层这一半的**门**是「【怪怪怪味豆】**在场**」✓，而项目用 `self has_state 秘技` 表达「用过秘技」✓（`applyTechniqueStates` ✓）⇒ **「再次使用则解除召唤」这个开关表达不出来** ✗（调用方不提供「用了两次」这个事实 ✓）—— **如实登记** ✓。"
     },
     {
       "on": "SKILL_POINT_SPENT",
       "id": "p1506_zone_loot_box_on_a_spent_point",
-      "when": ["self_resource:好活当赏 >= 1", "self has_state 结界", "self has_state 无敌玩家"],
+      "when": [
+        "self_resource:好活当赏 >= 1",
+        "self has_state 结界",
+        "self has_state 无敌玩家"
+      ],
       "one_of": true,
       "chance": 1.0,
       "chance_decay": 0.2,
@@ -468,7 +797,11 @@
         {
           "op": "DAMAGE",
           "scale": "elation_base",
-          "percent_from": {"type": "skill_param", "skill": "ULTRA", "index": 2},
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 2
+          },
           "element": "Imaginary",
           "damage_type": "ELATION",
           "target": "all_enemies",
@@ -490,7 +823,10 @@
           "amount": 2,
           "target": "self",
           "weight": 1,
-          "weight_steps": ["战技点:4:-0.9", "战技点:5:-0.099"]
+          "weight_steps": [
+            "战技点:4:-0.9",
+            "战技点:5:-0.099"
+          ]
         },
         {
           "op": "GAIN_RESOURCE",
@@ -498,35 +834,67 @@
           "amount": 3,
           "target": "self",
           "weight": 10,
-          "weight_steps": ["隐藏分:60:-9", "隐藏分:120:-0.9", "隐藏分:300:-0.099"]
+          "weight_steps": [
+            "隐藏分:60:-9",
+            "隐藏分:120:-0.9",
+            "隐藏分:300:-0.099"
+          ]
         }
       ],
       "source": "1506 银狼LV.999 终结技 无敌玩家，启动！ (150603): 「结界内我方目标每消耗 1 个战技点，有概率触发 1 次【头号补给盲盒】：造成 90% 的虚数属性欢愉伤害，由敌方全体均分，并随机触发 1 种效果：【超超超大剑】：对生命值最高的敌方目标额外造成等同于本次总伤害值 20% 的真实伤害；【爆爆爆炸蛋】：恢复 2 个战技点；【怪怪怪味豆】：获得 3 个笑点。触发该效果的初始固定概率为 100%，成功触发后下一次触发的固定概率降低至当前概率的 20%。」—— 参数行（`skills.json` 1506 槽 3，满级第 15 行 = `[60, 0, 1.125, 0.2, 0.2, 3, 2]`）：**#3 = 1.125**（盲盒的份额 ✓；Lv10 显示行才是 0.9 ✓）、**#4 = 0.2**（超超超大剑的 20% ✓）、**#5 = 0.2**（衰减到当前概率的 20% ✓）、**#6 = 3**（怪怪怪味豆的 3 个笑点 ✓）、**#7 = 2**（爆爆爆炸蛋的 2 个战技点 ✓）；初始 100% 是正文、不在参数行里 ✓。⚠ 此前这条 source 把 #6／#7 写反了 ✓（已订正 ✓）。",
-      "note": "⭐⭐ **CORRECTED（本会话）补上了句子的第一个前提** ✓：原文写的是「「银狼LV.999」**持有【好活当赏】时**，结界内我方目标每消耗 1 个战技点，有概率触发 1 次…」✓ —— 而**词表里没有这个条件** ✗（本条此前只写 `结界` ＋ `无敌玩家` ✓，与 1503 上一版把门写成 `has_state 深度学习` 是**同一个错法** ✓）。现在用 `self_resource:好活当赏 >= 1` ✓（口径与证据见两条骑手规则的 note ✓）。⚠⚠ **登记**：她**自己没有任何规则**获得【好活当赏】✗（授予它的是**阿哈时刻** ✓，引擎没有这个阶段 ✗）⇒ 除非调用方往她的池里加 ✓，这一条与两条骑手**都不会触发** ✓ —— 这是**如实的**（不写这个门会让它在「她并不持有」时也开火 ✗，而那是一个**没有症状的**偏差 ✓）。⚠ 影响面：`SilverWolfLV999LootBox*Test` 一族与 `SilverWolfLV999ZoneTest` 的夹具现在必须**自己发**这 1 点【好活当赏】**才能把战场搭出来** ✓（判据的前提如此才成立 ✓）。⭐⭐ **整只盲盒现在是「一条规则」** ✓ —— 原文那句就是一条 ✓：「造成 90% 的虚数属性欢愉伤害，由敌方全体均分，**并**随机触发 1 种效果」✓ ⇒ **伤害那一半标 `always: true`** ✓（**不参与三选一** ✓，每次触发都跑 ✓），三选一仍由规则层 `one_of` 掷**一次** ✓。⚠⚠ **为什么必须合成一条** ✓：整只盲盒只有**一个固定概率** ✓（`chance: 1.0` ＋ `chance_decay: 0.2` ✓）⇒ 拆成两条规则会**各掷一次** ✓ ⇒ 伤害落地而效果没落地（或反过来）✗，而且两条会各有各的衰减 ✓。⭐ **概率那一半现在也写了** ✓：「初始固定概率 100%，成功触发后降低至当前概率的 20%」✓ ⇒ 规则层 `chance` **就是初始值** ✓，而**当前值**是**本场战斗的**状态 ✓（`CanHit.ruleCurrentChance` ✓，按规则 id 归档 ✓，与其它触发计数一起清空 ✓）⇒ **掷的是当前值** ✓。⚠ **只有真的触发成功才衰减** ✓（「成功触发后」✓）：掷失败的那次**什么都不改** ✓，被条件或次数挡下的那一次**根本没掷** ✓。⚠ 触发该效果的【崩坏级伤害演示】会把概率**重置为初始值** ✓ —— 那是**另一条规则** ✓（`RESET_RULE_CHANCE` ✓）。⚠ **旧写法（伤害单独一条 + 三选一另一条）** 记在提交 `89b4bb33` 之前 ✓。⚠ **「每消耗 1 个战技点」当时就能写** ✓（实测 `SKILL_POINT_SPENT` 是真实事件 ✓），⚠ 但它**每个消耗动作发一次** ✓ ⇒ 一次花 2 点只触发**一次**（文档读起来是 2 次 ✓）—— 与 1306／1312 登记过的**同一处语义差** ✓。⚠ 伤害按 `all_enemies` 结算**并标了 `split: true`** ✓ —— 即**原文的「由敌方全体均分」** ✓（**声明的 90% 是总量** ✓，N 个活着的受击者各拿 `90%/N` ✓，**总量与 N 无关** ✓）。⚠⚠ **这一条改过** ✓：先前引擎没有「把总量均分」的原语 ✓，于是写成「每个敌人各受 90%」并**如实登记**了那是读法选择 ✓ —— ⭐ **确认来自作者** ✓（2026-10-07：均分就是**总量切分** ✓）⇒ 现在按原文写 ✓，**大剑的基数也跟着变得与 N 无关** ✓（它读的是**已结算之和** ✓）。⚠ 除数只数**活着的**受击者 ✓（尸体不挨打，算进去会让一部分总量凭空消失 ✓）；⚠ **无敌**的受击者**要数** ✓（它那一份就是不结算 ✓，不重新分配 ✓）。⭐⭐ **CORRECTED（本会话）份额：0.9 是「Lv10 显示行」的字面量 → 改读 `ULTRA:2`** ✓ —— 与两条骑手**同一个错法** ✓（文档正文按 `min(10, 行数)` 显示 ✓，而本项目的等级口径是**取满级** ✓）。⚠ 盲盒的份额**就是大招那一行的第 3 项**（`#3` ✓），满级行 = **1.125** ✓：它与欢愉技·强化（槽 21）**自己**的每段份额**是同一列** ✓（两边 Lv10 都是 0.9 ✓、Lv15 都是 1.125 ✓）⇒ 这不是「猜一个基准」✗ 而是**读同一个数** ✓。⚠ 判据钉住**满级行**的数 ✓ ⇒ 改回 0.9 会红 ✓。⚠ 秘技那条（`p1506_technique_box_each_wave`）的份额**同源** ✓ ⇒ 一并改了 ✓。⭐⭐ **【超超超大剑】写的是原文的基数** ✓：「**等同于本次总伤害值 20%**」✓ ⇒ `scale: settled_damage_this_event` ✓（**本次触发过程中已结算的全部伤害之和** ✓，只有**战斗**拿得到这个和 ✓）；⚠ 它**只能配真伤害** ✓（装载期强制 ✓）：这个数**已经过完所有区** ✓，而**多段之和没有单一因子**可以除 ✓。⚠ **战技点的恢复**用 `GAIN_RESOURCE 战技点` ✓ —— 那个计数**由战斗持有** ✓（`skillPointPolicy` ✓，`CharacterFactory.requireReadableResources` 对它豁免 ✓）。⭐ **末句也写了** ✓：「**若触发前目标被消灭则对新入场的敌方目标触发**」✓ ⇒ 规则级 `defer_until_wave: true` ✓（作者答复：**指波次** ✓，且**整只盲盒一起补触发** ✓）；⚠ **那一刻已经掷过了** ✓（作者的答复 ✓）—— 条件与**概率**属于**那次触发** ✓（成功了就**已经衰减**到 20% ✓），而**效果**（包括三选一选中谁 ✓）在**交付时**才决定 ✓ ⇒ 判据同时钉住这两半 ✓（补触发**不再掷** ✓；下一次花战技点用 0.9 的掷点**什么都不触发** ✓）。⚠ 交付发生在 **`WAVE_START` 那一次触发的内部** ✓ ⇒ 读「本次触发已结算之和」的骑手**看得到**它自己的伤害 ✓（**同一次触发** ✓，不是两次 ✓）。"
+      "_note": "⭐⭐ **CORRECTED（本会话）补上了句子的第一个前提** ✓：原文写的是「「银狼LV.999」**持有【好活当赏】时**，结界内我方目标每消耗 1 个战技点，有概率触发 1 次…」✓ —— 而**词表里没有这个条件** ✗（本条此前只写 `结界` ＋ `无敌玩家` ✓，与 1503 上一版把门写成 `has_state 深度学习` 是**同一个错法** ✓）。现在用 `self_resource:好活当赏 >= 1` ✓（口径与证据见两条骑手规则的 note ✓）。⚠⚠ **登记**：她**自己没有任何规则**获得【好活当赏】✗（授予它的是**阿哈时刻** ✓，引擎没有这个阶段 ✗）⇒ 除非调用方往她的池里加 ✓，这一条与两条骑手**都不会触发** ✓ —— 这是**如实的**（不写这个门会让它在「她并不持有」时也开火 ✗，而那是一个**没有症状的**偏差 ✓）。⚠ 影响面：`SilverWolfLV999LootBox*Test` 一族与 `SilverWolfLV999ZoneTest` 的夹具现在必须**自己发**这 1 点【好活当赏】**才能把战场搭出来** ✓（判据的前提如此才成立 ✓）。⭐⭐ **整只盲盒现在是「一条规则」** ✓ —— 原文那句就是一条 ✓：「造成 90% 的虚数属性欢愉伤害，由敌方全体均分，**并**随机触发 1 种效果」✓ ⇒ **伤害那一半标 `always: true`** ✓（**不参与三选一** ✓，每次触发都跑 ✓），三选一仍由规则层 `one_of` 掷**一次** ✓。⚠⚠ **为什么必须合成一条** ✓：整只盲盒只有**一个固定概率** ✓（`chance: 1.0` ＋ `chance_decay: 0.2` ✓）⇒ 拆成两条规则会**各掷一次** ✓ ⇒ 伤害落地而效果没落地（或反过来）✗，而且两条会各有各的衰减 ✓。⭐ **概率那一半现在也写了** ✓：「初始固定概率 100%，成功触发后降低至当前概率的 20%」✓ ⇒ 规则层 `chance` **就是初始值** ✓，而**当前值**是**本场战斗的**状态 ✓（`CanHit.ruleCurrentChance` ✓，按规则 id 归档 ✓，与其它触发计数一起清空 ✓）⇒ **掷的是当前值** ✓。⚠ **只有真的触发成功才衰减** ✓（「成功触发后」✓）：掷失败的那次**什么都不改** ✓，被条件或次数挡下的那一次**根本没掷** ✓。⚠ 触发该效果的【崩坏级伤害演示】会把概率**重置为初始值** ✓ —— 那是**另一条规则** ✓（`RESET_RULE_CHANCE` ✓）。⚠ **旧写法（伤害单独一条 + 三选一另一条）** 记在提交 `89b4bb33` 之前 ✓。⚠ **「每消耗 1 个战技点」当时就能写** ✓（实测 `SKILL_POINT_SPENT` 是真实事件 ✓），⚠ 但它**每个消耗动作发一次** ✓ ⇒ 一次花 2 点只触发**一次**（文档读起来是 2 次 ✓）—— 与 1306／1312 登记过的**同一处语义差** ✓。⚠ 伤害按 `all_enemies` 结算**并标了 `split: true`** ✓ —— 即**原文的「由敌方全体均分」** ✓（**声明的 90% 是总量** ✓，N 个活着的受击者各拿 `90%/N` ✓，**总量与 N 无关** ✓）。⚠⚠ **这一条改过** ✓：先前引擎没有「把总量均分」的原语 ✓，于是写成「每个敌人各受 90%」并**如实登记**了那是读法选择 ✓ —— ⭐ **确认来自作者** ✓（2026-10-07：均分就是**总量切分** ✓）⇒ 现在按原文写 ✓，**大剑的基数也跟着变得与 N 无关** ✓（它读的是**已结算之和** ✓）。⚠ 除数只数**活着的**受击者 ✓（尸体不挨打，算进去会让一部分总量凭空消失 ✓）；⚠ **无敌**的受击者**要数** ✓（它那一份就是不结算 ✓，不重新分配 ✓）。⭐⭐ **CORRECTED（本会话）份额：0.9 是「Lv10 显示行」的字面量 → 改读 `ULTRA:2`** ✓ —— 与两条骑手**同一个错法** ✓（文档正文按 `min(10, 行数)` 显示 ✓，而本项目的等级口径是**取满级** ✓）。⚠ 盲盒的份额**就是大招那一行的第 3 项**（`#3` ✓），满级行 = **1.125** ✓：它与欢愉技·强化（槽 21）**自己**的每段份额**是同一列** ✓（两边 Lv10 都是 0.9 ✓、Lv15 都是 1.125 ✓）⇒ 这不是「猜一个基准」✗ 而是**读同一个数** ✓。⚠ 判据钉住**满级行**的数 ✓ ⇒ 改回 0.9 会红 ✓。⚠ 秘技那条（`p1506_technique_box_each_wave`）的份额**同源** ✓ ⇒ 一并改了 ✓。⭐⭐ **【超超超大剑】写的是原文的基数** ✓：「**等同于本次总伤害值 20%**」✓ ⇒ `scale: settled_damage_this_event` ✓（**本次触发过程中已结算的全部伤害之和** ✓，只有**战斗**拿得到这个和 ✓）；⚠ 它**只能配真伤害** ✓（装载期强制 ✓）：这个数**已经过完所有区** ✓，而**多段之和没有单一因子**可以除 ✓。⚠ **战技点的恢复**用 `GAIN_RESOURCE 战技点` ✓ —— 那个计数**由战斗持有** ✓（`skillPointPolicy` ✓，`CharacterFactory.requireReadableResources` 对它豁免 ✓）。⭐ **末句也写了** ✓：「**若触发前目标被消灭则对新入场的敌方目标触发**」✓ ⇒ 规则级 `defer_until_wave: true` ✓（作者答复：**指波次** ✓，且**整只盲盒一起补触发** ✓）；⚠ **那一刻已经掷过了** ✓（作者的答复 ✓）—— 条件与**概率**属于**那次触发** ✓（成功了就**已经衰减**到 20% ✓），而**效果**（包括三选一选中谁 ✓）在**交付时**才决定 ✓ ⇒ 判据同时钉住这两半 ✓（补触发**不再掷** ✓；下一次花战技点用 0.9 的掷点**什么都不触发** ✓）。⚠ 交付发生在 **`WAVE_START` 那一次触发的内部** ✓ ⇒ 读「本次触发已结算之和」的骑手**看得到**它自己的伤害 ✓（**同一次触发** ✓，不是两次 ✓）。"
     },
     {
       "on": "CAST_SETUP",
       "id": "p1506_honkai_demo_resets_the_box_chance",
-      "when": ["actor == self", "from_skill_id == 21.0"],
+      "when": [
+        "actor == self",
+        "from_skill_id == 21.0"
+      ],
       "do": [
-        { "op": "RESET_RULE_CHANCE", "rule": "p1506_zone_loot_box_on_a_spent_point" }
+        {
+          "op": "RESET_RULE_CHANCE",
+          "rule": "p1506_zone_loot_box_on_a_spent_point"
+        }
       ],
       "source": "1506 银狼LV.999 欢愉技·强化 崩坏级伤害演示 (150621): 「造成 6 次伤害，每次对敌方随机单体造成 90% 的虚数属性欢愉伤害。将触发【头号补给盲盒】的固定概率重置为初始值。」",
-      "note": "⭐⭐ **`RESET_RULE_CHANCE` 的唯一读者** ✓：「将触发【头号补给盲盒】的固定概率**重置为初始值**」✓ ⇒ 把盲盒那条规则的**当前概率**清掉 ✓（清空 = 回到它自己的 `chance` ✓ —— ⚠ **不是**写一个 1.0 进去 ✓：那样规则里的初始值一改，两处就会各说各话 ✓）。⚠ **它挂在 `CAST_SETUP` ＋ `from_skill_id == 21.0`** ✓ —— 21 是**欢愉技·强化**（`150621` ✓，`SkillSlotMappingTest` 钉住 `ELATION_EXTRA = 21` ✓），而 `CAST_SETUP` 带**槽位** ✓（`SkillExecutor` 传 `skill.getSkillSlot()` ✓）⇒ 每个「崩坏级伤害演示」**施放一次就重置一次** ✓（不是每段伤害重置一次 ✓）。⚠ 同一条从句里的「造成 6 次伤害…」那一半**不在这条规则里** ✓（它属于伤害行 ✓）。"
+      "_note": "⭐⭐ **`RESET_RULE_CHANCE` 的唯一读者** ✓：「将触发【头号补给盲盒】的固定概率**重置为初始值**」✓ ⇒ 把盲盒那条规则的**当前概率**清掉 ✓（清空 = 回到它自己的 `chance` ✓ —— ⚠ **不是**写一个 1.0 进去 ✓：那样规则里的初始值一改，两处就会各说各话 ✓）。⚠ **它挂在 `CAST_SETUP` ＋ `from_skill_id == 21.0`** ✓ —— 21 是**欢愉技·强化**（`150621` ✓，`SkillSlotMappingTest` 钉住 `ELATION_EXTRA = 21` ✓），而 `CAST_SETUP` 带**槽位** ✓（`SkillExecutor` 传 `skill.getSkillSlot()` ✓）⇒ 每个「崩坏级伤害演示」**施放一次就重置一次** ✓（不是每段伤害重置一次 ✓）。⚠ 同一条从句里的「造成 6 次伤害…」那一半**不在这条规则里** ✓（它属于伤害行 ✓）。"
     },
     {
       "on": "RESOURCE_CHANGED",
       "id": "p1506_e2_milestones_while_in_godmode",
       "min_eidolon": 2,
-      "when": ["self has_state 无敌玩家", "resource_changed:隐藏分"],
+      "when": [
+        "self has_state 无敌玩家",
+        "resource_changed:隐藏分"
+      ],
       "do": [
-        { "op": "GAIN_RESOURCE", "resource": "里程碑配额", "amountFromEvent": true, "target": "self" },
-        { "op": "EXTRA_TURN", "per_steps": "里程碑配额:120", "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "强化普攻次数", "per_steps": "里程碑配额:120", "amount": 1, "target": "self" },
-        { "op": "SPEND_STEPS", "steps": "里程碑配额:120", "target": "self" }
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "里程碑配额",
+          "amountFromEvent": true,
+          "target": "self"
+        },
+        {
+          "op": "EXTRA_TURN",
+          "per_steps": "里程碑配额:120",
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "强化普攻次数",
+          "per_steps": "里程碑配额:120",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "SPEND_STEPS",
+          "steps": "里程碑配额:120",
+          "target": "self"
+        }
       ],
       "source": "1506 银狼LV.999 星魂 2 用这副躯壳，抵达真理的尽头: 「本次【无敌玩家】状态下每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数」—— ⭐ 「获得 1 个额外回合」那一半**也已写** ✓ —— 它一度写不出来 ✓（`Queue` 只留**一个**待执行额外回合 ✓，重复授予互相覆盖 ✗）而**不许近似** ✓；本轮按作者裁决把引擎改成**同一单位的重复授予累加** ✓（`Queue.extraTurnsOwed` ✓，读数写回 `ExtraTurnTest.repeatedGrantsToTheSameUnitAccumulate` ✓）⇒ 效果就是 `EXTRA_TURN` ＋ `per_steps` ✓，排在 `SPEND_STEPS` **之前** ✓（它与强化普攻次数读**同一个数** ✓，而配额只被花一次 ✓）。",
-      "note": "⭐⭐ **星魂 2 后半的记账那一半** ✓：`里程碑配额` 是【隐藏分】**在本状态内的影子** ✓ —— 进入【无敌玩家】时先清空、再以 `amount_from_resource: 隐藏分` 记入**当时的**【隐藏分】✓（原文「**含初始**隐藏分」✓），此后每次【隐藏分】变化以 `amountFromEvent` 按**增量**累加 ✓（事件自己的量 ✓；被【隐藏分】自己的上限截掉的部分**不会**记进来 ✓，因为发事件前量的是**实际入账** ✓）。⚠ **每满 120 点**由**同一个数**付账 ✓：`per_steps` **只数不花** ✓ ⇒ 这条与额外回合那条都读到**同一个数** ✓；最后由 `SPEND_STEPS` **一次**花掉 `floor(配额/120) × 120` ✓，余数留给下一次 ✓。⚠⚠ **为什么必须分两步** ✓（这正是这对原语的由来 ✓）：一次跨 2 档时「判 `>= 120` 就花 120」会**少付** ✗ —— 实测 `PerStepsTest`：400 跨 120 是 **3** 档 ✓。⚠ **顺序曾经是承重的** ✓ —— 本条的第一个效果会改动 `里程碑配额` ✓，而这**曾经**会把战斗级 `lastChangedResource` 改写掉 ✓ ⇒ 排在它之后的 `resource_changed:隐藏分` 规则会**静默不命中** ✗。⭐ 那个缺陷**已修** ✓（`TriggerInterpreter.fireResourceChanged` 现在把名字**保存/恢复**到本次触发之内 ✓，判据 `ResourceChangeScopeTest` ✓）⇒ **本条不再需要排在最后** ✓；⚠ 普查判据仍钉着这条事件上的**集合与顺序** ✓（那是快照 ✓，新加一条规则会被它喊住 ✓）。⭐⭐ **「获得 1 个额外回合」那一半已写** ✓：它先被登记 ✓（实测 `Queue.grantExtraTurn` 只留**一个**待执行额外回合 ✓，重复授予互相覆盖 ✗ ⇒ 一次跨 2 档只会发 1 个 ✗），作者裁决「**算 2 个**」✓ ⇒ 引擎加了 `extraTurnsOwed` ✓（同一单位的重复授予**累加** ✓、快照仍取**第一次**授予的那个 ✓ ⇒ 普通回合的时点不被吃掉 ✓），并把那条成文语义（`ExtraTurnTest`「they do not accumulate」）**连同叙述一起改掉** ✓ —— ⚠ 语义变更**不许静默** ✓。⚠ 跨单位那一格**仍未动** ✓（两个不同单位在同一触发里各得一次，后者顶掉前者 ✓）：今天没有读者逼它 ✓，已登记 ✓。⚠ 判据驱动的是**引擎自己的回合边界** ✓（`stepForward` ＋ `beforeMove` ＋ `afterMove` ✓）：第一次额外回合之后，`getExtraTurnActor()` **仍是她** ✓（第二个还欠着 ✓），第二次之后才是 `null` ✓。⚠ 判据钉住的是**算术**：进入时 250 点 ⇒ 配额 30 = 270 − 2×120 ✓（**含初始** ✓；若不含，配额会是 20 ✓）；一次 +280 的实入账 ⇒ 2 档 ⇒ 强化普攻次数 **+2**（先花掉 2 次以使这次恢复看得见 ✓）、配额剩 60 ✓；不在【无敌玩家】状态下 ⇒ 配额**一点不动** ✓。"
+      "_note": "⭐⭐ **星魂 2 后半的记账那一半** ✓：`里程碑配额` 是【隐藏分】**在本状态内的影子** ✓ —— 进入【无敌玩家】时先清空、再以 `amount_from_resource: 隐藏分` 记入**当时的**【隐藏分】✓（原文「**含初始**隐藏分」✓），此后每次【隐藏分】变化以 `amountFromEvent` 按**增量**累加 ✓（事件自己的量 ✓；被【隐藏分】自己的上限截掉的部分**不会**记进来 ✓，因为发事件前量的是**实际入账** ✓）。⚠ **每满 120 点**由**同一个数**付账 ✓：`per_steps` **只数不花** ✓ ⇒ 这条与额外回合那条都读到**同一个数** ✓；最后由 `SPEND_STEPS` **一次**花掉 `floor(配额/120) × 120` ✓，余数留给下一次 ✓。⚠⚠ **为什么必须分两步** ✓（这正是这对原语的由来 ✓）：一次跨 2 档时「判 `>= 120` 就花 120」会**少付** ✗ —— 实测 `PerStepsTest`：400 跨 120 是 **3** 档 ✓。⚠ **顺序曾经是承重的** ✓ —— 本条的第一个效果会改动 `里程碑配额` ✓，而这**曾经**会把战斗级 `lastChangedResource` 改写掉 ✓ ⇒ 排在它之后的 `resource_changed:隐藏分` 规则会**静默不命中** ✗。⭐ 那个缺陷**已修** ✓（`TriggerInterpreter.fireResourceChanged` 现在把名字**保存/恢复**到本次触发之内 ✓，判据 `ResourceChangeScopeTest` ✓）⇒ **本条不再需要排在最后** ✓；⚠ 普查判据仍钉着这条事件上的**集合与顺序** ✓（那是快照 ✓，新加一条规则会被它喊住 ✓）。⭐⭐ **「获得 1 个额外回合」那一半已写** ✓：它先被登记 ✓（实测 `Queue.grantExtraTurn` 只留**一个**待执行额外回合 ✓，重复授予互相覆盖 ✗ ⇒ 一次跨 2 档只会发 1 个 ✗），作者裁决「**算 2 个**」✓ ⇒ 引擎加了 `extraTurnsOwed` ✓（同一单位的重复授予**累加** ✓、快照仍取**第一次**授予的那个 ✓ ⇒ 普通回合的时点不被吃掉 ✓），并把那条成文语义（`ExtraTurnTest`「they do not accumulate」）**连同叙述一起改掉** ✓ —— ⚠ 语义变更**不许静默** ✓。⚠ 跨单位那一格**仍未动** ✓（两个不同单位在同一触发里各得一次，后者顶掉前者 ✓）：今天没有读者逼它 ✓，已登记 ✓。⚠ 判据驱动的是**引擎自己的回合边界** ✓（`stepForward` ＋ `beforeMove` ＋ `afterMove` ✓）：第一次额外回合之后，`getExtraTurnActor()` **仍是她** ✓（第二个还欠着 ✓），第二次之后才是 `null` ✓。⚠ 判据钉住的是**算术**：进入时 250 点 ⇒ 配额 30 = 270 − 2×120 ✓（**含初始** ✓；若不含，配额会是 20 ✓）；一次 +280 的实入账 ⇒ 2 档 ⇒ 强化普攻次数 **+2**（先花掉 2 次以使这次恢复看得见 ✓）、配额剩 60 ✓；不在【无敌玩家】状态下 ⇒ 配额**一点不动** ✓。"
     }
   ]
 }

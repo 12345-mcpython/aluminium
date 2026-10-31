@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21057,
   "1": [
     {
       "on": "DEALING_DAMAGE",
@@ -15,7 +17,7 @@
         }
       ],
       "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
-      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+      "_note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
     }
   ],
   "2": [
@@ -34,7 +36,7 @@
         }
       ],
       "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
-      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+      "_note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
     }
   ],
   "3": [
@@ -53,7 +55,7 @@
         }
       ],
       "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
-      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+      "_note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
     }
   ],
   "4": [
@@ -72,7 +74,7 @@
         }
       ],
       "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
-      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+      "_note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
     }
   ],
   "5": [
@@ -91,7 +93,7 @@
         }
       ],
       "source": "光锥 21057: 「装备者忆灵造成的暴击伤容额外提高#2[i]%。」",
-      "note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
+      "_note": "⭐ **现成词汇** ✓：「装备者**忆灵**造成的暴击伤容额外提高#2[i]%」= `DEALING_DAMAGE` + **`actor == summon`** ✓ ⇒ **实例** `MODIFY_ATTR CRIT_ATTACK` ✓（与 23031 / 21043 同一条实例路径 ✓）。"
     }
   ]
 }

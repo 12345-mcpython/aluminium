@@ -1,4 +1,12 @@
 {
+  "_status": "partial",
+  "_gaps": [
+    "终结技嘲讽「目标与相邻目标」：只写了被指定目标这一半",
+    "天赋：每损失 1% 生命值积攒 1 点充能（按损失比例换算）未写",
+    "【血仇】「防御力保持为 0」未写（需要钉住/乘法修饰）",
+    "致命攻击不倒下、清空充能、退出【血仇】、回复 50% 生命上限未写",
+    "150 点【弑神登神】优先攻击终结技标记目标 / 1415 忆灵技 8 免费施放未写；星魂未读"
+  ],
   "resources": [
     {
       "id": "天赋充能",
@@ -11,60 +19,147 @@
     {
       "on": "BATTLE_START",
       "id": "technique_opening_aoe_and_charge",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "do": [
-        { "op": "DAMAGE", "scale": "owner_max_hp", "percent": 0.8, "element": "Imaginary", "target": "all_enemies" },
-        { "op": "TAUNT", "turns": 1, "target": "all_enemies" },
-        { "op": "GAIN_RESOURCE", "resource": "天赋充能", "amount": 50 }
+        {
+          "op": "DAMAGE",
+          "scale": "owner_max_hp",
+          "percent": 0.8,
+          "element": "Imaginary",
+          "target": "all_enemies"
+        },
+        {
+          "op": "TAUNT",
+          "turns": 1,
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "天赋充能",
+          "amount": 50
+        }
       ],
       "source": "1404 万敌 秘技 折戟臣服的监牢 (140407, Maze/Impair): 「使用秘技后牵引一定区域内的敌人并使其陷入10秒的晕眩状态…若主动攻击陷入晕眩状态的敌人，进入战斗时，对敌方全体造成等同于万敌80%生命上限的虚数属性伤害，并使目标陷入嘲讽状态，持续1回合。自身积攒50点天赋充能。」",
-      "note": "「**使用秘技后**…**若主动攻击陷入晕眩状态的敌人**，进入战斗时，对敌方全体造成等同于万敌 **80% 生命上限**的虚数属性伤害，并使目标**陷入嘲讽**，持续 **1 回合**。自身**积攒 50 点天赋充能**」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓；\"主动攻击晕眩敌人\"是**场外**条件 ✓，与秘技状态同源 ✓）；② 倍率用 `scale: owner_max_hp` ✓（第 189 轮 ✓）；③ 嘲讽用 `TAUNT` ✓；④ 充能用 **`GAIN_RESOURCE`** ✓（资源词汇来自 **1003** 的既有用法 ✓）。"
+      "_note": "「**使用秘技后**…**若主动攻击陷入晕眩状态的敌人**，进入战斗时，对敌方全体造成等同于万敌 **80% 生命上限**的虚数属性伤害，并使目标**陷入嘲讽**，持续 **1 回合**。自身**积攒 50 点天赋充能**」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓；\"主动攻击晕眩敌人\"是**场外**条件 ✓，与秘技状态同源 ✓）；② 倍率用 `scale: owner_max_hp` ✓（第 189 轮 ✓）；③ 嘲讽用 `TAUNT` ✓；④ 充能用 **`GAIN_RESOURCE`** ✓（资源词汇来自 **1003** 的既有用法 ✓）。"
     },
     {
       "on": "ULT_CAST",
       "id": "ult_heal_charge_and_taunt",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.2, "target": "self" },
-        { "op": "GAIN_RESOURCE", "resource": "天赋充能", "amount": 20 },
-        { "op": "TAUNT", "turns": 2, "target": "target" }
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.2,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "天赋充能",
+          "amount": 20
+        },
+        {
+          "op": "TAUNT",
+          "turns": 2,
+          "target": "target"
+        }
       ],
       "source": "1404 万敌 终结技 诛天焚骨的王座 (140403, Ultra/Blast): 「回复等同于万敌20.00%生命上限的生命值并积攒20点天赋充能。对指定敌方单体造成等同于万敌160%生命上限的虚数属性伤害，同时对其相邻目标造成等同于万敌100%生命上限的虚数属性伤害，并使目标与相邻目标陷入嘲讽状态，持续2回合。…」",
-      "note": "「**回复等同于万敌 20.00% 生命上限的生命值**并**积攒 20 点天赋充能**…并使**目标**陷入嘲讽状态，持续 **2 回合**」—— ① 治疗用 `HEAL` + `scale: owner_max_hp` + `target: self` ✓（读的是他自己的上限 ✓）；② 充能 `GAIN_RESOURCE 20` ✓；③ 嘲讽 `TAUNT turns 2 target target` ✓。⚠ **登记**：「并使目标**与相邻目标**陷入嘲讽状态」✗ —— **相邻**是伤害的**形状**（BLAST ✓），而 `TAUNT` 走的是**选择器** ✓ ⇒ \"被指定的那个 + 它的相邻\"没有写法 ✗；本条写的是**被指定目标**这一半 ✓（精确 ✓，不是近似 ✓）。⚠ 终结技**自身的伤害**不写规则 ✓（由技能数据结算 ✓，160%/100% 生命上限 ✓）。"
+      "_note": "「**回复等同于万敌 20.00% 生命上限的生命值**并**积攒 20 点天赋充能**…并使**目标**陷入嘲讽状态，持续 **2 回合**」—— ① 治疗用 `HEAL` + `scale: owner_max_hp` + `target: self` ✓（读的是他自己的上限 ✓）；② 充能 `GAIN_RESOURCE 20` ✓；③ 嘲讽 `TAUNT turns 2 target target` ✓。⚠ **登记**：「并使目标**与相邻目标**陷入嘲讽状态」✗ —— **相邻**是伤害的**形状**（BLAST ✓），而 `TAUNT` 走的是**选择器** ✓ ⇒ \"被指定的那个 + 它的相邻\"没有写法 ✗；本条写的是**被指定目标**这一半 ✓（精确 ✓，不是近似 ✓）。⚠ 终结技**自身的伤害**不写规则 ✓（由技能数据结算 ✓，160%/100% 生命上限 ✓）。"
     },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
       ],
       "source": "1404 万敌 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 50% 生命上限、战技 90%/50% 生命上限、终结技 160%/100% 生命上限、秘技 80% 生命上限）",
-      "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **天赋的整套状态机** ✗ —— 「每损失 1% 生命值积攒 1 点充能，**最多 200 点**；充能达到 **100** 时**消耗 100 点**进入【血仇】状态并回复 **25% 生命上限**、**行动提前 100%**；【血仇】状态下**生命上限提高 50%**、**防御力保持为 0**；自身回合开始时**自动施放【弑王成王】**（✅ **已出货** ✓：`turn_start_autocasts_skill` ⇒ `CAST_SKILL{skill: SKILL}` ✓ —— ⚠ 本行原本把它列成缺失 ✗，本轮订正 ✓）；充能达到 **150** 点时**立即获得 1 个额外回合**并**自动施放【弑神登神】**；受到**致命攻击**时不会倒下，但清空充能、退出【血仇】并回复 **50% 生命上限**」✗ —— 其中「每损失 1% 生命值积攒 1 点」需要**按损失的血量比例**换算 ✗（`GAIN_RESOURCE` 的 `amount` 是固定值 ✗）、「充能达到 100 时消耗 100 点并进入状态」需要**阈值触发 + 消耗 + 状态**的组合 ✗（1003 的做法是\"攻击时清空\" ✓，与本条语义不同 ✗）、「生命上限提高 50%」是**动态上限** ✗、「防御力保持为 0」是**覆写** ✗、「额外回合」与**自动施放指定技能**是**行动序列**层面 ✗、「受到致命攻击时」需要**致命一击**这个可观测 ✗（`DEALING_DAMAGE` 只能看到\"造成伤害\" ✓，看不到\"这一击本来会致死\" ✗，与 1104 登记过的同一件事 ✓）；② 战技「**消耗等同于万敌当前生命值 50% 的生命值**…若不足则降至 1 点」✗（**自损血量**没有写法 ✗，与 1310/停云× 那类同一缺口 ✓）；③ 「下一次【弑神登神】**优先攻击指定敌方单体**，该效果**仅对最新目标生效**」✗（双形态 + \"只保留最新一个\" ✗）；④ 星魂未读 ✗。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **天赋的整套状态机** ✗ —— 「每损失 1% 生命值积攒 1 点充能，**最多 200 点**；充能达到 **100** 时**消耗 100 点**进入【血仇】状态并回复 **25% 生命上限**、**行动提前 100%**；【血仇】状态下**生命上限提高 50%**、**防御力保持为 0**；自身回合开始时**自动施放【弑王成王】**（✅ **已出货** ✓：`turn_start_autocasts_skill` ⇒ `CAST_SKILL{skill: SKILL}` ✓ —— ⚠ 本行原本把它列成缺失 ✗，本轮订正 ✓）；充能达到 **150** 点时**立即获得 1 个额外回合**并**自动施放【弑神登神】**；受到**致命攻击**时不会倒下，但清空充能、退出【血仇】并回复 **50% 生命上限**」✗ —— 其中「每损失 1% 生命值积攒 1 点」需要**按损失的血量比例**换算 ✗（`GAIN_RESOURCE` 的 `amount` 是固定值 ✗）、「充能达到 100 时消耗 100 点并进入状态」需要**阈值触发 + 消耗 + 状态**的组合 ✗（1003 的做法是\"攻击时清空\" ✓，与本条语义不同 ✗）、「生命上限提高 50%」是**动态上限** ✗、「防御力保持为 0」是**覆写** ✗、「额外回合」与**自动施放指定技能**是**行动序列**层面 ✗、「受到致命攻击时」需要**致命一击**这个可观测 ✗（`DEALING_DAMAGE` 只能看到\"造成伤害\" ✓，看不到\"这一击本来会致死\" ✗，与 1104 登记过的同一件事 ✓）；② 战技「**消耗等同于万敌当前生命值 50% 的生命值**…若不足则降至 1 点」✗（**自损血量**没有写法 ✗，与 1310/停云× 那类同一缺口 ✓）；③ 「下一次【弑神登神】**优先攻击指定敌方单体**，该效果**仅对最新目标生效**」✗（双形态 + \"只保留最新一个\" ✗）；④ 星魂未读 ✗。"
     },
     {
       "on": "TURN_START",
       "id": "turn_start_autocasts_skill",
-      "when": ["actor == self", "self has_state 血仇"],
-      "do": [
-        { "op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": 9, "turns": 1, "target": "self" },
-        { "op": "CAST_SKILL", "skill": "SKILL", "target": "target" },
-        { "op": "CONSUME_HP", "scale": "target_current_hp", "percent": 0.35, "target": "self" }
+      "when": [
+        "actor == self",
+        "self has_state 血仇"
       ],
-      "note": "「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」⇒ `TURN_START` ＋ `self has_state 血仇` ⇒ `CONSUME_HP{scale: target_current_hp, percent: 0.35}` ✓ ⇒ `CAST_SKILL{skill: SKILL}` ✓。⚠⚠ **2026-10-02 三处订正（均实测 ✓）**：① 原来**没有 `self has_state 血仇` 门** ✗（句子明写在【血仇】语境里 ✓）；② 原来**没有付代价** ✗ ⇒ 本轮写出 `CONSUME_HP` ✓（新增**当前生命值**份额 `target_current_hp` ✓ —— 旧词汇只有最大值/已损失两种 ✗，而 35% 的**最大值**会是一个看上去很对的错数 ✗）；③ **旧报的 `CAST_SKILL{SKILL}` 放的是普通战技** ✗（槽 2 ✓）。⭐⭐ **2026-10-02 终于用一个有效对比钉住了它 ✓**：① 寿命试了 `until: next_attack` ✗ 与 `turns: 1` ✓，伤害都是 **767.585** ✓ 不变 ⇒ 不是寿命问题 ✗；② 而用来对比的那个 **383.793** ✓ 是在“**换掉他整张表**”的场景里量的 ✗ —— 那样 `level_convention` **没跑** ✗，槽 9 停在 **1 级** ✗，而内容场景是 **15 级** ✓ ⇒ 两个数**不可比** ✗。⇒ 如实的结论：⭐ **只知道换装装进了 map** ✓（`getSkillSlot()` 读到 9 ✓）；❗ **“被命令的放用哪一行”仍未测准** ✗（下一步：在**同一场景、同一等级**下对比 ✓）。⚠⚠ **而“改放【弑王成王】”本轮试了并撞到一个硬事实 ✗**：`REPLACE_SKILL{skill: SKILL, skill_id: **9**}` **确实装进了 map** ✓（`getSkills().get(SKILL).getSkillSlot()` 读到 **9** ✓、category `BPSKILL` ✓），⚠ 但**同一条规则里随后的 `CAST_SKILL` 仍执行旧行** ✗：同一场景里，内容那条造成 **767.585** ✓、而**直接**放槽 9 只有 **383.793** ✓（他攻击力 426.888、上限生命 1831.7376 ✓）。⇒ 所以换装那一半**本轮不进树** ✗，登记在 `EXPRESSION.md` §3 ✓。⚠ 仍登记 ✓：充能 150 那句（❗ 实测：「充能 ≥ 100」那条**没有【血仇】门** ✗ ⇒ 它会**反复**触发并把充能抽干 ✗，充能因此攒不到 150 ✗）。⭐ **有效对比（同内容、同表、同等级、同敌人，只差“有无换装” ✓）**：⭐ **有换装 = 767.585** ✓、**无换装 = 628.024** ✓ ⇒ 换装**确实传到了被命令的施放** ✓。⚠ 寿命用 `turns: 1` ✓（❗ `until: next_attack` 也量过、同样是 767.585 ✓；用 `turns: 1` 因为它的边界完全在这一回合内 ✓）。⚠ 仍登记 ✓：充能 150 那句（实测：「充能 ≥ 100」那条**没有【血仇】门** ✗⇒ 反复触发、把充能抽干 ✗⇒ 攒不到 150 ✗）。",
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "skill_id": 9,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "target"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_current_hp",
+          "percent": 0.35,
+          "target": "self"
+        }
+      ],
+      "_note": "「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」⇒ `TURN_START` ＋ `self has_state 血仇` ⇒ `CONSUME_HP{scale: target_current_hp, percent: 0.35}` ✓ ⇒ `CAST_SKILL{skill: SKILL}` ✓。⚠⚠ **2026-10-02 三处订正（均实测 ✓）**：① 原来**没有 `self has_state 血仇` 门** ✗（句子明写在【血仇】语境里 ✓）；② 原来**没有付代价** ✗ ⇒ 本轮写出 `CONSUME_HP` ✓（新增**当前生命值**份额 `target_current_hp` ✓ —— 旧词汇只有最大值/已损失两种 ✗，而 35% 的**最大值**会是一个看上去很对的错数 ✗）；③ **旧报的 `CAST_SKILL{SKILL}` 放的是普通战技** ✗（槽 2 ✓）。⭐⭐ **2026-10-02 终于用一个有效对比钉住了它 ✓**：① 寿命试了 `until: next_attack` ✗ 与 `turns: 1` ✓，伤害都是 **767.585** ✓ 不变 ⇒ 不是寿命问题 ✗；② 而用来对比的那个 **383.793** ✓ 是在“**换掉他整张表**”的场景里量的 ✗ —— 那样 `level_convention` **没跑** ✗，槽 9 停在 **1 级** ✗，而内容场景是 **15 级** ✓ ⇒ 两个数**不可比** ✗。⇒ 如实的结论：⭐ **只知道换装装进了 map** ✓（`getSkillSlot()` 读到 9 ✓）；❗ **“被命令的放用哪一行”仍未测准** ✗（下一步：在**同一场景、同一等级**下对比 ✓）。⚠⚠ **而“改放【弑王成王】”本轮试了并撞到一个硬事实 ✗**：`REPLACE_SKILL{skill: SKILL, skill_id: **9**}` **确实装进了 map** ✓（`getSkills().get(SKILL).getSkillSlot()` 读到 **9** ✓、category `BPSKILL` ✓），⚠ 但**同一条规则里随后的 `CAST_SKILL` 仍执行旧行** ✗：同一场景里，内容那条造成 **767.585** ✓、而**直接**放槽 9 只有 **383.793** ✓（他攻击力 426.888、上限生命 1831.7376 ✓）。⇒ 所以换装那一半**本轮不进树** ✗，登记在 `EXPRESSION.md` §3 ✓。⚠ 仍登记 ✓：充能 150 那句（❗ 实测：「充能 ≥ 100」那条**没有【血仇】门** ✗ ⇒ 它会**反复**触发并把充能抽干 ✗，充能因此攒不到 150 ✗）。⭐ **有效对比（同内容、同表、同等级、同敌人，只差“有无换装” ✓）**：⭐ **有换装 = 767.585** ✓、**无换装 = 628.024** ✓ ⇒ 换装**确实传到了被命令的施放** ✓。⚠ 寿命用 `turns: 1` ✓（❗ `until: next_attack` 也量过、同样是 767.585 ✓；用 `turns: 1` 因为它的边界完全在这一回合内 ✓）。⚠ 仍登记 ✓：充能 150 那句（实测：「充能 ≥ 100」那条**没有【血仇】门** ✗⇒ 反复触发、把充能抽干 ✗⇒ 攒不到 150 ✗）。",
       "source": "1404 万敌 天赋 以血还血 (140404) 【血仇】期间：「自身回合开始时自动施放【弑王成王】」；【弑王成王】自己那一行：「消耗等同于万敌**当前生命值 35%** 的生命值，对敌方单体造成等同于万敌 110% 生命上限的虚数属性伤害」"
     },
     {
       "on": "RESOURCE_CHANGED",
       "id": "talent_enters_bloodfeud_at_a_hundred",
-      "when": ["resource_changed:天赋充能", "self_resource:天赋充能 >= 100", "!self has_state 血仇"],
+      "when": [
+        "resource_changed:天赋充能",
+        "self_resource:天赋充能 >= 100",
+        "!self has_state 血仇"
+      ],
       "do": [
-        { "op": "SPEND_RESOURCE", "resource": "天赋充能", "amount": 100 },
-        { "op": "APPLY_BUFF", "buff": "血仇", "permanent": true, "target": "self" },
-        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.15, "target": "self" },
-        { "op": "ADVANCE", "percent": 1.0, "target": "self" },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "天赋充能",
+          "amount": 100
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "血仇",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "self"
+        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
@@ -76,94 +171,194 @@
         }
       ],
       "source": "1404 万敌 天赋 以血还血 (140404)：「**充能达到 100 时消耗 100 点充能进入【血仇】状态**并回复等同于万敌 **15%** 生命上限的生命值，同时**行动提前 100%**」",
-      "note": "⭐ 2026-10-02：**进入【血仇】** ✓（阈值 100 ✓／消耗 100 ✓／治疗 15% ✓／行动提前 100% ✓）。⚠ **仍登记**：状态内的属性块（生命上限提高、**防御力保持为 0** ✗）与「每损失 1% 生命积攒 1 点充能」✗（比值无效果层拼法 ✗）。\n⭐ 2026-10-02：**状态内的生命上限** ✓（`HEALTH +50%` ✓ ⾋ `buff: \"血仇\"` 绑定 ✓）—— ⚠ **“防御力保持为 0”仍登记** ✗（那是**钉住**，需要**乘法**修饰 ✗）。 ⭐ **2026-10-02 补上 `!self has_state 血仇`** ✓：❗ 实测——没有它时，这条在**已在【血仇】中**仍会再次消耗 100 点 ✗ ⇒ 充能**永远攒不到 150** ✗（而同一条天赋里的下一句正需要 150 ✓）。⚠ 否定的写法：`!` 前缀早就被解析 ✓（只允许否定 `PartyCondition` ✓，而 `has_state` 读的就是单位的增益 ✓）。"
+      "_note": "⭐ 2026-10-02：**进入【血仇】** ✓（阈值 100 ✓／消耗 100 ✓／治疗 15% ✓／行动提前 100% ✓）。⚠ **仍登记**：状态内的属性块（生命上限提高、**防御力保持为 0** ✗）与「每损失 1% 生命积攒 1 点充能」✗（比值无效果层拼法 ✗）。\n⭐ 2026-10-02：**状态内的生命上限** ✓（`HEALTH +50%` ✓ ⾋ `buff: \"血仇\"` 绑定 ✓）—— ⚠ **“防御力保持为 0”仍登记** ✗（那是**钉住**，需要**乘法**修饰 ✗）。 ⭐ **2026-10-02 补上 `!self has_state 血仇`** ✓：❗ 实测——没有它时，这条在**已在【血仇】中**仍会再次消耗 100 点 ✗ ⇒ 充能**永远攒不到 150** ✗（而同一条天赋里的下一句正需要 150 ✓）。⚠ 否定的写法：`!` 前缀早就被解析 ✓（只允许否定 `PartyCondition` ✓，而 `has_state` 读的就是单位的增益 ✓）。"
     },
     {
       "on": "LETHAL_DAMAGE",
       "id": "bloodfeud_survives_a_lethal_blow_and_ends",
-      "when": ["actor == self", "self has_state 血仇"],
+      "when": [
+        "actor == self",
+        "self has_state 血仇"
+      ],
       "do": [
-        { "op": "SPEND_RESOURCE", "resource": "天赋充能", "spendAll": true },
-        { "op": "REMOVE_STATE", "buff": "血仇", "target": "self" },
-        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.5, "target": "self" }
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "天赋充能",
+          "spendAll": true
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "血仇",
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.5,
+          "target": "self"
+        }
       ],
       "source": "1404 万敌 天赋 以血还血 (140404)：「【血仇】状态期间，万敌**受到致命攻击时不会陷入无法战斗状态，但会清空充能退出【血仇】状态**并回复等同于自身 **50%** 生命上限的生命值」",
-      "note": "⭐ 2026-10-02：⭐ **`LETHAL_DAMAGE` 的第六位读者** ✓，而且是**唯一会退出一个状态的** ✓。❗ **“清空充能”用 `spendAll`** ✓（已出货拼法，首个读者是 `1513` ✓）。❗ **为何 `permanent` 是准确的** ✓：全文只给了**一个**出口（就是本句 ✓）。"
+      "_note": "⭐ 2026-10-02：⭐ **`LETHAL_DAMAGE` 的第六位读者** ✓，而且是**唯一会退出一个状态的** ✓。❗ **“清空充能”用 `spendAll`** ✓（已出货拼法，首个读者是 `1513` ✓）。❗ **为何 `permanent` 是准确的** ✓：全文只给了**一个**出口（就是本句 ✓）。"
     },
     {
       "on": "RESOURCE_CHANGED",
       "id": "bloodfeud_godslayer_at_a_hundred_and_fifty",
-      "when": ["resource_changed:天赋充能", "self has_state 血仇", "self_resource:天赋充能 >= 150"],
+      "when": [
+        "resource_changed:天赋充能",
+        "self has_state 血仇",
+        "self_resource:天赋充能 >= 150"
+      ],
       "do": [
-        { "op": "SPEND_RESOURCE", "resource": "天赋充能", "amount": 150 },
-        { "op": "EXTRA_TURN", "target": "self" },
-        { "op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": 11, "turns": 1, "target": "self" },
-        { "op": "CAST_SKILL", "skill": "SKILL", "target": "self" }
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "天赋充能",
+          "amount": 150
+        },
+        {
+          "op": "EXTRA_TURN",
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "skill_id": 11,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "self"
+        }
       ],
       "source": "1404 万敌 天赋 以血还血 (140404)：「【血仇】状态期间充能达到 **150** 点时，万敌立即获得 1 个额外回合并自动施放【弑神登神】」",
-      "note": "「充能达到 **150** 点时，立即获得 1 个**额外回合**并**自动施放【弑神登神】**」⇒ 四个已有词 ✓：`SPEND_RESOURCE{150}` ✓（【弑神登神】自己那一行就写着「消耗 150 点充能」 ✓）；`EXTRA_TURN` ✓（已出货：`1102` 希儿、`1309` 知更鸟 ✓）；`REPLACE_SKILL{skill_id: **11**, turns: 1}` ✓ —— 槽 11 的破韧 **90/60** 与语料给【弑神登神】的逐字相符 ✓，而**换装会传到被命令的施放** ✓（同等级对比：有换装 767.585 vs 无换装 628.024 ✓）；`CAST_SKILL{SKILL}` ✓。⚠ 仍登记 ✓：「下一次【弑神登神】**优先攻击指定敌方单体**」（终结技标记的目标 ✗）与 `1415` 的忆灵技能 8「使其自动施放1次**不消耗充能**的【弑神登神】」✗。 ⚠ **2026-10-02 订正**：`CAST_SKILL` 的 `target` 选的是**谁来放** ✓（`requireCharacterOwner` ✓），而事件里的 `target` 是**敌人** ✗ ⇒ 原来那个 `target: \"target\"` 会**命令敌人施放** ✗（装载器报错：*“冰锋 has no SKILL skill…”* ✓）⇒ 改成 `self` ✓。"
+      "_note": "「充能达到 **150** 点时，立即获得 1 个**额外回合**并**自动施放【弑神登神】**」⇒ 四个已有词 ✓：`SPEND_RESOURCE{150}` ✓（【弑神登神】自己那一行就写着「消耗 150 点充能」 ✓）；`EXTRA_TURN` ✓（已出货：`1102` 希儿、`1309` 知更鸟 ✓）；`REPLACE_SKILL{skill_id: **11**, turns: 1}` ✓ —— 槽 11 的破韧 **90/60** 与语料给【弑神登神】的逐字相符 ✓，而**换装会传到被命令的施放** ✓（同等级对比：有换装 767.585 vs 无换装 628.024 ✓）；`CAST_SKILL{SKILL}` ✓。⚠ 仍登记 ✓：「下一次【弑神登神】**优先攻击指定敌方单体**」（终结技标记的目标 ✗）与 `1415` 的忆灵技能 8「使其自动施放1次**不消耗充能**的【弑神登神】」✗。 ⚠ **2026-10-02 订正**：`CAST_SKILL` 的 `target` 选的是**谁来放** ✓（`requireCharacterOwner` ✓），而事件里的 `target` 是**敌人** ✗ ⇒ 原来那个 `target: \"target\"` 会**命令敌人施放** ✗（装载器报错：*“冰锋 has no SKILL skill…”* ✓）⇒ 改成 `self` ✓。"
     },
     {
       "id": "memosprite_ode_raises_his_crit_damage_for_this_cast",
       "on": "CAST_SETUP",
-      "when": ["target == self", "actor is_summon", "from_skill_id == 16"],
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 16"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 2.0, "until": "cast_end", "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 2.0,
+          "until": "cast_end",
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 8 「献予「纷争」之诗」（数据槽位 16，SkillID 1141516）：「**本次攻击中**万敌的暴击伤害提高 `#1[i]%`」。（满级 `#1` = 2，即 **+200%**；属性名 `CRIT_ATTACK` —— 游戏的 `CriticalDamageBase` 就映射到它。）",
-      "note": "★ 「本次攻击中」是一个**寿命**：`MODIFY_ATTR` 接受 `until`，已出货的 **`cast_end`** 正是这个窗口（光锥 20001 同形）。⚠ 本条**不**受【行仇】限制（原句如此）。\n⭐⭐ **位置是必要的**：同一事件上的规则按**文件顺序派发**（`byEvent...add(rule)`），而 `CAST_SKILL` 是**同步**执行的 —— 若本条排在命令那条**之后**，那一击已经结算完了，增益才贴上去；实测差别是 **4391.48 → 9080.73**。"
+      "_note": "★ 「本次攻击中」是一个**寿命**：`MODIFY_ATTR` 接受 `until`，已出货的 **`cast_end`** 正是这个窗口（光锥 20001 同形）。⚠ 本条**不**受【行仇】限制（原句如此）。\n⭐⭐ **位置是必要的**：同一事件上的规则按**文件顺序派发**（`byEvent...add(rule)`），而 `CAST_SKILL` 是**同步**执行的 —— 若本条排在命令那条**之后**，那一击已经结算完了，增益才贴上去；实测差别是 **4391.48 → 9080.73**。"
     },
     {
       "id": "memosprite_ode_commands_the_godslayer_in_bloodfeud",
       "on": "CAST_SETUP",
-      "when": ["self has_state 血仇", "target == self", "actor is_summon", "from_skill_id == 16"],
+      "when": [
+        "self has_state 血仇",
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 16"
+      ],
       "do": [
-        { "op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": 11, "turns": 1, "target": "self" },
-        { "op": "CAST_SKILL", "skill": "SKILL", "target": "self" }
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "skill_id": 11,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 8（数据槽位 16，SkillID 1141516）的「血仇」分支。",
-      "note": "⚠ 探针阶段：事件与条件逐条加回。"
+      "_note": "⚠ 探针阶段：事件与条件逐条加回。"
     },
     {
       "id": "memosprite_ode_advances_him_outside_bloodfeud",
       "on": "CAST_SETUP",
-      "when": ["target == self", "actor is_summon", "from_skill_id == 16", "!self has_state 血仇"],
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 16",
+        "!self has_state 血仇"
+      ],
       "do": [
-        { "op": "ADVANCE", "percent": 1.0, "target": "self" }
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 8 「献予「纷争」之诗」（数据槽位 16，SkillID 1141516）：「若万敌**不**处于【血仇】状态，则使万敌行动提前 `#2[i]%`」。（`#2` 各级恒为 1，即 **100%**；形状照 1101／1212 的 `ADVANCE{percent: 1.0}`。）",
-      "note": "★ 否定用的是**现成的** `!`：`HasState` 本就实现了 `PartyCondition`，所以 `!self has_state <state>` 是一个普通的否定，不需要新词汇。（上一轮我据注释推断说写不出来，而类声明才是定论。）"
+      "_note": "★ 否定用的是**现成的** `!`：`HasState` 本就实现了 `PartyCondition`，所以 `!self has_state <state>` 是一个普通的否定，不需要新词汇。（上一轮我据注释推断说写不出来，而类声明才是定论。）"
     },
     {
       "id": "memosprite_ode_dispels_his_control_debuffs",
       "on": "CAST_SETUP",
-      "when": ["target == self", "actor is_summon", "from_skill_id == 16"],
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 16"
+      ],
       "do": [
-        { "op": "DISPEL", "kind": "control", "target": "self" }
+        {
+          "op": "DISPEL",
+          "kind": "control",
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 8 「献予「纷争」之诗」（数据槽位 16，SkillID 1141516）：「对万敌施放时**解除万敌陷入的所有控制类负面状态**」。（本条不带量：原句的「**所有**」不说数量，而 `kind` 单独出现即表示“该类全部”。）",
-      "note": "★ 本轮给 `DISPEL` 加了**类别过滤**：它之前只能移除最近的 N 个，而类别是状态自己的属性`AbstractBuff.debuffClass()`。词汇本来就有（条件 `debuff_class:control`，以及 `RESIST_DEBUFF` 的 `kind`）。"
+      "_note": "★ 本轮给 `DISPEL` 加了**类别过滤**：它之前只能移除最近的 N 个，而类别是状态自己的属性`AbstractBuff.debuffClass()`。词汇本来就有（条件 `debuff_class:control`，以及 `RESIST_DEBUFF` 的 `kind`）。"
     },
     {
       "id": "memosprite_ode_marks_him_for_the_battle",
       "on": "CAST_SETUP",
-      "when": ["target == self", "actor is_summon", "from_skill_id == 16"],
+      "when": [
+        "target == self",
+        "actor is_summon",
+        "from_skill_id == 16"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "献予「纷争」之诗", "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "献予「纷争」之诗",
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 8（数据槽位 16）：那句把状态挂在他身上的部分。（对应 tbgd 的 `MServant_CyreneServant_00_AmazingBuff_Mydeimos`：一个持续到战斗结束的 modifier。）",
-      "note": "★ 持久（`permanent: true`），因为它是“这句话还在他身上”这个事实本身。"
+      "_note": "★ 持久（`permanent: true`），因为它是“这句话还在他身上”这个事实本身。"
     },
     {
       "id": "memosprite_ode_restrikes_when_a_wave_monster_enters",
       "on": "WAVE_START",
-      "when": ["self has_state 献予「纷争」之诗"],
+      "when": [
+        "self has_state 献予「纷争」之诗"
+      ],
       "do": [
-        { "op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": 11, "turns": 1, "target": "self" },
-        { "op": "CAST_SKILL", "skill": "SKILL", "target": "self" }
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "skill_id": 11,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "self"
+        }
       ],
       "source": "1415 昔涟 忆灵技能 8：「若施放前目标被消灭则对**新入场**的敌方目标施放」。（tbgd 里它就是 `OnWaveMonster` ⇒ `TurnInsertAction{TargetType: ModifierOwnerEntity, AutoCast: true}`：有波次怪物入场，则**他自己**再行动一次；打谁是**技能自己**的事。）",
-      "note": "⚠ 本条只写了原句里**能被证实**的那半：「对**新入场**的敌方目标施放」。❗「若施放前**目标被消灭**」那半**没写** ✗：游戏的谓词是 `ByTargetAliveState{ModifierOwnerEntity}`（看的是**万敌自己**还在不在），而不是看某个敌人死没死 ✗。"
+      "_note": "⚠ 本条只写了原句里**能被证实**的那半：「对**新入场**的敌方目标施放」。❗「若施放前**目标被消灭**」那半**没写** ✗：游戏的谓词是 `ByTargetAliveState{ModifierOwnerEntity}`（看的是**万敌自己**还在不在），而不是看某个敌人死没死 ✗。"
     }
   ]
 }

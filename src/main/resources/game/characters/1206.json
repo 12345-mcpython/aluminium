@@ -1,303 +1,466 @@
-[
-  {
-    "on": "BREAK",
-    "id": "talent_speed_on_break",
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "SPEED",
-        "percent_from": { "type": "skill_param", "skill": "TALENT", "index": 0 },
-        "turns": 2,
-        "target": "self",
-        "max_stacks": 1,
-        "buff": "加速"
-      }
-    ],
-    "source": "1206 素裳 天赋 游刃若水 (120604, Enhance): 「当场上有敌方目标的弱点被击破，素裳的速度提高20%，持续2回合。」",
-    "note": "「当场上有敌方目标的弱点被击破，素裳的**速度提高 20%**，持续 2 回合」—— 挂在引擎的 **`BREAK` 事件**上 ✓（`Battle:1394` 以\"攻击者\"为 actor、\"被破韧的敌人\"为 target 发射 ✓），效果是自身的速度修正 ✓。⚠ 「场上**有**敌方目标\"是措辞：触发者就是被击破的那个目标 ✓，而加成落在**素裳自己**身上 ✓ ⇒ `target: self` ✓。⚠ **登记**：行迹「破敌：…**若场上有敌方目标处于弱点击破状态**，则素裳的行动提前 15%」需要的是一个**全场性**条件 ✗（`has_weakness`/`has_state` 都问**某个具体单位** ✓，没有\"存在一个…\"的写法 ✗）。 ⚠ **第 N 轮补充（为星魂 6 服务）**：本条现在**具名** `buff: 加速` 且显式 `max_stacks: 1` —— 前者让【加速】成为一个**可按名字找的**状态（否则星魂 6 的「叠加 2 层」只能另造一个同名不同源的修饰 ✗）；后者是**引擎的硬要求**：`MODIFY_RULE` + `effect_max_stacks` 在加载期会拒绝「被点名的规则没有上限可提」✗（实测报错原文：`there is no cap to raise`）。两个改动都**不改变 0 星魂时的行为** ✓：`StackBuff` 的默认上限就是 **1** ✓（`addStack` 里 `stackCap() == null ? 1 : ...` ✓），而不具名与具名的区别只在「能否被名字找到」✓ —— 本条此前没有任何按名字找它的读者 ✓。⭐⭐ **CORRECTED（2026-10-19）两处** ✓：① **过时的登记**：「破敌…需要的是一个**全场性**条件 ✗（没有\"存在一个…\"的写法 ✗）」**撤回** ✓ —— 那个写法**后来就有了** ✓（`enemy_state_count:<状态>` ✓，本文件的 `trace_breaking_advance_after_common` / `_after_skill` 正在用它 ✓，守卫 `EnemyStateCountSpellingTest` ✓）⇒ 从句**已出货** ✓；② **数值改成读行**（`percent: 0.2` → `percent_from_skill_param: \"TALENT:0\"` ✓）：0.2 是**天赋第 10 行**的值 ✓（`skills.json` 1206 槽 4 的 Lv10 = `[0.2, 2]` ✓），而**星魂 3 给天赋 +2 级** ⇒ 有效等级 12 ⇒ 那一行是 **0.21** ✗ ⇒ 写死会少算（症状：沉默 ✓）。判据 `SushangLevelRowsTest` 钉 E0 与 E3 **两端** ✓。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "skill_sword_stance_chance",
-    "when": ["actor == self", "from_skill SKILL", "!target has_state 弱点击破"],
-    "chance": 0.33,
-    "do": [
-      {
-        "op": "DAMAGE",
-        "element": "Physical",
-        "target": "target",
-        "scale": "self_attr:ATTACK",
-        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
-      }
-    ],
-    "source": "1206 素裳 战技 云骑剑经•山倾 (120602, BPSkill/SingleAttack): 「对指定敌方单体造成等同于素裳210%攻击力的物理属性伤害。同时最后一击后有33%概率发动【剑势】，对目标造成等同于素裳100%攻击力的物理属性附加伤害。若该目标处于弱点击破状态，则【剑势】必定发动。」",
-    "note": "「最后一击后**有 33% 概率**发动【剑势】，对目标造成等同于素裳 **100% 攻击力**的物理**附加伤害**」—— ① 概率用**规则级 `chance`** ✓（`TriggerSpec.chance` ✓，不写进条件 ✗）；② 附加伤害用 `DAMAGE` ✓（引擎的额外实例入口 ✓，`DamageType.ADDITIONAL` + 受害者不给能量 ✓）；③ 事件用 `ALLY_ATTACK` ✓（**每次施放只发一次** ✓，所以\"最后一击后\"只判一次 ✓ —— 挂在逐段的 `DEALING_DAMAGE` 上会**逐段掷骰** ✗）。⚠ `!target has_state 弱点击破` **合法** ✓：`has_state` 属于**队伍类条件** ✓，而取反只允许用于这一类 ✓（这正是\"处于弱点击破则必定发动\"的另一半 ✓）。⭐⭐ **CORRECTED（2026-10-19，逐句核时实测）倍率** ✓：上一版写 `percent: 1.0` 字面量 ✓，理由是「COMMON 那一行的 Lv10 值是 1.4 ✗」—— ⚠ 那个理由是**查错了槽** ✗：字面量的**出处**不是普通普攻的行 ✓ 而是**战技自己那一行的第 2 项** ✓（`skills.json` 1206 槽 2 的 Lv10 = `[2.1, 1, 0.33]` ⇒ **#2 = 1.0 = 100% 攻击力** ✓ 与正文逐字一致 ✓），而它**随等级走** ✓（Lv15 = 1.25 ✗、E5 后的 Lv12 = 1.1 ✗）⇒ 写死会在**星魂 5 抬战技等级**之后少算 ✓（而**症状是沉默的** ✓）。现在读 `percent_from_skill_param: \"SKILL:1\"` ✓（0 基的第 2 项 ✓）：E0 读 1.0 ✓、E5 读 1.1 ✓ —— 判据 `SushangLevelRowsTest` 钉住**两端** ✓（只钉 E0 看不出是字面量还是读行 ✓）。⚠ 顺带一提：同一行的 **#3 = 0.33 全等级恒定** ✓ ⇒ 概率那条**字面量不漂移** ✓，保持字面量 ✓。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "skill_sword_stance_guaranteed",
-    "when": ["actor == self", "from_skill SKILL", "target has_state 弱点击破"],
-    "do": [
-      {
-        "op": "DAMAGE",
-        "element": "Physical",
-        "target": "target",
-        "scale": "self_attr:ATTACK",
-        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
-      }
-    ],
-    "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」",
-    "note": "「若该目标**处于弱点击破状态**，则【剑势】**必定发动**」—— 与上一条**成对**：上一条带 `chance: 0.33` 并排除已破韧的情形 ✓，本条**不写 chance**（= 100% ✓）且在破韧时接管 ✓ ⇒ 两条合起来正好是文档的\"33%，破韧则必定\" ✓，而不会出现\"破韧时还掷 33% 骰子\" ✗。⚠ 破韧状态的名字来自引擎自己的常量 `BuffManager.BROKEN_STATE` ✓（`hasState` 会解析引擎状态 ✓）。⭐⭐ **CORRECTED（2026-10-19）倍率同上** ✓：`percent: 1.0`（字面量）→ `percent_from_skill_param: \"SKILL:1\"` ✓（读战技行的 #2 ✓，E0 = 1.0 ✓、E5 = 1.1 ✓，理由与证据见上一条 ✓）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "level_convention",
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
-    ],
-    "source": "1206 素裳 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 210%、终结技 320%、天赋 速度+20%）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = `trace_breaking_advance_after_common` + `trace_breaking_advance_after_skill` ✓（「普攻**或**战技」在无 or 的 DSL 里是**两条** ✓，`when` 不同故不算重复 ✓）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。✅ **本文件已无登记缺口**：终结技那句「额外增加 2 次【剑势】的发动判定，伤害为原伤害的 50%」现由 `ult_grants_two_extra_sword_stance_rolls` + `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed` 兑现 ✓ —— 它需要的「多掷 N 次」参数就是本轮新增的 `chance_rolls` ✓（规则级**独立**掷骰 ✓）。为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会判「one sentence written twice」✗（**实测**过 ✓）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "technique_opening_damage",
-    "when": ["self has_state 秘技"],
-    "do": [
-      { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.8, "element": "Physical", "target": "all_enemies" }
-    ],
-    "source": "1206 素裳 秘技 云骑剑经•叩阵 (120607, Maze/MazeAttack): 「立即攻击敌人，进入战斗后对敌方全体造成等同于素裳80%攻击力的物理属性伤害。」",
-    "note": "「使用秘技后…进入战斗后对敌方全体造成等同于素裳 **80% 攻击力**的物理属性伤害」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；② 伤害用 **`DAMAGE` 的字面倍率形态** ✓ —— 第 186 轮新加 ✓：`DAMAGE` 原本**必须**指定技能槽位 ✗（倍率只能取自技能数据行 ✗），而 80% 不是任何一行的倍率 ✓ ⇒ 现在可以只写 `scale: self_attr:ATTACK` + `percent` + `element` ✓（引擎用**已有的**刻度读取器取值 ✓；因为\"无技能可借元素\"，校验器**要求写明 element** ✓）；③ 目标 `all_enemies` ✓。⚠ 这是\"任意倍率伤害\"这一大类句子的**第一个出货读者** ✓（实测：天赋类 53 份、星魂类 15 份 ✓）。"
-  },
-
-  {
-    "on": "HP_LOST",
-    "id": "trace_low_hp_aggro_down",
-    "when": ["target == self", "hp_percent <= 0.5"],
-    "do": [
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "AGGRO_ADDED_RATIO",
-        "percent": -0.5,
-        "permanent": true,
-        "buff": "赤子",
-        "target": "self"
-      }
-    ],
-    "source": "1206 行迹 赤子 (1206101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）",
-    "note": "「若当前生命值百分比**小于等于 50%**，则被敌方目标攻击的概率**降低**」—— ⭐ **一句话，两位角色同形**，数值与门槛都在上游 ✓。① `ExcelOutput/AvatarSkillTreeConfig.json` 该点（`PointID 1206101`、`PointTriggerKey PointB1`）的 `ParamList = [{\"Value\": 0.5}, {\"Value\": 0.5}]` ✓：第一个 0.5 是文档点名的**门槛** ✓、第二个是**比率** ✓（两个值相等 ⇒ 顺序之争不影响数字 ✓，这一点如实写明 ✓）。② 上游挂的是 `MAvatar_Sushang_00_SkillTree_AggroDown` （扫描 Config/ConfigAbility/Avatar 得到，见 build/aggro_scan.txt），它写的属性是 **`AggroAddedRatio`** ✓，而全局 `M_SkillTree_AggroDown` 把它写成 **0 − 参数** ✓ ⇒ 值 = **−0.5** ⇒ 引擎读作 `权重 × (1 + (−0.5))` = **×0.5** ✓。③ ⭐ **触发时机是查出来的，不是猜的**：丹恒的 `MAvatar_DanHeng_00_LowHP_AggroDown` 在 **`OnStack` 与 `OnHPChange`** 两个回调上都挂了同一个 `ByCompareHPRatio` **LessEqual** 谓词 ✓ ⇒ 游戏是**只要生命值变化就重判** ✓；引擎里与它等价的是 **`HP_LOST`（掉到门槛下就挂）+ `HEALED`（回到门槛上就摘）** 这一对 ✓ —— 因为生命值只可能通过这两件事改变 ✓，所以这不是近似，而是同一次重判 ✓。④ 因此**两条规则**：挂（`MODIFY_ATTR` + 具名 `buff: 赤子` + `permanent`）与摘（`REMOVE_STATE` 同名的 `buff`）✓。⚠ 具名是必要的：`REMOVE_STATE` 按**名字**摘 ✓；不带名字的修饰摘不掉 ✗。⚠ 重复挂不会叠加 ✓（同名 buff 上限 1 ✓，测试里专门用\"再掉一次血\"钉住这一点 ✓）。⚠ **登记的两处差异**：① 若生命值**不经治疗**而回到门槛之上（例如生命上限被提高 ✗），这条摘除规则不会触发 ✗；② 战斗开始时若已低于 50%（这三位都不会 ✗，他们不消耗自身生命 ✗）⇒ 也不会挂上 ✗。"
-  },
-
-  {
-    "on": "HEALED",
-    "id": "trace_low_hp_aggro_down_cleanup",
-    "when": ["target == self", "hp_percent > 0.5"],
-    "do": [
-      { "op": "REMOVE_STATE", "buff": "赤子", "target": "self" }
-    ],
-    "source": "1206 行迹 赤子 (1206101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）（回到门槛之上的收尾，由 ③ 的 OnHPChange 重判推出）",
-    "note": "上一条规则的收尾 ✓：`REMOVE_STATE` 按**名字**摘掉 `赤子` 那个具名修饰 ✓，`target: self` 因为修饰挂在自己身上 ✓。⚠ 条件是 `hp_percent > 0.5` ✓（`hp_percent` 读的是**规则主人自己**的生命值 ✓，是分数 0–1 ⇒ 写 `0.5` 而不是 `50` ✓）；⚠ 摘一个不存在的东西**不是错误** ✓（每次治疗都会触发这条 ✓）。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "ult_acts_again_immediately",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "ADVANCE", "percent": 1.0, "target": "self" }
-    ],
-    "source": "1206 素裳 终结技 太虚形蕴•烛夜 (120603, Ultra/SingleAttack): 「对指定敌方单体造成等同于素裳320%攻击力的物理属性伤害，并使素裳立即行动。」",
-    "note": "「…**并使素裳立即行动**」—— 用 `EXTRA_TURN` ✓，`target: self` ✓（`target` 在 `EXTRA_TURN` 上是可选的 ✓；显式写出来与本库已有的三条同形 ✓：1309/1404/1501 ✓）。⚠ **登记一处**：本条只兑现「立即行动」✗，**不**同时兑现后面那句「攻击力提高 30%…持续 2 回合」✗ —— 那是**另一句**（同一个「同时」引出 ✓），已另立一条 `ult_raises_her_attack` ✓，两条分开是为了让「哪一句没兑现」一眼可查 ✓。⚠ 终伤本身**不写规则** ✓：终结技的 320% 是数据层按 `param_list` 结算的 ✓（实测全库只有 **2** 条 `ULT_Cast`+`DAMAGE` ✓，都不是「技能本体伤害」✓ ⇒ 写一条会是**第二套判据** ✗）。⚠⚠ **登记（2026-10-19 逐句核时新增）：「立即行动」是一个读法选择** ✓ —— 文档里没有这一条的**定义** ✗（`HSR.md` 只定义「**额外回合**：不消耗回合数，期间不可插入终结技」✓ 与「**行动提前/延后**：缩短/延长下次行动等待时间」✓），而正文用的是**第三个词** ✓（既不是「额外回合」也不是「行动提前 X%」✓）⇒ 本条按「**立即行动** = 她马上再动一次」读成 `EXTRA_TURN` ✓；⚠ **另一种读法是 `ADVANCE percent: 1.0`** ✓（1506 的「行动提前 100%」正是它 ✓）—— 两者在**行动序**上可观测地不同 ✓（额外回合是**插入**一个回合 ✓，提前 100% 是**把等待清零**、队列位置不变 ✓）⇒ 谁要推翻这个读法，改的是**这一条**，而判据要跟着说清「插入」还是「清零」✓。⭐⭐ **CORRECTED（2026-10-19 第五批）「立即行动」的读法由**官方数据**定下来** ✓：改成 `ADVANCE percent: 1.0` ✓（原来写 `EXTRA_TURN` ✓）。证据（读的，不是猜的 ✓）：`Avatar_Sushang_00_Ability.json` 的 `Avatar_Sushang_00_Skill03_Phase02` 在造伤与上 buff 之后，对 **Caster** 发的是 `RPG.GameCore.SetActionDelay` 且 **`Value = 0`** ✓ —— 把她**行动延迟清零** ✓；而全库的「插入一个回合」原语是 `RPG.GameCore.TurnInsertAbility`（实测 **1780** 处 ✓），她这个大招**没有用**它 ✓⇒ 这一句是「**把等待清零**」（引擎 `ADVANCE percent: 1.0` ✓ = 剩余 × (1−1.0) = 0 ✓），**不是**「白给一个回合」✓。⚠ 两者在**行动序**上可观测地不同 ✓：额外回合是**插入**一个回合（她这一回合照旧还在 ✓），清零是**把等待压到 0**（她**下一个**就动，原本那个回合被消耗 ✓）⇒ 判据 `SushangUltimateAndTraceTest.herUltimateMakesHerActImmediately`同时钉**两侧**：剩余等待变 **0** ✓、**没有**待执行的额外回合 ✓（变异回 `EXTRA_TURN` ⇒ 两条都红 ✓）。"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "ult_raises_her_attack",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent_from": { "type": "skill_param", "skill": "ULTRA", "index": 3 }, "turns": 2, "target": "self" }
-    ],
-    "source": "1206 素裳 终结技 太虚形蕴•烛夜: 「同时使其攻击力提高30%，且施放战技时额外增加2次【剑势】的发动判定，持续2回合。」 param Lv10 → [3.2, 2, 0.5, 0.3]（#1 伤害倍率、#2 额外判定次数、#3 额外判定倍率、#4 攻击力）",
-    "note": "「同时**使其攻击力提高 30%**…持续 **2** 回合」—— ① 「其」指前一句「使素裳立即行动」的主语 ⇒ 还是**素裳自己** ✓（原文是「并使素裳立即行动。同时使其攻击力提高」✓）⇒ `target: self` ✓；② `MODIFY_ATTR` + `ATTACK` + `percent: 0.3` + `turns: 2` ✓（普通属性修正 ✓，不是「对敌方」的区间 ✓ ⇒ 用 `MODIFY_ATTR` 而非 `MODIFY_DAMAGE_TAKEN` ✓）；③ ⚠ **不具名** `buff`：本条没有任何「摘除 / 延长 / 按名字查」的读者 ✗（对照 1215 的 `敕令`，那条是被星魂 4 按名字找的 ✓）⇒ 不具名更短，也不引入一个无人读的状态 ✓。✅ **同句的另一半已落地** ✓（本条只写攻击力那一句 ✓）：「施放战技时**额外增加 2 次【剑势】的发动判定**，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」= `ult_grants_two_extra_sword_stance_rolls`（2 回合标记 ✓）+ `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed`（各 `chance_rolls: 2` ✓、`percent: 0.5` ✓）。⚠ 本条**不**承担那两件事 ✗：一条规则一个句子 ✓，把「攻击力」与「额外判定」塞进同一条会让「哪一句没兑现」查不出来 ✓。⭐⭐ **CORRECTED（2026-10-19）数值改成读行** ✓：`percent: 0.3` 是**终结技第 10 行**的 #4 ✓（`skills.json` 1206 槽 3 的 Lv10 = `[3.2, 2, 0.5, 0.3]` ✓），而**星魂 3 给终结技 +2 级** ⇒ 有效等级 12 ⇒ 那一行是 **0.324** ✗ ⇒ 写死会少算 ✓（症状：沉默 ✓）。现在读 `percent_from_skill_param: \"ULTRA:3\"` ✓（0 基的 #4 ✓）：E0 = 0.3 ✓、E3 = 0.324 ✓ —— 判据 `SushangLevelRowsTest` 钉住**两端** ✓。⚠ 同行的 #2（额外判定次数 2 ✓）与 #3（50% ✓）**全等级恒定** ✓ ⇒ 那两处保持字面量 ✓。"
-  },
-
-  {
-    "on": "DAMAGE_SETTLED",
-    "id": "trace_sword_stance_counts_itself",
-    "when": ["actor == self", "damage_is_additional"],
-    "do": [
-      { "op": "ADD_STACK", "buff": "剑势", "amount": 1, "max_stacks": 10, "permanent": true, "target": "self" }
-    ],
-    "source": "1206 行迹 逐寇 (1206102): 「每发动1次【剑势】，【剑势】造成的伤害提高2.5%，该效果最多叠加10层。」",
-    "note": "「每发动 1 次【剑势】…最多叠加 **10** 层」的**计数那一半** ✓ —— 计的是**发动次数**，用 `ADD_STACK` ✓（`max_stacks: 10` 就是「最多 10 层」✓，`permanent: true` 因为原文没有时长 ✓）。① ⭐ **认哪一次的判据是查出来的** ✓：`damage_is_additional` ✓（`TRIGGER.md` §3.4 的裸谓词 ✓，先例 `1403.json` ✓）—— 【剑势】走的是 `DAMAGE` ⇒ `DamageType.ADDITIONAL` ✓，所以「这一发是追加伤害」正是「这一发是剑势」✓；② ⚠ 挂 `DAMAGE_SETTLED`（**结算之后**）而不是 `DEALING_DAMAGE` ✓：在 `DEALING_DAMAGE` 上计数会让**这一发自己**先吃到新层数 ✓（顺序错误 ⇒ 第一次剑势按 1 层算 ✗）；③ ⚠ `actor == self` **不可省** ✓：追加伤害也可能来自别人 ✓。⚠ **登记一处差异**：引擎把【剑势】建模成**两条规则里的 `DAMAGE`** ✗（没有「剑势」这个状态 ✗）⇒ 这里的「剑势」层数**只由本行迹创建与维护** ✓，与那两条伤害规则之间**没有**名字上的联系 ✗ —— 也就是说：将来若给素裳加了**别的** ADDITIONAL 伤害 ✓，本条会把它也数进去 ✗（当前她的文件里没有这种规则 ✓，而击破伤害不是 ADDITIONAL ✓）。"
-  },
-
-  {
-    "on": "DEALING_DAMAGE",
-    "id": "trace_sword_stance_damage_per_stack",
-    "when": ["actor == self", "damage_is_additional"],
-    "do": [
-      { "op": "BOOST_DAMAGE", "damage_type": "ADDITIONAL", "scale": "self_stacks:剑势", "percent": 0.025 }
-    ],
-    "source": "1206 行迹 逐寇 (1206102): 「每发动1次【剑势】，【剑势】造成的伤害提高2.5%，该效果最多叠加10层。」 param = [0.025, 10]（每层增量、层数上限）",
-    "note": "「…【剑势】造成的伤害提高 **2.5%**，该效果最多叠加 **10** 层」的**加成那一半** ✓ —— ① 「每层 +X%」按 §5.3 的规矩写成 **`percent` = 每层增量 + `scale` = 层数** ✓（`self_stacks:剑势` ✓、`percent: 0.025` ✓）⇒ 结算为 `percent × 层数` ✓ = 10 层时 **+25%** ✓，与「2.5% × 10 层」逐字一致 ✓；② 挂 `DEALING_DAMAGE` ✓（`BOOST_DAMAGE` 全库 **18/18** 都在这个事件上 ✓，因为它改的是**正在结算的这一发** ✓，没有时长、没有 buff ✓ ⇒ 不会漏进下一发 ✓）；③ ⚠ 用 `damage_type: ADDITIONAL` 把加成**限定在追加伤害**上 ✓ —— 原文说的是【剑势】**自己的**伤害提高 ✓，不是「素裳造成的伤害提高」✓；这不只是措辞：不加这个限制会**静默**给普攻 / 战技 / 终结技全都加成 ✗（引擎为此专门修过一次同类错误 ✓，见 `BOOST_DAMAGE` 源码注释里的 `follow-up attacks only ... raised every hit` ✓）；④ ⚠ 层数上限**不在这里写** ✗：它由 `ADD_STACK` 的 `max_stacks: 10` 兑现 ✓，两处各写一次就是**两个上限** ✓。⚠ 本条与上一条是**一对** ✓（计数 + 加成 ✓），共同替代了原文里「【剑势】」这个不存在的状态 ✓。"
-  },
-
-  {
-    "on": "SKILL_CAST",
-    "id": "eidolon1_skill_point_on_a_broken_target",
-    "min_eidolon": 1,
-    "when": ["actor == self", "target has_state 弱点击破"],
-    "do": [
-      { "op": "GAIN_SKILL_POINT", "amount": 1 }
-    ],
-    "source": "1206 素裳 星魂1 游刃有余: 「对陷入弱点击破状态的敌方目标施放战技后，恢复1个战技点。」",
-    "note": "「对陷入**弱点击破状态**的敌方目标施放战技后，恢复 **1** 个战技点」—— ① 事件 `SKILL_CAST` ✓（措辞是「施放战技**后**」✓，而这个事件在结算之后 ✓）；② 条件 `target has_state 弱点击破` ✓ —— 破韧状态名来自引擎自己的常量 `BuffManager.BROKEN_STATE` ✓（与本文件 `skill_sword_stance_guaranteed` 用的是同一个名字 ✓，两处不会分叉 ✓）；③ `actor == self` ✓（是**她**施放 ✓，不是队友 ✓）；④ `GAIN_SKILL_POINT` + `amount: 1` ✓（团队资源 ✓，没有 `target` ✓ —— 这个 op 改的是全队池子 ✓）。⚠ **登记**：原文说「**后**」，引擎在 `SKILL_CAST` 上结算 —— 该事件的时机是「施放完毕」✓，所以战技点比伤害晚到手 ✓，但**在同一帧内** ✓（本库既有的 `SKILL_CAST` 读者都是这个语义 ✓）。"
-  },
-
-  {
-    "on": "DAMAGE_SETTLED",
-    "id": "eidolon2_damage_reduction_after_sword_stance",
-    "min_eidolon": 2,
-    "when": ["actor == self", "damage_is_additional"],
-    "do": [
-      { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.2, "turns": 1, "target": "self" }
-    ],
-    "source": "1206 素裳 星魂2 其身百炼: 「触发【剑势】后，素裳受到的伤害降低20%，持续1回合。」 param = [0.2]",
-    "note": "「**触发【剑势】后**，素裳**受到的伤害降低 20%**，持续 **1** 回合」—— ① 「触发【剑势】」的判据与行迹逐寇**同一个** ✓：`damage_is_additional` ✓（【剑势】是 ADDITIONAL 实例 ✓，本文件已在这一对规则里用了两次同样判据 ✓ ⇒ 三处不会分叉 ✓）；② `MODIFY_DAMAGE_TAKEN` + `percent: -0.2` ✓ —— **负数**才是「受到的伤害降低」✓（正数是易伤 ✓，源码注释点名：两者都不是属性，所以 `MODIFY_ATTR` 表达不了 ✓）；③ `turns: 1` ✓、`target: self` ✓。⚠ 事件用 `DAMAGE_SETTLED` 与计数那条一致 ✓：挂 `DEALING_DAMAGE` 会让**这一发剑势自己**就吃上减伤 ✓（顺序错 ✓）。⚠ **登记**：`turns: 1` 的递减发生在**她的回合结束** ✓（引擎的 buff 计时语义 ✓），而原文只说「持续 1 回合」✓ —— 二者一致 ✓。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "eidolon3_ultra_and_talent_levels",
-    "min_eidolon": 3,
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
-    ],
-    "source": "1206 素裳 星魂3 传古剑流: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 技能等级+{'120603': 2, '120604': 2}",
-    "note": "「终结技等级 **+2**…天赋等级 **+2**」—— 两条 `RAISE_SKILL_LEVEL` ✓，与本库 **23** 条星魂等级声明的写法完全同形 ✓（如 1001 星魂3/5、1103 星魂3/5 ✓）。⚠ 「最多不超过 15 级」**不在这里写** ✗：上限由技能数据自己的等级行数决定 ✓（`skills.json` 的 `param_list` 有多少行就封顶到多少 ✓），再写一个 15 就是**第二套上限** ✓。⚠ 槽位映射：`120603` = `ULTRA`、`120604` = `TALENT` ✓（引擎的 `SKILL_SLOT` 约定 ✓；本文件 `level_convention` 那条已经把四个槽位都 +9 到 Lv10 ✓，本条在其上再 +2 ✓）。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "eidolon4_breaking_effect",
-    "min_eidolon": 4,
-    "do": [
-      { "op": "MODIFY_ATTR", "attribute": "BREAKING_EFFECT", "percent": 0.4, "permanent": true, "target": "self" }
-    ],
-    "source": "1206 素裳 星魂4 其心百辟: 「素裳的击破特攻提高40%。」 param = [0.4]",
-    "note": "「素裳的**击破特攻提高 40%**」—— `MODIFY_ATTR` + `attribute: BREAKING_EFFECT` + `percent: 0.4` + `permanent: true` ✓。① 属性名 `BREAKING_EFFECT` 是引擎枚举里的真实值 ✓（`AttributeType` 的 `breaking_effect` ✓，语料先例 1214/1222/1225 都用它 ✓）；② `permanent: true` ✓ —— 原文没有时长 ✓，引擎的 `permanent` 就是「到战斗结束」✓（源码注释点名：它**不是**一个很长的回合数 ✓）；③ 挂 `BATTLE_START` ✓ —— 与 1301 星魂1（`EFFECT_RESISTANCE` + `permanent`）同形 ✓。⚠ 「击破特攻」不是「击破伤害」✗：它乘的是**击破基数** ✓（`BreakDamageCalculator.build` ✓），与 `BREAK_DAMAGE_BOOST` 是两个通道 ✓ —— 原文说的是「击破**特攻**」✓ ⇒ 用前者 ✓。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "eidolon5_skill_and_common_levels",
-    "min_eidolon": 5,
-    "do": [
-      { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-      { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
-    ],
-    "source": "1206 素裳 星魂5 太虚神意: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 技能等级+{'120602': 2, '120601': 1}",
-    "note": "「战技等级 **+2**…普攻等级 **+1**」—— 与星魂3 同形 ✓（`SKILL` +2、`COMMON` +1 ✓）。⚠ 两处上限（15 / 10）都**不写** ✗，理由同星魂3 ✓：技能数据的等级行数已经封顶 ✓。⚠ 槽位映射：`120602` = `SKILL`、`120601` = `COMMON` ✓。"
-  },
-
-  {
-    "on": "BATTLE_START",
-    "id": "eidolon6_talent_speed_stacks_twice",
-    "min_eidolon": 6,
-    "do": [
-      { "op": "MODIFY_RULE", "rule": "talent_speed_on_break", "effect_max_stacks": 2 },
-      {
-        "op": "MODIFY_ATTR",
-        "attribute": "SPEED",
-        "percent_from": { "type": "skill_param", "skill": "TALENT", "index": 0 },
-        "turns": 2,
-        "max_stacks": 2,
-        "buff": "加速",
-        "target": "self"
-      }
-    ],
-    "source": "1206 素裳 星魂6 上善若水: 「天赋的加速效果可以叠加，最多叠加2层，且进入战斗后素裳立即获得1层天赋的加速效果。」",
-    "note": "一句话两件事，**两件都写** ✓：① 「天赋的加速效果**可以叠加，最多叠加 2 层**」⇒ `MODIFY_RULE` + `rule: talent_speed_on_break` + `effect_max_stacks: 2` ✓ —— 这是引擎专门为「提高某条天赋的上限」提供的口子 ✓（源码注释原话：a CAP, not a value ✓，且它在**任何层数挂上之前**生效 ✓，因为 `BATTLE_START` 先于一切回合 ✓）；② 「进入战斗后素裳**立即获得 1 层**天赋的加速效果」⇒ 同一条 `MODIFY_RULE` 之后追加一条 `MODIFY_ATTR` ✓（`SPEED +20%`、`turns: 2`、`max_stacks: 2` ✓）—— **数值与时长照抄天赋本身** ✓（天赋 Lv10 = `0.2` / `2` 回合 ✓，两处写在同一个文件里 ✓ 不会分叉 ✓）。⚠ **`buff: 加速` 是必须的** ✓：不带名字的修饰**叠加不了也摘不掉** ✗（`MODIFY_ATTR` 的 `max_stacks` 要按名字聚 ✓）；而天赋那条**不具名** ✗ —— ⇒ 星魂 6 的 `max_stacks` 管的是**这一条自己的**实例 ✓，与天赋那条**是两个**修饰 ✓ ⇒ **登记一处差异**：满层时她会有「天赋 1 层 + 星魂 1 层」两个无名字的联系 ✗，而原文说的是**同一个**加速效果叠 2 层 ✓。要让两者真正同源，需要让天赋那条也具名 ✓（改 `talent_speed_on_break` 加 `buff`）—— 本轮**没有**改它 ✗，因为那会改变 0 星魂时的行为 ✓，不在本批范围内 ✓。⚠ 另**登记**：`turns` 各自的计时独立 ✓，所以两层可能不同时到期 ✓（原文未说同时 ✓）。⭐⭐ **CORRECTED（2026-10-19）**：上面那段「与天赋那条**是两个**修饰」**已过时** ✓ —— 天赋那条**现在具名** `buff: 加速` ✓（见它的 note ✓）⇒ 两条**同源** ✓，`MODIFY_RULE` 提的上限与这里的 `max_stacks: 2` 说的是**同一个**加速 ✓。⚠ 数值同样改成**读行** ✓（`percent_from_skill_param: \"TALENT:0\"` ✓）：E3 之后天赋的有效等级是 12 ⇒ 0.21 ✓（写死 0.2 会少算 ✓，与天赋那条**同源同值** ⇒ 两处一起读行才不会分叉 ✓）。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "when": ["actor == self", "from_skill COMMON", "enemy_state_count:弱点击破 >= 1"],
-    "do": [
-      { "op": "ADVANCE", "percent": 0.15, "target": "self" }
-    ],
-    "source": "1206 行迹 破敌 (1206103): 「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前15%。」 param = [0.15]",
-    "note": "「**施放普攻或战技后**，若**场上有敌方目标处于弱点击破状态**，则素裳的**行动提前 15%**」—— ① 事件 `ALLY_ATTACK` ✓：它**每次施放只发一次** ✓（本文件两条【剑势】用的是同一个事件 ✓，理由也写在它们的 note 里：挂逐段的 `DEALING_DAMAGE` 会逐段触发 ✗）；② 「普攻**或**战技」写成**两条**规则 ✓ —— DSL 没有 or ✗（`when` 是 AND ✓），而两条的 `when` 不同（`from_skill COMMON` ✓）⇒ 不是「一句话写两遍」✓（`ContentDuplicateGuardTest` 的签名含 `when` ✓，同形先例 1111 的 COMMON/SKILL 一对 ✓）；③ ⭐ **本条是 `enemy_state_count:` 的第一个读者** ✓（本轮新增的引擎能力 ✓）—— 原文问的是**全场**（「场上有敌方目标」✓），而 `has_state` 只问**某个具体单位** ✗，`enemy_count` 又只数人头不问状态 ✗ ⇒ 两者都写不出这句 ✓。计数 == 1 与 >= 1 在这句话上等价 ✓，但仍按**数量**写 ✓：同一句话的「有」只是数量 >= 1 的一种说法 ✓；④ `ADVANCE` + `percent: 0.15` ✓，`target: self` ✓（行动提前的是**素裳**✓）。⚠ `percent` 的口径按引擎自己的定义 ✓：**1.0 = 跳过目标剩余等待时间的全部** ✓，所以 0.15 = 跳过剩余的 15% ✓ —— 与 1215 星魂1 的「行动提前 15%」写法**逐字相同** ✓；⚠ 原文没有说「剩余」，但这是本引擎对「行动提前 X%」的**统一口径** ✓（全库 33 处 `ADVANCE` 同此），本条不另立一套 ✓。⚠ **登记**：`enemy_state_count` 只数**活着**的敌人 ✓（`enemyCount` 同款过滤 ✓），而原文说「场上有」✓ —— 已死的敌人本来就不该算「在场上」✓，两者的差别只出现在「破韧后被打死」这一瞬间 ✓。",
-    "id": "trace_breaking_advance_after_common"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "when": ["actor == self", "from_skill SKILL", "enemy_state_count:弱点击破 >= 1"],
-    "do": [
-      { "op": "ADVANCE", "percent": 0.15, "target": "self" }
-    ],
-    "source": "1206 行迹 破敌 (1206103): 「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前15%。」 param = [0.15]",
-    "note": "「**施放普攻或战技后**，若**场上有敌方目标处于弱点击破状态**，则素裳的**行动提前 15%**」—— ① 事件 `ALLY_ATTACK` ✓：它**每次施放只发一次** ✓（本文件两条【剑势】用的是同一个事件 ✓，理由也写在它们的 note 里：挂逐段的 `DEALING_DAMAGE` 会逐段触发 ✗）；② 「普攻**或**战技」写成**两条**规则 ✓ —— DSL 没有 or ✗（`when` 是 AND ✓），而两条的 `when` 不同（`from_skill SKILL` ✓）⇒ 不是「一句话写两遍」✓（`ContentDuplicateGuardTest` 的签名含 `when` ✓，同形先例 1111 的 COMMON/SKILL 一对 ✓）；③ ⭐ **本条是 `enemy_state_count:` 的第一个读者** ✓（本轮新增的引擎能力 ✓）—— 原文问的是**全场**（「场上有敌方目标」✓），而 `has_state` 只问**某个具体单位** ✗，`enemy_count` 又只数人头不问状态 ✗ ⇒ 两者都写不出这句 ✓。计数 == 1 与 >= 1 在这句话上等价 ✓，但仍按**数量**写 ✓：同一句话的「有」只是数量 >= 1 的一种说法 ✓；④ `ADVANCE` + `percent: 0.15` ✓，`target: self` ✓（行动提前的是**素裳**✓）。⚠ `percent` 的口径按引擎自己的定义 ✓：**1.0 = 跳过目标剩余等待时间的全部** ✓，所以 0.15 = 跳过剩余的 15% ✓ —— 与 1215 星魂1 的「行动提前 15%」写法**逐字相同** ✓；⚠ 原文没有说「剩余」，但这是本引擎对「行动提前 X%」的**统一口径** ✓（全库 33 处 `ADVANCE` 同此），本条不另立一套 ✓。⚠ **登记**：`enemy_state_count` 只数**活着**的敌人 ✓（`enemyCount` 同款过滤 ✓），而原文说「场上有」✓ —— 已死的敌人本来就不该算「在场上」✓，两者的差别只出现在「破韧后被打死」这一瞬间 ✓。",
-    "id": "trace_breaking_advance_after_skill"
-  },
-
-  {
-    "on": "ULT_CAST",
-    "id": "ult_grants_two_extra_sword_stance_rolls",
-    "when": ["actor == self"],
-    "do": [
-      { "op": "ADD_STACK", "buff": "剑势额外判定", "amount": 1, "turns": 2, "target": "self" }
-    ],
-    "source": "1206 素裳 终结技 太虚形蕴•烛夜: 「…且施放战技时额外增加2次【剑势】的发动判定，持续2回合。」 param Lv10 → [3.2, 2, 0.5, 0.3]（#2 = 额外判定次数 2、#3 = 额外判定的伤害比率 0.5）",
-    "note": "这句话里**「持续 2 回合」的标记那一半** ✓：用 `ADD_STACK` + `turns: 2` 做一个**限时标记** ✓（`StackBuff` 的 `turns` 就是「到点自己掉」✓，与本库其它限时标记同形 ✓）。⚠ **不是层数消耗**：原文说「持续 2 回合」✗，没有说每掷一次消耗一层 ✗ ⇒ 一个不带层数的标记就够了 ✓（`amount: 1` ✓）；下面两条用 `self_stacks:` 读它 ✓。⚠ 具名 `剑势额外判定` 是必须的 ✓：`self_stacks:` 按**名字**读 ✓。⚠ 参数交叉验证 ✓：`AvatarConfigLD` 那一行 Lv10 的 `#2` 是 **2**（额外判定次数）✓、`#3` 是 **0.5** ✓，与正文的「2 次」「50%」逐字一致 ✓ —— 所以本句没有第二个数字歧义 ✓。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "extra_sword_stance_roll_chance",
-    "when": ["actor == self", "from_skill SKILL", "self_stacks:剑势额外判定 >= 1", "!target has_state 弱点击破"],
-    "chance": 0.33,
-    "chance_rolls": 2,
-    "do": [
-      {
-        "op": "DAMAGE",
-        "element": "Physical",
-        "target": "target",
-        "scale": "self_attr:ATTACK",
-        "percent": 0.5,
-        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
-      }
-    ],
-    "source": "1206 素裳 终结技: 「施放战技时额外增加2次【剑势】的发动判定，持续2回合。通过额外判定发动的【剑势】伤害为原伤害的50%。」",
-    "note": "「额外增加 **2** 次【剑势】的**发动判定**…通过额外判定发动的【剑势】伤害为**原伤害的 50%**」—— ① ⭐ **`chance_rolls: 2` 是本轮新增的引擎能力** ✓（规则级**独立**掷骰 ✓）—— 为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会把它判成「one sentence written twice」✗（**实测**：两条对称规则报 `ids extra_sword_stance_roll1 / _roll2` ✓）；② ⚠ 也**不是** `times: 2` ✗：`times` 重复的是**已经判定的结算** ✓，所以 `chance: 0.33, times: 2` 是「**一次**判定、两个伤害实例」✗，而原文说的是「**2 次**判定」✓ ⇒ 期望值相同、**分布不同** ✓，不能用前者近似后者 ✓；③ `chance: 0.33` 与基础【剑势】同值 ✓（同一句「33% 概率发动【剑势】」✓ —— 额外判定用的就是同一个判定 ✓）；④ `percent: 0.5` = 「原伤害的 50%」✓，`scale: self_attr:ATTACK` ✓（原伤害 = 100% 攻击力 ✓，与 `skill_sword_stance_chance` 同一口径 ✓）；⑤ `!target has_state 弱点击破` ✓ 与基础那条**成对** ✓（破韧时由 `_guaranteed` 接管 ✓，避免「破韧时还掷 33% 骰子」✗ —— 与基础那对完全同构 ✓）。⭐⭐ **CORRECTED（2026-10-19 第二批）「原伤害的 50%」改成「那一行 × 50%」** ✓：上一版写 `percent: 0.5` 字面量 ✓（= 50% 攻击力），而**原伤害**是**战技那一行的 #2**（`SKILL:1` ✓：E0 = 1.0、E5 之后 = **1.1** ✓）⇒ 星魂 5 抬了战技等级之后**少算 9%** ✓（0.5 对 0.55 ✓，症状沉默 ✓）。现在 `percent: 0.5` ＋ `percent_from_skill_param: \"SKILL:1\"` ✓ —— **两个一起写**是引擎本批新开的读法：`percent` 变成那个份额的**分数** ✓（`TriggerMagnitudes.shareOf` ✓）；⚠ 装载期只对**伤害路径**开口子 ✓（两条**行份额**仍然互斥 ✓，见 `TriggerValidator.requirePercent` ✓）。判据 `SushangExtraRollFollowsTheRowTest` ✓：E0／E5 两档里**每一发**剑势伤害之比 = **1.1** ✓（只钉 E0 分不出字面量与读行 ✓），三条变异都已验证会红 ✓。"
-  },
-
-  {
-    "on": "ALLY_ATTACK",
-    "id": "extra_sword_stance_roll_guaranteed",
-    "when": ["actor == self", "from_skill SKILL", "self_stacks:剑势额外判定 >= 1", "target has_state 弱点击破"],
-    "chance": 1.0,
-    "chance_rolls": 2,
-    "do": [
-      {
-        "op": "DAMAGE",
-        "element": "Physical",
-        "target": "target",
-        "scale": "self_attr:ATTACK",
-        "percent": 0.5,
-        "percent_from": { "type": "skill_param", "skill": "SKILL", "index": 1 }
-      }
-    ],
-    "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」+ 终结技: 「…额外增加2次【剑势】的发动判定…」",
-    "note": "破韧时额外的那 2 次判定**同样必定发动** ✓ —— 原文的「必定发动」是**关于【剑势】这个判定**说的 ✓，而终结技只说了「额外增加 2 次…判定」✓（**沿用**同一个判定 ✓，不另立规则 ✗）。⚠ `chance: 1.0` 是需要的 ✓：`chance_rolls` 在**没有** `chance` 时会被加载期拒绝 ✓（「roll twice for always」说不清要掷什么 ✓），而 `chance: 1.0` 不消耗骰子 ✓ ⇒ 两次都必定结算 ✓。⚠ `percent: 0.5` 同样适用 ✓：原文的 50% 说的是「通过额外判定发动的【剑势】」✓，与是否破韧无关 ✓。⚠ 与本文件的 `skill_sword_stance_guaranteed` **成对** ✓（一条是基础判定、一条是额外判定 ✓，`when` 不同 ✓）。⚠⚠ **登记（2026-10-19 逐句核时新增）**：「**原伤害的 50%**」里的**原伤害**指的是**基础【剑势】那一笔** ✓（= 战技行的 #2 × 攻击力 ✓），而本条的 `percent: 0.5` × `self_attr:ATTACK` 写的是**攻击力的 50%** ✗ —— 两者只在**基础剑势 = 100% 攻击力**时相等 ✓（Lv10 正是如此 ✓），而 **E5 之后基础剑势是 1.1** ✓ ⇒ 本条应收 **55% 攻击力**，实际给 **50%** ✗（少算约 9%，**无症状** ✓）。⚠ 词表里没有「一个份额 × 另一条技能行」的拼法 ✗（`percent_from_skill_param` 读到的是**份额本身** 1.1 ✓ 不能只取它的一半 ✗；`skill_param:` 这类 `scale` 读出来的是**参数值**、单位不是攻击力 ✗）⇒ **如实登记，不近似** ✓。⭐⭐ **CORRECTED（2026-10-19 第二批）「原伤害的 50%」改成「那一行 × 50%」** ✓：上一版写 `percent: 0.5` 字面量 ✓（= 50% 攻击力），而**原伤害**是**战技那一行的 #2**（`SKILL:1` ✓：E0 = 1.0、E5 之后 = **1.1** ✓）⇒ 星魂 5 抬了战技等级之后**少算 9%** ✓（0.5 对 0.55 ✓，症状沉默 ✓）。现在 `percent: 0.5` ＋ `percent_from_skill_param: \"SKILL:1\"` ✓ —— **两个一起写**是引擎本批新开的读法：`percent` 变成那个份额的**分数** ✓（`TriggerMagnitudes.shareOf` ✓）；⚠ 装载期只对**伤害路径**开口子 ✓（两条**行份额**仍然互斥 ✓，见 `TriggerValidator.requirePercent` ✓）。判据 `SushangExtraRollFollowsTheRowTest` ✓：E0／E5 两档里**每一发**剑势伤害之比 = **1.1** ✓（只钉 E0 分不出字面量与读行 ✓），三条变异都已验证会红 ✓。"
-  }
-]
+{
+  "schema": 1,
+  "character": 1206,
+  "_status": "partial",
+  "_gaps": [
+    "见 CONTENT-STATUS.md 的逐角色登记"
+  ],
+  "rules": [
+    {
+      "on": "BREAK",
+      "id": "talent_speed_on_break",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 0
+          },
+          "turns": 2,
+          "target": "self",
+          "max_stacks": 1,
+          "buff": "加速"
+        }
+      ],
+      "source": "1206 素裳 天赋 游刃若水 (120604, Enhance): 「当场上有敌方目标的弱点被击破，素裳的速度提高20%，持续2回合。」",
+      "_note": "「当场上有敌方目标的弱点被击破，素裳的**速度提高 20%**，持续 2 回合」—— 挂在引擎的 **`BREAK` 事件**上 ✓（`Battle:1394` 以\"攻击者\"为 actor、\"被破韧的敌人\"为 target 发射 ✓），效果是自身的速度修正 ✓。⚠ 「场上**有**敌方目标\"是措辞：触发者就是被击破的那个目标 ✓，而加成落在**素裳自己**身上 ✓ ⇒ `target: self` ✓。⚠ **登记**：行迹「破敌：…**若场上有敌方目标处于弱点击破状态**，则素裳的行动提前 15%」需要的是一个**全场性**条件 ✗（`has_weakness`/`has_state` 都问**某个具体单位** ✓，没有\"存在一个…\"的写法 ✗）。 ⚠ **第 N 轮补充（为星魂 6 服务）**：本条现在**具名** `buff: 加速` 且显式 `max_stacks: 1` —— 前者让【加速】成为一个**可按名字找的**状态（否则星魂 6 的「叠加 2 层」只能另造一个同名不同源的修饰 ✗）；后者是**引擎的硬要求**：`MODIFY_RULE` + `effect_max_stacks` 在加载期会拒绝「被点名的规则没有上限可提」✗（实测报错原文：`there is no cap to raise`）。两个改动都**不改变 0 星魂时的行为** ✓：`StackBuff` 的默认上限就是 **1** ✓（`addStack` 里 `stackCap() == null ? 1 : ...` ✓），而不具名与具名的区别只在「能否被名字找到」✓ —— 本条此前没有任何按名字找它的读者 ✓。⭐⭐ **CORRECTED（2026-10-19）两处** ✓：① **过时的登记**：「破敌…需要的是一个**全场性**条件 ✗（没有\"存在一个…\"的写法 ✗）」**撤回** ✓ —— 那个写法**后来就有了** ✓（`enemy_state_count:<状态>` ✓，本文件的 `trace_breaking_advance_after_common` / `_after_skill` 正在用它 ✓，守卫 `EnemyStateCountSpellingTest` ✓）⇒ 从句**已出货** ✓；② **数值改成读行**（`percent: 0.2` → `percent_from_skill_param: \"TALENT:0\"` ✓）：0.2 是**天赋第 10 行**的值 ✓（`skills.json` 1206 槽 4 的 Lv10 = `[0.2, 2]` ✓），而**星魂 3 给天赋 +2 级** ⇒ 有效等级 12 ⇒ 那一行是 **0.21** ✗ ⇒ 写死会少算（症状：沉默 ✓）。判据 `SushangLevelRowsTest` 钉 E0 与 E3 **两端** ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "skill_sword_stance_chance",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "!target has_state 弱点击破"
+      ],
+      "chance": 0.33,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "element": "Physical",
+          "target": "target",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "SKILL",
+            "index": 1
+          }
+        }
+      ],
+      "source": "1206 素裳 战技 云骑剑经•山倾 (120602, BPSkill/SingleAttack): 「对指定敌方单体造成等同于素裳210%攻击力的物理属性伤害。同时最后一击后有33%概率发动【剑势】，对目标造成等同于素裳100%攻击力的物理属性附加伤害。若该目标处于弱点击破状态，则【剑势】必定发动。」",
+      "_note": "「最后一击后**有 33% 概率**发动【剑势】，对目标造成等同于素裳 **100% 攻击力**的物理**附加伤害**」—— ① 概率用**规则级 `chance`** ✓（`TriggerSpec.chance` ✓，不写进条件 ✗）；② 附加伤害用 `DAMAGE` ✓（引擎的额外实例入口 ✓，`DamageType.ADDITIONAL` + 受害者不给能量 ✓）；③ 事件用 `ALLY_ATTACK` ✓（**每次施放只发一次** ✓，所以\"最后一击后\"只判一次 ✓ —— 挂在逐段的 `DEALING_DAMAGE` 上会**逐段掷骰** ✗）。⚠ `!target has_state 弱点击破` **合法** ✓：`has_state` 属于**队伍类条件** ✓，而取反只允许用于这一类 ✓（这正是\"处于弱点击破则必定发动\"的另一半 ✓）。⭐⭐ **CORRECTED（2026-10-19，逐句核时实测）倍率** ✓：上一版写 `percent: 1.0` 字面量 ✓，理由是「COMMON 那一行的 Lv10 值是 1.4 ✗」—— ⚠ 那个理由是**查错了槽** ✗：字面量的**出处**不是普通普攻的行 ✓ 而是**战技自己那一行的第 2 项** ✓（`skills.json` 1206 槽 2 的 Lv10 = `[2.1, 1, 0.33]` ⇒ **#2 = 1.0 = 100% 攻击力** ✓ 与正文逐字一致 ✓），而它**随等级走** ✓（Lv15 = 1.25 ✗、E5 后的 Lv12 = 1.1 ✗）⇒ 写死会在**星魂 5 抬战技等级**之后少算 ✓（而**症状是沉默的** ✓）。现在读 `percent_from_skill_param: \"SKILL:1\"` ✓（0 基的第 2 项 ✓）：E0 读 1.0 ✓、E5 读 1.1 ✓ —— 判据 `SushangLevelRowsTest` 钉住**两端** ✓（只钉 E0 看不出是字面量还是读行 ✓）。⚠ 顺带一提：同一行的 **#3 = 0.33 全等级恒定** ✓ ⇒ 概率那条**字面量不漂移** ✓，保持字面量 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "skill_sword_stance_guaranteed",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "target has_state 弱点击破"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "element": "Physical",
+          "target": "target",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "SKILL",
+            "index": 1
+          }
+        }
+      ],
+      "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」",
+      "_note": "「若该目标**处于弱点击破状态**，则【剑势】**必定发动**」—— 与上一条**成对**：上一条带 `chance: 0.33` 并排除已破韧的情形 ✓，本条**不写 chance**（= 100% ✓）且在破韧时接管 ✓ ⇒ 两条合起来正好是文档的\"33%，破韧则必定\" ✓，而不会出现\"破韧时还掷 33% 骰子\" ✗。⚠ 破韧状态的名字来自引擎自己的常量 `BuffManager.BROKEN_STATE` ✓（`hasState` 会解析引擎状态 ✓）。⭐⭐ **CORRECTED（2026-10-19）倍率同上** ✓：`percent: 1.0`（字面量）→ `percent_from_skill_param: \"SKILL:1\"` ✓（读战技行的 #2 ✓，E0 = 1.0 ✓、E5 = 1.1 ✓，理由与证据见上一条 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1206 素裳 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 210%、终结技 320%、天赋 速度+20%）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = `trace_breaking_advance_after_common` + `trace_breaking_advance_after_skill` ✓（「普攻**或**战技」在无 or 的 DSL 里是**两条** ✓，`when` 不同故不算重复 ✓）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。✅ **本文件已无登记缺口**：终结技那句「额外增加 2 次【剑势】的发动判定，伤害为原伤害的 50%」现由 `ult_grants_two_extra_sword_stance_rolls` + `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed` 兑现 ✓ —— 它需要的「多掷 N 次」参数就是本轮新增的 `chance_rolls` ✓（规则级**独立**掷骰 ✓）。为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会判「one sentence written twice」✗（**实测**过 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_opening_damage",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.8,
+          "element": "Physical",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1206 素裳 秘技 云骑剑经•叩阵 (120607, Maze/MazeAttack): 「立即攻击敌人，进入战斗后对敌方全体造成等同于素裳80%攻击力的物理属性伤害。」",
+      "_note": "「使用秘技后…进入战斗后对敌方全体造成等同于素裳 **80% 攻击力**的物理属性伤害」—— ① 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；② 伤害用 **`DAMAGE` 的字面倍率形态** ✓ —— 第 186 轮新加 ✓：`DAMAGE` 原本**必须**指定技能槽位 ✗（倍率只能取自技能数据行 ✗），而 80% 不是任何一行的倍率 ✓ ⇒ 现在可以只写 `scale: self_attr:ATTACK` + `percent` + `element` ✓（引擎用**已有的**刻度读取器取值 ✓；因为\"无技能可借元素\"，校验器**要求写明 element** ✓）；③ 目标 `all_enemies` ✓。⚠ 这是\"任意倍率伤害\"这一大类句子的**第一个出货读者** ✓（实测：天赋类 53 份、星魂类 15 份 ✓）。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "trace_low_hp_aggro_down",
+      "when": [
+        "target == self",
+        "hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "AGGRO_ADDED_RATIO",
+          "percent": -0.5,
+          "permanent": true,
+          "buff": "赤子",
+          "target": "self"
+        }
+      ],
+      "source": "1206 行迹 赤子 (1206101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）",
+      "_note": "「若当前生命值百分比**小于等于 50%**，则被敌方目标攻击的概率**降低**」—— ⭐ **一句话，两位角色同形**，数值与门槛都在上游 ✓。① `ExcelOutput/AvatarSkillTreeConfig.json` 该点（`PointID 1206101`、`PointTriggerKey PointB1`）的 `ParamList = [{\"Value\": 0.5}, {\"Value\": 0.5}]` ✓：第一个 0.5 是文档点名的**门槛** ✓、第二个是**比率** ✓（两个值相等 ⇒ 顺序之争不影响数字 ✓，这一点如实写明 ✓）。② 上游挂的是 `MAvatar_Sushang_00_SkillTree_AggroDown` （扫描 Config/ConfigAbility/Avatar 得到，见 build/aggro_scan.txt），它写的属性是 **`AggroAddedRatio`** ✓，而全局 `M_SkillTree_AggroDown` 把它写成 **0 − 参数** ✓ ⇒ 值 = **−0.5** ⇒ 引擎读作 `权重 × (1 + (−0.5))` = **×0.5** ✓。③ ⭐ **触发时机是查出来的，不是猜的**：丹恒的 `MAvatar_DanHeng_00_LowHP_AggroDown` 在 **`OnStack` 与 `OnHPChange`** 两个回调上都挂了同一个 `ByCompareHPRatio` **LessEqual** 谓词 ✓ ⇒ 游戏是**只要生命值变化就重判** ✓；引擎里与它等价的是 **`HP_LOST`（掉到门槛下就挂）+ `HEALED`（回到门槛上就摘）** 这一对 ✓ —— 因为生命值只可能通过这两件事改变 ✓，所以这不是近似，而是同一次重判 ✓。④ 因此**两条规则**：挂（`MODIFY_ATTR` + 具名 `buff: 赤子` + `permanent`）与摘（`REMOVE_STATE` 同名的 `buff`）✓。⚠ 具名是必要的：`REMOVE_STATE` 按**名字**摘 ✓；不带名字的修饰摘不掉 ✗。⚠ 重复挂不会叠加 ✓（同名 buff 上限 1 ✓，测试里专门用\"再掉一次血\"钉住这一点 ✓）。⚠ **登记的两处差异**：① 若生命值**不经治疗**而回到门槛之上（例如生命上限被提高 ✗），这条摘除规则不会触发 ✗；② 战斗开始时若已低于 50%（这三位都不会 ✗，他们不消耗自身生命 ✗）⇒ 也不会挂上 ✗。"
+    },
+    {
+      "on": "HEALED",
+      "id": "trace_low_hp_aggro_down_cleanup",
+      "when": [
+        "target == self",
+        "hp_percent > 0.5"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "赤子",
+          "target": "self"
+        }
+      ],
+      "source": "1206 行迹 赤子 (1206101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）（回到门槛之上的收尾，由 ③ 的 OnHPChange 重判推出）",
+      "_note": "上一条规则的收尾 ✓：`REMOVE_STATE` 按**名字**摘掉 `赤子` 那个具名修饰 ✓，`target: self` 因为修饰挂在自己身上 ✓。⚠ 条件是 `hp_percent > 0.5` ✓（`hp_percent` 读的是**规则主人自己**的生命值 ✓，是分数 0–1 ⇒ 写 `0.5` 而不是 `50` ✓）；⚠ 摘一个不存在的东西**不是错误** ✓（每次治疗都会触发这条 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_acts_again_immediately",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 1.0,
+          "target": "self"
+        }
+      ],
+      "source": "1206 素裳 终结技 太虚形蕴•烛夜 (120603, Ultra/SingleAttack): 「对指定敌方单体造成等同于素裳320%攻击力的物理属性伤害，并使素裳立即行动。」",
+      "_note": "「…**并使素裳立即行动**」—— 用 `EXTRA_TURN` ✓，`target: self` ✓（`target` 在 `EXTRA_TURN` 上是可选的 ✓；显式写出来与本库已有的三条同形 ✓：1309/1404/1501 ✓）。⚠ **登记一处**：本条只兑现「立即行动」✗，**不**同时兑现后面那句「攻击力提高 30%…持续 2 回合」✗ —— 那是**另一句**（同一个「同时」引出 ✓），已另立一条 `ult_raises_her_attack` ✓，两条分开是为了让「哪一句没兑现」一眼可查 ✓。⚠ 终伤本身**不写规则** ✓：终结技的 320% 是数据层按 `param_list` 结算的 ✓（实测全库只有 **2** 条 `ULT_Cast`+`DAMAGE` ✓，都不是「技能本体伤害」✓ ⇒ 写一条会是**第二套判据** ✗）。⚠⚠ **登记（2026-10-19 逐句核时新增）：「立即行动」是一个读法选择** ✓ —— 文档里没有这一条的**定义** ✗（`HSR.md` 只定义「**额外回合**：不消耗回合数，期间不可插入终结技」✓ 与「**行动提前/延后**：缩短/延长下次行动等待时间」✓），而正文用的是**第三个词** ✓（既不是「额外回合」也不是「行动提前 X%」✓）⇒ 本条按「**立即行动** = 她马上再动一次」读成 `EXTRA_TURN` ✓；⚠ **另一种读法是 `ADVANCE percent: 1.0`** ✓（1506 的「行动提前 100%」正是它 ✓）—— 两者在**行动序**上可观测地不同 ✓（额外回合是**插入**一个回合 ✓，提前 100% 是**把等待清零**、队列位置不变 ✓）⇒ 谁要推翻这个读法，改的是**这一条**，而判据要跟着说清「插入」还是「清零」✓。⭐⭐ **CORRECTED（2026-10-19 第五批）「立即行动」的读法由**官方数据**定下来** ✓：改成 `ADVANCE percent: 1.0` ✓（原来写 `EXTRA_TURN` ✓）。证据（读的，不是猜的 ✓）：`Avatar_Sushang_00_Ability.json` 的 `Avatar_Sushang_00_Skill03_Phase02` 在造伤与上 buff 之后，对 **Caster** 发的是 `RPG.GameCore.SetActionDelay` 且 **`Value = 0`** ✓ —— 把她**行动延迟清零** ✓；而全库的「插入一个回合」原语是 `RPG.GameCore.TurnInsertAbility`（实测 **1780** 处 ✓），她这个大招**没有用**它 ✓⇒ 这一句是「**把等待清零**」（引擎 `ADVANCE percent: 1.0` ✓ = 剩余 × (1−1.0) = 0 ✓），**不是**「白给一个回合」✓。⚠ 两者在**行动序**上可观测地不同 ✓：额外回合是**插入**一个回合（她这一回合照旧还在 ✓），清零是**把等待压到 0**（她**下一个**就动，原本那个回合被消耗 ✓）⇒ 判据 `SushangUltimateAndTraceTest.herUltimateMakesHerActImmediately`同时钉**两侧**：剩余等待变 **0** ✓、**没有**待执行的额外回合 ✓（变异回 `EXTRA_TURN` ⇒ 两条都红 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_raises_her_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 3
+          },
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1206 素裳 终结技 太虚形蕴•烛夜: 「同时使其攻击力提高30%，且施放战技时额外增加2次【剑势】的发动判定，持续2回合。」 param Lv10 → [3.2, 2, 0.5, 0.3]（#1 伤害倍率、#2 额外判定次数、#3 额外判定倍率、#4 攻击力）",
+      "_note": "「同时**使其攻击力提高 30%**…持续 **2** 回合」—— ① 「其」指前一句「使素裳立即行动」的主语 ⇒ 还是**素裳自己** ✓（原文是「并使素裳立即行动。同时使其攻击力提高」✓）⇒ `target: self` ✓；② `MODIFY_ATTR` + `ATTACK` + `percent: 0.3` + `turns: 2` ✓（普通属性修正 ✓，不是「对敌方」的区间 ✓ ⇒ 用 `MODIFY_ATTR` 而非 `MODIFY_DAMAGE_TAKEN` ✓）；③ ⚠ **不具名** `buff`：本条没有任何「摘除 / 延长 / 按名字查」的读者 ✗（对照 1215 的 `敕令`，那条是被星魂 4 按名字找的 ✓）⇒ 不具名更短，也不引入一个无人读的状态 ✓。✅ **同句的另一半已落地** ✓（本条只写攻击力那一句 ✓）：「施放战技时**额外增加 2 次【剑势】的发动判定**，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」= `ult_grants_two_extra_sword_stance_rolls`（2 回合标记 ✓）+ `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed`（各 `chance_rolls: 2` ✓、`percent: 0.5` ✓）。⚠ 本条**不**承担那两件事 ✗：一条规则一个句子 ✓，把「攻击力」与「额外判定」塞进同一条会让「哪一句没兑现」查不出来 ✓。⭐⭐ **CORRECTED（2026-10-19）数值改成读行** ✓：`percent: 0.3` 是**终结技第 10 行**的 #4 ✓（`skills.json` 1206 槽 3 的 Lv10 = `[3.2, 2, 0.5, 0.3]` ✓），而**星魂 3 给终结技 +2 级** ⇒ 有效等级 12 ⇒ 那一行是 **0.324** ✗ ⇒ 写死会少算 ✓（症状：沉默 ✓）。现在读 `percent_from_skill_param: \"ULTRA:3\"` ✓（0 基的 #4 ✓）：E0 = 0.3 ✓、E3 = 0.324 ✓ —— 判据 `SushangLevelRowsTest` 钉住**两端** ✓。⚠ 同行的 #2（额外判定次数 2 ✓）与 #3（50% ✓）**全等级恒定** ✓ ⇒ 那两处保持字面量 ✓。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "trace_sword_stance_counts_itself",
+      "when": [
+        "actor == self",
+        "damage_is_additional"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "剑势",
+          "amount": 1,
+          "max_stacks": 10,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1206 行迹 逐寇 (1206102): 「每发动1次【剑势】，【剑势】造成的伤害提高2.5%，该效果最多叠加10层。」",
+      "_note": "「每发动 1 次【剑势】…最多叠加 **10** 层」的**计数那一半** ✓ —— 计的是**发动次数**，用 `ADD_STACK` ✓（`max_stacks: 10` 就是「最多 10 层」✓，`permanent: true` 因为原文没有时长 ✓）。① ⭐ **认哪一次的判据是查出来的** ✓：`damage_is_additional` ✓（`TRIGGER.md` §3.4 的裸谓词 ✓，先例 `1403.json` ✓）—— 【剑势】走的是 `DAMAGE` ⇒ `DamageType.ADDITIONAL` ✓，所以「这一发是追加伤害」正是「这一发是剑势」✓；② ⚠ 挂 `DAMAGE_SETTLED`（**结算之后**）而不是 `DEALING_DAMAGE` ✓：在 `DEALING_DAMAGE` 上计数会让**这一发自己**先吃到新层数 ✓（顺序错误 ⇒ 第一次剑势按 1 层算 ✗）；③ ⚠ `actor == self` **不可省** ✓：追加伤害也可能来自别人 ✓。⚠ **登记一处差异**：引擎把【剑势】建模成**两条规则里的 `DAMAGE`** ✗（没有「剑势」这个状态 ✗）⇒ 这里的「剑势」层数**只由本行迹创建与维护** ✓，与那两条伤害规则之间**没有**名字上的联系 ✗ —— 也就是说：将来若给素裳加了**别的** ADDITIONAL 伤害 ✓，本条会把它也数进去 ✗（当前她的文件里没有这种规则 ✓，而击破伤害不是 ADDITIONAL ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_sword_stance_damage_per_stack",
+      "when": [
+        "actor == self",
+        "damage_is_additional"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "damage_type": "ADDITIONAL",
+          "scale": "self_stacks:剑势",
+          "percent": 0.025
+        }
+      ],
+      "source": "1206 行迹 逐寇 (1206102): 「每发动1次【剑势】，【剑势】造成的伤害提高2.5%，该效果最多叠加10层。」 param = [0.025, 10]（每层增量、层数上限）",
+      "_note": "「…【剑势】造成的伤害提高 **2.5%**，该效果最多叠加 **10** 层」的**加成那一半** ✓ —— ① 「每层 +X%」按 §5.3 的规矩写成 **`percent` = 每层增量 + `scale` = 层数** ✓（`self_stacks:剑势` ✓、`percent: 0.025` ✓）⇒ 结算为 `percent × 层数` ✓ = 10 层时 **+25%** ✓，与「2.5% × 10 层」逐字一致 ✓；② 挂 `DEALING_DAMAGE` ✓（`BOOST_DAMAGE` 全库 **18/18** 都在这个事件上 ✓，因为它改的是**正在结算的这一发** ✓，没有时长、没有 buff ✓ ⇒ 不会漏进下一发 ✓）；③ ⚠ 用 `damage_type: ADDITIONAL` 把加成**限定在追加伤害**上 ✓ —— 原文说的是【剑势】**自己的**伤害提高 ✓，不是「素裳造成的伤害提高」✓；这不只是措辞：不加这个限制会**静默**给普攻 / 战技 / 终结技全都加成 ✗（引擎为此专门修过一次同类错误 ✓，见 `BOOST_DAMAGE` 源码注释里的 `follow-up attacks only ... raised every hit` ✓）；④ ⚠ 层数上限**不在这里写** ✗：它由 `ADD_STACK` 的 `max_stacks: 10` 兑现 ✓，两处各写一次就是**两个上限** ✓。⚠ 本条与上一条是**一对** ✓（计数 + 加成 ✓），共同替代了原文里「【剑势】」这个不存在的状态 ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_skill_point_on_a_broken_target",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "target has_state 弱点击破"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "1206 素裳 星魂1 游刃有余: 「对陷入弱点击破状态的敌方目标施放战技后，恢复1个战技点。」",
+      "_note": "「对陷入**弱点击破状态**的敌方目标施放战技后，恢复 **1** 个战技点」—— ① 事件 `SKILL_CAST` ✓（措辞是「施放战技**后**」✓，而这个事件在结算之后 ✓）；② 条件 `target has_state 弱点击破` ✓ —— 破韧状态名来自引擎自己的常量 `BuffManager.BROKEN_STATE` ✓（与本文件 `skill_sword_stance_guaranteed` 用的是同一个名字 ✓，两处不会分叉 ✓）；③ `actor == self` ✓（是**她**施放 ✓，不是队友 ✓）；④ `GAIN_SKILL_POINT` + `amount: 1` ✓（团队资源 ✓，没有 `target` ✓ —— 这个 op 改的是全队池子 ✓）。⚠ **登记**：原文说「**后**」，引擎在 `SKILL_CAST` 上结算 —— 该事件的时机是「施放完毕」✓，所以战技点比伤害晚到手 ✓，但**在同一帧内** ✓（本库既有的 `SKILL_CAST` 读者都是这个语义 ✓）。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "eidolon2_damage_reduction_after_sword_stance",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "damage_is_additional"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.2,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1206 素裳 星魂2 其身百炼: 「触发【剑势】后，素裳受到的伤害降低20%，持续1回合。」 param = [0.2]",
+      "_note": "「**触发【剑势】后**，素裳**受到的伤害降低 20%**，持续 **1** 回合」—— ① 「触发【剑势】」的判据与行迹逐寇**同一个** ✓：`damage_is_additional` ✓（【剑势】是 ADDITIONAL 实例 ✓，本文件已在这一对规则里用了两次同样判据 ✓ ⇒ 三处不会分叉 ✓）；② `MODIFY_DAMAGE_TAKEN` + `percent: -0.2` ✓ —— **负数**才是「受到的伤害降低」✓（正数是易伤 ✓，源码注释点名：两者都不是属性，所以 `MODIFY_ATTR` 表达不了 ✓）；③ `turns: 1` ✓、`target: self` ✓。⚠ 事件用 `DAMAGE_SETTLED` 与计数那条一致 ✓：挂 `DEALING_DAMAGE` 会让**这一发剑势自己**就吃上减伤 ✓（顺序错 ✓）。⚠ **登记**：`turns: 1` 的递减发生在**她的回合结束** ✓（引擎的 buff 计时语义 ✓），而原文只说「持续 1 回合」✓ —— 二者一致 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_ultra_and_talent_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1206 素裳 星魂3 传古剑流: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 技能等级+{'120603': 2, '120604': 2}",
+      "_note": "「终结技等级 **+2**…天赋等级 **+2**」—— 两条 `RAISE_SKILL_LEVEL` ✓，与本库 **23** 条星魂等级声明的写法完全同形 ✓（如 1001 星魂3/5、1103 星魂3/5 ✓）。⚠ 「最多不超过 15 级」**不在这里写** ✗：上限由技能数据自己的等级行数决定 ✓（`skills.json` 的 `param_list` 有多少行就封顶到多少 ✓），再写一个 15 就是**第二套上限** ✓。⚠ 槽位映射：`120603` = `ULTRA`、`120604` = `TALENT` ✓（引擎的 `SKILL_SLOT` 约定 ✓；本文件 `level_convention` 那条已经把四个槽位都 +9 到 Lv10 ✓，本条在其上再 +2 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon4_breaking_effect",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1206 素裳 星魂4 其心百辟: 「素裳的击破特攻提高40%。」 param = [0.4]",
+      "_note": "「素裳的**击破特攻提高 40%**」—— `MODIFY_ATTR` + `attribute: BREAKING_EFFECT` + `percent: 0.4` + `permanent: true` ✓。① 属性名 `BREAKING_EFFECT` 是引擎枚举里的真实值 ✓（`AttributeType` 的 `breaking_effect` ✓，语料先例 1214/1222/1225 都用它 ✓）；② `permanent: true` ✓ —— 原文没有时长 ✓，引擎的 `permanent` 就是「到战斗结束」✓（源码注释点名：它**不是**一个很长的回合数 ✓）；③ 挂 `BATTLE_START` ✓ —— 与 1301 星魂1（`EFFECT_RESISTANCE` + `permanent`）同形 ✓。⚠ 「击破特攻」不是「击破伤害」✗：它乘的是**击破基数** ✓（`BreakDamageCalculator.build` ✓），与 `BREAK_DAMAGE_BOOST` 是两个通道 ✓ —— 原文说的是「击破**特攻**」✓ ⇒ 用前者 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_skill_and_common_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "1206 素裳 星魂5 太虚神意: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 技能等级+{'120602': 2, '120601': 1}",
+      "_note": "「战技等级 **+2**…普攻等级 **+1**」—— 与星魂3 同形 ✓（`SKILL` +2、`COMMON` +1 ✓）。⚠ 两处上限（15 / 10）都**不写** ✗，理由同星魂3 ✓：技能数据的等级行数已经封顶 ✓。⚠ 槽位映射：`120602` = `SKILL`、`120601` = `COMMON` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_talent_speed_stacks_twice",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_speed_on_break",
+          "effect_max_stacks": 2
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 0
+          },
+          "turns": 2,
+          "max_stacks": 2,
+          "buff": "加速",
+          "target": "self"
+        }
+      ],
+      "source": "1206 素裳 星魂6 上善若水: 「天赋的加速效果可以叠加，最多叠加2层，且进入战斗后素裳立即获得1层天赋的加速效果。」",
+      "_note": "一句话两件事，**两件都写** ✓：① 「天赋的加速效果**可以叠加，最多叠加 2 层**」⇒ `MODIFY_RULE` + `rule: talent_speed_on_break` + `effect_max_stacks: 2` ✓ —— 这是引擎专门为「提高某条天赋的上限」提供的口子 ✓（源码注释原话：a CAP, not a value ✓，且它在**任何层数挂上之前**生效 ✓，因为 `BATTLE_START` 先于一切回合 ✓）；② 「进入战斗后素裳**立即获得 1 层**天赋的加速效果」⇒ 同一条 `MODIFY_RULE` 之后追加一条 `MODIFY_ATTR` ✓（`SPEED +20%`、`turns: 2`、`max_stacks: 2` ✓）—— **数值与时长照抄天赋本身** ✓（天赋 Lv10 = `0.2` / `2` 回合 ✓，两处写在同一个文件里 ✓ 不会分叉 ✓）。⚠ **`buff: 加速` 是必须的** ✓：不带名字的修饰**叠加不了也摘不掉** ✗（`MODIFY_ATTR` 的 `max_stacks` 要按名字聚 ✓）；而天赋那条**不具名** ✗ —— ⇒ 星魂 6 的 `max_stacks` 管的是**这一条自己的**实例 ✓，与天赋那条**是两个**修饰 ✓ ⇒ **登记一处差异**：满层时她会有「天赋 1 层 + 星魂 1 层」两个无名字的联系 ✗，而原文说的是**同一个**加速效果叠 2 层 ✓。要让两者真正同源，需要让天赋那条也具名 ✓（改 `talent_speed_on_break` 加 `buff`）—— 本轮**没有**改它 ✗，因为那会改变 0 星魂时的行为 ✓，不在本批范围内 ✓。⚠ 另**登记**：`turns` 各自的计时独立 ✓，所以两层可能不同时到期 ✓（原文未说同时 ✓）。⭐⭐ **CORRECTED（2026-10-19）**：上面那段「与天赋那条**是两个**修饰」**已过时** ✓ —— 天赋那条**现在具名** `buff: 加速` ✓（见它的 note ✓）⇒ 两条**同源** ✓，`MODIFY_RULE` 提的上限与这里的 `max_stacks: 2` 说的是**同一个**加速 ✓。⚠ 数值同样改成**读行** ✓（`percent_from_skill_param: \"TALENT:0\"` ✓）：E3 之后天赋的有效等级是 12 ⇒ 0.21 ✓（写死 0.2 会少算 ✓，与天赋那条**同源同值** ⇒ 两处一起读行才不会分叉 ✓）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill COMMON",
+        "enemy_state_count:弱点击破 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.15,
+          "target": "self"
+        }
+      ],
+      "source": "1206 行迹 破敌 (1206103): 「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前15%。」 param = [0.15]",
+      "_note": "「**施放普攻或战技后**，若**场上有敌方目标处于弱点击破状态**，则素裳的**行动提前 15%**」—— ① 事件 `ALLY_ATTACK` ✓：它**每次施放只发一次** ✓（本文件两条【剑势】用的是同一个事件 ✓，理由也写在它们的 note 里：挂逐段的 `DEALING_DAMAGE` 会逐段触发 ✗）；② 「普攻**或**战技」写成**两条**规则 ✓ —— DSL 没有 or ✗（`when` 是 AND ✓），而两条的 `when` 不同（`from_skill COMMON` ✓）⇒ 不是「一句话写两遍」✓（`ContentDuplicateGuardTest` 的签名含 `when` ✓，同形先例 1111 的 COMMON/SKILL 一对 ✓）；③ ⭐ **本条是 `enemy_state_count:` 的第一个读者** ✓（本轮新增的引擎能力 ✓）—— 原文问的是**全场**（「场上有敌方目标」✓），而 `has_state` 只问**某个具体单位** ✗，`enemy_count` 又只数人头不问状态 ✗ ⇒ 两者都写不出这句 ✓。计数 == 1 与 >= 1 在这句话上等价 ✓，但仍按**数量**写 ✓：同一句话的「有」只是数量 >= 1 的一种说法 ✓；④ `ADVANCE` + `percent: 0.15` ✓，`target: self` ✓（行动提前的是**素裳**✓）。⚠ `percent` 的口径按引擎自己的定义 ✓：**1.0 = 跳过目标剩余等待时间的全部** ✓，所以 0.15 = 跳过剩余的 15% ✓ —— 与 1215 星魂1 的「行动提前 15%」写法**逐字相同** ✓；⚠ 原文没有说「剩余」，但这是本引擎对「行动提前 X%」的**统一口径** ✓（全库 33 处 `ADVANCE` 同此），本条不另立一套 ✓。⚠ **登记**：`enemy_state_count` 只数**活着**的敌人 ✓（`enemyCount` 同款过滤 ✓），而原文说「场上有」✓ —— 已死的敌人本来就不该算「在场上」✓，两者的差别只出现在「破韧后被打死」这一瞬间 ✓。",
+      "id": "trace_breaking_advance_after_common"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "enemy_state_count:弱点击破 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.15,
+          "target": "self"
+        }
+      ],
+      "source": "1206 行迹 破敌 (1206103): 「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前15%。」 param = [0.15]",
+      "_note": "「**施放普攻或战技后**，若**场上有敌方目标处于弱点击破状态**，则素裳的**行动提前 15%**」—— ① 事件 `ALLY_ATTACK` ✓：它**每次施放只发一次** ✓（本文件两条【剑势】用的是同一个事件 ✓，理由也写在它们的 note 里：挂逐段的 `DEALING_DAMAGE` 会逐段触发 ✗）；② 「普攻**或**战技」写成**两条**规则 ✓ —— DSL 没有 or ✗（`when` 是 AND ✓），而两条的 `when` 不同（`from_skill SKILL` ✓）⇒ 不是「一句话写两遍」✓（`ContentDuplicateGuardTest` 的签名含 `when` ✓，同形先例 1111 的 COMMON/SKILL 一对 ✓）；③ ⭐ **本条是 `enemy_state_count:` 的第一个读者** ✓（本轮新增的引擎能力 ✓）—— 原文问的是**全场**（「场上有敌方目标」✓），而 `has_state` 只问**某个具体单位** ✗，`enemy_count` 又只数人头不问状态 ✗ ⇒ 两者都写不出这句 ✓。计数 == 1 与 >= 1 在这句话上等价 ✓，但仍按**数量**写 ✓：同一句话的「有」只是数量 >= 1 的一种说法 ✓；④ `ADVANCE` + `percent: 0.15` ✓，`target: self` ✓（行动提前的是**素裳**✓）。⚠ `percent` 的口径按引擎自己的定义 ✓：**1.0 = 跳过目标剩余等待时间的全部** ✓，所以 0.15 = 跳过剩余的 15% ✓ —— 与 1215 星魂1 的「行动提前 15%」写法**逐字相同** ✓；⚠ 原文没有说「剩余」，但这是本引擎对「行动提前 X%」的**统一口径** ✓（全库 33 处 `ADVANCE` 同此），本条不另立一套 ✓。⚠ **登记**：`enemy_state_count` 只数**活着**的敌人 ✓（`enemyCount` 同款过滤 ✓），而原文说「场上有」✓ —— 已死的敌人本来就不该算「在场上」✓，两者的差别只出现在「破韧后被打死」这一瞬间 ✓。",
+      "id": "trace_breaking_advance_after_skill"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_grants_two_extra_sword_stance_rolls",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "剑势额外判定",
+          "amount": 1,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1206 素裳 终结技 太虚形蕴•烛夜: 「…且施放战技时额外增加2次【剑势】的发动判定，持续2回合。」 param Lv10 → [3.2, 2, 0.5, 0.3]（#2 = 额外判定次数 2、#3 = 额外判定的伤害比率 0.5）",
+      "_note": "这句话里**「持续 2 回合」的标记那一半** ✓：用 `ADD_STACK` + `turns: 2` 做一个**限时标记** ✓（`StackBuff` 的 `turns` 就是「到点自己掉」✓，与本库其它限时标记同形 ✓）。⚠ **不是层数消耗**：原文说「持续 2 回合」✗，没有说每掷一次消耗一层 ✗ ⇒ 一个不带层数的标记就够了 ✓（`amount: 1` ✓）；下面两条用 `self_stacks:` 读它 ✓。⚠ 具名 `剑势额外判定` 是必须的 ✓：`self_stacks:` 按**名字**读 ✓。⚠ 参数交叉验证 ✓：`AvatarConfigLD` 那一行 Lv10 的 `#2` 是 **2**（额外判定次数）✓、`#3` 是 **0.5** ✓，与正文的「2 次」「50%」逐字一致 ✓ —— 所以本句没有第二个数字歧义 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "extra_sword_stance_roll_chance",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "self_stacks:剑势额外判定 >= 1",
+        "!target has_state 弱点击破"
+      ],
+      "chance": 0.33,
+      "chance_rolls": 2,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "element": "Physical",
+          "target": "target",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.5,
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "SKILL",
+            "index": 1
+          }
+        }
+      ],
+      "source": "1206 素裳 终结技: 「施放战技时额外增加2次【剑势】的发动判定，持续2回合。通过额外判定发动的【剑势】伤害为原伤害的50%。」",
+      "_note": "「额外增加 **2** 次【剑势】的**发动判定**…通过额外判定发动的【剑势】伤害为**原伤害的 50%**」—— ① ⭐ **`chance_rolls: 2` 是本轮新增的引擎能力** ✓（规则级**独立**掷骰 ✓）—— 为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会把它判成「one sentence written twice」✗（**实测**：两条对称规则报 `ids extra_sword_stance_roll1 / _roll2` ✓）；② ⚠ 也**不是** `times: 2` ✗：`times` 重复的是**已经判定的结算** ✓，所以 `chance: 0.33, times: 2` 是「**一次**判定、两个伤害实例」✗，而原文说的是「**2 次**判定」✓ ⇒ 期望值相同、**分布不同** ✓，不能用前者近似后者 ✓；③ `chance: 0.33` 与基础【剑势】同值 ✓（同一句「33% 概率发动【剑势】」✓ —— 额外判定用的就是同一个判定 ✓）；④ `percent: 0.5` = 「原伤害的 50%」✓，`scale: self_attr:ATTACK` ✓（原伤害 = 100% 攻击力 ✓，与 `skill_sword_stance_chance` 同一口径 ✓）；⑤ `!target has_state 弱点击破` ✓ 与基础那条**成对** ✓（破韧时由 `_guaranteed` 接管 ✓，避免「破韧时还掷 33% 骰子」✗ —— 与基础那对完全同构 ✓）。⭐⭐ **CORRECTED（2026-10-19 第二批）「原伤害的 50%」改成「那一行 × 50%」** ✓：上一版写 `percent: 0.5` 字面量 ✓（= 50% 攻击力），而**原伤害**是**战技那一行的 #2**（`SKILL:1` ✓：E0 = 1.0、E5 之后 = **1.1** ✓）⇒ 星魂 5 抬了战技等级之后**少算 9%** ✓（0.5 对 0.55 ✓，症状沉默 ✓）。现在 `percent: 0.5` ＋ `percent_from_skill_param: \"SKILL:1\"` ✓ —— **两个一起写**是引擎本批新开的读法：`percent` 变成那个份额的**分数** ✓（`TriggerMagnitudes.shareOf` ✓）；⚠ 装载期只对**伤害路径**开口子 ✓（两条**行份额**仍然互斥 ✓，见 `TriggerValidator.requirePercent` ✓）。判据 `SushangExtraRollFollowsTheRowTest` ✓：E0／E5 两档里**每一发**剑势伤害之比 = **1.1** ✓（只钉 E0 分不出字面量与读行 ✓），三条变异都已验证会红 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "extra_sword_stance_roll_guaranteed",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "self_stacks:剑势额外判定 >= 1",
+        "target has_state 弱点击破"
+      ],
+      "chance": 1.0,
+      "chance_rolls": 2,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "element": "Physical",
+          "target": "target",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.5,
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "SKILL",
+            "index": 1
+          }
+        }
+      ],
+      "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」+ 终结技: 「…额外增加2次【剑势】的发动判定…」",
+      "_note": "破韧时额外的那 2 次判定**同样必定发动** ✓ —— 原文的「必定发动」是**关于【剑势】这个判定**说的 ✓，而终结技只说了「额外增加 2 次…判定」✓（**沿用**同一个判定 ✓，不另立规则 ✗）。⚠ `chance: 1.0` 是需要的 ✓：`chance_rolls` 在**没有** `chance` 时会被加载期拒绝 ✓（「roll twice for always」说不清要掷什么 ✓），而 `chance: 1.0` 不消耗骰子 ✓ ⇒ 两次都必定结算 ✓。⚠ `percent: 0.5` 同样适用 ✓：原文的 50% 说的是「通过额外判定发动的【剑势】」✓，与是否破韧无关 ✓。⚠ 与本文件的 `skill_sword_stance_guaranteed` **成对** ✓（一条是基础判定、一条是额外判定 ✓，`when` 不同 ✓）。⚠⚠ **登记（2026-10-19 逐句核时新增）**：「**原伤害的 50%**」里的**原伤害**指的是**基础【剑势】那一笔** ✓（= 战技行的 #2 × 攻击力 ✓），而本条的 `percent: 0.5` × `self_attr:ATTACK` 写的是**攻击力的 50%** ✗ —— 两者只在**基础剑势 = 100% 攻击力**时相等 ✓（Lv10 正是如此 ✓），而 **E5 之后基础剑势是 1.1** ✓ ⇒ 本条应收 **55% 攻击力**，实际给 **50%** ✗（少算约 9%，**无症状** ✓）。⚠ 词表里没有「一个份额 × 另一条技能行」的拼法 ✗（`percent_from_skill_param` 读到的是**份额本身** 1.1 ✓ 不能只取它的一半 ✗；`skill_param:` 这类 `scale` 读出来的是**参数值**、单位不是攻击力 ✗）⇒ **如实登记，不近似** ✓。⭐⭐ **CORRECTED（2026-10-19 第二批）「原伤害的 50%」改成「那一行 × 50%」** ✓：上一版写 `percent: 0.5` 字面量 ✓（= 50% 攻击力），而**原伤害**是**战技那一行的 #2**（`SKILL:1` ✓：E0 = 1.0、E5 之后 = **1.1** ✓）⇒ 星魂 5 抬了战技等级之后**少算 9%** ✓（0.5 对 0.55 ✓，症状沉默 ✓）。现在 `percent: 0.5` ＋ `percent_from_skill_param: \"SKILL:1\"` ✓ —— **两个一起写**是引擎本批新开的读法：`percent` 变成那个份额的**分数** ✓（`TriggerMagnitudes.shareOf` ✓）；⚠ 装载期只对**伤害路径**开口子 ✓（两条**行份额**仍然互斥 ✓，见 `TriggerValidator.requirePercent` ✓）。判据 `SushangExtraRollFollowsTheRowTest` ✓：E0／E5 两档里**每一发**剑势伤害之比 = **1.1** ✓（只钉 E0 分不出字面量与读行 ✓），三条变异都已验证会红 ✓。"
+    }
+  ]
+}

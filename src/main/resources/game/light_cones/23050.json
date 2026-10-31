@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23050,
   "1": [
     {
       "on": "WEAKNESS_ADDED",
@@ -8,7 +10,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
     },
     {
       "on": "ULT_CAST",
@@ -17,7 +19,7 @@
       "do": [
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
-      "note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+      "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
     }
   ],
   "2": [
@@ -29,7 +31,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
     },
     {
       "on": "ULT_CAST",
@@ -38,7 +40,7 @@
       "do": [
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
-      "note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+      "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
     }
   ],
   "3": [
@@ -50,7 +52,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
     },
     {
       "on": "ULT_CAST",
@@ -59,7 +61,7 @@
       "do": [
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
-      "note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+      "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
     }
   ],
   "4": [
@@ -71,7 +73,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
     },
     {
       "on": "ULT_CAST",
@@ -80,7 +82,7 @@
       "do": [
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
-      "note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+      "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
     }
   ],
   "5": [
@@ -92,7 +94,7 @@
         { "op": "GAIN_SKILL_POINT", "amount": 1, "target": "self" }
       ],
       "once_per_battle": true,
-      "note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
+      "_note": "「装备者**为敌方目标添加弱点时**恢复 1 个战技点，**最多触发 1 次**，**施放终结技时重置**可触发次数」—— `WEAKNESS_ADDED` ＋ `actor == self` ＋ `GAIN_SKILL_POINT(1)` ＋ `once_per_battle` 语义由 `RESET_TRIGGER_LIMIT` ✓ 承担（引擎里正是为这类句子加的 ✓）。\n⛔ **仍开（已登记 §4.3）**：「进入战斗时，使装备者和**另一位开战的队友**造成的击破伤害 +32%（**若不存在开战的队友**则对装备者和**击破特攻最高的队友**生效）」**整句没有** ✗ —— 需要「挑一个队友并给她上修饰」的选择器 ✗（`other_allies` 会给全队 ✓，`next_ally` 是**行动顺序**上的下一个 ✗）⇒ 等价缺口。"
     },
     {
       "on": "ULT_CAST",
@@ -101,7 +103,7 @@
       "do": [
         { "op": "RESET_TRIGGER_LIMIT", "rule": "cone23050_weakness_grants_skill_point", "target": "self" }
       ],
-      "note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
+      "_note": "「施放终结技时**重置**上一个效果的触发次数」—— `ULT_CAST` ＋ `RESET_TRIGGER_LIMIT{rule: cone23050_weakness_grants_skill_point}` ✓。"
     }
   ]
 }

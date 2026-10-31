@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "relic_set": 117,
   "2": [
     {
       "on": "DEALING_DAMAGE",
@@ -7,7 +9,7 @@
         { "op": "BOOST_DAMAGE", "percent": 0.12 }
       ],
       "source": "relic set 117 (死水深潜的先驱 / Pioneer Diver of Dead Waters), 2-piece: 「对受负面状态影响的敌人造成的伤害提高#1[i]%。」 param = [0.12]",
-      "note": "The whole 2-piece (its `properties` is empty, so there is nothing for the data path to apply). ⚠ `DEALING_DAMAGE` fires **before** the zones are read and hands the pending instance over, so `BOOST_DAMAGE` changes that one instance; a rule hung on `ALLY_ATTACK` would be too late, the number being final by then. ⚠ `actor == self` is 「装备者造成的伤害」: DEALING_DAMAGE is delivered to every character's table for every instance, so without it the wearer would boost a teammate's hit on the same debuffed enemy -- the same reading 桂乃芬's trace (characters/1210.json) uses. ⚠ `target_debuff_count` counts what the VICTIM carries, which is what 「受负面状态影响的敌人」 says."
+      "_note": "The whole 2-piece (its `properties` is empty, so there is nothing for the data path to apply). ⚠ `DEALING_DAMAGE` fires **before** the zones are read and hands the pending instance over, so `BOOST_DAMAGE` changes that one instance; a rule hung on `ALLY_ATTACK` would be too late, the number being final by then. ⚠ `actor == self` is 「装备者造成的伤害」: DEALING_DAMAGE is delivered to every character's table for every instance, so without it the wearer would boost a teammate's hit on the same debuffed enemy -- the same reading 桂乃芬's trace (characters/1210.json) uses. ⚠ `target_debuff_count` counts what the VICTIM carries, which is what 「受负面状态影响的敌人」 says."
     }
   ],
   "4": [
@@ -19,7 +21,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.08, "instance": true, "target": "self", "turns": 1 }
       ],
       "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
-      "note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化版翻倍（+16% / +24% ✓）、四条都改成 **instance: true** ✓（伤害时修饰不带回合 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：强化那两条原先写回原值 ✗（等于没翻倍 ✗）、且用 \turns: 1 ✗。"
+      "_note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化版翻倍（+16% / +24% ✓）、四条都改成 **instance: true** ✓（伤害时修饰不带回合 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：强化那两条原先写回原值 ✗（等于没翻倍 ✗）、且用 \turns: 1 ✗。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -29,7 +31,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "instance": true, "target": "self", "turns": 1 }
       ],
       "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
-      "note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化版翻倍（+16% / +24% ✓）、四条都改成 **instance: true** ✓（伤害时修饰不带回合 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：强化那两条原先写回原值 ✗（等于没翻倍 ✗）、且用 \turns: 1 ✗。"
+      "_note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化版翻倍（+16% / +24% ✓）、四条都改成 **instance: true** ✓（伤害时修饰不带回合 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：强化那两条原先写回原值 ✗（等于没翻倍 ✗）、且用 \turns: 1 ✗。"
     },
     {
       "on": "DEBUFF_APPLIED",
@@ -39,7 +41,7 @@
         { "op": "ADD_STACK", "buff": "负面激化", "amount": 1, "target": "self", "turns": 1 }
       ],
       "source": "遗器 117 死水深潜的先驱 4 件套（施加负面效果分支）: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
-      "note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化版翻倍（+16% / +24% ✓）、四条都改成 **instance: true** ✓（伤害时修饰不带回合 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：强化那两条原先写回原值 ✗（等于没翻倍 ✗）、且用 \turns: 1 ✗。"
+      "_note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化版翻倍（+16% / +24% ✓）、四条都改成 **instance: true** ✓（伤害时修饰不带回合 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：强化那两条原先写回原值 ✗（等于没翻倍 ✗）、且用 \turns: 1 ✗。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -49,7 +51,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.08, "instance": true, "target": "self", "turns": 1 }
       ],
       "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
-      "note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化那一半单独一条规则，与基础那条**相加**就是翻倍 ✓（0.08+0.08=0.16 ✓）。\n⚠⚠ **2026-10-19 逐句核时把四条都改成 instance: true + \turns: 1** ✓（伤害时修饰 ✓）；强化那两条原本就是相加的写法 ✓（不能再把数值改成翻倍 ✗）。"
+      "_note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化那一半单独一条规则，与基础那条**相加**就是翻倍 ✓（0.08+0.08=0.16 ✓）。\n⚠⚠ **2026-10-19 逐句核时把四条都改成 instance: true + \turns: 1** ✓（伤害时修饰 ✓）；强化那两条原本就是相加的写法 ✓（不能再把数值改成翻倍 ✗）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -59,7 +61,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "instance": true, "target": "self", "turns": 1 }
       ],
       "source": "遗器 117 死水深潜的先驱 4 件套: 暴击率提高#1[i]%，装备者对陷入不少于#4[i]/#5[i]个负面效果的敌方目标造成的暴击伤害提高#2[i]%/#3[i]%。装备者对敌方目标施加负面效果后，上述效果提高100%，持续#6[i]回合。",
-      "note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化那一半单独一条规则，与基础那条**相加**就是翻倍 ✓（0.08+0.08=0.16 ✓）。\n⚠⚠ **2026-10-19 逐句核时把四条都改成 instance: true + \turns: 1** ✓（伤害时修饰 ✓）；强化那两条原本就是相加的写法 ✓（不能再把数值改成翻倍 ✗）。"
+      "_note": "「装备者对陷入 ≥2 / ≥4 个负面效果的敌方目标造成的暴击伤害 +8% / +12%；**对敌方施加负面效果后，上述效果提高 100%**」—— 强化那一半单独一条规则，与基础那条**相加**就是翻倍 ✓（0.08+0.08=0.16 ✓）。\n⚠⚠ **2026-10-19 逐句核时把四条都改成 instance: true + \turns: 1** ✓（伤害时修饰 ✓）；强化那两条原本就是相加的写法 ✓（不能再把数值改成翻倍 ✗）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -69,7 +71,7 @@
         { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.04, "instance": true, "target": "self", "turns": 1 }
       ],
       "source": "遗器 117 四件套: 「上述效果提高 100%」也包括暴击率那一半",
-      "note": "「**上述效果提高 100%**」也包含「暴击率 +4%」⇒ 强化期间再加 一条 **+4%** 的实例修饰 ✓（原文件只有暴击伤害那两条 ✗）。"
+      "_note": "「**上述效果提高 100%**」也包含「暴击率 +4%」⇒ 强化期间再加 一条 **+4%** 的实例修饰 ✓（原文件只有暴击伤害那两条 ✗）。"
     }
   ]
 }

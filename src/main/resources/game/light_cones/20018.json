@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 20018,
   "1": [
     {
       "on": "SKILL_CAST",
@@ -8,7 +10,7 @@
         { "op": "ADD_STACK", "buff": "下一次普攻待命", "amount": 1, "max_stacks": 1, "until": "next_attack", "target": "self" }
       ],
       "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -19,7 +21,7 @@
         { "op": "REMOVE_STACK", "buff": "下一次普攻待命", "amount": 1, "target": "self" }
       ],
       "source": "光锥 20018 匿影: 「施放战技后，使装备者的**下一次普攻**对敌方目标造成等同于自身 #1% 攻击力的附加伤害。」（`weapon_skill_data` 逐档 0.6/0.75/0.9/1.05/1.2 ✓）",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
     }
   ],
   "2": [
@@ -31,7 +33,7 @@
         { "op": "ADD_STACK", "buff": "下一次普攻待命", "amount": 1, "max_stacks": 1, "until": "next_attack", "target": "self" }
       ],
       "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -42,7 +44,7 @@
         { "op": "REMOVE_STACK", "buff": "下一次普攻待命", "amount": 1, "target": "self" }
       ],
       "source": "光锥 20018 匿影: 「施放战技后，使装备者的**下一次普攻**对敌方目标造成等同于自身 #1% 攻击力的附加伤害。」（`weapon_skill_data` 逐档 0.6/0.75/0.9/1.05/1.2 ✓）",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
     }
   ],
   "3": [
@@ -54,7 +56,7 @@
         { "op": "ADD_STACK", "buff": "下一次普攻待命", "amount": 1, "max_stacks": 1, "until": "next_attack", "target": "self" }
       ],
       "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -65,7 +67,7 @@
         { "op": "REMOVE_STACK", "buff": "下一次普攻待命", "amount": 1, "target": "self" }
       ],
       "source": "光锥 20018 匿影: 「施放战技后，使装备者的**下一次普攻**对敌方目标造成等同于自身 #1% 攻击力的附加伤害。」（`weapon_skill_data` 逐档 0.6/0.75/0.9/1.05/1.2 ✓）",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
     }
   ],
   "4": [
@@ -77,7 +79,7 @@
         { "op": "ADD_STACK", "buff": "下一次普攻待命", "amount": 1, "max_stacks": 1, "until": "next_attack", "target": "self" }
       ],
       "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -88,7 +90,7 @@
         { "op": "REMOVE_STACK", "buff": "下一次普攻待命", "amount": 1, "target": "self" }
       ],
       "source": "光锥 20018 匿影: 「施放战技后，使装备者的**下一次普攻**对敌方目标造成等同于自身 #1% 攻击力的附加伤害。」（`weapon_skill_data` 逐档 0.6/0.75/0.9/1.05/1.2 ✓）",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
     }
   ],
   "5": [
@@ -100,7 +102,7 @@
         { "op": "ADD_STACK", "buff": "下一次普攻待命", "amount": 1, "max_stacks": 1, "until": "next_attack", "target": "self" }
       ],
       "source": "光锥 20018: 「施放战技后，使装备者的**下一次普攻**…」",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗（原文：*\"that is the event that hands over what it changes\"* ✓）⇒ **先上标记**（`until: next_attack` ✓），**再在命中时消耗** ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -111,7 +113,7 @@
         { "op": "REMOVE_STACK", "buff": "下一次普攻待命", "amount": 1, "target": "self" }
       ],
       "source": "光锥 20018 匿影: 「施放战技后，使装备者的**下一次普攻**对敌方目标造成等同于自身 #1% 攻击力的附加伤害。」（`weapon_skill_data` 逐档 0.6/0.75/0.9/1.05/1.2 ✓）",
-      "note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
+      "_note": "⭐⭐ **两步写法** ✓（加载器给出的硬规则 ✓）：`ADD_DAMAGE` **只能挂在 `DEALING_DAMAGE`** ✗ ⇒ 先上标记、命中时消耗 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `from_skill COMMON`** ✓：没有它，这一发**不是**普攻也会被消耗并付伤害 ✗（句子写的是「下一次**普攻**」✓）。\n⛔ **仍开（已登记 §4.3）**：寿命 `until: \"next_attack\"` 的终止条件是「**任一种攻击落地**」✗ —— 若她先放战技，标记会在那一发上**白白消失** ✗（句子要的是「下一次**普攻**」✓，而词表里没有这一档寿命 ✗）。⇒ 现在的取舍是**宁可不付、不付错** ✓；见证在 `ConeAuditBatchFourTest` ✓。"
     }
   ]
 }

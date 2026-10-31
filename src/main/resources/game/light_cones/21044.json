@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21044,
   "1": [
     {
       "on": "DEALING_DAMAGE",
@@ -15,7 +17,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -32,7 +34,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     }
   ],
   "2": [
@@ -51,7 +53,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -68,7 +70,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     }
   ],
   "3": [
@@ -87,7 +89,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -104,7 +106,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     }
   ],
   "4": [
@@ -123,7 +125,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -140,7 +142,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     }
   ],
   "5": [
@@ -159,7 +161,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**防御降低**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -176,7 +178,7 @@
         }
       ],
       "source": "光锥 21044: 「装备者对处于**减速**状态下的敌人造成的暴击伤容提高#2[i]%。」",
-      "note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
+      "_note": "「装备者对处于**防御降低或减速**状态下的敌人造成的暴击伤害提高 24%」—— 两条规则（`target_debuff:DEFENCE` / `target_debuff:SPEED`）＋ `MODIFY_ATTR CRIT_ATTACK{instance: true}` ✓；「暴击率提高 8%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `instance: true`** ✗ —— 原先只有 `permanent: true`，那会把「打中过一次带负面效果的敌人」变成**永久 +24% 暴伤** ✗（句子说的是「**对其造成**的暴击伤害」✓，只对这一发 ✓）。"
     }
   ]
 }

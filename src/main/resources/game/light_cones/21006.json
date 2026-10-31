@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 21006,
   "1": [
     {
       "on": "BATTLE_START",
@@ -7,7 +9,7 @@
         { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.24, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21006（「我」的诞生）: 「使装备者追加攻击造成的伤害提高#1[i]%。若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -17,7 +19,7 @@
         { "op": "BOOST_DAMAGE", "percent": 0.24, "instance": true, "damage_type": "ADDITIONAL" }
       ],
       "source": "光锥 21006: 「若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     }
   ],
   "2": [
@@ -28,7 +30,7 @@
         { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.3, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21006（「我」的诞生）: 「使装备者追加攻击造成的伤害提高#1[i]%。若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -38,7 +40,7 @@
         { "op": "BOOST_DAMAGE", "percent": 0.3, "instance": true, "damage_type": "ADDITIONAL" }
       ],
       "source": "光锥 21006: 「若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     }
   ],
   "3": [
@@ -49,7 +51,7 @@
         { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.36, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21006（「我」的诞生）: 「使装备者追加攻击造成的伤害提高#1[i]%。若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -59,7 +61,7 @@
         { "op": "BOOST_DAMAGE", "percent": 0.36, "instance": true, "damage_type": "ADDITIONAL" }
       ],
       "source": "光锥 21006: 「若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     }
   ],
   "4": [
@@ -70,7 +72,7 @@
         { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.42, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21006（「我」的诞生）: 「使装备者追加攻击造成的伤害提高#1[i]%。若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -80,7 +82,7 @@
         { "op": "BOOST_DAMAGE", "percent": 0.42, "instance": true, "damage_type": "ADDITIONAL" }
       ],
       "source": "光锥 21006: 「若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     }
   ],
   "5": [
@@ -91,7 +93,7 @@
         { "op": "MODIFY_ATTR", "attribute": "FOLLOW_UP_DAMAGE_BOOST", "percent": 0.48, "permanent": true, "target": "self" }
       ],
       "source": "光锥 21006（「我」的诞生）: 「使装备者追加攻击造成的伤害提高#1[i]%。若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -101,7 +103,7 @@
         { "op": "BOOST_DAMAGE", "percent": 0.48, "instance": true, "damage_type": "ADDITIONAL" }
       ],
       "source": "光锥 21006: 「若该敌方目标当前生命值百分比小于等于#2[i]%，则追加攻击造成的伤害额外提高#3[i]%」",
-      "note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
+      "_note": "⭐ **常数半写成一条无条件的规则** ✓（`BATTLE_START` + `FOLLOW_UP_DAMAGE_BOOST` ✓）—— 本椎**没有 `ability_property`** ✗（与 22003/23009/23015 相反 ✓）。⭐ 第二句用 **`BOOST_DAMAGE` + `instance: true` + `damage_type: \"ADDITIONAL\"`** ✓ 限定在追加攻击上 ✓（否则它会把**普通伤害**也抬起来 ✗，而文本只说追加攻击 ✓）。⭐ 数值取自数据行 ✓（`values[0]` = 无条件那半 ✓、`values[1]` = 血量阈值 ✓、`values[2]` = 额外那半 ✓）。"
     }
   ]
 }

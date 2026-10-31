@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 22004,
   "1": [
     {
       "on": "DEALING_DAMAGE",
@@ -17,7 +19,7 @@
         }
       ],
       "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
-      "note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
+      "_note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
     }
   ],
   "2": [
@@ -38,7 +40,7 @@
         }
       ],
       "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
-      "note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
+      "_note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
     }
   ],
   "3": [
@@ -59,7 +61,7 @@
         }
       ],
       "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
-      "note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
+      "_note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
     }
   ],
   "4": [
@@ -80,7 +82,7 @@
         }
       ],
       "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
-      "note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
+      "_note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
     }
   ],
   "5": [
@@ -101,7 +103,7 @@
         }
       ],
       "source": "光锥 22004: 「敌方目标每拥有1个不同属性的弱点，装备者对其造成的伤容提高#2[i]%，最多计入7个。」",
-      "note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
+      "_note": "「敌方目标每拥有 **1 个不同属性的弱点**，装备者对其造成的伤害提高 #2%，**最多计入 7 个**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `instance: true` ＋ `per_stack: target_weakness_count` ✓ ＋ **`cap_amount: 0.28`** ✓（= 7 × 4% ✓，叠影 1 每弱点 4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `cap_amount`** ✗：原先没有上限 ⇒ 8 个弱点会读成 32% 而不是 28% ✗。"
     }
   ]
 }

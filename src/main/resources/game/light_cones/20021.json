@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 20021,
   "1": [
     {
       "on": "SUMMONED",
@@ -10,7 +12,7 @@
         { "op": "GAIN_ENERGY", "amount": 12, "target": "self" }
       ],
       "source": "光锥 20021: 「装备者**首次召唤忆灵**时，恢复#1[i]点战技点，并恢复自身#2[i]点能量。」",
-      "note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
+      "_note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
     }
   ],
   "2": [
@@ -24,7 +26,7 @@
         { "op": "GAIN_ENERGY", "amount": 14, "target": "self" }
       ],
       "source": "光锥 20021: 「装备者**首次召唤忆灵**时，恢复#1[i]点战技点，并恢复自身#2[i]点能量。」",
-      "note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
+      "_note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
     }
   ],
   "3": [
@@ -38,7 +40,7 @@
         { "op": "GAIN_ENERGY", "amount": 16, "target": "self" }
       ],
       "source": "光锥 20021: 「装备者**首次召唤忆灵**时，恢复#1[i]点战技点，并恢复自身#2[i]点能量。」",
-      "note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
+      "_note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
     }
   ],
   "4": [
@@ -52,7 +54,7 @@
         { "op": "GAIN_ENERGY", "amount": 18, "target": "self" }
       ],
       "source": "光锥 20021: 「装备者**首次召唤忆灵**时，恢复#1[i]点战技点，并恢复自身#2[i]点能量。」",
-      "note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
+      "_note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
     }
   ],
   "5": [
@@ -66,7 +68,7 @@
         { "op": "GAIN_ENERGY", "amount": 20, "target": "self" }
       ],
       "source": "光锥 20021: 「装备者**首次召唤忆灵**时，恢复#1[i]点战技点，并恢复自身#2[i]点能量。」",
-      "note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
+      "_note": "⭐ **两件现成东西拼成** ✓：`SUMMONED` ✓（召唤事件 ✓）+ **`once_per_battle: true`** ✓ 表达「**首次**」 ✓ —— 它本来就是\"一场战斗只发一次\"的规则级限制 ✓。⭐ 两个效果：`GAIN_SKILL_POINT` ✓ + `GAIN_ENERGY` ✓（都是现成 op ✓）。⚠ 口径：门槛 `actor == self` ✓（是**装备者自己**召唤 ✓，而不是任何人 ✗）。"
     }
   ]
 }

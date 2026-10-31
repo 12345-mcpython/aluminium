@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "light_cone": 23027,
   "1": [
     {
       "on": "DEALING_DAMAGE",
@@ -16,7 +18,7 @@
         }
       ],
       "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
-      "note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
+      "_note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -26,7 +28,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
-      "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
+      "_note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
     }
   ],
   "2": [
@@ -46,7 +48,7 @@
         }
       ],
       "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
-      "note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
+      "_note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -56,7 +58,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.14, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
-      "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
+      "_note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
     }
   ],
   "3": [
@@ -76,7 +78,7 @@
         }
       ],
       "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
-      "note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
+      "_note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -86,7 +88,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.16, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
-      "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
+      "_note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
     }
   ],
   "4": [
@@ -106,7 +108,7 @@
         }
       ],
       "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
-      "note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
+      "_note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -116,7 +118,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.18, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
-      "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
+      "_note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
     }
   ],
   "5": [
@@ -136,7 +138,7 @@
         }
       ],
       "source": "光锥 23027: 「造成的击破伤容无视目标#3[i]%的防御力。」",
-      "note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
+      "_note": "「造成的**击破伤害**无视目标 #3% 防御力」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `MODIFY_ATTR DEFENCE_IGNORE{percent: 20/23/26/29/32%, damage_type: BREAK, instance: true}` ✓（只对击破伤害 ✓）。⚠ 「击破特攻提高 #1%」由光锥属性给 ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -146,7 +148,7 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.2, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23027 驶向第二次生命: 「当装备者在战斗中击破特攻大于等于 #2% 时，速度提高 #4%。」",
-      "note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
+      "_note": "「当装备者在战斗中**击破特攻 ≥ 150%** 时，速度提高 #4%」—— `BATTLE_START` ＋ `self_attr:BREAKING_EFFECT >= 1.5` ＋ `MODIFY_ATTR SPEED` ✓（12/14/16/18/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破无视防御那一句** ✗，速度这一句**整块没有** ✗。"
     }
   ]
 }
