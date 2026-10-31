@@ -10,8 +10,18 @@
         { "op": "SHIELD", "scale": "owner_max_hp", "percent": 0.16, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24002: 「当装备者受到攻击后，如果自身未持有护盾，则获得1个等同于装备者#2[i]%生命上限的护盾，持续#3[i]回合。该效果每#4[i]回合只能触发1次。」",
-      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**如果装备者持有护盾**，则使自身受到的伤害降低 12%」**没有** ✗ —— 引擎能问 `self has_shield` ✓，但「受到伤害时按是否有盾改伤害」要落在伤害结算的那条规则上 ✓，而**同一个事件只能用一种门** ✗（护盾那一半要挂 `DEALING_DAMAGE` ＋ 减伤修饰 ✗）⇒ 登记 ✓。",
+      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n✅ 已写：`cone24002_less_damage_while_shielded`（`DEALING_DAMAGE` + `target == self` + `self has_shield` + 负份额的实例 `MODIFY_DAMAGE_TAKEN`）✓。",
       "cooldown": 3
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24002_less_damage_while_shielded",
+      "when": ["target == self", "self has_shield"],
+      "do": [
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.12, "instance": true, "permanent": true }
+      ],
+      "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv1 #5 = -0.12",
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "2": [
@@ -23,8 +33,18 @@
         { "op": "SHIELD", "scale": "owner_max_hp", "percent": 0.2, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24002: 「当装备者受到攻击后，如果自身未持有护盾，则获得1个等同于装备者#2[i]%生命上限的护盾，持续#3[i]回合。该效果每#4[i]回合只能触发1次。」",
-      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**如果装备者持有护盾**，则使自身受到的伤害降低 12%」**没有** ✗ —— 引擎能问 `self has_shield` ✓，但「受到伤害时按是否有盾改伤害」要落在伤害结算的那条规则上 ✓，而**同一个事件只能用一种门** ✗（护盾那一半要挂 `DEALING_DAMAGE` ＋ 减伤修饰 ✗）⇒ 登记 ✓。",
+      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n✅ 已写：`cone24002_less_damage_while_shielded`（`DEALING_DAMAGE` + `target == self` + `self has_shield` + 负份额的实例 `MODIFY_DAMAGE_TAKEN`）✓。",
       "cooldown": 3
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24002_less_damage_while_shielded",
+      "when": ["target == self", "self has_shield"],
+      "do": [
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.15, "instance": true, "permanent": true }
+      ],
+      "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv2 #5 = -0.15",
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "3": [
@@ -36,8 +56,18 @@
         { "op": "SHIELD", "scale": "owner_max_hp", "percent": 0.24, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24002: 「当装备者受到攻击后，如果自身未持有护盾，则获得1个等同于装备者#2[i]%生命上限的护盾，持续#3[i]回合。该效果每#4[i]回合只能触发1次。」",
-      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**如果装备者持有护盾**，则使自身受到的伤害降低 12%」**没有** ✗ —— 引擎能问 `self has_shield` ✓，但「受到伤害时按是否有盾改伤害」要落在伤害结算的那条规则上 ✓，而**同一个事件只能用一种门** ✗（护盾那一半要挂 `DEALING_DAMAGE` ＋ 减伤修饰 ✗）⇒ 登记 ✓。",
+      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n✅ 已写：`cone24002_less_damage_while_shielded`（`DEALING_DAMAGE` + `target == self` + `self has_shield` + 负份额的实例 `MODIFY_DAMAGE_TAKEN`）✓。",
       "cooldown": 3
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24002_less_damage_while_shielded",
+      "when": ["target == self", "self has_shield"],
+      "do": [
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.18, "instance": true, "permanent": true }
+      ],
+      "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv3 #5 = -0.18",
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "4": [
@@ -49,8 +79,18 @@
         { "op": "SHIELD", "scale": "owner_max_hp", "percent": 0.28, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24002: 「当装备者受到攻击后，如果自身未持有护盾，则获得1个等同于装备者#2[i]%生命上限的护盾，持续#3[i]回合。该效果每#4[i]回合只能触发1次。」",
-      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**如果装备者持有护盾**，则使自身受到的伤害降低 12%」**没有** ✗ —— 引擎能问 `self has_shield` ✓，但「受到伤害时按是否有盾改伤害」要落在伤害结算的那条规则上 ✓，而**同一个事件只能用一种门** ✗（护盾那一半要挂 `DEALING_DAMAGE` ＋ 减伤修饰 ✗）⇒ 登记 ✓。",
+      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n✅ 已写：`cone24002_less_damage_while_shielded`（`DEALING_DAMAGE` + `target == self` + `self has_shield` + 负份额的实例 `MODIFY_DAMAGE_TAKEN`）✓。",
       "cooldown": 3
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24002_less_damage_while_shielded",
+      "when": ["target == self", "self has_shield"],
+      "do": [
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.21, "instance": true, "permanent": true }
+      ],
+      "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv4 #5 = -0.21",
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "5": [
@@ -62,8 +102,18 @@
         { "op": "SHIELD", "scale": "owner_max_hp", "percent": 0.32, "turns": 2, "target": "self" }
       ],
       "source": "光锥 24002: 「当装备者受到攻击后，如果自身未持有护盾，则获得1个等同于装备者#2[i]%生命上限的护盾，持续#3[i]回合。该效果每#4[i]回合只能触发1次。」",
-      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n⛔ **仍开（已登记 §4.3）**：「**如果装备者持有护盾**，则使自身受到的伤害降低 12%」**没有** ✗ —— 引擎能问 `self has_shield` ✓，但「受到伤害时按是否有盾改伤害」要落在伤害结算的那条规则上 ✓，而**同一个事件只能用一种门** ✗（护盾那一半要挂 `DEALING_DAMAGE` ＋ 减伤修饰 ✗）⇒ 登记 ✓。",
+      "_note": "「当装备者**受到攻击后**，如果自身**未持有护盾**，则获得 1 个等同于装备者 **16% 生命上限**的护盾，持续 2 回合，**该效果每 3 回合只能触发 1 次**」—— `TAKING_HIT` ＋ `target == self` ＋ `!self has_shield` ＋ `SHIELD{scale: owner_max_hp, percent: 16/…, turns: 2}` ＋ ⭐ **`cooldown: 3`** ✓（16/… ✓）；「效果抵抗提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时补的 `cooldown: 3`** ✗（原先没有限流 ✓）。\n✅ 已写：`cone24002_less_damage_while_shielded`（`DEALING_DAMAGE` + `target == self` + `self has_shield` + 负份额的实例 `MODIFY_DAMAGE_TAKEN`）✓。",
       "cooldown": 3
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone24002_less_damage_while_shielded",
+      "when": ["target == self", "self has_shield"],
+      "do": [
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.24, "instance": true, "permanent": true }
+      ],
+      "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv5 #5 = -0.24",
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ]
 }
