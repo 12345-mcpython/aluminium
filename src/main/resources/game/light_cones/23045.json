@@ -1,9 +1,199 @@
 {
   "schema": 1,
   "light_cone": 23045,
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-  "5": []
+  "1": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_ult_attack_up",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.4,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「施放终结技时，使装备者的攻击力提高#6[i]%。」 param Lv1 #6 = 0.4、#4 = 2",
+      "_note": "「施放终结技时，使装备者的攻击力提高 #6%，…并**再次**使装备者的攻击力提高 #2%，持续 #4 回合」—— 两条修饰必须**相加**：同一属性、同一身份的修饰会**互相替换**（实测：不同名字也一样只剩一条 ✗）⇒ 两条都带 `buff: \"加冕\"` + `max_stacks: 2`，成为**两个可叠层实例** ✓（23058 的同一手法 ✓）。⚠ 「持续 #4 回合」读作**两句共同**的 2 回合（句子只在末尾给了一次期限 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_energy_and_second_attack_up",
+      "when": ["actor == self", "self_max_energy >= 300"],
+      "do": [
+        { "op": "GAIN_ENERGY", "percent": 0.1, "fixed": true, "target": "self" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.4,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「若装备者的能量上限大于等于#3[i]点，为装备者固定恢复等同于装备者能量上限#5[i]%的能量，并再次使装备者的攻击力提高#2[i]%，持续#4[i]回合。」 param Lv1 = [0.36, 0.4, 300, 2, 0.1, 0.4]",
+      "_note": "「若能量上限 **≥ 300**，**固定恢复**等同于能量上限 **10%** 的能量」—— ① 门 `self_max_energy >= 300` ✓；② `GAIN_ENERGY percent: 0.1, fixed: true` ✓ —— `fixed` 让能量恢复效率**不**参与 ✓，`percent` 取**收能量者自己**的上限 ✓（1512 的同一口径 ✓）；③ 第二条攻击修饰与上一条**同名同叠层上限** ⇒ 相加 ✓（40% + 40% = 80%）。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_ult_attack_up",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.5,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「施放终结技时，使装备者的攻击力提高#6[i]%。」 param Lv2 #6 = 0.5、#4 = 2",
+      "_note": "同第 1 档，数值按 Lv2 行：#6 = 0.5 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_energy_and_second_attack_up",
+      "when": ["actor == self", "self_max_energy >= 300"],
+      "do": [
+        { "op": "GAIN_ENERGY", "percent": 0.1, "fixed": true, "target": "self" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.5,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「…并再次使装备者的攻击力提高#2[i]%…」 param Lv2 #2 = 0.5、#5 = 0.1",
+      "_note": "同第 1 档，数值按 Lv2 行：#2 = 0.5 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_ult_attack_up",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.6,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「施放终结技时，使装备者的攻击力提高#6[i]%。」 param Lv3 #6 = 0.6、#4 = 2",
+      "_note": "同第 1 档，数值按 Lv3 行：#6 = 0.6 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_energy_and_second_attack_up",
+      "when": ["actor == self", "self_max_energy >= 300"],
+      "do": [
+        { "op": "GAIN_ENERGY", "percent": 0.1, "fixed": true, "target": "self" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.6,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「…并再次使装备者的攻击力提高#2[i]%…」 param Lv3 #2 = 0.6、#5 = 0.1",
+      "_note": "同第 1 档，数值按 Lv3 行：#2 = 0.6 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_ult_attack_up",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.7,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「施放终结技时，使装备者的攻击力提高#6[i]%。」 param Lv4 #6 = 0.7、#4 = 2",
+      "_note": "同第 1 档，数值按 Lv4 行：#6 = 0.7 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_energy_and_second_attack_up",
+      "when": ["actor == self", "self_max_energy >= 300"],
+      "do": [
+        { "op": "GAIN_ENERGY", "percent": 0.1, "fixed": true, "target": "self" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.7,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「…并再次使装备者的攻击力提高#2[i]%…」 param Lv4 #2 = 0.7、#5 = 0.1",
+      "_note": "同第 1 档，数值按 Lv4 行：#2 = 0.7 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_ult_attack_up",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.8,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「施放终结技时，使装备者的攻击力提高#6[i]%。」 param Lv5 #6 = 0.8、#4 = 2",
+      "_note": "同第 1 档，数值按 Lv5 行：#6 = 0.8 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23045_energy_and_second_attack_up",
+      "when": ["actor == self", "self_max_energy >= 300"],
+      "do": [
+        { "op": "GAIN_ENERGY", "percent": 0.1, "fixed": true, "target": "self" },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.8,
+          "buff": "加冕",
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23045: 「…并再次使装备者的攻击力提高#2[i]%…」 param Lv5 #2 = 0.8、#5 = 0.1",
+      "_note": "同第 1 档，数值按 Lv5 行：#2 = 0.8 ✓。"
+    }
+  ]
 }
