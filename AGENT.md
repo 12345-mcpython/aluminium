@@ -820,6 +820,19 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 **收口条件（两步）**：① 引擎要能"数持有某 buff 的我方单位"（现有谓词只有 `debuff_count`，没有队伍侧的 `ally_buff_count`）；② `DAMAGE` 的 `percent` 要能加一项 `per_count × n`（上限 0.24）。有了这两样，`zone_true_damage_rider` 就写成 `0.24 + 0.06 × n`，19~21 条 0.42 rider 一次性进对账。补法：按"持有德谬歌增益的我方角色数"上调该规则的 `percent`，上限 +0.24；1415 在本账号是 **E2** ✓，所以这条在实战里一直生效。
 
+#### ⛔ 23037 的「本次终结技消耗的能量」在事件里读不到（2026-10-31 实测，已回退）
+
+`ULT_CAST` 的 payload **写了** `battle.getLastUltEnergySpent()`（`SkillExecutor` 第 5 个参数），
+但 `UltimateService.settle` 在**发事件之前**就执行了 `lastEnergySpent = 0`（在 `onUltCast` 的能量返还分支里），
+所以事件携带的永远是 **0**（实测：140 上限的角色施放后读到 0.0）。
+
+试过把清零挪到 `Battle.endCastOutcome`（"这次施放结束再忘"）——**已回退**，因为 `BattleDamage` 的守卫
+（`getLastUltEnergySpent() > 0` 才把能量记到 `Damage` 上）依赖"它在终结技路径之外恒为 0"；
+挪动之后**后续任何一发伤害**都会被打上上一发终结技的能量，这是会静默传播的错。
+
+⇒ 正确方向：让 `settle` 把该数记在**这次 cast 的上下文**里（而不是全局字段），事件从上下文读。
+本次只留结论，不改引擎。
+
 #### ⛔ 23039 的「消耗 > 500」那条规则不开火（2026-10-31 实测）
 
 为了「若该效果消耗的生命值高于 500 点，可使伤害额外提高 30%」加了数值变量 **`event_amount`**（= `ctx.amount()`，已在位、
