@@ -1219,9 +1219,9 @@ gate the rule with `self_summon_count >= 1` so it only fires when there is one
 - **光锥审计（2026-10-19，168 份逐条核完）新增的缺口族** ✓ —— 每族都写明**读者**（哪条光锥）、**缺的词**、**缺口见证** ✓：
   - **「没有暴击」没有事件** ✗：`CRIT_DEALT` 只报**暴击成功** ✓。读者：**23012**（「普攻或战技伤害**未造成暴击**时暴击率 +36%」）。见证：`ConeAuditBatchNineteenTest` 的「规则数 0」✓。
   - **「记录一个数、以后再读」没有写入端** ✗：读者：**23013**（「记录治疗量 → 按该记录的 36% 造成附加伤害」）。见证：`ConeAuditBatchNineteenTest` ✓。
-  - **「上一次施放的是哪一招」记不住** ✗：`damage_skill_key` 只描述当前这一发 ✓。读者：**23064**（「欢愉技与上一次不同 ⇒ 额外获得【潮流】」）。见证：`ConeAuditBatchTwentyEightTest` ✓。
+  - ⭐ **已解决（2026-10-31）**：「上一次施放的是哪一招」—— 新增条件变量 **`last_elation_skill_id`** ✓（`CanHit.lastElationSkillId`，`SkillExecutor` 在这一发的 CAST_SETUP 事件**之后**写入 ✓ ⇒ 规则读到的是**上一次** ✓），与 `from_skill_id` 组成两变量比较 ✓（`!=` 现在接受**两个数值变量** ✓）。读者 **23064** ✓；判据 `LastElationSkillTest`（同招不叠、异招触发）+ `ConeTwentyThreeThousandSixtyFourTest` ✓。
   - **「两名及以上相同命途」配不起来** ✗：`has_path` 只能问**某一个单位** ✓。读者：**21046**。见证：同前 ✓。
-  - **「击杀时检查这层 DoT 是不是她上的」没有归属** ✗：`target_dot_count` 数得到 ✓、问不了来源 ✗。读者：**24003**。见证：`ConeAuditBatchTwentyNineTest` ✓。
+  - ⭐ **已解决（2026-10-31）**：「击杀时检查这层 DoT 是不是她上的」—— 变量 **`target_dots_from_self`** 早就在 ✓（23029 的同一变量，KILL 在 `perish()` 之后、buff 清扫之前发 ⇒ 死者的 DoT 还数得到 ✓）。读者 **24003** ✓；判据 `ConeTwentyFourThousandThreeTest` ✓。
   - **「受到的**暴击伤害**」不是一个可改的层** ✗：`MODIFY_DAMAGE_TAKEN` 改的是总区 ✓。读者：**23059**（【炼狱】）。见证：同批 ✓。
   - **「助战技」不是技能类** ✗：`from_skill` 闭集只有 COMMON/SKILL/ULTRA/TALENT ✓。读者：**23060**。见证：`ConeAuditBatchTwentySevenTest` ✓。
   - **「就地升级一个状态」没有拼法** ✗：`APPLY_BUFF` 只能新增 ✓。读者：**23029**（【卸甲】→【穷寇】）、**23047**（【魂迷】三条内部效果）。见证：各批 ✓。
