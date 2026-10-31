@@ -25,8 +25,8 @@ import java.util.List;
  * 21030's rider had no per-attack cap (a multi-hit ultimate paid it per hit); 21031's dispel had neither its 16% chance nor its
  * once-per-attack cap.
  *
- * <p>⛔ <b>21032 is registered</b>: 「随机生效 1 个」 of three effects has no spelling (a rule-level `chance` is per RULE, not a
- * mutually-exclusive draw), so today all three are live.
+ * <p>21032 is NOT a gap: the draw is `one_of` + `one_of_no_repeat` (judged in `SecretLightConeTest`), and its five
+ * ranks are pinned by `ConeTwentyOneThousandThirtyTwoRanksTest`.
  */
 public class ConeAuditBatchTenTest {
     private static final int LEVEL = 80;
