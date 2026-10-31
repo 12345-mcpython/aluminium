@@ -61,10 +61,12 @@ public class ConeAuditBatchOneTest {
         TestTurns.take(f.battle, f.wearer);
         Assertions.assertEquals(0.12, f.critChance() - bare, 1e-9, "第 2 个自己的回合里仍在");
         TestTurns.take(f.battle, f.wearer);
-        System.out.println("[20000] 第 3 个自己的回合开始后的增量 +" + (f.critChance() - bare)
-                + "（引擎今天在这里到期；句子要的是再撑一个回合 —— 已登记 §4.3）");
+        Assertions.assertEquals(0.12, f.critChance() - bare, 1e-9,
+                "第 3 个自己的回合里仍在 —— 缺口已收（2026-10-31）：数据写 `turns: 4`，因为引擎的时钟在持有者回合边界递减，"
+                        + "而这条 buff 在开战前授予，第一个边界会白花掉一回合");
+        TestTurns.take(f.battle, f.wearer);
         Assertions.assertEquals(0.0, f.critChance() - bare, 1e-9,
-                "今天的行为：`turns: 3` 在第 3 个回合开始时到期（缺口见证）");
+                "第 4 个自己的回合起到期 —— 「持续 3 回合」就是三个回合");
     }
 
     /**
