@@ -783,9 +783,10 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | `DAMAGE` 不进外层重复 ✓ | 它自己按 `times` settle，外层再乘一次会得到 N² 段 ✗ |
 | `times: 0` 在装载期拒绝 ✓ | 运行 0 次等于整条效果消失，是拼错不是简写 ✗ |
 
-⚠ **内容侧仍未迁移的一处**：1302 的天赋「每击中 1 个敌方目标获得 1 层」**故意仍按每次施放 1 层** —— 打开
-`times_from: "hit_count"` 会让单目标的战技/终结技加 **2 层**（实测；那 2 层的来源未查明，见 `_gaps` 的措辞）。两半一起
-修之前不动它，文件 `_gaps` 与 `ArgentiStacksTest.aThreeTargetCastStillAddsOneStack` 把今天的样子钉住 ✓。
+⚠ **CORRECTED（2026-10-31，同一日）**：曾量到「打开 `times_from: "hit_count"` 后单目标的战技/终结技加 **2 层**」，
+并据此把 1302 的天赋留在「每次施放 1 层」。重测**没有复现**：合成表与 1302 本文件都量到 1 命中 1 层、3 命中 3 层
+（`ArgentiStacksTest.threeEnemiesGiveThreeStacks`）。⇒ 1302 的天赋已改成按命中数叠层，文件 `_gaps` 里那条撤回 ✓。
+教训：一次读数不是结论 —— 尤其当夹具在上一次实验里刚被改过时；重跑要把「同一份内容 + 同一夹具」说清 ✓。
 
 【已把守：`EffectTimesTest`（`times: 3` 三次实例 / 无 `times` 一次 / `hit_count` 三次命中三次 / 0 命中 0 次 / `times: 0` 装载期拒绝）】
 
@@ -1846,6 +1847,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
 | `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
 | `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
+
 
 
 
