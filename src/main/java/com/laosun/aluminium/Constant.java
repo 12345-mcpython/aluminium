@@ -197,6 +197,7 @@ public final class Constant {
             SkillType.TALENT, 4,
             SkillType.MAZE, 6,
             SkillType.TECHNIQUE, 7,
+            SkillType.ENHANCED_BASIC, 8,
             // The Elation damage skills: the data files them under slots 20 and 21.
             SkillType.ELATION_SKILL, 20,
             SkillType.ELATION_EXTRA, 21);

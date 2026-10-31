@@ -133,6 +133,9 @@ final class TriggerTargets {
             case TriggerVocabulary.TARGET_RANDOM_ENEMY ->
                     require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                             TriggerVocabulary.TARGET_RANDOM_ENEMY, ctx);
+            case "random_adjacent_enemy" ->
+                    require(ctx.battle() == null ? null : ctx.battle().randomAdjacentEnemy(ctx.target()),
+                            "random_adjacent_enemy", ctx);
             // "the enemy target with the highest HP" - ALL of the opponents, not the ones this attack happened to hit.
             // Reader: 1506 Silver Wolf LV.999's 【超超超大剑】 - 「对生命值最高的敌方目标额外造成…真实伤害」 - which fires from a
             // Skill-Point event that carries no hit set at all, so `highest_hp_attack_hit` (same pool as
@@ -183,6 +186,11 @@ final class TriggerTargets {
                     everySummon.addAll(battle.summonsOf(ally));
                 }
                 return List.copyOf(everySummon);
+            }
+            case "all_hit_enemies" -> {
+                // The frozen hit set of ATTACK_FINISHED: exactly the enemies this attack struck. Reader: 1103
+                // Serval's Skill shock ("the enemy target(s) hit"), where the blast's neighbours are in the set too.
+                return ctx.attackHitTargets().isEmpty() ? List.of() : List.copyOf(ctx.attackHitTargets());
             }
             case "all_allies_lost_hp_this_action" -> {
                 if (battle == null) {

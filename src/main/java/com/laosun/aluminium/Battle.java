@@ -480,6 +480,31 @@ public class Battle {
     }
 
     /**
+     * One living enemy adjacent (in the enemy roster's order) to {@code center}, chosen with the battle's
+     * own seeded randomness. The reader is 1103 Serval's Eidolon 1: "the Basic ATK's damage also hits
+     * one random adjacent target for 60% of that damage".
+     *
+     * <p>Adjacency is the roster order the battle was built with; dead neighbours are skipped. A centre
+     * that is not on the enemy side, or has no living neighbour, answers {@code null}.
+     */
+    public CanHit randomAdjacentEnemy(CanHit center) {
+        List<com.laosun.aluminium.enemy.Enemy> enemies = enemyUnits().stream()
+                .filter(unit -> !unit.isDeath()).toList();
+        int index = enemies.indexOf(center);
+        if (index < 0) {
+            return null;
+        }
+        List<CanHit> neighbours = new java.util.ArrayList<>(2);
+        if (index > 0) {
+            neighbours.add(enemies.get(index - 1));
+        }
+        if (index + 1 < enemies.size()) {
+            neighbours.add(enemies.get(index + 1));
+        }
+        return neighbours.isEmpty() ? null : neighbours.get(rng.nextInt(neighbours.size()));
+    }
+
+    /**
      * The {@link Enemy} entries of {@link #enemies}, in the same order - the monsters, without any
      * summon that may be sharing the camp.
      *
@@ -1998,6 +2023,11 @@ public class Battle {
      * @return the value actually credited
      */
     public double grantSkillEnergy(CanHit user, Skill skill, Set<? extends CanHit> hitTargets) {
+        // 「该战技无法恢复能量」: a state on the caster can suppress the cast's own energy gain (1315 Boothill).
+        // It is checked here, after SKILL_CAST rules have attached the state, and nowhere else.
+        if (user.getBuffManager() != null && user.getBuffManager().suppresses("energy_gain")) {
+            return 0;
+        }
         return energy.grantSkill(user, skill, hitTargets);
     }
 

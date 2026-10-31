@@ -43,6 +43,11 @@ public final class DebuffService {
         if (caster == null || target == null || buff == null || target.isDeath()) {
             return false;
         }
+        // 「抵抗 1 次负面效果」: a charge shield refuses the application before any roll. A percentage
+        // resistance is the other branch; both can sit on the same unit.
+        if (target.getBuffManager().consumeDebuffShield()) {
+            return false;
+        }
         double classResist = target.getBuffManager().debuffResistOf(buff.debuffClass());
         double chance = battle.hitChance(caster, target, baseChance, specificResistKey) * (1 - classResist);
         if (!(battle.getRng().nextDouble() < Math.clamp(chance, 0, 1))) {

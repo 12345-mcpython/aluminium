@@ -361,6 +361,10 @@ public final class TriggerInterpreter {
             // Match the RAW op too: `normalizeOp` derives its name and a spend spelled `overflow_only` did not reach this branch, so the capture of a spend read 0.
             String rawOp = effect.getOp() == null ? "" : effect.getOp().trim().toUpperCase(java.util.Locale.ROOT);
             int perStepsStairs = perStepsRepeat(effect, effectCtx);
+            // "each enemy hit gives one stack" / "this effect happens N times": `times` and `times_from` repeat the
+            // EFFECT, not just a settlement. DAMAGE keeps its own inner loop (it re-draws a random target on every
+            // repetition), so it is excluded here -- counting it twice would square the number of instances.
+            int effectTimes = "DAMAGE".equals(movingOp) ? 1 : timesCount(battle, effect, effectCtx);
         // An additive PERCENTAGE modifier applied N times is one modifier of N x the value - and repeating it would be WRONG,
         // because the engine replaces a same-kind modifier instead of stacking it (measured on 23001's speed stair: three
         // layers read as one). Only the plain `percent` form is folded here; a stated `amount` or a derived `scale` keeps the
@@ -380,7 +384,7 @@ public final class TriggerInterpreter {
                 return;
             }
         }
-        for (int repeat = perStepsStairs; repeat > 0; repeat--) {
+        for (int repeat = perStepsStairs * Math.max(0, effectTimes); repeat > 0; repeat--) {
                 if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
                         || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
                     //: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
@@ -660,7 +664,7 @@ public final class TriggerInterpreter {
                 // A FLOOR, not a gain: energy is raised to the stated share of the maximum and left alone
                 // when it is already at or above it. Adding a share instead would overshoot.
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    double floor = target.getMaxEnergy() * effect.getPercent();
+                    double floor = target.getMaxEnergy() * TriggerMagnitudes.shareOf(effect, ctx);
                     if (target.getCurrentEnergy() < floor) {
                         target.setCurrentEnergy(floor);
                     }
@@ -709,7 +713,9 @@ public final class TriggerInterpreter {
                 // the time this runs they are known good; the casts here are reads, not checks.
                 String resource = effect.getResource().trim();
                 double unitAmount = effect.getUnitAmount();
-                double share = effect.getPercent();
+                double share = effect.getValue() != null
+                        ? TriggerMagnitudes.shareOf(effect, ctx)
+                        : effect.getPercent();
                 // Who pays. Defaults to the rule's owner (Pearl), which is the documented shape: the counter is hers
                 // while the protected units are the party.
                 CanHit payer = effect.getPayer() == null || effect.getPayer().isBlank()
@@ -761,13 +767,23 @@ public final class TriggerInterpreter {
                     if (banned && target != giver) {
                         continue;
                     }
-                    battle.queue().advanceActionByPercent(target, effect.getPercent());
+                    battle.queue().advanceActionByPercent(target, TriggerMagnitudes.shareOf(effect, ctx));
+                }
+            }
+            case DELAY -> {
+                // 「行动延后 X%」: a one-off push of the target's action bar by X% of its action period.
+                // Unlike ADVANCE there is no "advance_to_others" suppression: that sentence bans advances,
+                // not delays.
+                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                    battle.delayMovePercent(target, TriggerMagnitudes.shareOf(effect, ctx));
                 }
             }
             case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
             // The pool is team-level and its owner is the policy, so this is the one op that goes
             // straight to the policy rather than through a unit's resources.
-            case RAISE_SKILL_POINT_CAP -> battle.getSkillPointPolicy().raiseMax((int) Math.round(effect.getAmount()));
+            case RAISE_SKILL_POINT_CAP -> battle.getSkillPointPolicy().raiseMax(effect.getValue() != null
+                    ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
+                    : (int) Math.round(effect.getAmount()));
             case GAIN_RESOURCE -> {
                 // ⚠ The store that MOVED, not the rule owner's: an effect may grant to somebody else ("give that ally 2
                 // points"), and `resourceAmount(owner)` measured on a unit that does not carry the counter reads 0 on
@@ -818,30 +834,9 @@ public final class TriggerInterpreter {
                 // Note: `times` repeats the WHOLE settlement, and because resolveTargets is called INSIDE the outer
                 // loop, every repetition re-draws its target -- which is what "randomly a single enemy each time" means.
                 // "for each 1 point spent ... 1 extra instance": the repeat count can follow the event.
-                int times = effect.getTimes() == null ? 1 : effect.getTimes();
-                if (effect.getTimesFrom() != null) {
-                    String from = effect.getTimesFrom().trim();
-                    if ("event_amount".equals(from)) {
-                        times = (int) Math.abs(ctx.amount());
-                    } else if ("hit_count".equals(from)) {
-                        // "for each 1 target attacked, ... deal 1 instance" (reader: 1403 Tribbie (缇宝)'s zone rider): the repeat count is how many
-                        // targets this attack connected with. It belongs HERE and not in `per_target`, which multiplies a magnitude.
-                        times = Math.max(0, ctx.hitCount());
-                    } else if (from.startsWith("resource:")) {
-                        // "as many extra hits as the counter has points" (reader: 1141526's extra hit).
-                        String id = from.substring("resource:".length()).trim();
-                        if (id.isEmpty()) {
-                            throw new IllegalStateException(
-                                    "times_from 'resource:' names no resource; say which counter drives the repeat count");
-                        }
-                        times = resourceAmount(battle, ctx.actor(), id);
-                    } else {
-                        throw new IllegalStateException("times_from '" + effect.getTimesFrom()
-                                + "' is not a spelling this engine has: \"event_amount\", \"hit_count\" or \"resource:<name>\"");
-                    }
-                    if (times <= 0) {
-                        return;
-                    }
+                int times = timesCount(battle, effect, ctx);
+                if (times <= 0) {
+                    return;
                 }
                 for (int repeat = 0; repeat < times; repeat++) {
                     List<CanHit> victims = TriggerTargets.resolveTargets(battle, effect, ctx);
@@ -1051,6 +1046,16 @@ public final class TriggerInterpreter {
      * the scale family makes everywhere else.
      */
     private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
+        if (effect.getValue() != null) {
+            // One whole magnitude: `fixed` still decides whether the energy-regeneration rate touches it.
+            double amount = TriggerMagnitudes.valueOf(effect, ctx);
+            if (Boolean.TRUE.equals(effect.getFixed())) {
+                battle.applyEnergyGain(target, com.laosun.aluminium.energy.EnergyGain.fixed(amount));
+            } else {
+                battle.grantEnergy(target, amount);
+            }
+            return;
+        }
         // 「固定恢复 N 点」: the number as stated, NOT a base for the energy-regeneration rate (reader: light cone 23055).
         // Note: the model already had the two kinds side by side (`EnergyGain.fixed` / `.normal`); what was missing was a
         // way for a RULE to pick the fixed one. Measured before this: a fixed +10 became +15 at a 50% rate.
@@ -1145,7 +1150,9 @@ public final class TriggerInterpreter {
             resource.setMaxOverflow(Integer.MAX_VALUE);
             return;
         }
-        int raise = (int) Math.round(effect.getAmount());
+        int raise = effect.getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
+                : (int) Math.round(effect.getAmount());
         resource.setMaxOverflow(resource.getMaxOverflow() + raise);
     }
 
@@ -1586,7 +1593,19 @@ public final class TriggerInterpreter {
         // does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently IGNORED -- worse than refusing
         // it. A plain zone (no scale) still takes `percent` exactly as before.
         boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
-        double percent = derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : effect.getPercent();
+        double percent = effect.getValue() != null
+                ? TriggerMagnitudes.shareOf(effect, ctx)
+                : derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : effect.getPercent();
+        if (Boolean.TRUE.equals(effect.getInstance())) {
+            // One-shot vulnerability/reduction on the instance being settled. Reader: 1315 Boothill's
+            // Eidolon 4 ("that target takes 12% more from him / he takes 12% less from it").
+            if (ctx.damage() == null) {
+                throw new IllegalStateException(
+                        "Op MODIFY_DAMAGE_TAKEN states \"instance\": true but the context carries no damage instance");
+            }
+            ctx.damage().addVulnerable(percent);
+            return;
+        }
         boolean permanent = TriggerLifetimes.unticked(effect);
         int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         // "break damage taken is raised": an optional damage-type scope, spelled with the enum's own names.
@@ -1786,6 +1805,9 @@ public final class TriggerInterpreter {
      * @param ctx    the context ({@code owner_max_hp} reads the rule owner, i.e. the healer)
      */
     static double grantAmount(EffectSpec effect, CanHit target, TriggerContext ctx) {
+        if (effect.getValue() != null) {
+            return TriggerMagnitudes.valueOf(effect, ctx);
+        }
         String scale = effect.getScale();
         if (scale == null || scale.isBlank()) {
             return scaledAmount(effect, ctx);
@@ -2009,7 +2031,9 @@ public final class TriggerInterpreter {
                             + "an engine fault");
         }
         int slot = effect.getSkillId();
-        int amount = effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
+        int amount = effect.getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
+                : effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
         for (CanHit target : TriggerTargets.resolveTargets(ctx.battle(), effect, ctx)) {
             target.raiseSkillHits(slot, amount);
         }
@@ -2044,6 +2068,14 @@ public final class TriggerInterpreter {
             // slot is its DATA SLOT (`skill_id`), which no SkillType names. `CanHit.skillLevel` reads the owner's map
             // when it resolves a memosprite's skill, so every summon of this character inherits the raise.
             owner.raiseMemospriteSkillLevel(effect.getSkillId(), delta);
+            return;
+        }
+        if (effect.getSkills() != null) {
+            // One fact, one amount: ["COMMON", "SKILL", "ULTRA", "TALENT"] is the file's level convention, and the
+            // validator has already refused a blank, unknown or repeated slot.
+            for (String slot : effect.getSkills()) {
+                owner.raiseSkillLevel(SkillType.valueOf(slot.trim().toUpperCase(Locale.ROOT)), delta);
+            }
             return;
         }
         owner.raiseSkillLevel(SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT)), delta);
@@ -2149,10 +2181,19 @@ public final class TriggerInterpreter {
         DebuffClass kind = DebuffClass.fromString(effect.getKind());
         // kind may be absent: RESIST_DEBUFF without a class means ANY negative state (1409s immunity clause).
         boolean permanent = TriggerLifetimes.unticked(effect);
+        if (effect.getCharges() != null) {
+            // 「抵抗 1 次负面效果，2 回合后可再次触发」 (1207's 襄尺): a charge shield, not a percentage.
+            int cooldown = effect.getCooldown() == null ? 0 : effect.getCooldown();
+            for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                target.getBuffManager().addBuff(named(
+                        withSource(new DebuffShieldBuff(effect.getCharges(), cooldown), ctx), effect));
+            }
+            return;
+        }
         int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             AbstractBuff resist = withSource(TriggerLifetimes.withTickOwner(TriggerLifetimes.withLifetime(
-                    new ClassResistBuff(kind, effect.getPercent(), turns, permanent), effect), effect, ctx), ctx);
+                    new ClassResistBuff(kind, TriggerMagnitudes.shareOf(effect, ctx), turns, permanent), effect), effect, ctx), ctx);
             // the name is optional and only content that asks for it gets it (see `named`)
             target.getBuffManager().addBuff(named(resist, effect));
         }
@@ -2351,6 +2392,50 @@ public final class TriggerInterpreter {
         int steps = parseCounterSteps(written.trim(), "per_steps").wholeSteps(ctx);
         Integer cap = effect.getPerStepsCap();
         return cap == null ? steps : Math.min(cap, steps);
+    }
+
+    /**
+     * How many times one effect runs: {@code times}, or the number {@code times_from} names.
+     *
+     * <p><b>Why both readers call it.</b> {@code times} is not a property of a settlement -
+     * it is "this effect happens N times". {@code DAMAGE} repeats its own settlement (one instance per repetition,
+     * re-drawing a random target each time), and every other op is repeated by the loop in
+     * {@link #applyUnchecked}; both must read the same number from the same place, or a stack clause and a damage
+     * clause spelled identically would count differently. Measured 2026-10-31: before this, a `times_from: "hit_count"`
+     * on {@code MODIFY_ATTR} was silently ignored (1302's talent granted one stack for three enemies hit).
+     *
+     * @param battle the battlefield (the {@code resource:} form reads a counter)
+     * @param effect the effect
+     * @param ctx    the trigger context
+     * @return the repetition count, or {@code 0} when {@code times_from} resolves to zero
+     */
+    private static int timesCount(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        int times = effect.getTimes() == null ? 1 : effect.getTimes();
+        String from = effect.getTimesFrom();
+        if (from == null) {
+            return times;
+        }
+        from = from.trim();
+        if ("event_amount".equals(from)) {
+            return (int) Math.abs(ctx.amount());
+        }
+        if ("hit_count".equals(from)) {
+            // "for each 1 target attacked, ..." (readers: 1403 Tribbie (缇宝)'s zone rider, 1302's talent stack): the
+            // repeat count is how many targets this attack connected with. It belongs HERE and not in `per_target`,
+            // which multiplies one magnitude.
+            return Math.max(0, ctx.hitCount());
+        }
+        if (from.startsWith("resource:")) {
+            // "as many extra hits as the counter has points" (reader: 1141526's extra hit).
+            String id = from.substring("resource:".length()).trim();
+            if (id.isEmpty()) {
+                throw new IllegalStateException(
+                        "times_from 'resource:' names no resource; say which counter drives the repeat count");
+            }
+            return resourceAmount(battle, ctx.actor(), id);
+        }
+        throw new IllegalStateException("times_from '" + effect.getTimesFrom()
+                + "' is not a spelling this engine has: \"event_amount\", \"hit_count\" or \"resource:<name>\"");
     }
 
 

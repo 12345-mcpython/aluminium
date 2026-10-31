@@ -73,6 +73,7 @@ public class EffectSpec {
         copy.scale = this.scale;
         copy.attribute = this.attribute;
         copy.percent = this.percent;
+        copy.ratio = this.ratio;
         copy.turns = this.turns;
         copy.permanent = this.permanent;
         // The deferral must survive a copy, or a rule that is amended/copied silently loses it (the guard test says so).
@@ -98,10 +99,12 @@ public class EffectSpec {
         copy.target = this.target;
         copy.castTarget = this.castTarget;
         copy.skill = this.skill;
+        copy.skills = this.skills == null ? null : new java.util.ArrayList<>(this.skills);
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
         copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
+        copy.value = NumberProviders.copyOf(this.value);
         copy.percentPerAllyState = this.percentPerAllyState;
         copy.allyState = this.allyState;
         copy.allyStateCap = this.allyStateCap;
@@ -139,6 +142,8 @@ public class EffectSpec {
         copy.cooldownDelta = this.cooldownDelta;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
+        copy.charges = this.charges;
+        copy.cooldown = this.cooldown;
         copy.damageType = this.damageType;
         copy.scopeElement = this.scopeElement;
         copy.capScale = this.capScale;
@@ -489,6 +494,21 @@ public class EffectSpec {
      */
     @SerializedName("percent")
     private Double percent;
+
+    /**
+     * A <b>ratio attribute's</b> magnitude, spelled with the unit it means: {@code 5} = +500%, {@code 0.1} = +10%.
+     *
+     * <p>Only {@code MODIFY_ATTR}, and only when the target attribute is a ratio
+     * ({@link com.laosun.aluminium.enums.AttributeType#isPercent} is true). It is numerically the same convention as
+     * {@code percent}; the separate name exists so a file can say "this is a ratio" instead of leaving the reader to
+     * infer it from the attribute.
+     *
+     * <p>Exactly one of {@code ratio} / {@code percent} / {@code value} may be stated. A flat attribute
+     * ({@code ATTACK}, {@code SPEED}, ...) refuses {@code ratio} at load time - "raise ATTACK by 5 ratio" is not a
+     * sentence the engine can read.
+     */
+    @SerializedName("ratio")
+    private Double ratio;
 
     /**
      * A counter this modifier's magnitude is multiplied by: "每层[当品]额外使翡翠的攻击力
@@ -969,6 +989,20 @@ public class EffectSpec {
     private String skill;
 
     /**
+     * Several skill slots raised by one {@code RAISE_SKILL_LEVEL} effect - {@code ["COMMON", "SKILL", "ULTRA",
+     * "TALENT"]} with one {@code amount}.
+     *
+     * <p><b>Why.</b> A file's level convention ("every slot is at Lv10") is ONE fact, but spelling it as four identical
+     * effects repeated the amount four times: changing the convention meant editing four numbers, and missing one left
+     * one slot at a different row with nothing to report. The list is the same statement in one place.
+     *
+     * <p>Exactly one of {@link #skill} and this is stated; {@code memosprite} rules keep {@code skill_id}, since a
+     * memosprite's slots are data slots rather than {@code SkillType}s.
+     */
+    @SerializedName("skills")
+    private List<String> skills;
+
+    /**
      * Which entry of the skill's per-level parameter row is the damage multiplier.
      *
      * <p>Note: This exists because <b>no single index works</b>. Basic attacks and skills happen to carry
@@ -1057,6 +1091,36 @@ public class EffectSpec {
     /** The cap on the count above (the Eidolon states four allies = +24%). */
     @SerializedName("ally_state_cap")
     private Integer allyStateCap;
+
+    /**
+     * The <b>whole magnitude</b> as one expression: {@code {"type": "skill_param", ...}} or a composed provider
+     * ({@code add} / {@code mul} / {@code attr} / ...).
+     *
+     * <p><b>Why this exists.</b> The older spellings split one number across three fields - {@code scale} (what it is a
+     * share of), {@code percent} (how much of it) and {@code amount} (the constant) - and every op had to know which
+     * combination it reads. A {@code value} is the number itself, resolved by {@link com.laosun.aluminium.trigger.NumberProviders}
+     * through one reader ({@code TriggerMagnitudes.valueOf}). For a magnitude op it is already in the target attribute's
+     * own units ({@code {"type": "const", "value": 50}} on SPEED is +50 points); for a share-only op it is the fraction
+     * itself ({@code 0.1} = 10%).
+     *
+     * <p><b>Compatibility.</b> Exactly one spelling may be used: stating {@code value} beside {@code scale} / {@code
+     * percent} / {@code amount} / any {@code *_from_*} magnitude field is refused at load time. The legacy fields keep
+     * working unchanged, so this is a migration path rather than a break.
+     *
+     * <p><b>Where it is read.</b> The ops whose number goes through a magnitude reader: {@code DAMAGE},
+     * {@code ADD_DAMAGE}, {@code HEAL}, {@code SHIELD}, {@code MODIFY_ATTR}, {@code APPLY_DOT},
+     * {@code APPLY_CONTROL}'s per-turn damage, {@code GAIN_ENERGY}, {@code GAIN_RESOURCE},
+     * {@code SPEND_RESOURCE}, {@code REMOVE_RESOURCE}, {@code CONSUME_HP}; the share readers
+     * {@code MODIFY_DAMAGE_TAKEN}, {@code BOOST_DAMAGE}, {@code ADVANCE}, {@code BOOST_TOUGHNESS},
+     * {@code SUPER_BREAK}, {@code TICK_DOT}, {@code RAISE_ENERGY_TO}, {@code ABSORB_DAMAGE}, {@code RESIST_DEBUFF};
+     * and the count readers
+     * {@code GAIN_SKILL_POINT}, {@code ADD_STACK}, {@code REMOVE_STACK}, {@code REMOVE_BUFF}, {@code DISPEL},
+     * {@code RAISE_RESOURCE_CAP}, {@code RAISE_SKILL_HITS}, {@code RAISE_SKILL_POINT_CAP} (rounded to a whole count).
+     * An op that reads no number (e.g. {@code MODIFY_RULE}) refuses {@code value} at load time rather than silently
+     * ignoring it.
+     */
+    @SerializedName("value")
+    private NumberProvider value;
 
     /**
      * The <b>number provider</b> form of the share: {@code {"type": "skill_param", "skill": "SKILL", "index": 1}}.
@@ -1354,6 +1418,20 @@ public class EffectSpec {
      */
     @SerializedName("effect_max_stacks")
     private Integer effectMaxStacks;
+
+    /**
+     * {@code RESIST_DEBUFF}: how many debuff applications the shield may refuse before it goes on cooldown
+     * ("抵抗 1 次负面效果", 1207's 襄尺). With this stated, the op builds a charge shield instead of a
+     * percentage resistance, and {@code cooldown} says how many of the carrier's turns it stays down.
+     */
+    @SerializedName("charges")
+    private Integer charges;
+
+    /**
+     * {@code RESIST_DEBUFF}: the turns between one charge being spent and the shield being ready again.
+     */
+    @SerializedName("cooldown")
+    private Integer cooldown;
 
     /**
      * The stack cap, whichever spelling the rule used.

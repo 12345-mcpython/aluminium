@@ -28,7 +28,30 @@ import java.util.Set;
  */
 public final class Predicates {
 
+    /**
+     * One shared, stateless Gson: used only to turn the JSON object of a predicate entry into its bean. The
+     * `when` array is read as {@code JsonElement}s because one entry may be a DSL string and the next an object;
+     * this is where the object half becomes a {@link PredicateSpec}.
+     */
+    private static final com.google.gson.Gson GSON = new com.google.gson.Gson();
+
     private Predicates() {
+    }
+
+    /**
+     * Compiles one predicate written as a JSON object - the object half of a {@code when} entry.
+     *
+     * <p>The object half of a {@code when} entry therefore reaches {@link #compile(PredicateSpec, TriggerSpec,
+     * Map)} with the same bean, so there is one reader for both the DSL and the structured spelling.
+     *
+     * @param json     the predicate object as written
+     * @param rule     the rule it belongs to, for its {@code source} in error messages
+     * @param registry the named predicates ({@code null} = none)
+     * @return the condition
+     */
+    public static Condition compile(com.google.gson.JsonElement json, TriggerSpec rule,
+                                    Map<String, PredicateSpec> registry) {
+        return compile(GSON.fromJson(json, PredicateSpec.class), rule, registry);
     }
 
     /**

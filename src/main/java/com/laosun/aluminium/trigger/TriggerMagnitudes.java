@@ -42,6 +42,20 @@ final class TriggerMagnitudes {
     private TriggerMagnitudes() {
     }
 
+    /**
+     * The effect's one expression, resolved: the {@code value} spelling of a magnitude.
+     *
+     * <p>It is the single reader every {@code value} path goes through. The number is already in the target
+     * attribute's own units (the provider {@code attr} / {@code skill_param} / {@code add} terms decide that), so no
+     * op-specific scale arithmetic is applied after it.
+     */
+    static double valueOf(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getValue() == null) {
+            throw new IllegalStateException("Op " + effect.getOp() + " has no \"value\" to resolve");
+        }
+        return NumberProviders.resolve(effect.getValue(), effect, ctx);
+    }
+
 
     /**
      * The base of a literal-ratio damage instance: a raw number the instance is settled from directly.
@@ -53,6 +67,9 @@ final class TriggerMagnitudes {
      * path reads it directly.
      */
     static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect, TriggerContext ctx) {
+        if (effect.getValue() != null) {
+            return valueOf(effect, ctx);
+        }
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
         // Note: `shareOf`, not the raw field: a share may also come from one of the owner's own skills (`percent_from_skill_param`),
         // and `derivedMagnitude` was fixed for exactly this one round earlier. Same family, same line.
@@ -302,6 +319,9 @@ final class TriggerMagnitudes {
      * @return the constant term, {@code 0} when neither spelling is stated
      */
     static double constantTerm(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getValue() != null) {
+            return valueOf(effect, ctx);
+        }
         if (effect.getAmountFrom() != null) {
             return NumberProviders.resolve(effect.getAmountFrom(), effect, ctx);
         }
@@ -328,6 +348,9 @@ final class TriggerMagnitudes {
      * and both read the <b>rule owner</b>, never the victim.
      */
     static double dotMagnitude(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getValue() != null) {
+            return applyDerivedCeiling(effect, ctx, valueOf(effect, ctx));
+        }
         double magnitude;
         if (effect.getScale() == null) {
             magnitude = constantTerm(effect, ctx);
@@ -553,6 +576,11 @@ final class TriggerMagnitudes {
      * existing number moved.
      */
     static double shareOf(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getValue() != null) {
+            // For the share-only ops (`ADVANCE`, `MODIFY_DAMAGE_TAKEN`, ...) `value` is the share itself;
+            // the op's own vocabulary says what it is a share of.
+            return valueOf(effect, ctx);
+        }
         Double fraction = effect.getPercent();
         // A NUMBER PROVIDER, the general spelling: it names its source as a type and can compose two sources.
         // Note: it sits first because it is the spelling the field-per-source ones are being retired into; `fraction`
@@ -737,6 +765,9 @@ final class TriggerMagnitudes {
      * Measured: the settled {@code DefenceArea} moved by 0.5% at every gauge value, from 0 to 50.
      */
     static double magnitudeOf(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getValue() != null) {
+            return valueOf(effect, ctx);
+        }
         boolean scaled = effect.getScale() != null && !effect.getScale().isBlank();
         if (statesShare(effect)) {
             return scaled || effect.getPercent() == null
@@ -747,6 +778,9 @@ final class TriggerMagnitudes {
     }
 
     static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getValue() != null) {
+            return valueOf(effect, ctx);
+        }
         // A share with NO scale: the magnitude IS the share (plus any constant term) - for EVERY share spelling.
         //
         // Note: The gap this closes: 1002 Dan Heng (丹恒)'s talent, 「下一次攻击的风属性抗性穿透提高 36%」, where the 36% lives in
@@ -1015,6 +1049,11 @@ final class TriggerMagnitudes {
      * @return the attribute named by the scale
      */
     static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
+        // A `value` expression names its own source (the provider's `attr` / `skill_param` / ...); there is no
+        // single attribute for this method to return, and the caller only uses it to validate a `scale`.
+        if (effect.getValue() != null) {
+            return null;
+        }
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
         // `party_resource:<name>` joins this list: like EVENT_AMOUNT it is a magnitude the op can read
