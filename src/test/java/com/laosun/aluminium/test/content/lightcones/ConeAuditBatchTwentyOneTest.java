@@ -18,7 +18,7 @@ import java.util.List;
  *
  * <p>Defects: 23023 stated its defence share twice (property + rule) and gave its vulnerability no base chance; 23022's attack
  * share had no stack buffer; 23024's 【泡影】 re-applied on every hit instead of once per attack. 23022's per-DoT-type-once and
- * 23025's break-damage-taken clause are registered.
+ * 23025's break-damage-taken clause is spelled now (judged in ConeTwentyThreeThousandTwentyFiveTest).
  */
 public class ConeAuditBatchTwentyOneTest {
     private static final int LEVEL = 80;
@@ -131,7 +131,8 @@ public class ConeAuditBatchTwentyOneTest {
         Assertions.assertEquals(2, slow.get("turns").getAsInt(), "「持续 2 回合」");
 
         // Witness: 「【溃败】状态下目标受到装备者造成的**击破伤害**提高 24%」 has no rule at all.
-        Assertions.assertEquals(2, rules(23025), "缺口见证：只有溃败与减速两条（击破伤害那半没有拼法）");
+        Assertions.assertEquals(3, rules(23025),
+                "collapse, the slow, and the break-damage-taken zone (the gap was closed with from_self)");
     }
 
     // ==================================================================
