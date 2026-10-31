@@ -1612,7 +1612,15 @@ public final class TriggerInterpreter {
                 throw new IllegalStateException(
                         "Op MODIFY_DAMAGE_TAKEN states \"instance\": true but the context carries no damage instance");
             }
-            ctx.damage().addVulnerable(percent);
+            if (percent >= 0) {
+                ctx.damage().addVulnerable(percent);
+            } else {
+                // 「受到的伤害降低 12%」 (light cone 24002, while shielded): a NEGATIVE share is a reduction, the same
+                // reading the zone arm below already makes (`percent > 0` -> VulnerabilityBuff, else ReductionBuff).
+                // Sending it to the vulnerability zone would rely on that zone accepting negative values, which is a
+                // different zone's arithmetic (and a silent clamp there would turn the clause into a no-op).
+                ctx.damage().addReduction(-percent);
+            }
             return;
         }
         boolean permanent = TriggerLifetimes.unticked(effect);
