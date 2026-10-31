@@ -26,7 +26,25 @@
         }
       ],
       "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
-      "_note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.18（光锥属性）、步长 10、每层普攻/战技 +0.06、叠加上限 6。"
+      "_note": "✅ 「同时终结技的暴击伤害提高」已写：见同档的 `cone23001_ult_crit_damage_stair`（实例级 `CRIT_ATTACK`，只对 `from_skill ULTRA`）。 数值：暴击率 0.18（光锥属性）、步长 10、每层普攻/战技 +0.06、叠加上限 6。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23001_ult_crit_damage_stair",
+      "when": ["actor == self", "from_skill ULTRA"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.12,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv1 #4 = 0.12、#5 = 6",
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "2": [
@@ -54,7 +72,25 @@
         }
       ],
       "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
-      "_note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.21（光锥属性）、步长 10、每层普攻/战技 +0.07、叠加上限 6。"
+      "_note": "✅ 「同时终结技的暴击伤害提高」已写：见同档的 `cone23001_ult_crit_damage_stair`（实例级 `CRIT_ATTACK`，只对 `from_skill ULTRA`）。 数值：暴击率 0.21（光锥属性）、步长 10、每层普攻/战技 +0.07、叠加上限 6。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23001_ult_crit_damage_stair",
+      "when": ["actor == self", "from_skill ULTRA"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.14,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv2 #4 = 0.14、#5 = 6",
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "3": [
@@ -82,7 +118,25 @@
         }
       ],
       "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
-      "_note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.24（光锥属性）、步长 10、每层普攻/战技 +0.08、叠加上限 6。"
+      "_note": "✅ 「同时终结技的暴击伤害提高」已写：见同档的 `cone23001_ult_crit_damage_stair`（实例级 `CRIT_ATTACK`，只对 `from_skill ULTRA`）。 数值：暴击率 0.24（光锥属性）、步长 10、每层普攻/战技 +0.08、叠加上限 6。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23001_ult_crit_damage_stair",
+      "when": ["actor == self", "from_skill ULTRA"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.16,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv3 #4 = 0.16、#5 = 6",
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "4": [
@@ -110,7 +164,25 @@
         }
       ],
       "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
-      "_note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.27（光锥属性）、步长 10、每层普攻/战技 +0.09、叠加上限 6。"
+      "_note": "✅ 「同时终结技的暴击伤害提高」已写：见同档的 `cone23001_ult_crit_damage_stair`（实例级 `CRIT_ATTACK`，只对 `from_skill ULTRA`）。 数值：暴击率 0.27（光锥属性）、步长 10、每层普攻/战技 +0.09、叠加上限 6。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23001_ult_crit_damage_stair",
+      "when": ["actor == self", "from_skill ULTRA"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.18,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv4 #4 = 0.18、#5 = 6",
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "5": [
@@ -138,7 +210,26 @@
         }
       ],
       "source": "光锥 23001 于夜色中:「使装备者的暴击率提高 #1%。当装备者在战斗中速度大于 100 时，每超过 #2 点，普攻和战技造成的伤害提高 #3%，同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」",
-      "_note": "注意：「同时终结技的暴击伤害提高」这一半仍未表达 —— 引擎只有全局的 CRIT_ATTACK，没有按技能类别限定的暴击伤害属性；不拿全局暴伤冒充（那会让普攻也吃到）。 数值：暴击率 0.30（光锥属性）、步长 10、每层普攻/战技 +0.10、叠加上限 6。"
+      "_note": "✅ 「同时终结技的暴击伤害提高」已写：见同档的 `cone23001_ult_crit_damage_stair`（实例级 `CRIT_ATTACK`，只对 `from_skill ULTRA`）。 数值：暴击率 0.30（光锥属性）、步长 10、每层普攻/战技 +0.10、叠加上限 6。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23001_ult_crit_damage_stair",
+      "when": ["actor == self", "from_skill ULTRA"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "per_steps": "SPEED-100:10",
+          "per_steps_cap": 6,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv5 #4 = 0.2、#5 = 6",
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ]
 }
+
