@@ -78,6 +78,7 @@
 - 对象形式**必须有** `rules`；写错键（`"trigger"`）会在装载期拒绝，而不是变成“没有规则”。
 - `schema` 可选。省略 = 旧文件；写了必须是 **1**。别的值装载期报错 —— 新格式的文件不会被旧引擎静默读错。
 - `character` 可选。写了必须等于文件名里的 cid；复制到别的 cid 下的规则集会装载期被拒。
+- 出货的角色文件**都**写 schema: 1 + character: <cid>；光锥 / 遗器的同一套文件头见 §1.1a，三者由 ContentFileHeaderTest 逐文件把守。
 
 ### 1.1a 光锥 / 遗器的文件头（2026-10-31 定形）
 
@@ -625,4 +626,5 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `HSR.md` | 游戏侧公式与属性表 |
 | `CONTENT-STATUS.md` | 逐角色/光锥/遗器的实现状态 |
 | `README.md` | 项目入口 |
+
 
