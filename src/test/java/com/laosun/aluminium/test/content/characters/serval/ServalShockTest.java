@@ -120,8 +120,8 @@ public class ServalShockTest {
      * The whole file is present, and the registered clauses are absent on purpose.
      */
     public void herFileCarriesWhatItSays() {
-        Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.SKILL_CAST),
-                "the shock (the blast's damage is the engine's own path)");
+        Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ATTACK_FINISHED),
+                "the shock, applied to every enemy the Skill hit (the blast's damage is the engine's own path)");
         Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "Eidolon 6's conditional boost");
         Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ALLY_ATTACK),

@@ -1,0 +1,1 @@
+{ "schema": 1, "relic_set": 99990, "2": [ { "on": "BATTLE_START", "id": "probe", "do": [ { "op": "GAIN_SKILL_POINT", "amount": 1 } ], "_note": "header probe" } ] }

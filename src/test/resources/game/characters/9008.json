@@ -1,0 +1,48 @@
+{
+  "schema": 1,
+  "character": 9008,
+  "rules": [
+    {
+      "on": "TURN_START",
+      "id": "mixed_conditions",
+      "when": [
+        "actor == self",
+        {
+          "type": "entity",
+          "entity": "target",
+          "json": {
+            "hp_pct": {
+              "min": 0.3
+            }
+          }
+        },
+        {
+          "type": "any_of",
+          "terms": [
+            {
+              "type": "entity",
+              "entity": "self",
+              "json": {
+                "is_ally": true
+              }
+            },
+            {
+              "type": "entity",
+              "entity": "actor",
+              "json": {
+                "same_as": "target"
+              }
+            }
+          ]
+        }
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1,
+          "target": "self"
+        }
+      ]
+    }
+  ]
+}

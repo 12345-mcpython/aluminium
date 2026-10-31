@@ -327,12 +327,6 @@ public class UltCastTriggerTest {
      * widening the production API for test convenience.
      */
     private static void set(Object target, String field, Object value) {
-        try {
-            var declared = target.getClass().getDeclaredField(field);
-            declared.setAccessible(true);
-            declared.set(target, value);
-        } catch (ReflectiveOperationException e) {
-            throw new IllegalStateException("cannot set " + field, e);
-        }
+        com.laosun.aluminium.test.support.TriggerSpecs.set(target, field, value);
     }
 }

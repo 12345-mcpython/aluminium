@@ -29,8 +29,16 @@ import java.util.stream.Stream;
 public class EffectKeyDisciplineTest {
     /**
      * `note` belongs to a RULE; an effect that repeats one is dead text, but harmless and already shipped.
+     * The underscore keys are the loader's annotation vocabulary: they are accepted on an effect and never reach a bean.
      */
-    private static final Set<String> ALSO_ALLOWED = Set.of("note");
+    private static final Set<String> ALSO_ALLOWED = allowedExtras();
+
+    private static Set<String> allowedExtras() {
+        Set<String> allowed = new HashSet<>(com.laosun.aluminium.data.TriggerTables.ANNOTATION_KEYS);
+        allowed.add("note");
+        allowed.add("source");
+        return Set.copyOf(allowed);
+    }
 
     private static Set<String> knownKeys() {
         Set<String> known = new HashSet<>();

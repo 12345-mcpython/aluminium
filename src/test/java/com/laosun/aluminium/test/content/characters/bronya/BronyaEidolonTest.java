@@ -144,6 +144,28 @@ public class BronyaEidolonTest {
     }
 
     // ==================================================================
+    // Eidolon 3 / 5: the named skill-level raises
+    // ==================================================================
+
+    @Test
+    public void eidolonsThreeAndFiveRaiseTheSlotsTheyName() {
+        int[] e0 = levelsAt(0);
+        int[] e3 = levelsAt(3);
+        int[] e5 = levelsAt(5);
+
+        Assertions.assertEquals(e0[2] + 2, e3[2], "星魂 3：终结技 +2");
+        Assertions.assertEquals(e0[3] + 2, e3[3], "星魂 3：天赋 +2");
+        Assertions.assertEquals(e0[1], e3[1], "星魂 3 不动战技");
+        Assertions.assertEquals(e0[0], e3[0], "星魂 3 不动普攻");
+
+        Assertions.assertEquals(e3[1] + 2, e5[1], "星魂 5：战技 +2");
+        Assertions.assertTrue(e5[0] >= e3[0] && e5[0] <= e3[0] + 1,
+                "星魂 5：普攻 +1（被它自己的表夹住时，最多只加 1）");
+        Assertions.assertEquals(e3[2], e5[2], "星魂 5 不动终结技");
+        Assertions.assertEquals(e3[3], e5[3], "星魂 5 不动天赋");
+    }
+
+    // ==================================================================
     // Helpers
     // ==================================================================
 
@@ -192,6 +214,15 @@ public class BronyaEidolonTest {
                 .stream()
                 .map(DoubleValue.Modifier::getValue)
                 .toList();
+    }
+
+    private static int[] levelsAt(int rank) {
+        Character bronya = battleWith(rank, 0.0).characters().getFirst();
+        return new int[]{
+                bronya.skillLevel(bronya.getSkills().get(SkillType.COMMON)),
+                bronya.skillLevel(bronya.getSkills().get(SkillType.SKILL)),
+                bronya.skillLevel(bronya.getSkills().get(SkillType.ULTRA)),
+                bronya.skillLevel(bronya.getSkills().get(SkillType.TALENT))};
     }
 
     private static Battle battleWith(int rank, double roll) {

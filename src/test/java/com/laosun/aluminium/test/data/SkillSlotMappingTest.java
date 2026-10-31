@@ -36,7 +36,7 @@ public class SkillSlotMappingTest {
     private static final double EPS = 1e-9;
 
     /**
-     * The slot table itself: 1 basic attack / 2 skill / 3 ultimate / 4 talent / 6 map basic attack / technique (5 does not exist in the data).
+     * The slot table itself: 1 basic attack / 2 skill / 3 ultimate / 4 talent / 6 map basic attack / 7 technique / 8 enhanced basic (5 does not exist in the data).
      */
     @Test
     public void slotTableIsTheSingleSourceOfTruth() {
@@ -47,6 +47,7 @@ public class SkillSlotMappingTest {
                         SkillType.TALENT, 4,
                         SkillType.MAZE, 6,
                         SkillType.TECHNIQUE, 7,
+                        SkillType.ENHANCED_BASIC, 8,
                         //: the Elation damage skills live in slots 20/21 in `skills.json`
                         SkillType.ELATION_SKILL, 20,
                         SkillType.ELATION_EXTRA, 21),

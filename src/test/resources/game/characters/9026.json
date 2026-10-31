@@ -1,0 +1,24 @@
+{
+  "schema": 1,
+  "character": 9026,
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "bad_source_params",
+      "source": {
+        "text": "fixture source text",
+        "skill": "SKILL",
+        "row": 10,
+        "params": {
+          "#x": 1
+        }
+      },
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}

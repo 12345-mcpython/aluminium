@@ -1,0 +1,17 @@
+{
+  "schema": 1,
+  "character": 9022,
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "status_bad",
+      "_status": "done",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}

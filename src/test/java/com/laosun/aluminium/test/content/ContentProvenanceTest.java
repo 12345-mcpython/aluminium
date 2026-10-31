@@ -20,7 +20,7 @@ import java.util.stream.Stream;
 
 /**
  * Every shipped rule carries its <b>provenance</b>: the sentence it comes from ({@code source}) and what was decided
- * about it ({@code note}).
+ * about it ({@code note}, or the annotation spelling {@code _note}).
  *
  * <p><b>Why a guard and not a convention.</b> The audit status of a character is only as good as its notes: a rule with
  * no {@code note} has nothing to re-check, and a rule with no {@code source} cannot be traced back to a document. 42 such
@@ -120,7 +120,7 @@ public class ContentProvenanceTest {
             if (blank(rule, "source")) {
                 missing.add("source");
             }
-            if (blank(rule, "note")) {
+            if (blank(rule, "note") && blank(rule, "_note")) {
                 missing.add("note");
             }
             if (!missing.isEmpty()) {
@@ -132,6 +132,9 @@ public class ContentProvenanceTest {
 
     private static boolean blank(JsonObject rule, String field) {
         JsonElement value = rule.get(field);
+        if (value != null && value.isJsonObject() && "source".equals(field)) {
+            value = value.getAsJsonObject().get("text");
+        }
         return value == null || value.isJsonNull() || value.getAsString().isBlank();
     }
 }

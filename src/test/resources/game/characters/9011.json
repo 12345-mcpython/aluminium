@@ -1,0 +1,15 @@
+{
+  "schema": 1,
+  "character": 1001,
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}

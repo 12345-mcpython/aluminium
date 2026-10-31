@@ -31,7 +31,7 @@ public class ContentDuplicateGuardTest {
      */
     private static final List<String> OPERANDS =
             List.of("attribute", "buff", "resource", "rule", "state", "scale", "target", "permanent", "turns",
-                    "percent", "amount", "crit_rate", "crit_damage", "per_stack", "max_stacks",
+                    "percent", "ratio", "value", "amount", "crit_rate", "crit_damage", "per_stack", "max_stacks",
                     // `element` names WHAT is affected as much as `buff` does: a Fire damage-over-time and an Ice one are different effects, and
                     // 1415's ocean ode writes one tick rule per element (TICK_DOT has no wildcard spelling) -- without this the guard read those 14 rules as duplicates.
                     "element",
@@ -138,7 +138,9 @@ public class ContentDuplicateGuardTest {
             JsonArray array = when.getAsJsonArray();
             List<String> conditions = new ArrayList<>();
             for (JsonElement condition : array) {
-                conditions.add(condition.getAsString());
+                // `when` holds both DSL strings and predicate objects; render the object form as its own JSON so two
+                // rules that differ only in the structured half are not called identical.
+                conditions.add(condition.isJsonPrimitive() ? condition.getAsString() : condition.toString());
             }
             Collections.sort(conditions);
             out.append(" when=").append(conditions);

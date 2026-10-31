@@ -1,0 +1,1 @@
+{ "schema": 1, "light_cone": 99996, "lght_cone": 99996, "1": [ { "on": "BATTLE_START", "do": [ { "op": "GAIN_SKILL_POINT", "amount": 1 } ] } ] }

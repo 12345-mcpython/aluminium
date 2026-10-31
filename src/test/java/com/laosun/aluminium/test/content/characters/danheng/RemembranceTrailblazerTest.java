@@ -73,7 +73,7 @@ public class RemembranceTrailblazerTest {
             var table = com.laosun.aluminium.data.TriggerTables.of(cid);
             Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.SKILL_CAST), "cid " + cid);
             Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST), "cid " + cid);
-            Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START), "cid " + cid);
+            Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START), "cid " + cid);
         }
     }
 

@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "character": 9015,
+  "resources": [
+    {
+      "id": "probe",
+      "max": 99,
+      "initial": 10
+    }
+  ],
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "value_resource_ops",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "value": {
+            "type": "const",
+            "value": 10
+          },
+          "fixed": true,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "probe",
+          "value": {
+            "type": "const",
+            "value": 5
+          }
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "probe",
+          "value": {
+            "type": "const",
+            "value": 2
+          }
+        },
+        {
+          "op": "REMOVE_RESOURCE",
+          "resource": "probe",
+          "value": {
+            "type": "const",
+            "value": 1
+          }
+        },
+        {
+          "op": "CONSUME_HP",
+          "value": {
+            "type": "const",
+            "value": 100
+          },
+          "target": "self"
+        }
+      ]
+    }
+  ]
+}
