@@ -128,12 +128,13 @@ public class ConeConditionLiteralsTest {
         // rule was a silent no-op. The DSL spelling is `is_slowed`.
         assertRule(20011, 5, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target is_slowed"));
         // 2026-10-19: 20012-20017 said `List.of()` - no conditions - and every one of them paid on a TEAMMATE's
-        // event (the engine fires each event at every ally's table). The gate is `actor == self`.
-        assertRule(20012, 1, "BASIC_ATTACK", "cone20012_energy", List.of("actor == self"));
-        assertRule(20012, 2, "BASIC_ATTACK", "cone20012_energy", List.of("actor == self"));
-        assertRule(20012, 3, "BASIC_ATTACK", "cone20012_energy", List.of("actor == self"));
-        assertRule(20012, 4, "BASIC_ATTACK", "cone20012_energy", List.of("actor == self"));
-        assertRule(20012, 5, "BASIC_ATTACK", "cone20012_energy", List.of("actor == self"));
+        // event (the engine fires each event at every ally's table). 2026-10-31: 20012's sentence is 「施放攻击**或**受到
+        // 攻击后」, so its gate became the disjunction `self_is_actor_or_target` - the two halves share one `per_turn`.
+        assertRule(20012, 1, "BASIC_ATTACK", "cone20012_energy", List.of("self_is_actor_or_target"));
+        assertRule(20012, 2, "BASIC_ATTACK", "cone20012_energy", List.of("self_is_actor_or_target"));
+        assertRule(20012, 3, "BASIC_ATTACK", "cone20012_energy", List.of("self_is_actor_or_target"));
+        assertRule(20012, 4, "BASIC_ATTACK", "cone20012_energy", List.of("self_is_actor_or_target"));
+        assertRule(20012, 5, "BASIC_ATTACK", "cone20012_energy", List.of("self_is_actor_or_target"));
         assertRule(20013, 1, "SKILL_CAST", "cone20013_energy_on_skill", List.of("actor == self"));
         assertRule(20013, 2, "SKILL_CAST", "cone20013_energy_on_skill", List.of("actor == self"));
         assertRule(20013, 3, "SKILL_CAST", "cone20013_energy_on_skill", List.of("actor == self"));

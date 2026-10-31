@@ -2,71 +2,121 @@
   "1": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": ["SKILL_CAST", "ULT_CAST"],
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST",
+        "TAKING_HIT"
+      ],
       "id": "cone20012_energy",
       "per_turn": 1,
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 4.0, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 4.0,
+          "target": "self"
+        }
       ],
       "source": "光锥 20012 轮契: 使装备者施放攻击或受到攻击后，额外恢复#1[i]点能量，该效果单个回合内不可重复触发。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。",
-      "when": ["actor == self"]
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。 ⚠ 2026-10-31：口径改为**一条规则 + `on_any` 里加 `TAKING_HIT`**，条件用新开的 `self_is_actor_or_target`（她既是 actor 又可能是 target）—— 这样「施放攻击」与「受到攻击」共用**同一个** `per_turn: 1`，与「该效果单个回合内不可重复触发」一致（拆两条会变成一回合两次 ✗）。",
+      "when": [
+        "self_is_actor_or_target"
+      ]
     }
   ],
   "2": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": ["SKILL_CAST", "ULT_CAST"],
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST",
+        "TAKING_HIT"
+      ],
       "id": "cone20012_energy",
       "per_turn": 1,
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 5.0, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5.0,
+          "target": "self"
+        }
       ],
       "source": "光锥 20012 轮契: 使装备者施放攻击或受到攻击后，额外恢复#1[i]点能量，该效果单个回合内不可重复触发。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。",
-      "when": ["actor == self"]
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。 ⚠ 2026-10-31：口径改为**一条规则 + `on_any` 里加 `TAKING_HIT`**，条件用新开的 `self_is_actor_or_target`（她既是 actor 又可能是 target）—— 这样「施放攻击」与「受到攻击」共用**同一个** `per_turn: 1`，与「该效果单个回合内不可重复触发」一致（拆两条会变成一回合两次 ✗）。",
+      "when": [
+        "self_is_actor_or_target"
+      ]
     }
   ],
   "3": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": ["SKILL_CAST", "ULT_CAST"],
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST",
+        "TAKING_HIT"
+      ],
       "id": "cone20012_energy",
       "per_turn": 1,
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 6.0, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 6.0,
+          "target": "self"
+        }
       ],
       "source": "光锥 20012 轮契: 使装备者施放攻击或受到攻击后，额外恢复#1[i]点能量，该效果单个回合内不可重复触发。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。",
-      "when": ["actor == self"]
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。 ⚠ 2026-10-31：口径改为**一条规则 + `on_any` 里加 `TAKING_HIT`**，条件用新开的 `self_is_actor_or_target`（她既是 actor 又可能是 target）—— 这样「施放攻击」与「受到攻击」共用**同一个** `per_turn: 1`，与「该效果单个回合内不可重复触发」一致（拆两条会变成一回合两次 ✗）。",
+      "when": [
+        "self_is_actor_or_target"
+      ]
     }
   ],
   "4": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": ["SKILL_CAST", "ULT_CAST"],
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST",
+        "TAKING_HIT"
+      ],
       "id": "cone20012_energy",
       "per_turn": 1,
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 7.0, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 7.0,
+          "target": "self"
+        }
       ],
       "source": "光锥 20012 轮契: 使装备者施放攻击或受到攻击后，额外恢复#1[i]点能量，该效果单个回合内不可重复触发。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。",
-      "when": ["actor == self"]
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。 ⚠ 2026-10-31：口径改为**一条规则 + `on_any` 里加 `TAKING_HIT`**，条件用新开的 `self_is_actor_or_target`（她既是 actor 又可能是 target）—— 这样「施放攻击」与「受到攻击」共用**同一个** `per_turn: 1`，与「该效果单个回合内不可重复触发」一致（拆两条会变成一回合两次 ✗）。",
+      "when": [
+        "self_is_actor_or_target"
+      ]
     }
   ],
   "5": [
     {
       "on": "BASIC_ATTACK",
-      "on_any": ["SKILL_CAST", "ULT_CAST"],
+      "on_any": [
+        "SKILL_CAST",
+        "ULT_CAST",
+        "TAKING_HIT"
+      ],
       "id": "cone20012_energy",
       "per_turn": 1,
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 8.0, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 8.0,
+          "target": "self"
+        }
       ],
       "source": "光锥 20012 轮契: 使装备者施放攻击或受到攻击后，额外恢复#1[i]点能量，该效果单个回合内不可重复触发。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。",
-      "when": ["actor == self"]
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（4/5/6/7/8 点 ✓）。\n⭐ 「**施放攻击**」= 她自己的三种攻击 ✓：`on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST, ULT_CAST]` ✓，配 **`per_turn: 1`** ✓（同一批对象挂在多个事件下 ⇒ 计数器**跨事件共享** ✓，正是「单个回合内不可重复」✓）。\n⚠⚠ **2026-10-19 逐句核时加的 `actor == self`** ✓：没有它，**队友**施放战技/终结技也会给装备者回能 ✗。\n⛔ **仍开（已登记 §4.3）**：「**受到攻击**后」这一半**写不出来** ✗ —— 它要 `target == self`，而前半要 `actor == self`，条件之间是 **AND** ✓（没有「或」）⇒ 拆成两条规则会把 `per_turn: 1` 变成**每条一次**（一回合最多两次）✗，与「单个回合内不可重复」相违 ✓。⇒ 保留能精确表达的那一半，另一半登记 ✓（缺口见证：`ConeAuditBatchThreeTest`）。 ⚠ 2026-10-31：口径改为**一条规则 + `on_any` 里加 `TAKING_HIT`**，条件用新开的 `self_is_actor_or_target`（她既是 actor 又可能是 target）—— 这样「施放攻击」与「受到攻击」共用**同一个** `per_turn: 1`，与「该效果单个回合内不可重复触发」一致（拆两条会变成一回合两次 ✗）。",
+      "when": [
+        "self_is_actor_or_target"
+      ]
     }
   ]
 }
