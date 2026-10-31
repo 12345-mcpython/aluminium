@@ -59,7 +59,8 @@ public class ConeAuditBatchNineteenTest {
     }
 
     /**
-     * 23012 如泥酣眠: the crit-damage share is the property, and the file carries no rules (registered gap).
+     * 23012 如泥酣眠: the crit-damage share is the property; the "did not crit" clause is spelled now (judged in
+     * ConeTwentyThreeThousandTwelveTest).
      */
     @Test
     public void coneTwoThreeOneTwoHasOnlyTheCritDamageShare() {
@@ -68,7 +69,7 @@ public class ConeAuditBatchNineteenTest {
         double critDamage = f.attribute(AttributeType.CRIT_ATTACK) - bare.attribute(AttributeType.CRIT_ATTACK);
         System.out.println("[23012] 暴伤增量 " + critDamage + " ; 规则数 " + rules(23012));
         Assertions.assertTrue(critDamage > 0, "「暴击伤害提高 30%」—— 光锥属性给一次");
-        Assertions.assertEquals(0, rules(23012), "缺口见证：没有规则（未暴击那一句没有拼法，见状态表）");
+        Assertions.assertEquals(2, rules(23012), "the two category rules (basic / skill)");
     }
 
     /**
