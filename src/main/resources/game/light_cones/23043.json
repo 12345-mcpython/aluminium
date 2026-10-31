@@ -1,9 +1,194 @@
 {
   "schema": 1,
   "light_cone": 23043,
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-  "5": []
+  "1": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_defence_down",
+      "when": ["actor == self", "self_attr:SPEED < 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.16,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「施放攻击后，有#2[i]%的基础概率使敌方每个单体目标陷入【茫然】，【茫然】防御力降低#3[i]%，持续#4[i]回合」 param Lv1 = [0.18, 1.2, 0.16, 2, 1.2, 0.08, 170]",
+      "_note": "「施放攻击后，有 **120% 的基础概率**使敌方**每个单体目标**陷入【茫然】（防御 −16%，2 回合）」—— ① 事件 `ATTACK_FINISHED` ✓；② 目标 `all_enemies` ✓（「每个单体目标」= 逐个敌人 ✓）；③ `base_chance: 1.2` ✓ —— 句子自己给的**基础概率**（120%），装载走效果抵抗判定（`attachRolled` ✓；判据里用 0 抵抗的靶子定住 ✓）；④ 防御降低是**基数份额**（`percent` 在平属性上按基数计 ✓）＋ 具名修饰 `茫然` ✓。「重复施加只保留最新」= 同一身份替换（刷新）✓。⚠ 速度 ≥ 170 的那一支见下一条（两条分支互斥 ⇒ 不会互相替换）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_and_theft_defence_down",
+      "when": ["actor == self", "self_attr:SPEED >= 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.24,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「若装备者的速度大于等于170，有#5[i]%的基础概率使敌方每个单体目标陷入【失窃】，【失窃】防御力降低#6[i]%，持续#4[i]回合」 param Lv1 = [.., 1.2, .., 2, 1.2, 0.08, 170]",
+      "_note": "「速度 **≥ 170** 时，另有【失窃】（防御 −8%）」—— ① 门 `self_attr:SPEED >= 170` ✓；② 与【茫然】的 −16% **相加** = −24% ✓ —— 两条分支**互斥**（`< 170` / `>= 170`），所以没有「同属性修饰互相替换」的问题 ✓；若拆成两条独立修饰（两个状态名），引擎里它们仍会**互相替换**（实测：不同 buff 名字也只剩一条 ✗），于是这里把两支合并进一条份额；③ 同样 `base_chance: 1.2`。"
+    }
+  ],
+  "2": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_defence_down",
+      "when": ["actor == self", "self_attr:SPEED < 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.18,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【茫然】防御力降低#3[i]%…」 param Lv2 = [0.21, 1.2, 0.18, 2, 1.2, 0.09, 170]",
+      "_note": "同第 1 档，数值按 Lv2 行：#3 = 0.18 ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_and_theft_defence_down",
+      "when": ["actor == self", "self_attr:SPEED >= 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.27,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【失窃】防御力降低#6[i]%…」 param Lv2 #3 = 0.18、#6 = 0.09",
+      "_note": "同第 1 档，合并份额按 Lv2 行：#3 + #6 = 0.27 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_defence_down",
+      "when": ["actor == self", "self_attr:SPEED < 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.2,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【茫然】防御力降低#3[i]%…」 param Lv3 = [0.24, 1.2, 0.2, 2, 1.2, 0.1, 170]",
+      "_note": "同第 1 档，数值按 Lv3 行：#3 = 0.2 ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_and_theft_defence_down",
+      "when": ["actor == self", "self_attr:SPEED >= 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.3,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【失窃】防御力降低#6[i]%…」 param Lv3 #3 = 0.2、#6 = 0.1",
+      "_note": "同第 1 档，合并份额按 Lv3 行：#3 + #6 = 0.3 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_defence_down",
+      "when": ["actor == self", "self_attr:SPEED < 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.22,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【茫然】防御力降低#3[i]%…」 param Lv4 = [0.27, 1.2, 0.22, 2, 1.2, 0.11, 170]",
+      "_note": "同第 1 档，数值按 Lv4 行：#3 = 0.22 ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_and_theft_defence_down",
+      "when": ["actor == self", "self_attr:SPEED >= 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.33,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【失窃】防御力降低#6[i]%…」 param Lv4 #3 = 0.22、#6 = 0.11",
+      "_note": "同第 1 档，合并份额按 Lv4 行：#3 + #6 = 0.33 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_defence_down",
+      "when": ["actor == self", "self_attr:SPEED < 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.24,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【茫然】防御力降低#3[i]%…」 param Lv5 = [0.3, 1.2, 0.24, 2, 1.2, 0.12, 170]",
+      "_note": "同第 1 档，数值按 Lv5 行：#3 = 0.24 ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone23043_daze_and_theft_defence_down",
+      "when": ["actor == self", "self_attr:SPEED >= 170"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.36,
+          "buff": "茫然",
+          "base_chance": 1.2,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "光锥 23043: 「…【失窃】防御力降低#6[i]%…」 param Lv5 #3 = 0.24、#6 = 0.12",
+      "_note": "同第 1 档，合并份额按 Lv5 行：#3 + #6 = 0.36 ✓。"
+    }
+  ]
 }
