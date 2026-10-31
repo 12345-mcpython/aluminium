@@ -52,21 +52,23 @@ public class LingeringTearTest {
     }
 
     @Test
-    public void theDeclarationReachesTheWearer() {
+    public void theCounterIsTheBattlesNotTheWearers() {
         Battle battle = battle(true);
-        Assertions.assertTrue(wearer.getResources().has(LAUGHTER),
-                "the cone's file declares the resource and the merge registers it");
-        Assertions.assertEquals(0, wearer.getResources().value(LAUGHTER), "declared with initial 0");
+        Assertions.assertFalse(wearer.getResources().has(LAUGHTER),
+                "the cone no longer declares its own copy - 笑点 is battle-level now");
+        Assertions.assertNotNull(battle.partyResource(LAUGHTER),
+                "and every battle has it, declared once in game/battle_resources.json");
+        Assertions.assertEquals(0, battle.partyResourceValue(LAUGHTER), "starting empty");
     }
 
     @Test
     public void thePanelOpensAtTenAndClosesBelowIt() {
         Battle battle = battle(true);
         double base = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        wearer.getResources().gain(LAUGHTER, THRESHOLD);
+        battle.partyResource(LAUGHTER).gain(THRESHOLD);
         changed(battle);
         double opened = wearer.getAttribute(AttributeType.CRIT_ATTACK).get() - base;
-        wearer.getResources().spend(LAUGHTER, THRESHOLD);
+        battle.partyResource(LAUGHTER).spend(THRESHOLD);
         changed(battle);
         double closed = wearer.getAttribute(AttributeType.CRIT_ATTACK).get() - base;
         System.out.println("[20024] at 10: +" + opened + " ; back to 0: +" + closed);
@@ -82,7 +84,7 @@ public class LingeringTearTest {
     @Test
     public void theSpecPinsBothDirections() {
         Battle battle = battle(true);
-        wearer.getResources().gain(LAUGHTER, THRESHOLD);
+        battle.partyResource(LAUGHTER).gain(THRESHOLD);
         int met = 0;
         int lost = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.RESOURCE_CHANGED,
@@ -107,7 +109,7 @@ public class LingeringTearTest {
                 }
             }
         }
-        wearer.getResources().spend(LAUGHTER, THRESHOLD);
+        battle.partyResource(LAUGHTER).spend(THRESHOLD);
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.RESOURCE_CHANGED,
                 new TriggerTable.TriggerContext(wearer, wearer, wearer, 0, 0, null, battle, null))) {
             if (!rule.id().startsWith("cone20024_")) {
@@ -127,7 +129,7 @@ public class LingeringTearTest {
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
         double base = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        wearer.getResources().gain(LAUGHTER, THRESHOLD);
+        battle.partyResource(LAUGHTER).gain(THRESHOLD);
         changed(battle);
         Assertions.assertEquals(base, wearer.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
                 "no cone, no panel (false case)");
