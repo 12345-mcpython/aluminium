@@ -135,7 +135,7 @@ public class ConeAuditBatchSixteenTest {
     }
 
     /**
-     * 22006 飞向粉色的明天: the crit share is the property, and the other two clauses are missing (the witness).
+     * 22006 飞向粉色的明天: the crit share is the property, and the two Trailblazer-Memory clauses are spelled now.
      */
     @Test
     public void coneTwoInnocentTwoZeroSixHasOnlyTheCritShare() {
@@ -145,8 +145,8 @@ public class ConeAuditBatchSixteenTest {
             JsonObject root = JsonParser.parseReader(
                     new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
             int rules = root.getAsJsonArray("1").size();
-            System.out.println("[22006] 规则条数 " + rules + "（光锥属性已给暴伤；另外两句未写）");
-            Assertions.assertEquals(1, rules, "缺口见证：只有一条规则（暴伤那条重复规则已删，另两句整块没有）");
+            System.out.println("[22006] 规则条数 " + rules + "（暴伤由属性给；两句各拆 8007/8008 两条）");
+            Assertions.assertEquals(4, rules, "two cids x (party share + enhanced basic)");
         } catch (java.io.IOException failure) {
             throw new IllegalStateException(failure);
         }
