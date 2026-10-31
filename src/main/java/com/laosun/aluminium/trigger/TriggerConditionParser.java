@@ -2110,6 +2110,9 @@ final class TriggerConditionParser {
                     // by SkillExecutor after each such cast. `from_skill_id` is the CURRENT one, so the comparison is
                     // `from_skill_id != last_elation_skill_id`.
                     "last_elation_skill_id",
+                    // 「开拓者·记忆装备时」 (light cone 22006): the rule owner own cid. A light cone file is shared by every
+                    // wearer, so "when worn by X" can only be asked as a number; `ally_cid:` names a unit, not the owner.
+                    "self_cid",
                     // The owner's Eidolon rank, as a condition. Note: `min_eidolon` already gates a whole RULE on it, and that
                     // is enough when the clause IS the Eidolon's ("【深度学习】时 ... 抗性穿透提高 20%"). It is not enough when an
                     // Eidolon clause MODIFIES an effect the base kit also has at the same event: the two rules then carry

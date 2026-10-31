@@ -1815,6 +1815,13 @@ public class TriggerTable {
                 return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
+                case "self_cid" -> {
+                    // 「开拓者·记忆装备时」 (light cone 22006): the rule owner cid.
+                    if (ctx.owner() instanceof com.laosun.aluminium.entity.Character owner) {
+                        yield owner.getCid();
+                    }
+                    yield Double.NaN;      // a memosprite has no cid
+                }
                 case "last_elation_skill_id" -> {
                     // 「与上一次施放的欢愉技不同」 (light cone 23064): the slot of the owner is previous Elation-damage cast
                     // (0 before the first one). Compared against `from_skill_id` in the same condition.
