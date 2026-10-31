@@ -125,7 +125,11 @@ final class TriggerVocabulary {
                     // 「击破特攻最高的队友」 (the same cone, fallback branch): the living OTHER ally with the highest
                     // BREAKING_EFFECT. Ties keep roster order. Handled in the plural path, because "no other ally" is an
                     // ordinary battle state, not an error.
-                    "highest_break_effect_ally");
+                    "highest_break_effect_ally",
+                    // 「获得【卫戍】的目标，若目标拥有召唤物则造成的伤害额外提高 #3%」 (light cone 23051): the allies that
+                    // OWN at least one memosprite. A filter over our side, because the condition language decides whether
+                    // a rule runs, not which units its effects reach.
+                    "allies_with_summons");
     /**
      * The two spellings of "every one of our characters".
      */
