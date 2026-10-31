@@ -3,9 +3,17 @@
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_wearer",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.3, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
@@ -13,21 +21,78 @@
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_summon",
-      "when": ["target == summon"],
+      "when": [
+        "target == summon"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.3, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23040_bid_the_summon_goodbye",
+      "when": [
+        "actor is_summon",
+        "self_stacks:送别的花 < 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.12,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "送别的花",
+          "amount": 1,
+          "max_stacks": 1,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「最多触发 1 次」= 一个最多 1 层的标记 `送别的花` 当门；「每次施放终结技时重置」= `ULT_CAST` 上把那个标记撤掉。「忆灵消失」= `SUMMON_LEFT` + `actor is_summon`（那是**装备者的**忆灵），行动提前给装备者自己。 ⚠ 门的写法是 `self_stacks:送别的花 < 1`（数值变量不能取反，只能反过来比较）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23040_bid_resets_on_the_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "送别的花",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「装备者每次施放终结技时重置触发次数」= 撤掉那个一次性标记。"
     }
   ],
   "2": [
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_wearer",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.35, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.35,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
@@ -35,21 +100,78 @@
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_summon",
-      "when": ["target == summon"],
+      "when": [
+        "target == summon"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.35, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.35,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23040_bid_the_summon_goodbye",
+      "when": [
+        "actor is_summon",
+        "self_stacks:送别的花 < 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "送别的花",
+          "amount": 1,
+          "max_stacks": 1,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「最多触发 1 次」= 一个最多 1 层的标记 `送别的花` 当门；「每次施放终结技时重置」= `ULT_CAST` 上把那个标记撤掉。「忆灵消失」= `SUMMON_LEFT` + `actor is_summon`（那是**装备者的**忆灵），行动提前给装备者自己。 ⚠ 门的写法是 `self_stacks:送别的花 < 1`（数值变量不能取反，只能反过来比较）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23040_bid_resets_on_the_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "送别的花",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「装备者每次施放终结技时重置触发次数」= 撤掉那个一次性标记。"
     }
   ],
   "3": [
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_wearer",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.4, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.4,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
@@ -57,21 +179,78 @@
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_summon",
-      "when": ["target == summon"],
+      "when": [
+        "target == summon"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.4, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.4,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23040_bid_the_summon_goodbye",
+      "when": [
+        "actor is_summon",
+        "self_stacks:送别的花 < 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.18,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "送别的花",
+          "amount": 1,
+          "max_stacks": 1,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「最多触发 1 次」= 一个最多 1 层的标记 `送别的花` 当门；「每次施放终结技时重置」= `ULT_CAST` 上把那个标记撤掉。「忆灵消失」= `SUMMON_LEFT` + `actor is_summon`（那是**装备者的**忆灵），行动提前给装备者自己。 ⚠ 门的写法是 `self_stacks:送别的花 < 1`（数值变量不能取反，只能反过来比较）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23040_bid_resets_on_the_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "送别的花",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「装备者每次施放终结技时重置触发次数」= 撤掉那个一次性标记。"
     }
   ],
   "4": [
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_wearer",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.45, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.45,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
@@ -79,21 +258,78 @@
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_summon",
-      "when": ["target == summon"],
+      "when": [
+        "target == summon"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.45, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.45,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23040_bid_the_summon_goodbye",
+      "when": [
+        "actor is_summon",
+        "self_stacks:送别的花 < 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.21,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "送别的花",
+          "amount": 1,
+          "max_stacks": 1,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「最多触发 1 次」= 一个最多 1 层的标记 `送别的花` 当门；「每次施放终结技时重置」= `ULT_CAST` 上把那个标记撤掉。「忆灵消失」= `SUMMON_LEFT` + `actor is_summon`（那是**装备者的**忆灵），行动提前给装备者自己。 ⚠ 门的写法是 `self_stacks:送别的花 < 1`（数值变量不能取反，只能反过来比较）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23040_bid_resets_on_the_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "送别的花",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「装备者每次施放终结技时重置触发次数」= 撤掉那个一次性标记。"
     }
   ],
   "5": [
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_wearer",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.5, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.5,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
@@ -101,12 +337,61 @@
     {
       "on": "HP_LOST",
       "id": "cone23040_flower_from_summon",
-      "when": ["target == summon"],
+      "when": [
+        "target == summon"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.5, "turns": 2, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.5,
+          "turns": 2,
+          "target": "self"
+        }
       ],
       "source": "光锥 23040: 「装备者或装备者的忆灵损失生命值时，装备者获得【冥花】，【冥花】可以使装备者和装备者的忆灵造成伤容时，无视目标#2[i]%的防御力，持续#3[i]回合。」",
       "note": "「装备者或忆灵在自身回合内损失生命时获得【冥花】：造成伤害时**无视 30% 防御**，持续 2 回合」—— HP_LOST 以 **\target == self / \target == summon** 为门 ✓、MODIFY_ATTR DEFENCE_IGNORE{turns: 2} ✓（30/35/40/45/50% ✓）；生命上限 +30% 由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的门**：原文件写 \u0007ctor == self / \u0007ctor == summon ✗✗ —— HP_LOST 的受害者在 **\target** 上 ✓（同形：21024 的 TAKING_HIT 也是用 \target == ✓），所以原来这条**永远不会开火** ✗（实测增量 0 ✗）。\n⛔ **仍开（已登记 §4.3）**：「**忆灵消失时**，行动提前 12%，**最多 1 次**，**终结技重置次数**」整句没有 ✗。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23040_bid_the_summon_goodbye",
+      "when": [
+        "actor is_summon",
+        "self_stacks:送别的花 < 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.24,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "送别的花",
+          "amount": 1,
+          "max_stacks": 1,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「最多触发 1 次」= 一个最多 1 层的标记 `送别的花` 当门；「每次施放终结技时重置」= `ULT_CAST` 上把那个标记撤掉。「忆灵消失」= `SUMMON_LEFT` + `actor is_summon`（那是**装备者的**忆灵），行动提前给装备者自己。 ⚠ 门的写法是 `self_stacks:送别的花 < 1`（数值变量不能取反，只能反过来比较）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23040_bid_resets_on_the_ultimate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "送别的花",
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23040 让告别，更美一些:「当装备者的忆灵消失时，使装备者行动提前 #4%。该效果最多触发 1 次，装备者每次施放终结技时重置触发次数。」",
+      "note": "「装备者每次施放终结技时重置触发次数」= 撤掉那个一次性标记。"
     }
   ]
 }
