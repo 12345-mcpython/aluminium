@@ -28,7 +28,7 @@ public class ConeAuditBatchTwentyFiveTest {
     private static final int ALLY = 1204;
 
     /**
-     * 23043 谎言在风中飘扬: only the speed share is spelled (the two states are registered).
+     * 23043 谎言在风中飘扬: the speed share is the property; the two defence states are spelled now (judged in\n * ConeTwentyThreeThousandFortyThreeTest).
      */
     @Test
     public void coneTwoThreeFourThreeHasOnlyTheSpeedShare() {
@@ -38,7 +38,7 @@ public class ConeAuditBatchTwentyFiveTest {
                 - bare.wearer.getAttribute(AttributeType.SPEED).get()) + " ; 规则数 " + rules(23043));
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.SPEED).get()
                 > bare.wearer.getAttribute(AttributeType.SPEED).get(), "「速度提高 18%」—— 光锥属性给一次");
-        Assertions.assertEquals(0, rules(23043), "缺口见证：没有规则（【茫然】/【失窃】没有拼法）");
+        Assertions.assertEquals(2, rules(23043), "the two speed-gated defence branches");
     }
 
     /**
