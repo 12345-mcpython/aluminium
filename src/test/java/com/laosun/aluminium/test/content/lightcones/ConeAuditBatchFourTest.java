@@ -70,10 +70,13 @@ public class ConeAuditBatchFourTest {
         TestTurns.take(f.battle, f.wearer);
         double afterOneTurn = f.wearer.getAttribute(AttributeType.SPEED).get()
                 - bare.wearer.getAttribute(AttributeType.SPEED).get();
-        System.out.println("[20019] 她自己过一个回合之后的速度增量 " + afterOneTurn
-                + "（「持续 1 回合」的时钟 —— 已登记 §4.3）");
-        Assertions.assertEquals(0.0, afterOneTurn, 1e-9,
-                "今天的行为：`turns: 1` 在第一个回合开始就到期（缺口见证，不是期望的最终样子）");
+        Assertions.assertEquals(12.0, afterOneTurn, 1e-9,
+                "「持续 1 回合」就是她自己的第一个回合 —— 缺口已收（2026-10-31）：数据写 `turns: 2`，"
+                        + "因为这条 buff 在开战前授予，第一个回合的开场边界会白花掉一回合");
+        TestTurns.take(f.battle, f.wearer);
+        Assertions.assertEquals(0.0, f.wearer.getAttribute(AttributeType.SPEED).get()
+                - bare.wearer.getAttribute(AttributeType.SPEED).get(), 1e-9,
+                "第二个回合起到期");
     }
 
     /**
