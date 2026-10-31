@@ -30,7 +30,41 @@
         { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
-      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
+      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n✅ 两条已写：`cone23059_purgatory_crit_taken`（任何来源）与 `_from_wearer`（只有装备者）—— 实例 `CRIT_ATTACK`，只在暴击时进倍率 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken",
+      "when": ["target has_state 炼狱"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下目标受到的暴击伤害提高#4[i]%。」 param Lv1 #4 = 0.3",
+      "_note": "「【炼狱】状态下目标**受到的暴击伤害**提高 #4%」—— **MODIFY_ATTR CRIT_ATTACK + instance: true** ✓：实例分支把份额加到这一发的 xtraCritDamage（TriggerEffects 的实例路径 ✓），而 CritArea.rate() 只在**暴击时**才用它 ✓ ⇒ 「只作用于暴击」不需要新事件/新关键词 ✓。门 	arget has_state 炼狱 ✓（【炼狱】是状态，不是层数 ✓）—— 不写 ctor == self：句子说的是**任何来源**的暴击伤害 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken_from_wearer",
+      "when": ["target has_state 炼狱", "actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下…受到**来自装备者的**暴击伤害额外提高#5[i]%。」 param Lv1 #5 = 0.3",
+      "_note": "「受到**来自装备者的**暴击伤害**额外**提高 #5%」—— 与上一条**叠加**（两条都往同一发的 xtraCritDamage 上加 ✓，实例加成不是修饰、没有身份替换 ✓）；门 ctor == self ✓。两条合起来 = 装备者打【炼狱】目标时 +0.3 + 0.3，其他人打只 +0.3 ✓。"
     }
   ],
   "2": [
@@ -62,7 +96,41 @@
         { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
-      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
+      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n✅ 两条已写：`cone23059_purgatory_crit_taken`（任何来源）与 `_from_wearer`（只有装备者）—— 实例 `CRIT_ATTACK`，只在暴击时进倍率 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken",
+      "when": ["target has_state 炼狱"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.375,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下目标受到的暴击伤害提高#4[i]%。」 param Lv2 #4 = 0.375",
+      "_note": "「【炼狱】状态下目标**受到的暴击伤害**提高 #4%」—— **MODIFY_ATTR CRIT_ATTACK + instance: true** ✓：实例分支把份额加到这一发的 xtraCritDamage（TriggerEffects 的实例路径 ✓），而 CritArea.rate() 只在**暴击时**才用它 ✓ ⇒ 「只作用于暴击」不需要新事件/新关键词 ✓。门 	arget has_state 炼狱 ✓（【炼狱】是状态，不是层数 ✓）—— 不写 ctor == self：句子说的是**任何来源**的暴击伤害 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken_from_wearer",
+      "when": ["target has_state 炼狱", "actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.375,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下…受到**来自装备者的**暴击伤害额外提高#5[i]%。」 param Lv2 #5 = 0.375",
+      "_note": "「受到**来自装备者的**暴击伤害**额外**提高 #5%」—— 与上一条**叠加**（两条都往同一发的 xtraCritDamage 上加 ✓，实例加成不是修饰、没有身份替换 ✓）；门 ctor == self ✓。两条合起来 = 装备者打【炼狱】目标时 +0.375 + 0.375，其他人打只 +0.375 ✓。"
     }
   ],
   "3": [
@@ -94,7 +162,41 @@
         { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
-      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
+      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n✅ 两条已写：`cone23059_purgatory_crit_taken`（任何来源）与 `_from_wearer`（只有装备者）—— 实例 `CRIT_ATTACK`，只在暴击时进倍率 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken",
+      "when": ["target has_state 炼狱"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.45,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下目标受到的暴击伤害提高#4[i]%。」 param Lv3 #4 = 0.45",
+      "_note": "「【炼狱】状态下目标**受到的暴击伤害**提高 #4%」—— **MODIFY_ATTR CRIT_ATTACK + instance: true** ✓：实例分支把份额加到这一发的 xtraCritDamage（TriggerEffects 的实例路径 ✓），而 CritArea.rate() 只在**暴击时**才用它 ✓ ⇒ 「只作用于暴击」不需要新事件/新关键词 ✓。门 	arget has_state 炼狱 ✓（【炼狱】是状态，不是层数 ✓）—— 不写 ctor == self：句子说的是**任何来源**的暴击伤害 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken_from_wearer",
+      "when": ["target has_state 炼狱", "actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.45,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下…受到**来自装备者的**暴击伤害额外提高#5[i]%。」 param Lv3 #5 = 0.45",
+      "_note": "「受到**来自装备者的**暴击伤害**额外**提高 #5%」—— 与上一条**叠加**（两条都往同一发的 xtraCritDamage 上加 ✓，实例加成不是修饰、没有身份替换 ✓）；门 ctor == self ✓。两条合起来 = 装备者打【炼狱】目标时 +0.45 + 0.45，其他人打只 +0.45 ✓。"
     }
   ],
   "4": [
@@ -126,7 +228,41 @@
         { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
-      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
+      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n✅ 两条已写：`cone23059_purgatory_crit_taken`（任何来源）与 `_from_wearer`（只有装备者）—— 实例 `CRIT_ATTACK`，只在暴击时进倍率 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken",
+      "when": ["target has_state 炼狱"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.525,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下目标受到的暴击伤害提高#4[i]%。」 param Lv4 #4 = 0.525",
+      "_note": "「【炼狱】状态下目标**受到的暴击伤害**提高 #4%」—— **MODIFY_ATTR CRIT_ATTACK + instance: true** ✓：实例分支把份额加到这一发的 xtraCritDamage（TriggerEffects 的实例路径 ✓），而 CritArea.rate() 只在**暴击时**才用它 ✓ ⇒ 「只作用于暴击」不需要新事件/新关键词 ✓。门 	arget has_state 炼狱 ✓（【炼狱】是状态，不是层数 ✓）—— 不写 ctor == self：句子说的是**任何来源**的暴击伤害 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken_from_wearer",
+      "when": ["target has_state 炼狱", "actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.525,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下…受到**来自装备者的**暴击伤害额外提高#5[i]%。」 param Lv4 #5 = 0.525",
+      "_note": "「受到**来自装备者的**暴击伤害**额外**提高 #5%」—— 与上一条**叠加**（两条都往同一发的 xtraCritDamage 上加 ✓，实例加成不是修饰、没有身份替换 ✓）；门 ctor == self ✓。两条合起来 = 装备者打【炼狱】目标时 +0.525 + 0.525，其他人打只 +0.525 ✓。"
     }
   ],
   "5": [
@@ -158,7 +294,41 @@
         { "op": "APPLY_BUFF", "buff": "炼狱", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23059 淬炼: 使装备者的生命上限提高#1[i]%，装备者回合开始时，固定恢复#2[i]点能量，该效果每个波次可触发1次。装备者施放战技攻击后，使目标陷入【炼狱】状态，持续#3[i]回合，【炼狱】状态下目标受到的暴击伤害提高#4[i]%，受到来自装备者的暴击伤害额外提高#5[i]%。",
-      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n⛔ **仍开（已登记 §4.3）**：【炼狱】的两条内部效果**没有** ✗ —— ① 「受到的**暴击伤害** +30%」；② 「受到**来自装备者的**暴击伤害额外 +30%」。"
+      "_note": "「施放战技攻击后使目标陷入【炼狱】2 回合」—— ATTACK_FINISHED ＋ \from_category BPSKILL ＋ APPLY_BUFF{炼狱, turns: 2, target: target} ✓。\n✅ 两条已写：`cone23059_purgatory_crit_taken`（任何来源）与 `_from_wearer`（只有装备者）—— 实例 `CRIT_ATTACK`，只在暴击时进倍率 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken",
+      "when": ["target has_state 炼狱"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.6,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下目标受到的暴击伤害提高#4[i]%。」 param Lv5 #4 = 0.6",
+      "_note": "「【炼狱】状态下目标**受到的暴击伤害**提高 #4%」—— **MODIFY_ATTR CRIT_ATTACK + instance: true** ✓：实例分支把份额加到这一发的 xtraCritDamage（TriggerEffects 的实例路径 ✓），而 CritArea.rate() 只在**暴击时**才用它 ✓ ⇒ 「只作用于暴击」不需要新事件/新关键词 ✓。门 	arget has_state 炼狱 ✓（【炼狱】是状态，不是层数 ✓）—— 不写 ctor == self：句子说的是**任何来源**的暴击伤害 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23059_purgatory_crit_taken_from_wearer",
+      "when": ["target has_state 炼狱", "actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.6,
+          "instance": true,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23059: 「【炼狱】状态下…受到**来自装备者的**暴击伤害额外提高#5[i]%。」 param Lv5 #5 = 0.6",
+      "_note": "「受到**来自装备者的**暴击伤害**额外**提高 #5%」—— 与上一条**叠加**（两条都往同一发的 xtraCritDamage 上加 ✓，实例加成不是修饰、没有身份替换 ✓）；门 ctor == self ✓。两条合起来 = 装备者打【炼狱】目标时 +0.6 + 0.6，其他人打只 +0.6 ✓。"
     }
   ]
 }
