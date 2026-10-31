@@ -80,8 +80,8 @@ public class ConeAuditBatchTwentyTwoTest {
         Fixture bare = new Fixture(null);
         double crit = f.attribute(AttributeType.CRIT_CHANCE) - bare.attribute(AttributeType.CRIT_CHANCE);
         Assertions.assertTrue(crit > 0, "「暴击率提高 16%」—— 光锥属性给一次");
-        Assertions.assertEquals(4, rules(23028),
-                "the crit-damage stair, the window twice (battle start and after a basic), and the ultimate's ignore");
+        Assertions.assertEquals(5, rules(23028),
+                "the crit-damage stair, the window twice, and the two ignore rules (ultimate / follow-up)");
     }
 
     /**
