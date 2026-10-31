@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * {@code instance: true}. Without that flag it would raise the WEARER's attribute, which is the defect 23031 shipped and
  * had to be repaired -- so this judge asserts the flag, and the sweep flips it.
  *
- * <p>22006: crit damage, permanent. Its other clauses are Trailblazer-Memory gated and registered.
+ * <p>22006: the crit damage is the cone property, judged once; the Trailblazer-Memory clauses live in\n * {@code ConeTwentyTwoThousandSixTest}.
  */
 public class AStarThatLightsTheNightAndFlyIntoAPinkTomorrowTest {
     private static final int LEVEL = 80;
@@ -43,15 +43,18 @@ public class AStarThatLightsTheNightAndFlyIntoAPinkTomorrowTest {
     }
 
     @Test
-    public void cone22006StatesItsCritDamage() {
+    public void cone22006StatesItsCritDamageOnce() {
+        // The crit share is the cone's PROPERTY; a rule repeating it would double it (the file used to have one, and the
+        // wearer really did read 24% where the row says 12%). Judge the attribute, and the absence of the rule.
         for (int rank = 1; rank <= 5; rank++) {
-            var rules = wearer(22006, rank).getTriggerTable().rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone22006_crit_damage")).toList();
-            Assertions.assertEquals(1, rules.size(), "rank " + rank + ": the crit-damage rule");
-            var e = rules.getFirst().effects().getFirst();
-            Assertions.assertEquals("CRIT_ATTACK", e.getAttribute(), "rank " + rank);
-            Assertions.assertEquals(CRITDMG[rank - 1], e.getPercent(), 1e-9, "rank " + rank + ": the value");
-            Assertions.assertEquals("self", e.getTarget(), "rank " + rank);
+            Character withCone = wearer(22006, rank);
+            Character bare = CharacterFactory.create(WEARER, LEVEL);
+            double share = withCone.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get()
+                    - bare.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get();
+            Assertions.assertEquals(CRITDMG[rank - 1], share, 1e-9, "rank " + rank + ": the property, once");
+            boolean duplicate = withCone.getTriggerTable().rulesFor(TriggerEvent.BATTLE_START).stream()
+                    .filter(r -> r.id().equals("cone22006_crit_damage")).findAny().isPresent();
+            Assertions.assertFalse(duplicate, "rank " + rank + ": no rule repeats the property");
             System.out.println("[22006] rank=" + rank + " ok");
         }
     }
