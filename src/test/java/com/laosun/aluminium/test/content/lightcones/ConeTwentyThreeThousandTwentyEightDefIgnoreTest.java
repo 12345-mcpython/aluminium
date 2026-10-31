@@ -74,6 +74,23 @@ public class ConeTwentyThreeThousandTwentyEightDefIgnoreTest {
     }
 
     /**
+     * A follow-up attack in the window ignores it too - the engine's marker for one is the DAMAGE TYPE ({@code ADDITIONAL}),
+     * which is why 「或追加攻击」 needed no new {@code SkillCategory}.
+     */
+    @Test
+    public void aFollowUpInTheWindowIgnoresDefenceAsWell() {
+        Run run = new Run();
+        run.battle.applyAdditionalDamage(run.wearer, run.enemy,
+                com.laosun.aluminium.enums.DamageElement.PHYSICAL, 500);
+        run.battle.processRequests();
+        double ignore = run.settled.stream()
+                .filter(d -> d.getType() == com.laosun.aluminium.enums.DamageType.ADDITIONAL)
+                .mapToDouble(Damage::getDefenceIgnore).max().orElse(0);
+        Assertions.assertEquals(0.20, ignore, 1e-9,
+                "「使终结技**或追加攻击**造成的伤害无视目标 20% 的防御」 - the follow-up half");
+    }
+
+    /**
      * The window closes: after its two turns the ultimate no longer ignores defence.
      */
     @Test

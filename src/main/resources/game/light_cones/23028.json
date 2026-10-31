@@ -68,6 +68,36 @@
       ],
       "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 20% 的防御",
       "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_follow_up",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "damage_type": "ADDITIONAL",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "damage_type": "TALENT",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内使**追加攻击**造成的伤害无视目标 20% 的防御",
+      "note": "追加攻击在引擎里的权威标记是**伤害类型**（`ADDITIONAL` 或 `TALENT`，见 BattleDamage 的注释），不是 SkillCategory —— 所以不需要新开 FOLLOW_UP 类别；两种类型作为**两条效果**写在同一条规则里（同一句句子只写一次）。"
     }
   ],
   "2": [
@@ -139,6 +169,36 @@
       ],
       "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 24% 的防御",
       "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_follow_up",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.24,
+          "instance": true,
+          "damage_type": "ADDITIONAL",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.24,
+          "instance": true,
+          "damage_type": "TALENT",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内使**追加攻击**造成的伤害无视目标 24% 的防御",
+      "note": "追加攻击在引擎里的权威标记是**伤害类型**（`ADDITIONAL` 或 `TALENT`，见 BattleDamage 的注释），不是 SkillCategory —— 所以不需要新开 FOLLOW_UP 类别；两种类型作为**两条效果**写在同一条规则里（同一句句子只写一次）。"
     }
   ],
   "3": [
@@ -210,6 +270,36 @@
       ],
       "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 28% 的防御",
       "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_follow_up",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.28,
+          "instance": true,
+          "damage_type": "ADDITIONAL",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.28,
+          "instance": true,
+          "damage_type": "TALENT",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内使**追加攻击**造成的伤害无视目标 28% 的防御",
+      "note": "追加攻击在引擎里的权威标记是**伤害类型**（`ADDITIONAL` 或 `TALENT`，见 BattleDamage 的注释），不是 SkillCategory —— 所以不需要新开 FOLLOW_UP 类别；两种类型作为**两条效果**写在同一条规则里（同一句句子只写一次）。"
     }
   ],
   "4": [
@@ -281,6 +371,36 @@
       ],
       "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 32% 的防御",
       "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_follow_up",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.32,
+          "instance": true,
+          "damage_type": "ADDITIONAL",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.32,
+          "instance": true,
+          "damage_type": "TALENT",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内使**追加攻击**造成的伤害无视目标 32% 的防御",
+      "note": "追加攻击在引擎里的权威标记是**伤害类型**（`ADDITIONAL` 或 `TALENT`，见 BattleDamage 的注释），不是 SkillCategory —— 所以不需要新开 FOLLOW_UP 类别；两种类型作为**两条效果**写在同一条规则里（同一句句子只写一次）。"
     }
   ],
   "5": [
@@ -352,6 +472,36 @@
       ],
       "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 36% 的防御",
       "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_follow_up",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.36,
+          "instance": true,
+          "damage_type": "ADDITIONAL",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.36,
+          "instance": true,
+          "damage_type": "TALENT",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内使**追加攻击**造成的伤害无视目标 36% 的防御",
+      "note": "追加攻击在引擎里的权威标记是**伤害类型**（`ADDITIONAL` 或 `TALENT`，见 BattleDamage 的注释），不是 SkillCategory —— 所以不需要新开 FOLLOW_UP 类别；两种类型作为**两条效果**写在同一条规则里（同一句句子只写一次）。"
     }
   ]
 }
