@@ -533,7 +533,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 `skill`（技能槽）、`damage_param`（参数表第几项）、`crit_rate` / `crit_damage`（固定暴击）、`times`（这个效果执行几次）、
 `rule`（`MODIFY_RULE` 点名的规则 id）。
 
-⚠ `times` / `times_from` 重复的是**整个效果**，不只是伤害：`DAMAGE` 在自己的循环里逐次重抽目标，
+`per_steps` 是「按步长分段」的修饰量：`"<计数器>-<阈值>:<步长>"`（如 `"SPEED-100:10"`、`"max_energy-120:10"`），`per_steps_cap` 封顶段数；计数器可以是属性名、`max_energy`、自身/队伍计数器或战技点。N 段会折成一条 `percent × N` 的修饰（同属性同身份会互相替换，所以**不能**写成两条无名修饰再加）。⚠ `times` / `times_from` 重复的是**整个效果**，不只是伤害：`DAMAGE` 在自己的循环里逐次重抽目标，
 其余 op 由解释器的效果循环重复（`EffectTimesTest`）。所以「每击中 1 个敌方目标获得 1 层」现在可以写成
 `ADD_STACK` / `MODIFY_ATTR` + `times_from: "hit_count"`。`times: 0` 在装载期拒绝。
 
@@ -626,5 +626,6 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `HSR.md` | 游戏侧公式与属性表 |
 | `CONTENT-STATUS.md` | 逐角色/光锥/遗器的实现状态 |
 | `README.md` | 项目入口 |
+
 
 
