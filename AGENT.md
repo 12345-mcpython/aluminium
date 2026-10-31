@@ -820,6 +820,21 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 **收口条件（两步）**：① 引擎要能"数持有某 buff 的我方单位"（现有谓词只有 `debuff_count`，没有队伍侧的 `ally_buff_count`）；② `DAMAGE` 的 `percent` 要能加一项 `per_count × n`（上限 0.24）。有了这两样，`zone_true_damage_rider` 就写成 `0.24 + 0.06 × n`，19~21 条 0.42 rider 一次性进对账。补法：按"持有德谬歌增益的我方角色数"上调该规则的 `percent`，上限 +0.24；1415 在本账号是 **E2** ✓，所以这条在实战里一直生效。
 
+#### ✅ 遗器三件"未完成"里的一件其实是过时记录（2026-10-31）
+
+`CONTENT-STATUS` 把 **312 梦想之地匹诺康尼** 的四件套记为"没有按属性比较两个单位的拼法"，但**条件语言早就有**：
+
+```
+target: all_allies  +  target_when: ["is_other_same_element_as_self"]
+```
+
+`TriggerConditionParser` 里 `IS_OTHER_SAME_ELEMENT` / `IsSameElementAsSelf` 已在位 ⇒ 只是状态行没更新。补判据
+`RelicOpenClausesTest`（姬子 Fire 的同属性队友吃 +10%、三月七 Ice 不吃）后，312 记为**完全实现**。
+
+另外两件仍然**真的**缺内容，不是缺引擎：
+- **129** 四件套第二句「每累计 5 点笑点 ⇒ 欢愉伤害额外无视 1% 防御，最多 10 层」：需要一个**累计的笑点计数器**，而文档从未写它的上限 ⇒ 按本项目的规矩**不编数字**（与 1501 火花的「笑点/好活当赏」同一判断）。机制本身可写（`per_steps: "笑点:5"` + 上限），等计数器落地即可；
+- **132** 叩问天工的名冶：`_unmodelled.json` 已登记，真正的阻塞是「防御力降低」在游戏数据里**不是具名状态**（只是属性变化），既没有选择器也没有"We inflicted DEF reduction"事件 ⇒ 维持登记。
+
 #### ⏳ 最后 3 行 differ 是「这一发能选中谁」，而 payload 的 `field.targetable` 还不能直接用（2026-10-30 实测）
 
 两份录像（e / f）各剩 1–2 行，现象同一类：**引擎打的敌人比捕获多**。
