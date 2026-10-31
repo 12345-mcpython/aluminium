@@ -70,16 +70,17 @@ public class ConeAuditBatchTwentyTwoTest {
     }
 
     /**
-     * 23028 偏偏希望无价: only the crit share is spelled - both of its other clauses are registered.
+     * 23028 偏偏希望无价: the crit share is the property, and the crit-damage stair landed on 2026-10-31 as
+     * {@code per_steps: "CRIT_ATTACK-1.2:0.2"} (judged in {@code ConeTwentyThreeThousandTwentyEightTest}). The DEF-ignore sentence is
+     * still registered - it needs a CAST-category scope on DEFENCE_IGNORE, which the engine does not have.
      */
     @Test
-    public void coneTwoThreeTwoEightHasOnlyTheCritShare() {
+    public void coneTwoThreeTwoEightCarriesItsCritShareAndTheStair() {
         Fixture f = new Fixture(23028);
         Fixture bare = new Fixture(null);
         double crit = f.attribute(AttributeType.CRIT_CHANCE) - bare.attribute(AttributeType.CRIT_CHANCE);
-        System.out.println("[23028] 暴击率增量 " + crit + " ; 规则数 " + rules(23028));
         Assertions.assertTrue(crit > 0, "「暴击率提高 16%」—— 光锥属性给一次");
-        Assertions.assertEquals(0, rules(23028), "缺口见证：没有规则（两句都没有拼法，见状态表）");
+        Assertions.assertEquals(1, rules(23028), "the crit-damage stair is spelled now");
     }
 
     /**
