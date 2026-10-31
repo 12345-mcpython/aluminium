@@ -73,6 +73,33 @@ public class ConeTwentyThreeThousandFortySevenTest {
         }
     }
 
+    /**
+     * 「受到我方目标攻击时，使<b>攻击者</b>速度提高 10%，持续 3 回合」 - the attacker, not the wearer.
+     */
+    @Test
+    public void theAttackerGetsTheSpeedWhileTheTargetCarriesTheState() {
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23047, LEVEL, false, 1));
+        Character ally = CharacterFactory.create(1001, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(wearer, ally)), new ArrayList<>(List.of(enemy)),
+                BattleFixture.seeded());
+        battle.startBattle();
+        double before = ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TAKING_HIT, ally, enemy, 0, 0));
+        battle.processRequests();
+        Assertions.assertEquals(before, ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
+                "no 魂迷 on the target, no speed");
+
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("魂迷", 3));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TAKING_HIT, ally, enemy, 0, 0));
+        battle.processRequests();
+        Assertions.assertEquals(before * 1.10, ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(),
+                1e-6, "「使攻击者速度提高 10%」");
+    }
+
     @Test
     public void theZoneFollowsTheNumberOfNegativeEffectsTheWearerApplied() {
         Run bare = new Run();

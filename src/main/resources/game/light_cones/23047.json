@@ -43,6 +43,25 @@
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
       "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23047_speed_for_the_attacker",
+      "when": [
+        "target has_state 魂迷",
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.1,
+          "turns": 3,
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
+      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "2": [
@@ -89,6 +108,25 @@
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
       "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23047_speed_for_the_attacker",
+      "when": [
+        "target has_state 魂迷",
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.125,
+          "turns": 3,
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
+      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "3": [
@@ -135,6 +173,25 @@
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
       "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23047_speed_for_the_attacker",
+      "when": [
+        "target has_state 魂迷",
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.15,
+          "turns": 3,
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
+      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "4": [
@@ -181,6 +238,25 @@
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
       "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23047_speed_for_the_attacker",
+      "when": [
+        "target has_state 魂迷",
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.175,
+          "turns": 3,
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
+      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ],
   "5": [
@@ -227,6 +303,25 @@
       ],
       "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下，每有 1 个装备者施加的负面效果，受到的持续伤害提高 #4%，该效果最多叠加 #5 层。」",
       "note": "「每有 1 个装备者施加的负面效果」= 计数器 `target_debuffs_from_self`（目标身上 `isDebuff()` 且 `getSource() == owner` 的个数）；「最多 #5 层」= `per_steps_cap`。写法：在 `DEBUFF_APPLIED` 上**先摘掉再挂上**同名 zone，使层数跟着当前计数走（而不是每次叠加）。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "cone23047_speed_for_the_attacker",
+      "when": [
+        "target has_state 魂迷",
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.2,
+          "turns": 3,
+          "target": "attacker"
+        }
+      ],
+      "source": "光锥 23047 海洋为何而歌:「【魂迷】状态下…受到我方目标攻击时，使攻击者速度提高 #6%，持续 #7 回合。」",
+      "note": "作用面是**攻击者**（`target: attacker`），不是装备者：句子说「使攻击者速度提高」。门是 `target has_state 魂迷`（被打的那位挂着【魂迷】）与 `actor is_ally`（我方打的不算敌方）。"
     }
   ]
 }
