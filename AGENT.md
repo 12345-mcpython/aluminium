@@ -1220,7 +1220,6 @@ gate the rule with `self_summon_count >= 1` so it only fires when there is one
   - **「没有暴击」没有事件** ✗：`CRIT_DEALT` 只报**暴击成功** ✓。读者：**23012**（「普攻或战技伤害**未造成暴击**时暴击率 +36%」）。见证：`ConeAuditBatchNineteenTest` 的「规则数 0」✓。
   - **「记录一个数、以后再读」没有写入端** ✗：读者：**23013**（「记录治疗量 → 按该记录的 36% 造成附加伤害」）。见证：`ConeAuditBatchNineteenTest` ✓。
   - **「上一次施放的是哪一招」记不住** ✗：`damage_skill_key` 只描述当前这一发 ✓。读者：**23064**（「欢愉技与上一次不同 ⇒ 额外获得【潮流】」）。见证：`ConeAuditBatchTwentyEightTest` ✓。
-  - **「场上每有 1 名持盾角色」数不出来** ✗：只有 `enemy_state_count` 那一类 ✓。读者：**21043**。见证：`ConeAuditBatchTwelveTest` ✓。
   - **「两名及以上相同命途」配不起来** ✗：`has_path` 只能问**某一个单位** ✓。读者：**21046**。见证：同前 ✓。
   - **「击杀时检查这层 DoT 是不是她上的」没有归属** ✗：`target_dot_count` 数得到 ✓、问不了来源 ✗。读者：**24003**。见证：`ConeAuditBatchTwentyNineTest` ✓。
   - **「受到的**暴击伤害**」不是一个可改的层** ✗：`MODIFY_DAMAGE_TAKEN` 改的是总区 ✓。读者：**23059**（【炼狱】）。见证：同批 ✓。
