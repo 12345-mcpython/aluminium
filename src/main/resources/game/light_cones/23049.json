@@ -1,9 +1,294 @@
 {
   "schema": 1,
   "light_cone": 23049,
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-  "5": []
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23049_nightfall_on_sprite_skill",
+      "when": ["actor == summon"],
+      "do": [
+        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
+      "_note": "「装备者**的**忆灵施放技能时」—— `CAST_SETUP` 是**每一次施放**都会发的事件 ✓（`SkillExecutor` 在结算前发，包括忆灵的 BUFF 类技能：它们不发 SKILL_CAST/ULT_CAST ✓，但 CAST_SETUP 发 ✓），条件 **`actor == summon`** 把它限定在**装备者自己的忆灵**上 ✓（`is_summon` 会连敌方召唤物一起收进来 ✗）。【夜色】没有期限句 ⇒ `permanent: true` ✓，「同类效果无法叠加」⇒ 重复施放是替换 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprites_ignore_defence",
+      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23049: 「装备者持有【夜色】时，我方全体忆灵造成的伤害无视目标#2[i]%的防御力…」 param Lv1 #2 = 0.2",
+      "_note": "「**装备者持有【夜色】时**，**我方全体忆灵**造成的伤害无视目标 #2% 防御」—— ① 门 `self has_state 夜色` ✓（持有者 = 装备者 ✓）；② 作用域 `actor is_summon` + `actor is_ally`：只收**我方**召唤物 ✓（`is_summon` 单独用会把敌方召唤物也算进来 ✗）；③ **实例** `DEFENCE_IGNORE` ✓ —— 只改**正在结算的这一发**，不是给单位加一层永久属性 ✓。⚠ 实例修饰的 `permanent: true` 只是装载器要求的寿命字段（实例不建 buff）✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_wearer_damage_boost",
+      "when": ["self has_state 夜色", "actor == self"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.3 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv1 #3 = 0.3",
+      "_note": "「**装备者**和装备者忆灵造成的伤害提高 #3%」—— 装备者那一半：`actor == self` ✓，**实例** `BOOST_DAMAGE` ✓（「造成的伤害」是逐发的，不是一层属性）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprite_damage_boost",
+      "when": ["self has_state 夜色", "actor == summon"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.3 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv1 #3 = 0.3",
+      "_note": "忆灵那一半：`actor == summon` 只指名**装备者自己的**忆灵 ✓（不是全体忆灵 —— 全体忆灵只吃防御无视那一条 ✓）。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23049_energy_when_sprite_leaves",
+      "when": ["actor is_summon", "actor is_ally"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 8, "target": "self" }
+      ],
+      "source": "光锥 23049: 「…装备者的忆灵消失时为装备者恢复#4[i]点能量，同类效果无法叠加。」 param Lv1 #4 = 8",
+      "_note": "「装备者的忆灵消失时，为装备者恢复 #4 点能量」—— `SUMMON_LEFT` ✓（离场事件；单位**就是**刚离场的那一个 ⇒ 用 `actor` 而**不能**用 `target == summon`，20022 的同一课 ✓）；`actor is_ally` 把敌方召唤物排除 ✓。「同类效果无法叠加」⇒ 一次离场只付一次 ✓。⚠ `GAIN_ENERGY` 不带 `fixed`：句子是「恢复」，按引擎口径吃能量恢复效率 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23049_nightfall_on_sprite_skill",
+      "when": ["actor == summon"],
+      "do": [
+        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
+      "_note": "同第 1 档。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprites_ignore_defence",
+      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.225,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23049: 「装备者持有【夜色】时，我方全体忆灵造成的伤害无视目标#2[i]%的防御力…」 param Lv2 #2 = 0.225",
+      "_note": "同第 1 档，数值按 Lv2 行：#2 = 0.225 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_wearer_damage_boost",
+      "when": ["self has_state 夜色", "actor == self"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.375 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv2 #3 = 0.375",
+      "_note": "同第 1 档，数值按 Lv2 行：#3 = 0.375 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprite_damage_boost",
+      "when": ["self has_state 夜色", "actor == summon"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.375 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv2 #3 = 0.375",
+      "_note": "同第 1 档，数值按 Lv2 行：#3 = 0.375 ✓。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23049_energy_when_sprite_leaves",
+      "when": ["actor is_summon", "actor is_ally"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 10, "target": "self" }
+      ],
+      "source": "光锥 23049: 「…装备者的忆灵消失时为装备者恢复#4[i]点能量…」 param Lv2 #4 = 10",
+      "_note": "同第 1 档，数值按 Lv2 行：#4 = 10 ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23049_nightfall_on_sprite_skill",
+      "when": ["actor == summon"],
+      "do": [
+        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
+      "_note": "同第 1 档。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprites_ignore_defence",
+      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.25,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23049: 「装备者持有【夜色】时，我方全体忆灵造成的伤害无视目标#2[i]%的防御力…」 param Lv3 #2 = 0.25",
+      "_note": "同第 1 档，数值按 Lv3 行：#2 = 0.25 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_wearer_damage_boost",
+      "when": ["self has_state 夜色", "actor == self"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.45 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv3 #3 = 0.45",
+      "_note": "同第 1 档，数值按 Lv3 行：#3 = 0.45 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprite_damage_boost",
+      "when": ["self has_state 夜色", "actor == summon"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.45 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv3 #3 = 0.45",
+      "_note": "同第 1 档，数值按 Lv3 行：#3 = 0.45 ✓。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23049_energy_when_sprite_leaves",
+      "when": ["actor is_summon", "actor is_ally"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 12, "target": "self" }
+      ],
+      "source": "光锥 23049: 「…装备者的忆灵消失时为装备者恢复#4[i]点能量…」 param Lv3 #4 = 12",
+      "_note": "同第 1 档，数值按 Lv3 行：#4 = 12 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23049_nightfall_on_sprite_skill",
+      "when": ["actor == summon"],
+      "do": [
+        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
+      "_note": "同第 1 档。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprites_ignore_defence",
+      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.275,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23049: 「装备者持有【夜色】时，我方全体忆灵造成的伤害无视目标#2[i]%的防御力…」 param Lv4 #2 = 0.275",
+      "_note": "同第 1 档，数值按 Lv4 行：#2 = 0.275 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_wearer_damage_boost",
+      "when": ["self has_state 夜色", "actor == self"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.525 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv4 #3 = 0.525",
+      "_note": "同第 1 档，数值按 Lv4 行：#3 = 0.525 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprite_damage_boost",
+      "when": ["self has_state 夜色", "actor == summon"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.525 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv4 #3 = 0.525",
+      "_note": "同第 1 档，数值按 Lv4 行：#3 = 0.525 ✓。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23049_energy_when_sprite_leaves",
+      "when": ["actor is_summon", "actor is_ally"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 14, "target": "self" }
+      ],
+      "source": "光锥 23049: 「…装备者的忆灵消失时为装备者恢复#4[i]点能量…」 param Lv4 #4 = 14",
+      "_note": "同第 1 档，数值按 Lv4 行：#4 = 14 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23049_nightfall_on_sprite_skill",
+      "when": ["actor == summon"],
+      "do": [
+        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
+      "_note": "同第 1 档。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprites_ignore_defence",
+      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.3,
+          "instance": true,
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23049: 「装备者持有【夜色】时，我方全体忆灵造成的伤害无视目标#2[i]%的防御力…」 param Lv5 #2 = 0.3",
+      "_note": "同第 1 档，数值按 Lv5 行：#2 = 0.3 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_wearer_damage_boost",
+      "when": ["self has_state 夜色", "actor == self"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.6 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv5 #3 = 0.6",
+      "_note": "同第 1 档，数值按 Lv5 行：#3 = 0.6 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23049_sprite_damage_boost",
+      "when": ["self has_state 夜色", "actor == summon"],
+      "do": [
+        { "op": "BOOST_DAMAGE", "percent": 0.6 }
+      ],
+      "source": "光锥 23049: 「…装备者和装备者忆灵造成的伤害提高#3[i]%…」 param Lv5 #3 = 0.6",
+      "_note": "同第 1 档，数值按 Lv5 行：#3 = 0.6 ✓。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "cone23049_energy_when_sprite_leaves",
+      "when": ["actor is_summon", "actor is_ally"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 16, "target": "self" }
+      ],
+      "source": "光锥 23049: 「…装备者的忆灵消失时为装备者恢复#4[i]点能量…」 param Lv5 #4 = 16",
+      "_note": "同第 1 档，数值按 Lv5 行：#4 = 16 ✓。"
+    }
+  ]
 }
