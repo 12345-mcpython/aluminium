@@ -1018,18 +1018,23 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 【已把守：`PerStackArithmeticTest`（1/2/3 层 = 基数 ×5/10/15%，加法而非复利；`per_stack_live` 同数；0 层为 0；
 夹具前提「单位已有另一份 ATK%」写成断言）】
 
-#### ⛔ 23037 的「本次终结技消耗的能量」在事件里读不到（2026-10-31 实测，已回退）
+#### ✅ CORRECTED 23037 的「本次终结技消耗的能量」：`ULT_CAST` 一直带着它（2026-10-31 同日收回）
 
-`ULT_CAST` 的 payload **写了** `battle.getLastUltEnergySpent()`（`SkillExecutor` 第 5 个参数），
-但 `UltimateService.settle` 在**发事件之前**就执行了 `lastEnergySpent = 0`（在 `onUltCast` 的能量返还分支里），
-所以事件携带的永远是 **0**（实测：140 上限的角色施放后读到 0.0）。
+旧记录说 `UltimateService.settle` 在发事件**之前**就把 `lastEnergySpent` 清成 0，所以事件携带 0。重读 `settle`
+的顺序：**记下本次能量 → 清零血条 → `processRequests()`（事件在这里发）→ `onUltCast` 返还 → 这才清 0**。
+事件看到的是本次消耗量 ✓。
 
-试过把清零挪到 `Battle.endCastOutcome`（"这次施放结束再忘"）——**已回退**，因为 `BattleDamage` 的守卫
-（`getLastUltEnergySpent() > 0` 才把能量记到 `Damage` 上）依赖"它在终结技路径之外恒为 0"；
-挪动之后**后续任何一发伤害**都会被打上上一发终结技的能量，这是会静默传播的错。
+合成探针与内容都证实：140 上限的角色 `event_amount >= 140` **成立**；90 / 120 的施放则不成立。
+旧读数是**结算之后**读 `battle.getLastUltEnergySpent()`（此时按设计为 0：血条已花掉、返还已入账），不是事件里的值。
 
-⇒ 正确方向：让 `settle` 把该数记在**这次 cast 的上下文**里（而不是全局字段），事件从上下文读。
-本次只留结论，不改引擎。
+⇒ 23037 的句子直接写出：`cone23037_energy_threshold_restores_skill_point`（`ULT_CAST` +
+`event_amount >= 140` + `GAIN_SKILL_POINT`，五档同文）。判据 `ConeTwentyThreeThousandThirtySevenTest`
+（180 → +1 战技点；90 / 120 → 不变）。
+
+⚠ **两个变量不要混**：`cast_energy_spent` 是**伤害实例上的量**（`DEALING_DAMAGE` 的 instance，23062 的
+「每消耗 1 点能量」读它）；`event_amount` 是**当前事件的数值**（cast 事件上就是耗能）。同一句话挂在 cast 上就该用后者 ✓。
+⚠ 旧记录里那条「把清零挪到 `Battle.endCastOutcome` 会让后续伤害被打上上一发的能量」**仍然成立、不要撤销** ——
+它防的是**全局字段**被读晚；本条的新结论只是「事件里本来就拿得到」，不需要挪动任何代码 ✓。
 
 #### ⛔ 23039 的「消耗 > 500」那条规则不开火（2026-10-31 实测）
 
