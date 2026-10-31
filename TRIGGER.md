@@ -261,6 +261,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `event_amount` | 触发事件自带的数值（如 `HP_CONSUMED` 的实际消耗） |
 | `self_summon_count` / `target_summon_count` | 召唤物数量 |
 | `enemy_count` / `ally_count` | 场上敌我数量 |
+| `map_attacker_count` | 除装备者外、本场「开战」的队友数（地图攻击的发起者）|
 | `skill_point_max` / `skill_point` | 战技点上限 / 当前战技点 |
 | `eidolon` | 星魂等级 |
 | `from_skill_id` / `damage_skill_key` | 技能 id / key |
@@ -391,13 +392,15 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 | 分类 | 选择器 |
 |---|---|
-| 自己人 | `self` `target` `attacker` `actor` `all_allies` `party` `other_allies` `next_ally` `party_first` `lowest_hp_ally` `random_ally_below_half_energy` |
+| 自己人 | `self` `target` `attacker` `actor` `all_allies` `party` `other_allies` `next_ally` `party_first` `lowest_hp_ally` `random_ally_below_half_energy` `other_map_attackers` `highest_break_effect_ally` |
 | 敌人 | `all_enemies` `random_enemy` `random_hit_enemy` `highest_hp_enemy` `target_else_random_enemy` |
 | 召唤物 | `summon` `all_summons` `target_and_summon` |
 | 按标记找人 | `holder_of:<状态>` |
 | 按命途 / id | `allies_of_path:<命途>` `allies_of_path_except:<命途>:<名单>` `ally_cid:<id>` |
 | 按波次 | `wave_monster` `wave_monsters` |
 | 特殊 | `all_allies_lethally_hit_this_action` `highest_hp_attack_hit` |
+
+⚠ `other_map_attackers` 是**除装备者外**、本场之前用**地图攻击**开战的队友（`Battle.declareMapAttack` 的记录）；没有就是空集。`highest_break_effect_ally` 是**除装备者外**击破特攻最高的存活队友（并列取名册顺序）；没有别的队友就是空集（不报错）。
 
 ⚠ 选择器是闭集；拼错的 `target` 装载期拒绝（曾经会静默当成 `self`，那是没有症状的错误）。
 
