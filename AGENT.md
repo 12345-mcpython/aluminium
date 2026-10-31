@@ -666,6 +666,9 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 `March7thFreezeDotTest`）未改一字、照旧通过；格式本身由 `March7thFormatMigrationTest` 把守 ✓。
 **全部角色文件现在都是对象形式**：完全实现的标 `implemented`，其余标 `partial` + `_gaps` ✓；未逐句核对的用
 “尚未逐句核对”作为 gap，已有详细登记的用“见 CONTENT-STATUS.md 的逐角色登记”/具体缺口 ✓。
+⭐ **2026-10-31 补齐文件头**：每个角色文件都写了 `schema: 1` + `character: <cid>` —— 与光锥 / 遗器的
+`schema` + `light_cone` / `relic_set` 同一套（§3.7zn）。三种内容的**出货文件**从此都带文件头，
+`ContentFileHeaderTest` 扫描三个目录；装载器仍接受裸数组（旧文件照读），但出货内容不再是裸数组 ✓。
 `FileStatusCoverageTest` 扫描全部角色文件 ✓。
 ⭐ **1002 丹恒是第二个样板**（2026-10-31）：15 条 `note` → `_note`，全部标 `_status: implemented`；`skill_crit_slows_the_target`
 与 `ult_ethereal_dream_hits_a_slowed_target` 的参数行写进 `source` 对象（`SKILL` / `ULTRA` row 10）；语义未改，
@@ -811,7 +814,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 `CONTENT-STATUS` 逐件定、`partial` 还要带 `_gaps` —— 那是内容政策，不是格式缺口 ✓。`ContentFileHeaderTest` 目前只钉
 `schema` + 归属键 ✓。
 
-【已把守：`ContentFileHeaderTest`（两目录全覆盖 + 合法头能装载 + 九种坏头被拒：schema 2 / 归属 id 不符 / 拼错的键 /
+【已把守：`ContentFileHeaderTest`（三个内容目录全覆盖 + 合法头能装载 + 九种坏头被拒：schema 2 / 归属 id 不符 / 拼错的键 /
 未知状态 / 规则里的 `_notee`，光锥与遗器各一套；坏头样本在 `src/test/resources/game/.../9999x.json`，只按 id 读、
 不会被覆盖扫描看到）】
 
@@ -1751,7 +1754,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 演示至少不抛异常 | `DemoSmokeTest` |
 | 触发规则表装载 | `TriggerTableTest` |
 | **`times` / `times_from` 重复的是效果**（非 `DAMAGE` 由效果循环重复；`times: 0` 装载期拒绝） | `EffectTimesTest` |
-| **光锥 / 遗器的文件头**（`schema` + `light_cone` / `relic_set`；两目录全覆盖；坏头被拒） | `ContentFileHeaderTest` |
+| **三种内容的文件头**（`schema` + `character` / `light_cone` / `relic_set`；三个目录全覆盖；坏头被拒） | `ContentFileHeaderTest` |
 | **trigger 格式骨架**（schema / character / 注解键 / `when` 混合两种拼法 / `skills` / 注释） | `TriggerFormatSkeletonTest`、`March7thFormatMigrationTest` |
 | **`value` 数值表达式**（常量就是整个 magnitude；与旧三件套互斥；只读 share 的 op 拒绝；provider 装载期校验） | `ValueExpressionTest` |
 | **`when_predicates` 已移除**（装载器不再接受旧键；主内容已迁移） | `ContentConditionSpellingTest` |
@@ -1843,6 +1846,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
 | `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
 | `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
+
 
 
 
