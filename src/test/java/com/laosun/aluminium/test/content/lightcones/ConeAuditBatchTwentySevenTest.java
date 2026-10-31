@@ -78,7 +78,7 @@ public class ConeAuditBatchTwentySevenTest {
     }
 
     /**
-     * 23059 灼尽炼狱的新骸: the health share is the property; the turn energy fires once a wave; the skill sticks 【炼狱】.
+     * 23059 灼尽炼狱的新骸: the health share is the property; the turn energy fires once a wave; the skill sticks 【炼狱】; the\n * two crit-damage shares are spelled now (judged in ConeTwentyThreeThousandFiftyNineTest).
      */
     @Test
     public void coneTwoThreeFiveNinePurgatoryAndWaveEnergy() {
@@ -87,7 +87,7 @@ public class ConeAuditBatchTwentySevenTest {
         double health = f.wearer.getAttribute(AttributeType.HEALTH).get() - bare.wearer.getAttribute(AttributeType.HEALTH).get();
         System.out.println("[23059] 生命上限增量 " + health + " ; 规则数 " + rules(23059));
         Assertions.assertTrue(health > 0, "「生命上限提高 30%」");
-        Assertions.assertEquals(3, rules(23059), "回合回能、波次重置、【炼狱】");
+        Assertions.assertEquals(5, rules(23059), "回合回能、波次重置、【炼狱】、两条暴伤份额");
 
         f.wearer.setCurrentEnergy(0);
         f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
