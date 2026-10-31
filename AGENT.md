@@ -45,6 +45,8 @@
    把 `max_stacks` 写在修饰上**不叠层** ✗（光锥如此；遗器的该形状**会**累加 ✓，先量再写 ✓）。
 7. **每句都要标出来源** ✓：规则的 `source` 抄原文、`note` 写「每个从句对上哪个词、为什么别的词不行」✓；
    若某个数**是按等级读的**，`note` 里点名它读的是哪一列 ✓（否则下一个人无法判断它会不会随等级动 ✓）。
+   ⚠ 新文件也可以把这些写成**注解**（`_source` / `_note` / `_status` / `_gaps` / `_divergences`）：装载器接受、
+   **不进任何 bean** ✓；旧的 `source` / `note` 仍然可读 ✓（见 §3.7zg）。
 8. **事件没有队友门** ✓：`KILL` / `ULT_CAST` / `SKILL_CAST` / `BASIC_ATTACK` / `TAKING_HIT` / `BREAK` 都是**对每个队友各发一次** ✓
    ⇒ 「使装备者/本人…」的句子必须加 `actor == self`（或 `target == self`）✓ —— 漏门是本仓库第一大族 ✓。
 
@@ -637,6 +639,182 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ✅ **门已落地**（2026-10-29）：「【忆质】≥ #3（16）才可施放」用 `skill_effects.json` 的新字段 **`castable_when`**（拼法与规则的 `when` 完全一致 ✓），由 `SkillCastability` 在**两个施放入口**（`CastService.useSkill` / `Battle.castImmediate`）把关 ✓ —— 不足时**拒绝施放**（消耗为零 ✓），不再按当时点数结算 ✗。主语是**召唤者的**计数器（忆灵的门读 1413 的【忆质】✓，与 `Summon.damageBase` 同一主体 ✓）。
 
 【已把守：`EvernightDreamDumpTest`（50 点 ⇒ 主/其他 `3.0`/`1.5` ✓；0 点 ⇒ 0 ✓；施放后忆质清空、**又被她自己的天赋退回 2 点**（同一条「消耗生命值」触发 ✓）、她降到 **1 点生命**且**没有倒下** ✓、长夜**离场** ✓）、`BattleReplayTest`（**13/13** 可驱动 ✓）】
+
+#### 3.7zg（格式）trigger 的骨架：文件头、注解、一个条件数组、`skills`
+
+四项都是**格式**，不是新机制；读者是写内容的人与下一个改加载器的人，判据是 `TriggerFormatSkeletonTest`。
+
+| 形状 | 不变量 | 为什么 |
+|---|---|---|
+| 对象形式加 `schema` / `character` | `schema` 省略 = 旧文件；写了必须是本引擎读的版本。`character` 写了必须等于文件的 cid | 新格式的文件不会被旧引擎静默读错；复制到别的 cid 下的规则集不会套到别人身上 |
+| `_note` / `_source` / `_status` / `_gaps` / `_divergences` / `_changelog` / `_literal_reason` / `_comment` | 文件 / 规则 / 效果三层都接受，**不进任何 bean**；名字是闭集，`_notee` 照样拒绝 | 注解与运行时字段分开；"为什么刻意"可以写成机器可读的字段，而不必挤进一条永不被执行的字符串 |
+| `when` 的每一项可以是 DSL 字符串**或**谓词对象 | 两半编译成同一个 `Condition`；`when_predicates` 已移除，主内容已全部迁移到 `when` | 一个规则只有一份条件列表；执行器只有一套 |
+| `RAISE_SKILL_LEVEL` 的 `skills` | 一个 `amount` 配多个槽位；`skill` / `skills` 互斥；空表 / 重复 / 未知槽位装载期拒绝 | 文件级等级约定是一件事，四个数字副本漏改一个没有症状 |
+
+⚠ **只加了注释，没有加尾逗号** ✓：Gson 的 lenient 读取器接受注释，**不**接受尾逗号；`TRIGGER.md` §1.1 写的是实测结果 ✓。
+⚠ **迁移前内容文件一个没动** ✓：裸数组、`source` / `note`、`when` 字符串全部照旧可读 ✓；从 1001 开始逐文件迁移（见下）✓。
+⚠ `when` 的对象项走的是 `Predicates.compile`，与 `when_predicates` **同一个**编译器 ✓ —— 新增谓词只需改一处，两半同时得到 ✓。
+⚠ `note` 也已移出 `TriggerSpec`：它只是注解（`_note` / 旧 `note`），Gson 不映射；`source` 仍保留，因为装载错误会引用它 ✓。
+⭐ **构建期剥离**（2026-10-31）：`processResources` 对 `game/{characters,light_cones,relic_sets}` 的**运行时副本**剥掉
+`note` / `_note` / `_status` 等注解，`source` 保留；`src/main/resources` 源文件不改 ✓。`memosprites` 不剥：`MemospriteSpec`
+的 `note` 是运行期字段（`MemospriteTest` 会读）✓；**资源声明的 `note` 也不剥**：它是 `ResourceSpec` 字段（`RuntimeAnnotationStripTest`）✓。
+判据 `RuntimeAnnotationStripTest` ✓。
+
+⭐ **1001 三月七是第一个样板**（2026-10-31）：16 条规则的 `note` → `_note`，7 条规则的 `when_predicates` 并进 `when`，
+`level_convention` 的四个 `RAISE_SKILL_LEVEL` 收成一个 `skills` 列表，星魂 5 的两个同额槽位同理。它是**格式**迁移：
+语义判据（`March7thKitTest` / `March7thLevelTest` / `March7thTraceStatsTest` / `March7thTechniqueTest` /
+`March7thFreezeDotTest`）未改一字、照旧通过；格式本身由 `March7thFormatMigrationTest` 把守 ✓。
+**全部角色文件现在都是对象形式**：完全实现的标 `implemented`，其余标 `partial` + `_gaps` ✓；未逐句核对的用
+“尚未逐句核对”作为 gap，已有详细登记的用“见 CONTENT-STATUS.md 的逐角色登记”/具体缺口 ✓。
+`FileStatusCoverageTest` 扫描全部角色文件 ✓。
+⭐ **1002 丹恒是第二个样板**（2026-10-31）：15 条 `note` → `_note`，全部标 `_status: implemented`；`skill_crit_slows_the_target`
+与 `ult_ethereal_dream_hits_a_slowed_target` 的参数行写进 `source` 对象（`SKILL` / `ULTRA` row 10）；语义未改，
+`DanHengFormatMigrationTest` 把守格式，`DanHengTest` 把守行为 ✓。
+⭐ **1003 姬子是第三个样板**（2026-10-31）：15 条 `note` → `_note`，全部标 `_status: implemented`；它是第一个带
+顶层 `resources` 的迁移文件，只改规则、不碰资源声明；`technique_incomplete_combustion` 的参数行写进 `source`
+对象（`TECHNIQUE` row 1），终结技额外能量句按它引用的 row 1 写（Lv10 行 #1 不同，本条只用 #2）；
+`HimekoFormatMigrationTest` 把守格式，`HimekoChargeTest` 把守行为 ✓。
+⭐ **1409 风堇是第四个样板**（2026-10-31）：39 条 `note` → `_note`，全部标 `_status: implemented`；它同时有
+`rules` 与 `resources`，迁移只碰规则；终结技 / 秘技 / 天赋的参数行写进 `source` 对象；
+`HyacineFormatMigrationTest` 把守格式，现有 `Hyacine*` 判据把守行为 ✓。
+⭐ **1413 长夜月是第五个样板**（2026-10-31）：22 条 `note` → `_note`，全部标 `_status: implemented`；有些规则没有
+`id`，格式判据用 `on` 做诊断名；战技 / 天赋 / 终结技的参数行写进 `source` 对象（row 10）；
+`EvernightFormatMigrationTest` 把守格式，`Evernight*` 判据把守行为 ✓。
+⭐ **1415 昔涟 / 1512 知更鸟•晴歌是第六、七个样板**（2026-10-31）：28 / 18 条规则 `note` → `_note`，全部标
+`_status: implemented`；两者的 `resources[].note` 保持 `note`（`ResourceSpec` 运行期字段）；1415 的强化普攻参数行
+写进 `source`（`ENHANCED_BASIC` row 1，data slot 8），1512 的终结技与【特邀嘉宾】攻击条款写进 `source` 对象
+（同一 `ULTRA` row 1）；`CyreneAndRobinFormatMigrationTest` 把守这个边界 ✓。
+⭐ **23055 献给明日的色彩是第一个光锥样板**（2026-10-31）：5 个叠影档各一条规则，`note` → `_note`，每档都标
+`_status: implemented`；`Cone23055FormatMigrationTest` 把守格式，`Cone23055Test` 把守行为 ✓。
+⭐ **1004 / 1005 / 1006 是“未完全实现”的迁移样板**（2026-10-31）：只把 `note` → `_note`，**不加 `_status`** ——
+它们仍有登记缺口，状态要等缺口清单一起写；`PartialCharacterNoteMigrationTest` 只把守注解拼写 ✓。
+⭐ **角色 `note` 批量迁移完成**（2026-10-31）：95 个角色文件共 724 条规则 `note` → `_note`；17 个
+`resources[].note` 仍保持 `note`（`ResourceSpec` 运行期字段）。`CharacterNoteSpellingTest` 扫描全部角色文件，
+防止旧键或资源误改 ✓。
+⭐ **光锥 / 遗器 `note` 批量迁移完成**（2026-10-31）：169 个光锥文件 + 62 个遗器文件共 1585 条规则
+`note` → `_note`；光锥的 1 个 `resources[].note` 仍保持 `note`。至此**全部主内容**共 2309 条规则使用 `_note`，
+`AllContentNoteSpellingTest` 扫描三个目录把守这条边界 ✓。
+⭐ **`game/data` 的 27 条注解也迁到 `_note`**（2026-10-31）：这些文件没有运行期 `note` 字段；`DataNoteSpellingTest`
+扫描 `game/data` + `battle_resources.json` ✓。`memosprites` 的 `note` 仍是运行期字段，不迁 ✓。
+
+#### 3.7zh（引擎）`value`：一个数值表达式
+
+`scale` + `percent` + `amount` 把**一个数**拆进三个字段；`value` 用**一个数值提供器**写出整条数值（`NumberProviders` 是第一读者 ✓），
+由 `TriggerMagnitudes.valueOf` 一个口子求值 ✓。1001 的护盾是第一份内容：`DEFENCE × SKILL:0 + SKILL:3` ✓。
+
+| 不变量 | 为什么 |
+|---|---|
+| `value` 与 `scale` / `percent` / `amount` / `percent_from` / `amount_from` / 所有 `*_from_*` **互斥**，同时写装载期拒绝 ✓ | 一个数两种拼法就是两个答案，引擎不该替作者选 |
+| `value` 的值**已经是属性自己的单位** ✓（ratio 属性 `5` = +500%，速度 `50` = +50 点） | 旧拼法里同名字段两种量纲，靠 note 解释；表达式让读到的数就是写下的数 |
+| 只允许在**读数值**的 op 上：magnitude 类 `DAMAGE` / `ADD_DAMAGE` / `HEAL` / `SHIELD` / `MODIFY_ATTR` / `APPLY_DOT` / `APPLY_CONTROL` / `GAIN_ENERGY` / `GAIN_RESOURCE` / `SPEND_RESOURCE` / `REMOVE_RESOURCE` / `CONSUME_HP`，share 类 `MODIFY_DAMAGE_TAKEN` / `BOOST_DAMAGE` / `ADVANCE` / `BOOST_TOUGHNESS` / `SUPER_BREAK` / `TICK_DOT` / `RAISE_ENERGY_TO` / `ABSORB_DAMAGE` / `RESIST_DEBUFF`，以及 count 类 `GAIN_SKILL_POINT` / `ADD_STACK` / `REMOVE_STACK` / `REMOVE_BUFF` / `DISPEL` / `RAISE_RESOURCE_CAP` / `RAISE_SKILL_HITS` / `RAISE_SKILL_POINT_CAP` ✓ | 不读数值的 op（`MODIFY_RULE` 等）会**静默忽略** `value`，正是本项目要消掉的错误 |
+| 解析器仍是 `NumberProviders` ✓ | 不新开一门数值语言：`attr` / `skill_param` / `const` / `add` / `mul` 与 `percent_from` 共用同一张表 |
+
+【已把守：`ValueExpressionTest`（常量表达式就是整个护盾；`value`+`percent`、`ADVANCE`+`value`、未知 provider 三种拒绝）、
+`March7thFormatMigrationTest`（1001 的护盾没有旧三件套）、`March7thKitTest`（护盾数值不变）】
+
+#### 3.7zi（引擎）`ratio`：ratio 属性的单位
+
+`ratio` 是 `percent` 在 **ratio 属性**上的显式写法：`ratio: 5` = +500%，`ratio: 0.1` = +10% ✓。
+它只被 `MODIFY_ATTR` 读，只允许 `AttributeType.isPercent == true` 的属性 ✓；与 `percent` / `value` / `amount` 互斥 ✓。
+平属性（`ATTACK` / `SPEED`）写 `ratio` 在装载期拒绝 —— “把攻击提高 5 个 ratio”不是一个可读的句子 ✓。
+1001 的 `skill_soft_aggro` 已从 `percent: 5` 改成 `ratio: 5` ✓。
+
+【已把守：`RatioUnitTest`（1001 的 ratio 5 / 平属性拒绝 / ratio+percent 拒绝 / 非 MODIFY_ATTR 拒绝）】
+
+#### 3.7zj（内容）参数表对账：`source.params`
+
+参数行写在规则的 `source` 对象里，不再有独立的 `_params`：
+
+```json
+"source": { "text": "…", "skill": "SKILL", "row": 10,
+            "params": { "#1": 0.57, "#2": 3, "#3": 0.3, "#4": 760, "#5": 5 } }
+```
+
+`ParamAnnotationReconciliationTest` 用 `Constant.SKILLS` 取 `cid + skill + row` 的 `param_list`，逐项比较 `#N` ✓。
+形状在装载期由 `SourceTextAdapter` 检查（`skill` / `row` / `params` 的类型与未知键）✓；它不是运行时字段，引擎只保留
+`text` ✓。`_params` 已从装载器移除；1001 的 5 条参数规则已全部用 `source.params` ✓。
+
+【已把守：`ParamAnnotationReconciliationTest`（任意一条参数值与参数行不符即红）、`March7thFormatMigrationTest`
+（1001 的 5 条参数行都在 source）】
+
+#### 3.7zk（内容）`_status` / `_gaps` / `_divergences`：结构化状态
+
+规则的 `_status` 是闭集：`implemented` / `partial` / `registered` / `unmodelled` ✓。
+`_gaps` / `_divergences` 是**非空字符串数组**；`implemented` 不能带非空 gap/divergence，`partial` / `registered` / `unmodelled` 必须至少带一条 ✓ ——
+“这个规则还有工作”不能没有状态，反过来“已实现”也不能挂着一个 gap ✓。未知状态 / 非数组 / 空白项 / 空 claim 在装载期拒绝 ✓。
+1001 的 16 条规则已全部标 `implemented` ✓（`March7thFormatMigrationTest.everyRuleCarriesAStatus`）。
+**文件级**也接受同一组字段：1003 / 1409 / 1413 / 1415 / 1512 顶层标 `implemented`；1004 / 1005 / 1006 从裸数组改成
+对象，顶层写 `_status: partial` + `_gaps`（缺口不是一个规则，所以状态属于整个文件）✓；`FileStatusCoverageTest` 与
+`PartialCharacterNoteMigrationTest` 把守这个形状 ✓。
+
+【已把守：`TriggerFormatSkeletonTest`（合法状态装载 / 未知状态拒绝 / partial 无 gap 拒绝）、`March7thFormatMigrationTest`（1001 每条规则都有状态）、`PartialCharacterNoteMigrationTest`（1004-1006 的文件级 partial + gap）、`FileStatusCoverageTest`（已迁移对象文件的文件级状态）】
+
+#### 3.7zl（引擎）`source` 可以是对象
+
+`source` 仍是 `String`（错误信息只读它），但 Gson 适配器 `SourceTextAdapter` 接受两种写法：
+
+```json
+"source": { "text": "…原文…", "skill": "SKILL", "row": 10, "params": { "#1": 0.57 } }
+```
+
+- `text` 必填；`skill` / `row` / `params` 可选且装载期校验形状（`skill` 是合法槽位、`row` 是正整数、
+  `params` 是非空 `#N` → 数字对象，且同时需要 `skill` + `row`）；
+- 引擎只保留 `text`；结构化字段给读者和参数对账（`ParamAnnotationReconciliationTest` 只读 `source.params`）；
+- 未知键 / 缺 `text` / 坏 `row` / 坏 `params` 在装载期拒绝；
+- 旧的字符串写法完全兼容；1001 的 5 条参数规则（`skill_shield` / `skill_soft_aggro` / `counter` /
+  `ultimate_freeze` / `technique_freeze`）已全部用对象写法并删掉 `_params` ✓。
+
+【已把守：`TriggerFormatSkeletonTest`（对象 source 的 text 被保留 / 缺 text 拒绝 / 坏 params 拒绝）、
+`ParamAnnotationReconciliationTest`（source.params 对账）、`March7thFormatMigrationTest`（1001 的 5 条参数行都在 source）】
+
+#### 3.7zm（引擎）`times` / `times_from`：重复的是**效果**，不只是伤害
+
+`times` 以前只在 `DAMAGE` 的分支里读，其他 op 写了会被**静默忽略**（同一形状的错：字段在那、没人读）。
+2026-10-31 起：非 `DAMAGE` 的效果由 `TriggerInterpreter.applyUnchecked` 的效果循环重复，`DAMAGE` 保留自己的循环
+（它每次重复要**重抽**随机目标）。两处读同一个 `timesCount`，所以同一条拼法不会数出两个数。
+
+| 不变量 | 为什么 |
+|---|---|
+| `times` / `times_from` 对任何 op 都是「这条效果执行 N 次」 ✓ | 「每击中 1 个敌方目标获得 1 层」「每消耗 1 点…」都是这个形状；以前只有伤害能写 ✓ |
+| `times_from` 的三种拼法不变：`event_amount` / `hit_count` / `resource:<name>` ✓ | 解析仍在 `timesCount` 一处；读的是事件或计数器，不是新词汇 ✓ |
+| `DAMAGE` 不进外层重复 ✓ | 它自己按 `times` settle，外层再乘一次会得到 N² 段 ✗ |
+| `times: 0` 在装载期拒绝 ✓ | 运行 0 次等于整条效果消失，是拼错不是简写 ✗ |
+
+⚠ **内容侧仍未迁移的一处**：1302 的天赋「每击中 1 个敌方目标获得 1 层」**故意仍按每次施放 1 层** —— 打开
+`times_from: "hit_count"` 会让单目标的战技/终结技加 **2 层**（实测；那 2 层的来源未查明，见 `_gaps` 的措辞）。两半一起
+修之前不动它，文件 `_gaps` 与 `ArgentiStacksTest.aThreeTargetCastStillAddsOneStack` 把今天的样子钉住 ✓。
+
+【已把守：`EffectTimesTest`（`times: 3` 三次实例 / 无 `times` 一次 / `hit_count` 三次命中三次 / 0 命中 0 次 / `times: 0` 装载期拒绝）】
+
+#### 3.7zn（格式）光锥 / 遗器的文件头：**键写在档位旁边**
+
+2026-10-31 定形。光锥按叠影档分键（`"1"`..`"5"`），遗器按件数分键（`"2"` / `"4"`），文件头就写在它们旁边：
+
+```json
+{ "schema": 1, "light_cone": 23055, "1": [ … ], … , "5": [ … ] }
+{ "schema": 1, "relic_set": 101, "2": [ … ], "4": [ … ] }
+```
+
+| 不变量 | 为什么 |
+|---|---|
+| 归属键按内容种类命名：`character` / `light_cone` / `relic_set` ✓ | 写错种类的键**就是未知键**，装载期拒绝 —— 复制的文件不会“看起来能读” ✓ |
+| `schema` 可选、写了必须是 **1**；归属键可选、写了必须是文件名里的 id ✓ | 旧文件照读 ✓；新文件不会悄悄留在旧格式 ✓ |
+| 出货内容**必须**两个键都有 ✓ | `ContentFileHeaderTest` 扫三个目录；漏一个/写错 id 就红 ✓ |
+| 顶层只允许：数字键、该种类的元数据键、§1.2 的注解 ✓ | 光锥装载器以前对未知顶层键**静默忽略** ✗；遗器则把它当件数解析、报一个看不懂的错 ✗ |
+| 规则数组走**与角色同一套**词表守卫：`TriggerTables.requireRuleVocabulary` ✓ | 两个装载器以前直接把规则交给 Gson，`_notee` 这种拼写是**静默丢弃** ✗ |
+| 光锥额外允许 `rules`（各档共用）与 `resources`；遗器没有这两个键 ✓ | 既有形状，不动 ✓ |
+
+⭐ **为什么不是 `"ranks": { ... }` 包一层**：那只把全部光锥/遗器文件整体重排、不增加任何信息；而“元数据与行并列”在光锥的
+`resources` 上已有先例 ✓。包一层的唯一好处是顶层键集合更纯，但它买不到任何一条上面列出的不变量 ✓。
+
+⚠ **文件级 `_status` 还没要求**：形状允许（与角色同一闭集，`requireFileStatus` 会校验），但每个文件的状态要先从
+`CONTENT-STATUS` 逐件定、`partial` 还要带 `_gaps` —— 那是内容政策，不是格式缺口 ✓。`ContentFileHeaderTest` 目前只钉
+`schema` + 归属键 ✓。
+
+【已把守：`ContentFileHeaderTest`（两目录全覆盖 + 合法头能装载 + 九种坏头被拒：schema 2 / 归属 id 不符 / 拼错的键 /
+未知状态 / 规则里的 `_notee`，光锥与遗器各一套；坏头样本在 `src/test/resources/game/.../9999x.json`，只按 id 读、
+不会被覆盖扫描看到）】
+
 
 ### 3.8 数据文件速查
 
@@ -1572,6 +1750,24 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 命中率 clamp 的**上界**（命中 0.32 时返回 1.0 而不是 1.32） | `HitResistTest` |
 | 演示至少不抛异常 | `DemoSmokeTest` |
 | 触发规则表装载 | `TriggerTableTest` |
+| **`times` / `times_from` 重复的是效果**（非 `DAMAGE` 由效果循环重复；`times: 0` 装载期拒绝） | `EffectTimesTest` |
+| **光锥 / 遗器的文件头**（`schema` + `light_cone` / `relic_set`；两目录全覆盖；坏头被拒） | `ContentFileHeaderTest` |
+| **trigger 格式骨架**（schema / character / 注解键 / `when` 混合两种拼法 / `skills` / 注释） | `TriggerFormatSkeletonTest`、`March7thFormatMigrationTest` |
+| **`value` 数值表达式**（常量就是整个 magnitude；与旧三件套互斥；只读 share 的 op 拒绝；provider 装载期校验） | `ValueExpressionTest` |
+| **`when_predicates` 已移除**（装载器不再接受旧键；主内容已迁移） | `ContentConditionSpellingTest` |
+| **1002 的 `note` → `_note` / `_status`** | `DanHengFormatMigrationTest` |
+| **1003 的 `note` → `_note` / `_status`（含 resources 的顶层对象）** | `HimekoFormatMigrationTest` |
+| **1409 的 `note` → `_note` / `_status`（rules + resources 并存）** | `HyacineFormatMigrationTest` |
+| **1413 的 `note` → `_note` / `_status`（部分规则无 id）** | `EvernightFormatMigrationTest` |
+| **1415 / 1512 的规则注解与 `ResourceSpec.note` 边界** | `CyreneAndRobinFormatMigrationTest` |
+| **23055 光锥 5 个叠影档的规则注解** | `Cone23055FormatMigrationTest` |
+| **未完全实现角色的 `note` 注解迁移**（1004 / 1005 / 1006，文件级 `partial` + `_gaps`） | `PartialCharacterNoteMigrationTest` |
+| **已迁移对象文件有文件级 `_status`**（全部角色文件） | `FileStatusCoverageTest` |
+| **全部角色规则用 `_note`、资源声明仍用 `note`** | `CharacterNoteSpellingTest` |
+| **全部主内容（角色 / 光锥 / 遗器）规则用 `_note`、资源声明仍用 `note`** | `AllContentNoteSpellingTest` |
+| **`game/data` / `battle_resources.json` 用 `_note`** | `DataNoteSpellingTest` |
+| **运行时副本已剥注解**（classpath 的 `1001.json` 没有 `_note`/`note`，仍有 `source`） | `RuntimeAnnotationStripTest` |
+| **参数行写在 `source.params` 并与 `skills.json` 对账** | `ParamAnnotationReconciliationTest` |
 | **`enemy_state_count:` 全场状态计数**（状态过滤 / 只数活人 / 空状态名在加载期被拒 / 未知变量提示它） | `EnemyStateCountTest` / `EnemyStateCountSpellingTest` |
 | **`chance_rolls:` 规则级独立掷骰**（两次判定都结算、各 50% 伤害；0 次与"无 chance 却要掷两次"在加载期被拒） | `ChanceRollsTest` / `ChanceRollsValidationTest` |
 | **§3.5 变量表与加载器零漂移**（双向：代码有文档无 / 文档有代码无 / 标题消失时大声失败而非空集相等） | `TriggerVocabularyDriftTest` |
@@ -1647,3 +1843,6 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
 | `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
 | `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
+
+
+
