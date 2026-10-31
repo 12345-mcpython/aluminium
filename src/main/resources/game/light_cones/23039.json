@@ -1,7 +1,442 @@
 {
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-  "5": []
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.06,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.06,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_skill",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.3
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次战技的攻击吃「血火」的那一份。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_ult",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.3
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次终结技的攻击吃「血火」的那一份。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.065,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.065,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_skill",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.35
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次战技的攻击吃「血火」的那一份。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_ult",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.35
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次终结技的攻击吃「血火」的那一份。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.07,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.07,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_skill",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.4
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次战技的攻击吃「血火」的那一份。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_ult",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.4
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次终结技的攻击吃「血火」的那一份。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.075,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.075,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_skill",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.45
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次战技的攻击吃「血火」的那一份。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_ult",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.45
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次终结技的攻击吃「血火」的那一份。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_bpskill",
+      "when": [
+        "actor == self",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.08,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23039_pay_hp_ultra",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "血火",
+          "amount": 1,
+          "max_stacks": 1,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.08,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "「消耗 #2% 生命上限」= `CONSUME_HP{scale: owner_max_hp}`（`HealthState.consume` 自带\"最多降到 1 点\"的钳制 ✓）；「本次攻击伤害提高」= 挂一个**只活 1 回合**的标记 `血火`，由两条 `DEALING_DAMAGE` 规则在战技/终结技上付。 ⚠ 标记用 `ADD_STACK`（不是 `APPLY_BUFF`）：门的条件是 `self_stacks:`，而 `stacksOf` 数的是**可叠层**的计数，普通 StateBuff 读作 0（实测：消耗发生了、标记却在门外）。 ⚠ 用 `CAST_SETUP` 而不是 `SKILL_CAST`：后者在**伤害结算之后**才发（实测：消耗发生了、标记却在那一发之后才出现，所以同一发攻击读不到它）。 ⚠ 标记必须**先于** CONSUME_HP 施加：消耗会立刻发 HP_CONSUMED，而「消耗高于 500」那条要能在同一链里读到标记。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_skill",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category BPSKILL"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.5
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次战技的攻击吃「血火」的那一份。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23039_boost_ult",
+      "when": [
+        "actor == self",
+        "self_stacks:血火 >= 1",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.5
+        }
+      ],
+      "source": "光锥 23039 血火啊，燃烧前路:「施放战技或终结技时消耗等同于自身 #2% 生命上限的生命值，并使本次攻击造成的伤害提高 #3%，若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%。若当前生命值不足，该效果最多使装备者的当前生命值降低至 1 点。」",
+      "note": "本次终结技的攻击吃「血火」的那一份。"
+    }
+  ]
 }

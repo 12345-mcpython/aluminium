@@ -820,6 +820,15 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 **收口条件（两步）**：① 引擎要能"数持有某 buff 的我方单位"（现有谓词只有 `debuff_count`，没有队伍侧的 `ally_buff_count`）；② `DAMAGE` 的 `percent` 要能加一项 `per_count × n`（上限 0.24）。有了这两样，`zone_true_damage_rider` 就写成 `0.24 + 0.06 × n`，19~21 条 0.42 rider 一次性进对账。补法：按"持有德谬歌增益的我方角色数"上调该规则的 `percent`，上限 +0.24；1415 在本账号是 **E2** ✓，所以这条在实战里一直生效。
 
+#### ⛔ 23039 的「消耗 > 500」那条规则不开火（2026-10-31 实测）
+
+为了「若该效果消耗的生命值高于 500 点，可使伤害额外提高 30%」加了数值变量 **`event_amount`**（= `ctx.amount()`，已在位、
+`TRIGGER.md` 同步），写法也合规（`on: HP_CONSUMED` + `actor == self` + `event_amount > 500`），
+但**手发一记 `HP_CONSUMED(1000)` 都没能触发它**（探针打印 `烈燃=0`）。
+
+⇒ 那两条规则**已删除**（不留永不触发的死规则），23039 记"前半已落地、500 分支仍开"。
+下一步要查的是：`HP_CONSUMED` 究竟发给了哪些表（是不是只发给"造成伤害的一方"，而 `CONSUME_HP` 的 spender 与表主不是同一位）。
+
 #### ⛔ 23047 的【魂迷】触发会自我递归（2026-10-31 实测，已回退）
 
 写法本身合规（`DEBUFF_APPLIED` + `actor == self` + `!target has_state 魂迷` + `APPLY_BUFF{base_chance: 0.8}`），
