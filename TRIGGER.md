@@ -238,6 +238,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `from_skill_id <id>` | 这次来自哪个具体技能 |
 | `from_category <类别>` | 按技能类别 |
 | `damage_is_attack` | 这一发算不算一次攻击 |
+| `damage_did_not_crit` | 这一发**没有暴击**（只在 `DAMAGE_SETTLED` 上，掷骰已发生）|
 | `damage_is_additional` | 这一发是不是追加伤害 |
 | `damage_has_no_cast` | 这一发没有施放来源 |
 | `damage_element_is_self` | 这一发的属性 = 我自己的属性 |
