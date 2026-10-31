@@ -1,7 +1,10 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.equipment.Weapon;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -39,6 +42,53 @@ public class ConeTwentyThreeThousandOneTest {
         return wearer.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get();
     }
 
+    /**
+     * The same stair on the terminator's own crit damage: 「同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层」.
+     *
+     * <p>Read on the instance ({@code extraCritDamage}), not on the panel: the clause is scoped to the ULTIMATE, so a
+     * global CRIT_ATTACK modifier would be a different sentence (it would raise the basic attack too).
+     */
+    @Test
+    public void theStairAlsoRaisesTheUltimatesCritDamage() {
+        Assertions.assertEquals(0.0, ultCritDamageAt(100), 1e-9, "at 100 exactly: no layer");
+        Assertions.assertEquals(0.12, ultCritDamageAt(110), 1e-9, "one step -> +12% crit damage on the ultimate");
+        Assertions.assertEquals(0.36, ultCritDamageAt(130), 1e-9, "three steps");
+        Assertions.assertEquals(0.72, ultCritDamageAt(160), 1e-9, "six steps - the ceiling");
+        Assertions.assertEquals(0.72, ultCritDamageAt(200), 1e-9, "past the ceiling it stays at six");
+        Assertions.assertEquals(0.0, basicCritDamageAt(160), 1e-9,
+                "the basic attack must NOT get it: the clause names 「终结技」");
+    }
+
+    /** The instance's extra crit damage from the wearer's ULTIMATE at a forced speed. */
+    private static double ultCritDamageAt(int speed) {
+        return extraCritDamage(speed, SkillType.ULTRA);
+    }
+
+    /** The control: the same wearer, the same speed, a basic attack. */
+    private static double basicCritDamageAt(int speed) {
+        return extraCritDamage(speed, SkillType.COMMON);
+    }
+
+    private static double extraCritDamage(int speed, SkillType slot) {
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23001, LEVEL, false, 1));
+        double natural = wearer.getAttribute(AttributeType.SPEED).get();
+        Battle battle = new Battle(new ArrayList<>(List.of(wearer)),
+                new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.seeded());
+        wearer.getAttribute(AttributeType.SPEED)
+                .addModifier(com.laosun.aluminium.DoubleValue.Modifier.pure(speed - natural));
+        battle.startBattle();
+        List<Damage> seen = new ArrayList<>();
+        battle.addDamageObserver((Damage damage, double applied, double hpLost, double shield, boolean died) ->
+                seen.add(damage));
+        battle.castImmediate(wearer.getSkills().get(slot), wearer, List.of(battle.enemies().getFirst()));
+        battle.processRequests();
+        return seen.stream()
+                .filter(d -> d.getType() == DamageType.NORMAL)
+                .mapToDouble(Damage::getExtraCritDamage)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("the " + slot + " settled no instance"));
+    }
+
     @Test
     public void theStairCountsTheStepsAboveOneHundred() {
         double atHundred = boostAt(100);
@@ -51,3 +101,4 @@ public class ConeTwentyThreeThousandOneTest {
                 "「可叠加 6 层」 - past the ceiling it keeps paying six, not ten");
     }
 }
+
