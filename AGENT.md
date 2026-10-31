@@ -811,6 +811,13 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 **2026-10-30 已落地一半（可数标记）**：`memosprite_ode_marks_the_allies_it_buffs` —— 德谬歌忆灵技（数据槽 1）给 **1409 / 1413 / 1415（self）** 施加可数标记 `德谬歌忆灵技增益`，**不给 1512**（他没有变体，这正是捕获里 3/4 的原因）。判据 `CyreneOdeMarksTheAlliesTest`：直接放德谬歌的忆灵技后，三人有标记、第四人没有 ⇒ 星魂 2 数到的 n = 3 ✓。⚠ 标记是"谁拿到过"，**不是**那三个变体各自的效果（各自效果仍缺）。
 
+**变体各自的真实效果（tbgd 读到的，尚未建模）**：
+- `_Hyacine`（1409）：`OnCreate` 给持有者加 `ExtraHealRatio`（动态 hash -1945637710），`OnAfterSkillUse` 只在 `Skill`/`Ultra` 后触发进一步结算 ⇒ 是"治疗加成 + 技能后追加"的一整套。
+- `_Evernight`（1413）：`OnListenBeforeHitAll` 里用 `ByCurrentSkillName == Skill11` 判断，配合 `S02_ExtraRatio` 动态量 ⇒ 改的是**长夜月 Skill11 的份额**，不是简单属性。
+- 通用 `AmazingBuff`：`OnStack` 时若昔涟**点开星魂 2**（`ByRankActivated`，hash 523552506），再给持有者加 `MServant_Cyrene_00_Rank02_ThanksGift` ⇒ 这才是"增益效果"链条的第二段。
+
+⇒ 三档各自是一段独立机制（涉及动态 hash 与技能钩子），不是"加一条 MODIFY_ATTR"能覆盖的；要建模必须先有 1409/1413 各自的文档句子（现有文档只讲了星魂 2 的计数，没讲各变体的效果）。
+
 **收口条件（两步）**：① 引擎要能"数持有某 buff 的我方单位"（现有谓词只有 `debuff_count`，没有队伍侧的 `ally_buff_count`）；② `DAMAGE` 的 `percent` 要能加一项 `per_count × n`（上限 0.24）。有了这两样，`zone_true_damage_rider` 就写成 `0.24 + 0.06 × n`，19~21 条 0.42 rider 一次性进对账。补法：按"持有德谬歌增益的我方角色数"上调该规则的 `percent`，上限 +0.24；1415 在本账号是 **E2** ✓，所以这条在实战里一直生效。
 
 #### ⏳ 最后 3 行 differ 是「这一发能选中谁」，而 payload 的 `field.targetable` 还不能直接用（2026-10-30 实测）
