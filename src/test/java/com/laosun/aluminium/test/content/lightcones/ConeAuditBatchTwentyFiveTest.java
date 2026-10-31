@@ -63,7 +63,7 @@ public class ConeAuditBatchTwentyFiveTest {
     }
 
     /**
-     * 23045 没有回报的加冕: only the crit-damage share is spelled; the energy-cap clause is registered.
+     * 23045 没有回报的加冕: the crit-damage share is the property; the ultimate and energy-cap clauses are spelled now (judged in\n * ConeTwentyThreeThousandFortyFiveTest).
      */
     @Test
     public void coneTwoThreeFourFiveHasOnlyTheCritDamageShare() {
@@ -73,7 +73,7 @@ public class ConeAuditBatchTwentyFiveTest {
                 - bare.wearer.getAttribute(AttributeType.CRIT_ATTACK).get()) + " ; 规则数 " + rules(23045));
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.CRIT_ATTACK).get()
                 > bare.wearer.getAttribute(AttributeType.CRIT_ATTACK).get(), "「暴击伤害提高 36%」");
-        Assertions.assertEquals(0, rules(23045), "缺口见证：没有规则（能量上限那一句没有拼法）");
+        Assertions.assertEquals(2, rules(23045), "the unconditional ATK share and the energy-cap pair");
     }
 
     /**
