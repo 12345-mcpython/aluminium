@@ -9,8 +9,106 @@
       "do": [
         { "op": "MODIFY_ATTR", "attribute": "DOT_DAMAGE_BOOST", "percent": 0.24, "turns": 2, "target": "self" }
       ],
-      "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤容提高#2[i]%，持续#3[i]回合。」",
-      "_note": "「当装备者施放终结技时，使装备者造成的**持续伤害**提高 **24%**，持续 2 回合」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `MODIFY_ATTR DOT_DAMAGE_BOOST{turns: 2}` ✓；「击破特攻提高 #1%」由光锥属性给 ✓。\n⚠⚠ **2026-10-19 逐句核时改的数**：原先写 **0.48** ✗（那是叠影 5 的值）⇒ 本档应为 **0.24** ✓。\n⛔ **仍开（已登记 §4.3）**：「**陷入装备者施加的持续伤害**的敌方目标被消灭时，装备者恢复 4 点能量」**整句没有** ✗ —— 需要「击杀时检查目标身上是不是**她**的 DoT」✗（`target_dot_count` 数得到 ✓，但问不了「是谁的」✗）⇒ 等价缺口。"
+      "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤害提高#2[i]%，持续#3[i]回合。」 param Lv1 = [0.2, 0.24, 2, 4] → #2 = 0.24、#3 = 2",
+      "_note": "「当装备者施放终结技时，使装备者造成的**持续伤害**提高 **24%**，持续 2 回合」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `MODIFY_ATTR DOT_DAMAGE_BOOST{turns: 2}` ✓；「击破特攻提高 #1%」由光锥属性给 ✓。⚠ 五档的 #2 是 0.24 / 0.30 / 0.36 / 0.42 / 0.48（以前文件只有 1 档，其余档回落读成 0.24 ✗）。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24003_dot_kill_energy",
+      "when": ["actor == self", "target_dots_from_self >= 1"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 4, "target": "self" }
+      ],
+      "source": "光锥 24003：「陷入装备者施加的持续伤害效果的敌方目标被消灭时，装备者恢复#4[f1]点能量。」 param Lv1 #4 = 4",
+      "_note": "「**陷入装备者施加的持续伤害**效果的敌方目标**被消灭**时，装备者恢复 #4 点能量」—— ① 事件 `KILL` ✓（击杀时 `DamageService` 在 `perish()` 之后发，死者的 buff 还在 ⇒ 数得到 ✓）；② 条件 **`target_dots_from_self >= 1`** ✓ —— 它数的是**目标身上、来源是规则持有者**的 `DotBuff`（23029 的同一个变量）；实测「我的 DoT → 1 / 队友的 DoT → 0」✓；③ `actor == self` 只让**装备者的击杀**付账 ✓；④ 数值 #4 每档不同（4 / 4.5 / 5 / 5.5 / 6），**不是固定值** ✓；⚠ 不写 `fixed: true`：句子说的是「恢复」，按引擎的既有口径吃能量恢复效率 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone24003_ult_dot",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "DOT_DAMAGE_BOOST", "percent": 0.3, "turns": 2, "target": "self" }
+      ],
+      "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤害提高#2[i]%，持续#3[i]回合。」 param Lv2 = [0.25, 0.3, 2, 4.5] → #2 = 0.3、#3 = 2",
+      "_note": "同第 1 档，数值按 Lv2 行：#2 = 0.30 ✓。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24003_dot_kill_energy",
+      "when": ["actor == self", "target_dots_from_self >= 1"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 4.5, "target": "self" }
+      ],
+      "source": "光锥 24003：「陷入装备者施加的持续伤害效果的敌方目标被消灭时，装备者恢复#4[f1]点能量。」 param Lv2 #4 = 4.5",
+      "_note": "同第 1 档，数值按 Lv2 行：#4 = **4.5** ✓（能量是小数，`GAIN_ENERGY` 收 double ✓）。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone24003_ult_dot",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "DOT_DAMAGE_BOOST", "percent": 0.36, "turns": 2, "target": "self" }
+      ],
+      "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤害提高#2[i]%，持续#3[i]回合。」 param Lv3 = [0.3, 0.36, 2, 5] → #2 = 0.36、#3 = 2",
+      "_note": "同第 1 档，数值按 Lv3 行：#2 = 0.36 ✓。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24003_dot_kill_energy",
+      "when": ["actor == self", "target_dots_from_self >= 1"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 5, "target": "self" }
+      ],
+      "source": "光锥 24003：「陷入装备者施加的持续伤害效果的敌方目标被消灭时，装备者恢复#4[f1]点能量。」 param Lv3 #4 = 5",
+      "_note": "同第 1 档，数值按 Lv3 行：#4 = 5 ✓。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone24003_ult_dot",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "DOT_DAMAGE_BOOST", "percent": 0.42, "turns": 2, "target": "self" }
+      ],
+      "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤害提高#2[i]%，持续#3[i]回合。」 param Lv4 = [0.35, 0.42, 2, 5.5] → #2 = 0.42、#3 = 2",
+      "_note": "同第 1 档，数值按 Lv4 行：#2 = 0.42 ✓。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24003_dot_kill_energy",
+      "when": ["actor == self", "target_dots_from_self >= 1"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 5.5, "target": "self" }
+      ],
+      "source": "光锥 24003：「陷入装备者施加的持续伤害效果的敌方目标被消灭时，装备者恢复#4[f1]点能量。」 param Lv4 #4 = 5.5",
+      "_note": "同第 1 档，数值按 Lv4 行：#4 = 5.5 ✓。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone24003_ult_dot",
+      "when": ["actor == self", "from_category ULTRA"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "DOT_DAMAGE_BOOST", "percent": 0.48, "turns": 2, "target": "self" }
+      ],
+      "source": "光锥 24003：「当装备者施放终结技时，使装备者造成的持续伤害提高#2[i]%，持续#3[i]回合。」 param Lv5 = [0.4, 0.48, 2, 6] → #2 = 0.48、#3 = 2",
+      "_note": "同第 1 档，数值按 Lv5 行：#2 = 0.48 ✓。"
+    },
+    {
+      "on": "KILL",
+      "id": "cone24003_dot_kill_energy",
+      "when": ["actor == self", "target_dots_from_self >= 1"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 6, "target": "self" }
+      ],
+      "source": "光锥 24003：「陷入装备者施加的持续伤害效果的敌方目标被消灭时，装备者恢复#4[f1]点能量。」 param Lv5 #4 = 6",
+      "_note": "同第 1 档，数值按 Lv5 行：#4 = 6 ✓。"
     }
   ]
 }
