@@ -16,6 +16,24 @@
       ],
       "source": "光锥 23013 时节不居:「当装备者对我方目标提供治疗时，记录治疗量。」",
       "note": "「记录治疗量」= 一条自己的资源 `记录的治疗量` + `amountFromEvent: true`（把这次**实际回复量**原样记进去，与 1409 的「小伊卡累计治疗」同一个字段）。⛔ 第二句仍未表达：「任意我方目标施放攻击后，按记录的 #3% 对随机 1 个受到攻击的敌人造成**基于装备者属性**的附加伤害，**该伤害不受加成影响**，每回合最多 1 次」—— `DAMAGE` 的份额与目标都拼得出来，但「**不受加成影响**」表达不了（引擎的伤害一律走加成区），照写会让这一句的数值**偏高**，所以不写。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23013_pays_a_share_of_the_record",
+      "per_turn": 1,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:记录的治疗量",
+          "percent": 0.36,
+          "element": "Physical",
+          "target": "random_hit_enemy",
+          "unboosted": true,
+          "as_attack": false
+        }
+      ],
+      "source": "光锥 23013 时节不居:「当任意我方目标施放攻击后，根据记录治疗量的 #3% ，对随机 1 个受到攻击的敌方目标造成基于装备者属性的附加伤害。该伤害不受加成影响，每回合最多结算 1 次。」",
+      "note": "份额 = `scale: self_resource:记录的治疗量` + `percent: #3%`；「**不受加成影响**」= **`unboosted: true`**（引擎新增：实例在装配时跳过整个 boost 区，element/all-type/follow-up/cast-category 一律不乘）；「随机 1 个受到攻击的敌方目标」= `random_hit_enemy`；「每回合最多 1 次」= `per_turn: 1`；`as_attack: false`（附加伤害，不视为一次攻击）。"
     }
   ],
   "2": [
@@ -35,6 +53,24 @@
       ],
       "source": "光锥 23013 时节不居:「当装备者对我方目标提供治疗时，记录治疗量。」",
       "note": "「记录治疗量」= 一条自己的资源 `记录的治疗量` + `amountFromEvent: true`（把这次**实际回复量**原样记进去，与 1409 的「小伊卡累计治疗」同一个字段）。⛔ 第二句仍未表达：「任意我方目标施放攻击后，按记录的 #3% 对随机 1 个受到攻击的敌人造成**基于装备者属性**的附加伤害，**该伤害不受加成影响**，每回合最多 1 次」—— `DAMAGE` 的份额与目标都拼得出来，但「**不受加成影响**」表达不了（引擎的伤害一律走加成区），照写会让这一句的数值**偏高**，所以不写。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23013_pays_a_share_of_the_record",
+      "per_turn": 1,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:记录的治疗量",
+          "percent": 0.36,
+          "element": "Physical",
+          "target": "random_hit_enemy",
+          "unboosted": true,
+          "as_attack": false
+        }
+      ],
+      "source": "光锥 23013 时节不居:「当任意我方目标施放攻击后，根据记录治疗量的 #3% ，对随机 1 个受到攻击的敌方目标造成基于装备者属性的附加伤害。该伤害不受加成影响，每回合最多结算 1 次。」",
+      "note": "份额 = `scale: self_resource:记录的治疗量` + `percent: #3%`；「**不受加成影响**」= **`unboosted: true`**（引擎新增：实例在装配时跳过整个 boost 区，element/all-type/follow-up/cast-category 一律不乘）；「随机 1 个受到攻击的敌方目标」= `random_hit_enemy`；「每回合最多 1 次」= `per_turn: 1`；`as_attack: false`（附加伤害，不视为一次攻击）。"
     }
   ],
   "3": [
@@ -54,6 +90,24 @@
       ],
       "source": "光锥 23013 时节不居:「当装备者对我方目标提供治疗时，记录治疗量。」",
       "note": "「记录治疗量」= 一条自己的资源 `记录的治疗量` + `amountFromEvent: true`（把这次**实际回复量**原样记进去，与 1409 的「小伊卡累计治疗」同一个字段）。⛔ 第二句仍未表达：「任意我方目标施放攻击后，按记录的 #3% 对随机 1 个受到攻击的敌人造成**基于装备者属性**的附加伤害，**该伤害不受加成影响**，每回合最多 1 次」—— `DAMAGE` 的份额与目标都拼得出来，但「**不受加成影响**」表达不了（引擎的伤害一律走加成区），照写会让这一句的数值**偏高**，所以不写。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23013_pays_a_share_of_the_record",
+      "per_turn": 1,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:记录的治疗量",
+          "percent": 0.36,
+          "element": "Physical",
+          "target": "random_hit_enemy",
+          "unboosted": true,
+          "as_attack": false
+        }
+      ],
+      "source": "光锥 23013 时节不居:「当任意我方目标施放攻击后，根据记录治疗量的 #3% ，对随机 1 个受到攻击的敌方目标造成基于装备者属性的附加伤害。该伤害不受加成影响，每回合最多结算 1 次。」",
+      "note": "份额 = `scale: self_resource:记录的治疗量` + `percent: #3%`；「**不受加成影响**」= **`unboosted: true`**（引擎新增：实例在装配时跳过整个 boost 区，element/all-type/follow-up/cast-category 一律不乘）；「随机 1 个受到攻击的敌方目标」= `random_hit_enemy`；「每回合最多 1 次」= `per_turn: 1`；`as_attack: false`（附加伤害，不视为一次攻击）。"
     }
   ],
   "4": [
@@ -73,6 +127,24 @@
       ],
       "source": "光锥 23013 时节不居:「当装备者对我方目标提供治疗时，记录治疗量。」",
       "note": "「记录治疗量」= 一条自己的资源 `记录的治疗量` + `amountFromEvent: true`（把这次**实际回复量**原样记进去，与 1409 的「小伊卡累计治疗」同一个字段）。⛔ 第二句仍未表达：「任意我方目标施放攻击后，按记录的 #3% 对随机 1 个受到攻击的敌人造成**基于装备者属性**的附加伤害，**该伤害不受加成影响**，每回合最多 1 次」—— `DAMAGE` 的份额与目标都拼得出来，但「**不受加成影响**」表达不了（引擎的伤害一律走加成区），照写会让这一句的数值**偏高**，所以不写。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23013_pays_a_share_of_the_record",
+      "per_turn": 1,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:记录的治疗量",
+          "percent": 0.36,
+          "element": "Physical",
+          "target": "random_hit_enemy",
+          "unboosted": true,
+          "as_attack": false
+        }
+      ],
+      "source": "光锥 23013 时节不居:「当任意我方目标施放攻击后，根据记录治疗量的 #3% ，对随机 1 个受到攻击的敌方目标造成基于装备者属性的附加伤害。该伤害不受加成影响，每回合最多结算 1 次。」",
+      "note": "份额 = `scale: self_resource:记录的治疗量` + `percent: #3%`；「**不受加成影响**」= **`unboosted: true`**（引擎新增：实例在装配时跳过整个 boost 区，element/all-type/follow-up/cast-category 一律不乘）；「随机 1 个受到攻击的敌方目标」= `random_hit_enemy`；「每回合最多 1 次」= `per_turn: 1`；`as_attack: false`（附加伤害，不视为一次攻击）。"
     }
   ],
   "5": [
@@ -92,6 +164,24 @@
       ],
       "source": "光锥 23013 时节不居:「当装备者对我方目标提供治疗时，记录治疗量。」",
       "note": "「记录治疗量」= 一条自己的资源 `记录的治疗量` + `amountFromEvent: true`（把这次**实际回复量**原样记进去，与 1409 的「小伊卡累计治疗」同一个字段）。⛔ 第二句仍未表达：「任意我方目标施放攻击后，按记录的 #3% 对随机 1 个受到攻击的敌人造成**基于装备者属性**的附加伤害，**该伤害不受加成影响**，每回合最多 1 次」—— `DAMAGE` 的份额与目标都拼得出来，但「**不受加成影响**」表达不了（引擎的伤害一律走加成区），照写会让这一句的数值**偏高**，所以不写。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "cone23013_pays_a_share_of_the_record",
+      "per_turn": 1,
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:记录的治疗量",
+          "percent": 0.36,
+          "element": "Physical",
+          "target": "random_hit_enemy",
+          "unboosted": true,
+          "as_attack": false
+        }
+      ],
+      "source": "光锥 23013 时节不居:「当任意我方目标施放攻击后，根据记录治疗量的 #3% ，对随机 1 个受到攻击的敌方目标造成基于装备者属性的附加伤害。该伤害不受加成影响，每回合最多结算 1 次。」",
+      "note": "份额 = `scale: self_resource:记录的治疗量` + `percent: #3%`；「**不受加成影响**」= **`unboosted: true`**（引擎新增：实例在装配时跳过整个 boost 区，element/all-type/follow-up/cast-category 一律不乘）；「随机 1 个受到攻击的敌方目标」= `random_hit_enemy`；「每回合最多 1 次」= `per_turn: 1`；`as_attack: false`（附加伤害，不视为一次攻击）。"
     }
   ],
   "resources": [

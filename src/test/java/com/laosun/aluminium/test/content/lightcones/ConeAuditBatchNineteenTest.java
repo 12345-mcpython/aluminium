@@ -83,7 +83,7 @@ public class ConeAuditBatchNineteenTest {
                 > bare.attribute(AttributeType.OUTGOING_HEALING_BOOST), "「治疗量提高 12%」");
         // 2026-10-31: the RECORDING half landed (one resource fed from HEALED). The payment half is still open, because
         // 「该伤害不受加成影响」 has no expression - see the status row.
-        Assertions.assertEquals(1, rules(23013), "the heal-recording rule");
+        Assertions.assertEquals(2, rules(23013), "the heal-recording rule and the unboosted rider");
     }
 
     /**

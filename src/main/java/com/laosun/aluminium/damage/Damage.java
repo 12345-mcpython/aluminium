@@ -303,6 +303,30 @@ public class Damage {
     private double absorbed;
 
     /**
+     * Whether this instance SKIPS the damage-boost zone entirely.
+     *
+     * <p>「该伤害不受加成影响」 (light cone 23013's rider): the sentence states a damage that is a share of a recorded number and
+     * explicitly takes no boosts, so folding it through the boost zone would report a number that is too high. Off by default -
+     * every shipped instance is boosted - and opted into by the effect that creates it ({@code unboosted: true}).
+     */
+    private boolean skipsBoost;
+
+    /**
+     * @return whether this instance is exempt from the boost zone
+     */
+    public boolean skipsBoost() {
+        return skipsBoost;
+    }
+
+    /**
+     * @return this instance, marked exempt from the boost zone
+     */
+    public Damage skipsBoostZone() {
+        this.skipsBoost = true;
+        return this;
+    }
+
+    /**
      * The game's second additive DMG-boost factor (created if it does not exist).
      */
     public FinalBoostArea finalBoostArea() {

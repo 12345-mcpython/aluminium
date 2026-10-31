@@ -63,6 +63,11 @@ public final class BattleDamage {
 
         // 1) DMG boost zone: element boost + all-type boost (break/super break/true damage are skipped
         //  automatically by BoostArea.applies)
+        if (damage.skipsBoost()) {
+            // 「该伤害不受加成影响」 (light cone 23013's rider): the share is stated by the sentence, so the whole boost zone is
+            // skipped - element, all-type, follow-up and cast-category alike.
+            return;
+        }
         AttributeType elementBoost = AttributeType.getBoostByElement(damage.getElement());
         if (elementBoost != null) {
             damage.addBoost(attacker.getAttribute(elementBoost).get());

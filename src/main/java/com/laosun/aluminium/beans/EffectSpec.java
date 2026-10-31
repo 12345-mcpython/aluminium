@@ -89,6 +89,7 @@ public class EffectSpec {
         copy.toMax = this.toMax;
         copy.unbounded = this.unbounded;
         copy.fixed = this.fixed;
+        copy.unboosted = this.unboosted;
         copy.maxPerRound = this.maxPerRound;
         copy.payer = this.payer;
         copy.until = this.until;
@@ -729,6 +730,15 @@ public class EffectSpec {
 
     @SerializedName("unbounded")
     private Boolean unbounded;
+
+    /**
+     * Whether the instance this effect settles takes <b>no damage boosts</b> - 「该伤害不受加成影响」 (light cone 23013's rider).
+     *
+     * <p>The sentence names a damage that is a share of a recorded number and explicitly exempts it from every boost, so the
+     * instance must skip the boost zone rather than be multiplied twice.
+     */
+    @SerializedName("unboosted")
+    private Boolean unboosted;
 
     /**
      * For {@code GAIN_RESOURCE}: how much may be gained <b>within one round</b>, across every gain of this resource by
