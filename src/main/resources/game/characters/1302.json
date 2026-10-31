@@ -5,8 +5,7 @@
   "_gaps": [
     "行迹 慷慨「在敌方目标进入战斗时，自身立即恢复 #1 点能量」未写：引擎没有「敌方入场」事件（`SUMMONED` 只由召唤物发出，`addCombatant` 不发；`WAVE_START` 也不数这一波新入场的敌人）",
     "强化终结技（数据槽 14，130214）整段未接入：引擎的施放路径没有这个槽（`SkillType` 的映射不含 14），所以「消耗 180 能量、336% 全体、再造成 6 次随机单体 114%」在本引擎里放不出来",
-    "星魂 1「每层【升格】额外使暴击伤害提高 4%」现在是战斗开始时贴一次的固定 +4%：0 层也有、10 层也只有一次。见证：`ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks`（修好时它会红）",
-    "天赋「每击中 1 个敌方目标…获得 1 层【升格】」现在每次施放只加 1 层：3 个目标的 AoE 也只加 1 层。引擎的 `times_from: \"hit_count\"` 已经能给非 `DAMAGE` 效果按命中数重复（`EffectTimesTest`），但实测打开后单目标的战技/终结技一次会加 2 层（原因未查明：可能是那些事件的 hit_count 报 2，也可能是同一次施放被派发两次），所以先不打开。见证：`ArgentiStacksTest.aThreeTargetCastStillAddsOneStack`"
+    "星魂 1「每层【升格】额外使暴击伤害提高 4%」现在是战斗开始时贴一次的固定 +4%：0 层也有、10 层也只有一次。见证：`ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks`（修好时它会红）"
   ],
   "rules": [
     {
@@ -28,11 +27,12 @@
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
+          "times_from": "hit_count",
           "target": "self"
         }
       ],
       "source": "1302 银枝 天赋 崇高的客体 (130204, Enhance): 「施放普攻、战技、终结技时，每击中1个敌方目标，为银枝恢复3点能量并获得1层【升格】，使银枝暴击率提高2.50%，该效果最多叠加10层。」 数据行 Lv10 = [3, 0.025, 10] → #1 = 3 能量、#2 = 0.025、#3 = 10 层",
-      "_note": "The talent, on the 普攻 half of its three slots. ⚠ `per_target: true` is 「**每击中 1 个**敌方目标…恢复 3 点能量」 — the energy multiplies by the event's hit count. ⚠【升格】 is a **stackable named modifier** rather than a separate counter plus a buff: `max_stacks: 10` on the crit-rate modifier gives 「最多叠加10层」 for free, and `buff: 升格` gives the name every other clause needs. ⚠ **KNOWN SHORTFALL, registered** (2026-10-31 measured): the stack is granted **once per cast**, while the sentence says 「每击中 1 个敌方目标」 - an AoE that hits three targets adds one layer, not three. The engine can express the per-hit count (`times_from: \"hit_count\"` on a non-`DAMAGE` effect now repeats it - `EffectTimesTest` pins that), but turning it on here makes a single-target 战技/终结技 cast add **two** layers, which is a second defect in how those cast events report their hits; the witness `ArgentiStacksTest.aThreeTargetCastStillAddsOneStack` pins today's reading until both halves are understood together. ⚠ The value is her talent row's #2 (Lv10 = 0.025), not a literal somebody typed.",
+      "_note": "The talent, on the 普攻 half of its three slots. ⚠ `per_target: true` is 「**每击中 1 个**敌方目标…恢复 3 点能量」 — the energy multiplies by the event's hit count. ⚠【升格】 is a **stackable named modifier** rather than a separate counter plus a buff: `max_stacks: 10` on the crit-rate modifier gives 「最多叠加10层」 for free, and `buff: 升格` gives the name every other clause needs. ⚠ **`times_from: \"hit_count\"` is the stack half** (2026-10-31): 「每击中 1 个敌方目标」 grants one layer **per target hit**, so an AoE that hits three grants three. A non-`DAMAGE` effect now repeats on the event's hit count (`EffectTimesTest`), and `ArgentiStacksTest.threeEnemiesGiveThreeStacks` pins 1 hit = 1 layer and 3 hits = 3. ⚠ An earlier probe read 2 layers for a single-target 战技/终结技; it did not reproduce on the same content (both a synthetic table and this file measure 1), so it is recorded as a false reading, not a defect (AGENT §3.7zm CORRECTED). ⚠ The value is her talent row's #2 (Lv10 = 0.025), not a literal somebody typed.",
       "id": "talent_stack_basic"
     },
     {
@@ -54,11 +54,12 @@
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
+          "times_from": "hit_count",
           "target": "self"
         }
       ],
       "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之二（战技）",
-      "_note": "The 战技 third of the same sentence — three rules because 「普攻、战技、终结技」 are three cast events, and a rule fires on one. ⚠ They cannot be one rule: [the DSL has no OR], and the events themselves are split at the emitter (see 1215's shock marks for the same shape). ⚠ The per-hit half is the registered shortfall the 普攻 rule describes; it is the same sentence, so it is wrong in the same way here.",
+      "_note": "The 战技 third of the same sentence — three rules because 「普攻、战技、终结技」 are three cast events, and a rule fires on one. ⚠ They cannot be one rule: [the DSL has no OR], and the events themselves are split at the emitter (see 1215's shock marks for the same shape). ⚠ `times_from: \"hit_count\"` here for the reason the 普攻 rule states: one layer per enemy hit.",
       "id": "talent_stack_skill"
     },
     {
@@ -80,11 +81,12 @@
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
+          "times_from": "hit_count",
           "target": "self"
         }
       ],
       "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之三（终结技）",
-      "_note": "The 终结技 third — see the 普攻 rule for why there are three and for the per-hit shortfall registered there. ⚠ It fires for the **强化终结技** as well in the game (both are the Ultra slot), but this engine only casts 130203: data slot 14 is not in the `SkillType` map, which is registered in `_gaps`. ⚠ The per-hit half is the registered shortfall the 普攻 rule describes.",
+      "_note": "The 终结技 third — see the 普攻 rule for why there are three and for the per-hit count. ⚠ It fires for the **强化终结技** as well in the game (both are the Ultra slot), but this engine only casts 130203: data slot 14 is not in the `SkillType` map, which is registered in `_gaps`. ⚠ The per-hit half is one layer per enemy hit, the same as the 普攻 rule.",
       "id": "talent_stack_ultra"
     },
     {
@@ -284,8 +286,3 @@
     }
   ]
 }
-
-
-
-
-
