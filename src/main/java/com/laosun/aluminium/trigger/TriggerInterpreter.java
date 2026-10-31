@@ -185,6 +185,11 @@ public final class TriggerInterpreter {
         if (owner == null) {
             return 0;
         }
+        // "for every 10 points of maximum energy above 120" (light cone 23058): the cap is a fact about the unit, not one of
+        // its attributes, so the attribute lookup below cannot answer it. Same name the derived scale uses.
+        if ("max_energy".equals(name)) {
+            return owner.getMaxEnergy();
+        }
         try {
             return owner.getAttribute(AttributeType.fromString(name)).get();
         } catch (IllegalArgumentException notAnAttribute) {
