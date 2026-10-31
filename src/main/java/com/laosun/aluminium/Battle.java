@@ -3417,6 +3417,27 @@ public class Battle {
     }
 
     /**
+     * The units that declared a map basic attack on the way into this battle, in the order they were declared and without
+     * duplicates.
+     *
+     * <p>「另一位**开战的队友**」 (light cone 23050): the teammate who <b>triggered combat</b> is the one whose map attack
+     * landed - the engine already records exactly that ({@link #declareMapAttack}), and a rule needs to ask "who was
+     * it". No declaration (an ambush, or a caller that does not model the overworld) is an <b>empty</b> list, which is
+     * the sentence's 「若不存在开战的队友」 branch.
+     *
+     * @return the declared map attackers, possibly empty
+     */
+    public List<CanHit> mapAttackers() {
+        List<CanHit> attackers = new ArrayList<>();
+        for (com.laosun.aluminium.battle.PreBattle.MapAttack hit : preBattle.mapAttacks()) {
+            if (hit.attacker() != null && !attackers.contains(hit.attacker())) {
+                attackers.add(hit.attacker());
+            }
+        }
+        return List.copyOf(attackers);
+    }
+
+    /**
      * Records the unit that 【美学底本】 sat on when the battle began - the technique's own half.
      *
      * <p>Reader: 1503 Pearl (真珠)'s technique - 「使用秘技后获得【美学底本】，切换行动角色时【美学底本】转移至当前行动角色。下一次

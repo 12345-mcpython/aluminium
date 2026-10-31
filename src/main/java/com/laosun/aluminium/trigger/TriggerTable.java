@@ -1815,6 +1815,16 @@ public class TriggerTable {
                 return holder == null ? Double.NaN : holder.getBuffManager().stacksOf(stacksName);
             }
             return switch (variable) {
+                case "map_attacker_count" -> {
+                    // 「若不存在开战的队友」 (light cone 23050): how many of OUR units other than the rule owner declared a
+                    // map attack on the way in. Zero is the fallback branch, not an error.
+                    if (ctx.battle() == null) {
+                        yield Double.NaN;
+                    }
+                    yield ctx.battle().mapAttackers().stream()
+                            .filter(unit -> unit != ctx.owner() && !unit.isDeath())
+                            .count();
+                }
                 case "target_dots_from_self" -> {
                     // 「若目标处于**装备者施加的**持续伤害状态」 (light cone 23029): DoTs on the target whose source is the owner.
                     if (ctx.target() == null || ctx.target().getBuffManager() == null) {
