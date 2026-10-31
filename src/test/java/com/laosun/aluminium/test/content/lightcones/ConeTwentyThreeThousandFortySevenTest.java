@@ -103,6 +103,32 @@ public class ConeTwentyThreeThousandFortySevenTest {
     }
 
     /**
+     * 「当装备者陷入无法战斗状态时，移除所有【魂迷】」 - the engine's own anchor rule: a buff whose CLOCK is another unit is
+     * released when that unit dies ({@code DeathService.releaseBuffsAnchoredToTheDead}), which is why 魂迷 is applied
+     * {@code ticks_on: self}. The sweep runs after any cast, so an ally's basic is enough to reach it.
+     */
+    @Test
+    public void whenTheWearerFallsEveryCharmIsReleased() {
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23047, LEVEL, false, 1));
+        Character ally = CharacterFactory.create(1001, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(wearer, ally)), new ArrayList<>(List.of(enemy)),
+                BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.DEBUFF_APPLIED, wearer, enemy, 0, 0));
+        battle.processRequests();
+        Assertions.assertTrue(enemy.getBuffManager().hasState("魂迷"), "precondition: the target is charmed");
+
+        wearer.takeDamage(wearer.getMaxHp() * 2);
+        // Any cast sweeps the dead; the ally's basic is the lever the public API offers.
+        battle.castImmediate(ally.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON), ally, List.of(enemy));
+        battle.processRequests();
+        Assertions.assertFalse(enemy.getBuffManager().hasState("魂迷"),
+                "「装备者陷入无法战斗状态时，移除所有【魂迷】」");
+    }
+
+    /**
      * 「受到我方目标攻击时，使<b>攻击者</b>速度提高 10%，持续 3 回合」 - the attacker, not the wearer.
      */
     @Test
