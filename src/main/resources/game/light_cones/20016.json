@@ -3,60 +3,115 @@
     {
       "on": "TURN_START",
       "id": "cone20016_crit_below_threshold",
-      "when": ["hp_percent < 0.8"],
+      "when": [
+        "hp_percent < 0.8"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "turns": 1, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。 ⚠ 2026-10-31：补 `on_any: [\"HP_LOST\"]` 后重测。",
+      "on_any": [
+        "HP_LOST"
+      ]
     }
   ],
   "2": [
     {
       "on": "TURN_START",
       "id": "cone20016_crit_below_threshold",
-      "when": ["hp_percent < 0.8"],
+      "when": [
+        "hp_percent < 0.8"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.15, "turns": 1, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.15,
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。 ⚠ 2026-10-31：补 `on_any: [\"HP_LOST\"]` 后重测。",
+      "on_any": [
+        "HP_LOST"
+      ]
     }
   ],
   "3": [
     {
       "on": "TURN_START",
       "id": "cone20016_crit_below_threshold",
-      "when": ["hp_percent < 0.8"],
+      "when": [
+        "hp_percent < 0.8"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.18, "turns": 1, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。 ⚠ 2026-10-31：补 `on_any: [\"HP_LOST\"]` 后重测。",
+      "on_any": [
+        "HP_LOST"
+      ]
     }
   ],
   "4": [
     {
       "on": "TURN_START",
       "id": "cone20016_crit_below_threshold",
-      "when": ["hp_percent < 0.8"],
+      "when": [
+        "hp_percent < 0.8"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.21, "turns": 1, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.21,
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。 ⚠ 2026-10-31：补 `on_any: [\"HP_LOST\"]` 后重测。",
+      "on_any": [
+        "HP_LOST"
+      ]
     }
   ],
   "5": [
     {
       "on": "TURN_START",
       "id": "cone20016_crit_below_threshold",
-      "when": ["hp_percent < 0.8"],
+      "when": [
+        "hp_percent < 0.8"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.24, "turns": 1, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.24,
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "光锥 20016 俱殁: 装备者当前生命值百分比小于unbreak>#1[i]%/unbreak>时，暴击率提高color=#f29e38ff>unbreak>#2[i]%/unbreak>/color>。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data` ✓（12/15/18/21/24% ✓）。⭐ 阈值用 **`hp_percent`** ✓（读**规则拥有者**的生命百分比 ✓，是「关于我自己的事实」✓）。⚠⚠ **本条目判为未完全实现** ✗：句子是**连续条件**，而引擎只在**她自己的回合开始**求值一次 ✓（`TURN_START` ＋ `turns: 1` 的窗口 ✓，读数要在回合内取 ✓）⇒ **掉到 80% 以下的当回合读不到** ✗。⚠ 补采那一半试过 `on_any: [HP_LOST]` ✓：**实测无效** ✗（真实伤害路径与手动 fire 都试过，暴击率一直停在 0.05 ✓）⇒ 撤回该写法并登记 §4.3 ✓（`HP_LOST` 的 `actor` 是**攻击者**、目标是掉血者，而 `hp_percent` 读的是**表的主人** ✓ —— 这条组合为什么没触发，留给下一位查 ✓）。 ⚠ 2026-10-31：补 `on_any: [\"HP_LOST\"]` 后重测。",
+      "on_any": [
+        "HP_LOST"
+      ]
     }
   ]
 }
