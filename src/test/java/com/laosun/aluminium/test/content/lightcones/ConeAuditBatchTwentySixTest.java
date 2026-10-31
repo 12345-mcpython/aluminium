@@ -52,7 +52,8 @@ public class ConeAuditBatchTwentySixTest {
                 - bare.wearer.getAttribute(AttributeType.BREAKING_EFFECT).get();
         System.out.println("[23050] 击破特攻增量 " + breaking + " ; 规则数 " + rules(23050));
         Assertions.assertEquals(0.6, breaking, 1e-9, "「击破特攻提高 60%」—— 属性给一次");
-        Assertions.assertEquals(2, rules(23050), "剩下的两条：弱点回点与终结技重置");
+        Assertions.assertEquals(5, rules(23050),
+                "the weakness skill point, the ultimate reset, and the three break-damage rules (wearer / starter / fallback)");
 
         JsonObject reset = rule(23050, "cone23050_resets_the_weakness_count").getAsJsonArray("do").get(0).getAsJsonObject();
         System.out.println("[23050] 重置: rule=" + reset.get("rule"));
@@ -192,4 +193,5 @@ public class ConeAuditBatchTwentySixTest {
         }
     }
 }
+
 
