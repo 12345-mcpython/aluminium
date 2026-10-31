@@ -74,6 +74,35 @@ public class ConeTwentyThreeThousandFortySevenTest {
     }
 
     /**
+     * 「当有敌方目标陷入装备者施加的负面效果时，有 80% 基础概率使其陷入【魂迷】，持续 3 回合，同类效果无法叠加」.
+     *
+     * <p>The guard {@code !target has_state 魂迷} is not decoration: an {@code APPLY_BUFF} with a {@code base_chance} goes through
+     * {@code DebuffService.tryApply}, which fires {@code DEBUFF_APPLIED} again after adding the buff - so without it the rule meets
+     * its own application (measured: 「Trigger recursion exceeded 8 levels」, with the state correctly on the enemy).
+     */
+    @Test
+    public void myNegativeEffectHasAChanceToCharmTheTarget() {
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23047, LEVEL, false, 1));
+        Character ally = CharacterFactory.create(1001, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(wearer, ally)), new ArrayList<>(List.of(enemy)),
+                BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.DEBUFF_APPLIED, ally, enemy, 0, 0));
+        battle.processRequests();
+        Assertions.assertFalse(enemy.getBuffManager().hasState("魂迷"),
+                "「装备者施加的负面效果」- a TEAMMATE's debuff does not charm");
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.DEBUFF_APPLIED, wearer, enemy, 0, 0));
+        battle.processRequests();
+        Assertions.assertTrue(enemy.getBuffManager().hasState("魂迷"),
+                "her own debuff has an 80% base chance, and the generator rolled low");
+    }
+
+    /**
      * 「受到我方目标攻击时，使<b>攻击者</b>速度提高 10%，持续 3 回合」 - the attacker, not the wearer.
      */
     @Test

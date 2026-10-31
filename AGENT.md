@@ -840,7 +840,10 @@ Trigger recursion exceeded 8 levels while firing DEBUFF_APPLIED; a trigger table
 两道候选门都试过、都**没挡住**：
 - `!target has_state 魂迷`（`tryApply` 里 `addBuff` 在 `bus.fire` **之前**，理论上该变假）⇒ 仍然递归；
 - 再加 `once_per_turn: 1` ⇒ 仍然递归（说明该上限的登记发生在效果执行**之后**，拦不住同一链内的重入）。
-⇒ 下一步要查的是 `applyState` 的这条路：`addBuff` 是否真的把 `魂迷` 挂到了 `ctx.target()` 上、以及嵌套时 `ctx.target()` 是谁。
+**结论（同日第三轮，已收）**：递归是**我这个 duplicating 规则**造成的 —— 文件里早就有一条 `cone23047_ensnare` 做同一件事，
+我又加了一条 `cone23047_soul_charm_trigger`，两条互相接住对方 ⇒ 8 层。删掉重复的那条、并给**原有的**规则补上
+`!target has_state 魂迷`（探针已证：`tryApply` 里 `addBuff` 在 `bus.fire` 之前，状态确实先落地），递归消失、判据转绿。
+⇒ 教训：**先看文件里有没有同名的规则**，再怀疑引擎。
 
 #### ⛔ 129 的笑点阶梯：计数器是队级的，但**没有"全局声明"的地方**（2026-10-31 实测）
 
