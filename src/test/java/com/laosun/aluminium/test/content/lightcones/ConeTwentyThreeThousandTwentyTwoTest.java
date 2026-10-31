@@ -73,9 +73,9 @@ public class ConeTwentyThreeThousandTwentyTwoTest {
 
         run.hitWhileCarrying("灼烧");
         Assertions.assertEquals(2, run.seer(), "a different type pays again");
-        // 「每层使攻击力提高 5%」 - the direction is right, the ARITHMETIC is not: two layers measured x1.078125, not x1.10.
-        // That is a real open question (the `per_stack` modifier is re-written per firing and the same-kind rule may be
-        // replacing rather than summing), so this pins only "it rises" and the status row carries the gap.
+        // 「每层使攻击力提高 5%」 - the DIRECTION holds, the arithmetic does not. Measured: two layers read x1.078125 with
+        // `per_stack` and x1.03906 with `per_stack_live`; the sentence wants x1.10. Both numbers are in the status row - this
+        // pins only what is true today, so the gap cannot be mistaken for a pass.
         Assertions.assertTrue(run.attack() > base, "「每层使攻击力提高 5%」 - the attack is raised");
     }
 }
