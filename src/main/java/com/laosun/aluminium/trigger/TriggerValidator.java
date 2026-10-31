@@ -208,7 +208,22 @@ final class TriggerValidator {
                             + " read it; an op that ignores it would silently apply to every element "
                             + "(source: " + spec.getSource() + ")");
         }
-        // `skills` is RAISE_SKILL_LEVEL's plural spelling; on every other op it would be dropped silently, which is
+        // `from_self` narrows a damage-taken zone to the owner's own damage. Only MODIFY_DAMAGE_TAKEN reads it, and only
+        // its VULNERABILITY arm does: a negative share builds a ReductionBuff, which has no source filter, so accepting it
+        // there would silently ignore the scope.
+        if (effect.getFromSelf() != null) {
+            if (!"MODIFY_DAMAGE_TAKEN".equals(op)) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states \"from_self\", but only MODIFY_DAMAGE_TAKEN reads it: it narrows a "
+                                + "damage-taken zone to the damage the rule owner dealt (source: " + spec.getSource() + ")");
+            }
+            if (effect.getPercent() != null && effect.getPercent() < 0) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states \"from_self\" with a negative share (" + effect.getPercent()
+                                + "), but the reduction arm has no attacker filter; state a positive share for a "
+                                + "vulnerability (source: " + spec.getSource() + ")");
+            }
+        }        // `skills` is RAISE_SKILL_LEVEL's plural spelling; on every other op it would be dropped silently, which is
         // the same failure the two scope guards above close.
         if (effect.getSkills() != null && !"RAISE_SKILL_LEVEL".equals(op)) {
             throw new IllegalArgumentException(

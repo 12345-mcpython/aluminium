@@ -1634,7 +1634,8 @@ public final class TriggerInterpreter {
             AbstractBuff zone = withSource(TriggerLifetimes.withTickOwner(TriggerLifetimes.withLifetime(percent > 0
                     // ⚠ The element scope goes to the VULNERABILITY branch only: measured, `ReductionBuff` has no scope
                     // field and no guard at all -- only the vulnerability half ever scoped.
-                    ? new VulnerabilityBuff(turns, percent, permanent, scope, elementScope)
+                    ? new VulnerabilityBuff(turns, percent, permanent, scope, elementScope,
+                            Boolean.TRUE.equals(effect.getFromSelf()) ? ctx.owner() : null)
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
             // Note: `withTickOwner` joined this chain on. It was missing, so `ticks_on` was a SILENT no-op on
             // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant

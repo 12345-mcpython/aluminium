@@ -146,6 +146,7 @@ public class EffectSpec {
         copy.cooldown = this.cooldown;
         copy.damageType = this.damageType;
         copy.scopeElement = this.scopeElement;
+        copy.fromSelf = this.fromSelf;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -589,6 +590,18 @@ public class EffectSpec {
      */
     @SerializedName("scope_element")
     private String scopeElement;
+
+    /**
+     * For a damage-taken zone: whether only the damage <b>caused by the rule's owner</b> is affected, e.g. 「受到装备者造成的
+     * 击破伤害提高 24%」 (light cone 23025).
+     *
+     * <p>⚠ A scope of its own, like {@code scope_element}: the sentence narrows by <b>who dealt it</b>, which neither the
+     * damage type nor the element can say. Read by {@code MODIFY_DAMAGE_TAKEN} only, and only on the zone arm (an
+     * instance share already knows whose instance it is). {@code null} -- every rule written before it -- means any
+     * attacker, exactly as before.
+     */
+    @SerializedName("from_self")
+    private Boolean fromSelf;
 
     /**
      * Duration in turns, where the op needs one.
