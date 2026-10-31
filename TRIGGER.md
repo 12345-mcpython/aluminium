@@ -544,6 +544,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 ⚠ `element` 与 `damage_type` 是两个问题：前者是火/冰/雷，后者是 DoT/击破/追加；可以同时出现。
 ⚠ `scope_element` 只被 `MODIFY_DAMAGE_TAKEN` 读，是另一个字段，不是复用 `element`。
 ⚠ 实例路径的 `MODIFY_DAMAGE_TAKEN` 也收**负** `percent`：负 = 这一发**减伤**（进 Reduction 区），正 = 易伤（读者：光锥 24002）。
+⚠ 易伤区（正 `percent`、非实例）可加 **`from_self: true`**：只对**规则拥有者造成**的伤害生效（读者：光锥 23025）；它与 `damage_type` / `scope_element` 叠加收窄。负份额不接受它（减伤区没有来源过滤，装载期拒绝）。
 
 ---
 

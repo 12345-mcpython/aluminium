@@ -1226,7 +1226,7 @@ gate the rule with `self_summon_count >= 1` so it only fires when there is one
   - **「助战技」不是技能类** ✗：`from_skill` 闭集只有 COMMON/SKILL/ULTRA/TALENT ✓。读者：**23060**。见证：`ConeAuditBatchTwentySevenTest` ✓。
   - **「就地升级一个状态」没有拼法** ✗：`APPLY_BUFF` 只能新增 ✓。读者：**23029**（【卸甲】→【穷寇】）、**23047**（【魂迷】三条内部效果）。见证：各批 ✓。
   - **「每场 1 次 + 终结技重置」的旗标不可复位** ✗：`once_per_battle` 不能复位 ✓（`RESET_TRIGGER_LIMIT` 只对**规则级**限流有效 ✓）。读者：**23040**（忆灵消失）。见证：`ConeAuditBatchTwentyFourTest` ✓。
-  - **「击破伤害」这一层只有在 `damage_type` 上才认** ✓（`BREAK` ✓，23025/23035 用它 ✓）；但**「受到的击破伤害」若要与「来自某人」叠加**仍不行 ✗（读者 **23025** ✓）。
+  - ⭐ **已解决（2026-10-31）**：「**受到的击破伤害** + **来自某人**」—— `damage_type: BREAK` ✓ 与新字段 **`from_self: true`** ✓（易伤区在结算时比 `damage.getAttacker()`，`VulnerabilityBuff` 的来源过滤 ✓）可以叠加；读者 **23025** ✓；判据 `ConeTwentyThreeThousandTwentyFiveTest` ✓。
   - **⭐ 已解决的旧登记** ✓：**「这次施放花了多少能量」** —— 变量 **`cast_energy_spent`** 已存在 ✓（读者 **23062** ✓），所以 **23037** 的同类句子可以**下次直接写** ✓（不必再登记 ✓）。
 
 - **`DamageType` 给不出"规则身份"** ✗：`Damage` 上没有规则 id、也没有目标选择器 ⇒ "这条天赋伤害是哪个规则发的"在**类型这一层**区分不了 ✓ ⇒ 不猜 ✓（§6.8(d) 的 TALENT 讨论 ✓）。
