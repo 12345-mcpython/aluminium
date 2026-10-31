@@ -2513,12 +2513,10 @@ public final class TriggerInterpreter {
             return;
         }
         battle.applyAdditionalDamage(attacker, victim, TriggerMagnitudes.elementOf(effect, skill, attacker), settledBase,
-                effect.getCritRate(), effect.getCritDamage(), damageType,
-                // The rule may state that this instance is a "follow-up attack": `applyAdditionalDamage` fires FOLLOW_UP without a
-                // category, so the instance has to carry it for a listener to be able to ask.
-                effect.getCastCategory() == null || effect.getCastCategory().isBlank()
-                        ? null
-                        : com.laosun.aluminium.enums.SkillCategory.fromString(effect.getCastCategory().trim()));
+                effect.getCritRate(), effect.getCritDamage(), damageType, effect.getCastCategory() == null
+                        || effect.getCastCategory().isBlank() ? null
+                        : com.laosun.aluminium.enums.SkillCategory.fromString(effect.getCastCategory().trim()),
+                Boolean.TRUE.equals(effect.getUnboosted()));
     }
 
 

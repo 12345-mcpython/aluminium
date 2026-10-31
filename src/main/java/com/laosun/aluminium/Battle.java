@@ -3022,7 +3022,22 @@ public class Battle {
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
                                         Double fixedCritRate, Double fixedCritDamage, DamageType type,
                                         com.laosun.aluminium.enums.SkillCategory castCategory) {
+        return applyAdditionalDamage(attacker, target, element, base, fixedCritRate, fixedCritDamage, type, castCategory, false);
+    }
+
+    /**
+     * The same, with the instance optionally exempt from the damage-boost zone ({@code unboosted}).
+     *
+     * @param unboosted {@code true} for 「该伤害不受加成影响」 - the share is stated and takes no boost
+     */
+    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
+                                        Double fixedCritRate, Double fixedCritDamage, DamageType type,
+                                        com.laosun.aluminium.enums.SkillCategory castCategory, boolean unboosted) {
         Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base, castCategory);
+        if (unboosted) {
+            // 「该伤害不受加成影响」 (light cone 23013's rider): the share is stated, so it takes no boost zone.
+            extra.skipsBoostZone();
+        }
         if (fixedCritRate != null) {
             // Note: A rate of 0.0 means "never crits" and must not REPORT a crit either: the flag is what
             // CRIT_DEALT and `isCrit` read, so `fixedCrit(true, 0)` would multiply by 1.0 (numerically the same
