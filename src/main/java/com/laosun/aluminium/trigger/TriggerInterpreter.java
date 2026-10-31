@@ -2418,7 +2418,9 @@ public final class TriggerInterpreter {
         // `base x (percent + term) / percent` is exactly the share the sentence describes - and it leaves every other row
         // (no `percent_per_ally_state`) untouched.
         Double perAlly = effect.getPercentPerAllyState();
-        if (perAlly != null && effect.getAllyState() != null && !effect.getAllyState().isBlank()
+        boolean statesTheCountedState = (effect.getAllyState() != null && !effect.getAllyState().isBlank())
+                || (effect.getAllyStates() != null && !effect.getAllyStates().isEmpty());
+        if (perAlly != null && statesTheCountedState
                 && base != 0 && effect.getPercent() != null && effect.getPercent() > 0) {
             double term = TriggerMagnitudes.allyStateTerm(effect, ctx);
             if (term != 0) {

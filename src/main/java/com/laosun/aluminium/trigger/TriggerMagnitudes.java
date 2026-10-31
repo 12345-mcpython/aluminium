@@ -500,8 +500,19 @@ final class TriggerMagnitudes {
      * @return the term to add to the share, in the same units
      */
     public static double allyStateTerm(EffectSpec effect, TriggerContext ctx) {
-        if (effect.getPercentPerAllyState() == null || effect.getAllyState() == null
-                || effect.getAllyState().isBlank() || ctx == null || ctx.battle() == null) {
+        java.util.List<String> names = new java.util.ArrayList<>();
+        if (effect.getAllyStates() != null) {
+            for (String each : effect.getAllyStates()) {
+                if (each != null && !each.isBlank()) {
+                    names.add(each.trim());
+                }
+            }
+        }
+        if (effect.getAllyState() != null && !effect.getAllyState().isBlank()) {
+            names.add(effect.getAllyState().trim());
+        }
+        if (effect.getPercentPerAllyState() == null || names.isEmpty()
+                || ctx == null || ctx.battle() == null) {
             return 0;
         }
         int count = 0;
@@ -509,7 +520,15 @@ final class TriggerMagnitudes {
             if (ally.isDeath() || ally.getBuffManager() == null) {
                 continue;
             }
-            if (ally.getBuffManager().hasState(effect.getAllyState().trim())) {
+            // A state counts whether it is carried as a plain StateBuff or as STACKS (the sky ode is a stack: 2 per grant).
+            boolean marked = false;
+            for (String name : names) {
+                if (ally.getBuffManager().hasState(name) || ally.getBuffManager().stacksOf(name) > 0) {
+                    marked = true;
+                    break;
+                }
+            }
+            if (marked) {
                 count++;
             }
         }

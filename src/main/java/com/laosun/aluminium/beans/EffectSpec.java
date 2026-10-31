@@ -103,6 +103,7 @@ public class EffectSpec {
         copy.percentPerAllyState = this.percentPerAllyState;
         copy.allyState = this.allyState;
         copy.allyStateCap = this.allyStateCap;
+        copy.allyStates = this.allyStates == null ? null : new java.util.ArrayList<>(this.allyStates);
         copy.amountFromSkillParam = this.amountFromSkillParam;
         copy.amountFrom = NumberProviders.copyOf(this.amountFrom);
         copy.amountFromCastParam = this.amountFromCastParam;
@@ -1024,6 +1025,14 @@ public class EffectSpec {
     /** The state counted by {@link #percentPerAllyState}: one ally character counts once, however many stacks it has. */
     @SerializedName("ally_state")
     private String allyState;
+
+    /**
+     * Several states, <b>any</b> of which marks the ally - the faithful reading of 1415's Eidolon 2, whose 「增益效果」
+     * is per character: 风堇 holds 「献予「天空」之诗」, 昔涟 「献予「真我」之诗」, 长夜月 「献予「岁月」之诗」, and an ally with no
+     * ode of its own (知更鸟•晴歌) holds none - which is why the recorded fight counts three of four.
+     */
+    @SerializedName("ally_states")
+    private java.util.List<String> allyStates;
 
     /** The cap on the count above (the Eidolon states four allies = +24%). */
     @SerializedName("ally_state_cap")
