@@ -16,6 +16,58 @@
       ],
       "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
       "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.16（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.12、上限 4 层。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_def_ignore_window_at_battle_start",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 这里是那个窗口(两处授予: 开战与普攻后)",
+      "note": "窗口用带时长的状态表示; 真正的作用在 DEALING_DAMAGE 规则里按 CAST 类别施加"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23028_def_ignore_window_after_a_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 窗口的第二次授予(普攻后)",
+      "note": "与开战那条同一个状态名, 所以普攻会刷新窗口, 与句子的 战斗开始时和...普攻后 一致"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_ultimate",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 20% 的防御",
+      "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
     }
   ],
   "2": [
@@ -35,6 +87,58 @@
       ],
       "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
       "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.19（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.14、上限 4 层。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_def_ignore_window_at_battle_start",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 这里是那个窗口(两处授予: 开战与普攻后)",
+      "note": "窗口用带时长的状态表示; 真正的作用在 DEALING_DAMAGE 规则里按 CAST 类别施加"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23028_def_ignore_window_after_a_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 窗口的第二次授予(普攻后)",
+      "note": "与开战那条同一个状态名, 所以普攻会刷新窗口, 与句子的 战斗开始时和...普攻后 一致"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_ultimate",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.24,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 24% 的防御",
+      "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
     }
   ],
   "3": [
@@ -54,6 +158,58 @@
       ],
       "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
       "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.22（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.16、上限 4 层。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_def_ignore_window_at_battle_start",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 这里是那个窗口(两处授予: 开战与普攻后)",
+      "note": "窗口用带时长的状态表示; 真正的作用在 DEALING_DAMAGE 规则里按 CAST 类别施加"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23028_def_ignore_window_after_a_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 窗口的第二次授予(普攻后)",
+      "note": "与开战那条同一个状态名, 所以普攻会刷新窗口, 与句子的 战斗开始时和...普攻后 一致"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_ultimate",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.28,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 28% 的防御",
+      "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
     }
   ],
   "4": [
@@ -73,6 +229,58 @@
       ],
       "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
       "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.25（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.18、上限 4 层。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_def_ignore_window_at_battle_start",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 这里是那个窗口(两处授予: 开战与普攻后)",
+      "note": "窗口用带时长的状态表示; 真正的作用在 DEALING_DAMAGE 规则里按 CAST 类别施加"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23028_def_ignore_window_after_a_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 窗口的第二次授予(普攻后)",
+      "note": "与开战那条同一个状态名, 所以普攻会刷新窗口, 与句子的 战斗开始时和...普攻后 一致"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_ultimate",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.32,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 32% 的防御",
+      "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
     }
   ],
   "5": [
@@ -92,6 +300,58 @@
       ],
       "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
       "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.28（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.20、上限 4 层。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_def_ignore_window_at_battle_start",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 这里是那个窗口(两处授予: 开战与普攻后)",
+      "note": "窗口用带时长的状态表示; 真正的作用在 DEALING_DAMAGE 规则里按 CAST 类别施加"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "cone23028_def_ignore_window_after_a_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "偏偏希望无价之视",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 第二句: 战斗开始时和装备者施放普攻后, 使终结技或追加攻击造成的伤害无视目标 #6% 的防御, 持续 #7 回合 -- 窗口的第二次授予(普攻后)",
+      "note": "与开战那条同一个状态名, 所以普攻会刷新窗口, 与句子的 战斗开始时和...普攻后 一致"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23028_def_ignore_on_the_ultimate",
+      "when": [
+        "actor == self",
+        "self has_state 偏偏希望无价之视",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.36,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23028 第二句的作用面: 窗口内且只对这一发终结技, 无视目标 36% 的防御",
+      "note": "按 CAST 类别圈定: from_category ULTRA + instance true. 追加攻击那一半仍未表达, 因为 SkillCategory 没有 FOLLOW_UP"
     }
   ]
 }
