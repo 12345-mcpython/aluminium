@@ -4,10 +4,16 @@
       "on": "BATTLE_START",
       "id": "cone20019_party_speed",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 12.0, "turns": 1, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 12.0,
+          "turns": 2,
+          "target": "all_allies"
+        }
       ],
       "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。 ⚠ 2026-10-31：`turns` 写 **2** 才是「持续 1 回合」——这条 buff 在**开战前**授予，她的第一个回合开场那个边界会白花掉一回合（与 20000/20004 同一情形）。判据 `ConeTwoThousandNineteenTest`。"
     }
   ],
   "2": [
@@ -15,10 +21,16 @@
       "on": "BATTLE_START",
       "id": "cone20019_party_speed",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 14.0, "turns": 1, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 14.0,
+          "turns": 2,
+          "target": "all_allies"
+        }
       ],
       "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。 ⚠ 2026-10-31：`turns` 写 **2** 才是「持续 1 回合」——这条 buff 在**开战前**授予，她的第一个回合开场那个边界会白花掉一回合（与 20000/20004 同一情形）。判据 `ConeTwoThousandNineteenTest`。"
     }
   ],
   "3": [
@@ -26,10 +38,16 @@
       "on": "BATTLE_START",
       "id": "cone20019_party_speed",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 16.0, "turns": 1, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 16.0,
+          "turns": 2,
+          "target": "all_allies"
+        }
       ],
       "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。 ⚠ 2026-10-31：`turns` 写 **2** 才是「持续 1 回合」——这条 buff 在**开战前**授予，她的第一个回合开场那个边界会白花掉一回合（与 20000/20004 同一情形）。判据 `ConeTwoThousandNineteenTest`。"
     }
   ],
   "4": [
@@ -37,10 +55,16 @@
       "on": "BATTLE_START",
       "id": "cone20019_party_speed",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 18.0, "turns": 1, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 18.0,
+          "turns": 2,
+          "target": "all_allies"
+        }
       ],
       "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。 ⚠ 2026-10-31：`turns` 写 **2** 才是「持续 1 回合」——这条 buff 在**开战前**授予，她的第一个回合开场那个边界会白花掉一回合（与 20000/20004 同一情形）。判据 `ConeTwoThousandNineteenTest`。"
     }
   ],
   "5": [
@@ -48,10 +72,16 @@
       "on": "BATTLE_START",
       "id": "cone20019_party_speed",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 20.0, "turns": 1, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 20.0,
+          "turns": 2,
+          "target": "all_allies"
+        }
       ],
       "source": "光锥 20019 调和: 进入战斗时，我方全体速度提高#1[i]点，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条触发在**战斗中**发生 ✓、不依赖\"开战瞬间的生命/状态\" ✓ ⇒ **真实流程可驱动** ✓。⚠ 事件必须以**实际目标**触发 ✓（第 129/270 轮实测 ✓）。 ⚠ 文档写的是「提高 #1 **点**」⇒ 用 **`amount`（点数）** ✓，**不是 `percent`** ✗。 ⚠ 2026-10-31：`turns` 写 **2** 才是「持续 1 回合」——这条 buff 在**开战前**授予，她的第一个回合开场那个边界会白花掉一回合（与 20000/20004 同一情形）。判据 `ConeTwoThousandNineteenTest`。"
     }
   ]
 }
