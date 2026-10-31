@@ -1,7 +1,97 @@
 {
-  "1": [],
-  "2": [],
-  "3": [],
-  "4": [],
-  "5": []
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_crit_damage_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.12,
+          "per_steps": "CRIT_ATTACK-1.2:0.2",
+          "per_steps_cap": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.16（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.12、上限 4 层。"
+    }
+  ],
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_crit_damage_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.14,
+          "per_steps": "CRIT_ATTACK-1.2:0.2",
+          "per_steps_cap": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.19（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.14、上限 4 层。"
+    }
+  ],
+  "3": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_crit_damage_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.16,
+          "per_steps": "CRIT_ATTACK-1.2:0.2",
+          "per_steps_cap": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.22（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.16、上限 4 层。"
+    }
+  ],
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_crit_damage_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.18,
+          "per_steps": "CRIT_ATTACK-1.2:0.2",
+          "per_steps_cap": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.25（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.18、上限 4 层。"
+    }
+  ],
+  "5": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone23028_crit_damage_stair",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "FOLLOW_UP_DAMAGE_BOOST",
+          "percent": 0.2,
+          "per_steps": "CRIT_ATTACK-1.2:0.2",
+          "per_steps_cap": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23028 偏偏希望无价:「使装备者的暴击率提高 #1%。当装备者在战斗中暴击伤害大于 #2% 时，每超过 #3%，追加攻击造成的伤害提高 #4%，该效果可叠加 #5 层。」",
+      "note": "「战斗中暴击伤害大于 #2% 时，每超过 #3%」= per_steps 的阈值形式 CRIT_ATTACK-阈值:步长（数据里 1.2 / 0.2 ✓）。第二句「使终结技或追加攻击造成的伤害无视目标 #6% 的防御，持续 #7 回合」仍未表达：引擎的 DEFENCE_IGNORE 没有按技能类别限定的拼法（只有 damage_type 这个伤害类型维度，而终结技/追加攻击是 CAST 类别），不拿全局破防冒充。 数值：暴击率 0.28（光锥属性）、阈值 1.2、步长 0.2、每层追加攻击 +0.20、上限 4 层。"
+    }
+  ]
 }

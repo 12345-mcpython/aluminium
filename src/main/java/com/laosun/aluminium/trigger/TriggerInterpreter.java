@@ -2260,7 +2260,11 @@ public final class TriggerInterpreter {
          * steps ABOVE the line, so 110 is one layer and 100 is none (light cone 23001 于夜色中).
          */
         int wholeSteps(TriggerContext ctx) {
-            return (int) Math.floor(Math.max(0, counterValue(counter, ctx) - threshold) / step);
+            // The epsilon is NOT slack: shares are stored as doubles, so 「暴击伤害 140% 超过 120% 每 20% 一层」 computes 1.4 - 1.2 as
+            // 0.19999999999999996, and a bare floor would read ZERO layers at the exact step (measured on 23028). It is far smaller
+            // than any step this vocabulary is used with, so it cannot invent a layer that the data does not grant.
+            double steps = Math.max(0, counterValue(counter, ctx) - threshold) / step;
+            return (int) Math.floor(steps + 1e-9);
         }
     }
 
