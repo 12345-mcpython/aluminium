@@ -263,6 +263,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `enemy_count` / `ally_count` | 场上敌我数量 |
 | `map_attacker_count` | 除装备者外、本场「开战」的队友数（地图攻击的发起者）|
 | `last_elation_skill_id` | 自己上一次**施放完成的欢愉技**的槽位（0 = 还没施放过）；与 `from_skill_id` 比较可写「与上一次不同」|
+| `self_cid` | 自己的角色 id（光锥里写「某角色装备时」的门）|
 | `skill_point_max` / `skill_point` | 战技点上限 / 当前战技点 |
 | `eidolon` | 星魂等级 |
 | `from_skill_id` / `damage_skill_key` | 技能 id / key |
