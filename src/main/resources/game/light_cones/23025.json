@@ -10,7 +10,7 @@
         { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
-      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
     },
     {
       "on": "BREAK",
@@ -21,6 +21,23 @@
       ],
       "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_break_vulnerability",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.24,
+          "damage_type": "BREAK",
+          "from_self": true,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv1 #2 = 0.24、#4 = 2",
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "2": [
@@ -32,7 +49,7 @@
         { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
-      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
     },
     {
       "on": "BREAK",
@@ -43,6 +60,23 @@
       ],
       "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_break_vulnerability",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.28,
+          "damage_type": "BREAK",
+          "from_self": true,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv2 #2 = 0.28、#4 = 2",
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "3": [
@@ -54,7 +88,7 @@
         { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
-      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
     },
     {
       "on": "BREAK",
@@ -65,6 +99,23 @@
       ],
       "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_break_vulnerability",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.32,
+          "damage_type": "BREAK",
+          "from_self": true,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv3 #2 = 0.32、#4 = 2",
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "4": [
@@ -76,7 +127,7 @@
         { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
-      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
     },
     {
       "on": "BREAK",
@@ -87,6 +138,23 @@
       ],
       "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_break_vulnerability",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.36,
+          "damage_type": "BREAK",
+          "from_self": true,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv4 #2 = 0.36、#4 = 2",
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "5": [
@@ -98,7 +166,7 @@
         { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
-      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。⚠ **同句后半已登记** ✗：「【崩溃】状态下目标**受到装备者造成的击破伤容提高 24%**」—— 实测：**击破伤容按设计不受普通加成** ✗（`DamageType.BREAK` 的 `isBoostable()==false` ✓），所以它必须走 **`BREAK_DAMAGE_BOOST`** ✓（第 29 轮新建 ✓）—— 而那个通道**没有实例槽** ✗，于是\"仅对这一击生效的击破加成\"无法表达 ✗ ⇒ 不写近似 ✓。"
+      "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
     },
     {
       "on": "BREAK",
@@ -109,6 +177,23 @@
       ],
       "source": "光锥 23025: 「【崩溃】状态下…速度降低#3[i]%。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "cone23025_collapse_break_vulnerability",
+      "when": ["actor == self"],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.4,
+          "damage_type": "BREAK",
+          "from_self": true,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv5 #2 = 0.4、#4 = 2",
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ]
 }
