@@ -256,6 +256,32 @@
 那种消失 `DEATH` 收不到 ✓、只有它收得到 ✓。收到它的是**还活着的规则持有者**（离场的那位自己没有表可以动 ✓），
 所以条件写 `actor is_summon` ✓；`target == summon` 在这里会失效 ✗（该选择器拒绝已经不在场的单位 ✓）。
 
+### 4.1 时序：一次施放里谁先谁后（**按代码实测**，2026-10-31）
+
+写「施放时…」的规则时，**选错事件常常表现为"标记来不及被同一发攻击读到"**，而不是报错。下表是引擎的真实顺序，
+出处写在每行后面（`SkillExecutor` / `DamageService` 的行号会漂，看方法名更稳）：
+
+| 顺序 | 事件 | 相对什么 | 谁收到 | 关键事实 |
+|---|---|---|---|---|
+| 1 | `CAST_SETUP` | **命中结算之前** | 我方表 | 带 `from_skill_id`（数据槽）；`SkillExecutor.execute` 在 `resolveHits` **之前**发它 |
+| 2 | `DEALING_DAMAGE` | **在 assemble 内、各 zone 之前** | 双方的 `DamagePayload` | 可以**改写**这一发（后续 zone 都读改写后的数）|
+| 3 | `TAKING_HIT` | HP 已经扣完之后 | 我方表（`fireForAlly`）| 受害者是 `target`、出手方是 `actor` |
+| 4 | `HP_LOST` | 同上，仅当 `hpLoss > 0` | 我方表 | 实际掉血量在事件的 amount |
+| 5 | `DAMAGE_SETTLED` | 结算完毕 | 双方 | 规则块（`share_of: RULE`）读它 |
+| 6 | `DEATH` / `KILL` | 目标阵亡时 | `DEATH` 给场上、`KILL` 带击杀者当 `actor` | |
+| 7 | `ULT_CAST` / `SKILL_CAST` / `BASIC_ATTACK` | **所有命中都结算完之后** | 我方表 | 携带 `hits` 列表与命中数；`from_skill_id` 同样可读 |
+
+⚠ **因此：「施放时给这一发加伤」必须挂 `CAST_SETUP`（或 `DEALING_DAMAGE`），不能挂 `SKILL_CAST`** ——
+后者在伤害**之后**才发，标记赶不上同一发（实测：23039 先写成 `SKILL_CAST`，消耗发生了、加成却是 0）。
+
+⚠ **`AFTERMATH` 那一类事件（`ATTACK_FINISHED` / `ALLY_ATTACK`）在全部命中之后**，适合"这一发打完了再付"的句子。
+
+⚠ **`SUMMON_LEFT` 由 `DeathService` 在清扫时发** ✓，所以"忆灵离场时"的规则读到的是**已经离场**的战场 ✓。
+
+⚠ **`HP_CONSUMED` 由 `CONSUME_HP` 这个 op 自己发**（`TriggerInterpreter` 的 CONSUME_HP 分支），事件主体是付代价的人。
+⚠⚠ **实测异常（2026-10-31，未解决）**：23039 想用它做「消耗 > 500 额外加伤」，一条手发的 `HP_CONSUMED(1000)` 也没能让
+那条规则开火。**先别把它当成可靠入口**，要用时先写探针确认（细节见 `AGENT.md` 的同日条目）。
+
 ⚠ **`BATTLE_START` 是最常用的一类** ✓ —— 秘技（`self has_state 秘技`）、星魂等级声明、开战加攻都属于它 ✓
 ⚠ 而它的效果**在任何回合开始之前结算** ✓ —— 前端要记得把这段写进日志 ✓（本项目为此专门修过一次 ✓）
 
