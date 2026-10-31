@@ -1,3 +1,7 @@
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import groovy.xml.XmlSlurper
+
 plugins {
     id 'java'
     id 'application'
@@ -171,7 +175,7 @@ tasks.register('gate') {
         int tests = 0
         int failures = 0
         results.each { f ->
-            def suite = new groovy.xml.XmlSlurper().parse(f)
+            def suite = new XmlSlurper().parse(f)
             tests += (suite.@tests.text() as int)
             failures += (suite.@failures.text() as int) + (suite.@errors.text() as int)
         }
@@ -253,4 +257,50 @@ tasks.named('javadoc') {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+// The trigger source files keep their annotations -- that is what authors edit and what the content guards read from
+// `src/main/resources`. The RUNTIME copy on the classpath drops the long annotation text, because no engine path reads
+// it. `source` stays: load failures quote it.
+//
+// ⚠ This runs on processResources output, not on the sources. A test that wants the annotation reads the source path
+// (ContentProvenanceTest, March7thFormatMigrationTest); a test that loads the table sees the stripped copy.
+tasks.named('processResources') {
+    doLast {
+        def annotationKeys = ['_note', '_source', '_status', '_gaps', '_divergences',
+                              '_changelog', '_literal_reason', '_comment']
+        def ruleOrEffect = { Map node ->
+            node.containsKey('op')
+                    || (node.containsKey('do') && (node.containsKey('on') || node.containsKey('on_any')))
+        }
+        def strip
+        strip = { node ->
+            if (node instanceof Map) {
+                annotationKeys.each { node.remove(it) }
+                // Legacy `note` is an annotation on a RULE / EFFECT. A resource declaration's `note` is a
+                // ResourceSpec field (runtime), so it must stay.
+                if (ruleOrEffect(node)) {
+                    node.remove('note')
+                }
+                node.values().each { strip(it) }
+            } else if (node instanceof List) {
+                node.each { strip(it) }
+            }
+        }
+        def destination = destinationDir
+        ['characters', 'light_cones', 'relic_sets'].each { sub ->
+            def dir = new File(destination, "game/${sub}")
+            if (!dir.isDirectory()) {
+                return
+            }
+            dir.eachFile { file ->
+                if (!file.name.endsWith('.json')) {
+                    return
+                }
+                def parsed = new JsonSlurper().parse(file, 'UTF-8')
+                strip(parsed)
+                file.setText(JsonOutput.toJson(parsed), 'UTF-8')
+            }
+        }
+    }
 }
