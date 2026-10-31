@@ -16,21 +16,28 @@
           "per_stack": "缅怀",
           "permanent": true,
           "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.08,
+          "per_stack": "缅怀",
+          "permanent": true,
+          "target": "summon"
         }
       ],
       "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
-      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n⛔ **仍开（已登记 §4.3）**：忆灵身上那份「每层增伤」**还没写** ✗ —— `per_stack` 读的是**受修饰者自己的**计数器还是**拥有者的**，尚未量过 ✓（写错会读成主人那 4 层 ✗）⇒ 先只写装备者这一份 ✓，并在判据里钉住它 ✓。"
+      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n✅ **2026-10-31 补完**：忆灵身上那份「每层增伤」用 **`target: summon`** + 同一条 `per_stack: 缅怀` —— `per_stack` 读的是**修饰落点自己**的计数器（`TriggerEffects` 用 effect 的 target 求 factor ✓），所以忆灵读到的是**它自己的层数**，不是主人的 ✓。⚠ 同时发现五档的 `percent` 原来**全是 0.08**（S2–S5 应为 0.09 / 0.10 / 0.11 / 0.12）✗ ⇒ 一并修正 ✓。判据 `ConeTwentyThousandTwentyTwoTest`（两侧层数/增伤、封顶、离场清除）。"
     },
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
       "when": ["actor is_summon"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
-      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
+      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」：**只清装备者** ✓ —— 忆灵的那份随它自己离场（它的 buff 已经不在场上了），而给一个**已经消失**的单位写 `target: summon` 会在解析时抛「no summon on the field」（2026-10-31 实测 ✗）⇒ 只保留 `target: self` ✓，并在判据里钉住「装备者的层数被清空」。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
     }
   ],
   "2": [
@@ -44,25 +51,32 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.08,
+          "percent": 0.09,
           "per_stack": "缅怀",
           "permanent": true,
           "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.09,
+          "per_stack": "缅怀",
+          "permanent": true,
+          "target": "summon"
         }
       ],
       "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
-      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n⛔ **仍开（已登记 §4.3）**：忆灵身上那份「每层增伤」**还没写** ✗ —— `per_stack` 读的是**受修饰者自己的**计数器还是**拥有者的**，尚未量过 ✓（写错会读成主人那 4 层 ✗）⇒ 先只写装备者这一份 ✓，并在判据里钉住它 ✓。"
+      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n✅ **2026-10-31 补完**：忆灵身上那份「每层增伤」用 **`target: summon`** + 同一条 `per_stack: 缅怀` —— `per_stack` 读的是**修饰落点自己**的计数器（`TriggerEffects` 用 effect 的 target 求 factor ✓），所以忆灵读到的是**它自己的层数**，不是主人的 ✓。⚠ 同时发现五档的 `percent` 原来**全是 0.08**（S2–S5 应为 0.09 / 0.10 / 0.11 / 0.12）✗ ⇒ 一并修正 ✓。判据 `ConeTwentyThousandTwentyTwoTest`（两侧层数/增伤、封顶、离场清除）。"
     },
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
       "when": ["actor is_summon"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
-      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
+      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」：**只清装备者** ✓ —— 忆灵的那份随它自己离场（它的 buff 已经不在场上了），而给一个**已经消失**的单位写 `target: summon` 会在解析时抛「no summon on the field」（2026-10-31 实测 ✗）⇒ 只保留 `target: self` ✓，并在判据里钉住「装备者的层数被清空」。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
     }
   ],
   "3": [
@@ -76,25 +90,32 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.08,
+          "percent": 0.1,
           "per_stack": "缅怀",
           "permanent": true,
           "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "per_stack": "缅怀",
+          "permanent": true,
+          "target": "summon"
         }
       ],
       "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
-      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n⛔ **仍开（已登记 §4.3）**：忆灵身上那份「每层增伤」**还没写** ✗ —— `per_stack` 读的是**受修饰者自己的**计数器还是**拥有者的**，尚未量过 ✓（写错会读成主人那 4 层 ✗）⇒ 先只写装备者这一份 ✓，并在判据里钉住它 ✓。"
+      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n✅ **2026-10-31 补完**：忆灵身上那份「每层增伤」用 **`target: summon`** + 同一条 `per_stack: 缅怀` —— `per_stack` 读的是**修饰落点自己**的计数器（`TriggerEffects` 用 effect 的 target 求 factor ✓），所以忆灵读到的是**它自己的层数**，不是主人的 ✓。⚠ 同时发现五档的 `percent` 原来**全是 0.08**（S2–S5 应为 0.09 / 0.10 / 0.11 / 0.12）✗ ⇒ 一并修正 ✓。判据 `ConeTwentyThousandTwentyTwoTest`（两侧层数/增伤、封顶、离场清除）。"
     },
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
       "when": ["actor is_summon"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
-      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
+      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」：**只清装备者** ✓ —— 忆灵的那份随它自己离场（它的 buff 已经不在场上了），而给一个**已经消失**的单位写 `target: summon` 会在解析时抛「no summon on the field」（2026-10-31 实测 ✗）⇒ 只保留 `target: self` ✓，并在判据里钉住「装备者的层数被清空」。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
     }
   ],
   "4": [
@@ -108,25 +129,32 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.08,
+          "percent": 0.11,
           "per_stack": "缅怀",
           "permanent": true,
           "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.11,
+          "per_stack": "缅怀",
+          "permanent": true,
+          "target": "summon"
         }
       ],
       "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
-      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n⛔ **仍开（已登记 §4.3）**：忆灵身上那份「每层增伤」**还没写** ✗ —— `per_stack` 读的是**受修饰者自己的**计数器还是**拥有者的**，尚未量过 ✓（写错会读成主人那 4 层 ✗）⇒ 先只写装备者这一份 ✓，并在判据里钉住它 ✓。"
+      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n✅ **2026-10-31 补完**：忆灵身上那份「每层增伤」用 **`target: summon`** + 同一条 `per_stack: 缅怀` —— `per_stack` 读的是**修饰落点自己**的计数器（`TriggerEffects` 用 effect 的 target 求 factor ✓），所以忆灵读到的是**它自己的层数**，不是主人的 ✓。⚠ 同时发现五档的 `percent` 原来**全是 0.08**（S2–S5 应为 0.09 / 0.10 / 0.11 / 0.12）✗ ⇒ 一并修正 ✓。判据 `ConeTwentyThousandTwentyTwoTest`（两侧层数/增伤、封顶、离场清除）。"
     },
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
       "when": ["actor is_summon"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
-      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
+      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」：**只清装备者** ✓ —— 忆灵的那份随它自己离场（它的 buff 已经不在场上了），而给一个**已经消失**的单位写 `target: summon` 会在解析时抛「no summon on the field」（2026-10-31 实测 ✗）⇒ 只保留 `target: self` ✓，并在判据里钉住「装备者的层数被清空」。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
     }
   ],
   "5": [
@@ -140,25 +168,32 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.08,
+          "percent": 0.12,
           "per_stack": "缅怀",
           "permanent": true,
           "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.12,
+          "per_stack": "缅怀",
+          "permanent": true,
+          "target": "summon"
         }
       ],
       "source": "光锥 20022: 「**忆灵的回合开始时**，使装备者和忆灵**分别获得1层【缅怀】**，每层使造成的伤容提高#1[i]%，最多叠加#2[i]层。」",
-      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n⛔ **仍开（已登记 §4.3）**：忆灵身上那份「每层增伤」**还没写** ✗ —— `per_stack` 读的是**受修饰者自己的**计数器还是**拥有者的**，尚未量过 ✓（写错会读成主人那 4 层 ✗）⇒ 先只写装备者这一份 ✓，并在判据里钉住它 ✓。"
+      "_note": "⭐⭐ 「**忆灵的回合开始时**」= `TURN_START` ＋ `actor == summon` ✓；「使装备者和忆灵**分别**获得 1 层」= 两条 `ADD_STACK` ✓（`target: self` ✓ / `target: summon` ✓，`max_stacks: 4` ✓ = 「最多叠加 4 层」✓）。\n⚠⚠ **2026-10-19 逐句核时补的第三件** ✓：「**每层**使造成的伤害提高 #1%」原先**根本没有修饰器** ✗（层数只是数字 ✓）⇒ 加 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST per_stack: 缅怀` ✓（与光锥 20024 同一拼法 ✓）。\n✅ **2026-10-31 补完**：忆灵身上那份「每层增伤」用 **`target: summon`** + 同一条 `per_stack: 缅怀` —— `per_stack` 读的是**修饰落点自己**的计数器（`TriggerEffects` 用 effect 的 target 求 factor ✓），所以忆灵读到的是**它自己的层数**，不是主人的 ✓。⚠ 同时发现五档的 `percent` 原来**全是 0.08**（S2–S5 应为 0.09 / 0.10 / 0.11 / 0.12）✗ ⇒ 一并修正 ✓。判据 `ConeTwentyThousandTwentyTwoTest`（两侧层数/增伤、封顶、离场清除）。"
     },
     {
       "on": "SUMMON_LEFT",
       "id": "cone20022_memorial_removed_when_it_is_killed",
       "when": ["actor is_summon"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "summon" }
+        { "op": "REMOVE_STACK", "buff": "缅怀", "amount": 4, "target": "self" }
       ],
       "source": "光锥 20022 溯忆: 「忆灵的回合开始时，使装备者和忆灵分别获得 1 层【缅怀】，每层使造成的伤害提高 #1%，最多叠加 #2 层。**忆灵消失时**移除装备者和忆灵的【缅怀】。」",
-      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」= **两条** `REMOVE_STACK` ✓（原先只清了装备者 ✗）。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
+      "_note": "⭐⭐ **事件纠正（2026-10-19 逐句核）** ✓：「忆灵**消失**时」是 **`SUMMON_LEFT`** ✓（引擎的「忆灵离场」事件 ✓，在清扫点发、按身份去重 ✓ —— 见 §3.7w），**不是** `KILL` ✗（`CanHit.perish()` **不发** `DEATH` ✓）：忆灵被击杀只是它消失的一种 ✓，被替换/离场也走这条路 ✓。\n⚠ 「移除**装备者和忆灵**的【缅怀】」：**只清装备者** ✓ —— 忆灵的那份随它自己离场（它的 buff 已经不在场上了），而给一个**已经消失**的单位写 `target: summon` 会在解析时抛「no summon on the field」（2026-10-31 实测 ✗）⇒ 只保留 `target: self` ✓，并在判据里钉住「装备者的层数被清空」。\n⚠ 门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 这条事件的单位**正是刚离场的那一个**，而 `target == summon` 会按 `isDeath()` 过滤 ⇒ 当场抛错 ✓（§3.7w 的同一坑 ✓）。"
     }
   ]
 }
