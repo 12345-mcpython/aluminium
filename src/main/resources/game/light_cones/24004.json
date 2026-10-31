@@ -10,7 +10,35 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.08, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
-      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.08 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
+      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.08 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n✅ 后半已写：`cone24004_attack_per_hit_aura`（`per_stack_live` 读 `self_stacks:演算`，每次读属性重读层数）+ `cone24004_attack_per_hit_stacks`（`ATTACK_FINISHED` 时**先清旧层、再按 `hit_count` 叠新层**，`max_stacks: 5`）✓ —— 「持续到下次攻击后」不需要 `until: next_attack`，事件顺序本身就是那个窗口 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone24004_attack_per_hit_aura",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.04,
+          "per_stack": "self_stacks:演算",
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv1 #2 = 0.04",
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone24004_attack_per_hit_stacks",
+      "when": ["actor == self"],
+      "do": [
+        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv1 #2 = 0.04",
+      "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
     }
   ],
   "2": [
@@ -22,7 +50,35 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.1, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
-      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.1 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
+      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.1 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n✅ 后半已写：`cone24004_attack_per_hit_aura`（`per_stack_live` 读 `self_stacks:演算`，每次读属性重读层数）+ `cone24004_attack_per_hit_stacks`（`ATTACK_FINISHED` 时**先清旧层、再按 `hit_count` 叠新层**，`max_stacks: 5`）✓ —— 「持续到下次攻击后」不需要 `until: next_attack`，事件顺序本身就是那个窗口 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone24004_attack_per_hit_aura",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "per_stack": "self_stacks:演算",
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv2 #2 = 0.05",
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone24004_attack_per_hit_stacks",
+      "when": ["actor == self"],
+      "do": [
+        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv2 #2 = 0.05",
+      "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
     }
   ],
   "3": [
@@ -34,7 +90,35 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
-      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.12 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
+      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.12 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n✅ 后半已写：`cone24004_attack_per_hit_aura`（`per_stack_live` 读 `self_stacks:演算`，每次读属性重读层数）+ `cone24004_attack_per_hit_stacks`（`ATTACK_FINISHED` 时**先清旧层、再按 `hit_count` 叠新层**，`max_stacks: 5`）✓ —— 「持续到下次攻击后」不需要 `until: next_attack`，事件顺序本身就是那个窗口 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone24004_attack_per_hit_aura",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.06,
+          "per_stack": "self_stacks:演算",
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv3 #2 = 0.06",
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone24004_attack_per_hit_stacks",
+      "when": ["actor == self"],
+      "do": [
+        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv3 #2 = 0.06",
+      "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
     }
   ],
   "4": [
@@ -46,7 +130,35 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.14, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
-      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.14 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
+      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.14 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n✅ 后半已写：`cone24004_attack_per_hit_aura`（`per_stack_live` 读 `self_stacks:演算`，每次读属性重读层数）+ `cone24004_attack_per_hit_stacks`（`ATTACK_FINISHED` 时**先清旧层、再按 `hit_count` 叠新层**，`max_stacks: 5`）✓ —— 「持续到下次攻击后」不需要 `until: next_attack`，事件顺序本身就是那个窗口 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone24004_attack_per_hit_aura",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.07,
+          "per_stack": "self_stacks:演算",
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv4 #2 = 0.07",
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone24004_attack_per_hit_stacks",
+      "when": ["actor == self"],
+      "do": [
+        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv4 #2 = 0.07",
+      "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
     }
   ],
   "5": [
@@ -58,7 +170,35 @@
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.16, "turns": 1, "target": "self" }
       ],
       "source": "光锥 24004 无界之思: 使装备者的攻击力提高#1[i]%。施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后，若击中大于等于#3[i]名敌方目标，使自身速度提高#4[i]%，持续#5[i]回合。",
-      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.16 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n⛔ **仍开（已登记 §4.3）**：「施放攻击后，**每击中 1 名敌方目标**攻击再 +4%，最多 5 层，**持续到下次攻击后**」**整句没有** ✗ —— `hit_count` 读得到 ✓，但这条的「持续到下次攻击后」要一个**跨事件的窗口** ✗（`until: next_attack` 有 ✓，可它与「按 hit_count 叠层」的组合在引擎里要写成两层修饰 ✗）⇒ 等价缺口。"
+      "_note": "「若击中大于等于 #3[i]=3 名敌方目标，使自身速度提高 #4[i]%，持续 #5[i]=1 回合」—— ① 事件 ATTACK_FINISHED ✓ 的 hitCount 参数就是**本次命中的目标数** ✓（发送点传的是 targets.size() ✓）⇒ `hit_count >= 3` 正是「击中 ≥3 名」 ✓；② 数值 #4[i] = 0.16 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone24004_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（8% ✓）⇒ 重复会读成两倍 ✗。\n✅ 后半已写：`cone24004_attack_per_hit_aura`（`per_stack_live` 读 `self_stacks:演算`，每次读属性重读层数）+ `cone24004_attack_per_hit_stacks`（`ATTACK_FINISHED` 时**先清旧层、再按 `hit_count` 叠新层**，`max_stacks: 5`）✓ —— 「持续到下次攻击后」不需要 `until: next_attack`，事件顺序本身就是那个窗口 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone24004_attack_per_hit_aura",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.08,
+          "per_stack": "self_stacks:演算",
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv5 #2 = 0.08",
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "cone24004_attack_per_hit_stacks",
+      "when": ["actor == self"],
+      "do": [
+        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv5 #2 = 0.08",
+      "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
     }
   ]
 }
