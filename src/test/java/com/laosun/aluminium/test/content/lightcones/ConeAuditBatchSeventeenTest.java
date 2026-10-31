@@ -79,9 +79,10 @@ public class ConeAuditBatchSeventeenTest {
 
 
     /**
-     * 23001 于夜色中: the crit share is the property, and the speed stair landed on 2026-10-31 as {@code per_steps: "SPEED-100:10"}
-     * (the threshold form). The stair itself is judged in {@code ConeTwentyThreeThousandOneTest}; what this pins is that the file
-     * now carries a rule AND that the crit share is still exactly the property's.
+     * 23001 于夜色中: the crit share is the property, and both stair halves landed on 2026-10-31 - the basic/Skill damage
+     * boost at battle start and the ultimate-only crit damage on the damage instance (both {@code per_steps:
+     * "SPEED-100:10"}). The behaviour is judged in {@code ConeTwentyThreeThousandOneTest}; what this pins is that the file
+     * carries two rules AND that the crit share is still exactly the property's.
      */
     @Test
     public void coneTwoThreeZeroOneCarriesBothHalvesItCanSpell() {
@@ -89,7 +90,8 @@ public class ConeAuditBatchSeventeenTest {
         Fixture bare = new Fixture(null, 1);
         double crit = f.attribute(AttributeType.CRIT_CHANCE) - bare.attribute(AttributeType.CRIT_CHANCE);
         Assertions.assertEquals(0.18, crit, 1e-9, "the crit share comes from the property, once");
-        Assertions.assertEquals(1, ruleCount(23001), "the speed stair is spelled now");
+        Assertions.assertEquals(2, ruleCount(23001),
+                "the speed stair (battle start) and the ultimate's crit-damage stair (per instance)");
     }
 
     /**
@@ -215,3 +217,4 @@ public class ConeAuditBatchSeventeenTest {
         }
     }
 }
+
