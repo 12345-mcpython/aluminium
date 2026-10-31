@@ -149,6 +149,8 @@ public final class RuleAudit {
         if (!report.impliedCounters().isEmpty()) {
             System.out.println("counters a HEAL_TALLY row implies (cast -> value): " + report.impliedCounters());
         }
+        Map<String, Object> stage = onStageCheck(capture);
+        System.out.println("field.on_stage vs what each cast actually hit: " + stage);
         Map<String, java.util.TreeSet<Double>> rates = parentRates(capture);
         if (!rates.isEmpty()) {
             System.out.println("each derived instance's rate against its parent (type|rule -> distinct base/parent):");
@@ -208,6 +210,61 @@ public final class RuleAudit {
                     .add(Math.round(base / parentDamage * 1e9) / 1e9);
         }
         return rates;
+    }
+
+    /**
+     * Whether {@code field.on_stage} equals the set of enemies that cast actually hit.
+     *
+     * <p>That is the whole point of the field: it must be the set a skill can <b>reach</b>, so an AoE's victims are exactly
+     * it. A cast whose field lists only the aim point is the {@code targetable} shape, which is a different fact and cannot
+     * drive target selection (measured on the 2026-10-30 21:20 recording: 12 of 17 casts matched, and every mismatch was an
+     * AoE cast whose field held just the aim).
+     *
+     * @param capture the parsed capture
+     * @return {@code {castsWithField, matching, mismatching, examples}}
+     */
+    public static Map<String, Object> onStageCheck(JsonObject capture) {
+        JsonArray events = capture.getAsJsonArray("damage_events");
+        Map<Integer, java.util.Set<Long>> hit = new LinkedHashMap<>();
+        Map<Integer, java.util.Set<Long>> onStage = new LinkedHashMap<>();
+        if (events != null) {
+            for (JsonElement element : events) {
+                JsonObject event = element.getAsJsonObject();
+                if (event.get("cast_index") == null) {
+                    continue;
+                }
+                int cast = event.get("cast_index").getAsInt();
+                hit.computeIfAbsent(cast, key -> new java.util.LinkedHashSet<>())
+                        .add(event.getAsJsonObject("target").get("uid").getAsLong());
+                if (event.has("field") && !event.get("field").isJsonNull()) {
+                    JsonObject field = event.getAsJsonObject("field");
+                    if (field.has("on_stage") && field.get("on_stage").isJsonArray()
+                            && !onStage.containsKey(cast)) {
+                        java.util.Set<Long> uids = new java.util.LinkedHashSet<>();
+                        for (JsonElement uid : field.getAsJsonArray("on_stage")) {
+                            uids.add(uid.getAsLong());
+                        }
+                        onStage.put(cast, uids);
+                    }
+                }
+            }
+        }
+        int matching = 0;
+        java.util.List<String> examples = new java.util.ArrayList<>();
+        for (Map.Entry<Integer, java.util.Set<Long>> each : onStage.entrySet()) {
+            java.util.Set<Long> actually = hit.getOrDefault(each.getKey(), java.util.Set.of());
+            if (each.getValue().equals(actually)) {
+                matching++;
+            } else if (examples.size() < 4) {
+                examples.add("cast " + each.getKey() + " on_stage=" + each.getValue() + " hit=" + actually);
+            }
+        }
+        Map<String, Object> report = new LinkedHashMap<>();
+        report.put("castsWithField", onStage.size());
+        report.put("matching", matching);
+        report.put("mismatching", onStage.size() - matching);
+        report.put("examples", examples);
+        return report;
     }
 
     /**

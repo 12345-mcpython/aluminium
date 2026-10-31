@@ -85,6 +85,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.skills.copyFrom(skills);
     }
 
+    private boolean untargetable;
+
     private final HealthState health = new HealthState();
 
     /**
@@ -92,6 +94,26 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     public double getCurrentHp() {
         return health.hp();
+    }
+
+    /**
+     * Whether this unit is present but cannot be <b>selected</b> as a target right now.
+     *
+     * <p>Distinct from invulnerability: an invulnerable unit still absorbs what reaches it, while an untargetable one is
+     * skipped when a skill picks its victims. Reader: a recorded fight states, per cast, which enemies the skill could reach
+     * ({@code field.on_stage}) - measured: cast 65 of the 2026-10-30 fight hit ONE enemy twice where the replay hit three.
+     *
+     * @return {@code true} when a skill's target selection must skip this unit
+     */
+    public boolean isUntargetable() {
+        return untargetable;
+    }
+
+    /**
+     * @param untargetable whether skills must skip this unit when selecting targets
+     */
+    public void setUntargetable(boolean untargetable) {
+        this.untargetable = untargetable;
     }
 
     /**

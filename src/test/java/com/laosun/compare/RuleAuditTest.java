@@ -92,6 +92,29 @@ public class RuleAuditTest {
     }
 
     /**
+     * {@code field.on_stage} must be the set a cast could REACH - the question it exists to answer.
+     */
+    @Test
+    public void onStageIsTheSetTheCastCouldReach() throws IOException {
+        java.util.Map<String, Object> older = RuleAudit.onStageCheck(
+                RuleAudit.fromResource("/captures/veritas-2026-10-30f.json"));
+        Assertions.assertEquals(0, older.get("castsWithField"),
+                "the 2026-10-30 recordings predate the field, so nothing is claimed: " + older);
+
+        JsonObject shaped = JsonParser.parseString("{\"damage_events\":["
+                + "{\"cast_index\":16,\"target\":{\"uid\":100013},"
+                + "\"field\":{\"on_stage\":[100013,100015]}},"
+                + "{\"cast_index\":16,\"target\":{\"uid\":100015},"
+                + "\"field\":{\"on_stage\":[100013,100015]}},"
+                + "{\"cast_index\":17,\"target\":{\"uid\":100013},"
+                + "\"field\":{\"on_stage\":[100013]}}]}").getAsJsonObject();
+        java.util.Map<String, Object> report = RuleAudit.onStageCheck(shaped);
+        Assertions.assertEquals(2, report.get("castsWithField"));
+        Assertions.assertEquals(2, report.get("matching"), "both casts' fields equal what they hit: " + report);
+        Assertions.assertEquals(0, report.get("mismatching"));
+    }
+
+    /**
      * The captures the project holds do not all state a rule block; the audit says so instead of failing.
      */
     @Test
