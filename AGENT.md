@@ -1222,7 +1222,7 @@ gate the rule with `self_summon_count >= 1` so it only fires when there is one
   - ⭐ **已解决（2026-10-31）**：「上一次施放的是哪一招」—— 新增条件变量 **`last_elation_skill_id`** ✓（`CanHit.lastElationSkillId`，`SkillExecutor` 在这一发的 CAST_SETUP 事件**之后**写入 ✓ ⇒ 规则读到的是**上一次** ✓），与 `from_skill_id` 组成两变量比较 ✓（`!=` 现在接受**两个数值变量** ✓）。读者 **23064** ✓；判据 `LastElationSkillTest`（同招不叠、异招触发）+ `ConeTwentyThreeThousandSixtyFourTest` ✓。
   - **「两名及以上相同命途」配不起来** ✗：`has_path` 只能问**某一个单位** ✓。读者：**21046**。见证：同前 ✓。
   - ⭐ **已解决（2026-10-31）**：「击杀时检查这层 DoT 是不是她上的」—— 变量 **`target_dots_from_self`** 早就在 ✓（23029 的同一变量，KILL 在 `perish()` 之后、buff 清扫之前发 ⇒ 死者的 DoT 还数得到 ✓）。读者 **24003** ✓；判据 `ConeTwentyFourThousandThreeTest` ✓。
-  - **「受到的**暴击伤害**」不是一个可改的层** ✗：`MODIFY_DAMAGE_TAKEN` 改的是总区 ✓。读者：**23059**（【炼狱】）。见证：同批 ✓。
+  - ⭐ **已解决（2026-10-31）**：「**受到的暴击伤害**」—— 用实例 **`MODIFY_ATTR CRIT_ATTACK` + `instance: true`** ✓（份额加进这一发的 `extraCritDamage`，`CritArea.rate()` **只在暴击时**读它 ✓ ⇒ 不需要新的承受区/事件）。读者 **23059** ✓；判据 `ConeTwentyThreeThousandFiftyNineTest` ✓。
   - **「助战技」不是技能类** ✗：`from_skill` 闭集只有 COMMON/SKILL/ULTRA/TALENT ✓。读者：**23060**。见证：`ConeAuditBatchTwentySevenTest` ✓。
   - **「就地升级一个状态」没有拼法** ✗：`APPLY_BUFF` 只能新增 ✓。读者：**23029**（【卸甲】→【穷寇】）、**23047**（【魂迷】三条内部效果）。见证：各批 ✓。
   - **「每场 1 次 + 终结技重置」的旗标不可复位** ✗：`once_per_battle` 不能复位 ✓（`RESET_TRIGGER_LIMIT` 只对**规则级**限流有效 ✓）。读者：**23040**（忆灵消失）。见证：`ConeAuditBatchTwentyFourTest` ✓。
