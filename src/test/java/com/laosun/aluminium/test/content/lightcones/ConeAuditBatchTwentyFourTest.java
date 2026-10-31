@@ -82,10 +82,11 @@ public class ConeAuditBatchTwentyFourTest {
                 > bare.wearer.getAttribute(AttributeType.HEALTH).get(), "「生命上限提高 18%」");
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.HEAL_TAKEN_RATIO).get()
                 > bare.wearer.getAttribute(AttributeType.HEAL_TAKEN_RATIO).get(), "「受到的治疗量提高 20%」");
-        // 2026-10-31: the payment clause landed (pay 6% Max HP at CAST_SETUP and raise the same attack by 30%); the
-        // 500-point branch is still open, so this pins the rules that exist rather than "none".
-        Assertions.assertEquals(4, rules(23039),
-                "two payment rules (skill / ultimate) and the two boosts that read their marker");
+        // 2026-10-31: the whole clause landed - pay 6% Max HP at CAST_SETUP and raise the same attack by 30%, plus the
+        // 500-point branch (an HP_CONSUMED marker and two extra boosts). This pins the census, not the absence: two
+        // payment rules, two boosts, one marker, two extra boosts.
+        Assertions.assertEquals(7, rules(23039),
+                "two payment rules, two boosts, the 500-point marker rule and the two extra boosts");
     }
 
     /**
@@ -176,3 +177,4 @@ public class ConeAuditBatchTwentyFourTest {
         }
     }
 }
+
