@@ -305,6 +305,13 @@ final class TriggerConditionParser {
 
         // `from_skill COMMON|SKILL|ULTRA|TALENT`: the causing instance's cast category. No subject: the "who" is
         // already a separate condition (`actor == self`), and the sentence never names a second unit.
+        // `self_is_actor_or_target`: a bare keyword. It is the ONE disjunction the language offers, because a clause whose
+        // halves name different units ("casts an attack OR is attacked") cannot be written with AND and must not be split
+        // into two rules when the sentence also caps it per turn (light cone 20012 轮契's 「单个回合内不可重复触发」).
+        if (text.trim().equalsIgnoreCase(SELF_IS_ACTOR_OR_TARGET)) {
+            return new SelfIsActorOrTarget(raw);
+        }
+
         // `damage_is_attack`: a bare keyword, no subject and no value. Kept positive on purpose -- see DAMAGE_IS_ATTACK.
         if (text.trim().equalsIgnoreCase(DAMAGE_IS_ATTACK)) {
             TriggerEvent event = TriggerEvent.fromString(spec.getOn());
@@ -1458,6 +1465,34 @@ final class TriggerConditionParser {
         }
     }
 
+    /**
+     * {@link #SELF_IS_ACTOR_OR_TARGET}: the rule owner is the event's actor or its target.
+     *
+     * <p>Reader: light cone 20012 轮契's 「使装备者施放攻击或受到攻击后，额外恢复 4 点能量，该效果单个回合内不可重复触发」.
+     */
+    static final class SelfIsActorOrTarget implements Condition {
+        private final String raw;
+
+        SelfIsActorOrTarget(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx != null && (ctx.owner() == ctx.actor() || ctx.owner() == ctx.target());
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
     /* The element half of {@link #DAMAGE_IS_ATTACK}: the instance's element against the rule owner's own. */
     /**
      * The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack.
@@ -2309,6 +2344,15 @@ final class TriggerConditionParser {
      */
     private static final Pattern FROM_CATEGORY =
             Pattern.compile("(?<![\\w])from_category(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * 「施放攻击**或**受到攻击后」 - the wearer is the event's ACTOR or its TARGET.
+     *
+     * <p>One spelling where the language otherwise has only AND: the two halves are {@code actor == self} and
+     * {@code target == self}, and a rule that stated both would never fire. Splitting the rule in two is not an option either -
+     * the clause it belongs to is capped 「单个回合内不可重复触发」, and two rules get one cap each (light cone 20012 轮契).
+     */
+    static final String SELF_IS_ACTOR_OR_TARGET = "self_is_actor_or_target";
 
     /**
      * The bare keyword {@code damage_is_attack}: "the instance being settled counts as an attack".

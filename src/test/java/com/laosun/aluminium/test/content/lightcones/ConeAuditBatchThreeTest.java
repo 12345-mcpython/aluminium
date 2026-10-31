@@ -63,12 +63,24 @@ public class ConeAuditBatchThreeTest {
 
         // ⚠ Fired as an EVENT, not through `applyDamage`: taking a hit also credits the engine's own hit energy (+10), which
         // would hide what this cone does or does not add.
-        f.wearer.setCurrentEnergy(0);
-        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, f.wearer, 0, 0));
-        System.out.println("[20012] 单发 `TAKING_HIT` 之后的能量 " + f.wearer.getCurrentEnergy()
-                + "（「受到攻击」那一半仍未表达 —— 已登记 §4.3）");
-        Assertions.assertEquals(0.0, f.wearer.getCurrentEnergy(), 1e-9,
-                "今天的行为：被攻击不给能量（缺口见证，不是最终样子）");
+        // A FRESH fixture: `f` has already spent its per-turn budget above, and this case is about the budget itself.
+        Fixture same = new Fixture(20012, true);
+        same.wearer.setCurrentEnergy(0);
+        same.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST,
+                same.wearer, same.battle.enemyUnits().getFirst(), 0, 0));
+        same.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT,
+                same.battle.enemyUnits().getFirst(), same.wearer, 0, 0));
+        System.out.println("[20012] 同一回合内 先施放战技、再被攻击 之后的能量 " + same.wearer.getCurrentEnergy());
+        Assertions.assertEquals(4.0, same.wearer.getCurrentEnergy(), 1e-9,
+                "「施放攻击**或**受到攻击」共用同一个 per_turn 上限 —— 两件事在同一回合只算一次");
+
+        Fixture hit = new Fixture(20012, true);
+        hit.wearer.setCurrentEnergy(0);
+        hit.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT,
+                hit.battle.enemyUnits().getFirst(), hit.wearer, 0, 0));
+        System.out.println("[20012] 单发 `TAKING_HIT` 之后的能量 " + hit.wearer.getCurrentEnergy());
+        Assertions.assertEquals(4.0, hit.wearer.getCurrentEnergy(), 1e-9,
+                "缺口已收（2026-10-31）：`self_is_actor_or_target` 让「受到攻击」这一半也能开火");
     }
 
     /**
