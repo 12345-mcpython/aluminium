@@ -1,4 +1,6 @@
 {
+  "schema": 1,
+  "character": 1410,
   "_status": "partial",
   "_gaps": [
     "战技：100% 基础概率未写（走命中/抵抗管线的差异）",
