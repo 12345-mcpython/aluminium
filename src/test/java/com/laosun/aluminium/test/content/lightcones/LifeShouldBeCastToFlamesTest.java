@@ -24,9 +24,10 @@ public class LifeShouldBeCastToFlamesTest {
                 .filter(r -> r.id().startsWith("cone23041_")).toList();
         System.out.println("[23041] turn rules=" + turns.size() + " hit rules=" + hits.size());
         Assertions.assertEquals(1, turns.size(), "the turn-start energy");
-        Assertions.assertEquals(1, hits.size(), "the defence-down clause");
+        Assertions.assertEquals(2, hits.size(), "the defence-down clause and the added-weakness boost");
         var energy = turns.getFirst().effects().getFirst();
-        var down = hits.getFirst().effects().getFirst();
+        var down = hits.stream().filter(r -> r.id().equals("cone23041_defence_down")).findFirst().orElseThrow()
+                .effects().getFirst();
         System.out.println("[23041] spec energy op=" + energy.getOp() + " amount=" + energy.getAmount()
                 + " target=" + energy.getTarget()
                 + " ; def attr=" + down.getAttribute() + " percent=" + down.getPercent()
@@ -34,7 +35,8 @@ public class LifeShouldBeCastToFlamesTest {
         Assertions.assertEquals(10.0, energy.getAmount(), 1e-9, "ten energy");
         Assertions.assertEquals("self", energy.getTarget(), "for the wearer");
         Assertions.assertEquals("GAIN_ENERGY", energy.getOp(), "energy");
-        Assertions.assertEquals(-0.24, down.getPercent(), 1e-9, "24% less defence");
+        // 2026-10-31: the data row for rank 1 is 0.12 (12/15/18/21/24%), and the file used to carry the RANK-5 number.
+        Assertions.assertEquals(-0.12, down.getPercent(), 1e-9, "12% less defence at rank 1");
         Assertions.assertEquals(2.0, down.getTurns(), 1e-9, "for two turns");
         Assertions.assertEquals("target", down.getTarget(), "on the enemy it hit");
     }

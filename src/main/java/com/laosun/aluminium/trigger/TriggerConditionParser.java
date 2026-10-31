@@ -117,6 +117,18 @@ final class TriggerConditionParser {
                     spec);
         }
 
+        Matcher addedWeakness = HAS_ADDED_WEAKNESS.matcher(text);
+        if (addedWeakness.find()) {
+            String subject = normalize(text.substring(0, addedWeakness.start()));
+            if (!subject.isEmpty() && !"target".equals(subject)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' states the subject '" + subject + "' for \"has_added_weakness\"; it is asked "
+                                + "about the enemy the rule is aimed at, so write \"target has_added_weakness\" or nothing "
+                                + "at all (source: " + spec.getSource() + ")");
+            }
+            return new HasAddedWeakness(raw);
+        }
+
         // `has_weakness`: "<who> has_weakness Fire" - the target's weakness ELEMENT, which nothing else can ask.
         Matcher hasWeakness = HAS_WEAKNESS.matcher(text);
         if (hasWeakness.find()) {
@@ -904,6 +916,28 @@ final class TriggerConditionParser {
         @Override
         public boolean test(TriggerContext ctx) {
             return party.partyOf(ctx) != null && !inner.test(ctx);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /**
+     * {@link #HAS_ADDED_WEAKNESS}: the target carries a weakness an effect inserted.
+     */
+    static final class HasAddedWeakness implements Condition {
+        private final String raw;
+
+        HasAddedWeakness(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx != null && ctx.target() instanceof com.laosun.aluminium.enemy.Enemy enemy
+                    && enemy.hasAddedWeakness();
         }
 
         @Override
@@ -2272,6 +2306,13 @@ final class TriggerConditionParser {
      */
     private static final Pattern IS_OTHER_SAME_ELEMENT =
             Pattern.compile("(?<![\\w])is_other_same_element_as_self(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * The {@code has_added_weakness} keyword: 「敌方目标拥有<b>装备者添加的</b>弱点」 - a weakness an EFFECT inserted, as opposed to
+     * one the enemy's data gave it. No element: the sentence asks whether ANY added weakness is there (light cone 23041).
+     */
+    private static final Pattern HAS_ADDED_WEAKNESS =
+            Pattern.compile("(?<![\\w])has_added_weakness(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
      * The {@code has_weakness} keyword: "&lt;who&gt; is weak to this element".
