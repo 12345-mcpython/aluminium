@@ -116,7 +116,16 @@ final class TriggerVocabulary {
                     "all_hit_enemies",
                     // One living enemy ADJACENT (roster order) to the current target, chosen with the
                     // battle's seeded RNG. Reader: 1103 Serval's Eidolon 1 ("one random adjacent target").
-                    "random_adjacent_enemy");
+                    "random_adjacent_enemy",
+                    // "the wearer and another teammate who triggered combat" (light cone 23050). The engine records who
+                    // landed a map attack before the battle (`Battle.declareMapAttack`), so "triggered combat" is a fact,
+                    // not a guess. This plural selector is the "other than the owner" half: a wearer who started the
+                    // fight herself has no teammate in this sense, which is the fallback branch of the sentence.
+                    "other_map_attackers",
+                    // 「击破特攻最高的队友」 (the same cone, fallback branch): the living OTHER ally with the highest
+                    // BREAKING_EFFECT. Ties keep roster order. Handled in the plural path, because "no other ally" is an
+                    // ordinary battle state, not an error.
+                    "highest_break_effect_ally");
     /**
      * The two spellings of "every one of our characters".
      */

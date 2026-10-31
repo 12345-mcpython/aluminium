@@ -2088,6 +2088,8 @@ final class TriggerConditionParser {
                     // points at all, and the cap cannot stand in for the count (a pool of 4 out of 7 and a pool of 4 out of 4
                     // both satisfy "4 or more", while their caps are 7 and 4).
                     "skill_point",
+                    // 「若不存在开战的队友」 (light cone 23050): our OTHER units that declared a map attack before the battle.
+                    "map_attacker_count",
                     // The owner's Eidolon rank, as a condition. Note: `min_eidolon` already gates a whole RULE on it, and that
                     // is enough when the clause IS the Eidolon's ("【深度学习】时 ... 抗性穿透提高 20%"). It is not enough when an
                     // Eidolon clause MODIFIES an effect the base kit also has at the same event: the two rules then carry

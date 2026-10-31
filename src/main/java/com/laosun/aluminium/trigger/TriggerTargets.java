@@ -174,7 +174,42 @@ final class TriggerTargets {
                 }
                 return battle.waveMonsters();
             }
-            case "all_summons" -> {
+            case "other_map_attackers" -> {
+                // 「另一位开战的队友」 (light cone 23050): our units that declared a map attack before the battle, minus the
+                // rule owner. An empty list is an ordinary answer (nobody triggered it, or the wearer did).
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets \"other_map_attackers\" but no battle was supplied to read the declarations");
+                }
+                java.util.List<CanHit> starters = new ArrayList<>();
+                for (CanHit attacker : battle.mapAttackers()) {
+                    if (attacker != ctx.owner() && !attacker.isDeath()) {
+                        starters.add(attacker);
+                    }
+                }
+                return java.util.List.copyOf(starters);
+            }
+            case "highest_break_effect_ally" -> {
+                // 「击破特攻最高的队友」 (the same cone, fallback branch): the living other ally with the highest
+                // BREAKING_EFFECT; ties keep roster order. No other ally is an empty answer, not an error.
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets \"highest_break_effect_ally\" but no battle was supplied to read the party");
+                }
+                CanHit best = null;
+                double bestShare = Double.NEGATIVE_INFINITY;
+                for (CanHit ally : battle.allies()) {
+                    if (ally == ctx.owner() || ally.isDeath()) {
+                        continue;
+                    }
+                    double share = ally.getAttribute(AttributeType.BREAKING_EFFECT).get();
+                    if (share > bestShare) {
+                        best = ally;
+                        bestShare = share;
+                    }
+                }
+                return best == null ? java.util.List.of() : java.util.List.of(best);
+            }            case "all_summons" -> {
                 if (battle == null) {
                     throw new IllegalStateException(
                             "Effect targets \"all_summons\" but no battle was supplied to take the summons from");
