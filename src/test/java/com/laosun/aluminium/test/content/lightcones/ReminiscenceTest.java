@@ -101,8 +101,8 @@ public class ReminiscenceTest {
                 System.out.println("[20022] spec op=" + effect.getOp() + " buff=" + effect.getBuff()
                         + " amount=" + effect.getAmount() + " max=" + effect.getMaxStacks()
                         + " target=" + effect.getTarget());
-                // The rule has three effects since the audit: two stacks (wearer + memosprite) and the per-layer boost
-                // that the sentence states (「每层使造成的伤害提高 8%」) and the file used to omit entirely.
+                // The rule has four effects: two stacks (wearer + memosprite) and the per-layer boost
+                // on both sides (each copy reads its own counter).
                 if ("MODIFY_ATTR".equals(effect.getOp())) {
                     continue;
                 }
@@ -113,9 +113,9 @@ public class ReminiscenceTest {
                 }
             }
         }
-        // Three, not two: the audit found 「每层使造成的伤害提高 #1%」 had no modifier at all and added it.
-        Assertions.assertEquals(3, pinned, "two stacks + the per-layer damage boost");
-        Assertions.assertEquals(1, targets, "exactly one of them names the memosprite");
+        // Four: two stacks + one per-layer boost per side (the wearer's and the memosprite's).
+        Assertions.assertEquals(4, pinned, "two stacks + the per-layer boost on each side");
+        Assertions.assertEquals(1, targets, "exactly one STACK names the memosprite (the share does too, and is counted above)");
     }
 
     @Test
@@ -129,3 +129,6 @@ public class ReminiscenceTest {
         Assertions.assertFalse(any, "no cone, no rule (false case)");
     }
 }
+
+
+
