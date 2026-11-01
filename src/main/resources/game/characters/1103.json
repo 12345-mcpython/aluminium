@@ -50,7 +50,8 @@
         }
       ],
       "source": "1103 希露瓦 行迹 电音 (1103102): 「战斗开始时，立即恢复15点能量。」",
-      "_note": "「战斗开始时，立即恢复 15 点能量」 — a plain flat grant with no target stated, which means the rule's owner (her). ⚠ Not `percent`-of-anything and not `self_max_energy`-derived: the document gives a flat 15."
+      "_note": "「战斗开始时，立即恢复 15 点能量」 — a plain flat grant with no target stated, which means the rule's owner (her). ⚠ Not `percent`-of-anything and not `self_max_energy`-derived: the document gives a flat 15.",
+      "id": "battle_start"
     },
     {
       "on": "KILL",
@@ -76,7 +77,8 @@
         }
       ],
       "source": "1103 希露瓦 行迹 摇滚 (1103101): 「施放战技时，使受到攻击的敌方目标陷入触电状态的基础概率提高20%。」",
-      "_note": "「…陷入触电状态的**基础概率提高 20%**」: `MODIFY_RULE`'s probability form (the field is `percent`, because the sentence raises a probability, not a count), so 80% becomes 100% — ⚠ and it must be an *amendment* rather than a second shock rule, because a second rule would roll **twice** (1 − 0.2 × 0.2 = 96%, not 100%). ⚠ It is filed against `skill_shock`, so it only moves the Skill's roll, not a hypothetical other one."
+      "_note": "「…陷入触电状态的**基础概率提高 20%**」: `MODIFY_RULE`'s probability form (the field is `percent`, because the sentence raises a probability, not a count), so 80% becomes 100% — ⚠ and it must be an *amendment* rather than a second shock rule, because a second rule would roll **twice** (1 − 0.2 × 0.2 = 96%, not 100%). ⚠ It is filed against `skill_shock`, so it only moves the Skill's roll, not a hypothetical other one.",
+      "id": "battle_start_2"
     },
     {
       "on": "BATTLE_START",
@@ -98,7 +100,8 @@
         }
       ],
       "source": "1103 希露瓦 技能表的**等级口径**: 文档引用的 140%/60%/180% 都是 Lv10 行（110301/110302/110303 的 Lv10 与 Lv1 分别是 1.4/0.5、[1.4,0.6]/[0.7,0.3]、1.8/1.08）",
-      "_note": "The file stating **which level its quoted numbers come from** (M-32). ⚠ Unlike 1215 — whose quoted numbers lived in rules that state their own magnitudes — 希露瓦's 140%/60%/180% are the engine's own skill execution, which reads `user.skillLevel(skill)`; without this rule the engine would deal the Lv1 rows (70%/30%/108%) while her document says Lv10. ⚠ So this is not bookkeeping here: it changes the damage the engine deals, which is exactly what 「文档引用的是哪一行」 means. ⚠ `TALENT` is deliberately absent: her talent's row is only read by the (registered) additional-damage clause, and nothing in this file reads it."
+      "_note": "The file stating **which level its quoted numbers come from** (M-32). ⚠ Unlike 1215 — whose quoted numbers lived in rules that state their own magnitudes — 希露瓦's 140%/60%/180% are the engine's own skill execution, which reads `user.skillLevel(skill)`; without this rule the engine would deal the Lv1 rows (70%/30%/108%) while her document says Lv10. ⚠ So this is not bookkeeping here: it changes the damage the engine deals, which is exactly what 「文档引用的是哪一行」 means. ⚠ `TALENT` is deliberately absent: her talent's row is only read by the (registered) additional-damage clause, and nothing in this file reads it.",
+      "id": "level_convention"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -132,7 +135,8 @@
       ],
       "min_eidolon": 3,
       "source": "1103 希露瓦 星魂 3 听，齿轮的心跳 (Avatar_Serval_00_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110302': 2, '110301': 1}",
-      "_note": "星魂 3's two raises (M-32). ⚠ Here they compose with the base-level rule above by addition (SKILL: +9 then +2), which is the same arithmetic 1215's 星魂 3/5 use. ⚠ The caps (15 / 10) are the tables' own sizes, so an over-raise fails loudly rather than reading a row that does not exist."
+      "_note": "星魂 3's two raises (M-32). ⚠ Here they compose with the base-level rule above by addition (SKILL: +9 then +2), which is the same arithmetic 1215's 星魂 3/5 use. ⚠ The caps (15 / 10) are the tables' own sizes, so an over-raise fails loudly rather than reading a row that does not exist.",
+      "id": "eidolon3_levels"
     },
     {
       "on": "BATTLE_START",
@@ -150,7 +154,8 @@
       ],
       "min_eidolon": 5,
       "source": "1103 希露瓦 星魂 5 贝洛伯格最强音！ (Avatar_Serval_00_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'110303': 2, '110304': 2}",
-      "_note": "星魂 5's two raises. ⚠ The TALENT half is stated even though this file's talent clause is registered: it is a fact about the loadout, and the day that clause is written the level is already right — the same reasoning 1215's base-level rule gives. ⚠ **Not written yet in this file** (each with its blocker, all in ROADMAP): 天赋「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」(a rule's effect reaches what a *selector* names, so 「all shocked enemies」 cannot be filtered per target — `M-53`); 战技的相邻目标触电判定 (the skill's own hit list is not addressable); 星魂 1「普攻对指定敌方目标的 1 个随机相邻目标造成…60%」(no adjacent selector); 星魂 2「每触发 1 次天赋的附加伤害，希露瓦恢复 4 点能量」(rides on the talent); 星魂 4「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标…」(the negation is per target, `M-53` again)."
+      "_note": "星魂 5's two raises. ⚠ The TALENT half is stated even though this file's talent clause is registered: it is a fact about the loadout, and the day that clause is written the level is already right — the same reasoning 1215's base-level rule gives. ⚠ **Not written yet in this file** (each with its blocker, all in ROADMAP): 天赋「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」(a rule's effect reaches what a *selector* names, so 「all shocked enemies」 cannot be filtered per target — `M-53`); 战技的相邻目标触电判定 (the skill's own hit list is not addressable); 星魂 1「普攻对指定敌方目标的 1 个随机相邻目标造成…60%」(no adjacent selector); 星魂 2「每触发 1 次天赋的附加伤害，希露瓦恢复 4 点能量」(rides on the talent); 星魂 4「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标…」(the negation is per target, `M-53` again).",
+      "id": "eidolon5_levels"
     },
     {
       "on": "ALLY_ATTACK",
@@ -184,7 +189,7 @@
           "scale": "self_attr:ATTACK",
           "percent": 1.04,
           "turns": 2,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "target": "all_enemies",
           "target_when": [
             "!target has_state 触电"

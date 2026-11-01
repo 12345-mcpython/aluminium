@@ -89,7 +89,8 @@
       ],
       "min_eidolon": 3,
       "source": "1215 寒鸦 星魂 3 三尘 (Avatar_Hanya_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'121502': 2, '121501': 1}",
-      "_note": "「**战技**等级+2，最多不超过15级；**普攻**等级+1，最多不超过10级」 — two slots in one sentence, so two effects in one rule (M-32: the level a skill is read at is content, and the raise is a fact of the loadout, which is why it is a `BATTLE_START` amendment rather than a battle event). ⚠ The caps are her parameter tables' own sizes (SKILL 15 rows, COMMON 10 rows), so a raise past them fails loudly at fire time instead of reading a row that does not exist — a `cap` field would be a second place to state the same limit. ⚠ `min_eidolon: 3` is the gate."
+      "_note": "「**战技**等级+2，最多不超过15级；**普攻**等级+1，最多不超过10级」 — two slots in one sentence, so two effects in one rule (M-32: the level a skill is read at is content, and the raise is a fact of the loadout, which is why it is a `BATTLE_START` amendment rather than a battle event). ⚠ The caps are her parameter tables' own sizes (SKILL 15 rows, COMMON 10 rows), so a raise past them fails loudly at fire time instead of reading a row that does not exist — a `cap` field would be a second place to state the same limit. ⚠ `min_eidolon: 3` is the gate.",
+      "id": "eidolon3_levels"
     },
     {
       "on": "BATTLE_START",
@@ -107,7 +108,8 @@
       ],
       "min_eidolon": 5,
       "source": "1215 寒鸦 星魂 5 五阴 (Avatar_Hanya_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'121503': 2, '121504': 2}",
-      "_note": "「**终结技**等级+2，最多不超过15级；**天赋**等级+2，最多不超过15级」 — the same shape as 星魂 3, for the other two slots. ⚠ It matters to this file in a concrete way: raising ULTRA raises the row her ultimate's numbers are read from, and raising TALENT raises the row her (still registered) talent boost would read. ⚠ Caps = the tables' own sizes, as above. ⚠ `min_eidolon: 5` is the gate."
+      "_note": "「**终结技**等级+2，最多不超过15级；**天赋**等级+2，最多不超过15级」 — the same shape as 星魂 3, for the other two slots. ⚠ It matters to this file in a concrete way: raising ULTRA raises the row her ultimate's numbers are read from, and raising TALENT raises the row her (still registered) talent boost would read. ⚠ Caps = the tables' own sizes, as above. ⚠ `min_eidolon: 5` is the gate.",
+      "id": "eidolon5_levels"
     },
     {
       "on": "BATTLE_START",
@@ -119,7 +121,8 @@
         }
       ],
       "source": "1215 寒鸦 天赋 罚恶 (skill 121504) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（「造成的伤害提高30%」按该行读）",
-      "_note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again."
+      "_note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again.",
+      "id": "level_convention"
     },
     {
       "on": "SKILL_CAST",
@@ -218,7 +221,7 @@
       "do": [
         {
           "op": "GAIN_SKILL_POINT",
-          "amount": 1.0
+          "amount": 1
         },
         {
           "op": "ADD_STACK",
@@ -236,7 +239,7 @@
         },
         {
           "op": "GAIN_ENERGY",
-          "amount": 2.0
+          "amount": 2
         },
         {
           "op": "REMOVE_STATE",
@@ -321,7 +324,7 @@
       "do": [
         {
           "op": "GAIN_SKILL_POINT",
-          "amount": 1.0
+          "amount": 1
         }
       ],
       "source": "1215 寒鸦 行迹 幽府: 「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的触发次数小于等于1，则额外回复1点战技点。」",
@@ -368,13 +371,32 @@
     {
       "on": "BATTLE_START",
       "id": "technique_prey_on_a_random_enemy",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "pick": "random_enemy",
       "do": [
-        { "op": "REMOVE_STATE", "buff": "承负", "target": "all_enemies" },
-        { "op": "REMOVE_STATE", "buff": "承负次数", "target": "all_enemies" },
-        { "op": "REMOVE_STATE", "buff": "承负返还", "target": "all_enemies" },
-        { "op": "APPLY_BUFF", "buff": "承负", "permanent": true, "target": "pick" }
+        {
+          "op": "REMOVE_STATE",
+          "buff": "承负",
+          "target": "all_enemies"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "承负次数",
+          "target": "all_enemies"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "承负返还",
+          "target": "all_enemies"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "承负",
+          "permanent": true,
+          "target": "pick"
+        }
       ],
       "source": "1215 寒鸦 秘技 判冥 (121507, Maze/Enhance): 「立即攻击敌人，进入战斗后对敌方随机单体附上等同于战技效果的【承负】。」",
       "_note": "「进入战斗后对敌方**随机单体**附上等同于**战技效果**的【承负】」—— ① 规则级 **`pick: random_enemy`** ✓（一次抽签，后续 `target: pick` 与它同一个人 ✓）；② 「等同于战技效果」= 与 `skill_blessing` **同一串**：先清掉三个旧标记（「仅对最新被施加的目标生效」✓），再把 `承负` 挂到抽中的敌人 ✓；③ `permanent: true` 与战技那条同理：承负没有回合数（由「触发 2 次后自动解除」结束 ✓）。"

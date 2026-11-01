@@ -14,7 +14,7 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.3,
           "damage_type": "DOT",
-          "base_chance": 1.0,
+          "base_chance": 1,
           "turns": 2,
           "target": "all_enemies"
         }
@@ -47,7 +47,8 @@
         }
       ],
       "source": "1108 桑博 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 56%、终结技 160%、天赋 52% 都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **战技「弹射」无需规则**：引擎自带的 BOUNCE 形态就跑 56% ×（1+4）次，这正是\"能为则不写\"的例子。 ⚠ **2026-09-28 补齐**：天赋的「风化」已写出（见本文件最后一条规则）—— 此前整句登记，是因为「最多叠加 5 层」当时无处可写（DOT 会无限叠加），而只写 DOT、丢掉上限就是\"长线战斗里才显形的错数字\"；上限落地后这句就能完整表达了。 ⚠ **仍登记**：1307 那句\"超出上限的层数在结算后移除\"（只对一个状态陈述过，推广是推测）、以及行迹/星魂 1–6（尚未逐句读）。"
+      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **战技「弹射」无需规则**：引擎自带的 BOUNCE 形态就跑 56% ×（1+4）次，这正是\"能为则不写\"的例子。 ⚠ **2026-09-28 补齐**：天赋的「风化」已写出（见本文件最后一条规则）—— 此前整句登记，是因为「最多叠加 5 层」当时无处可写（DOT 会无限叠加），而只写 DOT、丢掉上限就是\"长线战斗里才显形的错数字\"；上限落地后这句就能完整表达了。 ⚠ **仍登记**：1307 那句\"超出上限的层数在结算后移除\"（只对一个状态陈述过，推广是推测）、以及行迹/星魂 1–6（尚未逐句读）。",
+      "id": "level_convention"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -75,8 +76,16 @@
       "id": "eidolon3_levels",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "source": "1108 桑博 星魂 3 大数字: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 skill_add_level = {110802: 2, 110801: 1}",
       "_note": "「战技等级 **+2**；普攻等级 **+1**」—— 与数据 `skill_add_level` 逐项吻合 ✓；与等级口径叠加 ✓。"
@@ -86,8 +95,16 @@
       "id": "eidolon5_levels",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "source": "1108 桑博 星魂 5 惊喜礼盒: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 skill_add_level = {110803: 2, 110804: 2}",
       "_note": "「终结技等级 **+2**；天赋等级 **+2**」—— 数据逐项吻合 ✓。"
@@ -97,7 +114,11 @@
       "id": "eidolon6_stronger_windtorn",
       "min_eidolon": 6,
       "do": [
-        { "op": "MODIFY_RULE", "rule": "talent_windtorn", "effect_percent_scale": 1.15 }
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_windtorn",
+          "effect_percent_scale": 1.15
+        }
       ],
       "source": "1108 桑博 星魂 6 窃贼的义气: 「天赋施加的风化状态的伤害倍率提高15%。」 param = [0.15]",
       "_note": "「天赋施加的风化状态**伤害倍率提高 15%**」—— 用 `MODIFY_RULE` 的新字段 **`effect_percent_scale: 1.15`** ✓（**乘**：0.52 → 0.598 ✓）。⚠ **为什么不是 `effect_percent: 0.15`**：那是**加**百分点（0.52 → 0.67 ⇒ 实测每跳 +28.8%）✗ —— 句子说的是「倍率提高 15%」= ×1.15 ✓，两种读法都能装载、都能跑，所以字段分开 ✓（判据 `SampoEidolonTest` 钉住 1.15）。⚠ 只改**天赋**那条（「天赋施加的」✓）；行迹/终结技里的风化不受影响 ✓。"
@@ -111,7 +132,12 @@
       ],
       "min_eidolon": 4,
       "do": [
-        { "op": "TICK_DOT", "element": "Wind", "percent": 0.08, "target": "target" }
+        {
+          "op": "TICK_DOT",
+          "element": "Wind",
+          "percent": 0.08,
+          "target": "target"
+        }
       ],
       "source": "1108 桑博 星魂 4 各取所需: 「战技击中风化状态大于等于5层的敌方目标时，使其当前承受的风化状态立即产生相当于原伤害8%的伤害。」 param = [5, 0.08]",
       "_note": "「战技击中风化 **≥ 5 层** 的目标时，使其当前承受的风化**立即产生一次**相当于原伤害 **8%** 的伤害」—— ① 层数用 **`target_stacks:风化 >= 5`** ✓（DOT 的每次施加就是一层；`stacksOf` 按元素名计数 ✓ —— 为此装载器把 `APPLY_DOT` 也算作「名字的创建者」✓）；② 「立即产生一次」= **`TICK_DOT`** ✓（多跳一次、不改寿命 ✓）；③ 份额 0.08 = **8%** ✓（param #2）。"
@@ -119,10 +145,21 @@
     {
       "on": "KILL",
       "id": "eidolon2_windtorn_on_kill",
-      "when": ["target has_state 风化"],
+      "when": [
+        "target has_state 风化"
+      ],
       "min_eidolon": 2,
       "do": [
-        { "op": "APPLY_DOT", "element": "Wind", "base_chance": 1.0, "scale": "self_attr:ATTACK", "percent_from_skill_param": "TALENT:1", "turns": 3, "max_stacks": 5, "target": "all_enemies" }
+        {
+          "op": "APPLY_DOT",
+          "element": "Wind",
+          "base_chance": 1,
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "TALENT:1",
+          "turns": 3,
+          "max_stacks": 5,
+          "target": "all_enemies"
+        }
       ],
       "source": "1108 桑博 星魂 2 黑色幽默: 「风化状态下的敌方目标被消灭时，使敌方全体有100%的基础概率叠加1层等同于天赋的风化状态。」 param = [1, 1]（100% 基础概率 / 1 层）",
       "_note": "「**风化状态**下的敌方目标**被消灭**时，使敌方**全体**有 **100% 基础概率**叠加 **1 层**等同于**天赋**的风化」—— ① 事件 `KILL` ✓ + 条件 `target has_state 风化` ✓（死者的 buff 在 `KILL` 时仍读得到 ✓ —— 23003 的同一时刻 ✓）；② 「**等同于天赋的**风化」 ⇒ 与 `talent_windtorn` **同一组参数** ✓：`self_attr:ATTACK` + **`percent_from_skill_param: TALENT:1`**（跟着天赋等级走 ✓，Lv10 = 0.52）+ `turns: 3` + `max_stacks: 5` ✓；③ 「**全体**」= `all_enemies` ✓；④ 「**1 层**」= **一次** `APPLY_DOT` ✓（DOT 每施加一次即一层 ✓）；⑤ `base_chance: 1.0` ✓（句子自给的 100%）。"
@@ -131,7 +168,11 @@
       "on": "BATTLE_START",
       "id": "trace_longer_windtorn",
       "do": [
-        { "op": "MODIFY_RULE", "rule": "talent_windtorn", "effect_turns": 1 }
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_windtorn",
+          "effect_turns": 1
+        }
       ],
       "source": "1108 桑博 行迹 圈套 (1108101): 「天赋使敌方陷入风化状态的持续时间延长1回合。」 param = [1]",
       "_note": "「天赋的**风化持续时间延长 1 回合**」—— `MODIFY_RULE` + **`effect_turns: 1`** ✓ 改的是 `talent_windtorn` 那条规则的 `turns`（3 → 4），不是另写一条更长 DOT ✗（同元素会互相顶掉 ✓）。"
@@ -139,9 +180,14 @@
     {
       "on": "ULT_CAST",
       "id": "trace_extra_energy",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 10 }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10
+        }
       ],
       "source": "1108 桑博 行迹 后手 (1108102): 「施放终结技时，额外恢复10点能量。」 param = [10]",
       "_note": "「施放终结技时，额外恢复 **10 点能量**」—— `ULT_CAST` + `actor == self` + `GAIN_ENERGY 10` ✓（无目标 = 规则主人 ✓，与 1217 行迹同形 ✓）。"
@@ -149,9 +195,17 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "trace_less_damage_from_windtorn",
-      "when": ["target == self", "actor has_state 风化"],
+      "when": [
+        "target == self",
+        "actor has_state 风化"
+      ],
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.15, "instance": true, "target": "self" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.15,
+          "instance": true,
+          "target": "self"
+        }
       ],
       "source": "1108 桑博 行迹 加料 (1108103): 「风化状态下的敌方目标对桑博造成的伤害降低15%。」 param = [0.15]",
       "_note": "「**风化状态下的敌方目标**对桑博造成的伤害降低 **15%**」—— ① 条件在**攻击者**身上：`actor has_state 风化` ✓（不是 `target`，那是桑博自己 ✗）；② 减伤**只对这一发** ⇒ `MODIFY_DAMAGE_TAKEN` + **`instance: true`** ✓（挂成 timed buff 会把之后的所有伤害都减掉 ✗）；③ 负值 = 减伤 ✓。⚠ 挂在 **`DEALING_DAMAGE`** 而不是 `TAKING_HIT` ✓ —— `instance: true` 要的是**正在结算的这一发**，而 `TAKING_HIT` 的上下文里没有伤害实例（实测报错 ✓）；`target == self` 表示「打到的是桑博」✓。"
@@ -161,7 +215,12 @@
       "id": "eidolon1_extra_skill_hit",
       "min_eidolon": 1,
       "do": [
-        { "op": "RAISE_SKILL_HITS", "skill": "SKILL", "skill_id": 2, "amount": 1 }
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill": "SKILL",
+          "skill_id": 2,
+          "amount": 1
+        }
       ],
       "source": "1108 桑博 星魂 1 加码的爱: 「施放战技时，对敌方随机单体额外造成1次伤害。」 param = [1]",
       "_note": "「施放战技时，对敌方**随机单体额外造成 1 次**伤害」—— 战技本来就写着「并额外造成 **4** 次伤害」（引擎从**句子**里读出这个数字 ✓，`SkillData.proseAdditionalHits`），所以星魂 1 就是**在同一槽位多 1 段** ⇒ `RAISE_SKILL_HITS SKILL +1` ✓（而不是另开一发：多出来的那一段与其余段同源、同倍率、同随机规则 ✓）。"

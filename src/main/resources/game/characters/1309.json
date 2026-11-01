@@ -16,7 +16,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "other_allies"
         }
       ],
@@ -47,7 +47,8 @@
         }
       ],
       "source": "1309 知更鸟 trace 华彩花腔",
-      "_note": "Doc text: 「战斗开始时，自身行动提前25%。」 Nothing new is needed for this one: BATTLE_START fires from startBattle() AFTER the queue was initialized in the constructor (so the action bar already holds everyone and there is a wait to shorten), and ADVANCE skips a fraction of the target's REMAINING wait, defaulting to the rule's owner -- so this pulls Robin forward and leaves the other three alone. E0 value (params [0.25]); the test compares her against the same character with an emptied table, because 'a quarter of the remaining wait' is not the same number as 'a quarter of the round'."
+      "_note": "Doc text: 「战斗开始时，自身行动提前25%。」 Nothing new is needed for this one: BATTLE_START fires from startBattle() AFTER the queue was initialized in the constructor (so the action bar already holds everyone and there is a wait to shorten), and ADVANCE skips a fraction of the target's REMAINING wait, defaulting to the rule's owner -- so this pulls Robin forward and leaves the other three alone. E0 value (params [0.25]); the test compares her against the same character with an emptied table, because 'a quarter of the remaining wait' is not the same number as 'a quarter of the round'.",
+      "id": "battle_start"
     },
     {
       "on": "SKILL_CAST",
@@ -104,7 +105,7 @@
         {
           "op": "RESIST_DEBUFF",
           "kind": "control",
-          "percent": 1.0,
+          "percent": 1,
           "buff": "协奏",
           "permanent": true,
           "target": "self"
@@ -125,7 +126,7 @@
           "op": "DAMAGE",
           "skill": "ULTRA",
           "damage_param": 3,
-          "crit_rate": 1.0,
+          "crit_rate": 1,
           "crit_damage": 1.5,
           "target": "target",
           "element": "PHYSICAL"
