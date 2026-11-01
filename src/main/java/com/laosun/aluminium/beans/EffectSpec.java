@@ -102,6 +102,7 @@ public class EffectSpec {
         copy.castTarget = this.castTarget;
         copy.skill = this.skill;
         copy.skills = this.skills == null ? null : new java.util.ArrayList<>(this.skills);
+        copy.baseChanceFromSkillParam = this.baseChanceFromSkillParam;
         copy.randomOf = this.randomOf == null ? null : new java.util.ArrayList<>(this.randomOf);
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
@@ -1080,6 +1081,13 @@ public class EffectSpec {
      */
     @SerializedName("skills")
     private List<String> skills;
+    /**
+     * A base chance READ from the owner's skill row: {@code "ULTRA:2"} is the third column of that row at its current
+     * level. Reader: 1312 Misha's Ultimate, 「每段攻击前有 20% 的基础概率使目标陷入冻结」, where the column moves with
+     * the level (0.12 at Lv1, 0.2 at Lv10).
+     */
+    @SerializedName("base_chance_from_skill_param")
+    private String baseChanceFromSkillParam;
 
     /**
      * 「植入 1 个随机【缺陷】」: pick ONE of these state names with the battle's RNG when the effect applies.

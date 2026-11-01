@@ -457,7 +457,8 @@ final class TriggerEffects {
         // probability in the text is a 100% BASE chance, which the game still runs through Effect Hit Rate / Effect RES / the
         // state's own resistance. Attaching it directly would have made every "immune to control-class negative states" clause silently
         // ineffective against exactly the controls the documents write without a number.
-        double baseChance = effect.getBaseChance() == null ? 1.0 : effect.getBaseChance();
+        Double statedChance = TriggerMagnitudes.baseChanceOf(effect, ctx);
+        double baseChance = statedChance == null ? 1.0 : statedChance;
         // ...plus whatever a trace / Eidolon raised it by ("raise the base chance to freeze the enemy target by 15%"), filed on this combatant under
         // THIS rule's id. Read here rather than written into the effect: rules are compiled once and cached per cid,
         // so the stated 0.5 stays the file's number and the amendment is a fact about this battle.
@@ -614,7 +615,8 @@ final class TriggerEffects {
         }
         double damage = TriggerMagnitudes.dotMagnitude(effect, ctx);
         // Note: The same "always roll" rule as a control: an unstated chance is 100% BASE chance, not "bypasses Effect RES".
-        double baseChance = effect.getBaseChance() == null ? 1.0 : effect.getBaseChance();
+        Double statedChance = TriggerMagnitudes.baseChanceOf(effect, ctx);
+        double baseChance = statedChance == null ? 1.0 : statedChance;
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
                 continue;

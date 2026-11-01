@@ -3,7 +3,7 @@
   "character": 1312,
   "_status": "partial",
   "_gaps": [
-    "「**增加 1 段**米沙下一次终结技的攻击段数」已落地 ✓（`RAISE_SKILL_HITS`），施放后回到初始段数用**减 6** 近似 ✓；终结技每段 20% 基础概率冻结 + 冻结附加伤害**已落地** ✓（`DEALING_DAMAGE` 逐段触发 `APPLY_CONTROL 冻结`）；仍开：① 冻结的 `base_chance` 只能写字面值（20%），Lv1 应为 0.12 —— 缺「概率按等级读」的拼法；② 星魂与秘技"
+    "「**增加 1 段**米沙下一次终结技的攻击段数」已落地 ✓（`RAISE_SKILL_HITS`），施放后回到初始段数用**减 6** 近似 ✓；终结技每段 20% 基础概率冻结 + 冻结附加伤害**已落地** ✓（`DEALING_DAMAGE` 逐段触发 `APPLY_CONTROL 冻结`）；仍开：星魂与秘技"
   ],
   "rules": [
     {
@@ -149,15 +149,15 @@
           "op": "APPLY_CONTROL",
           "control": "冻结",
           "turns": 1,
-          "base_chance": 0.2,
           "element": "Ice",
           "scale": "self_attr:ATTACK",
           "percent_from_skill_param": "ULTRA:3",
-          "target": "target"
+          "target": "target",
+          "base_chance_from_skill_param": "ULTRA:2"
         }
       ],
       "source": "1312 米沙 终结技 要…要迟到了: 「每段攻击前有20.00%的基础概率使目标陷入冻结状态，持续1回合。冻结状态下，敌方目标不能行动，同时每回合开始时受到等同于米沙30%攻击力的冰属性附加伤害。」 param Lv10 = [3, 0.6, 0.2, 0.3, 10]",
-      "_note": "「**每段攻击前**有 **20%** 的基础概率使目标陷入**冻结**，持续 **1 回合**；冻结下每回合开始时受到等同于米沙 **30% 攻击力**的冰属性附加伤害」—— 事件 `DEALING_DAMAGE`（**每段结算前**各触发一次，正是「每段攻击前」）✓ + `APPLY_CONTROL 冻结`（引擎的冻结自带「无法行动 + 每回合冰伤」，伤害份额 `#4` = 0.3 按等级读 ✓）。⚠ `base_chance: 0.2` 是**字面值**：`base_chance` 没有「按等级读」的拼法（`EffectSpec` 只有 `baseChance` 一个字段，不像 `percent` 有 `percent_from_skill_param`），而这一列在 Lv1 是 0.12 ⇒ 已登记为缺口（`_gaps`）。",
+      "_note": "「**每段攻击前**有 **20%** 的基础概率使目标陷入**冻结**，持续 **1 回合**；冻结下每回合开始时受到等同于米沙 **30% 攻击力**的冰属性附加伤害」—— 事件 `DEALING_DAMAGE`（**每段结算前**各触发一次，正是「每段攻击前」）✓；概率用本轮新增的 `base_chance_from_skill_param: 「ULTRA:2」`（#3 = 0.2，Lv1 是 0.12 ⇒ **按等级读** ✓）；`APPLY_CONTROL 冻结` 自带「无法行动 + 每回合冰伤」，伤害份额 `#4` 按等级读 ✓。",
       "when": [
         "actor == self",
         "from_skill ULTRA"
