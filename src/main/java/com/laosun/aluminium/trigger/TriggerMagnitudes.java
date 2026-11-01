@@ -178,6 +178,12 @@ final class TriggerMagnitudes {
                 // fall through to the attribute family below
             }
         }
+        // "此伤害使用我方最高的【好活当赏】计算" (the Elation Trailblazer): a resource read, not an attribute - the same
+        // spelling the MODIFY_ATTR family already resolves, so it goes through that resolver rather than the attribute list.
+        if (scale != null && scale.trim().startsWith(MAX_PARTY_RESOURCE_PREFIX)) {
+            double value = resolveScale(scale, share, ctx);
+            return flat == 0 ? value : value + flat;
+        }
         AttributeType attribute = TriggerMagnitudes.scaleAttribute(effect, "DAMAGE", null);
         if (attribute == null) {
             throw new IllegalStateException("a literal-ratio DAMAGE needs a derived scale like self_attr:ATTACK or a Max HP share like owner_max_hp, got '"
@@ -387,6 +393,22 @@ final class TriggerMagnitudes {
         }
         // A battle-level PARTY counter as a magnitude (reader: 1513's reward, which hands
         // [好活当赏] the [笑点] the Aha moment spent). The counter lives on the battle, not on a unit.
+        // "此伤害使用我方**最高**的【好活当赏】数值计算" (the Elation Trailblazer): the largest value any ally holds.
+        if (key.startsWith(MAX_PARTY_RESOURCE_PREFIX)) {
+            String id = key.substring(MAX_PARTY_RESOURCE_PREFIX.length()).trim();
+            if (id.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "scale \"" + key + "\" names no resource; write \"" + MAX_PARTY_RESOURCE_PREFIX + "<RESOURCE>\"");
+            }
+            if (ctx == null || ctx.battle() == null) {
+                return 0.0;
+            }
+            int most = 0;
+            for (com.laosun.aluminium.entity.CanHit ally : ctx.battle().allies()) {
+                most = Math.max(most, ally.getResources().value(id));
+            }
+            return percent * most;
+        }
         if (key.startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX)) {
             String counter = key.substring(TriggerInterpreter.PARTY_RESOURCE_PREFIX.length()).trim();
             if (ctx.battle() == null || ctx.battle().partyResource(counter) == null) {
@@ -470,6 +492,11 @@ final class TriggerMagnitudes {
      * The scale spelling that reads the biggest stack count among the enemies: {@code max_enemy_stacks:<NAME>}.
      */
     static final String MAX_ENEMY_STACKS_PREFIX = "max_enemy_stacks:";
+
+    /**
+     * The spelling that reads the biggest value OUR side holds: {@code max_party_resource:<NAME>}.
+     */
+    static final String MAX_PARTY_RESOURCE_PREFIX = "max_party_resource:";
 
     /**
      * The magnitude of a derived {@code MODIFY_ATTR}: {@code percent  x  <the rule owner's attribute> + amount}.
@@ -1087,7 +1114,8 @@ final class TriggerMagnitudes {
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (TriggerInterpreter.SELF_MAX_ENERGY.equals(raw) || TriggerInterpreter.EVENT_AMOUNT.equals(raw) || raw.startsWith(TriggerInterpreter.ABOVE_PREFIX)
                 || raw.startsWith(TriggerInterpreter.STEPS_PREFIX)
-                || raw.startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX) || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
+                || raw.startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX) || raw.startsWith(MAX_PARTY_RESOURCE_PREFIX)
+                || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
                 || raw.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)
                 || TriggerInterpreter.COUNTED_LAUGHS.equals(raw) || "elation_base".equals(raw)) {
             // `holder_attr:` joins them for the same reason `summon_attr:`/`actor_attr:` are not here: it names a
