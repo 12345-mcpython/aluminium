@@ -14,18 +14,18 @@
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
           "scale": "self_attr:SPEED",
-          "percent": 0.2,
           "buff": "敕令",
           "turns": 2,
-          "target": "target"
+          "target": "target",
+          "percent_from_skill_param": "ULTRA:2"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.6,
           "buff": "敕令",
           "turns": 2,
-          "target": "target"
+          "target": "target",
+          "percent_from_skill_param": "ULTRA:0"
         },
         {
           "op": "APPLY_BUFF",
@@ -35,7 +35,7 @@
         }
       ],
       "source": "1215 寒鸦 终结技 十王敕令，遍土遵行 (skill 121503, Ultra/Enhance): 「使指定我方单体速度提高，提高数值等同于寒鸦速度的20.00%，并使该目标攻击力提高60%，持续2回合。」 param Lv10 → #1 = 0.2（寒鸦速度的份额）, #2 = 0.6, #3 = 2 回合",
-      "_note": "One sentence, three effects, and the third is the interesting one. ⚠ The SPD boost is a <b>derived</b> magnitude (`scale: self_attr:SPEED`, read off 寒鸦 — 「等同于寒鸦速度的20%」 — and frozen when she casts), while the ATK boost is a plain 60%; both are ordinary modifiers, both carry `buff: 敕令` so that 星魂 4's 「终结技的持续时间额外增加1回合」 has a name to reach. ⚠ The <b>marker state</b> 「敕令」 is not decoration either: 星魂 1 says 「持有<b>终结技效果</b>的我方目标消灭敌方目标时，寒鸦行动提前15%」, and \"carries my ultimate's effect\" is only readable if the effect is also a <b>state</b> — a named modifier is invisible to `has_state` (which reads states, controls and DoTs). The marker shares the modifiers' `turns`, so the three end together. ⚠ `target != self` is 「指定我方单体」: a self-cast is not a target she may buff, and `ULT_CAST` reaches her own table too.",
+      "_note": "One sentence, three effects, and the third is the interesting one. ⚠ The SPD boost is a <b>derived</b> magnitude (`scale: self_attr:SPEED`, read off 寒鸦 — 「等同于寒鸦速度的20%」 — and frozen when she casts), while the ATK boost is a plain 60%; both are ordinary modifiers, both carry `buff: 敕令` so that 星魂 4's 「终结技的持续时间额外增加1回合」 has a name to reach. ⚠ The <b>marker state</b> 「敕令」 is not decoration either: 星魂 1 says 「持有<b>终结技效果</b>的我方目标消灭敌方目标时，寒鸦行动提前15%」, and \"carries my ultimate's effect\" is only readable if the effect is also a <b>state</b> — a named modifier is invisible to `has_state` (which reads states, controls and DoTs). The marker shares the modifiers' `turns`, so the three end together. ⚠ `target != self` is 「指定我方单体」: a self-cast is not a target she may buff, and `ULT_CAST` reaches her own table too. ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "ult_blessing"
     },
     {
@@ -65,14 +65,14 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "percent": 0.2,
           "turns": 1,
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "ULTRA:2"
         }
       ],
       "min_eidolon": 2,
       "source": "1215 寒鸦 星魂 2 二观 (Avatar_Hanya_Rank02): 「施放战技后，速度提高20%，持续1回合。」 param = [0.2, 1]",
-      "_note": "「施放**战技**后，速度提高20%，持续1回合」. ⚠ `SKILL_CAST` (not `ALLY_ATTACK`, not `BASIC_ATTACK`): the sentence names the Skill slot, and the emitter already splits the three in-battle casts, so this cannot fire on 普攻 or 终结技. ⚠ `actor == self` is load-bearing: SKILL_CAST is broadcast to the whole side. ⚠ The target is 寒鸦 herself — 「速度提高」 with no other subject in the sentence. ⚠ `min_eidolon: 2` is the gate.",
+      "_note": "「施放**战技**后，速度提高20%，持续1回合」. ⚠ `SKILL_CAST` (not `ALLY_ATTACK`, not `BASIC_ATTACK`): the sentence names the Skill slot, and the emitter already splits the three in-battle casts, so this cannot fire on 普攻 or 终结技. ⚠ `actor == self` is load-bearing: SKILL_CAST is broadcast to the whole side. ⚠ The target is 寒鸦 herself — 「速度提高」 with no other subject in the sentence. ⚠ `min_eidolon: 2` is the gate. ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "eidolon2_skill"
     },
     {
@@ -275,13 +275,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.3,
           "turns": 2,
-          "target": "attacker"
+          "target": "attacker",
+          "percent_from_skill_param": "TALENT:0"
         }
       ],
       "source": "1215 寒鸦 天赋 罚恶 (skill 121504): 「我方目标对陷入【承负】状态下的敌方目标施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合。」 之一（普攻）",
-      "_note": "「我方目标对陷入【承负】…施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合」 -- the boost is granted to the ATTACKER (`target: actor`) and lasts 2 of their turns, so it is an ordinary modifier, not a one-instance `BOOST_DAMAGE`. ⚠ It fires on the instance that satisfies the condition, which is why the sentence says 「施放…时」: the zone is assembled after the trigger, so this very hit is boosted too. ⚠ Three rules again (one per slot), matching one apiece. ⚠ `actor is_ally` is 「我方目标」: 寒鸦 herself counts (she is one of ours), an enemy attack does not.",
+      "_note": "「我方目标对陷入【承负】…施放普攻、战技、终结技时，造成的伤害提高30%，持续2回合」 -- the boost is granted to the ATTACKER (`target: actor`) and lasts 2 of their turns, so it is an ordinary modifier, not a one-instance `BOOST_DAMAGE`. ⚠ It fires on the instance that satisfies the condition, which is why the sentence says 「施放…时」: the zone is assembled after the trigger, so this very hit is boosted too. ⚠ Three rules again (one per slot), matching one apiece. ⚠ `actor is_ally` is 「我方目标」: 寒鸦 herself counts (she is one of ours), an enemy attack does not. ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "talent_common"
     },
     {
@@ -295,13 +295,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.3,
           "turns": 2,
-          "target": "attacker"
+          "target": "attacker",
+          "percent_from_skill_param": "TALENT:0"
         }
       ],
       "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之二（战技）",
-      "_note": "The 战技 half of her talent -- see the 普攻 rule above.",
+      "_note": "The 战技 half of her talent -- see the 普攻 rule above. ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "talent_skill"
     },
     {
@@ -315,13 +315,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.3,
           "turns": 2,
-          "target": "attacker"
+          "target": "attacker",
+          "percent_from_skill_param": "TALENT:0"
         }
       ],
       "source": "1215 寒鸦 天赋 罚恶: 「…普攻、战技、终结技…」 之三（终结技）",
-      "_note": "The 终结技 half of her talent -- see the 普攻 rule above.",
+      "_note": "The 终结技 half of her talent -- see the 普攻 rule above. ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "talent_ultra"
     },
     {
