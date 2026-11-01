@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 1009,
-  "_status": "partial",
-  "_gaps": [
-    "天赋蓄能的**基础层**（「每击中 1 名**不同**的敌方目标获得 1 层」）未写 —— 需要「**不同目标**」的计数（现有 `hit_count` 数的是命中次数，同一目标多段会重复计）；火弱点额外 +1 已落地 ✓"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "ULT_CAST",
@@ -129,6 +126,16 @@
       ],
       "source": "1009 艾丝妲 天赋 流星群: 「每击中1名不同的敌方目标获得1层蓄能，若受到攻击的敌方目标弱点为火属性，则额外获得1层蓄能。」 param Lv10 = [0.14, 5, 3]",
       "_note": "「若受到攻击的敌方目标**弱点为火属性**，则**额外**获得 **1 层**蓄能」—— ① 事件 `DEALING_DAMAGE` ✓（打在谁身上就判谁 ✓）+ 条件 **`target has_weakness Fire`** ✓（现成的弱点条件）；② `actor == self` ✓（「艾丝妲」自己的攻击）；③ `ADD_STACK 蓄能 1` ✓（**额外**的那一层；基础那层仍开，见 `_gaps`）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_charge_per_distinct_target",
+      "when": ["actor == self"],
+      "do": [
+        { "op": "ADD_STACK", "buff": "蓄能", "amount": 1, "max_stacks": 99, "permanent": true, "times_from": "distinct_hit_targets", "target": "self" }
+      ],
+      "source": "1009 艾丝妲 天赋 流星群: 「每击中1名不同的敌方目标获得1层蓄能…」 param Lv10 = [0.14, 5, 3]",
+      "_note": "「每击中 **1 名不同**的敌方目标获得 **1 层**蓄能」—— ① 事件 `ALLY_ATTACK` ✓（一次施放一条事件）；② **`times_from: distinct_hit_targets`** ✓ —— 数的是**命中集合里的不同敌人**（同一目标多段只算 1 ✓），而不是 `hit_count`（那是命中次数 ✗）；③ 目标 `self` ✓（层数在她自己身上）。"
     }
   ]
 }
