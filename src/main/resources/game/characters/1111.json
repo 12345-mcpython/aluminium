@@ -337,6 +337,29 @@
       ],
       "source": "1111 卢卡 星魂 2 敌弱，我强 (AvatarRankDesc_111102): 「若战技击中的敌方目标弱点为物理属性，获得1层【斗志】。」 param = [1]",
       "_note": "「若战技击中的敌方目标**弱点为物理属性**，获得 **1 层**【斗志】」—— ① 条件用现成的 **`target has_weakness Physical`** ✓（引擎的弱点条件，读者族同 1310/1315）；② 事件 `SKILL_CAST` + `actor == self` ✓；③ 层数 `ADD_STACK 斗志 1` ✓（上限 6 = 星魂 6 的「上限 4→6」？本档用 6 与他文件里其它 `斗志` 计数器一致 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon1_damage_up_while_bleeding",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "any_enemy has_state 裂伤"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "turns": 2,
+          "target": "self",
+          "percent": 0.15
+        }
+      ],
+      "source": "1111 卢卡 星魂 1 争斗不休: 「当卢卡行动时，若指定的敌方目标处于裂伤状态，卢卡造成的伤害提高15%，持续2回合。」 参数 = [0.15, 2]",
+      "_note": "「当卢卡**行动时**」→ `TURN_START` + `actor == self` ✓；「若指定的敌方目标处于**裂伤**」→ 新增条件 `any_enemy has_state 裂伤`（见 `_divergences`）✓；「造成的伤害提高 **15%**，持续 **2 回合**」→ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { percent: 0.15, turns: 2 }` ✓。⚠ **字面值是对的**：0.15 来自**星魂参数** `[0.15, 2]`（星魂没有等级轴，见 AGENT §0.1.3 的例外），不是技能行。",
+      "_divergences": [
+        "「**指定的**敌方目标处于裂伤」实现为「**有**敌方目标处于裂伤」—— 引擎没有「当前指定目标」这一事实，条件只能问「有没有」。两者只在「裂伤的不止一个 / 当前目标没裂伤但别人裂伤」时不同。"
+      ]
     }
   ]
 }
