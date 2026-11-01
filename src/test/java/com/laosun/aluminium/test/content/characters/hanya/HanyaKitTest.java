@@ -113,12 +113,15 @@ public class HanyaKitTest {
      */
     @Test
     public void herEidolonLevelRaisesAreStated() {
+        // Every slot starts at the file's own convention (+9, the Lv10 row), so an Eidolon's raise is read as the
+        // difference to rank 0 rather than as the absolute bonus.
+        int base = new Fixture(0).hanya.skillLevelBonus(SkillType.SKILL);
         Fixture atThree = new Fixture(3);
-        Assertions.assertEquals(2, atThree.hanya.skillLevelBonus(SkillType.SKILL), "Eidolon 3 「战技等级+2」 (Skill Lv. +2)");
-        Assertions.assertEquals(1, atThree.hanya.skillLevelBonus(SkillType.COMMON), "…\"Basic ATK Lv. +1\" (「普攻等级+1」)");
+        Assertions.assertEquals(base + 2, atThree.hanya.skillLevelBonus(SkillType.SKILL), "Eidolon 3 「战技等级+2」 (Skill Lv. +2)");
+        Assertions.assertEquals(1, atThree.hanya.skillLevelBonus(SkillType.COMMON) - base, "…\"Basic ATK Lv. +1\" (「普攻等级+1」)");
 
         Fixture atFive = new Fixture(5);
-        Assertions.assertEquals(2, atFive.hanya.skillLevelBonus(SkillType.ULTRA), "Eidolon 5 「终结技等级+2」 (Ultimate Lv. +2)");
+        Assertions.assertEquals(base + 2, atFive.hanya.skillLevelBonus(SkillType.ULTRA), "Eidolon 5 「终结技等级+2」 (Ultimate Lv. +2)");
         Assertions.assertEquals(11, atFive.hanya.skillLevelBonus(SkillType.TALENT),
                 "…「天赋等级+2」 (Talent Lv. +2) on top of the +9 base level the file states (10 + 2)");
     }
