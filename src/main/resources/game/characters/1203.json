@@ -3,7 +3,7 @@
   "character": 1203,
   "_status": "partial",
   "_gaps": [
-    "星魂 1（「结界生效时我方全体攻击力提高 20%」）、星魂 4（「结界生效时使敌方陷入虚弱、造成的伤害降低 12%」）未写；星魂 3/5 的等级加成已落地 ✓（星魂 6 的抗性降低**原本就在** `ult_all_type_res_down` 里 ✓，我曾误以为缺、写重复被 `ContentDuplicateGuardTest` 拦下 ✓）"
+    "星魂 4（「结界生效时使敌方陷入虚弱、造成的伤害降低 12%」）未写 —— 需要一个「造成的伤害降低」的区（虚弱区）；星魂 1（结界期间全队攻击 +20%，`while_state` 门控）与星魂 3/5 等级均已落地 ✓。⚠ 星魂 6 的抗性降低**原本就在** `ult_all_type_res_down` 里，我曾误以为缺、写重复被 `ContentDuplicateGuardTest` 拦下 ✓"
   ],
   "rules": [
     {
@@ -357,5 +357,17 @@
       ],
       "source": "1203 罗刹 星魂 3 愚人试探: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 data: skill_add_level = {120302: 2, 120301: 1}",
       "_note": "「战技 **+2**、普攻 **+1**」—— 取自 eidolons.json 的 skill_add_level ✓。"
-    }  ]
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_attack_while_the_zone_is_up",
+      "when": ["actor == self", "self has_state 结界"],
+      "min_eidolon": 1,
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.2, "permanent": true, "while_state": "结界", "target": "all_allies" }
+      ],
+      "source": "1203 罗刹 星魂 1 濯洗生者: 「结界生效时我方全体攻击力提高20%。」 param = [0.2]",
+      "_note": "「**结界生效时**我方全体攻击力提高 **20%**」—— 条件 self has_state 结界 + 属性带 while_state 结界（每个回合边界检查一次，结界一结束加成就被摘掉）。"
+    }
+  ]
 }
