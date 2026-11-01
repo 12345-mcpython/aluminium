@@ -62,12 +62,59 @@
     {
       "on": "ULT_CAST",
       "id": "ult_gains_two_reverse_scales",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "ADD_STACK", "buff": "逆鳞", "amount": 2, "max_stacks": 3, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "逆鳞",
+          "amount": 2,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1213 丹恒•饮月 终结技 盘拏耀跃: 「…并使自身获得2个【逆鳞】。【逆鳞】最多持有3个，可用来抵扣丹恒•饮月的战技点消耗。」 param Lv10 = [3, 1.4, 2, 3]",
       "_note": "「使自身获得 **2 个**【逆鳞】，最多持有 **3** 个」—— `ADD_STACK amount: 2` ✓（**`amount` 就是这一次加几层** ✓ —— 第 1111 轮已实测订正过旧记录 ✗）+ `max_stacks: 3` ✓（「最多持有 3 个」✓）；`permanent: true` ✓（没有回合时长 ✓）。⚠ 「可用来**抵扣战技点消耗**、消耗【逆鳞】**视为**消耗战技点」**未写** ⇒ 见 `_gaps` ✓（需要「先花逆鳞再花战技点」的支付顺序）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "1213 星魂 3: 等级加成（数据 skill_add_level）",
+      "_note": "取自 `skill_add_level` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1213 星魂 5: 等级加成（数据 skill_add_level）",
+      "_note": "取自 `skill_add_level` ✓。"
     }
   ]
 }
