@@ -30,9 +30,9 @@ public class AventurineEidolonSixTest {
         // from the shields this judge adds.
         for (int extra : new int[]{0, 1, 3}) {
             double[] result = boostWith(extra);
-            double expected = Math.min(result[1] * 0.005, 0.015);
+            double expected = Math.min(result[1] * 0.5, 1.5);
             Assertions.assertEquals(expected, result[0], 1e-9,
-                    extra + " extra shields (" + (int) result[1] + " shielded): min(count x 0.5%, 1.5%)");
+                    extra + " extra shields (" + (int) result[1] + " shielded): min(count x 50%, 150%)");
         }
     }
 
