@@ -4,8 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "终结技结界：统一烬煨层数为最高值、行动时 60% 叠层、最多 6 次/每敌每回合 1 次/施放重置未写",
-    "星魂 1：全队对烬煨目标 +40% 伤害、每次触发额外 +1 层未写",
-    "天赋抗性降低在烬煨层数清零时不会自动撤下（语义差）"
+    "星魂 1：全队对烬煨目标 +40% 伤害、每次触发额外 +1 层未写"
   ],
   "rules": [
     {
@@ -99,8 +98,9 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "RESISTANCE_REDUCTION",
-          "scale": "target_stacks:烬煨",
           "percent": 0.03,
+          "per_stack": "烬煨",
+          "per_stack_live": true,
           "permanent": true,
           "target": "target"
         }
