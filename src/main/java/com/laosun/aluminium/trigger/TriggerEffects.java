@@ -184,6 +184,11 @@ final class TriggerEffects {
             // separate absolute modifier, added below (`1409`'s 「30% + 600」). Folding the constant in here turned
             // "30% + 600" into "600.3 x base" (measured: 652,900 instead of 926).
             magnitude = scaled ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : TriggerMagnitudes.shareOf(effect, ctx);
+        } else if (effect.getAmount() == null && effect.getAmountFromSkillParam() != null) {
+            // "使我方全体速度提高50点" (Asta Ultimate): the FLAT half read out of the skill own row, because that column
+            // moves with the level; without this branch the flat arm unboxed a null amount.
+            magnitude = TriggerMagnitudes.ownerSkillParamValue(effect, ctx,
+                    String.valueOf(effect.getAmountFromSkillParam()));
         } else {
             magnitude = effect.getAmount();
         }

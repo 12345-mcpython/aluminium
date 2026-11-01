@@ -28,9 +28,10 @@ import java.util.Set;
 public class HardcodedSkillRowRatchetTest {
 
     /**
-     * The measured count on 2026-10-31. Lowering it is progress; raising it is the fault this test exists to catch.
+     * The measured count on 2026-10-31, after 1009 read its four rows instead of restating them. Lowering it is
+     * progress; raising it is the fault this test exists to catch.
      */
-    private static final int BASELINE = 219;
+    private static final int BASELINE = 215;
 
     private static final Set<String> MAGNITUDE_OPS = Set.of(
             "DAMAGE", "HEAL", "SHIELD", "APPLY_DOT", "APPLY_REGEN", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN",

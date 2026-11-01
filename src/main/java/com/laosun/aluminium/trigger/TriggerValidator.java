@@ -635,7 +635,10 @@ final class TriggerValidator {
                         && effect.getPercentFromCastParam() == null
                         && effect.getPercentFromSkillParam() == null && effect.getPercentFromResource() == null
                         && effect.getPercentFromSummonParam() == null)
-                        == (effect.getAmount() == null)) {
+                        // "使我方全体速度提高50点" (1009 Ultimate) reads that 50 out of the skill's own row, because the
+                        // column moves with the level: a level-aware FLAT spelling is still the flat half, so
+                        // amount_from_skill_param must count as one.
+                        == (effect.getAmount() == null && effect.getAmountFromSkillParam() == null)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs exactly one of \"percent\" (a share) or \"amount\" (a flat value) unless it also states a \"scale\", in which "
                                     + "case both are read as percent x scale + amount; it states "
@@ -684,7 +687,11 @@ final class TriggerValidator {
                         throw new IllegalArgumentException(
                                 "Op " + op + " states BOTH \"scale\" and \"per_stack\" (source: " + spec.getSource() + ")");
                     }
-                    if (effect.getPercent() == null && effect.getValue() == null && effect.getRatio() == null) {
+                    if (effect.getPercent() == null && effect.getValue() == null && effect.getRatio() == null
+                            && !TriggerMagnitudes.statesShare(effect)) {
+                        // A share may also be READ from the skill row ("每层蓄能使我方全体攻击力提高14%", 1009's Talent, whose
+                        // column moves with the level) - the same spellings the magnitude reader accepts, asked of its own
+                        // predicate instead of a copy that falls one spelling behind.
                         throw new IllegalArgumentException(
                                 "Op " + op + " states \"per_stack\" without \"percent\", \"ratio\" or \"value\" (source: " + spec.getSource() + ")");
                     }
