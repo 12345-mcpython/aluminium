@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 1217,
-  "_status": "partial",
-  "_gaps": [
-    "星魂 1 的另一半：「持有【禳命】时我方全体速度 +12%」未写 —— 需要「条件光环」（状态在时对全体持续生效，状态消失即撤）的写法"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "SKILL_CAST",
@@ -257,6 +254,27 @@
       ],
       "source": "1217 藿藿 星魂 4 乐以忘忧: 「施放战技或触发天赋为我方目标提供治疗时，目标的当前生命值越低治疗量越高，最多使藿藿提供的治疗量提高80%。」 param = [0.8]",
       "_note": "「目标的**当前生命值越低**，治疗量越高，**最多 +80%**」—— ① 这是**连续**函数，不是门槛 ⇒ `REGISTER_HEAL_BONUS` 加 **`scale_by_missing_hp: true`** ✓：加成 = `percent × (1 - 目标当前生命%)` ⇒ 满血 **+0%**、半血 **+40%**、空血 **+80%** ✓；② 正因为它在满血时也是 0，**不需要 `target_when`** ✓（校验器对带该标志的登记放宽——否则会强迫写一个永真的条件 ✗）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_speed_aura_on_gain",
+      "when": ["actor == self"],
+      "min_eidolon": 1,
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "permanent": true, "while_state": "禳命", "target": "all_allies" }
+      ],
+      "source": "1217 藿藿 星魂 1 人间烟火: 「…且当藿藿拥有【禳命】时我方全体提高12%的速度。」 param = [0.12, 1]",
+      "_note": "「**当藿藿拥有【禳命】时**我方全体提高 **12%** 的速度」—— ① 用新的 **`while_state: 禳命`** ✓：修饰挂在**全体**身上、但**门在藿藿身上**（谁施放规则就查谁 ✓）⇒ 禳命一离场，缓冲在下一个回合边界被摘掉 ✓（`AbstractBuff.gateBroken`）；② 不写 `turns` ✗ —— 句子说的是「拥有期间」，写回合数会在状态还在时掉 ✗；③ 这条挂在**战技**上（她这次施放正好给自己上了禳命 ✓），行迹那条在开战时另挂一次 ✓（同属性同来源类型 ⇒ 互相刷新，不会叠两层 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_speed_aura_on_start",
+      "min_eidolon": 1,
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "permanent": true, "while_state": "禳命", "target": "all_allies" }
+      ],
+      "source": "1217 藿藿 星魂 1 人间烟火: 「…且当藿藿拥有【禳命】时我方全体提高12%的速度。」 param = [0.12, 1]",
+      "_note": "与上一条相同的第二半，挂在 `BATTLE_START`：行迹 不敢自专 在开战时给禳命 ✓，所以这里的门当场成立 ✓。⚠ 两条都写是因为「获得禳命」有两个时刻（开战 / 战技），缓冲本身按属性刷新 ⇒ 不会叠 ✓。"
     }
   ]
 }
