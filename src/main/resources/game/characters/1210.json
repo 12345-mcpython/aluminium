@@ -34,7 +34,8 @@
         }
       ],
       "source": "1210 桂乃芬 trace 1210103 逾锋",
-      "_note": "Doc text: 「对陷入灼烧状态的敌方目标造成的伤害提高20%。」 Three things make this exact, and each of them is a deliberate choice: 'actor == self' because the text is about HER damage (without it an ally's hit on the same burning target would be boosted too); 'target has_state 灼烧' resolves to a Fire DoT -- 灼烧 is not a StateBuff but a DotBuff element, which is how the engine has modelled a burn since P10-0; and BOOST_DAMAGE changes the instance being settled, so nothing is attached to anybody, nothing has to be removed, and a hit against a target that is not burning gets nothing. E0 value (params [0.2])."
+      "_note": "Doc text: 「对陷入灼烧状态的敌方目标造成的伤害提高20%。」 Three things make this exact, and each of them is a deliberate choice: 'actor == self' because the text is about HER damage (without it an ally's hit on the same burning target would be boosted too); 'target has_state 灼烧' resolves to a Fire DoT -- 灼烧 is not a StateBuff but a DotBuff element, which is how the engine has modelled a burn since P10-0; and BOOST_DAMAGE changes the instance being settled, so nothing is attached to anybody, nothing has to be removed, and a hit against a target that is not burning gets nothing. E0 value (params [0.2]).",
+      "id": "on_damage_effect"
     }
   ]
 }

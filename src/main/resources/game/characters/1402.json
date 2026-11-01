@@ -21,7 +21,8 @@
         }
       ],
       "source": "1402 阿格莱雅 战技 高举吧，升华的名讳 (skill 140202, BPSkill/Summon) 第一句: 「为衣匠回复等同于其#1[i]%生命上限的生命值。」 param Lv10 = [0.5, 0, 5]",
-      "_note": "The 「衣匠已在场」 half: restore 50% of its Max HP. ⚠ That 0.5 is written here because HEAL's `scale` + `percent` take a literal and do not read a skill's parameter table. It is the Lv10 row the prose quotes (Lv1 would be 0.25) -- the same 「which row」 question `damage_level` answers for the ops that DO read a table, so it is registered with M-32. ⚠ `target: \"summon\"` fails loudly when there is no memosprite, which is why this rule needs `self_summon_count >= 1`; the next rule uses `== 0`, so the two halves are mutually exclusive by construction rather than by watching whether the summon actually happened (SUMMON is idempotent, so that is not observable afterwards)."
+      "_note": "The 「衣匠已在场」 half: restore 50% of its Max HP. ⚠ That 0.5 is written here because HEAL's `scale` + `percent` take a literal and do not read a skill's parameter table. It is the Lv10 row the prose quotes (Lv1 would be 0.25) -- the same 「which row」 question `damage_level` answers for the ops that DO read a table, so it is registered with M-32. ⚠ `target: \"summon\"` fails loudly when there is no memosprite, which is why this rule needs `self_summon_count >= 1`; the next rule uses `== 0`, so the two halves are mutually exclusive by construction rather than by watching whether the summon actually happened (SUMMON is idempotent, so that is not observable afterwards).",
+      "id": "skill_effect"
     },
     {
       "on": "SKILL_CAST",
@@ -35,12 +36,13 @@
         },
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         }
       ],
       "source": "1402 阿格莱雅 战技 高举吧，升华的名讳 (skill 140202, BPSkill/Summon) 第二句: 「若衣匠不在场，则召唤忆灵衣匠，并使自身立即行动。」",
-      "_note": "The 「衣匠不在场」 half: summon, and make HER take action immediately. ⚠ 「并使自身立即行动」 hangs off the 「若…则召唤」 branch (the 并 continues the summoning clause), so it lives in THIS rule and not in the one above -- putting it in both would advance her even when the memosprite was already out, which the text does not say. ⚠ `self_summon_count == 0` is the rare reverse spelling of that condition: it means \"I have no summon out\", NOT \"there is no battlefield\" -- a context without a battle makes these conditions fail outright (engine.md 4.6), so it cannot fire by accident."
+      "_note": "The 「衣匠不在场」 half: summon, and make HER take action immediately. ⚠ 「并使自身立即行动」 hangs off the 「若…则召唤」 branch (the 并 continues the summoning clause), so it lives in THIS rule and not in the one above -- putting it in both would advance her even when the memosprite was already out, which the text does not say. ⚠ `self_summon_count == 0` is the rare reverse spelling of that condition: it means \"I have no summon out\", NOT \"there is no battlefield\" -- a context without a battle makes these conditions fail outright (engine.md 4.6), so it cannot fire by accident.",
+      "id": "skill_effect_2"
     },
     {
       "on": "ULT_CAST",
@@ -54,7 +56,7 @@
         {
           "op": "HEAL",
           "scale": "target_max_hp",
-          "percent": 1.0,
+          "percent": 1,
           "target": "summon"
         },
         {
@@ -66,12 +68,13 @@
         },
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         }
       ],
       "source": "1402 阿格莱雅 终结技 残梦，由始至终 (skill 140203, Ultra/Enhance): 「召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入【至高之姿】状态并使自身立即行动。」 param Lv10 = [0.15, 0, 0, 100, 0, 0]",
-      "_note": "Four things, in the order the text writes them: summon, restore, enter the stance, advance herself. ⚠ 「若衣匠已在场，则使其生命值回复至上限」 needs NO branch: SUMMON is idempotent per summoner (already out => nothing happens), and the HEAL that follows is a full-HP heal on a fresh one (clamped by its Max HP, i.e. no change) -- the two cases are observably identical, so one rule covers both. ⚠ 「回复至上限」 is written as 「heal by 100% of its Max HP」: Battle.heal clamps current HP at the maximum, so the two are the same result rather than an approximation. ⚠ The ORDER is not decoration: `target: \"summon\"` in the HEAL and the ADVANCE fails loudly when nothing is out, so SUMMON has to come first -- and there is a test for that. ⭐ **2026-10-02 收窄**：【至高之姿】**本身现在就写出来了** ✓ —— `APPLY_BUFF` + `permanent: true` + **`ticks_on: \"summon\"`** ✓：文档没有给它回合数 ✓（它由「行动序列上的倒计时」结束 ✓），而**收窄点就在那一行** ✓ —— `ticks_on: \"summon\"` 把它的**寿命锚在衣匠身上** ✓ ⇒ 「**衣匠消失时阿莱莱雅解除【至高之姿】状态**」由引擎既有的锚点清扫完成 ✓（`removeBuffsAnchoredTo` 判的就是 `ticksOn` ✓，`releaseBuffsAnchoredToTheDead` 已扫两个阵营 ✓）。⚠ **仍登记（这个状态的**内容**）**：SPD +15%/层（层数来自衣匠的忆灵天赋 ✗）、普攻被替换为【孤锋千吻】且无法施放战技（技能替换 ✗）、衣匠免疫控制类负面状态（召唤物的免疫 ✗）、以及那个 100 速度的倒计时使衣匠自毁（`START_COUNTDOWN`/`COUNTDOWN_TURN` 存在 ✓，但\"回合开始时使衣匠自毁\"需要一个\"让召唤物退场\"的写法 ✗）—— ⚠ 于是本条出货的是**状态的生命周期**（进入 + 随衣匠解除 ✓），状态里**做什么**仍逐条登记 ✓，而不是用 `permanent` 冒充 ✓。⚠ Also un-authored: 衣匠's OWN attack. Its 忆灵技能1 is a Blast for 「110% 攻击力」 of 雷, but no document gives 衣匠 an ATK (the panel states only HP and SPD), and scaling it off 阿格莱雅's ATK would be a guess -- so it is not written, and the loader would refuse it anyway (Memeprites.validateAttack rejects a base the panel never states)."
+      "_note": "Four things, in the order the text writes them: summon, restore, enter the stance, advance herself. ⚠ 「若衣匠已在场，则使其生命值回复至上限」 needs NO branch: SUMMON is idempotent per summoner (already out => nothing happens), and the HEAL that follows is a full-HP heal on a fresh one (clamped by its Max HP, i.e. no change) -- the two cases are observably identical, so one rule covers both. ⚠ 「回复至上限」 is written as 「heal by 100% of its Max HP」: Battle.heal clamps current HP at the maximum, so the two are the same result rather than an approximation. ⚠ The ORDER is not decoration: `target: \"summon\"` in the HEAL and the ADVANCE fails loudly when nothing is out, so SUMMON has to come first -- and there is a test for that. ⭐ **2026-10-02 收窄**：【至高之姿】**本身现在就写出来了** ✓ —— `APPLY_BUFF` + `permanent: true` + **`ticks_on: \"summon\"`** ✓：文档没有给它回合数 ✓（它由「行动序列上的倒计时」结束 ✓），而**收窄点就在那一行** ✓ —— `ticks_on: \"summon\"` 把它的**寿命锚在衣匠身上** ✓ ⇒ 「**衣匠消失时阿莱莱雅解除【至高之姿】状态**」由引擎既有的锚点清扫完成 ✓（`removeBuffsAnchoredTo` 判的就是 `ticksOn` ✓，`releaseBuffsAnchoredToTheDead` 已扫两个阵营 ✓）。⚠ **仍登记（这个状态的**内容**）**：SPD +15%/层（层数来自衣匠的忆灵天赋 ✗）、普攻被替换为【孤锋千吻】且无法施放战技（技能替换 ✗）、衣匠免疫控制类负面状态（召唤物的免疫 ✗）、以及那个 100 速度的倒计时使衣匠自毁（`START_COUNTDOWN`/`COUNTDOWN_TURN` 存在 ✓，但\"回合开始时使衣匠自毁\"需要一个\"让召唤物退场\"的写法 ✗）—— ⚠ 于是本条出货的是**状态的生命周期**（进入 + 随衣匠解除 ✓），状态里**做什么**仍逐条登记 ✓，而不是用 `permanent` 冒充 ✓。⚠ Also un-authored: 衣匠's OWN attack. Its 忆灵技能1 is a Blast for 「110% 攻击力」 of 雷, but no document gives 衣匠 an ATK (the panel states only HP and SPD), and scaling it off 阿格莱雅's ATK would be a guess -- so it is not written, and the loader would refuse it anyway (Memeprites.validateAttack rejects a base the panel never states).",
+      "id": "ult_effect"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -143,7 +146,7 @@
       "do": [
         {
           "op": "GAIN_ENERGY",
-          "amount": 70.0,
+          "amount": 70,
           "target": "self"
         },
         {

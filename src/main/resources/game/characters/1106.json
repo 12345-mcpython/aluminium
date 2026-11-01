@@ -20,7 +20,8 @@
         }
       ],
       "source": "1106 佩拉 天赋 数据采集 (110604, Enhance): 「施放攻击后若敌方目标处于负面效果状态，则佩拉额外恢复10.00点能量。该效果每次攻击只能触发1次。」",
-      "_note": "「施放攻击后**若敌方目标处于负面效果状态**，则佩拉额外恢复 10 点能量」. ⚠ The condition is `target_debuff_count >= 1` — the numeric variable that reads how many negative buffs the **event's target** carries; this file is its first shipped reader. ⚠ 「该效果**每次攻击只能触发 1 次**」 needs no field: `ALLY_ATTACK` fires once per attack (not once per hit), so the limit is the event's own grain — stating `per_turn: 1` on top would be a *different* rule (it would also cap it across several attacks in one turn, which the sentence does not say)."
+      "_note": "「施放攻击后**若敌方目标处于负面效果状态**，则佩拉额外恢复 10 点能量」. ⚠ The condition is `target_debuff_count >= 1` — the numeric variable that reads how many negative buffs the **event's target** carries; this file is its first shipped reader. ⚠ 「该效果**每次攻击只能触发 1 次**」 needs no field: `ALLY_ATTACK` fires once per attack (not once per hit), so the limit is the event's own grain — stating `per_turn: 1` on top would be a *different* rule (it would also cap it across several attacks in one turn, which the sentence does not say).",
+      "id": "attack_effect"
     },
     {
       "on": "DEALING_DAMAGE",

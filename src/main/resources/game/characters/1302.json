@@ -104,7 +104,8 @@
         }
       ],
       "source": "1302 银枝 行迹 虔诚 (1302101): 「回合开始时，立即获得1层【升格】。」",
-      "_note": "「**回合开始时**，立即获得 1 层【升格】」 — `TURN_START` with `actor == self` (the event is delivered to the character whose turn begins; every other table evaluates it with `target` and `actor` other than the owner, so `actor == self` is what keeps it to her own turns). ⚠ The energy half is deliberately absent: this trace grants a stack, not energy."
+      "_note": "「**回合开始时**，立即获得 1 层【升格】」 — `TURN_START` with `actor == self` (the event is delivered to the character whose turn begins; every other table evaluates it with `target` and `actor` other than the owner, so `actor == self` is what keeps it to her own turns). ⚠ The energy half is deliberately absent: this trace grants a stack, not energy.",
+      "id": "turn_start_effect"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -119,7 +120,8 @@
         }
       ],
       "source": "1302 银枝 行迹 勇气 (1302103): 「对当前生命值百分比小于等于50%的敌方目标造成的伤害提高15%。」",
-      "_note": "「对**当前生命值百分比小于等于 50% 的**敌方目标造成的伤害提高 15%」. ⚠ `target_hp_percent` is the existing variable that reads the **event's target** — the unit being hit — which is exactly the sentence's subject, so no new vocabulary was needed; `actor == self` keeps it to her damage. ⚠ `BOOST_DAMAGE` raises this instance only, which is 就是「对某类目标造成的伤害」这类条件句的意思. ⚠ This is the first shipped reader of `target_hp_percent` in a *damage* rule (it was added for 1001's shield clause)."
+      "_note": "「对**当前生命值百分比小于等于 50% 的**敌方目标造成的伤害提高 15%」. ⚠ `target_hp_percent` is the existing variable that reads the **event's target** — the unit being hit — which is exactly the sentence's subject, so no new vocabulary was needed; `actor == self` keeps it to her damage. ⚠ `BOOST_DAMAGE` raises this instance only, which is 就是「对某类目标造成的伤害」这类条件句的意思. ⚠ This is the first shipped reader of `target_hp_percent` in a *damage* rule (it was added for 1001's shield clause).",
+      "id": "on_damage_effect"
     },
     {
       "on": "BATTLE_START",
@@ -285,7 +287,8 @@
       ],
       "min_eidolon": 6,
       "source": "1302 银枝 星魂 6 「你」的光芒 (Avatar_Argenti_00_Rank06): 「施放终结技时，无视敌方目标30%的防御力。」 param = [0.3]",
-      "_note": "「施放终结技时，无视敌方目标 30% 的防御力」 — the attribute exists (`DEFENCE_IGNORE`) and so does the shape: the buff is granted on `DEALING_DAMAGE` **before** the zones are assembled, so it applies to the very instance it was granted for (the same trick 知更鸟【协奏】的附加伤害 uses). ⚠ `from_skill ULTRA` keeps it to the ultimate (both ultimate ids are that slot) and `actor == self` keeps it to her damage. ⚠ `min_eidolon: 6` is the gate."
+      "_note": "「施放终结技时，无视敌方目标 30% 的防御力」 — the attribute exists (`DEFENCE_IGNORE`) and so does the shape: the buff is granted on `DEALING_DAMAGE` **before** the zones are assembled, so it applies to the very instance it was granted for (the same trick 知更鸟【协奏】的附加伤害 uses). ⚠ `from_skill ULTRA` keeps it to the ultimate (both ultimate ids are that slot) and `actor == self` keeps it to her damage. ⚠ `min_eidolon: 6` is the gate.",
+      "id": "eidolon6_on_damage"
     },
     {
       "on": "ENEMY_ENTERED",

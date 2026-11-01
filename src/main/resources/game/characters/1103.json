@@ -39,7 +39,8 @@
         }
       ],
       "source": "1103 希露瓦 终结技 机械热潮登场！ (110303, Ultra/AoEAttack): 「…并使触电状态下的敌方目标延长2回合的触电状态。」 param Lv10 = [1.8, 2] → #2 = 2（延长回合）",
-      "_note": "「使**触电状态下的**敌方目标延长 2 回合的触电状态」 — and `EXTEND_BUFF` says that exactly as it stands: it walks every resolved target and extends only the buffs whose name matches, so the unshocked enemies in `all_enemies` are simply not touched (no condition needed, and none could express it per-target anyway — that is the same `M-53` limit, dodged here rather than suffered). ⚠ The engine resolves 触电 through `BuffManager.isNamed`, which answers DOTs by their element's state name. ⚠ It extends buffs **applied by the rule owner** (`getSource() == source`), which is every shock her own kit makes; a shock from a teammate would be left alone, and that nuance is honest rather than accidental — the document's sentence has no source in it. ⚠ The 180% damage (#1) is the engine's own AoE path, not a rule."
+      "_note": "「使**触电状态下的**敌方目标延长 2 回合的触电状态」 — and `EXTEND_BUFF` says that exactly as it stands: it walks every resolved target and extends only the buffs whose name matches, so the unshocked enemies in `all_enemies` are simply not touched (no condition needed, and none could express it per-target anyway — that is the same `M-53` limit, dodged here rather than suffered). ⚠ The engine resolves 触电 through `BuffManager.isNamed`, which answers DOTs by their element's state name. ⚠ It extends buffs **applied by the rule owner** (`getSource() == source`), which is every shock her own kit makes; a shock from a teammate would be left alone, and that nuance is honest rather than accidental — the document's sentence has no source in it. ⚠ The 180% damage (#1) is the engine's own AoE path, not a rule.",
+      "id": "ult_effect"
     },
     {
       "on": "BATTLE_START",
@@ -65,7 +66,8 @@
         }
       ],
       "source": "1103 希露瓦 行迹 狂热 (1103103): 「消灭敌方目标后，攻击力提高20%，持续2回合。」",
-      "_note": "「消灭敌方目标后，攻击力提高 20%，持续 2 回合」. ⚠ `KILL`'s **actor** is the killer and the event carries no subject for the victim, so no condition is needed to say 「消灭敌方目标」 — but ⚠ this rule as written fires on *any* kill on the field, not only hers; gating it on `actor == self` would be an approximation of the opposite kind (the document says 「消灭敌方目标后」 with 希露瓦 as the subject, and the rule's owner is already her — a kill by a teammate still credits the party in this engine's `KILL` event). It is written without the gate and this note is the registration: the engine's `KILL` does not yet say *who* is credited in a way a rule can ask for."
+      "_note": "「消灭敌方目标后，攻击力提高 20%，持续 2 回合」. ⚠ `KILL`'s **actor** is the killer and the event carries no subject for the victim, so no condition is needed to say 「消灭敌方目标」 — but ⚠ this rule as written fires on *any* kill on the field, not only hers; gating it on `actor == self` would be an approximation of the opposite kind (the document says 「消灭敌方目标后」 with 希露瓦 as the subject, and the rule's owner is already her — a kill by a teammate still credits the party in this engine's `KILL` event). It is written without the gate and this note is the registration: the engine's `KILL` does not yet say *who* is credited in a way a rule can ask for.",
+      "id": "on_kill_effect"
     },
     {
       "on": "BATTLE_START",
@@ -117,7 +119,8 @@
       ],
       "min_eidolon": 6,
       "source": "1103 希露瓦 星魂 6 这一曲，贯穿天穹！ (Avatar_Serval_00_Rank06): 「希露瓦对触电状态下的敌方目标造成的伤害提高30%。」 param = [0.3]",
-      "_note": "「希露瓦**对触电状态下的敌方目标**造成的伤害提高 30%」. ⚠ `target has_state 触电` reads the unit being hit (`BuffManager.hasState` resolves DOTs by their element's state name), which is the sentence's subject; `actor == self` keeps it to **her** damage — without it, a teammate's hit on a shocked enemy would be boosted too. ⚠ `BOOST_DAMAGE` raises this **instance** only, which is what a damage-taken/damage-dealt conditional means; a 2-turn buff would be a different sentence (compare 1215's talent, which does state 「持续2回合」). ⚠ It is gated on the eidolon (`min_eidolon: 6`)."
+      "_note": "「希露瓦**对触电状态下的敌方目标**造成的伤害提高 30%」. ⚠ `target has_state 触电` reads the unit being hit (`BuffManager.hasState` resolves DOTs by their element's state name), which is the sentence's subject; `actor == self` keeps it to **her** damage — without it, a teammate's hit on a shocked enemy would be boosted too. ⚠ `BOOST_DAMAGE` raises this **instance** only, which is what a damage-taken/damage-dealt conditional means; a 2-turn buff would be a different sentence (compare 1215's talent, which does state 「持续2回合」). ⚠ It is gated on the eidolon (`min_eidolon: 6`).",
+      "id": "eidolon6_on_damage"
     },
     {
       "on": "BATTLE_START",
@@ -175,7 +178,8 @@
         }
       ],
       "source": "1103 希露瓦 天赋 燃情和弦 (110304, Enhance): 「施放攻击后，对所有触电状态下的敌方目标造成等同于希露瓦72%攻击力的雷属性附加伤害。」 数据行 Lv10 = [0.72]",
-      "_note": "「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」 — the sentence `M-53` existed for. ⚠ `target_when: [\"target has_state 触电\"]` is the new vocabulary: the selector says **which units** (`all_enemies`) and the filter says **which of them qualify**, tested one candidate at a time with `target` bound to that candidate. Writing it the old way — a rule condition `target has_state 触电` with `target: all_enemies` — would have damaged the unshocked enemies too, which is a wrong number with no symptom. ⚠ The magnitude is her **talent** row (110304: Lv1 0.36, Lv10 0.72), read through `damage_param: 0`; the level 口径 rule below raises TALENT, so the engine reads the Lv10 row the document quotes. ⚠ `actor == self` is 「施放攻击后」 with 希露瓦 as the subject (ALLY_ATTACK is broadcast to the whole side). ⚠ It fires on her own follow-ups too (a `FOLLOW_UP` is an attack she cast), which the document's 「施放攻击后」 also covers."
+      "_note": "「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」 — the sentence `M-53` existed for. ⚠ `target_when: [\"target has_state 触电\"]` is the new vocabulary: the selector says **which units** (`all_enemies`) and the filter says **which of them qualify**, tested one candidate at a time with `target` bound to that candidate. Writing it the old way — a rule condition `target has_state 触电` with `target: all_enemies` — would have damaged the unshocked enemies too, which is a wrong number with no symptom. ⚠ The magnitude is her **talent** row (110304: Lv1 0.36, Lv10 0.72), read through `damage_param: 0`; the level 口径 rule below raises TALENT, so the engine reads the Lv10 row the document quotes. ⚠ `actor == self` is 「施放攻击后」 with 希露瓦 as the subject (ALLY_ATTACK is broadcast to the whole side). ⚠ It fires on her own follow-ups too (a `FOLLOW_UP` is an attack she cast), which the document's 「施放攻击后」 also covers.",
+      "id": "attack_effect"
     },
     {
       "on": "ULT_CAST",
@@ -198,7 +202,8 @@
       ],
       "min_eidolon": 4,
       "source": "1103 希露瓦 星魂 4 制造噪音吧！ (Avatar_Serval_00_Rank04): 「施放终结技时，有100%基础概率使非触电状态下的敌方目标状态陷入与战技相同的触电状态。」 param = [1]",
-      "_note": "「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标陷入与战技相同的触电状态」. ⚠ The negation lives in the filter (`!target has_state 触电`), which is the same per-target machinery as the talent above — and the `!` prefix is the DSL's only negation, so this is also why identity negation is spelled `!=`. ⚠ `base_chance: 1` is 「100% 基础概率」 stated rather than assumed: an unstated chance in this engine is also 100% *base*, but the document names the number and a reader should see it. ⚠ 「与战技相同的触电状态」 ties the eidolon to the Skill's own row, so the numbers here are the same three (#3/#4/#5 = 0.8/2/1.04) — stated rather than referenced, because a rule cannot read another rule's fields (that is what `MODIFY_RULE` is for, and it amends rather than copies)."
+      "_note": "「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标陷入与战技相同的触电状态」. ⚠ The negation lives in the filter (`!target has_state 触电`), which is the same per-target machinery as the talent above — and the `!` prefix is the DSL's only negation, so this is also why identity negation is spelled `!=`. ⚠ `base_chance: 1` is 「100% 基础概率」 stated rather than assumed: an unstated chance in this engine is also 100% *base*, but the document names the number and a reader should see it. ⚠ 「与战技相同的触电状态」 ties the eidolon to the Skill's own row, so the numbers here are the same three (#3/#4/#5 = 0.8/2/1.04) — stated rather than referenced, because a rule cannot read another rule's fields (that is what `MODIFY_RULE` is for, and it amends rather than copies).",
+      "id": "eidolon4_ult"
     },
     {
       "on": "ALLY_ATTACK",
