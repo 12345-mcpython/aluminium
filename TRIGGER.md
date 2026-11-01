@@ -336,7 +336,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 
 ---
 
-## 4. 事件（共 40 个）
+## 4. 事件（共 41 个）
 
 | 分类 | 事件 |
 |---|---|
@@ -347,6 +347,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | 击破与控制 | `BREAK` `WEAKNESS_ADDED` `DEBUFF_APPLIED` `STATE_ENDED` |
 | 资源 | `ENERGY_GAINED` `SKILL_POINT_GAINED` `SKILL_POINT_SPENT` `SKILL_POINT_OVERFLOWED` `RESOURCE_CHANGED` |
 | 召唤 | `SUMMONED` `SUMMON_LEFT` |
+| 入场 | `ENEMY_ENTERED`（敌方单位**开战后**加入名册时；`actor` = 新来的；开战前摆好的名册不算）|
 
 ⚠ `SUMMON_LEFT` 是“忆灵离场”，不等于“死亡”；那种消失 `DEATH` 收不到，只有它收得到。收到它的是还活着的规则持有者，所以条件写 `actor is_summon`，不要用 `target == summon`。
 
