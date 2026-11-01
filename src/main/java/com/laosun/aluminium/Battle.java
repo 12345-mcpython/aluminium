@@ -1495,6 +1495,13 @@ public class Battle {
         // then give those clauses their moment.
         fire(TriggerPayload.Simple.of(TriggerEvent.BATTLE_READY));
         processRequests();
+        // Note: the FIRST wave gets its WAVE_START here. Until this line, only `WaveManager.nextWave` fired that event, so a
+        // rule written on it ("enemies entering the battle take 20% more damage") was dormant for the opening wave and
+        // active from the second one -- measured: a hand-built WAVE_START vulnerability landed nothing after
+        // `startBattle()` and landed correctly when fired by hand, and 1006's Eidolon 2 had been tested by firing the
+        // event manually. Fired after BATTLE_READY, the same order a later wave sees (spawn -> beginWave -> WAVE_START).
+        fire(TriggerPayload.Simple.of(TriggerEvent.WAVE_START));
+        processRequests();
         checkResult();
     }
 
