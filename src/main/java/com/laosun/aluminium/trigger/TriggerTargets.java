@@ -270,6 +270,17 @@ final class TriggerTargets {
                 // Serval's Skill shock ("the enemy target(s) hit"), where the blast's neighbours are in the set too.
                 return ctx.attackHitTargets().isEmpty() ? List.of() : List.copyOf(ctx.attackHitTargets());
             }
+            case "random_hit_enemy" -> {
+                // "对随机 1 个**命中目标**追加…" (1502 爻光's talent): the choice is made INSIDE the set the attack struck,
+                // not among every living enemy - `random_enemy` would be able to pick a unit this attack never touched.
+                java.util.List<com.laosun.aluminium.entity.CanHit> hit =
+                        ctx.attackHitTargets().stream().filter(unit -> unit != null && !unit.isDeath()).toList();
+                if (hit.isEmpty()) {
+                    return List.of();
+                }
+                java.util.Random rng = battle == null ? null : battle.getRng();
+                return List.of(hit.get(rng == null ? 0 : rng.nextInt(hit.size())));
+            }
             case "all_allies_lost_hp_this_action" -> {
                 if (battle == null) {
                     throw new IllegalStateException(
