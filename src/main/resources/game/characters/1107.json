@@ -4,7 +4,8 @@
   "_status": "partial",
   "_gaps": [
     "终结技 / 星魂 6 的数据 modifier 也写 AggroAddedRatio，但正文未提，按约定不写（数据与正文差异）",
-    "终结技的剩余两处：**被攻击概率提高**（正文不给数，数据的 AggroAddedRatio 与正文不符 ⇒ 不写）、反强化反击的**相邻 50%**（位置轴 ✗）"
+    "终结技的剩余两处：**被攻击概率提高**（正文不给数，数据的 AggroAddedRatio 与正文不符 ⇒ 不写）、反强化反击的**相邻 50%**（位置轴 ✗）",
+    "星魂 6 的两点残留：① 反击**不消耗**「强化反击」层数（原文「共用计数」这一层未写）；② 「并为其添加标记」未写（标记的消费端在天赋 `skill_extra_damage_on_marked`，但「加标记」这句的具体形状未核）"
   ],
   "rules": [
     {
@@ -294,6 +295,49 @@
       ],
       "source": "1107 克拉拉 终结技: 「当任意我方目标受到攻击后史瓦罗立即施放反击，对敌方目标造成的伤害倍率提高160%…」 param = [5, 1.6, 2, 0.25, 2]",
       "_note": "「当任意我方目标受到攻击后**史瓦罗立即施放反击**，造成的伤害倍率**提高 160%**」—— `ATTACK_FINISHED` + `actor is_enemy` ✓ + 门槛 `self_stacks:强化反击 >= 1` ✓ → `DAMAGE scale: self_attr:ATTACK percent: 1.6`（160% 攻击力 ✓）打**攻击者** ✓ + 扣 1 层 ✓。⚠ **不写**「对相邻目标 50%」（位置轴 ✗，已登记）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_extra_charge",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "强化反击",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1107 克拉拉 星魂 6 「沉重的礼物」: 「…终结技额外增加1次强化反击。」",
+      "_note": "「终结技**额外增加 1 次**强化反击」—— 在终结技那条（`ADD_STACK ×2`, `max_stacks: 2`）之后再加一层，并把上限放到 **3** ✓（`max_stacks` 是每条规则各自的上限，后写的那条要能装下第 3 层 ✓）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "eidolon6_counter_on_other_ally_hit",
+      "min_eidolon": 6,
+      "chance": 0.5,
+      "when": [
+        "actor is_enemy",
+        "target != self",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1,
+          "element": "Physical",
+          "damage_type": "TALENT",
+          "target": "actor"
+        }
+      ],
+      "source": "1107 克拉拉 星魂 6: 「我方其他目标遭到攻击后，史瓦罗有50%的固定概率发动反击并为其添加标记。」",
+      "_note": "「我方**其他目标**遭到攻击后，史瓦罗有 **50% 的固定概率**发动反击」—— `ATTACK_FINISHED` + `actor is_enemy` + `target != self` + `target is_ally` ✓（排除她自己挨打的情况：那由天赋那条管 ✓）；概率用**规则级 `chance: 0.5`** ✓（固定概率，不吃效果命中 ✓）；伤害 100% 攻击力（数据倍率见 `_gaps` 说明）。⚠ **不消耗**终结技的层数：这是「另一条反击」，与强化反击共用计数这一点仍未写（见 `_gaps`）。"
     }
   ]
 }
