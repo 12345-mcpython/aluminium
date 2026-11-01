@@ -3,7 +3,7 @@
   "character": 1504,
   "_status": "partial",
   "_gaps": [
-    "星魂 1（两段）、星魂 4、星魂 6 已落地 ✓。⛔ **星魂 6 的「当场上存在【饲饵】时」**这个前提没有条件可写（引擎没有「场上存在某状态」的条件），现按常驻处理。⚠ **夹具记录**（下次省一轮）：要给目标压血，`CanHit` 没有 `setCurrentHp`、`consumeHp` 对敌方无效、**一次大额 `applyDamage` 会被各区放大而直接打死目标** —— 可行做法是**循环小额扣血直到目标血线**（`AshveilEidolonOneTierTest` 里 1% × N 次）。"
+    "星魂 1（两段）、星魂 4、星魂 6 已落地 ✓。⛔ **星魂 6 的「当场上存在【饲饵】时」**这个前提没有条件可写（引擎没有「场上存在某状态」的条件），现按常驻处理。⚠ **夹具记录**（下次省一轮）：要给目标压血，`CanHit` 没有 `setCurrentHp`、`consumeHp` 对敌方无效、**一次大额 `applyDamage` 会被各区放大而直接打死目标** —— 可行做法是**循环小额扣血直到目标血线**（`AshveilEidolonOneTierTest` 里 1% × N 次）；另外 `target_hp_percent` 是**分数**（写 `50` 会恒假）。"
   ],
   "resources": [
     {
