@@ -85,6 +85,9 @@ final class TriggerVocabulary {
                     // paid is the event's actor (the archetype whose extra turn just began), not the rule's owner.
                     "actor",
                     "random_enemy", "random_hit_enemy",
+                    // The attack's hit set MINUS its main target: "同时对其**相邻目标**造成…" (1005 Kafka's Skill, the
+                    // enhanced form). `all_hit_enemies` would include the main target and pay it twice.
+                    "other_hit_enemies",
                     // "all allies lethally hit in one action" (140月茉之庇): the allies a lethal blow has landed on since
                     // this action began. A SET, not a unit -- hence the `all_` prefix, like `all_allies`.
                     // The game spells this as an EVENT, `OnWaveMonster`, so the selector is named after it -- an enemy

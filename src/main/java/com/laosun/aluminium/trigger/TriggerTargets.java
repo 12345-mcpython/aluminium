@@ -270,6 +270,16 @@ final class TriggerTargets {
                 // Serval's Skill shock ("the enemy target(s) hit"), where the blast's neighbours are in the set too.
                 return ctx.attackHitTargets().isEmpty() ? List.of() : List.copyOf(ctx.attackHitTargets());
             }
+            case "other_hit_enemies" -> {
+                // "同时对其**相邻目标**造成…": the hit set minus the unit the cast was aimed at, so a Blast does not pay
+                // its main target twice (once as the main target, once as a "neighbour").
+                java.util.List<com.laosun.aluminium.entity.CanHit> hit =
+                        ctx.attackHitTargets().stream().filter(unit -> unit != null && !unit.isDeath()).toList();
+                com.laosun.aluminium.entity.CanHit aimed = ctx.target();
+                java.util.List<com.laosun.aluminium.entity.CanHit> others = hit.stream()
+                        .filter(unit -> unit != aimed).toList();
+                return others.isEmpty() ? java.util.List.of() : java.util.List.copyOf(others);
+            }
             case "random_hit_enemy" -> {
                 // "对随机 1 个**命中目标**追加…" (1502 爻光's talent): the choice is made INSIDE the set the attack struck,
                 // not among every living enemy - `random_enemy` would be able to pick a unit this attack never touched.

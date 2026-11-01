@@ -59,4 +59,30 @@ public class KafkaSkillTicksEveryDotTest {
         Assertions.assertFalse(enemy.isDeath(), "the target must survive the tick, or the second state would settle nothing");
         return before - enemy.getCurrentHp();
     }
+    /**
+     * The enhanced form's second half: 「或相邻目标…立即产生相当于原伤害 50% 的伤害」. The selector is
+     * {@code other_hit_enemies} - the hit set MINUS the main target - so the main target must NOT be paid twice.
+     */
+    @Test
+    public void theNeighboursPayFiftyAndTheMainTargetIsNotPaidTwice() {
+        Character kafka = CharacterFactory.create(KAFKA, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy main = BattleFixture.dummy();
+        Enemy neighbour = BattleFixture.dummy();
+        Battle battle = new Battle(new ArrayList<>(List.of(kafka, ally)),
+                new ArrayList<>(List.of(neighbour, main)), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        neighbour.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 20_000, 3, 0, "灼烧"));
+        main.getBuffManager().addBuff(new DotBuff(ally, DamageElement.ICE, 20_000, 3, 0, "冻结伤"));
+        double mainBefore = main.getCurrentHp();
+        double neighbourBefore = neighbour.getCurrentHp();
+        battle.castImmediate(kafka.getSkills().get(SkillType.SKILL), kafka, List.of(main));
+        battle.processRequests();
+        double mainLost = mainBefore - main.getCurrentHp();
+        double neighbourLost = neighbourBefore - neighbour.getCurrentHp();
+        System.out.println("[1005] main lost " + mainLost + ", neighbour lost " + neighbourLost);
+        Assertions.assertTrue(neighbourLost > 0, "「或相邻目标…产生 50% 的伤害」: the neighbour's DoT ticks too");
+        Assertions.assertTrue(mainLost > neighbourLost,
+                "and the main target takes its 75% tick ONCE - a second 50% would make it larger than 75%");
+    }
 }
