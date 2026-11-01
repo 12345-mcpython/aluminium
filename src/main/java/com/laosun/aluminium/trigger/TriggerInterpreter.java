@@ -1672,6 +1672,10 @@ public final class TriggerInterpreter {
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 zone.setBuffName(effect.getBuff().trim());
             }
+            // "While the owner holds X": the modifier lives exactly as long as that state (see AbstractBuff.gateBroken).
+            if (effect.getWhileState() != null && !effect.getWhileState().isBlank()) {
+                zone.gate(effect.getWhileState().trim(), ctx.owner());
+            }
             // "this zone must live beside another source's zone": the `coexist` ask that MODIFY_ATTR has honoured since
             // 1408's trace was never read on THIS op, so a second `MODIFY_DAMAGE_TAKEN` from another rule evicted the
             // first. Measured: 1512's memosprite aura (+11.2%, set at SUMMONED) disappeared the moment light cone 23042's

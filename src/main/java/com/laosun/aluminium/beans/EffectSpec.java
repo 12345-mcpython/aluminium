@@ -150,6 +150,7 @@ public class EffectSpec {
         copy.fromSelf = this.fromSelf;
         copy.remove = this.remove;
         copy.scaleByMissingHp = this.scaleByMissingHp;
+        copy.whileState = this.whileState;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -585,6 +586,14 @@ public class EffectSpec {
      */
     @SerializedName("scale_by_missing_hp")
     private Boolean scaleByMissingHp;
+
+    /**
+     * A modifier that lives only <b>while the rule owner holds this state</b>: 1217 Eidolon 1s "while Huohuo has Divine
+     * Provision, all allies gain 12% SPEED". The buff is dropped when the state leaves (AbstractBuff.gateBroken), so the
+     * word "while" is answered instead of approximated with a turn count.
+     */
+    @SerializedName("while_state")
+    private String whileState;
 
     /**
      * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory}.

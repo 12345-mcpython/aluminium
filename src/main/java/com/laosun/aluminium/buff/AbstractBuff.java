@@ -284,6 +284,32 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     protected String ruleId = "";
 
     /**
+     * The state this buff is CONDITIONAL on, or {@code null}: "while the owner holds 禳命, all allies gain 12% SPEED"
+     * (1217 Eidolon 1). The gate is asked at every turn boundary and the buff is dropped when the state is gone - a
+     * `turns` count would outlive or die before the state does.
+     */
+    private String gateState;
+
+    /** The unit whose state the gate asks about (the rule owner), or {@code null} for no gate. */
+    private CanHit gateOwner;
+
+    /**
+     * @param state the state name to ask
+     * @param owner the unit that must still hold it
+     */
+    public void gate(String state, CanHit owner) {
+        this.gateState = state;
+        this.gateOwner = owner;
+    }
+
+    /**
+     * @return {@code true} only when a gate was set and its owner no longer holds that state
+     */
+    public boolean gateBroken() {
+        return gateState != null && gateOwner != null && !gateOwner.getBuffManager().hasState(gateState);
+    }
+
+    /**
      * Whether this buff asks NOT to evict others of its kind. Measured: `StatModifierBuff` identity is
      * `(attribute, modifierType, sourceRole)`, so two rules granting the same attribute evict each other -- while some
      * documents have both in effect at once. Note: Opt-in on purpose: making every different rule coexist broke seven shipped
