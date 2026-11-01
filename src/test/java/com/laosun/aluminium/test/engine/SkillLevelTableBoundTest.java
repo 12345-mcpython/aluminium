@@ -43,8 +43,8 @@ public class SkillLevelTableBoundTest {
         int level = her.skillLevel(common);
         System.out.println("[level-bound] COMMON at E3: level=" + level + " table rows=" + rows);
 
-        Assertions.assertEquals(rows, level,
-                "the effective level stops at the table: the row count IS the documented cap");
+        Assertions.assertEquals(Math.min(rows, 7), level,
+                "the basic starts at row 6 and its Eidolon +1 takes it to 7, inside its table");
         var victim = battle.enemyUnits().getFirst();
         double before = victim.getCurrentHp();
         battle.castImmediate(common, her, List.of(victim));
@@ -98,7 +98,7 @@ public class SkillLevelTableBoundTest {
         System.out.println("[level-bound] COMMON at E0: level=" + her.skillLevel(common) + " table rows=" + rows);
         Assertions.assertTrue(her.skillLevel(common) <= rows,
                 "the convention's 10 is within the table (" + rows + " rows)");
-        Assertions.assertEquals(rows, her.skillLevel(common),
-                "and it is the last row, which is why the Eidolon raise has nowhere to go");
+        Assertions.assertEquals(6, her.skillLevel(common),
+                "the convention pins the basic to row 6 - the row every document quotes as 100%");
     }
 }

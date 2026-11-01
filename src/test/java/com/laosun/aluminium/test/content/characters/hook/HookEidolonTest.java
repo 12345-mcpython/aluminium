@@ -42,12 +42,14 @@ public class HookEidolonTest {
      */
     @Test
     public void eidolonSixBoostsDamageAgainstBurningTargets() {
-        Assertions.assertEquals(1.0, rankRatio(false), 1e-6, "a healthy target: the Eidolon changes nothing");
+        Assertions.assertEquals(1.0, rankRatio(false), 1e-6, "a healthy target: rank 6 changes nothing");
         Assertions.assertEquals(1.2, rankRatio(true), 1e-6, "「对灼烧状态下的敌方目标造成的伤害提高 20%」");
     }
 
     private static double rankRatio(boolean burning) {
-        return damage(6, burning) / damage(0, burning);
+        // Rank 6 against rank 5, not against rank 0: her other Eidolons also move the numbers, and this is the
+        // clause under test.
+        return damage(6, burning) / damage(5, burning);
     }
 
     private static double damage(int eidolon, boolean burning) {

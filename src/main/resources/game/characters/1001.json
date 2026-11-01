@@ -11,16 +11,20 @@
         {
           "op": "RAISE_SKILL_LEVEL",
           "skills": [
-            "COMMON",
             "SKILL",
             "ULTRA",
             "TALENT"
           ],
           "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 5
         }
       ],
       "source": "1001 三月七 技能表的**等级口径**（不是一句技能文本，而是「这条文档引的是哪一行」）: 战技 / 终结技 / 天赋的正文都按 Lv10 引用（战技 param Lv10 = [0.57, 3, 0.3, 760, 5]、终结技 param Lv10 = [1.5, 0.5, 1, 0.6]、天赋 param Lv10 = [1, 2]），普攻按全库统一的 Lv10 口径；所以本场把四个槽位都读在第 10 行",
-      "_note": "This is the file stating **which level its own numbers were quoted at** (M-32). ⚠ Why a rule and not a rule field: `damage_level` answers 「read THIS row」 for one effect, while a level is a fact about the skill — every effect that reads that skill must see the same one, and a raise from a 星魂 has to compose with it (`CanHit.skillLevel` = base + this battle's raises, one resolver for all read sites). ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is spelled as +9. ⚠ **All four slots in one effect** (`skills`), not one effect per slot: 「which row the document quotes」 is one fact about the file, and her shield (#1 and #4 of the Skill) plus her ultimate (#1 damage, #4 the freeze DOT) now read their rows at the CURRENT level, so a slot left at 1 would have produced a mix of Lv1 and Lv10 numbers inside one sentence. It replaces the single-slot TALENT-only rule this file used to carry. ⚠ It is unconditional (no `min_eidolon`, no `when`): it is not a mechanic, it is the level the document was written at. ⚠ Unconditional rules like this one and the 星魂 rules BELOW it sum: at 星魂 5 the talent is 10 + 2 = **12** and the Skill is 12 too, which is what the game's own 「+2」 means — both tables have 15 rows, so 12 is a row that exists (a raise past the table fails loudly at fire time rather than reading nothing)."
+      "_note": "This is the file stating **which level its own numbers were quoted at** (M-32). ⚠ Why a rule and not a rule field: `damage_level` answers 「read THIS row」 for one effect, while a level is a fact about the skill — every effect that reads that skill must see the same one, and a raise from a 星魂 has to compose with it (`CanHit.skillLevel` = base + this battle's raises, one resolver for all read sites). ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is spelled as +9. ⚠ **All four slots in one effect** (`skills`), not one effect per slot: 「which row the document quotes」 is one fact about the file, and her shield (#1 and #4 of the Skill) plus her ultimate (#1 damage, #4 the freeze DOT) now read their rows at the CURRENT level, so a slot left at 1 would have produced a mix of Lv1 and Lv10 numbers inside one sentence. It replaces the single-slot TALENT-only rule this file used to carry. ⚠ It is unconditional (no `min_eidolon`, no `when`): it is not a mechanic, it is the level the document was written at. ⚠ Unconditional rules like this one and the 星魂 rules BELOW it sum: at 星魂 5 the talent is 10 + 2 = **12** and the Skill is 12 too, which is what the game's own 「+2」 means — both tables have 15 rows, so 12 is a row that exists (a raise past the table fails loudly at fire time rather than reading nothing). ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
     },
     {
       "on": "SKILL_CAST",

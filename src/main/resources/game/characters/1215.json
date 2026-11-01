@@ -9,16 +9,20 @@
         {
           "op": "RAISE_SKILL_LEVEL",
           "skills": [
-            "COMMON",
             "SKILL",
             "ULTRA",
             "TALENT"
           ],
           "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 5
         }
       ],
       "source": "1215 寒鸦 技能表的等级口径: 文档引用的是 Lv10 行（普攻/战技/终结技/天赋）",
-      "_note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again. ⚠ 原先**只钉了天赋**：终结技与战技仍走 Lv1，与规则里 Lv10 的数字不一致（实测：终结技速度份额读回 0.15，文档是 0.2）✗。现在四个槽一起钉到 Lv10 ✓。",
+      "_note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again. ⚠ 原先**只钉了天赋**：终结技与战技仍走 Lv1，与规则里 Lv10 的数字不一致（实测：终结技速度份额读回 0.15，文档是 0.2）✗。现在四个槽一起钉到 Lv10 ✓。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。",
       "id": "level_convention"
     },
     {

@@ -34,10 +34,10 @@ public class PhainonEidolonLevelsTest {
         int[] atFive = levelsAt(5);
         System.out.println("[1408] levels COMMON/SKILL/ULTRA/TALENT: E0 " + shown(atZero) + " ; E3 " + shown(atThree)
                 + " ; E5 " + shown(atFive));
-        Assertions.assertArrayEquals(new int[]{10, 10, 10, 10}, atZero, "等级口径：一律 Lv10");
-        Assertions.assertArrayEquals(new int[]{10, 10, 12, 10}, atThree,
-                "星魂 3：终结技+2 ⇒ 第 12 行；普攻+1 被它自己的 10 行表夹掉 ⇒ 仍是 10");
-        Assertions.assertArrayEquals(new int[]{10, 12, 12, 12}, atFive,
+        Assertions.assertArrayEquals(new int[]{6, 10, 10, 10}, atZero, "等级口径：普攻钉第 6 行，其余三槽第 10 行");
+        Assertions.assertArrayEquals(new int[]{7, 10, 12, 10}, atThree,
+                "星魂 3：终结技+2 ⇒ 第 12 行；普攻 6 ⇒ 7");
+        Assertions.assertArrayEquals(new int[]{7, 12, 12, 12}, atFive,
                 "星魂 5：战技+2、天赋+2 ⇒ 各第 12 行（终结技的 +2 来自星魂 3，仍在）");
     }
 

@@ -14,27 +14,21 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
+          "amount": 5
         }
       ],
       "source": "1004 瓦尔特 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 72%×3 段、终结技 150%、天赋 60%/100%）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **这条不是可有可无的**：第 142 轮实测过，缺了它技能会停在 Lv1，而 Lv1 行若参数为空则整次施放**一点伤害都没有** ✓（引擎自己的注释写着 `param_list = [[]]` 存在 ✗）。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **这条不是可有可无的**：第 142 轮实测过，缺了它技能会停在 Lv1，而 Lv1 行若参数为空则整次施放**一点伤害都没有** ✓（引擎自己的注释写着 `param_list = [[]]` 存在 ✗）。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
     },
     {
       "on": "ULT_CAST",

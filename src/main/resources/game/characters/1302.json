@@ -8,27 +8,21 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
+          "amount": 5
         }
       ],
       "source": "1302 银枝 技能表的**等级口径**: 文档引用的是 Lv10 行（130201 = 1.4、130202 = 1.2、130203 = [1.6, 90]、130214 = [2.8, 6, 0.95, 180]、130204 = [3, 0.025, 10]）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it.",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it. ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。",
       "id": "level_convention"
     },
     {

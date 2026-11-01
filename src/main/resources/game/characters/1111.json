@@ -11,27 +11,21 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
+          "amount": 5
         }
       ],
       "source": "1111 卢卡 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 120%、终结技 330%、强化普攻 20%/80% 都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: ⚠ **2026-09-28 补齐**：战技的裂伤已写出（见本文件最后一条规则）—— 它此前整句登记，因为「自身 24% 生命上限」需要**目标侧份额**、而「最多不超过 338%」是 **min_of_two**（两个派生值取小）。两者都已落地。 ⚠ **仍登记**：天赋的强化普攻替换与\"裂伤立即结算\"、秘技的随机单体、星魂 1–6。",
+      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: ⚠ **2026-09-28 补齐**：战技的裂伤已写出（见本文件最后一条规则）—— 它此前整句登记，因为「自身 24% 生命上限」需要**目标侧份额**、而「最多不超过 338%」是 **min_of_two**（两个派生值取小）。两者都已落地。 ⚠ **仍登记**：天赋的强化普攻替换与\"裂伤立即结算\"、秘技的随机单体、星魂 1–6。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。",
       "id": "level_convention"
     },
     {
