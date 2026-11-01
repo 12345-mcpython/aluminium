@@ -375,7 +375,7 @@ final class TriggerMagnitudes {
                 throw new IllegalStateException(
                         "APPLY_DOT scales off the target's Max HP (\"scale\": \"target_max_hp\"), but neither the event nor the effect names a unit");
             }
-            magnitude = victim.getMaxHp() * effect.getPercent();
+            magnitude = victim.getMaxHp() * shareOf(effect, ctx);
         } else {
             magnitude = derivedMagnitude(effect, ctx);
         }
@@ -858,7 +858,7 @@ final class TriggerMagnitudes {
         // cast-skill share gives: the count belongs to the battle, so a context without a rule owner can still read it.
         if (effect.getScale() != null && TriggerInterpreter.COUNTED_LAUGHS.equals(effect.getScale().trim())) {
             double points = ctx.battle() == null ? 0 : ctx.battle().countedLaughPoints();
-            return effect.getPercent() * points + constantTerm(effect, ctx);
+            return shareOf(effect, ctx) * points + constantTerm(effect, ctx);
         }
         com.laosun.aluminium.entity.Character owner = requireCharacterOwner(effect, ctx);
         // Note: `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
@@ -872,7 +872,7 @@ final class TriggerMagnitudes {
             // scaleAttribute would throw a message that reads like missing unit data.
             com.laosun.aluminium.damage.Damage hit = ctx.damage();
             double spent = hit == null ? 0 : hit.getCastEnergySpent();
-            return effect.getPercent() * spent + constantTerm(effect, ctx);
+            return shareOf(effect, ctx) * spent + constantTerm(effect, ctx);
         }
         if (TriggerInterpreter.EVENT_AMOUNT.equals(effect.getScale().trim())) {            // "raise X% for each 1 point spent ...": the triggering event's own magnitude, as a
             // modifier. Note: `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's
@@ -1016,7 +1016,7 @@ final class TriggerMagnitudes {
             if (effect.getMaxPoints() != null) {
                 excess = Math.min(excess, effect.getMaxPoints());
             }
-            return effect.getPercent() * excess + constantTerm(effect, ctx);
+            return shareOf(effect, ctx) * excess + constantTerm(effect, ctx);
         }
         // A battle-level PARTY counter (reader: 1513's reward): the counter lives on the battle, so it is
         // resolved here rather than through `scaleAttribute`, which answers "which attribute" and has no answer for it.
@@ -1036,7 +1036,7 @@ final class TriggerMagnitudes {
         if (TriggerInterpreter.SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // "for each 1 point above" where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
-            return effect.getPercent() * owner.getMaxEnergy() + constantTerm(effect, ctx);
+            return shareOf(effect, ctx) * owner.getMaxEnergy() + constantTerm(effect, ctx);
         }
         AttributeType source = TriggerMagnitudes.scaleAttribute(effect, effect.getOp(), null);
         if (source == null) {
