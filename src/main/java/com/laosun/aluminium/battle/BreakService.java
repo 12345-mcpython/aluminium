@@ -80,6 +80,12 @@ public final class BreakService {
         }
         double consumed = enemy.reduceStance(stanceDamage);
         double overkill = stanceDamage - consumed;
+        // "雪衣施放攻击削减敌方韧性时，会叠加【恶报】层数，削减的韧性越多叠加层数越多" (1214's Talent): the amount is the
+        // number every toughness-scaled clause needs, and it used to exist only in this method's return value.
+        // Fired BEFORE the break branch so a hit that empties the bar reports both.
+        if (consumed > 0) {
+            bus.fire(TriggerPayload.Subject.of(TriggerEvent.TOUGHNESS_REDUCED, attacker, enemy, consumed, fromCast));
+        }
         if (enemy.getStance() > 0) {
             return new Battle.StanceResult(consumed, 0, 0, false);
         }

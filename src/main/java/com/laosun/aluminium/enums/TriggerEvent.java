@@ -482,6 +482,7 @@ public enum TriggerEvent {
      * restore 1 skill point"). Note: Three readers: 23050, 1405's talent, 1006's Skill.
      * Note: Fired in {@code ADD_ELEMENTAL_WEAKNESS}'s success branch, so it only fires when one was really added.
      */
+    TOUGHNESS_REDUCED("TOUGHNESS_REDUCED", true),
     WEAKNESS_ADDED("WEAKNESS_ADDED", true),
 
     /**
