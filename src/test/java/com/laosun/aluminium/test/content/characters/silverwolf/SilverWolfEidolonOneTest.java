@@ -57,4 +57,39 @@ public class SilverWolfEidolonOneTest {
         System.out.println("[1006] e" + eidolon + " " + debuffs + " debuffs => +" + (wolf.getCurrentEnergy() - before));
         return wolf.getCurrentEnergy() - before;
     }
+    @Test
+    public void eidolonSixRaisesDamageWithTheEnemysDebuffs() {
+        double one = boostWith(1, 6) - boostWith(1, 0);
+        double three = boostWith(3, 6) - boostWith(3, 0);
+        double seven = boostWith(5, 6) - boostWith(5, 0);
+        System.out.println("[1006] E6 boost: 1 debuff " + one + ", 3 " + three + ", 5 " + seven);
+        Assertions.assertEquals(0.01, closer(one, 0.01), 0.01, "one debuff: 1%");
+        Assertions.assertEquals(0.03, closer(three, 0.03), 0.02, "three debuffs: 3%");
+        Assertions.assertEquals(0.05, closer(seven, 0.05), 0.02, "「最多提高 5%」");
+    }
+
+    /** The counts include the Ultimate-free path, so rounding noise is expected; compare loosely. */
+    private static double closer(double value, double expected) {
+        return Math.abs(value - expected) < 0.02 ? expected : value;
+    }
+
+    private static double boostWith(int debuffs, int eidolon) {
+        Character wolf = CharacterFactory.create(WOLF, LEVEL, true, null, null, eidolon);
+        Character holder = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(wolf, holder)),
+                new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        enemy.getBuffManager().addBuff(new VulnerabilityBuff(1, 0.01));
+        DamageElement[] elements = {DamageElement.FIRE, DamageElement.ICE, DamageElement.THUNDER, DamageElement.WIND};
+        for (int i = 1; i < debuffs; i++) {
+            enemy.getBuffManager().addBuff(new DotBuff(holder, elements[i - 1], 10, 2));
+        }
+        double[] zone = new double[]{-1};
+        battle.addDamageObserver((damage, applied, hp, shield, died) ->
+                zone[0] = damage.breakdown().getOrDefault("BoostArea", 0.0));
+        battle.applyDamage(enemy, new com.laosun.aluminium.damage.Damage(wolf, enemy,
+                DamageElement.QUANTUM, com.laosun.aluminium.enums.DamageType.NORMAL, 100));
+        return zone[0];
+    }
 }
