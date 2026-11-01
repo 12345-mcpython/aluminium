@@ -172,6 +172,44 @@
       ],
       "source": "1223 貊泽 行迹「墨毫绣衣」(1223101): 「施放天赋的追加攻击后，恢复 1 个战技点，该效果在 1 回合后可再次触发」",
       "_note": "⭐ **`FOLLOW_UP` 是按\"伤害实例\"发出的** ✓（`Battle:2417` ✓）⇒ 用规则级 **`cooldown: 1`** ✓ 表达「1 回合后可再次触发」✓；数值 **1**（战技点）与 **1**（回合）都取自数据行 ✓（`1223101 param=[1, 1]` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1223 星魂 3: 等级加成（数据 skill_add_level: 122303=ULTRA+2, 122304=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1223 星魂 5: 等级加成（数据 skill_add_level: 122301=COMMON+1, 122302=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

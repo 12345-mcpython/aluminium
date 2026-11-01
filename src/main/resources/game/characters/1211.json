@@ -110,6 +110,44 @@
       ],
       "source": "1211 白露 天赋：「当**白露的队友**受到致命攻击时，不会陷入**无法战斗状态**，**白露会立即为其提供治疗**，回复等同于**白露** 18.00% 生命上限 + 480 的生命值。」",
       "_note": "⭐ 2026-10-02：⭐ **本条是 `LETHAL_DAMAGE` 的**第三位读者**** ✓，而且是**新形态** ✓：前两位（1104⾋1408）都是**自己救自己** ✓，而这里**治疗者与被害者是两个单位** ✓。❗ `scale: \"owner_max_hp\"` 正是原文的“等同于**白露**…” ✓（owner 是白露 ✓，`target` 是那个即将倒下的单位 ✓）。⚠ **“队友”排除她自己** ✓：已出货的 `1101.json` 就写着 `\"target != self\"` ✓ ⇒ `!=` 在 DSL 里 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1211 星魂 3: 等级加成（数据 skill_add_level: 121102=SKILL+2, 121104=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1211 星魂 5: 等级加成（数据 skill_add_level: 121101=COMMON+1, 121103=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

@@ -161,6 +161,44 @@
       ],
       "source": "1301 加拉赫 强化普攻 酒花奔涌 (130108 的技能描述): 「对指定敌方单体造成等同于加拉赫250%攻击力的火属性伤害。并使目标攻击力降低15.00%，持续2回合。」",
       "_note": "「并使目标攻击力降低 15.00%，持续 2 回合」—— 这句必须挂在 DEALING_DAMAGE 上：ALLY_ATTACK 刻意不带被瞄准的单位（执行时会报 Effect targets target but this event has no such party），而 DEALING_DAMAGE 既有目标、现在也带技能键（Damage.skillKey）。⚠ from_skill_id 的取值是装载键（强化普攻 = 槽位 8），不是数据行 130108。 ⚠ 条件里不写 target == target（装载器会拒绝：它只支持与队伍或数值字面量的比较）；目标由效果自己的 target 选择器决定。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1301 星魂 3: 等级加成（数据 skill_add_level: 130101=COMMON+1, 130102=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1301 星魂 5: 等级加成（数据 skill_add_level: 130103=ULTRA+2, 130104=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

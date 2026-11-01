@@ -58,7 +58,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         },
         {
@@ -145,6 +145,44 @@
       ],
       "source": "1212 镜流 天赋: 「【转魄】状态内，我方目标**受到伤害**或消耗生命值时，镜流会获得 1 层【月色】…最多拥有 5 层」—— **受到伤害**这一半",
       "_note": "⭐ **析取写成两条规则** ✓（原文：「受到伤害**或**消耗生命值」✓）—— 第 183/240 轮的做法 ✓。⚠ 条件 **`self has_state 转魄`** ✓（合法主体只有 actor/self/target ✓ —— 我第一版写 `owner` ✗，加载器当场报出 ✓）；数值 **1 层** ✓、上限 **5 层** ✓、持续 **2 回合** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1212 星魂 3: 等级加成（数据 skill_add_level: 121203=ULTRA+2, 121204=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1212 星魂 5: 等级加成（数据 skill_add_level: 121201=COMMON+1, 121202=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

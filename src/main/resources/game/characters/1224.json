@@ -140,6 +140,44 @@
       ],
       "source": "1224 三月七 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 师父速度 +10.00%、终结技 240%、强化普攻 80%×3 起）",
       "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① **终结技**「使下一次强化普攻的**初始段数增加 2 段**，**额外造成伤害的固定概率提高 20%**」✗（改写\"另一条规则/技能\"的参数 ✗ —— 与 8006 的 `MODIFY_RULE` 同类 ✓，但这里要改的是**段数**与**固定概率** ✗）；② **强化普攻**「初始造成 **3 段**伤害，每段 80% 攻击力；每造成最后 1 段后有 **60% 固定概率**再造成 1 段，**最多额外 3 段**；能量不随段数提高；无法恢复战技点」✗（**逐段 + 概率续段** ✗ + 两处\"不随段数提高\" ✗）；③ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；④ **星魂**未读 ✗。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1224 星魂 3: 等级加成（数据 skill_add_level: 122401=COMMON+1, 122402=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1224 星魂 5: 等级加成（数据 skill_add_level: 122403=ULTRA+2, 122404=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

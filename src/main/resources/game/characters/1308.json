@@ -77,6 +77,49 @@
       ],
       "source": "1308 黄泉 天赋: 「在敌方目标进入战斗时，使其陷入终结技伤害易伤状态，受到的终结技伤害提高 8%」",
       "_note": "⭐ 这用的是**既有的\"伤害类型域\"** ✓（`MODIFY_DAMAGE_TAKEN` + `damage_type: \"ULTRA\"` ✓ —— `DamageType` 里确有 `ULTRA` ✓，与 `BREAK`/`DOT` 同族 ✓）。⚠ **数值 8% 绑定到该从句原文** ✓（同一份文档另有「终结技的【啼泽雨斩】…使黄泉造成的伤害提高 30%」✗ 与 「存在 1/2 名虚无命途角色时…为原伤害的 115%/160%」✗ —— 都不是本条 ✓，第 106 条纪律 ✓）。⚠ 持续期取 **`permanent`** ✓：原文是\"**在敌方目标进入战斗时**…陷入…状态\" ✓，无持续回合数 ✓，而该条是**天赋**（常驻）✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1308 星魂 3: 等级加成（数据 skill_add_level: 130801=COMMON+1, 130803=ULTRA+2, 130814=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1308 星魂 5: 等级加成（数据 skill_add_level: 130802=SKILL+2, 130804=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

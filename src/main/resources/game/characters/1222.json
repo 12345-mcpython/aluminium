@@ -123,6 +123,44 @@
       ],
       "source": "1222 灵砂 星魂 2 欹枕垂云，烟奁红雪: 「施放终结技后，使我方全体击破特攻提高40%，持续3回合」（0.4 见 skill 122201 的 param）",
       "_note": "「**施放终结技后**，使我方全体**击破特攻提高 40%**，持续 **3 回合**」—— ① 触发 **`ULT_CAST`** ✓（⭐ 由**触发表**判定 ✓ —— 第 108/270 轮给扫描器加了「触发词 → 事件」表 ✓，**判不出就拒绝** ✗，不再默认 `SKILL_CAST` ✗）；作用域 **`all_allies`** ✓（\"我方全体\" ✓）、时长 **3 回合** ✓；② ⚠ **击破特攻是比率型属性** ✓ ⇒ `percent` 以**绝对加值**落地 ✓（第 97/270 轮实测：比率型给点数 ✓、平值型按基数缩放 ✗）⇒ 判据断言队友 **+0.40** ✓，而不是\"基数的 40%\"✗；③ ⭐ **数值经查找核实** ✓：`0.4` 出现在她**自己的技能 `122201`** 的 `param` 里 ✓；④ ⚠ **这是星魂 2 的内容** ✓（与本项目既有做法一致：星魂条款按\"已激活\"写成普通规则 ✓，例如 1013 的 `eidolon4_*` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1222 星魂 3: 等级加成（数据 skill_add_level: 122203=ULTRA+2, 122204=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1222 星魂 5: 等级加成（数据 skill_add_level: 122201=COMMON+1, 122202=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }
