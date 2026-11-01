@@ -148,8 +148,9 @@ public class TalentTest {
         double withCorrectParam = counterDamage(1);
         double withWrongParam = counterDamage(0);
 
-        double right = talentRow(CLARA, 1, 1);
-        double wrong = talentRow(CLARA, 0, 1);
+        // The file now raises the talent to Lv10 (level_convention), so the expected rows are read at 10.
+        double right = talentRow(CLARA, 1, 10);
+        double wrong = talentRow(CLARA, 0, 10);
         Assertions.assertNotEquals(wrong, right, "the two parameters must differ, or this proves nothing");
 
         Assertions.assertEquals(right / wrong, withCorrectParam / withWrongParam, 1e-6,
@@ -409,3 +410,4 @@ public class TalentTest {
         Assertions.fail("the enemy never got a turn");
     }
 }
+
