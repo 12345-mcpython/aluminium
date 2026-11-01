@@ -337,7 +337,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 
 ---
 
-## 4. 事件（共 41 个）
+## 4. 事件（共 42 个）
 
 | 分类 | 事件 |
 |---|---|
@@ -345,7 +345,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | 施放 | `CAST_SETUP` `SKILL_CAST` `BASIC_ATTACK` `ULT_CAST` `INSERTED_CAST_END` `ATTACK_FINISHED` |
 | 攻击与受击 | `ALLY_ATTACK` `ENEMY_ATTACK` `SUMMON_ATTACK` `TAKING_HIT` `DEALING_DAMAGE` `DAMAGE_SETTLED` `FOLLOW_UP` `CRIT_DEALT` |
 | 伤害与生命 | `HP_LOST` `HP_CONSUMED` `LETHAL_DAMAGE` `HEALED` `SHIELD_GRANTED` `DEATH` `KILL` |
-| 击破与控制 | `BREAK` `WEAKNESS_ADDED` `DEBUFF_APPLIED` `STATE_ENDED` |
+| 击破与控制 | `BREAK` `TOUGHNESS_REDUCED` `WEAKNESS_ADDED` `DEBUFF_APPLIED` `STATE_ENDED` |
 | 资源 | `ENERGY_GAINED` `SKILL_POINT_GAINED` `SKILL_POINT_SPENT` `SKILL_POINT_OVERFLOWED` `RESOURCE_CHANGED` |
 | 召唤 | `SUMMONED` `SUMMON_LEFT` |
 | 入场 | `ENEMY_ENTERED`（敌方单位**开战后**加入名册时；`actor` = 新来的；开战前摆好的名册不算）|
