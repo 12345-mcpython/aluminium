@@ -699,6 +699,13 @@ public class BuffManager {
     }
 
     private void processBuffTick(boolean early) {
+        // A state-gated buff ("while the owner holds 禳命") ends when the state does, not when a turn count runs out.
+        // Checked at every turn boundary, so the aura cannot outlive its gate by more than one beat.
+        for (AbstractBuff buff : List.copyOf(buffs)) {
+            if (buff.gateBroken()) {
+                removeBuff(buff);
+            }
+        }
         tickBuff(instance, early);
     }
 

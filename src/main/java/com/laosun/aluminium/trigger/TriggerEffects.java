@@ -262,6 +262,11 @@ final class TriggerEffects {
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 buff.setBuffName(effect.getBuff().trim());
             }
+            // "while the owner holds X": the modifier lives exactly as long as that state (AbstractBuff.gateBroken is asked
+            // at every turn boundary). Reader: 1217 Eidolon 1 speed aura.
+            if (effect.getWhileState() != null && !effect.getWhileState().isBlank()) {
+                buff.gate(effect.getWhileState().trim(), ctx.owner());
+            }
             // "with a 100% base chance, additionally lower the target's all-type RES by 10.00%": an attribute modifier may be ROLLED,
             // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes
