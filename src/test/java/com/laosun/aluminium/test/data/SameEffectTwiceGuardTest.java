@@ -40,7 +40,7 @@ public class SameEffectTwiceGuardTest {
 
     /**
      * The shapes that are legitimate, by "file :: effect" - measured on 2026-11-01 and reviewed one by one (see
-     * {@code docs/MODIFIER-COLLISION-AUDIT.md}, "第三类扫描").
+     * this file's BASELINE list, one reason each).
      */
     private static final Map<String, Integer> BASELINE = Map.ofEntries(
             Map.entry("1217.json :: MODIFY_ATTR|SPEED|0.12|all_allies|-|true", 2),
