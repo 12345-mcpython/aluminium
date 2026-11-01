@@ -3,7 +3,9 @@
   "character": 1201,
   "_status": "partial",
   "_gaps": [
-    "见 CONTENT-STATUS.md 的逐角色登记"
+    "星魂 2 现已覆盖**两次抽牌**（她自己回合开始、她自己战技）✓；天赋那次「任意我方目标回合开始」的抽牌仍只在她自己回合回能（`actor == self`）",
+    "【暗杠】：需要在**三张花色计数**之间判定「4 张同花色」（三种花色的牌是资源，`琼玉牌` 现在只记总数）",
+    "星魂 4（【不求人】：战后 24% 固定概率 + 强化普攻后追加攻击）与星魂 6（强化普攻回 1 战技点）需要「强化普攻」这个槽位的识别"
   ],
   "resources": [
     {
@@ -148,6 +150,57 @@
       "source": "1201 星魂 5: 等级加成（数据 skill_add_level: 120101=COMMON+1, 120102=SKILL+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon1_ult_damage",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.1
+        }
+      ],
+      "source": "1201 青雀 星魂 1: 「施放终结技造成的伤害提高10%。」 param = [0.1]",
+      "_note": "「**施放终结技**造成的伤害提高 **10%**」—— `DEALING_DAMAGE` + `from_skill ULTRA` ✓ → `BOOST_DAMAGE 0.1`（只作用于这一发 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon2_energy_on_her_draw",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1201 青雀 星魂 2: 「青雀每次触发抽牌时，立即恢复1点能量。」 param = [1]",
+      "_note": "「每次触发**抽牌**时立即恢复 **1** 点能量」—— 她的抽牌发生在**每个我方目标回合开始**（天赋）⇒ 事件 `TURN_START` ✓ + `actor == self`? ⚠ **注意**：天赋的抽牌是「**我方目标**回合开始时」，不限于她自己 ⇒ 严格讲 `actor` 应是任何人。见 `_gaps`：这里只接了「她自己回合」那一半（可测），另一半需要与天赋同门槛。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon2_energy_on_skill_draw",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1201 青雀 星魂 2: 「每次触发抽牌时，立即恢复1点能量」",
+      "_note": "战技也抽牌（`skill_draw_tiles` ✓）⇒ 同一次抽牌回 1 点 ✓。"
     }
   ]
 }
