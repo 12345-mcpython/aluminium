@@ -446,6 +446,25 @@
       ],
       "source": "1412 刻律德菈 秘技 先手优势: 「使用秘技后获得【军功】…下一次战斗开始时自动对持有【军功】的角色施放1次战技，此次战技不消耗战技点。」",
       "_note": "「使用秘技后**获得【军功】**」= `BATTLE_START` + `self has_state 「秘技」` → `APPLY_BUFF 军功`（给自己）✓。⛔ **未写两段**：① 「切换行动角色时【军功】转移至当前行动角色」—— 大地图行为，不在战斗引擎内；② 「下一次战斗开始时**自动对持有【军功】的角色施放 1 次战技，此次战技不消耗战技点**」—— 需要「开战时免费施放一次战技」的写法（`CAST_SKILL` + 免战技点），尚未核对。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon2_self_boost_while_an_ally_has_merit",
+      "min_eidolon": 2,
+      "when": [
+        "any_ally has_state 军功"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 1.6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1412 刻律德菈 星魂 2 凝聚万众宏愿: 「…场上存在持有【军功】的队友时，刻律德菈造成的伤害提高160%。」",
+      "_note": "「场上存在持有【军功】的**队友**时，刻律德菈造成的伤害提高 **160%**」= 条件 `any_ally has_state 「军功」`（**本轮新增**，与 `any_enemy has_state` 对称）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { percent: 1.6 }` ✓。⚠ **近似**：条件在 `BATTLE_START` 时判定一次，之后授予/失去【军功】不会重新判定；文档说的是「场上存在…时」的持续状态。详见 AGENT 关于「没有『场上存在某状态』的持续条件」的登记。 ⚠ **挂 `TURN_START` 而不是 `BATTLE_START`**：实测 `BATTLE_START` 时这个条件读不到队友身上的【军功】（同一时刻测试里 `hasState` 为 true、`characters()` 有 2 个，但规则没有触发），改到每回合开始判定后生效。"
     }
   ]
 }

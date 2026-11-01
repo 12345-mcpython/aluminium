@@ -117,6 +117,10 @@ final class TriggerConditionParser {
             if (ANY_ENEMY_SUBJECT.equals(subject)) {
                 return new AnyEnemyHasState(text.substring(hasState.end()).trim(), raw, spec);
             }
+            // "若场上有队友持有【军功】": the PARTY camp as a question - 1412's Eidolon 2 asks it about herself.
+            if (ANY_ALLY_SUBJECT.equals(subject)) {
+                return new AnyAllyHasState(text.substring(hasState.end()).trim(), raw, spec);
+            }
             String state = text.substring(hasState.end()).trim();
             return new HasState(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw,
                     spec);
@@ -1620,6 +1624,52 @@ final class TriggerConditionParser {
     }
 
     /**
+     * {@code any_ally has_state <name>}: some living PARTY member carries that state.
+     *
+     * <p>Reader: 1412 Cerydra's Eidolon 2 — 「场上存在持有【军功】的队友时，刻律德菈造成的伤害提高 160%」. Like its enemy
+     * counterpart this answers a QUESTION rather than naming a target, and it counts the rule's owner too: the sentence says
+     * 「队友」 but a party of one is still "some ally holds it" in the engine's terms, which the rule's own note records.
+     */
+    static final class AnyAllyHasState implements Condition {
+
+        private final String state;
+        private final String raw;
+
+        AnyAllyHasState(String state, String raw, TriggerSpec spec) {
+            if (state.isEmpty()) {
+                throw new IllegalArgumentException("Condition '" + raw + "' names no state after has_state"
+                        + " (source: " + spec.getSource() + ")");
+            }
+            this.state = state;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            com.laosun.aluminium.Battle battle = ctx.battle();
+            if (battle == null) {
+                return false;
+            }
+            for (com.laosun.aluminium.entity.Character ally : battle.characters()) {
+                if (ally != null && !ally.isDeath() && ally.getBuffManager().hasState(state)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
+    /**
      * {@code any_enemy has_state <name>}: some living enemy on the field carries that state.
      *
      * <p>Why a condition and not a selector: the sentence asks a QUESTION - "若指定的敌方目标处于裂伤，造成的伤害提高 15%" -
@@ -2370,6 +2420,8 @@ final class TriggerConditionParser {
 
     static final Set<String> STATE_SUBJECTS = Set.of("self", "actor", "target");
 
+    /** The party camp as a CONDITION subject: `any_ally has_state <name>` (mirror of the enemy one). */
+    static final String ANY_ALLY_SUBJECT = "any_ally";
     /** The enemy camp as a CONDITION subject: `any_enemy has_state <name>`. */
     static final String ANY_ENEMY_SUBJECT = "any_enemy";
 
