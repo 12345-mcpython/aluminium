@@ -76,6 +76,9 @@ final class TriggerVocabulary {
      */
     static final Set<String> TARGET_SELECTORS =
             Set.of("party_first", "next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
+                    // "使【无量忿怒】倒计时行动延后 15%" (1507 Eidolon 1): the countdown the rule owner PLACED - a real unit
+                    // on the action order, addressable at last.
+                    "countdown",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
                     // Note: `actor` is `attacker` under the name the condition language and the events use. Reader:
                     // 1503's extra-turn reward - "该额外回合开始时，【美学底本】获得 30 点【好活当赏】" - where the unit to be

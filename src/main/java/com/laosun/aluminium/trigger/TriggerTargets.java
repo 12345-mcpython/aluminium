@@ -95,6 +95,10 @@ final class TriggerTargets {
             // extra turn begins: the ARCHETYPE gains 30") could not be written even though EXTRA_TURN_STARTED fires
             // with exactly that unit as its actor.
             case "actor" -> require(ctx.actor(), "actor", ctx);
+            // "使【无量忿怒】倒计时行动延后 15%" (1507 Eidolon 1): the countdown a rule owner PLACED is a real unit
+            // on the action order; START_COUNTDOWN created it and COUNTDOWN_TURN watched it expire, but nothing could
+            // act on it until this selector.
+            case "countdown" -> require(theCountdown(ctx), "countdown", ctx);
             case "summon" -> requireSummon(ctx);
             // "the rule-level pick": one unit chosen once per firing, shared by every effect that names it.
             case "pick" -> require(
@@ -560,6 +564,25 @@ final class TriggerTargets {
         int lastColon = rest.lastIndexOf(':');
         String name = (lastColon < 0 ? rest : rest.substring(lastColon + 1)).trim();
         return AttributeType.fromString(name);
+    }
+
+    /**
+     * The most recent countdown the rule owner placed, or null.
+     *
+     * <p>The newest one: a kit that restarts its zone means the live one, and a rule that delays the countdown is
+     * talking about the zone that is up now.
+     */
+    private static CanHit theCountdown(TriggerContext ctx) {
+        if (ctx.battle() == null || ctx.owner() == null) {
+            return null;
+        }
+        com.laosun.aluminium.entity.Countdown newest = null;
+        for (var countdown : ctx.battle().countdowns()) {
+            if (countdown.getOwner() == ctx.owner()) {
+                newest = countdown;
+            }
+        }
+        return newest;
     }
 
     /**
