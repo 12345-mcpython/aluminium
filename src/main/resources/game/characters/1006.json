@@ -11,7 +11,7 @@
     "强化后天赋：击杀时转移弱点、优先精英未写",
     "行迹 旁注：负面效果 ≥ 3 时额外降低 3%（改写另一条规则）未写",
     "星魂：未读",
-    "星魂 1 已落地 ✓（`value` 提供器 `min(debuffs(target), 5)`）；星魂 4/6 仍缺：两者都要「按目标负面数**缩放伤害**」—— `BOOST_DAMAGE` 只吃 `percent`/`percent_from`，不接 `value` 提供器，需要给它同样的入口"
+    "星魂 6 已落地 ✓（`BOOST_DAMAGE` 现在接 `value` 提供器）；星魂 4 仍缺：那条要在**终结技的每一发**上按负面数追加一段伤害，需要「本发之后追加减伤」的时序（与「按削韧量增伤」同族）"
   ],
   "rules": [
     {
@@ -180,6 +180,43 @@
       ],
       "source": "1006 银狼 星魂 1: 「施放终结技攻击敌方目标后，目标每有1个负面效果，银狼恢复1点能量。该效果在每次终结技攻击中最多触发5次。」 param = [1, 5]",
       "_note": "「目标**每有 1 个负面效果**，恢复 **1** 点能量，每次终结技**最多 5 次**」—— 用 **`value` 提供器**（不是 `scale`！`GAIN_ENERGY` 会把 `scale` 当成「能量上限的份额」，实测回 +110 ✗）：`min( debuffs(target), const 5 )` ✓ —— `{\"type\": \"debuffs\", \"whose\": \"target\"}` 是**本轮新增的点数提供器**，`min` 正好表达「最多 5 次」✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon6_damage_per_debuff",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "value": {
+            "type": "min",
+            "inputs": [
+              {
+                "type": "mul",
+                "inputs": [
+                  {
+                    "type": "debuffs",
+                    "whose": "target"
+                  },
+                  {
+                    "type": "const",
+                    "value": 0.01
+                  }
+                ]
+              },
+              {
+                "type": "const",
+                "value": 0.05
+              }
+            ]
+          }
+        }
+      ],
+      "source": "1006 银狼 星魂 6: 「敌方目标每有1个负面效果，银狼对其造成的伤害提高1%，最多提高5%。」 param = [0.01, 5]",
+      "_note": "「每有 **1 个负面效果**…对其造成的伤害提高 **1%**，最多提高 **5%**」—— `BOOST_DAMAGE` 现在接受 **`value` 提供器** ✓ ⇒ `min(debuffs(target) × 0.01, 0.05)` ✓（「最多 5%」由 `min` 表达 ✓，不是 5 层）。"
     }
   ]
 }

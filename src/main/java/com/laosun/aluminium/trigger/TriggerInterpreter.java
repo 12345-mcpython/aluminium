@@ -1789,9 +1789,13 @@ public final class TriggerInterpreter {
         // Note: This method ignores `damage_type` the same way -- see the comment above.
         // Through `shareOf`, like every other op that reads a share (; measured: `percent_from_resource` passed validation -- `TriggerValidator.requirePercent` has admitted it since round
         // 83 -- and then died here with "getPercent() is null", so the op validated against a vocabulary it did not apply).
-        double magnitude = effect.getScale() == null || effect.getScale().isBlank()
-                ? TriggerMagnitudes.shareOf(effect, ctx)
-                : TriggerMagnitudes.derivedMagnitude(effect, ctx);
+        // "敌方目标每有 1 个负面效果...对其造成的伤害提高 1%" (1006 Eidolons 4 and 6): a share built out of a COUNT.
+        // The share family here reads percent / percent_from; a provider states the number itself, so it goes first.
+        double magnitude = effect.getValue() != null
+                ? TriggerMagnitudes.valueOf(effect, ctx)
+                : effect.getScale() == null || effect.getScale().isBlank()
+                        ? TriggerMagnitudes.shareOf(effect, ctx)
+                        : TriggerMagnitudes.derivedMagnitude(effect, ctx);
         // `per_stack` on a BOOST_DAMAGE is a LIVE count on the event's target (cone 21001: "for each
         // debuff the enemy has, the wearer's damage +12%"). This method used to drop it, so the
         // per-stack branch silently behaved as one stack while the at-cap rule produced the only
