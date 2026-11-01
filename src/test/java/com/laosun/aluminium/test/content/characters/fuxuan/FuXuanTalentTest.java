@@ -64,12 +64,32 @@ public class FuXuanTalentTest {
         Assertions.assertEquals(0.0, healed[0], 1e-9, "the charge is the gate");
     }
 
+    /**
+     * The Ultimate grants the second charge, and the cap holds at two.
+     */
+    @Test
+    public void theUltimateGrantsTheSecondCharge() {
+        Fixture f = new Fixture();
+        Assertions.assertEquals(1, f.fuxuan.getBuffManager().stacksOf(CHARGE), "precondition: one at battle start");
+
+        f.ultimate();
+        Assertions.assertEquals(2, f.fuxuan.getBuffManager().stacksOf(CHARGE),
+                "「获得 1 次天赋的生命回复触发次数」");
+
+        f.ultimate();
+        Assertions.assertEquals(2, f.fuxuan.getBuffManager().stacksOf(CHARGE), "「最多可拥有 2 次」 - the cap holds");
+    }
     // ==================================================================
 
     private static final class Fixture {
         private final Character fuxuan;
         private final Enemy enemy = BattleFixture.monster();
         private final Battle battle;
+
+        private void ultimate() {
+            battle.castImmediate(fuxuan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), fuxuan,
+                    java.util.List.of(enemy));
+        }
 
         private Fixture() {
             fuxuan = CharacterFactory.create(FUXUAN, LEVEL);
@@ -79,3 +99,4 @@ public class FuXuanTalentTest {
         }
     }
 }
+
