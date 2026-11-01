@@ -14,27 +14,21 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
+          "amount": 5
         }
       ],
       "source": "1301 加拉赫 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、终结技 150%、强化普攻 250%、战技 1600 点都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing and damage (his Skill is a `Restore` skill and his ultimate an AoE, both read from rows). ⚠ **Not classified yet** — the rest of his document, each with its blocker: 终结技「并将**下一次普攻强化**为【酒花奔涌】」 (a skill *replacement* — 「强化普攻」 is a different skill object, and the engine has no vocabulary for \"the next basic attack becomes X\"), 天赋「【酩酊】使目标**受到的击破伤害**提高 12.00%」 (a **taken-side** vulnerability scoped to one damage type: `BREAKING_EFFECT` is the dealer side and there is no \"break damage taken\" spelling — the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」), ⚠ **2026-09-28 补齐**：天赋的「回复**攻击者** 640 点生命值」已写出（`HEAL … target: \"attacker\"`，见本文件最后一条规则）—— 此前那条\"没有拼写能指向攻击者\"的登记是**读错了文件**（选择器表在 `TriggerInterpreter`，不在 `TargetSelector.java`）。行迹 崭新配方「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，**最多使提供的治疗量提高 75%**」 (the derived half is expressible with `scale: self_attr:BREAKING_EFFECT`, but the **cap** is not: shipping without it would over-heal exactly in the break-effect builds this trace is for — the clamp gap is registered), 行迹 敬请干杯 (rides on 酒花奔涌), and 星魂 2–6 (not yet read clause by clause).",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing and damage (his Skill is a `Restore` skill and his ultimate an AoE, both read from rows). ⚠ **Not classified yet** — the rest of his document, each with its blocker: 终结技「并将**下一次普攻强化**为【酒花奔涌】」 (a skill *replacement* — 「强化普攻」 is a different skill object, and the engine has no vocabulary for \"the next basic attack becomes X\"), 天赋「【酩酊】使目标**受到的击破伤害**提高 12.00%」 (a **taken-side** vulnerability scoped to one damage type: `BREAKING_EFFECT` is the dealer side and there is no \"break damage taken\" spelling — the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」), ⚠ **2026-09-28 补齐**：天赋的「回复**攻击者** 640 点生命值」已写出（`HEAL … target: \"attacker\"`，见本文件最后一条规则）—— 此前那条\"没有拼写能指向攻击者\"的登记是**读错了文件**（选择器表在 `TriggerInterpreter`，不在 `TargetSelector.java`）。行迹 崭新配方「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，**最多使提供的治疗量提高 75%**」 (the derived half is expressible with `scale: self_attr:BREAKING_EFFECT`, but the **cap** is not: shipping without it would over-heal exactly in the break-effect builds this trace is for — the clamp gap is registered), 行迹 敬请干杯 (rides on 酒花奔涌), and 星魂 2–6 (not yet read clause by clause). ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。",
       "id": "level_convention"
     },
     {

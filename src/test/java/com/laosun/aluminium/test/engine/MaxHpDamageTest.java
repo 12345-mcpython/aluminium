@@ -99,7 +99,7 @@ public class MaxHpDamageTest {
      * slots by nine, which is how every file puts its numbers on the Lv10 row the document quotes).
      */
     private static TriggerTable conventionOnly() {
-        EffectSpec common = levelRaise("COMMON");
+        EffectSpec common = levelRaise("COMMON", 5.0);   // the file pins the basic to row 6
         EffectSpec skill = levelRaise("SKILL");
         EffectSpec ultra = levelRaise("ULTRA");
         EffectSpec talent = levelRaise("TALENT");
@@ -107,10 +107,14 @@ public class MaxHpDamageTest {
     }
 
     private static EffectSpec levelRaise(String slot) {
+        return levelRaise(slot, 9.0);
+    }
+
+    private static EffectSpec levelRaise(String slot, double amount) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "RAISE_SKILL_LEVEL");
         TriggerSpecs.set(effect, "skill", slot);
-        TriggerSpecs.set(effect, "amount", 9.0);
+        TriggerSpecs.set(effect, "amount", amount);
         return effect;
     }
 

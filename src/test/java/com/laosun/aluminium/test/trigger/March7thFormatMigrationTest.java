@@ -155,15 +155,18 @@ public class March7thFormatMigrationTest {
     public void theLevelConventionIsOneSkillsEffect() {
         JsonObject convention = ruleById("level_convention");
         JsonArray effects = convention.getAsJsonArray("do");
-        Assertions.assertEquals(1, effects.size(), "four identical effects became one");
+        Assertions.assertEquals(2, effects.size(), "the four slots used to be one effect; the basic is pinned to row 6");
         JsonObject effect = effects.get(0).getAsJsonObject();
         Assertions.assertEquals("RAISE_SKILL_LEVEL", effect.get("op").getAsString());
         Assertions.assertFalse(effect.has("skill"), "the singular spelling is gone");
 
         List<String> slots = new ArrayList<>();
         effect.getAsJsonArray("skills").forEach(slot -> slots.add(slot.getAsString()));
-        Assertions.assertEquals(List.of("COMMON", "SKILL", "ULTRA", "TALENT"), slots);
-        Assertions.assertEquals(9, effect.get("amount").getAsInt());
+        Assertions.assertEquals(List.of("SKILL", "ULTRA", "TALENT"), slots, "the basic moved to its own effect");
+        Assertions.assertEquals(9, effect.get("amount").getAsInt(), "the three leveled slots go to row 10");
+        JsonObject basic = effects.get(1).getAsJsonObject();
+        Assertions.assertEquals("COMMON", basic.get("skill").getAsString(), "the basic is its own effect");
+        Assertions.assertEquals(5, basic.get("amount").getAsInt(), "and it goes to row 6");
 
         var compiled = TriggerTables.of(MARCH_7TH).rulesFor(TriggerEvent.BATTLE_START).stream()
                 .filter(rule -> "level_convention".equals(rule.id()))

@@ -48,7 +48,8 @@ public class SilverWolfLV999EidolonLevelsTest {
         System.out.println("[1506] effective levels: COMMON=" + common + " SKILL=" + skill + " ULTRA=" + ultra
                 + " TALENT=" + talent + " ELATION_SKILL=" + elation + " ELATION_EXTRA=" + extra);
 
-        Assertions.assertEquals(10, common, "普攻的表有 10 行 -> 满级 10");
+        // 1506 is the one file whose convention is its own (fourteen levels on five slots), so its basic stays at row 10.
+        Assertions.assertEquals(10, common, "普攻的表有 10 行 -> 满级 10（这一份文件的口径是自定的）");
         Assertions.assertEquals(15, skill, "战技的表有 15 行 -> 满级 15");
         Assertions.assertEquals(15, ultra, "终结技 15 行");
         Assertions.assertEquals(15, talent, "天赋 15 行");

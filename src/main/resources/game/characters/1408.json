@@ -37,27 +37,21 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
+          "amount": 5
         }
       ],
       "source": "1408 白厄 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 300%/120%、终结技 960%、天赋 12 点与 30% 暴伤）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32）。⭐⭐ **CORRECTED（2026-10-19 逐句核）这张登记表曾经整片过时** ✗ —— 它写于那几批出货**之前**，而其中多项此后**已经落地** ✓（各条 note 里都记着 ✓）⇒ 现在按**逐项核过的现状**重写 ✓：点了规则 id 的 = 已出货 ✓，没点的 = **仍开** ✓。① **变身** ✓ 已出货（`ult_transformation`：`APPLY_BUFF 变身` ＋ 倒计时 ＋ 属性块 ＋ 免疫控制 ✓）—— ⚠ 仍开：境界【时墟铁墓】✗、**其他队友离场且无法行动** ✗、**敌方全体始终拥有物理属性弱点** ✗。② **额外回合** ✓ 已出货：「**8 个**」由**资源「额外回合计数」（上限 8）** ＋ `countdown_turn_counts` 数它 ＋ `last_countdown_turn_ends_the_transformation` 在第 8 次结束变身表达 ✓（⚠ 「永续的燃烧」在场时不结束 ✓，见那条的否定门 ✓）—— ⚠ 仍开：「**不会进入自己的回合**」✗、**速度基数可改写** ✗（现在是字面量 `speed: 59.4` ＝ 面板 99 × 60% ✓，而星魂 1 要抬到 66% ⇒ **不跟随** ✗）。③ **最后一击** ✗ 仍开（960% 均分 ✗ ＋ 触发时机 ✗ ＋ 「每剩余 1 个额外回合减少原倍率的 12.50%」✗）。④ **天赋的进入条件** ✓ 两半都已出货（`talent_coreflame_on_being_targeted` ＋ `talent_crit_damage_when_ally_targets_her` ✓）—— ⚠ **近似**：「成为技能目标」用 `SKILL_CAST` ＋ `target == self` ✓（引擎**没有**「我被某个技能指为目标」这个事件 ✗）。⑤ **强化天赋** ✓ 已出货：攻击力 +80% ／ 生命上限 +270% ／ 穿透 +20% ／ 免疫控制（`ult_transformation` ✓）、施放攻击后回复 20% 生命上限（`transformation_heals_on_attack` ✓）、**受到致命攻击时回复 25%**（`transformation_survives_a_lethal_hit` ✓ —— 数值由**本会话**从 20% 订正为 25% ✓）、变身结束时我方全体速度 +15% 持续 1 回合（`transformation_end_speeds_the_party` ✓）—— ⚠ 仍开：「**并立即发动最后一击**」✗、12.50% 的衰减 ✗。⑥ **行迹**：文档列了**三条** ✓（`:376`~`:378`）—— 1408101 【行向世界终点】✓ 已出货（`trace_worlds_end_one_seed_at_battle_start` ＋ `trace_worlds_end_three_seeds` ✓）、1408103 【照见英雄本色】✓ 已出货（`trace_hero_true_colors_*` 两条 ✓）、1408102 【身承炎炬万千】**前半** ✓ 已出货（`trace_bide_in_flames_raises_his_damage`，2026-10-19 补 ✓）、**后半**（受队友回能时获得 1 点火种）✗ 仍开 —— `ENERGY_GAINED` 不带「谁给的」✓，见那条的 note ✓。⑦ **星魂**（2026-10-19 第三批：E1~E6 逐条核过 ✓；点了规则 id 的 = 已出货，没点的 = **仍开**）：\n  · **E1 后半** ✓ 已出货（`ult_transformation` 的暴伤效果，效果级 `min_eidolon: 1` ✓ —— **本会话**补的，此前 0 星魂也白拿 +50% ✗）；**E1 前半** ✗ 仍开（倒计时速度继承比例 66% 起、每消灭 1 个敌方目标 +1.5%、上限 84% —— 倒计时的速度是**字面量** ✓，词表没有「倒计时速度 = 基础速度 × 一个会变的份额」✗）。\n  · **E2 前半** ✓ 已出货（`ult_transformation` 的穿透效果，效果级 `min_eidolon: 2` ✓ —— **本批次**补的，此前记成行迹 ⇒ 0 星魂白拿 +20% ✗）；**E2 后半** ✗ 仍开（「单次施放【支柱•死星天裁】消耗【毁伤】达到 4 点时获得 1 个额外回合」—— 引擎没有「这次施放花掉多少【毁伤】」这个读数 ✗）。\n  · **E3** ✓ 已出货（`eidolon3_ultra_and_common_levels`）；`140808`（槽 8 强化普攻 +1）**写不了** ✗ （槽 8 没有 `SkillType` ✗）。\n  · **E4** ✗ **仍开，且不是「少一句」而是整条依赖未建模** ✓：「施放【灾厄•弑魂焚诏】时，额外获得 #1 = 4 层【弑魂之炽】」—— 【弑魂之炽】本身（`skills.json` 140809 那一句的四条从句：受伤 -75%、每次敌方行动 +1 层、行动完毕的反击与其额外 4 次伤害、解除）**一条规则都没有** ✗，全库**一次**都没出现过「弑魂之炽」这个名字 ✓（`characters/` 与 `memosprites/` 全扫 ✓）⇒ 「额外获得 4 层」无处可加 ✓，**如实登记** ✓。\n  · **E5** ✓ 已出货（`eidolon5_skill_and_talent_levels`）；`140805`／`140809`／`140811` **写不了** ✗（三者都没有 `SkillType` ✗）。\n  · **E6** ✓ **三句全部已出货**（`eidolon6_unbounded_coreflame_overflow` ／ `eidolon6_six_coreflame_at_battle_start` ／ `eidolon6_stardeath_verdict_true_damage`）—— 判据 `PhainonEidolonSixTest`（三条各一端 ＋ 变异验证 ✓）。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⭐⭐ **CORRECTED（2026-10-19 逐句核）这张登记表曾经整片过时** ✗ —— 它写于那几批出货**之前**，而其中多项此后**已经落地** ✓（各条 note 里都记着 ✓）⇒ 现在按**逐项核过的现状**重写 ✓：点了规则 id 的 = 已出货 ✓，没点的 = **仍开** ✓。① **变身** ✓ 已出货（`ult_transformation`：`APPLY_BUFF 变身` ＋ 倒计时 ＋ 属性块 ＋ 免疫控制 ✓）—— ⚠ 仍开：境界【时墟铁墓】✗、**其他队友离场且无法行动** ✗、**敌方全体始终拥有物理属性弱点** ✗。② **额外回合** ✓ 已出货：「**8 个**」由**资源「额外回合计数」（上限 8）** ＋ `countdown_turn_counts` 数它 ＋ `last_countdown_turn_ends_the_transformation` 在第 8 次结束变身表达 ✓（⚠ 「永续的燃烧」在场时不结束 ✓，见那条的否定门 ✓）—— ⚠ 仍开：「**不会进入自己的回合**」✗、**速度基数可改写** ✗（现在是字面量 `speed: 59.4` ＝ 面板 99 × 60% ✓，而星魂 1 要抬到 66% ⇒ **不跟随** ✗）。③ **最后一击** ✗ 仍开（960% 均分 ✗ ＋ 触发时机 ✗ ＋ 「每剩余 1 个额外回合减少原倍率的 12.50%」✗）。④ **天赋的进入条件** ✓ 两半都已出货（`talent_coreflame_on_being_targeted` ＋ `talent_crit_damage_when_ally_targets_her` ✓）—— ⚠ **近似**：「成为技能目标」用 `SKILL_CAST` ＋ `target == self` ✓（引擎**没有**「我被某个技能指为目标」这个事件 ✗）。⑤ **强化天赋** ✓ 已出货：攻击力 +80% ／ 生命上限 +270% ／ 穿透 +20% ／ 免疫控制（`ult_transformation` ✓）、施放攻击后回复 20% 生命上限（`transformation_heals_on_attack` ✓）、**受到致命攻击时回复 25%**（`transformation_survives_a_lethal_hit` ✓ —— 数值由**本会话**从 20% 订正为 25% ✓）、变身结束时我方全体速度 +15% 持续 1 回合（`transformation_end_speeds_the_party` ✓）—— ⚠ 仍开：「**并立即发动最后一击**」✗、12.50% 的衰减 ✗。⑥ **行迹**：文档列了**三条** ✓（`:376`~`:378`）—— 1408101 【行向世界终点】✓ 已出货（`trace_worlds_end_one_seed_at_battle_start` ＋ `trace_worlds_end_three_seeds` ✓）、1408103 【照见英雄本色】✓ 已出货（`trace_hero_true_colors_*` 两条 ✓）、1408102 【身承炎炬万千】**前半** ✓ 已出货（`trace_bide_in_flames_raises_his_damage`，2026-10-19 补 ✓）、**后半**（受队友回能时获得 1 点火种）✗ 仍开 —— `ENERGY_GAINED` 不带「谁给的」✓，见那条的 note ✓。⑦ **星魂**（2026-10-19 第三批：E1~E6 逐条核过 ✓；点了规则 id 的 = 已出货，没点的 = **仍开**）：\n  · **E1 后半** ✓ 已出货（`ult_transformation` 的暴伤效果，效果级 `min_eidolon: 1` ✓ —— **本会话**补的，此前 0 星魂也白拿 +50% ✗）；**E1 前半** ✗ 仍开（倒计时速度继承比例 66% 起、每消灭 1 个敌方目标 +1.5%、上限 84% —— 倒计时的速度是**字面量** ✓，词表没有「倒计时速度 = 基础速度 × 一个会变的份额」✗）。\n  · **E2 前半** ✓ 已出货（`ult_transformation` 的穿透效果，效果级 `min_eidolon: 2` ✓ —— **本批次**补的，此前记成行迹 ⇒ 0 星魂白拿 +20% ✗）；**E2 后半** ✗ 仍开（「单次施放【支柱•死星天裁】消耗【毁伤】达到 4 点时获得 1 个额外回合」—— 引擎没有「这次施放花掉多少【毁伤】」这个读数 ✗）。\n  · **E3** ✓ 已出货（`eidolon3_ultra_and_common_levels`）；`140808`（槽 8 强化普攻 +1）**写不了** ✗ （槽 8 没有 `SkillType` ✗）。\n  · **E4** ✗ **仍开，且不是「少一句」而是整条依赖未建模** ✓：「施放【灾厄•弑魂焚诏】时，额外获得 #1 = 4 层【弑魂之炽】」—— 【弑魂之炽】本身（`skills.json` 140809 那一句的四条从句：受伤 -75%、每次敌方行动 +1 层、行动完毕的反击与其额外 4 次伤害、解除）**一条规则都没有** ✗，全库**一次**都没出现过「弑魂之炽」这个名字 ✓（`characters/` 与 `memosprites/` 全扫 ✓）⇒ 「额外获得 4 层」无处可加 ✓，**如实登记** ✓。\n  · **E5** ✓ 已出货（`eidolon5_skill_and_talent_levels`）；`140805`／`140809`／`140811` **写不了** ✗（三者都没有 `SkillType` ✗）。\n  · **E6** ✓ **三句全部已出货**（`eidolon6_unbounded_coreflame_overflow` ／ `eidolon6_six_coreflame_at_battle_start` ／ `eidolon6_stardeath_verdict_true_damage`）—— 判据 `PhainonEidolonSixTest`（三条各一端 ＋ 变异验证 ✓）。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
     },
     {
       "on": "SKILL_CAST",

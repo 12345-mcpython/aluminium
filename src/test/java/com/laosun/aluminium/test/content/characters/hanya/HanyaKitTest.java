@@ -118,7 +118,8 @@ public class HanyaKitTest {
         int base = new Fixture(0).hanya.skillLevelBonus(SkillType.SKILL);
         Fixture atThree = new Fixture(3);
         Assertions.assertEquals(base + 2, atThree.hanya.skillLevelBonus(SkillType.SKILL), "Eidolon 3 「战技等级+2」 (Skill Lv. +2)");
-        Assertions.assertEquals(1, atThree.hanya.skillLevelBonus(SkillType.COMMON) - base, "…\"Basic ATK Lv. +1\" (「普攻等级+1」)");
+        int commonBase = new Fixture(0).hanya.skillLevelBonus(SkillType.COMMON);
+        Assertions.assertEquals(commonBase + 1, atThree.hanya.skillLevelBonus(SkillType.COMMON), "…\"Basic ATK Lv. +1\" (「普攻等级+1」)");
 
         Fixture atFive = new Fixture(5);
         Assertions.assertEquals(base + 2, atFive.hanya.skillLevelBonus(SkillType.ULTRA), "Eidolon 5 「终结技等级+2」 (Ultimate Lv. +2)");

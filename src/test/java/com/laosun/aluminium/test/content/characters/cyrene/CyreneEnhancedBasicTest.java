@@ -53,6 +53,8 @@ public class CyreneEnhancedBasicTest {
 
     /** Lv10 row of 141508: #1 = 0.42, #2 = 3, #3 = 0.42. */
     private static final double LV10_SHARE = 0.42;
+    /** The same share at row 6, where the basic attack is pinned: 0.3 Max HP. */
+    private static final double LV6_SHARE = 0.3;
 
     @Test
     public void theSinglePartLandsFirstAndTheAreaPartReachesEveryEnemy() {
@@ -85,11 +87,11 @@ public class CyreneEnhancedBasicTest {
                         + hits.stream().map(Damage::getStance).toList());
 
         double health = cyrene.getAttribute(AttributeType.HEALTH).get();
-        double single = LV10_SHARE * health;
+        double single = LV6_SHARE * health;
         // The area half's two instances carry 30% and 70% of the same row share.
-        List<Double> area = List.of(0.3 * LV10_SHARE * health, 0.7 * LV10_SHARE * health);
+        List<Double> area = List.of(0.3 * LV6_SHARE * health, 0.7 * LV6_SHARE * health);
         Assertions.assertEquals(single, hits.get(0).breakdown().get("base"), 1e-6,
-                "the single-target half keeps the whole row share (0.42 Max HP at Lv10)");
+                "the single-target half keeps the whole row share (0.3 Max HP at row 6)");
         for (int i = 1; i < hits.size(); i++) {
             double expected = area.get((i - 1) / 2);
             Assertions.assertEquals(expected, hits.get(i).breakdown().get("base"), 1e-6,

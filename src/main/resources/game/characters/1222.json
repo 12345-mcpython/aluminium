@@ -13,27 +13,21 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
+          "amount": 5
         }
       ],
       "source": "1222 灵砂 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（战技 Lv10 = [0.8, 0.14, 420, 0.2]）",
-      "_note": "与本项目其它角色文件一致：把技能等级抬到文档所引用的那一档，使数据行的数值与正文一致。"
+      "_note": "与本项目其它角色文件一致：把技能等级抬到文档所引用的那一档，使数据行的数值与正文一致。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
     },
     {
       "on": "SKILL_CAST",

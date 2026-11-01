@@ -8,27 +8,21 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
+          "amount": 5
         }
       ],
       "source": "1217 藿藿 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 50%生命上限、战技 21.00%+560、终结技 20%能量/40%攻击力、天赋 4.50%+120 都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6.",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6. ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。",
       "id": "level_convention"
     },
     {

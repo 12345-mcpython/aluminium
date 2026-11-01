@@ -39,11 +39,11 @@ public class ArcherEidolonLevelsTest {
         int[] atFive = levelsAt(5);
         System.out.println("[1015] COMMON/SKILL/ULTRA/TALENT: E0 " + shown(atZero) + " ; E3 " + shown(atThree)
                 + " ; E5 " + shown(atFive));
-        Assertions.assertArrayEquals(new int[]{9, 10, 10, 10}, atZero,
-                "等级口径：一律 Lv10，而普攻只有 9 行 ⇒ 被它自己的表夹到 9");
-        Assertions.assertArrayEquals(new int[]{9, 12, 10, 10}, atThree,
-                "星魂 3：战技+2 ⇒ 第 12 行；普攻+1 正好补到 10，仍被 9 行表夹住 ⇒ 还是 9");
-        Assertions.assertArrayEquals(new int[]{9, 12, 12, 12}, atFive,
+        Assertions.assertArrayEquals(new int[]{6, 10, 10, 10}, atZero,
+                "等级口径：普攻钉第 6 行（文档引 100%），其余三槽第 10 行");
+        Assertions.assertArrayEquals(new int[]{7, 12, 10, 10}, atThree,
+                "星魂 3：战技+2 ⇒ 第 12 行；普攻 6 ⇒ 7");
+        Assertions.assertArrayEquals(new int[]{7, 12, 12, 12}, atFive,
                 "星魂 5：终结技+2、天赋+2 ⇒ 各第 12 行（星魂 3 的战技 +2 仍在）");
     }
 
