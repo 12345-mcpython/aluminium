@@ -55,8 +55,8 @@ public class LuochaTest {
         // 星魂 2's two halves moved OFF this event on 2026-10-31: the heal bonus registers once at BATTLE_START (the
         // mechanism's own contract) and the shield belongs on CAST_SETUP, because SKILL_CAST fires AFTER the heal and the
         // target is already back above 50% by then (its >= 50% gate would always hold).
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the counter, the zone opener, the dispel and Eidolon 1 aura while the zone is up");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the counter, the zone opener, the dispel, Eidolon 1 aura and Eidolon 4 weaken");
         // The level convention, 行迹 行过幽谷's control resistance, 秘技 愚者的悲悯's field, 星魂 5, and 星魂 2's heal bonus.
         Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the level convention, the control resistance, the technique, Eidolons 2/3/5 levels and the heal bonus");
@@ -89,5 +89,6 @@ public class LuochaTest {
         }
     }
 }
+
 
 
