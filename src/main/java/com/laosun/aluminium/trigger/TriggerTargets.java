@@ -96,6 +96,9 @@ final class TriggerTargets {
             // with exactly that unit as its actor.
             case "actor" -> require(ctx.actor(), "actor", ctx);
             case "summon" -> requireSummon(ctx);
+            // "the rule-level pick": one unit chosen once per firing, shared by every effect that names it.
+            case "pick" -> require(
+                    ctx.battle() == null ? null : ctx.battle().currentRulePick(), "pick", ctx);
             // "randomly 1 enemy target": the roll is the battle's own seeded one, so the same seed picks the
             // same unit -- and the judge can therefore pin both determinism and genuine variation.
             // "our next other target to act"(cone 21025): the unit that will act after this one, walking the
@@ -365,6 +368,14 @@ final class TriggerTargets {
             }
         }
         return List.of(resolveTarget(effect, ctx));
+    }
+
+    /**
+     * Normalises a selector token written outside an {@link EffectSpec} (the rule-level {@code pick}) the same way the
+     * effect target is normalised: trimmed and lower-cased.
+     */
+    static String normalizeSelector(String selector) {
+        return selector == null ? "" : selector.trim().toLowerCase(Locale.ROOT);
     }
 
     static String normalizeTarget(EffectSpec effect) {

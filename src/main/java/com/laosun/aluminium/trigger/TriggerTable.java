@@ -713,7 +713,7 @@ public class TriggerTable {
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
                 validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec),
                 spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim(),
-                Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec)));
+                Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec), validatePick(spec, effects)));
     }
 
     /**
@@ -922,6 +922,47 @@ public class TriggerTable {
                             + "(source: " + spec.getSource() + ")");
         }
         return chance;
+    }
+
+    /**
+     * Validates a rule-level {@code pick} and returns its normalised selector (empty when none).
+     *
+     * <p>Two shapes are refused, both symptoms of a typo rather than a rule: a {@code pick} that no effect uses, and a
+     * {@code target: "pick"} on a rule that states no {@code pick}. A selector that can reach several units is not refused
+     * here (that needs the event to resolve against); it fails loudly the first time it is used.
+     */
+    private static String validatePick(TriggerSpec spec, List<EffectSpec> effects) {
+        String written = spec.getPick() == null ? "" : spec.getPick().trim();
+        boolean usedByAnEffect = false;
+        for (EffectSpec effect : effects) {
+            if ("pick".equals(TriggerTargets.normalizeTarget(effect))) {
+                usedByAnEffect = true;
+            }
+        }
+        if (written.isEmpty()) {
+            if (usedByAnEffect) {
+                throw new IllegalArgumentException(
+                        "a rule targets \"pick\" but states no \"pick\": nothing chose that unit (source: "
+                                + spec.getSource() + ")");
+            }
+            return "";
+        }
+        if (!usedByAnEffect) {
+            throw new IllegalArgumentException(
+                    "rule states \"pick\": \"" + written + "\", but no effect targets \"pick\"; the pick would be rolled and "
+                            + "never read (source: " + spec.getSource() + ")");
+        }
+        String selector = TriggerTargets.normalizeSelector(written);
+        boolean known = TriggerVocabulary.TARGET_SELECTORS.contains(selector)
+                || selector.startsWith(TriggerTargets.ALLY_CID_PREFIX)
+                || selector.startsWith(TriggerVocabulary.HOLDER_OF_PREFIX);
+        if (!known) {
+            throw new IllegalArgumentException(
+                    "rule states \"pick\": \"" + written + "\", which is not a target selector; known: "
+                            + TriggerVocabulary.TARGET_SELECTORS.stream().sorted().toList()
+                            + " (source: " + spec.getSource() + ")");
+        }
+        return selector;
     }
 
     /**
@@ -1208,7 +1249,12 @@ public class TriggerTable {
                                 * rule states "额外增加 N 次…判定". See {@code TriggerSpec.chanceRolls} for why
                                 * the count lives on the rule and not on a second, identical rule.
                                 */
-                               int chanceRolls) {
+                               int chanceRolls,
+                               /*
+                                * The rule-level `pick`: a selector resolved once per firing, so several effects can name
+                                * the same randomly chosen unit. Empty when the rule states none.
+                                */
+                               String pick) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.

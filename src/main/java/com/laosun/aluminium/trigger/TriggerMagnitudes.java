@@ -358,10 +358,16 @@ final class TriggerMagnitudes {
             // Note: The victim's own maximum: "take ... DoT equal to 24.00% of its own Max HP" (1111 卢卡). Every other scale here
             // is the rule OWNER's, which is why this spelling had to be added -- and it is read when the buff LANDS, so a
             // later change to the victim's Max HP does not move a DOT that is already ticking (the DOT's own convention).
+            // The victim is the unit the effect is AIMED at: the event own target when it has one, otherwise the effect
+            // resolved target (a rule-level `pick` at BATTLE_START names it; 1111 Luka's technique). Resolving here
+            // keeps one meaning for the scale instead of asking the event to carry a target it never had.
             CanHit victim = ctx.target();
+            if (victim == null && ctx.battle() != null) {
+                victim = TriggerTargets.resolveTarget(effect, ctx);
+            }
             if (victim == null) {
                 throw new IllegalStateException(
-                        "APPLY_DOT scales off the target's Max HP (\"scale\": \"target_max_hp\"), but this event carries no target");
+                        "APPLY_DOT scales off the target's Max HP (\"scale\": \"target_max_hp\"), but neither the event nor the effect names a unit");
             }
             magnitude = victim.getMaxHp() * effect.getPercent();
         } else {
