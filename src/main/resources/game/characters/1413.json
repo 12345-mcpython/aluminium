@@ -75,9 +75,9 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "amount": 0.6,
           "turns": 2,
-          "target": "self"
+          "target": "self",
+          "amount_from_skill_param": "TALENT:1"
         },
         {
           "op": "GAIN_RESOURCE",
@@ -99,7 +99,7 @@
           "#7": 0.05
         }
       },
-      "_note": "「生命降低时，**自身**的暴击伤害提高 60%（2 回合），并获得 2 点【忆质】」—— ① 挂 `HP_CONSUMED` ✓（战技消耗生命 ✓）；② `CRIT_ATTACK` 用 **`amount: 0.6`**（点数属性，写 `percent` 会被当\"基础的百分比\" ✗）；③ `亿质 +2` ✓。⭐ **忆灵那一半已补**（同一份额 0.6，`target: summon` ✓，两条既有判据的期望同步加了 0.6 ✓）；旧的登记：：文档说\"**自身和忆灵**\"，但给忆灵也加 0.6 会顶红 `EvernightCritForSummonsTest` 与 `TimeOdeRaisesHerCritTest`（它们钉的是\"忆灵暴伤收益 = 她暴伤 × 战技#1\"，实测多出 0.072 = 0.6 × 0.12）✗ —— 这两条判据的**口径**需要扩展成\"战技#1 + 天赋 0.6\"两段，本轮先把角色自身那半落地 ✓，忆灵那半等判据口径更新 ✓。 || 2026-10-18（第 40 轮）：忆灵那半**又试了一次**（`target: summon`，先 `percent: 0.6` 后 `amount: 0.6`）——两次实测都让忆灵多出 **0.072**（= 0.6 × 0.12，忆灵暴伤基础 0.12）而不是 0.6 ✗ ⇒ 说明给**忆灵**的属性修饰走的是**份额**路径（`amount` 与 `percent` 在这条路径上同效），而给**她本人**的 `amount: 0.6` 是点数 ✓（同一条规则里两种口径 ✗）。⇒ 忆灵那半需要的是\"按点数给忆灵\"的写法/能力 ⇒ 下一轮先量 `statModifier` 对 `Summon` 目标的口径，再写。"
+      "_note": "「生命降低时，**自身**的暴击伤害提高 60%（2 回合），并获得 2 点【忆质】」—— ① 挂 `HP_CONSUMED` ✓（战技消耗生命 ✓）；② `CRIT_ATTACK` 用 **`amount: 0.6`**（点数属性，写 `percent` 会被当\"基础的百分比\" ✗）；③ `亿质 +2` ✓。⭐ **忆灵那一半已补**（同一份额 0.6，`target: summon` ✓，两条既有判据的期望同步加了 0.6 ✓）；旧的登记：：文档说\"**自身和忆灵**\"，但给忆灵也加 0.6 会顶红 `EvernightCritForSummonsTest` 与 `TimeOdeRaisesHerCritTest`（它们钉的是\"忆灵暴伤收益 = 她暴伤 × 战技#1\"，实测多出 0.072 = 0.6 × 0.12）✗ —— 这两条判据的**口径**需要扩展成\"战技#1 + 天赋 0.6\"两段，本轮先把角色自身那半落地 ✓，忆灵那半等判据口径更新 ✓。 || 2026-10-18（第 40 轮）：忆灵那半**又试了一次**（`target: summon`，先 `percent: 0.6` 后 `amount: 0.6`）——两次实测都让忆灵多出 **0.072**（= 0.6 × 0.12，忆灵暴伤基础 0.12）而不是 0.6 ✗ ⇒ 说明给**忆灵**的属性修饰走的是**份额**路径（`amount` 与 `percent` 在这条路径上同效），而给**她本人**的 `amount: 0.6` 是点数 ✓（同一条规则里两种口径 ✗）。⇒ 忆灵那半需要的是\"按点数给忆灵\"的写法/能力 ⇒ 下一轮先量 `statModifier` 对 `Summon` 目标的口径，再写。 ⚠ **平值按等级读**：暴击伤害份额取自天赋 #2（Lv1 0.3 → Lv10 0.6）。"
     },
     {
       "on": "BATTLE_START",
@@ -243,24 +243,24 @@
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.3,
           "turns": 3,
           "coexist": true,
-          "target": "all_enemies"
+          "target": "all_enemies",
+          "percent_from_skill_param": "ULTRA:3"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.6,
           "turns": 3,
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "ULTRA:2"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.6,
           "turns": 3,
-          "target": "summon"
+          "target": "summon",
+          "percent_from_skill_param": "ULTRA:2"
         }
       ],
       "id": "ult_summons_and_darkens",
@@ -276,7 +276,7 @@
           "#4": 0.3
         }
       },
-      "_note": "「进入【至暗之谜】：敌方全体受到的伤害提高 **30%**、长夜月与忆灵「长夜」造成的伤害提高 **60%**、免疫控制」—— ① 状态 `APPLY_BUFF 至暗之谜` ✓；② 敌方易伤 `MODIFY_DAMAGE_TAKEN 0.3` + `coexist: true` ✓（与光锥/光环叠加 ✓）；③ 她与忆灵各一条 `ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ **单独成条**（不并进召唤那条）：`SummonCommandTest` 钉着\"召唤那条只声明 summon + command 两件事\" ✓，而且本条的 `target: summon` 必须在**召唤之后**解析 ✓ ⇒ 规则顺序上放在召唤那条**后面** ✓。⚠ 登记：「充能 2 点 / 忆灵施放【迷梦，流失，如露】消耗 1 点 / 无充能退出」用 `turns: 3` 近似 ✗；免疫控制未写 ✗。  ⚠ **一条规则**：`SUMMON` 必须在 `target: summon` 之前执行 ⇒ 它们同属一条（`do` 按顺序跑 ✓），这也满足了 `SummonCommandTest` 的\"她的终结技只有一条规则\" ✓。"
+      "_note": "「进入【至暗之谜】：敌方全体受到的伤害提高 **30%**、长夜月与忆灵「长夜」造成的伤害提高 **60%**、免疫控制」—— ① 状态 `APPLY_BUFF 至暗之谜` ✓；② 敌方易伤 `MODIFY_DAMAGE_TAKEN 0.3` + `coexist: true` ✓（与光锥/光环叠加 ✓）；③ 她与忆灵各一条 `ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ **单独成条**（不并进召唤那条）：`SummonCommandTest` 钉着\"召唤那条只声明 summon + command 两件事\" ✓，而且本条的 `target: summon` 必须在**召唤之后**解析 ✓ ⇒ 规则顺序上放在召唤那条**后面** ✓。⚠ 登记：「充能 2 点 / 忆灵施放【迷梦，流失，如露】消耗 1 点 / 无充能退出」用 `turns: 3` 近似 ✗；免疫控制未写 ✗。  ⚠ **一条规则**：`SUMMON` 必须在 `target: summon` 之前执行 ⇒ 它们同属一条（`do` 按顺序跑 ✓），这也满足了 `SummonCommandTest` 的\"她的终结技只有一条规则\" ✓。 ⚠ **按等级读**：易伤与暴击伤害份额取自终结技 #4 / #3。"
     },
     {
       "on": "DEALING_DAMAGE",
