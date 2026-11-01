@@ -895,6 +895,7 @@ public final class TriggerInterpreter {
             case REPLACE_SKILL -> TriggerEffects.replaceSkill(battle, effect, ctx);
             case TICK_DOT -> TriggerEffects.tickDot(battle, effect, ctx);
             case SHARE_DAMAGE -> shareDamage(effect, ctx);
+            case SET_STACKS -> TriggerEffects.setStacks(battle, effect, ctx);
             case REMOVE_STATE -> TriggerEffects.removeState(effect, ctx);
             case TAUNT -> TriggerEffects.taunt(battle, effect, ctx);
             case APPLY_CONTROL -> TriggerEffects.applyControl(battle, effect, ctx);

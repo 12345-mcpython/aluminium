@@ -615,6 +615,27 @@ final class TriggerEffects {
     }
 
     /**
+     * {@code SET_STACKS}: "set the counter TO this many layers". Adding and removing are the same statement in two
+     * directions - a unit below the goal gains layers, one above loses them - and layers already equal are left alone,
+     * which is what "set" means. Reader: 1218 Jiaoqiu's Ultimate (「把敌方目标的层数统一设置为场上最高值」).
+     */
+    static void setStacks(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        String name = effect.getBuff() == null ? "" : effect.getBuff().trim();
+        double wanted = TriggerMagnitudes.resolveScale(effect.getScale(),
+                effect.getPercent() == null ? 1 : effect.getPercent(), ctx);
+        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+            int current = target.getBuffManager().stacksOf(name);
+            int goal = Math.max(0, (int) Math.round(wanted));
+            for (int layer = current; layer < goal; layer++) {
+                target.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff(name, 2, false, Math.max(goal, 5)));
+            }
+            for (int layer = current; layer > goal; layer--) {
+                target.getBuffManager().removeState(name);
+            }
+        }
+    }
+
+    /**
      * {@code ADD_STACK}: "after our target casts a basic attack/Skill/Ultimate 2 times on an enemy target in the [承负] state ..." - one more mark on a
      * named counter.
      *

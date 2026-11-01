@@ -103,7 +103,13 @@ public enum TriggerOperator {
      * ({@code percent} is removed from it) and the same share, element and type is settled against the named unit through
      * ITS zones. Reader: 1208 Fu Xuan 穷观阵 - the ally takes 35% and Fu Xuan takes 65% of the pre-shield amount.
      */
-    SHARE_DAMAGE(true);
+    SHARE_DAMAGE(true),
+
+    /**
+     * "把敌方目标的层数统一设置为场上最高值": the counter is SET to a stated number - layers are added or removed until it
+     * matches, unlike {@code ADD_STACK}, which only ever adds. Reader: 1218 Jiaoqiu's Ultimate.
+     */
+    SET_STACKS(true);
 
     /**
      * Whether the engine can perform this op today. {@code false} is a statement about the ENGINE,
