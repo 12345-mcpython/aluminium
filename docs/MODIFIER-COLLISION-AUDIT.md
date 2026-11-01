@@ -46,6 +46,20 @@
 
 ⇒ **这一类扫完了：1 处真错（1412，已修），其余 14 处是合法形态。**
 
+## 第四类扫描：规则 id 与触发事件不符（已清零）
+
+条件：id 里含 `battle_start` / `on_kill` / `on_break` / `turn_start` / `turn_end` / `ult_cast` / `skill_cast` / `basic_attack` / `dealing_damage` / `hp_lost` / `state_ended`，而 `on` 不是对应事件。全库命中 **5 处**，逐条看完**没有一处是错的**：
+
+| 文件 | 规则 | 为什么合理 |
+| --- | --- | --- |
+| 1014 | `eidolon1_resonance_after_basic_or_skill` | id 自带「**or**」：普攻那半是同一条款的**另一条规则**，这条只管战技 |
+| 1111 | `talent_after_basic` | 挂在 `ALLY_ATTACK` 上，而「普攻之后」在引擎里就是队伍的攻击事件 |
+| 1202 | `trace_basic_attack_boost` | 它**放大普攻那一发的伤害**，所以要挂 `DEALING_DAMAGE` |
+| 1408 | `last_countdown_turn_ends_the_transformation` | 结束它的是**倒计时单位**的回合，事件正是 `COUNTDOWN_TURN` |
+| 8007 | `..._after_the_reinforced_basic_attack` | 强化普攻后的**换装**是 `CAST_SETUP`，不是攻击事件本身 |
+
+⇒ **这一类扫完了：0 处真错。** 结论是**命名不够精确**，不是内容错误 —— 不值得为它改 id（id 是判据与账本引用的键）。
+
 ## 候选清单
 
 | 文件 | 属性 -> 目标 | 常驻修饰 | 临时修饰 |
