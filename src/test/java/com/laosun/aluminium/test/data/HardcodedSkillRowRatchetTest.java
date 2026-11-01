@@ -28,6 +28,13 @@ import java.util.Set;
 public class HardcodedSkillRowRatchetTest {
 
     /**
+     * Every remaining entry is a DECIDED one - `docs/SKILL-ROW-AUDIT.md` groups all of them by reason:
+     *   - a fixture that never calls `startBattle()`, so the file's level convention never fires (AGENT item 28);
+     *   - a rule whose share is scaled by an Eidolon through `MODIFY_RULE effect_percent_scale`, where a literal is
+     *     multiplied and a row share is ADDED (item 27);
+     *   - a coincidence: the source sentence names no such slot (item 26, bucket B).
+     * The number is therefore a CEILING of decided cases, not a backlog: converting one of them would change behaviour.
+     *
      * The measured count on 2026-10-31. Counters are not counted at all (see MAGNITUDE_OPS): 12 of the original
      * entries were "gain 1 point" style counts that only coincided with a Lv10 cell. ⚠ A file whose `level_convention` pins only SOME slots still runs the others at
      * Lv1, so a literal there is exact and a row read would silently drop it (measured on 1215: its convention raises the
