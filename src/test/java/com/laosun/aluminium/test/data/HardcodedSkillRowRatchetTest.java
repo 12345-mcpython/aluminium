@@ -43,8 +43,12 @@ public class HardcodedSkillRowRatchetTest {
      * corrections: 1009 reads its four rows instead of restating them, and
      * numbers a character TRACE states are no longer reported (52 of the original 219 were trace constants, which are not
      * leveled and therefore exact). Lowering it is progress; raising it is the fault this test exists to catch.
+     *
+     * <p>2026-11-01: 1412's Eidolon 4 「终结技的伤害倍率提高 240%」 is a STAR-SOUL parameter (2.4) that happens to equal a row
+     * cell, so the scan cannot tell it from a frozen row. It is a share of the SETTLED damage (x3.4), not of the row, and
+     * `docs/SKILL-ROW-AUDIT.md` records it under its own heading.
      */
-    private static final int BASELINE = 35;
+    private static final int BASELINE = 36;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
