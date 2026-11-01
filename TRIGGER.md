@@ -533,6 +533,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `instance` | 每次施加算独立实例 |
 | `stacks` | 一次施加几层 |
 | `per_stack` / `per_stack_live` | 每层的增量 / 是否实时跟随层数 |
+| `per_stack_cap` | 「最多叠加 N 层」：封**这份加成**用的层数（计数器本身可以更多）|
 | **`base_chance`** | 基础概率，会被效果抵抗削减；100% 不是保证 |
 | `target_when` | 筛选受术者的条件 |
 
