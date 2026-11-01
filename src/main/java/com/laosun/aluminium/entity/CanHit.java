@@ -246,25 +246,21 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final RuleAmendments ruleAmendments = new RuleAmendments();
 
     /**
-     * Heal bonuses that are conditional on <b>who is being healed</b>, held by the healer.
+     * One registered heal bonus: the question asked about each heal, the bonus as a fraction, and whether that fraction
+     * is a <b>ceiling</b> scaled by how hurt the recipient is ({@code percent * (1 - hp%)}).
      *
-     * <p><b>Why this cannot be an attribute.</b> 「为当前生命值百分比小于等于 30% 的我方目标提供治疗时，
-     * 娜塔莎的治疗量提高 50%」 (1105's talent) is not a fact about the healer: a stat such as
-     * {@code OUTGOING_HEALING_BOOST} has no idea who the recipient is, so the same +50% would apply to a heal
-     * on a full-HP ally. It is also not expressible as a rule: there is no pre-heal event, so no rule can raise
-     * her outgoing healing just before the heal it is about. The one place with the healer and the recipient
-     * together is {@code Battle.calculateHeal}, and this is what it reads there.
+     * <p>Heal bonuses conditional on <b>who is being healed</b> cannot be an attribute: 「为当前生命值百分比小于等于 30% 的我方
+     * 目标提供治疗时，娜塔莎的治疗量提高 50%」 (1105's talent) is not a fact about the healer - {@code OUTGOING_HEALING_BOOST} would
+     * raise every heal equally, including one on a full-HP ally. It is also not expressible as a rule: there is no pre-heal
+     * event, so no rule can raise her healing just before the heal it is about. The one place holding the healer, the
+     * recipient and the battle together is {@code Battle.calculateHeal}, and this is what it reads there.
      *
-     * <p>A list rather than a running total, because each entry keeps its own condition and they are evaluated
-     * per heal -- the answer legitimately differs between recipients in the same turn.
-     *
-     * <p>Registered by {@code REGISTER_HEAL_BONUS} at {@code BATTLE_START}, so it is in place before any heal.
-     *
-     * @param condition the question asked about this heal, evaluated with the healer as {@code owner} and
-     *                  {@code actor} and the recipient as {@code target}
-     * @param percent   the bonus as a fraction: {@code 0.5} for 「提高 50%」
+     * @param condition        the question asked about this heal, evaluated with the healer as {@code owner} and
+     *                         {@code actor} and the recipient as {@code target}
+     * @param percent          the bonus as a fraction: {@code 0.5} for 「提高 50%」
+     * @param scaleByMissingHp {@code true} makes it a continuous bonus ({@code 0.8} = up to +80% at 0% HP): 1217's Eidolon 4
      */
-    public record ConditionalHealBonus(TriggerTable.Condition condition, double percent) {
+    public record ConditionalHealBonus(TriggerTable.Condition condition, double percent, boolean scaleByMissingHp) {
     }
 
     /**
@@ -279,9 +275,16 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param percent   the bonus as a fraction
      */
     public void addConditionalHealBonus(TriggerTable.Condition condition, double percent) {
-        if (condition != null) {
-            conditionalHealBonuses.add(condition, percent);
-        }
+        addConditionalHealBonus(condition, percent, false);
+    }
+
+    /**
+     * The same, with the continuous scaling flag (see {@link ConditionalHealBonus}).
+     */
+    public void addConditionalHealBonus(TriggerTable.Condition condition, double percent, boolean scaleByMissingHp) {
+        // A null condition means always: a bonus scaled by missing HP is its own gate (nothing at full HP), so the
+        // scaled registration does not need a target_when. See the record javadoc.
+        conditionalHealBonuses.add(condition, percent, scaleByMissingHp);
     }
 
     /**

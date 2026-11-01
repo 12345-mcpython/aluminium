@@ -2337,9 +2337,14 @@ public class Battle {
                 new com.laosun.aluminium.trigger.TriggerTable.TriggerContext(
                         healer, healer, target, 0, 0, null, this);
         double bonus = 0;
+        double missingShare = target.getMaxHp() <= 0 ? 0
+                : Math.clamp(1 - target.getCurrentHp() / target.getMaxHp(), 0, 1);
         for (CanHit.ConditionalHealBonus entry : healer.conditionalHealBonuses()) {
-            if (entry.condition().test(ctx)) {
-                bonus += entry.percent();
+            if (entry.condition() == null || entry.condition().test(ctx)) {
+                // A scaled bonus is a CEILING: 0.8 grants nothing at full HP and +80% at 0% ("the lower the target current
+                // HP, the more healing, up to 80%" - 1217 Eidolon 4). Conditions still gate it, so a half-HP threshold and
+                // a continuous scale can be combined.
+                bonus += entry.percent() * (entry.scaleByMissingHp() ? missingShare : 1.0);
             }
         }
         return 1 + bonus;

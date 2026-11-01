@@ -1017,6 +1017,11 @@ final class TriggerValidator {
                 // precisely the wrong number it exists to avoid -- so it is required loudly here rather than left to
                 // show up as a silent over-heal.
                 requirePercent(effect, op, spec);
+                // A bonus scaled by how hurt the recipient is says its own gate (at full HP it grants nothing), so an empty
+                // target_when is allowed THERE; a flat bonus still needs one, or it would raise every heal.
+                if (Boolean.TRUE.equals(effect.getScaleByMissingHp())) {
+                    break;
+                }
                 if (effect.getTargetWhen() == null || effect.getTargetWhen().isEmpty()) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs a \"target_when\" saying which heals it applies to: the condition "
