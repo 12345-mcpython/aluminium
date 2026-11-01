@@ -4,7 +4,6 @@
   "_status": "partial",
   "_gaps": [
     "终结技「下一次战技强化」：强化战技的装载槽位与相邻目标选择器未写",
-    "秘技：「用过秘技」门槛与随机单体选择器未写",
     "星魂 3 第三项：强化战技 +2 级未写，依赖强化战技的槽位"
   ],
   "rules": [
@@ -203,6 +202,17 @@
       ],
       "source": "1109 虎克 行迹 无邪 (1109102): 「抵抗控制类负面状态的概率提高35%。」",
       "_note": "「抵抗**控制类**负面状态的概率提高 35%」—— 引擎把\"按**类**抵抗\"建模成自己的 `ClassResistBuff`（`BuffManager.debuffResistOf(DebuffClass)` ✓），而控制类正是 `DebuffClass.CONTROL` ✓（冻结/纠缠/禁锢等 ✓），所以用 `RESIST_DEBUFF` + `debuff_class` ✓，而不是去改通用的效果抵抗 ✗（后者对所有负面效果生效，会**过度** ✗）。⚠ `permanent: true`：行迹是常驻的 ✓（不是\"持续 N 回合\" ✗）。 ⚠ 字段名是 kind 且取值**小写**（control / dot）—— 装载器原话：Op RESIST_DEBUFF requires kind (which class of negative state it resists; known: control / dot) ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_burn_on_entry",
+      "when": ["self has_state 秘技"],
+      "do": [
+        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.5, "element": "Fire", "target": "random_enemy" },
+        { "op": "APPLY_DOT", "element": "Fire", "base_chance": 1.0, "scale": "self_attr:ATTACK", "percent": 0.5, "turns": 3, "target": "all_enemies" }
+      ],
+      "source": "1109 虎克 秘技 哎！瞧这一团糟 (110907, Maze/Enhance): 「立即攻击敌人，进入战斗后对敌方随机单体造成等同于虎克50%攻击力的火属性伤害，同时有100%的基础概率使敌方每个单体目标陷入灼烧状态，持续3回合。灼烧状态下，敌方目标每回合开始时受到等同于虎克50%攻击力的火属性持续伤害。」 param = [1, 0.5, 3, 0.5]",
+      "_note": "「进入战斗后对敌方**随机单体**造成 50% 攻击力火属性伤害，同时有 **100% 基础概率**使敌方**每个单体**陷入灼烧 3 回合（每回合 50% 攻击力火伤）」—— ① 门 `self has_state 秘技` ✓（`applyTechniqueStates` 在任何 `BATTLE_START` 规则之前打 ✓）；② 随机单体 = **`random_enemy`** ✓（已有选择器 ✓）；③ 灼烧 = `APPLY_DOT` + `base_chance: 1.0`（句子自己的**基础概率** ✓）+ `scale: self_attr:ATTACK` + `percent: 0.5` + `turns: 3` ✓，目标 `all_enemies` ✓（「每个单体」= 全体逐个 ✓）；④ 数值取自秘技行 `[1, 0.5, 3, 0.5]` ✓（秘技只有一级 ⇒ 字面量 ✓）。⚠ 两半打的是**不同对象**（伤害随机一个、灼烧全体）⇒ 不存在「一次随机要绑定多条效果」的问题 ✓。"
     }
   ]
 }
