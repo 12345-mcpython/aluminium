@@ -603,7 +603,10 @@ final class TriggerEffects {
      * shortcut: adding one later is passing a key here.)
      */
     static void applyDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        DamageElement element = DamageElement.fromString(effect.getElement());
+        // No element named = EVERY DoT on the target ("所有持续伤害"), one instance each.
+        DamageElement element = effect.getElement() == null || effect.getElement().isBlank()
+                ? null
+                : DamageElement.fromString(effect.getElement());
         if (element == null) {
             throw new IllegalStateException(
                     "APPLY_DOT ran with element '" + effect.getElement() + "'; the loader validates it against "

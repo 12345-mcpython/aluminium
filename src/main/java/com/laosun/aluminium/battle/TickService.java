@@ -68,14 +68,17 @@ public final class TickService {
      * @return the total settled
      */
     public double dotStateNow(CanHit target, DamageElement element, double percent) {
-        if (target == null || target.isDeath() || element == null) {
+        // Note: a NULL element means ALL of them: "其当前承受的**所有**持续伤害立即产生 75% 的伤害" (1005 Kafka's
+        // Skill) settles one instance per DoT state. Each state still pays its own per-element cap, because the cap is a
+        // property of the state, not of the tick.
+        if (target == null || target.isDeath()) {
             return 0;
         }
         double total = 0;
         Map<DamageElement, Integer> paidPerState = new HashMap<>();
         for (DotBuff dot : target.getBuffManager().allBuffsOf(DotBuff.class)) {
             int paid = paidPerState.merge(dot.getElement(), 1, Integer::sum);
-            if (dot.getElement() != element) {
+            if (element != null && dot.getElement() != element) {
                 continue;
             }
             if (dot.getMaxStacks() > 0 && paid > dot.getMaxStacks()) {

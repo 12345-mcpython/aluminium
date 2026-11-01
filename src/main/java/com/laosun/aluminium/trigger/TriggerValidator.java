@@ -2475,6 +2475,11 @@ final class TriggerValidator {
     }
 
     static void requireElement(EffectSpec effect, String op, TriggerSpec spec, boolean allowAttackerElement) {
+        // `TICK_DOT` may name NO element: "其当前承受的**所有**持续伤害立即产生 75% 的伤害" (1005 Kafka's Skill)
+        // settles one instance per DoT state, so the element is not the rule's to state. Every other op still must.
+        if ("TICK_DOT".equals(op) && (effect.getElement() == null || effect.getElement().isBlank())) {
+            return;
+        }
         if (allowAttackerElement && effect.getElement() != null
                 && TriggerInterpreter.ATTACKER_ELEMENT.equalsIgnoreCase(effect.getElement().trim())) {
             return;
