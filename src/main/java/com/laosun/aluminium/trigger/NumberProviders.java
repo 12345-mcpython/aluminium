@@ -38,6 +38,8 @@ public final class NumberProviders {
             "const", "skill_param", "cast_param", "summon_param", "resource", "attr", "stacks",
             // "目标每有 1 个负面效果" (1006 Eidolon 1): a debuff COUNT as a number.
             "debuffs",
+            // "场上每有 1 个敌方目标" (1312 Eidolon 1): a head COUNT.
+            "units",
             "original_damage", "settled_damage_this_event", "elation_base", "cast_applied",
             "party_resource", "energy", "skill_point", "steps",
             "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg",
@@ -95,6 +97,8 @@ public final class NumberProviders {
             // A provider rather than a scale because GAIN_ENERGY reads every `scale` as a share of max energy;
             // a provider is a NUMBER, which is what "1 point each" is.
             case "debuffs" -> debuffCountOf(provider, ctx);
+            // "场上每有 1 个敌方目标" (1312 Eidolon 1): a head COUNT, as a number.
+            case "units" -> unitCountOf(provider, ctx);
             case "original_damage" -> TriggerMagnitudes.originalDamageOf(effect, ctx);
             case "settled_damage_this_event" -> TriggerMagnitudes.settledDamageOf(ctx);
             case "elation_base" -> TriggerMagnitudes.elationBase(ctx);
@@ -407,6 +411,23 @@ public final class NumberProviders {
         String whose = provider.getWhose() == null ? "owner" : provider.getWhose();
         CanHit unit = "target".equals(whose) ? ctx.target() : ctx.owner();
         return unit == null ? 0 : unit.getBuffManager().debuffCount();
+    }
+
+    /**
+     * {@code {"type": "units", "whose": "enemies" | "allies" | "other_allies"}} - a head COUNT.
+     */
+    private static double unitCountOf(NumberProvider provider, TriggerContext ctx) {
+        if (ctx.battle() == null) {
+            return 0;
+        }
+        String whose = provider.getWhose() == null ? "enemies" : provider.getWhose().trim();
+        return switch (whose) {
+            case "enemies" -> ctx.battle().enemies().size();
+            case "allies" -> ctx.battle().allies().size();
+            case "other_allies" -> Math.max(0, ctx.battle().allies().size() - 1);
+            default -> throw new IllegalStateException(
+                    "a \"units\" provider names whose \"" + whose + "\"; it is enemies, allies or other_allies");
+        };
     }
 
     /**

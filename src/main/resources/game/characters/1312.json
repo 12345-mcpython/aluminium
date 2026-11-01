@@ -116,6 +116,36 @@
       "source": "1312 星魂 5: 等级加成（数据 skill_add_level: 131202=SKILL+2, 131204=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "eidolon1_extra_segments_per_enemy",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill_id": 3,
+          "value": {
+            "type": "min",
+            "inputs": [
+              {
+                "type": "units",
+                "whose": "enemies"
+              },
+              {
+                "type": "const",
+                "value": 5
+              }
+            ]
+          }
+        }
+      ],
+      "source": "1312 米沙 星魂 1: 「施放终结技时，场上每有1个敌方目标，本次终结技的攻击段数额外增加1段，最多额外增加5段。」 param = [1, 5]",
+      "_note": "「场上**每有 1 个敌方目标**，本次终结技的攻击段数额外增加 **1** 段，最多 **5** 段」—— `CAST_SETUP`（结算前 ⇒ 段数还来得及改 ✓）+ `RAISE_SKILL_HITS { value: min(units(enemies), 5) }` ✓ —— `{\"type\": \"units\", \"whose\": \"enemies\"}` 是**本轮新增的头数提供器** ✓。"
     }
   ]
 }
