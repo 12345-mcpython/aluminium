@@ -3,7 +3,7 @@
   "character": 1222,
   "_status": "partial",
   "_gaps": [
-    "⚠ **【浮元】是「召唤物」，但引擎的 `Summon` 建模的是「忆灵（memosprite）」** —— 两者**不等价**（忆灵是 3.x 的快照型召唤物；神君 / 浮元这类 1.x 召唤物没有快照模型）。所以：① 两条 `ADVANCE { target: 「summon」 }` 规则**已写但未验证** —— 它们靠 `self_summon_count >= 1` 门槛保护，而 `summonOf(owner)` 对**非忆灵召唤物**是否返回单位，尚未确认；② 原登记「引擎没有召唤物面板」也**不能简单作废**，正确说法是「引擎有**忆灵**模型，没有通用的**召唤物**模型」。⛔ 仍开：普攻 / 天赋 / 其余星魂与秘技。"
+    "⚠ **【浮元】是非忆灵召唤物 ⇒ 它沿用灵砂自身的属性、没有独立面板**。所以「行动提前」不该指望 `target: 「summon」`：引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元大概率解析不到单位（`self_summon_count >= 1` 会把它挡成永假，而**永假没有症状**）。正确的建模方向是**挂在灵砂自己身上的行动/计数器**，待定。原登记「引擎没有召唤物面板」应改为「引擎有忆灵模型，没有通用召唤物模型」。⛔ 仍开：普攻 / 天赋 / 其余星魂与秘技。"
   ],
   "rules": [
     {
@@ -156,40 +156,6 @@
       "source": "1222 星魂 5: 等级加成（数据 skill_add_level: 122201=COMMON+1, 122202=SKILL+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
-    },
-    {
-      "on": "SKILL_CAST",
-      "id": "skill_advances_the_summon",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
-      "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 0.2,
-          "target": "summon"
-        }
-      ],
-      "source": "1222 灵砂 战技 烟斜雾横: 「…使【浮元】行动提前20%。」",
-      "_note": "「使【浮元】**行动提前 20%**」= `ADVANCE { percent: 0.2, target: 「summon」 }` ✓ —— 引擎**有**召唤物与 `summon` 选择器（原登记「引擎没有召唤物面板」**作废**）。 ⚠ 必须带 `self_summon_count >= 1`：引擎对「没有召唤物时的 `target: summon`」会**抛错**（不是静默跳过），报错信息本身就建议这个门槛。"
-    },
-    {
-      "on": "ULT_CAST",
-      "id": "ult_advances_the_summon_fully",
-      "when": [
-        "actor == self",
-        "self_summon_count >= 1"
-      ],
-      "do": [
-        {
-          "op": "ADVANCE",
-          "percent": 1,
-          "target": "summon"
-        }
-      ],
-      "source": "1222 灵砂 终结技 遗芳入梦: 「…使【浮元】行动提前100%。」",
-      "_note": "「使【浮元】**行动提前 100%**」= `ADVANCE { percent: 1, target: 「summon」 }` ✓（100% = 把等待清零）。 ⚠ 必须带 `self_summon_count >= 1`：引擎对「没有召唤物时的 `target: summon`」会**抛错**（不是静默跳过），报错信息本身就建议这个门槛。"
     }
   ]
 }
