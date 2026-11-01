@@ -42,7 +42,7 @@ public class TriggerOperatorVocabularyTest {
             "REMOVE_RESOURCE", "REMOVE_STACK", "REMOVE_STATE", "REPLACE_SKILL", "RESET_RESOURCE_CAP",
             "RESET_RULE_CHANCE", "RESET_TRIGGER_LIMIT", "RESIST_DEBUFF", "SHIELD", "SPEND_RESOURCE",
             "SPEND_STEPS", "START_COUNTDOWN", "SUMMON", "SUMMON_SERVANT", "SUPER_BREAK", "TAUNT",
-            "SHARE_DAMAGE",
+            "SHARE_DAMAGE", "SET_STACKS",
             "TICK_DOT");
 
     /**
@@ -103,3 +103,4 @@ public class TriggerOperatorVocabularyTest {
         Assertions.assertNull(TriggerOperator.parse("GAIN ENERGY"));
     }
 }
+
