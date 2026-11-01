@@ -5,8 +5,8 @@
   "_gaps": [
     "终结技「在两种攻击模式中选择其一」：二选一双形态未写",
     "行迹：仅写「坚韧」，其余行迹未读",
-    "星魂 1 / 2 / 3 / 5 / 6：未读、未写（E4 已写）",
-    "强化普攻 / 战技替换等其余基础 kit 从句未核"
+    "强化普攻 / 战技替换等其余基础 kit 从句未核",
+    "星魂 6「消灭敌方目标时也会触发天赋」未写（要把天赋的效果在击杀时复述一次）"
   ],
   "rules": [
     {
@@ -113,6 +113,82 @@
       ],
       "source": "8001/8002 开拓者•毁灭 星魂 4 凝眸毁灭的瞬间: 「击中处于弱点击破状态的敌方目标时，暴击率提高25%」",
       "_note": "「**击中处于弱点击破状态的**敌方目标时，**暴击率提高 25%**」—— ① 条件用**既有**状态 ✓（`target has_state 弱点击破` ✓，与已出货的 1002 同一拼写 ✓，`SuperBreakTest` 的前置规则也在用它 ✓）；② 幅度 `percent: 0.25` ✓（比率型 ⇒ 份额 ✓）；③ ⚠ **事件选 `ALLY_ATTACK`** ✓：它是**攻击发起**时的事件 ✓ ⇒ 此时加上的暴击率**会被这一击的暴击区读到** ✓ （⚠ 若挂在 `DEALING_DAMAGE` 上就**太晚** ✗ —— `Battle.assemble` 第 1 步发该事件、第 2 步才掷暴击 ✓）；④ 时长 `until: next_attack` ✓（「**击中…时**」是这一击的事 ✓，与 1002 的\"下一次攻击\"同一时长拼写 ✓）；⑤ 门槛 `min_eidolon: 4` ✓。"
+    },
+    {
+      "on": "KILL",
+      "id": "eidolon1_energy_on_ult_kill",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "per_attack": 1,
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "target": "self"
+        }
+      ],
+      "source": "8001 开拓者•毁灭 星魂 1: 「施放终结技消灭敌方目标时，开拓者额外恢复10点能量，该效果每次攻击只能触发1次。」 param = [10]",
+      "_note": "「施放**终结技**消灭敌方目标时…额外恢复 **10** 点能量，**每次攻击只能触发 1 次**」—— `KILL` + `from_skill ULTRA` ✓（与 1206 的星魂 4 同形）+ `per_attack: 1` ✓（「每次攻击只能触发 1 次」）。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "eidolon2_heal_when_hitting_a_physical_weakness",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "target has_weakness Physical"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.05,
+          "target": "self"
+        }
+      ],
+      "source": "8001 开拓者•毁灭 星魂 2: 「施放攻击后，若击中的敌方目标弱点为物理属性，则回复等同于开拓者5%攻击力的生命值。」 param = [0.05]",
+      "_note": "「**施放攻击后**，若击中的敌方目标**弱点为物理属性**，则回复等同于开拓者 **5% 攻击力**的生命值」—— 事件 `ATTACK_FINISHED` ✓（攻击结束）+ 条件 `target has_weakness Physical` ✓ + `HEAL scale: self_attr:ATTACK percent: 0.05` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "8001 星魂 3: 「战技等级+2…天赋等级+2…」",
+      "_note": "取自 skill_add_level ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "8001 星魂 5: 「终结技等级+2…普攻等级+1…」",
+      "_note": "取自 skill_add_level ✓（数据里另有槽 8/9 的 +2，属强化形态，未接）。"
     }
   ]
 }

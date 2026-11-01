@@ -100,7 +100,7 @@ public class TrailblazerSiblingTest {
         var table = TriggerTables.of(TB2);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
                 "the talent's ATK stack and (2026-09-29) the Tenacity (坚韧) trace's per-layer DEFENCE, both on BREAK");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the technique heal and the level convention");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the technique heal, the level convention and Eidolons 3 + 5 (both on BATTLE_START)");
     }
 
     private static Random fixed() {

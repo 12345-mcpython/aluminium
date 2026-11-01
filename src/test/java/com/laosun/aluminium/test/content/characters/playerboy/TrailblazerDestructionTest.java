@@ -55,7 +55,7 @@ public class TrailblazerDestructionTest {
         var table = TriggerTables.of(TB);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
                 "the talent's ATK stack and (2026-09-29) the Tenacity (坚韧) trace's per-layer DEFENCE, both on BREAK");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the technique heal (round 178) and the level convention");
     }
 
