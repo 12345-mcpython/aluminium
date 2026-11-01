@@ -540,8 +540,8 @@
           "amount": 1
         }
       ],
-      "source": "1503 真珠 星魂 3 速写，惊涛悬停的刹那: 「终结技等级+2；普攻等级+1；欢愉技等级+1」（参数 `{'150303': 2, '150301': 1, '150320': 1, '150308': 1, '150310': 1}`）。",
-      "_note": "⭐ 语料参数里的五个技能 ID 映到四个槽位：150303 → ULTRA、150301 → COMMON、150320 → ELATION_SKILL（槽 20）、而 **150308 与 150310 同属 `ELATION_EXTRA`**（强化普攻，实测自 `SkillType` 枚举）—— 所以它们共用一条 `+1`。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
+      "source": "1503 真珠 星魂 3 速写，惊涛悬停的刹那: 「终结技等级+2，普攻等级+1，欢愉技等级+1（各级上限略）」（参数 `{'150303': 2, '150301': 1, '150320': 1, '150308': 1, '150310': 1}`）。",
+      "_note": "⭐ 语料参数里的五个技能 ID 映到四个槽位：150303 → ULTRA、150301 → COMMON、150320 → ELATION_SKILL（槽 20）、而 **150308 与 150310 同属 `ELATION_EXTRA`**（强化普攻，实测自 `SkillType` 枚举）—— 所以它们共用一条 `+1`。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12. ⚠ 引文原来省掉了每项后面的「最多不超过 N 级」，看起来像逐字引用其实不是；已在引文里标注「各级上限略」。"
     },
     {
       "on": "BATTLE_START",
@@ -564,8 +564,8 @@
           "amount": 1
         }
       ],
-      "source": "1503 真珠 星魂 5 透视，笔端星夜的肌理: 「战技等级+2；天赋等级+2；欢愉技等级+1」（参数 `{'150302': 2, '150304': 2, '150320': 1}`）。",
-      "_note": "⭐ 三个参数直接对应 SKILL / TALENT / ELATION_SKILL，无歧义。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
+      "source": "1503 真珠 星魂 5 透视，笔端星夜的肌理: 「战技等级+2，天赋等级+2，欢愉技等级+1（各级上限略）」（参数 `{'150302': 2, '150304': 2, '150320': 1}`）。",
+      "_note": "⭐ 三个参数直接对应 SKILL / TALENT / ELATION_SKILL，无歧义。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12. ⚠ 引文原来省掉了每项后面的「最多不超过 N 级」，看起来像逐字引用其实不是；已在引文里标注「各级上限略」。"
     },
     {
       "on": "CAST_SETUP",
