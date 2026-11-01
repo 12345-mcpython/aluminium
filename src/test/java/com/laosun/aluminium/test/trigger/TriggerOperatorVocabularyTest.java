@@ -42,6 +42,7 @@ public class TriggerOperatorVocabularyTest {
             "REMOVE_RESOURCE", "REMOVE_STACK", "REMOVE_STATE", "REPLACE_SKILL", "RESET_RESOURCE_CAP",
             "RESET_RULE_CHANCE", "RESET_TRIGGER_LIMIT", "RESIST_DEBUFF", "SHIELD", "SPEND_RESOURCE",
             "SPEND_STEPS", "START_COUNTDOWN", "SUMMON", "SUMMON_SERVANT", "SUPER_BREAK", "TAUNT",
+            "SHARE_DAMAGE",
             "TICK_DOT");
 
     /**
