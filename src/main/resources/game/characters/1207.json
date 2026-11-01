@@ -56,14 +56,14 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.8,
           "buff": "鸣弦号令增益",
           "permanent": true,
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "SKILL:1"
         }
       ],
       "source": "1207 驭空 战技 天阙鸣弦 (120702, BPSkill/Support): 「获得2层【鸣弦号令】，最多持有不超过2层。当驭空持有【鸣弦号令】时，我方全体攻击力提高80%…」 param Lv10 = [2, 0.8] → #1 = 2 层、#2 = 0.8",
-      "_note": "「获得 **2 层**【鸣弦号令】，最多持有不超过 2 层。当驭空持有【鸣弦号令】时，我方全体攻击力提高 80%」. ⚠ Two `ADD_STACK` effects, because **one layer is one buff** (that is the engine's stacking) — the same shape 1302 星魂 4 uses for 「获得 2 层」. ⚠ The party boost carries `buff: 鸣弦号令` so it is removed **with the state**, by name, in the turn-end rules below; a boost with no name would stay up forever once the layers ran out. ⚠ `permanent: true` is not \"forever\": it means no turn count, and the end is stated by those rules — the honest spelling of a duration decided by a *counter* rather than by turns. ⚠ **2026-09-28 实测修正**：全队增益**不能**与层同名 —— `stacksOf(<名字>)` 数的是**所有**带该名字的 buff，于是\"2 层 + 1 个增益\"会读成 **3 层**，而 `REMOVE_STACK buff 鸣弦号令` 更可能**吃掉那个增益**而不是一层。现在层叫【鸣弦号令】、增益叫【鸣弦号令增益】，两者各自按名移除。"
+      "_note": "「获得 **2 层**【鸣弦号令】，最多持有不超过 2 层。当驭空持有【鸣弦号令】时，我方全体攻击力提高 80%」. ⚠ Two `ADD_STACK` effects, because **one layer is one buff** (that is the engine's stacking) — the same shape 1302 星魂 4 uses for 「获得 2 层」. ⚠ The party boost carries `buff: 鸣弦号令` so it is removed **with the state**, by name, in the turn-end rules below; a boost with no name would stay up forever once the layers ran out. ⚠ `permanent: true` is not \"forever\": it means no turn count, and the end is stated by those rules — the honest spelling of a duration decided by a *counter* rather than by turns. ⚠ **2026-09-28 实测修正**：全队增益**不能**与层同名 —— `stacksOf(<名字>)` 数的是**所有**带该名字的 buff，于是\"2 层 + 1 个增益\"会读成 **3 层**，而 `REMOVE_STACK buff 鸣弦号令` 更可能**吃掉那个增益**而不是一层。现在层叫【鸣弦号令】、增益叫【鸣弦号令增益】，两者各自按名移除。 ⚠ **按等级读**：攻击力份额取自战技 #2（Lv1 0.4 → Lv10 0.8）。"
     },
     {
       "on": "TURN_END",
@@ -145,22 +145,22 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.28,
           "buff": "鸣弦号令增益",
           "permanent": true,
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "ULTRA:1"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "percent": 0.65,
           "buff": "鸣弦号令增益",
           "permanent": true,
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "ULTRA:2"
         }
       ],
       "source": "1207 驭空 终结技 贯云饮羽 (120703, Ultra/SingleAttack): 「施放终结技时，若驭空持有【鸣弦号令】，则额外使我方全体暴击率提高28.00%，暴击伤害提高65%。…」 param Lv10 = [3.8, 0.28, 0.65] → #2 = 0.28、#3 = 0.65",
-      "_note": "「施放终结技时，**若驭空持有【鸣弦号令】**，则额外使我方全体暴击率提高 28.00%，暴击伤害提高 65%」. ⚠ The gate is `self_stacks:鸣弦号令 >= 1` — the condition vocabulary can read a named counter, so no new spelling was needed. ⚠ Both buffs carry `buff: 鸣弦号令`, so they leave with the layers (the same cleanup rule above). ⚠ The 380% damage (#1) is the engine's own skill path, not a rule.",
+      "_note": "「施放终结技时，**若驭空持有【鸣弦号令】**，则额外使我方全体暴击率提高 28.00%，暴击伤害提高 65%」. ⚠ The gate is `self_stacks:鸣弦号令 >= 1` — the condition vocabulary can read a named counter, so no new spelling was needed. ⚠ Both buffs carry `buff: 鸣弦号令`, so they leave with the layers (the same cleanup rule above). ⚠ The 380% damage (#1) is the engine's own skill path, not a rule. ⚠ **按等级读**：暴击率 / 暴击伤害份额取自终结技 #2 / #3。",
       "id": "ult_effect"
     },
     {

@@ -206,7 +206,8 @@ public class CastTargetTest {
         Character other = characterWith(rule("SKILL_CAST", "target == self"));
         // ⚠ This fixture deliberately does NOT start the battle, so 1101's level convention never fires and everything runs
         // on row 1. That is why her file keeps LITERALS for the Skill's share (0.66): reading the row here would give the
-        // Lv1 value 0.33. Changing this fixture means re-measuring all five of its cases.
+        // Lv1 value 0.33. Starting it changes a second case's numbers too (0.5 vs 0.6), so 1101 stays literal until this
+        // fixture is re-measured case by case.
         return new Battle(List.of(bronya, ally, other), List.of(dummy()), BattleFixture.seeded());
     }
 
