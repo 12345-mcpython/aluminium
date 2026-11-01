@@ -43,7 +43,10 @@ public class ContentDuplicateGuardTest {
                     // (1506 Silver Wolf LV.999) is two REPLACE_SKILL rules that differ ONLY in which slot they swap and which row
                     // they swap it for -- measured: without these the guard called them "one sentence written twice", while a
                     // rule that names a different slot is not the same sentence by construction.
-                    "skill", "skill_id");
+                    "skill", "skill_id",
+                    // Toughness: 「让这一发削 N 点、且无视弱点」 is a DIFFERENT sentence from the same damage without it --
+                    // measured on 1214, whose Eidolon-2 follow-up is otherwise identical to the plain one.
+                    "stance", "ignoreWeakness");
 
     @Test
     public void noFileStatesTheSameRuleTwice() throws IOException {

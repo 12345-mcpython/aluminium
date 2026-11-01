@@ -3,9 +3,8 @@
   "character": 1214,
   "_status": "partial",
   "_gaps": [
-    "星魂 2「天赋追加攻击**无视弱点属性**削韧 + 回复 5% 生命上限 + 击破时触发量子弱点击破」：规则式 `DAMAGE` 完全不削韧 ⇒ 缺「让这一发按 N 点削韧、且无视弱点」的参数；回血那半可以与它一起做（同一个触发点）",
-    "终结技「**无视弱点削韧** + 按削韧量增伤最多 60%」：同一个参数缺口的第二个读者（与星魂 2 一起解决）",
-    "她自己削韧的「**削得越多叠越多**」：正文与数据都不给换算（只给上限 8）⇒ 不编比例"
+    "她自己削韧的「**削得越多叠越多**」：正文与数据都不给换算（只给上限 8）⇒ 不编比例",
+    "终结技「**无视弱点削韧** + 按削韧量增伤最多 60%」：削韧半句现在有写法（`stance`/`ignore_weakness` ✓），但「按削韧量增伤最多 60%」要读**这一发削了多少**，需要 `event_amount` 式的取值路径，未做"
   ],
   "rules": [
     {
@@ -137,23 +136,23 @@
       ],
       "do": [
         {
+          "op": "REMOVE_STACK",
+          "buff": "恶报",
+          "amount": 8,
+          "target": "self"
+        },
+        {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
           "percent": 0.9,
           "element": "Quantum",
           "times": 3,
           "target": "random_enemy"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "恶报",
-          "amount": 8,
-          "target": "self"
         }
       ],
       "source": "1214 雪衣 天赋: 「当【恶报】叠加至上限时消耗当前所有【恶报】，立即对敌方目标发动追加攻击，造成3次伤害，每次伤害对敌方随机单体造成等同于雪衣90%攻击力的量子属性伤害。」 param = [8, 0.9, 1]",
-      "_note": "「叠加至**上限**时**消耗当前所有**，立即发动追加攻击，造成 **3 次**，每次对**随机单体** **90% 攻击力**量子伤害」—— 条件 `self_stacks:恶报 >= 8` ✓ + `DAMAGE { percent: 0.9, times: 3, target: random_enemy }` ✓ + `REMOVE_STACK 8` ✓（上限就是 8，所以「移除 8 层」= 「消耗当前所有」；`SET_STACKS` 需要 `scale`，而「设为 0」没有合适的 scale 拼法）。⚠ 「本次追加攻击**无法叠加**【恶报】」未写（见 `_gaps`）。",
-      "max_eidolon": 5
+      "_note": "「叠加至**上限**时**消耗当前所有**，立即发动追加攻击，造成 **3 次**，每次对**随机单体** **90% 攻击力**量子伤害」—— 条件 `self_stacks:恶报 >= 8` ✓ + `DAMAGE { percent: 0.9, times: 3, target: random_enemy }` ✓ + `REMOVE_STACK 8` ✓（上限就是 8，所以「移除 8 层」= 「消耗当前所有」；`SET_STACKS` 需要 `scale`，而「设为 0」没有合适的 scale 拼法）。⚠ 「本次追加攻击**无法叠加**【恶报】」未写（见 `_gaps`）。 ⚠ **顺序**：先 `REMOVE_STACK` 再 `DAMAGE` —— 追击现在会削韧（星魂 2），削韧又会发 `TOUGHNESS_REDUCED`；若先结算伤害，嵌套事件里层数还是满的 ⇒ 同一条规则再次触发，引擎会以「Trigger recursion exceeded 8 levels」拒绝（实测踩过）。",
+      "max_eidolon": 1
     },
     {
       "on": "TOUGHNESS_REDUCED",
@@ -164,22 +163,24 @@
       ],
       "do": [
         {
+          "op": "REMOVE_STACK",
+          "buff": "恶报",
+          "amount": 6,
+          "target": "self"
+        },
+        {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
           "percent": 0.9,
           "element": "Quantum",
           "times": 3,
-          "target": "random_enemy"
-        },
-        {
-          "op": "REMOVE_STACK",
-          "buff": "恶报",
-          "amount": 6,
-          "target": "self"
+          "target": "random_enemy",
+          "stance": 15,
+          "ignoreWeakness": true
         }
       ],
       "source": "1214 雪衣 星魂 6 「斩断不死」: 「【恶报】的层数上限降低至6层。」 param = [6]",
-      "_note": "「【恶报】的层数**上限降低至 6 层**」—— 用「两条同形规则 + 星魂门槛互斥」实现：低于 6 星魂走 8 层的 `talent_karma_overflow_followup`（加了 `max_eidolon: 5` ✓），6 星魂走这条 6 层的 ✓。⚠ 不写「改上限」这个字段（`max_stacks` 不能由规则改写）—— 而这正是它的语义：**上限变了 ⇒ 触发点变了** ✓。"
+      "_note": "「【恶报】的层数**上限降低至 6 层**」—— 用「两条同形规则 + 星魂门槛互斥」实现：低于 6 星魂走 8 层的 `talent_karma_overflow_followup`（加了 `max_eidolon: 5` ✓），6 星魂走这条 6 层的 ✓。⚠ 不写「改上限」这个字段（`max_stacks` 不能由规则改写）—— 而这正是它的语义：**上限变了 ⇒ 触发点变了** ✓。 ⚠ **顺序**：先 `REMOVE_STACK` 再 `DAMAGE` —— 追击现在会削韧（星魂 2），削韧又会发 `TOUGHNESS_REDUCED`；若先结算伤害，嵌套事件里层数还是满的 ⇒ 同一条规则再次触发，引擎会以「Trigger recursion exceeded 8 levels」拒绝（实测踩过）。"
     },
     {
       "on": "BATTLE_START",
@@ -227,6 +228,50 @@
       ],
       "source": "1214 雪衣 星魂 2 「斩断烦恼」: 「天赋的追加攻击无视弱点属性削减敌方的韧性，同时为自身恢复等同于雪衣5%生命上限的生命值…」 param = [0.05]",
       "_note": "「天赋的追加攻击**无视弱点属性**削减敌方的韧性，同时为自身恢复 **5% 生命上限**」—— ⚠ 这条只写**回血**那半：回血发生在**那次追击触发时**，而触发点是「层数到上限」⇒ 用 `self_stacks >= 7` 作为「这一发就要触发」的门槛（8 层版本；6 星魂版本见 `_gaps`）。**削韧**那半现在有写法了（`DAMAGE` 新增的 `stance` + `ignore_weakness` ✓），但要放进追击规则本身，下一轮接。"
+    },
+    {
+      "on": "TOUGHNESS_REDUCED",
+      "id": "talent_karma_overflow_followup_e2",
+      "when": [
+        "self_stacks:恶报 >= 8"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "恶报",
+          "amount": 8,
+          "target": "self"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.9,
+          "element": "Quantum",
+          "times": 3,
+          "target": "random_enemy",
+          "stance": 15,
+          "ignoreWeakness": true
+        }
+      ],
+      "source": "1214 雪衣 星魂 2（削韧半句）: 「天赋的追加攻击**无视弱点属性**削减敌方的韧性…」 param = [0.05]",
+      "_note": "「天赋的追加攻击**无视弱点属性**削减敌方的韧性」—— `DAMAGE` 新增的 **`stance: 15`** + **`ignore_weakness: true`** ✓。15 不是我编的：那是这一行自己的 `stance_list.single`（`SkillData.stanceFor` 对 Bounce 就是读 `single` ✓，**每段** 15）⇒ 3 段共 45，与引擎结算真实技能时的口径一致 ✓。⚠ 与 8 层消费规则**分开成两条**：削韧只在星魂 2 之后才有（`max_eidolon: 1` 那条不带 ✓）。 ⚠ **顺序**：先 `REMOVE_STACK` 再 `DAMAGE` —— 追击现在会削韧（星魂 2），削韧又会发 `TOUGHNESS_REDUCED`；若先结算伤害，嵌套事件里层数还是满的 ⇒ 同一条规则再次触发，引擎会以「Trigger recursion exceeded 8 levels」拒绝（实测踩过）。",
+      "min_eidolon": 2,
+      "max_eidolon": 5
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_followup_damage_e2",
+      "min_eidolon": 1,
+      "max_eidolon": 5,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_karma_overflow_followup_e2",
+          "effect_percent_scale": 1.4
+        }
+      ],
+      "source": "1214 雪衣 星魂 1（用于星魂 2 的削韧版本）: 「天赋的追加攻击造成的伤害提高40%。」",
+      "_note": "同一句要同时修饰「带削韧」的那条 ✓（`MODIFY_RULE` 按规则名，所以每条被修饰的规则都要一条）。"
     }
   ]
 }
