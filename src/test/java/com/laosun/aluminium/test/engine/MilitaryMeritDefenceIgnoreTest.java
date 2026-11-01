@@ -28,7 +28,9 @@ public class MilitaryMeritDefenceIgnoreTest {
      */
     @Test
     public void theMeritHolderIgnoresSixteenPercent() {
-        Character owner = CharacterFactory.create(OWNER, 80);
+        // ⚠ Eidolon 1: the sentences give the 16% to 「持有【军功】的角色」 only at 星魂 1. This test used to build at E0 and
+        // pass only because the Skill rule carried a copy of that clause; with the copy gone the gate is the honest one.
+        Character owner = CharacterFactory.create(OWNER, 80, true, null, null, 1);
         Character ally = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(owner, ally),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
