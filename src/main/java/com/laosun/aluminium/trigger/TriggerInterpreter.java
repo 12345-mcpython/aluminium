@@ -800,6 +800,12 @@ public final class TriggerInterpreter {
                     battle.queue().advanceActionByPercent(target, TriggerMagnitudes.shareOf(effect, ctx));
                 }
             }
+            case IGNORE_WEAKNESS -> {
+                int casts = effect.getAmount() == null ? 1 : (int) Math.round(effect.getAmount());
+                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                    target.markIgnoreWeaknessCasts(casts);
+                }
+            }
             case DELAY -> {
                 // 「行动延后 X%」: a one-off push of the target's action bar by X% of its action period.
                 // Unlike ADVANCE there is no "advance_to_others" suppression: that sentence bans advances,

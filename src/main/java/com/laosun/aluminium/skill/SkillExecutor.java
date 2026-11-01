@@ -941,7 +941,13 @@ public final class SkillExecutor {
         double effectiveStance = stanceDamage * (1 + user.getBuffManager().toughnessBoost());
         // The instance is passed on: a weakness break caused by THIS cast has to be attributable to it
         // ("when casting the Skill ... causes a weakness break"), and damage is the only thing carrying the cast's category.
-        Battle.StanceResult stance = battle.reduceToughness(user, enemy, element, effectiveStance, damage.getCastCategory());
+        // "本次攻击无视弱点属性削减敌方的韧性" (1214 Ultimate): the cast carries the flag, and the gate is lifted for it.
+        boolean ignoreWeakness = user.ignoresWeaknessThisCast();
+        if (ignoreWeakness) {
+            user.consumeIgnoreWeaknessCast();
+        }
+        Battle.StanceResult stance = battle.reduceToughness(user, enemy, element, effectiveStance,
+                damage.getCastCategory(), ignoreWeakness);
         return stance.breakDamage()
                 + applySuperBreak(battle, user, enemy, element, stance.superBreakStance(), damage.getCastCategory());
     }
