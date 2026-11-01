@@ -32,12 +32,12 @@ public class ConeAttackEnergyTest {
 
     @Test
     public void cone21004GivesTheRankShareOfBreakEffect() {
-        Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21004, LEVEL, false, 1));
-        Battle battle = new Battle(List.of(unit), List.of(BattleFixture.monster()), BattleFixture.seeded());
-        double before = unit.getAttribute(AttributeType.BREAKING_EFFECT).get();
-        battle.startBattle();
-        Assertions.assertEquals(0.28, unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-6,
-                "break effect at battle start");
+        // The share is the cone PROPERTY, applied when the weapon is assembled - not at battle start. A rule repeating it
+        // read DOUBLE; it is gone, and this judge compares against a bare wearer instead of a battle-start delta.
+        Character withCone = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21004, LEVEL, false, 1));
+        Character bare = CharacterFactory.create(WEARER, LEVEL);
+        Assertions.assertEquals(0.28, withCone.getAttribute(AttributeType.BREAKING_EFFECT).get()
+                - bare.getAttribute(AttributeType.BREAKING_EFFECT).get(), 1e-6, "break effect from the property");
     }
 
     @Test
