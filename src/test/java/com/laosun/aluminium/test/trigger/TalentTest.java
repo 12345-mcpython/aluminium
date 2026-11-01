@@ -66,8 +66,8 @@ public class TalentTest {
 
         Assertions.assertEquals(1, TriggerTables.of(CLARA).ruleCount(TriggerEvent.HP_LOST),
                 "Clara counters on HP_LOST");
-        Assertions.assertEquals(1, TriggerTables.of(SEELE).ruleCount(TriggerEvent.KILL),
-                "Seele acts on KILL");
+        Assertions.assertEquals(2, TriggerTables.of(SEELE).ruleCount(TriggerEvent.KILL),
+                "Seele acts on KILL: the talent and Eidolon 4 entry");
     }
 
     /**
@@ -410,4 +410,5 @@ public class TalentTest {
         Assertions.fail("the enemy never got a turn");
     }
 }
+
 
