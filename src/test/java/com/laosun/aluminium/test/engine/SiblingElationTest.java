@@ -81,8 +81,8 @@ public class SiblingElationTest {
             Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
                     "cid " + cid + ": the Ultimate now has four clauses -- the CRIT DMG buff, the action advance when there is no Elation Skill, "
                             + "gains 5 Punchline, and \"if the target has an Elation Skill ... makes it immediately cast 1 Elation Skill\" (「若目标拥有欢愉技…使其立即施放 1 次欢愉技」)");
-            Assertions.assertEquals(cid == 8009 ? 2 : 1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
-                    "cid " + cid + ": 8009 also pays 3 笑点 on its own attack (Talent)");
+            Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                    "cid " + cid + ": the talent pays 3 笑点 on its own attack");
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid);
         }
     }
@@ -173,4 +173,5 @@ public class SiblingElationTest {
         return BattleFixture.alwaysRoll(1.0);
     }
 }
+
 
