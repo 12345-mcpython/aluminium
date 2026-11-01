@@ -48,7 +48,11 @@ public class CharacterConditionLiteralsTest {
         assertRule(1005, "BATTLE_START", "level_convention", List.of());
         assertRule(1005, "ALLY_ATTACK", "talent_followup", List.of("actor is_other_ally", "from_skill COMMON"));
         assertRule(1005, "ULT_CAST", "trace_shock_lasts_one_more_turn", List.of("actor == self"));
-        assertRule(1005, "FOLLOW_UP", "talent_dot_taken_on_followup", List.of("actor == self"));
+        assertRule(1005, "FOLLOW_UP", "eidolon1_dot_taken_on_followup", List.of("actor == self"));
+        assertRule(1005, "BATTLE_START", "eidolon2_party_dot_damage", List.of());
+        assertRule(1005, "BATTLE_START", "eidolon3_levels", List.of());
+        assertRule(1005, "BATTLE_START", "eidolon5_levels", List.of());
+        assertRule(1005, "BATTLE_START", "eidolon6_shock_multiplier", List.of());
         assertRule(1006, "ULT_CAST", "ult_defence_down", List.of("actor == self"));
         assertRule(1006, "BATTLE_START", "level_convention", List.of());
         assertRule(1006, "SKILL_CAST", "skill_all_type_res_down", List.of("actor == self"));
@@ -419,3 +423,4 @@ public class CharacterConditionLiteralsTest {
         assertRule(8010, "BATTLE_START", "level_convention", List.of());
     }
 }
+

@@ -50,7 +50,8 @@ public class KafkaTest {
         var table = TriggerTables.of(KAFKA);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
                 "the Shock plus its immediate tick, and the trace that lengthens the shock by a turn");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention and Eidolons 2, 3, 5 (and 6 via MODIFY_RULE, also on BATTLE_START)");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "the talent follow-up (moved to the once-per-cast event, which now carries the aim)");
     }
@@ -109,3 +110,4 @@ public class KafkaTest {
         }
     }
 }
+
