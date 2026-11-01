@@ -157,6 +157,43 @@
       "source": "1304 星魂 5: 等级加成（数据 skill_add_level: 130402=SKILL+2, 130404=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon6_damage_per_shielded_ally",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "value": {
+            "type": "min",
+            "inputs": [
+              {
+                "type": "mul",
+                "inputs": [
+                  {
+                    "type": "units",
+                    "whose": "shielded_allies"
+                  },
+                  {
+                    "type": "const",
+                    "value": 0.005
+                  }
+                ]
+              },
+              {
+                "type": "const",
+                "value": 0.015
+              }
+            ]
+          }
+        }
+      ],
+      "source": "1304 砂金 星魂 6: 「每有1个队友持有护盾，砂金造成的伤害提高0.5%，最高不超过1.5%。」 param = [0.005, 0.015]",
+      "_note": "「**每有 1 个队友持有护盾**，造成的伤害提高 **0.5%**，最高 **1.5%**」—— `BOOST_DAMAGE { value: min(units(shielded_allies) × 0.005, 0.015) }` ✓ —— `units` 的**新取值 `shielded_allies`**（真数护盾：`ShieldBuff.getAmount() > 0` ✓）；`min` 表达「最高不超过」✓。"
     }
   ]
 }

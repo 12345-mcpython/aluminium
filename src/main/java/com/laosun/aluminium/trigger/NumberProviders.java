@@ -425,6 +425,11 @@ public final class NumberProviders {
             case "enemies" -> ctx.battle().enemies().size();
             case "allies" -> ctx.battle().allies().size();
             case "other_allies" -> Math.max(0, ctx.battle().allies().size() - 1);
+            // "每有 1 个队友持有护盾" (1304 Eidolon 6): allies that actually carry a shield right now.
+            case "shielded_allies" -> (int) ctx.battle().allies().stream()
+                    .filter(unit -> unit.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.ShieldBuff.class)
+                            .stream().anyMatch(shield -> shield.getAmount() > 0))
+                    .count();
             default -> throw new IllegalStateException(
                     "a \"units\" provider names whose \"" + whose + "\"; it is enemies, allies or other_allies");
         };
