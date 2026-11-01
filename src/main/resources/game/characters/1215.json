@@ -4,6 +4,19 @@
   "_status": "implemented",
   "rules": [
     {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1215 寒鸦 天赋 罚恶 (skill 121504) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（「造成的伤害提高30%」按该行读）",
+      "_note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again.",
+      "id": "level_convention"
+    },
+    {
       "on": "ULT_CAST",
       "when": [
         "actor == self",
@@ -114,19 +127,6 @@
       "_note": "「**终结技**等级+2，最多不超过15级；**天赋**等级+2，最多不超过15级」 — the same shape as 星魂 3, for the other two slots. ⚠ It matters to this file in a concrete way: raising ULTRA raises the row her ultimate's numbers are read from, and raising TALENT raises the row her (still registered) talent boost would read. ⚠ Caps = the tables' own sizes, as above. ⚠ `min_eidolon: 5` is the gate.",
       "id": "eidolon5_levels",
       "_status": "implemented"
-    },
-    {
-      "on": "BATTLE_START",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1215 寒鸦 天赋 罚恶 (skill 121504) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（「造成的伤害提高30%」按该行读）",
-      "_note": "The file stating **which level its own numbers were quoted at** (M-32), the same convention 1001/1003/1413 use. ⚠ It is unconditional and is not a mechanic: the engine's base level for every skill is 1, so 「the document quotes Lv10」 is spelled +9, and a 星魂's 「天赋等级+2」 (星魂 5 above) composes with it by addition. ⚠ Today nothing reads her talent's row — her talent's own rule is registered (the note below) — but the base level belongs in the file with the rest of its loadout facts, so that rule can be written without touching this file again.",
-      "id": "level_convention"
     },
     {
       "on": "SKILL_CAST",

@@ -4,6 +4,34 @@
   "_status": "implemented",
   "rules": [
     {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1217 藿藿 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 50%生命上限、战技 21.00%+560、终结技 20%能量/40%攻击力、天赋 4.50%+120 都是该行）",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6.",
+      "id": "level_convention"
+    },
+    {
       "on": "SKILL_CAST",
       "id": "skill_talisman",
       "when": [
@@ -93,34 +121,6 @@
       "source": "1217 藿藿 天赋 凭附•气通天真的触发部分: 「当藿藿拥有【禳命】时，我方目标回合开始…时回复自身等同于藿藿4.50%生命上限+120的生命值，同时对每个当前生命值百分比小于等于50%的我方目标各产生1次回复效果。触发【禳命】为我方目标提供治疗时，解除该目标1个负面效果。」",
       "_note": "The trigger half of the talent. ⚠ 「藿藿拥有【禳命】时」 is `self has_state 禳命`: the **rule owner** carries the state while the event belongs to whoever's turn starts (that is what `self` means in this DSL, and it is the same shape 1001's counter-shield heal uses). ⚠ The heal's magnitude is 「等同于**藿藿** 4.50% 生命上限 + 120」 = `scale: owner_max_hp` — the rule owner's, not the recipient's, and the constant rides along in `amount`. ⚠ The third effect is 「对每个当前生命值百分比 ≤ 50% 的我方目标**各产生 1 次**」: `target_when` evaluates the filter per candidate, so `target_hp_percent` reads each candidate's own health. ⚠ It may heal the same unit twice (once as 「自身」, once if it is also ≤ 50%) — that is what 「各产生 1 次」 says. ⚠ **Registered**: the same trigger on 「**或施放终结技时**」 — the unit casting the ultimate is the event's *actor*, and `attacker` (the only selector that could name a caster) is defined for damage segments, so attaching a heal to whoever cast an ultimate is a spelling this engine does not have; and the 「强化后」 healing sentence (see the state rule).",
       "id": "turn_start_effect"
-    },
-    {
-      "on": "BATTLE_START",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1217 藿藿 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 50%生命上限、战技 21.00%+560、终结技 20%能量/40%攻击力、天赋 4.50%+120 都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6.",
-      "id": "level_convention"
     },
     {
       "on": "BATTLE_START",

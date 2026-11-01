@@ -29,6 +29,34 @@
   ],
   "rules": [
     {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1503 真珠 技能表的等级口径: 语料页引用的是 **Lv10** 行（战技明写“效果量（Lv10）: 12% × 防御力 + 240”；终结技的“额外 60% 冰属性欢愉伤害”也是 Lv10 文本）。",
+      "_note": "⭐ 同 `1310.json` 的 `level_convention` 同法（同一组四个槽位、同一个 `amount: 9`）。⭐ **为什么必须有它**：本文件其它规则里的数字（战技的 12%+240）取自语料的 **Lv10** 行；若技能停在 Lv1，那些数字就描述了一个单位不在的等级。⭐ 这条让口径自洽：文档引 Lv10 ⇒ 技能在 Lv10。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
+    },
+    {
       "on": "SKILL_CAST",
       "id": "skill_heals_everyone_and_the_lowest_ally_again",
       "when": [
@@ -491,34 +519,6 @@
       ],
       "source": "1503 真珠 强化普攻 【行笔，绘制末浪】 (150310): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
       "_note": "「为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值」—— 描述里的 8% / 160 是低等级行的值。本文件的 level_convention 声明「语料页引用 Lv10」，而 150308 / 150310 的 Lv10 行是 [1.4, 0.112, 1, 224] → 11.2% 防御力 + 224 ⇒ 这里写的是 Lv10 的两个常量。⚠ 为什么不能读行（实测两次）：percent_from_skill_param: COMMON:1 会在强化普攻还没被 REPLACE_SKILL 装上时读到普通普攻的行（size=1，越界）；percent_from_cast_param 则报 the scale owner_def reads the skill that produced the event, but Pearl has no loaded skill at slot 8 —— 角色身上没有 8 号数据槽，8/10 号是 REPLACE_SKILL 装进 COMMON 的。⇒ 引擎目前没有「读被替换技能那一行」的拼法，所以保留常量并把值改成 Lv10 的正确值（原先写 0.08 / 160 是低等级行，满级少算约 28%）。⭐⭐ **CORRECTED（2026-10-19，探针实测）**：「E3 把普攻等级 +1 后这一行还会变，常量不会跟着走」**撤回** ✗ —— **实测**（E0 与 E3 各建一场、放大招装上替换）：替换槽的**对象等级**两处都是 **1** ✓，而 `CanHit.skillLevel` 的**有效等级**两处都是 **10** ✓（`RAISE_SKILL_LEVEL` 记在 `skillLevelBonus` 上 ✓，而 COMMON 的表只有 **10 行** ⇒ `min(level, rows)` 把 E3 那一级**夹掉**了 ✓）⇒ 有效等级那一行就是 `[1.4, 0.112, 1.0, 224.0]` ✓，**正是这两个常量** ✓ ⇒ **E3 不产生漂移** ✓。（⚠ 会漂移的是**对象等级**那一行 `[0.5, 0.04, 1.0, 80.0]` ✗ —— 那正是 `percent_from_cast_param` 读到的东西 ✓，所以常量不但没错，还比读行**更接近**原文 ✓。）⚠ **仍开的缺口**不变：引擎没有「读**被替换技能**在当前有效等级那一行」的拼法 ✗（`percent_from_skill_param: COMMON:1` 在替换装上之后本可以读对 ✓，但它在**装上之前**会读到普通普攻的 1 行表 ✗ ⇒ 需要一个「按有效等级读当前槽位」的拼法 ✓，登记在此 ✓）。判据 PearlEnhancedBasicHealAmountTest 钉 11.2% x 防御 + 224。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1503 真珠 技能表的等级口径: 语料页引用的是 **Lv10** 行（战技明写“效果量（Lv10）: 12% × 防御力 + 240”；终结技的“额外 60% 冰属性欢愉伤害”也是 Lv10 文本）。",
-      "_note": "⭐ 同 `1310.json` 的 `level_convention` 同法（同一组四个槽位、同一个 `amount: 9`）。⭐ **为什么必须有它**：本文件其它规则里的数字（战技的 12%+240）取自语料的 **Lv10** 行；若技能停在 Lv1，那些数字就描述了一个单位不在的等级。⭐ 这条让口径自洽：文档引 Lv10 ⇒ 技能在 Lv10。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
     },
     {
       "on": "BATTLE_START",

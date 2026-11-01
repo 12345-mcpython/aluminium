@@ -11,6 +11,34 @@
   ],
   "rules": [
     {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1306 花火 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 24.00% 暴伤 + 45.00%、终结技 4 个战技点、天赋每点 6.00%）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 本角色的文档**通篇给了\"强化前/强化后\"两套** ✗ ⇒ 本文件一律写**强化前** ✓（基准 ✓），所有**强化后**的从句逐条登记在上面的规则注释里 ✓（不混用、不取平均 ✗）；② **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；③ **星魂**未读 ✗。"
+    },
+    {
       "on": "SKILL_CAST",
       "id": "skill_crit_damage_share_and_advance",
       "when": [
@@ -87,34 +115,6 @@
       ],
       "source": "1306 花火 秘技 不可靠叙事者 (130607, Maze/Enhance): 「强化前：使用秘技后，我方全体进入持续20秒的【迷误】状态。【迷误】状态下不会被敌人发现。【迷误】状态期间进入战斗时为我方恢复3个战技点。」",
       "_note": "「【迷误】状态期间进入战斗时为我方**恢复 3 个战技点**」—— 门槛 `self has_state 秘技` ✓；`GAIN_SKILL_POINT 3` ✓。⚠ **登记**：① 「【迷误】状态下**不会被敌人发现**」✗（大地图 ✗）；② **强化后**「并使花火**恢复 20 点能量**」✗（⭐ **形式可写** ✓ `GAIN_ENERGY 20` ✓，但与上面同属\"强化后\"那一套 ✗ ⇒ 一并登记 ✓）。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1306 花火 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 24.00% 暴伤 + 45.00%、终结技 4 个战技点、天赋每点 6.00%）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 本角色的文档**通篇给了\"强化前/强化后\"两套** ✗ ⇒ 本文件一律写**强化前** ✓（基准 ✓），所有**强化后**的从句逐条登记在上面的规则注释里 ✓（不混用、不取平均 ✗）；② **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；③ **星魂**未读 ✗。"
     },
     {
       "on": "SKILL_POINT_SPENT",

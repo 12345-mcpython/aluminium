@@ -4,6 +4,20 @@
   "_status": "implemented",
   "rules": [
     {
+      "on": "BATTLE_START",
+      "_status": "implemented",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        }
+      ],
+      "source": "1413 长夜月 终结技 (skill 141303) 的**等级口径**: 她的终结技在文档里按 Lv10 引用（#1[i]% 长夜生命上限的冰属性伤害按 Lv10 行读）",
+      "_note": "The file stating **which level its numbers were quoted at** (M-32), replacing the `damage_level: 10` that her ultimate's damage rule used to carry. ⚠ A level is a fact about the skill (every effect reads it, and a 星魂's raise composes with it), while `damage_level` pins one effect to one row — the difference only shows once something raises a level, which is exactly what the 星魂 sentences do. ⚠ Base 1 in the engine, so 「quoted at Lv10」 is +9. ⚠ Unconditional, and not a mechanic. ⚠ Her ultimate's parameter table has 15 rows, so a later raise stays inside it; going past the table fails loudly at fire time. || 2026-10-18：**天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地**，三条实测结论：① 文档写作【忆质】✓，本文件声明的是 **`亿质`** ✓ —— 用错名字会在**装配期**直接报错（`CharacterException: ... uses the resource 忆质, which the character does not declare` ✓，这次正是这么被抓到的 ✓）；② 她的战技是「**消耗**当前生命值 10%」⇒ 引擎区分\"受伤\"（`HP_LOST`）与\"代价\"（`consumeHp` 不触发 `HP_LOST` ✓）——所以按 `HP_LOST` 写，放完战技暴伤**不动** ✗；③ 又补了一条 `HP_CONSUMED` 的孪生规则，**仍然不动** ✗ ⇒ 说明\"战技消耗 10% 生命\"这件事在引擎里**要么没被执行、要么没发 `HP_CONSUMED`** ✗。下一步：用探针打印放战技前后的 `currentHp` 与 `HP_CONSUMED`/`HP_LOST` 计数，再决定挂哪个事件 ✓。 || 2026-10-18：天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地。三条实测：① 资源名：文档写【忆质】，本文件声明的是 亿质 —— 用错会在装配期直接抛 CharacterException；② 只挂 HP_LOST 时放完战技暴伤不动（0.633 → 0.633）；补 HP_CONSUMED 孪生规则仍不动；③ 第 32 轮探针把原因钉死：放战技前后 currentHp 一模一样（1556.97696 → 1556.97696），HP_LOST 与 HP_CONSUMED 计数都是 0 ⇒ 引擎根本没有执行技能数据里的\"消耗 #6% 生命值\"这个代价（引擎缺口，见 AGENT.md 3.7g）⇒ 天赋要等这个能力补上。 || 2026-10-18（第 33 轮）：把「战技消耗 10% 生命」用 `CONSUME_HP`（`scale: owner_max_hp`, `percent: 0.1`）写成规则 ✓，再把天赋挂到 `HP_CONSUMED` ✓ —— 两条都**能加载、也能让暴伤 +60** ✓，但**顶红了另外两条既有判据**：`EvernightCritForSummonsTest`（期望\"忆灵暴伤收益 = 她暴伤 × 战技#1\"= 0.07596，实得 0.14796）与 `TimeOdeRaisesHerCritTest`（0.11394 → 0.22194）—— 差值 **0.072 = 0.6 × 0.12** ⇒ 天赋给忆灵的那 0.6 **点数**在那两条判据的口径里被算成了\"额外收益\"（它们钉的是\"战技#1 那一段\"）。⚖ 这不是内容写错，而是**判据口径需要扩展**（把天赋那一段也纳入期望值），但那要同时改两条既有判据的语义 ⇒ 本轮**先回滚内容**、把这件事登记下来，下一轮决定是\"扩判据\"还是\"把天赋的忆灵那半换成别的写法\" ✓。",
+      "id": "level_convention"
+    },
+    {
       "on": "SKILL_CAST",
       "id": "skill_consumes_hp",
       "_status": "implemented",
@@ -81,20 +95,6 @@
         }
       },
       "_note": "「生命降低时，**自身**的暴击伤害提高 60%（2 回合），并获得 2 点【忆质】」—— ① 挂 `HP_CONSUMED` ✓（战技消耗生命 ✓）；② `CRIT_ATTACK` 用 **`amount: 0.6`**（点数属性，写 `percent` 会被当\"基础的百分比\" ✗）；③ `亿质 +2` ✓。⭐ **忆灵那一半已补**（同一份额 0.6，`target: summon` ✓，两条既有判据的期望同步加了 0.6 ✓）；旧的登记：：文档说\"**自身和忆灵**\"，但给忆灵也加 0.6 会顶红 `EvernightCritForSummonsTest` 与 `TimeOdeRaisesHerCritTest`（它们钉的是\"忆灵暴伤收益 = 她暴伤 × 战技#1\"，实测多出 0.072 = 0.6 × 0.12）✗ —— 这两条判据的**口径**需要扩展成\"战技#1 + 天赋 0.6\"两段，本轮先把角色自身那半落地 ✓，忆灵那半等判据口径更新 ✓。 || 2026-10-18（第 40 轮）：忆灵那半**又试了一次**（`target: summon`，先 `percent: 0.6` 后 `amount: 0.6`）——两次实测都让忆灵多出 **0.072**（= 0.6 × 0.12，忆灵暴伤基础 0.12）而不是 0.6 ✗ ⇒ 说明给**忆灵**的属性修饰走的是**份额**路径（`amount` 与 `percent` 在这条路径上同效），而给**她本人**的 `amount: 0.6` 是点数 ✓（同一条规则里两种口径 ✗）。⇒ 忆灵那半需要的是\"按点数给忆灵\"的写法/能力 ⇒ 下一轮先量 `statModifier` 对 `Summon` 目标的口径，再写。"
-    },
-    {
-      "on": "BATTLE_START",
-      "_status": "implemented",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        }
-      ],
-      "source": "1413 长夜月 终结技 (skill 141303) 的**等级口径**: 她的终结技在文档里按 Lv10 引用（#1[i]% 长夜生命上限的冰属性伤害按 Lv10 行读）",
-      "_note": "The file stating **which level its numbers were quoted at** (M-32), replacing the `damage_level: 10` that her ultimate's damage rule used to carry. ⚠ A level is a fact about the skill (every effect reads it, and a 星魂's raise composes with it), while `damage_level` pins one effect to one row — the difference only shows once something raises a level, which is exactly what the 星魂 sentences do. ⚠ Base 1 in the engine, so 「quoted at Lv10」 is +9. ⚠ Unconditional, and not a mechanic. ⚠ Her ultimate's parameter table has 15 rows, so a later raise stays inside it; going past the table fails loudly at fire time. || 2026-10-18：**天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地**，三条实测结论：① 文档写作【忆质】✓，本文件声明的是 **`亿质`** ✓ —— 用错名字会在**装配期**直接报错（`CharacterException: ... uses the resource 忆质, which the character does not declare` ✓，这次正是这么被抓到的 ✓）；② 她的战技是「**消耗**当前生命值 10%」⇒ 引擎区分\"受伤\"（`HP_LOST`）与\"代价\"（`consumeHp` 不触发 `HP_LOST` ✓）——所以按 `HP_LOST` 写，放完战技暴伤**不动** ✗；③ 又补了一条 `HP_CONSUMED` 的孪生规则，**仍然不动** ✗ ⇒ 说明\"战技消耗 10% 生命\"这件事在引擎里**要么没被执行、要么没发 `HP_CONSUMED`** ✗。下一步：用探针打印放战技前后的 `currentHp` 与 `HP_CONSUMED`/`HP_LOST` 计数，再决定挂哪个事件 ✓。 || 2026-10-18：天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地。三条实测：① 资源名：文档写【忆质】，本文件声明的是 亿质 —— 用错会在装配期直接抛 CharacterException；② 只挂 HP_LOST 时放完战技暴伤不动（0.633 → 0.633）；补 HP_CONSUMED 孪生规则仍不动；③ 第 32 轮探针把原因钉死：放战技前后 currentHp 一模一样（1556.97696 → 1556.97696），HP_LOST 与 HP_CONSUMED 计数都是 0 ⇒ 引擎根本没有执行技能数据里的\"消耗 #6% 生命值\"这个代价（引擎缺口，见 AGENT.md 3.7g）⇒ 天赋要等这个能力补上。 || 2026-10-18（第 33 轮）：把「战技消耗 10% 生命」用 `CONSUME_HP`（`scale: owner_max_hp`, `percent: 0.1`）写成规则 ✓，再把天赋挂到 `HP_CONSUMED` ✓ —— 两条都**能加载、也能让暴伤 +60** ✓，但**顶红了另外两条既有判据**：`EvernightCritForSummonsTest`（期望\"忆灵暴伤收益 = 她暴伤 × 战技#1\"= 0.07596，实得 0.14796）与 `TimeOdeRaisesHerCritTest`（0.11394 → 0.22194）—— 差值 **0.072 = 0.6 × 0.12** ⇒ 天赋给忆灵的那 0.6 **点数**在那两条判据的口径里被算成了\"额外收益\"（它们钉的是\"战技#1 那一段\"）。⚖ 这不是内容写错，而是**判据口径需要扩展**（把天赋那一段也纳入期望值），但那要同时改两条既有判据的语义 ⇒ 本轮**先回滚内容**、把这件事登记下来，下一轮决定是\"扩判据\"还是\"把天赋的忆灵那半换成别的写法\" ✓。",
-      "id": "level_convention"
     },
     {
       "on": "BATTLE_START",

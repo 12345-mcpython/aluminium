@@ -35,6 +35,34 @@
   "rules": [
     {
       "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1505 技能表的等级口径: 文档引用的是 Lv10 行（本文件其余规则的数值都取自那一行）",
+      "_note": "**本文件原先没有等级口径** ⇒ 技能自身走 Lv1 行、而规则写的是 Lv10 的数字：两套口径并存 ✗。补上后四个槽都在 Lv10 ✓（与其余文件一致）。"
+    },
+    {
+      "on": "BATTLE_START",
       "id": "p1505_elation_value",
       "do": [
         {
@@ -248,34 +276,6 @@
       "source": "1505 星魂 5: 等级加成（数据 skill_add_level: 150502=SKILL+2, 150504=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1505 技能表的等级口径: 文档引用的是 Lv10 行（本文件其余规则的数值都取自那一行）",
-      "_note": "**本文件原先没有等级口径** ⇒ 技能自身走 Lv1 行、而规则写的是 Lv10 的数字：两套口径并存 ✗。补上后四个槽都在 Lv10 ✓（与其余文件一致）。"
     }
   ]
 }
