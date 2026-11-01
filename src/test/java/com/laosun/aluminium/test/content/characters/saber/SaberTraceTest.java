@@ -58,4 +58,24 @@ public class SaberTraceTest {
         battle.startBattle();
         return battle;
     }
+    /**
+     * 湖之祝福's opening clause:「战斗开始时若能量不足 60% 则使其恢复至 60%」.
+     *
+     * <p>Two directions: from empty it tops up to 60% of the cap; already above 60% it must do nothing.
+     */
+    @Test
+    public void lakeBlessingTopsUpToSixtyPercent() {
+        Character low = CharacterFactory.create(SABER, LEVEL);
+        low.setCurrentEnergy(0);
+        battle(low);
+        double expected = 0.6 * low.getMaxEnergy();
+        System.out.println("[1014] from 0 -> " + low.getCurrentEnergy() + " (cap " + low.getMaxEnergy() + ")");
+        Assertions.assertEquals(expected, low.getCurrentEnergy(), 1e-9, "「恢复至 60%」");
+
+        Character high = CharacterFactory.create(SABER, LEVEL);
+        high.setCurrentEnergy(high.getMaxEnergy());
+        battle(high);
+        Assertions.assertEquals(high.getMaxEnergy(), high.getCurrentEnergy(), 1e-9,
+                "「若能量不足 60%」: a full bar is left alone");
+    }
 }

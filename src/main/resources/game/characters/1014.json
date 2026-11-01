@@ -596,6 +596,42 @@
       ],
       "source": "1014 Saber 星魂 2 尘封的圆桌誓言: 「本场战斗中每获得1点【炉心共鸣】，使Saber造成的伤害无视目标1.00%的防御力，该效果最多叠加15层。」 参数 = [0.07, 0.01, 15]",
       "_note": "「本场战斗中**每获得 1 点**【炉心共鸣】，无视目标 **1%** 防御力，**最多 15 层**」= `MODIFY_ATTR DEFENCE_IGNORE { percent: 0.01 }` + `per_stack: 「self_stacks:炉心共鸣」` + `per_stack_cap: 15` + `per_stack_live: true`（实时读层数，因为「每获得 1 点」是**累计**而非一次性）✓。数值来自星魂参数（无等级轴）⇒ 字面值 ✓。⛔ **未写**同一句的后半：「触发【炉心共鸣】提高战技倍率的效果时，每点**额外 +7%** 战技倍率」。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_lake_blessing_to_sixty_percent",
+      "when": [
+        "self_energy_percent < 0.6"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "value": {
+            "type": "sub",
+            "left": {
+              "type": "mul",
+              "inputs": [
+                {
+                  "type": "energy",
+                  "whose": "owner",
+                  "relation": "max"
+                },
+                {
+                  "type": "const",
+                  "value": 0.6
+                }
+              ]
+            },
+            "right": {
+              "type": "energy",
+              "whose": "owner",
+              "relation": "current"
+            }
+          }
+        }
+      ],
+      "source": "1014 Saber 行迹 湖之祝福(1014102): 「…战斗开始时若能量不足60%则使其恢复至60%。」",
+      "_note": "「战斗开始时**若能量不足 60% 则使其恢复至 60%**」= 条件 `self_energy_percent < 0.6` + `GAIN_ENERGY { 0.6 × 上限 − 当前 }` ✓（`energy` 提供器支持 `whose` + `relation: current/max`，所以「补到某个百分比」不需要新词汇）。数值 **0.6** 来自行迹正文（无等级轴 ⇒ 字面值 ✓）。⛔ **未写**：「可积攒最多 **120** 点溢出能量（星魂 6 提到 **200**），施放终结技后清空并恢复相应的能量值」—— 「溢出能量」这个池子引擎里没有。 ⚠ `sub` 的拼法是 `left` / `right`（不是 `inputs`）。"
     }
   ],
   "_gaps": [
