@@ -66,6 +66,16 @@ public final class BreakService {
      */
     public Battle.StanceResult reduce(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage,
                                       SkillCategory fromCast) {
+        return reduce(attacker, enemy, element, stanceDamage, fromCast, false);
+    }
+
+    /**
+     * The same, with the weakness gate optionally lifted.
+     *
+     * @param ignoreWeakness whether a non-weakness element still takes toughness off
+     */
+    public Battle.StanceResult reduce(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage,
+                                      SkillCategory fromCast, boolean ignoreWeakness) {
         if (attacker == null || enemy == null || stanceDamage <= 0) {
             return Battle.StanceResult.NONE;
         }
@@ -75,7 +85,7 @@ public final class BreakService {
         if (enemy.isBroken() || !enemy.hasToughnessBar()) {
             return new Battle.StanceResult(0, stanceDamage, 0, false);
         }
-        if (!enemy.isWeakTo(element)) {
+        if (!ignoreWeakness && !enemy.isWeakTo(element)) {
             return Battle.StanceResult.NONE;
         }
         double consumed = enemy.reduceStance(stanceDamage);
