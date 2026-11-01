@@ -3,7 +3,6 @@
   "character": 1302,
   "_status": "partial",
   "_gaps": [
-    "行迹 慷慨「在敌方目标进入战斗时，自身立即恢复 #1 点能量」未写：引擎没有「敌方入场」事件（`SUMMONED` 只由召唤物发出，`addCombatant` 不发；`WAVE_START` 也不数这一波新入场的敌人）",
     "强化终结技（数据槽 14，130214）整段未接入：引擎的施放路径没有这个槽（`SkillType` 的映射不含 14），所以「消耗 180 能量、336% 全体、再造成 6 次随机单体 114%」在本引擎里放不出来",
     "星魂 1「每层【升格】额外使暴击伤害提高 4%」现在是战斗开始时贴一次的固定 +4%：0 层也有、10 层也只有一次。见证：`ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks`（修好时它会红）"
   ],
@@ -283,6 +282,15 @@
       "min_eidolon": 6,
       "source": "1302 银枝 星魂 6 「你」的光芒 (Avatar_Argenti_00_Rank06): 「施放终结技时，无视敌方目标30%的防御力。」 param = [0.3]",
       "_note": "「施放终结技时，无视敌方目标 30% 的防御力」 — the attribute exists (`DEFENCE_IGNORE`) and so does the shape: the buff is granted on `DEALING_DAMAGE` **before** the zones are assembled, so it applies to the very instance it was granted for (the same trick 知更鸟【协奏】的附加伤害 uses). ⚠ `from_skill ULTRA` keeps it to the ultimate (both ultimate ids are that slot) and `actor == self` keeps it to her damage. ⚠ `min_eidolon: 6` is the gate."
+    },
+    {
+      "on": "ENEMY_ENTERED",
+      "id": "trace_generous_energy",
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 2, "target": "self" }
+      ],
+      "source": "1302 银枝 行迹 慷慨: 「在敌方目标进入战斗时，自身立即恢复2点能量。」 param [2]",
+      "_note": "「在敌方目标进入战斗时，自身立即恢复 2 点能量」—— 事件 **`ENEMY_ENTERED`** ✓（本轮新增：`Battle.addEnemy` / `addCombatant` 把**新加入敌方名册**的单位送进场时发一次，`actor` = 那个新来的 ✓；开战前的名册只是「摆好」，不算入场 ✓）；额度 2 = 行迹数据 `param [2]` ✓。⚠ 同一单位**重复加入**不会重复付账 ✓（幂等判据在引擎侧 ✓）。"
     }
   ]
 }
