@@ -399,6 +399,34 @@
     },
     {
       "on": "DEALING_DAMAGE",
+      "id": "trace_dragon_knight_spends_mana_for_a_point",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "self has_state 魔力放出",
+        "self_stacks:炉心共鸣 >= 1",
+        "self_energy + self_stacks:炉心共鸣 * 8 >= self_max_energy"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "魔力放出",
+          "target": "self"
+        },
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "EXTRA_TURN",
+          "target": "self"
+        }
+      ],
+      "source": "1014 Saber 行迹 龙之骑士(1014101): 「…该效果下，若Saber持有【炉心共鸣】，且施放战技并消耗【炉心共鸣】可为Saber恢复满能量，则消耗【魔力放出】为我方恢复1个战技点并使Saber立即行动。」",
+      "_note": "三个前提 + 三个效果按原文顺序 ✓。⚠ **必须排在 `skill_resonance_boost_and_spend` 之前**：那条会用 `REMOVE_STATE` 把【炉心共鸣】清空，而本条的 `self_stacks:炉心共鸣 >= 1` 要在清空**之前**读（实测：挂在 `SKILL_CAST` 上时该条件恒假，阶梯探针 s1/s2 真、s3 假，且战后 `stacks=0`）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
       "id": "skill_resonance_boost_and_spend",
       "when": [
         "actor == self",
