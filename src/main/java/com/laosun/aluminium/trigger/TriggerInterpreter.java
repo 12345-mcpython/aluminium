@@ -232,18 +232,31 @@ public final class TriggerInterpreter {
      * @param ctx    the context the rule was matched with
      */
     public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
-        // Every effect of every rule passes through here, so this is the one seam that can name the rule a failure came
-        // from: the context's own rule id is empty on the paths that resolve a target before a rule scope exists
-        // (measured: the summon guard reported `rule ""`), and a message without the id leaves the author to hunt for it.
+        // A rule-level `pick`: resolved ONCE, before any effect runs, so several effects can name the same randomly chosen
+        // unit. The stack in Battle keeps a nested firing (an effect that triggers another rule) from leaking its pick.
+        boolean picked = battle != null && rule != null && rule.pick() != null && !rule.pick().isBlank();
         try {
-            applyUnchecked(battle, rule, ctx);
-        } catch (IllegalStateException failure) {
-            String message = failure.getMessage() == null ? "" : failure.getMessage();
-            String id = rule == null ? null : rule.id();
-            if (id == null || id.isBlank() || message.contains("[rule: ")) {
-                throw failure;
+            if (picked) {
+                battle.beginRulePick(TriggerTargets.resolveSelector(
+                        TriggerTargets.normalizeSelector(rule.pick()), null, ctx));
             }
-            throw new IllegalStateException(message + " [rule: " + id + "]", failure);
+            // Every effect of every rule passes through here, so this is the one seam that can name the rule a failure came
+            // from: the context's own rule id is empty on the paths that resolve a target before a rule scope exists
+            // (measured: the summon guard reported `rule ""`), and a message without the id leaves the author to hunt for it.
+            try {
+                applyUnchecked(battle, rule, ctx);
+            } catch (IllegalStateException failure) {
+                String message = failure.getMessage() == null ? "" : failure.getMessage();
+                String id = rule == null ? null : rule.id();
+                if (id == null || id.isBlank() || message.contains("[rule: ")) {
+                    throw failure;
+                }
+                throw new IllegalStateException(message + " [rule: " + id + "]", failure);
+            }
+        } finally {
+            if (picked) {
+                battle.endRulePick();
+            }
         }
     }
 

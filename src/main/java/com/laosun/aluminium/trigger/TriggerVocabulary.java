@@ -129,7 +129,10 @@ final class TriggerVocabulary {
                     // 「获得【卫戍】的目标，若目标拥有召唤物则造成的伤害额外提高 #3%」 (light cone 23051): the allies that
                     // OWN at least one memosprite. A filter over our side, because the condition language decides whether
                     // a rule runs, not which units its effects reach.
-                    "allies_with_summons");
+                    "allies_with_summons",
+                    // "the rule-level pick": resolved once per firing from the rule own `pick`, so several effects can
+                    // name the SAME randomly chosen unit (1111 Luka technique: damage and bleed on one target).
+                    "pick");
     /**
      * The two spellings of "every one of our characters".
      */

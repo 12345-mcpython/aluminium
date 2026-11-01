@@ -1212,6 +1212,28 @@ public class Battle {
     private final java.util.Set<String> oncePerTurnUsed = new java.util.HashSet<>();
 
     /**
+     * The rule-level {@code pick} in force, innermost first: a rule that states {@code pick} resolves it once per firing
+     * and every {@code target: "pick"} inside that rule answers this unit. A STACK because rule effects may fire further
+     * rules (a damage rider that triggers an attack), and the inner firing must not leave its pick behind.
+     */
+    private final java.util.ArrayDeque<CanHit> rulePicks = new java.util.ArrayDeque<>();
+
+    /** The innermost rule-level pick, or {@code null} outside a rule that stated one. */
+    public CanHit currentRulePick() {
+        return rulePicks.peek();
+    }
+
+    /** Enters a firing whose rule stated {@code pick}; pair with {@link #endRulePick()}. */
+    public void beginRulePick(CanHit pick) {
+        rulePicks.push(pick);
+    }
+
+    /** Leaves the firing entered by {@link #beginRulePick(CanHit)}. */
+    public void endRulePick() {
+        rulePicks.pop();
+    }
+
+    /**
      * Consumes a {@code "once_per_turn"} key: the first call within a turn answers {@code true}, every later one false.
      *
      * @param key the effect's own key (its {@code once_per_turn} word)

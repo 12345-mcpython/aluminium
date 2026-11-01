@@ -305,6 +305,17 @@ public class TriggerSpec {
     private String oneOfNoRepeat;
 
     /**
+     * A selector resolved <b>once per firing</b> and shared by the rule's effects, which name it as {@code "target": "pick"}.
+     *
+     * <p>Why a rule-level pick exists at all: a selector such as {@code random_enemy} is resolved <b>per effect</b>, so two
+     * effects of one rule would roll separately. 「对敌方随机单体造成伤害，并使<b>该目标</b>陷入裂伤」 (1111 Luka's technique) means
+     * ONE randomly chosen enemy for both halves, and no per-effect spelling can say that. {@code pick} is resolved before the
+     * effects run and stored for the duration of the firing, so every {@code target: "pick"} answers the same unit.
+     */
+    @SerializedName("pick")
+    private String pick;
+
+    /**
      * If this rule triggers while every opponent is <b>down</b>, it is not delivered now: it is held and delivered when a
      * wave brings enemies in - 「若触发前目标被消灭则对新入场的敌方目标触发」.
      *
