@@ -387,6 +387,16 @@ public class TriggerTable {
             }
             return;
         }
+        if (effect.getEffectAmount() != null) {
+            boolean statesAmount = named.effects().stream().anyMatch(e -> e.getAmount() != null);
+            if (!statesAmount) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE raises the layer count of rule \"" + target + "\", but none of that rule's effects "
+                                + "states an \"amount\"; an unstated amount means one layer and has no number to raise "
+                                + "(source: " + amender.source() + ")");
+            }
+            return;
+        }
         if (effect.getEffectPercentScale() != null) {
             // "倍率提高 300%" scales a share the named rule already states; without one there is nothing to multiply, and the
             // amendment would load and change no number. Note: this branch was MISSING - a scale amendment fell through to the

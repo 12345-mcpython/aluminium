@@ -1134,6 +1134,21 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
+     * Adds {@code delta} layers to the {@code amount} of every effect of the named rule (reader: 1218's Eidolon 1, whose
+     * 「本次叠加的层数额外 +1 层」 raises the Talent's own one-layer application).
+     */
+    public void amendRuleEffectAmount(String ruleId, int delta) {
+        ruleAmendments.addEffectAmount(ruleId, delta);
+    }
+
+    /**
+     * The amount amendment for a rule, or {@code null} when nothing raised it.
+     */
+    public Integer ruleEffectAmountBonus(String ruleId) {
+        return ruleAmendments.effectAmount(ruleId);
+    }
+
+    /**
      * @param ruleId the rule id
      * @return the factor its effect percents are multiplied by, or null when it does not scale
      */

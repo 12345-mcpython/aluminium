@@ -1180,6 +1180,13 @@ final class TriggerValidator {
                                 "Op " + op + " raises a rule's effect value, so \"effect_percent\" must not be 0 "
                                         + "(source: " + spec.getSource() + ")");
                     }
+                } else if (effect.getEffectAmount() != null) {
+                    if (effect.getEffectAmount() == 0) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " raises the layers an application grants, so \"effect_amount\" must not be 0"
+                                        + " (source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "effect_amount");
                 } else if (effect.getEffectPercentScale() != null) {
                     if (!(effect.getEffectPercentScale() > 0)) {
                         throw new IllegalArgumentException(
@@ -1514,7 +1521,7 @@ final class TriggerValidator {
         int stated = 0;
         for (Object candidate : new Object[]{effect.getAmount(), effect.getBaseChance(), effect.getPercent(),
                 effect.getEffectPercent(), effect.getEffectPercentScale(), effect.getEffectPercentFromResource(),
-                effect.getEffectTurns(), effect.getEffectMaxStacks(), effect.getCooldownDelta()}) {
+                effect.getEffectAmount(), effect.getEffectTurns(), effect.getEffectMaxStacks(), effect.getCooldownDelta()}) {
             if (candidate != null) {
                 stated++;
             }
@@ -1523,7 +1530,7 @@ final class TriggerValidator {
             throw new IllegalArgumentException(
                     "Op " + op + " must state exactly ONE amendment -- \"amount\" (firings per turn), \"base_chance\" "
                             + "(probability), \"effect_percent\" (raise a value), \"effect_turns\" (raise a "
-                            + "duration) or \"cooldown_delta\" (raise or lower a cooldown) -- but " + stated
+                            + "duration), \"effect_amount\" (layers an application grants) or \"cooldown_delta\" (raise or lower a cooldown) -- but " + stated
                             + " were stated (source: " + spec.getSource() + ")");
         }
     }
