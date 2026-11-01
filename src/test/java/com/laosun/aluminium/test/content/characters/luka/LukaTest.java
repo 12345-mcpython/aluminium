@@ -166,7 +166,8 @@ public class LukaTest {
                 "the starting layer + the level convention + the technique + Eidolons 3, 4 and 5");
         Assertions.assertEquals(6, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "one layer rule per cast category, the enhancement, its removal, the bleed tick and the two-layer cost");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the trace's REMOVE_BUFF and the Skill's Bleed (裂伤) DOT");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the trace REMOVE_BUFF, the Skill Bleed DOT and Eidolon 2 weakness layer");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST));
     }
 
