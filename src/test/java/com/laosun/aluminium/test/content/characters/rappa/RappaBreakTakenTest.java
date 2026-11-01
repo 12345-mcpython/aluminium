@@ -57,6 +57,9 @@ public class RappaBreakTakenTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         double breaking = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.BREAK, 1000));
         System.out.println("[1317] normal=" + normal + " break=" + breaking + " ratio=" + (breaking / normal));
-        Assertions.assertEquals(1.02, breaking / normal, 1e-6, "break damage rises by exactly the authored 2%");
+        // The talent (+50%) and the trace (+2%) are two sentences and ADD (canon: 1 + Σ 易伤). Before the identity
+        // fix the trace's 2% evicted the talent's 50%, so this used to read 1.02 - a wrong number that nothing reported.
+        Assertions.assertEquals(1.52, breaking / normal, 1e-6,
+                "break damage carries the talent's 50% and the trace's 2%");
     }
 }
