@@ -743,7 +743,9 @@ public final class TriggerInterpreter {
                 // the time this runs they are known good; the casts here are reads, not checks.
                 String resource = effect.getResource().trim();
                 double unitAmount = effect.getUnitAmount();
-                double share = effect.getValue() != null
+                // Any spelling of a share, not only a literal percent: the same "reader keeps its own list" trap the
+                // rest of the file has been collapsing into TriggerMagnitudes.shareOf.
+                double share = TriggerMagnitudes.statesShare(effect)
                         ? TriggerMagnitudes.shareOf(effect, ctx)
                         : effect.getPercent();
                 // Who pays. Defaults to the rule's owner (Pearl), which is the documented shape: the counter is hers
@@ -1017,7 +1019,7 @@ public final class TriggerInterpreter {
                     "REGISTER_HEAL_BONUS needs a target_when condition saying WHICH heals it applies to "
                             + "(an unconditional version would raise every heal, including on a full-HP ally)");
         }
-        double percent = effect.getPercent() == null ? 0 : effect.getPercent();
+        double percent = TriggerMagnitudes.statesShare(effect) ? TriggerMagnitudes.shareOf(effect, ctx) : 0;
         if (conditions == null || conditions.isEmpty()) {
             owner.addConditionalHealBonus(null, percent, true);
             return;
@@ -1043,7 +1045,7 @@ public final class TriggerInterpreter {
                     "SHARE_DAMAGE runs on DEALING_DAMAGE, the event that carries the instance being settled; there is none "
                             + "here (rule: " + ctx.ruleId() + ")");
         }
-        double share = effect.getPercent();
+        double share = TriggerMagnitudes.shareOf(effect, ctx);
         double base = damage.getSkillBaseValue() * share;
         damage.addReduction(share);
         for (CanHit receiver : TriggerTargets.resolveTargets(battle, effect, ctx)) {
@@ -1555,7 +1557,7 @@ public final class TriggerInterpreter {
         if (!scale.startsWith(SELF_RESOURCE_PREFIX)) {
             return -1;
         }
-        double share = effect.getPercent() == null ? 1 : effect.getPercent();
+        double share = TriggerMagnitudes.statesShare(effect) ? TriggerMagnitudes.shareOf(effect, ctx) : 1;
         return (int) Math.round(TriggerMagnitudes.selfResourceOf(scale, ctx) * share);
     }
 
