@@ -418,16 +418,33 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "owner_max_hp",
-          "percent": 1.4922,
           "element": "Quantum",
           "target": "all_enemies",
-          "cast_category": "FOLLOW_UP"
+          "cast_category": "FOLLOW_UP",
+          "value": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "attr",
+                "attribute": "HEALTH",
+                "whose": "owner"
+              },
+              {
+                "type": "skill_param",
+                "skill": "TALENT",
+                "index": 0
+              },
+              {
+                "type": "const",
+                "value": 8.29
+              }
+            ]
+          }
         }
       ],
       "min_eidolon": 6,
       "source": "1403 缇宝 星魂 6: 「缇宝施放终结技后，对敌方全体发动天赋的追加攻击。天赋的追加攻击造成的伤害提高729%。」",
-      "_note": "E6 自己的终结技：天赋追加攻击 18% 生命上限 ×（1 + 7.29）= 149.22% 生命上限，`target: all_enemies`、`cast_category: FOLLOW_UP`。"
+      "_note": "E6 自己的终结技：天赋追加攻击 18% 生命上限 ×（1 + 7.29）= 149.22% 生命上限，`target: all_enemies`、`cast_category: FOLLOW_UP`。 ⚠ **倍数按天赋行推导**：`value = 天赋 #1 × 8.29`，不再手算并冻结 1.4922 / 1.3122（AGENT §0.1.3）。 ⚠ **倍数按天赋行推导**：`value = 生命上限 × 天赋 #1 × 8.29`（`value` 取代 `scale`，所以把生命上限也折进提供器），不再手算并冻结 1.4922 / 1.3122。"
     },
     {
       "on": "ULT_CAST",
@@ -438,11 +455,28 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "owner_max_hp",
-          "percent": 1.3122,
           "element": "Quantum",
           "target": "all_enemies",
-          "cast_category": "FOLLOW_UP"
+          "cast_category": "FOLLOW_UP",
+          "value": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "attr",
+                "attribute": "HEALTH",
+                "whose": "owner"
+              },
+              {
+                "type": "skill_param",
+                "skill": "TALENT",
+                "index": 0
+              },
+              {
+                "type": "const",
+                "value": 7.29
+              }
+            ]
+          }
         }
       ],
       "min_eidolon": 6,
@@ -450,7 +484,7 @@
       "per_subject": "actor",
       "defer_until_wave": true,
       "source": "1403 缇宝 星魂 6: 「天赋的追加攻击造成的伤害提高729%。」",
-      "_note": "E6 对其他队友终结技的加成：基础天赋规则仍打 18%，本条补上 18% × 7.29 = 131.22%，两者相加正好是 149.22%；沿用 `per_turn: 1` / `per_subject: actor`，并与基础规则一起被终结技重置。"
+      "_note": "E6 对其他队友终结技的加成：基础天赋规则仍打 18%，本条补上 18% × 7.29 = 131.22%，两者相加正好是 149.22%；沿用 `per_turn: 1` / `per_subject: actor`，并与基础规则一起被终结技重置。 ⚠ **倍数按天赋行推导**：`value = 天赋 #1 × 7.29`，不再手算并冻结 1.4922 / 1.3122（AGENT §0.1.3）。 ⚠ **倍数按天赋行推导**：`value = 生命上限 × 天赋 #1 × 7.29`（`value` 取代 `scale`，所以把生命上限也折进提供器），不再手算并冻结 1.4922 / 1.3122。"
     }
   ]
 }
