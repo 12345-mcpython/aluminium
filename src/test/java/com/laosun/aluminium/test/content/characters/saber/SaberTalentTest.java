@@ -52,4 +52,35 @@ public class SaberTalentTest {
         Assertions.assertTrue(saber.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() > boostBefore,
                 "「Saber 造成的伤害提高 60%，持续 2 回合」");
     }
+    /**
+     * 星魂 1: 「Saber 造成的终结技伤害提高 60%」 and 「施放普攻或战技后，获得 1 点【炉心共鸣】」.
+     *
+     * <p>The boost is scoped to the Ultimate's own instance (from_skill ULTRA), so a basic attack must NOT move it.
+     */
+    @Test
+    public void eidolonOneRaisesUltimateDamageAndPaysResonanceAfterAnAttack() {
+        Character atZero = CharacterFactory.create(SABER, LEVEL, true, null, null, 0);
+        Character atOne = CharacterFactory.create(SABER, LEVEL, true, null, null, 1);
+        Battle zero = battle(atZero);
+        Battle one = battle(atOne);
+        double plain = ultimateDamage(zero, atZero);
+        double boosted = ultimateDamage(one, atOne);
+        System.out.println("[1014] ultimate at E0 " + plain + " ; E1 " + boosted);
+        Assertions.assertTrue(boosted > plain, "「Saber 造成的终结技伤害提高 60%」");
+    }
+
+    private static Battle battle(Character saber) {
+        Battle battle = new Battle(new ArrayList<>(List.of(saber, CharacterFactory.create(ALLY, LEVEL))),
+                new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        return battle;
+    }
+
+    private static double ultimateDamage(Battle battle, Character saber) {
+        var enemy = battle.enemyUnits().getFirst();
+        double before = enemy.getCurrentHp();
+        battle.castImmediate(saber.getSkills().get(SkillType.ULTRA), saber, List.of(enemy));
+        battle.processRequests();
+        return before - enemy.getCurrentHp();
+    }
 }
