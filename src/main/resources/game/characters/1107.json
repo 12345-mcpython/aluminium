@@ -227,13 +227,13 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent": 1.2,
           "element": "Physical",
-          "target": "all_enemies_with_state:反击标记"
+          "target": "all_enemies_with_state:反击标记",
+          "percent_from_skill_param": "SKILL:0"
         }
       ],
       "source": "1107 克拉拉 战技 史瓦罗的大人: 「对所有被史瓦罗标上【反击标记】的敌方目标额外造成等同于克拉拉120%攻击力物理属性伤害。」 param Lv10 = [1.2, 1.2]",
-      "_note": "「对**所有被标上【反击标记】的敌方目标额外造成 120% 攻击力物理伤害**；战技施放后所有标记失效」—— ① 目标用**新增的** all_enemies_with_state:反击标记 ✓（按状态筛选敌方全体；空集合是合法答案 ✓）；② self_attr:ATTACK × 1.2 ✓（= #2 120%）；③ ⚠ 事件挂在 CAST_SETUP ✓ 而不是 SKILL_CAST —— 同文件的 `skill_clears_the_mark` 在 SKILL_CAST 上会**先**把标记摘掉，挂在事后就读不到目标了（实测两目标掉血完全相同 ✗）。"
+      "_note": "「对**所有被标上【反击标记】的敌方目标额外造成 120% 攻击力物理伤害**；战技施放后所有标记失效」—— ① 目标用**新增的** all_enemies_with_state:反击标记 ✓（按状态筛选敌方全体；空集合是合法答案 ✓）；② self_attr:ATTACK × 1.2 ✓（= #2 120%）；③ ⚠ 事件挂在 CAST_SETUP ✓ 而不是 SKILL_CAST —— 同文件的 `skill_clears_the_mark` 在 SKILL_CAST 上会**先**把标记摘掉，挂在事后就读不到目标了（实测两目标掉血完全相同 ✗）。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "ULT_CAST",
@@ -283,10 +283,10 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent": 1.6,
           "element": "Physical",
           "damage_type": "TALENT",
-          "target": "actor"
+          "target": "actor",
+          "percent_from_skill_param": "ULTRA:1"
         },
         {
           "op": "REMOVE_STACK",
@@ -296,7 +296,7 @@
         }
       ],
       "source": "1107 克拉拉 终结技: 「当任意我方目标受到攻击后史瓦罗立即施放反击，对敌方目标造成的伤害倍率提高160%…」 param = [5, 1.6, 2, 0.25, 2]",
-      "_note": "「当任意我方目标受到攻击后**史瓦罗立即施放反击**，造成的伤害倍率**提高 160%**」—— `ATTACK_FINISHED` + `actor is_enemy` ✓ + 门槛 `self_stacks:强化反击 >= 1` ✓ → `DAMAGE scale: self_attr:ATTACK percent: 1.6`（160% 攻击力 ✓）打**攻击者** ✓ + 扣 1 层 ✓。⚠ **不写**「对相邻目标 50%」（位置轴 ✗，已登记）。"
+      "_note": "「当任意我方目标受到攻击后**史瓦罗立即施放反击**，造成的伤害倍率**提高 160%**」—— `ATTACK_FINISHED` + `actor is_enemy` ✓ + 门槛 `self_stacks:强化反击 >= 1` ✓ → `DAMAGE scale: self_attr:ATTACK percent: 1.6`（160% 攻击力 ✓）打**攻击者** ✓ + 扣 1 层 ✓。⚠ **不写**「对相邻目标 50%」（位置轴 ✗，已登记）。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "ULT_CAST",

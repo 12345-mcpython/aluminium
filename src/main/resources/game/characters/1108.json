@@ -40,15 +40,15 @@
       "do": [
         {
           "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.3,
           "damage_type": "DOT",
           "base_chance": 1,
           "turns": 2,
-          "target": "all_enemies"
+          "target": "all_enemies",
+          "percent_from_skill_param": "ULTRA:1"
         }
       ],
       "source": "1108 桑博 终结技 惊喜礼盒 (110803, Ultra/AoEAttack): 「对敌方全体造成等同于桑博160%攻击力的风属性伤害，同时有100%的基础概率使被攻击的敌方目标受到的持续伤害提高30%，持续2回合。」 param = [1.6, 1, 0.3]",
-      "_note": "「同时有 **100% 的基础概率**使被攻击的敌方目标**受到的持续伤害**提高 30%，持续 2 回合」 — the 160% AoE damage is the engine's own skill path; this rule is the debuff half. ⚠ Three spellings carry it, and each is load-bearing: `damage_type: \"DOT\"` (the taken-side zone is scoped to damage-over-time; `Battle.tickDots` settles those as `DamageType.DOT`, which is why this is expressible at all), `base_chance: 1.0` (⚠ **not** the same as \"always\": a base chance is the number **before** effect resistance, so the zone goes through the same resist pipeline a DOT or a state does — attaching it unconditionally would turn 「基础概率」 into \"always\"), and `turns: 2` (the duration the sentence states). ⚠ The trap on the other side of the same words: `DOT_DAMAGE_BOOST` is \"how hard **my** DOTs hit\", while 「受到的持续伤害提高」 is \"how hard DOTs hurt **me**\" — two sides, and only the second belongs on the victim."
+      "_note": "「同时有 **100% 的基础概率**使被攻击的敌方目标**受到的持续伤害**提高 30%，持续 2 回合」 — the 160% AoE damage is the engine's own skill path; this rule is the debuff half. ⚠ Three spellings carry it, and each is load-bearing: `damage_type: \"DOT\"` (the taken-side zone is scoped to damage-over-time; `Battle.tickDots` settles those as `DamageType.DOT`, which is why this is expressible at all), `base_chance: 1.0` (⚠ **not** the same as \"always\": a base chance is the number **before** effect resistance, so the zone goes through the same resist pipeline a DOT or a state does — attaching it unconditionally would turn 「基础概率」 into \"always\"), and `turns: 2` (the duration the sentence states). ⚠ The trap on the other side of the same words: `DOT_DAMAGE_BOOST` is \"how hard **my** DOTs hit\", while 「受到的持续伤害提高」 is \"how hard DOTs hurt **me**\" — two sides, and only the second belongs on the victim. ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -62,14 +62,14 @@
           "element": "Wind",
           "base_chance": 0.65,
           "scale": "self_attr:ATTACK",
-          "percent": 0.52,
           "turns": 3,
           "max_stacks": 5,
-          "target": "target"
+          "target": "target",
+          "percent": 0.52
         }
       ],
       "source": "1108 桑博 天赋 撕风的匕首 (110804, Enhance): 「桑博击中敌方目标后有65%的基础概率使目标陷入风化状态，持续3回合。风化状态下，敌方目标每回合开始时受到等同于桑博52%攻击力的风属性持续伤害。风化状态最多叠加5层。」",
-      "_note": "「击中敌方目标后有 **65% 的基础概率**使目标陷入**风化**状态，持续 3 回合；风化状态下每回合开始时受到等同于桑博 **52% 攻击力**的风属性持续伤害；风化状态**最多叠加 5 层**」 — four numbers from her row, each on its own spelling: `base_chance: 0.65` (a roll, so it meets effect resistance — a DOT the documents call 「陷入」 with a base chance is NOT \"always\"), `element: Wind` (which IS the state: the engine's DOT states are per element, so 风化 and 灼烧 are different states and two 风化 applications are the same one), `scale: self_attr:ATTACK` + `percent` (the per-turn damage is a share of **his** attack, frozen when it lands), and `max_stacks: 5` (the ceiling, new on 2026-09-28). ⚠ 「每回合开始时」 needs no rule of its own: `Battle.tickDots` settles every DOT on a unit during the early tick, before 回合开始 events fire. ⚠ **What the ceiling does and does not do** — **实测（2026-10-31）**：九次命中的风化**读到 9 层**（DOT 不被顶掉 ✓），但**每跳伤害与 5 层时完全相同**（704.47 = 704.47 ✓）⇒ 「最多叠加 5 层」对**伤害**是硬上限 ✓，多出的层数**不产生伤害** ✓。1307 的「超出上限的层数在结算后**移除**」是**另一句话**（他的文档没这句）⇒ 不推广是对的，这条登记已删 ✓。"
+      "_note": "「击中敌方目标后有 **65% 的基础概率**使目标陷入**风化**状态，持续 3 回合；风化状态下每回合开始时受到等同于桑博 **52% 攻击力**的风属性持续伤害；风化状态**最多叠加 5 层**」 — four numbers from her row, each on its own spelling: `base_chance: 0.65` (a roll, so it meets effect resistance — a DOT the documents call 「陷入」 with a base chance is NOT \"always\"), `element: Wind` (which IS the state: the engine's DOT states are per element, so 风化 and 灼烧 are different states and two 风化 applications are the same one), `scale: self_attr:ATTACK` + `percent` (the per-turn damage is a share of **his** attack, frozen when it lands), and `max_stacks: 5` (the ceiling, new on 2026-09-28). ⚠ 「每回合开始时」 needs no rule of its own: `Battle.tickDots` settles every DOT on a unit during the early tick, before 回合开始 events fire. ⚠ **What the ceiling does and does not do** — **实测（2026-10-31）**：九次命中的风化**读到 9 层**（DOT 不被顶掉 ✓），但**每跳伤害与 5 层时完全相同**（704.47 = 704.47 ✓）⇒ 「最多叠加 5 层」对**伤害**是硬上限 ✓，多出的层数**不产生伤害** ✓。1307 的「超出上限的层数在结算后**移除**」是**另一句话**（他的文档没这句）⇒ 不推广是对的，这条登记已删 ✓。 ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ **保留字面值**：这条规则被 `MODIFY_RULE` 的百分比修正改过，而修正对「字面 percent」是**乘**、对「行份额」是**加**（见 AGENT §0.2 第 27 条）⇒ 改成读行会改变星魂的加成方式。"
     },
     {
       "on": "BATTLE_START",
