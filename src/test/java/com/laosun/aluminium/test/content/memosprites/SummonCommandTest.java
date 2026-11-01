@@ -59,6 +59,14 @@ import com.laosun.aluminium.DoubleValue;
 public class SummonCommandTest {
     private static final double EPS = 1e-6;
 
+    /** Whether this raise names the ULTRA slot, in either spelling ({@code skill} or the {@code skills} list). */
+    private static boolean namesUltra(EffectSpec effect) {
+        if ("ULTRA".equals(effect.getSkill())) {
+            return true;
+        }
+        return effect.getSkills() != null && effect.getSkills().contains("ULTRA");
+    }
+
     /**
      * Evernight (长夜月) - her ultimate is the first user of {@code COMMAND_SUMMON}.
      */
@@ -342,8 +350,8 @@ public class SummonCommandTest {
                                 new TriggerTable.TriggerContext(owner, owner, null, 0, 0, null, battle)).stream()
                         .flatMap(rule -> rule.effects().stream())
                         .anyMatch(effect -> "RAISE_SKILL_LEVEL".equals(effect.getOp())
-                                && "ULTRA".equals(effect.getSkill())
-                                && effect.getAmount() != null && effect.getAmount() == 9.0),
+                                && effect.getAmount() != null && effect.getAmount() == 9.0
+                                && namesUltra(effect)),
                 "her file states \"quoted at Lv10\" as a ULTRA +9 battle-start raise");
         Assertions.assertEquals("HEALTH", command.getAttribute());
         Assertions.assertNull(command.getPercent(), "the multiplier is the skill's, not a second copy here");
