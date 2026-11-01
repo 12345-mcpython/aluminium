@@ -50,4 +50,26 @@ public class SaberEidolonSixEnergyTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, saber, saber, 0, 0));
         Assertions.assertEquals(0.0, saber.getCurrentEnergy(), 1e-9, "the control: nothing at Eidolon 5");
     }
+    /**
+     * 「每再施放 3 次终结技可触发 1 次」: after the first refund, the counter runs 1 / 2 / 3 and the fourth ultimate pays
+     * again. Judged at the event level for the same reason as the first case - a full bar swallows the number.
+     */
+    @Test
+    public void everyThreeMoreUltimatesPayAgain() {
+        Character saber = CharacterFactory.create(SABER, LEVEL, true, null, null, 6);
+        Battle battle = new Battle(new ArrayList<>(List.of(saber)),
+                new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        List<Double> energies = new ArrayList<>();
+        for (int cast = 1; cast <= 4; cast++) {
+            saber.setCurrentEnergy(0);
+            battle.fire(TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, saber, saber, 0, 0));
+            energies.add(saber.getCurrentEnergy());
+        }
+        System.out.println("[1014] energy after ultimates 1..4: " + energies);
+        Assertions.assertEquals(300.0, energies.get(0), 1e-9, "the FIRST ultimate pays");
+        Assertions.assertEquals(0.0, energies.get(1), 1e-9, "the second pays nothing (1 of 3)");
+        Assertions.assertEquals(0.0, energies.get(2), 1e-9, "the third pays nothing (2 of 3)");
+        Assertions.assertEquals(300.0, energies.get(3), 1e-9, "the fourth pays again (3 of 3)");
+    }
 }

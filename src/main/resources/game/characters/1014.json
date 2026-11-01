@@ -305,6 +305,72 @@
       "_note": "「**否则**立即获得 **3** 点【炉心共鸣】」—— 「否则」= 前一支不成立，直接把它写成**取反的比较**（`self_energy + self_stacks:炉心共鸣 * 8 < self_max_energy`）：层数为 0 时 `0 < max` 成立、层数不足以回满时也成立，两种情况都覆盖 ✓。⚠ **不能**用 `!` 前缀 —— 它只允许否定「读队伍」的条件（数值条件取反会把 NaN 变成「成立」，见解析器注释）。事件用 `SKILL_CAST`（每次施放**一次**），不是 `DEALING_DAMAGE`（那会**每段**加 3 点）。"
     },
     {
+      "on": "ULT_CAST",
+      "id": "eidolon6_every_three_ultimates_count",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "self has_state 首次终结技已触发"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "终结技计数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1014 Saber 星魂 6: 「…该效果每再施放3次终结技可触发1次。」",
+      "_note": "「**每再**施放 3 次终结技可触发 1 次」的**计数**半边：每次 +1（上限 3），只在**首次已触发之后**才数。⚠ **必须排在 `eidolon6_first_ult_refunds_energy` 之前** —— 同事件按文件顺序结算，排在后面会把「首次」也数进去（实测会变成第 3、6… 次触发，而原文是第 4、7… 次）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_first_ult_refunds_energy",
+      "min_eidolon": 6,
+      "once_per_battle": true,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 300
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "首次终结技已触发",
+          "turns": 99,
+          "target": "self"
+        }
+      ],
+      "source": "1014 Saber 星魂 6 守护命运长夜: 「…进入战斗首次施放终结技后，为Saber固定恢复300点能量，该效果每再施放3次终结技可触发1次。」 参数 = [0.2, 3, 300, 200]",
+      "_note": "「进入战斗**首次**施放终结技后固定恢复 **300** 点能量」= `ULT_CAST` + `once_per_battle: true` + `GAIN_ENERGY { amount: 300 }` ✓。⚠ 判据在**事件层**验证（手动发 `ULT_CAST`）：`castImmediate` 那条路**不扣终结技能量**，所以从施放前后读能量看不出这 300（上限 360 会把它吞掉）。⛔ **未写**：「每再施放 3 次终结技可触发 1 次」（环形计数器）、行迹【湖之祝福】的溢出能量 200。 ⚠ 本条同时留一个 **`首次终结技已触发`** 标记给下一条规则用：原文的「**每再**施放 3 次」是从**首发放完之后**开始数的。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_every_three_ultimates_refund",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "self_stacks:终结技计数 >= 3"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 300
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "终结技计数",
+          "target": "self"
+        }
+      ],
+      "source": "1014 Saber 星魂 6: 「…该效果每再施放3次终结技可触发1次。」 参数 = [0.2, 3, 300, 200]",
+      "_note": "「每再施放 **3** 次终结技可触发 1 次」= 计数到 **3** 时 `GAIN_ENERGY { amount: 300 }` 并**清空计数**（`REMOVE_STATE`）⇒ 形成一个 3 次一轮的环 ✓。⚠ **必须排在计数规则之后**（同事件按文件顺序结算，否则永远读到 2）。"
+    },
+    {
       "on": "DEALING_DAMAGE",
       "id": "eidolon6_ult_resistance_penetration",
       "min_eidolon": 6,
@@ -323,23 +389,6 @@
       ],
       "source": "1014 Saber 星魂 6 守护命运长夜: 「Saber造成的终结技伤害的风属性抗性穿透提高20%…」 参数 = [0.2, 3, 300, 200]",
       "_note": "「**造成的终结技伤害**的风属性抗性穿透提高 **20%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.2 }` 挂在 `DEALING_DAMAGE` + `from_skill 「ULTRA」` ⇒ 只作用于终结技那一发 ✓。⚠ **近似两处**：① `RESISTANCE_REDUCTION` 是**全属性**（引擎没有风属性穿透这一维度）；② 用 `turns: 1` 表示「只对本次」，因为引擎没有「仅本发」的修饰（`BOOST_DAMAGE` 有，但它是伤害乘区、不是穿透区）。"
-    },
-    {
-      "on": "ULT_CAST",
-      "id": "eidolon6_first_ult_refunds_energy",
-      "min_eidolon": 6,
-      "once_per_battle": true,
-      "when": [
-        "actor == self"
-      ],
-      "do": [
-        {
-          "op": "GAIN_ENERGY",
-          "amount": 300
-        }
-      ],
-      "source": "1014 Saber 星魂 6 守护命运长夜: 「…进入战斗首次施放终结技后，为Saber固定恢复300点能量，该效果每再施放3次终结技可触发1次。」 参数 = [0.2, 3, 300, 200]",
-      "_note": "「进入战斗**首次**施放终结技后固定恢复 **300** 点能量」= `ULT_CAST` + `once_per_battle: true` + `GAIN_ENERGY { amount: 300 }` ✓。⚠ 判据在**事件层**验证（手动发 `ULT_CAST`）：`castImmediate` 那条路**不扣终结技能量**，所以从施放前后读能量看不出这 300（上限 360 会把它吞掉）。⛔ **未写**：「每再施放 3 次终结技可触发 1 次」（环形计数器）、行迹【湖之祝福】的溢出能量 200。"
     },
     {
       "on": "BATTLE_START",
