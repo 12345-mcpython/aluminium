@@ -214,6 +214,46 @@
       ],
       "source": "1314 翡翠 战技: 「…并消耗【收债人】生命上限2%的生命值，若当前生命值不足，当前生命值降至1点。…若翡翠成为【收债人】时…攻击后不消耗生命值。」 param Lv10 = [30, 0.02, 0.25, 3]",
       "_note": "「消耗【收债人】**生命上限 2%** 的生命值」—— ① 消耗者是**收债人本人** ⇒ `target: actor` ✓；② 份额是**收债人自己的生命上限** ⇒ `scale: target_max_hp` ✓（`grantAmount` 对 CONSUME_HP 的 `target` 就是「付账的人」✓，不会读到翡翠的上限 ✗）；③ 「当前生命值不足则降至 **1 点**」由 `consumeHp` 的下限保证 ✓（实测 HP 不会低于 1 ✓）；④ 「**若翡翠**成为收债人…攻击后**不消耗**」⇒ 条件 **`actor != self`** ✓（分成两条规则，扣血这条有门 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1314 星魂 3: 等级加成（数据 skill_add_level: 131402=SKILL+2, 131404=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1314 星魂 5: 等级加成（数据 skill_add_level: 131401=COMMON+1, 131403=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

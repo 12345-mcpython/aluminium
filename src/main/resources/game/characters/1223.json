@@ -190,7 +190,8 @@
         }
       ],
       "source": "1223 星魂 3: 等级加成（数据 skill_add_level: 122303=ULTRA+2, 122304=TALENT+2）",
-      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -209,7 +210,8 @@
         }
       ],
       "source": "1223 星魂 5: 等级加成（数据 skill_add_level: 122301=COMMON+1, 122302=SKILL+2）",
-      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

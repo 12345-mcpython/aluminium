@@ -42,7 +42,7 @@
       "do": [
         {
           "op": "SUPER_BREAK",
-          "percent": 1.0,
+          "percent": 1,
           "target": "target"
         }
       ],
@@ -127,6 +127,46 @@
       ],
       "source": "8005 开拓者·虚数 战技: 「并额外造成 4 次伤害，每次对随机敌方单体造成 50% 攻击力虚数伤害。」",
       "_note": "⭐ **`times` 的第一个读者** ✓（本日新增的效果级重复 ✓）。四件事合作 ✓：① 事件 `DEALING_DAMAGE` ✓ ＋ `from_skill SKILL` ✓（「战技」✓）；② **`damage_is_attack` 护栏** ✓（⚠ 不可省 ✗ —— 追加实例本身也是一次 `DEALING_DAMAGE` ✓，⚠ 无护栏会自我触发到递归上限 ✗，写法照 1109 的同族条款 ✓）；③ `DAMAGE` ＋ 字面倍率 `self_attr:ATTACK` **0.5** ✓ ＋ `element: Imaginary` ✓；④ ⭐ `target: random_enemy` ＋ **`times: 4`** ✓ —— ⚠ `times` 把整次结算重复 4 遍 ✓，⚠ 而 `resolveTargets` 在重复循环**内部**被调用 ✓ ⇒ **每次重抽一个随机敌方目标** ✓（⚠ 这正是「每次对随机敌方单体」的意思 ✓）。⚠ **兄弟纪律** ✗：⚠ 「额外造成4次伤害」在 **8005 与 8006 两份文档里都有** ✓（本日实测 ✓，`aluminium_texts/8005_开拓者.md` 与 `8006_开拓者.md` ✓）⇒ ⚠ 按 `SiblingHarmonyTest` 的宗旨（*mirrored where the two documents agree* ✓）**8006 也应当镜像这一条** ✗ —— ⚠ 该项**尚未完成** ✓，如实登记于此 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "8005 星魂 3: 等级加成（数据 skill_add_level: 800502=SKILL+2, 800504=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "8005 星魂 5: 等级加成（数据 skill_add_level: 800501=COMMON+1, 800503=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

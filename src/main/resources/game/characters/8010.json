@@ -188,6 +188,46 @@
       ],
       "source": "8010 开拓者•欢愉 天赋: 「开拓者持有【好活当赏】时，战技对敌方全体额外造成30%的雷属性欢愉伤害，此伤害使用我方最高的【好活当赏】数值计算。」",
       "_note": "「开拓者持有【好活当赏】时，战技对敌方全体额外造成 **30%** 雷属性**欢愉伤害**，此伤害使用**我方最高**的【好活当赏】数值计算」—— ① 条件 `self_resource:好活当赏 > 0` ✓；② 量 = **`max_party_resource:好活当赏`** × 0.3 ✓（跨单位资源最大值，`DAMAGE` 已接受该拼法 ✓）；③ `damage_type: ELATION` ✓。⚠ **实测（2026-10-31）**：结算量随「本队最高【好活当赏】」**线性变化** —— 战技自身先给 20 点，故「自带 0 / +20 / +40」对应最大值 20 / 40 / 60，基础值 6 / 12 / 18，落地面 4.67 / 9.33 / 14.00（比值 1 : 2 : 3 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "8010 星魂 3: 等级加成（数据 skill_add_level: 801002=SKILL+2, 801004=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "8010 星魂 5: 等级加成（数据 skill_add_level: 801001=COMMON+1, 801003=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

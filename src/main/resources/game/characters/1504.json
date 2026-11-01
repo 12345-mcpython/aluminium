@@ -35,7 +35,7 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent": 2.0,
+          "percent": 2,
           "element": "Thunder",
           "target": "target"
         },
@@ -61,7 +61,7 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent": 1.0,
+          "percent": 1,
           "element": "Thunder",
           "target": "all_enemies"
         },
@@ -217,6 +217,46 @@
         }
       ],
       "_note": "⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `TALENT` ✓ —— ⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；⚠ 它不经过战技点消耗 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1504 星魂 3: 等级加成（数据 skill_add_level: 150401=COMMON+1, 150403=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1504 星魂 5: 等级加成（数据 skill_add_level: 150402=SKILL+2, 150404=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

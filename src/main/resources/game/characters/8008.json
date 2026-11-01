@@ -112,13 +112,63 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent": 1.0,
+          "percent": 1,
           "element": "Ice",
           "target": "all_enemies"
         }
       ],
       "source": "8008 开拓者•记忆 秘技: 「…入场后使敌方全体行动延后50%并造成100%攻击力冰伤。」",
       "_note": "秘技的战斗层：`DELAY 0.5` + `DAMAGE 100% 攻击力、冰、全体`。⚠ 仍登记：大地图的「特殊领域 / 时停」不在引擎层。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 1
+        }
+      ],
+      "source": "8008 星魂 3: 等级加成（数据 skill_add_level: 800802=SKILL+2, 800804=TALENT+2, 1800703=ULTRA+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "8008 星魂 5: 等级加成（数据 skill_add_level: 800801=COMMON+1, 800803=ULTRA+2, 1800701=COMMON+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

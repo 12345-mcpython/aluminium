@@ -79,7 +79,7 @@
       "do": [
         {
           "op": "BOOST_DAMAGE",
-          "percent": 1.0,
+          "percent": 1,
           "scale": "self_stacks:回路层数"
         }
       ],

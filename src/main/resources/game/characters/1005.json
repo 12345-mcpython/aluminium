@@ -16,7 +16,7 @@
         {
           "op": "APPLY_DOT",
           "element": "Thunder",
-          "base_chance": 1.0,
+          "base_chance": 1,
           "scale": "self_attr:ATTACK",
           "percent": 2.9,
           "turns": 2,
@@ -25,7 +25,7 @@
         {
           "op": "TICK_DOT",
           "element": "Thunder",
-          "percent": 1.0,
+          "percent": 1,
           "target": "target"
         }
       ],
@@ -79,7 +79,7 @@
         {
           "op": "APPLY_DOT",
           "element": "Thunder",
-          "base_chance": 1.0,
+          "base_chance": 1,
           "scale": "self_attr:ATTACK",
           "percent": 2.9,
           "turns": 2,
@@ -118,7 +118,7 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.3,
           "damage_type": "DOT",
-          "base_chance": 1.0,
+          "base_chance": 1,
           "turns": 2,
           "target": "target"
         }
@@ -131,29 +131,54 @@
       "id": "eidolon3_levels",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "source": "1005 卡芙卡 星魂 3 我赞美，即兴: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 data: skill_add_level = {100502: 2, 100501: 1}",
-      "_note": "「战技 +2、普攻 +1」—— 取自 eidolons.json 的 skill_add_level ✓。"
+      "_note": "「战技 +2、普攻 +1」—— 取自 eidolons.json 的 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
       "id": "eidolon5_levels",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "source": "1005 卡芙卡 星魂 5 只有今晚奏鸣: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 data: skill_add_level = {100503: 2, 100504: 2}",
-      "_note": "「终结技 +2、天赋 +2」—— 取自 skill_add_level ✓。"
+      "_note": "「终结技 +2、天赋 +2」—— 取自 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
       "id": "eidolon2_party_dot_damage",
       "min_eidolon": 2,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "DOT_DAMAGE_BOOST", "percent": 0.25, "permanent": true, "ticks_on": "self", "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.25,
+          "permanent": true,
+          "ticks_on": "self",
+          "target": "all_allies"
+        }
       ],
       "source": "1005 卡芙卡 星魂 2 狂想者，呜咽: 「卡芙卡在场时，我方全体造成的持续伤害提高25%。」 param = [0.25]",
       "_note": "「卡芙卡在场时，我方全体造成的持续伤害提高 25%」—— 属性 DOT_DAMAGE_BOOST（「造成的」一侧）+ all_allies ✓；「在场时」用 ticks_on: 「self」 锚在她身上 ⇒ 她倒下时全队这份加成一起消失 ✓。"
@@ -163,11 +188,14 @@
       "id": "eidolon6_shock_multiplier",
       "min_eidolon": 6,
       "do": [
-        { "op": "MODIFY_RULE", "rule": "ult_shock_and_tick", "effect_percent_scale": 2.56 }
+        {
+          "op": "MODIFY_RULE",
+          "rule": "ult_shock_and_tick",
+          "effect_percent_scale": 2.56
+        }
       ],
       "source": "1005 卡芙卡 星魂 6 回旋，悄悄地: 「终结技、秘技与天赋触发的追加攻击使敌方目标陷入的触电状态的伤害倍率提高156%…」 param = [1.56, 1]",
       "_note": "「触电状态的伤害倍率提高 156%」= ×2.56（1.56 + 1）—— effect_percent_scale ✓（与「+156 个百分点」区分开 ✓）。"
     }
-
   ]
 }

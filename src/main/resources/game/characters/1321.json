@@ -104,6 +104,46 @@
       ],
       "source": "1321 大丽花 行迹/光环: 「大丽花在场时，敌方全体全属性抗性降低20%」",
       "_note": "「**大丽花在场时**，敌方全体**全属性抗性降低 20%**」—— ⭐ 新属性 `RESISTANCE_REDUCTION` 的**第一位读者** ✓（语料里同类从句 **19 份** ✓：1004、1006、1203、1218、1304、1308、1321、1405、1407、1410、1504、1507，另加 1222/1505（无文件）与光锥/词条 ✓；此前**没有任何已出货文件**用过抗性降低拼写 ✓）。① 幅度 20% ⇒ `percent: 0.2` ✓；② \"**在场时**\" ⇒ `BATTLE_START` + `permanent` ✓；③ 目标 `all_enemies` ✓。⚠ **不写 `DAMAGE_PENETRATION`** ✗：穿透属于**攻击方**且不能无视本来没有的抗性 ✓，而抗性降低属于**受击方**、可以把它压成**负数** ✓（`ResistArea` 的区间是 0.1–2.0 ✓）⇒ 合并会让\"抗性降低\"停在 0 ✗。⚠ 实测（2026-09-29）：对物理抗性 20% 的目标降低 20% ⇒ 同一发攻击 **×1.25** ✓（= 1/0.8 ✓）。⚠ **本轮顺带发现一处脆 fixture** ✓：`SuperBreakTest` 原本按\"对英雄元素弱\"挑敌人 ✓，而它**会被自己的击破伤害打死**（击破基数 31037 vs 血量 16498 ✓）⇒ 一旦伤害 ×1.2 就越线 ✓ ⇒ 该 fixture 已改成\"取血量最大的元素弱候选\" ✓（见其注释 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1321 星魂 3: 等级加成（数据 skill_add_level: 132101=COMMON+1, 132103=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1321 星魂 5: 等级加成（数据 skill_add_level: 132102=SKILL+2, 132104=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

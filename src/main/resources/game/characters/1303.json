@@ -171,7 +171,8 @@
         }
       ],
       "source": "1303 阮•梅 星魂 3 「彩缎烟衫绿婆娑」: 「终结技等级+2…天赋等级+2…」 data: {130303: 2, 130304: 2}",
-      "_note": "取自 skill_add_level ✓。"
+      "_note": "取自 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -190,7 +191,8 @@
         }
       ],
       "source": "1303 阮•梅 星魂 5 「手弄慵鬟玲珑钗」: 「战技等级+2…普攻等级+1…」 data: {130302: 2, 130301: 1}",
-      "_note": "取自 skill_add_level ✓。"
+      "_note": "取自 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BREAK",

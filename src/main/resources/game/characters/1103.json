@@ -139,7 +139,8 @@
       "min_eidolon": 3,
       "source": "1103 希露瓦 星魂 3 听，齿轮的心跳 (Avatar_Serval_00_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110302': 2, '110301': 1}",
       "_note": "星魂 3's two raises (M-32). ⚠ Here they compose with the base-level rule above by addition (SKILL: +9 then +2), which is the same arithmetic 1215's 星魂 3/5 use. ⚠ The caps (15 / 10) are the tables' own sizes, so an over-raise fails loudly rather than reading a row that does not exist.",
-      "id": "eidolon3_levels"
+      "id": "eidolon3_levels",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -158,7 +159,8 @@
       "min_eidolon": 5,
       "source": "1103 希露瓦 星魂 5 贝洛伯格最强音！ (Avatar_Serval_00_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'110303': 2, '110304': 2}",
       "_note": "星魂 5's two raises. ⚠ The TALENT half is stated even though this file's talent clause is registered: it is a fact about the loadout, and the day that clause is written the level is already right — the same reasoning 1215's base-level rule gives. ⚠ **Not written yet in this file** (each with its blocker, all in ROADMAP): 天赋「施放攻击后，对**所有触电状态下的**敌方目标造成等同于希露瓦 72% 攻击力的雷属性附加伤害」(a rule's effect reaches what a *selector* names, so 「all shocked enemies」 cannot be filtered per target — `M-53`); 战技的相邻目标触电判定 (the skill's own hit list is not addressable); 星魂 1「普攻对指定敌方目标的 1 个随机相邻目标造成…60%」(no adjacent selector); 星魂 2「每触发 1 次天赋的附加伤害，希露瓦恢复 4 点能量」(rides on the talent); 星魂 4「施放终结技时，有 100% 基础概率使**非触电状态下的**敌方目标…」(the negation is per target, `M-53` again).",
-      "id": "eidolon5_levels"
+      "id": "eidolon5_levels",
+      "_status": "implemented"
     },
     {
       "on": "ALLY_ATTACK",

@@ -165,7 +165,7 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent": 1.0,
+          "percent": 1,
           "element": "physical",
           "target": "all_enemies",
           "ordinary": true
@@ -208,6 +208,46 @@
       ],
       "source": "1505 绯英 行迹 开不败: 「队友持有的【好活当赏】**结束时**，绯英会**将其中的 50%** 转化为自身的【好活当赏】」",
       "_note": "「队友持有的【好活当赏】结束时…取其中的 **50%**」⇒ `STATE_ENDED` ⇒ `GAIN_RESOURCE{好活当赏, **amountFromEvent × 0.5**, target: self}` ✓。⚠ 条件 `actor state_ended 好活当赏` ✓（事件以 `(carrier, carrier, …)` 触发 ✓）。⚠ 事件携带的量（本轮）就是**被结束状态的实例数** ✓。⚠ **登记**：`1513` 的奖励仍以**普通状态**施加 好活当赏 ✗（不可叠加 ✗）⇒ 真实对局里它只有 **1** 个实例 ✗ ⇒ 「50% of it」在实战里是 0.5 ✗；那桥接（笑点 → 状态层数）单独登记 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1505 星魂 3: 等级加成（数据 skill_add_level: 150501=COMMON+1, 150503=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1505 星魂 5: 等级加成（数据 skill_add_level: 150502=SKILL+2, 150504=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

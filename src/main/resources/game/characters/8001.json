@@ -168,7 +168,8 @@
         }
       ],
       "source": "8001 星魂 3: 「战技等级+2…天赋等级+2…」",
-      "_note": "取自 skill_add_level ✓。"
+      "_note": "取自 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -187,7 +188,8 @@
         }
       ],
       "source": "8001 星魂 5: 「终结技等级+2…普攻等级+1…」",
-      "_note": "取自 skill_add_level ✓（数据里另有槽 8/9 的 +2，属强化形态，未接）。"
+      "_note": "取自 skill_add_level ✓（数据里另有槽 8/9 的 +2，属强化形态，未接）。",
+      "_status": "implemented"
     },
     {
       "on": "KILL",

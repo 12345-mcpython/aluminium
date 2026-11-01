@@ -147,7 +147,15 @@
         }
       ],
       "per_turn": 2,
-      "source": {       "text": "1001 三月七 天赋 少女的特权 (100104, 单体攻击/Ice): 「当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击，对其造成等同于三月七100%攻击力的冰属性伤害，该效果每回合可触发2次。」 param Lv10 = [1, 2] → #1 = 1（伤害倍率），#2 = 2（每回合可触发次数）",       "skill": "TALENT",       "row": 10,       "params": {         "#1": 1,         "#2": 2       }     },
+      "source": {
+        "text": "1001 三月七 天赋 少女的特权 (100104, 单体攻击/Ice): 「当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击，对其造成等同于三月七100%攻击力的冰属性伤害，该效果每回合可触发2次。」 param Lv10 = [1, 2] → #1 = 1（伤害倍率），#2 = 2（每回合可触发次数）",
+        "skill": "TALENT",
+        "row": 10,
+        "params": {
+          "#1": 1,
+          "#2": 2
+        }
+      },
       "_note": "Every clause of this sentence is carried by one piece of vocabulary, and each piece is the one that makes a *different* wrong reading impossible. ① 「受到…攻击后」 is `TAKING_HIT`, not `HP_LOST`: TAKING_HIT fires whenever an incoming damage instance lands, **including when the shield absorbs all of it** (hpLoss == 0), and this talent is precisely about a shielded ally -- gating it on HP loss would have skipped the case it exists for. ② 「持有护盾的我方目标」 is `target has_shield`, read from the alive shield value (a shield that has been used up no longer qualifies). ⚠ 「我方」 is not a condition: TAKING_HIT is only ever delivered for a subject on our side (Battle.fireTriggersForAlly), which is why the event is the right one for this sentence and `HP_LOST` (either side) would not be. ③ 「受到**敌方目标**攻击」 is `!actor is_ally` -- the event's `actor` is the attacker, and without the condition a friendly-fire instance would be countered as well. ④ 「向攻击者发起反击」 is `target: \"attacker\"`. ⑤ 「每回合可触发2次」 is `per_turn: 2` (param #2), counted in **三月七's own** turns, exactly like `cooldown`: without it the counter would fire on every hit of a three-hit attack -- a wrong number with nothing to report. ⚠ It is the first user of both `has_shield` and `per_turn`. ⑥ The numbers are not written here: `skill: \"TALENT\"` + `damage_param: 0` reads the row the TALENT's **current level** names (row 10 = 1, i.e. 100% ATK) and the Ice element and single-target shape come from 100104's own data. ⚠ It used to carry `damage_level: 10`, a per-effect row pin; the `level_convention` rule above states the file's level **once**, so 星魂 5's 「天赋等级+2」 raises this counter to row 12 (110% ATK) instead of the number staying pinned at row 10 (M-32). ⚠ 「反击也属于追加攻击」 holds automatically: `DAMAGE` settles through `Battle.applyAdditionalDamage`, the engine's one notion of a follow-up attack, which is also what emits FOLLOW_UP. ⚠ ⚠ 星魂 4 BOTH sentences SHIPPED on 2026-09-28: the cap as a `MODIFY_RULE` amendment (and the DEF-derived addend as `ADD_DAMAGE`), and the old 「NOT authored」 wording here was replaced -- a second rule with `per_turn: 3` would *add* firings rather than raise this rule's cap (there is no \"modify another rule's limit\" mechanism), and the damage addend is a derived flat value no op can express; 星魂 1 (energy per frozen target) and 行迹「冰咒」 (+15% freeze chance) need the freeze control state; 星魂 2 needs a 「生命值百分比最低的队友」 selector; 星魂 6 and 行迹「加护」 need the shield's provider / a way to lengthen a shield that is already up."
     },
     {
@@ -401,7 +409,7 @@
           "op": "APPLY_CONTROL",
           "control": "冻结",
           "turns": 1,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "element": "Ice",
           "scale": "self_attr:ATTACK",
           "percent": 0.5,

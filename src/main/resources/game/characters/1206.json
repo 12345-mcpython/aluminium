@@ -168,7 +168,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         }
       ],
@@ -443,7 +443,7 @@
         "self_stacks:剑势额外判定 >= 1",
         "target has_state 弱点击破"
       ],
-      "chance": 1.0,
+      "chance": 1,
       "chance_rolls": 2,
       "do": [
         {

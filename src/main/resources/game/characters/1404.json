@@ -159,7 +159,7 @@
         },
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         },
         {
@@ -249,7 +249,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "percent": 2.0,
+          "percent": 2,
           "until": "cast_end",
           "target": "self"
         }
@@ -295,7 +295,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         }
       ],
@@ -361,6 +361,51 @@
       ],
       "source": "1415 昔涟 忆灵技能 8：「若施放前目标被消灭则对**新入场**的敌方目标施放」。（tbgd 里它就是 `OnWaveMonster` ⇒ `TurnInsertAction{TargetType: ModifierOwnerEntity, AutoCast: true}`：有波次怪物入场，则**他自己**再行动一次；打谁是**技能自己**的事。）",
       "_note": "⚠ 本条只写了原句里**能被证实**的那半：「对**新入场**的敌方目标施放」。❗「若施放前**目标被消灭**」那半**没写** ✗：游戏的谓词是 `ByTargetAliveState{ModifierOwnerEntity}`（看的是**万敌自己**还在不在），而不是看某个敌人死没死 ✗。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 2
+        }
+      ],
+      "source": "1404 星魂 3: 等级加成（数据 skill_add_level: 140401=COMMON+1, 140402=SKILL+2, 140411=COMMON+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1404 星魂 5: 等级加成（数据 skill_add_level: 140403=ULTRA+2, 140404=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

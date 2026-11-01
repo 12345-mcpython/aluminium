@@ -76,6 +76,46 @@
       ],
       "source": "1312 米沙 终结技: 「初始拥有3段攻击段数…」（施放后回到初始段数）",
       "_note": "施放后回到**初始 3 段**：`RAISE_SKILL_HITS` 支持负数（\"a negative amount takes them back\" ✓），这里取一个**足够大**的 −6（数据里最多 3+… 段，正常不会超过 9）⇒ 等价于「恢复至初始」。⚠ 这是**近似**：真正的语义是「设回 3」，而引擎只有「加/减 N 段」；减 6 在本角色的取值范围内等价，但若将来段数上限更大就要跟着改。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1312 星魂 3: 等级加成（数据 skill_add_level: 131201=COMMON+1, 131203=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1312 星魂 5: 等级加成（数据 skill_add_level: 131202=SKILL+2, 131204=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

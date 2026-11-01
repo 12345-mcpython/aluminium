@@ -81,7 +81,7 @@ public class HertaTheTest {
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the ultimate's modifiers");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the technique and the convention");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the technique and the convention");
     }
 
     private static Random fixed() {

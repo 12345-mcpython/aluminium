@@ -187,7 +187,7 @@
           "op": "GAIN_RESOURCE",
           "resource": "生死之诗的溢出消耗",
           "amountFromPrevious": true,
-          "amountPercent": 12.0,
+          "amountPercent": 12,
           "target": "self"
         },
         {
@@ -228,7 +228,7 @@
         {
           "op": "CONSUME_HP",
           "scale": "owner_max_hp",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         }
       ],
@@ -252,6 +252,66 @@
       ],
       "source": "同上：「同时为我方全体回复等同于遐蝶 #3% 生命上限 + #4 点的生命值」（`#3 = 0.084`、`#4 = 1120`）。",
       "_note": "⭐ 两部分都在：份额（`scale` + `percent`）与常量（`amount`）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 1
+        }
+      ],
+      "source": "1407 星魂 3: 等级加成（数据 skill_add_level: 140701=COMMON+1, 140703=ULTRA+2, 1140703=ULTRA+1, 1140712=SKILL+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 1
+        }
+      ],
+      "source": "1407 星魂 5: 等级加成（数据 skill_add_level: 140702=SKILL+2, 140704=TALENT+2, 1140701=COMMON+1, 1140702=SKILL+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

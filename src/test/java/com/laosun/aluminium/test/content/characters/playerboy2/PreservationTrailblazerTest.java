@@ -106,7 +106,7 @@ public class PreservationTrailblazerTest {
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BASIC_ATTACK), "cid " + cid + ": the basic-attack shield");
             Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "cid " + cid + ": reduction+taunt and the shield");
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "cid " + cid + ": the ultimate's shield");
-            Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid + ": the technique and the convention");
+            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid + ": the technique and the convention");
         }
     }
 

@@ -95,7 +95,8 @@
         }
       ],
       "source": "1213 星魂 3: 等级加成（数据 skill_add_level）",
-      "_note": "取自 `skill_add_level` ✓。"
+      "_note": "取自 `skill_add_level` ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -114,7 +115,8 @@
         }
       ],
       "source": "1213 星魂 5: 等级加成（数据 skill_add_level）",
-      "_note": "取自 `skill_add_level` ✓。"
+      "_note": "取自 `skill_add_level` ✓。",
+      "_status": "implemented"
     }
   ]
 }
