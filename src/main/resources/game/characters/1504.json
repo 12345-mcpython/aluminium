@@ -3,7 +3,7 @@
   "character": 1504,
   "_status": "partial",
   "_gaps": [
-    "见 CONTENT-STATUS.md 的逐角色登记"
+    "星魂 4（终结技时攻击 +40%）与星魂 6（敌方全属性抗性 −20% + 每层【婪酣】+4% 伤害，≤30 层）已落地 ✓。⛔ **星魂 1 未落地（引擎）**：「敌方全体受到的伤害提高 24%」写成 `MODIFY_DAMAGE_TAKEN { percent: 0.24, permanent: true, target: all_enemies }` 挂在 `BATTLE_START` 上，实测**敌方身上出现 2 个 `VulnerabilityBuff`**（E0 = 0、E1 = 2 ⇒ 伤害比值 1.48 而不是 1.24），加 `once_per_battle: true` 也不变；而同一条规则用 `MODIFY_ATTR RESISTANCE_REDUCTION` 只落 1 个 ⇒ 问题在 `MODIFY_DAMAGE_TAKEN` 的施加入口，需要先查再写（不交付双倍易伤）。另：星魂 1 的「血量 ≤50% 时提高到 36%」是**替换**不是叠加，也需要新写法。"
   ],
   "resources": [
     {
@@ -270,6 +270,32 @@
       ],
       "source": "1504 星魂 4: 「不死途施放终结技时，攻击力提高40%，持续3回合。」 param = [0.4, 3]",
       "_note": "「**施放终结技时**，攻击力提高 **40%**，持续 **3 回合**」—— `ULT_CAST` + `actor == self` → `MODIFY_ATTR ATTACK` + `turns: 3` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_res_down_and_damage_up",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_enemies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.04,
+          "per_stack": "self_stacks:婪酣",
+          "per_stack_cap": 30,
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1504 不死途 星魂 6 结局，或许无人生还: 「当场上存在【饲饵】时，敌方全体的全属性抗性降低20%。不死途每获得过1层【婪酣】，造成的伤害提高4%，该效果最多叠加30层。」 参数 = [0.2, 0.04, 30]",
+      "_note": "「敌方全体**全属性抗性降低 20%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.2 }` ✓；「每获得过 1 层【婪酣】，造成的伤害提高 **4%**，最多 **30** 层」= `per_stack: 「self_stacks:婪酣」` + `per_stack_cap: 30` + `per_stack_live: true` ✓（每层 4%，实时读层数，层名与天赋的 `ADD_STACK 婪酣` 一致）。数值来自星魂参数 ⇒ 字面值 ✓。⛔ **近似**：「**当场上存在【饲饵】时**」这个前提未成条件（引擎没有「场上存在某状态」的条件），现按常驻处理，已登记。"
     }
   ]
 }
