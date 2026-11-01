@@ -162,7 +162,8 @@ public class LukaTest {
     @Test
     public void hisFileCarriesTheClauses() {
         TriggerTable table = TriggerTables.of(LUKA);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the starting layer + the level convention");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the starting layer + the level convention + the technique");
         Assertions.assertEquals(5, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "one layer rule per cast category + the ⚠2-layer enhancement (whose file position is what makes the threshold reachable on the same attack)");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the trace's REMOVE_BUFF and the Skill's Bleed (裂伤) DOT");
@@ -200,3 +201,4 @@ public class LukaTest {
         return BattleFixture.alwaysRoll(0.0);
     }
 }
+
