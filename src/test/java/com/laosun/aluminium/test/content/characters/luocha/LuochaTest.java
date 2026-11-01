@@ -51,12 +51,17 @@ public class LuochaTest {
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(LUOCHA);
-        // The counter, the zone opener that consumes it, 行迹 浸池苏生's dispel, and 星魂 2's two halves.
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the counter, the zone opener, the dispel, and Eidolon 2's heal-boost and shield");
-        // The level convention, 行迹 行过幽谷's control resistance, 秘技 愚者的悲悯's field, and 星魂 5.
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the control resistance, the technique, and Eidolon 5's levels");
+        // The counter, the zone opener that consumes it, and 行迹 浸池苏生's dispel.
+        // 星魂 2's two halves moved OFF this event on 2026-10-31: the heal bonus registers once at BATTLE_START (the
+        // mechanism's own contract) and the shield belongs on CAST_SETUP, because SKILL_CAST fires AFTER the heal and the
+        // target is already back above 50% by then (its >= 50% gate would always hold).
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the counter, the zone opener, and the dispel");
+        // The level convention, 行迹 行过幽谷's control resistance, 秘技 愚者的悲悯's field, 星魂 5, and 星魂 2's heal bonus.
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the control resistance, the technique, Eidolon 5's levels, and the heal bonus");
+        // 星魂 2's shield half: decided before settlement, when the target's HP is still the pre-heal value.
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.CAST_SETUP), "Eidolon 2's shield");
         // 星魂 6's resistance reduction and the ultimate's own dispel + stack.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
                 "Eidolon 6's resistance reduction and the ultimate's dispel");
