@@ -3,7 +3,7 @@
   "character": 1217,
   "_status": "partial",
   "_gaps": [
-    "行迹段落：尚未读、未写",
+
     "星魂 1 / 3 / 4 / 5 / 6：未读、未写（E2 已写）"
   ],
   "rules": [
@@ -175,6 +175,34 @@
       ],
       "source": "1217 藿藿 星魂 2 「判官书符，镇尾锁灵」：「当**藿藿拥有【禳命】时**，若**我方目标**受到致命攻击，不会陷入**无法战斗状态**，并立即回复等同于**其自身**生命上限 **50%** 的生命值。**该效果单场战斗中可以触发 2 次**」（`param = [0.5, 2]` ⇒ #1 = 50% ✓，#2 = 2 次 ✓）",
       "_note": "⭐ 2026-10-02（第 52 件）：⭐ **补上同一句里的上限** ✓。⚠ 上限就在原句里（「该效果单场战斗中可以触发 **2** 次」），而 `param` 的 #2 = **2** ✓。⭐ **拼法是现成的** ✓：计数器 = `ADD_STACK` + `self_stacks:<名>` 条件（样板 `1111.json` 的【斗志】✓；而 `TriggerInterpreter:762` 的注释**点名了这一句**：「触发 2 次后自动解除」⇒ 计数器 ✓）。⚠ 计数器写在**规则主人自己**身上 ✓（`self_stacks:` 读的就是规则主人 ✓）。⚠ **无需引擎改动** ✓（本来以为要加 `per_battle` 字段 ✗，已回滚 ✓）。⚠ **仍登记**：「使【禳命】的持续回合数**减 1**」✗（`EXTEND_BUFF` 只收正数 ✗）。 ⭐ 2026-10-02: 补上第三句「使【穹命】的持续回合数**减 1**」⇒ `EXTEND_BUFF{buff: 穹命, turns: -1, target: self}`。⚠ 形状取自**游戏自己的配置**：`Avatar_Huohuo_00_Rank02_Insert` 对具名 modifier 做 `SetModifierValue{ModifyFunction: \"Add\", ValueType: \"LifeTime\"}`（另一条同族任务是 `SetDynamicValueByAddValue{AddValue: -1, Min: 0}`）—— 即“对具名状态寿命做**带符号的 Add**”，所以是**负的 `turns`**，而不新增 op。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_fearful_to_act",
+      "do": [
+        { "op": "APPLY_BUFF", "buff": "禳命", "turns": 1, "target": "self" }
+      ],
+      "source": "1217 藿藿 行迹 不敢自专 (1217101): 「战斗开始时，藿藿获得【禳命】，持续1回合。」 param = [1]",
+      "_note": "「**战斗开始时**，藿藿获得【禳命】，持续 **1 回合**」—— `BATTLE_START` + `APPLY_BUFF 禳命` + `turns: 1` ✓（与战技那条同一个状态 ✓，所以「有禳命」的所有读者自动受益 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_cursed_one",
+      "do": [
+        { "op": "RESIST_DEBUFF", "percent": 0.35, "permanent": true, "target": "self", "kind": "control" }
+      ],
+      "source": "1217 藿藿 行迹 贞凶之命 (1217102): 「抵抗控制类负面状态的概率提高35%。」 param = [0.35]",
+      "_note": "「抵抗**控制类**负面状态的概率提高 35%」—— `RESIST_DEBUFF` + **`kind: control`** ✓（引擎按**类**建模 = `ClassResistBuff`，`debuffResistOf(CONTROL)` 能读 ✓），**不是**改通用效果抵抗 ✗（那会对所有负面生效，过度 ✗）；`permanent: true` ✓（行迹常驻 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "trace_stress_reaction",
+      "when": ["self has_state 禳命"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 1 }
+      ],
+      "source": "1217 藿藿 行迹 怯惧应激 (1217103): 「触发天赋为我方目标提供治疗时，藿藿恢复1点能量。」 param = [1]",
+      "_note": "「触发**天赋**为我方目标提供治疗时，藿藿恢复 **1 点能量**」—— 天赋的治疗本身就挂在 `TURN_START` + `self has_state 禳命` 上 ✓（见本档那条 `HEAL` 规则 ✓）⇒ 回能挂在**同一个时刻** ✓。⚠ 与治疗规则**分开**写：一条规则只做一类事，扣层/回能可以各自变异 ✓。"
     }
   ]
 }
