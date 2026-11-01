@@ -150,7 +150,13 @@ public class ContentDuplicateGuardTest {
                 conditions.add(condition.isJsonPrimitive() ? condition.getAsString() : condition.toString());
             }
             Collections.sort(conditions);
-            out.append(" when=").append(conditions);
+            // An EMPTY `when` is the same statement as no `when` at all: appending "when=[]" let a copy-paste through -
+            // 1504's Eidolon 1 was written twice, once with `"when": []` and once without the field, and this guard read
+            // two different signatures. Measured: two vulnerability layers on the enemy and 1.48 damage where 1.24 was
+            // expected.
+            if (!conditions.isEmpty()) {
+                out.append(" when=").append(conditions);
+            }
         }
         // The structured conditions are part of the signature too: a rule's `when_predicates` is the same statement as
         // `when` in the new spelling, and a signature that ignored it would call two rules identical the moment one of
