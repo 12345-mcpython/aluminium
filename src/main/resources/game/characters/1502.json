@@ -3,7 +3,7 @@
   "character": 1502,
   "_status": "partial",
   "_gaps": [
-    "见 CONTENT-STATUS.md 的逐角色登记"
+    "结界本身已建为状态（`APPLY_BUFF 结界`，`ticks_on: self` ⇒ 她自己回合开始减 1 ✓）与「普攻/战技后 +3 笑点」✓；仍缺：① 「结界期间我方全体**欢愉度**提高，等于爻光欢愉度的 **20%**」（需要**欢愉度**的跨单位派生修饰）、② 终结技「使阿哈立即获得 1 个**固定计入 20 笑点**的额外回合」（额外回合 + 资源门槛）、③ 天赋【大吉大利】（每次攻击后对随机 1 个命中目标追加 20% 对应属性**欢愉伤害**，消耗战技点时再触发一次，且「不视为一次攻击」）、④ 星魂与行迹未读"
   ],
   "rules": [
     {
@@ -29,6 +29,58 @@
       ],
       "source": "爻光 终结技 霓裳铁翎，六爻皆吉：「…并使我方全体目标全属性抗性穿透提高#2[f1]%，持续#3[i]回合。」；「获得#1[i]个笑点」",
       "_note": "⭐ 只写**能完整表达**的那一句 ✓：终结技「使我方全体目标**全属性抗性穿透提高 10%**，持续 **3** 回合」✓ = `CAST_SETUP` + `from_category ULTRA` ⇒ `MODIFY_ATTR` + `turns` + `target: all_allies` ✓。⚠ 同技能另两半已登记 ✗：「获得 5 个**笑点**」（队伍级资源 ✗）、「使阿哈立即获得 1 个固定计入 20 笑点的额外回合」（额外回合 + 笑点 ✗）；以及天赋/额外能力里的【大吉大利】、【凶星低语】与\"随机目标\" 部分 ✗。 ✅ 同一次施放还给 5 个笑点 ✓（读者：同句首句 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_opens_the_zone",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "结界",
+          "turns": 3,
+          "ticks_on": "self",
+          "target": "self"
+        }
+      ],
+      "source": "1502 爻光 战技: 「展开结界，持续3回合，自身每回合开始时结界持续回合数减1。」 param Lv10 = [3, 0.2, 3]",
+      "_note": "「展开结界，持续 **3 回合**，**自身每回合开始时**结界持续回合数减 1」—— `APPLY_BUFF` + `turns: 3` + **`ticks_on: 「self」`** ✓（「自身每回合开始时减 1」正是这个钟 ✓，与 8005 的【伴舞】同形）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "zone_pays_three_laughs_after_skill",
+      "when": [
+        "actor == self",
+        "self has_state 结界"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "笑点",
+          "amount": 3
+        }
+      ],
+      "source": "1502 爻光 战技: 「…且爻光施放普攻、战技后获得3个笑点。」 param = [3, 0.2, 3]（#3 = 3）",
+      "_note": "「结界持续期间…**爻光施放普攻、战技后获得 3 个笑点**」—— 门槛 `self has_state 结界` ✓（句子把它限定在结界期间）+ 事件 `SKILL_CAST` ✓；普攻那半见下一条 ✓。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "zone_pays_three_laughs_after_basic",
+      "when": [
+        "actor == self",
+        "self has_state 结界"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "笑点",
+          "amount": 3
+        }
+      ],
+      "source": "1502 爻光 战技: 「…爻光施放普攻、战技后获得3个笑点」",
+      "_note": "同句的**普攻**那一半 ✓（`BASIC_ATTACK`）。"
     }
   ],
   "resources": [
