@@ -2,7 +2,9 @@
   "schema": 1,
   "character": 1207,
   "_status": "implemented",
-  "_gaps": [],
+  "_gaps": [
+    "⛔ **秘技未写**（2026-11-01 覆盖复核发现）：文档有「秘技：云鸢逐风 / Windchaser」一节，文件里**没有任何秘技规则** —— 此前的「完全实现」不成立。"
+  ],
   "rules": [
     {
       "on": "BATTLE_START",
