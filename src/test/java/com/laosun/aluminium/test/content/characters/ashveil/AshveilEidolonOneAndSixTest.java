@@ -75,11 +75,18 @@ public class AshveilEidolonOneAndSixTest {
         return before - enemy.getCurrentHp();
     }
 
+    /**
+     * ⚠ The rank-six aura is gated on 「当场上存在【饲饵】时」, so the Skill has to put the bait down first: at BATTLE_START
+     * no bait exists and the aura is correctly absent.
+     */
     private static double enemyResistance(int eidolon) {
         Character owner = CharacterFactory.create(OWNER, LEVEL, true, null, null, eidolon);
         Battle battle = new Battle(new ArrayList<>(List.of(owner)),
                 new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        return battle.enemyUnits().getFirst().getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        var enemy = battle.enemyUnits().getFirst();
+        battle.castImmediate(owner.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), owner, List.of(enemy));
+        battle.processRequests();
+        return enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
     }
 }

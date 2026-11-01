@@ -3,7 +3,7 @@
   "character": 1504,
   "_status": "partial",
   "_gaps": [
-    "星魂 1（两段）、星魂 4、星魂 6 已落地 ✓。⛔ **星魂 6 的「当场上存在【饲饵】时」**这个前提没有条件可写（引擎没有「场上存在某状态」的条件），现按常驻处理。⚠ **夹具记录**（下次省一轮）：要给目标压血，`CanHit` 没有 `setCurrentHp`、`consumeHp` 对敌方无效、**一次大额 `applyDamage` 会被各区放大而直接打死目标** —— 可行做法是**循环小额扣血直到目标血线**（`AshveilEidolonOneTierTest` 里 1% × N 次）；另外 `target_hp_percent` 是**分数**（写 `50` 会恒假）。"
+    "⭐ 星魂 1（两段）、星魂 4、**星魂 6（两段：抗性 −20% + 每层【婪酣】+4% 伤害 ≤30 层）** 均已落地 ✓。✅ 「**当场上存在【饲饵】时**」这个前提**有条件可写** —— `any_enemy has_state 「饲饵」`（原登记的「引擎没有『场上存在某状态』的条件」已作废）；事件从 `BATTLE_START` 改成 `SKILL_CAST`（开战时还没有【饲饵】）。⛔ 仍开：技能与行迹的其余从句。⚠ **夹具记录**：要给目标压血，`CanHit` 没有 `setCurrentHp`、`consumeHp` 对敌方无效、大额 `applyDamage` 会被各区放大而直接打死目标 —— 可行做法是**循环小额扣血**；另 `target_hp_percent` 是**分数**（写 `50` 会恒假）。"
   ],
   "resources": [
     {
@@ -272,7 +272,7 @@
       "_note": "「**施放终结技时**，攻击力提高 **40%**，持续 **3 回合**」—— `ULT_CAST` + `actor == self` → `MODIFY_ATTR ATTACK` + `turns: 3` ✓。"
     },
     {
-      "on": "BATTLE_START",
+      "on": "SKILL_CAST",
       "id": "eidolon6_res_down_and_damage_up",
       "min_eidolon": 6,
       "do": [
@@ -295,7 +295,11 @@
         }
       ],
       "source": "1504 不死途 星魂 6 结局，或许无人生还: 「当场上存在【饲饵】时，敌方全体的全属性抗性降低20%。不死途每获得过1层【婪酣】，造成的伤害提高4%，该效果最多叠加30层。」 参数 = [0.2, 0.04, 30]",
-      "_note": "「敌方全体**全属性抗性降低 20%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.2 }` ✓；「每获得过 1 层【婪酣】，造成的伤害提高 **4%**，最多 **30** 层」= `per_stack: 「self_stacks:婪酣」` + `per_stack_cap: 30` + `per_stack_live: true` ✓（每层 4%，实时读层数，层名与天赋的 `ADD_STACK 婪酣` 一致）。数值来自星魂参数 ⇒ 字面值 ✓。⛔ **近似**：「**当场上存在【饲饵】时**」这个前提未成条件（引擎没有「场上存在某状态」的条件），现按常驻处理，已登记。"
+      "_note": "「敌方全体**全属性抗性降低 20%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.2 }` ✓；「每获得过 1 层【婪酣】，造成的伤害提高 **4%**，最多 **30** 层」= `per_stack: 「self_stacks:婪酣」` + `per_stack_cap: 30` + `per_stack_live: true` ✓（每层 4%，实时读层数，层名与天赋的 `ADD_STACK 婪酣` 一致）。数值来自星魂参数 ⇒ 字面值 ✓。✅ 「**当场上存在【饲饵】时**」= `any_enemy has_state 「饲饵」`（引擎**有条件**，原登记的「没有『场上存在某状态』的条件」已作废）✓。 ⚠ 事件从 `BATTLE_START` 改成 **`SKILL_CAST`**：`any_enemy has_state 「饲饵」` 在开战时恒假（那时还没有【饲饵】），而这条效果的文案是「**当场上存在**【饲饵】时」的**持续**条件 ⇒ 挂在她施加【饲饵】的那次施放上，之后每次施放重算（修饰是常驻/实时，重复应用同值）。",
+      "when": [
+        "actor == self",
+        "any_enemy has_state 饲饵"
+      ]
     },
     {
       "on": "DEALING_DAMAGE",
