@@ -126,7 +126,9 @@ public class ArgentiStacksTest {
         for (int i = 0; i < 12; i++) {
             f.fireCast(TriggerEvent.BASIC_ATTACK, 1);
         }
-        Assertions.assertEquals(base + 10 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
+        // 0.028, not 0.025: at rank 4 her Eidolon 3 has already raised the TALENT by two, so the row the rule reads is
+        // Lv12 (0.025 at Lv10, 0.028 at Lv12). That difference is exactly why the rule reads the row instead of a literal.
+        Assertions.assertEquals(base + 10 * 0.028, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
                 "12 layers in the group: the two granted at battle start plus ten more from the hits");
         Assertions.assertEquals(2, f.argenti.ruleEffectMaxStacksBonus("talent_stack_basic"),
                 "…and the amendment is filed against the named rule — the mechanism, not a coincidence");

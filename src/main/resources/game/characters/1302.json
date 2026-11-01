@@ -46,12 +46,12 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.025,
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
           "times_from": "hit_count",
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "TALENT:1"
         }
       ],
       "source": "1302 银枝 天赋 崇高的客体 (130204, Enhance): 「施放普攻、战技、终结技时，每击中1个敌方目标，为银枝恢复3点能量并获得1层【升格】，使银枝暴击率提高2.50%，该效果最多叠加10层。」 数据行 Lv10 = [3, 0.025, 10] → #1 = 3 能量、#2 = 0.025、#3 = 10 层",
@@ -73,12 +73,12 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.025,
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
           "times_from": "hit_count",
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "TALENT:1"
         }
       ],
       "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之二（战技）",
@@ -100,12 +100,12 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.025,
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
           "times_from": "hit_count",
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "TALENT:1"
         }
       ],
       "source": "1302 银枝 天赋: 「施放普攻、战技、终结技时…」 之三（终结技）",
@@ -121,11 +121,11 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.025,
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "TALENT:1"
         }
       ],
       "source": "1302 银枝 行迹 虔诚 (1302101): 「回合开始时，立即获得1层【升格】。」",
@@ -193,20 +193,20 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.025,
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "TALENT:1"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.025,
           "max_stacks": 10,
           "buff": "升格",
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "percent_from_skill_param": "TALENT:1"
         },
         {
           "op": "MODIFY_RULE",
@@ -338,8 +338,5 @@
       "source": "1302 银枝 强化终结技: 施放后能量归零 ⇒ 强化形态必须换回普通行 ✓",
       "_note": "施放终结技后把替换摘掉 ✓（`remove: true`，与 1111 的天赋结束同形 ✓）。"
     }
-  ],
-  "_gaps": [
-    "每层升格的暴击率（天赋 #2，Lv1 0.01 / Lv10 0.025）**暂时保留字面值**：改成 `percent_from_skill_param: TALENT:1` 后，`ArgentiStacksTest` 的「E4 上限」用例从 0.35 变成 0.38（14 层 ⇒ 预期 0.35），说明改读行后**层数记账变了**（疑似两层同形修饰的合并/身份判定），需要先查清再改；数值本身（0.025）是对的 ✓"
   ]
 }
