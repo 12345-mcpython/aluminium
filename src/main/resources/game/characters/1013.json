@@ -104,6 +104,44 @@
       ],
       "source": "1013 星魂 6: > 施放终结技后，攻击力提高25%，持续1回合。",
       "_note": "「> 施放终结技后，攻击力提高25%，持续1回合。」—— ① 触发 **`ULT_CAST`** ✓、作用域 **`self`** ✓、时长 **1 回合** ✓；② ⭐ **数值经数据核实** ✓：`data/eidolons.json` 的 **1013 → rank \"6\"** 行 `param = [0.25, 1]` ✓，且与文档**逐字一致** ✓；③ ⚠ **平值型** ⇒ `percent` 按 `baseValue()` 缩放 ✓，基准取规则生效后 ✓（第 125/133 轮）；④ ⚠ **星魂内容按\"已激活\"写成普通规则** ✓（先例：1013 的 `eidolon4_*` ✓、1222 与 1107 的星魂 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1013 星魂 3: 等级加成（数据 skill_add_level: 101301=COMMON+1, 101302=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1013 星魂 5: 等级加成（数据 skill_add_level: 101303=ULTRA+2, 101304=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

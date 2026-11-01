@@ -45,7 +45,7 @@ public class WeltTest {
         var table = TriggerTables.of(WELT);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the slow-gated talent");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }
 
     private static final class Fixture {

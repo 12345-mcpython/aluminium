@@ -66,7 +66,7 @@ public class LynxTest {
         var table = TriggerTables.of(LYNX);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the state and the base regeneration");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the cleanse and the regeneration half");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }
 
     // ==================================================================

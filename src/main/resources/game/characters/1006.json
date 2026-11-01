@@ -70,7 +70,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "RESISTANCE_REDUCTION",
           "percent": 0.1,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "turns": 2,
           "target": "target"
         }
@@ -93,6 +93,44 @@
         }
       ],
       "_note": "「为指定敌方单体目标添加 1 个场上我方目标持有属性的弱点…持续 2 回合」—— ⭐2026-09-30 转正 ✓：技能说明给了答案 「优先添加我方编队第一位角色持有属性的弱点」⇒ element: party_first ✓（cacb8b8）；时长 \turns: 2 ✓（95ff510，按**目标自己的回合**递减）。⚠ 仍登记（同一句）：② 「该弱点对应属性的抗性降低 20%」✗（**按具体属性**减抗 ✗ —— RESISTANCE_REDUCTION 偏全属性）；③ 「若添加的是原有属性则不触发」✗（可用 Enemy.isWeakTo 表达 ✓ —— **待动**）；④ 「仅保留最新」✗；⑤ 「被消灭时转移」✗。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1006 星魂 3: 等级加成（数据 skill_add_level: 100602=SKILL+2, 100604=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1006 星魂 5: 等级加成（数据 skill_add_level: 100601=COMMON+1, 100603=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

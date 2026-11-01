@@ -119,6 +119,44 @@
       ],
       "source": "1205 刃 星魂 2 支离旧梦，万端遗恨: 「刃处于【地狱变】状态时，暴击率提高#1[i]%」（param = [0.15]）",
       "_note": "数值取自 `data/eidolons.json` 的 **1205 → rank \"2\"** 行 ✓，且该行的 `desc` **与从句逐字一致** ✓（这是本轮的归属确认方式 ✓ —— 按**小节标题切块**取从句 ✓，再用**数据行自己的 `desc`** 反证 ✓）。⚠ **`param = [0.15]` 本身就是份额** ✓（无需归一化 ✓）。⭐ 触发 **`TURN_START` + `on_any: SKILL_CAST`**：状态由战技规则挂上（同文件 `skill_hellscape_state` ✓，持续 3 回合 ✓），`turns: 1` ⇒ **状态在、效果在** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1205 星魂 3: 等级加成（数据 skill_add_level: 120503=ULTRA+2, 120504=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1205 星魂 5: 等级加成（数据 skill_add_level: 120501=COMMON+1, 120502=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

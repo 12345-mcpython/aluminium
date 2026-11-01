@@ -71,7 +71,7 @@ public class TingyunTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the grant and the boost");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the basic-attack bonus trace");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the energy trace");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }
 
     private static final class Fixture {

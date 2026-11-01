@@ -56,7 +56,7 @@ public class PelaDebuffTest {
         Fixture f = new Fixture();
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get() > 0,
                 "「while Pela is on the field, the effect hit rate of all of our side is increased by 10%」");
-        Assertions.assertEquals(2, TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1,
+        Assertions.assertEquals(4, TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1,
                 "census: the Secret Strategy (秘策) rule, the level-convention rule, and (2026-09-29) the technique's "
                         + "「defence reduced by 20%」 which rolls a base chance");
     }
@@ -113,3 +113,4 @@ public class PelaDebuffTest {
         return BattleFixture.alwaysRoll(0.0);
     }
 }
+

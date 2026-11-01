@@ -91,9 +91,18 @@
     {
       "on": "TURN_START",
       "id": "talent_turn_counter",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "ADD_STACK", "buff": "自身回合数", "amount": 1, "max_stacks": 99, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "自身回合数",
+          "amount": 1,
+          "max_stacks": 99,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1009 艾丝妲 天赋: 「从自身的第2回合开始，艾丝妲每回合开始时蓄能层数减少3层。」 param Lv10 = [0.14, 5, 3]",
       "_note": "「从自身的**第 2 回合**开始」需要一个「这是她第几回合」的计数 ⇒ 用 `TURN_START` + `ADD_STACK 自身回合数` 自建 ✓（规则按文件顺序执行，所以下面的减层规则读到的计数**已包含本回合** ✓）。"
@@ -101,9 +110,17 @@
     {
       "on": "TURN_START",
       "id": "talent_charge_decays_from_second_turn",
-      "when": ["actor == self", "self_stacks:自身回合数 >= 2"],
+      "when": [
+        "actor == self",
+        "self_stacks:自身回合数 >= 2"
+      ],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "蓄能", "amount": 3, "target": "self" }
+        {
+          "op": "REMOVE_STACK",
+          "buff": "蓄能",
+          "amount": 3,
+          "target": "self"
+        }
       ],
       "source": "1009 艾丝妲 天赋: 「从自身的第2回合开始，艾丝妲每回合开始时蓄能层数减少3层。」",
       "_note": "「从自身的**第 2 回合**开始，每回合开始**减少 3 层**」—— 条件 `self_stacks:自身回合数 >= 2` ✓（计数由上一行规则在本回合已加过 ✓，所以第 2 回合恰好成立 ✓）；扣层 `REMOVE_STACK amount: 3` ✓。"
@@ -112,7 +129,16 @@
       "on": "BATTLE_START",
       "id": "talent_charge_raises_all_attack",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.14, "per_stack": "self_stacks:蓄能", "per_stack_cap": 5, "per_stack_live": true, "permanent": true, "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.14,
+          "per_stack": "self_stacks:蓄能",
+          "per_stack_cap": 5,
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "all_allies"
+        }
       ],
       "source": "1009 艾丝妲 天赋 流星群: 「每拥有1层蓄能，会使我方全体攻击力提高14.00%，该效果最多叠加5层。」 param Lv10 = [0.14, 5, 3]",
       "_note": "「每拥有 **1 层**蓄能，使我方**全体**攻击力提高 **14%**，该效果**最多叠加 5 层**」—— ① `per_stack: **self_stacks:蓄能**`（层数在**她**身上、修饰在**全体**身上 ⇒ 必须用「规则主人」的前缀；裸名字读的是**每个目标的**层数 ✗） + **`per_stack_live: true`** ✓（层数会在战斗中变化 ⇒ 必须实时读 ✓）；② **`per_stack_cap: 5`** ✓ —— 句子封的是**这份加成**（层数本身可以更多）⇒ 用新字段而不是把计数器卡在 5 ✗；③ `target: all_allies` ✓（「我方全体」包含她自己 ✓）。"
@@ -120,9 +146,19 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "talent_charge_on_fire_weakness",
-      "when": ["actor == self", "target has_weakness Fire"],
+      "when": [
+        "actor == self",
+        "target has_weakness Fire"
+      ],
       "do": [
-        { "op": "ADD_STACK", "buff": "蓄能", "amount": 1, "max_stacks": 99, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "蓄能",
+          "amount": 1,
+          "max_stacks": 99,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1009 艾丝妲 天赋 流星群: 「每击中1名不同的敌方目标获得1层蓄能，若受到攻击的敌方目标弱点为火属性，则额外获得1层蓄能。」 param Lv10 = [0.14, 5, 3]",
       "_note": "「若受到攻击的敌方目标**弱点为火属性**，则**额外**获得 **1 层**蓄能」—— ① 事件 `DEALING_DAMAGE` ✓（打在谁身上就判谁 ✓）+ 条件 **`target has_weakness Fire`** ✓（现成的弱点条件）；② `actor == self` ✓（「艾丝妲」自己的攻击）；③ `ADD_STACK 蓄能 1` ✓（**额外**的那一层；基础那层仍开，见 `_gaps`）。"
@@ -130,12 +166,60 @@
     {
       "on": "ALLY_ATTACK",
       "id": "talent_charge_per_distinct_target",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "ADD_STACK", "buff": "蓄能", "amount": 1, "max_stacks": 99, "permanent": true, "times_from": "distinct_hit_targets", "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "蓄能",
+          "amount": 1,
+          "max_stacks": 99,
+          "permanent": true,
+          "times_from": "distinct_hit_targets",
+          "target": "self"
+        }
       ],
       "source": "1009 艾丝妲 天赋 流星群: 「每击中1名不同的敌方目标获得1层蓄能…」 param Lv10 = [0.14, 5, 3]",
       "_note": "「每击中 **1 名不同**的敌方目标获得 **1 层**蓄能」—— ① 事件 `ALLY_ATTACK` ✓（一次施放一条事件）；② **`times_from: distinct_hit_targets`** ✓ —— 数的是**命中集合里的不同敌人**（同一目标多段只算 1 ✓），而不是 `hit_count`（那是命中次数 ✗）；③ 目标 `self` ✓（层数在她自己身上）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1009 星魂 3: 等级加成（数据 skill_add_level: 100902=SKILL+2, 100904=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1009 星魂 5: 等级加成（数据 skill_add_level: 100901=COMMON+1, 100903=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

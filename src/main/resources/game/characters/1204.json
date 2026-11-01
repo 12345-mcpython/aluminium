@@ -53,6 +53,44 @@
       ],
       "source": "1204 景元 行迹 遣将: 「施放战技后，暴击率提升10%，持续2回合」（数值取自 skill_traces.json 的 1204 行迹数据）",
       "_note": "「施放**战技后**，**暴击率提升 10.0%**，持续 **2 回合**」—— ① 属性键 **`CRIT_CHANCE`** ✓（**照抄 1209 的既有出货** ✓；⚠ `CRIT_ATTACK` 是**暴击伤害** ✗，不是暴击率 ✓）；② 触发 `SKILL_CAST` + `actor == self` ✓、作用域 `self` ✓、时长 **2 回合** ✓；③ ⭐ **数值来自数据** ✓（`skill_traces.json` 的 1204 行迹 ✓，脚本先打印再断言 ✓，**取不到就拒绝出货** ✓）；⚠ ④ **登记**：他的**神君**相关从句全部受阻 ✗ —— 战技「增加 2 段【神君】下回合的攻击段数」✗、天赋「【神君】行动后，景元的普攻/战技/终结技造成的伤害提高 20%，持续 2 回合」✗、（引擎**没有神君的面板** ✗ ⇒ 段数与\"神君行动后\"都没有可指名的主体 ✗）；⚠ ⑤ 神君**自身的伤害**由引擎按技能数据计算 ✓（不属内容 ✓），其余技能/星魂**尚未编写** ✓。 ⚠ ⑥ **数值已按数据改正** ✓：首版从正文抄了 10% ✗ ⇒ 脚本**取出 `trace_id 1204103` 自己的 `param`** ✓ （`[0.1, 2.0]` ✓）⇒ 内容与判据都改为 **0.1 / 2 回合** ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1204 星魂 3: 等级加成（数据 skill_add_level: 120401=COMMON+1, 120403=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1204 星魂 5: 等级加成（数据 skill_add_level: 120402=SKILL+2, 120404=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }
