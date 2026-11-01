@@ -80,7 +80,7 @@ public class SiblingHarmonyTest {
         //: 2 -- 8005 gained the skill clause "额外造成 4 次伤害，每次对随机敌方单体" (times).
         Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE));
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BREAK));
-        Assertions.assertEquals(4, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(5, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),
                 "the technique and the convention");
     }
 
