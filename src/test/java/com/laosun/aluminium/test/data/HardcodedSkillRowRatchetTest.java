@@ -32,7 +32,7 @@ public class HardcodedSkillRowRatchetTest {
      * numbers a character TRACE states are no longer reported (52 of the original 219 were trace constants, which are not
      * leveled and therefore exact). Lowering it is progress; raising it is the fault this test exists to catch.
      */
-    private static final int BASELINE = 158;
+    private static final int BASELINE = 156;
 
     private static final Set<String> MAGNITUDE_OPS = Set.of(
             "DAMAGE", "HEAL", "SHIELD", "APPLY_DOT", "APPLY_REGEN", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN",
