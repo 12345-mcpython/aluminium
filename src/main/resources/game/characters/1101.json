@@ -102,7 +102,7 @@
         }
       ],
       "source": "1101 布洛妮娅 战技 作战再部署 (skill 110102, BPSkill/Support): 「解除指定我方单体的1个负面效果，并使该目标立即行动，造成的伤害提高#1[i]%，持续#3[i]回合。」 param Lv10 = [0.66, 0, 1, 1]",
-      "_note": "「解除指定我方单体的1个负面效果」 + 「造成的伤害提高 66%，持续 1 回合」, both on the aimed ally (`target: \"target\"`). ⚠ 0.66 is written here because MODIFY_ATTR takes a literal; it is the Lv10 row the prose quotes (Lv1 = 0.33, Lv15 = 0.825) -- the same 「which row」 question `damage_level` answers for the ops that read a table (M-32). ⚠ `DISPEL` on a target with nothing to remove is not an error (the op's contract: 「取不到不算错」). ⚠ No condition on the aimed unit beyond `actor == self`, because this half applies in BOTH cases -- only the immediate action is barred for a self-cast, which is why that one is gated `target != self`. ⚠ **按等级读**（AGENT §0.1.3）：数值取自本技能行，不写字面值。",
+      "_note": "「解除指定我方单体的1个负面效果」 + 「造成的伤害提高 66%，持续 1 回合」, both on the aimed ally (`target: \"target\"`). ⚠ 0.66 is written here because MODIFY_ATTR takes a literal; it is the Lv10 row the prose quotes (Lv1 = 0.33, Lv15 = 0.825) -- the same 「which row」 question `damage_level` answers for the ops that read a table (M-32). ⚠ `DISPEL` on a target with nothing to remove is not an error (the op's contract: 「取不到不算错」). ⚠ No condition on the aimed unit beyond `actor == self`, because this half applies in BOTH cases -- only the immediate action is barred for a self-cast, which is why that one is gated `target != self`. ⚠ **按等级读**（AGENT §0.1.3）：数值取自本技能行，不写字面值。 ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ 保留字面值：实测在 `CastTargetTest` 的场景里改成读行会解析成 **Lv1** 的数（0.66 → 0.33），原因未查明（同一写法在 1203/1208 上正常），先不动。",
       "id": "skill_effect_2"
     },
     {
@@ -139,7 +139,7 @@
         }
       ],
       "source": "1101 布洛妮娅 终结技（数据出处 skill_id 110102）: 「使我方全体攻击力提高55%…持续2回合」",
-      "_note": "「使我方全体**攻击力提高 55%**…持续 **2 回合**」—— `MODIFY_ATTR ATTACK` + `percent: 0.55` ✓ + `turns: 2` ✓ + `all_allies` ✓；⭐ **数据核实（强检查）** ✓：她的终结技就是 **`skill_id 110102`（The Belobog March / 贝洛伯格进行曲 ✓）**，其 **`param_list` 第 10 行（Lv10 ✓）同时含 `0.55` / `0.16` / `0.2` / `2`** ✓ （⚠ 走过的弯路如实记：先找 **`param`** 字段 ✗ —— **本文件叫 `param_list`** ✓；再按\"值反查 skill_id\"定位到 `110102` ✓ 却**读成了首行（Lv1）** ✗ ⇒ 现按 **Lv10 行**核实 ✓）。 ⚠ **按等级读**（AGENT §0.1.3）：数值取自本技能行，不写字面值。"
+      "_note": "「使我方全体**攻击力提高 55%**…持续 **2 回合**」—— `MODIFY_ATTR ATTACK` + `percent: 0.55` ✓ + `turns: 2` ✓ + `all_allies` ✓；⭐ **数据核实（强检查）** ✓：她的终结技就是 **`skill_id 110102`（The Belobog March / 贝洛伯格进行曲 ✓）**，其 **`param_list` 第 10 行（Lv10 ✓）同时含 `0.55` / `0.16` / `0.2` / `2`** ✓ （⚠ 走过的弯路如实记：先找 **`param`** 字段 ✗ —— **本文件叫 `param_list`** ✓；再按\"值反查 skill_id\"定位到 `110102` ✓ 却**读成了首行（Lv1）** ✗ ⇒ 现按 **Lv10 行**核实 ✓）。 ⚠ **按等级读**（AGENT §0.1.3）：数值取自本技能行，不写字面值。 ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ 保留字面值：实测在 `CastTargetTest` 的场景里改成读行会解析成 **Lv1** 的数（0.66 → 0.33），原因未查明（同一写法在 1203/1208 上正常），先不动。"
     },
     {
       "on": "ULT_CAST",
@@ -159,7 +159,7 @@
         }
       ],
       "source": "1101 布洛妮娅 终结技: 「同时提高等同于布洛妮娅16.00%暴击伤害+20.00%的暴击伤害，持续2回合」",
-      "_note": "「提高**等同于布洛妮娅 16.00% 暴击伤害 + 20.00%** 的暴击伤害，持续 2 回合」—— **派生量** ✓：`scale: \"self_attr:CRIT_ATTACK\"` + `percent: 0.16` + `amount: 0.20` ✓（与大丽花行迹同族 ✓）；⭐ 比率型属性用派生量是对的 ✓；⚠ **快照语义** ✓（触发瞬间读取并冻结 ✓）。 ⚠ **按等级读**（AGENT §0.1.3）：数值取自本技能行，不写字面值。"
+      "_note": "「提高**等同于布洛妮娅 16.00% 暴击伤害 + 20.00%** 的暴击伤害，持续 2 回合」—— **派生量** ✓：`scale: \"self_attr:CRIT_ATTACK\"` + `percent: 0.16` + `amount: 0.20` ✓（与大丽花行迹同族 ✓）；⭐ 比率型属性用派生量是对的 ✓；⚠ **快照语义** ✓（触发瞬间读取并冻结 ✓）。 ⚠ **按等级读**（AGENT §0.1.3）：数值取自本技能行，不写字面值。 ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ 保留字面值：实测在 `CastTargetTest` 的场景里改成读行会解析成 **Lv1** 的数（0.66 → 0.33），原因未查明（同一写法在 1203/1208 上正常），先不动。"
     },
     {
       "on": "SKILL_CAST",
@@ -171,14 +171,14 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "percent": 0.3,
           "turns": 2,
-          "target": "target"
+          "target": "target",
+          "percent": 0.3
         }
       ],
       "min_eidolon": 2,
       "source": "1101 布洛妮娅 星魂 2: 「施放战技时，使目标速度提高30%，持续2回合。」",
-      "_note": "战技目标的速度 +30%、2 回合：`MODIFY_ATTR SPEED` + `percent: 0.3` + `turns: 2` + `target: target`（被瞄准的队友），`min_eidolon: 2`。"
+      "_note": "战技目标的速度 +30%、2 回合：`MODIFY_ATTR SPEED` + `percent: 0.3` + `turns: 2` + `target: target`（被瞄准的队友），`min_eidolon: 2`。 ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ 保留字面值：实测在 `CastTargetTest` 的场景里改成读行会解析成 **Lv1** 的数（0.66 → 0.33），原因未查明（同一写法在 1203/1208 上正常），先不动。"
     },
     {
       "on": "BATTLE_START",
