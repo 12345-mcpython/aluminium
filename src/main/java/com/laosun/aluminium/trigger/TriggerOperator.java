@@ -48,6 +48,11 @@ public enum TriggerOperator {
     DAMAGE(true),
     DELEGATE_DAMAGE(true),
     DELAY(true),
+    /**
+     * "本次攻击无视弱点属性削减敌方的韧性" (1214 Ultimate): the cast still reports throw, but the weakness gate stops
+     * refusing it. Read by SkillExecutor where a nominal reduction becomes a settled one.
+     */
+    IGNORE_WEAKNESS(true),
     DISMISS_SUMMON(true),
     DISPEL(true),
     EXTEND_BUFF(true),

@@ -912,6 +912,34 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return skillBonuses.hitBonus(slot);
     }
 
+    /**
+     * How many of this unit's NEXT casts may ignore the weakness gate.
+     *
+     * <p>"本次攻击无视弱点属性削减敌方的韧性" (1214 Ultimate): a cast is a whole action, so the count is per cast, and the
+     * executor consumes one when it settles a hit that would otherwise be refused. A counter rather than a boolean for the
+     * same reason every other lifetime here is explicit: a flag never cleared would silently make the rest of the battle
+     * ignore every weakness.
+     */
+    private int ignoreWeaknessCasts;
+
+    /** @param casts how many of the next casts ignore the weakness gate */
+    public void markIgnoreWeaknessCasts(int casts) {
+        ignoreWeaknessCasts = Math.max(0, ignoreWeaknessCasts + casts);
+    }
+
+    /** @return whether the next cast may ignore the weakness gate */
+    public boolean ignoresWeaknessThisCast() {
+        return ignoreWeaknessCasts > 0;
+    }
+
+    /** Spends one such cast, called once the executor has used it. */
+    public void consumeIgnoreWeaknessCast() {
+        if (ignoreWeaknessCasts > 0) {
+            ignoreWeaknessCasts--;
+        }
+    }
+
+
     public void raiseSkillLevel(SkillType slot, int delta) {
         skillBonuses.raiseLevel(slot, delta);
     }
