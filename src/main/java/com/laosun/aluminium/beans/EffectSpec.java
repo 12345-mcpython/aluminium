@@ -148,6 +148,7 @@ public class EffectSpec {
         copy.scopeElement = this.scopeElement;
         copy.fromSelf = this.fromSelf;
         copy.remove = this.remove;
+        copy.scaleByMissingHp = this.scaleByMissingHp;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -576,6 +577,13 @@ public class EffectSpec {
      */
     @SerializedName("remove")
     private Boolean remove;
+
+    /**
+     * {@code REGISTER_HEAL_BONUS} with this flag makes {@code percent} a ceiling scaled by how hurt the recipient is:
+     * {@code percent * (1 - hp%)}. Reader: 1217 Eidolon 4 - "the lower the target current HP, the more healing, up to 80%".
+     */
+    @SerializedName("scale_by_missing_hp")
+    private Boolean scaleByMissingHp;
 
     /**
      * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory}.

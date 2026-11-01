@@ -22,8 +22,8 @@ public final class ConditionalHealBonuses {
      * @param condition the parsed condition
      * @param percent   the multiplier bonus
      */
-    public void add(TriggerTable.Condition condition, double percent) {
-        bonuses.add(new CanHit.ConditionalHealBonus(condition, percent));
+    public void add(TriggerTable.Condition condition, double percent, boolean scaleByMissingHp) {
+        bonuses.add(new CanHit.ConditionalHealBonus(condition, percent, scaleByMissingHp));
     }
 
     /**

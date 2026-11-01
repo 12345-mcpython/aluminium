@@ -989,7 +989,8 @@ public final class TriggerInterpreter {
             return;
         }
         List<TriggerTable.Condition> conditions = ctx.targetFilter();
-        if (conditions == null || conditions.isEmpty()) {
+        boolean scaleByMissingHp = Boolean.TRUE.equals(effect.getScaleByMissingHp());
+        if ((conditions == null || conditions.isEmpty()) && !scaleByMissingHp) {
             // A bonus with no condition would apply to every heal, which is exactly the wrong number this op exists
             // to avoid. Refused loudly rather than registered unconditionally.
             throw new IllegalStateException(
@@ -997,8 +998,12 @@ public final class TriggerInterpreter {
                             + "(an unconditional version would raise every heal, including on a full-HP ally)");
         }
         double percent = effect.getPercent() == null ? 0 : effect.getPercent();
+        if (conditions == null || conditions.isEmpty()) {
+            owner.addConditionalHealBonus(null, percent, true);
+            return;
+        }
         for (TriggerTable.Condition condition : conditions) {
-            owner.addConditionalHealBonus(condition, percent);
+            owner.addConditionalHealBonus(condition, percent, scaleByMissingHp);
         }
     }
 
@@ -2669,3 +2674,4 @@ public final class TriggerInterpreter {
         return total;
     }
 }
+
