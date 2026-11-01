@@ -2531,6 +2531,11 @@ public final class TriggerInterpreter {
         if ("event_amount".equals(from)) {
             return (int) Math.abs(ctx.amount());
         }
+        if ("distinct_hit_targets".equals(from)) {
+            // "每击中 1 名**不同**的敌方目标": counting the hit TARGETS, not the hits - a three-hit combo on one enemy is one
+            // target, which `hit_count` would read as three. Reader: 1009 Asta's charge.
+            return (int) ctx.attackHitTargets().stream().distinct().count();
+        }
         if ("hit_count".equals(from)) {
             // "for each 1 target attacked, ..." (readers: 1403 Tribbie (缇宝)'s zone rider, 1302's talent stack): the
             // repeat count is how many targets this attack connected with. It belongs HERE and not in `per_target`,
