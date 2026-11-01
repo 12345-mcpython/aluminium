@@ -391,6 +391,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 ```
 
 - `REDUCE_TOUGHNESS` 是**声明了但还没实现**的 op；写它会装载期报错并说明原因。
+- `REPLACE_SKILL` 有两个方向：**装上**（`skill` + `skill_id` + 一个寿命）与 **`"remove": true`**（把该槽位的替换取下、恢复原来的行；不带 `skill_id`、不带寿命）。重复装上**同一**替换是 no-op（否则第二个会把强化行记成「原始」，卸下时反而装回去）。读者：1111 卢卡「≥2 层时强化 / <2 层时恢复」
 - **每个 op 的参数以 `TriggerInterpreter` 的类注释为准**，本文不复制。
 
 ### 5.2 目标（`target`）
