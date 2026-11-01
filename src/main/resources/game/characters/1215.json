@@ -38,7 +38,7 @@
           "buff": "敕令",
           "turns": 2,
           "target": "target",
-          "percent_from_skill_param": "ULTRA:0"
+          "percent": 0.6
         },
         {
           "op": "APPLY_BUFF",
@@ -80,7 +80,7 @@
           "attribute": "SPEED",
           "turns": 1,
           "target": "self",
-          "percent_from_skill_param": "ULTRA:2"
+          "percent": 0.2
         }
       ],
       "min_eidolon": 2,
