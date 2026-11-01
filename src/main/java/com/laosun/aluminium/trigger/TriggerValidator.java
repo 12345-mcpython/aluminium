@@ -1209,6 +1209,19 @@ final class TriggerValidator {
                                     + spec.getOn() + " (source: " + spec.getSource() + ")");
                 }
             }
+            case SHARE_DAMAGE -> {
+                requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
+                requirePercent(effect, op, spec);
+                if (effect.getPercent() <= 0 || effect.getPercent() >= 1) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states the share BORNE BY the target, so \"percent\" is a fraction in (0,1): "
+                                    + "0.65 = \"65% is shared\" (source: " + spec.getSource() + ")");
+                }
+                if (effect.getTarget() == null || effect.getTarget().isBlank()) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " needs a \"target\": the unit that bears the share (source: " + spec.getSource() + ")");
+                }
+            }
             case ADD_DAMAGE -> {
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
                 TriggerMagnitudes.scaleAttribute(effect, op, spec);
