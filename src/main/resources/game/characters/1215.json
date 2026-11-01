@@ -17,7 +17,7 @@
           "buff": "敕令",
           "turns": 2,
           "target": "target",
-          "percent_from_skill_param": "ULTRA:2"
+          "percent": 0.2
         },
         {
           "op": "MODIFY_ATTR",
