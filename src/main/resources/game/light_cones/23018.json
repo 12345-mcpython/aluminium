@@ -2,15 +2,7 @@
   "schema": 1,
   "light_cone": 23018,
   "1": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone23018_crit_damage",
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.36, "permanent": true, "target": "self" }
-      ],
-      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
-      "_note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
+
     {
       "on": "ULT_CAST",
       "id": "cone23018_ult_damage_per_energy",
@@ -31,15 +23,7 @@
     }
   ],
   "2": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone23018_crit_damage",
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.42, "permanent": true, "target": "self" }
-      ],
-      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
-      "_note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
+
     {
       "on": "ULT_CAST",
       "id": "cone23018_ult_damage_per_energy",
@@ -60,15 +44,7 @@
     }
   ],
   "3": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone23018_crit_damage",
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.48, "permanent": true, "target": "self" }
-      ],
-      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
-      "_note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
+
     {
       "on": "ULT_CAST",
       "id": "cone23018_ult_damage_per_energy",
@@ -89,15 +65,7 @@
     }
   ],
   "4": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone23018_crit_damage",
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.54, "permanent": true, "target": "self" }
-      ],
-      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
-      "_note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
+
     {
       "on": "ULT_CAST",
       "id": "cone23018_ult_damage_per_energy",
@@ -118,15 +86,7 @@
     }
   ],
   "5": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone23018_crit_damage",
-      "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.6, "permanent": true, "target": "self" }
-      ],
-      "source": "光锥 23018 片刻，留在眼底: 使装备者的暴击伤害提高#1[i]%。当装备者施放终结技时，根据装备者的能量上限，提高装备者终结技造成的伤害：每点能量提高#2[f2]%，最多计入#3[i]点。",
-      "_note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓。⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
+
     {
       "on": "ULT_CAST",
       "id": "cone23018_ult_damage_per_energy",
