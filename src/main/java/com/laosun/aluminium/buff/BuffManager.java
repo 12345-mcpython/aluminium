@@ -1056,7 +1056,11 @@ public class BuffManager {
         int count = 0;
         for (AbstractBuff buff : List.copyOf(buffs)) {
             if (wanted.equals(buff.getBuffName()) || (buff instanceof StackBuff stack
-                    && wanted.equals(stack.getBuffName()))) {
+                    && wanted.equals(stack.getBuffName()))
+                    // A DOT is named by its ELEMENT in the documents (FIRE -> 灼烧), and APPLY_DOT carries no `buff` for
+                    // getBuffName() to answer. Without this, counting layers of 风化/灼烧/裂伤 by name returns 0 for every
+                    // content-applied DOT - readers: `target_stacks:<DOT>` thresholds and 1108 Eidolon 2.
+                    || (buff instanceof DotBuff dot && wanted.equals(stateNameOf(dot.getElement())))) {
                 count++;
             }
         }
