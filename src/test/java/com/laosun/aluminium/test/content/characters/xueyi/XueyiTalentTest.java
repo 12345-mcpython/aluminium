@@ -60,6 +60,10 @@ public class XueyiTalentTest {
                 + " enemy hp " + hp + " -> " + enemy.getCurrentHp());
         Assertions.assertEquals(0, xueyi.getBuffManager().stacksOf(KARMA), "「消耗当前所有【恶报】」");
         Assertions.assertTrue(enemy.getCurrentHp() < hp, "the follow-up landed");
+        // 「本次追加攻击无法叠加【恶报】」: a rule-driven DAMAGE does not touch toughness at all, so the follow-up cannot
+        // report a reduction and cannot pay itself a stack. Asserted, not assumed.
+        Assertions.assertEquals(0, xueyi.getBuffManager().stacksOf(KARMA),
+                "「本次追加攻击无法叠加【恶报】」 - it reduces no toughness, so nothing is reported");
     }
 
     private static Battle battle() {
