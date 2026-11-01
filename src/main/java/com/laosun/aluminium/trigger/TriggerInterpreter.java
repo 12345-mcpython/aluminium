@@ -1716,7 +1716,7 @@ public final class TriggerInterpreter {
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 zone.setBuffName(effect.getBuff().trim());
             }
-            // "While the owner holds X": the modifier lives exactly as long as that state (see AbstractBuff.gateBroken).
+            // "每层【烬煨】使敌人受到的伤害提高 5%": a ZONE whose size follows a moving counter. The share is asked for at every\n            // settlement (`VulnerabilityBuff.makeLive`), which is the same shape the attribute path already has.\n            if (Boolean.TRUE.equals(effect.getPerStackLive()) && effect.getPerStack() != null\n                    && !effect.getPerStack().isBlank()) {\n                if (zone instanceof com.laosun.aluminium.buff.VulnerabilityBuff liveZone) {\n                    liveZone.makeLive(() -> percent * TriggerInterpreter.perStackFactor(effect, target, ctx));\n                } else if (zone instanceof com.laosun.aluminium.buff.ReductionBuff liveReduction) {\n                    liveReduction.makeLive(() -> -percent * TriggerInterpreter.perStackFactor(effect, target, ctx));\n                }\n            }\n            // "While the owner holds X": the modifier lives exactly as long as that state (see AbstractBuff.gateBroken).
             if (effect.getWhileState() != null && !effect.getWhileState().isBlank()) {
                 zone.gate(effect.getWhileState().trim(), ctx.owner());
             }

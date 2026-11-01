@@ -29,6 +29,25 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
 
     private final double ratio;
 
+    /**
+     * The share asked for at EVERY settlement, or {@code null} for a fixed {@link #ratio}.
+     */
+    private java.util.function.DoubleSupplier liveRatio;
+
+    /**
+     * @param share the live share, read at every settlement
+     */
+    public void makeLive(java.util.function.DoubleSupplier share) {
+        this.liveRatio = share;
+    }
+
+    /**
+     * @return the share to inject NOW
+     */
+    private double share() {
+        return liveRatio == null ? ratio : liveRatio.getAsDouble();
+    }
+
     public ReductionBuff(int duration, double ratio) {
         this(duration, ratio, false);
     }
@@ -97,6 +116,6 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
         if (!damage.isOnDefenderSide(owner)) {
             return;                                  // C-1: reduction only blocks "the hit I take", it does not weaken "the hit I deal"
         }
-        damage.addReduction(ratio, ModifierSource.BUFF, id);
+        damage.addReduction(share(), ModifierSource.BUFF, id);
     }
 }
