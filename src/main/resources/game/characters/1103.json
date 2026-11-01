@@ -9,22 +9,17 @@
       "do": [
         {
           "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
+          "skills": [
+            "COMMON",
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
           "amount": 9
         }
       ],
-      "source": "1103 希露瓦 技能表的**等级口径**: 文档引用的 140%/60%/180% 都是 Lv10 行（110301/110302/110303 的 Lv10 与 Lv1 分别是 1.4/0.5、[1.4,0.6]/[0.7,0.3]、1.8/1.08）",
-      "_note": "The file stating **which level its quoted numbers come from** (M-32). ⚠ Unlike 1215 — whose quoted numbers lived in rules that state their own magnitudes — 希露瓦's 140%/60%/180% are the engine's own skill execution, which reads `user.skillLevel(skill)`; without this rule the engine would deal the Lv1 rows (70%/30%/108%) while her document says Lv10. ⚠ So this is not bookkeeping here: it changes the damage the engine deals, which is exactly what 「文档引用的是哪一行」 means. ⚠ `TALENT` is deliberately absent: her talent's row is only read by the (registered) additional-damage clause, and nothing in this file reads it.",
+      "source": "1103 技能表的等级口径: 文档引用的是 Lv10 行（普攻/战技/终结技/天赋）",
+      "_note": "The file stating **which level its quoted numbers come from** (M-32). ⚠ Unlike 1215 — whose quoted numbers lived in rules that state their own magnitudes — 希露瓦's 140%/60%/180% are the engine's own skill execution, which reads `user.skillLevel(skill)`; without this rule the engine would deal the Lv1 rows (70%/30%/108%) while her document says Lv10. ⚠ So this is not bookkeeping here: it changes the damage the engine deals, which is exactly what 「文档引用的是哪一行」 means. ⚠ `TALENT` is deliberately absent: her talent's row is only read by the (registered) additional-damage clause, and nothing in this file reads it. ⚠ 原先**只钉了部分槽**（1103），没钉的槽仍在 Lv1，与规则里 Lv10 的数字不一致 ✗。现在四个槽一起钉到 Lv10 ✓（AGENT §0.2 第 24 条）。",
       "id": "level_convention"
     },
     {

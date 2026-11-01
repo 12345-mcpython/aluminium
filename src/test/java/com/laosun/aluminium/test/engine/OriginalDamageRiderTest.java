@@ -62,8 +62,10 @@ public class OriginalDamageRiderTest {
     public void hisEidolonSixShips() {
         double e6 = ultimateLoss(6);
         double e0 = ultimateLoss(0);
-        // measured again on 2026-10-19 after her three traces landed (道标/星火/灼热), with crit switched off below:
-        double ultimateOwnInstance = 933.7324506605253;
+        // The ULTIMATE's own instance, measured with crit switched off below. It moved from 933.73 to 1412.57 on
+        // 2026-10-31 when 1003 started pinning all four slots to the Lv10 row (the file used to pin only its Talent, so the
+        // Ultimate ran on row 1 while the rules restated Lv10 cells).
+        double ultimateOwnInstance = 1412.5696048454125;
         // ⚠ The toughness damage reduction reaches this clause in a shape worth writing down, measured (ratio 1.0000000004):
         // the rider is 2 x 40% of the ultimate's own instance and the two instances take the reduction ONCE between them.
         // That is not an accident of arithmetic - "the original damage" is read when DEALING_DAMAGE fires, which is step 1
