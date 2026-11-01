@@ -61,7 +61,8 @@ public class ImbibitorLunaeTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the per-hit stack");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST),
                 "the Squama grant: 「获得 2 个【逆鳞】」 - `amount` IS the layer count (the old note said otherwise)");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention plus Eidolons 3 and 5 (both are BATTLE_START)");
     }
 
     private static Random fixed() {
