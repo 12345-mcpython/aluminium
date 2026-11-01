@@ -147,6 +147,7 @@ public class EffectSpec {
         copy.damageType = this.damageType;
         copy.scopeElement = this.scopeElement;
         copy.fromSelf = this.fromSelf;
+        copy.remove = this.remove;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -565,6 +566,16 @@ public class EffectSpec {
      */
     @SerializedName("skill_id")
     private Integer skillId;
+
+    /**
+     * {@code REPLACE_SKILL} with {@code "remove": true} takes the swap off the named slot instead of installing one,
+     * putting back whatever was there before. Reader: 1111 Luka's 「当持有的【斗志】大于等于 2 层时，普攻强化为…」 - the
+     * sentence also says what happens <b>below</b> two layers (the ordinary attack is back), and a swap that can only be
+     * installed would keep the enhanced row forever, which is a wrong number with no symptom. The condition is the rule's
+     * own ({@code when}), so content states it once per direction rather than inventing a second op.
+     */
+    @SerializedName("remove")
+    private Boolean remove;
 
     /**
      * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory}.

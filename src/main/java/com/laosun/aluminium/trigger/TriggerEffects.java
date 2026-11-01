@@ -855,6 +855,33 @@ final class TriggerEffects {
                     "REPLACE_SKILL names the slot '" + effect.getSkill() + "', which is not one this engine knows; known: "
                             + java.util.Arrays.toString(SkillType.values()));
         }
+        // `remove: true` is the other direction: 「当持有的【斗志】小于 2 层时」 means the ordinary attack is back, and a swap
+        // that could only be installed would keep the enhanced row forever. Removing the swap restores the original row
+        // through SkillSwapBuff's own lifecycle, so there is no second restore path to keep in step.
+        if (Boolean.TRUE.equals(effect.getRemove())) {
+            for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                if (target instanceof com.laosun.aluminium.entity.Character character) {
+                    for (com.laosun.aluminium.buff.AbstractBuff buff
+                            : java.util.List.copyOf(character.getBuffManager().activeBuffs())) {
+                        if (buff instanceof com.laosun.aluminium.buff.SkillSwapBuff swap && swap.getSlot() == slot) {
+                            character.getBuffManager().removeBuff(buff);
+                        }
+                    }
+                }
+            }
+            return;
+        }
+        // Re-installing the SAME replacement is a no-op: a second SkillSwapBuff would capture the swapped skill as its
+        // "original" and put the enhanced row back on removal, which is the opposite of what `remove` means. A rule that
+        // keeps firing while the condition holds (1111's "at or above two layers") lands here on every attack.
+        for (com.laosun.aluminium.buff.AbstractBuff buff
+                : java.util.List.copyOf(owner.getBuffManager().activeBuffs())) {
+            if (buff instanceof com.laosun.aluminium.buff.SkillSwapBuff swap && swap.getSlot() == slot
+                    && swap.getReplacement() != null
+                    && swap.getReplacement().getSkillSlot() == effect.getSkillId()) {
+                return;
+            }
+        }
         // The replacement keeps the level the slot is currently at (the flow raises slot levels, and an enhanced attack
         // shares its slot's level rather than inventing one).
         Skill current = owner.getSkills().get(slot);
