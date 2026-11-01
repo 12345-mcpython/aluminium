@@ -5,7 +5,7 @@
   "_gaps": [
     "战技：65% 伤害分摊给符玄、符玄倒下解除穷观阵未写",
 
-    "秘技：大地图屏障 + 进战自动开启穷观阵未写",
+    "秘技的屏障本身（大地图屏障、抵挡敌人攻击不进入战斗）未写 —— 属大地图/秘技层",
     "星魂 2：致命伤害拦截 + 自身生命上限 70% 回复 + 单场 1 次未写；其余星魂未读"
   ],
   "rules": [
@@ -161,6 +161,18 @@
       ],
       "source": "1208 符玄 终结技 穷观阵: 「…并获得1次天赋的生命回复触发次数。」",
       "_note": "「获得 **1 次**天赋的生命回复触发次数」—— `ULT_CAST` + `actor == self` + `ADD_STACK 避厄治疗次` ✓，上限 **2** 与天赋的「最多可拥有 2 次」一致 ✓（到顶后不再加 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_starts_the_zone",
+      "when": ["self has_state 秘技"],
+      "do": [
+        { "op": "APPLY_BUFF", "buff": "鉴知", "turns": 2, "target": "all_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "scale": "self_attr:HEALTH", "percent": 0.06, "turns": 2, "target": "all_allies" },
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "turns": 2, "target": "all_allies" }
+      ],
+      "source": "1208 符玄 秘技 太微行棋: 「屏障持续期间进入战斗时符玄自动开启【穷观阵】，持续2回合。」 param = [20, 2]",
+      "_note": "「屏障持续期间**进入战斗时自动开启【穷观阵】，持续 2 回合**」—— 与战技那组**同形**（`鉴知` 状态 + 生命上限 6% + 暴击率 12% ✓），只是时长取秘技的 **2 回合** ✓（战技是 3 ✓）。⚠ 秘技的**屏障本身**（大地图效果、抵挡敌人攻击不进入战斗）**未写** ⇒ 见 `_gaps` ✓。"
     }
   ]
 }
