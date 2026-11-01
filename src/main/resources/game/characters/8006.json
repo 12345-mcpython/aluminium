@@ -3,7 +3,6 @@
   "character": 8006,
   "_status": "partial",
   "_gaps": [
-    "秘技：全队击破特攻 +30%、2 回合未写（8005 已写出）",
     "星魂 6：未读、未写"
   ],
   "rules": [
@@ -164,7 +163,7 @@
       "do": [
         {
           "op": "SUPER_BREAK",
-          "percent": 1.0,
+          "percent": 1,
           "target": "target"
         }
       ],
@@ -191,6 +190,24 @@
       ],
       "source": "8006 开拓者·虚数 战技: 「并额外造成 4 次伤害，每次对随机敌方单体造成 50% 攻击力虚数伤害。」",
       "_note": "⭐ **`times` 的第二个读者，也是 `8005` 的兄弟镜像** ✓ —— ⚠ 「额外造成4次伤害」在 **8005 与 8006 两份文档里都有** ✓（2026-09-30 实测 ✓）⇒ ⚠ 按 `SiblingHarmonyTest` 的宗旨（*mirrored where the two documents agree* ✓）本条与 8005 同名同形 ✓。⚠ 护栏与 8005 一致 ✓：`from_skill SKILL` ✓ ＋ **`damage_is_attack`** ✗（⚠ 不可省 —— 追加实例本身也是一次 `DEALING_DAMAGE` ✓，⚠ 无护栏会撞上递归上限 ✓，第 630 轮实测过 ✓）＋ `target: random_enemy` ＋ **`times: 4`** ✓。⚠ 本条的落地同时改了一处**被钉死的计数** ✓：`SuperBreakContentTest` 里 `8006` 的 `DEALING_DAMAGE` 条数 `1 → 2` ✓（⚠ 该处消息原文写的是*the file ONLY DEALING_DAMAGE rule* ✗，⚠ 一并改写以免消息本身变成假账 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_breaking_effect",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "8006 开拓者•同谐 秘技: 「使用秘技后，下一次战斗开始时使我方全体的击破特攻提高30%，持续2回合。」 param = [0.3, 2]",
+      "_note": "「使用秘技后，下一次战斗开始时使我方全体的**击破特攻提高 30%**，持续 **2 回合**」—— 与 8005 的同名规则**逐字段一致** ✓（兄弟角色的同一条秘技）；门槛 `self has_state 秘技` ✓。"
     }
   ]
 }
