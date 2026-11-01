@@ -455,6 +455,16 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 ⚠ 不写 `stance` ⇒ 行为与过去完全一致（不削韧）。⚠ `ignore_weakness` 只影响**削不削**，不影响伤害与击破元素。
 
+#### 5.3.1b `IGNORE_WEAKNESS`：让**这一次施放**无视弱点（2026-10-31）
+
+规则式 `DAMAGE` 用 `stance` / `ignoreWeakness` 处理「这一发」；而**技能自身**的削韧走 `SkillExecutor`，需要另一个开关：
+
+```json
+{ "op": "IGNORE_WEAKNESS", "amount": 1, "target": "self" }
+```
+
+挂在 `CAST_SETUP` + `from_category ULTRA`（或任何施放前的事件）上 ⇒ 这一发**无视弱点属性**照削韧性；`SkillExecutor` 在把名义削韧变成实际削韧时**读一次并消耗一次** ✓（只影响这一发，不会整场生效）。
+
 #### 5.3.2 一个表达式：`value`（优先）
 
 `value` 把整条数值写成一个**数值提供器**，求出来的数**已经是属性自己的单位**：
