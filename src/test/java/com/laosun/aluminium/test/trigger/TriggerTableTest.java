@@ -245,8 +245,8 @@ public class TriggerTableTest {
         Character himeko = CharacterFactory.create(1402, 80);
         Battle battle = newBattle(List.of(robin, himeko), 1);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)),
-                "only her Coloratura Cadenza (华彩花腔) trace listens to BATTLE_START");
+        Assertions.assertEquals(3, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)),
+                "her Coloratura Cadenza trace, plus the level convention both files now carry");
 
         Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, robin, null, 1, 0)),
                 "nothing in her file listens to BASIC_ATTACK: Basic ATK (普攻) is not Skill (战技)");

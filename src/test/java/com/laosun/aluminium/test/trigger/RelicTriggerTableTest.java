@@ -560,16 +560,16 @@ public class RelicTriggerTableTest {
                 RelicFactory.suit(PASSERBY, STAR, LEVEL));
 
         Assertions.assertNotNull(fourPieces.getTriggerTable(), "the trigger table is never null");
-        Assertions.assertEquals(3, fourPieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(4, fourPieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // three plus the level convention
                 "four pieces of set 101 must bring its battle-start rule");
 
         Character threePieces = CharacterFactory.create(NO_RULES, 80, true, null,
                 partialSuit(PASSERBY, RelicType.HEAD, RelicType.HAND, RelicType.BODY));
-        Assertions.assertEquals(2, threePieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // the character's own level Eidolons
+        Assertions.assertEquals(3, threePieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // its level Eidolons plus the level convention
                 "three pieces is one short of the 4-piece bonus");
 
         Character unequipped = CharacterFactory.create(NO_RULES, 80);
-        Assertions.assertEquals(2, unequipped.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(3, unequipped.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
                 "a character without relics behaves exactly as before relic rules existed");
         Assertions.assertSame(TriggerTables.of(NO_RULES), unequipped.getTriggerTable(),
                 "…which is literally its own (empty) table, not a merged copy");

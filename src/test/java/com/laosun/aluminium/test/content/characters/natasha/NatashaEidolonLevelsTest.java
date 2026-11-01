@@ -90,6 +90,12 @@ public class NatashaEidolonLevelsTest {
      * @return the levels this battle has raised that slot by
      */
     private static int bonus(SkillType slot, int eidolon) {
+        // The file carries the corpus-wide level convention (+9 to every slot, so every number matches the Lv10 row the
+        // document quotes), so this asks for the raise ABOVE rank 0 rather than the absolute bonus.
+        return level(slot, eidolon) - level(slot, 0);
+    }
+
+    private static int level(SkillType slot, int eidolon) {
         Character natasha = CharacterFactory.create(NATASHA, LEVEL, false, null, null, eidolon);
         Battle battle = new Battle(List.of(natasha),
                 List.of(EnemyFactory.create(MONSTER, LEVEL, 1)), BattleFixture.alwaysRoll(1.0));
