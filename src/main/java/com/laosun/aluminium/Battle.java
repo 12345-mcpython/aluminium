@@ -3162,7 +3162,13 @@ public class Battle {
      */
     public void addEnemy(CanHit enemy) {
         if (enemy != null) {
+            boolean newlyAdded = !enemyRoster.contains(enemy);
             enemyRoster.add(enemy);
+            if (newlyAdded && getStatus() != Status.NOT_STARTED) {
+                // 「在敌方目标进入战斗时」: an enemy that enters mid-battle. Before the battle starts a roster is simply
+                // laid out - nothing has entered yet.
+                fire(TriggerPayload.Simple.of(TriggerEvent.ENEMY_ENTERED, enemy, enemy, 0, 0));
+            }
         }
     }
 
@@ -3224,7 +3230,8 @@ public class Battle {
                             + "decide who it fights for");
         }
         List<CanHit> camp = unit.getCamp() == Camp.PLAYER ? allyRoster : enemyRoster;
-        if (!camp.contains(unit)) {
+        boolean newlyAdded = !camp.contains(unit);
+        if (newlyAdded) {
             camp.add(unit);
         }
         if (unit instanceof Character character && !characterRoster.contains(character)) {
@@ -3235,6 +3242,10 @@ public class Battle {
         // needs it too, otherwise a speed buff on it would never reorder the action bar.
         unit.setSpeedChangeListener(this::onSpeedChanged);
         unit.getBuffManager().setBattle(this);
+        if (newlyAdded && unit.getCamp() == Camp.ENEMY && getStatus() != Status.NOT_STARTED) {
+            // The sibling of the firing in `addEnemy`: an enemy admitted through the roster+queue door has also entered.
+            fire(TriggerPayload.Simple.of(TriggerEvent.ENEMY_ENTERED, unit, unit, 0, 0));
+        }
     }
 
     private void processAddRequests() {
