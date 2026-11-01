@@ -29,8 +29,8 @@ public class SilverWolfEidolonOneTest {
     public void eachDebuffPaysOnePoint() {
         // The Ultimate lands a debuff of its own, and the clause counts the target AFTER that - so the expectation is the
         // count at settlement time, not the one the fixture started with.
-        Assertions.assertEquals(4.0, gain(3), 1e-9, "three planted + the Ultimate's own = four points");
-        Assertions.assertEquals(2.0, gain(1), 1e-9, "one planted + the Ultimate's own = two points");
+        Assertions.assertEquals(28.0, gain(3), 1e-9, "four debuffs at 7 points each (under the five-trigger cap)");
+        Assertions.assertEquals(14.0, gain(1), 1e-9, "two debuffs at 7 points each");
     }
 
     /** @return how much MORE energy her Ultimate pays with the Eidolon than without, for that many debuffs */
@@ -63,9 +63,9 @@ public class SilverWolfEidolonOneTest {
         double three = boostWith(3, 6) - boostWith(3, 0);
         double seven = boostWith(5, 6) - boostWith(5, 0);
         System.out.println("[1006] E6 boost: 1 debuff " + one + ", 3 " + three + ", 5 " + seven);
-        Assertions.assertEquals(0.01, closer(one, 0.01), 0.01, "one debuff: 1%");
-        Assertions.assertEquals(0.03, closer(three, 0.03), 0.02, "three debuffs: 3%");
-        Assertions.assertEquals(0.05, closer(seven, 0.05), 0.02, "「最多提高 5%」");
+        Assertions.assertEquals(0.2, closer(one, 0.2), 0.02, "one debuff: 20%");
+        Assertions.assertEquals(0.6, closer(three, 0.6), 0.02, "three debuffs: 60%");
+        Assertions.assertEquals(1.0, closer(seven, 1.0), 0.02, "「最多提高 100%」");
     }
 
     /** The counts include the Ultimate-free path, so rounding noise is expected; compare loosely. */
