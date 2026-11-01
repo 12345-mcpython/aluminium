@@ -182,8 +182,18 @@ public class TriggerTable {
         for (List<CompiledRule> rules : byEvent.values()) {
             for (CompiledRule rule : rules) {
                 for (EffectSpec effect : rule.effects()) {
-                    if (effect.getBuff() != null && !effect.getBuff().isBlank() && isNameCreating(effect.getOp())) {
-                        createdNames.add(effect.getBuff().trim());
+                    if (isNameCreating(effect.getOp())) {
+                        String name = effect.getBuff();
+                        if ((name == null || name.isBlank()) && "APPLY_DOT".equalsIgnoreCase(effect.getOp())
+                                && effect.getElement() != null && !effect.getElement().isBlank()) {
+                            // A DOT names its state by ELEMENT (FIRE -> 灼烧): "5 layers of 风化" reads the layers that
+                            // element created, and the effect carries no `buff` to say so.
+                            name = com.laosun.aluminium.buff.BuffManager.dotStateName(
+                                    com.laosun.aluminium.enums.DamageElement.fromString(effect.getElement()));
+                        }
+                        if (name != null && !name.isBlank()) {
+                            createdNames.add(name.trim());
+                        }
                     }
                 }
                 for (Condition condition : rule.conditions()) {
@@ -294,7 +304,10 @@ public class TriggerTable {
         }
         TriggerOperator operator = TriggerOperator.parse(op);
         return switch (operator == null ? null : operator) {
-            case ADD_STACK, APPLY_BUFF, MODIFY_ATTR, RESIST_DEBUFF, SHIELD -> true;
+            // APPLY_DOT: a DOT that stacks is also a named counter - "the target has 5 or more layers of 风化" reads the
+            // APPLY_DOT: a DOT that stacks is also a named counter - "5 or more layers of 风化" reads the layers
+            // each application added, and the effect names it by element rather than by `buff`.
+            case ADD_STACK, APPLY_BUFF, APPLY_DOT, MODIFY_ATTR, RESIST_DEBUFF, SHIELD -> true;
             case null, default -> false;
         };
     }
