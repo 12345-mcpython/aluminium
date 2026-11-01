@@ -2714,6 +2714,14 @@ public final class TriggerInterpreter {
                     damageType == null ? DamageType.NORMAL : damageType, settledBase));
             return;
         }
+        // "天赋的追加攻击**无视弱点属性**削减敌方韧性" (1214's Eidolon 2 / Ultimate): a rule-driven instance never touched
+        // toughness before, so a clause that wants it to had no spelling. Opt-in through the effect, and the weakness
+        // gate is lifted only when the author says so.
+        if (effect.getStance() != null && victim instanceof com.laosun.aluminium.enemy.Enemy enemy
+                && battle != null && battle.enemies().contains(enemy)) {
+            battle.reduceToughness(attacker, enemy, TriggerMagnitudes.elementOf(effect, skill, attacker),
+                    effect.getStance(), null, Boolean.TRUE.equals(effect.getIgnoreWeakness()));
+        }
         battle.applyAdditionalDamage(attacker, victim, TriggerMagnitudes.elementOf(effect, skill, attacker), settledBase,
                 effect.getCritRate(), effect.getCritDamage(), damageType, effect.getCastCategory() == null
                         || effect.getCastCategory().isBlank() ? null

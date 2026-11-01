@@ -158,6 +158,8 @@ public class EffectSpec {
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
         copy.skillId = this.skillId;
+        copy.stance = this.stance;
+        copy.ignoreWeakness = this.ignoreWeakness;
         return copy;
     }
 
@@ -1522,6 +1524,19 @@ public class EffectSpec {
      */
     @SerializedName("cooldown")
     private Integer cooldown;
+
+    /**
+     * TOUGHNESS points this instance takes off ({@code "stance": 15}), or {@code null} for none.
+     *
+     * <p>"雪衣的天赋追加攻击…削减敌方韧性" (1214)：规则式 DAMAGE 历来**完全不碰韧性**，所以「让这一发削 N 点」
+     * 没有写法。{@code ignore_weakness: true} 让它**无视弱点属性**也照削（同一句的两个读者：星魂 2 与终结技）。
+     */
+    private Double stance;
+
+    /**
+     * Whether {@link #stance} applies even when the element is not one of the target's weaknesses.
+     */
+    private Boolean ignoreWeakness;
 
     /**
      * The stack cap, whichever spelling the rule used.

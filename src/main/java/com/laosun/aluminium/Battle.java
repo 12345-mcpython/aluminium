@@ -2170,6 +2170,16 @@ public class Battle {
     }
 
     /**
+     * The same, with the weakness gate lifted ("天赋的追加攻击**无视弱点属性**削减敌方韧性", 1214's Eidolon 2).
+     *
+     * @param ignoreWeakness whether a non-weakness element still takes toughness off
+     */
+    public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage,
+                                        SkillCategory fromCast, boolean ignoreWeakness) {
+        return breakService.reduce(attacker, enemy, element, stanceDamage, fromCast, ignoreWeakness);
+    }
+
+    /**
      * The result of one toughness reduction.
      *
      * <p>The two toughness reduction numbers always sum to this instance's nominal toughness reduction,
