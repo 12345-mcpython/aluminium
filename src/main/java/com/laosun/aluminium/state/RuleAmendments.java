@@ -19,6 +19,7 @@ public final class RuleAmendments {
     private final Map<String, Integer> effectTurns = new HashMap<>();
     private final Map<String, Integer> cooldownDelta = new HashMap<>();
     private final Map<String, Integer> effectMaxStacks = new HashMap<>();
+    private final Map<String, Integer> effectAmount = new HashMap<>();
 
     /**
      * @param ruleId the rule id
@@ -82,6 +83,16 @@ public final class RuleAmendments {
 
     /**
      * @param ruleId the rule id
+     * @param delta  the effect-amount amendment (layers an ``ADD_STACK`` grants)
+     */
+    public void addEffectAmount(String ruleId, int delta) {
+        if (ruleId != null && !ruleId.isBlank()) {
+            effectAmount.merge(ruleId.trim(), delta, Integer::sum);
+        }
+    }
+
+    /**
+     * @param ruleId the rule id
      * @param delta  the max-stacks amendment
      */
     public void addEffectMaxStacks(String ruleId, int delta) {
@@ -96,6 +107,14 @@ public final class RuleAmendments {
      */
     public int perTurn(String ruleId) {
         return ruleId == null || ruleId.isBlank() ? 0 : perTurn.getOrDefault(ruleId.trim(), 0);
+    }
+
+    /**
+     * @param ruleId the rule id
+     * @return the effect-amount amendment
+     */
+    public Integer effectAmount(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? null : effectAmount.get(ruleId.trim());
     }
 
     /**

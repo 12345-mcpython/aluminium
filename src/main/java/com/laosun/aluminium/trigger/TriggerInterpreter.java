@@ -562,7 +562,9 @@ public final class TriggerInterpreter {
         Double percentScale = owner.ruleEffectPercentScale(ctx.ruleId());
         Integer turnsDelta = owner.ruleEffectTurnsBonus(ctx.ruleId());
         Integer stacksDelta = owner.ruleEffectMaxStacksBonus(ctx.ruleId());
-        if (percentDelta == null && percentScale == null && turnsDelta == null && stacksDelta == null) {
+        Integer amountDelta = owner.ruleEffectAmountBonus(ctx.ruleId());
+        if (percentDelta == null && percentScale == null && turnsDelta == null && stacksDelta == null
+                && amountDelta == null) {
             return effect;
         }
         EffectSpec amended = effect;
@@ -581,6 +583,10 @@ public final class TriggerInterpreter {
         }
         if (stacksDelta != null) {
             amended = amended.withMaxStacks(stacksDelta);
+        }
+        if (amountDelta != null) {
+            // "本次叠加的层数额外 +1": the LAYER COUNT of an application, not its share.
+            amended = amended.withAmount(amountDelta);
         }
         return amended;
     }
@@ -2228,6 +2234,9 @@ public final class TriggerInterpreter {
             owner.amendRuleEffectPercent(target, effect.getEffectPercent());
         } else if (effect.getEffectPercentScale() != null) {
             owner.amendRuleEffectPercentScale(target, effect.getEffectPercentScale());
+        } else if (effect.getEffectAmount() != null) {
+            // "本次叠加的层数额外 +1 层": the LAYER COUNT an application grants.
+            owner.amendRuleEffectAmount(target, effect.getEffectAmount());
         } else if (effect.getEffectPercentFromResource() != null) {
             // The SAME amendment, sized by a resource in basis points (reader: 114151"for each 1% of overflow spent...").
             int basisPoints = resourceAmount(ctx.battle(), owner, effect.getEffectPercentFromResource().trim());

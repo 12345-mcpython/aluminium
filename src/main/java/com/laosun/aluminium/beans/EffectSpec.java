@@ -145,6 +145,7 @@ public class EffectSpec {
         copy.cooldownDelta = this.cooldownDelta;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
+        copy.effectAmount = this.effectAmount;
         copy.charges = this.charges;
         copy.cooldown = this.cooldown;
         copy.damageType = this.damageType;
@@ -190,6 +191,21 @@ public class EffectSpec {
         EffectSpec copy = copy();
         if (copy.turns != null && delta != null) {
             copy.turns = copy.turns + delta;
+        }
+        return copy;
+    }
+
+    /**
+     * A copy whose {@code amount} is raised by {@code delta} ("本次叠加的层数额外 +1 层"). An effect that states no amount
+     * at all is left alone: it means one layer, and inventing a number here would change what the rule says.
+     *
+     * @param delta the extra layers
+     * @return the amended copy
+     */
+    public EffectSpec withAmount(Integer delta) {
+        EffectSpec copy = copy();
+        if (copy.amount != null && delta != null) {
+            copy.amount = copy.amount + delta;
         }
         return copy;
     }
@@ -1476,6 +1492,13 @@ public class EffectSpec {
      */
     @SerializedName("target_when")
     private List<String> targetWhen;
+    /**
+     * "本次叠加的层数额外 +1 层": raises the LAYER COUNT an {@code ADD_STACK} application grants. Reader: 1218's
+     * Eidolon 1, which raises the Talent's own one-layer application.
+     */
+    @SerializedName("effect_amount")
+    private Integer effectAmount;
+
     /**
      * {@code MODIFY_RULE}: raise the <b>stack cap</b> of the named rule's effects by this many layers
      * ("天赋的效果可叠加上限提高 2 层", 1302 Eidolon 4).

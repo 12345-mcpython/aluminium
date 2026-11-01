@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 1218,
-  "_status": "partial",
-  "_gaps": [
-    "星魂 1 的第二句：「每当触发天赋使敌方陷入【烬煨】时，本次叠加的层数额外 +1 层」未写 —— 需要「改另一条规则的**一次施加量**」的写法（`effect_amount` 之类）；现有 `MODIFY_RULE` 只支持概率 / 时长 / 层上限 / 倍率"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "ALLY_ATTACK",
@@ -234,6 +231,16 @@
       ],
       "source": "1218 椒丘 终结技: 「将敌方目标具有的【烬煨】层数统一设置为场上【烬煨】层数的最高值。」",
       "_note": "「将敌方目标具有的【烬煨】层数**统一设置为场上最高值**」—— ① **`SET_STACKS`** ✓（加/减层到目标值，与只会加的 `ADD_STACK` 相对 ✓）；② 目标值 = **`scale: max_enemy_stacks:烬煨`** ✓（扫敌方列表取最大层数，新增的取值 ✓）× `percent: 1`；③ `all_enemies` ✓（「敌方目标」复数 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_extra_layer_per_application",
+      "min_eidolon": 1,
+      "do": [
+        { "op": "MODIFY_RULE", "rule": "talent_ashen_roast_and_burn", "effect_amount": 1 }
+      ],
+      "source": "1218 椒丘 星魂 1: 「每当触发天赋效果使敌方目标陷入【烬煨】状态时，使本次叠加的【烬煨】层数额外提高1层。」 param = [0.4, 1]",
+      "_note": "「使本次叠加的【烬煨】层数**额外提高 1 层**」—— `MODIFY_RULE` + 新字段 **`effect_amount: 1`** ✓（改的是那条规则**一次施加的层数** 1 → 2 ✓，不是概率/时长/上限 ✓）。"
     }
   ]
 }
