@@ -3,7 +3,7 @@
   "character": 1502,
   "_status": "partial",
   "_gaps": [
-    "结界本身已建为状态（`APPLY_BUFF 结界`，`ticks_on: self` ⇒ 她自己回合开始减 1 ✓）与「普攻/战技后 +3 笑点」✓；仍缺：① 「结界期间我方全体**欢愉度**提高，等于爻光欢愉度的 **20%**」（需要**欢愉度**的跨单位派生修饰）、② 终结技「使阿哈立即获得 1 个**固定计入 20 笑点**的额外回合」（额外回合 + 资源门槛）、③ 天赋【大吉大利】（每次攻击后对随机 1 个命中目标追加 20% 对应属性**欢愉伤害**，消耗战技点时再触发一次，且「不视为一次攻击」）、④ 星魂与行迹未读"
+    "结界本身已建为状态（`APPLY_BUFF 结界`，`ticks_on: self` ⇒ 她自己回合开始减 1 ✓）与「普攻/战技后 +3 笑点」✓；仍缺：① 「结界期间我方全体**欢愉度**提高，等于爻光欢愉度的 **20%**」（需要**欢愉度**的跨单位派生修饰）、② 终结技「使阿哈立即获得 1 个**固定计入 20 笑点**的额外回合」（额外回合 + 资源门槛）、③ 天赋【大吉大利】的「消耗战技点时**再触发一次**」、④ 星魂与行迹未读"
   ],
   "rules": [
     {
@@ -143,6 +143,26 @@
       "source": "1502 星魂 5: 等级加成（数据 skill_add_level: 150203=ULTRA+2, 150204=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "talent_lucky_followup",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "TALENT:0",
+          "element": "Physical",
+          "damage_type": "ELATION",
+          "target": "random_hit_enemy",
+          "cast_category": "ADDITIONAL"
+        }
+      ],
+      "source": "1502 爻光 天赋 大吉大利: 「每次攻击后，对随机 1 个命中目标追加 1 次等同于爻光 20% 攻击力的对应属性欢愉伤害。该伤害不视为造成了 1 次攻击。」 天赋 Lv10 = [0.2]",
+      "_note": "「**随机 1 个命中目标**」—— 用 `random_hit_enemy`（**命中集合内**随机，不是全體随机）✓；`damage_type: 「ELATION」` 表示欢愉伤害 ✓；`percent_from_skill_param: 「TALENT:0」` 按等级读 ✓。⚠ 「不视为造成了 1 次攻击」由 `cast_category: 「ADDITIONAL」` 表达（与追击同族，不触发「攻击后」类规则）。⛔ 仍缺：「消耗战技点时再触发一次」—— 需要在**消耗**事件上重复这条（`SPEND_RESOURCE` 的钩子），已登记在 `_gaps`。"
     }
   ],
   "resources": [
