@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 1215,
-  "_status": "partial",
-  "_gaps": [
-    "秘技：未逐句读、未写"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "ULT_CAST",
@@ -367,6 +364,20 @@
       ],
       "source": "1215 寒鸦 星魂 6 六正 (Avatar_Hanya_Rank06): 「天赋的伤害提高效果额外提高10%。」 param = [0.1]",
       "_note": "「天赋的伤害提高效果额外提高10%」 (30% -> 40%). ⚠ Three amendments for one sentence, because the talent is three rules -- one per cast slot (see their notes); 「天赋的伤害提高效果」 names all of it, so all three are raised. ⚠ Written as an amendment rather than as a second, bigger rule: the three rules grant a `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST`, and a fourth rule granting 0.1 would **replace** the 0.3 currently on the attacker instead of adding to it (same-kind modifiers refresh) -- the number would come out 0.1, and nothing would look broken."
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_prey_on_a_random_enemy",
+      "when": ["self has_state 秘技"],
+      "pick": "random_enemy",
+      "do": [
+        { "op": "REMOVE_STATE", "buff": "承负", "target": "all_enemies" },
+        { "op": "REMOVE_STATE", "buff": "承负次数", "target": "all_enemies" },
+        { "op": "REMOVE_STATE", "buff": "承负返还", "target": "all_enemies" },
+        { "op": "APPLY_BUFF", "buff": "承负", "permanent": true, "target": "pick" }
+      ],
+      "source": "1215 寒鸦 秘技 判冥 (121507, Maze/Enhance): 「立即攻击敌人，进入战斗后对敌方随机单体附上等同于战技效果的【承负】。」",
+      "_note": "「进入战斗后对敌方**随机单体**附上等同于**战技效果**的【承负】」—— ① 规则级 **`pick: random_enemy`** ✓（一次抽签，后续 `target: pick` 与它同一个人 ✓）；② 「等同于战技效果」= 与 `skill_blessing` **同一串**：先清掉三个旧标记（「仅对最新被施加的目标生效」✓），再把 `承负` 挂到抽中的敌人 ✓；③ `permanent: true` 与战技那条同理：承负没有回合数（由「触发 2 次后自动解除」结束 ✓）。"
     }
   ]
 }
