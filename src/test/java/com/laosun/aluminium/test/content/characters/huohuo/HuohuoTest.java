@@ -37,6 +37,8 @@ public class HuohuoTest {
     @Test
     public void herSkillGrantsTheStateToHerself() {
         Fixture f = new Fixture();
+        // The 行迹 grants 【禳命】 at battle start (1217101), so the "nothing yet" state is produced by removing it.
+        f.huohuo.getBuffManager().removeState("禳命");
         Assertions.assertFalse(f.huohuo.getBuffManager().hasState("禳命"), "nothing before the cast");
 
         f.skill();
@@ -76,6 +78,7 @@ public class HuohuoTest {
         Fixture f = new Fixture();
         TriggerTable table = TriggerTables.of(HUOHUO);
 
+        f.huohuo.getBuffManager().removeState("禳命");
         Assertions.assertTrue(table.matching(TriggerEvent.TURN_START, ctx(f, false)).isEmpty(),
                 "no 【禳命】 (Divine Provision) on her, no trigger");
 
@@ -92,7 +95,10 @@ public class HuohuoTest {
         Assertions.assertEquals(2, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.SKILL_CAST),
                 "the cleanse and the state");
         Assertions.assertEquals(1, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.ULT_CAST));
-        Assertions.assertEquals(1, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.TURN_START));
+        Assertions.assertEquals(2, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.TURN_START),
+                "the talent heal and the trace energy - one moment, two statements");
+        Assertions.assertEquals(4, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the technique, and the two traces (the starting state and the control resistance)");
     }
 
     // ==================================================================
@@ -126,3 +132,4 @@ public class HuohuoTest {
         return BattleFixture.alwaysRoll(0.0);
     }
 }
+
