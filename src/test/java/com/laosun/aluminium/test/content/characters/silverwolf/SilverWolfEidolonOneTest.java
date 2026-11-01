@@ -59,13 +59,17 @@ public class SilverWolfEidolonOneTest {
     }
     @Test
     public void eidolonSixRaisesDamageWithTheEnemysDebuffs() {
-        double one = boostWith(1, 6) - boostWith(1, 0);
-        double three = boostWith(3, 6) - boostWith(3, 0);
-        double seven = boostWith(5, 6) - boostWith(5, 0);
+        // Rank 6 against rank 5: her Eidolon 2 also moves the damage now (it is the enhanced form, +20% taken), and this
+        // case is about Eidolon 6 alone.
+        double one = boostWith(1, 6) - boostWith(1, 5);
+        double three = boostWith(3, 6) - boostWith(3, 5);
+        double seven = boostWith(5, 6) - boostWith(5, 5);
         System.out.println("[1006] E6 boost: 1 debuff " + one + ", 3 " + three + ", 5 " + seven);
-        Assertions.assertEquals(0.2, closer(one, 0.2), 0.02, "one debuff: 20%");
-        Assertions.assertEquals(0.6, closer(three, 0.6), 0.02, "three debuffs: 60%");
-        Assertions.assertEquals(1.0, closer(seven, 1.0), 0.02, "「最多提高 100%」");
+        // 0.4, not 0.2: her Eidolon 2 now plants a vulnerability on entry (the enhanced form), which is a 负面效果 of its own -
+        // so "one planted debuff" is TWO for this clause, and the counts below each carry that extra one.
+        Assertions.assertEquals(0.4, closer(one, 0.4), 0.02, "one planted debuff plus Eidolon 2's vulnerability: 2 x 20%");
+        Assertions.assertEquals(0.8, closer(three, 0.8), 0.02, "four debuffs: 80%");
+        Assertions.assertEquals(1.0, closer(seven, 1.0), 0.02, "「最多提高 100%」 (six debuffs would exceed it)");
     }
 
     /** The counts include the Ultimate-free path, so rounding noise is expected; compare loosely. */

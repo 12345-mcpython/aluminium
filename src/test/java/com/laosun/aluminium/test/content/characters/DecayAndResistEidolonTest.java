@@ -32,10 +32,32 @@ public class DecayAndResistEidolonTest {
 
     }
 
+    /**
+     * 1006's Eidolon 2 in its <b>enhanced</b> form: the documents give a 强化前 (「效果抵抗降低 20%」) and a 强化后
+     * (「使其受到的伤害提高 20%」), and the live game applies the enhanced one - so that is what her file states.
+     */
     @Test
-    public void eidolonTwoLowersEffectResistanceOnEntry() {
+    public void eidolonTwoRaisesTheDamageTheEnemyTakesOnEntry() {
         Assertions.assertEquals(0.0, resDrop(0), 1e-9, "control: nothing without the Eidolon");
-        Assertions.assertEquals(-0.2, resDrop(2), 1e-9, "「效果抵抗降低 20%」");
+        Assertions.assertEquals(0.0, resDrop(2), 1e-9, "强化前's resistance drop is superseded, not stacked");
+        double with = damageTaken(2);
+        double without = damageTaken(0);
+        System.out.println("[1006] Eidolon 2: " + without + " -> " + with);
+        Assertions.assertEquals(1.2, with / without, 1e-9, "「强化后：使其受到的伤害提高 20%」");
+    }
+
+    /** One fixed hit against a monster, in a battle built with the given Eidolon rank. */
+    private static double damageTaken(int eidolon) {
+        Character silverWolf = CharacterFactory.create(1006, LEVEL, true, null, null, eidolon);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(silverWolf, CharacterFactory.create(1001, LEVEL))),
+                new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        double before = enemy.getCurrentHp();
+        battle.applyDamage(enemy, new com.laosun.aluminium.damage.Damage(
+                silverWolf, enemy, com.laosun.aluminium.enums.DamageElement.QUANTUM,
+                com.laosun.aluminium.enums.DamageType.NORMAL, 1000));
+        return before - enemy.getCurrentHp();
     }
 
     /**
