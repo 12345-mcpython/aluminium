@@ -40,12 +40,15 @@ public class TodayIsAnotherPeacefulDayAndAnInstantBeforeAGazesandTest {
     @Test
     public void cone23018RaisesCritDamageAndAnUltScopedBoost() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23018, LEVEL, false, 5));
+        Character bare = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
-        double critBefore = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         double energy = unit.getMaxEnergy();
         battle.startBattle();
-        double crit = unit.getAttribute(AttributeType.CRIT_ATTACK).get() - critBefore;
+        // The crit share is the cone PROPERTY (applied when the weapon is assembled): compare against a bare wearer, not
+        // a battle-start delta - a rule repeating the property used to make this 120%, and it is gone.
+        double crit = unit.getAttribute(AttributeType.CRIT_ATTACK).get()
+                - bare.getAttribute(AttributeType.CRIT_ATTACK).get();
         double boostBefore = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double ultBoost = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get() - boostBefore;
