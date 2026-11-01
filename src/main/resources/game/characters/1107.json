@@ -3,9 +3,8 @@
   "character": 1107,
   "_status": "partial",
   "_gaps": [
-    "星魂 6「我方其他目标遭到攻击后，史瓦罗有 50% 固定概率反击并加标记；终结技额外 +1 次强化反击」未写：与终结技强化反击共用计数",
     "终结技 / 星魂 6 的数据 modifier 也写 AggroAddedRatio，但正文未提，按约定不写（数据与正文差异）",
-    "终结技：**减伤 25% / 2 回合已落地** ✓；仍未写 —— **被攻击概率提高**（正文说「大幅提高」但不给数，数据里的 `AggroAddedRatio` 与正文不符）、**强化反击**（任意我方受击即反击、倍率 ×1.6、对相邻 50%、生效 2 次 —— 次数要一个资源计数 + 反击伤害要一条独立规则）"
+    "终结技的剩余两处：**被攻击概率提高**（正文不给数，数据的 AggroAddedRatio 与正文不符 ⇒ 不写）、反强化反击的**相邻 50%**（位置轴 ✗）"
   ],
   "rules": [
     {
@@ -250,6 +249,51 @@
       ],
       "source": "1107 克拉拉 终结技 史瓦罗的怒吼 (110703): 「施放终结技后克拉拉受到的伤害额外降低25%且被敌方目标攻击的概率大幅提高，持续2回合。」 param Lv10 = [5, 1.6, 2, 0.25, 2]",
       "_note": "「施放终结技后克拉拉**受到的伤害额外降低 25%**…持续 **2 回合**」—— `ULT_CAST` + `MODIFY_DAMAGE_TAKEN percent: -0.25`（引擎语义 = 伤害 ×(1+p) ⇒ ×0.75 ✓）+ `turns: 2` + `buff` 名 ✓（同一句里还有「被攻击概率提高」，那条见 `_gaps`）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_enhanced_counter_charges",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "强化反击",
+          "amount": 2,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1107 克拉拉 终结技: 「强化效果可生效2次。」 param Lv10 = [5, 1.6, 2, 0.25, 2]",
+      "_note": "「强化效果可生效 **2 次**」—— 用**层数**当次数：`ADD_STACK 强化反击 ×2`、`max_stacks: 2` ✓（终结技刷新到 2 次 ✓）；下面那条反击每触发一次扣 1 层 ✓。"
+    },
+    {
+      "on": "ATTACK_FINISHED",
+      "id": "ult_enhanced_counter",
+      "when": [
+        "actor is_enemy",
+        "self_stacks:强化反击 >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.6,
+          "element": "Physical",
+          "damage_type": "TALENT",
+          "target": "actor"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "强化反击",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1107 克拉拉 终结技: 「当任意我方目标受到攻击后史瓦罗立即施放反击，对敌方目标造成的伤害倍率提高160%…」 param = [5, 1.6, 2, 0.25, 2]",
+      "_note": "「当任意我方目标受到攻击后**史瓦罗立即施放反击**，造成的伤害倍率**提高 160%**」—— `ATTACK_FINISHED` + `actor is_enemy` ✓ + 门槛 `self_stacks:强化反击 >= 1` ✓ → `DAMAGE scale: self_attr:ATTACK percent: 1.6`（160% 攻击力 ✓）打**攻击者** ✓ + 扣 1 层 ✓。⚠ **不写**「对相邻目标 50%」（位置轴 ✗，已登记）。"
     }
   ]
 }
