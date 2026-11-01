@@ -225,19 +225,18 @@ public class ArgentiStacksTest {
      * the layer count, the second assertion (0.04 at five layers) becomes 0.24 and this test goes red on purpose.
      */
     @Test
-    public void herCritDamageDoesNotFollowTheStacks() {
+    public void herCritDamageFollowsTheStacks() {
         Fixture f = new Fixture(1, 1);
         double start = f.argenti.getAttribute(AttributeType.CRIT_ATTACK).get();
-        Assertions.assertEquals(0.54, start, 1e-9,
-                "today: +0.04 already at 0 layers (base 0.5), which the sentence does not grant");
+        Assertions.assertEquals(0.5, start, 1e-9, "0 layers: 「每层…提高 4%」 grants nothing");
 
         for (int i = 0; i < 5; i++) {
             f.fireCast(TriggerEvent.BASIC_ATTACK, 1);
         }
-        Assertions.assertEquals(0.54, f.argenti.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
-                "today: five layers are still +0.04; the sentence wants +0.04 x 5 = 0.20");
+        Assertions.assertEquals(0.7, f.argenti.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "「每层【升格】额外使暴击伤害提高 4%」 - five layers = +0.20 over the base 0.5");
         Assertions.assertEquals(0.175, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
-                "meanwhile the crit-rate half really does stack, which is what makes the pair's asymmetry visible");
+                "and the crit-rate half stacks the same way (0.025 x 5 over its base)");
     }
 
     /**
@@ -323,3 +322,4 @@ public class ArgentiStacksTest {
         return BattleFixture.alwaysRoll(0.0);
     }
 }
+

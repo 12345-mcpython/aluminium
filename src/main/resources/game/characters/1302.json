@@ -3,8 +3,7 @@
   "character": 1302,
   "_status": "partial",
   "_gaps": [
-    "强化终结技（数据槽 14，130214）整段未接入：引擎的施放路径没有这个槽（`SkillType` 的映射不含 14），所以「消耗 180 能量、336% 全体、再造成 6 次随机单体 114%」在本引擎里放不出来",
-    "星魂 1「每层【升格】额外使暴击伤害提高 4%」现在是战斗开始时贴一次的固定 +4%：0 层也有、10 层也只有一次。见证：`ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks`（修好时它会红）"
+    "强化终结技（数据槽 14，130214）整段未接入：引擎的施放路径没有这个槽（`SkillType` 的映射不含 14），所以「消耗 180 能量、336% 全体、再造成 6 次随机单体 114%」在本引擎里放不出来"
   ],
   "rules": [
     {
@@ -129,8 +128,8 @@
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
           "percent": 0.04,
-          "max_stacks": 10,
-          "buff": "升格",
+          "per_stack": "升格",
+          "per_stack_live": true,
           "permanent": true,
           "target": "self"
         }
