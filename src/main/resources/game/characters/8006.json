@@ -39,7 +39,8 @@
         }
       ],
       "source": "8006 开拓者 天赋 全屏段的高空踏歌 (800604, Enhance): 「当有敌方目标的弱点被击破时，开拓者立即恢复10.00点能量。」 数据行 Lv10 = [10]",
-      "_note": "「当**有敌方目标的弱点被击破时**，开拓者立即恢复 10 点能量」 — `BREAK` is that moment (`Battle.reduceToughness` emits it at the only entry point, and an already-broken enemy never reaches it twice). ⚠ No `actor == self`: 「有敌方目标」 is any enemy and the sentence names no breaker, so a break caused by an ally (or by a DOT) credits her too — writing `actor == self` would be the *other* sentence 「开拓者击破弱点时」. ⚠ The event carries the victim as `target`, which this clause does not need."
+      "_note": "「当**有敌方目标的弱点被击破时**，开拓者立即恢复 10 点能量」 — `BREAK` is that moment (`Battle.reduceToughness` emits it at the only entry point, and an already-broken enemy never reaches it twice). ⚠ No `actor == self`: 「有敌方目标」 is any enemy and the sentence names no breaker, so a break caused by an ally (or by a DOT) credits her too — writing `actor == self` would be the *other* sentence 「开拓者击破弱点时」. ⚠ The event carries the victim as `target`, which this clause does not need.",
+      "id": "on_break_effect"
     },
     {
       "on": "SKILL_CAST",
@@ -171,7 +172,8 @@
         }
       ],
       "source": "8006 开拓者 终结技: 「持有【伴舞】的我方目标击破特攻提高30%，并且攻击处于弱点击破状态下的敌方目标后，会将本次攻击的削韧值转化为1次超击破伤害。」 param Lv10 = [3, 1, 0.3] → #2 = 1（转化倍率）",
-      "_note": "「**持有【伴舞】的**我方目标…攻击**处于弱点击破状态下的**敌方目标后，会将本次攻击的**削韧值**转化为 1 次超击破伤害」 — the clause this file registered until now, and the first shipped content for the pair that landed in round 75 (the `弱点击破` condition + `SUPER_BREAK`). ⚠ 「持有【伴舞】的我方目标」 is `actor has_state 伴舞`: the **attacker** must carry it, so an unbuffed ally's attack converts nothing. ⚠ The multiplier is #2 of her own ultimate row (1 = 100%); the row states it even though the prose leaves it implicit, which is why the data is worth reading. ⚠ The magnitude is the instance's **削韧值** (`Damage.stance`, recorded by `SkillExecutor` before settlement), not its damage — the two differ by an order of magnitude."
+      "_note": "「**持有【伴舞】的**我方目标…攻击**处于弱点击破状态下的**敌方目标后，会将本次攻击的**削韧值**转化为 1 次超击破伤害」 — the clause this file registered until now, and the first shipped content for the pair that landed in round 75 (the `弱点击破` condition + `SUPER_BREAK`). ⚠ 「持有【伴舞】的我方目标」 is `actor has_state 伴舞`: the **attacker** must carry it, so an unbuffed ally's attack converts nothing. ⚠ The multiplier is #2 of her own ultimate row (1 = 100%); the row states it even though the prose leaves it implicit, which is why the data is worth reading. ⚠ The magnitude is the instance's **削韧值** (`Damage.stance`, recorded by `SkillExecutor` before settlement), not its damage — the two differ by an order of magnitude.",
+      "id": "on_damage_effect"
     },
     {
       "on": "DEALING_DAMAGE",

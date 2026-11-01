@@ -35,7 +35,8 @@
         }
       ],
       "source": "relic set 122 (识海迷坠的学者 / Scholar Lost in Erudition), 4-piece: 「施放终结技后，下一次施放战技时造成的伤害额外提高#2[i]%。」 param = [0.2, 0.25]",
-      "_note": "The second sentence: 「下一次施放战技时」 is an EVENT, not a number of turns, so it is `\"until\": \"next_skill\"` -- written as `turns: 1` it would expire on a turn boundary instead, and survive a turn in which no Skill was cast. ⚠ `max_stacks: 2` is NOT decoration, and leaving it out would be a silent 10-point error: 「额外提高」 means the +25% is ON TOP of the +20% above, but the default cap is 1 and two modifiers on the same attribute then REPLACE each other (the trap ROADMAP records for 波提欧 16% + 阮·梅 20% = 20%). With the cap at 2 the two coexist and add to 0.45 for the next Skill. ⚠ The lifetime is keyed to the OWNER, which here is exactly right: 「施放终结技后」 is her own ultimate, and the buff must end when SHE next casts a Skill (a teammate's Skill is not 「下一次施放战技」), while the permanent +20% above is a separate buff and survives."
+      "_note": "The second sentence: 「下一次施放战技时」 is an EVENT, not a number of turns, so it is `\"until\": \"next_skill\"` -- written as `turns: 1` it would expire on a turn boundary instead, and survive a turn in which no Skill was cast. ⚠ `max_stacks: 2` is NOT decoration, and leaving it out would be a silent 10-point error: 「额外提高」 means the +25% is ON TOP of the +20% above, but the default cap is 1 and two modifiers on the same attribute then REPLACE each other (the trap ROADMAP records for 波提欧 16% + 阮·梅 20% = 20%). With the cap at 2 the two coexist and add to 0.45 for the next Skill. ⚠ The lifetime is keyed to the OWNER, which here is exactly right: 「施放终结技后」 is her own ultimate, and the buff must end when SHE next casts a Skill (a teammate's Skill is not 「下一次施放战技」), while the permanent +20% above is a separate buff and survives.",
+      "id": "ult_effect"
     }
   ],
   "schema": 1,

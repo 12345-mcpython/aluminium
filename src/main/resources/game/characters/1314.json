@@ -25,7 +25,8 @@
         }
       ],
       "source": "1314 翡翠 星魂 4 真诚？唯凭认沽: 「施放终结技时，使翡翠造成的伤害无视敌方目标#1[i]%的防御力，持续#2[i]回合。」 param = [0.12, 3]",
-      "_note": "The wearer's damage ignores 12% of the target's DEF for 3 turns, so the effect belongs to HER, not to the target -- hence no `target` selector (absent means self, and 使翡翠造成的伤害 is a fact about the damage she deals). DEFENCE_IGNORE is a ratio attribute, so MODIFY_ATTR adds a flat 0.12 there (0.12 means 12%), and Battle.assemble hands the attacker's total to the defence zone. ⚠ This is the FIRST user of that attribute in the whole shipped content: it was read by the pipeline and its arithmetic was tested, but no rule file had ever granted it, so the path 'rule -> attribute -> defence zone' had never run end to end. That is what DefenceIgnoreTest now covers. It is also the second Eidolon-gated rule (after Bronya's), which is why min_eidolon: 4 sits next to the mechanic."
+      "_note": "The wearer's damage ignores 12% of the target's DEF for 3 turns, so the effect belongs to HER, not to the target -- hence no `target` selector (absent means self, and 使翡翠造成的伤害 is a fact about the damage she deals). DEFENCE_IGNORE is a ratio attribute, so MODIFY_ATTR adds a flat 0.12 there (0.12 means 12%), and Battle.assemble hands the attacker's total to the defence zone. ⚠ This is the FIRST user of that attribute in the whole shipped content: it was read by the pipeline and its arithmetic was tested, but no rule file had ever granted it, so the path 'rule -> attribute -> defence zone' had never run end to end. That is what DefenceIgnoreTest now covers. It is also the second Eidolon-gated rule (after Bronya's), which is why min_eidolon: 4 sits next to the mechanic.",
+      "id": "eidolon4_ult"
     },
     {
       "on": "BATTLE_START",
@@ -121,7 +122,15 @@
       "on": "BATTLE_START",
       "id": "trace_every_goods_raises_attack",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.005, "per_stack": "当品", "per_stack_live": true, "permanent": true, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.005,
+          "per_stack": "当品",
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1314 翡翠 行迹 绝当品 (1314103): 「天赋中每层【当品】额外使翡翠的攻击力提高0.50%。」 param = [0.005]",
       "_note": "「每层【当品】额外使**翡翠的攻击力**提高 **0.50%**」—— ① 层数在**她自己**身上（`ADD_STACK` ✓）⇒ `per_stack: 当品` ✓；② ⚠ 必须 **`per_stack_live: true`** ✓ —— 【当品】会在战斗中途增减，快照会把攻击力钉在挂载那一刻（读者族：十四份文档的「每层…」光环 ✓）；③ `permanent: true` ✓（行迹常驻，不是回合数 ✓）。"
@@ -130,7 +139,14 @@
       "on": "ENEMY_ENTERED",
       "id": "trace_reverse_repo_on_enemy_entry",
       "do": [
-        { "op": "ADD_STACK", "buff": "当品", "amount": 1, "max_stacks": 50, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "当品",
+          "amount": 1,
+          "max_stacks": 50,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1314 翡翠 行迹 逆回购 (1314101): 「在敌方目标进入战斗时，翡翠获得1层【当品】。」 param = [3, 1]",
       "_note": "「在敌方目标**进入战斗时**，翡翠获得 **1** 层【当品】」—— `ENEMY_ENTERED` ✓（开战**之后**新加入的敌人；开战前摆好的名册由 `trace_reverse_repo_one_goods` 的 `BATTLE_START` 那层覆盖 ✓，两者合起来正好是「每一次入场」✓）。⚠ 星魂/层数上限 50 ✓ 与天赋一致 ✓。"
@@ -138,10 +154,27 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_makes_a_debt_collector",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "收债人", "turns": 3, "ticks_on": "self", "target": "target" },
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "amount": 30, "turns": 3, "target": "target", "target_when": ["target != self"] }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "收债人",
+          "turns": 3,
+          "ticks_on": "self",
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 30,
+          "turns": 3,
+          "target": "target",
+          "target_when": [
+            "target != self"
+          ]
+        }
       ],
       "source": "1314 翡翠 战技 恣肆吞併的担保 (131402): 「指定我方单体成为【收债人】，使其速度提高30点，持续3回合。…若翡翠成为【收债人】时，无法获得速度提高效果…翡翠每回合开始时【收债人】状态持续回合数减1。」 param Lv10 = [30, 0.02, 0.25, 3]",
       "_note": "「指定我方单体成为【收债人】，使其**速度提高 30 点**，持续 **3 回合**」—— ① 状态 `APPLY_BUFF 收债人 turns: 3` ✓；② ⭐ **`ticks_on: 「self」`** ✓（时钟 = **规则主人（翡翠）**） —— 句子的计时主体是**翡翠自己**（「翡翠每回合开始时…减 1」✓），不是收债人的回合 ✓；③ 速度是**点数额**（30 点 ≠ 30%）⇒ `amount: 30` ✓（`amount` 对 MODIFY_ATTR 就是「加多少点」✓，plain 修饰才会当份额 ✗）；④ 「**若翡翠成为【收债人】时，无法获得速度提高**」⇒ 第二条效果用 **`target_when: [\"target != self\"]`** ✓（而不是另写一条规则 ✓）。⚠ **未写**（见 `_gaps`）：持有【收债人】时翡翠不能施放战技、收债人攻击后的附加伤害与扣血。"
@@ -149,9 +182,17 @@
     {
       "on": "ALLY_ATTACK",
       "id": "collector_attack_deals_extra",
-      "when": ["actor has_state 收债人"],
+      "when": [
+        "actor has_state 收债人"
+      ],
       "do": [
-        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.25, "element": "Quantum", "target": "all_hit_enemies" }
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.25,
+          "element": "Quantum",
+          "target": "all_hit_enemies"
+        }
       ],
       "source": "1314 翡翠 战技: 「【收债人】施放攻击后，对每个击中的敌方目标造成1次等同于翡翠25%攻击力的量子属性附加伤害」 param Lv10 = [30, 0.02, 0.25, 3]",
       "_note": "「对**每个击中的敌方目标**造成 1 次等同于翡翠 **25% 攻击力**的量子属性**附加伤害**」—— ① 事件 `ALLY_ATTACK` ✓（`actor` = 施放攻击的人 ✓）+ 条件 **`actor has_state 收债人`** ✓（不是翡翠自己，也不是 `target` ✓）；② ⭐ 目标 **`all_hit_enemies`** ✓ = 「**每个击中的**敌方目标」（不是全体、也不是主目标 ✓）；③ 「等同于翡翠 25% 攻击力」⇒ `scale: self_attr:ATTACK` ✓（**规则主人**是翡翠 ✓）；④ `DAMAGE` ⇒ 附加伤害实例 ✓（不是给本次攻击加一个固定值 ✗）。"
@@ -159,9 +200,17 @@
     {
       "on": "ALLY_ATTACK",
       "id": "collector_attack_costs_hp",
-      "when": ["actor has_state 收债人", "actor != self"],
+      "when": [
+        "actor has_state 收债人",
+        "actor != self"
+      ],
       "do": [
-        { "op": "CONSUME_HP", "scale": "target_max_hp", "percent": 0.02, "target": "actor" }
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_max_hp",
+          "percent": 0.02,
+          "target": "actor"
+        }
       ],
       "source": "1314 翡翠 战技: 「…并消耗【收债人】生命上限2%的生命值，若当前生命值不足，当前生命值降至1点。…若翡翠成为【收债人】时…攻击后不消耗生命值。」 param Lv10 = [30, 0.02, 0.25, 3]",
       "_note": "「消耗【收债人】**生命上限 2%** 的生命值」—— ① 消耗者是**收债人本人** ⇒ `target: actor` ✓；② 份额是**收债人自己的生命上限** ⇒ `scale: target_max_hp` ✓（`grantAmount` 对 CONSUME_HP 的 `target` 就是「付账的人」✓，不会读到翡翠的上限 ✗）；③ 「当前生命值不足则降至 **1 点**」由 `consumeHp` 的下限保证 ✓（实测 HP 不会低于 1 ✓）；④ 「**若翡翠**成为收债人…攻击后**不消耗**」⇒ 条件 **`actor != self`** ✓（分成两条规则，扣血这条有门 ✓）。"

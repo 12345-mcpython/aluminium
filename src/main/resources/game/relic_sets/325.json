@@ -1,86 +1,210 @@
 {
-  "schema": 1,
-  "relic_set": 325,
   "2": [
     {
       "on": "CAST_SETUP",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.4", "self_attr:ELATION_DAMAGE_BOOST < 0.8", "!self has_state 325_30"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.8",
+        "!self has_state 325_30"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_30", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.2, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "cast_setup_effect"
     },
     {
       "on": "CAST_SETUP",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.8", "!self has_state 325_60"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
+        "!self has_state 325_60"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_60", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.32, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "cast_setup_effect_2"
     },
     {
       "on": "SKILL_CAST",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.4", "self_attr:ELATION_DAMAGE_BOOST < 0.8", "!self has_state 325_30"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.8",
+        "!self has_state 325_30"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_30", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.2, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "skill_effect"
     },
     {
       "on": "SKILL_CAST",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.8", "!self has_state 325_60"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
+        "!self has_state 325_60"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_60", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.32, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "skill_effect_2"
     },
     {
       "on": "SKILL_POINT_SPENT",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.4", "self_attr:ELATION_DAMAGE_BOOST < 0.8", "!self has_state 325_30"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.8",
+        "!self has_state 325_30"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_30", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.2, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "on_skill_point_effect"
     },
     {
       "on": "SKILL_POINT_SPENT",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.8", "!self has_state 325_60"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
+        "!self has_state 325_60"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_60", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.32, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "on_skill_point_effect_2"
     },
     {
       "on": "ULT_CAST",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.4", "self_attr:ELATION_DAMAGE_BOOST < 0.8", "!self has_state 325_30"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
+        "self_attr:ELATION_DAMAGE_BOOST < 0.8",
+        "!self has_state 325_30"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_30", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.2, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_30",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "ult_effect"
     },
     {
       "on": "ULT_CAST",
-      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.8", "!self has_state 325_60"],
+      "when": [
+        "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
+        "!self has_state 325_60"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "325_60", "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.32, "permanent": true, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "325_60",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "relic set 325 二件套: 「使装备者的欢愉度提高 8%。当装备者的欢愉度在战斗中首次达到 30%/60% 时，使装备者的暴击伤害提高 15%/30%。」",
-      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。"
+      "_note": "「战斗中**欢愉度首次达到 40% / 80%** 时，暴击伤害提高 **20% / 32%**」—— 四个事件（`CAST_SETUP`/`SKILL_CAST`/`SKILL_POINT_SPENT`/`ULT_CAST`）× 两档，各配一次性旗标状态 ✓；「欢愉度 +8%」是两件套属性 ✓。\n⚠⚠ **2026-10-19 逐句核时改的两类数**：档位原先写 **0.3 / 0.6** ✗（#2/#3 是 40%/80% ✓）、加成原先写 **0.15 / 0.3** ✗（#4/#5 是 20%/32% ✓）（判据 `PunklordeStageZeroTest` 同步 ✓）。",
+      "id": "ult_effect_2"
     }
-  ]
+  ],
+  "schema": 1,
+  "relic_set": 325
 }

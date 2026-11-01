@@ -1,25 +1,49 @@
 {
-  "schema": 1,
-  "relic_set": 324,
   "2": [
     {
       "on": "SKILL_POINT_SPENT",
-      "when": ["self_stacks:本回合消耗 < 3"],
+      "when": [
+        "self_stacks:本回合消耗 < 3"
+      ],
       "do": [
-        { "op": "ADD_STACK", "buff": "本回合消耗", "amount": 1.0, "max_stacks": 3, "until": "turn_end", "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合消耗",
+          "amount": 1,
+          "max_stacks": 3,
+          "until": "turn_end",
+          "target": "self"
+        }
       ],
       "source": "relic set 324 二件套: 「暴击伤害提高 16%。若装备者在单个回合内消耗 4 个或更多战技点，则暴击伤害额外提高 16%，持续 3 回合。」param = [0.16, 3, 0.32, 3]",
-      "_note": "「若在**同一回合内消耗 ≥ 3 点战技点**，额外使暴击伤害提高 **32%**，持续 3 回合」—— 计数层（`until: turn_end`）＋ 满 **3** 层付清 ＋ `MODIFY_ATTR CRIT_ATTACK{percent: 0.32, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：阈值原先写 **4** ✗（#2 是 3 ✓）、加成原先写 **0.16** ✗（#3 是 32% ✓）、扣层数跟着阈值改 ✓（判据 `TengokuLivestreamTest` 同步 ✓）。"
+      "_note": "「若在**同一回合内消耗 ≥ 3 点战技点**，额外使暴击伤害提高 **32%**，持续 3 回合」—— 计数层（`until: turn_end`）＋ 满 **3** 层付清 ＋ `MODIFY_ATTR CRIT_ATTACK{percent: 0.32, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：阈值原先写 **4** ✗（#2 是 3 ✓）、加成原先写 **0.16** ✗（#3 是 32% ✓）、扣层数跟着阈值改 ✓（判据 `TengokuLivestreamTest` 同步 ✓）。",
+      "id": "on_skill_point_effect"
     },
     {
       "on": "SKILL_POINT_SPENT",
-      "when": ["self_stacks:本回合消耗 >= 3"],
+      "when": [
+        "self_stacks:本回合消耗 >= 3"
+      ],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "本回合消耗", "amount": 3.0, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.32, "turns": 3, "target": "self" }
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合消耗",
+          "amount": 3,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.32,
+          "turns": 3,
+          "target": "self"
+        }
       ],
       "source": "relic set 324 二件套: 「暴击伤害提高 16%。若装备者在单个回合内消耗 4 个或更多战技点，则暴击伤害额外提高 16%，持续 3 回合。」param = [0.16, 3, 0.32, 3]",
-      "_note": "「若在**同一回合内消耗 ≥ 3 点战技点**，额外使暴击伤害提高 **32%**，持续 3 回合」—— 计数层（`until: turn_end`）＋ 满 **3** 层付清 ＋ `MODIFY_ATTR CRIT_ATTACK{percent: 0.32, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：阈值原先写 **4** ✗（#2 是 3 ✓）、加成原先写 **0.16** ✗（#3 是 32% ✓）、扣层数跟着阈值改 ✓（判据 `TengokuLivestreamTest` 同步 ✓）。"
+      "_note": "「若在**同一回合内消耗 ≥ 3 点战技点**，额外使暴击伤害提高 **32%**，持续 3 回合」—— 计数层（`until: turn_end`）＋ 满 **3** 层付清 ＋ `MODIFY_ATTR CRIT_ATTACK{percent: 0.32, turns: 3}` ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：阈值原先写 **4** ✗（#2 是 3 ✓）、加成原先写 **0.16** ✗（#3 是 32% ✓）、扣层数跟着阈值改 ✓（判据 `TengokuLivestreamTest` 同步 ✓）。",
+      "id": "on_skill_point_effect_2"
     }
-  ]
+  ],
+  "schema": 1,
+  "relic_set": 324
 }

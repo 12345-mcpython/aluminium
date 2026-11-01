@@ -53,7 +53,8 @@
       "min_eidolon": 1,
       "per_turn": 1,
       "source": "1215 寒鸦 星魂 1 一心 (Avatar_Hanya_Rank01): 「持有终结技效果的我方目标消灭敌方目标时，寒鸦行动提前15%，该效果每回合只能触发1次。」 param = [0.15, 1]",
-      "_note": "⚠ `actor has_state 敕令` is the whole clause: `KILL`'s `actor` is the <b>killer</b>, so this asks \"does the one who got the kill carry my ultimate's effect\" — which is what 「持有终结技效果的我方目标消灭敌方目标时」 says, rather than \"I got a kill\" (`actor == self`, a different sentence). That works only because the ultimate also plants a marker <b>state</b> (see its note). ⚠ `target: self` is 寒鸦: 「**寒鸦**行动提前15%」 — the one who acted early is her, not the killer. ⚠ `per_turn: 1` is 「该效果每回合只能触发1次」 (counted in her own turns, like every `per_turn`). ⚠ `min_eidolon: 1` is the gate."
+      "_note": "⚠ `actor has_state 敕令` is the whole clause: `KILL`'s `actor` is the <b>killer</b>, so this asks \"does the one who got the kill carry my ultimate's effect\" — which is what 「持有终结技效果的我方目标消灭敌方目标时」 says, rather than \"I got a kill\" (`actor == self`, a different sentence). That works only because the ultimate also plants a marker <b>state</b> (see its note). ⚠ `target: self` is 寒鸦: 「**寒鸦**行动提前15%」 — the one who acted early is her, not the killer. ⚠ `per_turn: 1` is 「该效果每回合只能触发1次」 (counted in her own turns, like every `per_turn`). ⚠ `min_eidolon: 1` is the gate.",
+      "id": "eidolon1_on_kill"
     },
     {
       "on": "SKILL_CAST",
@@ -71,7 +72,8 @@
       ],
       "min_eidolon": 2,
       "source": "1215 寒鸦 星魂 2 二观 (Avatar_Hanya_Rank02): 「施放战技后，速度提高20%，持续1回合。」 param = [0.2, 1]",
-      "_note": "「施放**战技**后，速度提高20%，持续1回合」. ⚠ `SKILL_CAST` (not `ALLY_ATTACK`, not `BASIC_ATTACK`): the sentence names the Skill slot, and the emitter already splits the three in-battle casts, so this cannot fire on 普攻 or 终结技. ⚠ `actor == self` is load-bearing: SKILL_CAST is broadcast to the whole side. ⚠ The target is 寒鸦 herself — 「速度提高」 with no other subject in the sentence. ⚠ `min_eidolon: 2` is the gate."
+      "_note": "「施放**战技**后，速度提高20%，持续1回合」. ⚠ `SKILL_CAST` (not `ALLY_ATTACK`, not `BASIC_ATTACK`): the sentence names the Skill slot, and the emitter already splits the three in-battle casts, so this cannot fire on 普攻 or 终结技. ⚠ `actor == self` is load-bearing: SKILL_CAST is broadcast to the whole side. ⚠ The target is 寒鸦 herself — 「速度提高」 with no other subject in the sentence. ⚠ `min_eidolon: 2` is the gate.",
+      "id": "eidolon2_skill"
     },
     {
       "on": "BATTLE_START",
@@ -154,7 +156,8 @@
         }
       ],
       "source": "1215 寒鸦 战技 生灭系缚 (skill 121502) 第二句: 「…并使其陷入【承负】状态…【承负】仅对最新被施加的目标生效，并会在触发2次战技点恢复效果后自动解除。」（伤害是引擎自己的技能路径，不需要规则）",
-      "_note": "The 【承负】 half of her Skill (the 240% damage is the engine's own path). ⚠ The three REMOVE_STATE effects are 「仅对最新被施加的目标生效」: the state goes off everybody, then onto the new target -- there is no \"only one holder\" flag, the removal IS that clause (星期日's 【蒙福者】 reads the same way). ⚠ The two counters are cleared with it so a new target starts both at zero; their meaning is in the notes below. ⚠ `permanent: true` is not \"forever\": 承负 has no turn count (its end is 「触发 2 次战技点恢复效果后」, a threshold), so stating `turns` would be a different duration in every fight -- the removal rule below is the honest spelling."
+      "_note": "The 【承负】 half of her Skill (the 240% damage is the engine's own path). ⚠ The three REMOVE_STATE effects are 「仅对最新被施加的目标生效」: the state goes off everybody, then onto the new target -- there is no \"only one holder\" flag, the removal IS that clause (星期日's 【蒙福者】 reads the same way). ⚠ The two counters are cleared with it so a new target starts both at zero; their meaning is in the notes below. ⚠ `permanent: true` is not \"forever\": 承负 has no turn count (its end is 「触发 2 次战技点恢复效果后」, a threshold), so stating `turns` would be a different duration in every fight -- the removal rule below is the honest spelling.",
+      "id": "skill_effect"
     },
     {
       "on": "ALLY_ATTACK",
@@ -173,7 +176,8 @@
         }
       ],
       "source": "1215 寒鸦 战技: 「每当我方目标对【承负】状态下的敌方目标施放2次普攻、战技、终结技后…」 之一（普攻）",
-      "_note": "One of THREE mark rules, one per qualifying cast slot. ⚠ Three rules rather than one because the condition DSL has no OR and `from_skill` states a single slot -- and that is the point: an attack matches exactly one of them, so each qualifying attack adds exactly ONE mark. ⚠ `追加攻击` and DoT instances carry no cast slot, so they match none of the three -- which is what 「普攻、战技、终结技」 excludes. ⚠ `max_stacks: 2` caps the counter at the threshold (see the rule that answers it). ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
+      "_note": "One of THREE mark rules, one per qualifying cast slot. ⚠ Three rules rather than one because the condition DSL has no OR and `from_skill` states a single slot -- and that is the point: an attack matches exactly one of them, so each qualifying attack adds exactly ONE mark. ⚠ `追加攻击` and DoT instances carry no cast slot, so they match none of the three -- which is what 「普攻、战技、终结技」 excludes. ⚠ `max_stacks: 2` caps the counter at the threshold (see the rule that answers it). ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。",
+      "id": "attack_effect"
     },
     {
       "on": "ALLY_ATTACK",
@@ -192,7 +196,8 @@
         }
       ],
       "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之二（战技）",
-      "_note": "The 战技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
+      "_note": "The 战技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。",
+      "id": "attack_effect_2"
     },
     {
       "on": "ALLY_ATTACK",
@@ -211,7 +216,8 @@
         }
       ],
       "source": "1215 寒鸦 战技: 「…2次普攻、战技、终结技后…」 之三（终结技）",
-      "_note": "The 终结技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。"
+      "_note": "The 终结技 half of the same sentence -- see the 普攻 rule above for why the three are three. ⚠ **2026-09-29 修正**：条件从 `actor is_ally` 改为 **`actor is_other_ally`** ✓。文档写的是「**队友**攻击酩酊目标时」✓，而 `is_ally` **包含冰雅自己** ✗ （她也在 `battle.allies` 里）⇒ 她**自己的施放也会加一层** ✗。这个 bug 之前被掩盖了：`ALLY_ATTACK` 从前**不带目标** ✗，所以 `target has_state 酩酊` 永远不成立 ✗；第 154 轮让它带上目标后才暴露出来 ✓。",
+      "id": "attack_effect_3"
     },
     {
       "on": "ALLY_ATTACK",
@@ -253,7 +259,8 @@
         }
       ],
       "source": "1215 寒鸦 战技: 「…立即为我方恢复1个战技点…并在触发2次战技点恢复效果后自动解除。」 + 行迹 录事「触发【承负】战技点回复效果的我方单位攻击力提高10%，持续1回合」 + 行迹 还阳「当【承负】战技点恢复效果被触发时，自身恢复2点能量」",
-      "_note": "The threshold: at two marks the party gets a skill point (「立即为我方恢复1个战技点」), the third mark clears the whole state (「触发 2 次…后自动解除」 is the SECOND counter -- see below), and the two traces that hang off \"the refund was triggered\" ride in the same rule. ⚠ Why the traces are effects here rather than rules of their own: 「触发…时」 is this moment, and the engine has no event for \"a skill point was refunded\" -- adding one would be a capability for a single reader, while these three consequences are unconditional at that moment. ⚠ 还阳 heals HER energy (`GAIN_ENERGY` with no target = the rule owner) while 录事 boosts the ALLY that triggered it (`target: actor`). ⚠ Order matters inside the rule: the 承负返还 counter increments before the removals, and the removal of 承负次数 resets the two-mark threshold. ⚠ This rule is LAST among the ALLY_ATTACK ones on purpose: rules of one event are evaluated in file order, so the marks land before the threshold is read."
+      "_note": "The threshold: at two marks the party gets a skill point (「立即为我方恢复1个战技点」), the third mark clears the whole state (「触发 2 次…后自动解除」 is the SECOND counter -- see below), and the two traces that hang off \"the refund was triggered\" ride in the same rule. ⚠ Why the traces are effects here rather than rules of their own: 「触发…时」 is this moment, and the engine has no event for \"a skill point was refunded\" -- adding one would be a capability for a single reader, while these three consequences are unconditional at that moment. ⚠ 还阳 heals HER energy (`GAIN_ENERGY` with no target = the rule owner) while 录事 boosts the ALLY that triggered it (`target: actor`). ⚠ Order matters inside the rule: the 承负返还 counter increments before the removals, and the removal of 承负次数 resets the two-mark threshold. ⚠ This rule is LAST among the ALLY_ATTACK ones on purpose: rules of one event are evaluated in file order, so the marks land before the threshold is read.",
+      "id": "attack_effect_4"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -328,7 +335,8 @@
         }
       ],
       "source": "1215 寒鸦 行迹 幽府: 「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的触发次数小于等于1，则额外回复1点战技点。」",
-      "_note": "「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的**触发次数小于等于1**，则额外回复1点战技点」. ⚠ `target has_state 承负` reads the VICTIM (KILL's subject is the one who died), which is what 「持有【承负】的敌方目标」 names. ⚠ The condition is the SECOND counter: 承负次数 is reset at every refund (it is the \"2 次\" threshold), so it cannot count refunds -- 承负返还 is incremented by the refund rule and never cleared, which is exactly 「触发次数」. ⚠ `<= 1` rather than a threshold: the sentence is a ceiling, not a target."
+      "_note": "「持有【承负】的敌方目标被消灭时，如果【承负】为全队回复战技点的**触发次数小于等于1**，则额外回复1点战技点」. ⚠ `target has_state 承负` reads the VICTIM (KILL's subject is the one who died), which is what 「持有【承负】的敌方目标」 names. ⚠ The condition is the SECOND counter: 承负次数 is reset at every refund (it is the \"2 次\" threshold), so it cannot count refunds -- 承负返还 is incremented by the refund rule and never cleared, which is exactly 「触发次数」. ⚠ `<= 1` rather than a threshold: the sentence is a ceiling, not a target.",
+      "id": "on_kill_effect"
     },
     {
       "on": "BATTLE_START",

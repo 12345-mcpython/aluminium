@@ -35,7 +35,8 @@
         }
       ],
       "source": "relic set 320 (渊思巨虑的巨树 / Giant Tree of Rapt Brooding), 2-piece: 「该效果同时对装备者的忆灵生效。」 param = [0.06, 135, 180, 0.12, 0.2]",
-      "_note": "「及其忆灵」 on arrival, the convention 124/319/320 established (set 124's file has the full reasoning). ⚠ The threshold is the WEARER's speed (`self_attr` reads the rule's owner); the memosprite does not have to be fast enough itself."
+      "_note": "「及其忆灵」 on arrival, the convention 124/319/320 established (set 124's file has the full reasoning). ⚠ The threshold is the WEARER's speed (`self_attr` reads the rule's owner); the memosprite does not have to be fast enough itself.",
+      "id": "summoned_effect"
     },
     {
       "on": "BATTLE_START",
@@ -70,7 +71,8 @@
         }
       ],
       "source": "relic set 320 (渊思寂虑的巨树 / Giant Tree of Rapt Brooding), 2-piece: 「该效果同时对装备者的忆灵生效。」 param = [0.06, 135, 180, 0.12, 0.2]",
-      "_note": "The upper tier's arrival rule, matching the one above."
+      "_note": "The upper tier's arrival rule, matching the one above.",
+      "id": "summoned_effect_2"
     }
   ],
   "schema": 1,

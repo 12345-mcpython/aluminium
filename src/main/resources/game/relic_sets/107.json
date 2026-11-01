@@ -28,7 +28,8 @@
         }
       ],
       "source": "relic set 107 (熔岩锻铸的火匠 / Firesmith of Lava-Forging), 4-piece: 「并使施放终结技后的下一次攻击造成的火属性伤害提高#2[i]%。」 param = [0.12, 0.12]",
-      "_note": "The second sentence: 「施放终结技后的<b>下一次攻击</b>」 is an EVENT, not a turn count, so it is `\"until\": \"next_attack\"` -- `turns: 1` would expire on a turn boundary and also survive a turn in which nothing was attacked. ⚠ The scope is the wearer's FIRE damage, not all damage: `FIRE_DAMAGE_BOOST`, so the buff is consumed by the next attack even if that attack is not fire (which is what the sentence says: it is the NEXT attack's fire damage that is raised, not the next fire attack's)."
+      "_note": "The second sentence: 「施放终结技后的<b>下一次攻击</b>」 is an EVENT, not a turn count, so it is `\"until\": \"next_attack\"` -- `turns: 1` would expire on a turn boundary and also survive a turn in which nothing was attacked. ⚠ The scope is the wearer's FIRE damage, not all damage: `FIRE_DAMAGE_BOOST`, so the buff is consumed by the next attack even if that attack is not fire (which is what the sentence says: it is the NEXT attack's fire damage that is raised, not the next fire attack's).",
+      "id": "ult_effect"
     }
   ],
   "schema": 1,

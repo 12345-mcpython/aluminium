@@ -19,7 +19,8 @@
         }
       ],
       "source": "1102 希儿 talent 再现 (Resurgence)",
-      "_note": "Doc: 「消灭敌方目标后，希儿立即获得1个额外回合。」 Modelled with the existing EXTRA_TURN op -- no new engine capability needed, only the KILL event plus the 'actor == self' condition (the killer is me). The talent slot's own data is Enhance/Unknown with stance 0, i.e. it carries no attack, which is exactly why this rule grants a turn instead of dealing damage."
+      "_note": "Doc: 「消灭敌方目标后，希儿立即获得1个额外回合。」 Modelled with the existing EXTRA_TURN op -- no new engine capability needed, only the KILL event plus the 'actor == self' condition (the killer is me). The talent slot's own data is Enhance/Unknown with stance 0, i.e. it carries no attack, which is exactly why this rule grants a turn instead of dealing damage.",
+      "id": "on_kill_effect"
     },
     {
       "on": "HP_LOST",
@@ -61,22 +62,42 @@
     {
       "on": "BATTLE_START",
       "id": "technique_enters_amplified_state",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.8, "turns": 1, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "增幅", "turns": 1, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.8,
+          "turns": 1,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "增幅",
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "1102 希儿 秘技 幻蝶: 「主动攻击敌人进入战斗时，希儿立即进入增幅状态。」+ 天赋 再现 Lv10 = [0.8, 1]（伤害 +80% / 1 回合）",
       "_note": "「主动攻击敌人进入战斗时，希儿**立即进入增幅状态**」—— 增幅的数值取自**天赋**那一行（Lv10 = [0.8, 1]：「造成的伤害提高 80%，持续 1 回合」✓，不是旧登记写的 40%/2 回合 ✗）；实现用 **ALL_DAMAGE_TYPE_BOOST**（BattleDamage 把攻击者的该属性加进增伤区 ✓，与罗刹星魂 4 同一通道），1 回合 ✓。"
-    }
-,
+    },
     {
       "on": "BATTLE_START",
       "id": "eidolon3_levels",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "source": "1102 希儿 星魂 3 缭乱: 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 data: skill_add_level = {110202: 2, 110204: 2}",
       "_note": "「战技 **+2**、天赋 **+2**」—— 取自 eidolons.json 的 skill_add_level ✓。"
@@ -86,8 +107,16 @@
       "id": "eidolon5_levels",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "source": "1102 希儿 星魂 5 锋锐: 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 data: skill_add_level = {110203: 2, 110201: 1}",
       "_note": "「终结技 **+2**、普攻 **+1**」—— 取自 eidolons.json 的 skill_add_level ✓。"
@@ -95,10 +124,20 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "eidolon1_crit_against_the_wounded",
-      "when": ["actor == self", "target_hp_percent <= 0.8"],
+      "when": [
+        "actor == self",
+        "target_hp_percent <= 0.8"
+      ],
       "min_eidolon": 1,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.15, "instance": true, "turns": 1, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.15,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "1102 希儿 星魂 1 斩尽: 「对当前生命值百分比小于等于80%的敌方目标造成伤害时，暴击率提高15%。」 param = [0.8, 0.15]",
       "_note": "「对生命 ≤ **80%** 的敌方目标造成伤害时，**暴击率提高 15%**」—— ① `DEALING_DAMAGE` + `actor == self` ✓；② 门槛 **`target_hp_percent <= 0.8`** ✓；③ 只对这一发 ⇒ **`instance: true`** ✓（`CRIT_CHANCE` 的实例通道 ✓）。"
@@ -106,14 +145,19 @@
     {
       "on": "KILL",
       "id": "eidolon4_energy_on_kill",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "min_eidolon": 4,
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 15, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15,
+          "target": "self"
+        }
       ],
       "source": "1102 希儿 星魂 4 掠影: 「希儿消灭敌方目标时，自身恢复15点能量。」 param = [15]",
       "_note": "「希儿**消灭**敌方目标时，自身恢复 **15** 点能量」—— ① 事件 `KILL` ✓（`actor` = 击杀者 ✓）+ `actor == self` ✓；② `GAIN_ENERGY 15` ✓ 目标 `self` ✓。"
     }
-
   ]
 }

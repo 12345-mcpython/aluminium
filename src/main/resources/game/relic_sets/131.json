@@ -44,7 +44,8 @@
         }
       ],
       "source": "relic set 131 (星如我见的领航员), 4-piece ability Ability51311 — the 「或施放战技时」 half",
-      "_note": "'actor == self' is 'the wearer uses'. Note SKILL_CAST now means the Skill slot *only* (narrowed 2026-09-27, M-24): before that fix this rule also fired on 普攻, so the counter would have grown on every basic attack too and never matched the text."
+      "_note": "'actor == self' is 'the wearer uses'. Note SKILL_CAST now means the Skill slot *only* (narrowed 2026-09-27, M-24): before that fix this rule also fired on 普攻, so the counter would have grown on every basic attack too and never matched the text.",
+      "id": "skill_effect"
     },
     {
       "on": "TURN_START",
@@ -64,7 +65,8 @@
         }
       ],
       "source": "relic set 131 (星如我见的领航员), 4-piece ability Ability51311 — the 「回合开始时…移除1层」 half",
-      "_note": "Two effects, because the two scopes are two independent counters. Removing when there is nothing to remove is a no-op by design (BuffManager.removeStacks), which is what makes 'every turn' safe: the instruction fires whether or not a stack is up. ⚠ Ordering matters and is in our favour: TURN_START is delivered before that turn's Skill is cast, so a turn in which the wearer uses their Skill is a net zero (one stack off, one on) -- which is exactly how the set is supposed to behave."
+      "_note": "Two effects, because the two scopes are two independent counters. Removing when there is nothing to remove is a no-op by design (BuffManager.removeStacks), which is what makes 'every turn' safe: the instruction fires whether or not a stack is up. ⚠ Ordering matters and is in our favour: TURN_START is delivered before that turn's Skill is cast, so a turn in which the wearer uses their Skill is a net zero (one stack off, one on) -- which is exactly how the set is supposed to behave.",
+      "id": "turn_start_effect"
     },
     {
       "on": "ULT_CAST",
@@ -84,7 +86,8 @@
         }
       ],
       "source": "relic set 131 (星如我见的领航员), 4-piece ability Ability51311 — the 「或施放终结技后…移除1层」 half",
-      "_note": "ULT_CAST and SKILL_CAST are mutually exclusive at the emitter, so the two '+' rules and the two '-' rules can never both fire for one action."
+      "_note": "ULT_CAST and SKILL_CAST are mutually exclusive at the emitter, so the two '+' rules and the two '-' rules can never both fire for one action.",
+      "id": "ult_effect"
     }
   ],
   "schema": 1,
