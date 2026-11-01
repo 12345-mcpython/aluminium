@@ -88,8 +88,30 @@ public class MaxHpDamageTest {
      */
     private static Character emptyTable(int eidolon) {
         Character bare = CharacterFactory.create(NATASHA, LEVEL, true, null, null, eidolon);
-        bare.setTriggerTable(new TriggerTable(NATASHA, List.of()));
+        // NOT an empty table any more: the file carries the corpus-wide level convention, so removing every rule would
+        // compare Lv1 damage against Lv10 damage - the difference would be the convention, not Eidolon 6.
+        bare.setTriggerTable(conventionOnly());
         return bare;
+    }
+
+    /**
+     * Her table with exactly one rule left: the level convention (the {@code BATTLE_START} rule that raises all four
+     * slots by nine, which is how every file puts its numbers on the Lv10 row the document quotes).
+     */
+    private static TriggerTable conventionOnly() {
+        EffectSpec common = levelRaise("COMMON");
+        EffectSpec skill = levelRaise("SKILL");
+        EffectSpec ultra = levelRaise("ULTRA");
+        EffectSpec talent = levelRaise("TALENT");
+        return new TriggerTable(NATASHA, List.of(TriggerSpecs.rule("BATTLE_START", null, common, skill, ultra, talent)));
+    }
+
+    private static EffectSpec levelRaise(String slot) {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "RAISE_SKILL_LEVEL");
+        TriggerSpecs.set(effect, "skill", slot);
+        TriggerSpecs.set(effect, "amount", 9.0);
+        return effect;
     }
 
     /**

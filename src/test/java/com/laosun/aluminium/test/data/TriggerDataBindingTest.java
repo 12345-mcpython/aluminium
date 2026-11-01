@@ -41,7 +41,9 @@ public class TriggerDataBindingTest {
         // three rules: the talent (ALLY_ATTACK) and two traces (BATTLE_START, SKILL_CAST). The counts
         // are asserted per event rather than as a total, so a rule that lands on the wrong event is
         // still caught.
-        Assertions.assertEquals(3, robin.ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(4, robin.ruleCount(TriggerEvent.BATTLE_START),
+                "plus the level convention every file now carries");
+        Assertions.assertEquals(4, robin.ruleCount(TriggerEvent.BATTLE_START),
                 "Coloratura Cadenza (华彩花腔): \"advances her own action by 25% at battle start\" (战斗开始时自身行动提前25%)");
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.SKILL_CAST),
                 "Sequential Passage (模进乐段): \"restores 5 extra Energy when casting the Skill\" (施放战技时额外恢复5点能量)");

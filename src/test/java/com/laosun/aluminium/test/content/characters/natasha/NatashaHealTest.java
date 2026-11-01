@@ -39,10 +39,9 @@ public class NatashaHealTest {
         f.ally.takeDamage(f.ally.getMaxHp() * 0.5);
         double before = f.ally.getCurrentHp();
         // The Healer (医者) trace (+10% outgoing healing) is on the same file, so the settled heal is the row times 1.1.
-        // Note: The ENGINE's skill execution is at level 1 (params [0.0, 0.048, 2, 0, 48]), not at the Lv10 row the
-        // document quotes -- a *rule* states its own magnitude, which is why 1105's file needed no rule for this heal at
-        // all. The +10% is the Healer (医者) trace, which is live on this character.
-        double expected = (0.07 * f.natasha.getMaxHp() + 70) * 1.1;
+        // The file carries the corpus-wide level convention (+9 to every slot), so the engine reads the Lv10 row the
+        // document quotes: [0.105, 280]. The +10% is the Healer (医者) trace, live on this character.
+        double expected = (0.105 * f.natasha.getMaxHp() + 280) * 1.1;
 
         double herBefore = f.natasha.getCurrentHp();
         f.castSkillOn(f.ally);
@@ -68,7 +67,7 @@ public class NatashaHealTest {
         // resolved upstream), so both allies are named here.
         f.battle.castImmediate(f.natasha.getSkills().get(SkillType.ULTRA), f.natasha, List.of(f.ally, f.natasha));
 
-        double expected = (0.092 * f.natasha.getMaxHp() + 92) * 1.1;   // Lv1 row [0.092, 92], plus the Healer (医者) trace
+        double expected = (0.138 * f.natasha.getMaxHp() + 368) * 1.1;   // Lv10 row [0.138, 368], plus the Healer (医者) trace
         Assertions.assertEquals(Math.min(f.ally.getMaxHp(), allyBefore + expected), f.ally.getCurrentHp(), 1.0,
                 "「立即为我方全体回复等同于娜塔莎13.80%生命上限+368」 (the Lv10 row the prose quotes; the engine runs Lv1)");
         Assertions.assertEquals(Math.min(f.natasha.getMaxHp(), herBefore + expected), f.natasha.getCurrentHp(), 1.0,
