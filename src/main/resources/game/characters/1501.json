@@ -74,6 +74,46 @@
       ],
       "source": "1501 火花 行迹（文档 `:145`）：「**阿哈时刻结束时使火花获得 1 个【额外回合】**和 2 个【爆点】」",
       "_note": "⭐ 2026-10-02：触发 **已通** ✓（显式移除会公告 `STATE_ENDED` ✓ —— 本段第 20 件）；量用 **`EXTRA_TURN`** ✓（已接线 ✓：`TriggerInterpreter:1165` 直接调 `battle.grantExtraTurn(...)` ✓）。⚠ **已登记**：同句的【爆点】（资源上限在编译表达式里 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1501 星魂 3: 等级加成（数据 skill_add_level: 150101=COMMON+1, 150102=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1501 星魂 5: 等级加成（数据 skill_add_level: 150103=ULTRA+2, 150104=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

@@ -82,7 +82,8 @@
       "min_eidolon": 3,
       "source": "1105 娜塔莎 星魂 3 对症下药 (Avatar_Natasha_00_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110502': 2, '110501': 1}",
       "_note": "The level raise (M-32). ⚠ Stated for completeness as a loadout fact: nothing in this file reads a skill row today — the two heals and the boost state their own magnitudes (the Lv10 rows quoted above) — so this rule moves the engine's own skill execution, not these rules. The caps (15 / 10) are the parameter tables' own sizes, so an over-raise fails loudly instead of reading a row that does not exist (see 1001/1215 for the same convention). ⚠ **Not classified yet in this file**: 星魂 4/5/6 and the 行迹 that ride on the regeneration (调理 「施放战技产生的持续回复效果延长1回合」、星魂 2 「对生命百分比 ≤ 30% 的我方目标附加 1 回合的持续治疗效果」), plus 天赋 生机焕发 「为当前生命值百分比 ≤ 30% 的我方目标提供治疗时，娜塔莎的治疗量提高 50%，该效果对持续治疗效果也会生效」 — the last one needs the same missing piece as everything else here: a hook **before** a heal is computed (the engine has `HEALED`, which fires *after* the HP was restored, and `MODIFY_ATTR` cannot reach an instance that is already being settled). All four are registered in ROADMAP with their readers.",
-      "id": "eidolon3_levels"
+      "id": "eidolon3_levels",
+      "_status": "implemented"
     },
     {
       "on": "SKILL_CAST",

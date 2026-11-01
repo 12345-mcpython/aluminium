@@ -118,6 +118,51 @@
       ],
       "source": "1507 千冶•刃 星魂 1「骨血为薪」后半: 「施放天赋的额外战技后使【无量忿怒】倒计时行动延后15%。」 param = [0.2, 0.15]",
       "_note": "「施放**天赋的额外战技**后…倒计时**行动延后 15%**」—— 条件 `from_skill_id == 150705`（天赋额外战技那一行 ✓，用它把「天赋的额外战技」与普通战技分开）；动作 `DELAY { target: 「countdown」, percent: 0.15 }` ✓ —— **`countdown` 是本轮新增的选择器**（此前 `START_COUNTDOWN` 能造、`COUNTDOWN_TURN` 能看，却没有任何效果能作用于它）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1507 星魂 3: 等级加成（数据 skill_add_level: 150703=ULTRA+2, 150704=TALENT+2, 150714=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1507 星魂 5: 等级加成（数据 skill_add_level: 150701=COMMON+1, 150702=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

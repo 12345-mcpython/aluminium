@@ -100,7 +100,8 @@
         }
       ],
       "source": "1102 希儿 星魂 3 缭乱: 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 data: skill_add_level = {110202: 2, 110204: 2}",
-      "_note": "「战技 **+2**、天赋 **+2**」—— 取自 eidolons.json 的 skill_add_level ✓。"
+      "_note": "「战技 **+2**、天赋 **+2**」—— 取自 eidolons.json 的 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -119,7 +120,8 @@
         }
       ],
       "source": "1102 希儿 星魂 5 锋锐: 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 data: skill_add_level = {110203: 2, 110201: 1}",
-      "_note": "「终结技 **+2**、普攻 **+1**」—— 取自 eidolons.json 的 skill_add_level ✓。"
+      "_note": "「终结技 **+2**、普攻 **+1**」—— 取自 eidolons.json 的 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "DEALING_DAMAGE",

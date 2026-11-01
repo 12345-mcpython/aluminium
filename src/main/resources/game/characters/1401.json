@@ -44,7 +44,7 @@
         },
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         },
         {
@@ -91,10 +91,57 @@
       "on": "ENEMY_ENTERED",
       "id": "talent_insight_on_entry",
       "do": [
-        { "op": "ADD_STACK", "buff": "解读", "amount": 1, "max_stacks": 42, "permanent": true, "target": "actor" }
+        {
+          "op": "ADD_STACK",
+          "buff": "解读",
+          "amount": 1,
+          "max_stacks": 42,
+          "permanent": true,
+          "target": "actor"
+        }
       ],
       "source": "1401 大黑塔 天赋 此心亦如钢铁 (140104): 「敌方目标进入战斗时，大黑塔对其施加1层【解读】。…【解读】最多可叠加42层。」 param Lv10 = [0.08, 0.04, 42, 1, 42, 25]",
       "_note": "「敌方目标**进入战斗时**，大黑塔对其施加 **1 层**【解读】」—— ① 事件 `ENEMY_ENTERED` ✓（`actor` = 新入场的那个敌人 ✓）；② `target: actor` ✓（不是全体、也不是随机 ✓）；③ `max_stacks: 42` ✓（句子的「最多可叠加 **42** 层」✓）。⚠ 同句的其余部分仍开（`_gaps`）：每波开始的 25 层与「优先精英」、按层数的倍率加成、「智识」命途加成、离场转移。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1401 星魂 3: 等级加成（数据 skill_add_level: 140102=SKILL+2, 140104=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1401 星魂 5: 等级加成（数据 skill_add_level: 140101=COMMON+1, 140103=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

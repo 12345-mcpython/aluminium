@@ -134,7 +134,7 @@
           "attribute": "SPEED",
           "percent": -0.12,
           "turns": 2,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "target": "target"
         }
       ],
@@ -166,7 +166,7 @@
           "attribute": "SPEED",
           "percent": -0.2,
           "turns": 2,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "target": "target"
         }
       ],

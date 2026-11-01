@@ -226,6 +226,46 @@
       ],
       "source": "1405 那刻夏 天赋: 「那刻夏对处于【质性揭露】状态的目标造成的伤害提高30%…」 param = [0.3]",
       "_note": "「对处于【质性揭露】状态的目标造成的伤害提高 **30%**」—— `DEALING_DAMAGE` + `actor == self` + `target has_state 质性揭露` → `BOOST_DAMAGE 0.3` ✓（「造成的伤害」= 增伤区 ✓，只作用于这一发 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1405 星魂 3: 等级加成（数据 skill_add_level: 140501=COMMON+1, 140503=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1405 星魂 5: 等级加成（数据 skill_add_level: 140502=SKILL+2, 140504=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ],
   "resources": [

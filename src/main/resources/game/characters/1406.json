@@ -111,7 +111,7 @@
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
-          "percent": 1.0,
+          "percent": 1,
           "element": "Quantum",
           "target": "all_enemies"
         }
@@ -175,7 +175,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "percent": 1.0,
+          "percent": 1,
           "instance": true,
           "damage_type": "ADDITIONAL",
           "permanent": true,
@@ -266,6 +266,46 @@
       ],
       "source": "同上：「**【老主顾】以外的敌方目标的防御力降低 #3%**」（#3 = 0.06）。",
       "_note": "⭐ 否定条件 `!target has_state 老主顾`（已出货的写法）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1406 星魂 3: 等级加成（数据 skill_add_level: 140601=COMMON+1, 140603=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1406 星魂 5: 等级加成（数据 skill_add_level: 140602=SKILL+2, 140604=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

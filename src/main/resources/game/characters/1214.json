@@ -89,7 +89,8 @@
         }
       ],
       "source": "1214 雪衣 星魂 3: 「战技等级+2…普攻等级+1…」 data: {121402: 2, 121401: 1}",
-      "_note": "取自 skill_add_level ✓。"
+      "_note": "取自 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -108,7 +109,8 @@
         }
       ],
       "source": "1214 雪衣 星魂 5: 「终结技等级+2…天赋等级+2…」 data: {121403: 2, 121404: 2}",
-      "_note": "取自 skill_add_level ✓。"
+      "_note": "取自 skill_add_level ✓。",
+      "_status": "implemented"
     },
     {
       "on": "TOUGHNESS_REDUCED",

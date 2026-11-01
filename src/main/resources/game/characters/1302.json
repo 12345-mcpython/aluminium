@@ -246,7 +246,8 @@
       "min_eidolon": 3,
       "source": "1302 银枝 星魂 3 荆棘路的荣光 (Avatar_Argenti_00_Rank03): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'130202': 2, '130204': 2}",
       "_note": "星魂 3's two raises (M-32). ⚠ They compose with the base-level rule by addition (the same arithmetic 1103/1215 use).",
-      "id": "eidolon3_levels"
+      "id": "eidolon3_levels",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -265,7 +266,8 @@
       "min_eidolon": 5,
       "source": "1302 银枝 星魂 5 宇宙某处的雪 (Avatar_Argenti_00_Rank05): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'130203': 2, '130201': 1, '130214': 2}",
       "_note": "星魂 5's two raises. ⚠ The data line names **three** skill ids (130203, 130201 and 130214 — the enhanced ultimate too), while the sentence names two slots: the ULTRA raise covers both ultimate ids because a slot is what the engine reads (`SkillType.ULTRA`), which is why the third id needs no rule of its own. ⚠ **已写**：星魂 2（`eidolon2_attack_with_three_enemies`）与星魂 6（下面那条 `DEALING_DAMAGE`）原先记在这里说\"写不了\"，两条都已在文件里 —— `enemy_count` 与 `DEFENCE_IGNORE` 后来都落地了。⚠ **仍开、已登记在 `_gaps`**：行迹 慷慨「在敌方目标进入战斗时…」（没有敌方入场事件）与强化终结技整段（引擎的施放路径没有数据槽 14，所以「额外 6 次随机单体」与 336% 那一行都放不出来）。",
-      "id": "eidolon5_levels"
+      "id": "eidolon5_levels",
+      "_status": "implemented"
     },
     {
       "on": "DEALING_DAMAGE",

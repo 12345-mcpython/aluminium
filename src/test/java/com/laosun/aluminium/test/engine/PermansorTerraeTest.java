@@ -73,7 +73,7 @@ public class PermansorTerraeTest {
                         + "which is why the two are in this order in the file: the first designates, the second reads "
                         + "`holder_of:同袍`");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the level convention, the technique's Bondmate (【同袍】) (\"gaining the Bondmate after using the Technique\" (「使用秘技后获得【同袍】」)), Sylvanity (葳蕤)'s \"action advance 40%\" (「行动提前40%」) and "
                         + "-- since 2026-10-02 -- the technique's auto-cast, i.e. \"at the start of the next battle it automatically casts 1 Skill on the holder of the Bondmate (【同袍】)\" (「下一次战斗开始时自动对持有【同袍】的"
                         + "角色施放1次战技」), which CAST_SKILL can now deliver because it casts the skill through the "

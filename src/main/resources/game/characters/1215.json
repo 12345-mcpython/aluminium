@@ -92,7 +92,8 @@
       "min_eidolon": 3,
       "source": "1215 寒鸦 星魂 3 三尘 (Avatar_Hanya_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'121502': 2, '121501': 1}",
       "_note": "「**战技**等级+2，最多不超过15级；**普攻**等级+1，最多不超过10级」 — two slots in one sentence, so two effects in one rule (M-32: the level a skill is read at is content, and the raise is a fact of the loadout, which is why it is a `BATTLE_START` amendment rather than a battle event). ⚠ The caps are her parameter tables' own sizes (SKILL 15 rows, COMMON 10 rows), so a raise past them fails loudly at fire time instead of reading a row that does not exist — a `cap` field would be a second place to state the same limit. ⚠ `min_eidolon: 3` is the gate.",
-      "id": "eidolon3_levels"
+      "id": "eidolon3_levels",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -111,7 +112,8 @@
       "min_eidolon": 5,
       "source": "1215 寒鸦 星魂 5 五阴 (Avatar_Hanya_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'121503': 2, '121504': 2}",
       "_note": "「**终结技**等级+2，最多不超过15级；**天赋**等级+2，最多不超过15级」 — the same shape as 星魂 3, for the other two slots. ⚠ It matters to this file in a concrete way: raising ULTRA raises the row her ultimate's numbers are read from, and raising TALENT raises the row her (still registered) talent boost would read. ⚠ Caps = the tables' own sizes, as above. ⚠ `min_eidolon: 5` is the gate.",
-      "id": "eidolon5_levels"
+      "id": "eidolon5_levels",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",

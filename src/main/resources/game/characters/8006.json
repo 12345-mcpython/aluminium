@@ -137,7 +137,8 @@
       "min_eidolon": 3,
       "source": "8006 开拓者 星魂 3 休止符的疗养院 (Avatar_Trailblazer_00_Rank03): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'800602': 2, '800604': 2}",
       "_note": "星魂 3's two raises (M-32), composing with the base-level rule by addition.",
-      "id": "eidolon3_levels"
+      "id": "eidolon3_levels",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
@@ -156,7 +157,8 @@
       "min_eidolon": 5,
       "source": "8006 开拓者 星魂 5 包庇旧节拍的诗 (Avatar_Trailblazer_00_Rank05): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'800603': 2, '800601': 1}",
       "_note": "星魂 5's two raises. ⚠ **Not classified yet in this file** (the document's remaining clauses, each needing something the engine does not have): 行迹 随波逐流「施放战技时，**第一次**伤害的削韧值额外提高 100%」 (`BOOST_TOUGHNESS` exists, but it is a timed buff, so it would boost **every** bounce hit of the cast rather than the first — registering the difference rather than over-applying it), 行迹 剧院之帽「我方目标造成弱点击破后额外使敌方目标**行动延后** 30%」 (the engine has `ADVANCE` and no delay op), 星魂 6 and the 秘技 (a map skill, out of in-battle scope).",
-      "id": "eidolon5_levels"
+      "id": "eidolon5_levels",
+      "_status": "implemented"
     },
     {
       "on": "DEALING_DAMAGE",

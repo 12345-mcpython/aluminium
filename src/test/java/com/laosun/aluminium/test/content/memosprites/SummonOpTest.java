@@ -92,7 +92,7 @@ public class SummonOpTest {
         // Note: two rules: the summoning clause and the rule that states which level her ultimate's numbers were
         // quoted at ("quoted at Lv10" as an ULTRA +9 raise). The level lives in that rule rather than in a `damage_level`
         // field on the damage effect.
-        Assertions.assertEquals(2, TriggerTables.of(CASTORICE_LIKE).ruleCount(TriggerEvent.BATTLE_START));
+        Assertions.assertEquals(4, TriggerTables.of(CASTORICE_LIKE).ruleCount(TriggerEvent.BATTLE_START));
         Assertions.assertFalse(TriggerTables.of(CASTORICE_LIKE).isEmpty());
     }
 

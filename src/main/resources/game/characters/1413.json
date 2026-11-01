@@ -695,6 +695,56 @@
       ],
       "source": "1413 长夜月 忆灵技2「迷梦，流失，如露」(1141307, SkillTriggerKey Skill11)：「…施放后，消耗全部【忆质】和生命值，并使「长夜」消失。」",
       "_note": "「**施放后**，消耗全部【忆质】和生命值，并使「长夜」消失」—— 三句三个 op ✓：① `SPEND_RESOURCE` + **`spendAll`**（「全部」，不写数目 ✓）；② `CONSUME_HP` `scale: owner_max_hp` + `percent: 1.0`（「生命值」= 她自己的上限；op 内部的**下限 1 点**就是原文没说要死 ✓）；③ `DISMISS_SUMMON`（新 op，「消失」≠ 死亡 ✓，走 `perish()` 后 `SUMMON_LEFT` 照常公告 ✓）。⚠ 挂 `ATTACK_FINISHED` 而不是 `CAST_SETUP`：与 11413/1 那条同一个理由 —— 「施放**后**」是这一发**结算之后** ✓；这里的后果（把自己的忆质清零）若在伤害前发生，这一发就会按 0 点结算 ✗ —— 而伤害恰恰要按**这一发开始时**的点数算 ✓（`per_share` 读的是同一时刻）。⚠ 门 `actor == summon` + `from_skill_id == 7`：只有**长夜**施放它自己的槽 7 才触发 ✓（别人的忆灵不算 ✓）。【已把守：`EvernightDreamDumpTest`（50 点 ⇒ 伤害按 50 点算完，随后忆质归零、她降到 1 点生命、长夜离场 ✓）】"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 1
+        }
+      ],
+      "source": "1413 星魂 3: 等级加成（数据 skill_add_level: 141301=COMMON+1, 141302=SKILL+2, 1141303=ULTRA+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "1413 星魂 5: 等级加成（数据 skill_add_level: 141303=ULTRA+2, 141304=TALENT+2, 1141301=COMMON+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ],
   "resources": [

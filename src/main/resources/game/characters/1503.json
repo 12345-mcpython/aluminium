@@ -881,7 +881,7 @@
         {
           "op": "ABSORB_DAMAGE",
           "resource": "好活当赏",
-          "unit_amount": 200.0,
+          "unit_amount": 200,
           "percent": 0.6,
           "permanent": true,
           "target": "all_allies"

@@ -249,7 +249,16 @@
           }
         }
       ],
-      "source": {         "text": "1415 昔涟 强化普攻「向着爱与明天♪」(141508): 「获得#2[i]点【追忆】并对指定敌方单体造成等同于昔涟#3[i]%生命上限的冰属性伤害，随后对敌方全体造成等同于昔涟#1[i]%生命上限的冰属性伤害。【向着爱与明天♪】无法恢复战技点。」 param Lv1 = [0.15, 3, 0.15]",         "skill": "ENHANCED_BASIC",         "row": 1,         "params": {           "#1": 0.15,           "#2": 3,           "#3": 0.15         }       },
+      "source": {
+        "text": "1415 昔涟 强化普攻「向着爱与明天♪」(141508): 「获得#2[i]点【追忆】并对指定敌方单体造成等同于昔涟#3[i]%生命上限的冰属性伤害，随后对敌方全体造成等同于昔涟#1[i]%生命上限的冰属性伤害。【向着爱与明天♪】无法恢复战技点。」 param Lv1 = [0.15, 3, 0.15]",
+        "skill": "ENHANCED_BASIC",
+        "row": 1,
+        "params": {
+          "#1": 0.15,
+          "#2": 3,
+          "#3": 0.15
+        }
+      },
       "_note": "「获得 **#2 点**【追忆】」—— `CAST_SETUP` + `from_skill_id == 8`（强普就是数据槽 8，终结技用 `REPLACE_SKILL` 把普攻换成它 ✓），数量读**这一发施放自己的行**（`cast_param` 1 ⇒ 各行都是 3 ✓，不是字面量）。⚠ 与普通普攻那条的关系：那条加了「不在【往昔的涟漪】里」的门 ⇒ 强普只拿这 3 点 ✓。⚠ **登记**：「**无法恢复战技点**」✗ —— 需要「这一发不产生战技点」的能力（引擎没有）；本文件不动战技点口径，登记而不冒充。"
     },
     {
@@ -292,7 +301,7 @@
           "json": {
             "attribute": {
               "name": "SPEED",
-              "min": 180.0
+              "min": 180
             }
           }
         }
@@ -535,7 +544,7 @@
           "json": {
             "resource": {
               "name": "故事",
-              "min": 3.0
+              "min": 3
             }
           }
         },
@@ -647,7 +656,7 @@
           "json": {
             "resource": {
               "name": "追忆",
-              "min": 24.0
+              "min": 24
             }
           }
         }
@@ -785,7 +794,7 @@
           "json": {
             "resource": {
               "name": "追忆",
-              "min": 12.0
+              "min": 12
             }
           }
         }
@@ -816,7 +825,7 @@
           "json": {
             "resource": {
               "name": "追忆",
-              "min": 24.0
+              "min": 24
             }
           }
         }
@@ -850,7 +859,7 @@
           "json": {
             "resource": {
               "name": "追忆",
-              "min": 12.0
+              "min": 12
             }
           }
         }
@@ -909,6 +918,96 @@
       ],
       "source": "1415 忆灵技能 11/16/18：「德谬歌施放忆灵技时，使风堇获得 2 层【献予「天空」之诗】」（§11）、「整场生效，对长夜月施放后…」（§16）、「…德谬歌被召唤时，使德谬歌获得 1 点【故事】」（§18）。星魂 2 数「每有 1 名不同的我方角色获得德谬歌忆灵技的增益效果」⇒ 这里按 cid 施加三份**已存在的** ode 状态，**不给知更鸟•晴歌**（他没有对应的诗）。",
       "_note": "⚠ 这三份 ode 各自的**效果**由别的规则负责（`sky_ode_*` 在 1409、`time_ode_*` 在 1413、`true_self_ode_*` 在 1415）；本条只负责「谁拿到过」，供星魂 2 计数。⚠ 「献予「天空」之诗」本来就是可叠层的（2 层/次），所以计数时按`hasState || stacksOf > 0` 任一成立即可。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 1
+        }
+      ],
+      "source": "1415 星魂 3: 等级加成（数据 skill_add_level: 141503=ULTRA+2, 141504=TALENT+2, 141514=TALENT+2, 1141501=COMMON+1, 1141502=SKILL+1, 1141513=ULTRA+1, 1141514=TALENT+1, 1141521=COMMON+1, 1141522=SKILL+1, 1141523=ULTRA+1, 1141524=TALENT+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 1
+        }
+      ],
+      "source": "1415 星魂 5: 等级加成（数据 skill_add_level: 141501=COMMON+1, 141502=SKILL+2, 1141503=ULTRA+1）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
     }
   ]
 }

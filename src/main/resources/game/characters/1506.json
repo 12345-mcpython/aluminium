@@ -88,7 +88,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         }
       ],
@@ -220,7 +220,7 @@
         {
           "op": "RESIST_DEBUFF",
           "kind": "control",
-          "percent": 1.0,
+          "percent": 1,
           "permanent": true,
           "buff": "无敌玩家-免疫控制",
           "target": "self"
@@ -404,7 +404,7 @@
         {
           "op": "ADD_DAMAGE",
           "scale": "counted_laughs",
-          "percent": 5.0,
+          "percent": 5,
           "element": "Imaginary",
           "damage_type": "ELATION"
         }
@@ -792,7 +792,7 @@
         "self has_state 无敌玩家"
       ],
       "one_of": true,
-      "chance": 1.0,
+      "chance": 1,
       "chance_decay": 0.2,
       "defer_until_wave": true,
       "do": [
