@@ -73,22 +73,22 @@
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
           "scale": "self_attr:HEALTH",
-          "percent": 0.06,
           "turns": 3,
           "ticks_on": "self",
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "SKILL:3"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.12,
           "turns": 3,
           "ticks_on": "self",
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "SKILL:4"
         }
       ],
       "source": "1208 符玄 战技 太微行棋，灵台示影 (120802, BPSkill/Defence): 「开启【穷观阵】，使符玄队友所承受的未受护盾抵挡之前的伤害的65%分摊给符玄，持续3回合。处于【穷观阵】的我方全体获得【鉴知】。【鉴知】状态下的我方目标生命上限提高，提高数值等同于符玄生命上限的6.00%，暴击率提高12.00%。当符玄陷入无法战斗状态时，【穷观阵】也会被解除。」",
-      "_note": "「持续 **3 回合**。处于【穷观阵】的我方**全体**获得【**鉴知**】。【鉴知】状态下的我方目标**生命上限提高**，提高数值**等同于符玄生命上限的 6.00%**，**暴击率提高 12.00%**」—— ① 标记 `APPLY_BUFF 鉴知 turns 3` + **`all_allies`** ✓；② 生命上限用**派生量** ✓：`scale: self_attr:HEALTH` + `percent: 0.06` ✓ ⇒ **绝对值** = **她**的生命上限 × 6% ✓ （⭐ 注意 `scale` 读的是**规则主人**的属性 ✓ ⇒ 正是文档说的\"**等同于符玄**生命上限\" ✓）；③ 暴击率 `attribute: **CRIT_CHANCE**` ✓（⭐ 属性名是**读**出来的 ✓：`CRIT_CHANCE` = 暴击率 ✓、`CRIT_ATTACK` = 暴击伤害 ✓ —— 二者名字相近，不猜 ✓）；④ 三条都是 `turns: 3` ✓（文档只给【穷观阵】的时长 ✓，而【鉴知】依附于它 ✓）。⚠ **登记**：① 「使符玄队友所承受的**未受护盾抵挡之前的伤害的 65% 分摊给符玄**」✗（**把伤害改道给第三方** ✗）；② ✅ 「当符玄陷入**无法战斗**状态时，【穷观阵】也会被解除」= 三条都加 **`ticks_on: 「self」`** ✓（时钟是**她**）⇒ 计时按**她的回合**走 ✓，且她倒下时 `DeathService.releaseBuffsAnchoredToTheDead` 把锚在她身上的 buff 一并摘掉 ✓（判据 `FuXuanTechniqueTest.herDeathTakesTheZoneOffEveryone` ✓）。⚠ **一次自误**：先前以为该拼写无效，其实是补丁没打上（缩进不匹配）⇒ 结论已订正 ✓。"
+      "_note": "「持续 **3 回合**。处于【穷观阵】的我方**全体**获得【**鉴知**】。【鉴知】状态下的我方目标**生命上限提高**，提高数值**等同于符玄生命上限的 6.00%**，**暴击率提高 12.00%**」—— ① 标记 `APPLY_BUFF 鉴知 turns 3` + **`all_allies`** ✓；② 生命上限用**派生量** ✓：`scale: self_attr:HEALTH` + `percent: 0.06` ✓ ⇒ **绝对值** = **她**的生命上限 × 6% ✓ （⭐ 注意 `scale` 读的是**规则主人**的属性 ✓ ⇒ 正是文档说的\"**等同于符玄**生命上限\" ✓）；③ 暴击率 `attribute: **CRIT_CHANCE**` ✓（⭐ 属性名是**读**出来的 ✓：`CRIT_CHANCE` = 暴击率 ✓、`CRIT_ATTACK` = 暴击伤害 ✓ —— 二者名字相近，不猜 ✓）；④ 三条都是 `turns: 3` ✓（文档只给【穷观阵】的时长 ✓，而【鉴知】依附于它 ✓）。⚠ **登记**：① 「使符玄队友所承受的**未受护盾抵挡之前的伤害的 65% 分摊给符玄**」✗（**把伤害改道给第三方** ✗）；② ✅ 「当符玄陷入**无法战斗**状态时，【穷观阵】也会被解除」= 三条都加 **`ticks_on: 「self」`** ✓（时钟是**她**）⇒ 计时按**她的回合**走 ✓，且她倒下时 `DeathService.releaseBuffsAnchoredToTheDead` 把锚在她身上的 buff 一并摘掉 ✓（判据 `FuXuanTechniqueTest.herDeathTakesTheZoneOffEveryone` ✓）。⚠ **一次自误**：先前以为该拼写无效，其实是补丁没打上（缩进不匹配）⇒ 结论已订正 ✓。 ⚠ **按等级读**（AGENT §0.1.3）：生命上限份额与暴击率份额都取自战技 #4 / #5（口径已补全到四槽）。"
     },
     {
       "on": "SKILL_CAST",
@@ -207,22 +207,22 @@
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
           "scale": "self_attr:HEALTH",
-          "percent": 0.06,
           "turns": 2,
           "ticks_on": "self",
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "SKILL:3"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 0.12,
           "turns": 2,
           "ticks_on": "self",
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "SKILL:4"
         }
       ],
       "source": "1208 符玄 秘技 太微行棋: 「屏障持续期间进入战斗时符玄自动开启【穷观阵】，持续2回合。」 param = [20, 2]",
-      "_note": "「屏障持续期间**进入战斗时自动开启【穷观阵】，持续 2 回合**」—— 与战技那组**同形**（`鉴知` 状态 + 生命上限 6% + 暴击率 12% ✓），只是时长取秘技的 **2 回合** ✓（战技是 3 ✓）。⚠ 秘技的**屏障本身**（大地图效果、抵挡敌人攻击不进入战斗）**未写** ⇒ 见 `_gaps` ✓。"
+      "_note": "「屏障持续期间**进入战斗时自动开启【穷观阵】，持续 2 回合**」—— 与战技那组**同形**（`鉴知` 状态 + 生命上限 6% + 暴击率 12% ✓），只是时长取秘技的 **2 回合** ✓（战技是 3 ✓）。⚠ 秘技的**屏障本身**（大地图效果、抵挡敌人攻击不进入战斗）**未写** ⇒ 见 `_gaps` ✓。 ⚠ **按等级读**（AGENT §0.1.3）：生命上限份额与暴击率份额都取自战技 #4 / #5（口径已补全到四槽）。"
     },
     {
       "on": "DEALING_DAMAGE",
