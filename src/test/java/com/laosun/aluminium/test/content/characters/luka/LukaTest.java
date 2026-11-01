@@ -162,8 +162,8 @@ public class LukaTest {
     @Test
     public void hisFileCarriesTheClauses() {
         TriggerTable table = TriggerTables.of(LUKA);
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the starting layer + the level convention + the technique + Eidolons 3 and 5 (the level bumps)");
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the starting layer + the level convention + the technique + Eidolons 3, 4 and 5");
         Assertions.assertEquals(6, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "one layer rule per cast category, the enhancement, its removal, the bleed tick and the two-layer cost");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the trace's REMOVE_BUFF and the Skill's Bleed (裂伤) DOT");
@@ -201,6 +201,7 @@ public class LukaTest {
         return BattleFixture.alwaysRoll(0.0);
     }
 }
+
 
 
 
