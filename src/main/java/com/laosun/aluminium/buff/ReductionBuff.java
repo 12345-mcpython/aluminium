@@ -59,6 +59,19 @@ public class ReductionBuff extends AbstractBuff implements DamageEvent {
         this.scope = scope;
     }
 
+    /**
+     * Whether two reductions are the same effect: only when they come from the <b>same rule</b> and cover the same
+     * damage type. Two independent sentences (Clara's talent 「受到的伤害降低 10%」 and her Eidolon 4 「降低 30%」) are two
+     * zones and multiply together per the canon's 减伤区 = Π(1 - 减伤); the class-level default would let the second
+     * evict the first, which silently loses a sentence. Re-applying the SAME rule still refreshes rather than stacks.
+     */
+    @Override
+    public boolean isSameKind(AbstractBuff other) {
+        return other instanceof ReductionBuff reduction
+                && reduction.scope == this.scope
+                && java.util.Objects.equals(reduction.ruleId, this.ruleId);
+    }
+
     @Override
     public boolean canAct() {
         return true;

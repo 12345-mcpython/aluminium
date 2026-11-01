@@ -17,26 +17,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Gap witness: the engine REPLACES two same-kind reductions instead of adding them.
+ * Two independent reduction sentences must both land: Clara's talent 「受到的伤害降低 10%」 and her Eidolon 4 「降低 30%」.
  *
- * <p>Clara's talent says 「受到的伤害降低 10%」 and her Eidolon 4 says 「受到的伤害降低 30%」 - two independent sentences, so the
- * game's total is 40%. Measured: after the Eidolon's zone lands, the probe is reduced by 30% total (the talent's 10% is
- * gone), i.e. 0.7 of a bare dummy instead of 0.6. {@link com.laosun.aluminium.buff.ReductionBuff} inherits the
- * class-level {@code isSameKind}, so {@code BuffManager.addBuff} evicts the first one.
- *
- * <p>This test pins today's reading on purpose: the day reductions become additive across sources, the second assertion
- * turns red and the four numbers in the content file become correct without any further edit.
+ * <p>The canon's reduction zone is a <b>product</b> (HSR.md: 减伤区 = Π(1 - 减伤)), so the total is 0.9 x 0.7 = 0.63 - not
+ * 0.6 (that would be additive) and not 0.7 (that is what a same-kind <b>replacement</b> gives, which silently loses the
+ * talent's sentence). {@code ReductionBuff.isSameKind} now compares the creating rule, so two rules coexist while a
+ * re-application of the same rule still refreshes.
  */
-public class ClaraReductionStackingGapTest {
+public class ClaraReductionStackingTest {
 
     private static final int LEVEL = 80;
     private static final int CLARA = 1107;
 
-    /**
-     * Today: E2's 10% is replaced by E4's 30%, so the total is 30% and not 40%.
-     */
     @Test
-    public void todaysTotalIsThirtyPercentNotForty() {
+    public void theTwoSentencesMultiply() {
         Fixture f = new Fixture();
         double dummy = f.probeDummy();
         Assertions.assertEquals(0.9, f.probeClara() / dummy, 1e-6, "the talent alone");
@@ -44,8 +38,8 @@ public class ClaraReductionStackingGapTest {
         f.fireAttackFinishedOnClara();
         double after = f.probeClara();
         System.out.println("[1107] stacking: after=" + after / dummy);
-        Assertions.assertEquals(0.7, after / dummy, 1e-6,
-                "TODAY 30% replaces 10%; the sentences add up to 40% (0.6), so this assertion is the defect witness");
+        Assertions.assertEquals(0.63, after / dummy, 1e-6,
+                "both sentences are in the zone now (a same-kind replacement would give 0.7)");
     }
 
     private static final class Fixture {
@@ -86,3 +80,4 @@ public class ClaraReductionStackingGapTest {
         }
     }
 }
+

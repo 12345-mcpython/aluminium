@@ -54,7 +54,8 @@ public class ClaraEidolonFourTest {
         e4.fireAttackFinishedOnClara();
         double after = e4.probeClara();
         System.out.println("[1107] e4 after=" + after + " dummy=" + dummy + " ratio=" + (after / dummy));
-        Assertions.assertEquals(0.7, after / dummy, 1e-6,
+        // The talent 10% and the Eidolon 30% are two zones, multiplied (0.9 x 0.7 = 0.63).
+        Assertions.assertEquals(0.63, after / dummy, 1e-6,
                 "「受到的伤害降低 30%」 - and it is still up until her next turn starts");
     }
 
