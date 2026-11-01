@@ -1079,6 +1079,14 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
+     * Files a <b>multiplicative</b> amendment on another rule effect percents: "damage multiplier increased by 15%" is a
+     * factor of 1.15, not +15 percentage points (see RuleAmendments).
+     */
+    public void amendRuleEffectPercentScale(String ruleId, double factor) {
+        ruleAmendments.addEffectPercentScale(ruleId, factor);
+    }
+
+    /**
      * Adds {@code delta} to the cooldown of the rule named {@code ruleId} for this battle.
      *
      * <p>Called by the {@code MODIFY_RULE} op, whose load-time check already made sure the named rule states a
@@ -1123,6 +1131,14 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     public Integer ruleEffectMaxStacksBonus(String ruleId) {
         return ruleAmendments.effectMaxStacks(ruleId);
+    }
+
+    /**
+     * @param ruleId the rule id
+     * @return the factor its effect percents are multiplied by, or null when it does not scale
+     */
+    public Double ruleEffectPercentScale(String ruleId) {
+        return ruleAmendments.effectPercentScale(ruleId);
     }
 
     /**

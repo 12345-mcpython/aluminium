@@ -15,6 +15,7 @@ public final class RuleAmendments {
     private final Map<String, Integer> perTurn = new HashMap<>();
     private final Map<String, Double> baseChance = new HashMap<>();
     private final Map<String, Double> effectPercent = new HashMap<>();
+    private final Map<String, Double> effectPercentScale = new HashMap<>();
     private final Map<String, Integer> effectTurns = new HashMap<>();
     private final Map<String, Integer> cooldownDelta = new HashMap<>();
     private final Map<String, Integer> effectMaxStacks = new HashMap<>();
@@ -36,6 +37,16 @@ public final class RuleAmendments {
     public void addBaseChance(String ruleId, double delta) {
         if (ruleId != null && !ruleId.isBlank()) {
             baseChance.merge(ruleId.trim(), delta, Double::sum);
+        }
+    }
+
+    /**
+     * @param ruleId the rule id
+     * @param factor the factor its effect percents are multiplied by
+     */
+    public void addEffectPercentScale(String ruleId, double factor) {
+        if (ruleId != null && !ruleId.isBlank()) {
+            effectPercentScale.merge(ruleId.trim(), factor, (a, b) -> a * b);
         }
     }
 
@@ -101,6 +112,14 @@ public final class RuleAmendments {
      */
     public int cooldownDelta(String ruleId) {
         return ruleId == null || ruleId.isBlank() ? 0 : cooldownDelta.getOrDefault(ruleId.trim(), 0);
+    }
+
+    /**
+     * @param ruleId the rule id
+     * @return the multiplicative amendment, or {@code null} when the rule does not scale
+     */
+    public Double effectPercentScale(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? null : effectPercentScale.get(ruleId.trim());
     }
 
     /**
