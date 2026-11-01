@@ -55,4 +55,30 @@ public class CerydraEidolonTwoTest {
                 com.laosun.aluminium.enums.TriggerEvent.TURN_START, her, her, 0, 0));
         return her.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
+    /**
+     * Eidolon 2's FIRST half:「持有【军功】的角色造成的伤害提高 40%」- the boost follows the HOLDER, so a second cast on
+     * another ally must move it, not add a second one.
+     */
+    @Test
+    public void theMeritHolderItselfDealsMoreAndTheBoostMoves() {
+        Character her = CharacterFactory.create(1412, 80, true, null, null, 2);
+        Character first = CharacterFactory.create(1101, 80);
+        Character second = CharacterFactory.create(1102, 80);
+        Battle battle = new Battle(new ArrayList<>(List.of(her, first, second)),
+                new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.castImmediate(her.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), her, List.of(first));
+        battle.processRequests();
+        double firstAfterFirstCast = first.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        System.out.println("[1412] first holder " + firstAfterFirstCast + " ; second " + second.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
+        Assertions.assertEquals(0.4, firstAfterFirstCast, 1e-9, "「持有【军功】的角色造成的伤害提高 40%」");
+        battle.castImmediate(her.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), her, List.of(second));
+        battle.processRequests();
+        System.out.println("[1412] moved: first " + first.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get()
+                + " ; second " + second.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
+        Assertions.assertEquals(0.0, first.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
+                "the boost MOVES with the merit, it does not stay behind");
+        Assertions.assertEquals(0.4, second.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
+                "and the new holder carries it");
+    }
 }
