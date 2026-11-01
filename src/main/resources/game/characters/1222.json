@@ -3,8 +3,7 @@
   "character": 1222,
   "_status": "partial",
   "_gaps": [
-    "【浮元】行动提前（战技 20% / 终结技 100%）未写：引擎没有召唤物面板",
-    "其余技能 / 天赋 / 星魂：尚未编写"
+    "✅ 【浮元】的行动提前**已落地**（战技 20% / 终结技 100%，`ADVANCE` + `summon` 选择器 + `self_summon_count >= 1` 门槛）—— 原登记「引擎没有召唤物面板」**作废**（`Summon`、`summon` 选择器、`summon_param` 提供器都在）。⚠ **未验证**：她的忆灵数据是否存在于 `skills.json`（若不存在，这两条规则会因门槛恒假而休眠，属于**数据缺口**而非引擎缺口）。⛔ 仍开：普攻 / 天赋 / 其余星魂与秘技。"
   ],
   "rules": [
     {
@@ -157,6 +156,40 @@
       "source": "1222 星魂 5: 等级加成（数据 skill_add_level: 122201=COMMON+1, 122202=SKILL+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_advances_the_summon",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.2,
+          "target": "summon"
+        }
+      ],
+      "source": "1222 灵砂 战技 烟斜雾横: 「…使【浮元】行动提前20%。」",
+      "_note": "「使【浮元】**行动提前 20%**」= `ADVANCE { percent: 0.2, target: 「summon」 }` ✓ —— 引擎**有**召唤物与 `summon` 选择器（原登记「引擎没有召唤物面板」**作废**）。 ⚠ 必须带 `self_summon_count >= 1`：引擎对「没有召唤物时的 `target: summon`」会**抛错**（不是静默跳过），报错信息本身就建议这个门槛。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_the_summon_fully",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "1222 灵砂 终结技 遗芳入梦: 「…使【浮元】行动提前100%。」",
+      "_note": "「使【浮元】**行动提前 100%**」= `ADVANCE { percent: 1, target: 「summon」 }` ✓（100% = 把等待清零）。 ⚠ 必须带 `self_summon_count >= 1`：引擎对「没有召唤物时的 `target: summon`」会**抛错**（不是静默跳过），报错信息本身就建议这个门槛。"
     }
   ]
 }
