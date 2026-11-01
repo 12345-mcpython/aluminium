@@ -12,7 +12,8 @@
     "行迹 旁注：负面效果 ≥ 3 时额外降低 3%（改写另一条规则）未写",
     "星魂：未读",
     "星魂 6 已落地 ✓（`BOOST_DAMAGE` 现在接 `value` 提供器）；星魂 4 仍缺：那条要在**终结技的每一发**上按负面数追加一段伤害，需要「本发之后追加减伤」的时序（与「按削韧量增伤」同族）",
-    "⚠ **星魂 2 只落「强化前」形态**：文档同时给「强化前：效果抵抗 −20%」与「强化后：受到的伤害 +20% + 受击时植入随机【缺陷】」，实装生效的是强化后。实测：把规则改成 `MODIFY_DAMAGE_TAKEN { percent: 0.2, target: all_enemies }` 挂在 `WAVE_START` 上，**规则已编译但敌方身上什么都落不下**（`activeBuffs()` 为空、同一击的伤害不变），而 `MODIFY_ATTR EFFECT_RESISTANCE` 在同一事件上正常生效 ⇒ `MODIFY_DAMAGE_TAKEN` 在 `WAVE_START` 的时序/目标解析有问题，需要先查引擎再改内容。"
+    "⚠ **星魂 2 的强化后形态只覆盖首波**：`MODIFY_DAMAGE_TAKEN` 挂在 **`WAVE_START`** 上**不生效**（规则已编译、`activeBuffs()` 为空、同一击伤害不变；同事件的 `MODIFY_ATTR` 正常）⇒ 现在用 `BATTLE_START`（首波 ✓，实测 ×1.2），**后续波次进场的敌人拿不到**。引擎的 `WAVE_START` 目标解析需要单独查。",
+    "星魂 2 后半句「受我方攻击时 100% 基础概率植入 1 个随机【缺陷】」未写 —— 需要「随机挑一种缺陷」的能力。"
   ],
   "rules": [
     {
@@ -131,20 +132,19 @@
       "_status": "implemented"
     },
     {
-      "on": "WAVE_START",
+      "on": "BATTLE_START",
       "id": "eidolon2_res_down_on_entry",
       "min_eidolon": 2,
       "do": [
         {
-          "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_RESISTANCE",
-          "percent": -0.2,
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
           "permanent": true,
           "target": "all_enemies"
         }
       ],
-      "source": "1006 银狼 星魂 2: 「在敌方目标进入战斗时，使其效果抵抗降低20%。」 param = [0.2]",
-      "_note": "「在敌方目标**进入战斗时**，使其效果抵抗降低 **20%**」—— `WAVE_START`（每一波开场 ✓，也覆盖第一次进场）+ `all_enemies` + `permanent` ✓。⚠ 不用 `ENEMY_ENTERED`：那个事件只在 `startBattle()` **之后**加入的敌人才发（见 AGENT §4.6）⇒ 会漏掉开局那一波。"
+      "source": "1006 银狼 星魂 2 僵尸网络「**强化后**」: 「在敌方目标进入战斗时，使其受到的伤害提高20%。…有100%的基础概率…植入1个随机【缺陷】。」 参数 = [0.2]",
+      "_note": "「**强化后**」形态 ✓：进入战斗时使敌方受到的伤害 +20%（强化前的「效果抵抗 −20%」已被取代 ⇒ 不模拟）。⚠ 事件用 `BATTLE_START` 而不是 `WAVE_START`：实测后者上一个都落不下（见 `_gaps`）。⛔ 后半句「植入随机【缺陷】」未写（需要「随机挑一种缺陷」的能力）。"
     },
     {
       "on": "ULT_CAST",
