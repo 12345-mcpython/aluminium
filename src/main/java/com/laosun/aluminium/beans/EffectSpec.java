@@ -102,6 +102,7 @@ public class EffectSpec {
         copy.castTarget = this.castTarget;
         copy.skill = this.skill;
         copy.skills = this.skills == null ? null : new java.util.ArrayList<>(this.skills);
+        copy.randomOf = this.randomOf == null ? null : new java.util.ArrayList<>(this.randomOf);
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
@@ -1079,6 +1080,16 @@ public class EffectSpec {
      */
     @SerializedName("skills")
     private List<String> skills;
+
+    /**
+     * 「植入 1 个随机【缺陷】」: pick ONE of these state names with the battle's RNG when the effect applies.
+     *
+     * <p>Why a field rather than an op: the application path (lifetime, source, tick owner, target set) is identical to
+     * {@code APPLY_BUFF}'s; only the NAME differs, and a second op would duplicate that path. Reader: 1006 Silver
+     * Wolf's Eidolon 2 (强化后), 「给受到攻击的敌方目标植入 1 个随机【缺陷】」.
+     */
+    @SerializedName("random_of")
+    private List<String> randomOf;
 
     /**
      * Which entry of the skill's per-level parameter row is the damage multiplier.
