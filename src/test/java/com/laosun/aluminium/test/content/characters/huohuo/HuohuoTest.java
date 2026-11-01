@@ -92,15 +92,15 @@ public class HuohuoTest {
      */
     @Test
     public void herFileCarriesTheClauses() {
-        Assertions.assertEquals(2, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.SKILL_CAST),
-                "the cleanse and the state");
+        Assertions.assertEquals(3, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.SKILL_CAST),
+                "the cleanse, the state, and Eidolon 1 speed aura on gain");
         Assertions.assertEquals(1, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.ULT_CAST));
         Assertions.assertEquals(1, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.HEALED),
                 "Eidolon 6: the healed ally deals more");
         Assertions.assertEquals(2, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.TURN_START),
                 "the talent heal and the trace energy - one moment, two statements");
-        Assertions.assertEquals(8, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the technique, the two traces, the level Eidolons, Eidolon 1 and Eidolon 4");
+        Assertions.assertEquals(9, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the technique, the traces, the level Eidolons, Eidolon 1 (amendment + aura) and Eidolon 4");
     }
 
     // ==================================================================
