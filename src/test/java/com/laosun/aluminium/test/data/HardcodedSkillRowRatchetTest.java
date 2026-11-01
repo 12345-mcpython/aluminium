@@ -28,7 +28,7 @@ import java.util.Set;
 public class HardcodedSkillRowRatchetTest {
 
     /**
-     * Every remaining entry is a DECIDED one - `docs/SKILL-ROW-AUDIT.md` groups all of them by reason:
+     * Every remaining entry is a DECIDED one - the reason is recorded in the rules' own `_note` fields, grouped by reason:
      *   - a fixture that never calls `startBattle()`, so the file's level convention never fires (AGENT item 28);
      *   - a rule whose share is scaled by an Eidolon through `MODIFY_RULE effect_percent_scale`, where a literal is
      *     multiplied and a row share is ADDED (item 27);
@@ -46,7 +46,7 @@ public class HardcodedSkillRowRatchetTest {
      *
      * <p>2026-11-01: 1412's Eidolon 4 「终结技的伤害倍率提高 240%」 is a STAR-SOUL parameter (2.4) that happens to equal a row
      * cell, so the scan cannot tell it from a frozen row. It is a share of the SETTLED damage (x3.4), not of the row, and
-     * `docs/SKILL-ROW-AUDIT.md` records it under its own heading.
+     * the rule's own `_note` records why.
      */
     private static final int BASELINE = 36;
 

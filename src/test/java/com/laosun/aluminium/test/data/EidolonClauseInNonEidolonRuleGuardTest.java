@@ -34,7 +34,7 @@ public class EidolonClauseInNonEidolonRuleGuardTest {
     private static final Path ROOT = Path.of("src/main/resources/game");
     private static final List<String> DIRS = List.of("characters", "lightcones", "relics");
 
-    /** Reviewed on 2026-11-01; see {@code docs/MODIFIER-COLLISION-AUDIT.md}, "另一类扫描". */
+    /** Reviewed one by one on 2026-11-01; the reason for each is in this file's ACCEPTED comment. */
     private static final Map<String, Integer> BASELINE = Map.ofEntries(
             Map.entry("1203.json :: talent_zone_opens_at_two_stacks", 1),
             Map.entry("1408.json :: ult_transformation", 2),
