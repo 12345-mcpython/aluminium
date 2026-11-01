@@ -137,6 +137,7 @@ public class EffectSpec {
         copy.attacker = this.attacker;
         copy.kind = this.kind;
         copy.effectPercent = this.effectPercent;
+        copy.effectPercentScale = this.effectPercentScale;
         copy.effectPercentFromResource = effectPercentFromResource;
         copy.effectTurns = this.effectTurns;
         copy.cooldownDelta = this.cooldownDelta;
@@ -1395,6 +1396,13 @@ public class EffectSpec {
      */
     @SerializedName("kind")
     private String kind;
+    /**
+     * How much the amended rule's literal {@code percent} values are MULTIPLIED by: "damage multiplier increased by 15%" is
+     * factor 1.15, while {@code effect_percent} adds percentage points. Reader: 1108 Eidolon 6 (the talent's windshear).
+     */
+    @SerializedName("effect_percent_scale")
+    private Double effectPercentScale;
+
     /**
      * {@code MODIFY_RULE}: raise every {@code percent} read of the named rule's effects by this much
      * ("天赋的伤害提高效果额外提高 10%", 1215 Eidolon 6).

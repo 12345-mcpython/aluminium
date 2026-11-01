@@ -559,12 +559,18 @@ public final class TriggerInterpreter {
             return effect;
         }
         Double percentDelta = owner.ruleEffectPercentBonus(ctx.ruleId());
+        Double percentScale = owner.ruleEffectPercentScale(ctx.ruleId());
         Integer turnsDelta = owner.ruleEffectTurnsBonus(ctx.ruleId());
         Integer stacksDelta = owner.ruleEffectMaxStacksBonus(ctx.ruleId());
-        if (percentDelta == null && turnsDelta == null && stacksDelta == null) {
+        if (percentDelta == null && percentScale == null && turnsDelta == null && stacksDelta == null) {
             return effect;
         }
         EffectSpec amended = effect;
+        if (percentScale != null && effect.getPercent() != null) {
+            // The multiplicative reading (0.52 -> 0.598): the delta below adds points instead. Both spellings load and
+            // run, so the field exists to keep "increased by 15%" apart from "+0.15".
+            amended = amended.withPercent(amended.getPercent() * (percentScale - 1));
+        }
         if (percentDelta != null && effect.getPercent() != null) {
             // Only a LITERAL share is raised in place. When the share comes from a spelling (`percent_from_skill_param` and friends), writing a `percent`
             // here would REPLACE it -- `shareOf` reads `percent` first -- so the amendment would erase the rule's own number instead of adding to it. `shareOf` adds it instead.
@@ -2161,6 +2167,8 @@ public final class TriggerInterpreter {
         } else if (effect.getEffectPercent() != null) {
             // "additionally raise the talent's damage boost effect by 10%": 30% -> 40%, the same rule, raised in place.
             owner.amendRuleEffectPercent(target, effect.getEffectPercent());
+        } else if (effect.getEffectPercentScale() != null) {
+            owner.amendRuleEffectPercentScale(target, effect.getEffectPercentScale());
         } else if (effect.getEffectPercentFromResource() != null) {
             // The SAME amendment, sized by a resource in basis points (reader: 114151"for each 1% of overflow spent...").
             int basisPoints = resourceAmount(ctx.battle(), owner, effect.getEffectPercentFromResource().trim());

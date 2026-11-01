@@ -1163,6 +1163,15 @@ final class TriggerValidator {
                                 "Op " + op + " raises a rule's effect value, so \"effect_percent\" must not be 0 "
                                         + "(source: " + spec.getSource() + ")");
                     }
+                } else if (effect.getEffectPercentScale() != null) {
+                    if (!(effect.getEffectPercentScale() > 0)) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " scales a rule effect values, so \"effect_percent_scale\" is a positive factor "
+                                        + "(1.15 = \"increased by 15%\"); a non-positive factor would flip or erase them "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "effect_percent_scale");
+
                 } else if (effect.getEffectPercentFromResource() != null) {
                     // A fifth amendment spelling: the SIZE is a resource, in basis points.
                     // Note: NOT `requireResource`: that checks `resource`, and this spelling names its resource in `effect_percent_from_resource`.
@@ -1474,8 +1483,8 @@ final class TriggerValidator {
     static void requireOneAmendment(EffectSpec effect, String op, TriggerSpec spec) {
         int stated = 0;
         for (Object candidate : new Object[]{effect.getAmount(), effect.getBaseChance(), effect.getPercent(),
-                effect.getEffectPercent(), effect.getEffectPercentFromResource(), effect.getEffectTurns(),
-                effect.getEffectMaxStacks(), effect.getCooldownDelta()}) {
+                effect.getEffectPercent(), effect.getEffectPercentScale(), effect.getEffectPercentFromResource(),
+                effect.getEffectTurns(), effect.getEffectMaxStacks(), effect.getCooldownDelta()}) {
             if (candidate != null) {
                 stated++;
             }
