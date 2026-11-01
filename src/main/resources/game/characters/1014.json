@@ -218,6 +218,44 @@
     },
     {
       "on": "BASIC_ATTACK",
+      "id": "enhanced_basic_extra_on_two_enemies",
+      "when": [
+        "actor == self",
+        "enemy_count == 2"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "COMMON:0",
+          "element": "Wind",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1014 Saber 强化普攻 解放的金色王权: 「…若施放时敌方目标数量为2/1，额外对敌方全体造成等同于Saber150%/220%攻击力的风属性伤害。」",
+      "_note": "「**敌方数量为 2** 时额外 **150%**」= 条件 `enemy_count == 2` + `DAMAGE { percent_from_skill_param: 「COMMON:0」 }`（Lv6 行 `#1` = **1.5** ✓）。⚠ **必须排在「还原普攻槽」那条之前**：还原会把 `COMMON` 指回槽 1（一行一个数），行读就报 `index 0 outside row (size=1)`。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "enhanced_basic_extra_on_one_enemy",
+      "when": [
+        "actor == self",
+        "enemy_count == 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "COMMON:3",
+          "element": "Wind",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1014 Saber 强化普攻 解放的金色王权: 「…若施放时敌方目标数量为2/1，额外对敌方全体造成等同于Saber150%/220%攻击力的风属性伤害。」",
+      "_note": "「**敌方数量为 1** 时额外 **220%**」= 条件 `enemy_count == 1` + `COMMON:3`（Lv6 行 `#4` = **2.2** ✓）。同样必须排在还原之前。"
+    },
+    {
+      "on": "BASIC_ATTACK",
       "id": "enhanced_basic_restores_the_plain_one",
       "do": [
         {
@@ -305,10 +343,9 @@
     }
   ],
   "_gaps": [
-    "⭐ **从零建立**（2026-11-01）：等级口径、星魂 3/5 等级、星魂 4 固定风穿透、天赋两段、星魂 1 全条、秘技、终结技→强化普攻的替换与还原、强化普攻 +2 点、战技「否则 +3 点」、**星魂 6 的两段**（终结技穿透 +20% / 首次终结技回 300 能量，后者在**事件层**验证）已落地 ✓。",
+    "⭐ **从零建立**（2026-11-01）：等级口径、星魂 1·3·4·5·6（终结技穿透 / 首次终结技回 300 能量）、天赋两段、秘技、终结技→强化普攻的替换与还原、强化普攻 +2 点、**强化普攻的 150%/220% 分档**、战技「否则 +3 点」已落地 ✓。",
     "⛔ **战技的「消耗回满」那一支**：门槛 45 层已查明，但 **`self_stacks:` 按实例不按层** ⇒ 不可达（见 AGENT 第 42 条）。",
-    "⛔ **强化普攻的 150%/220% 分档**：条件 `enemy_count` 已有，但 `percent_from_skill_param: 「COMMON:3」` 解析到**槽 1**（`size=1`）而不是替换后的**槽 8** ⇒ 缺「行读跟随换装」的拼法。",
-    "⛔ 其余未写：星魂 6 的「每再施放 3 次终结技触发 1 次」（环形计数器）、星魂 2 两段（含「每获得 1 点 +1% 无视防御，≤15 层」与「每点额外 +7% 战技倍率」）、行迹【湖之祝福】的溢出能量 200。",
-    "⚠ **近似/登记**：`RESISTANCE_REDUCTION` 是**全属性**；`炉心共鸣` 的 `max_stacks: 60` 是**占位上限**；星魂 6 的穿透用 `turns: 1` 表示「仅本发」。"
+    "⛔ 其余未写：星魂 6 的「每再施放 3 次终结技触发 1 次」（环形计数器）、星魂 2 的两段（「每获得 1 点 +1% 无视防御，≤15 层」/「每点额外 +7% 战技倍率」）、行迹【湖之祝福】的溢出能量 200。",
+    "⚠ **近似/登记**：`RESISTANCE_REDUCTION` 是**全属性**；`炉心共鸣` 的 `max_stacks: 60` 是**占位上限**；星魂 6 的穿透用 `turns: 1` 表示「仅本发」；强化普攻的**两档追加伤害**按 `enemy_count` 判断，而文档说的是「**施放时**敌方目标数量」—— 引擎按结算时的存活数读，两者在敌人中途死亡时会不同。"
   ]
 }
