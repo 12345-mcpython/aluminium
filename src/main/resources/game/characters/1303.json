@@ -6,8 +6,7 @@
     "天赋：击破伤害 120% 冰属性（不是普通 DAMAGE）未写",
     "战技：跨单位状态条件「她持有弦外音时，全队 +32% 伤害 / +50% 击破效率」未写",
     "终结技：【残梅绽】施加 / 从击破恢复时触发 / 延长击破 / 行动延后 / 50% 击破伤害未写",
-    "秘技：自动触发一次战技、模拟宇宙祝福缩放未写",
-    "其余星魂（3 / 4 / 5）未读、未写"
+    "秘技：自动触发一次战技、模拟宇宙祝福缩放未写"
   ],
   "rules": [
     {
@@ -154,6 +153,60 @@
       ],
       "source": "1303 阮•梅 星魂 2 「邂逅」: 「阮•梅在场时，我方全体对处于弱点击破状态的敌方目标造成伤害时，攻击力提高40%。」 param = [0.4]",
       "_note": "「我方全体对**处于弱点击破状态**的敌方目标**造成伤害时**，**攻击力提高 40%**」—— ⚠ 事件必须用 **`CAST_SETUP`**（**结算之前**，1303 的既有写法见 §4.6）；用 `DEALING_DAMAGE` 太晚：那时伤害基础值已算好（实测挂 ATTACK +40% 后比值仍是 1.0 ✗）。条件 `actor is_ally` + `target has_state 弱点击破` ✓（`弱点击破` = `BuffManager.BROKEN_STATE` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1303 阮•梅 星魂 3 「彩缎烟衫绿婆娑」: 「终结技等级+2…天赋等级+2…」 data: {130303: 2, 130304: 2}",
+      "_note": "取自 skill_add_level ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "1303 阮•梅 星魂 5 「手弄慵鬟玲珑钗」: 「战技等级+2…普攻等级+1…」 data: {130302: 2, 130301: 1}",
+      "_note": "取自 skill_add_level ✓。"
+    },
+    {
+      "on": "BREAK",
+      "id": "eidolon4_break_effect_on_break",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 1,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1303 阮•梅 星魂 4 「寻神铜镜前」: 「当敌方目标的弱点被击破时，阮•梅自身击破特攻提高100%，持续3回合。」 param = [1, 3]",
+      "_note": "「**当敌方目标的弱点被击破时**，阮•梅自身**击破特攻提高 100%**，持续 **3 回合**」—— 事件 `BREAK` ✓ + 加成挂在**自己**身上 ✓ + `turns: 3` ✓；param 的 1 就是 100% ✓。"
     }
   ]
 }
