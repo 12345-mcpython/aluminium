@@ -50,7 +50,8 @@
         }
       ],
       "source": "1106 佩拉 行迹 秘策 (1106102): 「佩拉在场时，我方全体的效果命中提高10%。」",
-      "_note": "「**佩拉在场时**，我方全体的**效果命中**提高 10%」 — an existing attribute (`EFFECT_HIT_RATE`), a party-wide target, and 「在场时」 is a loadout fact with no duration (`permanent: true`, not because it is forever but because no turn count is stated)."
+      "_note": "「**佩拉在场时**，我方全体的**效果命中**提高 10%」 — an existing attribute (`EFFECT_HIT_RATE`), a party-wide target, and 「在场时」 is a loadout fact with no duration (`permanent: true`, not because it is forever but because no turn count is stated).",
+      "id": "battle_start"
     },
     {
       "on": "BATTLE_START",
@@ -77,7 +78,8 @@
         }
       ],
       "source": "1106 佩拉 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 210%、终结技 100% 都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of her document, with the blocker each one hits: ⚠ **2026-09-28 补齐**：战技的「解除指定敌方单体的 1 个增益效果」已用 `REMOVE_BUFF` 写出（见本文件最后一条规则）；⚠ **2026-09-28 补齐**：终结技【通解】已写出（状态掷基础概率 + 该状态下的防御力降低，见 `ult_zone_suppression`）；剩下的登记是 行迹 追歼 与 星魂 1–6。"
+      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of her document, with the blocker each one hits: ⚠ **2026-09-28 补齐**：战技的「解除指定敌方单体的 1 个增益效果」已用 `REMOVE_BUFF` 写出（见本文件最后一条规则）；⚠ **2026-09-28 补齐**：终结技【通解】已写出（状态掷基础概率 + 该状态下的防御力降低，见 `ult_zone_suppression`）；剩下的登记是 行迹 追歼 与 星魂 1–6。",
+      "id": "level_convention"
     },
     {
       "on": "SKILL_CAST",

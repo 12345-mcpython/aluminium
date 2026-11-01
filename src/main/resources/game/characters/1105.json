@@ -6,9 +6,15 @@
   "rules": [
     {
       "on": "SKILL_CAST",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "DISPEL", "amount": 1, "target": "target" },
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "target"
+        },
         {
           "op": "APPLY_REGEN",
           "scale": "owner_max_hp",
@@ -22,53 +28,82 @@
       "source": "1105 娜塔莎 战技 爱，救护与抉择 (110502, BPSkill/Restore): 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 param Lv10 = [0.105, 0.072, 2, 280, 192] → #1 = 0.105, #4 = 280；行迹 舒缓 (1105101)：「施放战技时，解除指定我方单体的1个负面效果」；战技第二句：「同时目标每回合开始时为其回复等同于娜塔莎7.20%生命上限+192的生命值，持续2回合」 param Lv10 = [0.105, 0.072, 2, 280, 192] → #2 = 0.072、#5 = 192、#3 = 2",
       "_note": "The trace that rides on the same cast. ⚠ The Skill's own heal 「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 is **NOT** written here: her Skill is a `Restore` skill, so the engine's skill pipeline already heals from the row (110502, Lv10 #1/#4), exactly as a damage skill already deals its damage. ⚠ The first version of this file DID write it as a rule and the suite caught the double heal (measured 671.9 = the engine's 174.3 x 1.1 plus the rule's 480): a rule is for what the row does not already do. ⚠ `DISPEL` is that kind of clause (行迹 舒缓 「施放战技时，解除指定我方单体的1个负面效果」) and it reaches negative buffs only, which is exactly what the sentence says. The regeneration 「同时目标每回合开始时为其回复等同于娜塔莎7.20%生命上限+192的生命值，持续2回合」 (Skill row Lv10 #2 = 0.072, #5 = 192, #3 = 2 turns). ⚠ It is a **buff**, not a `TURN_START` rule, and that is the whole difficulty: the duration is counted down by the buff manager's *early* tick, which runs after the settle pass and before `TURN_START`, so a `turns: 2` **state** read from `TURN_START` is already gone on the second turn (one tick where the document says two). `APPLY_REGEN` settles in `Battle.tickRegens`, beside the DOT pass, so a `turns: 2` regeneration really settles twice. ⚠ `buff: 持续治疗` is required, and not for bookkeeping: 行迹 调理 「施放战技产生的持续回复效果延长1回合」 reaches it by that name (see the next rule). ⚠ The amount is derived from **her** max HP when the rule fires and then frozen, exactly like the shield and the heal; `Battle.heal` still reads her `OUTGOING_HEALING_BOOST`, which is why the trace below multiplies it."
     },
-  
     {
       "on": "TAKING_HIT",
-      "when": ["hp_percent <= 0.3", "!actor is_ally"],
+      "when": [
+        "hp_percent <= 0.3",
+        "!actor is_ally"
+      ],
       "do": [
-        { "op": "HEAL", "scale": "owner_max_hp", "percent": 0.15, "amount": 400, "target": "self" }
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "amount": 400,
+          "target": "self"
+        }
       ],
       "min_eidolon": 1,
       "once_per_battle": true,
       "source": "1105 娜塔莎 星魂 1 遍识药理 (Avatar_Natasha_00_Rank01): 「受到攻击后，若当前生命值百分比小于等于30%，对自身施放1次治疗，回复等同于自身15%生命上限+400的生命值。该效果单场战斗中只能触发1次。」 param = [0.3, 0.15, 400]",
       "_note": "「**受到攻击后**，若当前生命值百分比 ≤ 30%，对自身施放 1 次治疗（15% 生命上限 + 400），该效果单场战斗中只能触发 1 次」. ⚠ The gate is two conditions and two rule fields: `self hp_percent <= 0.3` is 「当前生命值百分比」 (hers, at that moment), `once_per_battle: true` is 「单场战斗中只能触发1次」 — the engine counts that per rule, which is what the sentence means. ⚠ `target: self` is 「对**自身**施放」 (the healer here is the healed). ⚠ `min_eidolon: 1` is the gate. ⚠ It is deliberately not `cooldown`-based: 「单场战斗」 is the whole battle, not a turn count."
     },
-  
     {
       "on": "BATTLE_START",
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "OUTGOING_HEALING_BOOST", "percent": 0.1, "permanent": true, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1105 娜塔莎 行迹 医者 (1105102): 「娜塔莎提供的治疗量提高10%。」",
-      "_note": "「娜塔莎**提供的治疗量**提高 10%」 — the outgoing side of healing, which is a different attribute from anything on the healed unit: `Battle.heal` reads `OUTGOING_HEALING_BOOST` **from the healer** while it computes the amount. ⚠ This is the first shipped content that grants it: the attribute and the read both existed (P2) but nothing had a sentence to spend them on, which is the shape this project refuses to guess at. ⚠ `permanent: true` because a 行迹 is a loadout fact with no duration."
+      "_note": "「娜塔莎**提供的治疗量**提高 10%」 — the outgoing side of healing, which is a different attribute from anything on the healed unit: `Battle.heal` reads `OUTGOING_HEALING_BOOST` **from the healer** while it computes the amount. ⚠ This is the first shipped content that grants it: the attribute and the read both existed (P2) but nothing had a sentence to spend them on, which is the shape this project refuses to guess at. ⚠ `permanent: true` because a 行迹 is a loadout fact with no duration.",
+      "id": "battle_start"
     },
-  
     {
       "on": "BATTLE_START",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "min_eidolon": 3,
       "source": "1105 娜塔莎 星魂 3 对症下药 (Avatar_Natasha_00_Rank03): 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'110502': 2, '110501': 1}",
-      "_note": "The level raise (M-32). ⚠ Stated for completeness as a loadout fact: nothing in this file reads a skill row today — the two heals and the boost state their own magnitudes (the Lv10 rows quoted above) — so this rule moves the engine's own skill execution, not these rules. The caps (15 / 10) are the parameter tables' own sizes, so an over-raise fails loudly instead of reading a row that does not exist (see 1001/1215 for the same convention). ⚠ **Not classified yet in this file**: 星魂 4/5/6 and the 行迹 that ride on the regeneration (调理 「施放战技产生的持续回复效果延长1回合」、星魂 2 「对生命百分比 ≤ 30% 的我方目标附加 1 回合的持续治疗效果」), plus 天赋 生机焕发 「为当前生命值百分比 ≤ 30% 的我方目标提供治疗时，娜塔莎的治疗量提高 50%，该效果对持续治疗效果也会生效」 — the last one needs the same missing piece as everything else here: a hook **before** a heal is computed (the engine has `HEALED`, which fires *after* the HP was restored, and `MODIFY_ATTR` cannot reach an instance that is already being settled). All four are registered in ROADMAP with their readers."
+      "_note": "The level raise (M-32). ⚠ Stated for completeness as a loadout fact: nothing in this file reads a skill row today — the two heals and the boost state their own magnitudes (the Lv10 rows quoted above) — so this rule moves the engine's own skill execution, not these rules. The caps (15 / 10) are the parameter tables' own sizes, so an over-raise fails loudly instead of reading a row that does not exist (see 1001/1215 for the same convention). ⚠ **Not classified yet in this file**: 星魂 4/5/6 and the 行迹 that ride on the regeneration (调理 「施放战技产生的持续回复效果延长1回合」、星魂 2 「对生命百分比 ≤ 30% 的我方目标附加 1 回合的持续治疗效果」), plus 天赋 生机焕发 「为当前生命值百分比 ≤ 30% 的我方目标提供治疗时，娜塔莎的治疗量提高 50%，该效果对持续治疗效果也会生效」 — the last one needs the same missing piece as everything else here: a hook **before** a heal is computed (the engine has `HEALED`, which fires *after* the HP was restored, and `MODIFY_ATTR` cannot reach an instance that is already being settled). All four are registered in ROADMAP with their readers.",
+      "id": "eidolon3_levels"
     },
-  
     {
       "on": "SKILL_CAST",
       "id": "trace_conditioning",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "EXTEND_BUFF", "buff": "持续治疗", "turns": 1, "target": "target" }
+        {
+          "op": "EXTEND_BUFF",
+          "buff": "持续治疗",
+          "turns": 1,
+          "target": "target"
+        }
       ],
       "source": "1105 娜塔莎 行迹 调理 (1105103): 「施放战技产生的持续回复效果延长1回合。」",
       "_note": "「施放战技**产生的**持续回复效果延长1回合」: `EXTEND_BUFF` by the buff's name, which is the same mechanic as 1001's 加护 (「战技提供的护盾持续时间增加1回合」). ⚠ It is a separate rule that sits **after** the Skill's own rule, so the regeneration is already attached when it runs: rules of one event run in file order, and only their *conditions* are evaluated together. ⚠ The +1 is deliberately not folded into the Skill's `turns: 2`: that would erase this trace's line from the data and make the Skill state a duration that is not its own."
     },
-  
     {
       "on": "ULT_CAST",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
         {
           "op": "APPLY_REGEN",
@@ -78,67 +113,110 @@
           "turns": 1,
           "buff": "持续治疗",
           "target": "all_allies",
-          "target_when": ["target_hp_percent <= 0.3"]
+          "target_when": [
+            "target_hp_percent <= 0.3"
+          ]
         }
       ],
       "min_eidolon": 2,
       "source": "1105 娜塔莎 星魂 2 临床研学 (Avatar_Natasha_00_Rank02): 「施放终结技时，对当前生命值百分比小于等于30%的我方目标附加1回合的持续治疗效果，目标回合开始时为其回复等同于娜塔莎6%生命上限+160的生命值。」 param = [0.3, 1, 0.06, 160]",
       "_note": "「施放终结技时，对**生命百分比 ≤ 30% 的**我方目标附加 1 回合的持续治疗效果，目标回合开始时为其回复等同于娜塔莎 6% 生命上限 + 160 的生命值」. ⚠ Two per-target pieces now carry it: `target_when: [\"target_hp_percent <= 0.3\"]` picks the allies who qualify (a rule condition could only have asked about the one ally the ultimate was aimed at), and `turns: 1` is the 「1 回合」 — with `APPLY_REGEN` settling before the duration is counted down, one turn really is one tick. ⚠ It is a **shorter, weaker** regeneration than her Skill's (0.06 + 160 against 0.072 + 192) and it refreshes rather than stacks, which is what 「附加 1 回合的持续治疗效果」 means when the Skill's is already up."
     },
-  
     {
       "on": "BASIC_ATTACK",
       "id": "eidolon6_max_hp_additional_damage",
       "min_eidolon": 6,
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "DAMAGE", "scale": "owner_max_hp", "percent": 0.4, "element": "Physical", "target": "target" }
+        {
+          "op": "DAMAGE",
+          "scale": "owner_max_hp",
+          "percent": 0.4,
+          "element": "Physical",
+          "target": "target"
+        }
       ],
       "source": "1105 娜塔莎 星魂 6 医者仁心 (Avatar_Natasha_00_Rank06): 「施放普攻时，额外造成等同于娜塔莎生命上限40%的物理属性伤害。」 param = [0.4]",
       "_note": "「**施放普攻时，额外造成**等同于娜塔莎**生命上限 40%** 的物理属性伤害」—— ① 触发用 **`BASIC_ATTACK`** ✓（\"施放普攻\" ✓，目标是那名敌人 ✓ = `target` ✓）；② 「额外造成」正是 `DAMAGE` 的语义 ✓（引擎的**附加伤害**入口 ✓：`DamageType.ADDITIONAL` ✓、**不计为一次攻击** ✓ ⇒ 不会自我触发 ✓）；③ 倍率用**字面形态** + **`scale: owner_max_hp`** ✓ —— 即\"**娜塔莎自己的生命上限**\" ✓；该刻度是**第 189 轮新加**的 ✓（原本字面形态只认 `self_attr:<属性>` ✗，读不了生命上限 ✓；实测这类句子共 **16 份**文档 ✓）。⚠ 与她的**治疗**区分 ✓：技能自带的治疗由**数据表**负责 ✓（第 165 轮实测 ✓），本条是**规则自己**造成的伤害 ✓ ⇒ 不重复 ✗。⚠ ⚠ **本条曾有两处错，均已更正**（对照 `1105_娜塔莎.md` 星魂 6 与 tbgd `AvatarRankConfig`）：① `source` 写成「**行迹（额外能力）**」✗ —— 她的三个额外能力是 舒缓 / 医者 / 调理（本文件里各有规则 ✓），而这句话是**星魂 6 医者仁心** ✓；② **缺 `min_eidolon: 6`** ✗ —— 于是这 40% 生命上限的附加伤害在**星魂 0** 就会打出去 ✗，比文档多了一整条效果 ✓。⚠ 数值与效果（40%、物理、附加伤害、不计为攻击）**一直是对的** ✓，错的是**出处**与**门槛**：出处是「这条规则凭什么存在」的证据 ✓，门槛决定它**什么时候**存在 ✓，两者都不是笔误级别的问题 ✗。⚠ 旧 id 是 `trace_max_hp_additional_damage` ✓，随出处一并改为 `eidolon6_max_hp_additional_damage` ✓ —— 留着 `trace` 会让下一个读它的人再错一次 ✗。"
     },
-  
     {
       "on": "BATTLE_START",
       "id": "technique_weaken_and_strike",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "do": [
-        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.8, "element": "Physical", "target": "random_enemy" },
-        { "op": "APPLY_BUFF", "buff": "虚弱", "turns": 1, "target": "all_enemies" },
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": -0.3, "turns": 1, "target": "all_enemies" }
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.8,
+          "element": "Physical",
+          "target": "random_enemy"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "虚弱",
+          "turns": 1,
+          "target": "all_enemies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": -0.3,
+          "turns": 1,
+          "target": "all_enemies"
+        }
       ],
       "source": "1105 娜塔莎 秘技 催眠研习 (110507, Maze/Physical): 「立即攻击敌人，进入战斗后对敌方随机单体造成等同于娜塔莎80%攻击力的物理属性伤害，并有100%的基础概率使敌方每个单体目标陷入虚弱状态。虚弱状态下的敌方目标对我方造成的伤害降低30%，持续1回合。」 param = [1, 0.3, 1, 0.8] → #1 = 1（100% 基础概率）、#2 = 0.3（伤害降低）、#3 = 1（持续回合）、#4 = 0.8（伤害倍率）",
       "_note": "「**立即攻击敌人**，进入战斗后对**敌方随机单体**造成等同于娜塔莎 **80% 攻击力**的物理属性伤害，并有 **100% 的基础概率**使**敌方每个单体目标**陷入**虚弱**状态。虚弱状态下的敌方目标对我方造成的伤害降低 **30%**，持续 **1 回合**。」——一句里两个效果，不是一个。 ① **伤害那半** = `DAMAGE` + `target: random_enemy`（已有选择器）+ `percent: 0.8`（param #4）：「随机单体」是**一个**敌人，「每个单体目标」是**全部**敌人 —— 两者是**不同**的选择器，写成同一个就是错的一半。 ② **虚弱那半** = `APPLY_BUFF 虚弱`（按名）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST -0.3`。⚠ 分成两条不是因为啰嗦：`虚弱` 这个名字本身**不带任何数值**（1406 赛飞儿、1503 真珠都只是按名挂它），真正让「造成的伤害降低 30%」生效的是那条属性修正 —— 1406 的同一句写的是 `-0.1`（10%），此处是 `-0.3`（30%）。只挂 buff 不挂属性 = **一个有名字、没效果的假状态** ✗。 ③ `turns: 1`（param #3）是「持续1回合」。 ④ ⚠ **`base_chance` 没写**：句子里有「100% 的基础概率」，但那是 **100%**，而 `base_chance` 是**逐目标过抵抗管线**的概率（`Battle.hitChance` 还要乘效果命中和敌方效果抵抗）—— 「100% 基础概率」已经是对全部目标无差别生效，写成 `base_chance: 1.0` 会**引入一个文档没写的抵抗判定**，让 100% 变成「可能被抵抗」。⚠ 这是**判断**，不是抄数：param #1 = 1 被记为「100% 基础概率」的事实，而它不落地成 `base_chance` 的理由如上；若将来有文档证明虚弱可被抵抗，这里应改成 `base_chance: 1.0`。 ⑤ 门槛 `self has_state 秘技` ✓ —— 引擎侧由 `Battle.applyTechniqueStates()` 在任何 `BATTLE_START` 规则之前加状态 ✓（与三月七 1001 的秘技同一条通路）。"
     },
-  
     {
       "on": "BATTLE_START",
       "id": "talent_heal_bonus_below_thirty_percent",
       "do": [
-        { "op": "REGISTER_HEAL_BONUS", "percent": 0.5, "target_when": ["target_hp_percent <= 0.3"] }
+        {
+          "op": "REGISTER_HEAL_BONUS",
+          "percent": 0.5,
+          "target_when": [
+            "target_hp_percent <= 0.3"
+          ]
+        }
       ],
       "source": "1105 娜塔莎 天赋 生机焕发 (110504, Enhance): 「为当前生命值百分比小于等于30%的我方目标提供治疗时，娜塔莎的治疗量提高50%，该效果对持续治疗效果也会生效。」 param Lv10 = [0.3, 0.5] → #1 = 0.3（血量门槛）、#2 = 0.5（治疗量提高）",
       "_note": "「为当前生命值百分比 **小于等于30%** 的我方目标提供治疗时，娜塔莎的**治疗量提高50%**，**该效果对持续治疗效果也会生效**。」 ① 用 `REGISTER_HEAL_BONUS` + `target_when: [\"target_hp_percent <= 0.3\"]`，**在治疗那一刻**求值：`Battle.calculateHeal` 用**治疗者**当 `owner`/`actor`、**被治疗者**当 `target` 去问这条条件，所以 `target_hp_percent` 读的正是**要治的那个人**。 ② ⚠ **为什么不是一条属性**：`OUTGOING_HEALING_BOOST` 是**治疗者自己**的事实，**看不见被治疗的是谁** —— 写成属性会把 +50% **平等地**加到「治疗满血队友」上，那是**错数字**。 ③ ⚠ **为什么不是普通规则**：引擎**没有「治疗前」事件** —— `HEALED` 由 `Battle.heal` 在**算完之后**发出，所以没有任何时机能在这笔治疗落地前抬高她的治疗量。唯一同时握着治疗者、被治疗者与 `Battle` 的地方就是 `calculateHeal`。 ④ 「**对持续治疗也生效**」**不需要额外写**：续疗走 `Battle.tickRegens` → `heal(regen.getSource(), target, base)`，**带的是原始施加者** ⇒ 同一条加成天然对每一跳生效。 ⑤ `percent: 0.5` 取**文档正文引用的 Lv10 行**（与本文件其它倍率同一口径：战技护盾/治疗、星魂 2 都读 Lv10）。 ⑥ ⚠ `target_when` 被**复用**了：`EffectSpec` **没有** effect 级的 `when`，而 `target_when` 在 `compile()` 里**已经**被解析成 `Condition` 并交给解释器，含义也一致（「这条效果是关于哪些单位的」）—— 只是这里的单位是**将来的被治疗者**，不是一次伤害的瞄准目标。把它**在治疗时**求值，而不是在触发时。 ⑦ ⚠ 校验器**拒绝**没有 `target_when` 的 `REGISTER_HEAL_BONUS`：无条件版本会抬高每一笔治疗，正是这条 op 存在的意义所要避免的。"
     },
-  
     {
       "on": "TAKING_HIT",
       "id": "eidolon4_energy_on_being_hit",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 5 }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5
+        }
       ],
       "min_eidolon": 4,
       "source": "1105 娜塔莎 星魂 4 妙手回春 (Avatar_Natasha_00_Rank04): 「受到攻击后，额外恢复5点能量。」 param = [5]",
       "_note": "「**受到攻击后**，额外恢复 **5** 点能量。」 ① 事件用 `TAKING_HIT` ✓ —— 「受到攻击后」 ✓，与她的**星魂 1**（同一条句子开头的「受到攻击后」）**同一个事件** ✓。 ② `when: [\"target == self\"]` ✓ —— `TAKING_HIT` 由 `Battle.java` 以**伤害的攻击者**为 `actor`、**被打的人**为 `target` 发出 ✓，所以规则主人是**挨打的那位** ✓，这条条件说的是「这一下打的是我」 ✓。⚠ **不能省**：省了就变成「场上**任何人**挨打都给娜塔莎回能」 ✗。 ③ `amount: 5`（param #1）✓，`target` 省略即作用于规则主人自己 ✓（与 1221 云璃天赋同形 ✓：`GAIN_ENERGY` + `TAKING_HIT` ✓）。 ④ `min_eidolon: 4` ✓ —— 星魂门槛写在**机制旁边** ✓，星魂 0~3 时这条根本不存在 ✓。"
     },
-  
     {
       "on": "BATTLE_START",
       "id": "eidolon5_ultra_and_talent_levels",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "min_eidolon": 5,
       "source": "1105 娜塔莎 星魂 5 医治未病 (Avatar_Natasha_00_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'110503': 2, '110504': 2}",

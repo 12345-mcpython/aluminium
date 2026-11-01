@@ -60,7 +60,8 @@
         }
       ],
       "source": "1301 加拉赫 秘技 亲启佳酿: 「…与处于特殊领域内的敌人进入战斗后，使敌方全体陷入【酩酊】状态，持续2回合，并对敌方全体造成等同于加拉赫50%攻击力的火属性伤害。」",
-      "_note": "The 秘技's **in-battle half**: 「进入战斗后使敌方全体陷入【酩酊】状态，持续 2 回合」 is a `BATTLE_START` fact, which is exactly how this engine models 「进入战斗后」. ⚠ The 50% AoE damage that follows in the same sentence is **not** written: the technique's damage is a separate mechanic with its own place in the pre-battle flow, and the engine settles battle-start effects without an instance. ⚠ The 20-second special field the sentence opens with is a map mechanic, out of in-battle scope. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。"
+      "_note": "The 秘技's **in-battle half**: 「进入战斗后使敌方全体陷入【酩酊】状态，持续 2 回合」 is a `BATTLE_START` fact, which is exactly how this engine models 「进入战斗后」. ⚠ The 50% AoE damage that follows in the same sentence is **not** written: the technique's damage is a separate mechanic with its own place in the pre-battle flow, and the engine settles battle-start effects without an instance. ⚠ The 20-second special field the sentence opens with is a map mechanic, out of in-battle scope. ⚠ **2026-09-28 补齐**：同句前一半「【酩酊】使目标**受到的击破伤害**提高 12%」也已写出 —— 用 `MODIFY_DAMAGE_TAKEN` 的新可选字段 `damage_type: \"BREAK\"`（**承受侧**，按伤害类型限定）。⚠ 它的过滤器 `target has_state 酩酊` 必须排在状态**之后**求值（同一规则内效果按顺序执行），这与 1211 里\"必须先于施加\"的情形正好相反。⚠ 另一侧的同名陷阱：`BREAKING_EFFECT` 是\"**我**打得有多疼\"，与本条\"击破伤害打**我**有多疼\"不是一回事。",
+      "id": "battle_start"
     },
     {
       "on": "ULT_CAST",
@@ -70,7 +71,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "self"
         }
       ],
@@ -94,7 +95,8 @@
       ],
       "min_eidolon": 1,
       "source": "1301 加拉赫 星魂 1 盐与犬 (Avatar_Gallagher_Rank01): 「加拉赫进入战斗后会恢复20点能量，效果抵抗提高50%。」 param = [20, 0.5]",
-      "_note": "星魂 1's two halves: 「进入战斗后恢复 20 点能量」 and 「效果抵抗提高 50%」 — the first is `GAIN_ENERGY` at battle start, the second the existing `EFFECT_RESISTANCE` attribute with no stated duration (「进入战斗后」 = a loadout fact ⇒ `permanent: true`). ⚠ Both numbers come from the eidolon's own row ([20, 0.5]), which is why the data is read rather than the prose alone."
+      "_note": "星魂 1's two halves: 「进入战斗后恢复 20 点能量」 and 「效果抵抗提高 50%」 — the first is `GAIN_ENERGY` at battle start, the second the existing `EFFECT_RESISTANCE` attribute with no stated duration (「进入战斗后」 = a loadout fact ⇒ `permanent: true`). ⚠ Both numbers come from the eidolon's own row ([20, 0.5]), which is why the data is read rather than the prose alone.",
+      "id": "eidolon1_battle_start"
     },
     {
       "on": "BATTLE_START",
@@ -121,7 +123,8 @@
         }
       ],
       "source": "1301 加拉赫 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、终结技 150%、强化普攻 250%、战技 1600 点都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing and damage (his Skill is a `Restore` skill and his ultimate an AoE, both read from rows). ⚠ **Not classified yet** — the rest of his document, each with its blocker: 终结技「并将**下一次普攻强化**为【酒花奔涌】」 (a skill *replacement* — 「强化普攻」 is a different skill object, and the engine has no vocabulary for \"the next basic attack becomes X\"), 天赋「【酩酊】使目标**受到的击破伤害**提高 12.00%」 (a **taken-side** vulnerability scoped to one damage type: `BREAKING_EFFECT` is the dealer side and there is no \"break damage taken\" spelling — the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」), ⚠ **2026-09-28 补齐**：天赋的「回复**攻击者** 640 点生命值」已写出（`HEAL … target: \"attacker\"`，见本文件最后一条规则）—— 此前那条\"没有拼写能指向攻击者\"的登记是**读错了文件**（选择器表在 `TriggerInterpreter`，不在 `TargetSelector.java`）。行迹 崭新配方「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，**最多使提供的治疗量提高 75%**」 (the derived half is expressible with `scale: self_attr:BREAKING_EFFECT`, but the **cap** is not: shipping without it would over-heal exactly in the break-effect builds this trace is for — the clamp gap is registered), 行迹 敬请干杯 (rides on 酒花奔涌), and 星魂 2–6 (not yet read clause by clause)."
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** healing and damage (his Skill is a `Restore` skill and his ultimate an AoE, both read from rows). ⚠ **Not classified yet** — the rest of his document, each with its blocker: 终结技「并将**下一次普攻强化**为【酒花奔涌】」 (a skill *replacement* — 「强化普攻」 is a different skill object, and the engine has no vocabulary for \"the next basic attack becomes X\"), 天赋「【酩酊】使目标**受到的击破伤害**提高 12.00%」 (a **taken-side** vulnerability scoped to one damage type: `BREAKING_EFFECT` is the dealer side and there is no \"break damage taken\" spelling — the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」), ⚠ **2026-09-28 补齐**：天赋的「回复**攻击者** 640 点生命值」已写出（`HEAL … target: \"attacker\"`，见本文件最后一条规则）—— 此前那条\"没有拼写能指向攻击者\"的登记是**读错了文件**（选择器表在 `TriggerInterpreter`，不在 `TargetSelector.java`）。行迹 崭新配方「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，**最多使提供的治疗量提高 75%**」 (the derived half is expressible with `scale: self_attr:BREAKING_EFFECT`, but the **cap** is not: shipping without it would over-heal exactly in the break-effect builds this trace is for — the clamp gap is registered), 行迹 敬请干杯 (rides on 酒花奔涌), and 星魂 2–6 (not yet read clause by clause).",
+      "id": "level_convention"
     },
     {
       "on": "ALLY_ATTACK",

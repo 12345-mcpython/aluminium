@@ -18,7 +18,8 @@
         }
       ],
       "source": "1210 桂乃芬 trace 1210102 投狭",
-      "_note": "Doc text: 「战斗开始时，桂乃芬的行动提前25%。」 Same shape as Robin's 华彩花腔: BATTLE_START fires after the action bar was initialized in the constructor, and ADVANCE skips a fraction of the target's REMAINING wait, defaulting to the rule's owner -- so this pulls her forward and moves nobody else. E0 value (params [0.25])."
+      "_note": "Doc text: 「战斗开始时，桂乃芬的行动提前25%。」 Same shape as Robin's 华彩花腔: BATTLE_START fires after the action bar was initialized in the constructor, and ADVANCE skips a fraction of the target's REMAINING wait, defaulting to the rule's owner -- so this pulls her forward and moves nobody else. E0 value (params [0.25]).",
+      "id": "battle_start"
     },
     {
       "on": "DEALING_DAMAGE",

@@ -24,7 +24,7 @@
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.2,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "turns": 3,
           "target": "target"
         }
@@ -71,9 +71,18 @@
     {
       "on": "ALLY_ATTACK",
       "id": "talent_enhance_basic",
-      "when": ["actor == self", "self_stacks:斗志 >= 2"],
+      "when": [
+        "actor == self",
+        "self_stacks:斗志 >= 2"
+      ],
       "do": [
-        { "op": "REPLACE_SKILL", "skill": "COMMON", "skill_id": 8, "permanent": true, "target": "self" }
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1111 卢卡 天赋: 「当持有的【斗志】大于等于2层时，普攻【直冲拳】强化为【直冲碎天拳】。」 强化普攻 = 槽位 8（数据行 111108，末位即槽位）",
       "_note": "「**≥ 2 层时**，普攻强化为【直冲碎天拳】」—— ⚠ 挂在 `ALLY_ATTACK` 上（见下）：层数是「施放**之后**」才得到的，`ALLY_ATTACK` 在**结算之前**发 ⇒ 挂在它上面会让**跨过 2 层的那一发自己**变成强化版 ✗（实测过 ✓）。⚠ `skill_id` 是**槽位 8**，不是数据行 111108 ✓（装载器按 `skills.json` 内层键索引；`EnhancedSkillDataProbeTest` 常驻 ✓）。⚠ **重复安装是 no-op** ✓（引擎侧已加：同一槽位、同一替换行只保留一个 `SkillSwapBuff`，否则第二个会把强化行记成\"原始\"，卸下时反而装回去 ✗）。"
@@ -119,13 +128,22 @@
     {
       "on": "ALLY_ATTACK",
       "id": "talent_restore_basic",
-      "when": ["actor == self", "self_stacks:斗志 < 2"],
+      "when": [
+        "actor == self",
+        "self_stacks:斗志 < 2"
+      ],
       "do": [
-        { "op": "REPLACE_SKILL", "skill": "COMMON", "remove": true, "target": "self" }
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "remove": true,
+          "target": "self"
+        }
       ],
       "source": "1111 卢卡 天赋: 「当持有的【斗志】大于等于2层时，普攻【直冲拳】强化为【直冲碎天拳】。」（反面：层数不足 2 时是普通普攻）",
       "_note": "「**≥ 2 层时**才强化」的**反面**：层数掉到 2 以下，强化必须**撤掉** ✓ —— `REPLACE_SKILL` 带 **`\"remove\": true`**（2026-10-31 新增 ✓）把该槽位的替换取下、恢复原来的行 ✓。⚠ 为什么不写「换成槽位 1」：那会**再叠一个替换**（`SkillSwapBuff` 会把当前强化行记成\"原始\"），卸下时反而装回强化 ✗。⚠ 两条规则条件互斥（`>= 2` / `< 2`）⇒ 每次攻击只走一条 ✓。"
-    },    {
+    },
+    {
       "on": "ALLY_ATTACK",
       "id": "talent_enhanced_laceration",
       "when": [
@@ -185,7 +203,8 @@
         }
       ],
       "source": "1111 卢卡 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 120%、终结技 330%、强化普攻 20%/80% 都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: ⚠ **2026-09-28 补齐**：战技的裂伤已写出（见本文件最后一条规则）—— 它此前整句登记，因为「自身 24% 生命上限」需要**目标侧份额**、而「最多不超过 338%」是 **min_of_two**（两个派生值取小）。两者都已落地。 ⚠ **仍登记**：天赋的强化普攻替换与\"裂伤立即结算\"、秘技的随机单体、星魂 1–6。"
+      "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **Not classified yet** — the rest of his document, each with its blocker: ⚠ **2026-09-28 补齐**：战技的裂伤已写出（见本文件最后一条规则）—— 它此前整句登记，因为「自身 24% 生命上限」需要**目标侧份额**、而「最多不超过 338%」是 **min_of_two**（两个派生值取小）。两者都已落地。 ⚠ **仍登记**：天赋的强化普攻替换与\"裂伤立即结算\"、秘技的随机单体、星魂 1–6。",
+      "id": "level_convention"
     },
     {
       "on": "SKILL_CAST",
@@ -197,7 +216,7 @@
         {
           "op": "APPLY_DOT",
           "element": "Physical",
-          "base_chance": 1.0,
+          "base_chance": 1,
           "scale": "target_max_hp",
           "percent": 0.24,
           "cap_scale": "self_attr:ATTACK",
@@ -212,12 +231,37 @@
     {
       "on": "BATTLE_START",
       "id": "technique_damage_and_bleed_on_one_enemy",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "pick": "random_enemy",
       "do": [
-        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.5, "element": "Physical", "target": "pick" },
-        { "op": "APPLY_DOT", "element": "Physical", "base_chance": 1.0, "scale": "target_max_hp", "percent": 0.24, "cap_scale": "self_attr:ATTACK", "cap_percent": 3.38, "turns": 3, "target": "pick" },
-        { "op": "ADD_STACK", "buff": "斗志", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" }
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.5,
+          "element": "Physical",
+          "target": "pick"
+        },
+        {
+          "op": "APPLY_DOT",
+          "element": "Physical",
+          "base_chance": 1,
+          "scale": "target_max_hp",
+          "percent": 0.24,
+          "cap_scale": "self_attr:ATTACK",
+          "cap_percent": 3.38,
+          "turns": 3,
+          "target": "pick"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "斗志",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1111 卢卡 秘技 抢先者 (111107, Maze/Enhance): 「立即攻击敌人，进入战斗后对敌方随机单体造成等同于卢卡50%攻击力的物理属性伤害，并有100%的基础概率使目标陷入与战技相同的裂伤状态。随后卢卡额外获得1层【斗志】。」 param = [0.5, 1]",
       "_note": "「进入战斗后对敌方**随机单体**造成 50% 攻击力物理伤害，并有 **100% 基础概率**使**该目标**陷入与战技相同的裂伤，随后额外获得 1 层【斗志】」—— ① ⭐ **规则级 `pick`** ✓（2026-10-31 新增）：`random_enemy` 抽**一次**，两条效果都用 `target: pick` ⇒ 伤害与裂伤落在**同一个**敌人上 ✓（逐效果抽签会分家 ✗）；② 裂伤参数与战技一致 ✓（`target_max_hp 24%`、上限 `338%` 攻击、3 回合 —— 与 `skill_lacerate` 同形）；③ `base_chance: 1.0` ✓（句子自给的基础概率）；④ `ADD_STACK 斗志` 1 层、上限 4 ✓（天赋的「最多 4 层」✓；⚠ `amount` 对 `ADD_STACK` 不是「一次加 N 层」✓，这里是 1 层所以无碍 ✓）。"
@@ -227,8 +271,16 @@
       "id": "eidolon3_raises_skill_and_talent",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "source": "1111 卢卡 星魂 3 为擂台而生: 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 data: skill_add_level = {111102: 2, 111104: 2}",
       "_note": "「战技等级 **+2**、天赋等级 **+2**」—— 数字取自数据行的 `skill_add_level`（111102 = 战技 +2、111104 = 天赋 +2 ✓）；等级上限 15 由 `RAISE_SKILL_LEVEL` 自己的口径处理 ✓。"
@@ -238,8 +290,16 @@
       "id": "eidolon5_raises_ult_and_basic",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "source": "1111 卢卡 星魂 5 地火之魂: 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 data: skill_add_level = {111103: 2, 111101: 1, 111108: 1}",
       "_note": "「终结技 **+2**、普攻 **+1**」—— 取自数据行 `skill_add_level` ✓（111103 = 终结技 +2、111101 = 普攻 +1；111108 是**强化普攻**那一行，同槽位的派生，不额外升 ✓）。"
@@ -249,7 +309,16 @@
       "id": "eidolon4_attack_per_will",
       "min_eidolon": 4,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.05, "per_stack": "斗志", "per_stack_cap": 4, "per_stack_live": true, "permanent": true, "target": "self" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.05,
+          "per_stack": "斗志",
+          "per_stack_cap": 4,
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1111 卢卡 星魂 4 百折不回: 「每获得1层【斗志】，攻击力提高5.00%，该效果最多叠加4层。」 param = [0.05, 4]",
       "_note": "「每获得 **1 层**【斗志】，攻击力提高 **5%**，最多叠加 **4 层**」—— `per_stack: 斗志` + **`per_stack_cap: 4`** + `per_stack_live` ✓（实测：他开局自带天赋 1 层 ⇒ 每加 1 层属性 +0.05×基础，到 4 层后不再涨 ✓）。"
@@ -257,10 +326,20 @@
     {
       "on": "SKILL_CAST",
       "id": "eidolon2_will_on_physical_weakness",
-      "when": ["actor == self", "target has_weakness Physical"],
+      "when": [
+        "actor == self",
+        "target has_weakness Physical"
+      ],
       "min_eidolon": 2,
       "do": [
-        { "op": "ADD_STACK", "buff": "斗志", "amount": 1, "max_stacks": 6, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "斗志",
+          "amount": 1,
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1111 卢卡 星魂 2 敌弱，我强 (AvatarRankDesc_111102): 「若战技击中的敌方目标弱点为物理属性，获得1层【斗志】。」 param = [1]",
       "_note": "「若战技击中的敌方目标**弱点为物理属性**，获得 **1 层**【斗志】」—— ① 条件用现成的 **`target has_weakness Physical`** ✓（引擎的弱点条件，读者族同 1310/1315）；② 事件 `SKILL_CAST` + `actor == self` ✓；③ 层数 `ADD_STACK 斗志 1` ✓（上限 6 = 星魂 6 的「上限 4→6」？本档用 6 与他文件里其它 `斗志` 计数器一致 ✓）。"

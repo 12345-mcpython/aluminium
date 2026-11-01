@@ -16,7 +16,8 @@
         }
       ],
       "source": "1101 布洛妮娅 trace 阵地: 「战斗开始时，我方全体的防御力提高#2[i]%，持续#1[i]回合。」 param = [2, 0.2]",
-      "_note": "The trace's own numbers, and the reading order is worth checking rather than trusting: param[0] = 2 is the turn count and param[1] = 0.2 the DEF share, while the text names them the other way round (#2[i]% then #1[i] turns). 'target: all_allies' is 「我方全体」 — without it the effect would default to the rule's owner and buff only Bronya. Same shape as the Passerby 4-piece and 知更鸟's 军势: a battle-start party buff."
+      "_note": "The trace's own numbers, and the reading order is worth checking rather than trusting: param[0] = 2 is the turn count and param[1] = 0.2 the DEF share, while the text names them the other way round (#2[i]% then #1[i] turns). 'target: all_allies' is 「我方全体」 — without it the effect would default to the rule's owner and buff only Bronya. Same shape as the Passerby 4-piece and 知更鸟's 军势: a battle-start party buff.",
+      "id": "battle_start"
     },
     {
       "on": "SKILL_CAST",
@@ -44,7 +45,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 1.0,
+          "percent": 1,
           "target": "target"
         }
       ],
@@ -268,7 +269,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "percent": 1.0,
+          "percent": 1,
           "instance": true,
           "target": "self",
           "until": "next_attack"

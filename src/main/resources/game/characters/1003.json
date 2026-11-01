@@ -44,7 +44,8 @@
         }
       ],
       "source": "1003 姬子 天赋 乘胜追击 (100304) 的**等级口径**: 她的天赋在文档里按 Lv10 引用（row Lv10 = [1.4, 3]，即「140%攻击力」）",
-      "_note": "This is the file stating **which level its own numbers were quoted at** (M-32), replacing the `damage_level: 10` that the follow-up rule used to carry. ⚠ The two are not the same statement: `damage_level` pins ONE effect to a row, while a level is a fact about the skill — every effect that reads it sees the same level, and a 星魂's raise composes with it instead of being ignored. ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is +9. ⚠ It is unconditional and is not a mechanic (no `min_eidolon`, no `when`). ⚠ Her talent's table has 15 rows, so a later raise stays inside it; a raise past the table fails loudly at fire time instead of reading nothing."
+      "_note": "This is the file stating **which level its own numbers were quoted at** (M-32), replacing the `damage_level: 10` that the follow-up rule used to carry. ⚠ The two are not the same statement: `damage_level` pins ONE effect to a row, while a level is a fact about the skill — every effect that reads it sees the same level, and a 星魂's raise composes with it instead of being ignored. ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is +9. ⚠ It is unconditional and is not a mechanic (no `min_eidolon`, no `when`). ⚠ Her talent's table has 15 rows, so a later raise stays inside it; a raise past the table fails loudly at fire time instead of reading nothing.",
+      "id": "level_convention"
     },
     {
       "on": "BATTLE_START",
@@ -57,7 +58,8 @@
         }
       ],
       "source": "1003 姬子 天赋 乘胜追击 (100304) 第3句: 「战斗开始时获得1点充能。」",
-      "_note": "No `when`: BATTLE_START is fired once to every character's table with no actor and no target (TriggerTable refuses a carried-party condition on it), and this sentence has no condition. No `target` either -- GAIN_RESOURCE defaults to the rule's owner, which is the only unit the sentence names. ⚠ The op is fired through ResourceManager.gain, whose default overflow is 0, so 「上限3点」 is enforced by the declaration above rather than by the rule."
+      "_note": "No `when`: BATTLE_START is fired once to every character's table with no actor and no target (TriggerTable refuses a carried-party condition on it), and this sentence has no condition. No `target` either -- GAIN_RESOURCE defaults to the rule's owner, which is the only unit the sentence names. ⚠ The op is fired through ResourceManager.gain, whose default overflow is 0, so 「上限3点」 is enforced by the declaration above rather than by the rule.",
+      "id": "battle_start"
     },
     {
       "on": "BREAK",
@@ -103,7 +105,15 @@
           "amount": 5
         }
       ],
-      "source": {         "text": "1003 姬子 终结技 留待残烬 (100303, AoEAttack/Ultra) 第二句: 「每消灭1个敌方目标额外恢复姬子5点能量。」 param = [1.38, 5]（技能表 row 1；Lv10 行 [2.3, 5] 的 #2 同为 5）→ #2 = 5",         "skill": "ULTRA",         "row": 1,         "params": { "#1": 1.38, "#2": 5         }       },
+      "source": {
+        "text": "1003 姬子 终结技 留待残烬 (100303, AoEAttack/Ultra) 第二句: 「每消灭1个敌方目标额外恢复姬子5点能量。」 param = [1.38, 5]（技能表 row 1；Lv10 行 [2.3, 5] 的 #2 同为 5）→ #2 = 5",
+        "skill": "ULTRA",
+        "row": 1,
+        "params": {
+          "#1": 1.38,
+          "#2": 5
+        }
+      },
       "_note": "「每消灭1个敌方目标**额外**恢复姬子5点能量」 — 「额外」 is why this is a rule at all, and the reading is not a guess: ① the skill's own `param_list` row 1 is `[1.38, 5]`（Lv10 行是 `[2.3, 5]`，本条只用 #2）, i.e. the document states this 5; ② the engine's **general** kill credit (`Constant.ENERGY_GAIN_KILL`, `StandardEnergyProvider.onKill`) is folded into the attack's own energy (`Battle.grantHitAndKillEnergy`: one attack grants energy once), so it is not this sentence's 5; ③ the text says 「**额外**恢复」. Measured 2026-09-28 (`HimekoKillEnergyTest`): a 1-HP enemy killed by her ultimate pays **10** against **5** for the same cast that does not kill — the difference is exactly this rule — and a kill caused by an ally pays her **0**. ⚠ `from_skill ULTRA` keeps it to kills **her ultimate** caused: `actor == self` alone would also pay for a kill from her 普攻/战技/天赋 follow-up, and the sentence names the ultimate. ⚠ No `target`: 「为姬子恢复」 is GAIN_ENERGY's default. ⚠ No `min_eidolon`: this is the ultimate's own sentence (base kit), unlike 星魂 4 above. ⚠ `KILL` carries the killer as `actor`, the victim as the subject, and the causing instance's cast category."
     },
     {
@@ -162,7 +172,17 @@
           "target": "all_enemies"
         }
       ],
-      "source": {         "text": "1003 姬子 秘技 不完全燃烧 (Incomplete Combustion, 100307, Maze/Impair): 「使用秘技后，制造1片持续15秒的特殊领域。与处于特殊领域内的敌人进入战斗后，有100%的基础概率使敌方目标受到的火属性伤害提高10%，持续2回合。我方制造的领域效果最多存在1个。」param = [1, 0.1, 2, 15] → #1 = 1（100% 基础概率）、#2 = 0.1（受到的/**火属性**伤害 +10%）、#3 = 2（持续回合）、#4 = 15（领域持续秒数）",         "skill": "TECHNIQUE",         "row": 1,         "params": {           "#1": 1,           "#2": 0.1,           "#3": 2,           "#4": 15         }       },
+      "source": {
+        "text": "1003 姬子 秘技 不完全燃烧 (Incomplete Combustion, 100307, Maze/Impair): 「使用秘技后，制造1片持续15秒的特殊领域。与处于特殊领域内的敌人进入战斗后，有100%的基础概率使敌方目标受到的火属性伤害提高10%，持续2回合。我方制造的领域效果最多存在1个。」param = [1, 0.1, 2, 15] → #1 = 1（100% 基础概率）、#2 = 0.1（受到的/**火属性**伤害 +10%）、#3 = 2（持续回合）、#4 = 15（领域持续秒数）",
+        "skill": "TECHNIQUE",
+        "row": 1,
+        "params": {
+          "#1": 1,
+          "#2": 0.1,
+          "#3": 2,
+          "#4": 15
+        }
+      },
       "_note": "「使用秘技后…进入战斗后，有 **100% 的基础概率**使敌方目标受到的**火属性**伤害提高 **10%**，持续 **2 回合**」—— ① 「使用秘技后/进入战斗后」 = `on: BATTLE_START` + `when: self has_state 秘技` ✓，引擎那一半是 `Battle.applyTechniqueStates()` 在**任何** `BATTLE_START` 规则**之前**打上状态 ✓（与 1001 的 `technique_freeze` 同一道门 ✓）；② 「**火属性**伤害提高」 = `scope_element: Fire` ✓ —— ⚠ **这是本轮为它新加的参数** ✓，而且**是独立字段** ✓：`MODIFY_DAMAGE_TAKEN` 原有作用域只有 `damage_type`（DOT / BREAK / ADDITIONAL / ULTRA…）✗，而「受到的**火属性**伤害」要的是**元素**作用域 ✗；属性表里也只有 `ALL_TYPE_RESISTANCE`（全属性）✗。⭐ 若省略这一项写成全属性易伤，就是**把「火」悄悄放宽成「所有属性」** ✗ —— 一个不对的数，且**没有症状** ✗；⚠ 用 `scope_element` 而**不是**已有的 `element` ✓：`element` 是 `DAMAGE` / `APPLY_DOT` / `APPLY_CONTROL` 用来表示**它们产生的东西**的元素 ✓，把易伤的作用域写进同一个字段会让那三个的语义被改写 ✗；③ 「**100% 的基础概率**」 —— ⚠ **故意不写 `base_chance`** ✓，理由量过：`attachRolled` 会把声明了 `base_chance` 的 zone 送上 `tryApplyDebuff` ✓，于是**乘上 (1−效果抵抗)** ✓（实测同一对组合 `hitChance(1.0) = 0.7` ✓ —— 姬子效果命中 0、该敌人效果抵抗 30% ✓）⇒ 写了它这条规则**每次都有 30% 概率静默失效** ✗；而引擎里**不写** `base_chance` 即「直接附着、不判定」✓ ⇒ 与句子「100%」的结果一致 ✓。⚠ **登记**：因此这条**不吃效果命中、也不被效果抵抗** ✗；引擎无法表达「100% 基础概率**且**仍可抵抗」这个组合 ✗（写了被抵抗 30% ✗、不写完全不可抵抗 ✓），选了与句子结果一致的那一种 ✓；④ 「持续 2 回合」 = `turns: 2` ✓（易伤是**受击方**的 debuff ✓，`VulnerabilityBuff.isDebuff()` 本就说自己是负面效果 ✓）；⑤ `target: all_enemies` ✓ —— 「敌方目标」是**所有**敌人 ✓（她的领域包住整片区域 ✓，与 1001 那条单体冻结不同 ✓）；⚠ **登记**：`#4 = 15`（领域持续 15 秒）**没有写** ✗ —— 那是**地图层**的事实 ✓，「与处于领域内的敌人进入战斗」由调用方决定**谁用了秘技**来表达 ✓（`Techniques.released(1003)`），引擎不建模秒数 ✓；「我方制造的领域效果最多存在1个」同理是地图层规则 ✓。"
     },
     {

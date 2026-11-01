@@ -118,7 +118,8 @@
         }
       ],
       "source": "1217 藿藿 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 50%生命上限、战技 21.00%+560、终结技 20%能量/40%攻击力、天赋 4.50%+120 都是该行）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6."
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ It matters to the **engine's own** Skill heal (a `Restore` skill reads its row). ⚠ **Not classified yet**: 秘技 (a map mechanic plus a battle-start clause not yet read), and 星魂 1–6.",
+      "id": "level_convention"
     },
     {
       "on": "BATTLE_START",
@@ -131,7 +132,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": -0.25,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "turns": 2,
           "target": "all_enemies"
         }
@@ -178,8 +179,16 @@
       "id": "eidolon1_longer_talisman",
       "min_eidolon": 1,
       "do": [
-        { "op": "MODIFY_RULE", "rule": "skill_grants_talisman", "effect_turns": 1 },
-        { "op": "MODIFY_RULE", "rule": "trace_fearful_to_act", "effect_turns": 1 }
+        {
+          "op": "MODIFY_RULE",
+          "rule": "skill_grants_talisman",
+          "effect_turns": 1
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "trace_fearful_to_act",
+          "effect_turns": 1
+        }
       ],
       "source": "1217 藿藿 星魂 1 人间烟火: 「天赋产生的【禳命】持续时间延长1回合…」 param = [0.12, 1]",
       "_note": "「【禳命】的**持续时间延长 1 回合**」—— 用 `MODIFY_RULE` 的 **`effect_turns`** ✓，分别指向**两条**会挂【禳命】的规则（战技 `skill_grants_talisman`、行迹 `trace_fearful_to_act`）✓ —— 不另写一条更长的 `APPLY_BUFF` ✗（那样两条会互相顶掉 ✓）。⚠ 星魂 1 的**另一半**（「持有【禳命】时我方全体速度 +12%」）**未写** ⇒ 见 `_gaps`。"
@@ -188,7 +197,12 @@
       "on": "BATTLE_START",
       "id": "trace_fearful_to_act",
       "do": [
-        { "op": "APPLY_BUFF", "buff": "禳命", "turns": 1, "target": "self" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "禳命",
+          "turns": 1,
+          "target": "self"
+        }
       ],
       "source": "1217 藿藿 行迹 不敢自专 (1217101): 「战斗开始时，藿藿获得【禳命】，持续1回合。」 param = [1]",
       "_note": "「**战斗开始时**，藿藿获得【禳命】，持续 **1 回合**」—— `BATTLE_START` + `APPLY_BUFF 禳命` + `turns: 1` ✓（与战技那条同一个状态 ✓，所以「有禳命」的所有读者自动受益 ✓）。"
@@ -197,7 +211,13 @@
       "on": "BATTLE_START",
       "id": "trace_cursed_one",
       "do": [
-        { "op": "RESIST_DEBUFF", "percent": 0.35, "permanent": true, "target": "self", "kind": "control" }
+        {
+          "op": "RESIST_DEBUFF",
+          "percent": 0.35,
+          "permanent": true,
+          "target": "self",
+          "kind": "control"
+        }
       ],
       "source": "1217 藿藿 行迹 贞凶之命 (1217102): 「抵抗控制类负面状态的概率提高35%。」 param = [0.35]",
       "_note": "「抵抗**控制类**负面状态的概率提高 35%」—— `RESIST_DEBUFF` + **`kind: control`** ✓（引擎按**类**建模 = `ClassResistBuff`，`debuffResistOf(CONTROL)` 能读 ✓），**不是**改通用效果抵抗 ✗（那会对所有负面生效，过度 ✗）；`permanent: true` ✓（行迹常驻 ✓）。"
@@ -205,9 +225,14 @@
     {
       "on": "TURN_START",
       "id": "trace_stress_reaction",
-      "when": ["self has_state 禳命"],
+      "when": [
+        "self has_state 禳命"
+      ],
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 1 }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 1
+        }
       ],
       "source": "1217 藿藿 行迹 怯惧应激 (1217103): 「触发天赋为我方目标提供治疗时，藿藿恢复1点能量。」 param = [1]",
       "_note": "「触发**天赋**为我方目标提供治疗时，藿藿恢复 **1 点能量**」—— 天赋的治疗本身就挂在 `TURN_START` + `self has_state 禳命` 上 ✓（见本档那条 `HEAL` 规则 ✓）⇒ 回能挂在**同一个时刻** ✓。⚠ 与治疗规则**分开**写：一条规则只做一类事，扣层/回能可以各自变异 ✓。"
@@ -217,8 +242,16 @@
       "id": "eidolon3_levels",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "source": "1217 藿藿 星魂 3 日出为晞: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 skill_add_level = {121703: 2, 121704: 2}",
       "_note": "「终结技等级 **+2**；天赋等级 **+2**」—— 与数据 `skill_add_level` 逐项吻合 ✓；与 `level_convention` 叠加 ✓。"
@@ -228,8 +261,16 @@
       "id": "eidolon5_levels",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "source": "1217 藿藿 星魂 5 荒忽兮远望: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 skill_add_level = {121702: 2, 121701: 1}",
       "_note": "「战技等级 **+2**；普攻等级 **+1**」—— 数据逐项吻合 ✓。⚠ 行迹里的「战技 +1 级」是另一句（第 3 项），与本条可叠加 ✓。"
@@ -237,10 +278,18 @@
     {
       "on": "HEALED",
       "id": "eidolon6_healed_ally_deals_more",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "min_eidolon": 6,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.5, "turns": 2, "target": "target" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "turns": 2,
+          "target": "target"
+        }
       ],
       "source": "1217 藿藿 星魂 6 同渡彼岸: 「为我方目标提供治疗时，使目标造成的伤害提高50%，持续2回合。」 param = [0.5, 2]",
       "_note": "「为我方目标提供**治疗**时，使目标造成的伤害提高 **50%**，持续 **2 回合**」—— ① 事件 **`HEALED`** ✓（`Battle.heal` 在算完治疗量之后广播，`actor` = 施疗者、`target` = 被疗者 ✓）；② `actor == self` ✓（只有**她**的治疗算 ✓，别人的治疗不会给这层增伤 ✓）；③ `turns: 2` ✓ + `target: target` ✓（被疗者自己 ✓）。"
@@ -250,7 +299,11 @@
       "id": "eidolon4_more_healing_for_the_hurt",
       "min_eidolon": 4,
       "do": [
-        { "op": "REGISTER_HEAL_BONUS", "percent": 0.8, "scale_by_missing_hp": true }
+        {
+          "op": "REGISTER_HEAL_BONUS",
+          "percent": 0.8,
+          "scale_by_missing_hp": true
+        }
       ],
       "source": "1217 藿藿 星魂 4 乐以忘忧: 「施放战技或触发天赋为我方目标提供治疗时，目标的当前生命值越低治疗量越高，最多使藿藿提供的治疗量提高80%。」 param = [0.8]",
       "_note": "「目标的**当前生命值越低**，治疗量越高，**最多 +80%**」—— ① 这是**连续**函数，不是门槛 ⇒ `REGISTER_HEAL_BONUS` 加 **`scale_by_missing_hp: true`** ✓：加成 = `percent × (1 - 目标当前生命%)` ⇒ 满血 **+0%**、半血 **+40%**、空血 **+80%** ✓；② 正因为它在满血时也是 0，**不需要 `target_when`** ✓（校验器对带该标志的登记放宽——否则会强迫写一个永真的条件 ✗）。"
@@ -258,10 +311,19 @@
     {
       "on": "SKILL_CAST",
       "id": "eidolon1_speed_aura_on_gain",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "min_eidolon": 1,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "permanent": true, "while_state": "禳命", "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.12,
+          "permanent": true,
+          "while_state": "禳命",
+          "target": "all_allies"
+        }
       ],
       "source": "1217 藿藿 星魂 1 人间烟火: 「…且当藿藿拥有【禳命】时我方全体提高12%的速度。」 param = [0.12, 1]",
       "_note": "「**当藿藿拥有【禳命】时**我方全体提高 **12%** 的速度」—— ① 用新的 **`while_state: 禳命`** ✓：修饰挂在**全体**身上、但**门在藿藿身上**（谁施放规则就查谁 ✓）⇒ 禳命一离场，缓冲在下一个回合边界被摘掉 ✓（`AbstractBuff.gateBroken`）；② 不写 `turns` ✗ —— 句子说的是「拥有期间」，写回合数会在状态还在时掉 ✗；③ 这条挂在**战技**上（她这次施放正好给自己上了禳命 ✓），行迹那条在开战时另挂一次 ✓（同属性同来源类型 ⇒ 互相刷新，不会叠两层 ✓）。"
@@ -271,7 +333,14 @@
       "id": "eidolon1_speed_aura_on_start",
       "min_eidolon": 1,
       "do": [
-        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.12, "permanent": true, "while_state": "禳命", "target": "all_allies" }
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.12,
+          "permanent": true,
+          "while_state": "禳命",
+          "target": "all_allies"
+        }
       ],
       "source": "1217 藿藿 星魂 1 人间烟火: 「…且当藿藿拥有【禳命】时我方全体提高12%的速度。」 param = [0.12, 1]",
       "_note": "与上一条相同的第二半，挂在 `BATTLE_START`：行迹 不敢自专 在开战时给禳命 ✓，所以这里的门当场成立 ✓。⚠ 两条都写是因为「获得禳命」有两个时刻（开战 / 战技），缓冲本身按属性刷新 ⇒ 不会叠 ✓。"

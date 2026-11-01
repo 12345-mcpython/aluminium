@@ -136,7 +136,8 @@
       ],
       "min_eidolon": 1,
       "source": "1302 银枝 星魂 1 审美王国的缺口 (Avatar_Argenti_00_Rank01): 「每层【升格】额外使暴击伤害提高4%。」 param = [0.04]",
-      "_note": "「**每层**【升格】额外使暴击伤害提高 4%」 — one stackable crit-damage modifier on the same name and cap as the talent's crit-rate one. ⚠ **This clause is KNOWN WRONG and registered, not papered over** (2026-10-31 measured): the modifier is attached **once at battle start**, so the crit damage is a flat **+0.04** at every stack count, including zero - the sentence says per layer, and 0 layers must give 0. The engine's per-stack arms are the ones that turned out not to line up (see the registration in `_gaps`); the fix is the same shape as the talent's stacks (one modifier re-applied whenever a layer is gained), and `ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks` is the witness that goes red when it lands."
+      "_note": "「**每层**【升格】额外使暴击伤害提高 4%」 — one stackable crit-damage modifier on the same name and cap as the talent's crit-rate one. ⚠ **This clause is KNOWN WRONG and registered, not papered over** (2026-10-31 measured): the modifier is attached **once at battle start**, so the crit damage is a flat **+0.04** at every stack count, including zero - the sentence says per layer, and 0 layers must give 0. The engine's per-stack arms are the ones that turned out not to line up (see the registration in `_gaps`); the fix is the same shape as the talent's stacks (one modifier re-applied whenever a layer is gained), and `ArgentiStacksTest.herCritDamageDoesNotFollowTheStacks` is the witness that goes red when it lands.",
+      "id": "eidolon1_battle_start"
     },
     {
       "on": "CAST_SETUP",
@@ -198,7 +199,8 @@
       ],
       "min_eidolon": 4,
       "source": "1302 银枝 星魂 4 号角的奉献 (Avatar_Argenti_00_Rank04): 「战斗开始时，获得2层【升格】，并使天赋的效果可叠加上限提高2层。」 param = [2, 2] + 后半「并使天赋的效果可叠加上限提高2层」（用 `effect_max_stacks: 2` 抬三条天赋规则的上限）",
-      "_note": "「**战斗开始时，获得 2 层**【升格】」 — two effects because one stack is one buff: stating the same modifier twice at battle start attaches two of them, which is what 「2 层」 means and is the same shape 遗器's stacking bonuses use. ⚠ **Registered, not written**: the second half 「使天赋的效果**可叠加上限提高 2 层**」 would raise a `max_stacks` field on another rule's effect, which is `MODIFY_RULE`'s family but a **fourth** form (it raises a count of firings, a probability, a value and a duration today — not a cap). Filing it as two extra stacks instead would be wrong in the one case that matters: they must be able to exceed 10. ⚠ **2026-09-28 补齐**：后半「使天赋的效果**可叠加上限提高 2 层**」现在写出来了 —— `MODIFY_RULE` 的**第四形态**（`effect_max_stacks: 2`），三条天赋规则各抬一次（一条规则抬一条规则）。⚠ 写成\"再补两层\"是**错的**：它必须能**超过 10 层**，而补两层仍受 10 层上限约束。⚠ 修正案在战斗开始时就登记，而层数是之后一次次命中才叠上去的，所以新上限**来得及**生效（`max_stacks` 是 buff 实例上的值，事后抬没用）。"
+      "_note": "「**战斗开始时，获得 2 层**【升格】」 — two effects because one stack is one buff: stating the same modifier twice at battle start attaches two of them, which is what 「2 层」 means and is the same shape 遗器's stacking bonuses use. ⚠ **Registered, not written**: the second half 「使天赋的效果**可叠加上限提高 2 层**」 would raise a `max_stacks` field on another rule's effect, which is `MODIFY_RULE`'s family but a **fourth** form (it raises a count of firings, a probability, a value and a duration today — not a cap). Filing it as two extra stacks instead would be wrong in the one case that matters: they must be able to exceed 10. ⚠ **2026-09-28 补齐**：后半「使天赋的效果**可叠加上限提高 2 层**」现在写出来了 —— `MODIFY_RULE` 的**第四形态**（`effect_max_stacks: 2`），三条天赋规则各抬一次（一条规则抬一条规则）。⚠ 写成\"再补两层\"是**错的**：它必须能**超过 10 层**，而补两层仍受 10 层上限约束。⚠ 修正案在战斗开始时就登记，而层数是之后一次次命中才叠上去的，所以新上限**来得及**生效（`max_stacks` 是 buff 实例上的值，事后抬没用）。",
+      "id": "eidolon4_battle_start"
     },
     {
       "on": "BATTLE_START",
@@ -225,7 +227,8 @@
         }
       ],
       "source": "1302 银枝 技能表的**等级口径**: 文档引用的是 Lv10 行（130201 = 1.4、130202 = 1.2、130203 = [1.6, 90]、130214 = [2.8, 6, 0.95, 180]、130204 = [3, 0.025, 10]）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it."
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it.",
+      "id": "level_convention"
     },
     {
       "on": "BATTLE_START",
@@ -243,7 +246,8 @@
       ],
       "min_eidolon": 3,
       "source": "1302 银枝 星魂 3 荆棘路的荣光 (Avatar_Argenti_00_Rank03): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'130202': 2, '130204': 2}",
-      "_note": "星魂 3's two raises (M-32). ⚠ They compose with the base-level rule by addition (the same arithmetic 1103/1215 use)."
+      "_note": "星魂 3's two raises (M-32). ⚠ They compose with the base-level rule by addition (the same arithmetic 1103/1215 use).",
+      "id": "eidolon3_levels"
     },
     {
       "on": "BATTLE_START",
@@ -261,7 +265,8 @@
       ],
       "min_eidolon": 5,
       "source": "1302 银枝 星魂 5 宇宙某处的雪 (Avatar_Argenti_00_Rank05): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'130203': 2, '130201': 1, '130214': 2}",
-      "_note": "星魂 5's two raises. ⚠ The data line names **three** skill ids (130203, 130201 and 130214 — the enhanced ultimate too), while the sentence names two slots: the ULTRA raise covers both ultimate ids because a slot is what the engine reads (`SkillType.ULTRA`), which is why the third id needs no rule of its own. ⚠ **已写**：星魂 2（`eidolon2_attack_with_three_enemies`）与星魂 6（下面那条 `DEALING_DAMAGE`）原先记在这里说\"写不了\"，两条都已在文件里 —— `enemy_count` 与 `DEFENCE_IGNORE` 后来都落地了。⚠ **仍开、已登记在 `_gaps`**：行迹 慷慨「在敌方目标进入战斗时…」（没有敌方入场事件）与强化终结技整段（引擎的施放路径没有数据槽 14，所以「额外 6 次随机单体」与 336% 那一行都放不出来）。"
+      "_note": "星魂 5's two raises. ⚠ The data line names **three** skill ids (130203, 130201 and 130214 — the enhanced ultimate too), while the sentence names two slots: the ULTRA raise covers both ultimate ids because a slot is what the engine reads (`SkillType.ULTRA`), which is why the third id needs no rule of its own. ⚠ **已写**：星魂 2（`eidolon2_attack_with_three_enemies`）与星魂 6（下面那条 `DEALING_DAMAGE`）原先记在这里说\"写不了\"，两条都已在文件里 —— `enemy_count` 与 `DEFENCE_IGNORE` 后来都落地了。⚠ **仍开、已登记在 `_gaps`**：行迹 慷慨「在敌方目标进入战斗时…」（没有敌方入场事件）与强化终结技整段（引擎的施放路径没有数据槽 14，所以「额外 6 次随机单体」与 336% 那一行都放不出来）。",
+      "id": "eidolon5_levels"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -286,7 +291,11 @@
       "on": "ENEMY_ENTERED",
       "id": "trace_generous_energy",
       "do": [
-        { "op": "GAIN_ENERGY", "amount": 2, "target": "self" }
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 2,
+          "target": "self"
+        }
       ],
       "source": "1302 银枝 行迹 慷慨: 「在敌方目标进入战斗时，自身立即恢复2点能量。」 param [2]",
       "_note": "「在敌方目标进入战斗时，自身立即恢复 2 点能量」—— 事件 **`ENEMY_ENTERED`** ✓（本轮新增：`Battle.addEnemy` / `addCombatant` 把**新加入敌方名册**的单位送进场时发一次，`actor` = 那个新来的 ✓；开战前的名册只是「摆好」，不算入场 ✓）；额度 2 = 行迹数据 `param [2]` ✓。⚠ 同一单位**重复加入**不会重复付账 ✓（幂等判据在引擎侧 ✓）。"

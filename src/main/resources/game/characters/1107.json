@@ -57,7 +57,8 @@
         }
       ],
       "source": "1107 克拉拉 trace 守护 (1107102): 「抵抗控制类负面状态的概率提高35%。」",
-      "_note": "「永久」 is the shape every 行迹 has: the trace is unconditional, so this is applied once at BATTLE_START and never ticked ('permanent': true means the duration is not even counted). ⚠ The document states the class itself -- 「控制类负面状态：冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身」 -- which is why the op names a CLASS and not twelve keys: a control written tomorrow is covered by this rule without an edit, and the engine never has to keep a list in sync with the game's patch notes. ⚠ No 'target': 自身 is the rule's owner. ⚠ This is the RESIST direction, not immunity -- 35% of the controls that would have landed do not, and the roll itself is in Battle.tryApplyDebuff (the op installs the number, it does not decide anything by itself)."
+      "_note": "「永久」 is the shape every 行迹 has: the trace is unconditional, so this is applied once at BATTLE_START and never ticked ('permanent': true means the duration is not even counted). ⚠ The document states the class itself -- 「控制类负面状态：冻结，纠缠，禁锢，支配，怒噪，强烈震荡，异梦，缠禁，恐惧，行动锁定，幸福傀儡，怨火灼身」 -- which is why the op names a CLASS and not twelve keys: a control written tomorrow is covered by this rule without an edit, and the engine never has to keep a list in sync with the game's patch notes. ⚠ No 'target': 自身 is the rule's owner. ⚠ This is the RESIST direction, not immunity -- 35% of the controls that would have landed do not, and the roll itself is in Battle.tryApplyDebuff (the op installs the number, it does not decide anything by itself).",
+      "id": "battle_start"
     },
     {
       "on": "BATTLE_START",
@@ -99,10 +100,26 @@
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 9 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 9 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
       ],
       "source": "1107 克拉拉 技能表的等级口径: 文档引用的是 Lv10 行（普攻/战技/终结技/天赋）",
       "_note": "本文件说明自己的数字来自哪一行（M-32 ✓）：四条 `RAISE_SKILL_LEVEL +9` ⇒ 数据行 Lv1 起算到 Lv10 ✓。⚠ 与星魂 3 / 5 的 +2 **叠加** ✓（它们也是 `RAISE_SKILL_LEVEL` ✓）。"
@@ -112,8 +129,16 @@
       "id": "eidolon3_levels",
       "min_eidolon": 3,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
       ],
       "source": "1107 克拉拉 星魂 3 冰冷的怒火: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 skill_add_level = {110702: 2, 110701: 1}",
       "_note": "「战技等级 **+2**；普攻等级 **+1**」—— 与 `level_convention` 叠加 ✓；上限由技能表行数封顶 ✓（已核实不是缺口 ✓）。"
@@ -123,8 +148,16 @@
       "id": "eidolon5_levels",
       "min_eidolon": 5,
       "do": [
-        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
-        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
       ],
       "source": "1107 克拉拉 星魂 5 家庭的温暖: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 skill_add_level = {110703: 2, 110704: 2}",
       "_note": "「终结技等级 **+2**；天赋等级 **+2**」—— 数据 `skill_add_level` 逐项吻合 ✓（110703/110704 ✓）。"
@@ -132,10 +165,19 @@
     {
       "on": "ATTACK_FINISHED",
       "id": "eidolon4_damage_reduction_after_being_hit",
-      "when": ["target == self"],
+      "when": [
+        "target == self"
+      ],
       "min_eidolon": 4,
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.3, "until": ["next_turn_start"], "target": "self" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.3,
+          "until": [
+            "next_turn_start"
+          ],
+          "target": "self"
+        }
       ],
       "source": "1107 克拉拉 星魂 4 一家的依靠: 「受到攻击后，克拉拉受到的伤害降低30%，效果持续到自己的下个回合开始。」 param = [0.3]",
       "_note": "「**受到攻击后**，克拉拉受到的伤害降低 **30%**，效果**持续到自己的下个回合开始**」—— ① 挂 **`ATTACK_FINISHED`** 而不是 `TAKING_HIT` ✓：句子是「受击**之后**」，挂在受击瞬间会把**这一发**也减掉 30% ✗；`ATTACK_FINISHED` 的 `target` 正是被打的那个人 ✓；② 负的 `MODIFY_DAMAGE_TAKEN` = **减伤** ✓（引擎约定：负值进 `addReduction` ✓）；③ 寿命 **`until: [next_turn_start]`** ✓ —— 引擎的 `Lifetime.NEXT_TURN_START` 正是「自己的下个回合开始」✓（用 `turns: 1` 会在**回合结束**就掉，早了一拍 ✗）。"
@@ -144,7 +186,12 @@
       "on": "BATTLE_START",
       "id": "talent_protection_reduction",
       "do": [
-        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.1, "permanent": true, "target": "self" }
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.1,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1107 克拉拉 天赋 因为我们是家人: 「克拉拉在史瓦罗的保护下受到敌方目标攻击的伤害降低10%。」 param Lv10 #3 = 0.1",
       "_note": "「克拉拉在史瓦罗的保护下**受到的伤害降低 10%**」—— 负的 `MODIFY_DAMAGE_TAKEN` = 减伤 ✓（引擎约定：负值进 `ReductionBuff` ✓），`permanent: true` ✓（常驻 ✓）。⚠ 这条**没有条件**：句子是常驻保护，不是「受击后」✓（对比星魂 4 那条**才有** `ATTACK_FINISHED` 与 `next_turn_start` ✓）。"
@@ -152,9 +199,16 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_clears_the_mark",
-      "when": ["actor == self", "eidolon < 1"],
+      "when": [
+        "actor == self",
+        "eidolon < 1"
+      ],
       "do": [
-        { "op": "REMOVE_STATE", "buff": "反击标记", "target": "all_enemies" }
+        {
+          "op": "REMOVE_STATE",
+          "buff": "反击标记",
+          "target": "all_enemies"
+        }
       ],
       "source": "1107 克拉拉 战技 史瓦罗在看着你 (110702): 「…战技施放后所有【反击标记】失效。」",
       "_note": "「**战技施放后**所有【反击标记】失效」—— `SKILL_CAST` + `REMOVE_STATE 反击标记 all_enemies` ✓。⚠ **星魂 1** 是它的反面（「施放战技后，**不会**清除敌方目标的【反击标记】」）⇒ 本条加条件 **`eidolon < 1`** ✓：有星魂 1 时这条**不执行** ✓（`max_eidolon` 只接受 1–6 ⇒ 表达不了「没有星魂」✗）（不是另写一条\"不清除\"—— 那会用 `REMOVE_STATE` 的缺失表达，读者看不出意图 ✗）。"
@@ -162,13 +216,20 @@
     {
       "on": "CAST_SETUP",
       "id": "skill_extra_damage_on_marked",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 1.2, "element": "Physical", "target": "all_enemies_with_state:反击标记" }
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.2,
+          "element": "Physical",
+          "target": "all_enemies_with_state:反击标记"
+        }
       ],
       "source": "1107 克拉拉 战技 史瓦罗的大人: 「对所有被史瓦罗标上【反击标记】的敌方目标额外造成等同于克拉拉120%攻击力物理属性伤害。」 param Lv10 = [1.2, 1.2]",
       "_note": "「对**所有被标上【反击标记】的敌方目标额外造成 120% 攻击力物理伤害**；战技施放后所有标记失效」—— ① 目标用**新增的** all_enemies_with_state:反击标记 ✓（按状态筛选敌方全体；空集合是合法答案 ✓）；② self_attr:ATTACK × 1.2 ✓（= #2 120%）；③ ⚠ 事件挂在 CAST_SETUP ✓ 而不是 SKILL_CAST —— 同文件的 `skill_clears_the_mark` 在 SKILL_CAST 上会**先**把标记摘掉，挂在事后就读不到目标了（实测两目标掉血完全相同 ✗）。"
     }
-
   ]
 }
