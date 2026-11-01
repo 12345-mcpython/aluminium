@@ -99,8 +99,8 @@ public class HuohuoTest {
                 "Eidolon 6: the healed ally deals more");
         Assertions.assertEquals(2, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.TURN_START),
                 "the talent heal and the trace energy - one moment, two statements");
-        Assertions.assertEquals(6, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the technique, the two traces, and the level Eidolons (3 and 5)");
+        Assertions.assertEquals(7, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the technique, the two traces, the level Eidolons, and Eidolon 1's amendment");
     }
 
     // ==================================================================

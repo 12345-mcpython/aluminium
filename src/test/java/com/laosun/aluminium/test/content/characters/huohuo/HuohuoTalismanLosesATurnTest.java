@@ -60,8 +60,9 @@ public class HuohuoTalismanLosesATurnTest {
         System.out.println("[talisman] duration " + before + " -> " + after
                 + " ; the saved ally survives = " + !ally.isDeath());
 
-        Assertions.assertEquals(1, after,
-                "「使【禳命】的持续回合数减 1」 (reduces the remaining turns of Divine Provision by 1)-- her skill granted 2, so the save leaves 1");
+        // Eidolon 1 lengthens the Talisman by one turn, so the invariant is "the save spends ONE turn", not "it ends at 1".
+        Assertions.assertEquals(before - 1, after,
+                "「使【禳命】的持续回合数减 1」 - one turn, whatever she started with");
         Assertions.assertTrue(!ally.isDeath(),
                 "「不会陷入无法战斗状态」 (does not fall into the unable-to-fight state)-- answering the lethal event is what cancels the death");
     }
