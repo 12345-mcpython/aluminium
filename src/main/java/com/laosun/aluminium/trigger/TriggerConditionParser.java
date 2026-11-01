@@ -112,6 +112,11 @@ final class TriggerConditionParser {
         Matcher hasState = HAS_STATE.matcher(text);
         if (hasState.find()) {
             String subject = normalize(text.substring(0, hasState.start()));
+            // "任意敌方目标处于 <X>": the ENEMY camp, not the party - "若指定的敌方目标处于裂伤"
+            // (1111 Luka's Eidolon 1) needs a question no party subject can ask.
+            if (ANY_ENEMY_SUBJECT.equals(subject)) {
+                return new AnyEnemyHasState(text.substring(hasState.end()).trim(), raw, spec);
+            }
             String state = text.substring(hasState.end()).trim();
             return new HasState(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), state, raw,
                     spec);
@@ -1557,6 +1562,53 @@ final class TriggerConditionParser {
         }
     }
 
+    /**
+     * {@code any_enemy has_state <name>}: some living enemy on the field carries that state.
+     *
+     * <p>Why a condition and not a selector: the sentence asks a QUESTION - "若指定的敌方目标处于裂伤，造成的伤害提高 15%" -
+     * and the answer decides whether a buff is applied; there is no second unit to act on. Reader: 1111 Luka's
+     * Eidolon 1. ⚠ It answers "SOME enemy", not "the designated one": the engine has no notion of a current enemy
+     * target, and a rule that needs one records that divergence rather than pretending.
+     */
+    static final class AnyEnemyHasState implements Condition {
+
+        private final String state;
+        private final String raw;
+
+        AnyEnemyHasState(String state, String raw, TriggerSpec spec) {
+            if (state.isEmpty()) {
+                throw new IllegalArgumentException("Condition '" + raw + "' names no state after has_state"
+                        + " (source: " + spec.getSource() + ")");
+            }
+            this.state = state;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            com.laosun.aluminium.Battle battle = ctx.battle();
+            if (battle == null) {
+                return false;
+            }
+            for (com.laosun.aluminium.entity.CanHit unit : battle.enemyUnits()) {
+                if (unit != null && !unit.isDeath() && unit.getBuffManager().hasState(state)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+
+        @Override
+        public String toString() {
+            return raw;
+        }
+    }
+
     /* The element half of {@link #DAMAGE_IS_ATTACK}: the instance's element against the rule owner's own. */
     /**
      * The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack.
@@ -2260,6 +2312,9 @@ final class TriggerConditionParser {
             Pattern.compile("(?<![\\w])has_state(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     static final Set<String> STATE_SUBJECTS = Set.of("self", "actor", "target");
+
+    /** The enemy camp as a CONDITION subject: `any_enemy has_state <name>`. */
+    static final String ANY_ENEMY_SUBJECT = "any_enemy";
 
     /**
      * The keyword of the "that attribute of mine/theirs was lowered" condition (cone 22000's
