@@ -28,13 +28,15 @@ import java.util.Set;
 public class HardcodedSkillRowRatchetTest {
 
     /**
-     * The measured count on 2026-10-31, counted over the four NAMED slots only (8/9/10/12 are the enhanced rows and
+     * The measured count on 2026-10-31. ⚠ A file whose `level_convention` pins only SOME slots still runs the others at
+     * Lv1, so a literal there is exact and a row read would silently drop it (measured on 1215: its convention raises the
+     * TALENT only, so the Ultimate numbers must stay literal). Counted over the four NAMED slots only (8/9/10/12 are the enhanced rows and
      * no SkillType reaches them, so a number matching one cannot be replaced by a row read at all), after four
      * corrections: 1009 reads its four rows instead of restating them, and
      * numbers a character TRACE states are no longer reported (52 of the original 219 were trace constants, which are not
      * leveled and therefore exact). Lowering it is progress; raising it is the fault this test exists to catch.
      */
-    private static final int BASELINE = 118;
+    private static final int BASELINE = 120;
 
     private static final Set<String> MAGNITUDE_OPS = Set.of(
             "DAMAGE", "HEAL", "SHIELD", "APPLY_DOT", "APPLY_REGEN", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN",
