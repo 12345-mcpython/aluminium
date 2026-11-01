@@ -34,13 +34,10 @@ public class EidolonNumbersComeFromTheDataTest {
     /**
      * Numbers that are known NOT to come from this character's param columns, kept visible instead of silently allowed.
      *
-     * <p>1403's rank 6 states "提高729%" and the two rules use 1.4922 / 1.3122 - values derived from a base row and
-     * frozen by hand. They are pre-existing content from before this guard; re-deriving them needs the talent row's own
-     * percent, which is a character-level job (not this test's). Listed here so the guard keeps failing on NEW cases.
+     * <p>Empty since 2026-10-31: the one entry it held (1403's rank 6, the hand-computed 1.4922 / 1.3122) now derives
+     * its number from the Talent row through a `value` provider, so there is nothing frozen left to allow.
      */
-    private static final Set<String> KNOWN_FROZEN_DERIVATIONS = Set.of(
-            "1403 eidolon6_own_ult_talent_followup 1.4922",
-            "1403 eidolon6_other_ult_talent_damage_boost 1.3122");
+    private static final Set<String> KNOWN_FROZEN_DERIVATIONS = Set.of();
     private static final double EPS = 1e-9;
 
     @Test
