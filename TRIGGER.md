@@ -176,6 +176,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | **`one_of`** | 整组效果里随机取一条 |
 | **`one_of_no_repeat`** | 同上，但不重复取上一次的；值是共享记忆的名字 |
 | **`defer_until_wave`** | 触发时若敌方全灭，延到下一波再结算 |
+| **`pick`** | 规则级**一次抽签**：写一个单选选择器（如 `random_enemy`），效果的 `target` 写 `pick` 就共用这一次抽签（读者：1111 卢卡秘技「随机单体」伤害 + 同一目标的裂伤）|
 
 ---
 
@@ -403,6 +404,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | 按命途 / id | `allies_of_path:<命途>` `allies_of_path_except:<命途>:<名单>` `ally_cid:<id>` |
 | 按波次 | `wave_monster` `wave_monsters` |
 | 特殊 | `all_allies_lethally_hit_this_action` `highest_hp_attack_hit` |
+| 规则抽签 | `pick`（引用本规则 `pick` 字段解析出的那一个单位）|
 
 ⚠ `other_map_attackers` 是**除装备者外**、本场之前用**地图攻击**开战的队友（`Battle.declareMapAttack` 的记录）；没有就是空集。`highest_break_effect_ally` 是**除装备者外**击破特攻最高的存活队友（并列取名册顺序）；没有别的队友就是空集（不报错）。`allies_with_summons` 是**拥有至少一个忆灵**的存活队友（读者：23051）。
 
