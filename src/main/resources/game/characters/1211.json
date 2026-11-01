@@ -150,6 +150,25 @@
       "source": "1211 星魂 5: 等级加成（数据 skill_add_level: 121101=COMMON+1, 121103=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon2_heal_boost",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.15,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1211 白露 星魂 2: 「施放终结技后，白露的治疗量提高15%，持续2回合。」 param = [0.15, 2]",
+      "_note": "「施放终结技后，白露的**治疗量**提高 **15%**，持续 **2 回合**」—— **`OUTGOING_HEALING_BOOST`**（「造成的治疗」一侧）✓ + `turns: 2` ✓。"
     }
   ]
 }
