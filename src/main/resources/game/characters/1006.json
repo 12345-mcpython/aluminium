@@ -133,6 +133,22 @@
       "source": "1006 星魂 5: 等级加成（数据 skill_add_level: 100601=COMMON+1, 100603=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "eidolon2_res_down_on_entry",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": -0.2,
+          "permanent": true,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1006 银狼 星魂 2: 「在敌方目标进入战斗时，使其效果抵抗降低20%。」 param = [0.2]",
+      "_note": "「在敌方目标**进入战斗时**，使其效果抵抗降低 **20%**」—— `WAVE_START`（每一波开场 ✓，也覆盖第一次进场）+ `all_enemies` + `permanent` ✓。⚠ 不用 `ENEMY_ENTERED`：那个事件只在 `startBattle()` **之后**加入的敌人才发（见 AGENT §4.6）⇒ 会漏掉开局那一波。"
     }
   ]
 }
