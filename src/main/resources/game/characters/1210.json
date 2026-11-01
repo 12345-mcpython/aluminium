@@ -56,6 +56,44 @@
       ],
       "source": "1210 桂乃芬 战技 迎面开门红 (121002): 「对指定敌方单体造成…并对相邻目标造成…，有100%的基础概率使目标与相邻目标陷入灼烧状态…每回合开始时受到等同于桂乃芬218.208%攻击力的火属性持续伤害，持续2回合。」 param Lv10 = [1.2, 0.4, 1, 2.18208, 2]",
       "_note": "「有 **100% 的基础概率**使**目标与相邻目标**陷入**灼烧**…每回合受到等同于 **218.208% 攻击力**的火属性持续伤害，持续 **2 回合**」—— ① `APPLY_DOT` ✓ + `base_chance: 1.0` ✓ + `turns: 2` ✓ + `percent: 2.18208`（**小数**，不是 218.208 ✓）；② 目标用 **`all_hit_enemies`** ✓（战技是 Blast，命中集合 = 主目标 + 相邻 ⇒ 「目标与相邻目标」正是它，不需要位置轴 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1210 星魂 3: 等级加成（数据 skill_add_level: 121001=COMMON+1, 121002=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1210 星魂 5: 等级加成（数据 skill_add_level: 121003=ULTRA+2, 121004=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

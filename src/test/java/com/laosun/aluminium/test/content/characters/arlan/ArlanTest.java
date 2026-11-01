@@ -102,7 +102,7 @@ public class ArlanTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "the survival heal");
         //: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
         // with "进入战斗后"), and that trace is what the lethal blow is gated on.
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the DoT resistance, the level convention, and the eidolon-four trace");
     }
 

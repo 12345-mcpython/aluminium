@@ -182,6 +182,44 @@
       ],
       "source": "1209 彦卿 星魂 6 「自在」: 「消灭敌方目标时，如果当前持有…终结技的增益效果，则使这些增益效果的持续时间全部延长1回合。」",
       "_note": "「或**终结技的增益效果**…全部延长 1 回合」—— 终结技的两个修饰现在带名 `终结技增益` ✓，`EXTEND_BUFF` 按名字延长 ✓（引擎侧已让 `isNamed` 认得**带名的修饰** ✓）；不写「如果持有」条件：对不存在的名字是无操作 ✓。⚠ 与第一支（【智剑连心】）分成两条规则 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1209 星魂 3: 等级加成（数据 skill_add_level: 120901=COMMON+1, 120902=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1209 星魂 5: 等级加成（数据 skill_add_level: 120903=ULTRA+2, 120904=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

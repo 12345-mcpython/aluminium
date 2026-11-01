@@ -76,7 +76,7 @@ public class HertaTest {
         var table = TriggerTables.of(HERTA);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "the threshold bonus and the frozen bonus");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the resistance and the level convention");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the resistance and the level convention");
     }
 
     private static final class Fixture {

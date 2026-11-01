@@ -19,7 +19,7 @@
           "op": "APPLY_CONTROL",
           "control": "禁锢",
           "turns": 1,
-          "base_chance": 1.0,
+          "base_chance": 1,
           "target": "all_enemies"
         }
       ],
@@ -92,6 +92,44 @@
       ],
       "source": "1004 瓦尔特 天赋 时空扭曲 (100404, Enhance): 「击中处于减速状态的敌方目标时，额外造成1次等同于瓦尔特60%攻击力的虚数属性附加伤害。」",
       "_note": "「击中处于**减速**状态的敌方目标时，额外造成 **1 次**等同于瓦尔特 **60% 攻击力**的虚数属性**附加伤害**」—— ① 事件 `DEALING_DAMAGE` ✓（每一次真正落地的伤害实例都经过这里 ✓）；② `actor == self` ✓（只有瓦尔特自己的实例 ✓）；③ `target is_slowed` ✓（减速 = SPEED 上的负修饰，`is_slowed` 正是这个问题的词 ✓）；④ `damage_is_attack` **不可省** ✓ —— 附加伤害本身也会发 `DEALING_DAMAGE`，而它是 `notCountsAsAttack` ✓ ⇒ 该条件为假 ⇒ 不会自我递归 ✓（同 1109 的护栏）；⑤ `DAMAGE` + `scale: self_attr:ATTACK` + `percent: 0.6` ✓（附加伤害，不走 `damage_param`，因为原文写的是 60% 而非某个技能行）；⑥ 元素 `Imaginary` ✓。⚠ 本句写的是**强化前**的 60%；强化后的 100% 与【失重】、行迹、星魂仍未写（登记）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        }
+      ],
+      "source": "1004 星魂 3: 等级加成（数据 skill_add_level: 100401=COMMON+1, 100402=SKILL+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1004 星魂 5: 等级加成（数据 skill_add_level: 100403=ULTRA+2, 100404=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }
