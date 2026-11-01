@@ -11,7 +11,7 @@
     "强化后天赋：击杀时转移弱点、优先精英未写",
     "行迹 旁注：负面效果 ≥ 3 时额外降低 3%（改写另一条规则）未写",
     "星魂：未读",
-    "星魂 1「目标每有 1 个负面效果，银狼恢复 **1 点能量**，每次终结技最多 5 次」**试过但撤下**：`GAIN_ENERGY` 的每一种 `scale` 都被当作「**能量上限的份额**」（我加了一个读负面层数的 scale，实测一发终结技回 **+110**，不是 +3）⇒ 这个 op 无法表达「每层回 1 点」；需要 `amount_from` 类的**点数**提供器，或给 GAIN_ENERGY 增加「点数」语义"
+    "星魂 1 已落地 ✓（`value` 提供器 `min(debuffs(target), 5)`）；星魂 4/6 仍缺：两者都要「按目标负面数**缩放伤害**」—— `BOOST_DAMAGE` 只吃 `percent`/`percent_from`，不接 `value` 提供器，需要给它同样的入口"
   ],
   "rules": [
     {
@@ -150,6 +150,36 @@
       ],
       "source": "1006 银狼 星魂 2: 「在敌方目标进入战斗时，使其效果抵抗降低20%。」 param = [0.2]",
       "_note": "「在敌方目标**进入战斗时**，使其效果抵抗降低 **20%**」—— `WAVE_START`（每一波开场 ✓，也覆盖第一次进场）+ `all_enemies` + `permanent` ✓。⚠ 不用 `ENEMY_ENTERED`：那个事件只在 `startBattle()` **之后**加入的敌人才发（见 AGENT §4.6）⇒ 会漏掉开局那一波。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon1_energy_per_debuff",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "target != self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "value": {
+            "type": "min",
+            "inputs": [
+              {
+                "type": "debuffs",
+                "whose": "target"
+              },
+              {
+                "type": "const",
+                "value": 5
+              }
+            ]
+          },
+          "target": "self"
+        }
+      ],
+      "source": "1006 银狼 星魂 1: 「施放终结技攻击敌方目标后，目标每有1个负面效果，银狼恢复1点能量。该效果在每次终结技攻击中最多触发5次。」 param = [1, 5]",
+      "_note": "「目标**每有 1 个负面效果**，恢复 **1** 点能量，每次终结技**最多 5 次**」—— 用 **`value` 提供器**（不是 `scale`！`GAIN_ENERGY` 会把 `scale` 当成「能量上限的份额」，实测回 +110 ✗）：`min( debuffs(target), const 5 )` ✓ —— `{\"type\": \"debuffs\", \"whose\": \"target\"}` 是**本轮新增的点数提供器**，`min` 正好表达「最多 5 次」✓。"
     }
   ]
 }

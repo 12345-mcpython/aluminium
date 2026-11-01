@@ -36,6 +36,8 @@ public final class NumberProviders {
      */
     static final Set<String> TYPES = Set.of(
             "const", "skill_param", "cast_param", "summon_param", "resource", "attr", "stacks",
+            // "目标每有 1 个负面效果" (1006 Eidolon 1): a debuff COUNT as a number.
+            "debuffs",
             "original_damage", "settled_damage_this_event", "elation_base", "cast_applied",
             "party_resource", "energy", "skill_point", "steps",
             "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg",
@@ -89,6 +91,10 @@ public final class NumberProviders {
             case "abs" -> Math.abs(resolve(requireOperand(provider.getInput(), "abs", "input"), effect, ctx));
             case "attr" -> attributeOf(provider, ctx);
             case "stacks" -> stacksOf(provider, ctx);
+            // "目标每有 1 个负面效果" (1006 Eidolon 1): a COUNT of debuffs, so a rule can pay one point per debuff.
+            // A provider rather than a scale because GAIN_ENERGY reads every `scale` as a share of max energy;
+            // a provider is a NUMBER, which is what "1 point each" is.
+            case "debuffs" -> debuffCountOf(provider, ctx);
             case "original_damage" -> TriggerMagnitudes.originalDamageOf(effect, ctx);
             case "settled_damage_this_event" -> TriggerMagnitudes.settledDamageOf(ctx);
             case "elation_base" -> TriggerMagnitudes.elationBase(ctx);
@@ -392,6 +398,15 @@ public final class NumberProviders {
             throw new IllegalStateException("the \"stacks\" provider reads \"" + scale + "\", which is not a counter scale");
         }
         return value;
+    }
+
+    /**
+     * {@code {"type": "debuffs", "whose": "target" | "owner"}} - how many DEBUFFS that unit carries.
+     */
+    private static double debuffCountOf(NumberProvider provider, TriggerContext ctx) {
+        String whose = provider.getWhose() == null ? "owner" : provider.getWhose();
+        CanHit unit = "target".equals(whose) ? ctx.target() : ctx.owner();
+        return unit == null ? 0 : unit.getBuffManager().debuffCount();
     }
 
     /**
