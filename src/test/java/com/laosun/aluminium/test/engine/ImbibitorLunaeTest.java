@@ -59,8 +59,8 @@ public class ImbibitorLunaeTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DHIL);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the per-hit stack");
-        Assertions.assertEquals(0, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the Squama grant is registered: `amount` on ADD_STACK is not a layer count today");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the Squama grant: 「获得 2 个【逆鳞】」 - `amount` IS the layer count (the old note said otherwise)");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }
 
