@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
 
-    "星魂 1「【禳命】持续时间 +1 回合，且持有【禳命】时我方全体速度 +12%」未写（时长那半需要 `MODIFY_RULE` 指向施放禳命的规则 ⇒ 该规则得先有 id；速度那半是条件光环）",
+    "星魂 1 的另一半：「持有【禳命】时我方全体速度 +12%」未写 —— 需要「条件光环」（状态在时对全体持续生效，状态消失即撤）的写法",
     "星魂 4「治疗量按目标已损生命递增，最多 +80%」未写：需要「治疗量随目标血量比例缩放」的形状（现有 `target_when` 只能给门槛，不能给连续比例）"
   ],
   "rules": [
@@ -26,6 +26,7 @@
     },
     {
       "on": "SKILL_CAST",
+      "id": "skill_grants_talisman",
       "when": [
         "actor == self"
       ],
@@ -176,6 +177,17 @@
       ],
       "source": "1217 藿藿 星魂 2 「判官书符，镇尾锁灵」：「当**藿藿拥有【禳命】时**，若**我方目标**受到致命攻击，不会陷入**无法战斗状态**，并立即回复等同于**其自身**生命上限 **50%** 的生命值。**该效果单场战斗中可以触发 2 次**」（`param = [0.5, 2]` ⇒ #1 = 50% ✓，#2 = 2 次 ✓）",
       "_note": "⭐ 2026-10-02（第 52 件）：⭐ **补上同一句里的上限** ✓。⚠ 上限就在原句里（「该效果单场战斗中可以触发 **2** 次」），而 `param` 的 #2 = **2** ✓。⭐ **拼法是现成的** ✓：计数器 = `ADD_STACK` + `self_stacks:<名>` 条件（样板 `1111.json` 的【斗志】✓；而 `TriggerInterpreter:762` 的注释**点名了这一句**：「触发 2 次后自动解除」⇒ 计数器 ✓）。⚠ 计数器写在**规则主人自己**身上 ✓（`self_stacks:` 读的就是规则主人 ✓）。⚠ **无需引擎改动** ✓（本来以为要加 `per_battle` 字段 ✗，已回滚 ✓）。⚠ **仍登记**：「使【禳命】的持续回合数**减 1**」✗（`EXTEND_BUFF` 只收正数 ✗）。 ⭐ 2026-10-02: 补上第三句「使【穹命】的持续回合数**减 1**」⇒ `EXTEND_BUFF{buff: 穹命, turns: -1, target: self}`。⚠ 形状取自**游戏自己的配置**：`Avatar_Huohuo_00_Rank02_Insert` 对具名 modifier 做 `SetModifierValue{ModifyFunction: \"Add\", ValueType: \"LifeTime\"}`（另一条同族任务是 `SetDynamicValueByAddValue{AddValue: -1, Min: 0}`）—— 即“对具名状态寿命做**带符号的 Add**”，所以是**负的 `turns`**，而不新增 op。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_longer_talisman",
+      "min_eidolon": 1,
+      "do": [
+        { "op": "MODIFY_RULE", "rule": "skill_grants_talisman", "effect_turns": 1 },
+        { "op": "MODIFY_RULE", "rule": "trace_fearful_to_act", "effect_turns": 1 }
+      ],
+      "source": "1217 藿藿 星魂 1 人间烟火: 「天赋产生的【禳命】持续时间延长1回合…」 param = [0.12, 1]",
+      "_note": "「【禳命】的**持续时间延长 1 回合**」—— 用 `MODIFY_RULE` 的 **`effect_turns`** ✓，分别指向**两条**会挂【禳命】的规则（战技 `skill_grants_talisman`、行迹 `trace_fearful_to_act`）✓ —— 不另写一条更长的 `APPLY_BUFF` ✗（那样两条会互相顶掉 ✓）。⚠ 星魂 1 的**另一半**（「持有【禳命】时我方全体速度 +12%」）**未写** ⇒ 见 `_gaps`。"
     },
     {
       "on": "BATTLE_START",
