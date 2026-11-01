@@ -3,9 +3,8 @@
   "character": 1208,
   "_status": "partial",
   "_gaps": [
-
     "秘技的屏障本身（大地图屏障、抵挡敌人攻击不进入战斗）未写 —— 属大地图/秘技层",
-    "星魂 2：致命伤害拦截 + 自身生命上限 70% 回复 + 单场 1 次未写；其余星魂未读"
+    "其余星魂（1 / 3 / 4 / 5 / 6）未逐句读、未写"
   ],
   "rules": [
     {
@@ -134,7 +133,14 @@
       "on": "BATTLE_START",
       "id": "talent_heal_charge_starts_at_one",
       "do": [
-        { "op": "ADD_STACK", "buff": "避厄治疗次", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "避厄治疗次",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1208 符玄 天赋: 「该效果初始拥有1次触发次数，最多可拥有2次触发次数。」",
       "_note": "「**初始拥有 1 次**触发次数，**最多** 2 次」—— 计数器 `避厄治疗次`：开局 1 层、上限 2 ✓（上限也决定「最多」✓）。⚠ 另 1 次的来源是**终结技**（本档未写，已登记 ✓）。"
@@ -148,8 +154,18 @@
         "self_stacks:避厄治疗次 >= 1"
       ],
       "do": [
-        { "op": "HEAL", "scale": "target_lost_hp", "percent": 0.9, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "避厄治疗次", "amount": 1, "target": "self" }
+        {
+          "op": "HEAL",
+          "scale": "target_lost_hp",
+          "percent": 0.9,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "避厄治疗次",
+          "amount": 1,
+          "target": "self"
+        }
       ],
       "source": "1208 符玄 天赋: 「当符玄当前生命值百分比小于等于50%时触发生命回复，使自身回复等同于已损失生命值90%的生命值，受到致命攻击时无法触发该效果。」",
       "_note": "「当前生命值百分比 **≤ 50%** 时...回复等同于**已损失生命值 90%**」—— ① 事件 `HP_LOST` ✓ + `target == self` ✓ + `hp_percent <= 0.5` ✓（`hp_percent` 读的是**掉血的人**，正是她自己 ✓）；② 回复量 = `target_lost_hp × 0.9` ✓（不是上限的 90% ✗）；③ 触发一次**消耗一次**计数 ✓；④ 「受到**致命**攻击时无法触发」由事件本身保证 ✓ —— 致死那一下走的是 `LETHAL_DAMAGE`（另有规则），`HP_LOST` 的这条不会在死亡途中被当成救命 ✓。"
@@ -157,9 +173,18 @@
     {
       "on": "ULT_CAST",
       "id": "ult_grants_a_heal_charge",
-      "when": ["actor == self"],
+      "when": [
+        "actor == self"
+      ],
       "do": [
-        { "op": "ADD_STACK", "buff": "避厄治疗次", "amount": 1, "max_stacks": 2, "permanent": true, "target": "self" }
+        {
+          "op": "ADD_STACK",
+          "buff": "避厄治疗次",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
       ],
       "source": "1208 符玄 终结技 穷观阵: 「…并获得1次天赋的生命回复触发次数。」",
       "_note": "「获得 **1 次**天赋的生命回复触发次数」—— `ULT_CAST` + `actor == self` + `ADD_STACK 避厄治疗次` ✓，上限 **2** 与天赋的「最多可拥有 2 次」一致 ✓（到顶后不再加 ✓）。"
@@ -167,11 +192,34 @@
     {
       "on": "BATTLE_START",
       "id": "technique_starts_the_zone",
-      "when": ["self has_state 秘技"],
+      "when": [
+        "self has_state 秘技"
+      ],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "鉴知", "turns": 2, "ticks_on": "self", "target": "all_allies" },
-        { "op": "MODIFY_ATTR", "attribute": "HEALTH", "scale": "self_attr:HEALTH", "percent": 0.06, "turns": 2, "ticks_on": "self", "target": "all_allies" },
-        { "op": "MODIFY_ATTR", "attribute": "CRIT_CHANCE", "percent": 0.12, "turns": 2, "ticks_on": "self", "target": "all_allies" }
+        {
+          "op": "APPLY_BUFF",
+          "buff": "鉴知",
+          "turns": 2,
+          "ticks_on": "self",
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "scale": "self_attr:HEALTH",
+          "percent": 0.06,
+          "turns": 2,
+          "ticks_on": "self",
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.12,
+          "turns": 2,
+          "ticks_on": "self",
+          "target": "all_allies"
+        }
       ],
       "source": "1208 符玄 秘技 太微行棋: 「屏障持续期间进入战斗时符玄自动开启【穷观阵】，持续2回合。」 param = [20, 2]",
       "_note": "「屏障持续期间**进入战斗时自动开启【穷观阵】，持续 2 回合**」—— 与战技那组**同形**（`鉴知` 状态 + 生命上限 6% + 暴击率 12% ✓），只是时长取秘技的 **2 回合** ✓（战技是 3 ✓）。⚠ 秘技的**屏障本身**（大地图效果、抵挡敌人攻击不进入战斗）**未写** ⇒ 见 `_gaps` ✓。"
@@ -184,7 +232,11 @@
         "target != self"
       ],
       "do": [
-        { "op": "SHARE_DAMAGE", "percent": 0.65, "target": "self" }
+        {
+          "op": "SHARE_DAMAGE",
+          "percent": 0.65,
+          "target": "self"
+        }
       ],
       "source": "1208 符玄 战技: 「使符玄队友所承受的未受护盾抵挡之前的伤害的65%分摊给符玄」",
       "_note": "「使**符玄队友**所承受的…**65% 分摊给符玄**」—— ① 事件 `DEALING_DAMAGE` ✓（**结算之前**，所以还能改这一发 ✓）+ 条件 `target has_state 鉴知` + **`target != self`** ✓（她自己不吃这层分摊 ✓）；② `SHARE_DAMAGE` ✓：把 **65%** 从这一发里**减掉**（收区 ×0.35），并按**同元素/同类型/同 65% 基数**给**她**结算一发 ✓（走她自己的防御/抗性区 ✓）；③ 新实例**排队**在当次结算之后立刻结算 ✓（不在区运算里嵌套结算 ✓）。⚠ 「未受护盾抵挡之前的伤害」：基数取自**结算前的技能值** ✓（不是盾后的量 ✓）。"
