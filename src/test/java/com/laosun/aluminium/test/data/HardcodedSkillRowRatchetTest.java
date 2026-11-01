@@ -28,10 +28,11 @@ import java.util.Set;
 public class HardcodedSkillRowRatchetTest {
 
     /**
-     * The measured count on 2026-10-31, after 1009 read its four rows instead of restating them. Lowering it is
-     * progress; raising it is the fault this test exists to catch.
+     * The measured count on 2026-10-31, after two corrections: 1009 reads its four rows instead of restating them, and
+     * numbers a character TRACE states are no longer reported (52 of the original 219 were trace constants, which are not
+     * leveled and therefore exact). Lowering it is progress; raising it is the fault this test exists to catch.
      */
-    private static final int BASELINE = 215;
+    private static final int BASELINE = 163;
 
     private static final Set<String> MAGNITUDE_OPS = Set.of(
             "DAMAGE", "HEAL", "SHIELD", "APPLY_DOT", "APPLY_REGEN", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN",
@@ -41,6 +42,10 @@ public class HardcodedSkillRowRatchetTest {
     public void noMoreRulesFreezeAlevelVaryingRow() throws Exception {
         JsonObject skills = JsonParser.parseString(Files.readString(
                 Path.of("src/main/resources/game/data/skills.json"), StandardCharsets.UTF_8)).getAsJsonObject();
+        // A trace's numbers are NOT leveled, so a rule that restates one is exact - they must count as "from the data"
+        // or every trace constant that happens to equal a skill cell would be reported (1101's 阵地 is one).
+        JsonObject traces = JsonParser.parseString(Files.readString(
+                Path.of("src/main/resources/game/data/skill_traces.json"), StandardCharsets.UTF_8)).getAsJsonObject();
         List<String> suspects = new ArrayList<>();
 
         List<Path> files;
@@ -86,7 +91,7 @@ public class HardcodedSkillRowRatchetTest {
                         }
                         double literal = value.getAsDouble();
                         for (Column column : moving) {
-                            if (column.picksTheLv10Row(literal)) {
+                            if (column.picksTheLv10Row(literal) && !traceStates(traces, cid, literal)) {
                                 suspects.add(cid + " " + (rule.has("id") ? rule.get("id").getAsString() : "?")
                                         + " " + op + " " + field + "=" + literal);
                                 break;
@@ -102,6 +107,30 @@ public class HardcodedSkillRowRatchetTest {
                         + "damage_param / a value provider). Count grew from " + BASELINE + " to " + suspects.size()
                         + "; the new ones are among: " + String.join(" | ", suspects.subList(Math.min(BASELINE, suspects.size()),
                         Math.min(suspects.size(), BASELINE + 10))));
+    }
+
+    /** Whether one of this character's TRACES states this number (traces are not leveled, so restating one is exact). */
+    private static boolean traceStates(JsonObject traces, String cid, double literal) {
+        JsonElement entries = traces.get(cid);
+        if (entries == null || !entries.isJsonArray()) {
+            return false;
+        }
+        for (JsonElement entry : entries.getAsJsonArray()) {
+            if (!entry.isJsonObject() || !entry.getAsJsonObject().has("param")) {
+                continue;
+            }
+            JsonElement param = entry.getAsJsonObject().get("param");
+            if (!param.isJsonArray()) {
+                continue;
+            }
+            for (JsonElement value : param.getAsJsonArray()) {
+                if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isNumber()
+                        && Math.abs(value.getAsDouble() - literal) < 1e-9) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /** A field that already says where its number comes from needs no change. */
