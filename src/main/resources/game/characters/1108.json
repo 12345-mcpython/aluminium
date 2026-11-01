@@ -4,8 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "1307「超出上限的层数在结算后移除」只对一个状态陈述过，未推广到 1108 的风化",
-    "星魂 1「施放战技时，对敌方**随机单体**额外造成 1 次伤害」未写：句子只说「1 次」、没给倍率（取战技行还是天赋行需确认）→ 先登记",
-    "行迹：尚未逐句读、未写"
+    "星魂 1「施放战技时，对敌方**随机单体**额外造成 1 次伤害」未写：句子只说「1 次」、没给倍率（取战技行还是天赋行需确认）→ 先登记"
   ],
   "rules": [
     {
@@ -131,6 +130,35 @@
       ],
       "source": "1108 桑博 星魂 2 黑色幽默: 「风化状态下的敌方目标被消灭时，使敌方全体有100%的基础概率叠加1层等同于天赋的风化状态。」 param = [1, 1]（100% 基础概率 / 1 层）",
       "_note": "「**风化状态**下的敌方目标**被消灭**时，使敌方**全体**有 **100% 基础概率**叠加 **1 层**等同于**天赋**的风化」—— ① 事件 `KILL` ✓ + 条件 `target has_state 风化` ✓（死者的 buff 在 `KILL` 时仍读得到 ✓ —— 23003 的同一时刻 ✓）；② 「**等同于天赋的**风化」 ⇒ 与 `talent_windtorn` **同一组参数** ✓：`self_attr:ATTACK` + **`percent_from_skill_param: TALENT:1`**（跟着天赋等级走 ✓，Lv10 = 0.52）+ `turns: 3` + `max_stacks: 5` ✓；③ 「**全体**」= `all_enemies` ✓；④ 「**1 层**」= **一次** `APPLY_DOT` ✓（DOT 每施加一次即一层 ✓）；⑤ `base_chance: 1.0` ✓（句子自给的 100%）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_longer_windtorn",
+      "do": [
+        { "op": "MODIFY_RULE", "rule": "talent_windtorn", "effect_turns": 1 }
+      ],
+      "source": "1108 桑博 行迹 圈套 (1108101): 「天赋使敌方陷入风化状态的持续时间延长1回合。」 param = [1]",
+      "_note": "「天赋的**风化持续时间延长 1 回合**」—— `MODIFY_RULE` + **`effect_turns: 1`** ✓ 改的是 `talent_windtorn` 那条规则的 `turns`（3 → 4），不是另写一条更长 DOT ✗（同元素会互相顶掉 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "trace_extra_energy",
+      "when": ["actor == self"],
+      "do": [
+        { "op": "GAIN_ENERGY", "amount": 10 }
+      ],
+      "source": "1108 桑博 行迹 后手 (1108102): 「施放终结技时，额外恢复10点能量。」 param = [10]",
+      "_note": "「施放终结技时，额外恢复 **10 点能量**」—— `ULT_CAST` + `actor == self` + `GAIN_ENERGY 10` ✓（无目标 = 规则主人 ✓，与 1217 行迹同形 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_less_damage_from_windtorn",
+      "when": ["target == self", "actor has_state 风化"],
+      "do": [
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.15, "instance": true, "target": "self" }
+      ],
+      "source": "1108 桑博 行迹 加料 (1108103): 「风化状态下的敌方目标对桑博造成的伤害降低15%。」 param = [0.15]",
+      "_note": "「**风化状态下的敌方目标**对桑博造成的伤害降低 **15%**」—— ① 条件在**攻击者**身上：`actor has_state 风化` ✓（不是 `target`，那是桑博自己 ✗）；② 减伤**只对这一发** ⇒ `MODIFY_DAMAGE_TAKEN` + **`instance: true`** ✓（挂成 timed buff 会把之后的所有伤害都减掉 ✗）；③ 负值 = 减伤 ✓。⚠ 挂在 **`DEALING_DAMAGE`** 而不是 `TAKING_HIT` ✓ —— `instance: true` 要的是**正在结算的这一发**，而 `TAKING_HIT` 的上下文里没有伤害实例（实测报错 ✓）；`target == self` 表示「打到的是桑博」✓。"
     }
   ]
 }
