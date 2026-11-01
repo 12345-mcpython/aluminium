@@ -200,6 +200,22 @@ public class TriggerTable {
                     if (condition instanceof Numeric numeric && numeric.stacksName != null) {
                         readNames.add(numeric.stacksName);
                     }
+                    // An ARITHMETIC comparison names its counters inside the TERMS: without this the assembly-point check
+                    // would not see them, and a rule could read a counter nobody assembles until battle time.
+                    if (condition instanceof Numeric numeric && numeric.leftTerms != null) {
+                        for (Term term : numeric.leftTerms) {
+                            if (term.stacksName() != null) {
+                                readNames.add(term.stacksName());
+                            }
+                        }
+                        if (numeric.rightTerms != null) {
+                            for (Term term : numeric.rightTerms) {
+                                if (term.stacksName() != null) {
+                                    readNames.add(term.stacksName());
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1728,6 +1744,18 @@ public class TriggerTable {
 
 
     /**
+     * One addend of an arithmetic comparison: a variable times a coefficient ("层数 × 8").
+     *
+     * <p>Reader: 1014 Saber's Skill, 「若持有【炉心共鸣】且消耗后<b>能回满能量</b>」 - the clause is
+     * {@code self_energy + self_stacks:炉心共鸣 * 8 >= self_max_energy}, which the single-variable comparison could not
+     * state. The record mirrors {@link Numeric}'s own descriptors one-for-one, so a term is resolved by the very same
+     * reader the single-variable form uses.
+     */
+    record Term(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
+                boolean stacksOnActor, String path, double coefficient) {
+    }
+
+    /**
      * Numeric comparison such as {@code hit_count > 0} or {@code self_attr:SPEED >= 145}.
      */
     static final class Numeric implements Condition {
@@ -1780,6 +1808,14 @@ public class TriggerTable {
         private final String otherStacksName;
         private final boolean otherStacksOnTarget;
         private final boolean otherStacksOnActor;
+        /**
+         * The ADDENDS of an arithmetic comparison, or {@code null} for the ordinary single-variable form.
+         *
+         * <p>Sum of {@code coefficient × variable}; {@code null} keeps every existing condition on the old path, which is
+         * what makes this extension behaviour-neutral for the shipped corpus.
+         */
+        private final java.util.List<Term> leftTerms;
+        private final java.util.List<Term> rightTerms;
 
         Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
                 boolean stacksOnActor, String operator, double literal, boolean literalOnLeft, String otherVariable,
@@ -1802,10 +1838,40 @@ public class TriggerTable {
             this.otherStacksOnActor = otherStacksOnActor;
             this.path = path;
             this.otherPath = otherPath;
+            this.leftTerms = null;
+            this.rightTerms = null;
+        }
+
+        /** An ARITHMETIC comparison: each side is a sum of terms. */
+        Numeric(java.util.List<Term> leftTerms, String operator, java.util.List<Term> rightTerms) {
+            this.variable = null;
+            this.attribute = null;
+            this.resource = null;
+            this.stacksName = null;
+            this.stacksOnTarget = false;
+            this.stacksOnActor = false;
+            this.operator = operator;
+            this.literal = 0;
+            this.literalOnLeft = false;
+            this.otherVariable = null;
+            this.otherAttribute = null;
+            this.otherResource = null;
+            this.otherStacksName = null;
+            this.otherStacksOnTarget = false;
+            this.otherStacksOnActor = false;
+            this.path = null;
+            this.otherPath = null;
+            this.leftTerms = leftTerms;
+            this.rightTerms = rightTerms;
         }
 
         @Override
         public boolean test(TriggerContext ctx) {
+            if (leftTerms != null) {
+                double left = sum(leftTerms, ctx);
+                double right = rightTerms == null ? literal : sum(rightTerms, ctx);
+                return compare(left, right);
+            }
             double value = numericValue(ctx);
             double left;
             double right;
@@ -1820,18 +1886,32 @@ public class TriggerTable {
                 left = literalOnLeft ? literal : value;
                 right = literalOnLeft ? value : literal;
             }
+            return compare(left, right);
+        }
+
+        /** "不能读就当不成立": NaN compares false against everything, which is the corpus's rule for a failed read. */
+        private boolean compare(double left, double right) {
             return switch (operator) {
                 case ">" -> left > right;
                 case ">=" -> left >= right;
                 case "<" -> left < right;
                 case "<=" -> left <= right;
-                // Equality on numbers, which the DSL has always documented (`hit_count == 2`) and only
-                // started accepting -- see parseCondition. NaN compares false against
-                // everything, which is the "cannot read it, so the condition fails" rule.
                 case "==" -> left == right;
                 case "!=" -> left != right;
                 default -> false;
             };
+        }
+
+        /** The sum of an arithmetic side, each addend resolved by the same reader the single form uses. */
+        private double sum(java.util.List<Term> terms, TriggerContext ctx) {
+            double total = 0;
+            for (Term term : terms) {
+                total += term.coefficient() * (term.path() != null
+                        ? pathCount(ctx, term.path())
+                        : value(ctx, term.variable(), term.attribute(), term.resource(), term.stacksName(),
+                        term.stacksOnTarget(), term.stacksOnActor()));
+            }
+            return total;
         }
 
         /**

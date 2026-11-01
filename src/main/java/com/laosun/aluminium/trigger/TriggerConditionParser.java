@@ -539,6 +539,13 @@ final class TriggerConditionParser {
             }
         }
 
+        // ARITHMETIC comparison: a side may add terms ("self_energy + self_stacks:炉心共鸣 * 8 >= self_max_energy",
+        // 1014 Saber's Skill). Only `+` and `*` are accepted - no parentheses, no precedence beyond "term = variable
+        // [* literal]", which is the whole shape the corpus asks for and the whole shape this parser will read.
+        if (left.contains("+") || right.contains("+")) {
+            return new TriggerTable.Numeric(termsOf(left, raw, spec), operator, termsOf(right, raw, spec));
+        }
+
         // Numeric comparison against a literal.
         String variable;
         double literal;
@@ -848,6 +855,44 @@ final class TriggerConditionParser {
                             + "(source: " + spec.getSource() + ")");
         }
         return party;
+    }
+
+    /**
+     * One side of an arithmetic comparison: `term (+ term)*`, each term `variable [* literal]`.
+     *
+     * <p>A single-variable side still works - it becomes a one-element list - so a condition may mix an arithmetic side
+     * with a plain one ("... >= self_max_energy").
+     */
+    private static java.util.List<TriggerTable.Term> termsOf(String side, String raw, TriggerSpec spec) {
+        java.util.List<TriggerTable.Term> terms = new java.util.ArrayList<>();
+        for (String piece : side.split("\\+")) {
+            String term = piece.trim();
+            if (term.isEmpty()) {
+                continue;
+            }
+            double coefficient = 1;
+            int star = term.lastIndexOf('*');
+            if (star >= 0) {
+                String factor = term.substring(star + 1).trim();
+                term = term.substring(0, star).trim();
+                try {
+                    coefficient = Double.parseDouble(factor);
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Condition '" + raw + "' multiplies by '" + factor
+                            + "', which is not a number (source: " + spec.getSource() + ")");
+                }
+            }
+            String variable = normalize(term);
+            terms.add(new TriggerTable.Term(variable, selfAttributeOf(variable, raw, spec),
+                    selfResourceOf(variable, raw, spec), stacksNameOf(variable, raw, spec),
+                    variable.startsWith(TARGET_STACKS_PREFIX), variable.startsWith(ACTOR_STACKS_PREFIX),
+                    pathOf(variable, raw, spec), coefficient));
+        }
+        if (terms.isEmpty()) {
+            throw new IllegalArgumentException("Condition '" + raw + "' has an empty side (source: "
+                    + spec.getSource() + ")");
+        }
+        return terms;
     }
 
     /**
