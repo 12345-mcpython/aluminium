@@ -32,6 +32,10 @@ public class ContentDuplicateGuardTest {
     private static final List<String> OPERANDS =
             List.of("attribute", "buff", "resource", "rule", "state", "scale", "target", "permanent", "turns",
                     "percent", "ratio", "value", "amount", "crit_rate", "crit_damage", "per_stack", "max_stacks",
+                    // A MODIFY_RULE amendment names WHICH number it changes: two rules that amend the same rule's
+                    // duration and its percent are two sentences, and a signature that ignored the field called them twins
+                    // (measured: 1108's Eidolon 6 and its 圈套 trace).
+                    "effect_turns", "effect_percent", "effect_percent_scale", "effect_max_stacks", "cooldown_delta",
                     // `element` names WHAT is affected as much as `buff` does: a Fire damage-over-time and an Ice one are different effects, and
                     // 1415's ocean ode writes one tick rule per element (TICK_DOT has no wildcard spelling) -- without this the guard read those 14 rules as duplicates.
                     "element",
@@ -172,3 +176,4 @@ public class ContentDuplicateGuardTest {
         return out.toString();
     }
 }
+

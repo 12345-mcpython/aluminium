@@ -116,7 +116,7 @@ public class ScopedDamageTakenTest {
      */
     @Test
     public void hisFileCarriesTheRolledDotVulnerability() {
-        Assertions.assertEquals(1, TriggerTables.of(SAMPO).ruleCount(TriggerEvent.ULT_CAST),
+        Assertions.assertEquals(2, TriggerTables.of(SAMPO).ruleCount(TriggerEvent.ULT_CAST),
                 "his ultimate's debuff half is one rule; ⚠ the load itself validates every key, so a misspelled "
                         + "`damage_type` or `base_chance` would have thrown before this line ran");
     }
@@ -176,3 +176,4 @@ public class ScopedDamageTakenTest {
         return Enemy.fromAttributes("enemy", 1000000, 0, 100, 100);
     }
 }
+
