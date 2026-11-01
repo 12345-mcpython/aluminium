@@ -28,7 +28,7 @@
       "when": ["actor == self", "from_skill_id == 800708"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.6 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv1 #3 = 0.6",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -36,7 +36,7 @@
       "when": ["actor == self", "from_skill_id == 800808"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.6 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv1 #3 = 0.6",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     }
   ],
   "2": [
@@ -66,7 +66,7 @@
       "when": ["actor == self", "from_skill_id == 800708"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.7 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv2 #3 = 0.7",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -74,7 +74,7 @@
       "when": ["actor == self", "from_skill_id == 800808"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.7 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv2 #3 = 0.7",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     }
   ],
   "3": [
@@ -104,7 +104,7 @@
       "when": ["actor == self", "from_skill_id == 800708"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.8 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv3 #3 = 0.8",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -112,7 +112,7 @@
       "when": ["actor == self", "from_skill_id == 800808"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.8 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv3 #3 = 0.8",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     }
   ],
   "4": [
@@ -142,7 +142,7 @@
       "when": ["actor == self", "from_skill_id == 800708"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.9 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv4 #3 = 0.9",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -150,7 +150,7 @@
       "when": ["actor == self", "from_skill_id == 800808"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 0.9 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv4 #3 = 0.9",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     }
   ],
   "5": [
@@ -180,7 +180,7 @@
       "when": ["actor == self", "from_skill_id == 800708"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 1 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv5 #3 = 1",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8007 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800708** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -188,7 +188,7 @@
       "when": ["actor == self", "from_skill_id == 800808"],
       "do": [ { "op": "BOOST_DAMAGE", "percent": 1 } ],
       "source": "光锥 22006: 「强化普攻【明天，一同写下！】造成的伤害提高#3[i]%。」 param Lv5 #3 = 1",
-      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **rom_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
+      "_note": "「强化普攻【明天，一同写下！】造成的伤害提高 #3%」—— 那一招在 skills.json 里是 **8008 / 槽位 8 / attack_type Normal** ✓，所以 DEALING_DAMAGE 上的 **`from_skill_id** = 技能 key = cid*100+slot = **800808** ✓（DamageService 把 damage.getSkillKey() 放进事件 ✓）。"
     }
   ]
 }

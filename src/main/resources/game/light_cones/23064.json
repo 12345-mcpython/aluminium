@@ -56,7 +56,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "percent": 0.4, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】…若施放的欢愉技与上一次施放的欢愉技不同，则额外获得【潮流】，【潮流】使装备者的欢愉度提高#3[i]%。」 param Lv1 #3 = 0.4",
-      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **rom_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
+      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **`from_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
     }
   ],
   "2": [
@@ -114,7 +114,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "percent": 0.55, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】…若施放的欢愉技与上一次施放的欢愉技不同，则额外获得【潮流】，【潮流】使装备者的欢愉度提高#3[i]%。」 param Lv2 #3 = 0.55",
-      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **rom_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
+      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **`from_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
     }
   ],
   "3": [
@@ -172,7 +172,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "percent": 0.7, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】…若施放的欢愉技与上一次施放的欢愉技不同，则额外获得【潮流】，【潮流】使装备者的欢愉度提高#3[i]%。」 param Lv3 #3 = 0.7",
-      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **rom_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
+      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **`from_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
     }
   ],
   "4": [
@@ -230,7 +230,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "percent": 0.85, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】…若施放的欢愉技与上一次施放的欢愉技不同，则额外获得【潮流】，【潮流】使装备者的欢愉度提高#3[i]%。」 param Lv4 #3 = 0.85",
-      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **rom_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
+      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **`from_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
     }
   ],
   "5": [
@@ -288,7 +288,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ELATION_DAMAGE_BOOST", "percent": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23064: 「装备者施放欢愉技时，获得【风口】…若施放的欢愉技与上一次施放的欢愉技不同，则额外获得【潮流】，【潮流】使装备者的欢愉度提高#3[i]%。」 param Lv5 #3 = 1",
-      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **rom_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
+      "_note": "「若施放的欢愉技**与上一次施放的欢愉技不同**」—— 引擎记住**上一次施放完成的欢愉技槽位**（CanHit.lastElationSkillId，SkillExecutor 在这一发的 CAST_SETUP 事件**之后**写入 ✓，所以规则里读到的仍是「上一次」），条件写成 **`from_skill_id != last_elation_skill_id** ✓（两变量比较 ✓）。⚠ **第一次**施放时后者是 0 ⇒ 也算「不同」✓（没有上一发可比，句子没有排除这种情况）。「欢愉度」= ELATION_DAMAGE_BOOST ✓（23053 的同一口径）。"
     }
   ]
 }

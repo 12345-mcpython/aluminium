@@ -21,7 +21,7 @@
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.12, "instance": true, "permanent": true }
       ],
       "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv1 #5 = -0.12",
-      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 \target == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 `addReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "2": [
@@ -44,7 +44,7 @@
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.15, "instance": true, "permanent": true }
       ],
       "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv2 #5 = -0.15",
-      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 \target == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 `addReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "3": [
@@ -67,7 +67,7 @@
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.18, "instance": true, "permanent": true }
       ],
       "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv3 #5 = -0.18",
-      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 \target == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 `addReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "4": [
@@ -90,7 +90,7 @@
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.21, "instance": true, "permanent": true }
       ],
       "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv4 #5 = -0.21",
-      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 \target == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 `addReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ],
   "5": [
@@ -113,7 +113,7 @@
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.24, "instance": true, "permanent": true }
       ],
       "source": "光锥 24002: 「如果装备者持有护盾，则使自身受到的伤害降低#5[i]%。」 param Lv5 #5 = -0.24",
-      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 	arget == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 ddReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
+      "_note": "「**持有护盾**时，使自身受到的伤害**降低** #5%」—— ① 门 \target == self + **self has_shield**（结算那一刻的活值 ✓）；② **实例** MODIFY_DAMAGE_TAKEN + **负** percent ✓ —— 实例路径把负份额走 `addReduction ✓（与非实例路径的同一个读法：正 = 易伤、负 = 减伤 ✓）。⚠ permanent: true 只是实例修饰装载器要求的寿命字段（实例不建 buff）✓。与同档的 !self has_shield 规则不冲突：一个加盾、一个减伤，两个事件都读**当下**的盾 ✓。"
     }
   ]
 }

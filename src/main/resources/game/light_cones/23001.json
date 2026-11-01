@@ -44,7 +44,7 @@
         }
       ],
       "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv1 #4 = 0.12、#5 = 6",
-      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、`from_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "2": [
@@ -90,7 +90,7 @@
         }
       ],
       "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv2 #4 = 0.14、#5 = 6",
-      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、`from_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "3": [
@@ -136,7 +136,7 @@
         }
       ],
       "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv3 #4 = 0.16、#5 = 6",
-      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、`from_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "4": [
@@ -182,7 +182,7 @@
         }
       ],
       "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv4 #4 = 0.18、#5 = 6",
-      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、`from_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ],
   "5": [
@@ -228,7 +228,7 @@
         }
       ],
       "source": "光锥 23001: 「…同时终结技的暴击伤害提高 #4%，该效果可叠加 #5 层。」 param Lv5 #4 = 0.2、#5 = 6",
-      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、rom_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
+      "_note": "「同时**终结技的暴击伤害**提高 #4%，该效果可叠加 #5 层」—— ⚠ 只对**终结技**生效，所以不能写成全局 CRIT_ATTACK 修饰（那会让普攻/战技也吃到 ✗）：挂在 DEALING_DAMAGE 上、`from_skill ULTRA 门内、用**实例修饰** CRIT_ATTACK（TriggerEffects 的 instance 分支 → damage.addCritDamage）✓。⚠ 层数复用同一条 per_steps: \"SPEED-100:10\" + per_steps_cap: 6：per_steps 读到 N 层时会折成一条 percent × N 的实例修饰（TriggerInterpreter 的折叠分支）✓ —— 2026-10-31 前这条被记成「没有按技能类别限定的暴伤属性」，其实实例通道早就有，只是没被这条句子用过 ✓。⚠ `permanent: true` 只是装载器对 `MODIFY_ATTR` 的必需寿命字段；实例修饰不建 buff，寿命不参与 ✓。"
     }
   ]
 }

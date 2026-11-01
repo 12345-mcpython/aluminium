@@ -16,7 +16,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ENERGY_REGENERATION_RATE", "percent": 0.06, "permanent": true, "buff": "秘密-能量恢复", "target": "all_allies" }
       ],
       "source": "光锥 21032 秘密（Lv1）：「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力提高#1[i]%；暴击伤害提高#2[i]%；能量恢复效率提高#3[i]%。」",
-      "_note": "⛔ **仍开（已登记 §4.3）** → ✅ **2026-10-31 追记：这条实现本来就是对的** ——「从三条里随机取一、且不与上次重复」= **one_of: true + one_of_no_repeat** ✓（引擎已有：TriggerSpec.oneOf / CanHit.rememberPick）；三条 REMOVE_STATE 带 **lways: true**（每次发射都清掉旧的 ✓），三条 MODIFY_ATTR 是**候选池** ✓（one_of 只在池里抽 ✓）。2026-10-19 的登记已过时 ✓。⚠⚠ **同一轮发现：五档的数值原先全是第 1 档** ✗（0.1/0.12/0.06）⇒ 已按 Lv2–Lv5 补齐 ✓。判据 ConeTwentyOneThousandThirtyTwoTest（恰好一个生效、下一发不重复、五档份额、无光锥为空）✓。"
+      "_note": "⛔ **仍开（已登记 §4.3）** → ✅ **2026-10-31 追记：这条实现本来就是对的** ——「从三条里随机取一、且不与上次重复」= **one_of: true + one_of_no_repeat** ✓（引擎已有：TriggerSpec.oneOf / CanHit.rememberPick）；三条 REMOVE_STATE 带 **`always: true**（每次发射都清掉旧的 ✓），三条 MODIFY_ATTR 是**候选池** ✓（one_of 只在池里抽 ✓）。2026-10-19 的登记已过时 ✓。⚠⚠ **同一轮发现：五档的数值原先全是第 1 档** ✗（0.1/0.12/0.06）⇒ 已按 Lv2–Lv5 补齐 ✓。判据 ConeTwentyOneThousandThirtyTwoTest（恰好一个生效、下一发不重复、五档份额、无光锥为空）✓。"
     },
     {
       "on": "TURN_START",
@@ -32,7 +32,7 @@
         { "op": "MODIFY_ATTR", "attribute": "ENERGY_REGENERATION_RATE", "percent": 0.06, "permanent": true, "buff": "秘密-能量恢复", "target": "all_allies" }
       ],
       "source": "光锥 21032 秘密（Lv1）：「战斗开始时以及当装备者回合开始时，随机生效 1 个效果。该效果生效时，替换上次的效果且本次不会与上次重复。效果包含：我方全体攻击力提高#1[i]%；暴击伤害提高#2[i]%；能量恢复效率提高#3[i]%。」",
-      "_note": "⛔ **仍开（已登记 §4.3）** → ✅ **2026-10-31 追记：这条实现本来就是对的** ——「从三条里随机取一、且不与上次重复」= **one_of: true + one_of_no_repeat** ✓（引擎已有：TriggerSpec.oneOf / CanHit.rememberPick）；三条 REMOVE_STATE 带 **lways: true**（每次发射都清掉旧的 ✓），三条 MODIFY_ATTR 是**候选池** ✓（one_of 只在池里抽 ✓）。2026-10-19 的登记已过时 ✓。⚠⚠ **同一轮发现：五档的数值原先全是第 1 档** ✗（0.1/0.12/0.06）⇒ 已按 Lv2–Lv5 补齐 ✓。判据 ConeTwentyOneThousandThirtyTwoTest（恰好一个生效、下一发不重复、五档份额、无光锥为空）✓。"
+      "_note": "⛔ **仍开（已登记 §4.3）** → ✅ **2026-10-31 追记：这条实现本来就是对的** ——「从三条里随机取一、且不与上次重复」= **one_of: true + one_of_no_repeat** ✓（引擎已有：TriggerSpec.oneOf / CanHit.rememberPick）；三条 REMOVE_STATE 带 **`always: true**（每次发射都清掉旧的 ✓），三条 MODIFY_ATTR 是**候选池** ✓（one_of 只在池里抽 ✓）。2026-10-19 的登记已过时 ✓。⚠⚠ **同一轮发现：五档的数值原先全是第 1 档** ✗（0.1/0.12/0.06）⇒ 已按 Lv2–Lv5 补齐 ✓。判据 ConeTwentyOneThousandThirtyTwoTest（恰好一个生效、下一发不重复、五档份额、无光锥为空）✓。"
     }
   ],
   "2": [
