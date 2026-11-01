@@ -86,8 +86,8 @@ public class TechniqueGateTest {
     @Test
     public void hisFileCarriesTheTechniqueClause() {
         var table = TriggerTables.of(TB);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the technique heal and the level convention");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique heal, the level convention and Eidolons 3 + 5 (both on BATTLE_START)");
     }
 
     private static Random fixed() {
