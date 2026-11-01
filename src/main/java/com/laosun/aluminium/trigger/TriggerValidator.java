@@ -803,6 +803,23 @@ final class TriggerValidator {
             case REPLACE_SKILL -> {
                 // "strengthen the next basic attack into [酒花奔涌]": which slot, which data row, and how long the swap lasts.
                 requireSkill(effect, op, spec);
+                if (Boolean.TRUE.equals(effect.getRemove())) {
+                    // The other direction: take the swap off this slot. It states no data row and no lifetime - the
+                    // lifetime was the install's, and the removal is immediate - so either would be a field with no reader.
+                    if (effect.getSkillId() != null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " with \"remove\": true must not state \"skill_id\": there is nothing to "
+                                        + "install (source: " + spec.getSource() + ")");
+                    }
+                    if (effect.getTurns() != null || effect.getUntil() != null
+                            || Boolean.TRUE.equals(effect.getPermanent())) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " with \"remove\": true takes the swap off at once, so a lifetime says "
+                                        + "nothing (source: " + spec.getSource() + ")");
+                    }
+                    requireNoStackArguments(effect, op, spec);
+                    break;
+                }
                 if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs \"skill_id\": the data row of the replacement skill (an enhanced attack is "
