@@ -534,6 +534,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `stacks` | 一次施加几层 |
 | `per_stack` / `per_stack_live` | 每层的增量 / 是否实时跟随层数 |
 | `SET_STACKS` | 把计数器**设为**给定层数（加点/减点到达，与只会加的 `ADD_STACK` 相对）；值来自 `scale`，例如 `max_enemy_stacks:烬煨` |
+| `all_enemies_with_state:<状态>` | 敌方全体里**带该状态**的那些（空集合是合法答案）；读者 1107 克拉拉战技 |
 | `unbounded_stacks` | 计数器**没有上限**（`ADD_STACK` 不带 `max_stacks` 时默认只存 1 层，这个字段取消该默认）|
 | `per_stack_cap` | 「最多叠加 N 层」：封**这份加成**用的层数（计数器本身可以更多）|
 | **`base_chance`** | 基础概率，会被效果抵抗削减；100% 不是保证 |

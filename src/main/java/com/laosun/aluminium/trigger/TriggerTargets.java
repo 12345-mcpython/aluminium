@@ -161,6 +161,28 @@ final class TriggerTargets {
 
     static List<CanHit> resolveTargetsUnfiltered(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
+        if (selector.startsWith(ENEMIES_WITH_STATE_PREFIX)) {
+            // "对所有被标上【反击标记】的敌方目标…": the enemy side, filtered by a STATE. Reader: 1107 Clara's Skill.
+            // An empty result is a real answer here (nobody is marked), so this does not throw the way a single-target
+            // selector does.
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"" + selector + "\" but no battle was supplied to read the enemy side");
+            }
+            String state = selector.substring(ENEMIES_WITH_STATE_PREFIX.length()).trim();
+            if (state.isEmpty()) {
+                throw new IllegalStateException(
+                        "Effect targets \"" + selector + "\", which names no state; the spelling is "
+                                + "\"" + ENEMIES_WITH_STATE_PREFIX + "<STATE>\"");
+            }
+            List<CanHit> marked = new java.util.ArrayList<>();
+            for (CanHit enemy : battle.enemies()) {
+                if (enemy.getBuffManager().hasState(state)) {
+                    marked.add(enemy);
+                }
+            }
+            return List.copyOf(marked);
+        }
         if (selector.startsWith(TriggerVocabulary.HOLDER_OF_PREFIX)) {
             return holderOf(battle, effect.getTarget(), ctx);
         }
@@ -757,5 +779,11 @@ final class TriggerTargets {
      * the same way as the conditions around it.
      */
     static final String ALLIES_OF_PATH_EXCEPT_PREFIX = "allies_of_path_except:";
+
+    /**
+     * The enemy side filtered by a STATE: "对所有被标上【X】的敌方目标". Reader: 1107 Clara and Svarog.
+     */
+    static final String ENEMIES_WITH_STATE_PREFIX = "all_enemies_with_state:";
+
 }
 
