@@ -70,6 +70,7 @@ public class EffectSpec {
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
+        copy.perStackCap = this.perStackCap;
         copy.scale = this.scale;
         copy.attribute = this.attribute;
         copy.percent = this.percent;
@@ -521,6 +522,14 @@ public class EffectSpec {
      */
     @SerializedName("per_stack")
     private String perStack;
+
+    /**
+     * The most layers {@link #perStack} may count: "每层 X%，该效果最多叠加 5 层" caps the MULTIPLIER, not the counter (the
+     * counter itself may hold more). Reader: 1009 Asta's per-charge ATK aura, whose stacks can exceed 5 while the aura stops
+     * at five of them.
+     */
+    @SerializedName("per_stack_cap")
+    private Integer perStackCap;
 
     /*
      * Which <b>kind</b> of incoming damage this modifier is about, or {@code null} for "all damage".

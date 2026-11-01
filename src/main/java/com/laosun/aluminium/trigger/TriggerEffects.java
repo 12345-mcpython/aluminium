@@ -252,10 +252,14 @@ final class TriggerEffects {
                         String own = effect.getScale().trim().substring("self_stacks:".length()).trim();
                         double extra = effect.getAmount() == null ? 0 : effect.getAmount();
                         double pct = effect.getPercent() == null ? 0 : effect.getPercent();
-                        liveBuff.makeLive(() -> pct * target.getBuffManager().stacksOf(own) + extra);
+                        liveBuff.makeLive(() -> pct
+                                * TriggerInterpreter.capPerStack(effect, target.getBuffManager().stacksOf(own)) + extra);
                     } else {
                         String counter = TriggerInterpreter.counterName(effect);
-                        liveBuff.makeLive(() -> magnitude * target.getBuffManager().stacksOf(counter));
+                        // Note: read through `perStackFactor`, not `stacksOf(counter)`: a `self_stacks:` spelling names the RULE
+                        // OWNER's counter while the modifier sits on every ally, so a raw stacksOf() read the wrong unit and the
+                        // aura paid 0 to everyone but the owner (measured on 1009's per-charge ATK).
+                        liveBuff.makeLive(() -> magnitude * TriggerInterpreter.perStackFactor(effect, target, ctx));
                     }
                 }
             }

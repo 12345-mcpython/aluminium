@@ -1597,6 +1597,22 @@ public final class TriggerInterpreter {
     }
 
     static double perStackFactor(EffectSpec effect, CanHit target, TriggerContext ctx) {
+        return capPerStack(effect, perStackCount(effect, target, ctx));
+    }
+
+    /**
+     * Applies {@code per_stack_cap}: "每层 X%，最多 5 层" stops at five layers even when the counter holds more, and a rule
+     * that states no cap counts every layer.
+     */
+    static double capPerStack(EffectSpec effect, double count) {
+        Integer cap = effect.getPerStackCap();
+        return cap == null ? count : Math.min(count, cap);
+    }
+
+    /**
+     * The count {@code per_stack} names, uncapped: {@code self_stacks:<NAME>} reads the rule owner, a bare name the target.
+     */
+    private static double perStackCount(EffectSpec effect, CanHit target, TriggerContext ctx) {
         // A SELF counter (reader: cone 23053's "for each skill point the wearer consumes ... at most 4 stacks").
         // The bare name below is resolved on the TARGET, which is right for "each [当品] stack" (a counter on the victim) but
         // cannot say "MY counter" when the effect lands on somebody else -- so the condition vocabulary's own prefix is

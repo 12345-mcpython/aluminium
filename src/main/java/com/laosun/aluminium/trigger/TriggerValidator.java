@@ -667,6 +667,18 @@ final class TriggerValidator {
                 requireDerivedScale(effect, op, spec, true);
                 // Note: `per_stack` multiplies the PLAIN magnitude, so a scale would be a second multiplier on the same
                 // number. Refusing the combination keeps "the value" unambiguous.
+                if (effect.getPerStackCap() != null) {
+                    if (effect.getPerStack() == null || effect.getPerStack().isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"per_stack_cap\" but no \"per_stack\": there is no layer to cap (source: "
+                                        + spec.getSource() + ")");
+                    }
+                    if (effect.getPerStackCap() < 1) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " caps per_stack at " + effect.getPerStackCap() + ", which is below one layer "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                }
                 if (effect.getPerStack() != null && !effect.getPerStack().isBlank()) {
                     if (derivedModifier) {
                         throw new IllegalArgumentException(
