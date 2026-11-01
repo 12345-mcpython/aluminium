@@ -26,7 +26,7 @@ public class KafkaDotTakenTest {
 
     @Test
     public void theRuleStatesTheDotScopeAndShare() {
-        Character unit = CharacterFactory.create(WEARER, LEVEL);
+        Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, null, 1);   // the +30% DoT-taken is Eidolon 1
         Enemy enemy = BattleFixture.monster();
         var rules = unit.getTriggerTable().matching(TriggerEvent.FOLLOW_UP,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));
@@ -46,7 +46,7 @@ public class KafkaDotTakenTest {
 
     @Test
     public void dotDamageIsAmplifiedByExactlyThirtyPercent() {
-        Character unit = CharacterFactory.create(WEARER, LEVEL);
+        Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, null, 1);   // the +30% DoT-taken is Eidolon 1
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
@@ -57,3 +57,4 @@ public class KafkaDotTakenTest {
         Assertions.assertEquals(1.3, dot / normal, 1e-6, "DoT damage rises by exactly the authored 30%");
     }
 }
+
