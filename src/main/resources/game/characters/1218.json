@@ -114,14 +114,14 @@
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "scale": "target_stacks:烬煨",
-          "percent": 0.05,
           "amount": 0.1,
           "turns": 2,
-          "target": "target"
+          "target": "target",
+          "percent_from_skill_param": "TALENT:2"
         }
       ],
       "source": "1218 椒丘 天赋: 「1层时使敌人受到的伤害提高15.00%，此后每叠加1层提高5.00%。【烬煨】最多叠加5层，持续2回合」",
-      "_note": "「**1 层时**使敌人受到的伤害提高 **15.00%**，此后**每叠加 1 层提高 5.00%**」—— ① 这是\"**基数 + 每层**\"的曲线 ✓ ⇒ `amount: 0.1`（= 15% − 5% ✓）**加上** `percent: 0.05 × 层数` ✓ ⇒ **1 层 = 0.15** ✓、**3 层 = 0.25** ✓、**5 层（上限）= 0.35** ✓；② ⚠ **本轮为此给 `MODIFY_DAMAGE_TAKEN` 补了派生幅值** ✓：它此前**直接读 `percent`** ✗ ⇒ 写在上面的 `scale`/`amount` 会**装载成功却被静默忽略** ✗（比报错更糟 ✗）；现在与 `MODIFY_ATTR` 同路 ✓（**不写 `scale` 时行为一字不变** ✓）；③ 时长 `turns: 2` ✓（与【烬煨】本身同长 ✓，文档原话 ✓）。"
+      "_note": "「**1 层时**使敌人受到的伤害提高 **15.00%**，此后**每叠加 1 层提高 5.00%**」—— ① 这是\"**基数 + 每层**\"的曲线 ✓ ⇒ `amount: 0.1`（= 15% − 5% ✓）**加上** `percent: 0.05 × 层数` ✓ ⇒ **1 层 = 0.15** ✓、**3 层 = 0.25** ✓、**5 层（上限）= 0.35** ✓；② ⚠ **本轮为此给 `MODIFY_DAMAGE_TAKEN` 补了派生幅值** ✓：它此前**直接读 `percent`** ✗ ⇒ 写在上面的 `scale`/`amount` 会**装载成功却被静默忽略** ✗（比报错更糟 ✗）；现在与 `MODIFY_ATTR` 同路 ✓（**不写 `scale` 时行为一字不变** ✓）；③ 时长 `turns: 2` ✓（与【烬煨】本身同长 ✓，文档原话 ✓）。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "ULT_CAST",
@@ -154,14 +154,14 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "amount": 0.1,
           "scale": "target_stacks:烬煨",
-          "percent": 0.05,
           "cap_amount": 0.35,
           "turns": 2,
-          "target": "target"
+          "target": "target",
+          "percent_from_skill_param": "TALENT:2"
         }
       ],
       "source": "1218 椒丘 天赋: 「1 层时使敌人受到的伤害提高 15.00%，此后每叠加 1 层提高 5.00%。【烬煨】最多叠加 5 层，持续 2 回合」",
-      "_note": "⭐⭐ **完全用既有词汇** ✓：`MODIFY_DAMAGE_TAKEN` 的**派生量** ✓（`amount + percent × 层数` ✓，`TriggerInterpreter.modifyDamageTaken` 的注释里**正好点名本条** ✓）配 **`scale: \"target_stacks:烬煨\"`** ✓（`stackScale` 支持 `self_stacks:`/`target_stacks:` 两种前缀 ✓，本条读**事件目标**的层数 ✓）。⭐ 基线 `amount 0.10` ✓ ⇒ 1 层 = **0.15** ✓（与原文一致 ✓）；上限 `cap_amount 0.35` ✓（= 5 层 ✓）。⚠⚠ **判据的诚实说明** ✓：本条**只能做规格级判据** ✗ —— 该 zone 在**每次 `DEALING_DAMAGE`** 都重新施加 ✓，行为上无法把它的贡献与其它 zone 隔离 ✗（第 219/240 轮实测：去掉 `scale`、把条件改成不可达，**判据都照过** ✗）⇒ 因此判据直接断言**编译后规则的四个字段** ✓，并在此写明行为侧不可隔离 ✓。"
+      "_note": "⭐⭐ **完全用既有词汇** ✓：`MODIFY_DAMAGE_TAKEN` 的**派生量** ✓（`amount + percent × 层数` ✓，`TriggerInterpreter.modifyDamageTaken` 的注释里**正好点名本条** ✓）配 **`scale: \"target_stacks:烬煨\"`** ✓（`stackScale` 支持 `self_stacks:`/`target_stacks:` 两种前缀 ✓，本条读**事件目标**的层数 ✓）。⭐ 基线 `amount 0.10` ✓ ⇒ 1 层 = **0.15** ✓（与原文一致 ✓）；上限 `cap_amount 0.35` ✓（= 5 层 ✓）。⚠⚠ **判据的诚实说明** ✓：本条**只能做规格级判据** ✗ —— 该 zone 在**每次 `DEALING_DAMAGE`** 都重新施加 ✓，行为上无法把它的贡献与其它 zone 隔离 ✗（第 219/240 轮实测：去掉 `scale`、把条件改成不可达，**判据都照过** ✗）⇒ 因此判据直接断言**编译后规则的四个字段** ✓，并在此写明行为侧不可隔离 ✓。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "BATTLE_START",
