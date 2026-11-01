@@ -67,7 +67,7 @@ public class AventurineTest {
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(AVENTURINE);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the opening shield and the level convention");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the opening shield and the level convention");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the state");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "the Skill's shield comes from data/skill_effects.json, so a rule would double-count it");

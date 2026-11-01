@@ -149,6 +149,49 @@
       ],
       "source": "1220 飞霄 行迹「解形」(1220102): 「施放终结技对敌方目标造成伤害时，被视为发动了追加攻击。追加攻击的暴击伤害提高 36%」",
       "_note": "⭐⭐ 用刚落地的**实例路径 + 伤害类型域** ✓：`MODIFY_ATTR` + `instance: true` + **`damage_type: \"ADDITIONAL\"`** ✓ （引擎把追加攻击记成这个类型 ✓）⇒ 只给**追加攻击那一次伤害**加暴击伤害 ✓。⭐ 数值 **36%** 取自**数据行** ✓（`skill_traces.json` 的 `1220102 param=[0.36]` ✓，第 106 条 ✓）。⚠ 存活期写 `permanent: true` 仅为通过加载器校验 ✓（instance 路径不读它 ✓）。⚠ **登记**：同句前半「施放终结技造成伤害时**被视为发动了追加攻击**」✗ 未写 —— 那要求引擎把一次**终结技**伤害同时按\"追加攻击\"处理 ✗（维度只有 `ADDITIONAL` 一个值 ✗，无法叠加两种身份 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1220 星魂 3: 等级加成（数据 skill_add_level: 122001=COMMON+1, 122003=ULTRA+2, 122014=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1220 星魂 5: 等级加成（数据 skill_add_level: 122002=SKILL+2, 122004=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }

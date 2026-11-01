@@ -133,6 +133,44 @@
       ],
       "source": "1305 真理医生: 「…【智者的短见】效果最多触发 2 次且仅对最新施放的目标生效。施放终结技后重置该效果触发次数。」",
       "_note": "⭐ 「施放终结技后重置」那一半 ✓（2026-09-30 ✓）：⚠ 用 ⚠ `RESET_TRIGGER_LIMIT` ✗ 只清 ⚠ `ult_reaction_followup` 这一条的计数 ✓ —— ⚠ 他在 `ULT_CAST` 上还有 `ult_marks_wisemans_folly` ✓，⚠ 清全部就是近似 ✓。⚠ 而 ⚠ 被清的计数**记在被标记的敌人身上** ✗（⚠ `per_subject: target` ✓）⇒ ⚠ 换目标后另一个目标有自己的计数 ✓，⚠ 与「仅对最新施放的目标生效」一致 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        }
+      ],
+      "source": "1305 星魂 3: 等级加成（数据 skill_add_level: 130501=COMMON+1, 130503=ULTRA+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1305 星魂 5: 等级加成（数据 skill_add_level: 130502=SKILL+2, 130504=TALENT+2）",
+      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。"
     }
   ]
 }
