@@ -3,8 +3,6 @@
   "character": 1104,
   "_status": "partial",
   "_gaps": [
-    "星魂 2 要等一个「**非我方单位**的状态到期」的观测：条件 `state_ended` 现在只接受**我方承载者**（`requireCarriedParty`），敌人的冻结解除因此读不到 —— 实测 `target state_ended` 与 `actor state_ended` 两种主语都不触发 ✗（规则已撤下，不留未验证内容）",
-    "星魂 2「冻结解除后目标速度降低 20%」：缺控制解除这个可观测",
     "星魂 6「触发天赋时立即行动、回复量 +50% 生命上限」：依赖天赋的致命一击观测",
     "星魂 4 效果抵抗修饰挂在 BATTLE_START 且 permanent，主人倒下后不消失（语义差）"
   ],
@@ -214,6 +212,18 @@
       ],
       "source": "1104 镜流（行迹）：「受到**致命攻击**时不会陷入无法战斗状态，并立即回复等同于自身生命上限 **50%** 的生命值。**该效果单场战斗中只能触发 1 次**」",
       "_note": "⭐ 2026-10-02：⭐ **本文件自己把这句登记成“缺…”** ✓（`1104.json` 的 `note` 逐字：*「受到致命攻击时不会陷入无法战斗状态…」—— 缺…* ✓）⇒ 本件把它接上 ✓。❗ “**单场一次**”用 **`once_per_battle`** ✓ —— ⚠ **已出货拼法** ✓（`1105` ⾋ `1111` 都用它 ✓）。"
+    },
+    {
+      "on": "STATE_ENDED",
+      "id": "eidolon2_slow_after_freeze_ends",
+      "when": ["target state_ended 冻结"],
+      "min_eidolon": 2,
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": -0.2, "turns": 1, "target": "target" }
+      ],
+      "source": "1104 杰帕德 星魂 2 不被认可的请求: 「战技使敌方目标陷入的冻结状态解除后，目标的速度降低20%，持续1回合。」 param = [0.2, 1]",
+      "_note": "「战技使敌方目标陷入的冻结状态**解除后**，目标的速度降低 20%，持续 1 回合」—— ① 事件 STATE_ENDED ✓ + 条件 `target state_ended 冻结` ✓（该事件的 actor 与 target 都是**承载者** ✓）；② `percent: -0.2`（负值 = 减速）且 `turns: 1` ✓。"
     }
+
   ]
 }
