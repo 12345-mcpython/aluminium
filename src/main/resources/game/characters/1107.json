@@ -3,8 +3,9 @@
   "character": 1107,
   "_status": "partial",
   "_gaps": [
-    "星魂 1「施放战技后，不会清除敌方目标的【反击标记】」：本档没有【反击标记】这套标记（星魂 6 也依赖它）⇒ 需要先建标记子系统",
-    "星魂 6「我方其他目标遭到攻击后，史瓦罗有 50% 固定概率反击并加标记；终结技额外 +1 次强化反击」：需要史瓦罗（独立单位）+ 标记 + 强化反击计数",
+    "战技第二句：「对所有被标上【反击标记】的敌方目标额外造成 #2% 攻击力物理伤害」未写（需要一个「按状态筛选的敌方全体」目标形状，现有 `all_enemies` 不过滤状态）",
+    "终结技「减伤 #4% / 被攻击概率提高 / 持续 #3 回合；史瓦罗反击强化：任意我方受击即反击、倍率 + #2%、对相邻造成 50%、生效 #5 次」未写（强化反击的次数是资源型寿命 ✓ 形状可写，但「任意我方受击后反击」需要 `ALLY_ATTACK`/`TAKING_HIT` 观察者 + 计数）",
+    "星魂 6「我方其他目标遭到攻击后，史瓦罗有 50% 固定概率反击并加标记；终结技额外 +1 次强化反击」未写：与终结技强化反击共用计数",
     "终结技 / 星魂 6 的数据 modifier 也写 AggroAddedRatio，但正文未提，按约定不写（数据与正文差异）"
   ],
   "rules": [
@@ -20,10 +21,16 @@
           "damage_param": 1,
           "as_attack": false,
           "target": "attacker"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "反击标记",
+          "permanent": true,
+          "target": "attacker"
         }
       ],
       "source": "1107 克拉拉 talent 因为我们是家人 (Svarog's counter)",
-      "_note": "Doc: 「攻击克拉拉的敌方目标会被史瓦罗标上【反击标记】，并遭到史瓦罗的反击，对其造成等同于克拉拉160%攻击力的物理属性伤害。」 The talent data carries the attack itself (单体攻击 / Physical / 削韧 30, params [1, 0.8, 0.1] -> [1, 2, 0.1]); the multiplier sits at index 1 (NOT 0 like basic attacks). 160% is the level-10 value: params[1][9] = 1.6, verified. Because the engine reads the row for the skill's own level, a level-1 talent correctly yields 80%. 'target == self' means 'the HP loss happened to me'; the actor is the enemy that hit her, which the effect's target:'attacker' sends the counter back to."
+      "_note": "「攻击克拉拉的敌方目标会被史瓦罗标上**【反击标记】**，并遭到史瓦罗的**反击**（160% 攻击力物理伤害）」—— ① 反击 = `DAMAGE skill: TALENT damage_param: 1` ✓（倍率在参数 **#2**，不是 #1 ✓ 已核实 Lv10 = 1.6 ✓）；② **标记** = `APPLY_BUFF 反击标记` 挂到 **`attacker`** ✓（「攻击克拉拉的敌方目标」✓）；`permanent: true` ✓（句子没有时长，它的结束是「**战技施放后所有标记失效**」✓ 见 `skill_clears_the_mark`）。 ⚠ 以下是本注记此前的英文原文（保留对照）： 「攻击克拉拉的敌方目标会被史瓦罗标上【反击标记】，并遭到史瓦罗的反击，对其造成等同于克拉拉160%攻击力的物理属性伤害。」 The talent data carries the attack itself (单体攻击 / Physical / 削韧 30, params [1, 0.8, 0.1] -> [1, 2, 0.1]); the multiplier sits at index 1 (NOT 0 like basic attacks). 160% is the level-10 value: params[1][9] = 1.6, verified. Because the engine reads the row for the skill's own level, a level-1 talent correctly yields 80%. 'target == self' means 'the HP loss happened to me'; the actor is the enemy that hit her, which the effect's target:'attacker' sends the counter back to."
     },
     {
       "on": "TAKING_HIT",
@@ -133,6 +140,25 @@
       ],
       "source": "1107 克拉拉 星魂 4 一家的依靠: 「受到攻击后，克拉拉受到的伤害降低30%，效果持续到自己的下个回合开始。」 param = [0.3]",
       "_note": "「**受到攻击后**，克拉拉受到的伤害降低 **30%**，效果**持续到自己的下个回合开始**」—— ① 挂 **`ATTACK_FINISHED`** 而不是 `TAKING_HIT` ✓：句子是「受击**之后**」，挂在受击瞬间会把**这一发**也减掉 30% ✗；`ATTACK_FINISHED` 的 `target` 正是被打的那个人 ✓；② 负的 `MODIFY_DAMAGE_TAKEN` = **减伤** ✓（引擎约定：负值进 `addReduction` ✓）；③ 寿命 **`until: [next_turn_start]`** ✓ —— 引擎的 `Lifetime.NEXT_TURN_START` 正是「自己的下个回合开始」✓（用 `turns: 1` 会在**回合结束**就掉，早了一拍 ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "talent_protection_reduction",
+      "do": [
+        { "op": "MODIFY_DAMAGE_TAKEN", "percent": -0.1, "permanent": true, "target": "self" }
+      ],
+      "source": "1107 克拉拉 天赋 因为我们是家人: 「克拉拉在史瓦罗的保护下受到敌方目标攻击的伤害降低10%。」 param Lv10 #3 = 0.1",
+      "_note": "「克拉拉在史瓦罗的保护下**受到的伤害降低 10%**」—— 负的 `MODIFY_DAMAGE_TAKEN` = 减伤 ✓（引擎约定：负值进 `ReductionBuff` ✓），`permanent: true` ✓（常驻 ✓）。⚠ 这条**没有条件**：句子是常驻保护，不是「受击后」✓（对比星魂 4 那条**才有** `ATTACK_FINISHED` 与 `next_turn_start` ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_clears_the_mark",
+      "when": ["actor == self", "eidolon < 1"],
+      "do": [
+        { "op": "REMOVE_STATE", "buff": "反击标记", "target": "all_enemies" }
+      ],
+      "source": "1107 克拉拉 战技 史瓦罗在看着你 (110702): 「…战技施放后所有【反击标记】失效。」",
+      "_note": "「**战技施放后**所有【反击标记】失效」—— `SKILL_CAST` + `REMOVE_STATE 反击标记 all_enemies` ✓。⚠ **星魂 1** 是它的反面（「施放战技后，**不会**清除敌方目标的【反击标记】」）⇒ 本条加条件 **`eidolon < 1`** ✓：有星魂 1 时这条**不执行** ✓（`max_eidolon` 只接受 1–6 ⇒ 表达不了「没有星魂」✗）（不是另写一条\"不清除\"—— 那会用 `REMOVE_STATE` 的缺失表达，读者看不出意图 ✗）。"
     }
   ]
 }
