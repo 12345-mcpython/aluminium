@@ -375,6 +375,16 @@ public enum TriggerEvent {
      */
     SUMMONED("SUMMONED", true),
     /**
+     * An <b>enemy joined the field</b> after the battle started: fired by {@code Battle.addEnemy} / {@code Battle.addCombatant}
+     * when a unit lands on the enemy roster for the first time, with the newcomer as <b>both</b> actor and target.
+     *
+     * <p>Why it is not {@code SUMMONED}: a wave arriving or a caller laying out a staged fight is not a summon, and the
+     * sentence that needs this moment says "an enemy target enters combat" - 1302 Argenti (银枝)'s trace 慷慨:
+     * 「在敌方目标进入战斗时，自身立即恢复 #1 点能量」. Nothing fires before {@code startBattle}: a roster laid out at
+     * construction has not "entered".
+     */
+    ENEMY_ENTERED("ENEMY_ENTERED", true),
+    /**
      * A summon <b>left the field</b>: fired by {@code Battle.removeDeadCombatants} for every memosprite that is gone
      * from the roster, with the departed unit as <b>both</b> actor and target.
      *
