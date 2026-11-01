@@ -58,8 +58,8 @@ public class LuochaTest {
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "the counter, the zone opener, and the dispel");
         // The level convention, 行迹 行过幽谷's control resistance, 秘技 愚者的悲悯's field, 星魂 5, and 星魂 2's heal bonus.
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the control resistance, the technique, Eidolon 5's levels, and the heal bonus");
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the control resistance, the technique, Eidolons 2/3/5 levels and the heal bonus");
         // 星魂 2's shield half: decided before settlement, when the target's HP is still the pre-heal value.
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.CAST_SETUP), "Eidolon 2's shield");
         // 星魂 6's resistance reduction and the ultimate's own dispel + stack.
@@ -89,3 +89,4 @@ public class LuochaTest {
         }
     }
 }
+

@@ -3,7 +3,7 @@
   "character": 1203,
   "_status": "partial",
   "_gaps": [
-    "秘技、其余行迹、星魂：尚未分类 / 未读"
+    "星魂 1（「结界生效时我方全体攻击力提高 20%」）、星魂 4（「结界生效时使敌方陷入虚弱、造成的伤害降低 12%」）未写；星魂 3/5 的等级加成已落地 ✓（星魂 6 的抗性降低**原本就在** `ult_all_type_res_down` 里 ✓，我曾误以为缺、写重复被 `ContentDuplicateGuardTest` 拦下 ✓）"
   ],
   "rules": [
     {
@@ -345,8 +345,17 @@
           "target": "self"
         }
       ],
-      "source": "1203 罗刹 天赋 生息的轮转 (120304, Enhance): 「当罗刹陷入无法战斗状态时，结界也会被解除。」",
-      "_note": "「当罗刹**陷入无法战斗状态**时，结界**也会被解除**。」—— ① 用新事件 `DEATH` ✓ + `when: [\"target == self\"]` ✓：`DEATH` 由 `Battle.applyDamage` 在**判定死亡处**发出 ✓，**以倒下的人同时作为 actor 与 target** ✓ ⇒ `target == self` 读作「这次倒下的是我」 ✓（与 `TAKING_HIT`、反击规则**同一写法** ✓）。 ② ⚠ **为什么需要新事件**：`fireTriggers` 遍历队伍时会 **skip 掉已死单位** ✗（`if (ally.isDeath()) continue` ✓）—— 而\"收拾自己的结界\"按定义**只有倒下的人自己能做** ✗ ⇒ 没有这个事件就**写不出来** ✓。引擎对此**只开这一个例外** ✓：`DEATH` 只发给倒下的那一个 ✓，其它事件**仍然**是\"死人什么都不响应\" ✓。 ③ 用 `REMOVE_STATE` ✓ 而不是 `REMOVE_BUFF` ✓ —— 结界是 `APPLY_BUFF` 挂的**具名状态** ✓，`REMOVE_STATE` 正是\"按名字摘掉一个状态\" ✓。 ④ ⚠ 与 `KILL` **不是一回事** ✓：`KILL` 是**击杀者**的事实 ✓（发给**我方全体** ✓，读者是姬子星魂 6 那类 ✓）；本条是**倒下者**的事实 ✓。"
-    }
-  ]
+      "source": "1203 罗刹 天赋 生息的轮转 (120304, Enhance): 「当罗刹陷入无法战斗状态时，结界也会被解除。」",      "_note": "「当罗刹**陷入无法战斗状态**时，结界**也会被解除**。」—— ① 用新事件 `DEATH` ✓ + `when: [\"target == self\"]` ✓：`DEATH` 由 `Battle.applyDamage` 在**判定死亡处**发出 ✓，**以倒下的人同时作为 actor 与 target** ✓ ⇒ `target == self` 读作「这次倒下的是我」 ✓（与 `TAKING_HIT`、反击规则**同一写法** ✓）。 ② ⚠ **为什么需要新事件**：`fireTriggers` 遍历队伍时会 **skip 掉已死单位** ✗（`if (ally.isDeath()) continue` ✓）—— 而\"收拾自己的结界\"按定义**只有倒下的人自己能做** ✗ ⇒ 没有这个事件就**写不出来** ✓。引擎对此**只开这一个例外** ✓：`DEATH` 只发给倒下的那一个 ✓，其它事件**仍然**是\"死人什么都不响应\" ✓。 ③ 用 `REMOVE_STATE` ✓ 而不是 `REMOVE_BUFF` ✓ —— 结界是 `APPLY_BUFF` 挂的**具名状态** ✓，`REMOVE_STATE` 正是\"按名字摘掉一个状态\" ✓。 ④ ⚠ 与 `KILL` **不是一回事** ✓：`KILL` 是**击杀者**的事实 ✓（发给**我方全体** ✓，读者是姬子星魂 6 那类 ✓）；本条是**倒下者**的事实 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+      ],
+      "source": "1203 罗刹 星魂 3 愚人试探: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 data: skill_add_level = {120302: 2, 120301: 1}",
+      "_note": "「战技 **+2**、普攻 **+1**」—— 取自 eidolons.json 的 skill_add_level ✓。"
+    }  ]
 }
