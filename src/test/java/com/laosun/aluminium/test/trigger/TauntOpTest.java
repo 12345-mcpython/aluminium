@@ -91,8 +91,8 @@ public class TauntOpTest {
      */
     @Test
     public void theAuthoredRuleTauntsTheAimedEnemy() {
-        Assertions.assertEquals(1, TriggerTables.of(1507).ruleCount(TriggerEvent.SKILL_CAST),
-                "her Skill's taunt clause, and nothing else yet");
+        Assertions.assertEquals(2, TriggerTables.of(1507).ruleCount(TriggerEvent.SKILL_CAST),
+                "her Skill's taunt clause, plus Eidolon 1's delay of the zone countdown (also a SKILL_CAST)");
     }
 
     private static EffectSpec tauntEffect(int turns) {
