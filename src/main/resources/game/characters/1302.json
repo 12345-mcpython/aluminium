@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 1302,
-  "_status": "partial",
-  "_gaps": [
-    "强化终结技（数据槽 14，130214）整段未接入：引擎的施放路径没有这个槽（`SkillType` 的映射不含 14），所以「消耗 180 能量、336% 全体、再造成 6 次随机单体 114%」在本引擎里放不出来"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "BASIC_ATTACK",
@@ -302,6 +299,42 @@
       ],
       "source": "1302 银枝 行迹 慷慨: 「在敌方目标进入战斗时，自身立即恢复2点能量。」 param [2]",
       "_note": "「在敌方目标进入战斗时，自身立即恢复 2 点能量」—— 事件 **`ENEMY_ENTERED`** ✓（本轮新增：`Battle.addEnemy` / `addCombatant` 把**新加入敌方名册**的单位送进场时发一次，`actor` = 那个新来的 ✓；开战前的名册只是「摆好」，不算入场 ✓）；额度 2 = 行迹数据 `param [2]` ✓。⚠ 同一单位**重复加入**不会重复付账 ✓（幂等判据在引擎侧 ✓）。"
+    },
+    {
+      "on": "ENERGY_GAINED",
+      "id": "enhanced_ult_available",
+      "when": [
+        "actor == self",
+        "self_energy_percent >= 1.0"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "ULTRA",
+          "skill_id": 14,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1302 银枝 强化终结技 数据槽 14（驻「我」华庭，授予至勋）: 「消耗180点能量…」—— 能量**满**（180/180）时才换上强化行 ✓",
+      "_note": "能量满 ⇒ `REPLACE_SKILL ULTRA skill_id: 14` ✓（数据槽 14 存在 ✓）；`permanent: true` 让它留在槽上，直到下面的规则在能量不足时摘掉 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "enhanced_ult_spent",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "ULTRA",
+          "remove": true,
+          "target": "self"
+        }
+      ],
+      "source": "1302 银枝 强化终结技: 施放后能量归零 ⇒ 强化形态必须换回普通行 ✓",
+      "_note": "施放终结技后把替换摘掉 ✓（`remove: true`，与 1111 的天赋结束同形 ✓）。"
     }
   ]
 }
