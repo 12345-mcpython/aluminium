@@ -1,0 +1,88 @@
+{
+  "schema": 1,
+  "character": 1014,
+  "_status": "partial",
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 5
+        }
+      ],
+      "source": "1014 Saber 技能表的等级口径: 文档引用的是 Lv10 行（普攻按第 6 行：文档一律写「100% 攻击力」）",
+      "_note": "与全库一致：`SKILL/ULTRA/TALENT` 顶到 Lv10，`COMMON` 顶到 Lv6（AGENT §0.2 第 29 条）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "1014 Saber 星魂 3 十五个世纪的追寻: 「终结技等级+2…普攻等级+1…」 数据行 {101403: 2, 101401: 1}",
+      "_note": "星魂 3：终结技 +2、普攻 +1 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1014 Saber 星魂 5 于抵达理想的黎明: 「战技等级+2…天赋等级+2…」 数据行 {101402: 2, 101404: 2}",
+      "_note": "星魂 5：战技 +2、天赋 +2 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon4_wind_resistance_penetration",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.08,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1014 Saber 星魂 4 十六个冬日的奇遇: 「Saber的风属性抗性穿透提高8%。施放终结技后…提高4%，最多叠加3层。」 参数 = [0.08, 0.04, 3]",
+      "_note": "「**风属性抗性穿透提高 8%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.08, permanent: true }` ✓（近似：引擎的 `RESISTANCE_REDUCTION` 是全属性，不区分元素）。⛔ **未写**：「施放**终结技后**再 +4%，最多 3 层」—— 需要 `ULT_CAST` 上按层叠的修饰（可写，但同样只能全属性）。"
+    }
+  ],
+  "_gaps": [
+    "⭐ **从零建立**（本轮）：等级口径、星魂 3/5 的等级、星魂 4 的固定风穿透已落地。",
+    "⛔ **未写（需要逐条读文档并逐条判据）**：① 普攻/战技/终结技/天赋的全部从句（战技的 **【炉心共鸣】** 机制：每点 +14% 战技倍率、消耗回能、否则 +3 层 —— 需要「按资源层数放大本次施法」＋「条件性消耗换能量」两种写法）；② 强化普攻【解放的金色王权】；③ 秘技；④ 星魂 1/2/6；⑤ 行迹。",
+    "⚠ **登记**：`RESISTANCE_REDUCTION` 在引擎里是**全属性**，Saber 的两处「**风属性**抗性穿透」都只能按全属性近似。"
+  ]
+}
