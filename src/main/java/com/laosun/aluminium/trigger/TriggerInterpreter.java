@@ -2554,6 +2554,18 @@ public final class TriggerInterpreter {
             // target, which `hit_count` would read as three. Reader: 1009 Asta's charge.
             return (int) ctx.attackHitTargets().stream().distinct().count();
         }
+        if ("target_debuffs".equals(from)) {
+            // "目标每有 1 个负面效果，额外造成 …，该效果在每次终结技攻击中最多触发 N 次" (1006 Silver Wolf Eidolon 4): the
+            // repeat count is the VICTIM's negative-effect count and `times` is its ceiling. The victim is the instance
+            // being settled (DEALING_DAMAGE), because the count belongs to whoever was hit.
+            com.laosun.aluminium.entity.CanHit victim = ctx.damage() == null ? null : ctx.damage().getDefender();
+            if (victim == null) {
+                victim = ctx.target();
+            }
+            int count = victim == null ? 0 : victim.getBuffManager().debuffCount();
+            int cap = effect.getTimes() == null ? Integer.MAX_VALUE : effect.getTimes();
+            return Math.min(count, cap);
+        }
         if ("hit_count".equals(from)) {
             // "for each 1 target attacked, ..." (readers: 1403 Tribbie (缇宝)'s zone rider, 1302's talent stack): the
             // repeat count is how many targets this attack connected with. It belongs HERE and not in `per_target`,
@@ -2570,7 +2582,7 @@ public final class TriggerInterpreter {
             return resourceAmount(battle, ctx.actor(), id);
         }
         throw new IllegalStateException("times_from '" + effect.getTimesFrom()
-                + "' is not a spelling this engine has: \"event_amount\", \"hit_count\" or \"resource:<name>\"");
+                + "' is not a spelling this engine has: \"event_amount\", \"hit_count\", \"target_debuffs\" or \"resource:<name>\"");
     }
 
 
