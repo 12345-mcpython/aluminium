@@ -409,6 +409,12 @@ public class BuffManager {
         if (buff instanceof StateBuff state) {
             return stateName.equals(state.getState());
         }
+        // A NAMED modifier ("name these buffs, then lengthen them" - 1209's Eidolon 6 names the Ultimate's two effects
+        // and extends them on a kill): without this branch a modifier's name was unreadable by every name-based lookup,
+        // so "extend the buff called X" silently did nothing while the rule still reported a firing.
+        if (buff instanceof StatModifierBuff modifier) {
+            return stateName != null && stateName.equals(modifier.getBuffName());
+        }
         return false;
     }
 
