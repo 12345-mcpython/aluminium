@@ -128,11 +128,11 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "scale": "self_attr:ATTACK",
-          "percent": 0.228,
-          "amount": 200,
           "buff": "协奏",
           "permanent": true,
-          "target": "all_allies"
+          "target": "all_allies",
+          "percent_from_skill_param": "ULTRA:0",
+          "amount_from_skill_param": "ULTRA:2"
         },
         {
           "op": "RESIST_DEBUFF",
@@ -144,7 +144,7 @@
         }
       ],
       "source": "1309 知更鸟 终结技 ③「处于【协奏】状态时，我方全体攻击力提高，提高数值等同于知更鸟攻击力的 22.80%+200 点」+ ⑤「处于【协奏】状态时，知更鸟免疫控制类负面状态」 param Lv10 = [0.228, 90, 200, 1.2, 1, 1.5] → #1 = 0.228, #3 = 200",
-      "_note": "Clauses ③ and ⑤, the two effects that last <b>as long as the state does</b>. ⚠ Both carry `buff: 协奏` (2026-09-28), which is what makes that duration expressible at all: removal by name used to reach only <b>states</b>, so a modifier like this could only be written `permanent` -- a boost that never comes off, i.e. a wrong number with no symptom. Naming it means the countdown-turn rule's single `REMOVE_STATE 协奏` takes the state, the ATK boost AND the immunity off together. ⚠ ③ is a <b>derived</b> magnitude (22.8% of <i>her</i> ATK plus the flat 200), read when she casts and then frozen. ⚠ `all_allies` includes her (「我方全体」 says so); ② 「除自身以外」 is the ADVANCE rule above, a different sentence with a different selector. ⚠ `percent: 1.0` on the resistance is <b>immunity</b> -- the same mechanic at full strength.",
+      "_note": "Clauses ③ and ⑤, the two effects that last <b>as long as the state does</b>. ⚠ Both carry `buff: 协奏` (2026-09-28), which is what makes that duration expressible at all: removal by name used to reach only <b>states</b>, so a modifier like this could only be written `permanent` -- a boost that never comes off, i.e. a wrong number with no symptom. Naming it means the countdown-turn rule's single `REMOVE_STATE 协奏` takes the state, the ATK boost AND the immunity off together. ⚠ ③ is a <b>derived</b> magnitude (22.8% of <i>her</i> ATK plus the flat 200), read when she casts and then frozen. ⚠ `all_allies` includes her (「我方全体」 says so); ② 「除自身以外」 is the ADVANCE rule above, a different sentence with a different selector. ⚠ `percent: 1.0` on the resistance is <b>immunity</b> -- the same mechanic at full strength. ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "ult_effect_3"
     },
     {

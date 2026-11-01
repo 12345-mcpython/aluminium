@@ -56,8 +56,8 @@
         {
           "op": "HEAL",
           "scale": "target_max_hp",
-          "percent": 0.6,
-          "target": "summon"
+          "target": "summon",
+          "percent_from_skill_param": "SKILL:0"
         },
         {
           "op": "GAIN_RESOURCE",
@@ -67,7 +67,7 @@
         }
       ],
       "source": "8008 开拓者•记忆 战技 就决定是你了！ (800702, BPSkill/Summon): 「召唤忆灵迷迷。若迷迷已在场，为迷迷回复等同于迷迷生命上限60%的生命值，并且使迷迷获得10%充能。」",
-      "_note": "「**召唤忆灵迷迷**。若迷迷已在场，为迷迷回复等同于**迷迷生命上限 60%** 的生命值，并且使迷迷获得 **10% 充能**」—— ① 召唤用 `SUMMON` ✓；② 治疗用 `HEAL` + `scale: target_max_hp` + `target: summon`；③ 充能用 `GAIN_RESOURCE` + `target: summon`（忆灵的资源在 `memosprites/8008.json` 声明）。"
+      "_note": "「**召唤忆灵迷迷**。若迷迷已在场，为迷迷回复等同于**迷迷生命上限 60%** 的生命值，并且使迷迷获得 **10% 充能**」—— ① 召唤用 `SUMMON` ✓；② 治疗用 `HEAL` + `scale: target_max_hp` + `target: summon`；③ 充能用 `GAIN_RESOURCE` + `target: summon`（忆灵的资源在 `memosprites/8008.json` 声明）。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "ULT_CAST",
@@ -88,14 +88,14 @@
         {
           "op": "DAMAGE",
           "scale": "summon_attr:ATTACK",
-          "percent": 2.4,
           "attacker": "summon",
           "element": "Ice",
-          "target": "all_enemies"
+          "target": "all_enemies",
+          "percent_from_skill_param": "ULTRA:0"
         }
       ],
       "source": "8008 开拓者•记忆 终结技 一起上吧，迷迷！ (800703, Ultra/AoEAttack): 「召唤忆灵迷迷。使迷迷获得40%充能，随后使迷迷对敌方全体造成等同于迷迷240%攻击力的冰属性伤害。」",
-      "_note": "「**召唤忆灵迷迷**」用 `SUMMON`；「使迷迷获得 **40% 充能**」用 `GAIN_RESOURCE` + `target: summon`；「使迷迷对敌方全体造成等同于迷迷 **240% 攻击力**的冰伤」用 `DAMAGE` + `attacker: summon` + `scale: summon_attr:ATTACK` + `percent: 2.4`。忆灵的 ATTACK 面板在 `memosprites/8008.json` 里按召唤者攻击力的 100% 派生。"
+      "_note": "「**召唤忆灵迷迷**」用 `SUMMON`；「使迷迷获得 **40% 充能**」用 `GAIN_RESOURCE` + `target: summon`；「使迷迷对敌方全体造成等同于迷迷 **240% 攻击力**的冰伤」用 `DAMAGE` + `attacker: summon` + `scale: summon_attr:ATTACK` + `percent: 2.4`。忆灵的 ATTACK 面板在 `memosprites/8008.json` 里按召唤者攻击力的 100% 派生。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "BATTLE_START",
