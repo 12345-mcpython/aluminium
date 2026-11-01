@@ -4,7 +4,8 @@
   "_status": "partial",
   "_gaps": [
 
-    "星魂 1 / 3 / 4 / 5 / 6：未读、未写（E2 已写）"
+    "星魂 1「【禳命】持续时间 +1 回合，且持有【禳命】时我方全体速度 +12%」未写（时长那半需要 `MODIFY_RULE` 指向施放禳命的规则 ⇒ 该规则得先有 id；速度那半是条件光环）",
+    "星魂 4「治疗量按目标已损生命递增，最多 +80%」未写：需要「治疗量随目标血量比例缩放」的形状（现有 `target_when` 只能给门槛，不能给连续比例）"
   ],
   "rules": [
     {
@@ -203,6 +204,39 @@
       ],
       "source": "1217 藿藿 行迹 怯惧应激 (1217103): 「触发天赋为我方目标提供治疗时，藿藿恢复1点能量。」 param = [1]",
       "_note": "「触发**天赋**为我方目标提供治疗时，藿藿恢复 **1 点能量**」—— 天赋的治疗本身就挂在 `TURN_START` + `self has_state 禳命` 上 ✓（见本档那条 `HEAL` 规则 ✓）⇒ 回能挂在**同一个时刻** ✓。⚠ 与治疗规则**分开**写：一条规则只做一类事，扣层/回能可以各自变异 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_levels",
+      "min_eidolon": 3,
+      "do": [
+        { "op": "RAISE_SKILL_LEVEL", "skill": "ULTRA", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "TALENT", "amount": 2 }
+      ],
+      "source": "1217 藿藿 星魂 3 日出为晞: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 skill_add_level = {121703: 2, 121704: 2}",
+      "_note": "「终结技等级 **+2**；天赋等级 **+2**」—— 与数据 `skill_add_level` 逐项吻合 ✓；与 `level_convention` 叠加 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_levels",
+      "min_eidolon": 5,
+      "do": [
+        { "op": "RAISE_SKILL_LEVEL", "skill": "SKILL", "amount": 2 },
+        { "op": "RAISE_SKILL_LEVEL", "skill": "COMMON", "amount": 1 }
+      ],
+      "source": "1217 藿藿 星魂 5 荒忽兮远望: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 skill_add_level = {121702: 2, 121701: 1}",
+      "_note": "「战技等级 **+2**；普攻等级 **+1**」—— 数据逐项吻合 ✓。⚠ 行迹里的「战技 +1 级」是另一句（第 3 项），与本条可叠加 ✓。"
+    },
+    {
+      "on": "HEALED",
+      "id": "eidolon6_healed_ally_deals_more",
+      "when": ["actor == self"],
+      "min_eidolon": 6,
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.5, "turns": 2, "target": "target" }
+      ],
+      "source": "1217 藿藿 星魂 6 同渡彼岸: 「为我方目标提供治疗时，使目标造成的伤害提高50%，持续2回合。」 param = [0.5, 2]",
+      "_note": "「为我方目标提供**治疗**时，使目标造成的伤害提高 **50%**，持续 **2 回合**」—— ① 事件 **`HEALED`** ✓（`Battle.heal` 在算完治疗量之后广播，`actor` = 施疗者、`target` = 被疗者 ✓）；② `actor == self` ✓（只有**她**的治疗算 ✓，别人的治疗不会给这层增伤 ✓）；③ `turns: 2` ✓ + `target: target` ✓（被疗者自己 ✓）。"
     }
   ]
 }
