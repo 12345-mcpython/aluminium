@@ -510,7 +510,16 @@ final class TriggerEffects {
     static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
         boolean permanent = TriggerLifetimes.unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
-        String state = effect.getBuff().trim();
+        // 「植入 1 个随机【缺陷】」: one name out of the list, chosen with the battle's RNG (same source as every other
+        // random pick, so a seeded battle replays identically).
+        String state;
+        if (effect.getRandomOf() != null && !effect.getRandomOf().isEmpty()) {
+            java.util.List<String> names = effect.getRandomOf();
+            java.util.Random rng = battle == null ? null : battle.getRng();
+            state = names.get(rng == null ? 0 : rng.nextInt(names.size())).trim();
+        } else {
+            state = effect.getBuff().trim();
+        }
         // How many instances this application carries (reader: 1513's reward, whose state's INSTANCE COUNT is
         // the [符点] it spent). A plain state refreshes on re-application, so only a STACKABLE one is repeated --
         // otherwise the loop would be a no-op dressed as a feature.
