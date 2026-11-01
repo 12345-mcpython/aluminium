@@ -36,7 +36,7 @@ public class TopazFollowUpTakenTest {
             for (var effect : rule.effects()) {
                 if ("MODIFY_DAMAGE_TAKEN".equals(effect.getOp())) {
                     scope = effect.getDamageType();
-                    share = effect.getPercent();
+                    share = com.laosun.aluminium.test.support.RowLookup.shareOf(1112, effect);
                     System.out.println("[1112] rule id=" + rule.id() + " damageType=" + scope + " percent=" + share
                             + " turns=" + effect.getTurns());
                 }
@@ -58,4 +58,5 @@ public class TopazFollowUpTakenTest {
         System.out.println("[1112] plain=" + plain + " followUp=" + followUp + " ratio=" + (followUp / plain));
         Assertions.assertEquals(1.5, followUp / plain, 1e-6, "a follow-up instance rises by the authored 50%");
     }
+
 }

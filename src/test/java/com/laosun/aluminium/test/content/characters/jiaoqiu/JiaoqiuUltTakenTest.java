@@ -36,7 +36,9 @@ public class JiaoqiuUltTakenTest {
         for (var rule : rules) {
             for (var effect : rule.effects()) {
                 if ("MODIFY_DAMAGE_TAKEN".equals(effect.getOp())) {
-                    share = effect.getPercent();
+                    // The share may be READ from the Talent row: this rule scopes a per-layer vulnerability, and reading a row
+        // is the spelling the corpus is moving to, so the shape check follows whichever spelling the file uses.
+        share = com.laosun.aluminium.test.support.RowLookup.shareOf(1218, effect);
                     scope = effect.getDamageType();
                     turns = effect.getTurns();
                     System.out.println("[1218] rule id=" + rule.id() + " damageType=" + scope + " percent=" + share
@@ -82,7 +84,7 @@ public class JiaoqiuUltTakenTest {
             for (var effect : rule.effects()) {
                 if ("MODIFY_DAMAGE_TAKEN".equals(effect.getOp()) && effect.getScale() != null) {
                     amount = effect.getAmount();
-                    percent = effect.getPercent();
+                    percent = com.laosun.aluminium.test.support.RowLookup.shareOf(1218, effect);
                     cap = effect.getCapAmount();
                     scale = effect.getScale();
                     System.out.println("[1218] tiered rule id=" + rule.id() + " amount=" + amount + " scale=" + scale
@@ -95,4 +97,5 @@ public class JiaoqiuUltTakenTest {
         Assertions.assertEquals(0.05, percent, 1e-9, "each further layer adds 5%");
         Assertions.assertEquals(0.35, cap, 1e-9, "five layers cap it at 35%");
     }
+
 }

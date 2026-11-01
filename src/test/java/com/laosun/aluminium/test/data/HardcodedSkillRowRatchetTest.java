@@ -37,7 +37,7 @@ public class HardcodedSkillRowRatchetTest {
      * numbers a character TRACE states are no longer reported (52 of the original 219 were trace constants, which are not
      * leveled and therefore exact). Lowering it is progress; raising it is the fault this test exists to catch.
      */
-    private static final int BASELINE = 68;
+    private static final int BASELINE = 57;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

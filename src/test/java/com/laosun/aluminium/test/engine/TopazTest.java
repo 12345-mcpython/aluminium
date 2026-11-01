@@ -50,7 +50,7 @@ public class TopazTest {
         for (var rule : rules) {
             for (var effect : rule.effects()) {
                 if ("BOOST_DAMAGE".equals(effect.getOp())) {
-                    percent = effect.getPercent();
+                    percent = com.laosun.aluminium.test.support.RowLookup.shareOf(1112, effect);
                     conditions = rule.conditions().stream().map(c -> c.source()).toList();
                     System.out.println("[1112] trace rule id=" + rule.id() + " conditions=" + conditions
                             + " percent=" + percent);
@@ -71,7 +71,7 @@ public class TopazTest {
         for (var rule : rules) {
             for (var effect : rule.effects()) {
                 if ("DAMAGE".equals(effect.getOp())) {
-                    share = effect.getPercent();
+                    share = com.laosun.aluminium.test.support.RowLookup.shareOf(1112, effect);
                     System.out.println("[1112] skill damage rule id=" + rule.id() + " percent=" + share
                             + " element=" + effect.getElement());
                 }
@@ -79,4 +79,5 @@ public class TopazTest {
         }
         Assertions.assertEquals(1.5, share, 1e-9, "the skill states 150% of her attack");
     }
+
 }
