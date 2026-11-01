@@ -3,7 +3,6 @@
   "character": 1111,
   "_status": "partial",
   "_gaps": [
-    "终结技「获得 2 层【斗志】」：ADD_STACK 的 amount 不支持一次加多层",
     "天赋：强化普攻替换与「裂伤立即结算」未写",
     "星魂 1–6：未读、未写（含【斗志】上限 4→6）"
   ],
@@ -32,7 +31,7 @@
         }
       ],
       "source": "1111 卢卡 终结技 制胜一击 (111103, Ultra/SingleAttack): 「获得2层【斗志】，并有100%的基础概率使指定敌方单体受到的伤害提高20.00%，持续3回合，随后对该目标造成等同于卢卡330%攻击力的物理属性伤害。」 param = [2, 1, 0.2, 3, 3.3]",
-      "_note": "Three things happen in one sentence: 「获得 **2 层**【斗志】」（`ADD_STACK`, capped at the 4 the talent states）、「有 **100% 的基础概率**使指定敌方单体受到的伤害提高 20.00%，持续 3 回合」（`MODIFY_DAMAGE_TAKEN` with `base_chance` — ⚠ **not** \"always\": a base chance is the number **before** effect resistance, so it goes through the same resist pipeline a DOT does）、以及 330% 物理伤害（引擎自己的技能行）。 ⚠ The two effects are ordered by the file: the layer is granted first, matching the sentence. ⚠ 星魂 1/2/3/6 also raise 【斗志】(「最多持有 4 层」→ 6), which is a cap change this file cannot yet express — see the registrations at the end. ⚠ **实测纠正（2026-09-28）**：「获得 **2 层**【斗志】」这半句**写不出** —— `ADD_STACK` 的 `amount` **不是**\"一次加几层\"：实测每次触发**只加 1 层**（用例先写成 1+2=3、读到 2；六次施放停在 4 ⇒ **上限是真的**）。⇒ 登记：需要一个\"一次给 N 层\"的拼写（当前 `amount` 对 `ADD_STACK` 无意义）。"
+      "_note": "Three things happen in one sentence: 「获得 **2 层**【斗志】」（`ADD_STACK`, capped at the 4 the talent states）、「有 **100% 的基础概率**使指定敌方单体受到的伤害提高 20.00%，持续 3 回合」（`MODIFY_DAMAGE_TAKEN` with `base_chance` — ⚠ **not** \"always\": a base chance is the number **before** effect resistance, so it goes through the same resist pipeline a DOT does）、以及 330% 物理伤害（引擎自己的技能行）。 ⚠ The two effects are ordered by the file: the layer is granted first, matching the sentence. ⚠ 星魂 1/2/3/6 also raise 【斗志】(「最多持有 4 层」→ 6), which is a cap change this file cannot yet express — see the registrations at the end. ⚠ **✅ **2026-10-31 更正**：「获得 **2 层**【斗志】」**写得出来** —— `ADD_STACK` 的 `amount` 就是**一次加几层**（`TriggerEffects.addStack` 的注释点名 1314 的「立即获得 15 层」✓）。旧的「只加 1 层」是**当时的实测**（能力后来才落地）⇒ 已撤回 ✓；判据 `LukaUltStacksTest`（一次大招 +2、第二发停在 4）✓。"
     },
     {
       "on": "BATTLE_START",
