@@ -23,6 +23,36 @@ public class AshveilEidolonOneAndSixTest {
     private static final int OWNER = 1504;
     private static final int LEVEL = 80;
 
+    /**
+     * E1 「敌方全体受到的伤害提高 24%」: exactly ONE vulnerability layer appears when the rank is reached, and none
+     * before it.
+     *
+     * <p>⚠ Read as a LAYER COUNT, not as a damage ratio: the settled-damage ratio is (1 + z + 0.24) / (1 + z), so it is
+     * not 1.24 whenever anything else already sits in that zone. And read the FILE first - this clause already had a
+     * rule (`eidolon1_enemies_take_more`); a second one written beside it made the enemy carry two layers and
+     * looked exactly like an engine that applied the clause twice.
+     */
+    @Test
+    public void eidolonOneAddsExactlyOneVulnerabilityLayer() {
+        Assertions.assertEquals(0, vulnerabilityLayers(0), "control: nothing before Eidolon 1");
+        Assertions.assertEquals(1, vulnerabilityLayers(1), "E1's own 24%, exactly one layer");
+    }
+
+    /** How many VulnerabilityBuff layers the enemy carries right after the battle starts. */
+    private static int vulnerabilityLayers(int eidolon) {
+        Character owner = CharacterFactory.create(OWNER, LEVEL, true, null, null, eidolon);
+        Battle battle = new Battle(new ArrayList<>(List.of(owner)),
+                new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        int count = 0;
+        for (var buff : battle.enemyUnits().getFirst().getBuffManager().activeBuffs()) {
+            if (buff instanceof com.laosun.aluminium.buff.VulnerabilityBuff) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     @Test
     public void eidolonSixLowersTheEnemysResistance() {
         double atFive = enemyResistance(5);
