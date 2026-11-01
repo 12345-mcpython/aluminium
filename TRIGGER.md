@@ -648,3 +648,6 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 
 
+
+
+**`countdown`** 选择器（2026-10-31）：规则主人放下的倒计时单位 —— `START_COUNTDOWN` 造、`COUNTDOWN_TURN` 看到期，而 `DELAY`/`ADVANCE` 现在能作用于它（读者：1507 星魂 1「使【无量忿怒】倒计时行动延后 15%」）。
