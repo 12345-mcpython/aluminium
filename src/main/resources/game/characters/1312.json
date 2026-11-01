@@ -3,7 +3,7 @@
   "character": 1312,
   "_status": "partial",
   "_gaps": [
-    "「**增加 1 段**米沙下一次终结技的攻击段数」已落地 ✓（`RAISE_SKILL_HITS`），施放后回到初始段数用**减 6** 近似 ✓；终结技每段 20% 基础概率冻结 + 冻结附加伤害**已落地** ✓（`DEALING_DAMAGE` 逐段触发 `APPLY_CONTROL 冻结`）；仍开：星魂与秘技"
+    "「**增加 1 段**米沙下一次终结技的攻击段数」已落地 ✓（`RAISE_SKILL_HITS`），施放后回到初始段数用**减 6** 近似 ✓；终结技每段 20% 基础概率冻结 + 冻结附加伤害**已落地** ✓（`DEALING_DAMAGE` 逐段触发 `APPLY_CONTROL 冻结`）；仍开：① 星魂 6 的「**下一次施放战技后**为我方恢复 1 个战技点」未写（需要一次性延迟效果）；② 秘技；③ 星魂 6 的「持续至自身回合结束」用 2 回合近似"
   ],
   "rules": [
     {
@@ -162,6 +162,60 @@
         "actor == self",
         "from_skill ULTRA"
       ]
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon2_freeze_also_lowers_defence",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.16,
+          "turns": 3,
+          "base_chance": 0.24,
+          "target": "target"
+        }
+      ],
+      "source": "1312 米沙 星魂 2 青春的怅望: 「终结技每段攻击前，有24%的基础概率使目标防御力降低16%，持续3回合。」 参数 = [0.16, 3, 0.24]",
+      "_note": "「终结技**每段攻击前**，有 **24%** 基础概率使目标**防御力降低 16%**，持续 **3 回合**」—— 事件用 `DEALING_DAMAGE`（逐段）✓ + `MODIFY_ATTR DEFENCE { percent: -0.16, turns: 3 }` ✓ + `base_chance: 0.24` ✓。⚠ 三个数都是**星魂参数**（`[0.16, 3, 0.24]`，没有等级轴）⇒ 字面值是对的（AGENT §0.1.3 的例外）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon4_ult_segment_damage_up",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.06
+        }
+      ],
+      "source": "1312 米沙 星魂 4 亲挚的音容: 「终结技每段攻击的伤害倍率提高6%。」 参数 = [0.06]",
+      "_note": "「终结技**每段攻击**的伤害倍率提高 **6%**」—— `BOOST_DAMAGE { percent: 0.06 }` 挂在 `DEALING_DAMAGE` + `from_skill ULTRA` 上 ⇒ **每一段**都吃到 ✓（不是给某一段）。数值来自星魂参数（无等级轴）⇒ 字面值 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_damage_up_and_refunds_a_point",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1312 米沙 星魂 6 久已生疏的憧憬: 「施放终结技时，使自身造成的伤害提高30%，持续至自身回合结束，且下一次施放战技后为我方恢复1个战技点。」 参数 = [1, 0.3]",
+      "_note": "「施放终结技时，自身造成的伤害提高 **30%**，持续至自身回合结束」—— `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { percent: 0.3, turns: 2 }`（近似：引擎没有「到本回合结束」的时长写法，用 2 回合表示）⛔ **未写**：「下一次施放战技后恢复 1 个战技点」—— 需要在**下一次**战技后结算一次的点数返还（一次性延迟效果）。"
     }
   ]
 }
