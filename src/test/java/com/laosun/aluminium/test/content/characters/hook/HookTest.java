@@ -47,7 +47,7 @@ public class HookTest {
     }
 
     /**
-     * Census: the burn, the level convention, and the five traces/eidolons are all there.
+     * Census: the burn, the level convention, the five traces/eidolons and the technique are all there.
      */
     @Test
     public void hisFileCarriesTheClauses() {
@@ -56,8 +56,8 @@ public class HookTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the trace that follows the ultimate");
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "E6's bonus against a burning target and the talent's guarded extra instance");
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention plus E2/E3/E5 and the trace that resists controls");
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention plus E2/E3/E5, the trace that resists controls, and the technique");
     }
 
     // ==================================================================
@@ -81,3 +81,4 @@ public class HookTest {
         }
     }
 }
+
