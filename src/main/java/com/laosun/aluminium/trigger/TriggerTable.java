@@ -387,6 +387,21 @@ public class TriggerTable {
             }
             return;
         }
+        if (effect.getEffectPercentScale() != null) {
+            // "倍率提高 300%" scales a share the named rule already states; without one there is nothing to multiply, and the
+            // amendment would load and change no number. Note: this branch was MISSING - a scale amendment fell through to the
+            // chance check, which passed only when the target happened to state a `base_chance` (that is why 1108's trace-by-
+            // trace reader loaded while 1218's burn multiplier did not).
+            boolean statesShare = named.effects().stream().anyMatch(e -> e.getPercent() != null
+                    || e.getPercentFromSkillParam() != null || e.getPercentFromCastParam() != null
+                    || e.getPercentFromResource() != null);
+            if (!statesShare) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE scales the values of rule \"" + target + "\", but none of that rule's effects states a "
+                                + "share to scale (source: " + amender.source() + ")");
+            }
+            return;
+        }
         if (effect.getEffectPercentFromResource() != null) {
             // Same requirement as `effect_percent`: there must be a number on the target to raise.
             boolean statesPercent = named.effects().stream().anyMatch(e -> e.getPercent() != null);
