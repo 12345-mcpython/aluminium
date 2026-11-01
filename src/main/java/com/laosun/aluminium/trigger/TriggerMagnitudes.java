@@ -671,6 +671,18 @@ final class TriggerMagnitudes {
     }
 
     /**
+     * The base chance an effect states: a literal {@code base_chance}, or one READ from the owner's skill row
+     * ({@code base_chance_from_skill_param}), or {@code null} when it states neither (the callers default to 1.0).
+     */
+    static Double baseChanceOf(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getBaseChanceFromSkillParam() != null) {
+            return ownerSkillParamValue(effect, ctx, effect.getBaseChanceFromSkillParam().trim());
+        }
+        return effect.getBaseChance();
+    }
+
+
+    /**
      * A row/counter share, times an optional {@code percent} ("50% of the original"): see {@link #shareOf}.
      *
      * @param share    the share the row or the counter states

@@ -1999,11 +1999,12 @@ public final class TriggerInterpreter {
      */
     static boolean attachRolled(Battle battle, CanHit target, AbstractBuff buff, EffectSpec effect,
                                 TriggerContext ctx) {
-        if (effect.getBaseChance() == null) {
+        Double statedChance = TriggerMagnitudes.baseChanceOf(effect, ctx);
+        if (statedChance == null) {
             target.getBuffManager().addBuff(buff);
             return true;
         }
-        return battle.tryApplyDebuff(ctx.owner(), target, buff, effect.getBaseChance(), null);
+        return battle.tryApplyDebuff(ctx.owner(), target, buff, statedChance, null);
     }
 
 
