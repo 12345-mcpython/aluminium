@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 1403,
-  "_status": "partial",
-  "_gaps": [
-    "延后到下一波结算的那一发（`defer_until_wave`）实测比**直接**结算弱约 42%（71.13 vs 122.35，同一敌人同一基础值 18% 生命上限）—— 疑点：延后释放时丢了施放事实（`cast_category: FOLLOW_UP`）或走了不同的加成路径 ⇒ 数字未对齐，判据只钉了「延后 + 命中的是新入场敌人」"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "BATTLE_START",
