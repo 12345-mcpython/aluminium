@@ -96,7 +96,14 @@ public enum TriggerOperator {
     SUMMON_SERVANT(true),
     SUPER_BREAK(true),
     TAUNT(true),
-    TICK_DOT(true);
+    TICK_DOT(true),
+
+    /**
+     * "a share of the damage the ally takes is borne by me": the instance being settled keeps only its own share
+     * ({@code percent} is removed from it) and the same share, element and type is settled against the named unit through
+     * ITS zones. Reader: 1208 Fu Xuan 穷观阵 - the ally takes 35% and Fu Xuan takes 65% of the pre-shield amount.
+     */
+    SHARE_DAMAGE(true);
 
     /**
      * Whether the engine can perform this op today. {@code false} is a statement about the ENGINE,

@@ -1952,6 +1952,29 @@ public class Battle {
 
 
     /**
+     * Hits queued by {@code SHARE_DAMAGE}, settled right after the instance that produced them (see the op).
+     */
+    private final java.util.List<Object[]> pendingSharedDamage = new java.util.ArrayList<>();
+
+    /**
+     * Queues a share of the current hit for another unit as a fresh instance with the same element.
+     *
+     * <p>Note: takes the numbers, not a {@link Damage}, on purpose - the public API may expose exactly ONE method that
+     * accepts a Damage (the settlement entry point, `DamagePipelineTest`), and a second one would be a way around it.
+     *
+     * @param attacker the original hit attacker (zones may read it: 「受到装备者造成的伤害」 and the like)
+     * @param receiver the unit that bears it
+     * @param base     the share as an absolute base for the new instance
+     * @param element  the element of the hit being shared
+     */
+    public void deferSharedDamage(CanHit attacker, CanHit receiver, double base,
+                                  com.laosun.aluminium.enums.DamageElement element) {
+        if (receiver != null && element != null) {
+            pendingSharedDamage.add(new Object[]{attacker, receiver, base, element});
+        }
+    }
+
+    /**
      * Assembles every damage zone on the given hit, settles it and applies it to the
      * target, returning the damage actually settled.
      *
@@ -1968,8 +1991,33 @@ public class Battle {
         if (damage != null) {
             damage.stampCast(castSequence);
         }
-        return damageService.applyDamage(target, damage);
+        boolean outermost = pendingSharedDamage.isEmpty() || settlingShared == 0;
+        double settled = damageService.applyDamage(target, damage);
+        if (outermost && !pendingSharedDamage.isEmpty()) {
+            settlingShared++;
+            try {
+                while (!pendingSharedDamage.isEmpty()) {
+                    Object[] next = pendingSharedDamage.removeFirst();
+                    CanHit attacker = (CanHit) next[0];
+                    CanHit receiver = (CanHit) next[1];
+                    double base = (double) next[2];
+                    com.laosun.aluminium.enums.DamageElement element =
+                            (com.laosun.aluminium.enums.DamageElement) next[3];
+                    applyDamage(receiver, new Damage(attacker, receiver, element,
+                            com.laosun.aluminium.enums.DamageType.NORMAL, base));
+                }
+            } finally {
+                settlingShared--;
+            }
+        }
+        return settled;
     }
+
+    /** Depth guard for the shared-damage queue (one settlement at a time). */
+    private int settlingShared;
+
+
+
 
     /**
      * The assembly entry point, kept private so {@code applyDamage} stays the only public settlement path.

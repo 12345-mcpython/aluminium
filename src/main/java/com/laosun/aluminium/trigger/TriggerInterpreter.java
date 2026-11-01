@@ -894,6 +894,7 @@ public final class TriggerInterpreter {
             case REMOVE_BUFF -> TriggerEffects.removeBuffs(battle, effect, ctx);
             case REPLACE_SKILL -> TriggerEffects.replaceSkill(battle, effect, ctx);
             case TICK_DOT -> TriggerEffects.tickDot(battle, effect, ctx);
+            case SHARE_DAMAGE -> shareDamage(effect, ctx);
             case REMOVE_STATE -> TriggerEffects.removeState(effect, ctx);
             case TAUNT -> TriggerEffects.taunt(battle, effect, ctx);
             case APPLY_CONTROL -> TriggerEffects.applyControl(battle, effect, ctx);
@@ -1010,6 +1011,33 @@ public final class TriggerInterpreter {
         }
         for (TriggerTable.Condition condition : conditions) {
             owner.addConditionalHealBonus(condition, percent, scaleByMissingHp);
+        }
+    }
+
+    /**
+     * {@code SHARE_DAMAGE}: "the ally takes 35% and I take 65%". The instance being settled keeps its own share (the
+     * percent is taken out of its reduction zone, so every other zone still applies to what is left) and the SAME share,
+     * element and type is queued for the named unit - settled right after the current instance, through its own zones.
+     *
+     * <p>Queued rather than settled here: this runs inside the current instance's zone arithmetic, and a nested
+     * settlement would interleave two hits' events.
+     */
+    private static void shareDamage(EffectSpec effect, TriggerContext ctx) {
+        Battle battle = ctx.battle();
+        var damage = ctx.damage();
+        if (battle == null || damage == null) {
+            throw new IllegalStateException(
+                    "SHARE_DAMAGE runs on DEALING_DAMAGE, the event that carries the instance being settled; there is none "
+                            + "here (rule: " + ctx.ruleId() + ")");
+        }
+        double share = effect.getPercent();
+        double base = damage.getSkillBaseValue() * share;
+        damage.addReduction(share);
+        for (CanHit receiver : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+            if (receiver == null || receiver.isDeath()) {
+                continue;
+            }
+            battle.deferSharedDamage(damage.getAttacker(), receiver, base, damage.getElement());
         }
     }
 
@@ -2686,4 +2714,6 @@ public final class TriggerInterpreter {
         return total;
     }
 }
+
+
 
