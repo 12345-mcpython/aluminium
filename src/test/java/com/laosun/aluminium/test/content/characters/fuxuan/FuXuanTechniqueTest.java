@@ -42,6 +42,24 @@ public class FuXuanTechniqueTest {
         Assertions.assertFalse(without.fuxuan.getBuffManager().hasState(WARD), "no technique, no zone");
     }
 
+    /**
+     * 「当符玄陷入无法战斗状态时，【穷观阵】也会被解除」: the zone is anchored to HER clock, so her death takes it off the ally.
+     */
+    @Test
+    public void herDeathTakesTheZoneOffEveryone() {
+        Fixture f = new Fixture(true);
+        f.battle.castImmediate(f.fuxuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), f.fuxuan,
+                java.util.List.of(f.ally));
+        Assertions.assertTrue(f.ally.getBuffManager().hasState(WARD), "precondition: the zone is up");
+
+        f.battle.applyTrueDamage(f.ally, f.fuxuan, com.laosun.aluminium.enums.DamageElement.PHYSICAL,
+                f.fuxuan.getCurrentHp() * 10);
+        f.battle.processRequests();
+
+        Assertions.assertTrue(f.fuxuan.isDeath(), "precondition: she is down");
+        Assertions.assertFalse(f.ally.getBuffManager().hasState(WARD),
+                "「当符玄陷入无法战斗状态时，【穷观阵】也会被解除」");
+    }
     private static final class Fixture {
         private final Character fuxuan;
         private final Character ally;
@@ -60,6 +78,7 @@ public class FuXuanTechniqueTest {
         }
     }
 }
+
 
 
 
