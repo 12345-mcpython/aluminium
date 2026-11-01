@@ -62,7 +62,9 @@ public class SampoEidolonFourTest {
         private Fixture(int eidolon, int layers) {
             sampo = CharacterFactory.create(SAMPO, LEVEL, true, null, null, eidolon);
             battle = new Battle(new ArrayList<>(List.of(sampo, CharacterFactory.create(1001, LEVEL))),
-                    new ArrayList<>(List.of(enemy)), BattleFixture.seeded());
+                    // 0.99 fails the talent's 65% roll: otherwise the Skill itself adds a windshear layer and the
+                    // threshold (and the tick it triggers) would move between the two runs.
+                    new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.99));
             battle.startBattle();
             for (int i = 0; i < layers; i++) {
                 enemy.getBuffManager().addBuff(new DotBuff(sampo, DamageElement.WIND, TICK, 3, 0, "风化"));
@@ -72,4 +74,5 @@ public class SampoEidolonFourTest {
         }
     }
 }
+
 
