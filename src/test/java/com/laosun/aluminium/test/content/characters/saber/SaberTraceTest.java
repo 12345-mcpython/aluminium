@@ -31,16 +31,25 @@ public class SaberTraceTest {
         Assertions.assertTrue(saber.getBuffManager().hasState("魔力放出"), "「进入战斗…获得【魔力放出】」");
     }
 
+    /** 「施放战技时，使 Saber 的暴击伤害提高 50%，持续 2 回合」. */
     @Test
     public void starCrownRaisesCritDamageAfterASkill() {
-        Character saber = CharacterFactory.create(SABER, LEVEL);
-        Battle battle = battle(saber);
-        double before = saber.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.castImmediate(saber.getSkills().get(SkillType.SKILL), saber, List.of(battle.enemyUnits().getFirst()));
+        Character casting = CharacterFactory.create(SABER, LEVEL);
+        Battle battle = battle(casting);
+        double before = casting.getAttribute(AttributeType.CRIT_ATTACK).get();
+        battle.castImmediate(casting.getSkills().get(SkillType.SKILL), casting, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();
-        double after = saber.getAttribute(AttributeType.CRIT_ATTACK).get();
-        System.out.println("[1014] crit damage " + before + " -> " + after);
-        Assertions.assertEquals(0.5, after - before, 1e-9, "「暴击伤害提高 50%」");
+        double castDelta = casting.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
+
+        Character control = CharacterFactory.create(SABER, LEVEL);
+        double controlBefore = control.getAttribute(AttributeType.CRIT_ATTACK).get();
+        battle(control);
+        for (int i = 0; i < 3; i++) {
+            control.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("炉心共鸣", 1, true, 60));
+        }
+        double controlDelta = control.getAttribute(AttributeType.CRIT_ATTACK).get() - controlBefore;
+        System.out.println("[1014] crit damage: skill +" + castDelta + " ; the same points without a cast +" + controlDelta);
+        Assertions.assertEquals(0.5, castDelta - controlDelta, 1e-9, "「暴击伤害提高 50%」, over and above the points");
     }
 
     private static Battle battle(Character saber) {
