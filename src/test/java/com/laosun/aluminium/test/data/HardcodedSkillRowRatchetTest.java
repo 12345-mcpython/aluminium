@@ -28,7 +28,8 @@ import java.util.Set;
 public class HardcodedSkillRowRatchetTest {
 
     /**
-     * The measured count on 2026-10-31. ⚠ A file whose `level_convention` pins only SOME slots still runs the others at
+     * The measured count on 2026-10-31. Counters are not counted at all (see MAGNITUDE_OPS): 12 of the original
+     * entries were "gain 1 point" style counts that only coincided with a Lv10 cell. ⚠ A file whose `level_convention` pins only SOME slots still runs the others at
      * Lv1, so a literal there is exact and a row read would silently drop it (measured on 1215: its convention raises the
      * TALENT only, so the Ultimate numbers must stay literal). Counted over the four NAMED slots only (8/9/10/12 are the enhanced rows and
      * no SkillType reaches them, so a number matching one cannot be replaced by a row read at all), after four
@@ -36,11 +37,16 @@ public class HardcodedSkillRowRatchetTest {
      * numbers a character TRACE states are no longer reported (52 of the original 219 were trace constants, which are not
      * leveled and therefore exact). Lowering it is progress; raising it is the fault this test exists to catch.
      */
-    private static final int BASELINE = 96;
+    private static final int BASELINE = 84;
 
+    /**
+     * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
+     * 【气氛值】" or "remove 1 stack" is a COUNT, and a count that happens to equal a Lv10 cell (1 and 2 are everywhere)
+     * is a coincidence, not a frozen row - reported, it would push a future reader to bind the counter to a column.
+     */
     private static final Set<String> MAGNITUDE_OPS = Set.of(
             "DAMAGE", "HEAL", "SHIELD", "APPLY_DOT", "APPLY_REGEN", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN",
-            "BOOST_DAMAGE", "GAIN_ENERGY", "GAIN_RESOURCE", "TICK_DOT", "APPLY_CONTROL");
+            "BOOST_DAMAGE", "TICK_DOT", "APPLY_CONTROL");
 
     @Test
     public void noMoreRulesFreezeAlevelVaryingRow() throws Exception {
