@@ -498,6 +498,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 ⚠ 装载期拒绝：未知 `type`、缺必填字段、`uniform` 缺边界、`weighted_list` 没有正权重、`steps` 缺 counter/正 step、`energy` 的 `relation` 不是 `current`/`max`，以及与对应的旧拼法同时写。
 ⚠ `MODIFY_RULE` 改不了 provider 份额：`effect_percent` 只能加在字面 `percent` 上；provider 规则没有“被改大”的语义。
+⚠ 两个「提高」要分开：**`effect_percent`** = 加百分点（0.52 → 0.67）；**`effect_percent_scale`** = 乘比例（「倍率提高 15%」= 1.15 ⇒ 0.52 → 0.598）。读者：1215 星魂 6 用前者、1108 星魂 6 用后者。
 
 #### 5.3.4 技能等级与槽位
 
