@@ -222,6 +222,20 @@
       "source": "1009 星魂 5: 等级加成（数据 skill_add_level: 100901=COMMON+1, 100903=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_charge_decay_reduced",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_charge_decays_from_second_turn",
+          "effect_amount": -1
+        }
+      ],
+      "source": "1009 艾丝妲 星魂 6: 「天赋每回合减少的蓄能层数降低1。」 param = [1]",
+      "_note": "「天赋**每回合减少的蓄能层数降低 1**」—— 衰减本身是 `talent_charge_decays_from_second_turn` 的 `REMOVE_STACK 3` ✓ ⇒ `MODIFY_RULE` + **`effect_amount: -1`** 把它变成 2 ✓（同一手法见 1203 星魂 6）。"
     }
   ]
 }
