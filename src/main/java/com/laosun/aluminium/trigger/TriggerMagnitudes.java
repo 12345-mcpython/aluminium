@@ -467,6 +467,11 @@ final class TriggerMagnitudes {
     }
 
     /**
+     * The scale spelling that reads the biggest stack count among the enemies: {@code max_enemy_stacks:<NAME>}.
+     */
+    static final String MAX_ENEMY_STACKS_PREFIX = "max_enemy_stacks:";
+
+    /**
      * The magnitude of a derived {@code MODIFY_ATTR}: {@code percent  x  <the rule owner's attribute> + amount}.
      * <p>The first user is The Dahlia (大丽花)'s trace "又一场葬礼": "on entering battle, raise the other characters' Break Effect, the raise being equal to #1% of The Dahlia (大丽花)'s
      * Break Effect + #3%" - a percentage of her own Break Effect plus a flat part, granted to the rest of the party.
@@ -496,6 +501,22 @@ final class TriggerMagnitudes {
         String trimmed = key.trim();
         boolean owner;
         String name;
+        // "把层数统一设置为场上最高值" (1218's Ultimate): the largest count any enemy currently holds. This is the one stack
+        // form that needs the battlefield rather than a single unit, so it is answered here and nowhere else.
+        if (trimmed.startsWith(MAX_ENEMY_STACKS_PREFIX)) {
+            String counter = trimmed.substring(MAX_ENEMY_STACKS_PREFIX.length()).trim();
+            if (counter.isEmpty()) {
+                throw new IllegalStateException("a counter scale names no counter: " + key);
+            }
+            if (ctx == null || ctx.battle() == null) {
+                return 0.0;
+            }
+            double most = 0;
+            for (com.laosun.aluminium.entity.CanHit enemy : ctx.battle().enemies()) {
+                most = Math.max(most, enemy.getBuffManager().stacksOf(counter));
+            }
+            return percent * most;
+        }
         if (trimmed.startsWith(TriggerConditionParser.SELF_STACKS_PREFIX)) {
             owner = true;
             name = trimmed.substring(TriggerConditionParser.SELF_STACKS_PREFIX.length()).trim();
