@@ -444,6 +444,17 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 `ratio` 只允许 `MODIFY_ATTR` + ratio 属性（`CRIT_CHANCE` / `DAMAGE_BOOST` / `AGGRO_ADDED_RATIO` …），与 `percent` / `value` / `amount` 互斥；平属性写 `ratio` 会在装载期拒绝。
 新内容也可以统一用 §5.3.2 的 `value`。
 
+#### 5.3.1a `DAMAGE` 的两个削韧字段（2026-10-31）
+
+规则式 `DAMAGE` 历来**完全不碰韧性**。两句「让这一发削韧」的句子（1214 雪衣的星魂 2 与终结技）因此没有写法，现在补上：
+
+| 字段 | 含义 |
+|---|---|
+| `"stance": 15` | 这一发**削掉 15 点韧性**（走 `reduceToughness`，会发 `TOUGHNESS_REDUCED`、可能触发击破） |
+| `"ignore_weakness": true` | 即使元素**不是**目标的弱点也照削（正文「无视弱点属性」） |
+
+⚠ 不写 `stance` ⇒ 行为与过去完全一致（不削韧）。⚠ `ignore_weakness` 只影响**削不削**，不影响伤害与击破元素。
+
 #### 5.3.2 一个表达式：`value`（优先）
 
 `value` 把整条数值写成一个**数值提供器**，求出来的数**已经是属性自己的单位**：
