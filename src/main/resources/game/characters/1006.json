@@ -220,6 +220,29 @@
       ],
       "source": "1006 银狼 星魂 6 重叠网络: 「敌方目标每有1个负面效果，银狼对其造成的伤害提高20%，最多提高100%。」 参数 = [0.2, 1]",
       "_note": "「每有 **1 个负面效果**…提高 **20%**（`param[0] = 0.2` ✓），最多 **100%**（`param[1] = 1`）」—— `value: min(debuffs × 0.2, 1.0)` ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon4_additional_per_debuff",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.2,
+          "element": "Quantum",
+          "damage_type": "ADDITIONAL",
+          "target": "target",
+          "times": 5,
+          "times_from": "target_debuffs"
+        }
+      ],
+      "source": "1006 银狼 星魂 4 反弹端口「**强化后**」: 「施放终结技攻击敌方目标后，目标每有1个负面效果，则额外造成等同于银狼20%攻击力的量子属性附加伤害。该效果在每次终结技攻击中对每个目标最多触发5次。」 参数 = [0.2, 5]",
+      "_note": "「目标**每有 1 个负面效果** … 额外造成 **20% 攻击力**的量子附加伤害，**每次终结技中对每个目标最多 5 次**」—— `DAMAGE` × `times_from: \"target_debuffs\"`（新拼法：重复次数 = **受击者**的负面数）+ `times: 5`（上限）。⚠ 与强化前的差别只有「每次终结技攻击中」vs「对每个目标」—— 本写法按受击者计数，正是强化后的读法 ✓。"
     }
   ]
 }
