@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 8006,
-  "_status": "partial",
-  "_gaps": [
-    "星魂 6：未读、未写"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "ULT_CAST",
@@ -58,7 +55,8 @@
       "once_per_battle": true,
       "min_eidolon": 1,
       "source": "8006 开拓者 星魂 1 您的最佳观众席 (Avatar_Trailblazer_00_Rank01): 「施放首次战技后立即回复1点战技点。」 param = [1]",
-      "_note": "「施放**首次**战技后立即回复 1 点战技点」 — 「首次」 is `once_per_battle: true`, which is exactly \"the first one, once\". ⚠ Not a `cooldown`: the sentence is about the fight, not about turns. ⚠ `gain_skill_point` has no target (the party's pool is one number, so the rule's owner is the only subject it can mean)."
+      "_note": "「施放**首次**战技后立即回复 1 点战技点」 — 「首次」 is `once_per_battle: true`, which is exactly \"the first one, once\". ⚠ Not a `cooldown`: the sentence is about the fight, not about turns. ⚠ `gain_skill_point` has no target (the party's pool is one number, so the rule's owner is the only subject it can mean).",
+      "id": "eidolon1_skill_point_after_first_skill"
     },
     {
       "on": "BATTLE_START",
@@ -73,7 +71,8 @@
       ],
       "min_eidolon": 2,
       "source": "8006 开拓者 星魂 2 越狱的跨洋彩虹 (Avatar_Trailblazer_00_Rank02): 「战斗开始时，开拓者的能量恢复效率提高25%，持续3回合。」 param = [0.25, 3]",
-      "_note": "「战斗开始时，开拓者的**能量恢复效率**提高 25%，持续 3 回合」 — the attribute exists (`ENERGY_REGENERATION_RATE`), and 「持续3回合」 on herself is counted in her own turns (the ordinary case: no `ticks_on`). ⚠ It is a *loadout* fact fired at battle start, not an event: the sentence says 「战斗开始时」."
+      "_note": "「战斗开始时，开拓者的**能量恢复效率**提高 25%，持续 3 回合」 — the attribute exists (`ENERGY_REGENERATION_RATE`), and 「持续3回合」 on herself is counted in her own turns (the ordinary case: no `ticks_on`). ⚠ It is a *loadout* fact fired at battle start, not an event: the sentence says 「战斗开始时」.",
+      "id": "eidolon2_energy_regen"
     },
     {
       "on": "BATTLE_START",
@@ -89,7 +88,8 @@
       ],
       "min_eidolon": 4,
       "source": "8006 开拓者 星魂 4 袒护白鸽的冠冕 (Avatar_Trailblazer_00_Rank04): 「开拓者在场时，使除自身以外的队友击破特攻提高，提高数值等同于开拓者15%的击破特攻。」 param = [0.15]",
-      "_note": "「使**除自身以外**的队友击破特攻提高，提高数值**等同于开拓者 15% 的击破特攻**」 — two spellings the engine already has: `other_allies` (「除自身以外」, the selector 1309 知更鸟's Skill is pinned on) and a **derived** magnitude read off the rule owner (`scale: self_attr:BREAKING_EFFECT`). ⚠ Read when the rule fires (battle start) and frozen, so a later change to her break effect does not retroactively move it — the same convention as every other derived value. ⚠ It has no duration: 「在场时」 is a loadout fact. ⚠ 补上 permanent: true：「在场时」是装备事实，没有时长（装载期会因为缺时长而拒绝，这正是它该报的）。"
+      "_note": "「使**除自身以外**的队友击破特攻提高，提高数值**等同于开拓者 15% 的击破特攻**」 — two spellings the engine already has: `other_allies` (「除自身以外」, the selector 1309 知更鸟's Skill is pinned on) and a **derived** magnitude read off the rule owner (`scale: self_attr:BREAKING_EFFECT`). ⚠ Read when the rule fires (battle start) and frozen, so a later change to her break effect does not retroactively move it — the same convention as every other derived value. ⚠ It has no duration: 「在场时」 is a loadout fact. ⚠ 补上 permanent: true：「在场时」是装备事实，没有时长（装载期会因为缺时长而拒绝，这正是它该报的）。",
+      "id": "eidolon4_break_effect_for_others"
     },
     {
       "on": "BATTLE_START",
@@ -134,7 +134,8 @@
       ],
       "min_eidolon": 3,
       "source": "8006 开拓者 星魂 3 休止符的疗养院 (Avatar_Trailblazer_00_Rank03): 「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'800602': 2, '800604': 2}",
-      "_note": "星魂 3's two raises (M-32), composing with the base-level rule by addition."
+      "_note": "星魂 3's two raises (M-32), composing with the base-level rule by addition.",
+      "id": "eidolon3_levels"
     },
     {
       "on": "BATTLE_START",
@@ -152,7 +153,8 @@
       ],
       "min_eidolon": 5,
       "source": "8006 开拓者 星魂 5 包庇旧节拍的诗 (Avatar_Trailblazer_00_Rank05): 「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 数据行 技能等级+{'800603': 2, '800601': 1}",
-      "_note": "星魂 5's two raises. ⚠ **Not classified yet in this file** (the document's remaining clauses, each needing something the engine does not have): 行迹 随波逐流「施放战技时，**第一次**伤害的削韧值额外提高 100%」 (`BOOST_TOUGHNESS` exists, but it is a timed buff, so it would boost **every** bounce hit of the cast rather than the first — registering the difference rather than over-applying it), 行迹 剧院之帽「我方目标造成弱点击破后额外使敌方目标**行动延后** 30%」 (the engine has `ADVANCE` and no delay op), 星魂 6 and the 秘技 (a map skill, out of in-battle scope)."
+      "_note": "星魂 5's two raises. ⚠ **Not classified yet in this file** (the document's remaining clauses, each needing something the engine does not have): 行迹 随波逐流「施放战技时，**第一次**伤害的削韧值额外提高 100%」 (`BOOST_TOUGHNESS` exists, but it is a timed buff, so it would boost **every** bounce hit of the cast rather than the first — registering the difference rather than over-applying it), 行迹 剧院之帽「我方目标造成弱点击破后额外使敌方目标**行动延后** 30%」 (the engine has `ADVANCE` and no delay op), 星魂 6 and the 秘技 (a map skill, out of in-battle scope).",
+      "id": "eidolon5_levels"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -208,6 +210,21 @@
       ],
       "source": "8006 开拓者•同谐 秘技: 「使用秘技后，下一次战斗开始时使我方全体的击破特攻提高30%，持续2回合。」 param = [0.3, 2]",
       "_note": "「使用秘技后，下一次战斗开始时使我方全体的**击破特攻提高 30%**，持续 **2 回合**」—— 与 8005 的同名规则**逐字段一致** ✓（兄弟角色的同一条秘技）；门槛 `self has_state 秘技` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_extra_skill_hits",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill": "SKILL",
+          "skill_id": 2,
+          "amount": 2
+        }
+      ],
+      "source": "8006 开拓者•同谐 星魂 6 明天，栖息聚光之下: 「战技的额外伤害次数增加2次。」 param = [2]",
+      "_note": "「战技的额外伤害次数增加 **2** 次」—— 与桑博星魂 1 同形：`RAISE_SKILL_HITS SKILL +2` ✓（段数与倍率同源 ✓）。"
     }
   ]
 }
