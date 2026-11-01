@@ -257,6 +257,25 @@
       "source": "1504 星魂 5: 等级加成（数据 skill_add_level: 150402=SKILL+2, 150404=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon4_attack_on_ult",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.4,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1504 星魂 4: 「不死途施放终结技时，攻击力提高40%，持续3回合。」 param = [0.4, 3]",
+      "_note": "「**施放终结技时**，攻击力提高 **40%**，持续 **3 回合**」—— `ULT_CAST` + `actor == self` → `MODIFY_ATTR ATTACK` + `turns: 3` ✓。"
     }
   ]
 }

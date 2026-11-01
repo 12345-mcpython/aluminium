@@ -167,6 +167,22 @@
       "source": "8005 星魂 5: 等级加成（数据 skill_add_level: 800501=COMMON+1, 800503=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon2_energy_regen",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.25,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "8005 开拓者•同谐 星魂 2: 「战斗开始时，开拓者的能量恢复效率提高25%，持续3回合。」 param = [0.25, 3]",
+      "_note": "「**战斗开始时**，能量恢复效率提高 **25%**，持续 **3 回合**」—— `BATTLE_START` + `ENERGY_REGENERATION_RATE` + `turns: 3` ✓。"
     }
   ]
 }
