@@ -1630,7 +1630,7 @@ final class TriggerConditionParser {
      * counterpart this answers a QUESTION rather than naming a target, and it counts the rule's owner too: the sentence says
      * 「队友」 but a party of one is still "some ally holds it" in the engine's terms, which the rule's own note records.
      */
-    static final class AnyAllyHasState implements Condition {
+    static final class AnyAllyHasState implements PartyCondition {
 
         private final String state;
         private final String raw;
@@ -1656,6 +1656,12 @@ final class TriggerConditionParser {
                 }
             }
             return false;
+        }
+
+        /** The OWNER, so the negated form may be used: `!any_ally has_state X` = "nobody in the party holds it". */
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return ctx.owner();
         }
 
         @Override
