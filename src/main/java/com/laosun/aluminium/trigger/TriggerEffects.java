@@ -627,7 +627,10 @@ final class TriggerEffects {
      * the rule that resets it would fire twice in a row.
      */
     static void addStack(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        int cap = effect.stackCap() == null ? 1 : effect.stackCap();
+        // "the sentence states no ceiling" is not "one layer": `unbounded_stacks` asks for the largest cap the engine can
+        // hold, so the counter keeps every layer the rules give it.
+        int cap = effect.stackCap() != null ? effect.stackCap()
+                : Boolean.TRUE.equals(effect.getUnboundedStacks()) ? Integer.MAX_VALUE : 1;
         String name = effect.getBuff().trim();
         // Note: How many marks this application carries: "immediately gain 15 stacks of [当品]" (1314 Jade (翡翠)'s technique) grants
         // FIFTEEN at once, and `amount` alone would grant one. The readers are the "gain N stacks" family --

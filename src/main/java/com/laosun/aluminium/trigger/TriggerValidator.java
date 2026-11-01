@@ -1043,6 +1043,11 @@ final class TriggerValidator {
                 // The conditions themselves are parsed by TriggerTable.compile, which refuses a misspelling.
             }
             case ADD_STACK -> {
+                if (Boolean.TRUE.equals(effect.getUnboundedStacks()) && effect.getMaxStacks() != null) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states BOTH \"unbounded_stacks\" and \"max_stacks\": the document either gives a "
+                                    + "ceiling or it does not (source: " + spec.getSource() + ")");
+                }
                 // "after our targets ... cast 2 times..." / "automatically removed after triggering 2 times": a counter, which is a named stack buff (see StackBuff).
                 requireBuff(effect, op, spec);
                 requireDuration(effect, op, spec);

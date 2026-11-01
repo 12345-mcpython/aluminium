@@ -83,6 +83,7 @@ public class EffectSpec {
         copy.coexist = this.coexist;
         copy.perStackLive = this.perStackLive;
         copy.maxStacks = this.maxStacks;
+        copy.unboundedStacks = this.unboundedStacks;
         copy.instance = this.instance;
         copy.stacks = this.stacks;
         copy.resource = this.resource;
@@ -681,6 +682,14 @@ public class EffectSpec {
      */
     @SerializedName("max_stacks")
     private Integer maxStacks;
+
+    /**
+     * "has no upper limit": the counter may hold any number of layers. Without it an {@code ADD_STACK} that states no
+     * {@code max_stacks} holds exactly ONE layer - which is right for a marker and wrong for a resource-like counter whose
+     * sentence never gives a ceiling (reader: 1308's 集真赤, whose stacks are capped by nothing at all).
+     */
+    @SerializedName("unbounded_stacks")
+    private Boolean unboundedStacks;
 
     /**
      * Apply this modifier to the damage instance being settled instead of attaching a buff.
