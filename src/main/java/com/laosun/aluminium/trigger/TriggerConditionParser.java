@@ -883,6 +883,18 @@ final class TriggerConditionParser {
                 }
             }
             String variable = normalize(term);
+            // The SAME closed check the single-variable form uses. Without it a term could name anything (my first
+            // `self_energy` did not exist), resolve to NaN and make the whole comparison silently always false.
+            if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
+                    && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
+                    && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)
+                    && !variable.startsWith(SUMMON_RESOURCE_PREFIX) && !variable.startsWith(ALLIES_WITH_PATH_PREFIX)
+                    && !variable.startsWith(ENEMY_STATE_COUNT_PREFIX)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' compares unknown variable '" + variable + "' (in an arithmetic side); "
+                                + "known numeric variables: " + String.join(", ", knownNumericVariables())
+                                + " (source: " + spec.getSource() + ")");
+            }
             terms.add(new TriggerTable.Term(variable, selfAttributeOf(variable, raw, spec),
                     selfResourceOf(variable, raw, spec), stacksNameOf(variable, raw, spec),
                     variable.startsWith(TARGET_STACKS_PREFIX), variable.startsWith(ACTOR_STACKS_PREFIX),
@@ -2214,7 +2226,7 @@ final class TriggerConditionParser {
      */
     static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
-                    "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id", "damage_skill_key", "target_dot_count",
+                    "target_summon_count", "self_max_energy", "self_energy", "self_energy_percent", "from_skill_id", "damage_skill_key", "target_dot_count",
                     // 「若目标处于**装备者施加的**持续伤害状态」 (light cone 23029): `target_dot_count` counts every DoT, this one
                     // counts only the ones whose source is the rule's owner - a DoT keeps its source, so the applier is a fact.
                     "target_dots_from_self",

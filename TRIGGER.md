@@ -256,7 +256,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `hp_percent` | 自己当前生命百分比 |
 | `target_hp_percent` / `actor_hp_percent` | 目标 / 事件发起者的生命百分比 |
 | `target_hp_percent_before` | 掉血【之前】的目标生命百分比；只在会掉血的事件上有意义 |
-| `self_energy_percent` / `self_max_energy` | 自己的能量百分比 / 能量上限 |
+| `self_energy_percent` / `self_max_energy` / `self_energy` | 自己的能量百分比 / 能量上限 / **当前能量** |
 | `hit_count` / `weakness_hit_count` / `target_weakness_count` | 命中数 / 弱点命中数 / 目标弱点数 |
 | `target_debuff_count` / `target_dot_count` | 目标身上的负面数 / 持续伤害数 |
 | `target_dots_from_self` | 目标身上由规则拥有者施加的持续伤害数 |
