@@ -2070,6 +2070,10 @@ public class TriggerTable {
                 // "若装备者的能量上限大于等于…" -- not an attribute (`CanHit.getMaxEnergy()` is a field, and the
                 // attribute table has no slot for it), which is exactly why it needed a variable of its own.
                 case "self_max_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getMaxEnergy();
+                // "若消耗后**能回满能量**" (1014 Saber's Skill): the CURRENT energy, which neither the cap above nor
+                // `self_energy_percent` can stand in for - the clause adds stacks x 8 to it and compares with the cap, so a
+                // fraction would lose the units. Unreadable with no owner, like every other variable here.
+                case "self_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getCurrentEnergy();
                 // The owner's Eidolon rank. Note: A non-character owner (a summon, a hand-built context) has no
                 // Eidolons, and 0 is the answer that unlocks nothing - the same convention `eidolonRankOf` uses on the
                 // rule-level gate, spelled once here as a value.
