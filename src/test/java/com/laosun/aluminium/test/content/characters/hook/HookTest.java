@@ -53,7 +53,8 @@ public class HookTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(HOOK);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the burn");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the trace that follows the ultimate");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the trace that follows the ultimate and the enhanced-Skill swap");
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "E6's bonus against a burning target and the talent's guarded extra instance");
         Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
@@ -81,4 +82,5 @@ public class HookTest {
         }
     }
 }
+
 
