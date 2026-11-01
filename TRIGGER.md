@@ -385,12 +385,14 @@ INSERT_ACTION          MODIFY_ATTR            MODIFY_DAMAGE_TAKEN    MODIFY_RULE
 RAISE_ENERGY_TO        RAISE_RESOURCE_CAP     RAISE_SKILL_HITS       RAISE_SKILL_LEVEL
 RAISE_SKILL_POINT_CAP  REGISTER_HEAL_BONUS    REMOVE_BUFF            REMOVE_RESOURCE
 REMOVE_STACK           REMOVE_STATE           REPLACE_SKILL          RESET_RESOURCE_CAP
-RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF          SHIELD
+RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF          SHARE_DAMAGE
+SHIELD
 SPEND_RESOURCE         SPEND_STEPS            START_COUNTDOWN        SUMMON
 SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 ```
 
 - `REDUCE_TOUGHNESS` 是**声明了但还没实现**的 op；写它会装载期报错并说明原因。
+- **`SHARE_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：`{"percent": 0.65, "target": "self"}` 表示「这一发的 65% **由目标承担**」—— 本发只保留 35%，并按**同元素/同攻击者/同 65% 基数**给 `target` 另开一发（走它自己的防御/抗性区，结算在当次之后）。读者：1208 符玄【穷观阵】。
 - `REPLACE_SKILL` 有两个方向：**装上**（`skill` + `skill_id` + 一个寿命）与 **`"remove": true`**（把该槽位的替换取下、恢复原来的行；不带 `skill_id`、不带寿命）。重复装上**同一**替换是 no-op（否则第二个会把强化行记成「原始」，卸下时反而装回去）。读者：1111 卢卡「≥2 层时强化 / <2 层时恢复」
 - **每个 op 的参数以 `TriggerInterpreter` 的类注释为准**，本文不复制。
 
