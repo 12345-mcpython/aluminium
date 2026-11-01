@@ -1,10 +1,7 @@
 {
   "schema": 1,
   "character": 1203,
-  "_status": "partial",
-  "_gaps": [
-    "星魂 4（「结界生效时使敌方陷入虚弱、造成的伤害降低 12%」）未写 —— 需要一个「造成的伤害降低」的区（虚弱区）；星魂 1（结界期间全队攻击 +20%，`while_state` 门控）与星魂 3/5 等级均已落地 ✓。⚠ 星魂 6 的抗性降低**原本就在** `ult_all_type_res_down` 里，我曾误以为缺、写重复被 `ContentDuplicateGuardTest` 拦下 ✓"
-  ],
+  "_status": "implemented",
   "rules": [
     {
       "on": "SKILL_CAST",
@@ -368,6 +365,18 @@
       ],
       "source": "1203 罗刹 星魂 1 濯洗生者: 「结界生效时我方全体攻击力提高20%。」 param = [0.2]",
       "_note": "「**结界生效时**我方全体攻击力提高 **20%**」—— 条件 self has_state 结界 + 属性带 while_state 结界（每个回合边界检查一次，结界一结束加成就被摘掉）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon4_weaken_while_the_zone_is_up",
+      "when": ["actor == self", "self has_state 结界"],
+      "min_eidolon": 4,
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": -0.12, "permanent": true, "while_state": "结界", "target": "all_enemies" }
+      ],
+      "source": "1203 罗刹 星魂 4 荆冠审判: 「结界生效时使敌方目标陷入虚弱状态，造成的伤害降低12%。」 param = [0.12]",
+      "_note": "「结界生效时使敌方**造成的伤害降低 12%**」—— ① 负的 ALL_DAMAGE_TYPE_BOOST 落在**敌人身上** ✓（BattleDamage 把攻击者的该属性加进增伤区 ⇒ 负数就是削弱 ✓），不是 MODIFY_DAMAGE_TAKEN（那是「受到的伤害」✗）；② 条件 self has_state 结界 ✓ + **while_state: 结界** ✓；③ all_enemies ✓。实测：敌人对盟友的伤害 ×0.88 ✓。"
     }
+
   ]
 }
