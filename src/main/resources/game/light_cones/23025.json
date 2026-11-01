@@ -37,7 +37,7 @@
         }
       ],
       "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv1 #2 = 0.24、#4 = 2",
-      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 \target_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **`from_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ \turns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 `from_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "2": [
@@ -76,7 +76,7 @@
         }
       ],
       "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv2 #2 = 0.28、#4 = 2",
-      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 \target_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **`from_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ \turns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 `from_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "3": [
@@ -115,7 +115,7 @@
         }
       ],
       "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv3 #2 = 0.32、#4 = 2",
-      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 \target_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **`from_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ \turns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 `from_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "4": [
@@ -154,7 +154,7 @@
         }
       ],
       "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv4 #2 = 0.36、#4 = 2",
-      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 \target_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **`from_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ \turns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 `from_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ],
   "5": [
@@ -193,7 +193,7 @@
         }
       ],
       "source": "光锥 23025: 「【崩溃】状态下目标受到装备者造成的击破伤害提高#2[f1]%，同类效果无法叠加。」 param Lv5 #2 = 0.4、#4 = 2",
-      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 	arget_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **rom_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ 	urns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 rom_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
+      "_note": "「【崩溃】状态下目标**受到装备者造成的击破伤害**提高 #2%」—— ① 状态是**层数型** ⇒ 门槛用 \target_stacks:崩溃（不在本条：本条挂在**造成击破**那一刻，给目标挂一个 2 回合的易伤区 ✓，与【崩溃】同生 ✓）；② **damage_type: BREAK** ✓ 收窄到击破伤害（VulnerabilityArea 对 BREAK 照常参与 ✓ —— 不受加成的是 DAMAGE_BOOST 区 ✗，不是易伤区 ✓）；③ **`from_self: true** ✓ —— 只收**装备者造成**的（易伤区带上来源过滤，VulnerabilityBuff 在结算时比 damage.getAttacker() ✓）；④ \turns: 2 = #4；重复触发按同一身份替换 ⇒「同类效果无法叠加」✓。⚠ 本轮为它新增了 `from_self 字段（MODIFY_DAMAGE_TAKEN 的易伤臂专用 ✓，负份额会在装载期拒绝 ✓）。"
     }
   ]
 }

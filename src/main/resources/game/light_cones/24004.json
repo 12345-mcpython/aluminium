@@ -27,7 +27,7 @@
         }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv1 #2 = 0.04",
-      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + \times_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
     },
     {
       "on": "ATTACK_FINISHED",
@@ -67,7 +67,7 @@
         }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv2 #2 = 0.05",
-      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + \times_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
     },
     {
       "on": "ATTACK_FINISHED",
@@ -107,7 +107,7 @@
         }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv3 #2 = 0.06",
-      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + \times_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
     },
     {
       "on": "ATTACK_FINISHED",
@@ -147,7 +147,7 @@
         }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv4 #2 = 0.07",
-      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + \times_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
     },
     {
       "on": "ATTACK_FINISHED",
@@ -187,7 +187,7 @@
         }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv5 #2 = 0.08",
-      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + 	imes_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
+      "_note": "「**每击中一名敌方目标**，攻击力额外提高 #2%，**最多叠加 5 次**，**持续至下次攻击后**」—— ① 层数：ADD_STACK + \times_from: \"hit_count\"（见 cone24004_attack_per_hit_stacks）✓；② 增伤：**per_stack_live** 让这一条修饰在**每次读属性时**重读层数（self_stacks:演算）✓ —— 快照式修饰只能拿到挂上去那一刻的层数 ✗；③ 层数上限 5 由 max_stacks ✓。"
     },
     {
       "on": "ATTACK_FINISHED",

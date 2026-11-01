@@ -116,7 +116,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%」 param Lv1 #4 = 500、#5 = 0.3",
-      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的 vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里，vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
+      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的  vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里， vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -133,7 +133,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 500 点，可使伤害额外提高 #5%」（战技一侧）param Lv1 #5 = 0.3",
-      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 ddBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
+      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 `addBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -268,7 +268,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%」 param Lv2 #4 = 500、#5 = 0.35",
-      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的 vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里，vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
+      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的  vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里， vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -285,7 +285,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 500 点，可使伤害额外提高 #5%」（战技一侧）param Lv2 #5 = 0.35",
-      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 ddBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
+      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 `addBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -420,7 +420,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%」 param Lv3 #4 = 500、#5 = 0.4",
-      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的 vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里，vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
+      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的  vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里， vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -437,7 +437,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 500 点，可使伤害额外提高 #5%」（战技一侧）param Lv3 #5 = 0.4",
-      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 ddBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
+      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 `addBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -572,7 +572,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%」 param Lv4 #4 = 500、#5 = 0.45",
-      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的 vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里，vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
+      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的  vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里， vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -589,7 +589,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 500 点，可使伤害额外提高 #5%」（战技一侧）param Lv4 #5 = 0.45",
-      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 ddBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
+      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 `addBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -724,7 +724,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 #4 点，可使伤害额外提高 #5%」 param Lv5 #4 = 500、#5 = 0.5",
-      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的 vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里，vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
+      "_note": "「若该效果**消耗的生命值高于 500 点**，可使伤害**额外**提高 #5%」—— ⚠ 阈值判定挂在 **HP_CONSUMED** 上：CONSUME_HP 会在同一链里发这个事件，而它的  vent_amount 就是**实际付出的生命值**（2026-10-31 修：以前这个数被塞在 hit_count 槽里， vent_amount 恒为 0 ✓）。⚠ 满足时只贴一个 1 回合的标记 血火超额，由下面两条 DEALING_DAMAGE 规则加伤 —— 因为 BOOST_DAMAGE 只能在**伤害结算前**的那一发上读，而 HP_CONSUMED 发生时还没有实例 ✓。⚠ 每条付血规则**开头先 REMOVE_STATE**：同一回合里第二次施放若不足 500，不能继承上一发的超额标记 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -741,7 +741,7 @@
         }
       ],
       "source": "光锥 23039: 「若该效果消耗的生命值高于 500 点，可使伤害额外提高 #5%」（战技一侧）param Lv5 #5 = 0.5",
-      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 ddBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
+      "_note": "超额那半的战技分支：与 cone23039_boost_skill 同事件、同门，只多一个 self_stacks:血火超额 >= 1 ✓。两条 BOOST_DAMAGE 会在 `addBoost 里叠加（0.3 + 0.3 = 0.6 这种）✓。"
     },
     {
       "on": "DEALING_DAMAGE",
