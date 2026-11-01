@@ -29,6 +29,7 @@
 | 1506 | `p1506_ult_enters_godmode` | `SPEND_RESOURCE(E2)`、`GAIN_RESOURCE(E2)` | ✅ 合理 |
 | 1506 | `p1506_leaving_godmode_clears_hidden` | `GAIN_RESOURCE(E1)`、`SPEND_RESOURCE(E2)` | ✅ 合理 |
 
+⇒ **1412 刻律德菈（2026-11-01，已修）**：战技规则 `skill_grants_military_merit` 里带着一条 `DEFENCE_IGNORE 16%（常驻、target）`，与星魂 1 规则 `eidolon1_defence_ignore_for_marked` **同事件、同条件、同数值、同目标** —— 完全是同一条款的两份拷贝。文档里这 16% 明确属于**星魂 1**（「持有【军功】的角色造成伤害时无视目标 16% 的防御力」）。 ⚠ **连带修正一处判据**：`MilitaryMeritDefenceIgnoreTest` 原本在 **E0** 建角色却期望 0.16，它一直靠战技里那份错拷贝才通过；删掉拷贝后判据变红，改成 **E1** 建角色即恢复 —— 这说明**错误的判据会替错误的实现作证**。
 ⇒ **1203 的秘技路径也是同一处归属错误**（2026-11-01 已删）：秘技开局后结界存在，星魂 1 的常驻规则本来就会生效，不需要秘技再补一条 2 回合的。
 
 ## 候选清单
