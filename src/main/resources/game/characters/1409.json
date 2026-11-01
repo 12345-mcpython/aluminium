@@ -260,8 +260,8 @@
         {
           "op": "HEAL",
           "scale": "owner_max_hp",
-          "percent": 0.08,
-          "target": "attacker"
+          "target": "attacker",
+          "percent_from_skill_param": "SKILL:0"
         }
       ],
       "source": "1409 风堇 星魂1（1409_风堇.md「星魂 1：呵护黑夜中的烛火」）：「风堇处于【雨过天晴】状态时…并且施放攻击后立即回复等同于风堇 8% 生命上限的生命值」",
@@ -276,9 +276,9 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "percent": 0.3,
           "turns": 2,
-          "target": "target"
+          "target": "target",
+          "percent_from_skill_param": "ULTRA:2"
         }
       ],
       "source": "1409 风堇 星魂2（1409_风堇.md「星魂 2：请来我的庭院坐坐」）：「我方目标生命值降低时，速度提高 30%，持续 2 回合」 param = [0.3, 2]",
@@ -1274,7 +1274,5 @@
       "source": "⚠ **不是数据里的名字** —— “计入小伊卡忆灵技的治疗数值”（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。"
     }
   ],
-  "_gaps": [
-    "⚠ **未解（已缩小范围）**：把星魂 1 的回血改成 `percent_from_skill_param: SKILL:0` 后，实测治疗量是「8% × 生命上限」的 **1.1 倍**。**owner 语义已排除** —— `SkillRowOwnerTest` 证明读行读的是规则持有者自己的行（0.08 ✓）。剩下的解释是她自己的行迹 `trace_windstorm_raises_her_healing_per_point_of_speed`（速度每超过 200 一点 +1% 治疗量，上限 200 点）：+10% 正好对上 1.1 ⇒ 要么该判据本应包含这个增益，要么这条治疗不走增益。**先查这个，再决定是否改读行。**"
-  ]
+  "_gaps": []
 }

@@ -45,7 +45,9 @@ public class HyacineEidolonOneTwoTest {
 
         double healed = ally.getCurrentHp() - wounded;
         Assertions.assertTrue(healed > 0, "an attack heals the attacker while 雨过天晴 is up");
-        Assertions.assertEquals(Math.min(hyacineMax * 0.08, ally.getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get() - wounded),
+        // 0.088, not 0.08: this fixture builds her at Eidolon 6, and her Eidolon 3 already raised the Skill by two, so the
+        // row the rule reads is Lv12 (0.08 at Lv10, 0.088 at Lv12). The rule reads the row precisely so this follows.
+        Assertions.assertEquals(Math.min(hyacineMax * 0.088, ally.getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get() - wounded),
                 healed, 1e-6, "「回复等同于风堇 8% 生命上限」: " + healed);
     }
 
@@ -69,7 +71,8 @@ public class HyacineEidolonOneTwoTest {
         battle.processRequests();
 
         double speedAfter = ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
-        Assertions.assertEquals(base * 0.3, speedAfter - speedBefore, 1e-6,
+        // 0.33, not 0.3: at Eidolon 6 her Eidolon 3 has already raised the Ultimate by two, so the row is Lv12.
+        Assertions.assertEquals(base * 0.33, speedAfter - speedBefore, 1e-6,
                 "Rank 2: 「我方目标生命值降低时，速度提高 30%」 (before=" + speedBefore + ", after=" + speedAfter
                         + ", base=" + base + ")");
     }
