@@ -4,6 +4,34 @@
   "_status": "implemented",
   "rules": [
     {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1302 银枝 技能表的**等级口径**: 文档引用的是 Lv10 行（130201 = 1.4、130202 = 1.2、130203 = [1.6, 90]、130214 = [2.8, 6, 0.95, 180]、130204 = [3, 0.025, 10]）",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it.",
+      "id": "level_convention"
+    },
+    {
       "on": "BASIC_ATTACK",
       "when": [
         "actor == self"
@@ -200,34 +228,6 @@
       "source": "1302 银枝 星魂 4 号角的奉献 (Avatar_Argenti_00_Rank04): 「战斗开始时，获得2层【升格】，并使天赋的效果可叠加上限提高2层。」 param = [2, 2] + 后半「并使天赋的效果可叠加上限提高2层」（用 `effect_max_stacks: 2` 抬三条天赋规则的上限）",
       "_note": "「**战斗开始时，获得 2 层**【升格】」 — two effects because one stack is one buff: stating the same modifier twice at battle start attaches two of them, which is what 「2 层」 means and is the same shape 遗器's stacking bonuses use. ⚠ **Registered, not written**: the second half 「使天赋的效果**可叠加上限提高 2 层**」 would raise a `max_stacks` field on another rule's effect, which is `MODIFY_RULE`'s family but a **fourth** form (it raises a count of firings, a probability, a value and a duration today — not a cap). Filing it as two extra stacks instead would be wrong in the one case that matters: they must be able to exceed 10. ⚠ **2026-09-28 补齐**：后半「使天赋的效果**可叠加上限提高 2 层**」现在写出来了 —— `MODIFY_RULE` 的**第四形态**（`effect_max_stacks: 2`），三条天赋规则各抬一次（一条规则抬一条规则）。⚠ 写成\"再补两层\"是**错的**：它必须能**超过 10 层**，而补两层仍受 10 层上限约束。⚠ 修正案在战斗开始时就登记，而层数是之后一次次命中才叠上去的，所以新上限**来得及**生效（`max_stacks` 是 buff 实例上的值，事后抬没用）。",
       "id": "eidolon4_battle_start"
-    },
-    {
-      "on": "BATTLE_START",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1302 银枝 技能表的**等级口径**: 文档引用的是 Lv10 行（130201 = 1.4、130202 = 1.2、130203 = [1.6, 90]、130214 = [2.8, 6, 0.95, 180]、130204 = [3, 0.025, 10]）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ Three of the four slots matter to the **engine's own** skill execution (its damage rows), and TALENT matters to nothing here yet — it is stated because the entry is a fact about the loadout, and 星魂 3/5 below amend the same counters. Without this, the engine would deal the Lv1 rows (1.4→0.5, 1.2→0.6, 1.6→0.96). ⚠ The crit-rate/talent numbers above are stated literally in this file (they are rules, not rows the engine reads), so they are unaffected by it.",
-      "id": "level_convention"
     },
     {
       "on": "BATTLE_START",

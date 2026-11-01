@@ -4,6 +4,25 @@
   "_status": "implemented",
   "rules": [
     {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "_status": "implemented",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skills": [
+            "COMMON",
+            "SKILL",
+            "ULTRA",
+            "TALENT"
+          ],
+          "amount": 9
+        }
+      ],
+      "source": "1001 三月七 技能表的**等级口径**（不是一句技能文本，而是「这条文档引的是哪一行」）: 战技 / 终结技 / 天赋的正文都按 Lv10 引用（战技 param Lv10 = [0.57, 3, 0.3, 760, 5]、终结技 param Lv10 = [1.5, 0.5, 1, 0.6]、天赋 param Lv10 = [1, 2]），普攻按全库统一的 Lv10 口径；所以本场把四个槽位都读在第 10 行",
+      "_note": "This is the file stating **which level its own numbers were quoted at** (M-32). ⚠ Why a rule and not a rule field: `damage_level` answers 「read THIS row」 for one effect, while a level is a fact about the skill — every effect that reads that skill must see the same one, and a raise from a 星魂 has to compose with it (`CanHit.skillLevel` = base + this battle's raises, one resolver for all read sites). ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is spelled as +9. ⚠ **All four slots in one effect** (`skills`), not one effect per slot: 「which row the document quotes」 is one fact about the file, and her shield (#1 and #4 of the Skill) plus her ultimate (#1 damage, #4 the freeze DOT) now read their rows at the CURRENT level, so a slot left at 1 would have produced a mix of Lv1 and Lv10 numbers inside one sentence. It replaces the single-slot TALENT-only rule this file used to carry. ⚠ It is unconditional (no `min_eidolon`, no `when`): it is not a mechanic, it is the level the document was written at. ⚠ Unconditional rules like this one and the 星魂 rules BELOW it sum: at 星魂 5 the talent is 10 + 2 = **12** and the Skill is 12 too, which is what the game's own 「+2」 means — both tables have 15 rows, so 12 is a row that exists (a raise past the table fails loudly at fire time rather than reading nothing)."
+    },
+    {
       "on": "SKILL_CAST",
       "id": "skill_shield",
       "_status": "implemented",
@@ -157,25 +176,6 @@
         }
       },
       "_note": "Every clause of this sentence is carried by one piece of vocabulary, and each piece is the one that makes a *different* wrong reading impossible. ① 「受到…攻击后」 is `TAKING_HIT`, not `HP_LOST`: TAKING_HIT fires whenever an incoming damage instance lands, **including when the shield absorbs all of it** (hpLoss == 0), and this talent is precisely about a shielded ally -- gating it on HP loss would have skipped the case it exists for. ② 「持有护盾的我方目标」 is `target has_shield`, read from the alive shield value (a shield that has been used up no longer qualifies). ⚠ 「我方」 is not a condition: TAKING_HIT is only ever delivered for a subject on our side (Battle.fireTriggersForAlly), which is why the event is the right one for this sentence and `HP_LOST` (either side) would not be. ③ 「受到**敌方目标**攻击」 is `!actor is_ally` -- the event's `actor` is the attacker, and without the condition a friendly-fire instance would be countered as well. ④ 「向攻击者发起反击」 is `target: \"attacker\"`. ⑤ 「每回合可触发2次」 is `per_turn: 2` (param #2), counted in **三月七's own** turns, exactly like `cooldown`: without it the counter would fire on every hit of a three-hit attack -- a wrong number with nothing to report. ⚠ It is the first user of both `has_shield` and `per_turn`. ⑥ The numbers are not written here: `skill: \"TALENT\"` + `damage_param: 0` reads the row the TALENT's **current level** names (row 10 = 1, i.e. 100% ATK) and the Ice element and single-target shape come from 100104's own data. ⚠ It used to carry `damage_level: 10`, a per-effect row pin; the `level_convention` rule above states the file's level **once**, so 星魂 5's 「天赋等级+2」 raises this counter to row 12 (110% ATK) instead of the number staying pinned at row 10 (M-32). ⚠ 「反击也属于追加攻击」 holds automatically: `DAMAGE` settles through `Battle.applyAdditionalDamage`, the engine's one notion of a follow-up attack, which is also what emits FOLLOW_UP. ⚠ ⚠ 星魂 4 BOTH sentences SHIPPED on 2026-09-28: the cap as a `MODIFY_RULE` amendment (and the DEF-derived addend as `ADD_DAMAGE`), and the old 「NOT authored」 wording here was replaced -- a second rule with `per_turn: 3` would *add* firings rather than raise this rule's cap (there is no \"modify another rule's limit\" mechanism), and the damage addend is a derived flat value no op can express; 星魂 1 (energy per frozen target) and 行迹「冰咒」 (+15% freeze chance) need the freeze control state; 星魂 2 needs a 「生命值百分比最低的队友」 selector; 星魂 6 and 行迹「加护」 need the shield's provider / a way to lengthen a shield that is already up."
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "_status": "implemented",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skills": [
-            "COMMON",
-            "SKILL",
-            "ULTRA",
-            "TALENT"
-          ],
-          "amount": 9
-        }
-      ],
-      "source": "1001 三月七 技能表的**等级口径**（不是一句技能文本，而是「这条文档引的是哪一行」）: 战技 / 终结技 / 天赋的正文都按 Lv10 引用（战技 param Lv10 = [0.57, 3, 0.3, 760, 5]、终结技 param Lv10 = [1.5, 0.5, 1, 0.6]、天赋 param Lv10 = [1, 2]），普攻按全库统一的 Lv10 口径；所以本场把四个槽位都读在第 10 行",
-      "_note": "This is the file stating **which level its own numbers were quoted at** (M-32). ⚠ Why a rule and not a rule field: `damage_level` answers 「read THIS row」 for one effect, while a level is a fact about the skill — every effect that reads that skill must see the same one, and a raise from a 星魂 has to compose with it (`CanHit.skillLevel` = base + this battle's raises, one resolver for all read sites). ⚠ The base is 1 in the engine (a character has no progression model), so 「the document quotes Lv10」 is spelled as +9. ⚠ **All four slots in one effect** (`skills`), not one effect per slot: 「which row the document quotes」 is one fact about the file, and her shield (#1 and #4 of the Skill) plus her ultimate (#1 damage, #4 the freeze DOT) now read their rows at the CURRENT level, so a slot left at 1 would have produced a mix of Lv1 and Lv10 numbers inside one sentence. It replaces the single-slot TALENT-only rule this file used to carry. ⚠ It is unconditional (no `min_eidolon`, no `when`): it is not a mechanic, it is the level the document was written at. ⚠ Unconditional rules like this one and the 星魂 rules BELOW it sum: at 星魂 5 the talent is 10 + 2 = **12** and the Skill is 12 too, which is what the game's own 「+2」 means — both tables have 15 rows, so 12 is a row that exists (a raise past the table fails loudly at fire time rather than reading nothing)."
     },
     {
       "on": "BATTLE_START",

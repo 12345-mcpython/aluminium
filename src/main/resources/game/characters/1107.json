@@ -9,6 +9,34 @@
   ],
   "rules": [
     {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1107 克拉拉 技能表的等级口径: 文档引用的是 Lv10 行（普攻/战技/终结技/天赋）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32 ✓）：四条 `RAISE_SKILL_LEVEL +9` ⇒ 数据行 Lv1 起算到 Lv10 ✓。⚠ 与星魂 3 / 5 的 +2 **叠加** ✓（它们也是 `RAISE_SKILL_LEVEL` ✓）。"
+    },
+    {
       "on": "HP_LOST",
       "when": [
         "target == self"
@@ -97,34 +125,6 @@
       ],
       "source": "1107 星魂 2 紧紧的拥抱: 「施放终结技后攻击力提高#1[i]%，持续2回合」（param = [0.3, 2]）",
       "_note": "「**施放终结技后**，**攻击力提高 #1%**，持续 **2 回合**」—— ① 触发 **`ULT_CAST`** ✓、作用域 **`self`** ✓、时长 **2 回合** ✓；② ⭐ **数值经数据核实** ✓：`data/eidolons.json` 的 **1107 → rank \"2\"** 行自带 `param = [0.3, 2]` ✓（不是从散文里抄 ✗）；③ ⚠ **攻击力是平值型** ✓ ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，基准取**规则生效后** ✓，第 133/270 轮 ✓）；④ ⚠ **星魂内容按\"已激活\"写成普通规则** ✓（先例：1013 的 `eidolon4_*` ✓、1222 的星魂 2 ✓）。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1107 克拉拉 技能表的等级口径: 文档引用的是 Lv10 行（普攻/战技/终结技/天赋）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32 ✓）：四条 `RAISE_SKILL_LEVEL +9` ⇒ 数据行 Lv1 起算到 Lv10 ✓。⚠ 与星魂 3 / 5 的 +2 **叠加** ✓（它们也是 `RAISE_SKILL_LEVEL` ✓）。"
     },
     {
       "on": "BATTLE_START",

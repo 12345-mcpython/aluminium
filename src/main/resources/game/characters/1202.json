@@ -9,6 +9,34 @@
   ],
   "rules": [
     {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1202 停云 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 +50%/上限 25%、终结技 50 能量/+50% 伤害、天赋 60%）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 秘技（「使用秘技后立即为自身恢复50点能量」）缺**门槛** ✗；天赋与战技的\"附加伤害由**受赐福队友**打出\"两条见战技那条的登记 ✓；星魂未读 ✗。 ⚠ **2026-09-29：战技的【赐福】本轮未出货** ✗ —— 它需要\"有上限的属性修正\"（「攻击力提高50%，**最高不超过停云当前攻击力的25%**」），而引擎今天只有 `APPLY_DOT` 会读 `cap_scale`/`cap_percent` ✗。我试着把它放给 `MODIFY_ATTR` 并直接复用 DOT 的 clamp，结果让上限断言失败 ✗：**单位不同** —— `MODIFY_ATTR` 的 `percent` 是**份额**（目标攻击力的 50%），而 ceiling 解析出的是**绝对值**（停云攻击力的 25%），`min(份额, 绝对值)` 毫无意义。⇒ 正确的做法是**逐目标**把上限换算成份额（`cap绝对值 / 目标该属性值`），而不是在得到份额后直接 min ✗；该能力已登记为待做 ✓（读者：本句 + 语料里「最高不超过/至多不超过/上限为」**14 个文件** ✓）。"
+    },
+    {
       "on": "SKILL_CAST",
       "id": "skill_benediction",
       "when": [
@@ -112,34 +140,6 @@
       ],
       "source": "1202 停云 行迹 亨通 (1202103): 「停云的回合开始时，自身立即恢复5点能量。」",
       "_note": "「停云的**回合开始时**，自身立即恢复 5 点能量」—— `TURN_START` + `GAIN_ENERGY amount 5 target self` ✓。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1202 停云 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 +50%/上限 25%、终结技 50 能量/+50% 伤害、天赋 60%）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 秘技（「使用秘技后立即为自身恢复50点能量」）缺**门槛** ✗；天赋与战技的\"附加伤害由**受赐福队友**打出\"两条见战技那条的登记 ✓；星魂未读 ✗。 ⚠ **2026-09-29：战技的【赐福】本轮未出货** ✗ —— 它需要\"有上限的属性修正\"（「攻击力提高50%，**最高不超过停云当前攻击力的25%**」），而引擎今天只有 `APPLY_DOT` 会读 `cap_scale`/`cap_percent` ✗。我试着把它放给 `MODIFY_ATTR` 并直接复用 DOT 的 clamp，结果让上限断言失败 ✗：**单位不同** —— `MODIFY_ATTR` 的 `percent` 是**份额**（目标攻击力的 50%），而 ceiling 解析出的是**绝对值**（停云攻击力的 25%），`min(份额, 绝对值)` 毫无意义。⇒ 正确的做法是**逐目标**把上限换算成份额（`cap绝对值 / 目标该属性值`），而不是在得到份额后直接 min ✗；该能力已登记为待做 ✓（读者：本句 + 语料里「最高不超过/至多不超过/上限为」**14 个文件** ✓）。"
     },
     {
       "on": "BATTLE_START",

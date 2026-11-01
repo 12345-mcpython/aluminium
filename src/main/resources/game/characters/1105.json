@@ -5,6 +5,34 @@
   "_gaps": [],
   "rules": [
     {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1105 技能表的等级口径: 文档引用的是 Lv10 行（本文件其余规则的数值都取自那一行）",
+      "_note": "**本文件原先没有等级口径** ⇒ 技能自身走 Lv1 行、而规则写的是 Lv10 的数字：两套口径并存 ✗。补上后四个槽都在 Lv10 ✓（与其余文件一致）。"
+    },
+    {
       "on": "SKILL_CAST",
       "when": [
         "actor == self"
@@ -225,34 +253,6 @@
       "min_eidolon": 5,
       "source": "1105 娜塔莎 星魂 5 医治未病 (Avatar_Natasha_00_Rank05): 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 数据行 技能等级+{'110503': 2, '110504': 2}",
       "_note": "「**终结技等级+2**，最多不超过15级；**天赋等级+2**，最多不超过15级。」 ① 与**星魂 3**（战技+2、普攻+1）**同一形状** ✓：一条 `BATTLE_START` 规则 + 两条 `RAISE_SKILL_LEVEL` ✓；`skill` 令牌 `ULTRA`（= 终结技 110503）与 `TALENT`（= 天赋 110504）来自 tbgd `AvatarRankConfig` 110505 = `{'110503': 2, '110504': 2}` ✓。 ② ⚠ **不要写成第二条规则或第二份技能数据**：技能**读**的等级 = 数据行 + 本场战斗的加成，一个 op 抬的就是它 ✓ —— 复制一份会让终结技被**施放两次**级别的东西 ✓（与 `per_turn` 重复同类的坑 ✓）。 ③ 「最多不超过15级」的**上限**由技能自身的等级上限负责 ✓，不由这条规则夹 ✓（与 1103/1109/1215 同形 ✓）。 ④ `min_eidolon: 5` ✓ —— 门槛写在机制旁边 ✓。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1105 技能表的等级口径: 文档引用的是 Lv10 行（本文件其余规则的数值都取自那一行）",
-      "_note": "**本文件原先没有等级口径** ⇒ 技能自身走 Lv1 行、而规则写的是 Lv10 的数字：两套口径并存 ✗。补上后四个槽都在 Lv10 ✓（与其余文件一致）。"
     }
   ]
 }

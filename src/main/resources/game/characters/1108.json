@@ -4,25 +4,6 @@
   "_status": "implemented",
   "rules": [
     {
-      "on": "ULT_CAST",
-      "id": "ult_present",
-      "when": [
-        "actor == self"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.3,
-          "damage_type": "DOT",
-          "base_chance": 1,
-          "turns": 2,
-          "target": "all_enemies"
-        }
-      ],
-      "source": "1108 桑博 终结技 惊喜礼盒 (110803, Ultra/AoEAttack): 「对敌方全体造成等同于桑博160%攻击力的风属性伤害，同时有100%的基础概率使被攻击的敌方目标受到的持续伤害提高30%，持续2回合。」 param = [1.6, 1, 0.3]",
-      "_note": "「同时有 **100% 的基础概率**使被攻击的敌方目标**受到的持续伤害**提高 30%，持续 2 回合」 — the 160% AoE damage is the engine's own skill path; this rule is the debuff half. ⚠ Three spellings carry it, and each is load-bearing: `damage_type: \"DOT\"` (the taken-side zone is scoped to damage-over-time; `Battle.tickDots` settles those as `DamageType.DOT`, which is why this is expressible at all), `base_chance: 1.0` (⚠ **not** the same as \"always\": a base chance is the number **before** effect resistance, so the zone goes through the same resist pipeline a DOT or a state does — attaching it unconditionally would turn 「基础概率」 into \"always\"), and `turns: 2` (the duration the sentence states). ⚠ The trap on the other side of the same words: `DOT_DAMAGE_BOOST` is \"how hard **my** DOTs hit\", while 「受到的持续伤害提高」 is \"how hard DOTs hurt **me**\" — two sides, and only the second belongs on the victim."
-    },
-    {
       "on": "BATTLE_START",
       "do": [
         {
@@ -49,6 +30,25 @@
       "source": "1108 桑博 技能表的**等级口径**: 文档引用的是 Lv10 行（普攻 100%、战技 56%、终结技 160%、天赋 52% 都是该行）",
       "_note": "The file stating which level its numbers come from (M-32): the engine's own skill execution reads these rows. ⚠ **战技「弹射」无需规则**：引擎自带的 BOUNCE 形态就跑 56% ×（1+4）次，这正是\"能为则不写\"的例子。 ⚠ **2026-09-28 补齐**：天赋的「风化」已写出（见本文件最后一条规则）—— 此前整句登记，是因为「最多叠加 5 层」当时无处可写（DOT 会无限叠加），而只写 DOT、丢掉上限就是\"长线战斗里才显形的错数字\"；上限落地后这句就能完整表达了。 ⚠ **仍登记**：1307 那句\"超出上限的层数在结算后移除\"（只对一个状态陈述过，推广是推测）、以及行迹/星魂 1–6（尚未逐句读）。",
       "id": "level_convention"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_present",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.3,
+          "damage_type": "DOT",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1108 桑博 终结技 惊喜礼盒 (110803, Ultra/AoEAttack): 「对敌方全体造成等同于桑博160%攻击力的风属性伤害，同时有100%的基础概率使被攻击的敌方目标受到的持续伤害提高30%，持续2回合。」 param = [1.6, 1, 0.3]",
+      "_note": "「同时有 **100% 的基础概率**使被攻击的敌方目标**受到的持续伤害**提高 30%，持续 2 回合」 — the 160% AoE damage is the engine's own skill path; this rule is the debuff half. ⚠ Three spellings carry it, and each is load-bearing: `damage_type: \"DOT\"` (the taken-side zone is scoped to damage-over-time; `Battle.tickDots` settles those as `DamageType.DOT`, which is why this is expressible at all), `base_chance: 1.0` (⚠ **not** the same as \"always\": a base chance is the number **before** effect resistance, so the zone goes through the same resist pipeline a DOT or a state does — attaching it unconditionally would turn 「基础概率」 into \"always\"), and `turns: 2` (the duration the sentence states). ⚠ The trap on the other side of the same words: `DOT_DAMAGE_BOOST` is \"how hard **my** DOTs hit\", while 「受到的持续伤害提高」 is \"how hard DOTs hurt **me**\" — two sides, and only the second belongs on the victim."
     },
     {
       "on": "DEALING_DAMAGE",

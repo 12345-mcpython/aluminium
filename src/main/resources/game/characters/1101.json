@@ -6,6 +6,34 @@
   "rules": [
     {
       "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1101 布洛妮娅 技能表的等级口径: 文档引用的是 Lv10 行（本文件其余规则的数值都取自那一行）",
+      "_note": "**本文件原先没有等级口径** ⇒ 技能自身走 Lv1 行、而规则写的是 Lv10 的数字：两套口径并存 ✗（实测 `skillLevel` 是 1，而终结技「攻击力提高55%」是 Lv10 的数）。补上后四个槽都在 Lv10 ✓，`*_from_skill_param` 读到的行与文档一致 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -281,34 +309,6 @@
       ],
       "source": "1101 布洛妮娅 行迹 号令: 「普攻的暴击率提高至100%。」",
       "_note": "行迹「号令」：`DEALING_DAMAGE` 在暴击判定之前发出，`damage_skill_key == 1` 限定普攻；`MODIFY_ATTR CRIT_CHANCE` + `instance: true` + `percent: 1.0`，只改这一发。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1101 布洛妮娅 技能表的等级口径: 文档引用的是 Lv10 行（本文件其余规则的数值都取自那一行）",
-      "_note": "**本文件原先没有等级口径** ⇒ 技能自身走 Lv1 行、而规则写的是 Lv10 的数字：两套口径并存 ✗（实测 `skillLevel` 是 1，而终结技「攻击力提高55%」是 Lv10 的数）。补上后四个槽都在 Lv10 ✓，`*_from_skill_param` 读到的行与文档一致 ✓。"
     }
   ]
 }

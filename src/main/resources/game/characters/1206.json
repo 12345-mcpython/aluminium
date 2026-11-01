@@ -7,6 +7,34 @@
   ],
   "rules": [
     {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1206 素裳 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 210%、终结技 320%、天赋 速度+20%）",
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = `trace_breaking_advance_after_common` + `trace_breaking_advance_after_skill` ✓（「普攻**或**战技」在无 or 的 DSL 里是**两条** ✓，`when` 不同故不算重复 ✓）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。✅ **本文件已无登记缺口**：终结技那句「额外增加 2 次【剑势】的发动判定，伤害为原伤害的 50%」现由 `ult_grants_two_extra_sword_stance_rolls` + `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed` 兑现 ✓ —— 它需要的「多掷 N 次」参数就是本轮新增的 `chance_rolls` ✓（规则级**独立**掷骰 ✓）。为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会判「one sentence written twice」✗（**实测**过 ✓）。"
+    },
+    {
       "on": "BREAK",
       "id": "talent_speed_on_break",
       "do": [
@@ -75,34 +103,6 @@
       ],
       "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」",
       "_note": "「若该目标**处于弱点击破状态**，则【剑势】**必定发动**」—— 与上一条**成对**：上一条带 `chance: 0.33` 并排除已破韧的情形 ✓，本条**不写 chance**（= 100% ✓）且在破韧时接管 ✓ ⇒ 两条合起来正好是文档的\"33%，破韧则必定\" ✓，而不会出现\"破韧时还掷 33% 骰子\" ✗。⚠ 破韧状态的名字来自引擎自己的常量 `BuffManager.BROKEN_STATE` ✓（`hasState` 会解析引擎状态 ✓）。⭐⭐ **CORRECTED（2026-10-19）倍率同上** ✓：`percent: 1.0`（字面量）→ `percent_from_skill_param: \"SKILL:1\"` ✓（读战技行的 #2 ✓，E0 = 1.0 ✓、E5 = 1.1 ✓，理由与证据见上一条 ✓）。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "level_convention",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "1206 素裳 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 210%、终结技 320%、天赋 速度+20%）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = `trace_breaking_advance_after_common` + `trace_breaking_advance_after_skill` ✓（「普攻**或**战技」在无 or 的 DSL 里是**两条** ✓，`when` 不同故不算重复 ✓）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。✅ **本文件已无登记缺口**：终结技那句「额外增加 2 次【剑势】的发动判定，伤害为原伤害的 50%」现由 `ult_grants_two_extra_sword_stance_rolls` + `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed` 兑现 ✓ —— 它需要的「多掷 N 次」参数就是本轮新增的 `chance_rolls` ✓（规则级**独立**掷骰 ✓）。为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会判「one sentence written twice」✗（**实测**过 ✓）。"
     },
     {
       "on": "BATTLE_START",

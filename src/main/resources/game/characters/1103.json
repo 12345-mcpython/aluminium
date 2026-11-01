@@ -5,6 +5,29 @@
   "_gaps": [],
   "rules": [
     {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        }
+      ],
+      "source": "1103 希露瓦 技能表的**等级口径**: 文档引用的 140%/60%/180% 都是 Lv10 行（110301/110302/110303 的 Lv10 与 Lv1 分别是 1.4/0.5、[1.4,0.6]/[0.7,0.3]、1.8/1.08）",
+      "_note": "The file stating **which level its quoted numbers come from** (M-32). ⚠ Unlike 1215 — whose quoted numbers lived in rules that state their own magnitudes — 希露瓦's 140%/60%/180% are the engine's own skill execution, which reads `user.skillLevel(skill)`; without this rule the engine would deal the Lv1 rows (70%/30%/108%) while her document says Lv10. ⚠ So this is not bookkeeping here: it changes the damage the engine deals, which is exactly what 「文档引用的是哪一行」 means. ⚠ `TALENT` is deliberately absent: her talent's row is only read by the (registered) additional-damage clause, and nothing in this file reads it.",
+      "id": "level_convention"
+    },
+    {
       "on": "ATTACK_FINISHED",
       "id": "skill_shock",
       "when": [
@@ -81,29 +104,6 @@
       "source": "1103 希露瓦 行迹 摇滚 (1103101): 「施放战技时，使受到攻击的敌方目标陷入触电状态的基础概率提高20%。」",
       "_note": "「…陷入触电状态的**基础概率提高 20%**」: `MODIFY_RULE`'s probability form (the field is `percent`, because the sentence raises a probability, not a count), so 80% becomes 100% — ⚠ and it must be an *amendment* rather than a second shock rule, because a second rule would roll **twice** (1 − 0.2 × 0.2 = 96%, not 100%). ⚠ It is filed against `skill_shock`, so it only moves the Skill's roll, not a hypothetical other one.",
       "id": "battle_start_2"
-    },
-    {
-      "on": "BATTLE_START",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        }
-      ],
-      "source": "1103 希露瓦 技能表的**等级口径**: 文档引用的 140%/60%/180% 都是 Lv10 行（110301/110302/110303 的 Lv10 与 Lv1 分别是 1.4/0.5、[1.4,0.6]/[0.7,0.3]、1.8/1.08）",
-      "_note": "The file stating **which level its quoted numbers come from** (M-32). ⚠ Unlike 1215 — whose quoted numbers lived in rules that state their own magnitudes — 希露瓦's 140%/60%/180% are the engine's own skill execution, which reads `user.skillLevel(skill)`; without this rule the engine would deal the Lv1 rows (70%/30%/108%) while her document says Lv10. ⚠ So this is not bookkeeping here: it changes the damage the engine deals, which is exactly what 「文档引用的是哪一行」 means. ⚠ `TALENT` is deliberately absent: her talent's row is only read by the (registered) additional-damage clause, and nothing in this file reads it.",
-      "id": "level_convention"
     },
     {
       "on": "DEALING_DAMAGE",

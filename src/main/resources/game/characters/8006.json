@@ -4,6 +4,34 @@
   "_status": "implemented",
   "rules": [
     {
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "8006 开拓者 技能表的**等级口径**: 文档引用的是 Lv10 行（800601 = 1.4、800602 = [0.5, 2]、800603 = [3, 1, 0.3]、800604 = [10]）",
+      "_note": "The file stating which level its numbers come from (M-32). ⚠ The engine's own skill execution reads these rows, so without it her 普攻/战技 would deal the Lv1 rows (1.4→0.5, 0.5→0.25 per bounce hit); the rules above state their own magnitudes and are unaffected.",
+      "id": "level_convention"
+    },
+    {
       "on": "ULT_CAST",
       "id": "ult_dance",
       "when": [
@@ -91,34 +119,6 @@
       "source": "8006 开拓者 星魂 4 袒护白鸽的冠冕 (Avatar_Trailblazer_00_Rank04): 「开拓者在场时，使除自身以外的队友击破特攻提高，提高数值等同于开拓者15%的击破特攻。」 param = [0.15]",
       "_note": "「使**除自身以外**的队友击破特攻提高，提高数值**等同于开拓者 15% 的击破特攻**」 — two spellings the engine already has: `other_allies` (「除自身以外」, the selector 1309 知更鸟's Skill is pinned on) and a **derived** magnitude read off the rule owner (`scale: self_attr:BREAKING_EFFECT`). ⚠ Read when the rule fires (battle start) and frozen, so a later change to her break effect does not retroactively move it — the same convention as every other derived value. ⚠ It has no duration: 「在场时」 is a loadout fact. ⚠ 补上 permanent: true：「在场时」是装备事实，没有时长（装载期会因为缺时长而拒绝，这正是它该报的）。",
       "id": "eidolon4_break_effect_for_others"
-    },
-    {
-      "on": "BATTLE_START",
-      "do": [
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "SKILL",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 9
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "TALENT",
-          "amount": 9
-        }
-      ],
-      "source": "8006 开拓者 技能表的**等级口径**: 文档引用的是 Lv10 行（800601 = 1.4、800602 = [0.5, 2]、800603 = [3, 1, 0.3]、800604 = [10]）",
-      "_note": "The file stating which level its numbers come from (M-32). ⚠ The engine's own skill execution reads these rows, so without it her 普攻/战技 would deal the Lv1 rows (1.4→0.5, 0.5→0.25 per bounce hit); the rules above state their own magnitudes and are unaffected.",
-      "id": "level_convention"
     },
     {
       "on": "BATTLE_START",

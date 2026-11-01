@@ -1683,9 +1683,13 @@ public final class TriggerInterpreter {
         // does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently IGNORED -- worse than refusing
         // it. A plain zone (no scale) still takes `percent` exactly as before.
         boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
+        // A plain zone (no scale) takes its share from any of the share spellings, not only a literal percent: 1403
+        // writes "使敌人受到的伤害提高" with the row-read share, and unboxing getPercent() there is an NPE.
         double percent = effect.getValue() != null
                 ? TriggerMagnitudes.shareOf(effect, ctx)
-                : derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : effect.getPercent();
+                : derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx)
+                        : TriggerMagnitudes.statesShare(effect) ? TriggerMagnitudes.shareOf(effect, ctx)
+                                : effect.getPercent();
         if (Boolean.TRUE.equals(effect.getInstance())) {
             // One-shot vulnerability/reduction on the instance being settled. Reader: 1315 Boothill's
             // Eidolon 4 ("that target takes 12% more from him / he takes 12% less from it").
