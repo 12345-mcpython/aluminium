@@ -124,6 +124,25 @@
       "source": "1221 星魂 5: 等级加成（数据 skill_add_level）",
       "_note": "取自 `skill_add_level` ✓。",
       "_status": "implemented"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "eidolon4_effect_res_after_the_counter",
+      "min_eidolon": 4,
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "turns": 1,
+          "ratio": 0.5,
+          "target": "self"
+        }
+      ],
+      "source": "1221 云璃 星魂 4: 「发动【勘破•斩】或【勘破•灭】后使自身效果抵抗提高50%，持续1回合。」 param = [0.5, 1]",
+      "_note": "「发动【勘破•斩】或【勘破•灭】后使自身效果抵抗提高 **50%**，持续 **1 回合**」—— 勘破由天赋的反击实现（规则 `talent_counter_on_being_hit`，事件 **`TAKING_HIT`** ✓）⇒ 本条挂**同一个事件**（这就是本库「同一时刻」的既有做法）+ `EFFECT_RESISTANCE` + `turns: 1` ✓。⚠ 与「效果命中/抵抗」同族时用 `ratio`（比率属性）✓：`ratio: 0.5` = +50%。"
     }
   ]
 }
