@@ -3,7 +3,7 @@
   "character": 1214,
   "_status": "partial",
   "_gaps": [
-    "天赋【恶报】**两个前置都缺**：① 引擎没有「**削韧**」这个逐次事件（`reduceToughness` 返回 `StanceResult.consumed`，但没有任何触发器事件携带它 —— 只有 `BREAK`（削光才发）与 `WEAKNESS_ADDED`）；② 就算有了事件，正文只说「**削减的韧性越多叠加层数越多**」，**不给换算**（上限 8 层给了，每点韧性换几层没给）⇒ 不编比例。这两点解决后，星魂 1/2/6 才能一起落地",
+    "天赋【恶报】已落地**两条**（队友攻击削韧 +1 层 / 满 8 层立刻追加攻击 3×90% 并清空）✓；仍缺：① 她自己削韧的「**削得越多叠越多**」——正文与数据都不给换算（只给上限 8）⇒ 不编；② 「本次追加攻击**无法叠加**【恶报】」需要「这一发不算削韧」的标记；③ 星魂 1/2/6 待这两点",
     "终结技：无视弱点削韧 + 按削韧量增伤最多 60% 未写",
     "星魂 1/2 与星魂 6 都挂在**天赋的追加攻击**上（+40% 伤害 / 无视弱点削韧 / 【恶报】上限降到 6 层），而天赋本身尚未建模 ⇒ 先写天赋，这三条才有落点；星魂 3/5 已落地 ✓"
   ],
@@ -109,6 +109,50 @@
       ],
       "source": "1214 雪衣 星魂 5: 「终结技等级+2…天赋等级+2…」 data: {121403: 2, 121404: 2}",
       "_note": "取自 skill_add_level ✓。"
+    },
+    {
+      "on": "TOUGHNESS_REDUCED",
+      "id": "talent_karma_from_an_ally",
+      "when": [
+        "actor is_other_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "恶报",
+          "amount": 1,
+          "max_stacks": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1214 雪衣 天赋 十王圣断，业报恒常: 「当雪衣的队友施放攻击削减敌方韧性后，雪衣叠加1层【恶报】。」 param Lv10 = [8, 0.9, 1]（#3 = 1 层）",
+      "_note": "「当雪衣的**队友**施放攻击削减敌方韧性后，雪衣叠加 **1** 层【恶报】」—— 事件 **`TOUGHNESS_REDUCED`**（本轮新增，携带真正扣掉的韧性 ✓）+ `actor is_other_ally` ✓ + `ADD_STACK 1`、`max_stacks: 8` ✓（上限来自 #1 ✓）。⚠ 她自己那半（「削减的韧性越多叠越多」）**没有换算比例** ⇒ 未写，见 `_gaps`。"
+    },
+    {
+      "on": "TOUGHNESS_REDUCED",
+      "id": "talent_karma_overflow_followup",
+      "when": [
+        "self_stacks:恶报 >= 8"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.9,
+          "element": "Quantum",
+          "times": 3,
+          "target": "random_enemy"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "恶报",
+          "amount": 8,
+          "target": "self"
+        }
+      ],
+      "source": "1214 雪衣 天赋: 「当【恶报】叠加至上限时消耗当前所有【恶报】，立即对敌方目标发动追加攻击，造成3次伤害，每次伤害对敌方随机单体造成等同于雪衣90%攻击力的量子属性伤害。」 param = [8, 0.9, 1]",
+      "_note": "「叠加至**上限**时**消耗当前所有**，立即发动追加攻击，造成 **3 次**，每次对**随机单体** **90% 攻击力**量子伤害」—— 条件 `self_stacks:恶报 >= 8` ✓ + `DAMAGE { percent: 0.9, times: 3, target: random_enemy }` ✓ + `REMOVE_STACK 8` ✓（上限就是 8，所以「移除 8 层」= 「消耗当前所有」；`SET_STACKS` 需要 `scale`，而「设为 0」没有合适的 scale 拼法）。⚠ 「本次追加攻击**无法叠加**【恶报】」未写（见 `_gaps`）。"
     }
   ]
 }
