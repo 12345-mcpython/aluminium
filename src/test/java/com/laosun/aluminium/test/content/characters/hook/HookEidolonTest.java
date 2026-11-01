@@ -35,6 +35,34 @@ public class HookEidolonTest {
         Assertions.assertEquals(3, burnTurns(2), "「持续时间增加 1 回合」");
     }
 
+    /**
+     * Eidolon 6: the same hit is 20% stronger against a burning target - compared across EIDOLON RANKS, not across
+     * enemies. A burning enemy also draws the talent's extra instance (「对灼烧目标追加 100% 攻击力」), so the two enemies'
+     * totals differ by 1.71 for a reason that has nothing to do with E6; the rank-to-rank ratio cancels it.
+     */
+    @Test
+    public void eidolonSixBoostsDamageAgainstBurningTargets() {
+        Assertions.assertEquals(1.0, rankRatio(false), 1e-6, "a healthy target: the Eidolon changes nothing");
+        Assertions.assertEquals(1.2, rankRatio(true), 1e-6, "「对灼烧状态下的敌方目标造成的伤害提高 20%」");
+    }
+
+    private static double rankRatio(boolean burning) {
+        return damage(6, burning) / damage(0, burning);
+    }
+
+    private static double damage(int eidolon, boolean burning) {
+        Character hook = CharacterFactory.create(HOOK, LEVEL, true, null, null, eidolon);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(hook, CharacterFactory.create(1001, LEVEL))),
+                new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.99));
+        battle.startBattle();
+        if (burning) {
+            enemy.getBuffManager().addBuff(new DotBuff(hook, DamageElement.FIRE, 10, 3, 0, "灼烧"));
+        }
+        double before = enemy.getCurrentHp();
+        battle.castImmediate(hook.getSkills().get(SkillType.COMMON), hook, List.of(enemy));
+        return before - enemy.getCurrentHp();
+    }
     // ==================================================================
 
     private static int burnTurns(int eidolon) {
@@ -52,4 +80,5 @@ public class HookEidolonTest {
         return dots.getFirst().remainingTurns();
     }
 }
+
 
