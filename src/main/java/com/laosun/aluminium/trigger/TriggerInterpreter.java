@@ -1184,7 +1184,9 @@ public final class TriggerInterpreter {
                     "GAIN_ENERGY scales off " + target.getName() + "'s maximum energy, but that unit has no energy "
                             + "bar (its maximum is 0); a share of it is not a number");
         }
-        battle.grantEnergy(target, effect.getPercent() * maxEnergy);
+        // The share may be READ from a skill row ("施放终结技时，我方其他目标回复 20% 能量", 1217's Ultimate, whose row
+        // moves with the level): asking only getPercent() unboxes a null there.
+        battle.grantEnergy(target, TriggerMagnitudes.shareOf(effect, ctx) * maxEnergy);
     }
 
     /**
