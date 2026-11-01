@@ -27,6 +27,26 @@ public class HuohuoEidolonTest {
     private static final int ALLY = 1001;
 
     /**
+     * Eidolon 1, first half: 「天赋产生的【禳命】持续时间延长 1 回合」 - a MODIFY_RULE on the two rules that grant it.
+     */
+    @Test
+    public void eidolonOneLengthensTheTalisman() {
+        Assertions.assertEquals(talismanTurns(0, false) + 1, talismanTurns(1, false), "the Skill's 禳命 is one turn longer");
+        Assertions.assertEquals(talismanTurns(0, true) + 1, talismanTurns(1, true), "the trace's 禳命 too");
+    }
+
+    private static int talismanTurns(int eidolon, boolean viaTrace) {
+        Fixture f = new Fixture(eidolon);
+        if (!viaTrace) {
+            f.battle.castImmediate(f.huohuo.getSkills().get(SkillType.SKILL), f.huohuo, List.of(f.ally));
+        }
+        return f.huohuo.getBuffManager().activeBuffs().stream()
+                .filter(buff -> buff instanceof com.laosun.aluminium.buff.StateBuff state
+                        && "禳命".equals(state.getState()))
+                .mapToInt(com.laosun.aluminium.buff.AbstractBuff::remainingTurns)
+                .max().orElseThrow();
+    }
+    /**
      * Eidolon 3 and 5: the level clauses.
      */
     @Test
@@ -87,4 +107,5 @@ public class HuohuoEidolonTest {
         }
     }
 }
+
 
