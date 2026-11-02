@@ -224,6 +224,34 @@
       ],
       "source": "1005 卡芙卡 星魂 4 把宣叙呈献给 (Avatar_Kafka_00_Rank04): 「当敌方目标承受的由卡芙卡造成的触电状态产生伤害时，额外为卡芙卡恢复2点能量。」 param = [2]",
       "_note": "「当敌方目标承受的**由卡芙卡造成的触电状态**产生伤害时，额外恢复 **2** 点能量」= `DAMAGE_SETTLED` + **三个条件**：① **`damage_is_dot`**（新增条件词，见引擎那条）—— 只认持续伤害那一次结算，普通攻击/击破/附加伤害都不算 ✓；② `damage_element_is_self` —— 「**触电**」是雷属性，而卡芙卡自己就是雷 ✓（排除别的元素的 DoT）；③ `actor == self` —— 「**由卡芙卡造成的**」✓（DoT 的 source 是她）。⇒ 三个条件缺一个都会把范围放宽，所以三个都要。⚠ 若将来出现「她造成的**非雷**持续伤害」，②会漏掉它 —— 目前没有这样的来源。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_shock_on_every_enemy",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "skill": "TECHNIQUE",
+          "damage_param": 2,
+          "element": "Thunder",
+          "target": "all_enemies"
+        },
+        {
+          "op": "APPLY_DOT",
+          "element": "Thunder",
+          "base_chance": 1,
+          "scale": "self_attr:ATTACK",
+          "turns": 2,
+          "target": "all_enemies",
+          "percent_from_skill_param": "ULTRA:3"
+        }
+      ],
+      "source": "1005 卡芙卡 秘技 宽恕无关慈悲 (100507, Maze/Attack): 「立即攻击一定范围内的所有敌人，进入战斗后对敌方全体造成等同于卡芙卡50%攻击力的雷属性伤害，同时有100%的基础概率使敌方每个单体目标陷入与终结技相同的触电状态，持续2回合。」 param Lv1 = [1, 2, 0.5] → #1 = 1（100%）、#2 = 2（回合）、#3 = 0.5（50% 攻击力）",
+      "_note": "「对**敌方全体**造成 **50%** 攻击力雷伤 + **100%** 基础概率使**敌方每个单体**陷入**与终结技相同的**触电状态，持续 **2** 回合」—— ① `DAMAGE { skill: 「TECHNIQUE」, damage_param: 2 }`（秘技行第 3 列 = 0.5）✓；② 「**与终结技相同的**触电」⇒ 份额**读终结技行** `ULTRA:3`（秘技行里没有触电份额）✓，`turns: 2` 与秘技行 `#2 = 2` 一致 ✓；③ `target: all_enemies` = 「敌方每个单体」✓。⚠ **这一条此前整个缺失**：守卫 13 用关键词匹配「秘技」，而她的星魂 6 引文里出现过「终结技、秘技与天赋」，于是**假通过** —— 逐节手写判据才把它翻出来。"
     }
   ]
 }
