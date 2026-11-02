@@ -2,9 +2,7 @@
   "schema": 1,
   "character": 1103,
   "_status": "implemented",
-  "_gaps": [
-    "✅ **全条款覆盖（2026-11-02 逐条核对）**：文档 14 节全部有对应规则 —— 普攻（读技能行，无需规则）/ 战技 `skill_shock` / 终结技 `ult_effect` / 天赋 `attack_effect` / 秘技 `technique_shock_and_damage` / 星魂 1–6（`eidolon1_adjacent_damage_on_basic`、`eidolon2_energy_on_talent_additional_damage`、`eidolon3_levels`、`eidolon4_ult`、`eidolon5_levels`、`eidolon6_on_damage`）/ 行迹 电音·狂热·摇滚（`battle_start`、`on_kill_effect`、`battle_start_2`）。判据：`ServalClauseCoverageTest`（逐节断言）+ `ServalTechniqueTest`。⚠ 仍存在的**已知近似**（不是缺口）：① 秘技的「100% 基础概率」写成不判定的直接附着（不吃效果命中/抵抗）；② 星魂 4 的 `turns: 2` 是字面值，与战技行 `SKILL:3 = 2` 一致；③ 「20 秒」「移动速度」等地图层成分不建模。"
-  ],
+  "_gaps": [],
   "rules": [
     {
       "on": "BATTLE_START",

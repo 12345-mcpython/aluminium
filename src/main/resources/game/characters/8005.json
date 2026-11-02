@@ -2,9 +2,7 @@
   "schema": 1,
   "character": 8005,
   "_status": "implemented",
-  "_gaps": [
-    "✅ **全条款覆盖（2026-11-02 逐条核对）**：文档 12 节全部有落点 —— 普攻（读技能行）/ 战技 `skill_extra_hits_random` / 终结技 `ult_dance` + `ult_super_break` / 天赋 `talent_energy_on_break` / 秘技 `technique_breaking_effect` / 星魂 1 `eidolon1_skill_point_after_first_skill`、2 `eidolon2_energy_regen`、3 `eidolon3_levels`、4 `eidolon4_break_effect_for_others`、5 `eidolon5_levels`、6 `eidolon6_extra_skill_hits`。判据 `TrailblazerHarmonyClauseCoverageTest`。⚠ 补写的是**星魂 1/4/6 三节**（此前整个缺），写法与 8006 同一来源的一致。"
-  ],
+  "_gaps": [],
   "rules": [
     {
       "on": "BATTLE_START",
