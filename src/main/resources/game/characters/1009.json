@@ -106,7 +106,8 @@
       "id": "talent_charge_decays_from_second_turn",
       "when": [
         "actor == self",
-        "self_stacks:自身回合数 >= 2"
+        "self_stacks:自身回合数 >= 2",
+        "!self has_state 蓄能不减"
       ],
       "do": [
         {
@@ -117,7 +118,7 @@
         }
       ],
       "source": "1009 艾丝妲 天赋: 「从自身的第2回合开始，艾丝妲每回合开始时蓄能层数减少3层。」",
-      "_note": "「从自身的**第 2 回合**开始，每回合开始**减少 3 层**」—— 条件 `self_stacks:自身回合数 >= 2` ✓（计数由上一行规则在本回合已加过 ✓，所以第 2 回合恰好成立 ✓）；扣层 `REMOVE_STACK amount: 3` ✓。"
+      "_note": "「从自身的**第 2 回合**开始，每回合开始**减少 3 层**」—— 条件 `self_stacks:自身回合数 >= 2` ✓（计数由上一行规则在本回合已加过 ✓，所以第 2 回合恰好成立 ✓）；扣层 `REMOVE_STACK amount: 3` ✓。 ⚠ 星魂 2 需要这一条能**跳过**「下一回合」，所以 `when` 里加了 `!self has_state 蓄能不减`（那个状态由 `eidolon2_ult_stops_the_decay_once` 挂 1 回合）。"
     },
     {
       "on": "BATTLE_START",
@@ -230,6 +231,47 @@
       ],
       "source": "1009 艾丝妲 星魂 6: 「天赋每回合减少的蓄能层数降低1。」 param = [1]",
       "_note": "「天赋**每回合减少的蓄能层数降低 1**」—— 衰减本身是 `talent_charge_decays_from_second_turn` 的 `REMOVE_STACK 3` ✓ ⇒ `MODIFY_RULE` + **`effect_amount: -1`** 把它变成 2 ✓（同一手法见 1203 星魂 6）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_extra_skill_hit",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "SKILL:0",
+          "element": "Fire",
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1009 艾丝妲 星魂 1 星有无言之歌 (Avatar_Asta_00_Rank01): 「施放战技时，对敌方随机单体额外造成1次伤害。」 param = [1]",
+      "_note": "「施放战技时，对**敌方随机单体额外造成 1 次伤害**」= `SKILL_CAST` + `actor == self` → 一次 `DAMAGE { percent_from_skill_param: 「SKILL:0」, target: 「random_enemy」 }` ✓ —— 「额外 1 次」在引擎里就是**多一条 DAMAGE**（`times` 留默认 1），份额与战技同源（`SKILL:0` = 50%）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon2_ult_stops_the_decay_once",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "蓄能不减",
+          "turns": 1,
+          "ticks_on": "self",
+          "target": "self"
+        }
+      ],
+      "source": "1009 艾丝妲 星魂 2 月见圆缺之意 (Avatar_Asta_00_Rank02): 「施放终结技时，艾丝妲下回合不会减少蓄能层数。」",
+      "_note": "「施放终结技时，艾丝妲**下回合不会减少蓄能层数**」= `ULT_CAST` 时挂一个**持续 1 回合**的状态 `蓄能不减`，并让 `talent_charge_decays_from_second_turn` 的 `when` 加上 **`!self has_state 蓄能不减`** ✓ —— 这就是「下一回合那次不扣」。"
     }
+  ],
+  "_gaps": [
+    "⛔ **星魂 4 未写**（2026-11-02 逐节核对发现）：「天赋的蓄能层数**大于等于 2** 时，艾丝妲的能量恢复效率提高 **15%**」—— 这是一个**随活计数器跨越阈值而开合**的修饰：引擎有 `per_stack_live`（按层数**连续**缩放）和一次性 `when`（触发时判一次），但**没有「当…时持续生效」的修饰**；用「攻击时判一次 +15%」会在层数掉到 2 以下后仍然留着，用 `per_stack_live` 又会把阈值变成线性。⛔ 其余 12 节已全部有落点（见 `AstaClauseCoverageTest`）。"
   ]
 }
