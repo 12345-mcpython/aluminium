@@ -3,7 +3,10 @@
   "character": 1502,
   "_status": "partial",
   "_gaps": [
-    "结界本身已建为状态（`APPLY_BUFF 结界`，`ticks_on: self` ⇒ 她自己回合开始减 1 ✓）与「普攻/战技后 +3 笑点」✓；仍缺：① 「结界期间我方全体**欢愉度**提高，等于爻光欢愉度的 **20%**」（需要**欢愉度**的跨单位派生修饰）、② 终结技「使阿哈立即获得 1 个**固定计入 20 笑点**的额外回合」（额外回合 + 资源门槛）、③ 天赋【大吉大利】的「消耗战技点时**再触发一次**」、④ 星魂与行迹未读"
+    "⭐ **「结界期间我方全体欢愉度提高 = 爻光欢愉度的 20%」已落地**（2026-11-02）：`skill_opens_the_zone` 的 `do` 里追加 `MODIFY_ATTR ELATION_DAMAGE_BOOST { scale: 「self_attr:ELATION_DAMAGE_BOOST」, percent: 0.2, turns: 3, target: 「all_allies」 }` —— `self_attr:` 就是**爻光自己的**欢愉度（不需要新的跨单位词），`turns: 3` 与结界同长。判据 `YaoguangZoneElationTest`：她 0.6 时队友 +0.12 ✓（**断言写成「她的实时值 × 20%」**，因为她的欢愉度在开局还带别的加成 —— 写死 0.1 会误判）。",
+    "⛔ **终结技「使阿哈立即获得 1 个固定计入 20 笑点的额外回合」未写**：需要「额外回合 + 资源门槛」。",
+    "⛔ **天赋【大吉大利】「消耗战技点时再触发一次」未写**：「消耗战技点」是事件（`SKILL_POINT_SPENT` ✓ 存在），但「再触发一次」要**重入**同一效果，需先核对引擎是否允许。",
+    "⛔ **星魂与行迹未读**。"
   ],
   "rules": [
     {
@@ -65,10 +68,18 @@
           "turns": 3,
           "ticks_on": "self",
           "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "scale": "self_attr:ELATION_DAMAGE_BOOST",
+          "percent": 0.2,
+          "turns": 3,
+          "target": "all_allies"
         }
       ],
       "source": "1502 爻光 战技: 「展开结界，持续3回合，自身每回合开始时结界持续回合数减1。」 param Lv10 = [3, 0.2, 3]",
-      "_note": "「展开结界，持续 **3 回合**，**自身每回合开始时**结界持续回合数减 1」—— `APPLY_BUFF` + `turns: 3` + **`ticks_on: 「self」`** ✓（「自身每回合开始时减 1」正是这个钟 ✓，与 8005 的【伴舞】同形）。"
+      "_note": "「展开结界，持续 **3 回合**，**自身每回合开始时**结界持续回合数减 1」—— `APPLY_BUFF` + `turns: 3` + **`ticks_on: 「self」`** ✓（「自身每回合开始时减 1」正是这个钟 ✓，与 8005 的【伴舞】同形）。 ⚠ **2026-11-02 补**：「结界持续期间，我方全体目标**欢愉度**提高，提高数值等同于爻光欢愉度的 **20%**」= 同一条 `do` 里追加 `MODIFY_ATTR ELATION_DAMAGE_BOOST { scale: 「self_attr:ELATION_DAMAGE_BOOST」, percent: 0.2, turns: 3, target: 「all_allies」 }` ✓（`self_attr:` = **爻光自己的**欢愉度；`turns: 3` 与结界同长 ⇒ 同生同灭）。"
     },
     {
       "on": "SKILL_CAST",
