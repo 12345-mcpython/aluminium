@@ -356,7 +356,5 @@
       "_note": "「进入战斗时，对**敌方全体**造成 **80%** 攻击力物理伤害，并使银枝恢复 **15** 点能量」= `DAMAGE { skill: 「TECHNIQUE」, damage_param: 1, target: all_enemies }` + `GAIN_ENERGY { amount_from_skill_param: 「TECHNIQUE:2」 }` ✓（两个数都按秘技行读，一个都不手写）。⚠ **只写这两条**：「10 秒晕眩 / 敌人不主动攻击」是**地图层**事实。"
     }
   ],
-  "_gaps": [
-    "⭐ **秘技已实现**（2026-11-02）：`technique_damage_and_energy` —— 「进入战斗时对**敌方全体**造成 **80%** 攻击力物理伤害 + 恢复 **15** 点能量」= `DAMAGE { skill: 「TECHNIQUE」, damage_param: 1, target: all_enemies }` + `GAIN_ENERGY { amount_from_skill_param: 「TECHNIQUE:2」 }`（两个数都按秘技行读，没有手写）。判据 `ArgentiTechniqueTest`：用秘技时两敌合计掉 **2591.33**、能量 **15**；不用时 **0 / 0** ✓。⚠ 「10 秒晕眩 / 敌人不主动攻击」是地图层事实，不建模。⛔ 仍开：其余技能从句与星魂。"
-  ]
+  "_gaps": []
 }

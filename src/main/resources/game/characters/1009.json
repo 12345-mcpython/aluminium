@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "character": 1009,
-  "_status": "implemented",
+  "_status": "partial",
   "rules": [
     {
       "on": "BATTLE_START",
