@@ -129,6 +129,32 @@ public class DrRatioClauseCoverageTest {
         return instances[0];
     }
 
+    /**
+     * 行迹 推理: with three debuffs the same Skill hits for more, and with two nothing changes.
+     *
+     * <p>Measured as damage totals against a fixed seed: two battles with the same seed roll the same numbers, so the only
+     * difference left is the trace.
+     */
+    @Test
+    public void theInferenceTraceRaisesDamageAtThreeDebuffs() {
+        double without = damageAgainst(0);
+        double withThree = damageAgainst(3);
+        Assertions.assertTrue(withThree > without,
+                "「若目标负面状态 ≥3 个…造成伤害提高 10%」 (" + without + " -> " + withThree + ")");
+        Assertions.assertEquals(without, damageAgainst(2), 1e-9, "two debuffs is below the gate");
+    }
+
+    private static double damageAgainst(int debuffs) {
+        Fixture f = new Fixture(0);
+        for (int i = 0; i < debuffs; i++) {
+            f.enemy.getBuffManager().addBuff(new DotBuff(f.ratio, DamageElement.QUANTUM, 10, 3, 1, "灼烧" + i));
+        }
+        double[] total = {0};
+        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> total[0] += applied);
+        f.castSkill();
+        return total[0];
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -167,6 +193,7 @@ public class DrRatioClauseCoverageTest {
         }
     }
 }
+
 
 
 
