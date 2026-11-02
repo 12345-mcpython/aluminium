@@ -84,6 +84,51 @@ public class DrRatioClauseCoverageTest {
                 "「触发天赋时…额外恢复 15 点能量」 — exactly 15 more than at E0");
     }
 
+    /**
+     * 星魂 1: four layers at battle start, and the cap they were raised to.
+     */
+    @Test
+    public void eidolon1StartsWithFourLayers() {
+        Fixture e1 = new Fixture(1);
+        Assertions.assertEquals(4, e1.layers(), "「战斗开始时，立即获得 4 层【归纳】」");
+
+        Fixture e0 = new Fixture(0);
+        Assertions.assertEquals(0, e0.layers(), "control: nothing at E0");
+    }
+
+    /**
+     * 星魂 2: 「目标每有 1 个负面效果…最多触发 4 次」 — two debuffs give two extra instances, six give four.
+     */
+    @Test
+    public void eidolon2DealsOneExtraHitPerDebuffUpToFour() {
+        // The Skill lands 演绎 on the target itself, and that IS a negative effect, so the counts are one higher than the
+        // fixture's own debuffs: 2 -> 3, 6 -> capped at 4, and a bare cast -> 1.
+        Assertions.assertEquals(3, extraHitsAgainst(2), "two fixture debuffs plus the Skill's own 演绎");
+        Assertions.assertEquals(4, extraHitsAgainst(6), "「最多触发 4 次」 — six debuffs still give four");
+        Assertions.assertEquals(1, extraHitsAgainst(0), "only the Skill's own 演绎 is on the target");
+    }
+
+    /**
+     * The Eidolon's contribution, measured as the difference between E2 and E0 with the same board.
+     *
+     * <p>Counting instances outright would be wrong: one Skill cast settles its own hit <b>and</b> the talent's follow-up, so the
+     * baseline is two, not one. Subtracting the E0 count is the honest way to isolate the extra damage.
+     */
+    private static int extraHitsAgainst(int debuffs) {
+        return instancesFor(2, debuffs) - instancesFor(0, debuffs);
+    }
+
+    private static int instancesFor(int eidolon, int debuffs) {
+        Fixture f = new Fixture(eidolon);
+        for (int i = 0; i < debuffs; i++) {
+            f.enemy.getBuffManager().addBuff(new DotBuff(f.ratio, DamageElement.QUANTUM, 10, 3, 1, "灼烧" + i));
+        }
+        int[] instances = {0};
+        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> instances[0]++);
+        f.castSkill();
+        return instances[0];
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -122,6 +167,10 @@ public class DrRatioClauseCoverageTest {
         }
     }
 }
+
+
+
+
 
 
 

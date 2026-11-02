@@ -5,13 +5,13 @@
   "_gaps": [
     "⭐ **行迹 归纳 / 演绎 已于 2026-11-03 落地**：归纳 = `SKILL_CAST` + `target_debuff_count >= 1` → `ADD_STACK { value: debuffs(target), max_stacks: 6 }` 加层，`per_stack: self_stacks:归纳`（**`per_stack_live`**）每层 +2.5% 暴击率 / +5% 暴击伤害；演绎 = `APPLY_BUFF { base_chance: 1 }` + `target_when` 把效果抵抗降 10%/2 回合。判据 `DrRatioClauseCoverageTest`（3 例：3 个负面 ⇒ 3 层且暴击率 +7.5%、0 个负面 ⇒ 0 层、效果抵抗下降）。⚠ 夹具坑：`StateBuff` 的 `isDebuff()` 是 **false**，`target_debuff_count` 读不到 ⇒ 判据必须用**真负面**（`DotBuff` 三个不同名字）。",
     "⛔ 行迹 推理未写：「造成伤害时，若目标负面状态 ≥3 个，目标每有 1 个负面效果伤害提高 10%，最多 50%」—— 条件 `target_debuff_count >= 3` ✓ 有、`debuffs` 提供器 ✓ 有，差的是把 `min(debuffs,5) × 0.1` 写进 `BOOST_DAMAGE/ALL_DAMAGE_TYPE_BOOST` 的实例修饰（形状待定，先登记）。",
-    "⛔ 星魂 1（归纳上限 +4 / 立即 4 层 / 需解锁行迹）：上限可用 `MODIFY_RULE effect_max_stacks` ✓，但「立即 4 层」要排在**行迹加层规则之外**（否则会与施放战技那次的层数叠加），需确认先后。",
-    "⛔ 星魂 2（追加攻击按目标负面数 +20% 攻击、每次最多 4 次）：需要「次数 = min(负面数, 4)」的**提供器次数**（`times` 只收字面量）。",
     "⛔ 星魂 6（【智者的短见】触发 +1 次、天赋追加攻击伤害 +50%）：前者要改 `RESET_TRIGGER_LIMIT` 那族的**上限**，后者是 `MODIFY_RULE effect_percent_scale`（对行份额是加）。",
     "⭐ **星魂 4 已于 2026-11-03 落地**（触发天赋时额外 +15 能量）：与天赋同条件另起一条 `min_eidolon: 4` 的规则（不能并进天赋那条 —— 并进去 E0 也会回能），判据实测「比 E0 多 15」。",
     "⚠ 天赋「目标每有 1 个负面效果使追加攻击固定概率 +20%（基线 40% 已写）」仍未写：概率随负面数变化需要同一族提供器。",
     "⚠ 终结技【智者的短见】「最多触发 2 次」被解释成「每回合 2 次」（量纲差异）。",
-    "⚠ 秘技：100% 基础概率、特殊领域 / 嘲讽未写。"
+    "⚠ 秘技：100% 基础概率、特殊领域 / 嘲讽未写。",
+    "⭐ **星魂 1 已于 2026-11-03 落地**：开局 4 层（`ADD_STACK amount: 4, max_stacks: 10`）+ 上限 +4（`MODIFY_RULE effect_max_stacks`，6 → 10）；「需要先解锁行迹」是养成条件、不建模。判据实测 E1 开局 4 层、E0 为 0。",
+    "⭐ **星魂 2 已于 2026-11-03 落地**：`DAMAGE { percent: 0.2, times_from: \"target_debuffs\", times: 4 }` —— `target_debuffs` 是**已有**的拼法（1006 星魂 4 是第一个读者），`times` 是上限。⚠ 实测口径：**战技自己落的【演绎】也算一个负面** ⇒ 夹具 2 个负面时实际触发 3 次、6 个时封顶 4 次、0 个时为 1 次。"
   ],
   "rules": [
     {
@@ -271,6 +271,51 @@
       ],
       "source": "1305 真理医生 星魂 4 盲目造痴愚: 「触发天赋时，真理医生额外恢复15点能量。」 参数 = [15]",
       "_note": "「**触发天赋时**，真理医生额外恢复 **15** 点能量」—— 与天赋那条**同条件**（`ALLY_ATTACK` + `actor == self` + `from_skill SKILL`）另起一条规则 ✓（不能并进去：并进去后 E0 也会回能 ✗）。⚠ 同事件两条规则的**顺序无关**：两条都只加各自的东西 ✓。"
+    }
+    ,
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_starts_with_four_layers",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "归纳",
+          "amount": 4,
+          "max_stacks": 10,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "trace_induction_stacks_per_debuff",
+          "effect_max_stacks": 4
+        }
+      ],
+      "source": "1305 真理医生 星魂 1 倨傲生祸患: 「行迹【归纳】的叠加层数上限提高4层。战斗开始时，立即获得4层【归纳】。需要先解锁行迹【归纳】。」 参数 = [4, 4]",
+      "_note": "「行迹【归纳】的**叠加层数上限提高 4 层**。**战斗开始时立即获得 4 层**」—— ① 上限：`MODIFY_RULE { rule: trace_induction_stacks_per_debuff, effect_max_stacks: 4 }`（6 → **10** ✓）；② 开局层：`ADD_STACK { amount: 4, max_stacks: 10 }` ✓（**必须在**上限提过之后才够 10，所以两个效果按这个顺序 ✓）；③ 「需要先解锁行迹」是**养成**条件，不在战斗引擎里 ⇒ 不建模 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon2_extra_damage_per_debuff",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.2,
+          "element": "Imaginary",
+          "times_from": "target_debuffs",
+          "times": 4,
+          "target": "target"
+        }
+      ],
+      "source": "1305 真理医生 星魂 2 显微而阐幽: 「天赋的追加攻击击中目标时，目标每有1个负面效果，则额外造成等同于真理医生20%攻击力的虚数属性附加伤害。该效果在每次追加攻击中最多触发4次。」 参数 = [0.2, 4]",
+      "_note": "「**目标每有 1 个负面效果**，则额外造成 **20% 攻击力**的虚数**附加伤害**，每次追加攻击**最多触发 4 次**」—— ① `times_from: \"target_debuffs\"` **已有** ✓（1006 星魂 4 是它的第一个读者）；② `times: 4` 是**上限** ✓（`timesCount` 里 `min(count, cap)` ✓）；③ 20% 是**星魂自己的参数**（不是技能行）⇒ 字面值 ✓（`HardcodedSkillRowRatchetTest` 的基线 +1，理由：星魂参数不在技能表里）；④ 「**附加伤害**」= 常态伤害（不是欢愉/追加类型）⇒ 不写 `damage_type` ✓。"
     }
   ]
 }
