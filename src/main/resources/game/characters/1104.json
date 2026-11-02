@@ -248,6 +248,22 @@
       ],
       "source": "1104 杰帕德 星魂 6 以我之名: 「触发天赋时杰帕德立即行动，且当前生命值的回复量额外增加自身生命上限的50%。」 param = [0.5]",
       "_note": "「触发天赋时杰帕德**立即行动**，且当前生命值的回复量**额外增加自身生命上限的 50%**」—— 挂在 `LETHAL_DAMAGE` ✓（天赋就在这个时刻触发）+ `min_eidolon: 6`；`HEAL owner_max_hp 0.5` ✓（额外那半）+ `INSERT_ACTION self` ✓（立即行动）。⚠ 与天赋那条**同时**触发 ⇒ 合计回到满血（50% + 50%）✓。 ⚠ **按等级读**（AGENT §0.1.3）：数值取自本技能行（该文件有等级口径 ⇒ 与 Lv10 行一致）。"
+    },
+    {
+      "on": "LETHAL_DAMAGE",
+      "id": "trace_energy_to_full_when_the_talent_fires",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "RAISE_ENERGY_TO",
+          "percent": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1104 杰帕德 行迹 统领 (1104102): 「【不屈之身】触发后，杰帕德的能量立即恢复至100%。」",
+      "_note": "「【不屈之身】触发后，杰帕德的**能量立即恢复至 100%**」= `LETHAL_DAMAGE` + `target == self`（与天赋同一次触发）→ `RAISE_ENERGY_TO { percent: 1 }` ✓ —— 这个 op 是**下限**不是加法：「恢复至 100%」意味着已满就不再加，`GAIN_ENERGY` 会溢出。⚠ **这一条此前整个缺失**：守卫 13 的「行迹」关键词命中了她另外两条行迹，于是假通过。"
     }
   ],
   "_gaps": []
