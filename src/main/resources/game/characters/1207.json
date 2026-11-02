@@ -3,7 +3,7 @@
   "character": 1207,
   "_status": "implemented",
   "_gaps": [
-    "⛔ **秘技未写**（2026-11-01 覆盖复核发现）：文档有「秘技：云鸢逐风 / Windchaser」一节，文件里**没有任何秘技规则** —— 此前的「完全实现」不成立。"
+    "⭐ **秘技已实现**（2026-11-02）：`technique_two_stacks_on_entry` —— 「主动攻击敌人进入战斗时，驭空获得 **2 层**【鸣弦号令】」= `BATTLE_START` + `self has_state 秘技` → 两次 `ADD_STACK`（一个计数器是同名的多条 buff）。判据 `YukongTechniqueTest`：用秘技 **2 层**、不用 **0 层** ✓。⚠ 「20 秒冲刺 / 移动速度 +35%」是地图层事实，不建模。⛔ 仍开：其余技能从句与星魂。"
   ],
   "rules": [
     {
@@ -321,6 +321,31 @@
       ],
       "source": "1207 驭空 行迹 襄尺: 「驭空被施加负面效果时可抵抗1次负面效果，该效果在2回合后可再次触发。」",
       "_note": "襄尺：次数型抵抗，不是百分比免疫。`charges: 1` + `cooldown: 2` 由 `DebuffShieldBuff` 承载；第一次负面效果在掷骰前被拒绝，随后按驭空自己的回合计 2 回合冷却。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_two_stacks_on_entry",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "鸣弦号令",
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "鸣弦号令",
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1207 驭空 秘技 云鸢逐风 (120707, Maze/Enhance): 「使用秘技后进入持续20秒的冲刺状态。冲刺状态下自身移动速度提高35%，且主动攻击敌人进入战斗时，驭空获得2层【鸣弦号令】。」 param Lv1 = [20, 0.35, 2] → #1 = 20（秒）、#2 = 0.35（移动速度）、#3 = 2（层数）",
+      "_note": "「主动攻击敌人进入战斗时，驭空获得 **2 层**【鸣弦号令】」= `BATTLE_START` + `self has_state 秘技` → **两次** `ADD_STACK { buff: 鸣弦号令 }`（与 `skill_command` 给 2 层的写法一致：一个计数器是**同名的多条 buff**，一条 `ADD_STACK` 加一层）✓。⚠ **只写层数**：「20 秒冲刺」「移动速度 +35%」是**地图层**事实，引擎不建模。"
     }
   ]
 }
