@@ -11,10 +11,15 @@ import java.util.List;
 import com.laosun.aluminium.damage.Damage;
 
 /**
- * "[生息]结束时若我方目标当前生命值等于其生命上限，则额外恢复目标 8 点能量" (1211,).
+ * "[生息]结束时若我方目标当前生命值等于其生命上限，则额外恢复目标 8 点能量" (1211, <b>star soul 1</b>).
  *
  * <p>FILE-DRIVEN and TWO-WAY: the clause has to be shown to matter, so full HP must pay and less-than-full HP must not.
  * The announcement is fired through the engine's own `Battle.fireStateEnded`, which is what sets the name the condition reads.
+ *
+ * <p>Note: <b>Built at Eidolon 1</b>, because the sentence IS her Eidolon 1. The pre-2026-11-02 version of this probe built
+ * E0 — the rule carried no {@code min_eidolon} back then (the old files wrote Eidolon clauses without a threshold), so
+ * building at E0 was harmless and this probe could never see the gate. When the clause was fixed it was also given its
+ * threshold, and this fixture had to follow: the E0 reading is asserted in {@code BailuClauseCoverageTest} instead.
  */
 public class StateEndedEnergyProbeTest {
     private static final int OWNER = 1211;
@@ -42,7 +47,7 @@ public class StateEndedEnergyProbeTest {
      * @param missing the share of max HP to take away before the announcement
      */
     private static double gain(double missing) {
-        Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
+        Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 1);
         Battle battle = new Battle(List.of(owner),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();

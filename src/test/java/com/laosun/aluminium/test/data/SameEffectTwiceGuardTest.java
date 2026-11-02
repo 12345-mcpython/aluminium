@@ -43,6 +43,10 @@ public class SameEffectTwiceGuardTest {
      * this file's BASELINE list, one reason each).
      */
     private static final Map<String, Integer> BASELINE = Map.ofEntries(
+            // 1211 白露：行迹「拥有【生息】的角色受到的伤害降低 10%」是**状态自带**的效果，而【生息】有**两个来源**
+            // （终结技 ult_rebirth、秘技 technique_invigoration_for_the_whole_party）⇒ 同一条效果必须在两个触发点各给一次。
+            // 这正是本类 javadoc 说的「one effect, two triggers」那一族：不是把某条从句抄进了错的规则。
+            Map.entry("1211.json :: MODIFY_DAMAGE_TAKEN||-0.1|all_allies|2|false", 2),
             Map.entry("1217.json :: MODIFY_ATTR|SPEED|0.12|all_allies|-|true", 2),
             Map.entry("1301.json :: MODIFY_DAMAGE_TAKEN||0.12|all_enemies|2|false", 2),
             Map.entry("1314.json :: MODIFY_ATTR|CRIT_ATTACK|0.024|self|-|true", 2),

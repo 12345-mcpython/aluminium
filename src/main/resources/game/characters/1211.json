@@ -3,9 +3,11 @@
   "character": 1211,
   "_status": "partial",
   "_gaps": [
-    "秘技：进入战斗后我方全体获得【生息】未写",
-    "星魂 1–6：未读、未写",
-    "行迹：除「鳞渊福泽」与【生息】结束回能外，其余行迹未读"
+    "战技「然后白露随机为我方单体进行 2 次治疗，每提供 1 次治疗，下一次治疗回复的生命值会降低 15%」：缺「**随机目标序列** ＋ **逐次递减的倍率**」两样写法 —— 技能行只结算主目标那一次（11.70%+312，引擎自己读行 ✓），`HEAL` op 既没有随机选择器，也没有「第 N 次治疗 × (1−15%)^N」的链。读者：1211 战技（120702）。",
+    "天赋「拥有【生息】的我方目标，在受到攻击后会回复等同于白露 5.40% 生命上限 + 144 的生命值，**该效果可以触发 2 次**」：缺「**一个状态上带 N 次触发额度**」的计数器 —— `APPLY_BUFF` 产生的状态没有扣减次数的手段，`once_per_battle` 是**每条规则一个布尔**而不是额度。⚠ 单写 `HEAL` 会**每次受击都治**（错数，不是缺项）⇒ 整条未写。行迹 持明龙脉「【生息】效果的触发次数增加 1 次」卡在同一个计数器上（2 → 3）。",
+    "星魂 6「白露在单场战斗中累计可以对受到致命攻击的我方目标提供治疗的效果**触发次数增加 1 次**」：天赋那一条现在写的是 `once_per_battle: true`（= 1 次 ✓ E0–E5），而**没有「每场 N 次」的拼法** ⇒ +1 无法表达（要 `per_battle: 2` 这样的计数额度）。",
+    "行迹 岐黄精义 (1211101)「白露对我方目标造成**过量治疗**时会提高目标 10% 生命上限，持续 2 回合」：缺「**过量治疗**」这个观测 —— `HEALED` 的 `amount` 是**实际回复量**（已 clamp 到上限），溢出部分没有随事件发出 ⇒ 判不出「这次治疗有没有溢出」。",
+    "**引擎登记（读者：本文件星魂 4）**：`HEALED` 不携带**施放类别**，所以「**战技**提供的治疗」无法在 `HEALED` 上表达 —— 写 `from_category BPSKILL` 时装载期直接拒绝：`Condition 'from_category BPSKILL' asks the cast's category, but HEALED carries none, so the condition could never hold; it works on ALLY_ATTACK / ATTACK_FINISHED / BREAK / CAST_SETUP / CRIT_DEALT / DAMAGE_SETTLED / DEALING_DAMAGE / KILL`。⇒ 现在把星魂 4 挂在 `SKILL_CAST` 上（等价：战技一次只治一个目标）；等「两次随机治疗」落地时，必须给 `HEALED` 补上施放类别。缺口见证：`BailuClauseCoverageTest.eidolon4StacksOncePerSkillCast`。"
   ],
   "rules": [
     {
@@ -70,25 +72,51 @@
       "_note": "The two branches of ONE sentence, which is what `target_when` was built for: 「对于**没有**【生息】的…附上【生息】，对于**已拥有**【生息】的…延长 1 回合」 — the selector says which units (`all_allies`) and each effect's filter says which of them qualify, so the two halves cannot collide. ⚠ 行迹 鳞渊福泽 rides along with the same state (`buff: 生息`, `turns: 2`): 「拥有【生息】的角色受到的伤害降低 10%」 lasts exactly as long as 生息 does, and naming the modifier after the state is what makes 「附上/延长」 move both together — ⚠ so it is applied only in the *fresh* branch, which is the same lifetime the extension maintains. ⚠ 「该效果**不可叠加**」 is why this is `APPLY_BUFF` in one branch and `EXTEND_BUFF` in the other rather than a second application: a second application would refresh, and refreshing a 2-turn state is exactly what 「延长」 is not. ⚠ The immediate heal 「立即为我方全体回复等同于白露13.50%生命上限+360的生命值」 is **not** written: her ultimate is a `Restore` skill, so the engine's own skill path heals from the row (the lesson 1105's file records). ⚠ **实测抓到的顺序坑**：这条减伤必须排在 `APPLY_BUFF 生息` **之前** —— 同一规则的效果**按顺序执行**，而它的过滤条件是 「没有【生息】的目标」；排在后面时，轮到它时状态**刚被自己加上**，条件永远为假、减伤永远不生效（用例 `BailuRegenTest.theTraceReducesDamageTakenForTheBearers` 抓住的）。这也正是\"逐目标条件\"与\"逐条规则条件\"在**同一事件内求值时机**上的差别：前者在效果执行时才逐候选求值。"
     },
     {
-      "on": "STATE_ENDED",
-      "id": "trace_invigoration_ending_energy",
+      "on": "BATTLE_START",
+      "id": "technique_invigoration_for_the_whole_party",
       "when": [
-        "self state_ended 生息",
-        "hp_percent >= 1"
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.1,
+          "turns": 2,
+          "buff": "生息",
+          "target": "all_allies"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "生息",
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1211 白露 秘技 徜徉灵泽病恙短: 「使用秘技后，下一次战斗开始时为我方全体附上【生息】，持续2回合。」 param = [2] ＋ 行迹 鳞渊福泽 (1211103): 「拥有【生息】的角色受到的伤害降低10%。」",
+      "_note": "「使用**秘技**后，**下一次战斗开始时**为我方全体附上【生息】，持续 **2** 回合」—— ① 事件 **`BATTLE_START`** ＋ 条件 **`self has_state 秘技`**（与原文件里 8007 的秘技同一形状 ✓）；② `APPLY_BUFF 生息 turns 2` 对 `all_allies` ✓（含她自己 ✓，原句是「我方全体」）；③ 行迹 鳞渊福泽（−10%）跟着**同一回合数**一起给 —— 秘技是【生息】的另一条来源，只给状态不给减伤会让「拥有【生息】的角色受到的伤害降低 10%」在秘技开局时**少一条效果**。⚠ 与终结技那一条的**形状相同、触发点不同**（`SameEffectTwiceGuardTest` 的基线记的就是这一族：「一个效果、两个触发点」）。⚠ 回合数写成字面 `2` 是**等价**的：秘技表只有 1 级、`param = [2]`，整列都是 2。"
+    },
+    {
+      "on": "STATE_ENDED",
+      "id": "eidolon1_energy_when_invigoration_ends_at_full_hp",
+      "min_eidolon": 1,
+      "when": [
+        "target state_ended 生息",
+        "target_hp_percent >= 1"
       ],
       "do": [
         {
           "op": "GAIN_ENERGY",
           "amount": 8,
-          "target": "self"
+          "target": "target"
         }
       ],
-      "source": "1211 白露（行迹）: 「【生息】结束时**若我方目标当前生命值等于其生命上限**，则额外恢复目标 **8** 点能量」",
-      "_note": "⭐ 2026-10-02：条件 = **`self state_ended 生息`** ✓ 十 **`hp_percent >= 1`** ✓（文档原句里的“若…生命值等于其生命上限” ✓）；量 = **`GAIN_ENERGY 8`** ✓。⚠ 两向均已测：血满 ⇒ +8 ✓；血不满 ⇒ 不加 ✓。"
+      "source": "1211 白露 星魂 1 百脉甘津宁神久: 「【生息】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标8点能量。」 param = [8]",
+      "_note": "⭐ 2026-11-02 修（原 id `trace_invigoration_ending_energy`，原条件 `self state_ended 生息` + `hp_percent >= 1` + `target: self`）—— ⚠ 原句的主语是「**我方目标**」：**谁的**【生息】结束、**谁的**血线满。旧写法两个主语都落在**白露自己**身上（`hp_percent` 读规则主人、`GAIN_ENERGY target self` 给规则主人）⇒ 实测三组（`BailuClauseCoverageTest`）：盟友【生息】结束、双方满血 ⇒ 旧规则给**白露** +8、盟友 +0 ✗；盟友半血而白露满血 ⇒ 旧规则仍给白露 +8 ✗；盟友满血而白露半血 ⇒ 谁都不加 ✗。 `STATE_ENDED` 的 `actor`/`target` **都是载体**（`TriggerPayload.StateEnded`）⇒ 改成 `target state_ended` + **`target_hp_percent`** + `target: target` 之后，三条读数才与原句一致。⚠ 这条是**星魂 1**，所以补 `min_eidolon: 1`（旧文件把星魂从句写成无门槛，按 AGENT §0.2 第 20/21 条的旧约定；本文件既已逐条核对，就按新约定写门槛）。"
     },
     {
       "on": "LETHAL_DAMAGE",
       "id": "talent_heals_a_lethal_hit_on_a_teammate",
+      "once_per_battle": true,
       "when": [
         "actor is_ally",
         "actor != self"
@@ -102,8 +130,28 @@
           "amount_from_skill_param": "TALENT:3"
         }
       ],
-      "source": "1211 白露 天赋：「当**白露的队友**受到致命攻击时，不会陷入**无法战斗状态**，**白露会立即为其提供治疗**，回复等同于**白露** 18.00% 生命上限 + 480 的生命值。」",
-      "_note": "⭐ 2026-10-02：⭐ **本条是 `LETHAL_DAMAGE` 的**第三位读者**** ✓，而且是**新形态** ✓：前两位（1104⾋1408）都是**自己救自己** ✓，而这里**治疗者与被害者是两个单位** ✓。❗ `scale: \"owner_max_hp\"` 正是原文的“等同于**白露**…” ✓（owner 是白露 ✓，`target` 是那个即将倒下的单位 ✓）。⚠ **“队友”排除她自己** ✓：已出货的 `1101.json` 就写着 `\"target != self\"` ✓ ⇒ `!=` 在 DSL 里 ✓。 ⚠ **按等级读**（AGENT §0.1.3）。"
+      "source": "1211 白露 天赋：「当**白露的队友**受到致命攻击时，不会陷入**无法战斗状态**，**白露会立即为其提供治疗**，回复等同于**白露** 18.00% 生命上限 + 480 的生命值。该效果单场战斗中可以触发1次。」",
+      "_note": "⭐ 2026-10-02：⭐ **本条是 `LETHAL_DAMAGE` 的**第三位读者**** ✓，而且是**新形态** ✓：前两位（1104⾋1408）都是**自己救自己** ✓，而这里**治疗者与被害者是两个单位** ✓。❗ `scale: \"owner_max_hp\"` 正是原文的“等同于**白露**…” ✓（owner 是白露 ✓，`target` 是那个即将倒下的单位 ✓）。⚠ **“队友”排除她自己** ✓：已出货的 `1101.json` 就写着 `\"target != self\"` ✓ ⇒ `!=` 在 DSL 里 ✓。 ⚠ **按等级读**（AGENT §0.1.3）。 ⭐ 2026-11-02：补 **`once_per_battle: true`** —— 原句末尾的「该效果**单场战斗中**可以触发 **1** 次」此前**没有落地**，于是每一次致命一击都会再治一次（实测：连打两次致命，第二次仍回血）。⚠ 星魂 6「触发次数增加 1 次」**不是**同一条规则能表达的数 —— `once_per_battle` 是布尔、没有「N 次」的写法 ⇒ 那半句仍登记在 `_gaps`（缺口见证：`BailuClauseCoverageTest.theLethalHealHappensOncePerBattle`）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon4_healed_ally_deals_more",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "max_stacks": 3,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1211 白露 星魂 4 肘后备急除外障: 「战技提供的每1次治疗会额外使受治疗者造成的伤害提高10%，最多叠加3层，持续2回合。」 param = [0.1, 3, 2]",
+      "_note": "「**战技**提供的**每 1 次治疗**…使**受治疗者**造成的伤害提高 **10%**，最多叠加 **3** 层，持续 **2** 回合」—— ① `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` ＋ **`max_stacks: 3`**（唯一支持层数的修饰 op，AGENT §0.2 第 43 条）＋ `turns: 2` ＋ **`target: target`**（被治疗者，也就是这次战技选中的那位队友）；② ⚠ **为什么挂在 `SKILL_CAST` 而不是 `HEALED`**：原句要的是「**战技**提供的」治疗，而 `HEALED` **不携带施放类别** —— 装载期当场拒绝（`Condition 'from_category BPSKILL' asks the cast's category, but HEALED carries none ...`）。⇒ 挂 `SKILL_CAST` ＋ `actor == self`：她的战技**只治一个人**（主目标；那两次随机治疗尚未实现，见 `_gaps`）⇒ 「每次战技 = 对这位受治疗者 1 次治疗 = 1 层」，与当前实现**等价**；⚠ 等随机治疗落地时，这条要改回 `HEALED`（那时 `HEALED` 需要带上施放类别 —— 见 `_gaps` 里的引擎登记）。"
     },
     {
       "on": "BATTLE_START",
