@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class JiaoqiuClauseCoverageTest {
         SECTION_TO_RULE.put("秘技：旺火却乱", "technique_opening_aoe_and_stack");
         SECTION_TO_RULE.put("行迹：爟火", "trace_kindling_energy_at_battle_start");
         SECTION_TO_RULE.put("行迹：举炊", "(registered: no threshold-step scaling — 每超过 15% 记一次整)");
-        SECTION_TO_RULE.put("行迹：炙香", "(registered: no highest-stacks selector)");
+        SECTION_TO_RULE.put("行迹：炙香", "trace_fragrant_guide_copies_the_highest_layers");
         SECTION_TO_RULE.put("行迹：效果命中 / 火伤 / 速度（数值行迹）",
                 "(no rule needed: stat traces are folded into the panel by the loader)");
         SECTION_TO_RULE.put("星魂 1：五味五走，生熟有定", "eidolon1_more_damage_to_roasted");
@@ -56,6 +57,7 @@ public class JiaoqiuClauseCoverageTest {
         SECTION_TO_RULE.put("星魂 4：藏腑和平，血气资荣", "eidolon4_weaken_enemies_while_the_domain_is_up");
         SECTION_TO_RULE.put("星魂 5：九沸九变", "eidolon5_levels");
         SECTION_TO_RULE.put("星魂 6：九沸九变，火为之纪", "talent_ashen_roast_and_burn_at_eidolon_six");
+        SECTION_TO_RULE.put("星魂 6（击杀转移）", "eidolon6_the_roast_moves_to_the_least_roasted_enemy");
     }
 
     @Test
@@ -127,19 +129,73 @@ public class JiaoqiuClauseCoverageTest {
     }
 
     /**
-     * <b>Gap witness</b>: 星魂 6's kill transfer — 「其持有的【烬煨】会叠加给场上存活的【烬煨】层数最低的敌人」 — is still
-     * registered, because the engine has no "enemy with the fewest stacks of X" selector. This test pins the registration:
-     * when the selector lands and the clause is written, the gap text goes away and this assertion goes red.
+     * 星魂 6's kill transfer: 「其持有的【烬煨】会叠加给场上存活的【烬煨】层数最低的敌人」.
+     *
+     * <p>Measured with two enemies and Eidolon 1 also live (it adds one layer per application, so each attack marks twice):
+     * the one holding <b>6</b> dies and the one holding <b>2</b> goes to <b>8</b>. At E5 nothing moves.
      */
     @Test
-    public void theKillTransferIsStillRegistered() throws IOException {
+    public void eidolon6MovesTheLayersOfTheFallenToTheLeastRoasted() {
+        Fixture e6 = new Fixture(6, 2);
+        e6.stackOn(e6.enemies.get(0), 3);
+        e6.stackOn(e6.enemies.get(1), 1);
+
+        e6.kill(e6.enemies.get(0));
+
+        Assertions.assertEquals(8, e6.enemies.get(1).getBuffManager().stacksOf(ASHEN),
+                "the fallen enemy's 6 layers moved onto the enemy that had 2");
+
+        Fixture e5 = new Fixture(5, 2);
+        e5.stackOn(e5.enemies.get(0), 3);
+        e5.stackOn(e5.enemies.get(1), 1);
+        e5.kill(e5.enemies.get(0));
+        Assertions.assertEquals(2, e5.enemies.get(1).getBuffManager().stacksOf(ASHEN),
+                "control: it is Eidolon 6");
+    }
+
+    /**
+     * 行迹 炙香: 「敌方目标进入战斗时，会被施加【烬煨】，层数与结界展开期间【烬煨】层数最高者相同，最低为 1 层」.
+     *
+     * <p>Measured: with the domain up and the two enemies at 4 and 1 layers, a newcomer arrives with <b>4</b>. (The 4, not 3, is
+     * because the Ultimate that opens the domain is itself an attack and marks its target once.) With no domain it stays at 0,
+     * and with nobody holding any layers it gets the stated minimum of <b>1</b>.
+     */
+    @Test
+    public void theFragrantTraceCopiesTheHighestLayerCount() {
+        Fixture with = new Fixture(0, 2);
+        with.openDomain();
+        with.stackOn(with.enemies.get(0), 3);
+        with.stackOn(with.enemies.get(1), 1);
+        Enemy newcomer = with.addEnemy();
+        Assertions.assertEquals(4, newcomer.getBuffManager().stacksOf(ASHEN),
+                "「层数与…层数最高者相同」 — the highest is 4");
+
+        Fixture withoutDomain = new Fixture(0, 2);
+        withoutDomain.stackOn(withoutDomain.enemies.get(0), 3);
+        Enemy other = withoutDomain.addEnemy();
+        Assertions.assertEquals(0, other.getBuffManager().stacksOf(ASHEN),
+                "control: 「结界存在时」 — no domain, no layers");
+
+        Fixture empty = new Fixture(0, 1);
+        empty.openDomain();
+        Enemy first = empty.addEnemy();
+        Assertions.assertEquals(1, first.getBuffManager().stacksOf(ASHEN),
+                "「最低为 1 层」 — the floor applies");
+    }
+    /**
+     * <b>Gap witness</b>: 行迹 举炊 (「效果命中大于 80% 时，每超过 15%…」) is still registered — it needs a threshold-stepped
+     * scaling and the engine only has continuous arithmetic. This test pins the registration: when the scaling lands, the gap
+     * text goes away and this assertion goes red.
+     */
+    @Test
+    public void theThresholdTraceIsStillRegistered() throws IOException {
         boolean registered = false;
         for (var element : gaps()) {
-            if (element.getAsString().contains("层数最低")) {
+            if (element.getAsString().contains("举炊")) {
                 registered = true;
             }
         }
-        Assertions.assertTrue(registered, "the kill-transfer half is registered, not silently dropped");
+        Assertions.assertTrue(registered, "「每超过 15% 记一次整」 is registered, not silently dropped");
     }
 
     // ==================================================================
@@ -171,12 +227,21 @@ public class JiaoqiuClauseCoverageTest {
 
     private static final class Fixture {
         private final Character jiaoqiu;
-        private final Enemy enemy = BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL);
+        private final List<Enemy> enemies = new ArrayList<>();
         private final Battle battle;
+        private final Enemy enemy;
 
         private Fixture(int eidolon) {
+            this(eidolon, 1);
+        }
+
+        private Fixture(int eidolon, int enemyCount) {
             jiaoqiu = CharacterFactory.create(JIAOQIU, 80, false, null, null, eidolon);
-            battle = new Battle(List.of(jiaoqiu), List.of(enemy), BattleFixture.seeded());
+            for (int i = 0; i < enemyCount; i++) {
+                enemies.add(BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL));
+            }
+            enemy = enemies.getFirst();
+            battle = new Battle(List.of(jiaoqiu), List.copyOf(enemies), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
         }
@@ -190,5 +255,31 @@ public class JiaoqiuClauseCoverageTest {
             battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, jiaoqiu, enemy, 0, 0));
             battle.processRequests();
         }
+
+        /** Gives {@code target} {@code count} layers of [烬煨] directly, so a fixture can set up the counter it needs. */
+        private void stackOn(Enemy target, int count) {
+            for (int i = 0; i < count; i++) {
+                battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, jiaoqiu, target, 0, 0));
+                battle.processRequests();
+            }
+        }
+
+        private void kill(Enemy victim) {
+            battle.applyTrueDamage(jiaoqiu, victim, com.laosun.aluminium.enums.DamageElement.FIRE,
+                    victim.getMaxHp() * 2.0);
+            battle.processRequests();
+        }
+
+        private Enemy addEnemy() {
+            Enemy newcomer = BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL);
+            battle.addEnemy(newcomer);
+            battle.processRequests();
+            return newcomer;
+        }
     }
 }
+
+
+
+
+

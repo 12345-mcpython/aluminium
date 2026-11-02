@@ -336,6 +336,11 @@
           "op": "MODIFY_RULE",
           "rule": "talent_ashen_roast_and_burn",
           "effect_amount": 1
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_ashen_roast_and_burn_at_eidolon_six",
+          "effect_amount": 1
         }
       ],
       "source": "1218 椒丘 星魂 1: 「每当触发天赋效果使敌方目标陷入【烬煨】状态时，使本次叠加的【烬煨】层数额外提高1层。」 param = [0.4, 1]",
@@ -392,11 +397,56 @@
       ],
       "source": "1218 椒丘 行迹 爟火 (1218101): 「战斗开始时，立即恢复15点能量。」 param = [15]",
       "_note": "「**战斗开始时**，立即恢复 **15** 点能量」—— `BATTLE_START` ＋ `GAIN_ENERGY 15`（无 `target` ⇒ 自己 ✓）。⚠ 数值 15 是**行迹参数**（`skill_traces.json` 的行迹 `param`），行迹不随等级变化 ⇒ 字面值等价 ✓（`HardcodedSkillRowRatchetTest` 对「trace 里写过的数」有豁免）。"
+    },
+    {
+      "on": "KILL",
+      "id": "eidolon6_the_roast_moves_to_the_least_roasted_enemy",
+      "min_eidolon": 6,
+      "when": [
+        "!target is_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "烬煨",
+          "value": {
+            "type": "stacks",
+            "whose": "target",
+            "buff": "烬煨"
+          },
+          "max_stacks": 9,
+          "turns": 2,
+          "target": "lowest_stacks_enemy:烬煨"
+        }
+      ],
+      "source": "1218 椒丘 星魂 6 九沸九变，火为之纪 (AvatarRankDesc_121806): 「敌方目标被消灭时，其持有的【烬煨】会叠加给场上存活的【烬煨】层数最低的敌人。」",
+      "_note": "「**敌方目标被消灭时**，其持有的【烬煨】会**叠加给场上存活的【烬煨】层数最低的敌人**」—— ① 事件 `KILL`（`target` = 被消灭的那个敌人）；② **数量**：`value: { type: stacks, whose: target, buff: 烬煨 }` 读的是**死者**身上的层数 ✓；③ **目标**：新选择器 **`lowest_stacks_enemy:烬煨`**（2026-11-02 新增：按**层数**选敌方单位，平手按名册顺序；`lowest_hp_ally` 是**我方**且按血量 ✗）；④ `max_stacks: 9` 与星魂 6 抬高后的上限一致 ✓。⚠ `!target is_ally` 排除我方阵亡。⚠ 这条只在星魂 6 生效 ⇒ 上限 9 与那一档一致（E0–E5 没有这条，不存在「超过 5 层」的路径 ✓）。"
+    },
+    {
+      "on": "ENEMY_ENTERED",
+      "id": "trace_fragrant_guide_copies_the_highest_layers",
+      "when": [
+        "self has_state 结界"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "烬煨",
+          "value": {
+            "type": "stacks",
+            "whose": "highest_enemy",
+            "buff": "烬煨"
+          },
+          "max_stacks": 9,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1218 椒丘 行迹 炙香 (1218103): 「结界存在时，敌方目标进入战斗时，会被施加【烬煨】，层数与结界展开期间【烬煨】层数最高者相同，最低为 1 层。」",
+      "_note": "「**结界存在时**，敌方目标**进入战斗时**，会被施加【烬煨】，**层数与…层数最高者相同，最低为 1 层**」—— ① 事件 `ENEMY_ENTERED`（`target` = 新入场的那个敌人 ✓）；② 数量用新拼法 **`whose: highest_enemy`**（`stacks` 提供器的新选项：敌方中该状态层数的**最大值**；「最低为 1 层」由 `ADD_STACK` 自己的 `Math.max(1, …)` 保证 ✓）；③ `max_stacks: 9` 与星魂 6 的上限一致（E0–E5 时来源本身不可能超过 5 ⇒ 数值仍被来源限制住）。"
     }
   ],
   "_gaps": [
-    "⛔ 星魂 6 的**击杀转移**半句：「敌方目标被消灭时，其持有的【烬煨】会**叠加给场上存活的【烬煨】层数最低的敌人**」—— 缺一个「**敌方中该状态层数最低的那一个**」的选择器（现有 `lowest_hp_ally` 只对**我方**、按血量）。转移的**数量**已经能读：`amount_from: { type: stacks, whose: target, buff: 「烬煨」 }` ✓ ⇒ 只差选择器。缺口见证：`JiaoqiuClauseCoverageTest` 的 `theKillTransferIsStillRegistered`。",
-    "⛔ 行迹 炙香 (1218103)：「结界存在时，敌方目标**进入战斗**时，会被施加【烬煨】，层数与结界展开期间【烬煨】层数**最高者**相同，最低为 1 层」—— 事件有（`ENEMY_ENTERED`），缺的是「**敌方中该状态层数最高者**」选择器（与星魂 6 缺的是同一族的「按层数选人」）。",
-    "⛔ 行迹 举炊 (1218102)：「效果命中大于 **80%** 时，**每超过 15%** 额外提高 **60%** 攻击力，最高不超过 **240%**」—— 缺「**按阈值步进**」的缩放：`sub`/`mul`/`min` 提供器能算连续值，但「每超过 15% 记一次整」需要取整/分档，连续近似会在 80%~95% 区间多给（80% 时应当 0，连续式给 0，81% 时连续式给 4% 而正确值是 0）。"
+    "⛔ 行迹 举炊 (1218102)：「效果命中大于 **80%** 时，**每超过 15%** 额外提高 **60%** 攻击力，最高不超过 **240%**」—— 缺「**按阈值步进**」的缩放：`sub`/`mul`/`min` 提供器能算连续值，但「每超过 15% 记一次整」需要取整/分档；连续近似会在 80%~95% 区间多给（81% 时连续式给 4%，正确值是 0）。⚠ 已有的一半：`attr` 提供器的 **`above`** 能取「超出 0.8 的部分」✓（`{ type: attr, attribute: EFFECT_HIT_RATE, above: 0.8 }`），缺的只是**取整/分档**那个词（`steps` 只认**计数器**名，不认表达式）。**已登记，未写**。"
   ]
 }
