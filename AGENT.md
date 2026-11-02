@@ -957,6 +957,21 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 【已把守：`StacksRankingTest`（1/2/3 层里选最低的、平手取名册前者、`highest_enemy` 给出 3）+ `JiaoqiuClauseCoverageTest`（击杀转移 6+2→8；炙香 新入场者拿到最高层）】
 
+#### 3.7zq（引擎）`floor`：把「每超过 X%」变成**整台阶**
+
+2026-11-02 定形。读者是 1218 椒丘的行迹 举炊（「效果命中大于 80% 时，**每超过 15%** 额外提高 60% 攻击力，最高 240%」）。
+
+在这之前 `steps` 是唯一的取整拼法，但它读的是**计数器名字**（`self_stacks:…`），而这句话的输入是**属性**（效果命中）。
+所以加了 `{"type": "floor", "input": <提供器>}`：对任意表达式向下取整。
+
+| 不变量 | 为什么 |
+|---|---|
+| 台阶 = `floor((值 − 起点) / 步长)` ✓ | 1218 的读数是 0.94 ⇒ 601.524（0 台阶）、0.95 ⇒ 962.4384（1 台阶）、1.40 ⇒ 2045.1816（4 台阶，封顶）—— **连续式**会在 81% 就给 4% ✗ |
+| 「超出部分」用 `attr` 的 **`above:`** ✓ | 它已经只算超出量，不必拿 `max(0, 差)` 拼 |
+| 阈值上要塞一个**极小量**（本仓库用 `+1e-9`） ✓ | 0.95−0.8 在浮点里是 0.1499999…，直接除以 0.15 会得到 0.9999 ⇒ 少一台阶（实测踩到） |
+
+【已把守：`NumberProviderTest.floorCountsWholeStepsOnly`（floor(0.34/0.15) = 2 台阶）+ `JiaoqiuClauseCoverageTest.theStokingTraceStepsEveryFifteenPercent`（0.94/0.95/1.10/1.40/1.60 五档）】
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
@@ -2040,6 +2055,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
 | `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
 | `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
+
 
 
 

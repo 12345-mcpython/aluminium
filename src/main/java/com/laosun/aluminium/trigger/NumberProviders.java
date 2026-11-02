@@ -42,7 +42,7 @@ public final class NumberProviders {
             "units",
             "original_damage", "settled_damage_this_event", "elation_base", "cast_applied",
             "party_resource", "energy", "skill_point", "steps",
-            "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg",
+            "add", "sub", "mul", "div", "min", "max", "negate", "abs", "avg", "floor",
             "uniform", "weighted_list");
 
     private NumberProviders() {
@@ -91,6 +91,10 @@ public final class NumberProviders {
             }
             case "negate" -> -resolve(requireOperand(provider.getInput(), "negate", "input"), effect, ctx);
             case "abs" -> Math.abs(resolve(requireOperand(provider.getInput(), "abs", "input"), effect, ctx));
+            // 「每超过 15%…」 (1218 Jiaoqiu's trace 举炊): the count of WHOLE steps in an excess, not the continuous excess.
+            // Note: `steps` already does floor(value / step), but it reads a COUNTER by name; this one takes an expression,
+            // which is what "how far the effect-hit rate is above 80%" needs (an attribute, not a counter).
+            case "floor" -> Math.floor(resolve(requireOperand(provider.getInput(), "floor", "input"), effect, ctx));
             case "attr" -> attributeOf(provider, ctx);
             case "stacks" -> stacksOf(provider, ctx);
             // "目标每有 1 个负面效果" (1006 Eidolon 1): a COUNT of debuffs, so a rule can pay one point per debuff.
@@ -191,7 +195,7 @@ public final class NumberProviders {
                 validate(requireOperand(provider.getLeft(), provider.getType(), "left"), field, op, spec);
                 validate(requireOperand(provider.getRight(), provider.getType(), "right"), field, op, spec);
             }
-            case "negate", "abs" -> validate(requireOperand(provider.getInput(), provider.getType(), "input"),
+            case "negate", "abs", "floor" -> validate(requireOperand(provider.getInput(), provider.getType(), "input"),
                     field, op, spec);
             case "attr" -> {
                 if (provider.getAttribute() == null || provider.getAttribute().isBlank()) {
@@ -646,3 +650,6 @@ public final class NumberProviders {
         return copy;
     }
 }
+
+
+

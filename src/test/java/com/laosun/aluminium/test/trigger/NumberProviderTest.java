@@ -83,6 +83,21 @@ public class NumberProviderTest {
     }
 
     /**
+     * {@code floor} turns a continuous ratio into WHOLE steps — 「每超过 15%」 counts complete steps, not the excess.
+     *
+     * <p>Reader: 1218 Jiaoqiu's trace 举炊, where the effect-hit rate's excess over 80% pays 60% attack <b>per whole 15%</b>.
+     * Without the floor the same construction pays the fraction of a step (measured on the trace: 4% at 81% EHR instead of 0).
+     */
+    @Test
+    public void floorCountsWholeStepsOnly() {
+        double base = freshAttack();
+        NumberProvider steps = mul(floor(div(constant(0.34), constant(0.15))), constant(0.6));
+        double raised = attackAfter(rule(modifyAttack(steps)));
+
+        Assertions.assertEquals(base * (1 + 2 * 0.6), raised, 1e-9,
+                "floor(0.34 / 0.15) = 2 whole steps — the 0.04 above the second step pays nothing");
+    }
+    /**
      * An unknown type is refused when the table loads, not when the rule first fires.
      */
     @Test
@@ -176,4 +191,26 @@ public class NumberProviderTest {
         provider.setInputs(List.of(left, right));
         return provider;
     }
+    private static NumberProvider floor(NumberProvider input) {
+        NumberProvider provider = new NumberProvider();
+        provider.setType("floor");
+        provider.setInput(input);
+        return provider;
+    }
+
+    private static NumberProvider mul(NumberProvider left, NumberProvider right) {
+        NumberProvider provider = new NumberProvider();
+        provider.setType("mul");
+        provider.setInputs(List.of(left, right));
+        return provider;
+    }
+
+    private static NumberProvider div(NumberProvider left, NumberProvider right) {
+        NumberProvider provider = new NumberProvider();
+        provider.setType("div");
+        provider.setLeft(left);
+        provider.setRight(right);
+        return provider;
+    }
 }
+

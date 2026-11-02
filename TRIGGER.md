@@ -506,7 +506,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `resource` | `resource`（+ `basis_points`） | 规则主人的资源 |
 | `add` / `mul` / `min` / `max` / `avg` | `inputs` | 逐项求值后归约（`add` 空表=0、`mul` 空表=1；`min`/`max`/`avg` 空表拒绝） |
 | `sub` / `div` | `left` + `right` | 二元运算 |
-| `negate` / `abs` | `input` | 相反数 / 绝对值 |
+| `negate` / `abs` / `floor` | `input` | 相反数 / 绝对值 / **向下取整**（「每超过 15%」这种**整台阶**计数用它，读者 1218 行迹 举炊） |
 | `attr` | `attribute`（+ `whose` / `above`） | 单位属性；`whose: target` 读事件目标，`above` 只算超出部分 |
 | `stacks` | `buff`（+ `whose`：`owner` / `target` / **`highest_enemy`**） | 层数（`highest_enemy` = 敌方中该状态层数的**最大值**） |
 | `original_damage` | — | 触发这一发本身的伤害 |
@@ -673,4 +673,5 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 
 **`countdown`** 选择器（2026-10-31）：规则主人放下的倒计时单位 —— `START_COUNTDOWN` 造、`COUNTDOWN_TURN` 看到期，而 `DELAY`/`ADVANCE` 现在能作用于它（读者：1507 星魂 1「使【无量忿怒】倒计时行动延后 15%」）。
+
 
