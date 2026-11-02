@@ -701,6 +701,13 @@ final class TriggerEffects {
                                 effect, ctx),
                         ctx);
                 target.getBuffManager().addBuff(stack);
+                // 「每获得 1 层【X】」 (1111 Luka's trace 循环制动): one firing PER LAYER, so a rule that pays "3 energy each"
+                // needs no arithmetic. The name rides on the payload and the condition reads it as `<who> stack_added <name>`.
+                // ⚠ A rule that adds a counter itself must not listen to its own event without a guard — the same warning
+                // the DEALING_DAMAGE family carries.
+                if (battle != null) {
+                    battle.fireStackGained(target, name);
+                }
             }
         }
     }

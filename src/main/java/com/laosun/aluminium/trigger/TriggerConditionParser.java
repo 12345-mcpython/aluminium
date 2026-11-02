@@ -109,6 +109,16 @@ final class TriggerConditionParser {
                     state, raw, spec);
         }
 
+        // 「每获得 1 层【斗志】」 (1111 Luka's trace 循环制动): "<who> stack_added <name>" — the name rides on the payload, exactly
+        // like `state_ended`, and the subject is the unit that gained the layer.
+        Matcher stackAdded = STACK_ADDED_KEYWORD.matcher(text);
+        if (stackAdded.find()) {
+            String subject = normalize(text.substring(0, stackAdded.start()));
+            String stack = text.substring(stackAdded.end()).trim();
+            return new StackAdded(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
+                    stack, raw, spec);
+        }
+
         Matcher hasState = HAS_STATE.matcher(text);
         if (hasState.find()) {
             String subject = normalize(text.substring(0, hasState.start()));
@@ -2187,6 +2197,50 @@ final class TriggerConditionParser {
         }
     }
 
+    /**
+     * 「每获得 1 层【X】」: the counter NAMED X has just gained a layer on the subject.
+     *
+     * <p>The name rides on the payload for the same reason {@code state_ended} carries its state: by the time the rules run
+     * the layer is already there, and "how many do I hold" cannot tell this firing apart from the next unrelated event.
+     */
+    static final class StackAdded implements Condition, PartyCondition {
+
+        private final String subject;
+        private final String stack;
+        private final String raw;
+
+        StackAdded(String subject, String stack, String raw, TriggerSpec spec) {
+            if (stack.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' names no counter after \"stack_added\" "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            this.subject = subject;
+            this.stack = stack;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.battle() != null && stack.equals(ctx.battle().getLastStackGainedName());
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     static final class HasState implements Condition, PartyCondition {
 
         private final String subject;
@@ -2452,6 +2506,13 @@ final class TriggerConditionParser {
      */
     private static final Pattern STATE_ENDED_KEYWORD =
             Pattern.compile("(?<![\\w])state_ended(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * 「每获得 1 层【X】」: the counter NAME is data and is read as written, so it is matched as a word plus a suffix,
+     * exactly like {@link #STATE_ENDED_KEYWORD}.
+     */
+    private static final Pattern STACK_ADDED_KEYWORD =
+            Pattern.compile("(?<![\\w])stack_added(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
      * The keyword of the named-state condition, and the parties it may ask about.
@@ -2866,6 +2927,8 @@ final class TriggerConditionParser {
             8001, 8002, 8003, 8004, 8005, 8006, 8007, 8008, 8009, 8010,
             1001, 1002, 1003, 1004, 1213, 1224, 1313, 1413, 1414, 1510);
 }
+
+
 
 
 

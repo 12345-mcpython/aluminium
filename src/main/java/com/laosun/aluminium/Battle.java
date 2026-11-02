@@ -2761,6 +2761,12 @@ public class Battle {
     public String getLastStateEndedName() {
         return triggerFacts.stateEndedName();
     }
+    /**
+     * The counter named by the {@link TriggerEvent#STACK_GAINED} currently being fired, or {@code null}.
+     */
+    public String getLastStackGainedName() {
+        return triggerFacts.stackGainedName();
+    }
 
     /**
      * Fires {@link TriggerEvent#STATE_ENDED} for a state that has just left {@code carrier}.
@@ -2770,6 +2776,19 @@ public class Battle {
      */
     public void fireStateEnded(CanHit carrier, String stateName) {
         fireStateEnded(carrier, stateName, 0);
+    }
+
+    /**
+     * Fires {@link TriggerEvent#STACK_GAINED} for one layer of {@code stackName} that has just landed on {@code carrier}.
+     *
+     * <p>Reader: 1111 Luka's trace 循环制动 — 「每获得 1 层【斗志】，额外恢复 3 点能量」 — a sentence about the <b>gain</b>, which no
+     * "how many do I hold" check can answer without paying again on every later event.
+     *
+     * @param carrier   the unit that gained the layer
+     * @param stackName the counter's name as the data spells it
+     */
+    public void fireStackGained(CanHit carrier, String stackName) {
+        fire(TriggerPayload.StackGained.of(TriggerEvent.STACK_GAINED, carrier, stackName, 1));
     }
 
     /**
@@ -2848,6 +2867,17 @@ public class Battle {
      * @return how many rules fired
      */
     private int fire(TriggerPayload.StateEnded payload) {
+        return triggerBus.fire(payload);
+    }
+
+    /**
+     * Fires a stack-gained payload, scoping the counter's name to this firing (the same save/restore the state-ended and
+     * resource-changed paths use, so a nested firing cannot overwrite the outer name).
+     *
+     * @param payload the firing data
+     * @return how many rules fired
+     */
+    private int fire(TriggerPayload.StackGained payload) {
         return triggerBus.fire(payload);
     }
 
@@ -3612,6 +3642,10 @@ public class Battle {
     }
 
 }
+
+
+
+
 
 
 

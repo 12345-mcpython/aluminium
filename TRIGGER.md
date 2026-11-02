@@ -229,7 +229,8 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `X has_weakness` | 是否有弱点击破 |
 | `X is_ally` / `X is_other_ally` | 是否我方 / 是否除我以外的我方 |
 | `X is_summon` | 是否是召唤物 |
-| `state_ended` | 状态结束 |
+| `state_ended` | 状态结束（`X state_ended <名字>`）|
+| `stack_added` | **某计数器刚增加一层**（`X stack_added <名字>`；每层发一次，读者 1111 行迹 循环制动）|
 
 **“这一次施放”的谓词**：
 
@@ -338,7 +339,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 
 ---
 
-## 4. 事件（共 42 个）
+## 4. 事件（共 43 个）
 
 | 分类 | 事件 |
 |---|---|
@@ -347,7 +348,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | 攻击与受击 | `ALLY_ATTACK` `ENEMY_ATTACK` `SUMMON_ATTACK` `TAKING_HIT` `DEALING_DAMAGE` `DAMAGE_SETTLED` `FOLLOW_UP` `CRIT_DEALT` |
 | 伤害与生命 | `HP_LOST` `HP_CONSUMED` `LETHAL_DAMAGE` `HEALED` `SHIELD_GRANTED` `DEATH` `KILL` |
 | 击破与控制 | `BREAK` `TOUGHNESS_REDUCED` `WEAKNESS_ADDED` `DEBUFF_APPLIED` `STATE_ENDED` |
-| 资源 | `ENERGY_GAINED` `SKILL_POINT_GAINED` `SKILL_POINT_SPENT` `SKILL_POINT_OVERFLOWED` `RESOURCE_CHANGED` |
+| 资源 | `ENERGY_GAINED` `SKILL_POINT_GAINED` `SKILL_POINT_SPENT` `SKILL_POINT_OVERFLOWED` `RESOURCE_CHANGED` `STACK_GAINED`（层名随事件走）|
 | 召唤 | `SUMMONED` `SUMMON_LEFT` |
 | 入场 | `ENEMY_ENTERED`（敌方单位**开战后**加入名册时；`actor` = 新来的；开战前摆好的名册不算）|
 
@@ -673,5 +674,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 
 **`countdown`** 选择器（2026-10-31）：规则主人放下的倒计时单位 —— `START_COUNTDOWN` 造、`COUNTDOWN_TURN` 看到期，而 `DELAY`/`ADVANCE` 现在能作用于它（读者：1507 星魂 1「使【无量忿怒】倒计时行动延后 15%」）。
+
+
 
 

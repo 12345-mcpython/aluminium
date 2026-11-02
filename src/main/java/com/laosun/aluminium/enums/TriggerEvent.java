@@ -37,6 +37,19 @@ public enum TriggerEvent {
     STATE_ENDED("STATE_ENDED", true),
 
     /**
+     * One layer of a named counter has just landed ({@code STACK_GAINED}).
+     *
+     * <p><b>Why it exists.</b> 「每获得 1 层【斗志】，额外恢复 3 点能量」 (1111 Luka's trace 循环制动) is about the <b>gaining</b>:
+     * read as {@code self_stacks:斗志 >= 1} it would pay again on every unrelated event while the layers sit there. The
+     * counter's name rides on the payload (`TriggerPayload.StackGained`), and the condition reads it as
+     * {@code self stack_added <name>} — the same shape {@code state_ended} uses.
+     *
+     * <p>Note: <b>One firing per layer</b>, so a rule that says "3 energy each" needs no arithmetic. A rule that adds a
+     * counter itself must guard against re-entering (the same warning `DEALING_DAMAGE` rules carry).
+     */
+    STACK_GAINED("STACK_GAINED", true),
+
+    /**
      * A unit has just been knocked down, and is delivered <b>to that unit's own table</b> even though it is dead.
      *
      * <p><b>Why this had to exist.</b> 「当罗刹陷入无法战斗状态时，结界也会被解除」 (1203's Talent) -- and the whole
@@ -554,4 +567,5 @@ public enum TriggerEvent {
         return raw == null ? null : BY_NAME.get(raw.trim().toUpperCase(java.util.Locale.ROOT));
     }
 }
+
 

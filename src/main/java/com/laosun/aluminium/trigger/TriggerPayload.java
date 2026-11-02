@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 public sealed interface TriggerPayload permits TriggerPayload.Cast, TriggerPayload.DamagePayload,
         TriggerPayload.Subject, TriggerPayload.AllySubject, TriggerPayload.StateEnded,
-        TriggerPayload.ResourceChanged, TriggerPayload.Simple {
+        TriggerPayload.StackGained, TriggerPayload.ResourceChanged, TriggerPayload.Simple {
 
     /**
      * The event this payload is for.
@@ -317,6 +317,65 @@ public sealed interface TriggerPayload permits TriggerPayload.Cast, TriggerPaylo
     }
 
     /**
+     * One layer of a named counter has just landed on a unit.
+     *
+     * <p>The counter's name rides on the payload because the condition ({@code self stack_added <name>}) reads it from the
+     * battle for the duration of the firing, exactly as {@link StateEnded} carries the state's name; the save/restore that
+     * keeps a nested firing from overwriting it lives in {@code TriggerBus.fire}.
+     *
+     * <p><b>Why a named event instead of a "has this counter" check.</b> A sentence of the form 「每获得 1 层【斗志】，
+     * 额外恢复 3 点能量」 (1111 Luka's trace 循环制动) is about the <b>gaining</b>, not about holding: read off
+     * {@code self_stacks:斗志 >= 1} it would pay again on every unrelated event while the layers sit there.
+     *
+     * @param event      {@code STACK_GAINED}
+     * @param carrier    the unit that gained the layer
+     * @param stackName  the counter's name as the data spells it
+     * @param magnitude  how many layers this firing is about (1 per application today)
+     */
+    record StackGained(TriggerEvent event, CanHit carrier, String stackName, int magnitude)
+            implements TriggerPayload {
+
+        /**
+         * @throws NullPointerException when {@code event} or {@code stackName} is {@code null}
+         */
+        public StackGained {
+            Objects.requireNonNull(event, "a stack-gained payload needs its event");
+            Objects.requireNonNull(stackName, "a stack-gained payload needs the stack's name");
+        }
+
+        @Override
+        public CanHit actor() {
+            return carrier;
+        }
+
+        @Override
+        public CanHit target() {
+            return carrier;
+        }
+
+        @Override
+        public int hitCount() {
+            return 0;
+        }
+
+        @Override
+        public double amount() {
+            return magnitude;
+        }
+
+        /**
+         * @param event     {@code STACK_GAINED}
+         * @param carrier   the unit that gained the layer
+         * @param stackName the counter's name
+         * @param magnitude how many layers this firing is about
+         * @return the payload
+         */
+        public static StackGained of(TriggerEvent event, CanHit carrier, String stackName, int magnitude) {
+            return new StackGained(event, carrier, stackName, magnitude);
+        }
+    }
+
+    /**
      * A resource counter moved.
      *
      * <p>The resource's name rides on the payload because the condition
@@ -413,3 +472,4 @@ public sealed interface TriggerPayload permits TriggerPayload.Cast, TriggerPaylo
         }
     }
 }
+

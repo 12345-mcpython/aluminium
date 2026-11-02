@@ -972,6 +972,23 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 【已把守：`NumberProviderTest.floorCountsWholeStepsOnly`（floor(0.34/0.15) = 2 台阶）+ `JiaoqiuClauseCoverageTest.theStokingTraceStepsEveryFifteenPercent`（0.94/0.95/1.10/1.40/1.60 五档）】
 
+#### 3.7zr（引擎）`STACK_GAINED`：「每获得 1 层【X】」终于问的是**获得**
+
+2026-11-02 定形。读者是 1111 卢卡的行迹 循环制动（「每获得 1 层【斗志】，额外恢复 3 点能量」）。
+
+在这之前唯一能问的是 `self_stacks:斗志 >= 1` —— 那是「**持有**几层」，会在**任何**别的事件上重复给 ✗。
+现在每一次 `ADD_STACK` 落地都发一条 **`STACK_GAINED`**（**每层一条**），层名像 `state_ended` 一样**随事件走**，
+条件写成 **`X stack_added <名字>`**。
+
+| 不变量 | 为什么 |
+|---|---|
+| 每层发一次 ✓ | 「每获得 1 层」就不需要乘层数：一次给 2 层 ⇒ 触发两次（实测终结技 +6 能量）|
+| 层名随 payload 走、由 `TriggerFacts` 在**一次触发内**保存/恢复 ✓ | 嵌套触发（一次 `ADD_STACK` 里又发别的事件）不会把外层的层名冲掉 —— 与 `state_ended` / `resource_changed` 同一套 |
+| 名字是**数据**、按原样读 ✓ | 与 `has_state` 的承诺一致（中文字段名不做大小写/规范化）|
+| ⚠ 自己在 `STACK_GAINED` 里加计数器的规则要自己防重入 ✓ | 同 `DEALING_DAMAGE` 那一族的警告（本仓库没有额外的深度上限）|
+
+【已把守：`StackGainedTest`（一层一次、同名才给、另一个计数器不给）+ `LukaClauseCoverageTest.theRecycleTracePaysThreeEnergyPerLayer`（终结技 2 层 ⇒ +6）】
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
@@ -2055,6 +2072,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
 | `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
 | `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
+
 
 
 

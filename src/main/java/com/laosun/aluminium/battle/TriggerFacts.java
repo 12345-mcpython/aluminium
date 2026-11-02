@@ -13,6 +13,7 @@ import com.laosun.aluminium.enums.DebuffClass;
 public final class TriggerFacts {
 
     private String stateEndedName;
+    private String stackGainedName;
     private String changedResource;
     private DebuffClass appliedDebuffClass;
 
@@ -28,6 +29,20 @@ public final class TriggerFacts {
      */
     public void stateEndedName(String name) {
         stateEndedName = name;
+    }
+
+    /**
+     * @return the name of the counter a layer just landed on, or {@code null}
+     */
+    public String stackGainedName() {
+        return stackGainedName;
+    }
+
+    /**
+     * @param name the name of the counter that just gained a layer
+     */
+    public void stackGainedName(String name) {
+        stackGainedName = name;
     }
 
     /**
@@ -58,3 +73,4 @@ public final class TriggerFacts {
         appliedDebuffClass = debuffClass;
     }
 }
+

@@ -194,6 +194,21 @@ public final class TriggerBus {
     }
 
     /**
+     * @param payload the stack-gained firing data
+     * @return how many rules fired
+     */
+    public int fire(TriggerPayload.StackGained payload) {
+        String previous = facts.stackGainedName();
+        facts.stackGainedName(payload.stackName());
+        try {
+            return fire(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
+                    null, null, 0, 0, List.of());
+        } finally {
+            facts.stackGainedName(previous);
+        }
+    }
+
+    /**
      * @param payload the resource-changed firing data
      * @return how many rules fired
      */
