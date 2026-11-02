@@ -49,7 +49,9 @@ public class EvernightFormatMigrationTest {
                 structured++;
             }
         }
-        Assertions.assertEquals(3, structured, "the Skill / Talent / Ultimate rows are structured");
+        // Four since 2026-11-02: the technique states its own row too - it borrows the Skill's CRIT share but its MEMORIA
+        // count is its own `[1, 1]` row, so its source carries a structured reference as well.
+        Assertions.assertEquals(4, structured, "the Skill / Talent / Ultimate rows are structured, and the technique's");
     }
 
     private static JsonArray rules() {

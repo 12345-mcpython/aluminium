@@ -754,6 +754,38 @@
       "source": "1413 星魂 5: 等级加成（数据 skill_add_level: 141303=ULTRA+2, 141304=TALENT+2, 1141301=COMMON+1）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_skill_effect_plus_one_memoria",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "scale": "self_attr:crit_attack",
+          "percent_from_skill_param": "SKILL:0",
+          "turns": 2,
+          "target": "all_summons"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "亿质",
+          "amount": 1
+        }
+      ],
+      "source": {
+        "text": "1413 长夜月 秘技 愿有冷雨落下 (141307, Maze/Support): 「使用秘技后，下一次战斗开始时，获得与战技相同的提高我方全体忆灵暴击伤害的效果，并获得1点【忆质】。」 param Lv1 = [1, 1] → #1 = 1（忆质点数的量）",
+        "skill": "TECHNIQUE",
+        "row": 1,
+        "params": {
+          "#1": 1
+        }
+      },
+      "_note": "「获得**与战技相同**的提高我方全体忆灵暴击伤害的效果」⇒ 直接复用战技那条的写法：`MODIFY_ATTR CRIT_ATTACK { scale: 「self_attr:crit_attack」, percent_from_skill_param: 「SKILL:0」, turns: 2, target: 「all_summons」 }` ✓ —— 句子明说「与战技相同」，所以份额**必须读战技行**，不能读秘技行（秘技行 `[1,1]` 里没有暴击伤害的份额 ✓）。「获得 **1 点**【忆质】」= `GAIN_RESOURCE { resource: 忆质, amount: 1 }` ✓。 ⚠ **资源名用 `亿质` 而不是文档的「忆质」**：这个文件声明的资源 id 是 `亿质`（依据是数据的 TextMap 哈希），引擎要求「规则引用的资源必须在 `resources` 里声明」，用文档写法会在 `CharacterFactory` 抛 `CharacterException`。",
+      "_status": "implemented"
     }
   ],
   "resources": [
@@ -774,6 +806,6 @@
     }
   ],
   "_gaps": [
-    "⛔ **秘技未写**（2026-11-01 覆盖复核发现）：文档有「秘技：愿有冷雨落下 / Let it Rain Cold On」一节，文件里**没有任何秘技规则** —— 此前的「完全实现」不成立。"
+    "⭐ **秘技已实现**（2026-11-02）：`technique_skill_effect_plus_one_memoria` —— 「下一次战斗开始时，获得**与战技相同**的提高我方全体忆灵暴击伤害的效果，并获得 **1 点**【忆质】」= 复用战技那条的 `MODIFY_ATTR CRIT_ATTACK`（**份额读 `SKILL:0`**，因为句子说「与战技相同」；秘技行 `[1,1]` 里没有暴击伤害份额）+ `GAIN_RESOURCE { resource: 「亿质」, amount: 1 }`。判据 `EvernightTechniqueTest`：用秘技 **1 点**、不用 **0 点** ✓。⚠ 资源名必须写 `亿质`（文件声明的是它；写文档里的「忆质」会在 `CharacterFactory` 抛 `CharacterException`）。⛔ 仍开：其余技能从句与星魂。"
   ]
 }
