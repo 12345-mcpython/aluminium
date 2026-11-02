@@ -3,10 +3,15 @@
   "character": 1305,
   "_status": "partial",
   "_gaps": [
-    "天赋：目标每有 1 个负面效果使追加攻击固定概率 +20%（基线 40% 已写）",
-    "终结技【智者的短见】「最多触发 2 次」被解释成「每回合 2 次」（量纲差异）",
-    "秘技：100% 基础概率、特殊领域 / 嘲讽未写",
-    "星魂 1（归纳上限 +4 / 立即 4 层 / 需解锁行迹）、星魂 2（按负面数 +20% 攻击、每次最多 4 次）未写；其余星魂未读"
+    "⭐ **行迹 归纳 / 演绎 已于 2026-11-03 落地**：归纳 = `SKILL_CAST` + `target_debuff_count >= 1` → `ADD_STACK { value: debuffs(target), max_stacks: 6 }` 加层，`per_stack: self_stacks:归纳`（**`per_stack_live`**）每层 +2.5% 暴击率 / +5% 暴击伤害；演绎 = `APPLY_BUFF { base_chance: 1 }` + `target_when` 把效果抵抗降 10%/2 回合。判据 `DrRatioClauseCoverageTest`（3 例：3 个负面 ⇒ 3 层且暴击率 +7.5%、0 个负面 ⇒ 0 层、效果抵抗下降）。⚠ 夹具坑：`StateBuff` 的 `isDebuff()` 是 **false**，`target_debuff_count` 读不到 ⇒ 判据必须用**真负面**（`DotBuff` 三个不同名字）。",
+    "⛔ 行迹 推理未写：「造成伤害时，若目标负面状态 ≥3 个，目标每有 1 个负面效果伤害提高 10%，最多 50%」—— 条件 `target_debuff_count >= 3` ✓ 有、`debuffs` 提供器 ✓ 有，差的是把 `min(debuffs,5) × 0.1` 写进 `BOOST_DAMAGE/ALL_DAMAGE_TYPE_BOOST` 的实例修饰（形状待定，先登记）。",
+    "⛔ 星魂 1（归纳上限 +4 / 立即 4 层 / 需解锁行迹）：上限可用 `MODIFY_RULE effect_max_stacks` ✓，但「立即 4 层」要排在**行迹加层规则之外**（否则会与施放战技那次的层数叠加），需确认先后。",
+    "⛔ 星魂 2（追加攻击按目标负面数 +20% 攻击、每次最多 4 次）：需要「次数 = min(负面数, 4)」的**提供器次数**（`times` 只收字面量）。",
+    "⛔ 星魂 6（【智者的短见】触发 +1 次、天赋追加攻击伤害 +50%）：前者要改 `RESET_TRIGGER_LIMIT` 那族的**上限**，后者是 `MODIFY_RULE effect_percent_scale`（对行份额是加）。",
+    "⭐ **星魂 4 已于 2026-11-03 落地**（触发天赋时额外 +15 能量）：与天赋同条件另起一条 `min_eidolon: 4` 的规则（不能并进天赋那条 —— 并进去 E0 也会回能），判据实测「比 E0 多 15」。",
+    "⚠ 天赋「目标每有 1 个负面效果使追加攻击固定概率 +20%（基线 40% 已写）」仍未写：概率随负面数变化需要同一族提供器。",
+    "⚠ 终结技【智者的短见】「最多触发 2 次」被解释成「每回合 2 次」（量纲差异）。",
+    "⚠ 秘技：100% 基础概率、特殊领域 / 嘲讽未写。"
   ],
   "rules": [
     {
@@ -167,6 +172,105 @@
       "source": "1305 星魂 5: 等级加成（数据 skill_add_level: 130502=SKILL+2, 130504=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    }
+    ,
+    {
+      "on": "SKILL_CAST",
+      "id": "trace_induction_stacks_per_debuff",
+      "when": [
+        "actor == self",
+        "target_debuff_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "归纳",
+          "value": {
+            "type": "debuffs",
+            "whose": "target"
+          },
+          "max_stacks": 6,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1305 真理医生 行迹 归纳 (1305101): 「施放战技时，目标每有1个负面效果，真理医生暴击率提高2.50%、暴击伤害提高5%，该效果最多叠加6层。」",
+      "_note": "「施放战技时，**目标每有 1 个负面效果**，…该效果**最多叠加 6 层**」—— ① 层数 = **目标身上的负面数**：`ADD_STACK { value: { type: debuffs, whose: target } }` ✓（`value`/提供器这一族 ✓）；② `max_stacks: 6` ✓ 封的是**层数**（句子封的正是这份效果 ✓）；③ ⚠ 条件 `target_debuff_count >= 1` **必需**：`addStack` 对 0 会取 `Math.max(1, …)` ⇒ 没有负面时也会白给 1 层 ✗。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_induction_crit_aura",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "per_stack": "self_stacks:归纳",
+          "per_stack_cap": 6,
+          "per_stack_live": true,
+          "percent": 0.025,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "per_stack": "self_stacks:归纳",
+          "per_stack_cap": 6,
+          "per_stack_live": true,
+          "percent": 0.05,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1305 真理医生 行迹 归纳 (1305101): 「…真理医生暴击率提高2.50%、暴击伤害提高5%，该效果最多叠加6层。」",
+      "_note": "行迹的另一半：**每层**【归纳】给**暴击率 +2.5%、暴击伤害 +5%**。用 `per_stack: self_stacks:归纳` ＋ **`per_stack_live: true`** ✓（层数会在战斗中变 ⇒ 必须实时读）＋ `per_stack_cap: 6` ✓（层数本身已封 6，这里是双保险 ✓）。⚠ 与上一条配对：上面加层、这条读层。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "trace_deduction_lowers_effect_resistance",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "演绎",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": -0.1,
+          "turns": 2,
+          "buff": "演绎",
+          "target": "target",
+          "target_when": [
+            "target has_state 演绎"
+          ]
+        }
+      ],
+      "source": "1305 真理医生 行迹 演绎 (1305102): 「施放战技攻击敌方目标后，有100%的基础概率使受到攻击的敌方目标效果抵抗降低10%，持续2回合。」",
+      "_note": "「有 **100% 的基础概率**使受到攻击的敌方目标**效果抵抗降低 10%**，持续 **2 回合**」—— ① `APPLY_BUFF { base_chance: 1 }` 走**命中/抵抗管线** ✓（「基础概率」在抵抗之前 ✓，与 1106 【通解】同一写法）；② 降的是 **`EFFECT_RESISTANCE`** ✓（不是 `RESISTANCE_REDUCTION` 那个抗性穿透 ✗）；③ `target_when: [target has_state 演绎]` ✓ —— 掷骰可能失败 ⇒ 只有**真的挂上**的目标才降 ✓（同一条规则内先挂状态、后加修饰 ✓）。"
+    }
+    ,
+    {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon4_extra_energy_when_the_talent_fires",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15
+        }
+      ],
+      "source": "1305 真理医生 星魂 4 盲目造痴愚: 「触发天赋时，真理医生额外恢复15点能量。」 参数 = [15]",
+      "_note": "「**触发天赋时**，真理医生额外恢复 **15** 点能量」—— 与天赋那条**同条件**（`ALLY_ATTACK` + `actor == self` + `from_skill SKILL`）另起一条规则 ✓（不能并进去：并进去后 E0 也会回能 ✗）。⚠ 同事件两条规则的**顺序无关**：两条都只加各自的东西 ✓。"
     }
   ]
 }
