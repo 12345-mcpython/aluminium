@@ -93,12 +93,24 @@ public class LukaClauseCoverageTest {
     }
 
     /**
-     * <b>Gap witness</b>: 行迹 循环制动 (「每获得 1 层【斗志】…」) is registered — the engine has no "a counter was just gained"
-     * event, and folding the energy into six rules would scatter one clause.
+     * 行迹 循环制动: 「每获得 1 层【斗志】，额外恢复 3 点能量」 — now written on {@code STACK_GAINED}.
+     *
+     * <p>Measured: the Ultimate grants 2 layers at once and pays <b>+6</b> energy (one firing per layer), which is exactly why
+     * the event fires per layer rather than carrying a count. Note the earlier version of this test pinned the REGISTRATION
+     * (the engine had no "a counter was just gained" event); it now pins the payment.
      */
     @Test
-    public void theCounterGainTraceIsStillRegistered() throws IOException {
-        Assertions.assertTrue(gapMentions("循环制动"), "循环制动 is registered, not silently dropped");
+    public void theRecycleTracePaysThreeEnergyPerLayer() {
+        Fixture f = new Fixture();
+        int layersBefore = f.luka.getBuffManager().stacksOf("斗志");
+        double energyBefore = f.luka.getCurrentEnergy();
+
+        f.castUlt();
+
+        Assertions.assertEquals(layersBefore + 2, f.luka.getBuffManager().stacksOf("斗志"),
+                "precondition: the Ultimate grants 2 layers");
+        Assertions.assertEquals(energyBefore + 6, f.luka.getCurrentEnergy(), 1e-9,
+                "「每获得 1 层…额外恢复 3 点能量」 — two layers, two firings");
     }
 
     /**
@@ -172,6 +184,11 @@ public class LukaClauseCoverageTest {
             return cast();
         }
 
+        private void castUlt() {
+            battle.castImmediate(luka.getSkills().get(SkillType.ULTRA), luka, List.of(enemy));
+            battle.processRequests();
+        }
+
         private List<DamageType> cast() {
             List<DamageType> kinds = new ArrayList<>();
             battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) ->
@@ -182,3 +199,5 @@ public class LukaClauseCoverageTest {
         }
     }
 }
+
+
