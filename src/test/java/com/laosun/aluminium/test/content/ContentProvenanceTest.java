@@ -39,7 +39,7 @@ public class ContentProvenanceTest {
     /** The recorded backlog (2026-10-30). Fix one, delete its line. */
     private static final List<Gap> RECORDED = List.of(
             new Gap("1006.json", "skill_inserts_party_first_weakness", "source"),
-            new Gap("1203.json", "talent_zone_heals_the_attacker", "source"),
+            // 1203 talent_zone_heals_the_attacker: source filled on 2026-11-02 (see its _note).
             new Gap("1306.json", "talent_raises_skill_point_cap", "note"),
             new Gap("1309.json", "ult_zone_defence_ignore", "source"),
             new Gap("1310.json", "talent_energy_floor_at_battle_start", "note"),
