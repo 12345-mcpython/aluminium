@@ -64,9 +64,11 @@ public class LynxTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(LYNX);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the state and the base regeneration");
+        // Three since 2026-11-02: Eidolon 4 rides the same cast (「获得【求生反应】时…攻击力提高」).
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST), "the state, the base regeneration, and Eidolon 4");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the cleanse and the regeneration half");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        // Four since 2026-11-02: the technique adds its own BATTLE_START clause.
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention and the technique");
     }
 
     // ==================================================================
