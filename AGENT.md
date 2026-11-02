@@ -924,6 +924,21 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 不会被覆盖扫描看到）】
 
 
+#### 3.7zo（引擎）`target_buff_count`：「解除增益效果时」问的是**目标身上还有几条能解**
+
+2026-11-02 定形。读者是 1106 佩拉的行迹 追歼 与星魂 2（「施放战技**解除增益效果时**…」）。
+在这之前只有 `target_debuff_count`（那是**另一半**），而 `has_state` 顶不上：技能可能解除的是**没有状态名**的修饰，
+而且同一事件里后写的规则读到时状态**已经被前一条规则删掉**了。
+
+| 不变量 | 为什么 |
+|---|---|
+| 数的是 **`REMOVE_BUFF` 真的会删掉的那些** ✓ | 谓词只有一处：`BuffManager.isDispellable`（`!isDebuff() && !isPermanent()`），`removeBuffs` 与 `dispellableBuffCount` 共用 —— 两边不可能各数一套 ✓ |
+| **永久加成不算** ✓ | 光锥/行迹给的加值不是「增益效果」：没人用一个技能去解除配装 ✓ |
+| **负面状态不算** ✓ | 那是 `target_debuff_count` 的问题；混进来会让「解除增益时」在目标只有 DOT 时也成立 ✗ |
+| 读的是**解除之前**的值 ✓ | 规则条件按**规则逐条**求值（`TriggerInterpreter.fire` 的注释），所以「解除」那条规则必须排在同事件的最后 ✓ —— 佩拉文件里就是这么排的，`PelaClauseCoverageTest` 双向钉住 |
+
+【已把守：`TargetBuffCountTest`（临时增益算 1 / 空目标 0 / 永久增益 0 / DOT 0）+ `PelaClauseCoverageTest`（有增益 ⇒ 涨、没有 ⇒ 不涨、E1 ⇒ 不涨）】
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |

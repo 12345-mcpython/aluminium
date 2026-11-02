@@ -2316,6 +2316,10 @@ final class TriggerConditionParser {
      */
     static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
+                    // 「施放战技**解除增益效果时**」 (1106 Pela's trace 追歼 and her Eidolon 2): how many buffs the event's
+                    // target carries that a dispel would REALLY remove. `target_debuff_count` cannot answer it (it counts the
+                    // other half), and a `has_state` cannot either (a skill may strip a modifier no state name covers).
+                    "target_buff_count",
                     "target_summon_count", "self_max_energy", "self_energy", "self_energy_percent", "from_skill_id", "damage_skill_key", "target_dot_count",
                     // 「若目标处于**装备者施加的**持续伤害状态」 (light cone 23029): `target_dot_count` counts every DoT, this one
                     // counts only the ones whose source is the rule's owner - a DoT keeps its source, so the applier is a fact.

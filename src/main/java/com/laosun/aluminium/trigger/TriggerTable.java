@@ -2045,6 +2045,11 @@ public class TriggerTable {
                         : ("target_dot_count".equals(variable)
                         ? ctx.target().getBuffManager().countBuffs(com.laosun.aluminium.buff.DotBuff.class)
                         : ctx.target().getBuffManager().debuffCount());
+                // 「施放战技**解除增益效果时**」: what a dispel would really take away, asked BEFORE the dispel runs. The
+                // predicate is BuffManager's own `isDispellable` (permanent loadout bonuses and negative effects are not
+                // 「增益效果」), so the count and the removal cannot disagree. Readers: 1106's trace 追歼 and Eidolon 2.
+                case "target_buff_count" -> ctx.target() == null ? Double.NaN
+                        : ctx.target().getBuffManager().dispellableBuffCount();
                 // "若该目标当前生命值百分比大于等于 30%" -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
@@ -2244,3 +2249,5 @@ public class TriggerTable {
         }
     }
 }
+
+

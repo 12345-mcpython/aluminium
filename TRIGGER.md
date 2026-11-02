@@ -259,6 +259,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `self_energy_percent` / `self_max_energy` / `self_energy` | 自己的能量百分比 / 能量上限 / **当前能量** |
 | `hit_count` / `weakness_hit_count` / `target_weakness_count` | 命中数 / 弱点命中数 / 目标弱点数 |
 | `target_debuff_count` / `target_dot_count` | 目标身上的负面数 / 持续伤害数 |
+| `target_buff_count` | 目标身上**可被解除的增益**数（不含永久加成与负面状态，与 `REMOVE_BUFF` 同一个谓词）；写「解除增益效果时…」用它 |
 | `target_dots_from_self` | 目标身上由规则拥有者施加的持续伤害数 |
 | `event_amount` | 触发事件自带的数值（如 `HP_CONSUMED` 的实际消耗） |
 | `self_summon_count` / `target_summon_count` | 召唤物数量 |

@@ -1025,12 +1025,43 @@ public class BuffManager {
             if (removed >= max) {
                 break;
             }
-            if (!buff.isDebuff() && !buff.isPermanent()) {
+            if (isDispellable(buff)) {
                 removeBuff(buff);
                 removed++;
             }
         }
         return removed;
+    }
+
+    /**
+     * How many of this unit's buffs a 「解除增益效果」 would <b>actually</b> take away.
+     *
+     * <p><b>Why a counter exists at all.</b> A clause of the form 「<b>解除增益效果时</b>…」 (1106 Pela's trace 追歼 and her Eidolon 2)
+     * asks whether the Skill's dispel really removed something. The removal itself announced nothing, and a plain
+     * {@code has_state} cannot answer it either (the state is gone by then, and a skill may strip a modifier that no state
+     * name covers). This is the fact those sentences need, asked <b>before</b> the dispel runs.
+     *
+     * <p>The predicate is deliberately the <b>same one</b> {@link #removeBuffs(int max)} uses — {@link #isDispellable} — so the
+     * count cannot drift from what a removal would do: a permanent buff (a relic's bonus, a trace) is not a 「增益效果」 in the
+     * sense these sentences use, and a negative effect is not one either.
+     *
+     * @return the number of buffs a dispel would remove right now
+     */
+    public int dispellableBuffCount() {
+        int count = 0;
+        for (AbstractBuff buff : buffs) {
+            if (isDispellable(buff)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Whether one buff is something 「解除增益效果」 removes: neither a negative effect nor a permanent loadout bonus.
+     */
+    private static boolean isDispellable(AbstractBuff buff) {
+        return !buff.isDebuff() && !buff.isPermanent();
     }
 
     /**
@@ -1336,3 +1367,5 @@ public class BuffManager {
         return buffs.isEmpty();
     }
 }
+
+

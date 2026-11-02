@@ -56,7 +56,10 @@ public class UnitDisciplineTest {
             // Added with 1506 Silver Wolf LV.999's trace: 「施放欢愉技计入的笑点大于等于 20 个」. Distinct from
             // `self_resource:笑点`, which reads a POOL's value: the pool and the count differ whenever the pool has moved
             // since the state arrived, which is the case that state exists to describe.
-            "counted_laughs");
+            "counted_laughs",
+            // How many of the TARGET's buffs a 「解除增益效果」 would really remove. A COUNT (0..n), never a fraction:
+            // 「解除增益效果时」 asks whether there was at least one. Added with 1106 Pela's trace 追歼 and Eidolon 2.
+            "target_buff_count");
 
     /**
      * Of those, the ones that resolve to 0..1 rather than a count.
