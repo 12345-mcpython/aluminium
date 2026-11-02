@@ -404,7 +404,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | 自己人 | `self` `target` `attacker` `actor` `all_allies` `party` `other_allies` `next_ally` `party_first` `lowest_hp_ally` `random_ally_below_half_energy` `other_map_attackers` `highest_break_effect_ally` `allies_with_summons` |
 | 敌人 | `all_enemies` `random_enemy` `random_hit_enemy` `highest_hp_enemy` `target_else_random_enemy` `random_adjacent_enemy` `adjacent_enemies` |
 | 召唤物 | `summon` `all_summons` `target_and_summon` |
-| 按标记找人 | `holder_of:<状态>` |
+| 按标记找人 | `holder_of:<状态>` `lowest_stacks_enemy:<状态>`（敌方中该状态层数**最低**的一个，平手按名册顺序） |
 | 按命途 / id | `allies_of_path:<命途>` `allies_of_path_except:<命途>:<名单>` `ally_cid:<id>` |
 | 按波次 | `wave_monster` `wave_monsters` |
 | 特殊 | `all_allies_lethally_hit_this_action` `highest_hp_attack_hit` |
@@ -508,7 +508,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `sub` / `div` | `left` + `right` | 二元运算 |
 | `negate` / `abs` | `input` | 相反数 / 绝对值 |
 | `attr` | `attribute`（+ `whose` / `above`） | 单位属性；`whose: target` 读事件目标，`above` 只算超出部分 |
-| `stacks` | `buff`（+ `whose`） | 层数 |
+| `stacks` | `buff`（+ `whose`：`owner` / `target` / **`highest_enemy`**） | 层数（`highest_enemy` = 敌方中该状态层数的**最大值**） |
 | `original_damage` | — | 触发这一发本身的伤害 |
 | `settled_damage_this_event` | — | 本次触发已结算的总伤害 |
 | `elation_base` | — | 欢愉体系的基础值 |
@@ -673,3 +673,4 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 
 **`countdown`** 选择器（2026-10-31）：规则主人放下的倒计时单位 —— `START_COUNTDOWN` 造、`COUNTDOWN_TURN` 看到期，而 `DELAY`/`ADVANCE` 现在能作用于它（读者：1507 星魂 1「使【无量忿怒】倒计时行动延后 15%」）。
+

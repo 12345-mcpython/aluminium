@@ -208,10 +208,13 @@ public final class NumberProviders {
                 if (provider.getBuff() == null || provider.getBuff().isBlank()) {
                     throw new IllegalArgumentException("\"" + field + "\" of type \"stacks\" needs \"buff\"" + where);
                 }
+                // Note: `highest_enemy` is the one non-unit answer: it is the LARGEST count on the other side, for
+                // 「层数与…层数最高者相同」 (1218's trace 炙香), which copies a quantity rather than naming a unit.
                 if (provider.getWhose() != null && !provider.getWhose().equals("owner")
-                        && !provider.getWhose().equals("target")) {
+                        && !provider.getWhose().equals("target")
+                        && !provider.getWhose().equals("highest_enemy")) {
                     throw new IllegalArgumentException("\"" + field + "\" of type \"stacks\" names whose \""
-                            + provider.getWhose() + "\"; it is owner or target" + where);
+                            + provider.getWhose() + "\"; it is owner, target or highest_enemy" + where);
                 }
             }
 
@@ -396,6 +399,20 @@ public final class NumberProviders {
             throw new IllegalStateException("a \"stacks\" provider needs \"buff\"");
         }
         String whose = provider.getWhose() == null ? "owner" : provider.getWhose();
+        // 「层数与结界展开期间【烬煨】层数最高者相同」 (1218 Jiaoqiu's trace 炙香): the HIGHEST count on the other side, as a NUMBER.
+        // Note: not the `lowest_stacks_enemy:` selector - that one names a unit, while this sentence needs a quantity to copy.
+        if ("highest_enemy".equals(whose)) {
+            String state = provider.getBuff().trim();
+            int highest = 0;
+            if (ctx.battle() != null) {
+                for (CanHit enemy : ctx.battle().getOpponents(ctx.owner())) {
+                    if (enemy != null && !enemy.isDeath()) {
+                        highest = Math.max(highest, enemy.getBuffManager().stacksOf(state));
+                    }
+                }
+            }
+            return highest;
+        }
         String scale = ("target".equals(whose) ? "target_stacks:" : "self_stacks:") + provider.getBuff().trim();
         Double value = TriggerMagnitudes.stackScale(scale, 1.0, ctx);
         if (value == null) {

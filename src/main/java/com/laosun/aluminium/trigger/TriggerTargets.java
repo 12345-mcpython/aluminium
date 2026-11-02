@@ -156,6 +156,12 @@ final class TriggerTargets {
                     List<CanHit> holders = holderOf(ctx.battle(), selector, ctx);
                     yield require(holders.isEmpty() ? null : holders.getFirst(), selector, ctx);
                 }
+                // 「叠加给场上存活的【烬煨】层数最低的敌人」 (1218 Jiaoqiu's Eidolon 6): ONE enemy, picked by a counter rather than
+                // by health — the counterpart of `lowest_hp_ally`, which is our side and reads HP. Ties keep roster order.
+                if (selector.startsWith(TriggerVocabulary.LOWEST_STACKS_ENEMY_PREFIX)) {
+                    String state = selector.substring(TriggerVocabulary.LOWEST_STACKS_ENEMY_PREFIX.length()).trim();
+                    yield require(lowestStackedEnemy(ctx, state), selector, ctx);
+                }
                 throw new IllegalStateException(
                         "Effect names the target selector '" + selector + "', which can reach several units: it needs "
                                 + "an op that takes a list, not one that resolves a single target");
@@ -778,6 +784,34 @@ final class TriggerTargets {
         return highest;
     }
 
+    /**
+     * The living enemy carrying the <b>fewest</b> applications of {@code state} — the selector 「敌方中该状态层数最低的那一个」.
+     *
+     * <p>Reader: 1218 Jiaoqiu's Eidolon 6, 「敌方目标被消灭时，其持有的【煨烬】会叠加给场上存活的【煨烬】层数最低的敌人」. The counterpart of
+     * {@code lowest_hp_ally} (our side, by health) and of {@link #highestHpEnemy} (their side, by health): the ranking quantity
+     * here is a counter, not a panel.
+     *
+     * <p>Note: Ties keep roster order — the failure that "first one wins" hides is a target picked by the hash order of a set.
+     */
+    static CanHit lowestStackedEnemy(TriggerContext ctx, String state) {
+        if (ctx.battle() == null || state == null || state.isBlank()) {
+            return null;
+        }
+        CanHit lowest = null;
+        int fewest = Integer.MAX_VALUE;
+        for (CanHit enemy : ctx.battle().getOpponents(ctx.owner())) {
+            if (enemy == null || enemy.isDeath() || !ctx.passesTargetFilter(enemy)) {
+                continue;
+            }
+            int stacks = enemy.getBuffManager().stacksOf(state);
+            if (stacks < fewest) {
+                fewest = stacks;
+                lowest = enemy;
+            }
+        }
+        return lowest;
+    }
+
     static CanHit randomHitEnemy(TriggerContext ctx) {
         if (ctx.battle() == null) {
             return null;
@@ -839,4 +873,6 @@ final class TriggerTargets {
     static final String ENEMIES_WITH_STATE_PREFIX = "all_enemies_with_state:";
 
 }
+
+
 

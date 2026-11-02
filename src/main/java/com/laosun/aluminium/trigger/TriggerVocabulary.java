@@ -182,6 +182,17 @@ final class TriggerVocabulary {
      */
     static final String HOLDER_OF_PREFIX = "holder_of:";
     /**
+     * "The living enemy carrying the FEWEST layers of {@code <state>}" — 「场上存活的…层数最低的敌人」.
+     *
+     * <p>Reader: 1218 Jiaoqiu's Eidolon 6, 「敌方目标被消灭时，其持有的【烬煨】会叠加给场上存活的【烬煨】层数最低的敌人」. The ranking
+     * quantity is a COUNTER, not a panel — which is why {@code lowest_hp_ally} (our side, by health) cannot stand in, and
+     * why this is a prefix rather than a fixed name (the state is data, read exactly as written).
+     *
+     * <p>Note: Ties keep roster order, and "nobody on the other side" answers {@code null} (the single-target op reports it
+     * through {@code require}), the same convention {@code holder_of:} follows.
+     */
+    static final String LOWEST_STACKS_ENEMY_PREFIX = "lowest_stacks_enemy:";
+    /**
      * "The unit this cast <b>aimed at</b>, and <b>its</b> summon" - "a designated single ally <b>and their summon</b>".
      *
      * <p>Its first user is Sunday (星期日)'s Skill (131302): "make the designated single ally <b>and their summon</b> act immediately". It is a

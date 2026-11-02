@@ -939,6 +939,24 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 【已把守：`TargetBuffCountTest`（临时增益算 1 / 空目标 0 / 永久增益 0 / DOT 0）+ `PelaClauseCoverageTest`（有增益 ⇒ 涨、没有 ⇒ 不涨、E1 ⇒ 不涨）】
 
+#### 3.7zp（引擎）按**计数器**选人 / 取最大值：「层数最低的敌人」
+
+2026-11-02 定形。读者是 1218 椒丘的星魂 6 与行迹 炙香：前者的目标要按**【烬煨】层数**挑，后者的数量要按**最高层**取。
+两个问题不同，所以是两个词：
+
+| 拼法 | 回答 | 读者 |
+|---|---|---|
+| `target: "lowest_stacks_enemy:<状态>"` | **哪一个单位**（敌方中该状态层数最低的存活者，平手按名册顺序） | 1218 星魂 6「叠加给场上存活的【烬煨】层数最低的敌人」 |
+| `{"type":"stacks","whose":"highest_enemy","buff":"<状态>"}` | **多少层**（敌方中该状态层数的最大值） | 1218 行迹 炙香「层数与…层数最高者相同」 |
+
+| 不变量 | 为什么 |
+|---|---|
+| 选择器与提供器**互不替代** ✓ | 一个给单位、一个给数字；把「最高者的层数」写成选择器，效果会落到那个人身上而不是复制数字 ✗ |
+| 平手取**名册顺序** ✓ | 否则目标由集合的哈希顺序决定，同一场景两次跑出不同人 ✓ |
+| 「没人持有」是合法状态 ✓ | 选择器给 `null`（单目标 op 由 `require` 报出来），提供器给 `0`；`ADD_STACK` 的 `Math.max(1, …)` 顺便兜住「最低为 1 层」 ✓ |
+
+【已把守：`StacksRankingTest`（1/2/3 层里选最低的、平手取名册前者、`highest_enemy` 给出 3）+ `JiaoqiuClauseCoverageTest`（击杀转移 6+2→8；炙香 新入场者拿到最高层）】
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
@@ -2022,6 +2040,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
 | `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
 | `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
+
 
 
 

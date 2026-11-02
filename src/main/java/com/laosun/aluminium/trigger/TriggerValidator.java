@@ -1736,6 +1736,7 @@ final class TriggerValidator {
     static void requireSelectorSpelling(String value, String field, String op, TriggerSpec spec) {
         String selector = value.trim().toLowerCase(Locale.ROOT);
         if (!TriggerVocabulary.TARGET_SELECTORS.contains(selector) && !selector.startsWith(TriggerVocabulary.HOLDER_OF_PREFIX)
+                && !selector.startsWith(TriggerVocabulary.LOWEST_STACKS_ENEMY_PREFIX)
                 && !selector.startsWith(TriggerTargets.ALLIES_OF_PATH_EXCEPT_PREFIX)
                 && !selector.startsWith(TriggerTargets.ENEMIES_WITH_STATE_PREFIX)) {
             throw new IllegalArgumentException(
