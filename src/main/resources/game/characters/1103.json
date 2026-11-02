@@ -3,7 +3,7 @@
   "character": 1103,
   "_status": "implemented",
   "_gaps": [
-    "⛔ **秘技未写**（2026-11-01 覆盖复核发现）：文档有「秘技：晚安，贝洛伯格 / Good Night, Belobog」一节，文件里**没有任何秘技规则** —— 此前的「完全实现」不成立。"
+    "⭐ **秘技已实现**（2026-11-02）：`technique_shock_and_damage` —— 随机单体 50% 攻击力雷伤（`skill: 「TECHNIQUE」` + `damage_param: 1`）+ 敌方**全体**触电 3 回合（`APPLY_DOT` 读 `TECHNIQUE:3`）。判据 `ServalTechniqueTest`：两个敌人**都**进入触电、且总掉血 > 0；对照组（不用秘技）无人触电 ✓。⚠ 登记：句子是「100% 基础概率」，**故意不写 `base_chance`**（写了会被效果抵抗削掉），代价是这条不吃效果命中、也不被抵抗。⛔ 仍开：其余技能从句与星魂细节。"
   ],
   "rules": [
     {
@@ -247,6 +247,33 @@
       "min_eidolon": 1,
       "source": "1103 希露瓦 星魂 1: 「普攻对指定敌方目标的1个随机相邻目标造成等同于普攻伤害60%的雷属性伤害。」",
       "_note": "星魂 1：`ATTACK_FINISHED` 的 `event_amount` 是本次普攻的已结算总伤害，取其 60%；`random_adjacent_enemy` 从敌方队列里取目标的一个随机存活相邻目标。 ⚠ **按等级读**（AGENT §0.1.3）：这一列随等级动（战技 #5 在 Lv1 是 0.4、Lv10 是 1.04）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_shock_and_damage",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "skill": "TECHNIQUE",
+          "damage_param": 1,
+          "element": "Thunder",
+          "target": "random_enemy"
+        },
+        {
+          "op": "APPLY_DOT",
+          "element": "Thunder",
+          "scale": "self_attr:ATTACK",
+          "turns": 3,
+          "percent_from_skill_param": "TECHNIQUE:3",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1103 希露瓦 秘技 晚安，贝洛伯格 (110307, Maze/…): 「立即攻击敌人，进入战斗后对敌方随机单体造成等同于希露瓦50%攻击力的雷属性伤害，同时有100%的基础概率使敌方每个单体目标陷入触电状态，持续3回合。触电状态下，敌方目标每回合开始时受到等同于希露瓦50%攻击力的雷属性持续伤害。」 param Lv1 = [1, 0.5, 3, 0.5] → #1 = 1（100% 基础概率）、#2 = 0.5（随机单体伤害）、#3 = 3（回合）、#4 = 0.5（触电每回合伤害）",
+      "_note": "「立即攻击敌人，进入战斗后对敌方**随机单体**造成 **50%** 攻击力雷伤 + **100%** 基础概率使**敌方每个单体**陷入触电，持续 **3 回合**，触电每回合受到 **50%** 攻击力雷伤」—— 两条效果：① `DAMAGE { skill: 「TECHNIQUE」, damage_param: 1 }` + `target: 「random_enemy」` ✓（Technique 槽恒为 1 级 ⇒ 行读即文档值 ✓）；② `APPLY_DOT { percent_from_skill_param: 「TECHNIQUE:3」, turns: 3 }` + `target: all_enemies` ✓（「敌方**每个**单体」）⚠ **故意不写 `base_chance`**：句子是「100% 基础概率」，而写了它就会过 `tryApplyDebuff` 被效果抵抗削掉（与 1003 秘技同一判断），不写即「直接附着」，与句子的结果一致；代价是这条**不吃效果命中、也不被抵抗**，登记于此。"
     }
   ]
 }
