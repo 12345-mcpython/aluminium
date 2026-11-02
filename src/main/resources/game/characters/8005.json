@@ -2,7 +2,9 @@
   "schema": 1,
   "character": 8005,
   "_status": "implemented",
-  "_gaps": [],
+  "_gaps": [
+    "✅ **全条款覆盖（2026-11-02 逐条核对）**：文档 12 节全部有落点 —— 普攻（读技能行）/ 战技 `skill_extra_hits_random` / 终结技 `ult_dance` + `ult_super_break` / 天赋 `talent_energy_on_break` / 秘技 `technique_breaking_effect` / 星魂 1 `eidolon1_skill_point_after_first_skill`、2 `eidolon2_energy_regen`、3 `eidolon3_levels`、4 `eidolon4_break_effect_for_others`、5 `eidolon5_levels`、6 `eidolon6_extra_skill_hits`。判据 `TrailblazerHarmonyClauseCoverageTest`。⚠ 补写的是**星魂 1/4/6 三节**（此前整个缺），写法与 8006 同一来源的一致。"
+  ],
   "rules": [
     {
       "on": "BATTLE_START",
@@ -177,6 +179,55 @@
       ],
       "source": "8005 开拓者•同谐 星魂 2: 「战斗开始时，开拓者的能量恢复效率提高25%，持续3回合。」 param = [0.25, 3]",
       "_note": "「**战斗开始时**，能量恢复效率提高 **25%**，持续 **3 回合**」—— `BATTLE_START` + `ENERGY_REGENERATION_RATE` + `turns: 3` ✓。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_skill_point_after_first_skill",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "8005 开拓者 星魂 1 您的最佳观众席 (Avatar_Trailblazer_00_Rank01): 「施放首次战技后立即回复1点战技点。」 param = [1]",
+      "_note": "「施放**首次**战技后立即回复 **1** 点战技点」= `SKILL_CAST` + `actor == self` + **`once_per_battle: true`**（「首次」）→ `GAIN_SKILL_POINT { amount: 1 }` ✓（与 8006 同一来源，写法一致）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon4_break_effect_for_others",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "scale": "self_attr:BREAKING_EFFECT",
+          "percent": 0.15,
+          "target": "other_allies",
+          "permanent": true
+        }
+      ],
+      "source": "8005 开拓者 星魂 4 袒护白鸽的冠冕 (Avatar_Trailblazer_00_Rank04): 「开拓者在场时，使除自身以外的队友击破特攻提高，提高数值等同于开拓者15%的击破特攻。」 param = [0.15]",
+      "_note": "「使**除自身以外的队友**击破特攻提高，提高数值等同于开拓者 **15%** 的击破特攻」= `MODIFY_ATTR BREAKING_EFFECT { scale: 「self_attr:BREAKING_EFFECT」, percent: 0.15, target: 「other_allies」, permanent: true }` ✓ —— `other_allies` 正好是「除自身以外的队友」✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_extra_skill_hits",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill": "SKILL",
+          "skill_id": 2,
+          "amount": 2
+        }
+      ],
+      "source": "8005 开拓者•同谐 星魂 6 明天，栖息聚光之下: 「战技的额外伤害次数增加2次。」 param = [2]",
+      "_note": "「战技的额外伤害次数增加 **2** 次」= `RAISE_SKILL_HITS { skill: 「SKILL」, skill_id: 2, amount: 2 }` ✓（与 8006 同一来源；`skill_id: 2` 指额外伤害那一槽）。"
     }
   ]
 }

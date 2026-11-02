@@ -80,8 +80,10 @@ public class SiblingHarmonyTest {
         //: 2 -- 8005 gained the skill clause "额外造成 4 次伤害，每次对随机敌方单体" (times).
         Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE));
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BREAK));
-        Assertions.assertEquals(5, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),
-                "the technique and the convention");
+        // Seven since 2026-11-02: Eidolon 4 (the allies' break effect) and Eidolon 6 (two more skill hits) are BATTLE_START
+        // clauses too, and he gained Eidolon 1's first-skill skill point.
+        Assertions.assertEquals(7, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),
+                "the technique, the convention, and the four eidolon clauses that fire at battle start");
     }
 
     private static Random fixed() {
