@@ -35,7 +35,9 @@ public class PelaDebuffTest {
     @Test
     public void theDebuffConditionsAreOnTheRules() {
         TriggerTable table = TriggerTables.of(PELA);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "the talent's energy trace");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                "the talent's energy trace, plus (2026-11-02) Eidolon 6's additional damage — same event, same condition, "
+                        + "different Eidolon gate, so they are two rules rather than one");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "trace Bash (痛击)");
 
         // Note: Two separate fixtures: adding a DOT is not undone, so reusing one enemy would leave the "no debuff" check

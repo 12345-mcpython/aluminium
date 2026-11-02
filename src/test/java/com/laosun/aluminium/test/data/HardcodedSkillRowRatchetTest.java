@@ -50,7 +50,10 @@ public class HardcodedSkillRowRatchetTest {
      */
     // 37 since 2026-11-02: 1112 Topaz's Eidolon 1 writes 0.25 (「受到的追加攻击暴击伤害提高 25%」) - a STAR-SOUL parameter that
     // happens to equal a row cell, like 1412's 2.4 above. No reader exists for an Eidolon row, so it stays literal.
-    private static final int BASELINE = 37;
+    // 38 since 2026-11-02: 1106 Pela's Eidolon 6 writes 0.4 (「造成等同于佩拉 40% 攻击力的冰属性附加伤害」) - again a
+    // STAR-SOUL parameter (its `param` is [0.4]) that happens to equal her Ultimate's Lv10 base-chance cell (30%→45%, Lv10 40%).
+    // Same verdict: no reader exists for an Eidolon row, so it stays literal.
+    private static final int BASELINE = 38;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
