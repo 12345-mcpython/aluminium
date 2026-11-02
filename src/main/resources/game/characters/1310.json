@@ -108,7 +108,8 @@
           "target": "self"
         }
       ],
-      "source": "talent 131004: \"at the start of battle, if energy is below #2, restore it to #2\" (tbgd ParamList #2 = 0.5 at every level). The same talent's third clause, the dispel at full energy, is talent_dispel_when_energy_full."
+      "source": "talent 131004: \"at the start of battle, if energy is below #2, restore it to #2\" (tbgd ParamList #2 = 0.5 at every level). The same talent's third clause, the dispel at full energy, is talent_dispel_when_energy_full.",
+      "_note": "「战斗开始时，若能量低于 **#2**，则恢复到 **#2**」= `BATTLE_START` → `RAISE_ENERGY_TO { percent: 0.5 }` ✓ —— 这个 op 是**下限**语义（「恢复**到**某个份额」），能量已高于它时**什么都不做**；换成 `GAIN_ENERGY` 会**溢出**（多给一次 50%）。⚠ 数值 `tbgd ParamList #2 = 0.5`（各等级相同）。同一天赋的第三句（满能量时解除负面）是 `talent_dispel_when_energy_full`。"
     },
     {
       "on": "BATTLE_START",

@@ -40,9 +40,7 @@ public class ContentProvenanceTest {
     private static final List<Gap> RECORDED = List.of(
             // 1006 skill_inserts_party_first_weakness and 1504 ults_immediate_talent: sources filled on 2026-11-02.
             // 1203 talent_zone_heals_the_attacker: source filled on 2026-11-02 (see its _note).
-            new Gap("1306.json", "talent_raises_skill_point_cap", "note"),
             // 1309 ult_zone_defence_ignore: DELETED on 2026-11-02 - the sentence is 1303's Eidolon 1, which already implements it.
-            new Gap("1310.json", "talent_energy_floor_at_battle_start", "note"),
             new Gap("23034.json", "cone23034_skill_point_count_skill", "note"),
             new Gap("23034.json", "cone23034_skill_point_count_ult", "note"),
             new Gap("23034.json", "cone23034_skill_point_pay_skill", "note"),

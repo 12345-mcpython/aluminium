@@ -171,7 +171,8 @@
           "amount": 2
         }
       ],
-      "source": "talent 130604: while Sparkle is on the field the skill point cap is raised by 2 (tbgd ParamList #3 = 2 at every level). The other half of the same talent, the party damage on spending a point, is talent_party_damage_on_spend."
+      "source": "talent 130604: while Sparkle is on the field the skill point cap is raised by 2 (tbgd ParamList #3 = 2 at every level). The other half of the same talent, the party damage on spending a point, is talent_party_damage_on_spend.",
+      "_note": "「花火在场时，战技点上限提高 **2**」= `BATTLE_START` → `RAISE_SKILL_POINT_CAP { amount: 2 }` ✓ —— 战技点上限属于**队伍的 policy**（`Battle` 持有），不是某个单位的属性，所以这是一条**队伍级**的 op（与 `GAIN_SKILL_POINT` 的单点获得不同）。⚠ 数值来自 `tbgd ParamList #3 = 2`（各等级相同）。同一天赋的另一半（消耗战技点时全队增伤）是 `talent_party_damage_on_spend`。"
     },
     {
       "on": "BATTLE_START",
