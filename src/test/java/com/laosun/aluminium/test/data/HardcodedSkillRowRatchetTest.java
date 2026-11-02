@@ -53,7 +53,11 @@ public class HardcodedSkillRowRatchetTest {
     // 38 since 2026-11-02: 1106 Pela's Eidolon 6 writes 0.4 (「造成等同于佩拉 40% 攻击力的冰属性附加伤害」) - again a
     // STAR-SOUL parameter (its `param` is [0.4]) that happens to equal her Ultimate's Lv10 base-chance cell (30%→45%, Lv10 40%).
     // Same verdict: no reader exists for an Eidolon row, so it stays literal.
-    private static final int BASELINE = 38;
+    // 39 since 2026-11-04: 1218 Jiaoqiu's Eidolon 6 needs a SECOND copy of the talent's stacking rule (its only difference is
+    // `max_stacks` 5 vs 9), so its `percent: 1.8` is a second literal of the same cell. The literal is deliberate: Eidolon 2
+    // raises that burn with `MODIFY_RULE effect_percent_scale: 4`, which MULTIPLIES a literal but ADDS to a row share
+    // (AGENT item 27) - reading the row would turn x4 into +3, which `JiaoqiuEidolonTwoTest` measured.
+    private static final int BASELINE = 39;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
@@ -222,3 +226,4 @@ public class HardcodedSkillRowRatchetTest {
         }
     }
 }
+
