@@ -3,9 +3,10 @@
   "character": 1102,
   "_status": "partial",
   "_gaps": [
-    "秘技的大地图侧（隐身不被发现）未写，属大地图/秘技层",
-    "星魂 2（战技加速可叠 2 层：需要把现有的速度 buff 改成可叠）与星魂 6（【乱蝶】：附加伤害 / 被我方他人触发时不再触发天赋 / 希儿倒下解除）未写；星魂 1/3/4/5 已落地 ✓",
-    "行迹：除「夜行」外的其余行迹未读"
+    "⚠ 秘技的大地图侧（隐身不被发现）未写，属大地图/秘技层。",
+    "⭐ **星魂 2 已于 2026-11-03 落地**（战技加速可叠 2 层）：顺带发现**战技的速度 buff 整句原先没有规则**（旧缺口说「把现有的速度 buff 改成可叠」，而那个 buff 并不存在）。现在 `skill_raises_her_speed` 给 1 层（25%/2 回合、具名【加速】、显式 `max_stacks: 1`），星魂 2 用 `MODIFY_RULE effect_max_stacks 1` 提到 2 层；判据 `SeeleClauseCoverageTest`（实测 E0 两层不掉、E2 两层 = 基础速度 ×1.5）。",
+    "⛔ 星魂 6【乱蝶】未写：① 「施放终结技后使受到攻击的敌方单体陷入【乱蝶】1 回合」可写（`ULT_CAST` + `APPLY_BUFF`）；② 「受到攻击后额外受到 1 次等同于终结技伤害 **15%** 的量子附加伤害」需要一个**记住那一次终结技伤害**的读数端（`§4.3` 那个「记录一个数、以后再读」的缺口）；③ 「被我方**其他目标**触发时**不再触发**希儿的天赋」需要「这次追加伤害不算天赋触发」的标记 ✗；④ 「希儿倒下时解除」可写（`DEATH` + `REMOVE_STATE`）。",
+    "⛔ 行迹其余未读（只写了两条：夜行 的低血量仇恨、以及……本文件只有 `trace_low_hp_aggro_down` 一族）。"
   ],
   "rules": [
     {
@@ -182,6 +183,41 @@
       ],
       "source": "1102 希儿 星魂 4 掠影: 「希儿消灭敌方目标时，自身恢复15点能量。」 param = [15]",
       "_note": "「希儿**消灭**敌方目标时，自身恢复 **15** 点能量」—— ① 事件 `KILL` ✓（`actor` = 击杀者 ✓）+ `actor == self` ✓；② `GAIN_ENERGY 15` ✓ 目标 `self` ✓。"
+    }
+    ,
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_raises_her_speed",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.25,
+          "turns": 2,
+          "buff": "加速",
+          "max_stacks": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1102 希儿 战技 归刃 (110202, BPSkill/SingleAttack): 「强化前：使希儿的速度提高25%，…速度提高效果持续2回合。」 参数 Lv10 = [0.25, 2.2]",
+      "_note": "「使希儿的速度提高 **25%**，…持续 **2 回合**」—— ⭐ **2026-11-03 补**：整句原先**没有规则**（`_gaps` 里说「把现有的速度 buff 改成可叠」，但**那个 buff 根本不存在** ⇒ 缺口的前提本身是错的）。`MODIFY_ATTR SPEED percent: 0.25` ＋ `turns: 2` ＋ **`buff: 加速`**（具名，好让星魂 2 能按名字提上限）＋ **`max_stacks: 1`**（⚠ 引擎硬要求：`MODIFY_RULE` + `effect_max_stacks` 在加载期会拒绝「被点名的规则没有上限可提」，见 1206 行迹 破敌 的同一条注记）。⚠ `percent` 作用在 **SPEED 的基础值**上（第 197 轮的约定）⇒ 25% 是基础速度的 25%，不是当前速度的。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon2_speed_buff_stacks_twice",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "skill_raises_her_speed",
+          "effect_max_stacks": 1
+        }
+      ],
+      "source": "1102 希儿 星魂 2 蝶舞: 「战技的加速效果可以叠加，最多叠加2层。」",
+      "_note": "「战技的**加速效果可以叠加，最多叠加 2 层**」—— `MODIFY_RULE { rule: skill_raises_her_speed, effect_max_stacks: 1 }` ✓（把上限从 **1** 提到 **2**；⚠ **不改**基础值本身 ✗：1 层是文档的基准，星魂只在这场战斗里 +1 层）。⚠ 目标规则必须**具名**（`buff: 加速`）**且写了显式 `max_stacks`** ✓，否则加载期报 `there is no cap to raise` ✓。"
     }
   ]
 }
