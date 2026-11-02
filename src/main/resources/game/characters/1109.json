@@ -75,6 +75,11 @@
           "op": "MODIFY_RULE",
           "rule": "skill_burn",
           "effect_turns": 1
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "eidolon4_adjacent_burn",
+          "effect_turns": 1
         }
       ],
       "source": "1109 虎克 星魂 2 吃好喝好长身体: 「战技使敌方目标陷入的灼烧状态持续时间增加1回合。」",
@@ -242,9 +247,47 @@
       ],
       "source": "1109 虎克 终结技 轰！飞来焰火 (110903, Ultra/SingleAttack): 「施放终结技后，下一次施放的战技得到强化，强化后的战技能够同时对指定敌方单体及其相邻目标造成伤害。」 数据槽 9 = 110909（Blast，主目标 280% + 相邻 80%）",
       "_note": "「施放终结技后，**下一次施放的战技**得到强化，强化后的战技能够同时**对指定敌方单体及其相邻目标造成伤害**」—— ① 用现成的 **`REPLACE_SKILL`** ✓：`skill: SKILL` + `skill_id: 9`（⚠ **槽位号**，不是数据行 110909 ✓ —— 装载器按 `skills.json` 的内层键索引 ✓，1111 的同一课 ✓；数据槽 9 的 `skill_effect: Blast` ✓，`skill_effect: Blast` ✓ —— **相邻目标由数据行自己的弹射形态结算** ✓，不需要选择器 ✓）；② 寿命 **`until: [\"next_skill\"]`** ✓ —— 句子说的是「下一次**战技**」：`next_attack` 会在**普攻**上就用掉 ✗；`Lifetime.NEXT_SKILL` 正好是「施放战技后结束」✓；③ `target: self` ✓（强化的是自己的槽 ✓）。"
+    }    ,
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon1_enhanced_skill_damage_up",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "damage_skill_key == 9"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.2
+        }
+      ],
+      "source": "1109 虎克 星魂 1 早睡早起很健康: 「战技强化后造成的伤害提高20%。」 参数 = [0.2]",
+      "_note": "「**战技强化后**造成的伤害提高 **20%**」—— ① 事件 `DEALING_DAMAGE`（对**这一发**加成的唯一写法：`BOOST_DAMAGE` 只改当下这一发 ✓，行迹 痛击 与 1106 的同一族 ✓）；② 门槛是**强化形态**本身：**`damage_skill_key == 9`**（`Damage.getSkillKey()` 是**装载槽位号** —— `REPLACE_SKILL { skill: SKILL, skill_id: 9 }` 装进来的那一条 ✓）。⚠ **不能用 `from_skill_id`**：`DEALING_DAMAGE` 的 payload 走**不带 cast 事实**的重载（`TriggerTable` 在 `damage_skill_key` 的注释里写明同一件事），实测 `from_skill_id == 110909` **一次都不触发**（E0/E1 读数完全相同），换成 `damage_skill_key` 才有增量 ✓；③ `percent: 0.2` 取自星魂 1 的 `param`（`[0.2]`）✓。⚠ **不能写 `from_skill SKILL`**：那条会把**普通战技**也算进来（普通战技与强化战技是同一个 `SkillType` 槽 ✗），而句子只说「强化后」。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon4_adjacent_burn",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "target has_state 灼烧",
+        "damage_is_attack"
+      ],
+      "do": [
+        {
+          "op": "APPLY_DOT",
+          "element": "Fire",
+          "base_chance": 1,
+          "scale": "self_attr:ATTACK",
+          "turns": 2,
+          "target": "adjacent_enemies",
+          "percent_from_skill_param": "SKILL:3"
+        }
+      ],
+      "source": "1109 虎克 星魂 4 稀里糊涂没关系: 「触发天赋时，有100%基础概率使指定敌方目标的相邻目标也陷入等同于战技的灼烧状态。」 参数 = [1, 0.2]（技能行 SKILL:3 = 65% 攻击力的灼烧）",
+      "_note": "「**触发天赋时**，有 **100%** 基础概率使**指定敌方目标的相邻目标**也陷入**等同于战技的**灼烧状态」—— ① 「触发天赋时」= 天赋那条的三个条件逐字相同（`actor == self` + `target has_state 灼烧` + `damage_is_attack`，后者同时挡住「自己触发自己」的递归 ✓）；② 「**相邻目标**」用新选择器 **`adjacent_enemies`**（2026-11-02 新增：**两个**邻居都要，`random_adjacent_enemy` 只给一个 ✗）；③ 「**等同于战技的**灼烧」= 与 `skill_burn` **逐字相同的量**（`APPLY_DOT` + `element: Fire` + `scale: self_attr:ATTACK` + `percent_from_skill_param: SKILL:3` + `turns: 2` + `base_chance: 1`）✓ —— 星魂 2 的「持续时间 +1」通过 `MODIFY_RULE` 同时改 `skill_burn` 与这一条（否则 E2 之后两条灼烧的时长会不一致 ✗）。⚠ **顺序**：这条排在天赋规则**之后**，同一发攻击里先结算天赋的追加伤害；E2 之后它的时长同样是 3 回合 ✓。"
     }
   ],
-  "_gaps": [
-    "⛔ **星魂 1 / 4 未写**（2026-11-02 逐节覆盖扫描发现）：文档有「星魂 1：早睡早起很健康」「星魂 4：稀里糊涂没关系」两节，文件里没有对应规则。其余 10 节均有落点。"
-  ]
+  "_gaps": []
 }

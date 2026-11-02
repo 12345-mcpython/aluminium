@@ -55,8 +55,9 @@ public class HookTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the burn");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
                 "the trace that follows the ultimate and the enhanced-Skill swap");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
-                "E6's bonus against a burning target and the talent's guarded extra instance");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "E6's bonus against a burning target and the talent's guarded extra instance — plus (2026-11-02) "
+                        + "Eidolon 1's enhanced-Skill raise and Eidolon 4's burn on the neighbours");
         Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the level convention plus E2/E3/E5, the trace that resists controls, and the technique");
     }
