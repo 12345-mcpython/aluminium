@@ -358,6 +358,20 @@ final class TriggerConditionParser {
             return new DamageIsAdditional(raw);
         }
 
+        // 「持续伤害产生伤害时」 - the instance is a DoT tick. Same bare-keyword shape as the two above: `DAMAGE_SETTLED`
+        // fires for every settled instance (DoT ticks, break, additional damage), so "when the DoT deals damage" needs its
+        // own guard or a rule would also pay out on ordinary attacks. See DAMAGE_IS_DOT.
+        if (text.trim().equalsIgnoreCase(DAMAGE_IS_DOT)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance is continuous damage, but " + spec.getOn()
+                                + " carries no damage instance; it belongs on an event that settles one "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new DamageIsDot(raw);
+        }
+
         // 「普攻或战技伤害**未造成暴击**时」 (light cone 23012): the instance crit roll is decided during settlement, so this
         // keyword is only honest on DAMAGE_SETTLED -- on the pre-settlement events the answer would always be "did not",
         // which is a false reading of every hit that does crit.
@@ -1747,6 +1761,26 @@ final class TriggerConditionParser {
         }
     }
 
+    /** {@code damage_is_dot}: the settled instance is a DoT tick - see {@link #DAMAGE_IS_DOT}. */
+    static final class DamageIsDot implements Condition {
+        private final String raw;
+
+        DamageIsDot(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.damage() != null
+                    && ctx.damage().getType() == com.laosun.aluminium.enums.DamageType.DOT;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     static final class DamageElementIsSelf implements Condition {
         private final String raw;
 
@@ -2648,6 +2682,17 @@ final class TriggerConditionParser {
      * guard it was written to pass.
      */
     static final String DAMAGE_IS_ADDITIONAL = "damage_is_additional";
+
+    /**
+     * The bare keyword {@code damage_is_dot}: "the instance being settled is CONTINUOUS damage (a DoT tick)".
+     *
+     * <p><b>Why it exists.</b> {@code DAMAGE_SETTLED} fires for every settled instance - DoT ticks, break damage, additional
+     * damage and ordinary attacks alike - so 「当敌方目标承受的由卡芙卡造成的触电状态产生伤害时」 (1005's Eidolon 4) had no way
+     * to say "and it has to be the DoT". The only spellings available both widen the clause: element + owner also matches a
+     * shock someone ELSE applied, and an unguarded rule pays out on every attack. The instance carries
+     * {@link com.laosun.aluminium.enums.DamageType#DOT} ({@code TickService} builds it that way), so the guard is exact.
+     */
+    static final String DAMAGE_IS_DOT = "damage_is_dot";
 
     /**
      * The bare keyword {@code damage_has_no_cast}: "the instance being settled names no cast" (1415's passage ode, whose extra hit must react to the ENGINE's

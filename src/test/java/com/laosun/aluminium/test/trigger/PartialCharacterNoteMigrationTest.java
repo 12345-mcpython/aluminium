@@ -22,7 +22,9 @@ public class PartialCharacterNoteMigrationTest {
 
     @Test
     public void notesAreAnnotationsEvenWhenTheRuleIsNotComplete() throws Exception {
-        for (int cid : new int[]{1004, 1005, 1006}) {
+        // 1005 left this list on 2026-11-02: its last clause (Eidolon 4, 「触电状态产生伤害时恢复 2 点能量」) landed together
+        // with the `damage_is_dot` condition it needed, so it is complete now and the "partial" claim would be false.
+        for (int cid : new int[]{1004, 1006}) {
             Path file = Path.of("src", "main", "resources", "game", "characters", cid + ".json");
             try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
                 JsonElement root = JsonParser.parseReader(reader);
