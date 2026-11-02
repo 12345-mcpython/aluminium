@@ -3,10 +3,10 @@
   "character": 1210,
   "_status": "partial",
   "_gaps": [
-    "战技的灼烧已落地 ✓（`APPLY_DOT` × `all_hit_enemies`）；仍开：终结技（若目标灼烧则立即结算 92%）、天赋【吞火】、秘技、星魂 1–6、行迹其余",
-    "星魂 1–6：未读、未写",
-    "行迹：仅写「投狭」「逾锋」，其余行迹未读",
-    "普攻 / 技能伤害与火 DoT 的数值口径未核"
+    "✅ **已落地**（2026-11-02）：终结技的「灼烧立即产生 92%」（`ult_settles_the_burn`）、天赋【吞火】（`talent_firekiss_on_burn_tick`），加上原有的战技灼烧、行迹「投狭」「逾锋」、星魂 3/5 等级。",
+    "⛔ **秘技未写**：「进入战斗后造成 **4** 次伤害，每次对**随机单体**造成 **50%** 攻击力火伤，并有 100% 基础概率使目标陷入【吞火】」—— 4 次随机单体落在 `DAMAGE { times: 4, target: random_enemy }` 上是可做的，但【吞火】的叠层语义（每次命中叠一层、最多 3 层）需要先确认 `MODIFY_DAMAGE_TAKEN` 的 `max_stacks` 在**多次施放**之间的行为，下一轮核对后再写。",
+    "⛔ **星魂 1–6 未读**；**普攻 / 火 DoT 的数值口径未核**（`level_convention` 只说引用 Lv10 行，逐项没对）。",
+    "⛔ **【吞火】的「最多 3 层」未建模**：`MODIFY_DAMAGE_TAKEN` 不接受 `max_stacks`（只有 `MODIFY_ATTR` 支持层数），当前每次触发只挂一层 → 触发多次仍是 +7% 而不是 +21%。要忠实表达需要「易伤也能叠层」这一引擎能力。"
   ],
   "rules": [
     {
@@ -118,6 +118,42 @@
       "source": "1210 星魂 5: 等级加成（数据 skill_add_level: 121003=ULTRA+2, 121004=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_settles_the_burn",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "TICK_DOT",
+          "element": "Fire",
+          "percent_from_skill_param": "ULTRA:1",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1210 桂乃芬 终结技 给您来段看家戏: 「对敌方全体造成等同于桂乃芬120.00%攻击力的火属性伤害，若目标处于灼烧状态，使其当前承受的灼烧状态立即产生相当于原伤害92%的伤害。」",
+      "_note": "「若目标处于**灼烧**状态，使其当前承受的灼烧状态立即产生相当于原伤害 **92%** 的伤害」= `TICK_DOT { element: 「Fire」, percent_from_skill_param: 「ULTRA:1」, target: all_enemies }` ✓ —— `TICK_DOT` 只结算**已有的** DoT（没有灼烧的目标自然什么也不发生，正是「若…」的条件）✓，份额按终结技行读 ✓。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "talent_firekiss_on_burn_tick",
+      "when": [
+        "damage_is_dot",
+        "damage_element_is_self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.07,
+          "turns": 3,
+          "target": "target",
+          "buff": "吞火"
+        }
+      ],
+      "source": "1210 桂乃芬 天赋 古来君子养艺人: 「桂乃芬在场时，敌方受到的灼烧状态触发伤害后，有100%的基础概率陷入【吞火】状态，【吞火】状态下敌方目标受到的伤害提高7.00%，持续3回合，最多叠加3层。」",
+      "_note": "「敌方受到的**灼烧状态触发伤害后**…陷入【吞火】，受到的伤害提高 **7%**，持续 **3** 回合，最多 **3** 层」= `DAMAGE_SETTLED` + **`damage_is_dot`**（灼烧那一次结算）+ `damage_element_is_self`（她的火）→ `MODIFY_DAMAGE_TAKEN { percent: 0.07, turns: 3, buff: 吞火 }` ✓。⚠ `damage_is_dot` 正是今天为卡芙卡加的那个条件词，这里第二次用上 —— 没有它这条会把**任何**伤害都当成「灼烧触发」。⚠ 近似：「桂乃芬**在场时**」没有单独的门（她不在场她的规则不会触发，这一点由规则所有者的身份天然保证）。 ⛔ **叠层未建模**：`MODIFY_DAMAGE_TAKEN` 不吃 `max_stacks`（校验器只允许 `MODIFY_ATTR` 带层数），所以「最多 3 层」现在是**一层**。登记在 `_gaps`。"
     }
   ]
 }
