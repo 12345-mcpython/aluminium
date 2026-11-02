@@ -43,7 +43,8 @@ public class WeltTest {
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(WELT);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison");
+        // Two since 2026-11-02: Eidolon 1 also fires on ULT_CAST (「施放终结技后，瓦尔特获得强化」).
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison and Eidolon 1's power-up");
         // Two since 2026-11-02: Eidolon 2 rides the same slow-gated trigger (「触发天赋时，瓦尔特恢复 3 点能量」).
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the slow-gated talent and Eidolon 2");
         // Four since 2026-11-02: the technique is a BATTLE_START clause too.

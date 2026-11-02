@@ -3,7 +3,7 @@
   "character": 1004,
   "_status": "partial",
   "_gaps": [
-    "⛔ **强化形态【失重】未写 —— 但「缺机制」这个判断已被推翻**（2026-11-02 复查）：引擎**已有** `REPLACE_SKILL`（全库 **20 处**在用，1014 / 1109 / 1111 等），模式是 `ULT_CAST → REPLACE_SKILL { skill: COMMON, skill_id: 8 }` + `BASIC_ATTACK → REPLACE_SKILL { remove: true }`。⇒ 瓦尔特缺的是**内容**（把「终结技后 2 次普攻/战技附带附加伤害」写成 `ADD_STACK 强化 ×2` + 两条消耗规则），不是能力。⚠ 唯一需要新东西的是【失重】状态**由谁施加**（强化形态下的战技/终结技），那要在写的时候从文档里确认，不是先假定缺机制。",
+    "⛔ **强化形态【失重】与星魂 1/4/6 的「强化后」半条未写**：✅ 星魂 1 的**「强化前」半条已落地**（`eidolon1_powerup_after_ult` / `eidolon1_empowered_basic` / `eidolon1_empowered_skill`，判据 `WeltEidolonOneTest`：终结技后两击 **3224.61**、第三击回 **2456.85** ✓）。⚠ **「缺机制」这个判断已被推翻**：引擎的 `REPLACE_SKILL` 与 `ADD_STACK` + 层数消耗足以表达，本次就是用后者写的 —— 真正还没读的是【失重】**由谁施加**（强化形态下的战技/终结技），要从文档确认，不是先假定缺能力。",
     "⛔ **星魂 1 / 4 / 6 的「强化前」半条也未写**：它们各自需要「终结技后 2 次攻击附带附加伤害」「减速基础概率 +35%」「随机单体额外 1 次伤害」—— 前两条可做，被同一条强化形态的形态切换卡住（与上面同一根因）。",
     "✅ **已落地**（2026-11-02）：秘技（`technique_imprison_on_entry`）、星魂 2（`eidolon2_energy_on_the_talent`），加上原有的终结技禁锢、战技减速、天赋附加伤害、星魂 3/5 等级、行迹电音。",
     "⛔ **行迹未核对**：文档的行迹小节在本次抓取里没有独立标题，需按 `skill_traces.json` 逐条对照（下一轮做）。"
@@ -168,6 +168,120 @@
       ],
       "source": "1004 瓦尔特 星魂 2 星的凝聚 (Avatar_Welt_00_Rank02): 「触发天赋时，瓦尔特恢复3点能量。」 param = [3]",
       "_note": "「**触发天赋时**，瓦尔特恢复 **3** 点能量」= 与 `talent_additional_damage_on_slowed` **同一触发条件**（`DEALING_DAMAGE` + 自己 + 目标被减速 + 是攻击）→ `GAIN_ENERGY { amount: 3 }` ✓。⚠ **近似**：天赋本身是「额外造成 1 次附加伤害」，而这条挂在**它的触发条件**上、不是挂在「附加伤害真的结算了」上 —— 两者只有在附加伤害被完全挡住时才会分叉，当前引擎里没有那种情形。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon1_powerup_after_ult",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "强化",
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "强化",
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1004 瓦尔特 星魂 1 名的传承 (Avatar_Welt_00_Rank01) 强化前半: 「施放终结技后，瓦尔特获得强化，在随后2次施放普攻或战技时额外对敌方目标造成1次附加伤害。施放普攻造成的附加伤害等同于普攻伤害倍率的50%，施放战技造成的附加伤害等同于战技伤害倍率的80%。」",
+      "_note": "「施放终结技后，瓦尔特获得强化，在随后 **2 次**施放普攻或战技时额外造成 1 次附加伤害」= `ULT_CAST` → **两次** `ADD_STACK 强化`（一个计数器是同名的多条 buff；`max_stacks: 2` 与「2 次」一致）。⚠ 「强化」这个 buff 名是**本文件自己起的**（文档只说「获得强化」，没有状态名），所以下面两条消耗规则必须用同一个名字。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "eidolon1_empowered_basic",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "self_stacks:强化 >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "element": "Imaginary",
+          "target": "target",
+          "cast_category": "ADDITIONAL",
+          "value": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "attr",
+                "attribute": "ATTACK",
+                "whose": "owner"
+              },
+              {
+                "type": "skill_param",
+                "skill": "COMMON",
+                "index": 0
+              },
+              {
+                "type": "const",
+                "value": 0.5
+              }
+            ]
+          }
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "强化",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1004 瓦尔特 星魂 1 名的传承 强化前半: 「…施放普攻造成的附加伤害等同于普攻伤害倍率的50%…」",
+      "_note": "「施放普攻造成的附加伤害等同于**普攻伤害倍率的 50%**」= `value: { type: 「mul」, inputs: [攻击力, COMMON:0, 0.5] }` ✓ —— 用 `mul` 把「攻击力 × 普攻行倍率 × 50%」写成一条链，**没有任何手写数字**（0.5 是星魂参数）。⚠ `cast_category: 「ADDITIONAL」` = 「附加伤害」（不算一次攻击）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_empowered_skill",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "self_stacks:强化 >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "element": "Imaginary",
+          "target": "target",
+          "cast_category": "ADDITIONAL",
+          "value": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "attr",
+                "attribute": "ATTACK",
+                "whose": "owner"
+              },
+              {
+                "type": "skill_param",
+                "skill": "SKILL",
+                "index": 0
+              },
+              {
+                "type": "const",
+                "value": 0.8
+              }
+            ]
+          }
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "强化",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1004 瓦尔特 星魂 1 名的传承 强化前半: 「…施放战技造成的附加伤害等同于战技伤害倍率的80%…」",
+      "_note": "与普攻那条同构，份额换成 **战技行 × 80%**（`SKILL:0` × 0.8）。⚠ 两条都消耗同一层「强化」⇒ 「随后 2 次普攻或战技」由**层数**表达，不需要额外的形态标记。"
     }
   ]
 }
