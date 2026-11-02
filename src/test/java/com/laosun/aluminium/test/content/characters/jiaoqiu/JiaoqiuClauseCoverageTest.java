@@ -47,7 +47,7 @@ public class JiaoqiuClauseCoverageTest {
         SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
         SECTION_TO_RULE.put("秘技：旺火却乱", "technique_opening_aoe_and_stack");
         SECTION_TO_RULE.put("行迹：爟火", "trace_kindling_energy_at_battle_start");
-        SECTION_TO_RULE.put("行迹：举炊", "(registered: no threshold-step scaling — 每超过 15% 记一次整)");
+        SECTION_TO_RULE.put("行迹：举炊", "trace_stoking_attack_per_fifteen_percent");
         SECTION_TO_RULE.put("行迹：炙香", "trace_fragrant_guide_copies_the_highest_layers");
         SECTION_TO_RULE.put("行迹：效果命中 / 火伤 / 速度（数值行迹）",
                 "(no rule needed: stat traces are folded into the panel by the loader)");
@@ -183,21 +183,36 @@ public class JiaoqiuClauseCoverageTest {
                 "「最低为 1 层」 — the floor applies");
     }
     /**
-     * <b>Gap witness</b>: 行迹 举炊 (「效果命中大于 80% 时，每超过 15%…」) is still registered — it needs a threshold-stepped
-     * scaling and the engine only has continuous arithmetic. This test pins the registration: when the scaling lands, the gap
-     * text goes away and this assertion goes red.
+     * 行迹 举炊: 「效果命中大于 80% 时，每超过 15%，则额外提高 60% 攻击力，最高不超过 240%」.
+     *
+     * <p>Measured over the whole ladder: 0.94 and below ⇒ <b>601.524</b> (no step yet), 0.95 ⇒ <b>962.4384</b> (one step),
+     * 1.10 ⇒ <b>1323.3528</b> (two), 1.40 ⇒ <b>2045.1816</b> (four, the cap), and 1.60 ⇒ still 2045.1816.
+     *
+     * <p>Note: the step is a <b>whole</b> step, which is what {@code floor} buys — a continuous ratio would already pay 4% at
+     * 81% EHR, and the ladder above would be a straight line instead of five plateaus.
      */
     @Test
-    public void theThresholdTraceIsStillRegistered() throws IOException {
-        boolean registered = false;
-        for (var element : gaps()) {
-            if (element.getAsString().contains("举炊")) {
-                registered = true;
-            }
-        }
-        Assertions.assertTrue(registered, "「每超过 15% 记一次整」 is registered, not silently dropped");
+    public void theStokingTraceStepsEveryFifteenPercent() {
+        Assertions.assertEquals(601.524, attackAt(0.94), 1e-6, "below 95% ⇒ no step yet");
+        Assertions.assertEquals(962.4384, attackAt(0.95), 1e-6, "the first whole step");
+        Assertions.assertEquals(1323.3528, attackAt(1.10), 1e-6, "two steps");
+        Assertions.assertEquals(2045.1816, attackAt(1.40), 1e-6, "four steps = the 240% cap");
+        Assertions.assertEquals(2045.1816, attackAt(1.60), 1e-6, "「最高不超过 240%」 — 1.60 pays no more");
     }
 
+    /**
+     * The panel behind the ladder: the character is built, the effect-hit rate is set, and the battle start is what applies it.
+     */
+    private static double attackAt(double effectHitRate) {
+        Character jiaoqiu = CharacterFactory.create(JIAOQIU, 80);
+        jiaoqiu.getAttribute(AttributeType.EFFECT_HIT_RATE)
+                .addBase(effectHitRate - jiaoqiu.getAttribute(AttributeType.EFFECT_HIT_RATE).get());
+        Enemy enemy = BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL);
+        Battle battle = new Battle(List.of(jiaoqiu), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        battle.processRequests();
+        return jiaoqiu.getAttribute(AttributeType.ATTACK).get();
+    }
     // ==================================================================
     // Helpers
     // ==================================================================
@@ -278,6 +293,8 @@ public class JiaoqiuClauseCoverageTest {
         }
     }
 }
+
+
 
 
 
