@@ -44,8 +44,10 @@ public class WeltTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(WELT);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the slow-gated talent");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        // Two since 2026-11-02: Eidolon 2 rides the same slow-gated trigger (「触发天赋时，瓦尔特恢复 3 点能量」).
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the slow-gated talent and Eidolon 2");
+        // Four since 2026-11-02: the technique is a BATTLE_START clause too.
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention and the technique");
     }
 
     private static final class Fixture {

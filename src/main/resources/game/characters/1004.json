@@ -3,9 +3,10 @@
   "character": 1004,
   "_status": "partial",
   "_gaps": [
-    "强化形态的【失重】",
-    "行迹与星魂尚未核对",
-    "✅ 战技的「**75%**」是**速度降低的基础概率**（「攻击命中时有 75% 的基础概率使…速度降低 10%，持续 2 回合」），已由 `skill_speed_down` 实现（`base_chance: 0.75`）✓。⛔ 原登记写成「当前承受的所有持续伤害立即产生 75%」是**张冠李戴**（那是 1005 卡芙卡的战技），已删除。⛔ 仍开：强化形态的从句、终结技与行迹的其余部分。"
+    "⛔ **强化形态【失重】未写**（星魂 1/4/6 的「强化后」那一半都依赖它）：需要「施放终结技后进入强化形态，随后 2 次普攻/战技变形」的**技能替换**机制，且【失重】是强化形态才施加的状态。**机制缺口**，不是数据缺口。",
+    "⛔ **星魂 1 / 4 / 6 的「强化前」半条也未写**：它们各自需要「终结技后 2 次攻击附带附加伤害」「减速基础概率 +35%」「随机单体额外 1 次伤害」—— 前两条可做，被同一条强化形态的形态切换卡住（与上面同一根因）。",
+    "✅ **已落地**（2026-11-02）：秘技（`technique_imprison_on_entry`）、星魂 2（`eidolon2_energy_on_the_talent`），加上原有的终结技禁锢、战技减速、天赋附加伤害、星魂 3/5 等级、行迹电音。",
+    "⛔ **行迹未核对**：文档的行迹小节在本次抓取里没有独立标题，需按 `skill_traces.json` 逐条对照（下一轮做）。"
   ],
   "rules": [
     {
@@ -126,6 +127,47 @@
       "source": "1004 星魂 5: 等级加成（数据 skill_add_level: 100403=ULTRA+2, 100404=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_imprison_on_entry",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "APPLY_CONTROL",
+          "control": "禁锢",
+          "turns": 1,
+          "base_chance": 1,
+          "target": "all_enemies"
+        },
+        {
+          "op": "DELAY",
+          "percent": 0.2,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1004 瓦尔特 秘技 画地为牢 (100407, Maze/Impair): 「使用秘技后，制造1片持续15秒的特殊领域。处于特殊领域内的敌人移动速度降低50%。与处于特殊领域内的敌人进入战斗后，有100%的基础概率使敌方目标陷入禁锢状态，持续1回合。禁锢状态下，敌方目标行动延后20%…」",
+      "_note": "「与处于特殊领域内的敌人进入战斗后，有 **100%** 基础概率使敌方目标陷入**禁锢**，持续 **1** 回合；禁锢状态下敌方目标**行动延后 20%**」= `BATTLE_START` + `self has_state 秘技` → `APPLY_CONTROL 禁锢 { turns: 1, base_chance: 1 }` + `DELAY { percent: 0.2 }` ✓（与终结技的禁锢同一拼法）。⚠ 「15 秒领域 / 移动速度 −50%」是**地图层**事实。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon2_energy_on_the_talent",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "target is_slowed",
+        "damage_is_attack"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 3
+        }
+      ],
+      "source": "1004 瓦尔特 星魂 2 星的凝聚 (Avatar_Welt_00_Rank02): 「触发天赋时，瓦尔特恢复3点能量。」 param = [3]",
+      "_note": "「**触发天赋时**，瓦尔特恢复 **3** 点能量」= 与 `talent_additional_damage_on_slowed` **同一触发条件**（`DEALING_DAMAGE` + 自己 + 目标被减速 + 是攻击）→ `GAIN_ENERGY { amount: 3 }` ✓。⚠ **近似**：天赋本身是「额外造成 1 次附加伤害」，而这条挂在**它的触发条件**上、不是挂在「附加伤害真的结算了」上 —— 两者只有在附加伤害被完全挡住时才会分叉，当前引擎里没有那种情形。"
     }
   ]
 }
