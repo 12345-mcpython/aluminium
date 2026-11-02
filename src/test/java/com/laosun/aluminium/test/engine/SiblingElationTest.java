@@ -83,7 +83,9 @@ public class SiblingElationTest {
                             + "gains 5 Punchline, and \"if the target has an Elation Skill ... makes it immediately cast 1 Elation Skill\" (「若目标拥有欢愉技…使其立即施放 1 次欢愉技」)");
             Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                     "cid " + cid + ": the talent pays 3 笑点 on its own attack");
-            Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid);
+            // Four since 2026-11-02: the technique joined them on BATTLE_START (「下一次战斗开始时，使我方全体提高对应数值的
+            // 欢愉度，持续3回合」).
+            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid);
         }
     }
 
