@@ -3,7 +3,11 @@
   "character": 1513,
   "_status": "partial",
   "_gaps": [
-    "见 CONTENT-STATUS.md 的逐角色登记"
+    "⛔ 星魂 1 **后半**：「【热意】达到 **10 点/20 点/30 点**时，**都会**立即施放【举杯！敬炽烈一夏】」—— 缺「**阈值跨越**」这个事实：现有那条 10 点的规则靠「施放后花光【热意】」自我复位（见 `talent_autocasts_elation` 的 `_note`），而 20/30 两条与它**并存**时，达到 20 点会让「≥10」和「≥20」**同时**成立 ⇒ 连放两次。⇒ 需要一个「**正好跨过**某个阈值」的条件（或每条阈值一个一次性标记）。",
+    "⛔ 星魂 2：「【热意】**上限提高至 50 点**，达到 **40 点/50 点**时，也会触发天赋施放…。施放欢愉技后**额外获得 4 点【热意】**」—— ① 资源上限是 `resources[].max`（不是规则的 `max_stacks`）⇒ 改上限要**改资源声明**，而星魂门槛只能挂在规则上 ⇒ 需要「按星魂改资源上限」的写法；② 40/50 两条与星魂 1 的后半是同一个「阈值跨越」缺口；③ 「施放欢愉技后额外 +4【热意】」本身可写（`CAST_SETUP` + `from_category ElationDamage`），但它会改变**同一次施放**里「每消耗 1 点」的点数 ⇒ 要等 ①② 定下来一起写（否则会与 `fervor_extra_hit_per_point` 抢顺序）。",
+    "⛔ 星魂 6 **后半**：「砂金•戏浪施放 **2 次**欢愉技后，其后续施放的**所有**欢愉技均为【All in！敬炽烈一夏】，且在阿哈时刻外施放…**不再消耗【热意】**」—— 缺两样：① 「已施放 2 次」的**累计计数**（`CAST_COUNT` 那一族）；② 永久替换（`REPLACE_SKILL` 已支持 `permanent`，但它要**在第二次之后**才装，需要①来触发）。另「阿哈时刻外**不再消耗**」需要按场合开关 `SPEND_RESOURCE`。",
+    "⛔ 行迹 纵享惊涛（两分支）：① 「队伍中存在其他**欢愉**命途角色时，我方全体欢愉度 +20%、她自己额外 +80%」—— 条件 `has_same_path_ally` 有 ✓，但「额外 +80%」是**给她一个人**的（`all_allies` + `self` 两条即可，可写）；② 「队伍中**只有她**一名欢愉角色时，她施放欢愉技造成伤害**被视为追加攻击**」⇒ 需要「这次施放算不算追加攻击」的标记（`notCountsAsAttack` 的反面），引擎没有；③ 「队友施放攻击后，她获得 **2 点好活当赏**和 **1 个笑点**，并使**阿哈速度提高 25**，持续到阿哈时刻结束」⇒ `ALLY_ATTACK` + `GAIN_RESOURCE` 可写，但「阿哈速度」是**另一个单位**（阿哈）的属性，选择器里没有它。",
+    "⚠ **欢愉技行里的「10 次 × 18%」那一段仍未写**：`SkillExecutor` 只取参数行的**第一列**（60% 的全体伤害），这句追加段既不是规则也不是段表能给的 ⇒ 与 1111 的强化普攻段表同一族（**数据/引擎缺口**）。"
   ],
   "resources": [
     {
@@ -274,6 +278,107 @@
       "source": "1513 星魂 5: 等级加成（数据 skill_add_level: 151301=COMMON+1, 151303=ULTRA+2, 151321=COMMON+1）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    }
+    ,
+    {
+      "on": "BATTLE_START",
+      "id": "trace_joyful_party_speed_scales_elation",
+      "when": [
+        "self_attr:SPEED >= 140"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "permanent": true,
+          "target": "self",
+          "percent_from": {
+            "type": "add",
+            "inputs": [
+              {
+                "type": "const",
+                "value": 0.3
+              },
+              {
+                "type": "min",
+                "inputs": [
+                  {
+                    "type": "mul",
+                    "inputs": [
+                      {
+                        "type": "attr",
+                        "attribute": "SPEED",
+                        "above": 140
+                      },
+                      {
+                        "type": "const",
+                        "value": 0.01
+                      }
+                    ]
+                  },
+                  {
+                    "type": "const",
+                    "value": 2.0
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "source": "1513 砂金•戏浪 行迹 极乐派对 (1513101): 「速度大于等于140时，使自身欢愉度提高30%，之后每超过1点速度使自身欢愉度额外提高1%，最多计入200点超出的速度。」",
+      "_note": "「**速度 ≥140** 时，使自身**欢愉度**提高 **30%**，之后**每超过 1 点速度**额外提高 **1%**，**最多计入 200 点**超出的速度」—— ① 条件 `self_attr:SPEED >= 140` ✓；② 数值 = `0.3 + min(超出速度 × 0.01, 2.0)`，用 `attr` 提供器的 **`above: 140`**（只算超出量）＋ `mul`/`min`/`add` ✓ —— 「最多计入 200 点」正好是 200 × 1% = **2.0** ✓；③ `ELATION_DAMAGE_BOOST` 就是「欢愉度」✓（与 23052/8009 同一属性）。⚠ **近似**：挂在 `BATTLE_START` ⇒ 用**开战那一刻**的速度算一次；速度在战斗中变化不会重算（引擎没有「属性变化时重算」的事件）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_all_type_resistance_penetration",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION",
+          "percent": 0.24,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1513 砂金•戏浪 星魂 1 抵作筹码的假日: 「全属性抗性穿透提高24%。」 参数 = [0.24]",
+      "_note": "「**全属性抗性穿透**提高 **24%**」—— `MODIFY_ATTR DAMAGE_PENETRATION 0.24` 挂自己 ✓（与 1505 星魂 1 同一形状）。⚠ 星魂 1 的**后半**（【热意】达到 10/20/30 点都立即施放欢愉技）需要**多个阈值各自触发**，见 `_gaps`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_elation_damage_amp",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_AMP",
+          "percent": 0.25,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1513 砂金•戏浪 星魂 6 将往日兑作一场狂飙: 「砂金•戏浪造成的欢愉伤害增笑25%。」 参数 = [0.25]",
+      "_note": "「砂金•戏浪造成的**欢愉伤害增笑 25%**」—— **`ELATION_DAMAGE_AMP`** 是「增笑」的专用属性（与「欢愉度」`ELATION_DAMAGE_BOOST` 不同：后者是伤害提高、前者是欢愉伤害**自己的**放大器）✓。⚠ 星魂 6 的**后半**（施放 2 次欢愉技后所有欢愉技变为【All in！】、且阿哈时刻外不再消耗【热意】）需要「已施放欢愉技次数」的计数与「永久替换」的组合，见 `_gaps`。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon4_team_ignores_defence_after_skill",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.18,
+          "turns": 3,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1513 砂金•戏浪 星魂 4 无需同阳光交易: 「砂金•戏浪施放战技时，使我方全体造成的伤害无视敌方目标18%的防御力，持续3回合。」 参数 = [0.18, 3]",
+      "_note": "「施放战技时，使**我方全体**造成的伤害**无视 18% 防御力**，持续 **3 回合**」—— `MODIFY_ATTR DEFENCE_IGNORE 0.18` ＋ **`target: all_allies`** ＋ `turns: 3` ✓（防御无视是**攻击侧**属性 ⇒ 给全队而不是给敌人减防 ✓；与 1505 星魂 4 的单人版同一形状）。"
     }
   ]
 }
