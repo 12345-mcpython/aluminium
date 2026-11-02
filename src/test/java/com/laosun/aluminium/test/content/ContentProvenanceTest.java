@@ -44,9 +44,7 @@ public class ContentProvenanceTest {
             new Gap("23034.json", "cone23034_skill_point_count_skill", "note"),
             new Gap("23034.json", "cone23034_skill_point_count_ult", "note"),
             new Gap("23034.json", "cone23034_skill_point_pay_skill", "note"),
-            new Gap("23034.json", "cone23034_skill_point_pay_ult", "note"),
-            new Gap("23050.json", "cone23050_resets_the_weakness_count", "source"),
-            new Gap("23050.json", "cone23050_weakness_grants_skill_point", "source")
+            new Gap("23034.json", "cone23034_skill_point_pay_ult", "note")
     );
 
     @Test
