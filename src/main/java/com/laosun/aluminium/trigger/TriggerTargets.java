@@ -389,6 +389,15 @@ final class TriggerTargets {
                 // owner), and it does not filter the dead -- the op does, because only the op knows whether a dead
                 // unit is something it can act on.
             }
+            // 「使指定敌方目标的**相邻目标**也陷入…」 (1109 Hook's Eidolon 4): BOTH neighbours, in roster order -- the
+            // list twin of `random_adjacent_enemy`, which is one unit chosen from the same pair. A centre with no living
+            // neighbour answers an empty list, and the ops that take a list then do nothing (the honest reading).
+            case "adjacent_enemies" -> {
+                if (battle == null || ctx.target() == null) {
+                    return List.of();
+                }
+                return battle.adjacentEnemies(ctx.target());
+            }
             case TriggerVocabulary.TARGET_AND_SUMMON -> {
                 if (battle == null) {
                     throw new IllegalStateException(

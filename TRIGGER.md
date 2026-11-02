@@ -402,7 +402,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | 分类 | 选择器 |
 |---|---|
 | 自己人 | `self` `target` `attacker` `actor` `all_allies` `party` `other_allies` `next_ally` `party_first` `lowest_hp_ally` `random_ally_below_half_energy` `other_map_attackers` `highest_break_effect_ally` `allies_with_summons` |
-| 敌人 | `all_enemies` `random_enemy` `random_hit_enemy` `highest_hp_enemy` `target_else_random_enemy` |
+| 敌人 | `all_enemies` `random_enemy` `random_hit_enemy` `highest_hp_enemy` `target_else_random_enemy` `random_adjacent_enemy` `adjacent_enemies` |
 | 召唤物 | `summon` `all_summons` `target_and_summon` |
 | 按标记找人 | `holder_of:<状态>` |
 | 按命途 / id | `allies_of_path:<命途>` `allies_of_path_except:<命途>:<名单>` `ally_cid:<id>` |

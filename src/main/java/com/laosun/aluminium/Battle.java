@@ -488,11 +488,30 @@ public class Battle {
      * that is not on the enemy side, or has no living neighbour, answers {@code null}.
      */
     public CanHit randomAdjacentEnemy(CanHit center) {
+        List<CanHit> neighbours = adjacentEnemies(center);
+        return neighbours.isEmpty() ? null : neighbours.get(rng.nextInt(neighbours.size()));
+    }
+
+    /**
+     * <b>All</b> the living enemies adjacent (in the enemy roster's order) to {@code center}, in roster order.
+     *
+     * <p>The reader is 1109 Hook's Eidolon 4: 「触发天赋时…使指定敌方目标的<b>相邻目标</b>也陷入…灼烧状态」 — every neighbour, not one
+     * of them, which is why this is a list rather than the single-unit {@link #randomAdjacentEnemy(CanHit)}. Adjacency is
+     * the same roster order both methods use, and dead neighbours are skipped for the same reason: a corpse is not on the
+     * field to be burned.
+     *
+     * <p>Note: A centre that is not on the enemy side answers an <b>empty list</b> (not {@code null}) — the selector this
+     * feeds applies to nobody, which is the honest reading of "the adjacent targets of a unit that has none".
+     *
+     * @param center the unit whose neighbours are wanted
+     * @return the living enemies immediately before and after it in roster order; empty when it has none
+     */
+    public List<CanHit> adjacentEnemies(CanHit center) {
         List<com.laosun.aluminium.enemy.Enemy> enemies = enemyUnits().stream()
                 .filter(unit -> !unit.isDeath()).toList();
         int index = enemies.indexOf(center);
         if (index < 0) {
-            return null;
+            return List.of();
         }
         List<CanHit> neighbours = new java.util.ArrayList<>(2);
         if (index > 0) {
@@ -501,7 +520,7 @@ public class Battle {
         if (index + 1 < enemies.size()) {
             neighbours.add(enemies.get(index + 1));
         }
-        return neighbours.isEmpty() ? null : neighbours.get(rng.nextInt(neighbours.size()));
+        return List.copyOf(neighbours);
     }
 
     /**

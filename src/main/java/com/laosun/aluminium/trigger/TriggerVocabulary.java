@@ -123,6 +123,9 @@ final class TriggerVocabulary {
                     // One living enemy ADJACENT (roster order) to the current target, chosen with the
                     // battle's seeded RNG. Reader: 1103 Serval's Eidolon 1 ("one random adjacent target").
                     "random_adjacent_enemy",
+                    // BOTH living neighbours of the current target, in roster order -- the list twin of the selector above.
+                    // Reader: 1109 Hook's Eidolon 4 ("the adjacent targets of the designated enemy also burn").
+                    "adjacent_enemies",
                     // "the wearer and another teammate who triggered combat" (light cone 23050). The engine records who
                     // landed a map attack before the battle (`Battle.declareMapAttack`), so "triggered combat" is a fact,
                     // not a guess. This plural selector is the "other than the owner" half: a wearer who started the
