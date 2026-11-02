@@ -177,7 +177,8 @@ public final class DamageService {
         if (damage.getType().isCrittable() && !damage.isCritFixed()) {
             double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get() + damage.getExtraCritChance();
             boolean isCrit = critRate > 0 && battle.getRng().nextDouble() < critRate;
-            damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get() + damage.getExtraCritDamage());
+            damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get() + damage.getExtraCritDamage()
+                    + defender.getAttribute(AttributeType.CRIT_DAMAGE_TAKEN).get());
         }
         if (damage.critArea().isCrit()) {
             bus.fire(TriggerPayload.Subject.of(TriggerEvent.CRIT_DEALT, attacker, defender, 0,

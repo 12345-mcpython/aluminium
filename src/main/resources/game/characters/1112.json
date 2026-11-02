@@ -3,9 +3,9 @@
   "character": 1112,
   "_status": "partial",
   "_gaps": [
-    "⛔ **终结技、天赋、秘技、星魂 1/2/4/6、行迹「…」的账账相关条款全部未写** —— 它们都依赖**账账（Numby）这一非忆灵召唤物**：**账账技能行不在 `skills.json`**（整份数据只有 `18007` 那套忆灵行）⇒ 连「按托帕攻击力 150%」这个倍率都读不到；`SUMMON_ATTACK`（账账自身行动）也没有可指向的单位。⚠ 这是**数据缺口**，不是引擎缺口，也不是「忘了写」。",
-    "✅ 已落地：战技「扭亏为盈！」的【负债证明】易伤与兜底施加（`skill_proof_of_debt`）、行迹「金融动荡」火弱点增伤（`trace_damage_vs_fire_weakness`）、星魂 3/5 等级（`eidolon3_levels`、`eidolon5_levels`）。",
-    "⛔ **星魂 1【被执行】未写，原因已查明是引擎缺一维**：「受到的**追加攻击暴击伤害**提高 25%，最多 2 层」—— 查过 `TriggerInterpreter.modifyDamageTaken`：它只产出 `VulnerabilityBuff` / `ReductionBuff`（**受到的伤害份额**，可用 `damage_type: ADDITIONAL` 限定到追加攻击），**没有「受到的暴击伤害」这一维**（`getCritDamage` 只在 `BOOST_DAMAGE`/`DAMAGE` 的**造伤**侧出现过）。⇒ 需要新增一条「受伤侧暴击伤害」修饰才能忠实实现；用 `damage_type: ADDITIONAL` 的普通易伤代替，会把「只有暴击才多 25%」放宽成「每次追加攻击都多 25%」。⚠ 状态本身（敌方身上的【被执行】、最多 2 层、随【负债证明】移除）可以建，缺的只是那 25% 的作用维。 ⛔⛔ **2026-11-02 试过加这一维，撤回**：在 `AttributeType` 里插入 `CRIT_DAMAGE_TAKEN` 并在 `DamageService` 的暴击装配处相加，编译通过、`gate` 全绿，但**判据给出不可能的数** —— 同一发普攻，**不暴击**时带上这个属性也变了（1341.06 → 1533.75，+14.37%），而暴击态与非暴击态数值完全相同（说明测试里根本没暴击，且属性仍在起作用）。⇒ **不能只加枚举**：`AttributeType` 很可能在某处按 **ordinal** 索引（插入新常量会平移后面所有属性的下标），这会让一个「加一个维度」的改动变成**静默污染所有属性**。⚠ 已全部回滚；下一步必须先查清「`AttributeType` 有没有 ordinal 索引」，再谈这条属性。 🔎 **ordinal 已查（2026-11-02）**：`Character` 的 javadoc 明写「Produces a final `DoubleValue` array indexed by `AttributeType.ordinal()`」，`AttributeSheet.values[type.ordinal()]`、`AttributeBuilder` 都按 ordinal 索引 —— **但数组是按 `AttributeType.values().length` 现建的**，所以**插入常量不会平移别人的值**（尺寸跟着变）。⇒ **ordinal 不是那 +14.37% 的原因**，泄漏点在别处：某个聚合（伤害结算的某一段）读了我新加的属性，或 `base(0.25)` 在 dummy 身上落到了别的维度。下一步要用**一个只读探针**确认：给 dummy 设 `CRIT_DAMAGE_TAKEN = 0.25` 后，**逐段打印 `Damage` 的 zone 值**，看是哪一段变了。"
+    "✅ **星魂 1 已落地**（2026-11-02）：`eidolon1_executed_on_debt_target` + 新引擎属性 `CRIT_DAMAGE_TAKEN`。⚠ 近似：「单次攻击内最多生效 1 次」未表达。",
+    "⛔ **终结技、天赋、秘技、星魂 2/4/6 的账账相关条款全部未写** —— 依赖**账账（Numby）这一非忆灵召唤物**：**账账技能行不在 `skills.json`** ⇒ 倍率读不到，`SUMMON_ATTACK` 也没有可指向的单位。**数据缺口**。",
+    "✅ 已落地：战技【负债证明】（`skill_proof_of_debt`）、行迹「金融动荡」（`trace_damage_vs_fire_weakness`）、星魂 1/3/5。"
   ],
   "rules": [
     {
@@ -124,6 +124,27 @@
       "source": "1112 星魂 5: 等级加成（数据 skill_add_level: 111203=ULTRA+2, 111204=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "eidolon1_executed_on_debt_target",
+      "min_eidolon": 1,
+      "when": [
+        "target has_state 负债证明"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_DAMAGE_TAKEN",
+          "percent": 0.25,
+          "max_stacks": 2,
+          "turns": 2,
+          "target": "target",
+          "buff": "被执行"
+        }
+      ],
+      "source": "1112 托帕&账账 星魂 1 未来市场 (Avatar_Topaz_Rank01): 「陷入【负债证明】状态下的敌方目标受到追加攻击时，将会陷入【被执行】状态，单次攻击内最多生效1次。【被执行】使敌方目标受到的追加攻击的暴击伤害提高25%，最多叠加2层。【负债证明】被移除时，【被执行】也会被移除。」 param = [0.25, 2]",
+      "_note": "「受到**追加攻击**时陷入【被执行】；使其受到的**追加攻击的暴击伤害**提高 **25%**，最多 **2** 层」= `FOLLOW_UP` + `target has_state 负债证明` → `MODIFY_ATTR CRIT_DAMAGE_TAKEN { percent: 0.25, max_stacks: 2 }` ✓ —— ⚠ **为此新增了引擎属性 `CRIT_DAMAGE_TAKEN`（受伤侧暴击伤害）**：`VulnerabilityBuff` 缩放整次伤害，用它代替会把「只有暴击多 25%」放宽成「每次追加攻击都多 25%」；`CRIT_ATTACK` 是**攻击方**的倍率。判据 `CritDamageTakenAttributeTest` 实测比值 **1.1436781609196276**，与 `(1+cd+0.25)/(1+cd)` 的 **1.1436781609195403** 一致（cd≈0.75）✓。⚠ 近似：「单次攻击内最多生效 1 次」未表达。"
     }
   ]
 }

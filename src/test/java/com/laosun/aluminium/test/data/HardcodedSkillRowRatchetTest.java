@@ -48,7 +48,9 @@ public class HardcodedSkillRowRatchetTest {
      * cell, so the scan cannot tell it from a frozen row. It is a share of the SETTLED damage (x3.4), not of the row, and
      * the rule's own `_note` records why.
      */
-    private static final int BASELINE = 36;
+    // 37 since 2026-11-02: 1112 Topaz's Eidolon 1 writes 0.25 (「受到的追加攻击暴击伤害提高 25%」) - a STAR-SOUL parameter that
+    // happens to equal a row cell, like 1412's 2.4 above. No reader exists for an Eidolon row, so it stays literal.
+    private static final int BASELINE = 37;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

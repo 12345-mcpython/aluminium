@@ -38,6 +38,12 @@ public enum AttributeType {
 
     @SerializedName("crit_chance") CRIT_CHANCE("crit_chance"),
     @SerializedName("crit_attack") CRIT_ATTACK("crit_attack"),
+    /**
+     * 「受到的**暴击伤害**提高 X%」 - the RECEIVING side of a critical hit. Distinct from {@link #CRIT_ATTACK} (the attacker's
+     * own multiplier) and from the damage-taken zone (which scales the whole hit): a rule that says only CRITICAL hits hurt
+     * more needs this number. 0 by default; {@code MODIFY_ATTR} writes it like any other attribute.
+     */
+    @SerializedName("crit_damage_taken") CRIT_DAMAGE_TAKEN("crit_damage_taken"),
     @SerializedName("effect_hit_rate") EFFECT_HIT_RATE("effect_hit_rate"),
     @SerializedName("effect_resistance") EFFECT_RESISTANCE("effect_resistance"),
 
