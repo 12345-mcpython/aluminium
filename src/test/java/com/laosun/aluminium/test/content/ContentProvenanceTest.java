@@ -38,7 +38,7 @@ public class ContentProvenanceTest {
 
     /** The recorded backlog (2026-10-30). Fix one, delete its line. */
     private static final List<Gap> RECORDED = List.of(
-            new Gap("1006.json", "skill_inserts_party_first_weakness", "source"),
+            // 1006 skill_inserts_party_first_weakness and 1504 ults_immediate_talent: sources filled on 2026-11-02.
             // 1203 talent_zone_heals_the_attacker: source filled on 2026-11-02 (see its _note).
             new Gap("1306.json", "talent_raises_skill_point_cap", "note"),
             new Gap("1309.json", "ult_zone_defence_ignore", "source"),
@@ -46,7 +46,6 @@ public class ContentProvenanceTest {
             new Gap("1405.json", "talent_random_weakness_on_hit", "source"),
             new Gap("1406.json", "aura_damage_taken_while_present", "source"),
             new Gap("1410.json", "ult_zone_opens_and_lowers", "source"),
-            new Gap("1504.json", "ults_immediate_talent", "source"),
             new Gap("23034.json", "cone23034_skill_point_count_skill", "note"),
             new Gap("23034.json", "cone23034_skill_point_count_ult", "note"),
             new Gap("23034.json", "cone23034_skill_point_pay_skill", "note"),
