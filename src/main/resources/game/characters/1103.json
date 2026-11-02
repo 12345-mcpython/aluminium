@@ -3,7 +3,7 @@
   "character": 1103,
   "_status": "implemented",
   "_gaps": [
-    "⭐ **秘技已实现**（2026-11-02）：`technique_shock_and_damage` —— 随机单体 50% 攻击力雷伤（`skill: 「TECHNIQUE」` + `damage_param: 1`）+ 敌方**全体**触电 3 回合（`APPLY_DOT` 读 `TECHNIQUE:3`）。判据 `ServalTechniqueTest`：两个敌人**都**进入触电、且总掉血 > 0；对照组（不用秘技）无人触电 ✓。⚠ 登记：句子是「100% 基础概率」，**故意不写 `base_chance`**（写了会被效果抵抗削掉），代价是这条不吃效果命中、也不被抵抗。⛔ 仍开：其余技能从句与星魂细节。"
+    "✅ **全条款覆盖（2026-11-02 逐条核对）**：文档 14 节全部有对应规则 —— 普攻（读技能行，无需规则）/ 战技 `skill_shock` / 终结技 `ult_effect` / 天赋 `attack_effect` / 秘技 `technique_shock_and_damage` / 星魂 1–6（`eidolon1_adjacent_damage_on_basic`、`eidolon2_energy_on_talent_additional_damage`、`eidolon3_levels`、`eidolon4_ult`、`eidolon5_levels`、`eidolon6_on_damage`）/ 行迹 电音·狂热·摇滚（`battle_start`、`on_kill_effect`、`battle_start_2`）。判据：`ServalClauseCoverageTest`（逐节断言）+ `ServalTechniqueTest`。⚠ 仍存在的**已知近似**（不是缺口）：① 秘技的「100% 基础概率」写成不判定的直接附着（不吃效果命中/抵抗）；② 星魂 4 的 `turns: 2` 是字面值，与战技行 `SKILL:3 = 2` 一致；③ 「20 秒」「移动速度」等地图层成分不建模。"
   ],
   "rules": [
     {
