@@ -175,9 +175,11 @@ public class OtherAlliesTargetTest {
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(ROBIN).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(robin, robin, null, 0, 0, null, battle));
 
-        // Note: her ultimate's clauses fire four rules on ULT_CAST -- this ADVANCE, the [协奏] state
-        // plus its countdown, the state's own ATK boost plus control immunity, and the zone's 20% defence ignore.
-        Assertions.assertEquals(4, rules.size());
+        // Three since 2026-11-02: this ADVANCE, the [协奏] state plus its countdown, and the state's own ATK boost plus
+        // control immunity. A fourth rule (a 20% defence ignore under 「结界」) was removed that day: 知更鸟's document has no
+        // such clause at all (0 mentions of 结界 - her state is 【协奏】), and the sentence it quoted belongs to 1303 阮•梅's
+        // Eidolon 1, which already implements it.
+        Assertions.assertEquals(3, rules.size());
         List<EffectSpec> effects = rules.getFirst().effects();
         Assertions.assertEquals(1, effects.size());
         Assertions.assertEquals("ADVANCE", effects.getFirst().getOp());
