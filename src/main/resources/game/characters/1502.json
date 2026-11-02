@@ -5,7 +5,7 @@
   "_gaps": [
     "⭐ **「结界期间我方全体欢愉度提高 = 爻光欢愉度的 20%」已落地**（2026-11-02）：`skill_opens_the_zone` 的 `do` 里追加 `MODIFY_ATTR ELATION_DAMAGE_BOOST { scale: 「self_attr:ELATION_DAMAGE_BOOST」, percent: 0.2, turns: 3, target: 「all_allies」 }` —— `self_attr:` 就是**爻光自己的**欢愉度（不需要新的跨单位词），`turns: 3` 与结界同长。判据 `YaoguangZoneElationTest`：她 0.6 时队友 +0.12 ✓（**断言写成「她的实时值 × 20%」**，因为她的欢愉度在开局还带别的加成 —— 写死 0.1 会误判）。",
     "⛔ **终结技「使阿哈立即获得 1 个固定计入 20 笑点的额外回合」未写**：需要「额外回合 + 资源门槛」。",
-    "⛔ **天赋【大吉大利】「消耗战技点时再触发一次」未写**：「消耗战技点」是事件（`SKILL_POINT_SPENT` ✓ 存在），但「再触发一次」要**重入**同一效果，需先核对引擎是否允许。",
+    "⭐ **天赋【大吉大利】已修正并落地**（2026-11-02）：条件改为 `[「actor is_ally」, 「self has_state 好活当赏」]`、`element` 改为 `attacker`（「对应属性」）。判据 `YaoguangTalentScopeTest`：队友普攻在**持有时**损失 **1494.74**、**不持有**时 **1341.06** ✓（差 153.68 = 那 20% 的一发）。",
     "⛔ **星魂与行迹未读**。"
   ],
   "rules": [
@@ -159,21 +159,22 @@
       "on": "ATTACK_FINISHED",
       "id": "talent_lucky_followup",
       "when": [
-        "actor == self"
+        "actor is_ally",
+        "self has_state 好活当赏"
       ],
       "do": [
         {
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
           "percent_from_skill_param": "TALENT:0",
-          "element": "Physical",
+          "element": "attacker",
           "damage_type": "ELATION",
           "target": "random_hit_enemy",
           "cast_category": "ADDITIONAL"
         }
       ],
-      "source": "1502 爻光 天赋 大吉大利: 「每次攻击后，对随机 1 个命中目标追加 1 次等同于爻光 20% 攻击力的对应属性欢愉伤害。该伤害不视为造成了 1 次攻击。」 天赋 Lv10 = [0.2]",
-      "_note": "「**随机 1 个命中目标**」—— 用 `random_hit_enemy`（**命中集合内**随机，不是全體随机）✓；`damage_type: 「ELATION」` 表示欢愉伤害 ✓；`percent_from_skill_param: 「TALENT:0」` 按等级读 ✓。⚠ 「不视为造成了 1 次攻击」由 `cast_category: 「ADDITIONAL」` 表达（与追击同族，不触发「攻击后」类规则）。⛔ 仍缺：「消耗战技点时再触发一次」—— 需要在**消耗**事件上重复这条（`SPEND_RESOURCE` 的钩子），已登记在 `_gaps`。"
+      "source": "1502 爻光 天赋 屏开千光，遍观自在: 「爻光持有【好活当赏】时：使我方目标施放攻击后触发【大吉大利】效果，对随机1个击中的目标额外造成1次20.00%的对应属性欢愉伤害，本次攻击若消耗战技点，则额外触发1次【大吉大利】效果。触发【大吉大利】效果时若攻击者欢愉度低于爻光，则该次欢愉伤害使用爻光欢愉度来计算。触发【大吉大利】效果不视为1次攻击。」 天赋 Lv10 = [0.2]",
+      "_note": "「爻光**持有【好活当赏】时**：使我方目标施放攻击后触发【大吉大利】…对随机 1 个击中的目标额外造成 1 次 **20.00%** 的**对应属性**欢愉伤害」= `ATTACK_FINISHED` + `when: [「actor is_ally」, 「self has_state 好活当赏」]` → `DAMAGE { scale: 「self_attr:ATTACK」, percent_from_skill_param: 「TALENT:0」, element: 「attacker」, damage_type: 「ELATION」, target: 「random_hit_enemy」, cast_category: 「ADDITIONAL」 }` ✓。⚠ **两处修正（2026-11-02）**：① 条件原来是 `actor == self` —— 句子是「**我方目标**施放攻击后」，**队友的攻击也算**，而且必须**她持有【好活当赏】**（原写法两条都不满足，规则只在她自己普攻后触发）；② `element` 原来是写死的 `Physical` —— 句子是「**对应属性**」，即**攻击者的属性**，引擎有现成的 `element: 「attacker」`。⛔ 仍缺：「本次攻击若消耗战技点，则**额外触发 1 次**」（需要「这一发消耗了战技点」的条件，词表里没有）与「攻击者欢愉度低于爻光时改用爻光的欢愉度」（需要按欢愉度取大者的派生）。"
     }
   ],
   "resources": [
