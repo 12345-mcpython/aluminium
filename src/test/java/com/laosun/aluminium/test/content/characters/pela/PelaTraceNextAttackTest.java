@@ -30,6 +30,10 @@ public class PelaTraceNextAttackTest {
         Battle battle = new Battle(new ArrayList<>(List.of(pela, CharacterFactory.create(1001, LEVEL))),
                 new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
+        // Note: the sentence is 「施放战技**解除增益效果时**」 — so the fixture has to give the enemy something to dispel.
+        // Before 2026-11-02 the rule fired on every Skill (the engine had no way to ask), which is why this test did not
+        // need the buff; now the condition is real (`PelaClauseCoverageTest` holds the "nothing to dispel" half).
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("敌方增益", 2));
         double before = pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
         battle.castImmediate(pela.getSkills().get(SkillType.SKILL), pela, List.of(enemy));

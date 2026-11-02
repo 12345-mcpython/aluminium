@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.buff.DotBuff;
+import com.laosun.aluminium.buff.StateBuff;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
@@ -40,10 +41,10 @@ import java.util.Map;
  *       (only its defence-down half was).</li>
  * </ul>
  *
- * <p><b>What is registered instead</b>: 「施放战技<b>解除增益效果时</b>」 cannot be checked — there is no "how many buffs does the
- * target carry" variable and {@code REMOVE_BUFF} announces nothing — so the trace and Eidolon 2 fire on the <b>cast</b>.
- * {@link #theDispelTriggerIsApproximatedByTheCast} is the gap witness: it pins today's reading and will go red when the
- * engine can tell that something was really removed.
+ * <p><b>「施放战技<b>解除增益效果时</b>」 became exact on 2026-11-02</b>: the engine gained {@code target_buff_count} — what a
+ * dispel would <b>really</b> remove ({@code BuffManager.dispellableBuffCount()}, which shares its predicate with
+ * {@code removeBuffs}) — so the trace and Eidolon 2 fire only when the target had something to strip. ⚠ The dispel rule
+ * therefore has to sit <b>last</b> among the {@code SKILL_CAST} rules: conditions are evaluated per rule, in file order.
  */
 public class PelaClauseCoverageTest {
 
@@ -176,24 +177,50 @@ public class PelaClauseCoverageTest {
     }
 
     /**
-     * Eidolon 2: +10% SPD for 2 turns after the skill. Measured 105 → <b>115.5</b> at E2, unchanged at E1.
+     * Eidolon 2: 「施放战技解除增益效果时，速度提高 10%」 — and the "when it really dispelled" gate is now exact.
      *
-     * <p><b>Gap witness</b>: the target here carries <b>no</b> buff at all, yet the speed still lands — that is the
-     * 「解除增益效果时」 approximation registered in {@code _gaps}. This test will go red when the engine can tell that a
-     * buff was really removed.
+     * <p>Measured three ways: target carrying a dispellable buff ⇒ 105 → <b>115.5</b> (and the buff is gone); nothing to
+     * dispel ⇒ <b>105</b> (the clause does not fire); E1 ⇒ 105 even with a buff.
      */
     @Test
-    public void theDispelTriggerIsApproximatedByTheCast() {
+    public void eidolon2NeedsSomethingToDispel() {
         Fixture e2 = new Fixture(2);
-        Assertions.assertTrue(e2.enemy.getBuffManager().activeBuffs().isEmpty(), "precondition: nothing to dispel");
+        e2.enemy.getBuffManager().addBuff(new StateBuff("敌方增益", 2));
         e2.castSkill();
         Assertions.assertEquals(115.50000000000001, e2.pela.getAttribute(AttributeType.SPEED).get(), 1e-9,
-                "105 × 1.1 — the speed lands even though there was no buff to remove (the registered approximation)");
+                "105 × 1.1 — 「解除增益效果时」 and the target really had one");
+        Assertions.assertTrue(e2.enemy.getBuffManager().activeBuffs().isEmpty(), "...and the skill did dispel it");
+
+        Fixture nothing = new Fixture(2);
+        nothing.castSkill();
+        Assertions.assertEquals(105.0, nothing.pela.getAttribute(AttributeType.SPEED).get(), 1e-9,
+                "nothing to dispel ⇒ the clause does not fire (before 2026-11-02 this landed anyway)");
 
         Fixture e1 = new Fixture(1);
+        e1.enemy.getBuffManager().addBuff(new StateBuff("敌方增益", 2));
         e1.castSkill();
         Assertions.assertEquals(105.0, e1.pela.getAttribute(AttributeType.SPEED).get(), 1e-9,
                 "control: it is Eidolon 2");
+    }
+
+    /**
+     * The trace 追歼 reads the same gate: 「施放战技解除增益效果时，下一次攻击造成的伤害提高 20%」.
+     *
+     * <p>Measured: +0.2 with a buff to dispel, +0.0 without. (`PelaTraceNextAttackTest` holds the "spent by the next
+     * attack" half.)
+     */
+    @Test
+    public void theTraceNeedsSomethingToDispel() {
+        Fixture withBuff = new Fixture(0);
+        withBuff.enemy.getBuffManager().addBuff(new StateBuff("敌方增益", 2));
+        withBuff.castSkill();
+        Assertions.assertEquals(0.2, withBuff.pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
+                "「下一次攻击造成的伤害提高 20%」");
+
+        Fixture nothing = new Fixture(0);
+        nothing.castSkill();
+        Assertions.assertEquals(0.0, nothing.pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
+                "nothing to dispel ⇒ no boost");
     }
 
     /**
@@ -283,4 +310,5 @@ public class PelaClauseCoverageTest {
         }
     }
 }
+
 
