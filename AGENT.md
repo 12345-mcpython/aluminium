@@ -148,6 +148,8 @@
 
     ⚠ 反过来也成立：**真缺的时候要写清楚缺哪一维**（托帕的「受伤侧暴击伤害」经查确实没有）—— 一次是 1 分钟，一次是一整轮。
 
+55. **给老内容补 `min_eidolon` 会让「按旧约定建的判据」变红** ✓（2026-11-02，1211 星魂 1）—— 旧文件把星魂从句写成**无门槛**（见第 20 条），于是判据也建在 **E0**；补上门槛之后那条判据「有理有据地红」（`StateEndedEnergyProbeTest` 的夹具当时建在 E0）。⇒ 顺序是：**先把规则改对（含门槛），再改判据**；改的时候写清「旧版本建在 E0，是因为当时那条规则没有门槛」，并把「E0 不生效」这一侧移进逐节判据（`BailuClauseCoverageTest.eidolon1IsNotLiveAtE0`）。⚠ 别为了让旧判据变绿而**去掉门槛** —— 那是把星魂条款降级成常驻效果，和第 20 条是同一个错的两面。⚠ 判据报错的位置会指向「实现变了」，而真相是「判据在测旧约定」—— 先读那条判据的夹具建在哪个星魂档位。
+
 
 
 
@@ -1330,6 +1332,8 @@ gate the rule with `self_summon_count >= 1` so it only fires when there is one
   - **「每场 1 次 + 终结技重置」的旗标不可复位** ✗：`once_per_battle` 不能复位 ✓（`RESET_TRIGGER_LIMIT` 只对**规则级**限流有效 ✓）。读者：**23040**（忆灵消失）。见证：`ConeAuditBatchTwentyFourTest` ✓。
   - ⭐ **已解决（2026-10-31）**：「**受到的击破伤害** + **来自某人**」—— `damage_type: BREAK` ✓ 与新字段 **`from_self: true`** ✓（易伤区在结算时比 `damage.getAttacker()`，`VulnerabilityBuff` 的来源过滤 ✓）可以叠加；读者 **23025** ✓；判据 `ConeTwentyThreeThousandTwentyFiveTest` ✓。
   - **⭐ 已解决的旧登记** ✓：**「这次施放花了多少能量」** —— 变量 **`cast_energy_spent`** 已存在 ✓（读者 **23062** ✓），所以 **23037** 的同类句子可以**下次直接写** ✓（不必再登记 ✓）。
+
+- **`HEALED` 不携带「施放类别」** ✗（2026-11-02 实测 ✓）：「**战技**提供的每 1 次治疗」若想在 `HEALED` 上筛施放类别，**装载期**直接拒绝 —— 原话「`Condition 'from_category BPSKILL' asks the cast's category, but HEALED carries none, so the condition could never hold; it works on ALLY_ATTACK / ATTACK_FINISHED / BREAK / CAST_SETUP / CRIT_DEALT / DAMAGE_SETTLED / DEALING_DAMAGE / KILL`」。⇒ 目前只能用 `SKILL_CAST` 替代：那是**施放**的事实，而「战技只治一个目标」时两者等价（战技治多个目标时就不等价了）。读者：**1211 星魂 4**。缺口见证：`BailuClauseCoverageTest.eidolon4StacksOncePerSkillCast`。要开这个口子：给 `HEALED` 的 payload 带上施放类别 —— `Battle.heal` 在施放内被调用时这个事实是**可得**的，而施放之外（buff 自己触发的治疗）本来就没有类别，条件正好为假。
 
 - **「助战技」没有槽位，也没有施放入口** ✗：`SkillCategory.ASSIST` 能**命名** ✓（`from_category Assist` 装载通过 ✓），但 `SkillType` / `Constant.SKILL_SLOT` 里**没有助战技槽位**（数据里是 1510 的 22 / 25 / 26 ✓）⇒ 角色不会装备也不会施放它，`CAST_SETUP + from_category Assist` **永远不触发** ✗。读者：**23060**（「施放助战技时恢复 6 点能量并获得【启航】…」）。见证：`AssistSkillGapTest`（1510 装不到 22/25/26 ✓；能力落地时它红 ✓）。
 - **buff 身份的审计结论（2026-10-31）**：同类判定的正确语义**按 buff 家族分三类**，不能共用一个默认 ✓：
