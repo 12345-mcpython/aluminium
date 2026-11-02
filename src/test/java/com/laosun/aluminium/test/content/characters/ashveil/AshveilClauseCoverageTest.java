@@ -54,6 +54,26 @@ public class AshveilClauseCoverageTest {
         Assertions.assertEquals(18, e2.layers(), "「叠加上限提高至 18 层」");
     }
 
+    /**
+     * The Ultimate's other two halves (2026-11-03): 「使指定敌方单体成为【饲饵】」 and 「获得 3 点充能」.
+     *
+     * <p>Measured: after the Ultimate the target holds the bait and her charges are back to the declared maximum of <b>3</b> (from 0).
+     * The bait is applied BEFORE the follow-up cast, which is what lets 「对【饲饵】发动追加攻击」 see it.
+     */
+    @Test
+    public void theUltimateMarksTheBaitAndRefillsTheCharges() {
+        Fixture f = new Fixture(0);
+        f.ashveil.getResources().get("充能").setValue(0);
+
+        double hpBefore = f.enemy.getCurrentHp();
+        f.castUltimate();
+
+        Assertions.assertTrue(f.enemy.getCurrentHp() < hpBefore, "precondition: the Ultimate and its follow-up landed");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("饲饵"), "「使指定敌方单体成为【饲饵】」");
+        Assertions.assertEquals(3, f.ashveil.getResources().get("充能").value(), 1e-9,
+                "「且不死途获得 3 点充能」 (clamped at the declared maximum of 3)");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -89,9 +109,18 @@ public class AshveilClauseCoverageTest {
             battle.processRequests();
         }
 
+        private void castUltimate() {
+            battle.castImmediate(ashveil.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), ashveil, List.of(enemy));
+            battle.processRequests();
+        }
+
         private int layers() {
             return ashveil.getBuffManager().stacksOf(LAYERS);
         }
     }
 }
+
+
+
+
 
