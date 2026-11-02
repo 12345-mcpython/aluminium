@@ -190,7 +190,8 @@
           "target": "all_enemies"
         }
       ],
-      "_note": "「赛飞儿**在场时**，敌方全体目标**受到的伤害提高 40%**」—— ⭐ 2026-09-30 转正 ✓：⚠ 旧登记写“需要某角色在场时对全体敌方生效的通道”✗ —— 而那个通道**已经存在** ✓：withSource 给每个 buff 记下 source = ctx.owner()，而 BuffManager.removeBuffsAnchoredTo 由 Battle.removeDeadCombatants 调用 ⇒ **她倒下时它自动被摘** ✓，正是“在场”的语义。⚠ 判据必须断言**两件**：伤害 +40% ✓，以及**她倒下后它消失** ✗。"
+      "_note": "「赛飞儿**在场时**，敌方全体目标**受到的伤害提高 40%**」—— ⭐ 2026-09-30 转正 ✓：⚠ 旧登记写“需要某角色在场时对全体敌方生效的通道”✗ —— 而那个通道**已经存在** ✓：withSource 给每个 buff 记下 source = ctx.owner()，而 BuffManager.removeBuffsAnchoredTo 由 Battle.removeDeadCombatants 调用 ⇒ **她倒下时它自动被摘** ✓，正是“在场”的语义。⚠ 判据必须断言**两件**：伤害 +40% ✓，以及**她倒下后它消失** ✗。",
+      "source": "1406 赛飞儿 天赋 热情好客的多洛斯人: 「赛飞儿在场时，敌方全体目标受到的伤害提高40%。」"
     },
     {
       "id": "memosprite_ode_of_trickery_raises_her_damage",
