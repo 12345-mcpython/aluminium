@@ -3,10 +3,11 @@
   "character": 1223,
   "_status": "partial",
   "_gaps": [
-    "充能没有上限，无法声明资源：战技 +9、天赋消耗 1 点 / 每 3 点追加攻击、0 点解除猎物均未写",
-    "【猎物】的解除条件（0 充能 / 无其他可战斗角色）与离场状态未写",
-    "秘技「隐身状态下不会被敌人发现」大地图效果未写",
-    "星魂 2 跨单位条件（攻击者对猎物暴伤 +40%）未写；其余星魂未读"
+    "⛔ 充能没有上限、无法声明为资源：战技 +9、天赋消耗 1 点 / 每 3 点追加攻击、0 点解除【猎物】均未写（`resources` 需要一个不带上限的声明，或改用计数器）。",
+    "⛔ 【猎物】的解除条件（0 充能 / 无其他可战斗角色）与离场状态未写。",
+    "⚠ 秘技「隐身状态下不会被敌人发现」是大地图效果，不建模。",
+    "⭐ **星魂 2/4/6 已于 2026-11-03 落地**：② 对【猎物】的暴击伤害 +40%（跨单位 `target: actor`，`instance: true`）；④ 终结技后伤害 +30% / 2 回合；⑥ 天赋追加攻击倍率 ×1.25（`MODIFY_RULE effect_percent_scale`，对字面 `percent` 是乘）。判据 `MozeClauseCoverageTest`。",
+    "⚠ 星魂 1 的「每触发 1 次天赋附加伤害 +2 能量」现已写成 `ALLY_ATTACK` + `target has_state 猎物` 上的第二条规则 —— ⚠ 它与天赋伤害那条**同条件**，但「触发 1 次」在天赋**未触发**时（例如没有充能）也会加能量 ⇒ 近似，已在规则 `_note` 记录。"
   ],
   "rules": [
     {
@@ -206,6 +207,60 @@
       "source": "1223 星魂 5: 等级加成（数据 skill_add_level: 122301=COMMON+1, 122302=SKILL+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    }
+    ,
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon2_crit_damage_against_the_prey",
+      "min_eidolon": 2,
+      "when": [
+        "target has_state 猎物"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.4,
+          "instance": true,
+          "permanent": true,
+          "target": "actor"
+        }
+      ],
+      "source": "1223 貊泽 星魂 2 惩膺: 「我方全体目标对成为【猎物】的敌方目标造成伤害时，暴击伤害提高40%。」 参数 = [0.4]",
+      "_note": "「**我方全体目标**对成为【猎物】的敌方目标**造成伤害时**，**暴击伤害**提高 **40%**」—— ① 事件 `DEALING_DAMAGE` ✓（「造成伤害时」）；② 条件 `target has_state 猎物` ✓（被打的是猎物 ✓）；③ ⭐ **跨单位**：这条规则挂在貊泽的文件里，但加成要落在**出手的人**身上 ⇒ `target: actor` ✓（不是 `self` ✗ —— 那只会给她自己发）；④ `instance: true` 只加**这一发**的暴击区 ✓，不上面板、不漏到下一发 ✓（与 1003 行迹 道标 同一形状）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon4_damage_up_after_the_ultimate",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1223 貊泽 星魂 4 逐薮: 「施放终结技时，貊泽造成的伤害提高30.00%，持续2回合。」 参数 = [0.3, 2]",
+      "_note": "「施放终结技时，**貊泽**造成的伤害提高 **30%**，持续 **2 回合**」—— `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.3` ＋ `turns: 2` ＋ `target: self` ✓（限定主语是**她**，不是全队 ⇒ 不能写 `all_allies` ✗）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_raises_the_talent_multiplier",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_additional_damage_on_prey",
+          "effect_percent_scale": 1.25
+        }
+      ],
+      "source": "1223 貊泽 星魂 6 丹心: 「天赋的追加攻击的伤害倍率提高25%。」 参数 = [0.25]",
+      "_note": "「天赋的**追加攻击伤害倍率**提高 **25%**」—— `MODIFY_RULE { rule: talent_additional_damage_on_prey, effect_percent_scale: 1.25 }` ✓：那条天赋伤害写的是**字面 `percent: 0.3`** ⇒ `effect_percent_scale` 对字面值是**乘** ✓（0.3 → 0.375）；⚠ 若它是**行份额**则变成**加**（AGENT §0.2 第 26 条），所以要认准它读的是字面值 ✓。"
     }
   ]
 }
