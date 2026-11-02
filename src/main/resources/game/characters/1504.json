@@ -3,7 +3,8 @@
   "character": 1504,
   "_status": "partial",
   "_gaps": [
-    "⭐ 星魂 1（两段）、星魂 4、**星魂 6（两段：抗性 −20% + 每层【婪酣】+4% 伤害 ≤30 层）** 均已落地 ✓。✅ 「**当场上存在【饲饵】时**」这个前提**有条件可写** —— `any_enemy has_state 「饲饵」`（原登记的「引擎没有『场上存在某状态』的条件」已作废）；事件从 `BATTLE_START` 改成 `SKILL_CAST`（开战时还没有【饲饵】）。⛔ 仍开：技能与行迹的其余从句。⚠ **夹具记录**：要给目标压血，`CanHit` 没有 `setCurrentHp`、`consumeHp` 对敌方无效、大额 `applyDamage` 会被各区放大而直接打死目标 —— 可行做法是**循环小额扣血**；另 `target_hp_percent` 是**分数**（写 `50` 会恒假）。"
+    "⛔ 星魂 2 **后半**：「每当不死途发动**强化天赋追加攻击**后，**返还所移除【婪酣】层数的 35%**」—— 缺「**这一下移除了几层**」这个事实：引擎没有「层数被移除」的事件（`STACK_GAINED` 是**增加**那一侧），也没有「按刚移除的数量再加回」的写法。⇒ 需要对称的 `STACK_REMOVED`（带数量）＋ `amount_from` 读它。",
+    "⛔ 「技能与行迹的其余从句」尚未逐句核（`_status: partial`）：星魂 1/4/6、天赋、秘技已有落点（见各规则 `_note`），但**战技/终结技/行迹**里仍有未写的句子 —— 下一轮逐节核时按节登记。"
   ],
   "resources": [
     {
@@ -40,6 +41,7 @@
     {
       "on": "ALLY_ATTACK",
       "id": "talent_reaction_to_bait",
+      "max_eidolon": 1,
       "when": [
         "actor is_other_ally",
         "target has_state 饲饵"
@@ -64,15 +66,54 @@
         {
           "op": "ADD_STACK",
           "buff": "婪酣",
-          "amount": 1,
+          "amount": 2,
           "max_stacks": 12,
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "1504 不死途 天赋 宿怨，切齿奉还 (150404, Enhance/FollowUp): 「不死途初始拥有2点充能，最多拥有3点充能。【饲饵】受到我方其他目标攻击后，不死途固定恢复8点能量，随后消耗1点充能对【饲饵】发动追加攻击，造成等同于不死途200%攻击力的雷属性伤害，随后获得2层【婪酣】，最多叠加12层。」",
-      "_note": "「【饲饵】受到**我方其他目标**攻击后，不死途**固定恢复 8 点能量**，随后**消耗 1 点充能**对【饲饵】发动**追加攻击**，造成等同于不死途 **200% 攻击力**的雷属性伤害，随后获得 **2 层【婪酣】**，最多叠加 **12 层**」—— ① 事件 `ALLY_ATTACK` ✓（每次施放只发一次 ✓）+ 两条条件都承重 ✓：`actor is_other_ally` ✓（\"**其他**目标\" ✓ —— 她自己打不算 ✓）与 `target has_state 饲饵` ✓（**被打的必须是饲饵** ✓）；② 回能 `GAIN_ENERGY 8` ✓；③ 充能 `SPEND_RESOURCE 充能 amount: 1` ✓；④ 追加伤害用**字面倍率** ✓（第 186 轮 ✓）+ `self_attr:ATTACK` ✓（读结算后属性 ✓）；⑤ 层数 `ADD_STACK` + **`max_stacks: 12`** ✓。⚠ **登记**：① 「消耗 1 点充能」的**前置条件**（有充能才消耗/才触发 ✗）—— 引擎的 `SPEND_RESOURCE` 会**钳位** ✓，所以本条的**触发本身不依赖**是否有充能 ✗（文档读起来是依赖的 ✓）⇒ 差异写在注释里、不藏起来 ✓；② 文档「获得 **2 层**」与 `amount: 1` 的差别 ✗ —— ⚠ `ADD_STACK` 的 `amount` **不是层数** ✓（第 172 轮已登记 ✓：**一次触发就是一层** ✓）⇒ 本条的 2 层被写成**一层** ✗ ⇒ **不一致已登记** ✓（若要真写 2 层需要\"每触发加两层\"的写法 ✗）。"
+      "_note": "「【饲饵】受到**我方其他目标**攻击后，不死途**固定恢复 8 点能量**，随后**消耗 1 点充能**对【饲饵】发动**追加攻击**，造成等同于不死途 **200% 攻击力**的雷属性伤害，随后获得 **2 层【婪酣】**，最多叠加 **12 层**」—— ① 事件 `ALLY_ATTACK` ✓（每次施放只发一次 ✓）+ 两条条件都承重 ✓：`actor is_other_ally` ✓（\"**其他**目标\" ✓ —— 她自己打不算 ✓）与 `target has_state 饲饵` ✓（**被打的必须是饲饵** ✓）；② 回能 `GAIN_ENERGY 8` ✓；③ 充能 `SPEND_RESOURCE 充能 amount: 1` ✓；④ 追加伤害用**字面倍率** ✓（第 186 轮 ✓）+ `self_attr:ATTACK` ✓（读结算后属性 ✓）；⑤ 层数 `ADD_STACK` + **`max_stacks: 12`** ✓。⚠ **登记**：① 「消耗 1 点充能」的**前置条件**（有充能才消耗/才触发 ✗）—— 引擎的 `SPEND_RESOURCE` 会**钳位** ✓，所以本条的**触发本身不依赖**是否有充能 ✗（文档读起来是依赖的 ✓）⇒ 差异写在注释里、不藏起来 ✓；② ⭐ **2026-11-03 修正**：文档「获得 **2 层**【婪酣】」原先写成 `amount: 1`（旧注记以为 `amount` 不是层数 ✗）—— 但 `TriggerEffects.addStack` 的 `wanted` **就是** `amount`（源码原话：「immediately gain 15 stacks…`amount` alone would grant one」）⇒ `amount: 2` 才是两层 ✓。判据 `AshveilClauseCoverageTest.theTalentGrantsTwoLayers` 钉住。"
     },
+
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_reaction_to_bait_at_eidolon_two",
+      "min_eidolon": 2,
+      "when": [
+        "actor is_other_ally",
+        "target has_state 饲饵"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 8
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 2,
+          "element": "Thunder",
+          "target": "target"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "婪酣",
+          "amount": 2,
+          "max_stacks": 18,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1504 不死途 天赋 宿怨，切齿奉还 (150404, Enhance/FollowUp): 「不死途初始拥有2点充能，最多拥有3点充能。【饲饵】受到我方其他目标攻击后，不死途固定恢复8点能量，随后消耗1点充能对【饲饵】发动追加攻击，造成等同于不死途200%攻击力的雷属性伤害，随后获得2层【婪酣】，最多叠加12层。」",
+      "_note": "⭐ **2026-11-03**：星魂 2「【婪酣】**叠加上限提高至 18 层**」—— 按 AGENT §0.2 第 17 条用**两条带门槛的同形规则**表达（`max_stacks` 不能被规则改写）：基线 `max_eidolon: 1` 上限 12、这一条 `min_eidolon: 2` 上限 18，两条互斥 ✓。⚠ 星魂 2 的另一半（「返还所移除层数的 35%」）仍登记在 `_gaps`。原文：「【饲饵】受到**我方其他目标**攻击后，不死途**固定恢复 8 点能量**，随后**消耗 1 点充能**对【饲饵】发动**追加攻击**，造成等同于不死途 **200% 攻击力**的雷属性伤害，随后获得 **2 层【婪酣】**，最多叠加 **12 层**」—— ① 事件 `ALLY_ATTACK` ✓（每次施放只发一次 ✓）+ 两条条件都承重 ✓：`actor is_other_ally` ✓（\"**其他**目标\" ✓ —— 她自己打不算 ✓）与 `target has_state 饲饵` ✓（**被打的必须是饲饵** ✓）；② 回能 `GAIN_ENERGY 8` ✓；③ 充能 `SPEND_RESOURCE 充能 amount: 1` ✓；④ 追加伤害用**字面倍率** ✓（第 186 轮 ✓）+ `self_attr:ATTACK` ✓（读结算后属性 ✓）；⑤ 层数 `ADD_STACK` + **`max_stacks: 12`** ✓。⚠ **登记**：① 「消耗 1 点充能」的**前置条件**（有充能才消耗/才触发 ✗）—— 引擎的 `SPEND_RESOURCE` 会**钳位** ✓，所以本条的**触发本身不依赖**是否有充能 ✗（文档读起来是依赖的 ✓）⇒ 差异写在注释里、不藏起来 ✓；② ⭐ **2026-11-03 修正**：文档「获得 **2 层**【婪酣】」原先写成 `amount: 1`（旧注记以为 `amount` 不是层数 ✗）—— 但 `TriggerEffects.addStack` 的 `wanted` **就是** `amount`（源码原话：「immediately gain 15 stacks…`amount` alone would grant one」）⇒ `amount: 2` 才是两层 ✓。判据 `AshveilClauseCoverageTest.theTalentGrantsTwoLayers` 钉住。"
+    },
+
     {
       "on": "BATTLE_START",
       "id": "technique_opening_aoe",

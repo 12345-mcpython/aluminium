@@ -37,10 +37,14 @@ public class AshveilTest {
     }
 
     /**
-     * Note: One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed).
+     * Note: Two layers per firing (2026-11-03), and a LOUD refusal once the two declared charges are spent (measured, not assumed).
+     *
+     * <p><b>This test used to pin the wrong reading</b>: it asserted one layer per firing on the belief that {@code ADD_STACK}'s
+     * {@code amount} is not a layer count. It is — {@code TriggerEffects.addStack} builds {@code wanted} from exactly that field —
+     * so the talent's 「随后获得 2 层【婪酣】」 now grants two, and two firings give four.
      */
     @Test
-    public void eachReactionAddsALayerAndNeedsACharge() {
+    public void eachReactionAddsTwoLayersAndNeedsACharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -49,11 +53,11 @@ public class AshveilTest {
         // Make the enemy the Bait first: without it neither guard passes.
         battle.castImmediate(ashveil.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), ashveil, List.of(enemy));
 
-        // Her declaration gives 2 charges. One firing is one layer (ADD_STACK's `amount` is not a layer count, round 12).
+        // Her declaration gives 2 charges. One firing is TWO layers: the talent says 「获得 2 层【婪酣】」 and `amount` IS the count.
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
-        Assertions.assertEquals(2, ashveil.getBuffManager().stacksOf("婪酣"),
-                "two firings, one layer each");
+        Assertions.assertEquals(4, ashveil.getBuffManager().stacksOf("婪酣"),
+                "two firings, two layers each");
 
         Assertions.assertThrows(IllegalStateException.class,
                 () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0)),
@@ -96,3 +100,4 @@ public class AshveilTest {
         return BattleFixture.alwaysRoll(1.0);
     }
 }
+
