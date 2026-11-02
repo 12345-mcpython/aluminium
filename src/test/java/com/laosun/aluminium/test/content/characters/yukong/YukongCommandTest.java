@@ -46,10 +46,16 @@ public class YukongCommandTest {
     }
 
     /**
-     * Note: An ally's turn end removes exactly ONE layer; her own does not.
+     * 「at the end of each of our targets' turns, remove 1 layer」 — <b>including Yukong's own</b>, except on the turn she casts.
+     *
+     * <p>Note: <b>This test used to pin the approximation.</b> It was called
+     * {@code anAllysTurnEndRemovesOneLayerButHersDoesNot} and asserted that her own turn end never took a layer, because the
+     * clause was spelled {@code target != self}. The sentence only exempts the turn she <b>casts</b> on, so that reading let
+     * two layers survive two full rounds. The marker rule ({@code skill_cast_marks_the_turn}) now carries the fact to her own
+     * turn end, and the assertions below say what the sentence says.
      */
     @Test
-    public void anAllysTurnEndRemovesOneLayerButHersDoesNot() {
+    public void herOwnTurnEndTakesALayerAfterTheCastingTurn() {
         Fixture f = new Fixture();
         f.castSkill();
 
@@ -60,6 +66,10 @@ public class YukongCommandTest {
         f.turnEndOf(f.ally);
         Assertions.assertEquals(1, f.yukong.getBuffManager().stacksOf("鸣弦号令"),
                 "「at the end of each of our targets' turns, remove 1 layer from Yukong」");
+
+        f.turnEndOf(f.yukong);
+        Assertions.assertEquals(0, f.yukong.getBuffManager().stacksOf("鸣弦号令"),
+                "and her own next turn end takes one too — 「each of our targets」 includes her");
     }
 
     /**
@@ -121,9 +131,11 @@ public class YukongCommandTest {
      */
     @Test
     public void herFileCarriesWhatItSays() {
-        Assertions.assertEquals(3, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.TURN_END),
-                "census: three TURN_END rules (the energy trace, the one-layer removal, and the cleanup)");
-        Assertions.assertEquals(1, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.SKILL_CAST));
+        Assertions.assertEquals(5, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.TURN_END),
+                "census: the energy trace, the other-allies' removal, her own removal and her own marker-clear (2026-11-02), "
+                        + "and the cleanup");
+        Assertions.assertEquals(2, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.SKILL_CAST),
+                "the Skill's layers and boost, plus (2026-11-02) the one-turn marker that exempts the casting turn");
         Assertions.assertEquals(1, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.BASIC_ATTACK),
                 "the talent's additional damage (its 「toughness reduction increased by 100%」 half is registered)");
     }

@@ -2,9 +2,7 @@
   "schema": 1,
   "character": 1207,
   "_status": "implemented",
-  "_gaps": [
-    "⭐ **秘技已实现**（2026-11-02）：`technique_two_stacks_on_entry` —— 「主动攻击敌人进入战斗时，驭空获得 **2 层**【鸣弦号令】」= `BATTLE_START` + `self has_state 秘技` → 两次 `ADD_STACK`（一个计数器是同名的多条 buff）。判据 `YukongTechniqueTest`：用秘技 **2 层**、不用 **0 层** ✓。⚠ 「20 秒冲刺 / 移动速度 +35%」是地图层事实，不建模。⛔ 仍开：其余技能从句与星魂。"
-  ],
+  "_gaps": [],
   "rules": [
     {
       "on": "BATTLE_START",
@@ -62,6 +60,24 @@
       "_note": "「获得 **2 层**【鸣弦号令】，最多持有不超过 2 层。当驭空持有【鸣弦号令】时，我方全体攻击力提高 80%」. ⚠ Two `ADD_STACK` effects, because **one layer is one buff** (that is the engine's stacking) — the same shape 1302 星魂 4 uses for 「获得 2 层」. ⚠ The party boost carries `buff: 鸣弦号令` so it is removed **with the state**, by name, in the turn-end rules below; a boost with no name would stay up forever once the layers ran out. ⚠ `permanent: true` is not \"forever\": it means no turn count, and the end is stated by those rules — the honest spelling of a duration decided by a *counter* rather than by turns. ⚠ **2026-09-28 实测修正**：全队增益**不能**与层同名 —— `stacksOf(<名字>)` 数的是**所有**带该名字的 buff，于是\"2 层 + 1 个增益\"会读成 **3 层**，而 `REMOVE_STACK buff 鸣弦号令` 更可能**吃掉那个增益**而不是一层。现在层叫【鸣弦号令】、增益叫【鸣弦号令增益】，两者各自按名移除。 ⚠ **按等级读**：攻击力份额取自战技 #2（Lv1 0.4 → Lv10 0.8）。"
     },
     {
+      "on": "SKILL_CAST",
+      "id": "skill_cast_marks_the_turn",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合施放战技",
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1207 驭空 战技: 「驭空施放战技获得【鸣弦号令】的回合，不会移除【鸣弦号令】。」（本回合标记）",
+      "_note": "给「**施放战技的那一回合**」留一枚标记：`ADD_STACK { buff: 本回合施放战技, max_stacks: 1 }`（一个计数器 = 一条同名 buff）。⚠ 它**不是**游戏里的状态，只是把「这一回合施放过战技」这个事实记到回合结束 —— 她的回合结束时由 `her_own_turn_keeps_the_layer_on_the_casting_turn` 清掉 ✓。⚠ 上限 1 是为了让重复施放（额外回合里）不会叠出第 2 枚。"
+    },
+    {
       "on": "TURN_END",
       "when": [
         "actor is_ally",
@@ -96,6 +112,41 @@
       "id": "turn_end_effect_2"
     },
     {
+      "on": "TURN_END",
+      "id": "her_own_turn_removes_a_layer_after_the_casting_turn",
+      "when": [
+        "actor == self",
+        "self_stacks:本回合施放战技 <= 0"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "鸣弦号令",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1207 驭空 战技: 「…且每次我方目标回合结束时，移除驭空1层【鸣弦号令】。」（含驭空**自己**的回合 —— 除施放战技的那一回合）",
+      "_note": "「每次我方目标回合结束时（**包括驭空自己**）移除 1 层」—— 与 `turn_end_effect_2`（**其他**队友的回合）配对：那条用 `target != self` 排掉她自己，这条专门接她的回合，只在**不是**施放战技那一回合时掉层。⚠ 与上一条互斥（标记在 / 不在）。"
+    },
+    {
+      "on": "TURN_END",
+      "id": "her_own_turn_keeps_the_layer_on_the_casting_turn",
+      "when": [
+        "actor == self",
+        "self_stacks:本回合施放战技 >= 1"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合施放战技",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1207 驭空 战技: 「驭空施放战技获得【鸣弦号令】的回合，不会移除【鸣弦号令】。」",
+      "_note": "「**驭空施放战技获得【鸣弦号令】的回合，不会移除**【鸣弦号令】」—— ⭐ **2026-11-02 修正**：原先把这句读成 `target != self`（她的回合**永不**掉层），那是**近似**；句子只说**施放战技的那一回合**不掉。现在用一枚一回合的标记：`skill_cast_marks_the_turn` 在她施放战技时记下，她自己的回合结束时若标记在，就**只清标记、不掉层**（本规则）；标记不在才掉层（`her_own_turn_removes_a_layer_after_the_casting_turn`）。⚠ 两条条件互斥（`>= 1` / `<= 0`）⇒ 每次只走一条 ✓；⚠ 顺序上必须排在 `turn_end_effect_3`（层数归零时摘光环）**之前**。"
+    },    {
       "on": "TURN_END",
       "when": [
         "actor is_ally",
