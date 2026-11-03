@@ -629,7 +629,13 @@
       "_note": "⚠ `CAST_SKILL` 拒绝过它 ✗（报错原文自己点名：*\"1303/1412's are buffs the table has no entry for\"* ✓）。"
     }
   },
-  "11413": {
+  "1303": {
+    "2": {
+      "effect": "Rules",
+      "source": "1303 阮•梅 战技 密林芳踪：增益型技能——「提高我方全体造成的伤害」由规则表表达（`SKILL_CAST` 上的伤害加成规则），本身没有治疗量或护盾量可写 ⇒ `Rules`。",
+      "_note": "⭐ 2026-11-04：补这条是为了让**秘技**的「下一次战斗开始时自动触发 1 次战技」能用 `CAST_SKILL` —— 在此之前它被 `SkillExecutor.canDeliver` 拒绝（报错原文点名过「1303/1412's are buffs the table has no entry for」，1412 已补、1303 没补）。"
+    }
+  },  "11413": {
     "1": {
       "segments": [
         0.1,

@@ -61,9 +61,13 @@ public class CastSkillTest {
      */
     private static final int DHPT = 1414;
     /**
-     * Ruan Mei (阮-梅): her skill is a {@code Support} buff with no {@code skill_effects.json} entry -- undeliverable.
+     * The character whose Skill the engine still cannot deliver: Feixiao (1309) has a {@code Support} buff with no
+     * {@code skill_effects.json} entry, and no rule commands a cast of it.
+     *
+     * <p><b>Ruan Mei (1303) used to be this example.</b> She stopped being it on 2026-11-04: her Skill got a {@code Rules} entry so
+     * her technique could command a cast of it — the same call 1412's Skill needed earlier. The guard itself is unchanged.
      */
-    private static final int UNDELIVERABLE = 1303;
+    private static final int UNDELIVERABLE = 1309;
 
     // ==================================================================
     // 1. One reading of the row

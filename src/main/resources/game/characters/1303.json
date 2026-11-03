@@ -6,7 +6,7 @@
     "天赋：击破伤害 120% 冰属性（不是普通 DAMAGE）未写",
     "战技：跨单位状态条件「她持有弦外音时，全队 +32% 伤害 / +50% 击破效率」未写",
     "终结技：【残梅绽】施加 / 从击破恢复时触发 / 延长击破 / 行动延后 / 50% 击破伤害未写",
-    "秘技：自动触发一次战技、模拟宇宙祝福缩放未写"
+    "⭐ 秘技的「自动触发一次战技」已落地（2026-11-04：`BATTLE_START` + `self has_state 秘技` → `CAST_SKILL { SKILL, target: self }`；前提是 `skill_effects.json` 给她补了 `Rules` 登记，否则 `canDeliver` 会拒）；模拟宇宙祝福缩放（每祝福 +100% 削韧、最多 20 个）未写，属模拟宇宙玩法"
   ],
   "rules": [
     {
@@ -203,6 +203,23 @@
       ],
       "source": "1303 阮•梅 星魂 4 「寻神铜镜前」: 「当敌方目标的弱点被击破时，阮•梅自身击破特攻提高100%，持续3回合。」 param = [1, 3]",
       "_note": "「**当敌方目标的弱点被击破时**，阮•梅自身**击破特攻提高 100%**，持续 **3 回合**」—— 事件 `BREAK` ✓ + 加成挂在**自己**身上 ✓ + `turns: 3` ✓；param 的 1 就是 100% ✓。"
+    }
+    ,
+    {
+      "on": "BATTLE_START",
+      "id": "technique_auto_casts_the_skill",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "target": "self"
+        }
+      ],
+      "source": "1303 阮•梅 秘技 拭琴抚罗袂 (130307, Maze/Support): 「使用秘技后，获得【拭琴抚罗袂】，使下一次战斗开始时自动触发1次战技，此次触发不消耗战技点。」",
+      "_note": "「**下一次战斗开始时自动触发 1 次战技**，此次触发**不消耗战技点**」—— ① `BATTLE_START` + `self has_state 秘技` ✓（「用了秘技」这件事在本仓库就记成这个状态 ✓）；② `CAST_SKILL { skill: SKILL, target: self }` ✓（命令自己施放；`CAST_SKILL` 本来就不经战技点 ✓ = 「不消耗战技点」✓）；③ ⚠ 这条**能成立的前提**是她的战技在 `skill_effects.json` 里有一条 `effect: Rules` 的登记（同 1412）—— 否则 `SkillExecutor.canDeliver` 会拒绝「不造成伤害又无事可做的技能」✓。"
     }
   ]
 }
