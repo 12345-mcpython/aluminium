@@ -276,6 +276,12 @@ final class TriggerEffects {
             if (effect.getWhileState() != null && !effect.getWhileState().isBlank()) {
                 buff.gate(effect.getWhileState().trim(), ctx.owner());
             }
+            // "while the owner's counter is at least N": a THRESHOLD on layers, which `per_stack` cannot express (that one scales
+            // continuously). Reader: 1009 Eidolon 4, 「蓄能层数 ≥2 时能量恢复效率提高 15%」.
+            if (effect.getWhileStacks() != null && !effect.getWhileStacks().isBlank()) {
+                buff.gateStacks(effect.getWhileStacks().trim(),
+                        effect.getWhileStacksMin() == null ? 1 : effect.getWhileStacksMin(), ctx.owner());
+            }
             // "with a 100% base chance, additionally lower the target's all-type RES by 10.00%": an attribute modifier may be ROLLED,
             // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes

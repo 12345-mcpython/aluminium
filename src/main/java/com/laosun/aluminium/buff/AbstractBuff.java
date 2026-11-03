@@ -303,10 +303,36 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     }
 
     /**
-     * @return {@code true} only when a gate was set and its owner no longer holds that state
+     * The COUNTER threshold this buff is conditional on, or {@code null}: 「蓄能层数 ≥ 2 时，能量恢复效率提高 15%」 (1009 Asta's
+     * Eidolon 4). The sibling of {@link #gateState} for a fact that lives on a counter rather than on a state name - the same
+     * question a `self_stacks:` condition asks, but asked at every turn boundary instead of once.
+     */
+    private String gateStacksName;
+    private Integer gateStacksMin;
+
+
+    /**
+     * @param stacks the counter whose layer count the gate asks about
+     * @param min    the least number of layers that keeps the buff alive
+     * @param owner  the unit whose counter it is (the rule owner)
+     */
+    public void gateStacks(String stacks, int min, CanHit owner) {
+        this.gateStacksName = stacks;
+        this.gateStacksMin = min;
+        this.gateOwner = owner;
+    }
+
+    /**
+     * @return {@code true} only when a gate was set and its owner no longer satisfies it
      */
     public boolean gateBroken() {
-        return gateState != null && gateOwner != null && !gateOwner.getBuffManager().hasState(gateState);
+        if (gateOwner == null) {
+            return false;
+        }
+        if (gateStacksName != null) {
+            return gateOwner.getBuffManager().stacksOf(gateStacksName) < gateStacksMin;
+        }
+        return gateState != null && !gateOwner.getBuffManager().hasState(gateState);
     }
 
     /**
@@ -485,3 +511,5 @@ emainingDuration is protected). Needed to measure a clause that <b>shortens</b>
         remainingDuration = Math.max(0, remainingDuration + turns);   // signed, clamped at zero (the game's Min: 0)
     }
 }
+
+

@@ -139,6 +139,7 @@ final class TriggerValidator {
 
 
     static void validateOne(EffectSpec effect, TriggerSpec spec) {
+        validateWhileStacks(effect, spec);
         // Note: A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
         // kind of mistake this interpreter's closed sets exist to prevent.
         if ((effect.getCapScale() != null || effect.getCapPercent() != null)
@@ -2686,6 +2687,25 @@ final class TriggerValidator {
         }
     }
 
+    /**
+     * {@code while_stacks} and {@code while_stacks_min} are read as a pair: a threshold with no counter (or a counter with no
+     * threshold) is half a sentence, and half a sentence silently behaves like "always on".
+     */
+    static void validateWhileStacks(EffectSpec effect, TriggerSpec spec) {
+        boolean hasName = effect.getWhileStacks() != null && !effect.getWhileStacks().isBlank();
+        boolean hasMin = effect.getWhileStacksMin() != null;
+        if (hasName && !hasMin) {
+            throw new IllegalArgumentException(
+                    "Effect states \"while_stacks\" (" + effect.getWhileStacks() + ") but no \"while_stacks_min\": the pair is "
+                            + "read together, and without the threshold the modifier would never turn off "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (!hasName && hasMin) {
+            throw new IllegalArgumentException(
+                    "Effect states \"while_stacks_min\" (" + effect.getWhileStacksMin() + ") but no \"while_stacks\": there is "
+                            + "no counter to compare it against (source: " + spec.getSource() + ")");
+        }
+    }
     static void rejectAmendmentExtras(EffectSpec effect, String op, TriggerSpec spec, String kept) {
         boolean bothOrNeither = "amount".equals(kept) ? effect.getPercent() != null : effect.getAmount() != null;
         if (bothOrNeither || effect.getScale() != null || effect.getTurns() != null
@@ -2888,3 +2908,5 @@ final class TriggerValidator {
             "next_turn_start", "next_elation_skill");
 
 }
+
+

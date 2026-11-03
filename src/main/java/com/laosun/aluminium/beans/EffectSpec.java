@@ -156,6 +156,8 @@ public class EffectSpec {
         copy.remove = this.remove;
         copy.scaleByMissingHp = this.scaleByMissingHp;
         copy.whileState = this.whileState;
+        copy.whileStacks = this.whileStacks;
+        copy.whileStacksMin = this.whileStacksMin;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -624,6 +626,23 @@ public class EffectSpec {
      */
     @SerializedName("while_state")
     private String whileState;
+
+    /**
+     * A modifier that lives only <b>while the rule owner's counter is at least this many layers</b>:
+     * 「天赋的蓄能层数大于等于 2 时，艾丝妲的能量恢复效率提高 15%」 (1009 Asta's Eidolon 4).
+     *
+     * <p>The sibling of {@link #whileState} for a threshold on a counter: `per_stack` scales CONTINUOUSLY, so it can express
+     * "each layer gives 15%" but not "two layers or more give a flat 15%". The pair is read together — {@code while_stacks} without
+     * {@code while_stacks_min} is refused at load time.
+     */
+    @SerializedName("while_stacks")
+    private String whileStacks;
+
+    /**
+     * The least number of layers of {@link #whileStacks} that keeps the modifier alive.
+     */
+    @SerializedName("while_stacks_min")
+    private Integer whileStacksMin;
 
     /**
      * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory}.
@@ -1570,3 +1589,5 @@ public class EffectSpec {
         return maxStacks != null ? maxStacks : stacks;
     }
 }
+
+

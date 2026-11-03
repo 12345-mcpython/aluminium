@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "character": 1009,
-  "_status": "partial",
+  "_status": "implemented",
   "rules": [
     {
       "on": "BATTLE_START",
@@ -270,8 +270,25 @@
       "source": "1009 艾丝妲 星魂 2 月见圆缺之意 (Avatar_Asta_00_Rank02): 「施放终结技时，艾丝妲下回合不会减少蓄能层数。」",
       "_note": "「施放终结技时，艾丝妲**下回合不会减少蓄能层数**」= `ULT_CAST` 时挂一个**持续 1 回合**的状态 `蓄能不减`，并让 `talent_charge_decays_from_second_turn` 的 `when` 加上 **`!self has_state 蓄能不减`** ✓ —— 这就是「下一回合那次不扣」。"
     }
+    ,
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon4_energy_regen_while_charged",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ENERGY_REGENERATION_RATE",
+          "percent": 0.15,
+          "permanent": true,
+          "while_stacks": "蓄能",
+          "while_stacks_min": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1009 艾丝妲 星魂 4 极光显现之时: 「天赋的蓄能层数大于等于2时，艾丝妲的能量恢复效率提高15%。」 参数 = [2, 0.15]",
+      "_note": "「天赋的蓄能层数**大于等于 2** 时，能量恢复效率提高 **15%**」—— ⭐ **2026-11-04 落地**：本会话给引擎加的**计数门槛**修饰（`while_stacks` + `while_stacks_min`；`AbstractBuff.gateStacks`，两条施加路径都接：`TriggerEffects` 的 MODIFY_ATTR 与 `TriggerInterpreter` 的 MODIFY_DAMAGE_TAKEN）。与 `per_stack` 的区别正是原句：`per_stack` **每层连续**缩放，这里是 **≥2 层才给、掉到 1 层就摘**。判据 `AstaClauseCoverageTest.eidolon4PaysOnlyAtTwoOrMoreCharges`（1 层 0、2 层 0.15、3 层仍 0.15；gate 只在**真过回合边界**时被扫）。"
+    }
   ],
-  "_gaps": [
-    "⛔ **星魂 4 未写**（2026-11-02 逐节核对发现）：「天赋的蓄能层数**大于等于 2** 时，艾丝妲的能量恢复效率提高 **15%**」—— 这是一个**随活计数器跨越阈值而开合**的修饰：引擎有 `per_stack_live`（按层数**连续**缩放）和一次性 `when`（触发时判一次），但**没有「当…时持续生效」的修饰**；用「攻击时判一次 +15%」会在层数掉到 2 以下后仍然留着，用 `per_stack_live` 又会把阈值变成线性。⛔ 其余 12 节已全部有落点（见 `AstaClauseCoverageTest`）。"
-  ]
+  "_gaps": []
 }

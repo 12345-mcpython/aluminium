@@ -1759,6 +1759,12 @@ public final class TriggerInterpreter {
             if (effect.getWhileState() != null && !effect.getWhileState().isBlank()) {
                 zone.gate(effect.getWhileState().trim(), ctx.owner());
             }
+            // "While the owner's counter is at least N": the same question for a THRESHOLD on layers ("蓄能 ≥2 ⇒ +15%"), which
+            // `per_stack` cannot express because it scales continuously instead of switching on.
+            if (effect.getWhileStacks() != null && !effect.getWhileStacks().isBlank()) {
+                int min = effect.getWhileStacksMin() == null ? 1 : effect.getWhileStacksMin();
+                zone.gateStacks(effect.getWhileStacks().trim(), min, ctx.owner());
+            }
             // "this zone must live beside another source's zone": the `coexist` ask that MODIFY_ATTR has honoured since
             // 1408's trace was never read on THIS op, so a second `MODIFY_DAMAGE_TAKEN` from another rule evicted the
             // first. Measured: 1512's memosprite aura (+11.2%, set at SUMMONED) disappeared the moment light cone 23042's
