@@ -58,6 +58,34 @@ public class FuXuanClauseCoverageTest {
         Assertions.assertEquals(before, f.fuXuan.getCurrentEnergy(), 1e-9, "control: it is Eidolon 4");
     }
 
+    /**
+     * 星魂 6: the Ultimate's damage grows with the HP the side has lost, and the counter is emptied afterwards.
+     *
+     * <p>Measured on the settled damage of the Ultimate itself: E6 with 4000 HP lost must beat E0 with the same board, and the same
+     * E6 battle with no loss must NOT - which is what shows the boost is reading the accumulator rather than a flat bonus.
+     */
+    @Test
+    public void eidolon6ScalesTheUltimateWithTheSidesLostHp() {
+        double bare = ultimateDamage(6, 0);
+        double loaded = ultimateDamage(6, 4000);
+        Assertions.assertTrue(loaded > bare, "「终结技造成的伤害提高 = 累计已损失生命值 × 200%」 (" + bare + " -> " + loaded + ")");
+
+        Fixture f = new Fixture(6);
+        f.accumulate(4000);
+        f.castUltimate();
+        Assertions.assertEquals(0, f.fuXuan.getResources().value("累计损失"), 1e-9,
+                "「施放终结技后会清空并进行重新累计」");
+    }
+
+    private static double ultimateDamage(int eidolon, int lostHp) {
+        Fixture f = new Fixture(eidolon);
+        f.accumulate(lostHp);
+        double[] settled = {0};
+        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled[0] += applied);
+        f.castUltimate();
+        return settled[0];
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -79,6 +107,24 @@ public class FuXuanClauseCoverageTest {
             battle.processRequests();
         }
 
+        /**
+         * Records HP the side has lost, the way the engine does: one HP_LOST firing per loss, its magnitude the amount.
+         *
+         * <p>Fired rather than dealt, because a fixture that actually damages an ally has to get past shields, the zone's damage
+         * sharing and death - none of which is what this Eidolon is about.
+         */
+        private void accumulate(int lostHp) {
+            for (int i = 0; i < 1; i++) {
+                battle.fire(TriggerPayload.Simple.of(TriggerEvent.HP_LOST, ally, ally, 0, lostHp));
+                battle.processRequests();
+            }
+        }
+
+        private void castUltimate() {
+            battle.castImmediate(fuXuan.getSkills().get(SkillType.ULTRA), fuXuan, List.of(enemy));
+            battle.processRequests();
+        }
+
         private void allyIsHit() {
             battle.fire(TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, ally, 0, 0));
             battle.processRequests();
@@ -90,3 +136,4 @@ public class FuXuanClauseCoverageTest {
         }
     }
 }
+
