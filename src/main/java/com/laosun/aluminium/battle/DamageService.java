@@ -198,6 +198,9 @@ public final class DamageService {
                 ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
                 : 0.0;
         rawResist -= defender.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        // "the WIND resistance of a target in 风化 drops by 25%" (1307 Eidolon 1): the same subtraction, per element, from the
+        // constant that names it. Read HERE because this is the one place where the instance's element and the victim meet.
+        rawResist -= defender.getAttribute(AttributeType.resistanceReductionFor(damage.getElement())).get();
         rawResist += defender.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
         damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
 
@@ -251,3 +254,4 @@ public final class DamageService {
         return cause == null ? SkillCategory.UNSPECIFIED : cause;
     }
 }
+

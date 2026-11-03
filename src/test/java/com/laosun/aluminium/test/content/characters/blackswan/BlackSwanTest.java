@@ -320,7 +320,31 @@ public class BlackSwanTest {
         }
         return Math.max(0, enemy.getBuffManager().stacksOf("奥迹"));
     }
+
+    /**
+     * 星魂 1: 「处于风化、裂伤、灼烧、触电状态下的敌方目标对应的风、物理、火、雷属性抗性分别降低 25%」.
+     *
+     * <p>Measured per element: the SAME hit lands harder in its own element and unchanged in the others, which is the difference
+     * between a per-element resistance reduction and an all-type one.
+     */
+    @Test
+    public void eidolonOneLowersFourResistancesByElement() {
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "WIND"), 1e-9, "风 for 风化 (stored negative: the attribute is a REDUCTION)");
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "PHYSICAL"), 1e-9, "物理 for 裂伤");
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "FIRE"), 1e-9, "火 for 灼烧");
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "THUNDER"), 1e-9, "雷 for 触电");
+        Assertions.assertEquals(0.0, resistanceReduction(1, "ICE"), 1e-9, "冰 is not in the sentence");
+        Assertions.assertEquals(0.0, resistanceReduction(0, "WIND"), 1e-9, "and nothing at E0");
+    }
+
+    private static double resistanceReduction(int eidolon, String element) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, eidolon);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        return enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.resistanceReductionFor(
+                com.laosun.aluminium.enums.DamageElement.valueOf(element))).get();
+    }
 }
-
-
 

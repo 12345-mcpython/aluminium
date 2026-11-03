@@ -280,8 +280,41 @@ public enum AttributeType {
      *
      * <p>Note: <b>Appended, never inserted</b>: {@link #ordinal()} indexes every unit's attribute array.
      */
-    @SerializedName("resistance_reduction") RESISTANCE_REDUCTION("resistance_reduction");
+    @SerializedName("resistance_reduction") RESISTANCE_REDUCTION("resistance_reduction"),
+    /**
+     * Per-element resistance reduction: 「处于风化…的敌方目标对应的**风**属性抗性降低 25%」 (1307 Eidolon 1).
+     *
+     * <p><b>Why one constant per element rather than a scope on {@link #RESISTANCE_REDUCTION}.</b> That one is read at a single
+     * place ({@code DamageService}: `rawResist -= …`) where no element is in scope, and a scope field on the modifier would have to
+     * be excluded from the ordinary sum or it would double count. Seven constants cost nothing - these are simply never written
+     * unless a sentence asks - and that one read site picks the constant matching the instance's element.
+     */
+    @SerializedName("resistance_reduction_physical") RESISTANCE_REDUCTION_PHYSICAL("resistance_reduction_physical"),
+    @SerializedName("resistance_reduction_fire") RESISTANCE_REDUCTION_FIRE("resistance_reduction_fire"),
+    @SerializedName("resistance_reduction_ice") RESISTANCE_REDUCTION_ICE("resistance_reduction_ice"),
+    @SerializedName("resistance_reduction_thunder") RESISTANCE_REDUCTION_THUNDER("resistance_reduction_thunder"),
+    @SerializedName("resistance_reduction_wind") RESISTANCE_REDUCTION_WIND("resistance_reduction_wind"),
+    @SerializedName("resistance_reduction_quantum") RESISTANCE_REDUCTION_QUANTUM("resistance_reduction_quantum"),
+    @SerializedName("resistance_reduction_imaginary") RESISTANCE_REDUCTION_IMAGINARY("resistance_reduction_imaginary");
 
+    /**
+     * The per-element resistance-reduction constant for {@code element}, or {@link #RESISTANCE_REDUCTION} when the element is
+     * unknown - a null element falls back to the all-type constant, which is what the instance would have read anyway.
+     */
+    public static AttributeType resistanceReductionFor(com.laosun.aluminium.enums.DamageElement element) {
+        if (element == null) {
+            return RESISTANCE_REDUCTION;
+        }
+        return switch (element) {
+            case PHYSICAL -> RESISTANCE_REDUCTION_PHYSICAL;
+            case FIRE -> RESISTANCE_REDUCTION_FIRE;
+            case ICE -> RESISTANCE_REDUCTION_ICE;
+            case THUNDER -> RESISTANCE_REDUCTION_THUNDER;
+            case WIND -> RESISTANCE_REDUCTION_WIND;
+            case QUANTUM -> RESISTANCE_REDUCTION_QUANTUM;
+            case IMAGINARY -> RESISTANCE_REDUCTION_IMAGINARY;
+        };
+    }
     private static final Map<String, AttributeType> BY_STRING = new HashMap<>();
 
     static {
@@ -447,3 +480,4 @@ public enum AttributeType {
                 || this == ATTACK_PERCENT || this == SPEED_PERCENT;
     }
 }
+
