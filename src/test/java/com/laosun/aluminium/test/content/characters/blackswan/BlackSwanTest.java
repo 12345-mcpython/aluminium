@@ -138,8 +138,40 @@ public class BlackSwanTest {
         battle.processRequests();
         return blackSwan.getAttribute(AttributeType.DEFENCE_IGNORE).get();
     }
+
+    /**
+     * 终结技: 「使敌方全体陷入【揭露】，持续 2 回合」 and the +25% damage taken that rides it.
+     *
+     * <p>Both approximate the sentence in ways the rule records: the modifier's lifetime is a 2-turn clock beside the state rather
+     * than a gate on the holder's state, and 「自身回合内」 is not distinguished from any other moment in the window.
+     */
+    @Test
+    public void theUltimateMarksEveryEnemyAndTheyTakeMore() {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        Enemy left = BattleFixture.monster();
+        Enemy right = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(left, right), fixed());
+        battle.startBattle();
+        double before = hitFor(blackSwan, left);
+
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                blackSwan, List.of(left, right));
+        battle.processRequests();
+
+        Assertions.assertTrue(left.getBuffManager().hasState("揭露"), "「使敌方全体陷入【揭露】」");
+        Assertions.assertTrue(right.getBuffManager().hasState("揭露"), "both of them");
+        Assertions.assertTrue(hitFor(blackSwan, left) > before,
+                "「受到的伤害提高 25%」 (" + before + " -> " + hitFor(blackSwan, left) + ")");
+    }
+
+    /** One fixed hit, measured as the HP it actually removes. */
+    private static double hitFor(Character attacker, Enemy enemy) {
+        double before = enemy.getCurrentHp();
+        new Battle(List.of(attacker), List.of(enemy), fixed()).applyDamage(enemy,
+                new com.laosun.aluminium.damage.Damage(attacker, enemy,
+                        com.laosun.aluminium.enums.DamageElement.WIND,
+                        com.laosun.aluminium.enums.DamageType.NORMAL, 1000));
+        return before - enemy.getCurrentHp();
+    }
 }
-
-
-
 

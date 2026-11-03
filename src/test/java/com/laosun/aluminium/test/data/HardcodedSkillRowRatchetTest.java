@@ -63,7 +63,9 @@ public class HardcodedSkillRowRatchetTest {
     // 41 since 2026-11-04: 1303 Ruan Mei's Eidolon-2 half writes 0.32 for 「伤害提高 32.00%」 -- a STAR-SOUL/EIDOLON-independent
     // number from the Skill's own text, not a row cell: the Skill has no parameter row to read (its effect lives in the rule table,
     // see skill_effects.json's Rules entry), so there is nothing else the share could come from.
-    private static final int BASELINE = 41;
+    // 42 since 2026-11-04: 1307 Black Swan's ultimate writes 0.25 for 「受到的伤害提高 25%」 -- a STAR-SOUL/ULTIMATE text number,
+    // not a row cell: the epiphany bonus is not in her ultimate's parameter row (which carries the damage ratio and the duration).
+    private static final int BASELINE = 42;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
@@ -232,6 +234,7 @@ public class HardcodedSkillRowRatchetTest {
         }
     }
 }
+
 
 
 
