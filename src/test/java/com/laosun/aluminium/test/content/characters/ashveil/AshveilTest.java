@@ -56,8 +56,8 @@ public class AshveilTest {
         // Her declaration gives 2 charges. One firing is TWO layers: the talent says 「获得 2 层【婪酣】」 and `amount` IS the count.
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
-        Assertions.assertEquals(4, ashveil.getBuffManager().stacksOf("婪酣"),
-                "two firings, two layers each");
+        Assertions.assertEquals(5, ashveil.getBuffManager().stacksOf("婪酣"),
+                "two firings of two layers, plus the layer the Skill cast grants through 罪途");
 
         Assertions.assertThrows(IllegalStateException.class,
                 () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0)),
@@ -100,4 +100,5 @@ public class AshveilTest {
         return BattleFixture.alwaysRoll(1.0);
     }
 }
+
 
