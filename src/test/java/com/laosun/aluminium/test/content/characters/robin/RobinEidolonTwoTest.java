@@ -51,6 +51,25 @@ public class RobinEidolonTwoTest {
         Assertions.assertEquals(0, e2.battle.partyResource("气氛值").value(), "and her bar is still empty — capacity, not a gift");
     }
 
+    /**
+     * 星魂 6: 「本场战斗中第一次进入【Fever】状态后…固定恢复 140 点能量」.
+     *
+     * <p>Fired through the same event the talent uses (a third summon completing the band), twice: the first entry pays, the second
+     * must not — 「第一次」 is the whole clause.
+     */
+    @Test
+    public void eidolon6PaysFixedEnergyOnTheFirstFeverOnly() {
+        Fixture f = new Fixture(6);
+        double before = f.robin.getCurrentEnergy();
+
+        f.bringTheBandOnStage();
+        double afterFirst = f.robin.getCurrentEnergy();
+        Assertions.assertEquals(before + 140, afterFirst, 1e-9, "「固定恢复 140 点能量」");
+
+        f.bringTheBandOnStage();
+        Assertions.assertEquals(afterFirst, f.robin.getCurrentEnergy(), 1e-9, "「本场战斗中**第一次**」 — the second entry pays nothing");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -66,6 +85,18 @@ public class RobinEidolonTwoTest {
             battle.processRequests();
         }
 
+        /**
+         * Fills the band the way the engine does: the Skill summons one and its own +6 gauge crosses the thresholds for the rest, so two
+         * casts put three on stage. Firing SUMMONED by hand cannot work here - the rule reads `summon_count`, which counts real summons.
+         */
+        private void bringTheBandOnStage() {
+            for (int i = 0; i < 2; i++) {
+                battle.castImmediate(robin.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL),
+                        robin, List.of(robin));
+                battle.processRequests();
+            }
+        }
+
         private int cap() {
             return robin.getResources().get("气氛值").getMax();
         }
@@ -75,6 +106,9 @@ public class RobinEidolonTwoTest {
         }
     }
 }
+
+
+
 
 
 
