@@ -402,7 +402,22 @@
         }
       ],
       "source": "1305 真理医生 星魂 6 永恒唯真理: 「…天赋的追加攻击造成的伤害提高50%。」 参数 = [1, 0.5]",
-      "_note": "「天赋的**追加攻击**造成的伤害提高 **50%**」—— `MODIFY_RULE { rule: talent_chance_followup, effect_percent_scale: 1.5 }` ✓。⚠ 那条天赋用的 `percent_from_skill_param: TALENT:0`（**行份额**）⇒ `effect_percent_scale` 对行份额是**加**（AGENT §0.2 第 26 条）⇒ 实际效果是 **+1.5 倍行份额**而不是 ×1.5 ✗ —— 这是**已知近似**，写在缺口里（要精确需要一个「把行份额按比例放大」的写法）。⚠ 星魂 6 的另一半（【智者的短见】触发 +1 次）仍缺：`per_turn` 是**规则级字段**，只能靠 `MODIFY_RULE` 改它，而 `effect_per_turn` 这个字段还没有 ⇒ 登记。"
+      "_note": "「天赋的**追加攻击**造成的伤害提高 **50%**」—— `MODIFY_RULE { rule: talent_chance_followup, effect_percent_scale: 1.5 }` ✓。⚠ 那条天赋用的 `percent_from_skill_param: TALENT:0`（**行份额**）⇒ `effect_percent_scale` 对行份额是**加**（AGENT §0.2 第 26 条）⇒ 实际效果是 **+1.5 倍行份额**而不是 ×1.5 ✗ —— 这是**已知近似**，写在缺口里（要精确需要一个「把行份额按比例放大」的写法）。⭐ **2026-11-03**：星魂 6 的另一半（【智者的短见】触发 +1 次）也已落地 —— `MODIFY_RULE { rule: ult_reaction_followup, amount: 1 }`（`amount` 抬的就是 `per_turn`，引擎本来就有）；现在是 `eidolon6_one_more_trigger_of_the_mark`。"
+    }
+    ,
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_one_more_trigger_of_the_mark",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "ult_reaction_followup",
+          "amount": 1
+        }
+      ],
+      "source": "1305 真理医生 星魂 6 永恒唯真理: 「【智者的短见】的触发效果额外增加1次，…」 参数 = [1, 0.5]",
+      "_note": "「【智者的短见】的**触发效果额外增加 1 次**」—— `MODIFY_RULE { rule: ult_reaction_followup, amount: 1 }` ✓：`MODIFY_RULE` 的**哪个字段动哪个数**由字段决定，`amount` 抬的是**次数上限**（`addRulePerTurnBonus` ✓，读者是 `fire` 里的 per-turn 判定 ✓）⇒ `per_turn: 2` → **3** ✓。⚠ 不用 `effect_per_turn` 这个新字段 —— **引擎本来就有这条拼法**（本轮先查后写，省掉一次白改）。"
     }
   ]
 }

@@ -166,10 +166,36 @@ public class DrRatioClauseCoverageTest {
         return first[0];
     }
 
+    /**
+     * 星魂 6's second half: 「【智者的短见】的触发效果额外增加 1 次」 — three follow-ups per turn instead of two.
+     *
+     * <p>Measured by counting the damage instances her follow-up settles when a teammate keeps attacking the marked enemy.
+     */
+    @Test
+    public void eidolon6AllowsOneMoreTriggerOfTheMark() {
+        Assertions.assertEquals(2, followupsAt(0), "the base limit is two per turn");
+        Assertions.assertEquals(3, followupsAt(6), "「额外增加 1 次」");
+    }
+
+    private static int followupsAt(int eidolon) {
+        Fixture f = new Fixture(eidolon);
+        f.castUltimate();
+        int[] instances = {0};
+        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> instances[0]++);
+        for (int i = 0; i < 5; i++) {
+            f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, f.ally, f.enemy, 0, 0));
+            f.battle.processRequests();
+        }
+        // no teammate damage was settled here - the manual firings only wake her follow-up
+        return instances[0];
+    }
+
     // ==================================================================
 
     private static final class Fixture {
         private final Character ratio;
+        private final Character ally = CharacterFactory.create(1002, 80);
         private final Enemy enemy = BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL);
         private final Battle battle;
 
@@ -179,7 +205,7 @@ public class DrRatioClauseCoverageTest {
 
         private Fixture(int eidolon) {
             ratio = CharacterFactory.create(DR_RATIO, 80, false, null, null, eidolon);
-            battle = new Battle(List.of(ratio), List.of(enemy), BattleFixture.seeded());
+            battle = new Battle(List.of(ratio, ally), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
         }
@@ -194,6 +220,16 @@ public class DrRatioClauseCoverageTest {
             }
         }
 
+        private void allyAttacks() {
+            battle.castImmediate(ally.getSkills().get(SkillType.COMMON), ally, List.of(enemy));
+            battle.processRequests();
+        }
+
+        private void castUltimate() {
+            battle.castImmediate(ratio.getSkills().get(SkillType.ULTRA), ratio, List.of(enemy));
+            battle.processRequests();
+        }
+
         private void castSkill() {
             battle.castImmediate(ratio.getSkills().get(SkillType.SKILL), ratio, List.of(enemy));
             battle.processRequests();
@@ -204,6 +240,8 @@ public class DrRatioClauseCoverageTest {
         }
     }
 }
+
+
 
 
 
