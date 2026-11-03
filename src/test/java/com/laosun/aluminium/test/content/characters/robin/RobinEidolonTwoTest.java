@@ -97,6 +97,29 @@ public class RobinEidolonTwoTest {
                 "and the next turn's first cast pays the bonus again");
     }
 
+    /**
+     * 星魂 1: the side's damage is recorded, and the memosprite's skill turns the record into true damage — then keeps half.
+     */
+    @Test
+    public void eidolon1RecordsDamageAndPaysItBackAsTrueDamage() {
+        Fixture f = new Fixture(1);
+        f.bringTheBandOnStage();
+        f.recordADamageSettled(1000);
+        int recorded = f.record();
+        Assertions.assertTrue(recorded > 0, "precondition: the skill casts recorded something (" + recorded + ")");
+
+        double enemyHpBefore = f.enemy.getCurrentHp();
+        f.summonCastsASkill();
+
+        Assertions.assertTrue(f.enemy.getCurrentHp() < enemyHpBefore,
+                "「对生命值最高的敌方目标额外造成…真实伤害」");
+        // 「随后清空记录值的 50%」: half stays. It is not EXACTLY half, because the true damage just dealt is itself recorded -
+        // the 「非真实伤害」 filter is the registered approximation - so this asserts the shape (roughly half, never all or none).
+        int kept = f.record();
+        Assertions.assertTrue(kept > recorded / 4 && kept < recorded * 3 / 4,
+                "「清空记录值的 50%」 — about half stays (" + recorded + " -> " + kept + ")");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -141,6 +164,25 @@ public class RobinEidolonTwoTest {
             battle.processRequests();
         }
 
+        private int record() {
+            return robin.getResources().value("记录");
+        }
+
+                /** One settled instance on our side, which is what the recording rule listens to. */
+        private void recordADamageSettled(double amount) {
+            battle.fire(TriggerPayload.Simple.of(
+                    com.laosun.aluminium.enums.TriggerEvent.DAMAGE_SETTLED, robin, enemy, 0, amount));
+            battle.processRequests();
+        }
+
+        private void summonCastsASkill() {
+            battle.fire(TriggerPayload.Simple.of(
+                    com.laosun.aluminium.enums.TriggerEvent.SKILL_CAST,
+                    battle.summonsOf(robin).isEmpty() ? null : battle.summonsOf(robin).get(0),
+                    enemy, 0, 0));
+            battle.processRequests();
+        }
+
         private int cap() {
             return robin.getResources().get("气氛值").getMax();
         }
@@ -150,6 +192,12 @@ public class RobinEidolonTwoTest {
         }
     }
 }
+
+
+
+
+
+
 
 
 
