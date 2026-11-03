@@ -35,6 +35,22 @@ public class RobinEidolonTwoTest {
                 "control: nothing at E0");
     }
 
+    /**
+     * 「气氛值上限提高 20 点」 — capacity, not a gift.
+     *
+     * <p>The bar is PARTY-scoped, so it lives on the battle rather than on Robin: reading it from her own resource manager answers null
+     * and would "prove" the clause wrong. {@code RAISE_RESOURCE_CAP} falls back to the party counter, which is why this op works here.
+     */
+    @Test
+    public void eidolon2RaisesTheVibeCapByTwenty() {
+        Fixture e2 = new Fixture(2);
+        Fixture e0 = new Fixture(0);
+        int baseCap = e0.battle.partyResource("气氛值").getMax() + e0.battle.partyResource("气氛值").getMaxOverflow();
+        int e2Cap = e2.battle.partyResource("气氛值").getMax() + e2.battle.partyResource("气氛值").getMaxOverflow();
+        Assertions.assertEquals(baseCap + 20, e2Cap, "「气氛值上限提高 20 点」");
+        Assertions.assertEquals(0, e2.battle.partyResource("气氛值").value(), "and her bar is still empty — capacity, not a gift");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -59,6 +75,7 @@ public class RobinEidolonTwoTest {
         }
     }
 }
+
 
 
 
