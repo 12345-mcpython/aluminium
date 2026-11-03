@@ -46,6 +46,32 @@ public class BlackSwanTest {
                 "「【奥迹】最多叠加50层」 ([奥迹] stacks at most 50 times) -- sixty-one casts must still read fifty");
     }
 
+    /**
+     * 「使目标**与相邻目标**陷入 1 层【奥迹】…防御力降低 20.80%」 — the adjacent halves, which the file used to register as
+     * unwritable because it thought adjacency was only a damage shape. It is a SELECTOR ({@code adjacent_enemies}), so the 1 layer
+     * and the shred reach the neighbours of the aimed enemy, and nobody else.
+     */
+    @Test
+    public void theSkillReachesTheNeighboursOfTheAimedEnemy() {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        Enemy left = BattleFixture.monster();
+        Enemy aimed = BattleFixture.monster();
+        Enemy right = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(left, aimed, right), fixed());
+        battle.startBattle();
+        double aimedDefence = aimed.getAttribute(AttributeType.DEFENCE).get();
+        double leftDefence = left.getAttribute(AttributeType.DEFENCE).get();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, blackSwan, aimed, 0, 0));
+
+        Assertions.assertEquals(1, aimed.getBuffManager().stacksOf("奥迹"), "the aimed enemy");
+        Assertions.assertEquals(1, left.getBuffManager().stacksOf("奥迹"), "「与相邻目标」 — the neighbour too");
+        Assertions.assertEquals(1, right.getBuffManager().stacksOf("奥迹"), "both neighbours");
+        Assertions.assertEquals(0.208, (leftDefence - left.getAttribute(AttributeType.DEFENCE).get()) / leftDefence, 1e-6,
+                "the neighbour's defence is lowered by the same 20.80%");
+        Assertions.assertTrue(aimedDefence > 0, "the fixture must have defence to shred");
+    }
+
     private static Random fixed() {
         return BattleFixture.alwaysRoll(0.0);
     }

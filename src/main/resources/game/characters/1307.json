@@ -3,7 +3,7 @@
   "character": 1307,
   "_status": "partial",
   "_gaps": [
-    "战技：相邻目标叠奥迹 / 减防，以及 100% 基础概率未写（只写了主目标）",
+    "⭐ **战技的相邻半已落地（2026-11-04）**：`ADD_STACK 奥迹` 与 `MODIFY_ATTR DEFENCE -0.208` 各补一条 `target: adjacent_enemies` + **`base_chance: 1`**（「100% 的基础概率」⇒ 过效果命中 × 效果抵抗）。旧登记说「相邻是**伤害形状**、`ADD_STACK` 走选择器」—— 现在 `adjacent_enemies` 就是那个选择器 ✓。判据 `BlackSwanTest.theSkillReachesTheNeighboursOfTheAimedEnemy`（3 敌，瞄中间，三层奥迹 + 相邻减防）。",
     "天赋：奥迹每层 +12% 倍率、随后重置为 1 层、≥3 层相邻 / ≥7 层穿防未写",
     "终结技：揭露状态 + 自身回合内受到的伤害 +25%（按回合阶段）未写",
     "星魂：未读、未写"
@@ -107,6 +107,46 @@
       "source": "1307 星魂 5: 等级加成（数据 skill_add_level: 130701=COMMON+1, 130703=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    }
+    ,
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_arcana_stack_on_adjacent",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "奥迹",
+          "amount": 1,
+          "max_stacks": 50,
+          "base_chance": 1,
+          "permanent": true,
+          "target": "adjacent_enemies"
+        }
+      ],
+      "source": "1307 黑天鹅 战技 失坠，伪神的黄昏 (130702, BPSkill/Blast): 「…同时有100%的基础概率使目标与相邻目标陷入1层【奥迹】…」",
+      "_note": "「使目标**与相邻目标**陷入 **1 层【奥迹】**」的**相邻**半 —— `target: adjacent_enemies` ✓（本会话为 1109 虎克加的相邻选择器，这里复用 ✓）+ **`base_chance: 1`** ✓（「100% 的基础概率」⇒ 过**效果命中 × 效果抵抗** ✓，不是无条件）。⚠ 与主目标那条**分开**成两条 ✓：一条只做一类事，变异时各自可测。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_defence_down_on_adjacent",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.208,
+          "turns": 3,
+          "base_chance": 1,
+          "target": "adjacent_enemies"
+        }
+      ],
+      "source": "1307 黑天鹅 战技 失坠，伪神的黄昏 (130702, BPSkill/Blast): 「…此外有100%的基础概率使目标与相邻目标防御力降低20.80%，持续3回合。」",
+      "_note": "「使**目标与相邻目标**防御力降低 **20.80%**，持续 **3 回合**」的**相邻**半 —— `target: adjacent_enemies` + `base_chance: 1` ✓。⚠ `MODIFY_ATTR` 收 `base_chance` 是已有的能力（裁决过波次），这里正是它的读者。"
     }
   ]
 }
