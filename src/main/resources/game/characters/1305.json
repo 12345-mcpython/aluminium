@@ -5,13 +5,13 @@
   "_gaps": [
     "⭐ **行迹 归纳 / 演绎 已于 2026-11-03 落地**：归纳 = `SKILL_CAST` + `target_debuff_count >= 1` → `ADD_STACK { value: debuffs(target), max_stacks: 6 }` 加层，`per_stack: self_stacks:归纳`（**`per_stack_live`**）每层 +2.5% 暴击率 / +5% 暴击伤害；演绎 = `APPLY_BUFF { base_chance: 1 }` + `target_when` 把效果抵抗降 10%/2 回合。判据 `DrRatioClauseCoverageTest`（3 例：3 个负面 ⇒ 3 层且暴击率 +7.5%、0 个负面 ⇒ 0 层、效果抵抗下降）。⚠ 夹具坑：`StateBuff` 的 `isDebuff()` 是 **false**，`target_debuff_count` 读不到 ⇒ 判据必须用**真负面**（`DotBuff` 三个不同名字）。",
     "⭐ **星魂 4 已于 2026-11-03 落地**（触发天赋时额外 +15 能量）：与天赋同条件另起一条 `min_eidolon: 4` 的规则（不能并进天赋那条 —— 并进去 E0 也会回能），判据实测「比 E0 多 15」。",
-    "⚠ 天赋「目标每有 1 个负面效果使追加攻击固定概率 +20%（基线 40% 已写）」仍未写：概率随负面数变化需要同一族提供器。",
     "⚠ 终结技【智者的短见】「最多触发 2 次」被解释成「每回合 2 次」（量纲差异）。",
     "⚠ 秘技：100% 基础概率、特殊领域 / 嘲讽未写。",
     "⭐ **星魂 1 已于 2026-11-03 落地**：开局 4 层（`ADD_STACK amount: 4, max_stacks: 10`）+ 上限 +4（`MODIFY_RULE effect_max_stacks`，6 → 10）；「需要先解锁行迹」是养成条件、不建模。判据实测 E1 开局 4 层、E0 为 0。",
     "⭐ **星魂 2 已于 2026-11-03 落地**：`DAMAGE { percent: 0.2, times_from: \"target_debuffs\", times: 4 }` —— `target_debuffs` 是**已有**的拼法（1006 星魂 4 是第一个读者），`times` 是上限。⚠ 实测口径：**战技自己落的【演绎】也算一个负面** ⇒ 夹具 2 个负面时实际触发 3 次、6 个时封顶 4 次、0 个时为 1 次。",
     "⭐ **行迹 推理 已于 2026-11-03 落地**：「负面 ≥3 个 ⇒ 每个负面 +10%、最多 50%」= `DEALING_DAMAGE` + `target_debuff_count >= 3` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { percent_from: min(debuffs,5) × 0.1, instance: true }`。判据用**同种子伤害总量对比**（3 个负面 > 0 个；2 个与 0 个相等）。",
-    "⚠ **星魂 6 的伤害半已落、次数半未落**：`MODIFY_RULE effect_percent_scale 1.5` 对**行份额**是**加** ⇒ 实际是 +1.5 倍行份额而非 ×1.5（近似，已注记）；「【智者的短见】触发 +1 次」要改 `per_turn`（规则级字段，缺 `effect_per_turn`）⇒ 仍登记。"
+    "⚠ **星魂 6 的伤害半已落、次数半未落**：`MODIFY_RULE effect_percent_scale 1.5` 对**行份额**是**加** ⇒ 实际是 +1.5 倍行份额而非 ×1.5（近似，已注记）；「【智者的短见】触发 +1 次」要改 `per_turn`（规则级字段，缺 `effect_per_turn`）⇒ 仍登记。",
+    "⭐ **天赋「概率随负面数」已于 2026-11-03 落地**：引擎新增 **`chance_from`**（提供器，在**掷骰那一刻**求值并钳到 [0,1]），本条写成 `min(0.4 + 0.2 × debuffs(target), 1.0)`；`chance: 0.4` 保留作静态基准。判据 `ChanceFromTest`（引擎级，含变异验证）＋ `DrRatioClauseCoverageTest`。⚠ 因为概率会随负面数变化，「推理」那条行迹的判据改成**只比第一发**（`damage.toValue()`），否则总伤害会被天赋的追加次数带偏。"
   ],
   "rules": [
     {
@@ -44,6 +44,37 @@
         "from_skill SKILL"
       ],
       "chance": 0.4,
+  "chance_from": {
+    "type": "min",
+    "inputs": [
+      {
+        "type": "add",
+        "inputs": [
+          {
+            "type": "const",
+            "value": 0.4
+          },
+          {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "debuffs",
+                "whose": "target"
+              },
+              {
+                "type": "const",
+                "value": 0.2
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "const",
+        "value": 1.0
+      }
+    ]
+  },
       "do": [
         {
           "op": "DAMAGE",
@@ -54,7 +85,7 @@
         }
       ],
       "source": "1305 真理医生 天赋 我思故我在 (130504, Enhance/FollowUp): 「施放战技时，有40%的固定概率对该目标发动1次追加攻击，造成等同于真理医生270%攻击力的虚数属性伤害。目标每有1个负面效果，追加攻击发动的固定概率提高20%。若追加攻击施放前目标被消灭则对敌方随机单体发动追加攻击。」",
-      "_note": "「施放**战技**时，有 **40% 的固定概率**对该目标发动 1 次追加攻击，造成等同于真理医生 **270% 攻击力**的虚数属性伤害」—— ① 事件 `ALLY_ATTACK` ✓ + **`from_skill SKILL`** ✓（\"施放**战技**\" ✓ —— 不可省 ✗，否则普攻/终结技也会掷骰 ✓）；② 概率用**规则级 `chance: 0.4`** ✓（`TriggerSpec` 的字段 ✓，与 1206 的 `chance: 0.33` 同一拼法 ✓）；③ 伤害用**字面倍率** ✓（第 186 轮 ✓），元素 `Imaginary` ✓（虚数 ✓）。⚠ **登记**：① 「目标**每有 1 个负面效果**，追加攻击发动的固定概率**提高 20%**」✗ —— 引擎**有** `target_debuff_count` 这个条件变量 ✓，但**没有把概率写成公式**的写法 ✗（`chance` 是**静态字段** ✗）⇒ ⭐ 本文件写的是**基线 40%** ✓（文档的基准情形 ✓ **精确** ✓），**未写**的是随负面效果递增的那部分 ✓；② 「若追加攻击施放前目标被消灭则对敌方**随机单体**发动」✗ —— ⚠ **登记理由已于 2026-09-30 修正** ✓：原写作「缺**随机目标**」✗，**是错的** ✓（⚠ 与 `1220` ① / `1221` ② **同一个错** ✓）—— `TriggerInterpreter.TARGET_SELECTORS` **早已含 `random_enemy`** ✓。⭐ **真正的阻碍是它前面那个兜底从句** ✗：「**若追加攻击施放前目标被消灭**」✗ ⇒ ⚠ 引擎缺「**首选目标取不到时退而求其次**」这一判据 ✗（⚠ 该能力现有读者 **3** ✓：本条 ＋ `1220` ① ＋ `1221` ② ✓）。 ⭐ **退路已出货** ✓（2026-09-30 ✓）：⚠ 本条的 `target` 由 `target` ✗ 改为 **`target_else_random_enemy`** ✗ —— ⚠ 即 ⚠ 事件目标**未阵亡** ⇒ 打它 ✓；⚠ 已阵亡 ⇒ ⚠ 打一个存活的随机敌方 ✓（⚠ 与原句「若追加攻击施放前目标被消灭则对敌方随机单体发动」逐字对齐 ✓）。⚠ **订正一处旧账** ✗：⚠ 本条注记此前写作 `random_hit_enemy` ✗ —— ⚠ 那是**错的** ✓；⚠ 实测（2026-09-30，第 700 轮）⚠ 本条与 `ult_reaction_followup` **都打 `target`** ✓，⚠ 文件里从来没有 `random_hit_enemy` ✓。⚠ 引擎侧见 `TriggerInterpreter.resolveTarget` ✓（⚠ 谓词 `CanHit.isDeath()` ✓ —— ⚠ `CanHit` 第 88–90 行说明**无敌与阵亡正交** ✓，⚠ 所以无敌的 Boss 仍走首选 ✓）。⚠ **窗口真实存在**：⚠ `CanHit` 第 550 行 `isDeath()` alone does not remove anybody ✗ ⇒ ⚠ 已阵亡者仍留在 `battle.enemies` ✓。 ⚠ **按等级读**（AGENT §0.1.3）。"
+      "_note": "「施放**战技**时，有 **40% 的固定概率**对该目标发动 1 次追加攻击，造成等同于真理医生 **270% 攻击力**的虚数属性伤害」—— ① 事件 `ALLY_ATTACK` ✓ + **`from_skill SKILL`** ✓（\"施放**战技**\" ✓ —— 不可省 ✗，否则普攻/终结技也会掷骰 ✓）；② 概率用**规则级 `chance: 0.4`** ✓（`TriggerSpec` 的字段 ✓，与 1206 的 `chance: 0.33` 同一拼法 ✓）；③ 伤害用**字面倍率** ✓（第 186 轮 ✓），元素 `Imaginary` ✓（虚数 ✓）。⭐ **2026-11-03 补齐**：「目标**每有 1 个负面效果**，概率**提高 20%**」现在用 **`chance_from`（提供器）** 写在**掷骰那一刻**求值：`min(0.4 + 0.2 × debuffs(target), 1.0)` ✓ —— 引擎侧新增 `TriggerSpec.chance_from` + `CompiledRule.chanceFrom`，在 `TriggerInterpreter` 里**按事件求值并钳到 [0,1]**（`chance` 静态字段保留作基线）✓。② 「若追加攻击施放前目标被消灭则对敌方**随机单体**发动」✗ —— ⚠ **登记理由已于 2026-09-30 修正** ✓：原写作「缺**随机目标**」✗，**是错的** ✓（⚠ 与 `1220` ① / `1221` ② **同一个错** ✓）—— `TriggerInterpreter.TARGET_SELECTORS` **早已含 `random_enemy`** ✓。⭐ **真正的阻碍是它前面那个兜底从句** ✗：「**若追加攻击施放前目标被消灭**」✗ ⇒ ⚠ 引擎缺「**首选目标取不到时退而求其次**」这一判据 ✗（⚠ 该能力现有读者 **3** ✓：本条 ＋ `1220` ① ＋ `1221` ② ✓）。 ⭐ **退路已出货** ✓（2026-09-30 ✓）：⚠ 本条的 `target` 由 `target` ✗ 改为 **`target_else_random_enemy`** ✗ —— ⚠ 即 ⚠ 事件目标**未阵亡** ⇒ 打它 ✓；⚠ 已阵亡 ⇒ ⚠ 打一个存活的随机敌方 ✓（⚠ 与原句「若追加攻击施放前目标被消灭则对敌方随机单体发动」逐字对齐 ✓）。⚠ **订正一处旧账** ✗：⚠ 本条注记此前写作 `random_hit_enemy` ✗ —— ⚠ 那是**错的** ✓；⚠ 实测（2026-09-30，第 700 轮）⚠ 本条与 `ult_reaction_followup` **都打 `target`** ✓，⚠ 文件里从来没有 `random_hit_enemy` ✓。⚠ 引擎侧见 `TriggerInterpreter.resolveTarget` ✓（⚠ 谓词 `CanHit.isDeath()` ✓ —— ⚠ `CanHit` 第 88–90 行说明**无敌与阵亡正交** ✓，⚠ 所以无敌的 Boss 仍走首选 ✓）。⚠ **窗口真实存在**：⚠ `CanHit` 第 550 行 `isDeath()` alone does not remove anybody ✗ ⇒ ⚠ 已阵亡者仍留在 `battle.enemies` ✓。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "ULT_CAST",

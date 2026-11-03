@@ -137,22 +137,33 @@ public class DrRatioClauseCoverageTest {
      */
     @Test
     public void theInferenceTraceRaisesDamageAtThreeDebuffs() {
-        double without = damageAgainst(0);
-        double withThree = damageAgainst(3);
+        double without = firstHitAgainst(0);
+        double withThree = firstHitAgainst(3);
         Assertions.assertTrue(withThree > without,
                 "「若目标负面状态 ≥3 个…造成伤害提高 10%」 (" + without + " -> " + withThree + ")");
-        Assertions.assertEquals(without, damageAgainst(2), 1e-9, "two debuffs is below the gate");
+        Assertions.assertEquals(without, firstHitAgainst(2), 1e-9, "two debuffs is below the gate");
     }
 
-    private static double damageAgainst(int debuffs) {
+    /**
+     * The FIRST damage instance of the cast, which is the Skill's own hit.
+     *
+     * <p>Not the total: the talent's follow-up roll now depends on the debuff count too (its chance is 40% plus 20% per debuff), so a
+     * total would move for a reason that has nothing to do with 推理. The first instance settles before that roll, which keeps the
+     * comparison about the trace alone.
+     */
+    private static double firstHitAgainst(int debuffs) {
         Fixture f = new Fixture(0);
         for (int i = 0; i < debuffs; i++) {
             f.enemy.getBuffManager().addBuff(new DotBuff(f.ratio, DamageElement.QUANTUM, 10, 3, 1, "灼烧" + i));
         }
-        double[] total = {0};
-        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> total[0] += applied);
+        double[] first = {-1};
+        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> {
+            if (first[0] < 0) {
+                first[0] = damage.toValue();
+            }
+        });
         f.castSkill();
-        return total[0];
+        return first[0];
     }
 
     // ==================================================================
@@ -193,6 +204,7 @@ public class DrRatioClauseCoverageTest {
         }
     }
 }
+
 
 
 
