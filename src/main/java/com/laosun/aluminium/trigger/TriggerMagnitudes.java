@@ -387,6 +387,16 @@ final class TriggerMagnitudes {
      */
     static double resolveScale(String scale, double percent, TriggerContext ctx) {
         String key = scale == null ? "" : scale.trim();
+        // A CONSTANT: "set the counter to 1 layer" states a NUMBER, not a source. Every other prefix names somewhere to read
+        // from (an attribute, a counter, a resource), which is why SET_STACKS could not say "reset to 1" until now - the
+        // corpus asks for it in 1307 talent (「每层…提高 12%，随后重置为 1 层」).
+        if (key.startsWith("const:")) {
+            String value = key.substring("const:".length()).trim();
+            if (value.isEmpty()) {
+                throw new IllegalArgumentException("scale begins with const: but names no value; write const:<number>");
+            }
+            return percent * Double.parseDouble(value);
+        }
         Double fromStacks = stackScale(key, percent, ctx);
         if (fromStacks != null) {
             return fromStacks;
@@ -1263,3 +1273,5 @@ final class TriggerMagnitudes {
         return ctx.battle().settledDamageThisEvent();
     }
 }
+
+

@@ -228,4 +228,32 @@ public class BlackSwanTest {
         Assertions.assertEquals(afterTurn, blackSwan.getCurrentEnergy(), 1e-9,
                 "「在【揭露】持续时间内最多触发 1 次」 — the turn start already spent the window's allowance");
     }
+
+    /**
+     * 天赋: 「随后重置为 1 层」 — the layers are spent back down to one by the same turn start that deals the dot.
+     *
+     * <p>Two things had to be true at once for this to be writable: a {@code const:} scale (so {@code SET_STACKS} could say
+     * "one"), and the reset sitting LAST on the event (so the dot and the two threshold branches all read the count before it
+     * moves).
+     */
+    @Test
+    public void theTalentResetsTheLayersToOne() {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
+        battle.startBattle();
+        for (int i = 0; i < 12; i++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+        }
+        Assertions.assertEquals(12, enemy.getBuffManager().stacksOf("奥迹"), "precondition");
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+
+        Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp() || enemy.isDeath(), "the dot still landed");
+        Assertions.assertTrue(enemy.getBuffManager().stacksOf("奥迹") <= 1,
+                "「随后重置为 1 层」 — twelve layers are spent down to one, got "
+                        + enemy.getBuffManager().stacksOf("奥迹"));
+    }
 }
