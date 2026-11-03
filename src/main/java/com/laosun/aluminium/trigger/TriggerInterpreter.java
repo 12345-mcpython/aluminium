@@ -505,7 +505,15 @@ public final class TriggerInterpreter {
             // one firing sees the reduced number, the same way a second firing would.
             int attempts = rule.chanceRolls();
             for (int attempt = 0; attempt < attempts; attempt++) {
-                double chance = owner == null ? rule.chance() : owner.currentRuleChance(rule.id(), rule.chance());
+                // A rule may compute its probability from the firing ("目标每有 1 个负面效果…提高 20%"): the provider is
+                // resolved here, at the moment of the ROLL, and clamped into [0, 1] - asking for 1.4 must not mean "more
+                // than always". A constant `chance` with no provider takes the old path untouched.
+                double baseChance = rule.chance();
+                if (rule.chanceFrom() != null) {
+                    baseChance = NumberProviders.resolve(rule.chanceFrom(), new EffectSpec(), ctx);
+                    baseChance = Math.max(0.0, Math.min(1.0, baseChance));
+                }
+                double chance = owner == null ? baseChance : owner.currentRuleChance(rule.id(), baseChance);
                 if (chance < 1 && !battle.rollChance(chance)) {
                     continue;
                 }
@@ -2794,6 +2802,9 @@ public final class TriggerInterpreter {
         return total;
     }
 }
+
+
+
 
 
 

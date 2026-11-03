@@ -2,6 +2,7 @@ package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.beans.NumberProvider;
 import com.laosun.aluminium.trigger.TriggerTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -185,6 +186,18 @@ public class TriggerSpec {
     private Double chance;
 
     /**
+     * A chance computed from the firing instead of stated as a constant: 「目标每有 1 个负面效果，追加攻击发动的固定概率提高 20%」
+     * (1305 Dr. Ratio's talent).
+     *
+     * <p><b>Why it is a provider and not a formula on {@code chance}.</b> {@code chance} is a static field read once when the table is
+     * compiled, so it cannot see how many negative effects the victim carries at the moment of the roll. This field is resolved at
+     * <b>firing time</b> and then clamped into [0, 1]; when both are stated the provider WINS, because a rule that names one is
+     * saying its probability is not a constant.
+     */
+    @SerializedName("chance_from")
+    private NumberProvider chanceFrom;
+
+    /**
      * How many <b>independent</b> rolls of {@link #chance} one firing makes: "额外增加 2 次【剑势】的发动判定" is
      * {@code 2}, and each attempt rolls on its own so the two can come out differently.
      *
@@ -344,3 +357,6 @@ public class TriggerSpec {
     @JsonAdapter(SourceTextAdapter.class)
     private String source;
 }
+
+
+

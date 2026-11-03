@@ -159,7 +159,8 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | **`once_per_wave`** | 每波一次 |
 | **`once_per_attack`** | 同一次攻击内只触发一次 |
 | **`per_attack`** | 同一次攻击内最多 N 次 |
-| **`chance`** | 这条规则本身的触发概率（不是效果命中） |
+| **`chance`** | 这条规则本身的触发概率（不是效果命中）|
+| **`chance_from`** | 概率**在掷骰那一刻**算出来（提供器，钳到 [0,1]）；有它时**覆盖** `chance`。读者：1305 天赋「目标每有 1 个负面效果，概率提高 20%」|
 | **`chance_decay`** | 每次触发后概率的衰减因子 |
 | **`chance_rolls`** | 一次开火独立掷几次 `chance`（默认 1） |
 
@@ -674,6 +675,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 
 **`countdown`** 选择器（2026-10-31）：规则主人放下的倒计时单位 —— `START_COUNTDOWN` 造、`COUNTDOWN_TURN` 看到期，而 `DELAY`/`ADVANCE` 现在能作用于它（读者：1507 星魂 1「使【无量忿怒】倒计时行动延后 15%」）。
+
 
 
 

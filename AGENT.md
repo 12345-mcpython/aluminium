@@ -989,6 +989,21 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 【已把守：`StackGainedTest`（一层一次、同名才给、另一个计数器不给）+ `LukaClauseCoverageTest.theRecycleTracePaysThreeEnergyPerLayer`（终结技 2 层 ⇒ +6）】
 
+#### 3.7zs（引擎）`chance_from`：概率也可以**在掷骰那一刻**算
+
+2026-11-03 定形。读者是 1305 真理医生的天赋（「目标每有 1 个负面效果，追加攻击发动的**固定概率**提高 **20%**」）。
+
+`chance` 是**加载期**读一次的静态字段 ⇒ 它能说「40%」，说不出口「40% + 每个负面 20%」。新增 **`chance_from`**（`NumberProvider`）：
+
+| 不变量 | 为什么 |
+|---|---|
+| 在 **`TriggerInterpreter` 掷骰那一刻**求值 ✓ | 负面数会变，加载期算不出正确值 |
+| 结果**钳到 [0,1]** ✓ | 写 `1.4` 必须等于「必定」，不能大于 1 |
+| 有 `chance_from` 时**覆盖** `chance` ✓ | 规则一旦写了提供器，就是在说「这不是常量」 |
+| `chance_decay` 仍以**静态 `chance`** 为基准 ✓ | 衰减那一族（1506 头号补给盲盒）本就不该与动态概率混用 |
+
+【已把守：`ChanceFromTest`（0 ⇒ 永不、钳到 1 ⇒ 必中、0.6 ⇒ 四次中部分命中；变异：把解释器里的分支改成 `false &&` 后立刻变红）+ `DrRatioClauseCoverageTest`】
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
@@ -2072,6 +2087,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
 | `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
 | `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
+
 
 
 

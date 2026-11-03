@@ -4,6 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.NumberProvider;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.damage.Damage;
@@ -767,7 +768,7 @@ public class TriggerTable {
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
                 validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec),
                 spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim(),
-                Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec), validatePick(spec, effects)));
+                Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec), validatePick(spec, effects), spec.getChanceFrom()));
     }
 
     /**
@@ -967,6 +968,8 @@ public class TriggerTable {
     private static double validateChance(TriggerSpec spec) {
         Double chance = spec.getChance();
         if (chance == null) {
+            // A rule may compute its probability at firing time instead of stating one ("每有 1 个负面效果…提高 20%").
+            // The static value then only has to be "no decay"; the interpreter resolves the provider per firing.
             return 1.0;
         }
         if (!(chance > 0) || chance > 1) {
@@ -1308,7 +1311,12 @@ public class TriggerTable {
                                 * The rule-level `pick`: a selector resolved once per firing, so several effects can name
                                 * the same randomly chosen unit. Empty when the rule states none.
                                 */
-                               String pick) {
+                               String pick,
+                               /*
+                                * A chance computed at FIRING time ("每有 1 个负面效果…概率提高 20%", 1305). Resolved and clamped in
+                                * the interpreter; null means {@link #chance} really is a constant.
+                                */
+                               NumberProvider chanceFrom) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
@@ -2249,5 +2257,8 @@ public class TriggerTable {
         }
     }
 }
+
+
+
 
 
