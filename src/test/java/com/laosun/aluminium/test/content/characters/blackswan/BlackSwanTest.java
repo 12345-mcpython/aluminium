@@ -256,4 +256,71 @@ public class BlackSwanTest {
                 "「随后重置为 1 层」 — twelve layers are spent down to one, got "
                         + enemy.getBuffManager().stacksOf("奥迹"));
     }
+
+    /**
+     * Diagnostic for the Eidolon 6 allowance: does the grant rule fire, and does it fire in a SECOND fixture too?
+     *
+     * <p>The earlier probe printed 1 then 0 for two identically built battles, which is what moved the suspicion away from
+     * the comparison operator and onto the rule's reach.
+     */
+    @Test
+    public void eidolonSixGrantFiresInEveryFixture() {
+        Assertions.assertEquals(1, allowanceAfterUlt(6), "first fixture");
+        Assertions.assertEquals(1, allowanceAfterUlt(6), "second fixture, built exactly the same way");
+        Assertions.assertEquals(0, allowanceAfterUlt(5), "below E6 the rule is not in the table at all");
+    }
+
+    private static int allowanceAfterUlt(int eidolon) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, eidolon);
+        // Three enemies, so the 「≥3 层」 branch's adjacent stack lands on the neighbours instead of back on the target (with a
+        // single enemy it resolves onto itself and adds a layer, which made the first version of this count read 13).
+        Enemy left = BattleFixture.monster();
+        Enemy enemy = BattleFixture.monster();
+        Enemy right = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(left, enemy, right), BattleFixture.alwaysRoll(0.99));
+        battle.startBattle();
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                blackSwan, List.of(enemy));
+        battle.processRequests();
+        return blackSwan.getBuffManager().stacksOf("奥迹不重置额度");
+    }
+
+    /**
+     * 星魂 6: 「【奥迹】每回合开始造成伤害后不会重置层数」，once per 揭露 window.
+     */
+    @Test
+    public void eidolonSixKeepsTheLayersForOneTurnStart() {
+        // > 1 rather than exactly 12: the 65% dot-tick rule can add a layer too, and what this test is about is that the RESET did not happen.
+        Assertions.assertTrue(layersAfterTurnStarts(6, 1) > 1, "the window keeps the layers instead of resetting them");
+        Assertions.assertTrue(layersAfterTurnStarts(6, 2) <= 1,
+                "「最多触发 1 次」 — the next turn start resets it (and the dot may finish the target off entirely)");
+        Assertions.assertTrue(layersAfterTurnStarts(5, 1) <= 1, "below E6 there is no skip at all");
+    }
+
+    /** Layers left after firing {@code turnStarts} turn starts at the given eidolon rank. */
+    private static int layersAfterTurnStarts(int eidolon, int turnStarts) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, eidolon);
+        // Three enemies, so the 「≥3 层」 branch's adjacent stack lands on the neighbours instead of back on the target (with a
+        // single enemy it resolves onto itself and adds a layer, which made the first version of this count read 13).
+        Enemy left = BattleFixture.monster();
+        Enemy enemy = BattleFixture.monster();
+        Enemy right = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(left, enemy, right), BattleFixture.alwaysRoll(0.99));
+        battle.startBattle();
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                blackSwan, List.of(enemy));
+        battle.processRequests();
+        for (int i = 0; i < 12; i++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+        }
+        for (int i = 0; i < turnStarts; i++) {
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+            battle.processRequests();
+        }
+        return Math.max(0, enemy.getBuffManager().stacksOf("奥迹"));
+    }
 }
+
+
+
