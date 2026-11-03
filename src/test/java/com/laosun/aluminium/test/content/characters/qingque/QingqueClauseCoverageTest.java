@@ -47,6 +47,24 @@ public class QingqueClauseCoverageTest {
                 "precondition: the enhanced basic states the very rule Eidolon 6 exempts");
     }
 
+    /**
+     * 星魂 4: 「施放战技后，有 24% 的固定概率获得【不求人】…持续至本回合结束」, and the state adds one follow-up per Basic ATK.
+     */
+    @Test
+    public void eidolon4CanGrantTheStateAndTheStateAddsAFollowUp() throws IOException {
+        Assertions.assertTrue(hasRuleAndState(), "the two rules are in the file");
+    }
+
+    private static boolean hasRuleAndState() throws IOException {
+        JsonObject grant = rule("eidolon4_skill_may_grant_the_unasked_for_state");
+        JsonObject use = rule("eidolon4_the_state_adds_a_follow_up");
+        return grant.get("chance").getAsDouble() == 0.24
+                && grant.getAsJsonArray("do").toString().contains("不求人")
+                && use.get("on").getAsString().equals("ATTACK_FINISHED")
+                && use.getAsJsonArray("when").toString().contains("不求人")
+                && use.getAsJsonArray("do").toString().contains("COMMON");
+    }
+
     private static JsonObject rule(String id) throws IOException {
         JsonArray rules = JsonParser.parseString(
                         Files.readString(Path.of("src", "main", "resources", "game", "characters", "1201.json"),
@@ -61,3 +79,6 @@ public class QingqueClauseCoverageTest {
         throw new AssertionError("no rule " + id);
     }
 }
+
+
+
