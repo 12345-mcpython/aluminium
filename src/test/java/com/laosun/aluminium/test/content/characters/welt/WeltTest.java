@@ -44,13 +44,15 @@ public class WeltTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(WELT);
         // Two since 2026-11-02: Eidolon 1 also fires on ULT_CAST (「施放终结技后，瓦尔特获得强化」).
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison and Eidolon 1's power-up");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison, Eidolon 1's power-up, and the two trace rules");
         // Two since 2026-11-02: Eidolon 2 rides the same slow-gated trigger (「触发天赋时，瓦尔特恢复 3 点能量」).
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the slow-gated talent and Eidolon 2");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "the slow-gated talent, Eidolon 2 and trace 裁决");
         // Four since 2026-11-02: the technique is a BATTLE_START clause too.
         // Five since 2026-11-03: Eidolon 4 raises the slow's base chance at battle start (a MODIFY_RULE amendment).
         Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the level convention, the technique, Eidolon 3/5 levels and Eidolon 4's amendment");
+        // Three ULT_CAST rules since the traces landed (惩戒 / 审判 beside the imprison and Eidolon 1's power-up).
     }
 
     private static final class Fixture {
@@ -107,4 +109,6 @@ public class WeltTest {
                 "「对指定敌方单体造成等同于维尔特#1[i]%攻击力的虚数伤害，并额外造成 2 次伤害」 (deals Imaginary damage to a designated single enemy equal to #1[i]% of Welt's ATK, and deals 2 extra instances of damage) — the skill must land: loss " + loss);
     }
 }
+
+
 

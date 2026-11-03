@@ -3,11 +3,9 @@
   "character": 1004,
   "_status": "partial",
   "_gaps": [
-    "⭐ **星魂 4 / 6 的「强化前」半条已落地（2026-11-03）**：④ `MODIFY_RULE { rule: skill_speed_down, effect_percent: 0.35 }`（`percent` 抬的是**概率** ⇒ 0.75 → 1.10，钳到必中）；⑥ `SKILL_CAST` → `DAMAGE { skill: SKILL, damage_param: 0, target: random_enemy }`（**倍率**取战技自己的参数行，因为文档只写「1 次伤害」没给数）。",
-    "⛔ **强化形态【失重】整体未建模**：星魂 4 / 6 的「强化后」两半（【失重】目标全属性抗性 −30%；对减速目标暴击率 +30% / 暴伤 +60%）都要先把「强化后的战技」做成可区分的形态。",
-    "⛔ **天赋「击中减速目标额外 60% 攻击力附加伤害」未写**：需要「处于**减速**」这个可问的状态（现在减速只是属性修正，没有状态名）。⚠ `talent_additional_damage_on_slowed` 是**旧实现**，请以本条为准。",
-    "⛔ **战技是弹射**：「受到攻击的敌方目标」指**实际被命中的每一个**，而 `target` 只覆盖瞄准的那一个；弹射到的其余目标没有选择器能取到 ⇒ 只对主目标生效（登记）。",
-    "⛔ **行迹未核对**：文档的行迹小节没有独立标题，需按 `skill_traces.json` 逐条对照。"
+    "⭐ **行迹三条已落地（2026-11-03）**：惩戒 = `APPLY_BUFF base_chance: 1` + `MODIFY_DAMAGE_TAKEN 0.12`（`while_state` 只给真挂上的）；审判 = `GAIN_ENERGY 10`；裁决 = `DEALING_DAMAGE` + **`target has_state 弱点击破`**（`BuffManager.BROKEN_STATE` 的名字）→ 实例 +20%。判据 `WeltTest` 的 census 更新。",
+    "⛔ **强化形态【失重】整体未建模**：星魂 4 / 6 的「强化后」两半（【失重】目标全属性抗性 −30%；对减速目标暴击率 +30% / 暴伤 +60%）与行迹的「强化后」三半都要先把「强化后的战技」做成可区分的形态。",
+    "⛔ **战技是弹射**：「受到攻击的敌方目标」指**实际被命中的每一个**，而 `target` 只覆盖瞄准的那一个；弹射到的其余目标没有选择器能取到 ⇒ 只对主目标生效（登记）。"
   ],
   "rules": [
     {
@@ -318,6 +316,68 @@
       ],
       "source": "1004 瓦尔特 星魂 6 光明的未来: 「强化前：施放战技时，对随机敌方单体额外造成1次伤害。」",
       "_note": "「施放战技时，对**随机敌方单体**额外造成 **1 次伤害**」—— ① `DAMAGE { target: random_enemy }` ✓（选择器早已有）；② **倍率**：文档只写「1 次伤害」、**没给数字** ⇒ 取**战技自己的参数行**（`skill: SKILL, damage_param: 0` = 那一发的伤害份额 0.36@Lv1），这是唯一不需要臆造数值的读法 ✓；⚠ 若日后核出别的倍率，改这一处即可。⚠ **强化后的半条**（对减速目标暴击率 +30% / 暴伤 +60%）仍登记（同上：强化形态未建模）。"
+    }
+    ,
+    {
+      "on": "ULT_CAST",
+      "id": "trace_retribution_vulnerability",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "惩戒",
+          "base_chance": 1,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.12,
+          "turns": 2,
+          "buff": "惩戒",
+          "target": "target",
+          "while_state": "惩戒"
+        }
+      ],
+      "source": "1004 瓦尔特 行迹 惩戒 (1004101): 「施放终结技时，有100%基础概率使目标受到的伤害提高12%，持续2回合。」",
+      "_note": "「施放**终结技**时，有 **100% 基础概率**使目标**受到的伤害提高 12%**，持续 **2 回合**」—— ① `APPLY_BUFF { base_chance: 1 }` 走**命中/抵抗管线** ✓（「基础概率」在抵抗之前 ✓，与 1106 通解同写法）；② 「受到的伤害提高」= `MODIFY_DAMAGE_TAKEN 0.12` ✓，用 `while_state: 惩戒` 只对**真的挂上**的目标生效 ✓（`target_when` 在 `ULT_CAST` 上可用，但 `while_state` 语义更贴 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "trace_judgement_restores_ten_energy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10
+        }
+      ],
+      "source": "1004 瓦尔特 行迹 审判 (1004102): 「施放终结技时，额外恢复10点能量。」",
+      "_note": "「施放终结技时，**额外恢复 10 点能量**」—— 一条 `GAIN_ENERGY 10` 挂在 `ULT_CAST` 上 ✓（与终结技自己的回能是两笔 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_verdict_against_broken_targets",
+      "when": [
+        "actor == self",
+        "target has_state 弱点击破"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.2,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1004 瓦尔特 行迹 裁决 (1004103): 「对被弱点击破的敌方目标造成的伤害提高20%。」",
+      "_note": "「对被**弱点击破**的敌方目标造成的伤害提高 **20%**」—— ① 事件 `DEALING_DAMAGE` ✓（「造成的伤害」）；② `target has_weakness` 就是「**已被击破**」这个问题的词 ✓（不是「有弱点属性」✗ —— 那个是 `target_weakness_count`）；③ `instance: true` 只影响这一发 ✓。"
     }
   ]
 }
