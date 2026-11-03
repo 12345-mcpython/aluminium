@@ -173,5 +173,32 @@ public class BlackSwanTest {
                         com.laosun.aluminium.enums.DamageType.NORMAL, 1000));
         return before - enemy.getCurrentHp();
     }
-}
 
+    /**
+     * 星魂 4: 「每回合开始时…使黑天鹅恢复 8 点能量」，with 「在【揭露】持续时间内最多触发 1 次」 as a counted allowance.
+     */
+    @Test
+    public void eidolonFourPaysEightEnergyOncePerEpiphany() {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, 4);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
+        battle.startBattle();
+        double start = blackSwan.getCurrentEnergy();
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                blackSwan, List.of(enemy));
+        battle.processRequests();
+        double afterUlt = blackSwan.getCurrentEnergy();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        double afterFirstTurn = blackSwan.getCurrentEnergy();
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+
+        Assertions.assertTrue(afterFirstTurn > afterUlt, "the first turn start pays (from " + start + ")");
+        Assertions.assertEquals(afterFirstTurn, blackSwan.getCurrentEnergy(), 1e-9,
+                "「最多触发 1 次」 — the second turn start pays nothing until 揭露 is applied again");
+    }
+}
