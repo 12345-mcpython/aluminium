@@ -342,6 +342,13 @@ public class BlackSwanTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
+        // The reductions are applied at the victim's turn start while it is in the matching dot state, so the fixture puts all
+        // four states on it and then starts its turn.
+        for (String state : new String[]{"风化", "裂伤", "灼烧", "触电"}) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(state, 2));
+        }
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
         battle.processRequests();
         return enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.resistanceReductionFor(
                 com.laosun.aluminium.enums.DamageElement.valueOf(element))).get();
@@ -370,5 +377,33 @@ public class BlackSwanTest {
         Assertions.assertEquals(0, enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.VulnerabilityBuff.class).size(),
                 "the +25% went with the state");
     }
-}
 
+    /**
+     * 星魂 1 carries its REAL condition: the reduction is applied at the turn start of a victim that is in the matching dot state,
+     * and the holder gate takes it back off when that state leaves.
+     */
+    @Test
+    public void eidolonOneReductionsFollowTheVictimsState() {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, 1);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        var wind = com.laosun.aluminium.enums.AttributeType.RESISTANCE_REDUCTION_WIND;
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        Assertions.assertEquals(0.0, enemy.getAttribute(wind).get(), 1e-9,
+                "「处于风化…的敌方目标」 — no state, no reduction");
+
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("风化", 2));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        Assertions.assertEquals(-0.25, enemy.getAttribute(wind).get(), 1e-9, "with the state it applies");
+
+        enemy.getBuffManager().removeState("风化");
+        enemy.getBuffManager().beforeMove();
+        Assertions.assertEquals(0.0, enemy.getAttribute(wind).get(), 1e-9, "and the gate takes it off again");
+    }
+}

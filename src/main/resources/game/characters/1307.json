@@ -504,8 +504,11 @@
     }
     ,
     {
-      "on": "BATTLE_START",
+      "on": "TURN_START",
       "id": "eidolon1_wind_resist_for_windshear",
+      "when": [
+        "actor has_state 风化"
+      ],
       "min_eidolon": 1,
       "do": [
         {
@@ -513,15 +516,19 @@
           "attribute": "RESISTANCE_REDUCTION_WIND",
           "percent": -0.25,
           "permanent": true,
+          "while_holder_state": "风化",
           "target": "all_enemies"
         }
       ],
       "source": "1307 黑天鹅 星魂 1 三磅石，七阶柱: 「当黑天鹅处于可战斗状态时，处于风化、裂伤、灼烧、触电状态下的敌方目标对应的风、物理、火、雷属性抗性分别降低25%。」",
-      "_note": "「处于**风化**…的敌方目标对应的**风**属性抗性降低 **25%**」—— 本会话为这句话新增的**按元素抗性**常量 `RESISTANCE_REDUCTION_WIND`；`DamageService` 在唯一读抗性的地方按**这一发的元素**取对应常量 ⇒ 精确的「风抗 −25%」，不是易伤近似。⚠ **一处宽**：原文的条件是「处于风化状态」，而引擎还没有「当持有者自己处于某状态时」的持续修饰 ⇒ 目前对**全体敌人**生效。"
+      "_note": "「处于**风化**…的敌方目标对应的**风**属性抗性降低 **25%**」—— 本会话为这句话新增的**按元素抗性**常量 `RESISTANCE_REDUCTION_WIND`；`DamageService` 在唯一读抗性的地方按**这一发的元素**取对应常量 ⇒ 精确的「风抗 −25%」，不是易伤近似。⭐ **条件已精确（2026-11-04）**：规则改成 `TURN_START` + `when: actor has_state 风化`，并带 **`while_holder_state: 风化`** ⇒ 只有**处于风化**的敌人在**它自己的回合开始**时获得该减抗，状态消失后由 gate 摘掉（判据 `eidolonOneReductionsFollowTheVictimsState`）。⚠ 仍是**回合粒度的近似**：状态在两次回合之间出现/消失时，减抗要到下一个回合边界才跟上。"
     },
     {
-      "on": "BATTLE_START",
+      "on": "TURN_START",
       "id": "eidolon1_physical_resist_for_bleed",
+      "when": [
+        "actor has_state 裂伤"
+      ],
       "min_eidolon": 1,
       "do": [
         {
@@ -529,6 +536,7 @@
           "attribute": "RESISTANCE_REDUCTION_PHYSICAL",
           "percent": -0.25,
           "permanent": true,
+          "while_holder_state": "裂伤",
           "target": "all_enemies"
         }
       ],
@@ -536,8 +544,11 @@
       "_note": "「处于**裂伤**…**物理**抗性降低 25%」—— `RESISTANCE_REDUCTION_PHYSICAL` ✓。⚠ 同上的「条件宽」：对全体敌人生效。"
     },
     {
-      "on": "BATTLE_START",
+      "on": "TURN_START",
       "id": "eidolon1_fire_resist_for_burn",
+      "when": [
+        "actor has_state 灼烧"
+      ],
       "min_eidolon": 1,
       "do": [
         {
@@ -545,6 +556,7 @@
           "attribute": "RESISTANCE_REDUCTION_FIRE",
           "percent": -0.25,
           "permanent": true,
+          "while_holder_state": "灼烧",
           "target": "all_enemies"
         }
       ],
@@ -552,8 +564,11 @@
       "_note": "「处于**灼烧**…**火**抗性降低 25%」—— `RESISTANCE_REDUCTION_FIRE` ✓。⚠ 同上的「条件宽」。"
     },
     {
-      "on": "BATTLE_START",
+      "on": "TURN_START",
       "id": "eidolon1_thunder_resist_for_shock",
+      "when": [
+        "actor has_state 触电"
+      ],
       "min_eidolon": 1,
       "do": [
         {
@@ -561,6 +576,7 @@
           "attribute": "RESISTANCE_REDUCTION_THUNDER",
           "percent": -0.25,
           "permanent": true,
+          "while_holder_state": "触电",
           "target": "all_enemies"
         }
       ],
