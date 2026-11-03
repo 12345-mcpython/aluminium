@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "战技「本回合不会结束」：引擎没有「回合不结束」开关，回合由 afterMove 收尾",
-    "星魂 1「单个回合内施放 3 次战技后恢复 2 个战技点」：缺「本回合内第 N 次」计数，per_turn 只是限流",
+    "⭐ **星魂 1 已落地**（2026-11-03）：「单个回合内施放 3 次战技后恢复 2 个战技点」= 计数标记 `本回合战技次数`（结算规则**排在累加规则之前**）+ `TURN_START` 清零；实测第 3 次施放多给 2 点、新回合重新计数。⚠ 「per_turn 只是限流」这个说法**作废**：计数器+门槛就能表达「第 N 次」。",
     "星魂 2「敌方量子抗性降低 20%」：RESISTANCE_REDUCTION 是全属性，元素作用域只有 MODIFY_DAMAGE_TAKEN 收"
   ],
   "resources": [
@@ -457,6 +457,71 @@
       ],
       "source": "1015 Archer 星魂 6 无尽徘徊的巡礼: 「造成的**战技伤害无视 20%** 的防御力。」（`eidolons.json` 1015 E6 的 param = `[1, 0.2]` ⇒ #2 = 0.2 ✓）",
       "_note": "⭐⭐ 与星魂 4 同一条教训 ✓（**实测改正** ✓）：原先写在 `BATTLE_START` ＋ `damage_type: SKILL` ＋ `instance: true` ✗ ⇒ 既**不是**实例级 ✓、那个类型又**永远不会命中**技能自己那一发（它是 NORMAL ✓）⇒ 实测防御区一动不动 ✓（`1.0 -> 1.0` ✓）。现在挂 **`DEALING_DAMAGE` ＋ `from_skill SKILL`** ✓ ＋ `instance: true` ✓：**只**给这一发穿防 ✓（§3.7c 修好的那个实例级分支正是它的读者 ✓）。⚠ 判据 `ArcherEidolonLevelsTest.theEidolonSixHasAllThreeHalves` 的第三段 ✓ —— 量的是**防御区因子** ✓，而那个因子要**有防御力**才动 ✓（`BattleFixture.dummy()` 的 DEF 是 **0** ⇒ 换真怪 ✓）。"
+    }
+    ,
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_the_third_cast_pays",
+      "min_eidolon": 1,
+      "_status": "implemented",
+      "when": [
+        "actor == self",
+        "self_stacks:本回合战技次数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 2
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合战技次数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 星魂 1: 「…为我方恢复2个战技点。」",
+      "_note": "第三次施放（已累计 2 层）时结算：**恢复 2 个战技点**并清零 ✓。⚠ 清零后同回合再放 3 次也能再触发 —— 原句只要求「3 次后」✓。"
+    },
+{
+      "on": "SKILL_CAST",
+      "id": "eidolon1_third_skill_in_a_turn_pays_two_points",
+      "min_eidolon": 1,
+      "_status": "implemented",
+      "when": [
+        "actor == self",
+        "self_stacks:本回合战技次数 <= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "本回合战技次数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 星魂 1 未曾触及的理想: 「单个回合内施放3次战技后，为我方恢复2个战技点。」",
+      "_note": "「**单个回合内施放 3 次战技**后，为我方恢复 2 个战技点」—— 计数用一枚 `本回合战技次数`（`max_stacks: 3`）：本条负责**前两次**的累加，第三次由下一条结算。⚠ 顺序：本条在前、结算在后 —— 结算那条的条件看的是**加过之后**的层数 ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "turn_start_resets_the_skill_counter",
+      "_status": "implemented",
+      "when": [
+        "self_stacks:本回合战技次数 >= 1"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "本回合战技次数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 星魂 1: 「**单个回合内**…」（计数按回合复位）",
+      "_note": "「**单个回合内**」⇒ 每个回合开始时清空计数 ✓。"
     }
   ]
 }
