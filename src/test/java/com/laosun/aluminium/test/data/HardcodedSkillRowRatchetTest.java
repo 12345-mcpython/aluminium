@@ -57,7 +57,10 @@ public class HardcodedSkillRowRatchetTest {
     // `max_stacks` 5 vs 9), so its `percent: 1.8` is a second literal of the same cell. The literal is deliberate: Eidolon 2
     // raises that burn with `MODIFY_RULE effect_percent_scale: 4`, which MULTIPLIES a literal but ADDS to a row share
     // (AGENT item 27) - reading the row would turn x4 into +3, which `JiaoqiuEidolonTwoTest` measured.
-    private static final int BASELINE = 39;
+    // 40 since 2026-11-04: 1512 Robin's Eidolon 6 writes 1.0 (「忆灵技的伤害倍率提高原倍率的 100%」) as a BOOST_DAMAGE share.
+    // It is an EIDOLON parameter, not a row cell: the clause doubles one instance's damage, and the only spelling for that is a
+    // boost share - reading a row would express a different number (the row's ratio, not twice it).
+    private static final int BASELINE = 40;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
@@ -226,4 +229,5 @@ public class HardcodedSkillRowRatchetTest {
         }
     }
 }
+
 

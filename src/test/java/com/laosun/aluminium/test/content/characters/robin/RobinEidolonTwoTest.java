@@ -136,6 +136,27 @@ public class RobinEidolonTwoTest {
                 "the Eidolon's band moves faster (" + base.summonSpeed() + " -> " + slowest + ")");
     }
 
+    /**
+     * 星魂 6's other half: 「忆灵技的伤害倍率提高原倍率的 100%」 — the memosprite's instances carry a +100% boost at E6.
+     *
+     * <p>Read off the settled instance rather than a panel: the clause is about one instance's damage, and the rule is an
+     * {@code instance}-shaped effect, so nothing lands on the sheet to look at.
+     */
+    @Test
+    public void eidolon6DoublesTheMemospritesSkillDamage() {
+        Assertions.assertTrue(shareOfTheBestHit(6) > shareOfTheBestHit(0),
+                "「忆灵技的伤害倍率提高原倍率的 100%」 (" + shareOfTheBestHit(0) + " -> " + shareOfTheBestHit(6) + ")");
+    }
+
+    private static double shareOfTheBestHit(int eidolon) {
+        Fixture f = new Fixture(eidolon);
+        f.bringTheBandOnStage();
+        double[] best = {0};
+        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> best[0] = Math.max(best[0], applied));
+        f.summonCastsASkill();
+        return best[0];
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -215,6 +236,7 @@ public class RobinEidolonTwoTest {
         }
     }
 }
+
 
 
 
