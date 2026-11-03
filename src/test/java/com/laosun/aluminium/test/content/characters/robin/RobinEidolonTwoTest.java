@@ -70,6 +70,33 @@ public class RobinEidolonTwoTest {
         Assertions.assertEquals(afterFirst, f.robin.getCurrentEnergy(), 1e-9, "「本场战斗中**第一次**」 — the second entry pays nothing");
     }
 
+    /**
+     * 星魂 2's third half: 「任意目标回合内第一次施放技能…额外获得 2 点」.
+     *
+     * <p>Measured across a turn boundary: two skill casts in one turn pay the bonus once, and the next turn's first cast pays again.
+     */
+    @Test
+    public void eidolon2PaysTheBonusOncePerTurn() {
+        Fixture f = new Fixture(2);
+        int start = f.vibes();
+
+        f.castSkill();
+        int afterFirst = f.vibes();
+        Assertions.assertTrue(afterFirst > start, "precondition: the Skill grants vibes at all");
+
+        f.castSkill();
+        int afterSecond = f.vibes();
+        int firstGain = afterFirst - start;
+        int secondGain = afterSecond - afterFirst;
+        Assertions.assertEquals(firstGain - 2, secondGain,
+                "「本回合**第一次**…额外获得 2 点」 — the second cast pays the base gain only");
+
+        f.newTurn();
+        f.castSkill();
+        Assertions.assertEquals(firstGain, f.vibes() - afterSecond,
+                "and the next turn's first cast pays the bonus again");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -97,6 +124,23 @@ public class RobinEidolonTwoTest {
             }
         }
 
+        private int vibes() {
+            return battle.partyResource("气氛值").value();
+        }
+
+        private void castSkill() {
+            battle.castImmediate(robin.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL),
+                    robin, List.of(robin));
+            battle.processRequests();
+        }
+
+        /** A new turn for her: the one-shot marker is cleared on ANY unit's turn start. */
+        private void newTurn() {
+            battle.fire(TriggerPayload.Simple.of(
+                    com.laosun.aluminium.enums.TriggerEvent.TURN_START, robin, robin, 0, 0));
+            battle.processRequests();
+        }
+
         private int cap() {
             return robin.getResources().get("气氛值").getMax();
         }
@@ -106,6 +150,7 @@ public class RobinEidolonTwoTest {
         }
     }
 }
+
 
 
 
