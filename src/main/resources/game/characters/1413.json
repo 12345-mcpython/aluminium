@@ -806,6 +806,6 @@
     }
   ],
   "_gaps": [
-    "⭐ **秘技已实现**（2026-11-02）：`technique_skill_effect_plus_one_memoria` —— 「下一次战斗开始时，获得**与战技相同**的提高我方全体忆灵暴击伤害的效果，并获得 **1 点**【忆质】」= 复用战技那条的 `MODIFY_ATTR CRIT_ATTACK`（**份额读 `SKILL:0`**，因为句子说「与战技相同」；秘技行 `[1,1]` 里没有暴击伤害份额）+ `GAIN_RESOURCE { resource: 「亿质」, amount: 1 }`。判据 `EvernightTechniqueTest`：用秘技 **1 点**、不用 **0 点** ✓。⚠ 资源名必须写 `亿质`（文件声明的是它；写文档里的「忆质」会在 `CharacterFactory` 抛 `CharacterException`）。⛔ 仍开：其余技能从句与星魂。"
+    "⭐ **秘技已实现**（2026-11-02）：`technique_skill_effect_plus_one_memoria` —— 「下一次战斗开始时，获得**与战技相同**的提高我方全体忆灵暴击伤害的效果，并获得 **1 点**【忆质】」= 复用战技那条的 `MODIFY_ATTR CRIT_ATTACK`（**份额读 `SKILL:0`**，因为句子说「与战技相同」；秘技行 `[1,1]` 里没有暴击伤害份额）+ `GAIN_RESOURCE { resource: 「亿质」, amount: 1 }`。判据 `EvernightTechniqueTest`：用秘技 **1 点**、不用 **0 点** ✓。⚠ 资源名必须写 `亿质`（文件声明的是它；写文档里的「忆质」会在 `CharacterFactory` 抛 `CharacterException`）。⛔ 仍开：其余技能从句与星魂。 ⚠ **本条是「成果记录」，不是缺口**（它只是一条正面的落地说明）；真正的剩余面 —— 其余技能从句与各星魂 —— **尚未逐节列出**，所以**看到 `_gaps` 只有一条不要当成完全实现**。"
   ]
 }
