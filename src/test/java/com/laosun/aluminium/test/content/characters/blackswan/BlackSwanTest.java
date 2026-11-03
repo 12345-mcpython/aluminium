@@ -106,4 +106,30 @@ public class BlackSwanTest {
         battle.processRequests();
         return settled[0];
     }
+
+    /**
+     * 天赋: 「大于等于 7 层：使本次造成的持续伤害无视该目标及其相邻目标 20% 的防御力」.
+     *
+     * <p>What is asserted is the threshold, not the scope: at six layers the attacker has no defence ignore, at seven it does. The
+     * 「本次」 scope is an APPROXIMATION the rule records — the modifier lands on her rather than on that one instance.
+     */
+    @Test
+    public void sevenLayersTurnOnTheDefenceIgnore() {
+        Assertions.assertEquals(0.0, defenceIgnoreAt(6), 1e-9, "six layers is below the threshold");
+        Assertions.assertEquals(0.2, defenceIgnoreAt(7), 1e-9, "「大于等于 7 层…无视 20% 的防御力」");
+    }
+
+    private static double defenceIgnoreAt(int layers) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
+        battle.startBattle();
+        for (int i = 0; i < layers; i++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+        }
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        return blackSwan.getAttribute(AttributeType.DEFENCE_IGNORE).get();
+    }
 }
