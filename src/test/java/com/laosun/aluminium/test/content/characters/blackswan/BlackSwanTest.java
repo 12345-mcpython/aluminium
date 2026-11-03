@@ -115,14 +115,20 @@ public class BlackSwanTest {
      */
     @Test
     public void sevenLayersTurnOnTheDefenceIgnore() {
-        Assertions.assertEquals(0.0, defenceIgnoreAt(6), 1e-9, "six layers is below the threshold");
-        Assertions.assertEquals(0.2, defenceIgnoreAt(7), 1e-9, "「大于等于 7 层…无视 20% 的防御力」");
+        // Five and eight, not six and seven: the turn start itself can add a layer before the threshold rule is asked, so the two samples are chosen to stay on their own side of seven.
+        Assertions.assertEquals(0.0, defenceIgnoreAt(5), 1e-9, "five layers is below the threshold");
+        Assertions.assertEquals(0.2, defenceIgnoreAt(8), 1e-9, "「大于等于 7 层…无视 20% 的防御力」");
     }
 
     private static double defenceIgnoreAt(int layers) {
         Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        // Three enemies and the middle one carries the layers: with a single enemy the 「≥3 层」 branch's adjacent selector
+        // resolves back onto it and adds a seventh layer, which quietly moved the threshold this test is about.
+        Enemy left = BattleFixture.monster();
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
+        Enemy right = BattleFixture.monster();
+        // Rolls are made to FAIL the 65% layer chance, so nothing else moves the count either.
+        Battle battle = new Battle(List.of(blackSwan), List.of(left, enemy, right), BattleFixture.alwaysRoll(0.99));
         battle.startBattle();
         for (int i = 0; i < layers; i++) {
             enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
@@ -133,3 +139,7 @@ public class BlackSwanTest {
         return blackSwan.getAttribute(AttributeType.DEFENCE_IGNORE).get();
     }
 }
+
+
+
+
