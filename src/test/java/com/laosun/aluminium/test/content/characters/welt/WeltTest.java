@@ -48,7 +48,9 @@ public class WeltTest {
         // Two since 2026-11-02: Eidolon 2 rides the same slow-gated trigger (「触发天赋时，瓦尔特恢复 3 点能量」).
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the slow-gated talent and Eidolon 2");
         // Four since 2026-11-02: the technique is a BATTLE_START clause too.
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention and the technique");
+        // Five since 2026-11-03: Eidolon 4 raises the slow's base chance at battle start (a MODIFY_RULE amendment).
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the technique, Eidolon 3/5 levels and Eidolon 4's amendment");
     }
 
     private static final class Fixture {
@@ -105,3 +107,4 @@ public class WeltTest {
                 "「对指定敌方单体造成等同于维尔特#1[i]%攻击力的虚数伤害，并额外造成 2 次伤害」 (deals Imaginary damage to a designated single enemy equal to #1[i]% of Welt's ATK, and deals 2 extra instances of damage) — the skill must land: loss " + loss);
     }
 }
+
