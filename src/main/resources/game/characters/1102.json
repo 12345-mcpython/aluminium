@@ -4,9 +4,9 @@
   "_status": "partial",
   "_gaps": [
     "⚠ 秘技的大地图侧（隐身不被发现）未写，属大地图/秘技层。",
-    "⭐ **星魂 2 已于 2026-11-03 落地**（战技加速可叠 2 层）：顺带发现**战技的速度 buff 整句原先没有规则**（旧缺口说「把现有的速度 buff 改成可叠」，而那个 buff 并不存在）。现在 `skill_raises_her_speed` 给 1 层（25%/2 回合、具名【加速】、显式 `max_stacks: 1`），星魂 2 用 `MODIFY_RULE effect_max_stacks 1` 提到 2 层；判据 `SeeleClauseCoverageTest`（实测 E0 两层不掉、E2 两层 = 基础速度 ×1.5）。",
-    "⭐ **星魂 6 的前两句已落地（2026-11-04）**：`ULT_CAST` → `APPLY_BUFF 乱蝶 { turns: 1 }`；`DEALING_DAMAGE` + `target has_state 乱蝶` + **`damage_is_attack`** → `DAMAGE { scale: ATK, percent_from: ULTRA:0 × 0.15, element: Quantum }`（`damage_is_attack` 同时挡住**自我递归**）。⚠ 近似：文档说「终结技**伤害**的 15%」，这里用**那一行的份额** × 0.15。⛔ 仍开两句：「被我方其他目标触发消灭时**不触发希儿天赋**」（需要「这一发不算天赋触发」的标记）、「希儿倒下时解除」（`DEATH` + `REMOVE_STATE`，与形态问题同批）。",
-    "⛔ 行迹其余未读（只写了两条：夜行 的低血量仇恨、以及……本文件只有 `trace_low_hp_aggro_down` 一族）。"
+    "⭐ **星魂 2 / 星魂 6 前两句已落地（2026-11-04）**：战技加速可叠 2 层（`MODIFY_RULE effect_max_stacks`）；【乱蝶】= `ULT_CAST` 挂 1 回合状态 + `damage_is_attack` 挡自我递归的量子追伤（`ULTRA:0 × 0.15`），外加 `DEATH` 时 `REMOVE_STATE 乱蝶`。判据 `SeeleClauseCoverageTest`（4 例）。",
+    "⚠ **行迹 割裂 是近似**：「增幅状态下量子抗性穿透 +20%」写成 `ULT_CAST` 期间的 `DAMAGE_PENETRATION +20%`（`until: cast_end`）—— ① 与【增幅】的真实条件不同；② `DAMAGE_PENETRATION` 是**全属性**穿透，而文档说的是**量子**（元素作用域缺口，同 1015 星魂 2）。",
+    "⛔ **星魂 6 的两句仍开**：① 「被我方**其他目标**触发【乱蝶】消灭时**不触发**希儿的天赋」—— 需要「这一发不算天赋触发」的标记；② 行迹的**强化后**三段（夜行/割裂/涟漪各有强化后版本）整体未建模。"
   ],
   "rules": [
     {
@@ -272,6 +272,61 @@
       ],
       "source": "1102 希儿 星魂 6: 「【乱蝶】状态下的敌方目标受到攻击后，额外受到1次等同于希儿终结技伤害15%的量子属性附加伤害。」 参数 = [0.15, 1]",
       "_note": "「【乱蝶】下的敌方目标**受到攻击后**，额外受到 1 次**等同于希儿终结技伤害 15%** 的量子附加伤害」—— ① 事件 `DEALING_DAMAGE` + `target has_state 乱蝶` ✓（被打的就是带标记的）；② **`damage_is_attack` 不可省** ✓：这一发附加伤害自己也会发 `DEALING_DAMAGE`，而它是附加伤害（不算攻击）⇒ 不满足该条件 ⇒ **不会自我递归** ✓（与 1109/1004 的护栏同一招）；③ 数值 = **终结技行的份额 × 0.15** ✓（`skill_param ULTRA:0` × 0.15；近似之处：文档说的是「终结技**伤害**的 15%」，这里用**那一行的份额**，暴击/加成不进这一层）。⚠ 另两句仍登记：「被我方其他目标触发消灭时**不触发希儿天赋**」（需要「这一发不算天赋触发」的标记）与「希儿倒下时解除」（`DEATH` + `REMOVE_STATE` 可写，但与本条同属强化前/后的形态问题）。"
+    }
+    ,
+    {
+      "on": "BASIC_ATTACK",
+      "id": "trace_ripple_advances_after_a_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.2,
+          "target": "self"
+        }
+      ],
+      "source": "1102 希儿 行迹 涟漪 (1102103): 「施放普攻后，希儿的下一次行动提前20%。」",
+      "_note": "「施放**普攻后**，希儿的**下一次行动提前 20%**」—— `BASIC_ATTACK` + `ADVANCE 0.2` ✓（`ADVANCE` 是「行动提前」的既有 op ✓，作用在自身 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "trace_splitting_penetration_in_amplified_form",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION",
+          "percent": 0.2,
+          "until": [
+            "cast_end"
+          ],
+          "target": "self"
+        }
+      ],
+      "source": "1102 希儿 行迹 割裂 (1102102): 「增幅状态下希儿的量子属性抗性穿透提高20%。」",
+      "_note": "「**增幅状态下**希儿的量子抗性**穿透**提高 **20%**」—— ⚠ **近似**：本文件把【增幅】建模成 `technique_enters_amplified_state` 给的 `增幅` 状态 + 伤害加成，而**穿透**是**属性**（不是状态的效果）⇒ 写成「终结技期间 +20% 穿透」（`DURATION` 未写 ⇒ 目前是**永久**，见 `_gaps`）。⚠ 另：文档说的是「**量子属性**抗性穿透」，而 `DAMAGE_PENETRATION` 是**全属性**穿透 —— 与 1015 星魂 2 同一个元素作用域缺口。"
+    },
+    {
+      "on": "DEATH",
+      "id": "eidolon6_the_mark_ends_when_she_falls",
+      "min_eidolon": 6,
+      "_status": "implemented",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "乱蝶",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1102 希儿 星魂 6: 「当希儿陷入无法战斗状态时，敌方目标的【乱蝶】状态被解除。」",
+      "_note": "「当希儿**陷入无法战斗状态**时，敌方目标的【乱蝶】**被解除**」—— `DEATH` + `actor == self`（`DEATH` 的 actor 就是倒下的那个 ✓）→ `REMOVE_STATE 乱蝶` 对 `all_enemies`（标记可能在她死前挂过几个目标 ✓）。"
     }
   ]
 }
