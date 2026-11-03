@@ -3,7 +3,7 @@
   "character": 1503,
   "_status": "partial",
   "_gaps": [
-    "见 CONTENT-STATUS.md 的逐角色登记"
+    "⛔ **引擎没有「按有效等级读**被替换技能**那一行」的拼法**：强化普攻（槽 8/10）的回血写成常量 11.2% × 防御 + 224 —— 那是**有效等级 10** 的 `[1.4, 0.112, 1, 224]` 行；`COMMON:1` 会读到普通普攻的 size=1 行，`percent_from_cast_param` 直接报「Pearl has no loaded skill at slot 8」。⚠ 常量而非读行，是因为替换槽的**对象等级**是 1（而**有效等级**是 10），E3 的 +1 会被 10 行表夹掉而不漂移。缺口见证 `PearlEnhancedBasicHealAmountTest`（变异回 0.08/160 会红）。⚠ 本条原先是「见 CONTENT-STATUS.md 的逐角色登记」——**指针不是缺口** ⇒ 已就地展开。"
   ],
   "resources": [
     {
