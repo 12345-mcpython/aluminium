@@ -201,4 +201,31 @@ public class BlackSwanTest {
         Assertions.assertEquals(afterFirstTurn, blackSwan.getCurrentEnergy(), 1e-9,
                 "「最多触发 1 次」 — the second turn start pays nothing until 揭露 is applied again");
     }
+
+    /**
+     * 星魂 4: the other half of the energy clause — 「或被消灭时」 — sharing the same allowance, so a window pays once whichever half
+     * comes first.
+     */
+    @Test
+    public void eidolonFourSharesOneAllowanceBetweenTheTwoTriggers() {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, 4);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
+        battle.startBattle();
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                blackSwan, List.of(enemy));
+        battle.processRequests();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        double afterTurn = blackSwan.getCurrentEnergy();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.KILL, enemy, enemy, 0, 0));
+        battle.processRequests();
+
+        Assertions.assertEquals(afterTurn, blackSwan.getCurrentEnergy(), 1e-9,
+                "「在【揭露】持续时间内最多触发 1 次」 — the turn start already spent the window's allowance");
+    }
 }
