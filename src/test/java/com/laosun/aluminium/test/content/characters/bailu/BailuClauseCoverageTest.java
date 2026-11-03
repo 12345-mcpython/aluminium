@@ -218,6 +218,24 @@ public class BailuClauseCoverageTest {
                 "「单场战斗中可以触发 1 次」 — the second blow is not healed (first heal left " + afterFirst + " HP)");
     }
 
+    /**
+     * 星魂 6: 「效果触发次数增加 1 次」 — the second lethal blow IS answered at E6.
+     *
+     * <p>The allowance is a counter rather than {@code once_per_battle} precisely so this Eidolon could raise it: a boolean has
+     * nothing to add 1 to.
+     */
+    @Test
+    public void eidolonSixAnswersASecondLethalBlow() {
+        Fixture f = new Fixture(6, false, true);
+
+        f.strikeLethally();
+        Assertions.assertTrue(f.ally.getCurrentHp() > 0, "precondition: the first lethal blow was answered");
+
+        f.strikeLethally();
+        Assertions.assertTrue(f.ally.getCurrentHp() > 0,
+                "「效果触发次数增加 1 次」 — the second blow is answered too at E6");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
@@ -277,3 +295,4 @@ public class BailuClauseCoverageTest {
         }
     }
 }
+
