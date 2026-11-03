@@ -54,6 +54,41 @@ public class SeeleClauseCoverageTest {
         Assertions.assertEquals(base * 1.5, afterTwo, 1e-6, "two layers of 25% on the base speed");
     }
 
+    /**
+     * 星魂 6: the Ultimate marks its target, and the mark turns every later ATTACK into one extra Quantum instance.
+     *
+     * <p>The marking half is measured through the state; the rider through a damage observer, because it is a settled instance rather
+     * than a number on the sheet.
+     */
+    @Test
+    public void eidolon6MarksTheTargetAndTheMarkAddsARider() {
+        Assertions.assertTrue(markedByTheUltimate(), "「施放终结技攻击后…陷入【乱蝶】」");
+        Assertions.assertTrue(riderFiresOnANormalAttack(), "「受到攻击后，额外受到 1 次…量子附加伤害」");
+    }
+
+    private static boolean markedByTheUltimate() {
+        Fixture f = new Fixture(6);
+        f.castUltimate();
+        return f.enemy.getBuffManager().hasState("乱蝶");
+    }
+
+    private static boolean riderFiresOnANormalAttack() {
+        Fixture withMark = new Fixture(6);
+        withMark.castUltimate();
+        int withCount = instancesOfOneBasic(withMark);
+
+        Fixture plain = new Fixture(6);
+        int plainCount = instancesOfOneBasic(plain);
+        return withCount > plainCount;
+    }
+
+    private static int instancesOfOneBasic(Fixture f) {
+        int[] n = {0};
+        f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> n[0]++);
+        f.castBasic();
+        return n[0];
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -68,9 +103,20 @@ public class SeeleClauseCoverageTest {
             battle.processRequests();
         }
 
+        private void castUltimate() {
+            battle.castImmediate(seele.getSkills().get(SkillType.ULTRA), seele, List.of(enemy));
+            battle.processRequests();
+        }
+
+        private void castBasic() {
+            battle.castImmediate(seele.getSkills().get(SkillType.COMMON), seele, List.of(enemy));
+            battle.processRequests();
+        }
+
         private void castSkill() {
             battle.castImmediate(seele.getSkills().get(SkillType.SKILL), seele, List.of(enemy));
             battle.processRequests();
         }
     }
 }
+

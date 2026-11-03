@@ -5,7 +5,7 @@
   "_gaps": [
     "⚠ 秘技的大地图侧（隐身不被发现）未写，属大地图/秘技层。",
     "⭐ **星魂 2 已于 2026-11-03 落地**（战技加速可叠 2 层）：顺带发现**战技的速度 buff 整句原先没有规则**（旧缺口说「把现有的速度 buff 改成可叠」，而那个 buff 并不存在）。现在 `skill_raises_her_speed` 给 1 层（25%/2 回合、具名【加速】、显式 `max_stacks: 1`），星魂 2 用 `MODIFY_RULE effect_max_stacks 1` 提到 2 层；判据 `SeeleClauseCoverageTest`（实测 E0 两层不掉、E2 两层 = 基础速度 ×1.5）。",
-    "⛔ 星魂 6【乱蝶】未写：① 「施放终结技后使受到攻击的敌方单体陷入【乱蝶】1 回合」可写（`ULT_CAST` + `APPLY_BUFF`）；② 「受到攻击后额外受到 1 次等同于终结技伤害 **15%** 的量子附加伤害」需要一个**记住那一次终结技伤害**的读数端（`§4.3` 那个「记录一个数、以后再读」的缺口）；③ 「被我方**其他目标**触发时**不再触发**希儿的天赋」需要「这次追加伤害不算天赋触发」的标记 ✗；④ 「希儿倒下时解除」可写（`DEATH` + `REMOVE_STATE`）。",
+    "⭐ **星魂 6 的前两句已落地（2026-11-04）**：`ULT_CAST` → `APPLY_BUFF 乱蝶 { turns: 1 }`；`DEALING_DAMAGE` + `target has_state 乱蝶` + **`damage_is_attack`** → `DAMAGE { scale: ATK, percent_from: ULTRA:0 × 0.15, element: Quantum }`（`damage_is_attack` 同时挡住**自我递归**）。⚠ 近似：文档说「终结技**伤害**的 15%」，这里用**那一行的份额** × 0.15。⛔ 仍开两句：「被我方其他目标触发消灭时**不触发希儿天赋**」（需要「这一发不算天赋触发」的标记）、「希儿倒下时解除」（`DEATH` + `REMOVE_STATE`，与形态问题同批）。",
     "⛔ 行迹其余未读（只写了两条：夜行 的低血量仇恨、以及……本文件只有 `trace_low_hp_aggro_down` 一族）。"
   ],
   "rules": [
@@ -218,6 +218,60 @@
       ],
       "source": "1102 希儿 星魂 2 蝶舞: 「战技的加速效果可以叠加，最多叠加2层。」",
       "_note": "「战技的**加速效果可以叠加，最多叠加 2 层**」—— `MODIFY_RULE { rule: skill_raises_her_speed, effect_max_stacks: 1 }` ✓（把上限从 **1** 提到 **2**；⚠ **不改**基础值本身 ✗：1 层是文档的基准，星魂只在这场战斗里 +1 层）。⚠ 目标规则必须**具名**（`buff: 加速`）**且写了显式 `max_stacks`** ✓，否则加载期报 `there is no cap to raise` ✓。"
+    }
+    ,
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_ult_marks_the_target",
+      "min_eidolon": 6,
+      "_status": "implemented",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "乱蝶",
+          "turns": 1,
+          "target": "target"
+        }
+      ],
+      "source": "1102 希儿 星魂 6 离析: 「强化前：施放终结技攻击后使受到攻击的敌方单体陷入【乱蝶】状态，持续1回合。」 参数 = [0.15, 1]",
+      "_note": "「施放终结技**攻击后**使受到攻击的敌方单体陷入【乱蝶】，持续 **1 回合**」—— `ULT_CAST` + `APPLY_BUFF { turns: 1, target: target }` ✓（`ULT_CAST` 发在结算之后 ⇒ 正是「攻击后」✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon6_the_mark_adds_a_quantum_rider",
+      "min_eidolon": 6,
+      "_status": "implemented",
+      "when": [
+        "target has_state 乱蝶",
+        "damage_is_attack"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "element": "Quantum",
+          "target": "target",
+          "percent_from": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "skill_param",
+                "skill": "ULTRA",
+                "index": 0
+              },
+              {
+                "type": "const",
+                "value": 0.15
+              }
+            ]
+          }
+        }
+      ],
+      "source": "1102 希儿 星魂 6: 「【乱蝶】状态下的敌方目标受到攻击后，额外受到1次等同于希儿终结技伤害15%的量子属性附加伤害。」 参数 = [0.15, 1]",
+      "_note": "「【乱蝶】下的敌方目标**受到攻击后**，额外受到 1 次**等同于希儿终结技伤害 15%** 的量子附加伤害」—— ① 事件 `DEALING_DAMAGE` + `target has_state 乱蝶` ✓（被打的就是带标记的）；② **`damage_is_attack` 不可省** ✓：这一发附加伤害自己也会发 `DEALING_DAMAGE`，而它是附加伤害（不算攻击）⇒ 不满足该条件 ⇒ **不会自我递归** ✓（与 1109/1004 的护栏同一招）；③ 数值 = **终结技行的份额 × 0.15** ✓（`skill_param ULTRA:0` × 0.15；近似之处：文档说的是「终结技**伤害**的 15%」，这里用**那一行的份额**，暴击/加成不进这一层）。⚠ 另两句仍登记：「被我方其他目标触发消灭时**不触发希儿天赋**」（需要「这一发不算天赋触发」的标记）与「希儿倒下时解除」（`DEATH` + `REMOVE_STATE` 可写，但与本条同属强化前/后的形态问题）。"
     }
   ]
 }
