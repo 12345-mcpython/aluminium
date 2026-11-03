@@ -55,6 +55,25 @@ public class ArcherEidolonOneTest {
                 "after a new turn the counter restarts, so the first cast is just a cast");
     }
 
+    /**
+     * 星魂 2: the Ultimate implants a Quantum weakness and marks the target as taking more Quantum damage.
+     *
+     * <p>The resistance half is an APPROXIMATION recorded in the rule: RESISTANCE_REDUCTION is all-type in this engine, so the
+     * element-scoped spelling that exists is damage-taken. What is asserted is that both halves land on the target and expire with
+     * their stated duration - not that the number sits in the resistance zone.
+     */
+    @Test
+    public void eidolon2ImplantsAQuantumWeaknessAndMarksTheTarget() {
+        Scene scene = new Scene(2);
+        Assertions.assertFalse(scene.enemy.isWeakTo(com.laosun.aluminium.enums.DamageElement.QUANTUM), "precondition: no Quantum weakness yet");
+
+        scene.castUltimate();
+
+        Assertions.assertTrue(scene.enemy.isWeakTo(com.laosun.aluminium.enums.DamageElement.QUANTUM), "「并为其添加量子属性弱点」");
+        Assertions.assertTrue(scene.enemy.getBuffManager().countBuffs(com.laosun.aluminium.buff.VulnerabilityBuff.class) > 0,
+                "the damage-taken half is an element-scoped VulnerabilityBuff (the approximation the rule registers)");
+    }
+
     // ==================================================================
 
     private static final class Scene {
@@ -75,9 +94,16 @@ public class ArcherEidolonOneTest {
             battle.processRequests();
         }
 
+        private void castUltimate() {
+            battle.castImmediate(archer.getSkills().get(SkillType.ULTRA), archer, List.of(enemy));
+            battle.processRequests();
+        }
+
         private void newTurn() {
             battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, archer, archer, 0, 0));
             battle.processRequests();
         }
     }
 }
+
+

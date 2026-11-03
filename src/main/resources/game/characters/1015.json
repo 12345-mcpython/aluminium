@@ -5,7 +5,7 @@
   "_gaps": [
     "战技「本回合不会结束」：引擎没有「回合不结束」开关，回合由 afterMove 收尾",
     "⭐ **星魂 1 已落地**（2026-11-03）：「单个回合内施放 3 次战技后恢复 2 个战技点」= 计数标记 `本回合战技次数`（结算规则**排在累加规则之前**）+ `TURN_START` 清零；实测第 3 次施放多给 2 点、新回合重新计数。⚠ 「per_turn 只是限流」这个说法**作废**：计数器+门槛就能表达「第 N 次」。",
-    "星魂 2「敌方量子抗性降低 20%」：RESISTANCE_REDUCTION 是全属性，元素作用域只有 MODIFY_DAMAGE_TAKEN 收"
+    "⭐ **星魂 2 已落地（2026-11-04）**：`ADD_ELEMENTAL_WEAKNESS { element: Quantum, turns: 2 }` + `MODIFY_DAMAGE_TAKEN { percent: 0.2, element: Quantum }`。⚠ **近似已登记**：`RESISTANCE_REDUCTION` 是全属性、元素作用域只在 `MODIFY_DAMAGE_TAKEN` 上 ⇒ 「量子抗性 −20%」写成「对量子伤害易伤 +20%」，两者在伤害公式里位置不同，**不是同一个数**，但这是引擎今天唯一能按元素表达的地方。"
   ],
   "resources": [
     {
@@ -522,6 +522,33 @@
       ],
       "source": "1015 Archer 星魂 1: 「**单个回合内**…」（计数按回合复位）",
       "_note": "「**单个回合内**」⇒ 每个回合开始时清空计数 ✓。"
+    }
+    ,
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon2_quantum_resistance_and_weakness",
+      "min_eidolon": 2,
+      "_status": "implemented",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_ELEMENTAL_WEAKNESS",
+          "element": "Quantum",
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.2,
+          "turns": 2,
+          "element": "Quantum",
+          "target": "target"
+        }
+      ],
+      "source": "1015 Archer 星魂 2 未能实现的幸福: 「施放终结技时，使敌方目标的量子属性的抗性降低20%，并为其添加量子属性弱点，持续2回合。」 参数 = [0.2, 2]",
+      "_note": "「使敌方目标的**量子属性抗性降低 20%**，并为其添加**量子弱点**，持续 **2 回合**」—— ① 弱点：`ADD_ELEMENTAL_WEAKNESS { element: Quantum, turns: 2 }` ✓（1006 战技用的同一个 op ✓）；② **近似（已登记）**：`RESISTANCE_REDUCTION` 是**全属性**的，元素作用域只在 `MODIFY_DAMAGE_TAKEN` 上 ⇒ 这里写成「对**量子**伤害的易伤 +20%」。两者在伤害公式里位置不同（抗性在穿透之前、易伤在其后），**不是同一个数**，但这是引擎目前唯一能表达「按元素」的地方。"
     }
   ]
 }
