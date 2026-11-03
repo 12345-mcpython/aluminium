@@ -5,7 +5,7 @@
   "_gaps": [
     "【智剑连心】的仇恨降低 / 受到伤害后消失未写",
     "天赋 65% 冻结 + 冻结状态每回合 50% 攻击力附加伤害未写",
-    "秘技：对 ≥50% 生命目标 +30% 增伤，条件与修饰单位不同，写不出",
+    "⭐ **秘技 已落地（2026-11-04）**：「对当前生命值百分比 ≥50% 的敌人伤害 +30%，2 回合」= `BATTLE_START` + `self has_state 秘技` → `APPLY_BUFF 御剑真诀 { turns: 2 }`，再由 `DEALING_DAMAGE` + `self has_state 御剑真诀` + **`target_hp_percent >= 0.5`** → `BOOST_DAMAGE 0.3`。旧登记说「条件与修饰单位不同，写不出」**作废** —— `target_hp_percent` 回答的正是「被打的那个的血线」。判据 `YanqingTechniqueTest`（同一发对满血/残血各打一次，残血不吃加成）。",
     "其余星魂：未读、未写"
   ],
   "rules": [
@@ -216,6 +216,41 @@
       "source": "1209 星魂 5: 等级加成（数据 skill_add_level: 120903=ULTRA+2, 120904=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    }
+    ,
+    {
+      "on": "BATTLE_START",
+      "id": "technique_two_turns_of_bonus_damage",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "御剑真诀",
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1209 彦卿 秘技 御剑真诀 (120907, Maze/Enhance): 「使用秘技后，下一次战斗开始时彦卿对当前生命值百分比大于等于50%的敌方目标造成的伤害提高30%，持续2回合。」",
+      "_note": "「使用秘技后，**下一次战斗开始时**…造成的伤害提高 30%，**持续 2 回合**」—— 「用了秘技」记成 `self has_state 秘技` ✓，「2 回合」是 `turns: 2` ✓；**条件半**由下一条按**目标的当前生命值百分比**判 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "technique_bonus_against_healthy_targets",
+      "when": [
+        "actor == self",
+        "self has_state 御剑真诀",
+        "target_hp_percent >= 0.5"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.3
+        }
+      ],
+      "source": "1209 彦卿 秘技 御剑真诀: 「…对当前生命值百分比大于等于50%的敌方目标造成的伤害提高30%…」",
+      "_note": "「对**当前生命值百分比 ≥50% 的敌方目标**造成的伤害提高 **30%**」—— ⭐ **2026-11-04 落地**：旧登记说「条件与修饰单位不同，写不出」✗ —— 其实 `DEALING_DAMAGE` 上本来就有 **`target_hp_percent`**（1003 行迹 道标 用的是同一个变量 ✓）⇒ 「**目标**的血线」正是它回答的问题 ✓，而修饰落在**这一发**（`BOOST_DAMAGE`）上 ✓。`self has_state 御剑真诀` 是秘技给的那 2 回合窗口 ✓。"
     }
   ]
 }
