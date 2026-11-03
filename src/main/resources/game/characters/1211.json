@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "战技「然后白露随机为我方单体进行 2 次治疗，每提供 1 次治疗，下一次治疗回复的生命值会降低 15%」：缺「**随机目标序列** ＋ **逐次递减的倍率**」两样写法 —— 技能行只结算主目标那一次（11.70%+312，引擎自己读行 ✓），`HEAL` op 既没有随机选择器，也没有「第 N 次治疗 × (1−15%)^N」的链。读者：1211 战技（120702）。",
-    "天赋「拥有【生息】的我方目标，在受到攻击后会回复等同于白露 5.40% 生命上限 + 144 的生命值，**该效果可以触发 2 次**」：缺「**一个状态上带 N 次触发额度**」的计数器 —— `APPLY_BUFF` 产生的状态没有扣减次数的手段，`once_per_battle` 是**每条规则一个布尔**而不是额度。⚠ 单写 `HEAL` 会**每次受击都治**（错数，不是缺项）⇒ 整条未写。行迹 持明龙脉「【生息】效果的触发次数增加 1 次」卡在同一个计数器上（2 → 3）。",
+    "⭐ **天赋的【生息】回血已落地（2026-11-04）**：`TAKING_HIT` + `target has_state 生息` + `self_stacks:生息治疗额度 >= 1` → `HEAL { owner_max_hp × TALENT:0 + TALENT:1 }` + 扣一层。额度读**天赋行第 5 列**（`TALENT:4` = 2，全等级固定）。旧登记说「缺一个状态上带 N 次触发额度」**作废** —— 计数额度即可，不需要状态自带次数。判据 `BailuClauseCoverageTest.theInvigorationHealsTheHitAllyTwice`（前两次治、第三次不治、额度耗尽为 0）。",
     "⭐ **星魂 6 的「触发次数 +1」已落地（2026-11-04）**：天赋改用**额度计数**（`天赋治疗额度`）而不是 `once_per_battle` —— 两条同形规则按 `max_eidolon: 5` / `min_eidolon: 6` 各发 1 / 2 层，天赋本身 `self_stacks:天赋治疗额度 >= 1` + 治疗后悔一层 ⇒ E0–E5 一次、E6 两次。判据 `BailuClauseCoverageTest`（原「只触发一次」与新的「E6 触发两次」两端都钉）。",
     "行迹 岐黄精义 (1211101)「白露对我方目标造成**过量治疗**时会提高目标 10% 生命上限，持续 2 回合」：缺「**过量治疗**」这个观测 —— `HEALED` 的 `amount` 是**实际回复量**（已 clamp 到上限），溢出部分没有随事件发出 ⇒ 判不出「这次治疗有没有溢出」。",
     "**引擎登记（读者：本文件星魂 4）**：`HEALED` 不携带**施放类别**，所以「**战技**提供的治疗」无法在 `HEALED` 上表达 —— 写 `from_category BPSKILL` 时装载期直接拒绝：`Condition 'from_category BPSKILL' asks the cast's category, but HEALED carries none, so the condition could never hold; it works on ALLY_ATTACK / ATTACK_FINISHED / BREAK / CAST_SETUP / CRIT_DEALT / DAMAGE_SETTLED / DEALING_DAMAGE / KILL`。⇒ 现在把星魂 4 挂在 `SKILL_CAST` 上（等价：战技一次只治一个目标）；等「两次随机治疗」落地时，必须给 `HEALED` 补上施放类别。缺口见证：`BailuClauseCoverageTest.eidolon4StacksOncePerSkillCast`。"
@@ -252,6 +252,52 @@
       ],
       "source": "1211 白露 星魂 6: 「…效果触发次数增加1次。」",
       "_note": "「**触发次数增加 1 次**」⇒ 额度 **2** ✓（1 + 1 ✓）。⚠ 两条同形规则靠 `max_eidolon: 5` / `min_eidolon: 6` 互斥 ✓。"
+    }
+    ,
+    {
+      "on": "BATTLE_START",
+      "id": "talent_invigoration_heal_allowance",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "生息治疗额度",
+          "value": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 4
+          },
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1211 白露 天赋 奔走悬壶济世长: 「拥有【生息】的我方目标，在受到攻击后会回复…该效果可以触发2次。」 param Lv10 = [0.054, 144, 0.18, 480, 2] ⇒ #5 = 2 次",
+      "_note": "「该效果可以触发 **2 次**」—— 额度读**天赋行第 5 列**（`TALENT:4` = 2，全等级固定 ✓）⇒ 不写字面量 ✓。⚠ 与「致命治疗额度」是**两份额度**（2 次 vs 1 次 ✓），互不占用 ✓。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "talent_invigoration_heals_the_hit_ally",
+      "when": [
+        "target has_state 生息",
+        "self_stacks:生息治疗额度 >= 1"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "target": "target",
+          "percent_from_skill_param": "TALENT:0",
+          "amount_from_skill_param": "TALENT:1"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "生息治疗额度",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1211 白露 天赋: 「拥有【生息】的我方目标，在受到攻击后会回复等同于白露5.40%生命上限+144的生命值…」",
+      "_note": "「拥有【生息】的我方目标**受到攻击后**会回复…」—— ① 事件 `TAKING_HIT`（**受击**，只在**我方**投递 ✓）；② 条件 `target has_state 生息` ✓（被打的那个持有【生息】✓）；③ 治疗量 = **白露**的生命上限 × 5.4% + 144 ✓（`scale: owner_max_hp` 读**她**的上限 ✓，两个数按等级读天赋行 #1/#2 ✓）；④ 「2 次」= `生息治疗额度` 计数 ✓（治疗后扣一层 ✓）—— 这就是旧登记说「缺一个状态上带 N 次触发额度」的那一条，**用计数额度即可**，不需要状态自带次数 ✗。"
     }
   ]
 }

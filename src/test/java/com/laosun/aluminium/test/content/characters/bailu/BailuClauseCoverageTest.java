@@ -236,6 +236,44 @@ public class BailuClauseCoverageTest {
                 "「效果触发次数增加 1 次」 — the second blow is answered too at E6");
     }
 
+    /**
+     * 天赋: 「拥有【生息】的我方目标受到攻击后回复 5.4% 生命上限 + 144，该效果可以触发 2 次」.
+     *
+     * <p>The 「2 次」 is a counted allowance read off the talent's own row (#5), and the third hit heals nobody. That is the count the
+     * gap called missing — it never needed a state that carries its own uses.
+     */
+    @Test
+    public void theInvigorationHealsTheHitAllyTwice() {
+        Character bailu = CharacterFactory.create(BAILU, 80);
+        Character ally = CharacterFactory.create(ALLY, 80);
+        Battle battle = new Battle(List.of(bailu, ally), List.of(BattleFixture.dummy()),
+                BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        battle.castImmediate(bailu.getSkills().get(SkillType.ULTRA), bailu, List.of(ally, bailu));
+        battle.processRequests();
+        Assertions.assertTrue(ally.getBuffManager().hasState("生息"), "precondition: the Ultimate grants 生息");
+
+        double first = ally.getCurrentHp();
+        hit(battle, ally);
+        double afterFirst = ally.getCurrentHp();
+        hit(battle, ally);
+        double afterSecond = ally.getCurrentHp();
+        hit(battle, ally);
+        double afterThird = ally.getCurrentHp();
+
+        Assertions.assertTrue(afterFirst > first - 1e-6, "the first hit is answered");
+        Assertions.assertTrue(afterSecond > afterFirst - 1e-6, "the second hit is answered too");
+        Assertions.assertEquals(afterSecond, afterThird, 1e-9,
+                "「该效果可以触发 2 次」 — the third hit is not healed");
+        Assertions.assertEquals(0, bailu.getBuffManager().stacksOf("生息治疗额度"), "the allowance is spent");
+    }
+
+    private static void hit(Battle battle, Character ally) {
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.TAKING_HIT, battle.enemies().getFirst(), ally, 0, 0));
+        battle.processRequests();
+    }
     // ==================================================================
     // Helpers
     // ==================================================================
@@ -295,4 +333,6 @@ public class BailuClauseCoverageTest {
         }
     }
 }
+
+
 
