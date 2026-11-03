@@ -346,5 +346,29 @@ public class BlackSwanTest {
         return enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.resistanceReductionFor(
                 com.laosun.aluminium.enums.DamageElement.valueOf(element))).get();
     }
+
+    /**
+     * 终结技: the +25% now rides the VICTIM's own state — the modifier is dropped when the state is, instead of running on a
+     * parallel two-turn clock that could outlive it or die before it.
+     */
+    @Test
+    public void theEpiphanyBonusEndsWithTheState() {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                blackSwan, List.of(enemy));
+        battle.processRequests();
+        Assertions.assertTrue(enemy.getBuffManager().hasState("揭露"), "precondition: the state is on the victim");
+        Assertions.assertEquals(1, enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.VulnerabilityBuff.class).size(),
+                "precondition: the +25% sits on the victim");
+
+        enemy.getBuffManager().removeState("揭露");
+        enemy.getBuffManager().beforeMove();
+
+        Assertions.assertEquals(0, enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.VulnerabilityBuff.class).size(),
+                "the +25% went with the state");
+    }
 }
 

@@ -321,10 +321,29 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         this.gateStacksMin = min;
         this.gateOwner = owner;
     }
+
+    /**
+     * The state the <b>HOLDER</b> of this modifier must be in, or {@code null}: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
+     * (1307's Ultimate) - the condition and the modifier on the SAME unit, which {@link #gateState} cannot express because that
+     * one asks the rule's owner.
+     */
+    private String gateHolderState;
+
+    /** @param state the state this modifier's holder must still be in */
+    public void gateHolder(String state) {
+        this.gateHolderState = state;
+    }
 
     /**
-     * @return {@code true} only when a gate was set and its owner no longer satisfies it
+     * @param holder the unit this buff sits on (the sweep passes its own manager's unit)
+     * @return {@code true} only when a gate was set and is no longer satisfied
      */
+    public boolean gateBroken(CanHit holder) {
+        if (gateHolderState != null) {
+            return holder == null || !holder.getBuffManager().hasState(gateHolderState);
+        }
+        return gateBroken();
+    }
     public boolean gateBroken() {
         if (gateOwner == null) {
             return false;
@@ -511,5 +530,7 @@ emainingDuration is protected). Needed to measure a clause that <b>shortens</b>
         remainingDuration = Math.max(0, remainingDuration + turns);   // signed, clamped at zero (the game's Min: 0)
     }
 }
+
+
 
 

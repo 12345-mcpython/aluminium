@@ -156,6 +156,7 @@ public class EffectSpec {
         copy.remove = this.remove;
         copy.scaleByMissingHp = this.scaleByMissingHp;
         copy.whileState = this.whileState;
+        copy.whileHolderState = this.whileHolderState;
         copy.whileStacks = this.whileStacks;
         copy.whileStacksMin = this.whileStacksMin;
         copy.capScale = this.capScale;
@@ -643,6 +644,13 @@ public class EffectSpec {
      */
     @SerializedName("while_stacks_min")
     private Integer whileStacksMin;
+    /**
+     * A modifier that lives only <b>while the unit CARRYING it</b> holds this state: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
+     * (1307's Ultimate). The mirror of {@link #whileState}, which asks the RULE OWNER - the difference matters when the condition
+     * and the modifier sit on the same unit rather than on the caster.
+     */
+    @SerializedName("while_holder_state")
+    private String whileHolderState;
 
     /**
      * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory}.
@@ -1589,5 +1597,6 @@ public class EffectSpec {
         return maxStacks != null ? maxStacks : stacks;
     }
 }
+
 
 

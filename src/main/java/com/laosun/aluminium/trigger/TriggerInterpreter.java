@@ -1765,6 +1765,11 @@ public final class TriggerInterpreter {
                 int min = effect.getWhileStacksMin() == null ? 1 : effect.getWhileStacksMin();
                 zone.gateStacks(effect.getWhileStacks().trim(), min, ctx.owner());
             }
+            // "While the unit CARRYING this holds X": the mirror of `while_state`, for a condition and a modifier on the SAME
+            // unit (1307's Epiphany raises the damage its victims take).
+            if (effect.getWhileHolderState() != null && !effect.getWhileHolderState().isBlank()) {
+                zone.gateHolder(effect.getWhileHolderState().trim());
+            }
             // "this zone must live beside another source's zone": the `coexist` ask that MODIFY_ATTR has honoured since
             // 1408's trace was never read on THIS op, so a second `MODIFY_DAMAGE_TAKEN` from another rule evicted the
             // first. Measured: 1512's memosprite aura (+11.2%, set at SUMMONED) disappeared the moment light cone 23042's

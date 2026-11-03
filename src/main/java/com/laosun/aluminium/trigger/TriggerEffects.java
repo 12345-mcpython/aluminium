@@ -282,6 +282,11 @@ final class TriggerEffects {
                 buff.gateStacks(effect.getWhileStacks().trim(),
                         effect.getWhileStacksMin() == null ? 1 : effect.getWhileStacksMin(), ctx.owner());
             }
+            // "while the unit CARRYING this holds X": the mirror of `while_state`, for the case where the condition and the
+            // modifier sit on the SAME unit (1307's Epiphany raises the damage its victims take).
+            if (effect.getWhileHolderState() != null && !effect.getWhileHolderState().isBlank()) {
+                buff.gateHolder(effect.getWhileHolderState().trim());
+            }
             // "with a 100% base chance, additionally lower the target's all-type RES by 10.00%": an attribute modifier may be ROLLED,
             // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes
