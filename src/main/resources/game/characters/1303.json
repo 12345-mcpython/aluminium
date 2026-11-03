@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "天赋：击破伤害 120% 冰属性（不是普通 DAMAGE）未写",
-    "战技：跨单位状态条件「她持有弦外音时，全队 +32% 伤害 / +50% 击破效率」未写",
+    "⭐ 战技的跨单位条件**已落地**（2026-11-04）：「当阮•梅拥有【弦外音】时，我方全体伤害提高 32%」= `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { 0.32, while_state: 弦外音, all_allies }` —— **`while_state` 的 gate 检查的是规则主人的状态**（`AbstractBuff.gateBroken` 读 `gateOwner`），所以「她持有 ⇒ 全队生效」正好能写，且她状态一消失修饰即失效。⛔ 同句的「**弱点击破效率 +50%**」仍缺：引擎没有「击破效率」属性（`BREAKING_EFFECT` 是击破特攻、`BREAK_DAMAGE_BOOST` 是击破伤害加成，语义不同）。",
     "终结技：【残梅绽】施加 / 从击破恢复时触发 / 延长击破 / 行动延后 / 50% 击破伤害未写",
     "⭐ 秘技的「自动触发一次战技」已落地（2026-11-04：`BATTLE_START` + `self has_state 秘技` → `CAST_SKILL { SKILL, target: self }`；前提是 `skill_effects.json` 给她补了 `Rules` 登记，否则 `canDeliver` 会拒）；模拟宇宙祝福缩放（每祝福 +100% 削韧、最多 20 个）未写，属模拟宇宙玩法"
   ],
@@ -220,6 +220,26 @@
       ],
       "source": "1303 阮•梅 秘技 拭琴抚罗袂 (130307, Maze/Support): 「使用秘技后，获得【拭琴抚罗袂】，使下一次战斗开始时自动触发1次战技，此次触发不消耗战技点。」",
       "_note": "「**下一次战斗开始时自动触发 1 次战技**，此次触发**不消耗战技点**」—— ① `BATTLE_START` + `self has_state 秘技` ✓（「用了秘技」这件事在本仓库就记成这个状态 ✓）；② `CAST_SKILL { skill: SKILL, target: self }` ✓（命令自己施放；`CAST_SKILL` 本来就不经战技点 ✓ = 「不消耗战技点」✓）；③ ⚠ 这条**能成立的前提**是她的战技在 `skill_effects.json` 里有一条 `effect: Rules` 的登记（同 1412）—— 否则 `SkillExecutor.canDeliver` 会拒绝「不造成伤害又无事可做的技能」✓。"
+    }
+    ,
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_overtone_boosts_the_party_damage",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.32,
+          "permanent": true,
+          "while_state": "弦外音",
+          "target": "all_allies"
+        }
+      ],
+      "source": "1303 阮•梅 战技 慢捻抹复挑 (130302, BPSkill/Support): 「当阮•梅拥有【弦外音】时，我方全体伤害提高32.00%…」",
+      "_note": "「**当阮•梅拥有【弦外音】时**，我方全体**伤害提高 32.00%**」—— ⭐ **2026-11-04 落地**：这就是此前登记为「跨单位状态条件不可写」的那一句。**`while_state` 的 gate 检查的是「规则主人」的状态**（`AbstractBuff.gateBroken` 读 `gateOwner` = `ctx.owner()`），**不是**修饰持有者的 ⇒ 「她持有 X ⇒ 全队得到修饰」正好能写 ✓，而且【弦外音】消失时 gate 断掉、修饰随之失效 ✓（不是 `permanent` 那样留下来 ✗）。⚠ 「**弱点击破效率 +50%**」这半**仍缺**：引擎没有「击破效率」这个属性（只有 `BREAKING_EFFECT` 击破特攻与 `BREAK_DAMAGE_BOOST` 击破伤害加成），两者语义不同 ⇒ 登记。"
     }
   ]
 }

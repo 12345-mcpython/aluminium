@@ -3,6 +3,8 @@ package com.laosun.aluminium.test.content.characters.ruanmei;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -49,5 +51,29 @@ public class RuanMeiTechniqueTest {
         battle.processRequests();
         return battle;
     }
-}
 
+    /**
+     * 战技: 「当阮•梅拥有【弦外音】时，我方全体伤害提高 32%」 — the cross-unit gate.
+     *
+     * <p>This was registered as unwritable for months. {@code while_state} checks the RULE OWNER's state, not the modifier
+     * holder's, so "she holds it ⇒ the party gets the modifier" is exactly what it expresses — and the modifier stops when her
+     * state does.
+     */
+    @Test
+    public void theOvertoneBoostsTheWholeSideWhileSheHoldsIt() {
+        Character ruanMei = CharacterFactory.create(RUAN_MEI, 80);
+        Character ally = CharacterFactory.create(1002, 80);
+        Enemy enemy = BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL);
+        Battle battle = new Battle(List.of(ruanMei, ally), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        battle.processRequests();
+
+        double before = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        battle.castImmediate(ruanMei.getSkills().get(SkillType.SKILL), ruanMei, List.of(ally));
+        battle.processRequests();
+
+        Assertions.assertTrue(ruanMei.getBuffManager().hasState("弦外音"), "precondition: the Skill grants 弦外音");
+        Assertions.assertEquals(before + 0.32, ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
+                "「当阮•梅拥有【弦外音】时，我方全体伤害提高 32%」 — the ALLY carries it");
+    }
+}

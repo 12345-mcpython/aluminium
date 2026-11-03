@@ -60,7 +60,10 @@ public class HardcodedSkillRowRatchetTest {
     // 40 since 2026-11-04: 1512 Robin's Eidolon 6 writes 1.0 (「忆灵技的伤害倍率提高原倍率的 100%」) as a BOOST_DAMAGE share.
     // It is an EIDOLON parameter, not a row cell: the clause doubles one instance's damage, and the only spelling for that is a
     // boost share - reading a row would express a different number (the row's ratio, not twice it).
-    private static final int BASELINE = 40;
+    // 41 since 2026-11-04: 1303 Ruan Mei's Eidolon-2 half writes 0.32 for 「伤害提高 32.00%」 -- a STAR-SOUL/EIDOLON-independent
+    // number from the Skill's own text, not a row cell: the Skill has no parameter row to read (its effect lives in the rule table,
+    // see skill_effects.json's Rules entry), so there is nothing else the share could come from.
+    private static final int BASELINE = 41;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
@@ -229,5 +232,6 @@ public class HardcodedSkillRowRatchetTest {
         }
     }
 }
+
 
 
