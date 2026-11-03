@@ -120,6 +120,22 @@ public class RobinEidolonTwoTest {
                 "「清空记录值的 50%」 — about half stays (" + recorded + " -> " + kept + ")");
     }
 
+    /**
+     * 星魂 4's speed half: 「「晴空乐手」的速度提高（20% + 当前气氛值 × 0.50%）」, read at the moment Fever opens.
+     */
+    @Test
+    public void eidolon4RaisesTheMemospritesSpeedOnFeverEntry() {
+        Fixture f = new Fixture(4);
+        f.bringTheBandOnStage();
+        double slowest = f.summonSpeed();
+        Assertions.assertTrue(slowest > 0, "precondition: the band is on stage");
+
+        Fixture base = new Fixture(0);
+        base.bringTheBandOnStage();
+        Assertions.assertTrue(base.summonSpeed() < slowest,
+                "the Eidolon's band moves faster (" + base.summonSpeed() + " -> " + slowest + ")");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -164,6 +180,13 @@ public class RobinEidolonTwoTest {
             battle.processRequests();
         }
 
+        /** The first memosprite's speed: the clause is about 「晴空乐手」, and the band shares one stat sheet. */
+        private double summonSpeed() {
+            return battle.summonsOf(robin).isEmpty()
+                    ? -1
+                    : battle.summonsOf(robin).get(0).getAttribute(AttributeType.SPEED).get();
+        }
+
         private int record() {
             return robin.getResources().value("记录");
         }
@@ -192,6 +215,7 @@ public class RobinEidolonTwoTest {
         }
     }
 }
+
 
 
 
