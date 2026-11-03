@@ -75,4 +75,35 @@ public class BlackSwanTest {
     private static Random fixed() {
         return BattleFixture.alwaysRoll(0.0);
     }
+
+    /**
+     * 天赋: 「【奥迹】状态下，敌方目标每回合开始时受到等同于黑天鹅 240% 攻击力的风属性持续伤害，每层【奥迹】使此伤害倍率提高 12%」.
+     *
+     * <p>The per-layer part is the sentence's whole point, so the test compares the settled damage at two layer counts against the
+     * SAME enemy: five layers must be 240% × (1 + 0.6), one layer 240% × (1 + 0.12).
+     */
+    @Test
+    public void theTalentDotScalesWithTheArcanaLayers() {
+        double one = dotDamageAt(1);
+        double five = dotDamageAt(5);
+        Assertions.assertTrue(one > 0, "the dot lands at all");
+        Assertions.assertEquals((1 + 0.12 * 5) / (1 + 0.12), five / one, 1e-6,
+                "each layer raises the ratio by 12% (" + one + " at 1 layer, " + five + " at 5)");
+    }
+
+    private static double dotDamageAt(int layers) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
+        battle.startBattle();
+        for (int i = 0; i < layers; i++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+        }
+        double[] settled = {0};
+        battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled[0] += applied);
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        return settled[0];
+    }
 }

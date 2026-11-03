@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⭐ **战技的相邻半已落地（2026-11-04）**：`ADD_STACK 奥迹` 与 `MODIFY_ATTR DEFENCE -0.208` 各补一条 `target: adjacent_enemies` + **`base_chance: 1`**（「100% 的基础概率」⇒ 过效果命中 × 效果抵抗）。旧登记说「相邻是**伤害形状**、`ADD_STACK` 走选择器」—— 现在 `adjacent_enemies` 就是那个选择器 ✓。判据 `BlackSwanTest.theSkillReachesTheNeighboursOfTheAimedEnemy`（3 敌，瞄中间，三层奥迹 + 相邻减防）。",
-    "天赋：奥迹每层 +12% 倍率、随后重置为 1 层、≥3 层相邻 / ≥7 层穿防未写",
+    "⭐ **天赋的前两段已落地（2026-11-04）**：① `TURN_START` + `actor != self` + `actor has_state 奥迹` → `DAMAGE { damage_type: DOT, percent_from: TALENT:0 × (1 + 0.12 × 层数) }`（`stacks whose: target`）；② ≥3 层 → `adjacent_enemies` 吃 180% 攻击力持续伤害 + `base_chance 0.65` 叠 1 层。判据 `BlackSwanTest.theTalentDotScalesWithTheArcanaLayers`（1 层与 5 层的比值 = (1+0.6)/(1+0.12)）。⛔ 仍开：**「随后重置为 1 层」**（`REMOVE_STACK` 的 `amount` 是定值，没有「减到剩 1 层」的写法 ⇒ 需要「设到 N」或「按当前层数减」的 op）；**≥7 层无视 20% 防御**（要实例级 `DEFENCE_IGNORE`，待核）；「每受到 1 次持续伤害 65% 叠 1 层」。",
     "终结技：揭露状态 + 自身回合内受到的伤害 +25%（按回合阶段）未写",
     "星魂：未读、未写"
   ],
@@ -147,6 +147,89 @@
       ],
       "source": "1307 黑天鹅 战技 失坠，伪神的黄昏 (130702, BPSkill/Blast): 「…此外有100%的基础概率使目标与相邻目标防御力降低20.80%，持续3回合。」",
       "_note": "「使**目标与相邻目标**防御力降低 **20.80%**，持续 **3 回合**」的**相邻**半 —— `target: adjacent_enemies` + `base_chance: 1` ✓。⚠ `MODIFY_ATTR` 收 `base_chance` 是已有的能力（裁决过波次），这里正是它的读者。"
+    }
+    ,
+    {
+      "on": "TURN_START",
+      "id": "talent_arcana_dot_at_the_targets_turn_start",
+      "when": [
+        "actor != self",
+        "actor has_state 奥迹"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "element": "Wind",
+          "damage_type": "DOT",
+          "target": "actor",
+          "percent_from": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "add",
+                "inputs": [
+                  {
+                    "type": "const",
+                    "value": 1
+                  },
+                  {
+                    "type": "mul",
+                    "inputs": [
+                      {
+                        "type": "stacks",
+                        "whose": "target",
+                        "buff": "奥迹"
+                      },
+                      {
+                        "type": "const",
+                        "value": 0.12
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "skill_param",
+                "skill": "TALENT",
+                "index": 0
+              }
+            ]
+          }
+        }
+      ],
+      "source": "1307 黑天鹅 天赋 无端命运的机杼 (强化前): 「【奥迹】状态下，敌方目标每回合开始时受到等同于黑天鹅240%攻击力的风属性持续伤害，每层【奥迹】使此伤害倍率提高12.00%…」 参数 = [2.4, 0.12, 50]",
+      "_note": "「【奥迹】状态下，敌方目标**每回合开始时**受到等同于黑天鹅 **240% 攻击力**的风属性**持续伤害**，**每层【奥迹】使此倍率提高 12%**」—— ① `TURN_START` + `actor != self` + `actor has_state 奥迹` ✓（**敌人的回合开始**，条件是它持有【奥迹】✓）；② `damage_type: DOT` ✓（原文就是「持续伤害」✓ —— 引擎有这一型 ✓）；③ 倍率 = **240% × (1 + 0.12 × 层数)** ✓，用 `percent_from` 的 `mul/add/stacks` 拼出来 ✓（`stacks whose: target` 读**被打的敌人**身上的层数 ✓）。⚠ 「随后**重置为 1 层**」**仍登记**：`REMOVE_STACK` 的 `amount` 是**定值**，没有「减到剩 1 层」的写法（见 `_gaps`）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "talent_arcana_three_layers_hit_the_neighbours",
+      "when": [
+        "actor != self",
+        "actor has_state 奥迹",
+        "target_stacks:奥迹 >= 3"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "element": "Wind",
+          "damage_type": "DOT",
+          "target": "adjacent_enemies",
+          "percent_from_skill_param": "TALENT:1"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "奥迹",
+          "amount": 1,
+          "max_stacks": 50,
+          "base_chance": 0.65,
+          "permanent": true,
+          "target": "adjacent_enemies"
+        }
+      ],
+      "source": "1307 黑天鹅 天赋: 「大于等于3层：对相邻目标造成等同于黑天鹅180%攻击力的风属性持续伤害，并且有65%的基础概率使相邻目标陷入1层【奥迹】。」",
+      "_note": "「**大于等于 3 层**：对**相邻目标**造成 180% 攻击力风属性持续伤害，并且有 **65% 的基础概率**使相邻目标陷入 1 层【奥迹】」—— ① 条件 `target_stacks:奥迹 >= 3` ✓（`TURN_START` 上被打的是 `actor` ✓，所以用 `target_stacks` 读它 ✓）；② **伤害与叠层分开两条效果** ✓（一条只做一类事）；③ `base_chance: 0.65` ✓ 过命中/抵抗 ✓。⚠ 原文说的是「**相邻**目标」⇒ `adjacent_enemies` ✓。"
     }
   ]
 }
