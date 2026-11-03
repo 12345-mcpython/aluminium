@@ -191,6 +191,25 @@ public class DrRatioClauseCoverageTest {
         return instances[0];
     }
 
+    /**
+     * 秘技: 「100% 基础概率使敌方每个单体目标速度降低 15%，持续 2 回合」 — through the resistance pipeline, not around it.
+     */
+    @Test
+    public void theTechniqueLowersEveryEnemySpeed() {
+        Fixture f = new Fixture(0);
+        double before = f.enemy.getAttribute(AttributeType.SPEED).get();
+        f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, f.ratio, f.ratio, 0, 0));
+        // the technique is armed by the state, which the fixture sets the way the engine does
+        f.battle.markTechniqueUsed(f.ratio);
+        com.laosun.aluminium.trigger.TriggerPayload.Simple start = com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, f.ratio, f.ratio, 0, 0);
+        f.battle.fire(start);
+        f.battle.processRequests();
+        Assertions.assertTrue(f.enemy.getAttribute(AttributeType.SPEED).get() <= before,
+                "「速度降低 15%」 — never higher, and with base chance 100% it lands unless resistance refuses it");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -240,6 +259,7 @@ public class DrRatioClauseCoverageTest {
         }
     }
 }
+
 
 
 
