@@ -1489,17 +1489,21 @@ public class EffectSpec {
     private String element;
 
     /**
-     * <b>Whose</b> damage instance this is, when that is not the rule's owner: the only legal value is
-     * {@code "summon"} - "the rule owner's memosprite deals it".
+     * <b>Whose</b> damage instance this is, when that is not the rule's owner. Two subjects are legal:
+     * {@code "summon"} - "the rule owner's memosprite deals it" - and {@code "actor"} - "the unit the triggering event is
+     * about deals it".
      *
      * <p><b>Why the owner is the wrong default.</b> A rule lives in a <b>character's</b> file, but the sentence it
-     * encodes often says the damage is the <b>memosprite's</b>: 1409 Hyacine (风堇)'s 忆灵技1 is 「小伊卡对敌方全体造成…」,
-     * and everything hanging off "who deals it" then reads the wrong unit - the memosprite's own damage-dealt buffs
-     * (her talent's +80%/layer) would not apply, while the summoner's would.
+     * encodes often says the damage is somebody else's: 1409 Hyacine (风堇)'s 忆灵技1 is 「小伊卡对敌方全体造成…」, and
+     * everything hanging off "who deals it" then reads the wrong unit - the memosprite's own damage-dealt buffs (her
+     * talent's +80%/layer) would not apply, while the summoner's would.
      *
-     * <p>⚠ Not a general subject syntax: it names one relation (owner → its summon) because that is the only one a
-     * document has needed so far, and the selector it resolves through ({@code TriggerTargets}'s {@code summon}) is the
-     * one that already refuses loudly when the owner has no memosprite on the field.
+     * <p>Reader of {@code "actor"}: 1202 Tingyun (停云)'s Skill - 「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于
+     * <b>其自身</b> 40% 攻击力的…附加伤害」. The instance belongs to the <b>blessed ally</b>, who is the actor of the
+     * {@code ALLY_ATTACK} that fires the rule, and whose ATK the share must read.
+     *
+     * <p>⚠ Still not a general subject syntax: it names two relations (owner → its summon, event → its actor). A third
+     * party that is neither - "the ally holding 【赐福】 deals it while <i>she</i> attacks" - has no spelling yet.
      */
     @SerializedName("attacker")
     private String attacker;

@@ -73,6 +73,63 @@ public class TingyunEidolonTest {
         Assertions.assertEquals(50.0, ultEnergy(5), 1e-9, "and E5 pays the base 50");
     }
 
+    /**
+     * 战技:「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于**其自身** 40% 攻击力的雷属性附加伤害」.
+     *
+     * <p>The clause's whole difficulty is <b>whose</b> attack the instance is: it is the blessed ALLY's, so the engine's
+     * {@code attacker: "actor"} resolution decides both the attribution (asserted here) and which ATK the share reads
+     * (asserted by the ATK ratio between two fixtures that differ only in the caster's ATK).
+     */
+    @Test
+    public void theBlessedAlliesAttackCarriesHerOwnShare() {
+        double[] small = extraDamageAtAlliedAttack(1_000);
+        double[] large = extraDamageAtAlliedAttack(5_000);
+
+        Assertions.assertEquals(1, (int) small[0], "precondition: exactly one ADDITIONAL instance lands");
+        Assertions.assertEquals(1, (int) large[0], "precondition: and one in the stronger fixture too");
+        Assertions.assertTrue(small[1] > 0, "precondition: the instance deals damage: " + small[1]);
+        Assertions.assertEquals(5.0, large[1] / small[1], 1e-6,
+                "「等同于其自身 40% 攻击力」 — the share follows the ALLY's ATK (5000/1000), not Tingyun's: "
+                        + small[1] + " vs " + large[1]);
+
+        double unblessed = extraDamageAtAlliedAttack(1_000, false)[1];
+        Assertions.assertEquals(0.0, unblessed, 1e-9,
+                "control: without 【赐福】 the ally's attack carries nothing extra");
+    }
+
+    /**
+     * @return {how many ADDITIONAL instances landed, the HP they removed}
+     */
+    private static double[] extraDamageAtAlliedAttack(double allyAttack) {
+        return extraDamageAtAlliedAttack(allyAttack, true);
+    }
+
+    private static double[] extraDamageAtAlliedAttack(double allyAttack, boolean blessed) {
+        Character tingyun = CharacterFactory.create(TINGYUN, LEVEL);
+        Character ally = CharacterFactory.create(1001, LEVEL);
+        ally.setAttribute(AttributeType.ATTACK, new com.laosun.aluminium.DoubleValue(allyAttack));
+        if (blessed) {
+            ally.getBuffManager().addBuff(new StateBuff(BLESSING, 3));
+        }
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(tingyun, ally), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        int[] additional = {0};
+        double[] removed = {0};
+        battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> {
+            if (damage.getType() == com.laosun.aluminium.enums.DamageType.ADDITIONAL) {
+                additional[0]++;
+                Assertions.assertSame(ally, damage.getAttacker(),
+                        "the instance belongs to the blessed ALLY, not to Tingyun");
+                removed[0] += applied;
+            }
+        });
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0));
+        battle.processRequests();
+        return new double[]{additional[0], removed[0]};
+    }
+
     private static double energyAfterOpening(Character tingyun) {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tingyun), List.of(enemy), BattleFixture.alwaysRoll(0.0));
@@ -98,8 +155,7 @@ public class TingyunEidolonTest {
     }
 
     /** The same measurement at a given Eidolon rank with no blessing at all (the E0 control). */
-    private static double unblessedUltSpeedDeltaAt(int eidolon) {
-        Character tingyun = CharacterFactory.create(TINGYUN, LEVEL, false, null, null, eidolon);
+    private static double unblessedUltSpeedDeltaAt(int eidolon) {        Character tingyun = CharacterFactory.create(TINGYUN, LEVEL, false, null, null, eidolon);
         Character ally = CharacterFactory.create(1001, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tingyun, ally), List.of(enemy), BattleFixture.alwaysRoll(0.0));

@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⭐ **2026-11-04 逐节核**：旧 `_gaps` 三条里，②「秘技缺『用过秘技』门槛」是**错的**（那个门一直有）；③「星魂未读未写」已读并可写的写完。**本轮落地**：秘技（`technique_energy_on_entry`，`BATTLE_START` + `self has_state 秘技` → 50 能量）、星魂 1（`eidolon1_blessed_ult_grants_speed`：`ULT_CAST` + `actor has_state 赐福` → 速度 +20%/1 回合）、星魂 2（`eidolon2_blessed_kill_pays_energy`：`KILL` + 同条件 → +5 能量，`per_turn: 1`）、星魂 6（`eidolon6_ult_restores_ten_more`：+10 能量）。判据 `TingyunEidolonTest`（四组，秘技/星魂 6 各带「不声明 / 低星魂」对照，星魂 1 带「不带【赐福】」对照，星魂 2 钉「同回合第二次不再付」）。⚠ 另记：星魂 6 用**另加一条 `GAIN_ENERGY`** 而不是 `MODIFY_RULE effect_amount` —— 后者的读取是 `withAmount(δ)`（**替换**，不是相加），用它会把 50 变成 10。",
-    "⛔ **战技 / 天赋的附加伤害「由受【赐福】的队友打出」仍写不了（星魂 4 也依赖它）**：句子是「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于**其自身** 40% 攻击力的雷属性附加伤害」（战技）与「敌方目标受到停云攻击后，获得【赐福】的目标立即对其造成等同于**自身** 60% 攻击力的雷属性附加伤害」（天赋）。`DAMAGE` 的攻击者恒为**规则主人**（停云），而实例应当归**队友** —— `attacker` 字段的合法值**只有 `summon`**（`EffectSpec` 的注记写明它「不是通用主语」）⇒ 需要两样：`attacker: \"actor\"`（这一发的行动者/被祝福者）+ 一个 `actor_attr:`/`attacker_attr:` 的 `scale` 前缀（读**攻击者**的面板，而不是规则主人的）。⚠ 星魂 4「【赐福】附加的伤害倍率提高 20%」是这两条的 `MODIFY_RULE`，所以它随之一起等。"
+    "⭐ **战技的附加伤害已落地（2026-11-04）**：新增 `attacker: \"actor\"`（引擎第二个合法主语，`TriggerInterpreter.damage` 解析；`literalBase` 用解析后的 attacker 读面板 ⇒ **不需要**新的 `attacker_attr:` 前缀）。规则 `skill_blessed_ally_extra_damage`：`ALLY_ATTACK` + `actor has_state 赐福` → `DAMAGE { attacker: actor, scale: self_attr:ATTACK, percent_from_skill_param: SKILL:0, element: Thunder, damage_type: ADDITIONAL }`。判据 `TingyunEidolonTest.theBlessedAlliesAttackCarriesHerOwnShare`：实例的 attacker **就是队友**、且 5000/1000 攻击力的两场夹具伤害比 = **5.0**（证明读的是队友面板）、不带【赐福】时为 0。⛔ **天赋那一半仍开（星魂 4 也依赖它）**：「敌方目标受到**停云**攻击后，获得【赐福】的目标立即对其造成等同于**自身** 60% 攻击力的雷属性附加伤害」——这里的造成伤害者是**第三个人**：事件（停云攻击）的行动者是停云，而实例应归**被祝福的队友** ⇒ `attacker: \"actor\"` 解决不了，需要一个「**指定状态的持有者**作为主语」的写法（`attacker: \"allies_with_state:赐福\"` 之类，且要求**恰好一个**）。⚠ 星魂 4「【赐福】附加的伤害倍率提高 20%」是这两条的 `MODIFY_RULE`，所以它随之一起等。"
   ],
   "rules": [
     {
@@ -243,6 +243,26 @@
       "source": "1202 星魂 5: 等级加成（数据 skill_add_level: 120202=SKILL+2, 120204=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射到 1/2/3/4 号槽（普攻/战技/终结技/天赋），8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "skill_blessed_ally_extra_damage",
+      "when": [
+        "actor has_state 赐福"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "attacker": "actor",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "SKILL:0",
+          "element": "Thunder",
+          "damage_type": "ADDITIONAL",
+          "target": "target"
+        }
+      ],
+      "source": "1202 停云 战技 祥音和韵 (120202, BPSkill/Support): 「获得【赐福】的目标施放攻击后，会额外造成1次等同于其自身40%攻击力的雷属性附加伤害。」 param Lv10 = [0.4, 0.5, 3, 0.25]",
+      "_note": "「获得【赐福】的目标**施放攻击后**，会额外造成 1 次等同于**其自身 40% 攻击力**的雷属性**附加伤害**」—— 事件 `ALLY_ATTACK` ✓（我方任何人的施放都发）+ 条件 `actor has_state 赐福` ✓（被祝福的那位就是行动者 ✓）；⭐ **`attacker: \"actor\"`**（2026-11-04 新允许的第二个主语）+ `scale: self_attr:ATTACK` ⇒ **那一发读取的是攻击者（队友）的结算攻击力** ✓（`literalBase(attacker, …)` 用的是解析后的 attacker ✓，所以**不需要**新的 `attacker_attr:` 前缀）；份额读战技行 `SKILL:0` = 40% ✓（按等级 ✓）；`damage_type: ADDITIONAL` ✓（「附加伤害」= 不视为一次攻击 ⇒ 不会再触发本规则 ✓）。⚠ **同句的天赋那一半仍开**（见 `_gaps`）：那里的「造成伤害者」是**第三个人**（被祝福的队友），而本事件的行者是停云 ⇒ `attacker: \"actor\"` 解决不了。"
     }
   ]
 }

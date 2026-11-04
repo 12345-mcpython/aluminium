@@ -2647,22 +2647,32 @@ public final class TriggerInterpreter {
     private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
         CanHit attacker = ctx.owner();
         // `"attacker": "summon"`: the sentence says the MEMOSPRITE deals it (1409's 忆灵技1: 「小伊卡对敌方全体造成…」).
-        // Everything downstream - which unit's damage-dealt buffs apply, whose ATK a row-based scale would read - follows
-        // this one choice, so it is resolved once here rather than patched per zone.
+        // `"attacker": "actor"`: the sentence says the unit that CAUSED this event deals it (1202 Tingyun (停云)'s
+        // 「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于**其自身** 40% 攻击力的雷属性附加伤害」 - the damage is the
+        // blessed ALLY's, not hers). Everything downstream - which unit's damage-dealt buffs apply, whose ATK the scale
+        // reads - follows this one choice, so it is resolved once here rather than patched per zone.
         if (effect.getAttacker() != null && !effect.getAttacker().isBlank()) {
             String named = effect.getAttacker().trim();
-            if (!"summon".equalsIgnoreCase(named)) {
+            if ("actor".equalsIgnoreCase(named)) {
+                if (ctx.actor() == null) {
+                    throw new IllegalStateException("a DAMAGE states \"attacker\": \"actor\", but the event that fired it "
+                            + "carries no actor to deal it; name \"summon\" or say nothing (the rule owner deals it)");
+                }
+                attacker = ctx.actor();
+            } else if (!"summon".equalsIgnoreCase(named)) {
                 throw new IllegalStateException("a DAMAGE states \"attacker\": \"" + named
-                        + "\", and the only subject this engine can name is \"summon\" (the rule owner's memosprite)");
+                        + "\", and the subjects this engine can name are \"summon\" (the rule owner's memosprite) and "
+                        + "\"actor\" (the unit the event is about)");
+            } else {
+                CanHit owner = ctx.owner();
+                CanHit summon = owner == null || ctx.battle() == null ? null : ctx.battle().summonOf(owner);
+                if (summon == null) {
+                    throw new IllegalStateException("a DAMAGE states \"attacker\": \"summon\", but "
+                            + (owner == null ? "the rule has no owner" : owner.getName() + " has no summon on the field")
+                            + "; gate the rule with `self_summon_count >= 1` so it only fires while the memosprite is out");
+                }
+                attacker = summon;
             }
-            CanHit owner = ctx.owner();
-            CanHit summon = owner == null || ctx.battle() == null ? null : ctx.battle().summonOf(owner);
-            if (summon == null) {
-                throw new IllegalStateException("a DAMAGE states \"attacker\": \"summon\", but " 
-                        + (owner == null ? "the rule has no owner" : owner.getName() + " has no summon on the field")
-                        + "; gate the rule with `self_summon_count >= 1` so it only fires while the memosprite is out");
-            }
-            attacker = summon;
         }
         if (victim == null || victim.isDeath()) {
             return;
