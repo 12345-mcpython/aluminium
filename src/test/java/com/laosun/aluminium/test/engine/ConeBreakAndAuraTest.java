@@ -28,7 +28,12 @@ public class ConeBreakAndAuraTest {
 
     private Battle battle(Character... units) {
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(units), List.of(enemy), BattleFixture.seeded());
+        // Note: a FIXED roll, not a seeded one. Two of these tests compare a ratio between two identically-built battles,
+        // and a ratio is only crit-free when both sides crit - which a seeded stream guarantees only as long as every
+        // earlier draw is identical. It stopped being identical on 2026-11-04, when `ADD_STACK`'s stated `base_chance`
+        // (cone 23035 states 「100% 的基础概率」) started actually rolling: the extra draw moved which of the two ordinary
+        // hits crit, and the ratio read 1.5 (= one crit) for a sentence that touches BREAK damage only.
+        Battle battle = new Battle(List.of(units), List.of(enemy), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         return battle;
     }
@@ -70,7 +75,8 @@ public class ConeBreakAndAuraTest {
         double ordinary = battle.applyDamage(target, new Damage(withCone, target, DamageElement.FIRE, DamageType.NORMAL, 1000));
         // A second, clean enemy for the reference readings.
         Enemy reference = BattleFixture.monster();
-        Battle plain = new Battle(List.of(without), List.of(reference), BattleFixture.seeded());
+        // Note: the same FIXED roll as the battle above - a ratio is crit-free only when both sides crit.
+        Battle plain = new Battle(List.of(without), List.of(reference), BattleFixture.alwaysRoll(0.0));
         plain.startBattle();
         double breakPlain = plain.applyDamage(reference, new Damage(without, reference, DamageElement.FIRE, DamageType.BREAK, 1000));
         double ordinaryPlain = plain.applyDamage(reference, new Damage(without, reference, DamageElement.FIRE, DamageType.NORMAL, 1000));

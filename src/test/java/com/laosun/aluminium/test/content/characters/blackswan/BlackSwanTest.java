@@ -33,14 +33,14 @@ public class BlackSwanTest {
         Assertions.assertTrue(defenceBefore > 0, "the fixture must have defence to shred: " + defenceBefore);
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("奥迹"), "nothing before the Skill");
 
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
+        battle.fire(skillCast(blackSwan, enemy));
         Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("奥迹"),
                 "「使目标…陷入1层【奥迹】」 (puts the target ... into 1 stack of [奥迹])");
         Assertions.assertEquals(0.208, (defenceBefore - enemy.getAttribute(AttributeType.DEFENCE).get()) / defenceBefore, 1e-6,
                 "「防御力降低20.80%」 (lowers DEF by 20.80%) of its own defence");
 
         for (int i = 0; i < 60; i++) {
-            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
+            battle.fire(skillCast(blackSwan, enemy));
         }
         Assertions.assertEquals(50, enemy.getBuffManager().stacksOf("奥迹"),
                 "「【奥迹】最多叠加50层」 ([奥迹] stacks at most 50 times) -- sixty-one casts must still read fifty");
@@ -62,7 +62,8 @@ public class BlackSwanTest {
         double aimedDefence = aimed.getAttribute(AttributeType.DEFENCE).get();
         double leftDefence = left.getAttribute(AttributeType.DEFENCE).get();
 
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, blackSwan, aimed, 0, 0));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.SKILL_CAST, blackSwan, aimed, 0, 0,
+                com.laosun.aluminium.enums.SkillCategory.BPSKILL, 130702, 0, List.of()));
 
         Assertions.assertEquals(1, aimed.getBuffManager().stacksOf("奥迹"), "the aimed enemy");
         Assertions.assertEquals(1, left.getBuffManager().stacksOf("奥迹"), "「与相邻目标」 — the neighbour too");
@@ -74,6 +75,18 @@ public class BlackSwanTest {
 
     private static Random fixed() {
         return BattleFixture.alwaysRoll(0.0);
+    }
+
+    /**
+     * A 【战技】 cast, which is what the file's skill rules are gated on ({@code from_skill SKILL}).
+     *
+     * <p>Why a payload with a category: 「施放战技攻击…」 is about the slot, so a bare {@code SKILL_CAST} payload (which
+     * carries no cast) would answer "not the Skill slot" and silently fire nothing - the very mismatch that let these
+     * rules run on basic attacks before the gate was added.
+     */
+    private static com.laosun.aluminium.trigger.TriggerPayload.Cast skillCast(Character actor, Enemy target) {
+        return com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.SKILL_CAST, actor, target, 0, 0,
+                com.laosun.aluminium.enums.SkillCategory.BPSKILL, 130702, 0, List.of());
     }
 
     /**
@@ -268,10 +281,9 @@ public class BlackSwanTest {
      * the comparison operator and onto the rule's reach.
      */
     @Test
-    public void eidolonSixGrantFiresInEveryFixture() {
-        Assertions.assertEquals(1, allowanceAfterUlt(6), "first fixture");
-        Assertions.assertEquals(1, allowanceAfterUlt(6), "second fixture, built exactly the same way");
-        Assertions.assertEquals(0, allowanceAfterUlt(5), "below E6 the rule is not in the table at all");
+    public void theUltimateGrantsOneKeepAtEveryEidolonRank() {
+        Assertions.assertEquals(1, allowanceAfterUlt(1), "E1 - the sentence is the ULTIMATE's, so the rank does not matter");
+        Assertions.assertEquals(1, allowanceAfterUlt(6), "E6 grants the same one keep, not a different rule");
     }
 
     private static int allowanceAfterUlt(int eidolon) {
@@ -290,20 +302,24 @@ public class BlackSwanTest {
     }
 
     /**
-     * 星魂 6: 「【奥迹】每回合开始造成伤害后不会重置层数」，once per 揭露 window.
+     * 终结技: 「【奥迹】每回合开始造成伤害后不会重置层数…在【揭露】持续时间内最多触发 1 次」.
+     *
+     * <p>The control is a fight WITHOUT the Ultimate: the same twelve layers then reset on the first turn start. That
+     * side is what tells "the window keeps them" apart from "the reset never happens at all".
      */
     @Test
-    public void eidolonSixKeepsTheLayersForOneTurnStart() {
+    public void theEpiphanyKeepsTheLayersForOneTurnStart() {
         // > 1 rather than exactly 12: the 65% dot-tick rule can add a layer too, and what this test is about is that the RESET did not happen.
-        Assertions.assertTrue(layersAfterTurnStarts(6, 1) > 1, "the window keeps the layers instead of resetting them");
-        Assertions.assertTrue(layersAfterTurnStarts(6, 2) <= 1,
-                "「最多触发 1 次」 — the next turn start resets it (and the dot may finish the target off entirely)");
-        Assertions.assertTrue(layersAfterTurnStarts(5, 1) <= 1, "below E6 there is no skip at all");
+        Assertions.assertTrue(layersAfterTurnStarts(true, 1) > 1, "the window keeps the layers instead of resetting them");
+        Assertions.assertEquals(1, layersAfterTurnStarts(true, 2),
+                "「最多触发 1 次」 — the next turn start resets to exactly one");
+        Assertions.assertEquals(1, layersAfterTurnStarts(false, 1),
+                "control: without 揭露 the reset happens on the first turn start");
     }
 
-    /** Layers left after firing {@code turnStarts} turn starts at the given eidolon rank. */
-    private static int layersAfterTurnStarts(int eidolon, int turnStarts) {
-        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, eidolon);
+    /** Layers left after firing {@code turnStarts} turn starts, with or without an Ultimate first. */
+    private static int layersAfterTurnStarts(boolean withEpiphany, int turnStarts) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
         // Three enemies, so the 「≥3 层」 branch's adjacent stack lands on the neighbours instead of back on the target (with a
         // single enemy it resolves onto itself and adds a layer, which made the first version of this count read 13).
         Enemy left = BattleFixture.monster();
@@ -311,9 +327,11 @@ public class BlackSwanTest {
         Enemy right = BattleFixture.monster();
         Battle battle = new Battle(List.of(blackSwan), List.of(left, enemy, right), BattleFixture.alwaysRoll(0.99));
         battle.startBattle();
-        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
-                blackSwan, List.of(enemy));
-        battle.processRequests();
+        if (withEpiphany) {
+            battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                    blackSwan, List.of(enemy));
+            battle.processRequests();
+        }
         for (int i = 0; i < 12; i++) {
             enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
         }
@@ -323,6 +341,79 @@ public class BlackSwanTest {
             battle.processRequests();
         }
         return Math.max(0, enemy.getBuffManager().stacksOf("奥迹"));
+    }
+
+    /**
+     * 普攻: 「有 65% 的基础概率使目标陷入 1 层【奥迹】」.
+     *
+     * <p>Two rolls, because one number cannot tell a rule that rolls from a rule that always attaches. The control also
+     * pins the {@code from_skill} gate: with the Skill rules ungated they would stack a layer here too, and the failing
+     * roll would come back as 1 instead of 0.
+     */
+    @Test
+    public void theBasicAttackRollsForOneLayer() {
+        Assertions.assertEquals(1, arcanaAfterBasicAttack(0.0), "the 65% roll succeeds ⇒ one layer");
+        Assertions.assertEquals(0, arcanaAfterBasicAttack(0.99), "and it is a ROLL: a failed one applies nothing");
+    }
+
+    private static int arcanaAfterBasicAttack(double roll) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(roll));
+        battle.startBattle();
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON),
+                blackSwan, List.of(enemy));
+        battle.processRequests();
+        return enemy.getBuffManager().stacksOf("奥迹");
+    }
+
+    /**
+     * 星魂 6 (强化前): 「当敌方目标受到黑天鹅的**队友**的攻击时，黑天鹅有 65% 的基础概率使目标陷入 1 层【奥迹】」.
+     *
+     * <p>Three arms, because two of them are the condition: a teammate's attack at E6 lands a layer, the same attack at
+     * E5 lands none, and <b>her own</b> attack lands none at E6 either (「队友」 is not 「有人」).
+     */
+    @Test
+    public void eidolonSixAnswersATeammatesAttack() {
+        Assertions.assertEquals(1, arcanaAfterTeammateAttack(6, true), "E6 + a teammate's attack ⇒ one layer");
+        Assertions.assertEquals(0, arcanaAfterTeammateAttack(5, true), "E5: the rule is not in the table at all");
+        Assertions.assertEquals(0, arcanaAfterTeammateAttack(6, false), "her own attack is not 「队友的攻击」");
+    }
+
+    /** Layers on the enemy after one attack by {@code byTeammate ? ally : herself}. */
+    private static int arcanaAfterTeammateAttack(int eidolon, boolean byTeammate) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, eidolon);
+        Character ally = CharacterFactory.create(1002, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan, ally), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.ALLY_ATTACK, byTeammate ? ally : blackSwan, enemy, 1, 0));
+        battle.processRequests();
+        return enemy.getBuffManager().stacksOf("奥迹");
+    }
+
+    /**
+     * 行迹 烛影朕兆: 「使自身造成的伤害提高，提高数值等同于效果命中的 60%，最多使造成的伤害提高 72%」.
+     *
+     * <p>Two points on the curve: 1.0 effect hit gives 0.6 (the share), 2.0 would give 1.2 but the sentence stops at
+     * 0.72. The second number is what tells a capped read from an uncapped one.
+     */
+    @Test
+    public void theTraceTurnsEffectHitIntoDamage() {
+        Assertions.assertEquals(0.6, boostAtEffectHit(1.0), 1e-9, "「等同于效果命中的 60%」");
+        Assertions.assertEquals(0.72, boostAtEffectHit(2.0), 1e-9, "「最多使造成的伤害提高 72%」 — the ceiling, not 1.2");
+    }
+
+    /** Her own all-type damage boost at a given effect hit rate. */
+    private static double boostAtEffectHit(double effectHit) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
+        blackSwan.setAttribute(AttributeType.EFFECT_HIT_RATE, new com.laosun.aluminium.DoubleValue(effectHit));
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        var boost = blackSwan.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST);
+        return boost.get() - boost.baseValue();
     }
 
     /**

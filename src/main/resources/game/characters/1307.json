@@ -6,7 +6,11 @@
     "⭐ **战技的相邻半已落地（2026-11-04）**：`ADD_STACK 奥迹` 与 `MODIFY_ATTR DEFENCE -0.208` 各补一条 `target: adjacent_enemies` + **`base_chance: 1`**（「100% 的基础概率」⇒ 过效果命中 × 效果抵抗）。旧登记说「相邻是**伤害形状**、`ADD_STACK` 走选择器」—— 现在 `adjacent_enemies` 就是那个选择器 ✓。判据 `BlackSwanTest.theSkillReachesTheNeighboursOfTheAimedEnemy`（3 敌，瞄中间，三层奥迹 + 相邻减防）。⭐ 2026-11-04 补齐**主目标**那半的 `base_chance: 1` ✓ —— 此前只有相邻那半掷骰，同一句话的两半一个「必中」一个「过抵抗」，是无声的不一致（判据用 `alwaysRoll(0.0)`，所以它不会自己暴露）。",
     "⭐ **天赋的前两段已落地（2026-11-04）**：① `TURN_START` + `actor != self` + `actor has_state 奥迹` → `DAMAGE { damage_type: DOT, percent_from: TALENT:0 × (1 + 0.12 × 层数) }`（`stacks whose: target`）；② ≥3 层 → `adjacent_enemies` 吃 180% 攻击力持续伤害 + `base_chance 0.65` 叠 1 层。判据 `BlackSwanTest.theTalentDotScalesWithTheArcanaLayers`（1 层与 5 层的比值 = (1+0.6)/(1+0.12)）。⭐ **「随后重置为 1 层」已落地（2026-11-04）**：新增 **`const:` scale 前缀**（`TriggerMagnitudes.resolveScale`）让 `SET_STACKS` 能说「设到 1 层」；且这条重置必须是 `TURN_START` 上的**最后一条**规则（伤害与 ≥3/≥7 两条都要读**重置前**的层数）。判据 `theTalentResetsTheLayersToOne`（12 层 → ≤1 层，且伤害仍落地）。⭐ **2026-11-04 实测纠正：这里此前根本不是「重置为 1 层」，而是「重置为 0 层」** —— `SET_STACKS` 的**向下**分支走 `removeState`（一次把整个计数器清空），12 层一步变 0；而判据只断言 `<= 1`，**分辨不出 1 与 0**（第 53 条）。后果不只是数字：0 层时【奥迹】整条链一起消失（下一回合的持续伤害不再触发、≥3/≥7 分支不再成立、「视为风化」的别名也跟着没了）。现改为**逐层** `removeNamedStacks`，判据收紧成 `== 1`。",
     "⭐ **终结技的两半已落地（2026-11-04）**：`ULT_CAST` → `APPLY_BUFF 揭露 { turns: 2, all_enemies }` + `MODIFY_DAMAGE_TAKEN { 0.25, turns: 2, ticks_on: target, all_enemies }`。⚠ **近似两处**：① 寿命用**并列的 2 回合钟**而不是 `while_state`（gate 问的是规则主人，而【揭露】在受击者身上）；② 原文限定「**自身回合内**」的 +25%，这里写成窗口内常驻加成。⭐ 【揭露】的「【奥迹】不重置层数、每 2 回合最多 1 次」**已落地**（见 `eidolon6_*` 三条 + 判据）。⭐ **「【奥迹】目标被视为同时陷入风化、裂伤、灼烧、触电」已落地（2026-11-04）**：新增 **`counts_as` / `counts_as_requires`** 两个字段 —— 别名挂在**被创建的那一层 buff** 上，`BuffManager.hasState` 顺着别名回答（深度上限 4，防成环）⇒ ① 【奥迹】每一层带 `counts_as: [风化]`（技能说明的【奥迹】词条：「处于【奥迹】状态时，也会被视为陷入了风化状态」）；② 【揭露】带 `counts_as: [裂伤, 灼烧, 触电]` + **`counts_as_requires: 奥迹`**（「**当敌方目标处于【奥迹】状态时**」⇒ 只有**同时**有【奥迹】的【揭露】目标才算，别人的【揭露】不会被误判）。⚠ **不是**真挂四个持续伤害 —— 那样每回合会多跳四次伤害，原文没说。判据 `BuffAliasTest`（引擎三条：别名生效 / 前提条件 / 成环不递归）+ `BlackSwanTest.arcanaCountsAsWindShear`、`epiphanyMakesOnlyTheArcanaTargetsCount`（内容两条）。⭐ 连带精确了星魂 1 的「一处宽」：四条减抗现在只对**真正处于该状态（含别名）**的敌人成立。⚠ 上一轮那四次 `APPLY_BUFF { target: actor }` 的**失败原因仍没查清**：判据红、探针确认规则没进 ⇒ 疑似 `target: actor` 在 `TURN_START` 上不可用。本条改用别名后不再需要它，但那个坑还在 —— 下次写「回合开始时给敌人挂状态」时会再遇到。",
-    "⭐ **星魂 1 / 4 的可写半已落地（2026-11-04）**：星魂 1 = `KILL` + `target has_state 奥迹` → `adjacent_enemies` 各叠 6 层（`base_chance: 1`）；星魂 4 = 【揭露】期间效果抵抗 −10%（`EFFECT_RESISTANCE`，⚠ 并列 2 回合钟的近似）+ 「每回合开始回 8 能量」用**额度**表达（`揭露能量额度`，展开【揭露】时发 1 层、用掉 1 层 ⇒ 每个【揭露】窗口最多 1 次，再次展开即刷新）。判据 `eidolonFourPaysEightEnergyOncePerEpiphany`。⭐ **星魂 1 的按属性降抗已落地（2026-11-04）**：本会话新增 **7 个按元素抗性常量** `RESISTANCE_REDUCTION_<ELEMENT>`（`AttributeType.resistanceReductionFor` + `DamageService` 唯一读抗性处按**这一发的元素**取常量）⇒ 四条规则各 −25%，判据 `eidolonOneLowersFourResistancesByElement`（风/物理/火/雷 = −0.25，冰 = 0，E0 = 0）。⚠ **那处「宽」已在 2026-11-04 收盘**：四条减抗改成 `TURN_START` + `when: actor has_state <元素状态>` + `while_holder_state: <同一状态>`，且【奥迹】的「视为风化」别名（见上一条）让【奥迹】目标也吃风抗那一半 —— 此前「对全体敌人生效」的描述已过时（`while_holder_state` 正是当时说「还没有」的那个修饰，见 §6.2）。⚠ 仍是**回合粒度**的近似：状态在两次回合边界之间出现/消失时，减抗晚一拍跟上。⭐ **星魂 4 的「被消灭时」回能已落地**（与回合开始**共用同一额度**，判据 `eidolonFourSharesOneAllowanceBetweenTheTwoTriggers`）；⭐ **星魂 6「【奥迹】不重置层数」已落地（2026-11-04）**：常规重置加 `max_eidolon: 5`；E6 起改由「额度 + `self_stacks:奥迹不重置额度 <= 0`」的重置规则（额度 ≥1 时该条为假 ⇒ 不重置），另有一条在回合结束前**消耗额度**。`ULT_CAST` 上发额度（`max_stacks: 1` ⇒ 再次【揭露】即刷新）。判据 `eidolonSixKeepsTheLayersForOneTurnStart`（E6 一回合不清、第二回合清；E5 一回合就清）。⚠ 上一轮「`<=` 不成立」的判断是**错的** —— 真正的原因是当时那条 `max_eidolon: 5` 的替换没落到文件上（锚点因 CRLF 未匹配），条件本身一直是好的。"
+    "⭐ **星魂 4 与减抗的可写半已落地（2026-11-04）**：星魂 4 = 【揭露】期间效果抵抗 −10%（`EFFECT_RESISTANCE`，⚠ 并列 2 回合钟的近似）+ 「每回合开始回 8 能量」用**额度**表达（`揭露能量额度`，展开【揭露】时发 1 层、用掉 1 层 ⇒ 每个【揭露】窗口最多 1 次，再次展开即刷新）。判据 `eidolonFourPaysEightEnergyOncePerEpiphany`。⭐ **星魂 1 的按属性降抗已落地（2026-11-04）**：本会话新增 **7 个按元素抗性常量** `RESISTANCE_REDUCTION_<ELEMENT>`（`AttributeType.resistanceReductionFor` + `DamageService` 唯一读抗性处按**这一发的元素**取常量）⇒ 四条规则各 −25%，判据 `eidolonOneLowersFourResistancesByElement`（风/物理/火/雷 = −0.25，冰 = 0，E0 = 0）。⚠ **那处「宽」已在 2026-11-04 收盘**：四条减抗改成 `TURN_START` + `when: actor has_state <元素状态>` + `while_holder_state: <同一状态>`，且【奥迹】的「视为风化」别名让【奥迹】目标也吃风抗那一半 —— 此前「对全体敌人生效」的描述已过时。⚠ 仍是**回合粒度**的近似：状态在两次回合边界之间出现/消失时，减抗晚一拍跟上。⭐ **星魂 4 的「被消灭时」回能已落地**（与回合开始**共用同一额度**，判据 `eidolonFourSharesOneAllowanceBetweenTheTwoTriggers`）。⚠⚠ **2026-11-04 纠正两处归属错误**：① 此前记在这里的「星魂 6 三条规则」其实是**【终结技】的句子** —— 「【奥迹】每回合开始造成伤害后不会重置层数 / 最多触发 1 次」是终结技（**E0 就有**），却挂在 `min_eidolon: 6` 上，且常规重置压在 `max_eidolon: 5`；现已拆回终结技、合并成一条「额度 ≥1 就不重置」的规则，判据改成 E0 的 `theEpiphanyKeepsTheLayersForOneTurnStart` + `theUltimateGrantsOneKeepAtEveryEidolonRank`。② 「被消灭时叠 6 层」是**星魂 2** 的句子（星魂 1 是减抗），规则已改名 `eidolon2_kill_spreads_six_layers` 并把门槛改成 `min_eidolon: 2` —— 旧写法让 E1 就拿到 E2 的效果，**没有症状**。",
+    "⛔ **「攻击陷入风化、裂伤、灼烧、触电状态的敌方目标后，分别各有 65% 的基础概率额外使目标陷入 1 层【奥迹】」（普攻）与行迹 脏中躁动（同一句的战技版）未写（2026-11-04 首次登记）**：形状是现成的（每个状态一条：`target has_state 风化` … + `base_chance: 0.65` + `ADD_STACK 奥迹 1`；两个槽位各四条 = 8 条），本轮因为量没做。⚠ 落地时有一个**必须验证**的副作用：有了 `counts_as` 别名之后，打一个**已有**【奥迹】的目标会命中「视为风化」那一条 ⇒ 每次攻击真的多 65% 叠 1 层（这正是游戏的行为），所以判据要**先给目标奥迹、再打**，否则风化那一条永远测不到。",
+    "⛔ **行迹 杯底端倪两句都未写（2026-11-04 首次登记）**：① 「敌方目标**进入战斗时**，有 65% 的基础概率陷入 1 层【奥迹】」—— 可写（`BATTLE_START` + `all_enemies` + `base_chance: 0.65`），**没写**；② 「敌方目标在我方**单次攻击内**每受到 1 次持续伤害，有 65% 的基础概率陷入 1 层【奥迹】，**单次攻击内最多 3 层**」—— 缺「**单次攻击内**」这个计数的上限：`per_turn` 是回合级、`max_stacks` 是状态级，没有「一次攻击窗口内」的额度。不带上限的近似会在多段/多 DOT 的攻击里多叠，是**没有症状的错数字**，所以整句登记。",
+    "⛔ **星魂 6（强化前）的第二句未写（2026-11-04 首次登记）**：「每当黑天鹅使敌方目标陷入【奥迹】时，有 50% 的**固定概率**使**本次**叠加的层数额外提高 1 层」—— 缺「**本次**叠加」这个作用域：`STACK_GAINED`（条件 `stack_added 奥迹`）能让规则听到每一层，但它再加一层会**再发一次事件**（自我喂养）；而「固定概率」也不同于 `base_chance`（不吃效果命中/效果抵抗）。用「总是 +1 层」近似会改变层数分布，不能用，所以登记。",
+    "⛔ **「强化后」整块（角色加强）未落地（2026-11-04 首次登记）**：文档的普攻/终结技/天赋/行迹/星魂各有一份**强化后**版本，本文件一律建**强化前**。其中至少三句是**新机制**：① 【奥迹】「层数达到上限后**可以继续叠加**，产生伤害后**移除超出上限**的层数」（上限外叠加）；② 「每陷入 1 层【奥迹】时，有 **50% 固定概率**使本次叠加层数额外提高 1 层」；③ 行迹把「使**自身**造成的伤害提高」改成「使**我方全体**造成的伤害提高」（范围变了，数值同一条）。⇒ 需要先决定**形态**怎么表达（同一个槽位的第二套从句 —— HANDOVER §7.2 的结构性缺口），再逐条落地；在那之前整块不能算「已完成」。"
   ],
   "rules": [
     {
@@ -114,6 +118,24 @@
     }
     ,
     {
+      "on": "BATTLE_START",
+      "id": "trace_candle_omen_boost",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "scale": "self_attr:EFFECT_HIT_RATE",
+          "percent": 0.6,
+          "cap_amount": 0.72,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1307 黑天鹅 行迹 烛影朕兆 (1307103): 「使自身造成的伤害提高，提高数值等同于效果命中的60%，最多使造成的伤害提高72%。」",
+      "_note": "「使自身造成的伤害提高，提高数值**等同于效果命中的 60%**，**最多 72%**」—— `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + **`scale: self_attr:EFFECT_HIT_RATE`** + `percent: 0.6` + **`cap_amount: 0.72`** ✓（`applyDerivedCeiling` 在派生量上取 `min`，正是「最多」）。⚠ **挂在一处、按派生读**：`self_attr:` 是**实时**读她当前的效果命中（换遗器/吃增益都跟上），不是开战快照 —— 判据 `theTraceTurnsEffectHitIntoDamage` 用 1.0 / 2.0 两档证明 0.6 与封顶 0.72。⚠ 「使我方全体」是**强化后**的版本，本文件按强化前只写「自身」。"
+    }
+    ,
+    {
       "on": "SKILL_CAST",
       "id": "skill_arcana_stack_on_adjacent",
       "when": [
@@ -154,6 +176,30 @@
       ],
       "source": "1307 黑天鹅 战技 失坠，伪神的黄昏 (130702, BPSkill/Blast): 「…此外有100%的基础概率使目标与相邻目标防御力降低20.80%，持续3回合。」",
       "_note": "「使**目标与相邻目标**防御力降低 **20.80%**，持续 **3 回合**」的**相邻**半 —— `target: adjacent_enemies` + `base_chance: 1` ✓。⚠ `MODIFY_ATTR` 收 `base_chance` 是已有的能力（裁决过波次），这里正是它的读者。"
+    }
+    ,
+    {
+      "on": "BASIC_ATTACK",
+      "id": "basic_arcana_stack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "奥迹",
+          "counts_as": [
+            "风化"
+          ],
+          "amount": 1,
+          "max_stacks": 50,
+          "base_chance": 0.65,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "1307 黑天鹅 普攻 洞见，缄默的黎明 (130701): 「对指定敌方单体造成等同于黑天鹅60%攻击力的风属性伤害，有65%的基础概率使目标陷入1层【奥迹】，且攻击陷入风化、裂伤、灼烧、触电状态的目标后，分别各有65%的基础概率额外使目标陷入1层【奥迹】。」 参数 Lv6 = [0.6, 0.65, 0.65]",
+      "_note": "「有 **65% 的基础概率**使目标陷入 **1 层【奥迹】**」—— `BASIC_ATTACK`（引擎只为**普攻**这个施放类别发这个事件，见 `SkillExecutor.broadcastSkillCast` 的 switch）+ `base_chance: 0.65` ✓（过命中/抵抗）+ `max_stacks: 50` ✓（同一句的天赋给的上限）。⚠ 60% 那半是引擎自己的技能行，不用规则。⭐ **2026-11-04 补写**：此前整句没有规则 —— `SKILL_CAST` 只由战技发出（引擎按 `SkillCategory` 分流），所以普攻从来不叠【奥迹】。⚠ 仍只写了**前半**：后半「攻击陷入风化、裂伤、灼烧、触电状态的目标后，分别各有 65% …额外 1 层」见 `_gaps`。"
     }
     ,
     {
@@ -331,9 +377,34 @@
     }
     ,
     {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon6_teammate_attacks_stack_arcana",
+      "min_eidolon": 6,
+      "when": [
+        "actor is_other_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "奥迹",
+          "counts_as": [
+            "风化"
+          ],
+          "amount": 1,
+          "max_stacks": 50,
+          "base_chance": 0.65,
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "1307 黑天鹅 星魂 6 (强化前): 「当敌方目标受到黑天鹅的队友的攻击时，黑天鹅有65%的基础概率使目标陷入1层【奥迹】。」",
+      "_note": "「当敌方目标受到**黑天鹅的队友**的攻击时，有 **65%** 的基础概率使目标陷入 **1 层【奥迹】**」—— `ALLY_ATTACK`（每次**施放**发一次，不是每段）+ **`actor is_other_ally`** ✓（是**队友**而不是她自己；这个谓词是 1005 卡芙卡的天赋为此加的）+ `base_chance: 0.65` ✓（过命中/抵抗）。⚠ **不会自我触发**：叠层不产生伤害、也不是一次「施放」，所以不再发 `ALLY_ATTACK` ✓。判据 `eidolonSixAnswersATeammatesAttack`（E6 队友打 ⇒ 1 层；E5 ⇒ 0；E6 她**自己**打 ⇒ 0）。"
+    }
+    ,
+    {
       "on": "KILL",
-      "id": "eidolon1_kill_spreads_six_layers",
-      "min_eidolon": 1,
+      "id": "eidolon2_kill_spreads_six_layers",
+      "min_eidolon": 2,
       "when": [
         "target has_state 奥迹"
       ],
@@ -351,8 +422,8 @@
           "target": "adjacent_enemies"
         }
       ],
-      "source": "1307 黑天鹅 星魂 1 (强化前): 「【奥迹】状态下的敌方目标被消灭时，有100%的基础概率使相邻目标陷入6层【奥迹】。」 参数 = [6, 0.25, 10, 8]",
-      "_note": "「【奥迹】状态下的敌方目标**被消灭时**，有 **100% 的基础概率**使**相邻目标**陷入 **6 层**【奥迹】」—— `KILL` + `target has_state 奥迹` → `ADD_STACK 6` 对 `adjacent_enemies` ✓（`target` 在 `KILL` 上是**死掉的那个** ✓，相邻取它旁边 ✓），`base_chance: 1` 过命中/抵抗 ✓。⚠ 每一层都带 `counts_as: [ \"风化\" ]` ✓（见 `skill_arcana_stack`），所以被波及的相邻目标同样被「视为风化」。"
+      "source": "1307 黑天鹅 星魂 2 羔羊，请勿为我恸哭 (强化前): 「【奥迹】状态下的敌方目标被消灭时，有100%的基础概率使相邻目标陷入6层【奥迹】。」 参数 = [1, 6]",
+      "_note": "「【奥迹】状态下的敌方目标**被消灭时**，有 **100% 的基础概率**使**相邻目标**陷入 **6 层**【奥迹】」—— `KILL` + `target has_state 奥迹` → `ADD_STACK 6` 对 `adjacent_enemies` ✓（`target` 在 `KILL` 上是**死掉的那个** ✓，相邻取它旁边 ✓），`base_chance: 1` 过命中/抵抗 ✓。⚠ 每一层都带 `counts_as: [ \"风化\" ]` ✓（见 `skill_arcana_stack`），所以被波及的相邻目标同样被「视为风化」。⭐ **2026-11-04 改名并改门槛**：这条此前叫 `eidolon1_kill_spreads_six_layers`、门槛 `min_eidolon: 1` —— 而「被消灭时叠 6 层」是**星魂 2** 的句子，星魂 1 是减抗。后果是 E1 就有了 E2 的效果（多给 6 层，**没有症状**：谁也没为空缺的 0 层报警）。"
     },
     {
       "on": "ULT_CAST",
@@ -442,30 +513,8 @@
     }
     ,
     {
-      "on": "TURN_START",
-      "id": "talent_arcana_resets_to_one_layer",
-      "max_eidolon": 5,
-      "when": [
-        "actor != self",
-        "actor has_state 奥迹"
-      ],
-      "do": [
-        {
-          "op": "SET_STACKS",
-          "buff": "奥迹",
-          "scale": "const:1",
-          "percent": 1,
-          "target": "actor"
-        }
-      ],
-      "source": "1307 黑天鹅 天赋 (强化前): 「…每层【奥迹】使此伤害倍率提高12.00%，随后重置为1层。」",
-      "_note": "「…随后**重置为 1 层**」—— ⭐ **用 `SET_STACKS { scale: \"const:1\" }`** ✓（本会话为这句话新加的 `const:` 前缀：别的 scale 前缀都指向「来源」，而这里是一个**常数**）。⚠ **位置是本条的关键**：它必须是 `TURN_START` 上的**最后一条**规则 —— ① 伤害要读**重置前**的层数；② 「≥3 层」「≥7 层」两条也在同一事件里，同样要读**重置前**的层数。写在伤害那条规则里会让后面的规则读到 1 层（第一版就这么错，判据立刻报出来）。"
-    }
-    ,
-    {
       "on": "ULT_CAST",
-      "id": "eidolon6_epiphany_grants_one_keep",
-      "min_eidolon": 6,
+      "id": "ult_epiphany_grants_one_keep",
       "when": [
         "actor == self"
       ],
@@ -479,14 +528,13 @@
           "target": "self"
         }
       ],
-      "source": "1307 黑天鹅 星魂 6 (强化前): 「…【奥迹】不会重置层数的效果在【揭露】状态持续时间内最多触发1次，再次陷入【揭露】状态会刷新触发次数。」",
-      "_note": "「最多触发 1 次，再次陷入【揭露】刷新」—— `max_stacks: 1` 的额度：每次展开【揭露】发 1 层（再多也是 1 层 ⇒ 刷新 ✓）。⚠ 与「不重置」那条配对使用。"
+      "source": "1307 黑天鹅 终结技 (强化前): 「…【奥迹】每回合开始造成伤害后不会重置层数。【奥迹】不会重置层数的效果在【揭露】状态持续时间内最多触发1次，再次陷入【揭露】状态会刷新触发次数。」",
+      "_note": "「最多触发 **1** 次，再次陷入【揭露】刷新」—— `max_stacks: 1` 的额度：每次展开【揭露】发 1 层（再多也是 1 层 ⇒ 刷新 ✓）。⚠ 与「不重置」那条配对使用。⭐ **2026-11-04 改门槛**：这句是**终结技**的话（E0 就有），此前被写成 `min_eidolon: 6` 挂在星魂 6 上 —— 星魂 6 的原文是「队友攻击时 65% 叠 1 层」与「每使敌人陷入 1 层，50% 固定概率额外 +1 层」，与此无关（那两条见 `_gaps`）。"
     }
     ,
     {
       "on": "TURN_START",
-      "id": "eidolon6_the_reset_waits_while_the_allowance_holds",
-      "min_eidolon": 6,
+      "id": "talent_arcana_resets_to_one_unless_the_epiphany_holds_it",
       "when": [
         "actor != self",
         "actor has_state 奥迹",
@@ -501,13 +549,12 @@
           "target": "actor"
         }
       ],
-      "source": "1307 黑天鹅 星魂 6 (强化前): 「…【奥迹】每回合开始造成伤害后不会重置层数…」",
-      "_note": "「不会重置层数」—— 与 `max_eidolon: 5` 的常规重置**同形互斥**：额度 ≥1 时本条为假（不重置 ✓）。⚠ 必须排在「消耗额度」那条**之前**。"
+      "source": "1307 黑天鹅 天赋 (强化前): 「…每层【奥迹】使此伤害倍率提高12.00%，随后重置为1层。」＋终结技: 「…【奥迹】每回合开始造成伤害后不会重置层数。该效果在【揭露】持续时间内最多触发1次…」",
+      "_note": "「随后**重置为 1 层**」，但「在【揭露】中**不重置**，且一个窗口只白给一次」—— 两条句子合成一条规则：**额度 ≥1 时本条为假**（不重置 ✓），额度用完就恢复重置 ✓。⭐ **2026-11-04 合并**：此前是「`max_eidolon: 5` 的常规重置」+「`min_eidolon: 6` 的不重置」两条**同形互斥**规则 —— 那是把**终结技**的话误当成**星魂 6** 的话；星魂 6 与「不重置」无关（见 `_gaps`），而 E0–E5 的玩家明明也有【揭露】，却从来没得到过这句。合并后只有一条，且额度条件与「消耗额度」那条的顺序仍然有效（本条在前）。⚠ **位置**：它必须是 `TURN_START` 上读层数的规则（伤害、≥3、≥7）**之后**的那条。"
     },
     {
       "on": "TURN_START",
-      "id": "eidolon6_the_allowance_is_spent_by_one_turn",
-      "min_eidolon": 6,
+      "id": "ult_the_allowance_is_spent_by_one_turn",
       "when": [
         "actor != self",
         "actor has_state 奥迹",
@@ -521,8 +568,8 @@
           "target": "self"
         }
       ],
-      "source": "1307 黑天鹅 星魂 6 (强化前): 「…该效果最多触发1次…」",
-      "_note": "额度**用一次就没**（「最多触发 1 次」）⇒ 下一次回合开始恢复常规重置 ✓。⚠ 排在「不重置」之后。"
+      "source": "1307 黑天鹅 终结技 (强化前): 「…【奥迹】不会重置层数的效果在【揭露】状态持续时间内最多触发1次…」",
+      "_note": "额度**用一次就没**（「最多触发 1 次」）⇒ 下一次回合开始恢复常规重置 ✓。⚠ 排在「不重置」那条之后（同一事件里逐条求值，能看到前一条的写入 ⇒ 顺序决定本回合算不算白给）。"
     }
     ,
     {

@@ -738,7 +738,14 @@ final class TriggerEffects {
                                 effect, ctx),
                         ctx);
                 stampCountsAs(effect, stack);
-                target.getBuffManager().addBuff(stack);
+                // Note: A counter may also be ROLLED - 「有 65% 的基础概率使目标陷入 1 层【奥迹】」 (1307) and cone 23035's
+                // 「100% 的基础概率」. Until 2026-11-04 this line was a plain `addBuff`, so `base_chance` on ADD_STACK was
+                // accepted by the loader and then ignored: the layer landed every time. Measured: 5 cone files and 1307
+                // state one, and no test could see it because the cone's is 100% - the difference there is that a 100%
+                // BASE chance is still resistible (the same reading APPLY_DOT and APPLY_BUFF already follow).
+                if (!TriggerInterpreter.attachRolled(battle, target, stack, effect, ctx)) {
+                    continue;                   // the roll failed: no layer, and no STACK_GAINED to announce
+                }
                 // 「每获得 1 层【X】」 (1111 Luka's trace 循环制动): one firing PER LAYER, so a rule that pays "3 energy each"
                 // needs no arithmetic. The name rides on the payload and the condition reads it as `<who> stack_added <name>`.
                 // ⚠ A rule that adds a counter itself must not listen to its own event without a guard — the same warning
