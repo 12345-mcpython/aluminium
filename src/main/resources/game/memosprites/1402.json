@@ -1,7 +1,7 @@
 {
   "name": "衣匠",
   "source": "1402 阿格莱雅 忆灵天赋: 「忆灵衣匠初始拥有等同于阿格莱雅#1[i]%速度的速度以及等同于阿格莱雅#2[i]%生命上限+#3[i]的生命上限。」 param = [0.35, 0.66, 720]",
-  "note": "「ServantID 11402 · 仇恨: 125」 -- same line as 1413's servant, and the reason `aggro` exists on the spec at all. The panel is stated against the summoner, which is why this file is named after 阿格莱雅 rather than after 衣匠: the two percentages mean 'of HER sheet', and a file named after the memosprite would have to repeat the owner's name and could then disagree with it. ⚠ HEALTH is 0.66 x max HP PLUS 720 -- a share alone would be wrong at every level, because the game's own number has a flat term (the same shape as the Light Cone and trace bonuses). ⚠ Nothing else is inherited: ATTACK / DEFENCE and the resistances stay at the builder's 0, because no document states them and this data set has no memosprite stat table. The consequences are known and registered (ROADMAP): a memosprite takes the full hit, and its own damage is the engine's floor until 忆灵技 damage scaling exists. || 2026-10-02: servant_id = 11402 and all 4 of its skills (data slots [1, 3, 5, 6]), imported from ExcelOutput/AvatarServantSkillConfig.json. A memosprite's skills are ordinary skills: the engine addresses them by (cid, slot) with cid = the ServantID.",
+  "note": "「ServantID 11402 · 仇恨: 125」 -- same line as 1413's servant, and the reason `aggro` exists on the spec at all. The panel is stated against the summoner, which is why this file is named after 阿格莱雅 rather than after 衣匠: the two percentages mean 'of HER sheet', and a file named after the memosprite would have to repeat the owner's name and could then disagree with it. ⚠ HEALTH is 0.66 x max HP PLUS 720 -- a share alone would be wrong at every level, because the game's own number has a flat term (the same shape as the Light Cone and trace bonuses). || ⭐ **2026-11-04 更正：ATTACK 是有的，而且等于阿格莱雅的攻击力。** 旧注记写「Nothing else is inherited … this data set has no memosprite stat table」——**错**：tbgd 的 `Config/ConfigCharacter/Servant/Servant_AglaeaServant_00_Config.json` 第一行就写着 **`\"SyncPropertyExceptList\": [\"Speed\", \"BaseSpeed\", \"SpeedAddedRatio\", \"SpeedConvert\", \"SpeedDelta\", \"SpeedOverride\"]`** ⇒ 忆灵**同步召唤者的所有属性，唯独速度不同步**（速度走面板的 0.35、生命走 0.66+720，这两个正是不在同步里的那几项）。`ExcelOutput/AvatarServantConfig.json` 的 11402 行也只有 HPBase/HPInherit/HPSpeed 与 Aggro，**没有攻击力字段**，因为攻击力就是**同步来的**。⇒ 现在把 ATTACK 作为 1.0 × 阿格莱雅攻击力写进面板（`SummonFactory.panelOf` 的 `share * master.getAttribute(ATTACK)` ✓），这样「衣匠造成相当于其自身 200% 攻击力的伤害」才读得到数。 || 2026-10-02: servant_id = 11402 and all 4 of its skills (data slots [1, 3, 5, 6]), imported from ExcelOutput/AvatarServantSkillConfig.json. A memosprite's skills are ordinary skills: the engine addresses them by (cid, slot) with cid = the ServantID.",
   "aggro": 125,
   "panel": [
     {
@@ -12,6 +12,10 @@
     {
       "attribute": "SPEED",
       "percent": 0.35
+    },
+    {
+      "attribute": "ATTACK",
+      "percent": 1.0
     }
   ],
   "servant_id": 11402,

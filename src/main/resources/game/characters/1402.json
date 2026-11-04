@@ -6,7 +6,7 @@
     "⭐ **2026-11-04 逐节核（本文件第一次真正逐节）**：旧 `_gaps` 只有一行「1415 忆灵技 12 其余四部分…」—— 那句话是**别处记账时贴错的**（1415 的【浪漫】之诗在本文件里其实**写全了**：标记 + 消耗回 70 能量 + 增伤 + 无视防御 + 两条随【至高之姿】结束时摘除，见 `memosprite_ode_of_romance_*` 五条与 `MemospriteOdeTest`）。旧行同时**掩盖**了本角色自己的一大半从句：战技、终结技的「进入形态」和天赋的【间隙织线】有规则，**秘技、强化普攻、四个忆灵技能、三条行迹、星魂 1/2/4/6 与忆灵等级加成一句都没有规则**。下面六条就是这次逐节核的结果（判据 `AglaeaClauseCoverageTest` 把「每个小节 → 规则 id 或下面某条缺口」固定下来）。",
     "⛔ **终结技【至高之姿】的「状态里做什么」未写（进入/解除已落地）**：① 「获得衣匠**忆灵天赋**的速度提高层数，每层使自身速度提高 15%」—— 层的**来源**（忆灵技能 2 的 SPD 叠层）本身没写，所以这一半无米下锅；② 「普通攻击强化为【孤锋千吻】**且无法施放战技**」—— `REPLACE_SKILL`（普攻槽 ⇒ 数据槽 11）与 `APPLY_BUFF` 的 **`blocks: \"skill\"`** 两个词都在，**可写**；③ 「衣匠免疫**控制类**负面状态」—— 召唤物侧的免疫，引擎的免疫装在单位自己身上，忆灵没有属性表可挂；④ 「行动序列上出现倒计时，倒计时固定 100 速度…**回合开始时使衣匠自毁**」—— `START_COUNTDOWN` 与 **`DISMISS_SUMMON`**（1413 用过）都在，**可写**。⇒ ②④ 只差没写，①缺层数来源，③缺忆灵侧免疫。",
     "⭐ **秘技已落地（2026-11-04）**：`technique_meteoric_sunder` —— `self has_state 秘技` 门 + `SUMMON` + `GAIN_ENERGY{TECHNIQUE:1}` + `DAMAGE{100% 攻击力, Thunder, all_enemies}` + **规则级 `pick: random_enemy`**（先 `REMOVE_STATE` 全场、再给这一个 ⇒ 天赋那句「仅对最新被施加的目标生效」的唯一性）。判据 `AglaeaTechniqueTest`：同一场战斗「声明秘技 / 不声明」两侧对照 —— 衣匠在场、全体掉血、能量正好 **+30**、恰好**一个**敌人带【间隙织线】（对照组 0）。",
-    "⭐ **强化普攻已接上（2026-11-04）**：`p1402_stance_enhances_her_basic`（`ULT_CAST` → `REPLACE_SKILL { skill: COMMON, skill_id: 8, permanent: true }`）与 `p1402_memosprite_leaving_restores_her_basic`（`SUMMON_LEFT` + `actor == summon` → `remove: true`）。⚠ **两处更正**：① `skills.json` **早就有**槽 8/9（`孤锋千吻` Blast 2.8/1.26、`强化战技` Restore 0.5）—— 上一版说「没有槽 9/11，是数据缺口」是**读漏了**；② 「无法恢复战技点」**不需要开关**：槽 8 那一行的 `bp_add` 是 **0**（普攻是 1）✓。判据 `AglaeaStanceSkillSwapTest`（开大后普攻槽 = 8；`SUMMON_LEFT` 后回到 1）。 ⛔ **仍开**：衣匠那一半的 **200% / 90%** —— 那用的是**它的**攻击力，而忆灵面板只有生命/速度（`Memosprites.validateAttack` 会拒绝没有面板基数的伤害）⇒ 需要「忆灵的攻击力从哪来」这个数据问题。",
+    "⭐ **强化普攻已接上（2026-11-04）**：`p1402_stance_enhances_her_basic`（`ULT_CAST` → `REPLACE_SKILL { skill: COMMON, skill_id: 8, permanent: true }`）与 `p1402_memosprite_leaving_restores_her_basic`（`SUMMON_LEFT` + `actor == summon` → `remove: true`）。⚠ **两处更正**：① `skills.json` **早就有**槽 8/9（`孤锋千吻` Blast 2.8/1.26、`强化战技` Restore 0.5）—— 上一版说「没有槽 9/11，是数据缺口」是**读漏了**；② 「无法恢复战技点」**不需要开关**：槽 8 那一行的 `bp_add` 是 **0**（普攻是 1）✓。判据 `AglaeaStanceSkillSwapTest`（开大后普攻槽 = 8；`SUMMON_LEFT` 后回到 1）。 ⭐ **衣匠那一半也落地了（2026-11-04）**：先修**面板**——tbgd 的 `Config/ConfigCharacter/Servant/Servant_AglaeaServant_00_Config.json` 写着 `SyncPropertyExceptList = [Speed…]`（忆灵**同步召唤者除速度外的所有属性**）⇒ `memosprites/1402.json` 补 `ATTACK: 1.0 × 阿格莱雅`（旧注记说「没有忆灵属性表」是**错的**），判据 `theMemoSpriteFightsWithHerAttack`；再加 `p1402_garmentmaker_hits_the_same_target` / `..._the_neighbours`（`BASIC_ATTACK` + `from_skill_id == 8`，`attacker: summon` + `percent_from_skill_param: COMMON:2 / COMMON:3`）⇒ 主目标 + 两个相邻各一份，判据 `theGarmentmakerDealsItsOwnHalfOfTheJointAttack`（3 个实例都归忆灵）。",
     "⛔ **忆灵技能 1 / 2 未写（3 / 4 已落地，见本条末）**：① 刺纹之陷（110% / 相邻 66% 攻击力雷伤）—— 文档**没给衣匠 ATK**（忆灵面板只有生命与速度），按阿格莱雅攻击力算是猜测，且装载器会拒绝（`Memosprites.validateAttack` 要求面板给出基数）；② 泪水锻造的匠躯（攻击【间隙织线】敌人后 **SPD +55**，最多 **6** 层；行动时自动施放刺纹之陷并**优先**【间隙织线】目标）；③ 飞驰之夏（被召唤时**行动提前 100%**）；④ 枯草之盈（衣匠**消失时**给阿格莱雅 **20 能量**）。⇒ ②是①的读者、也是【至高之姿】SPD 那一半的来源，所以它们是一组，缺的是一个**忆灵自己的规则表**（引擎的规则只挂在角色上）。⭐ **③④ 已落地（2026-11-04）**：`memosprite_speeding_summer_advances_itself`（`SUMMONED` + `when: actor == summon` + `ADVANCE target: summon` ⇒ 召唤物进队列**之后**才发事件，所以规则碰得到它的行动值）与 `memosprite_bloom_of_drying_grass_pays_energy`（`SUMMON_LEFT` + `GAIN_ENERGY 20`；⚠ 那一刻它已不在场上，所以**不能**用 `battle.summonOf`）。判据 `AglaeaMemospritesTest`：召唤后 `queue().peekNext()` 就是衣匠；它离场后她的能量**正好 +20**（⚠ 让**队友**补最后一刀 —— 由她自己击杀会额外拿 5 点击杀回能，实测 25）。",
     "⛔ **行迹 短视之惩 / 织运之竭 未写（飞驰之阳已落地，见本条末）**：① 短视之惩（【至高之姿】下 阿格莱雅与衣匠 ATK += 阿格莱雅速度 × **720%** + 衣匠速度 × **360%**）—— 跨单位派生 `self_attr:` 有，但「衣匠的速度」要读召唤物属性；② 织运之竭（衣匠消失时忆灵天赋的 SPD 层数**最多保留 1 层**，再召唤时补回）—— 依赖忆灵技能 2 的层数；③ 飞驰之阳 ⭐ **已落地（2026-11-04）**：`trace_racing_sun_fills_half_the_energy` —— **`RAISE_ENERGY_TO`** 就是「设到上限的 N%」那个拼法（引擎原话：它是**下限不是加量**，所以「若不足」无需条件），判据 `AglaeaTracesTest`；⚠ 它与秘技的 30 点**会互相吞**（开战能量为 0 时，50% 的下限把秘技那 30 点盖掉 ⇒ 差值读 0 —— 这是行迹在正常工作，不是秘技没付钱，判据因此把起点设在 60%）。",
     "⭐ **星魂 1 已落地（2026-11-04）**：`eidolon1_threaded_target_takes_more` —— **先摘后给**的命名修饰（`间隙织线易伤`）跟着【间隙织线】**转移**，另加 **`while_holder_state: 间隙织线`** 兜住「状态自然到期」那一侧（否则那 15% 会留在已经没状态的敌人身上，没有症状）；`eidolon1_threaded_attack_pays_energy` + `..._for_the_garmentmaker` —— 两条 `ATTACK_FINISHED`（**每次攻击一次**，不是每段），「阿格莱雅**或**衣匠」写成两条因为条件 DSL 没有析取。判据 `AglaeaEidolonOneTest`：E1/E0 同一发的**比值 = 1.15**、修饰随状态**转移**（旧持有者归零、新持有者为 1）、两条攻击各 **+20** 能量。",
@@ -176,7 +176,45 @@
         }
       ],
       "source": "1402 阿格莱雅 终结技 (强化前): 「…衣匠消失时阿格莱雅解除【至高之姿】状态。」",
-      "_note": "【至高之姿】结束 ⇒ 普攻回到普通那一行 —— `REPLACE_SKILL { skill: COMMON, remove: true }` ✓（引擎自己的另一方向：摘掉交换，`SkillSwapBuff` 的 remove 会把**原来的**那一行放回）。⚠ 用 **`SUMMON_LEFT`** 而不是 `STATE_ENDED`：衣匠消失时，锚在它身上的【至高之姿】是被 `removeBuffsAnchoredTo` **直接摘掉**的（实测：那条路径**不发** `STATE_ENDED`）⇒ 用 `STATE_ENDED` 写的规则会**永远不触发**。⚠ 仍开的一半：衣匠那 **200%/90%** 用的是**它的**攻击力，而忆灵面板**没有攻击力**（只有生命/速度）⇒ 那一半见 `_gaps`。"
+      "_note": "【至高之姿】结束 ⇒ 普攻回到普通那一行 —— `REPLACE_SKILL { skill: COMMON, remove: true }` ✓（引擎自己的另一方向：摘掉交换，`SkillSwapBuff` 的 remove 会把**原来的**那一行放回）。⚠ 用 **`SUMMON_LEFT`** 而不是 `STATE_ENDED`：衣匠消失时，锚在它身上的【至高之姿】是被 `removeBuffsAnchoredTo` **直接摘掉**的（实测：那条路径**不发** `STATE_ENDED`）⇒ 用 `STATE_ENDED` 写的规则会**永远不触发**。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "p1402_garmentmaker_hits_the_same_target",
+      "when": [
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "attacker": "summon",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "COMMON:2",
+          "element": "Thunder",
+          "target": "target"
+        }
+      ],
+      "source": "1402 阿格莱雅 强化普攻 孤锋千吻 (强化前): 「阿格莱雅与衣匠向目标发起连携攻击，对目标分别造成等同于阿格莱雅200.00%攻击力以及衣匠200.00%攻击力的雷属性伤害…」 数据槽 8 的第 3 格 = 衣匠那一半（Lv10 = 2.8）",
+      "_note": "「**以及衣匠 200.00% 攻击力**的雷属性伤害」—— 她那一半由引擎自己的技能行结算（槽 8 的 `[0]`/`[1]` 两格 = 主目标/相邻），衣匠那一半是**本规则**：`attacker: \"summon\"` ✓（实例归忆灵）+ `scale: self_attr:ATTACK` ✓（`literalBase` 读**解析后的 attacker**=忆灵的面板，而忆灵的攻击力**同步自阿格莱雅** —— tbgd 的 `Servant_AglaeaServant_00_Config.json` 里 `SyncPropertyExceptList` 只有速度项，见 `memosprites/1402.json` 的注记）+ **`percent_from_skill_param: COMMON:2`** ✓（第 3 格；槽被 `REPLACE_SKILL` 换成 8 之后，`ownerSkillParamValue` 读的就是**槽里当前那个技能**的行 ✓）。⚠ 事件用 `BASIC_ATTACK`（**每次施放一次**，不是每段；8 段里她 4 段 + 它 4 段，本规则只补它那 2 个落点：主目标 + 相邻）⚠ `from_skill_id == 8` 把这条钉在**强化**普攻上（普通普攻是槽 1，不会误触发）✓。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "p1402_garmentmaker_hits_the_neighbours",
+      "when": [
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "attacker": "summon",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "COMMON:3",
+          "element": "Thunder",
+          "target": "adjacent_enemies"
+        }
+      ],
+      "source": "1402 阿格莱雅 强化普攻 孤锋千吻: 「…并对相邻目标分别造成等同于阿格莱雅90%攻击力以及衣匠90%攻击力的雷属性伤害…」 数据槽 8 的第 4 格 = 衣匠对相邻那一半（Lv10 = 1.26）",
+      "_note": "「并对**相邻目标**…以及**衣匠 90% 攻击力**」—— 与上一条同形，只换第 4 格（`COMMON:3`）与目标（`adjacent_enemies` ✓，1109 星魂 4 用过的选择器）。⚠ 两条**分开**而不是一条多目标：`adjacent_enemies` 与主目标是**两个落点、两种份额**。"
     },
     {
       "on": "BATTLE_START",

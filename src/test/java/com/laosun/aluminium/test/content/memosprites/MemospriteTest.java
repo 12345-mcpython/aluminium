@@ -451,7 +451,10 @@ public class MemospriteTest {
     @Test
     public void theShippedSpecsAreValidAndGroundedInTheirDocuments() {
         MemospriteSpec aglaea = Memosprites.of(AGLAEA);
-        Assertions.assertEquals(List.of(AttributeType.HEALTH, AttributeType.SPEED),
+        // Note: ATTACK joined on 2026-11-04 - tbgd's servant config syncs every property except speed, so the memosprite
+        // fights with the summoner's ATTACK (see memosprites/1402.json's note). The document states the two shares; the
+        // sync list is where the attack comes from.
+        Assertions.assertEquals(List.of(AttributeType.HEALTH, AttributeType.SPEED, AttributeType.ATTACK),
                 Memosprites.mentionedBy(aglaea));
         Assertions.assertTrue(aglaea.source().contains("1402"), aglaea.source());
         Assertions.assertTrue(aglaea.source().contains("0.66"), "the parameters are quoted: " + aglaea.source());

@@ -26,6 +26,28 @@ public class AglaeaMemospritesTest {
     private static final int LEVEL = 80;
 
     /**
+     * The memosprite's <b>ATTACK</b> is hers: tbgd's servant config says {@code "SyncPropertyExceptList"} carries only the
+     * Speed entries, so every other property - attack included - is synced from the summoner. Measured 2026-11-04, and it
+     * is what 「衣匠造成相当于其自身 200% 攻击力的伤害」 needs in order to read a number at all.
+     */
+    @Test
+    public void theMemoSpriteFightsWithHerAttack() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        Summon garmentmaker = battle.summonMemosprite(aglaea);
+        battle.processRequests();
+
+        double hers = aglaea.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
+        Assertions.assertEquals(hers, garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get(), 1e-9,
+                "the servant syncs every property except speed, so its ATTACK is the summoner's");
+        Assertions.assertEquals(hers,
+                garmentmaker.damageBase(com.laosun.aluminium.enums.AttributeType.ATTACK), 1e-9,
+                "and `damageBase` reads the same number the damage path would use");
+    }
+
+    /**
      * 「行动提前 100%」 is observable as a position: right after it is summoned, the Garmentmaker (衣匠) is what the
      * action order would play next. Without the advance a 35%-of-her-SPD memosprite would be behind her.
      */
