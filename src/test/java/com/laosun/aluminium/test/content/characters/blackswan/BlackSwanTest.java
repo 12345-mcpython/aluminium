@@ -252,7 +252,11 @@ public class BlackSwanTest {
         battle.processRequests();
 
         Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp() || enemy.isDeath(), "the dot still landed");
-        Assertions.assertTrue(enemy.getBuffManager().stacksOf("奥迹") <= 1,
+        // Exactly one, not "at most one": this assertion used to say `<= 1`, and that was loose enough to hide a real
+        // defect - `SET_STACKS` went through `removeState`, which takes the WHOLE counter off, so twelve layers became
+        // ZERO (measured 2026-11-04). "1 layer left" and "no layer left" are different games: with zero, the dot does
+        // not come back on the next turn and nothing carries the 「视为风化」 alias.
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("奥迹"),
                 "「随后重置为 1 层」 — twelve layers are spent down to one, got "
                         + enemy.getBuffManager().stacksOf("奥迹"));
     }
@@ -405,5 +409,86 @@ public class BlackSwanTest {
         enemy.getBuffManager().removeState("风化");
         enemy.getBuffManager().beforeMove();
         Assertions.assertEquals(0.0, enemy.getAttribute(wind).get(), 1e-9, "and the gate takes it off again");
+    }
+
+    /**
+     * 「处于【奥迹】状态时，也会被视为陷入了风化状态」 (the 【奥迹】 keyword block): the alias is what makes a rule asking about
+     * 风化 see an enemy that only has Arcana.
+     *
+     * <p>Measured through 星魂 1, whose four reductions are gated on the victim's own state - the only place in this kit
+     * where "does it count as 风化" has a number attached. The control is the same fixture without the Skill, so the
+     * two numbers differ only by whether Arcana was applied.
+     */
+    @Test
+    public void arcanaCountsAsWindShear() {
+        Assertions.assertEquals(0.0, windReductionAfterTurnStart(false), 1e-9,
+                "control: no Arcana, so nothing is 视为风化 and no reduction lands");
+        Assertions.assertEquals(-0.25, windReductionAfterTurnStart(true), 1e-9,
+                "「被视为陷入了风化状态」 - the Arcana layers alone answer for 风化 (the reduction is stored negative)");
+    }
+
+    /** The wind reduction on a victim after one of its turn starts, with or without Arcana from the Skill. */
+    private static double windReductionAfterTurnStart(boolean withArcana) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, 1);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        if (withArcana) {
+            // Through the Skill's own rule: that is where the alias is declared, so applying the stack by hand would
+            // test the alias's plumbing only if the test remembered to stamp it - which is exactly what is under test.
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
+            battle.processRequests();
+            Assertions.assertTrue(enemy.getBuffManager().stacksOf("奥迹") >= 1, "precondition: the Skill applies Arcana");
+        }
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        return enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.RESISTANCE_REDUCTION_WIND).get();
+    }
+
+    /**
+     * 终结技: 「当敌方目标处于【奥迹】状态时，也会被视为同时陷入了风化、裂伤、灼烧、触电状态」.
+     *
+     * <p>Two numbers per side, and the control is the one that matters: 揭露 on its own must <b>not</b> grant the three
+     * extra names (the sentence requires Arcana), so the same fixture without the Skill keeps all four at zero.
+     */
+    @Test
+    public void epiphanyMakesOnlyTheArcanaTargetsCount() {
+        double[] epiphanyOnly = resistancesAfterEpiphany(false);
+        Assertions.assertArrayEquals(new double[]{0, 0, 0, 0}, epiphanyOnly, 1e-9,
+                "control: 揭露 without 奥迹 is not 「处于【奥迹】状态」, so none of the four names applies");
+
+        double[] both = resistancesAfterEpiphany(true);
+        for (int i = 0; i < both.length; i++) {
+            Assertions.assertEquals(-0.25, both[i], 1e-9,
+                    "「会被视为同时陷入了风化、裂伤、灼烧、触电」 - every one of the four, index " + i);
+        }
+    }
+
+    /** The four reductions (风/物理/火/雷) on a victim after a turn start, with or without Arcana. */
+    private static double[] resistancesAfterEpiphany(boolean withArcana) {
+        Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL, false, null, null, 1);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(blackSwan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                blackSwan, List.of(enemy));
+        battle.processRequests();
+        Assertions.assertTrue(enemy.getBuffManager().hasState("揭露"), "precondition: the Ultimate marks the enemy");
+        if (withArcana) {
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
+            battle.processRequests();
+            Assertions.assertTrue(enemy.getBuffManager().stacksOf("奥迹") >= 1, "precondition: the Skill applies Arcana");
+        }
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.TURN_START, enemy, enemy, 0, 0));
+        battle.processRequests();
+        return new double[]{
+                enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.RESISTANCE_REDUCTION_WIND).get(),
+                enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.RESISTANCE_REDUCTION_PHYSICAL).get(),
+                enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.RESISTANCE_REDUCTION_FIRE).get(),
+                enemy.getAttribute(com.laosun.aluminium.enums.AttributeType.RESISTANCE_REDUCTION_THUNDER).get()};
     }
 }

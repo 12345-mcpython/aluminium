@@ -157,6 +157,8 @@ public class EffectSpec {
         copy.scaleByMissingHp = this.scaleByMissingHp;
         copy.whileState = this.whileState;
         copy.whileHolderState = this.whileHolderState;
+        copy.countsAs = this.countsAs == null ? null : new java.util.ArrayList<>(this.countsAs);
+        copy.countsAsRequires = this.countsAsRequires;
         copy.whileStacks = this.whileStacks;
         copy.whileStacksMin = this.whileStacksMin;
         copy.capScale = this.capScale;
@@ -651,6 +653,31 @@ public class EffectSpec {
      */
     @SerializedName("while_holder_state")
     private String whileHolderState;
+
+    /**
+     * The state names the buff this effect creates <b>also answers to</b>: 「处于【奥迹】状态时，<i>也会</i>被视为陷入了风化
+     * 状态」 (1307 Black Swan (黑天鹅)), read by {@code has_state} / {@code any_enemy has_state} / every other question
+     * about a state.
+     *
+     * <p><b>Why an alias instead of a second buff.</b> 「被视为同时陷入了风化、裂伤、灼烧、触电状态」 is a statement about
+     * <i>questions</i>, not about damage: applying four DOTs would tick four times a turn, which the sentence does not
+     * say. The alias is stamped onto the created buff ({@link com.laosun.aluminium.buff.AbstractBuff#countsAs()}), so it
+     * lasts exactly as long as that buff does.
+     *
+     * <p>⚠ Only the ops that create a <b>named</b> buff can state it - {@code APPLY_BUFF} (a state) and
+     * {@code ADD_STACK} (a counter, whose name already answers {@code has_state}); anything else would be accepted and
+     * never read.
+     */
+    @SerializedName("counts_as")
+    private java.util.List<String> countsAs;
+
+    /**
+     * A state the holder must <b>also</b> carry for {@link #countsAs} to answer, or {@code null} for "always":
+     * 1307's 终结技 says the four names hold of 【奥迹】 targets <i>while 揭露 is on them</i>, so a blanket grant to every
+     * 揭露 target would be a wrong answer with no symptom.
+     */
+    @SerializedName("counts_as_requires")
+    private String countsAsRequires;
 
     /**
      * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory}.

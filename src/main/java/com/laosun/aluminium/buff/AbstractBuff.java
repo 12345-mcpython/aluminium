@@ -321,7 +321,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         this.gateStacksMin = min;
         this.gateOwner = owner;
     }
-
+
     /**
      * The state the <b>HOLDER</b> of this modifier must be in, or {@code null}: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
      * (1307's Ultimate) - the condition and the modifier on the SAME unit, which {@link #gateState} cannot express because that
@@ -332,6 +332,58 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     /** @param state the state this modifier's holder must still be in */
     public void gateHolder(String state) {
         this.gateHolderState = state;
+    }
+
+    /**
+     * The state names this buff <b>also answers to</b>, or an empty set: 「处于【奥迹】状态时，也会被视为陷入了风化状态」
+     * and 「当敌方目标处于【奥迹】状态时，也会被视为同时陷入了风化、裂伤、灼烧、触电状态」 (1307 Black Swan (黑天鹅)).
+     *
+     * <p><b>Why the alias rides on the buff instance.</b> {@link BuffManager#hasState(String)} already resolves a
+     * damage-over-time state by its element and a control by its name - one name, one meaning. This is the same table
+     * one step further out: a fact the document states about <b>one particular effect</b> ("【奥迹】 counts as 风化"),
+     * not about a family of buffs. On the instance it is true exactly as long as that instance is (spend the last layer
+     * and the answer stops), and two kits can state different aliases for the same name.
+     *
+     * <p>⚠ <b>An alias is not a second buff.</b> 「被视为同时陷入四种持续伤害」 applied as four DOTs would tick four
+     * times a turn and deal four DOTs' damage, which the sentence does not say; the point of the alias is that only the
+     * <i>questions</i> about the state answer yes.
+     */
+    private java.util.Set<String> countsAs = java.util.Set.of();
+
+    /**
+     * A state the holder must <b>also</b> carry for {@link #countsAs} to answer, or {@code null} for "always".
+     *
+     * <p>Reader: 1307's 【揭露】, whose sentence is 「当敌方目标处于<b>【奥迹】</b>状态时，<i>也会</i>被视为同时陷入了风化、
+     * 裂伤、灼烧、触电状态」 - the three extra names are only true <i>of a target that also has 奥迹</i>. Without this
+     * field the alias would be a blanket grant to every 揭露 target, which is a wrong answer with no symptom.
+     */
+    private String countsAsRequires;
+
+    /** @return the names this buff also answers to (never {@code null}; empty means "none") */
+    public java.util.Set<String> countsAs() {
+        return countsAs;
+    }
+
+    /** @return the state the holder must also carry, or {@code null} */
+    public String countsAsRequires() {
+        return countsAsRequires;
+    }
+
+    /**
+     * @param names    the state names this buff also answers to (blank entries are dropped; empty clears the aliases)
+     * @param requires the state the holder must also carry, or {@code null} / blank for "always"
+     */
+    public void setCountsAs(Collection<String> names, String requires) {
+        java.util.Set<String> parsed = new java.util.LinkedHashSet<>();
+        if (names != null) {
+            for (String name : names) {
+                if (name != null && !name.isBlank()) {
+                    parsed.add(name.trim());
+                }
+            }
+        }
+        this.countsAs = java.util.Set.copyOf(parsed);
+        this.countsAsRequires = requires == null || requires.isBlank() ? null : requires.trim();
     }
 
     /**

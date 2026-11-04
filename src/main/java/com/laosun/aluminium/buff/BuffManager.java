@@ -882,11 +882,30 @@ public class BuffManager {
         return longest;
     }
 
+    /**
+     * How deep an ALIAS chain may go before {@link #hasState(String)} gives up.
+     *
+     * <p>A document states one hop ("【奥迹】 counts as 风化"), so the only chains the data can produce are
+     * prerequisites that are themselves aliased. Four hops is already far past anything a document says, and the cap
+     * is what keeps a cyclic pair ("A counts as B while C, C counts as A while B") from recursing forever - the answer
+     * for such data is "no", which is the safe direction.
+     */
+    private static final int MAX_ALIAS_DEPTH = 4;
+
     public boolean hasState(String state) {
         if (state == null || state.isBlank()) {
             return false;
         }
-        String wanted = state.trim();
+        return hasState(state.trim(), 0);
+    }
+
+    /**
+     * {@link #hasState(String)} for an already-trimmed name, carrying how many alias hops got here.
+     *
+     * @param wanted the trimmed state name
+     * @param depth  see {@link #MAX_ALIAS_DEPTH}
+     */
+    private boolean hasState(String wanted, int depth) {
         // Note: Subclass-inclusive: allBuffsOf compares classes EXACTLY, and DeferredDeathBuff is a StateBuff
         // SUBCLASS -- so a deferring state was invisible to has_state, and 140's own content could never see its trace.
         for (AbstractBuff buff : List.copyOf(buffs)) {
@@ -903,6 +922,22 @@ public class BuffManager {
         for (AbstractBuff named : List.copyOf(buffs)) {
             if (!named.getBuffName().isEmpty() && wanted.equals(named.getBuffName())) {
                 return true;
+            }
+        }
+        // Aliases: a buff may answer to OTHER names than its own ("【奥迹】… 也会被视为陷入了风化状态", 1307). This is
+        // the same one-name-one-meaning table as the entries below, moved out of the engine and onto the effect that
+        // states it, because the sentence is about one kit's state rather than about a class of buffs (see
+        // AbstractBuff#countsAs). Note: the prerequisite is asked through this same method, so "counts as all four
+        // WHILE the target also has 奥迹" needs no second vocabulary - and the depth cap is what ends a cyclic pair.
+        if (depth < MAX_ALIAS_DEPTH) {
+            for (AbstractBuff alias : List.copyOf(buffs)) {
+                if (!alias.countsAs().contains(wanted)) {
+                    continue;
+                }
+                String requires = alias.countsAsRequires();
+                if (requires == null || hasState(requires, depth + 1)) {
+                    return true;
+                }
             }
         }
         // Engine states: the names below are not StateBuff names -- they are states the engine represents with

@@ -563,11 +563,32 @@ final class TriggerEffects {
                 if (effect.getBlocks() != null && !effect.getBlocks().isBlank()) {
                     buff.setBlocks(blocksOf(effect));
                 }
+                // 「【奥迹】… 也会被视为陷入了风化状态」: the state also answers to other names while it lasts (see
+                // AbstractBuff#countsAs). Stamped on the instance, so spending its last layer stops the aliases too.
+                stampCountsAs(effect, buff);
                 // "with a 100% base chance, make the enemy ... enter the [通解] state": when the rule states one, the state is ROLLED (effect resistance
                 // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
                 TriggerInterpreter.attachRolled(battle, target, buff, effect, ctx);
             }
         }
+    }
+
+    /**
+     * Stamps the other names an effect's buff also answers to ({@code counts_as} / {@code counts_as_requires}, see
+     * {@link com.laosun.aluminium.buff.AbstractBuff#countsAs()}).
+     *
+     * <p>Read at <b>creation</b> time, like {@code blocks}: the aliases belong to the buff instance that was made, so
+     * they end with it. An effect that states none changes nothing, which is why every file written before this field
+     * keeps its answers exactly as they were.
+     *
+     * @param effect  the effect that created the buff
+     * @param created the buff it created
+     */
+    private static void stampCountsAs(EffectSpec effect, AbstractBuff created) {
+        if (effect.getCountsAs() == null || effect.getCountsAs().isEmpty()) {
+            return;
+        }
+        created.setCountsAs(effect.getCountsAs(), effect.getCountsAsRequires());
     }
 
     /**
@@ -659,8 +680,13 @@ final class TriggerEffects {
             for (int layer = current; layer < goal; layer++) {
                 target.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff(name, 2, false, Math.max(goal, 5)));
             }
-            for (int layer = current; layer > goal; layer--) {
-                target.getBuffManager().removeState(name);
+            // Note: ONE layer at a time, through removeNamedStacks - NOT removeState, which takes the whole counter off
+            // in a single sweep. Measured (2026-11-04): 「随后重置为 1 层」 (1307's Talent) with `removeState` left the
+            // victim with ZERO layers, so the alias, the next turn's dot and the "≥3 / ≥7 layers" branches all vanished
+            // together - a wrong number with no symptom, because the only test asserted `<= 1`.
+            int excess = current - goal;
+            if (excess > 0) {
+                target.getBuffManager().removeNamedStacks(name, excess);
             }
         }
     }
@@ -711,6 +737,7 @@ final class TriggerEffects {
                                         effect),
                                 effect, ctx),
                         ctx);
+                stampCountsAs(effect, stack);
                 target.getBuffManager().addBuff(stack);
                 // 「每获得 1 层【X】」 (1111 Luka's trace 循环制动): one firing PER LAYER, so a rule that pays "3 energy each"
                 // needs no arithmetic. The name rides on the payload and the condition reads it as `<who> stack_added <name>`.

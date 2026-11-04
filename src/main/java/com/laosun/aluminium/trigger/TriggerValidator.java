@@ -177,6 +177,7 @@ final class TriggerValidator {
             rejectValueWithLegacyMagnitude(effect, op, spec);
         }
         requireBlocksOnlyOnStates(effect, op, spec);
+        requireCountsAsOnNamedBuffs(effect, op, spec);
         requireTargetSelector(effect, op, spec);
         // Note: `cast_target` (who a COMMANDED cast is aimed at) is read by CAST_SKILL and by nothing else, so stating it
         // anywhere else is refused rather than dropped silently -- the same shape as the `cap_scale` and `damage_type`
@@ -1347,6 +1348,40 @@ final class TriggerValidator {
             throw new IllegalArgumentException("Op " + op + " states \"blocks\": \"" + effect.getBlocks()
                     + "\"; only APPLY_BUFF applies a state, so only it can say what that state suppresses"
                     + " (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * {@code counts_as} / {@code counts_as_requires} belong to the buff an effect CREATES, so only the two ops that
+     * create a <b>named</b> one may state them: {@code APPLY_BUFF} (a state) and {@code ADD_STACK} (a counter, whose
+     * name already answers {@code has_state}). On any other op the fields would be accepted by the parser and read by
+     * nobody - the silent hole this file has a closed-set rule about.
+     *
+     * <p>The pair is checked together: {@code counts_as_requires} alone would attach a prerequisite to nothing, which is
+     * a rule that reads as "only while X" and applies always.
+     */
+    static void requireCountsAsOnNamedBuffs(EffectSpec effect, String op, TriggerSpec spec) {
+        boolean hasNames = effect.getCountsAs() != null && !effect.getCountsAs().isEmpty();
+        boolean hasRequires = effect.getCountsAsRequires() != null && !effect.getCountsAsRequires().isBlank();
+        if (!hasNames) {
+            if (hasRequires) {
+                throw new IllegalArgumentException("Op " + op + " states \"counts_as_requires\": \""
+                        + effect.getCountsAsRequires() + "\" without \"counts_as\": the prerequisite only narrows a list "
+                        + "of alias names, so on its own it would apply to nothing (source: " + spec.getSource() + ")");
+            }
+            return;
+        }
+        if (!"APPLY_BUFF".equalsIgnoreCase(op) && !"ADD_STACK".equalsIgnoreCase(op)) {
+            throw new IllegalArgumentException("Op " + op + " states \"counts_as\", but only APPLY_BUFF and ADD_STACK "
+                    + "create the named buff the aliases are stamped onto; on any other op they would never be read "
+                    + "(source: " + spec.getSource() + ")");
+        }
+        for (String name : effect.getCountsAs()) {
+            if (name == null || name.isBlank()) {
+                throw new IllegalArgumentException("Op " + op + " has a blank entry in \"counts_as\": a state name is "
+                        + "the word {@code has_state} is asked with, so an empty one can never match "
+                        + "(source: " + spec.getSource() + ")");
+            }
         }
     }
 
