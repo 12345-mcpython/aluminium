@@ -62,16 +62,22 @@ public class TingyunTest {
     }
 
     /**
-     * Census: five rules of hers plus the level convention.
+     * Census: her rules per event.
+     *
+     * <p>Note: 2026-11-04 added four - the technique's 50 energy (BATTLE_START, gated on 秘技), Eidolon 1's speed
+     * (ULT_CAST), Eidolon 2's energy on a kill (KILL) and Eidolon 6's extra 10 energy (ULT_CAST).
      */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TINGYUN);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the Benediction and the trace's speed");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the grant and the boost");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the grant and the boost, plus Eidolon 1's speed and Eidolon 6's extra energy");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the basic-attack bonus trace");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the energy trace");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "Eidolon 2's energy on a kill");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the two Eidolon level raises, and the technique's energy");
     }
 
     private static final class Fixture {

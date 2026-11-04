@@ -3,9 +3,8 @@
   "character": 1202,
   "_status": "partial",
   "_gaps": [
-    "战技 / 天赋的附加伤害由受【赐福】的队友打出：DAMAGE 的攻击者是规则主人，缺「另一个单位为攻击者」的写法",
-    "秘技「使用秘技后立即恢复 50 点能量」：缺「用过秘技」门槛",
-    "星魂：未读、未写"
+    "⭐ **2026-11-04 逐节核**：旧 `_gaps` 三条里，②「秘技缺『用过秘技』门槛」是**错的**（那个门一直有）；③「星魂未读未写」已读并可写的写完。**本轮落地**：秘技（`technique_energy_on_entry`，`BATTLE_START` + `self has_state 秘技` → 50 能量）、星魂 1（`eidolon1_blessed_ult_grants_speed`：`ULT_CAST` + `actor has_state 赐福` → 速度 +20%/1 回合）、星魂 2（`eidolon2_blessed_kill_pays_energy`：`KILL` + 同条件 → +5 能量，`per_turn: 1`）、星魂 6（`eidolon6_ult_restores_ten_more`：+10 能量）。判据 `TingyunEidolonTest`（四组，秘技/星魂 6 各带「不声明 / 低星魂」对照，星魂 1 带「不带【赐福】」对照，星魂 2 钉「同回合第二次不再付」）。⚠ 另记：星魂 6 用**另加一条 `GAIN_ENERGY`** 而不是 `MODIFY_RULE effect_amount` —— 后者的读取是 `withAmount(δ)`（**替换**，不是相加），用它会把 50 变成 10。",
+    "⛔ **战技 / 天赋的附加伤害「由受【赐福】的队友打出」仍写不了（星魂 4 也依赖它）**：句子是「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于**其自身** 40% 攻击力的雷属性附加伤害」（战技）与「敌方目标受到停云攻击后，获得【赐福】的目标立即对其造成等同于**自身** 60% 攻击力的雷属性附加伤害」（天赋）。`DAMAGE` 的攻击者恒为**规则主人**（停云），而实例应当归**队友** —— `attacker` 字段的合法值**只有 `summon`**（`EffectSpec` 的注记写明它「不是通用主语」）⇒ 需要两样：`attacker: \"actor\"`（这一发的行动者/被祝福者）+ 一个 `actor_attr:`/`attacker_attr:` 的 `scale` 前缀（读**攻击者**的面板，而不是规则主人的）。⚠ 星魂 4「【赐福】附加的伤害倍率提高 20%」是这两条的 `MODIFY_RULE`，所以它随之一起等。"
   ],
   "rules": [
     {
@@ -134,6 +133,76 @@
       ],
       "source": "1202 停云 行迹 亨通 (1202103): 「停云的回合开始时，自身立即恢复5点能量。」",
       "_note": "「停云的**回合开始时**，自身立即恢复 5 点能量」—— `TURN_START` + `GAIN_ENERGY amount 5 target self` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_energy_on_entry",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 50,
+          "target": "self"
+        }
+      ],
+      "source": "1202 停云 秘技 惠风和畅 (120207, Maze/Support): 「使用秘技后立即为自身恢复50点能量。」 param = [50]",
+      "_note": "「使用秘技后**立即为自身恢复 50 点能量**」—— 门 `self has_state 秘技` ✓（`applyTechniqueStates` 在任何 `BATTLE_START` 规则之前给状态，1109/1501 同一写法）+ `GAIN_ENERGY 50` ✓。⚠ 2026-11-04：旧 `_gaps` 说「缺『用过秘技』门槛」—— **不对**，那个门一直有；本条只是没写。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon1_blessed_ult_grants_speed",
+      "min_eidolon": 1,
+      "when": [
+        "actor has_state 赐福"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.2,
+          "turns": 1,
+          "target": "actor"
+        }
+      ],
+      "source": "1202 停云 星魂 1 春风得意，时运驰骋: 「得到【赐福】的我方单体施放终结技后速度提高20%，持续1回合。」 参数 = [0.2]",
+      "_note": "「**得到【赐福】的我方单体**施放终结技后速度提高 **20%**，持续 1 回合」—— `ULT_CAST` ✓（事件对**我方任何人的**施放都发，`actor` 是施放者 ✓）+ 条件 `actor has_state 赐福` ✓（【赐福】就挂在被祝福的那位身上 ✓）+ `MODIFY_ATTR SPEED {0.2, turns: 1, target: actor}` ✓。判据 `TingyunEidolonTest.eidolonOneSpeedsUpTheBlessedCaster`：同一发终解，带/不带【赐福】的速度差正好 20%。"
+    },
+    {
+      "on": "KILL",
+      "id": "eidolon2_blessed_kill_pays_energy",
+      "min_eidolon": 2,
+      "per_turn": 1,
+      "when": [
+        "actor has_state 赐福"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5,
+          "target": "actor"
+        }
+      ],
+      "source": "1202 停云 星魂 2 君子惠渥，晏笑承之: 「得到【赐福】的我方单体在消灭敌方目标时恢复5点能量，该效果每回合只能触发1次。」 参数 = [5]",
+      "_note": "「得到【赐福】的我方单体在**消灭敌方目标**时恢复 **5** 点能量，该效果**每回合只能触发 1 次**」—— `KILL`（`actor` = 击杀者 ✓）+ `actor has_state 赐福` ✓ + `GAIN_ENERGY 5` 给 `actor` ✓（能量给**被祝福的队友**，不是停云 ✓）+ **`per_turn: 1`** ✓（现成的规则级额度）。判据 `TingyunEidolonTest.eidolonTwoPaysOncePerTurn`：同一回合两次击杀只付一次、下一回合再付。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_ult_restores_ten_more",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "target": "target"
+        }
+      ],
+      "source": "1202 停云 星魂 6 和气生财，泽盈四方: 「终结技为我方目标恢复的能量提高10点。」 参数 = [10]",
+      "_note": "「终结技为我方目标恢复的能量**提高 10 点**」—— **另写一条 `GAIN_ENERGY 10`**（与基础那条 `50` 相加 = 60 ✓）而不是 `MODIFY_RULE effect_amount`：后者的读取是 `withAmount(δ)`，即**替换**而不是相加（`TriggerInterpreter.amendedEffect` 的 `amountDelta` 只写 `withAmount`）⇒ 用它会把 50 变成 10 ✗。⚠ 这是个**已知的歧义**，登记在这里：`effect_amount` 现在只适合「层数额外 +1」那种**替换**，不是加量。判据 `TingyunEidolonTest.eidolonSixPaysSixty`（E6 = 60，E5 = 50）。"
     },
     {
       "on": "BATTLE_START",
