@@ -1,4 +1,21 @@
 {
+  "1111": {
+    "8": {
+      "damage_parts": [
+        {
+          "shape": "SingleAttack",
+          "index": 0,
+          "times": 3
+        },
+        {
+          "shape": "SingleAttack",
+          "index": 1,
+          "times": 1
+        }
+      ],
+      "source": "1111 卢卡 强化普攻 直冲碎天拳（Avatar_Luka_Skill11_Phase02）：文档「先使用【直冲拳】施放 3 段攻击，每段 20% 攻击力；再使用【碎天拳】施放 1 段攻击，80% 攻击力」⇒ 行 [0.2, 0.8] 的两格是每次命中的百分比，所以 times: 3 + times: 1（不是 ratios —— 那是「把一格切开」）。2026-11-04 新增 times 字段；总倍率 3x0.2+0.8 = 1.4x 行值。"
+    }
+  },
   "1002": {
     "1": {
       "segments": [

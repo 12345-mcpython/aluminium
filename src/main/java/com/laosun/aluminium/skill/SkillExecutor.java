@@ -766,19 +766,33 @@ public final class SkillExecutor {
             // moves by the column's value in total rather than once per instance.
             List<Double> ratios = part.getRatios() == null || part.getRatios().isEmpty()
                     ? List.of(1.0) : part.getRatios();
+            // 「每段…20%」: the OTHER way to reach several instances - the cell is the PER-HIT percentage and the part
+            // settles it `times` times at FULL value (1111's enhanced basic: three of cell 0, then one of cell 1).
+            // `ratios` cannot say this: those pieces add up to one cell, while this repeats the whole cell.
+            int times = part.getTimes() == null ? 1 : part.getTimes();
+            if (times < 1) {
+                throw new IllegalStateException("skill_effects.json's damage part for " + data.getSkillType()
+                        + " states times = " + times + ", which settles nothing - a part with no instance is a typo, "
+                        + "not a zero-damage half");
+            }
+            int instances = ratios.size() * times;
             switch (shape) {
                 case SINGLE_ATTACK -> {
-                    for (Double ratio : ratios) {
-                        total += hit(battle, data, user, element, partBase * ratio, mainTarget, hitTargets,
-                                data.getStanceList().single() / ratios.size(), skill.getSkillSlot());
+                    for (int repetition = 0; repetition < times; repetition++) {
+                        for (Double ratio : ratios) {
+                            total += hit(battle, data, user, element, partBase * ratio, mainTarget, hitTargets,
+                                    data.getStanceList().single() / instances, skill.getSkillSlot());
+                        }
                     }
                 }
                 case AOE_ATTACK -> {
-                    double stance = data.stanceFor(true) / ratios.size();   // an area hit's per-victim column
-                    for (Double ratio : ratios) {
-                        for (CanHit target : battle.targetableEnemies()) {
-                            total += hit(battle, data, user, element, partBase * ratio, target, hitTargets, stance,
-                                    skill.getSkillSlot());
+                    double stance = data.stanceFor(true) / instances;   // an area hit's per-victim column
+                    for (int repetition = 0; repetition < times; repetition++) {
+                        for (Double ratio : ratios) {
+                            for (CanHit target : battle.targetableEnemies()) {
+                                total += hit(battle, data, user, element, partBase * ratio, target, hitTargets, stance,
+                                        skill.getSkillSlot());
+                            }
                         }
                     }
                 }

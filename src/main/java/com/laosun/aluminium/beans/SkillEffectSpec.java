@@ -250,6 +250,22 @@ public class SkillEffectSpec {
          */
         @SerializedName("ratios")
         private java.util.List<Double> ratios;
+
+        /**
+         * How many times this part's <b>whole</b> multiplier is settled - {@code 3} reads as "this cell's percentage, three
+         * times at full value".
+         *
+         * <p><b>Why this is not {@link #ratios}.</b> {@code ratios} splits ONE total into pieces that add up to it: three
+         * instances of a 0.2 cell give 0.07 each and still 0.2 in all. Some rows state the opposite - the cell is the
+         * <b>per-hit</b> percentage and the game hits with it again and again. Reader: 1111 Luka (卢卡)'s enhanced basic
+         * 「先使用【直冲拳】施放 3 段攻击，每段…20%…再使用【碎天拳】施放 1 段攻击…80%」, whose row is {@code [0.2, 0.8]}
+         * at Lv6: three settlements of cell 0 and one of cell 1, i.e. 1.4x the row, not 1x. Shipping it as ratios would
+         * make the enhanced punch deal a seventh of its documented damage - a wrong number with no symptom.
+         *
+         * <p>Absent / 1 = one settlement, which is every row that existed before this field.
+         */
+        @SerializedName("times")
+        private Integer times;
     }
 
     /**

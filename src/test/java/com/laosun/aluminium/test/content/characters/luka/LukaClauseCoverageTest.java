@@ -29,7 +29,7 @@ import java.util.Map;
  * <p><b>What changed on 2026-11-02</b>: 行迹 粉碎斗志 is written ({@code chance: 0.5} on each segment of the enhanced Basic ATK,
  * an ADDITIONAL instance that cannot re-trigger itself). Two things are registered instead of written, each with what was
  * measured: 「每获得 1 层【斗志】」 has no "counter was just gained" event, and the enhanced Basic ATK's <b>segment list</b> is
- * not modelled — the engine settles one 20% hit where the document says three 20% hits plus one 80% hit.
+ * not modelled — the engine settles one 20% hit where the document says three 20% hits plus one 80% hit. Both are now closed: 循环制动 reads {@code STACK_GAINED} (2026-11-02) and the enhanced Basic ATK reads the segment table's {@code times} field (2026-11-04), so this file is the whole document.
  */
 public class LukaClauseCoverageTest {
 
@@ -46,7 +46,7 @@ public class LukaClauseCoverageTest {
         SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
         SECTION_TO_RULE.put("秘技：裂伤拳", "technique_damage_and_bleed_on_one_enemy");
         SECTION_TO_RULE.put("行迹：动能过载", "trace_overload");
-        SECTION_TO_RULE.put("行迹：循环制动", "(registered: no \"counter was just gained\" event)");
+        SECTION_TO_RULE.put("行迹：循环制动", "trace_recycle_energy_per_will_layer");
         SECTION_TO_RULE.put("行迹：粉碎斗志", "trace_crushing_will_extra_segment");
         SECTION_TO_RULE.put("行迹：攻击 / 效果命中 / 防御（数值行迹）",
                 "(no rule needed: stat traces are folded into the panel by the loader)");
@@ -87,9 +87,14 @@ public class LukaClauseCoverageTest {
         Assertions.assertEquals(1, f.settleBasic().size(), "the plain Basic ATK is one instance");
 
         List<DamageType> enhanced = f.settleEnhancedBasic();
-        Assertions.assertEquals(2, enhanced.size(), "one hit plus the trace's extra segment: " + enhanced);
-        Assertions.assertEquals(1, enhanced.stream().filter(type -> type == DamageType.ADDITIONAL).count(),
-                "the extra segment is ADDITIONAL —「对额外施放的攻击不会生效」 rides on that");
+        long normal = enhanced.stream().filter(type -> type == DamageType.NORMAL).count();
+        // Note: the BASE half is four instances since 2026-11-04 (「3 段 20% + 1 段 80%」, the `times` field), and the trace
+        // rolls 50% on EACH segment, so the ADDITIONAL count is 0..4 with the seeded RNG - which is why the base half is
+        // what is pinned here rather than the total.
+        Assertions.assertEquals(4, normal, "「先…3 段…每段 20%…再…1 段…80%」 — four segments: " + enhanced);
+        Assertions.assertEquals(enhanced.size(), normal + enhanced.stream()
+                        .filter(type -> type == DamageType.ADDITIONAL).count(),
+                "and everything else on this cast is the trace's ADDITIONAL segment");
     }
 
     /**
@@ -118,12 +123,14 @@ public class LukaClauseCoverageTest {
      * the document says three 20% hits then one 80% hit. This test pins that reading; when the segments land it goes red.
      */
     @Test
-    public void enhancedBasicPlaysOnlyOneSegment() {
+    public void enhancedBasicPlaysItsFourSegments() {
         Fixture f = new Fixture();
         f.settleBasic();
         List<DamageType> enhanced = f.settleEnhancedBasic();
-        Assertions.assertEquals(2, enhanced.size(),
-                "today: one 20% hit + the trace's extra; the document's three 20% + one 80% would be five instances");
+        // Three 20% instances and one 80% instance, all NORMAL; the trace's ADDITIONAL segments (if any rolled) are the
+        // other kind, so the base half is counted by type.
+        Assertions.assertEquals(4, enhanced.stream().filter(type -> type == DamageType.NORMAL).count(),
+                "the document's three 20% segments plus one 80% segment: " + enhanced);
     }
 
     // ==================================================================
