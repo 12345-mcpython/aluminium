@@ -65,7 +65,10 @@ public class HardcodedSkillRowRatchetTest {
     // see skill_effects.json's Rules entry), so there is nothing else the share could come from.
     // 42 since 2026-11-04: 1307 Black Swan's ultimate writes 0.25 for 「受到的伤害提高 25%」 -- a STAR-SOUL/ULTIMATE text number,
     // not a row cell: the epiphany bonus is not in her ultimate's parameter row (which carries the damage ratio and the duration).
-    private static final int BASELINE = 42;
+    // 43 since 2026-11-04: 1402 Aglaea's Eidolon 1 writes 0.15 for 「受到的伤害提高 15%」 -- a STAR-SOUL parameter ([0.15, 20])
+    // that happens to equal her Ultimate's Lv10 cell (0.15). Same verdict as 1307's above: the sentence's number is not in a
+    // skill row, and there is no reader for an Eidolon row, so it stays literal.
+    private static final int BASELINE = 43;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
