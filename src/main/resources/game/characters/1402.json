@@ -370,7 +370,7 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」：「**对阿格莱雅施放时，使阿格莱雅获得【浪漫】**」。",
-      "_note": "★ `from_skill_id == 14` 是该技能的**数据槽位**（数据项 SkillID 1141514 ⇒ 槽位 14），与已出货的第五句同形。⚠ 原句的其余四部分（衣匠天赋叠层、攻击后消耗回能、伤害提高 #2%、无视目标 #3% 防御）**未写**，已逐条登记。"
+      "_note": "★ `from_skill_id == 14` 是该技能的**数据槽位**（数据项 SkillID 1141514 ⇒ 槽位 14），与已出货的第五句同形。⭐ **2026-11-04 更正**：旧注记说「其余四部分**未写**」——**已过时**，那四半在本文件里都在（`..._spends_itself_for_energy` 消耗回能、`..._raises_damage_and_pierces_defence` / `..._also_reaches_the_garmentmaker` 增伤与穿防、`..._ends_with_her_stance` / `..._stance_end_also_clears_the_garmentmaker` 随【至高之姿】摘除）。逐节核时正是这行过时注记让旧 `_gaps` 的「1415 忆灵技 12 其余四部分」看起来像真的。"
     },
     {
       "id": "memosprite_ode_of_romance_spends_itself_for_energy",
