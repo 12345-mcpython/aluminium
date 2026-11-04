@@ -329,11 +329,14 @@ public class SummonFieldTest {
         // Make the wearer unambiguously first, so the turn this case opens is hers.
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(10_000));
         Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
+        battle.startBattle();
+        // Note: the turn is OPENED FIRST, and the memosprite is summoned afterwards. Why the order matters: memosprite
+        // skill 3 (「衣匠被召唤时，使自身行动提前 100%」) is authored into 1402's table (2026-11-04), so a memosprite
+        // summoned before the first step takes the opening turn, and this case is about the WEARER's turn start.
+        battle.stepForward();                       // opens the turn; beforeMove() is what emits TURN_START
         if (withSummon) {
             battle.summonMemosprite(wearer);
         }
-        battle.startBattle();
-        battle.stepForward();                       // opens the turn; beforeMove() is what emits TURN_START
         Assertions.assertSame(wearer, battle.currentMove().getCanHit(),
                 "precondition: the first turn is the wearer's");
         battle.beforeMove();

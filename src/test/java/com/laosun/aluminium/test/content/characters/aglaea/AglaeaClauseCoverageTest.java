@@ -57,10 +57,10 @@ public class AglaeaClauseCoverageTest {
         SECTION.put("强化普攻：孤锋千吻", List.of(GAP + "强化普攻 孤锋千吻 未接上"));
         SECTION.put("强化战技：高举吧，升华的名讳", List.of(RULE + "skill_effect"));
         SECTION.put("忆灵：衣匠（面板）", List.of(DATA + " MemospriteSpec 11402"));
-        SECTION.put("忆灵技能 1：刺纹之陷", List.of(GAP + "四个忆灵技能全部未写"));
-        SECTION.put("忆灵技能 2：泪水锻造的匠躯", List.of(GAP + "四个忆灵技能全部未写"));
-        SECTION.put("忆灵技能 3：飞驰之夏", List.of(GAP + "四个忆灵技能全部未写"));
-        SECTION.put("忆灵技能 4：枯草之盈", List.of(GAP + "四个忆灵技能全部未写"));
+        SECTION.put("忆灵技能 1：刺纹之陷", List.of(GAP + "忆灵技能 1 / 2 未写"));
+        SECTION.put("忆灵技能 2：泪水锻造的匠躯", List.of(GAP + "忆灵技能 1 / 2 未写"));
+        SECTION.put("忆灵技能 3：飞驰之夏", List.of(RULE + "memosprite_speeding_summer_advances_itself"));
+        SECTION.put("忆灵技能 4：枯草之盈", List.of(RULE + "memosprite_bloom_of_drying_grass_pays_energy"));
         SECTION.put("行迹：短视之惩", List.of(GAP + "三条行迹未写"));
         SECTION.put("行迹：织运之竭", List.of(GAP + "三条行迹未写"));
         SECTION.put("行迹：飞驰之阳", List.of(GAP + "三条行迹未写"));

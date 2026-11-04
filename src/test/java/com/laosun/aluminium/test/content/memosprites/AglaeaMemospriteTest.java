@@ -92,8 +92,11 @@ public class AglaeaMemospriteTest {
         Summon tailor = battle.memospriteOf(aglaea);
         Assertions.assertNotNull(tailor, "「若衣匠不在场，则召唤忆灵衣匠」 (if the Garmentmaker is not on the field, summons the memosprite Garmentmaker (忆灵衣匠))");
         Assertions.assertEquals(0, timeRemaining(battle, aglaea), EPS, "「并使自身立即行动」 (and makes herself act immediately)");
-        Assertions.assertTrue(timeRemaining(battle, tailor) > 0,
-                "the advance is HERS: the memosprite's own turn is untouched (it is not memosprite skill 3 (忆灵技能3))");
+        // Note: this used to assert the memosprite's own turn was UNTOUCHED ("the advance is HERS"). 2026-11-04: memosprite
+        // skill 3 (忆灵技能 3, 「衣匠被召唤时，使自身行动提前 100%」) is authored now, so it is advanced as well - the two
+        // clauses are independent and both fire on the summon.
+        Assertions.assertEquals(0, timeRemaining(battle, tailor), EPS,
+                "「衣匠被召唤时，使自身行动提前 100%」 - the memosprite's own clause advances it too");
     }
 
     /**
