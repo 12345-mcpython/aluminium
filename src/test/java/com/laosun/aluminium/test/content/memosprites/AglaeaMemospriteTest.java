@@ -210,13 +210,19 @@ public class AglaeaMemospriteTest {
 
         List<TriggerTable.CompiledRule> ultimate = TriggerTables.of(AGLAEA).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(aglaea, aglaea, null, 0, 0, null, battle));
-        Assertions.assertEquals(1, ultimate.size());
+        // Note: 2 since 2026-11-04 - the four-effect rule below plus 「普通攻击强化为【孤锋千吻】」, which is a rule of its own
+        // (a REPLACE_SKILL on the same event). The rule read here is the one that summons; the swap is judged by
+        // AglaeaStanceSkillSwapTest.
+        Assertions.assertEquals(2, ultimate.size());
+        TriggerTable.CompiledRule summoning = ultimate.stream()
+                .filter(rule -> rule.effects().stream().anyMatch(effect -> "SUMMON".equals(effect.getOp())))
+                .findFirst().orElseThrow();
         Assertions.assertEquals(List.of("SUMMON", "HEAL", "APPLY_BUFF", "ADVANCE"),
-                ultimate.getFirst().effects().stream().map(EffectSpec::getOp).toList(),
+                summoning.effects().stream().map(EffectSpec::getOp).toList(),
                 "the order the sentence writes them -- SUMMON must come first (the other three aim at the summon, "
                         + "and the stance is ANCHORED to it, which needs it to exist), and the stance \"Aglaea enters that stance\" (「阿格莱雅进入"
                         + "【至高之姿】 (Supreme Stance)状态」) precedes \"and makes herself act immediately\" (「并使自身立即行动」)");
-        Assertions.assertEquals(1.0, ultimate.getFirst().effects().get(1).getPercent(), EPS, "restores HP to the maximum (回复至上限)");
+        Assertions.assertEquals(1.0, summoning.effects().get(1).getPercent(), EPS, "restores HP to the maximum (回复至上限)");
     }
 
     // ==================================================================

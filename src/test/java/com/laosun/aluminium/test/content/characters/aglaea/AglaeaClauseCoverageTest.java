@@ -54,7 +54,8 @@ public class AglaeaClauseCoverageTest {
                 RULE + "talent_fissure_thread_bonus", DATA + " the memosprite panel is MemospriteSpec 11402"));
         SECTION.put("地图攻击：攻击", List.of(DATA + " the map attack happens outside battle"));
         SECTION.put("秘技：披星百裂", List.of(RULE + "technique_meteoric_sunder"));
-        SECTION.put("强化普攻：孤锋千吻", List.of(GAP + "强化普攻 孤锋千吻 未接上"));
+        SECTION.put("强化普攻：孤锋千吻", List.of(RULE + "p1402_stance_enhances_her_basic",
+                RULE + "p1402_memosprite_leaving_restores_her_basic", GAP + "衣匠那一半的 **200% / 90%**"));
         SECTION.put("强化战技：高举吧，升华的名讳", List.of(RULE + "skill_effect"));
         SECTION.put("忆灵：衣匠（面板）", List.of(DATA + " MemospriteSpec 11402"));
         SECTION.put("忆灵技能 1：刺纹之陷", List.of(GAP + "忆灵技能 1 / 2 未写"));
