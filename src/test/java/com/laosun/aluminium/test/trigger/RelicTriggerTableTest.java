@@ -560,16 +560,19 @@ public class RelicTriggerTableTest {
                 RelicFactory.suit(PASSERBY, STAR, LEVEL));
 
         Assertions.assertNotNull(fourPieces.getTriggerTable(), "the trigger table is never null");
-        Assertions.assertEquals(4, fourPieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // three plus the level convention
+        // Note: 1402's OWN battle-start rules are the level convention, its two Eidolon level raises and its technique
+        // gate - four, all pinned here so that "the relic added one" is the only variable. 2026-11-04: the technique
+        // rule was authored, so the three below became four.
+        Assertions.assertEquals(5, fourPieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // four plus the level convention
                 "four pieces of set 101 must bring its battle-start rule");
 
         Character threePieces = CharacterFactory.create(NO_RULES, 80, true, null,
                 partialSuit(PASSERBY, RelicType.HEAD, RelicType.HAND, RelicType.BODY));
-        Assertions.assertEquals(3, threePieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // its level Eidolons plus the level convention
+        Assertions.assertEquals(4, threePieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // its own four, no 4-piece bonus
                 "three pieces is one short of the 4-piece bonus");
 
         Character unequipped = CharacterFactory.create(NO_RULES, 80);
-        Assertions.assertEquals(3, unequipped.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(4, unequipped.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
                 "a character without relics behaves exactly as before relic rules existed");
         Assertions.assertSame(TriggerTables.of(NO_RULES), unequipped.getTriggerTable(),
                 "…which is literally its own (empty) table, not a merged copy");
