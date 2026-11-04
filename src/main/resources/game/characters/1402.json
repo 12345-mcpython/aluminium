@@ -10,7 +10,7 @@
     "⛔ **忆灵技能 1 / 2 未写（3 / 4 已落地，见本条末）**：① 刺纹之陷（110% / 相邻 66% 攻击力雷伤）—— 文档**没给衣匠 ATK**（忆灵面板只有生命与速度），按阿格莱雅攻击力算是猜测，且装载器会拒绝（`Memosprites.validateAttack` 要求面板给出基数）；② 泪水锻造的匠躯（攻击【间隙织线】敌人后 **SPD +55**，最多 **6** 层；行动时自动施放刺纹之陷并**优先**【间隙织线】目标）；③ 飞驰之夏（被召唤时**行动提前 100%**）；④ 枯草之盈（衣匠**消失时**给阿格莱雅 **20 能量**）。⇒ ②是①的读者、也是【至高之姿】SPD 那一半的来源，所以它们是一组，缺的是一个**忆灵自己的规则表**（引擎的规则只挂在角色上）。⭐ **③④ 已落地（2026-11-04）**：`memosprite_speeding_summer_advances_itself`（`SUMMONED` + `when: actor == summon` + `ADVANCE target: summon` ⇒ 召唤物进队列**之后**才发事件，所以规则碰得到它的行动值）与 `memosprite_bloom_of_drying_grass_pays_energy`（`SUMMON_LEFT` + `GAIN_ENERGY 20`；⚠ 那一刻它已不在场上，所以**不能**用 `battle.summonOf`）。判据 `AglaeaMemospritesTest`：召唤后 `queue().peekNext()` 就是衣匠；它离场后她的能量**正好 +20**（⚠ 让**队友**补最后一刀 —— 由她自己击杀会额外拿 5 点击杀回能，实测 25）。",
     "⛔ **行迹 短视之惩 / 织运之竭 未写（飞驰之阳已落地，见本条末）**：① 短视之惩（【至高之姿】下 阿格莱雅与衣匠 ATK += 阿格莱雅速度 × **720%** + 衣匠速度 × **360%**）—— 跨单位派生 `self_attr:` 有，但「衣匠的速度」要读召唤物属性；② 织运之竭（衣匠消失时忆灵天赋的 SPD 层数**最多保留 1 层**，再召唤时补回）—— 依赖忆灵技能 2 的层数；③ 飞驰之阳 ⭐ **已落地（2026-11-04）**：`trace_racing_sun_fills_half_the_energy` —— **`RAISE_ENERGY_TO`** 就是「设到上限的 N%」那个拼法（引擎原话：它是**下限不是加量**，所以「若不足」无需条件），判据 `AglaeaTracesTest`；⚠ 它与秘技的 30 点**会互相吞**（开战能量为 0 时，50% 的下限把秘技那 30 点盖掉 ⇒ 差值读 0 —— 这是行迹在正常工作，不是秘技没付钱，判据因此把起点设在 60%）。",
     "⭐ **星魂 1 已落地（2026-11-04）**：`eidolon1_threaded_target_takes_more` —— **先摘后给**的命名修饰（`间隙织线易伤`）跟着【间隙织线】**转移**，另加 **`while_holder_state: 间隙织线`** 兜住「状态自然到期」那一侧（否则那 15% 会留在已经没状态的敌人身上，没有症状）；`eidolon1_threaded_attack_pays_energy` + `..._for_the_garmentmaker` —— 两条 `ATTACK_FINISHED`（**每次攻击一次**，不是每段），「阿格莱雅**或**衣匠」写成两条因为条件 DSL 没有析取。判据 `AglaeaEidolonOneTest`：E1/E0 同一发的**比值 = 1.15**、修饰随状态**转移**（旧持有者归零、新持有者为 1）、两条攻击各 **+20** 能量。",
-    "⛔ **星魂 2 / 4 / 6 未写**：2 = 阿格莱雅或衣匠行动时，双方造成的伤害**无视 14% 防御**，最多 **3 层**，持续到「除自身与衣匠以外的任意单位主动施放技能」（「无视防御」按层数递增 —— 每层缩放那一族）；4 = 忆灵天赋 SPD 层数上限 **+1**，且阿格莱雅施放攻击后**衣匠也获得**该层；6 = 【至高之姿】下双方雷属性**抗性穿透 +20%**，且速度高于 **160/240/320** 时**连携攻击**伤害 +10%/30%/60%（`DAMAGE_PENETRATION` 与阈值分段都有，但都依赖第 4 条那条「连携攻击」的归属）。另：星魂 3/5 的**忆灵**等级加成（`skill_add_level` 里的 1140201/1140203/1140205/1140206）也没写 —— `RAISE_SKILL_LEVEL` 的 `memosprite: true` 是现成的。"
+    "⭐ **星魂 2 已落地（2026-11-04）**：`eidolon2_a_layer_when_she_acts` / `..._when_the_memosprite_acts`（`TURN_START` + 各自的行动者，`MODIFY_ATTR DEFENCE_IGNORE {0.14, stackable, max_stacks: 3, permanent}`）+ `eidolon2_another_units_skill_clears_it`（`SKILL_CAST` + `actor is_other_ally` ⇒ `REMOVE_STATE` `all_allies` 同时摘掉她和衣匠那两份）。判据 `AglaeaEidolonTwoTest`：1/2/3 次行动 = 0.14/0.28/0.42、第 4 次不加、E1 恒 0；衣匠自己的回合只叠**它自己**那份；队友一次施法把两份都清零。⚠ **一处窄**：**敌方**施放技能不清除（引擎只把我方施法送给规则表）⇒ 已登记。⛔ **星魂 4 / 6 未写**：4 = 忆灵天赋 SPD 层数上限 **+1**，且阿格莱雅施放攻击后**衣匠也获得**该层；6 = 【至高之姿】下双方雷属性**抗性穿透 +20%**，且速度高于 **160/240/320** 时**连携攻击**伤害 +10%/30%/60%（`DAMAGE_PENETRATION` 与阈值分段都有，但都依赖第 4 条那条「连携攻击」的归属）。另：星魂 3/5 的**忆灵**等级加成（`skill_add_level` 里的 1140201/1140203/1140205/1140206）也没写 —— `RAISE_SKILL_LEVEL` 的 `memosprite: true` 是现成的。"
   ],
   "rules": [
     {
@@ -291,6 +291,67 @@
       ],
       "source": "1402 阿格莱雅 星魂 1: 「…阿格莱雅**或衣匠**攻击该目标后额外恢复20点能量。」 参数 = [0.15, 20]",
       "_note": "「阿格莱雅**或衣匠**攻击该目标后」的衣匠那一半 —— `actor is_summon` ✓（1402 自己在 `memosprite_ode_of_romance_*` 里已用同一个谓词）。能量给**规则持有者**（阿格莱雅）⇒ `target: self` ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon2_a_layer_when_she_acts",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.14,
+          "permanent": true,
+          "stackable": true,
+          "max_stacks": 3,
+          "buff": "星魂二穿防",
+          "target": "self"
+        }
+      ],
+      "source": "1402 阿格莱雅 星魂 2 行舟命运的眼睑: 「当阿格莱雅或衣匠行动时，使阿格莱雅与衣匠造成的伤害无视目标14%的防御力，该效果最多叠加3层，持续至除自身与衣匠以外的任意单位主动施放技能时。」 参数 = [0.14, 3]",
+      "_note": "「**当阿格莱雅**…行动时…造成的伤害**无视目标 14% 的防御力**，最多叠加 **3 层**」—— `TURN_START` + `actor == self` ✓（「行动时」= 她的回合开始）+ `MODIFY_ATTR DEFENCE_IGNORE {0.14, stackable, max_stacks: 3, permanent}` ✓（形状照 1409 那条叠层修饰：`permanent` 因为它的寿命由**别人的施法**结束，不是回合数）。⚠ **只对她自己**这一半；衣匠那一半是下一条（`target: summon`）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon2_a_layer_when_the_memosprite_acts",
+      "min_eidolon": 2,
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.14,
+          "permanent": true,
+          "stackable": true,
+          "max_stacks": 3,
+          "buff": "星魂二穿防",
+          "target": "summon"
+        }
+      ],
+      "source": "1402 阿格莱雅 星魂 2: 「当阿格莱雅**或衣匠**行动时，使阿格莱雅与衣匠造成的伤害无视目标14%的防御力…」 参数 = [0.14, 3]",
+      "_note": "衣匠那一半 —— `actor is_summon`（事件本身就是它的回合开始 ⇒ 它一定在场，`target: summon` 不会解析失败）+ 同一个修饰名。⚠ 两份修饰**同名**是有意的：清理那一条按名字摘，`target: all_allies` 一次就能把她和衣匠的**都**摘掉（召唤物在 `battle.allies()` 里）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon2_another_units_skill_clears_it",
+      "min_eidolon": 2,
+      "when": [
+        "actor is_other_ally"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "星魂二穿防",
+          "target": "all_allies"
+        }
+      ],
+      "source": "1402 阿格莱雅 星魂 2: 「…持续至**除自身与衣匠以外的任意单位主动施放技能**时。」",
+      "_note": "「持续至**除自身与衣匠以外的任意单位**主动施放技能时」—— `SKILL_CAST` + **`actor is_other_ally`** ✓（除她以外的**队友**；她自己的施法不算 ✓，衣匠的施法是 `actor is_summon` ⇒ 也不匹配 ✓），`REMOVE_STATE` 按名字摘、`all_allies` 覆盖两份 ✓。⚠ **登记一处窄**：**敌方**主动施放技能不会清掉它 —— 引擎的规则表只收我方的施法（敌方技能不发 `SKILL_CAST` 给我的表），`ENEMY_ATTACK` 只能问到「敌人攻击」而不是「敌人施放技能」⇒ 这一半是近似，判据 `AglaeaEidolonTwoTest` 钉的是我方那一半。⚠ 「14% × 3 层 = 42%」是**加法**（每层一条独立修饰，`StatModifierBuff` 按 id 叠加）✓。"
     },
     {
       "id": "memosprite_ode_of_romance_marks_aglaea",

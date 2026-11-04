@@ -183,8 +183,10 @@ public class AglaeaMemospriteTest {
         // The skill is TWO rules, and `matching` hands back only the one whose condition holds -- which is the
         // split doing its job, so each half is read from the state it belongs to.
         TriggerTable table = TriggerTables.of(AGLAEA);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the skill's two sentences are two rules");
+        // Note: 3 since 2026-11-04 - the skill's two halves plus Eidolon 2's 「除自身与衣匠以外的任意单位主动施放技能时」
+        // clear rule, which also listens on SKILL_CAST (it cannot fire at E0, which is why `present` below is still one).
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the skill's two sentences are two rules, plus Eidolon 2's clear rule");
 
         List<TriggerTable.CompiledRule> present = table.matching(TriggerEvent.SKILL_CAST,
                 new TriggerTable.TriggerContext(aglaea, aglaea, null, 0, 0, null, battle));
