@@ -43,6 +43,10 @@ public class AglaeaTechniqueTest {
     /** What one battle looks like after BATTLE_START, with or without the technique declared. */
     private static Scene run(boolean technique) {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        // Note: above half of her bar, because her trace 飞驰之阳 raises energy TO 50% at battle start - measured
+        // 2026-11-04: starting from zero, the trace's floor swallows the technique's 30 points and the delta reads 0.
+        // That is the trace's own clause working, not the technique's failing, so the fixture starts above the floor.
+        aglaea.setCurrentEnergy(aglaea.getMaxEnergy() * 0.6);
         if (technique) {
             // The engine stamps this state before any BATTLE_START rule runs, which is the gate the rule reads.
             aglaea.getBuffManager().addBuff(new StateBuff("秘技", 1));

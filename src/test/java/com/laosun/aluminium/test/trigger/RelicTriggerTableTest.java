@@ -553,27 +553,30 @@ public class RelicTriggerTableTest {
 
     /**
      * Four pieces of the set put its rules on the character; fewer pieces do not.
+     *
+     * <p>Note: the counts are taken <b>relative</b> to the same character with no relic, so this test states the
+     * <i>set's</i> contribution and nothing about how many battle-start rules 1402 happens to own. It was pinned to
+     * literals until 2026-11-04, and every rule authored into her file turned it red - a test about relic merging
+     * failing because content grew is a false alarm, not a regression.
      */
     @Test
     public void theCharacterCarriesTheSetRulesOnlyWhenEnoughPiecesAreWorn() {
+        Character unequipped = CharacterFactory.create(NO_RULES, 80);
+        int own = unequipped.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START);
+
         Character fourPieces = CharacterFactory.create(NO_RULES, 80, true, null,
                 RelicFactory.suit(PASSERBY, STAR, LEVEL));
 
         Assertions.assertNotNull(fourPieces.getTriggerTable(), "the trigger table is never null");
-        // Note: 1402's OWN battle-start rules are the level convention, its two Eidolon level raises and its technique
-        // gate - four, all pinned here so that "the relic added one" is the only variable. 2026-11-04: the technique
-        // rule was authored, so the three below became four.
-        Assertions.assertEquals(5, fourPieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // four plus the level convention
-                "four pieces of set 101 must bring its battle-start rule");
+        Assertions.assertEquals(own + 1, fourPieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
+                "four pieces of set 101 must bring exactly ONE battle-start rule of its own");
 
         Character threePieces = CharacterFactory.create(NO_RULES, 80, true, null,
                 partialSuit(PASSERBY, RelicType.HEAD, RelicType.HAND, RelicType.BODY));
-        Assertions.assertEquals(4, threePieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),   // its own four, no 4-piece bonus
+        Assertions.assertEquals(own, threePieces.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
                 "three pieces is one short of the 4-piece bonus");
 
-        Character unequipped = CharacterFactory.create(NO_RULES, 80);
-        Assertions.assertEquals(4, unequipped.getTriggerTable().ruleCount(TriggerEvent.BATTLE_START),
-                "a character without relics behaves exactly as before relic rules existed");
+        Assertions.assertTrue(own > 0, "precondition: she has battle-start rules of her own to merge with");
         Assertions.assertSame(TriggerTables.of(NO_RULES), unequipped.getTriggerTable(),
                 "…which is literally its own (empty) table, not a merged copy");
     }

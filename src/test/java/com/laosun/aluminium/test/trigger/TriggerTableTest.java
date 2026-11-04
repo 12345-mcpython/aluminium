@@ -245,8 +245,11 @@ public class TriggerTableTest {
         Character himeko = CharacterFactory.create(1402, 80);
         Battle battle = newBattle(List.of(robin, himeko), 1);
 
-        Assertions.assertEquals(3, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)),
-                "her Coloratura Cadenza trace, plus the level convention both files now carry");
+        // Note: 4 since 2026-11-04 - her Coloratura Cadenza, the level convention both files carry, and 1402's
+        // 飞驰之阳 trace (an ungated BATTLE_START rule; 1402's technique rule is gated on the 秘技 state and her
+        // Eidolon level raises on the star rank, so neither matches a bare event).
+        Assertions.assertEquals(4, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)),
+                "her Coloratura Cadenza trace, plus the level convention both files now carry, plus 1402's own trace");
 
         Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, robin, null, 1, 0)),
                 "nothing in her file listens to BASIC_ATTACK: Basic ATK (普攻) is not Skill (战技)");
