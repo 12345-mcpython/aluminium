@@ -82,6 +82,13 @@ public final class UltimateService {
         if (ultra == null) {
             return false;
         }
+        // 「【无敌玩家】状态下…无法施放终结技」 (1506): the row's own gate is asked HERE, before the bar is settled -
+        // `requestSkill` only enqueues, and the refusal happens later in `CastService.useSkill`, by which time `settle`
+        // has already zeroed the energy. Measured 2026-11-04: without this check a banned Ultimate spent the bar and did
+        // nothing, and the call still answered `true`.
+        if (!com.laosun.aluminium.trigger.SkillCastability.allows(ultra, user, battle)) {
+            return false;
+        }
         if (!battle.requestSkill(ultra, user, targets)) {
             return false;
         }

@@ -163,6 +163,37 @@ public class SilverWolfLV999GodmodeClausesTest {
         battle.processRequests();
     }
 
+    /**
+     * 「【无敌玩家】状态下…<b>无法施放终结技</b>」 - asserted both ways, because "the cast failed" alone would pass just as
+     * well if the bar had been empty.
+     *
+     * <p>Measured 2026-11-04: the engine's {@code blocks} vocabulary has carried {@code "ultimate"} since 1315 Boothill's
+     * 【绝命对峙】, and {@code SkillCastability.allows} refuses slot 3 on exactly that word - so this clause was writable
+     * when it was registered as "the vocabulary has no such op". The state is entered by the Ultimate itself, which is
+     * why the first cast succeeds and the second is the one being judged.
+     */
+    @Test
+    public void godmodeBansTheUltimateAndTheBanLeavesWithIt() {
+        Battle battle = newBattle();
+        Character wolf = battle.characters().getFirst();
+        Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "precondition: not in 【无敌玩家】 yet");
+
+        // The first Ultimate is what puts her there; the full bar is restored before each attempt.
+        castUltimate(battle, wolf);
+        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "precondition: the Ultimate put her in 【无敌玩家】");
+
+        wolf.setCurrentEnergy(wolf.getMaxEnergy());
+        Assertions.assertFalse(battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst())),
+                "「无法施放终结技」 - the bar is full and the gate still refuses");
+        battle.processRequests();
+
+        // And the ban is the STATE's, not a permanent seal: once it is gone the same call goes through.
+        wolf.getBuffManager().removeState(GOD);
+        wolf.setCurrentEnergy(wolf.getMaxEnergy());
+        Assertions.assertTrue(battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst())),
+                "control: with the state removed the same cast is allowed");
+    }
+
     private static Battle newBattle() {
         return newBattle(0);
     }
