@@ -61,7 +61,8 @@ public class AglaeaClauseCoverageTest {
         SECTION.put("强化战技：高举吧，升华的名讳", List.of(RULE + "skill_effect"));
         SECTION.put("忆灵：衣匠（面板）", List.of(DATA + " MemospriteSpec 11402"));
         SECTION.put("忆灵技能 1：刺纹之陷", List.of(DATA + " memosprites/1402.json states its attack block (Blast, 1.54 / 0.924, stance 30 / 15)"));
-        SECTION.put("忆灵技能 2：泪水锻造的匠躯", List.of(GAP + "忆灵技能 2 仍未写"));
+        SECTION.put("忆灵技能 2：泪水锻造的匠躯", List.of(RULE + "p1402_memosprite_speed_stack_on_threaded_hit",
+                GAP + "行动时自动施放"));
         SECTION.put("忆灵技能 3：飞驰之夏", List.of(RULE + "memosprite_speeding_summer_advances_itself"));
         SECTION.put("忆灵技能 4：枯草之盈", List.of(RULE + "memosprite_bloom_of_drying_grass_pays_energy"));
         SECTION.put("行迹：短视之惩", List.of(GAP + "行迹 短视之惩 / 织运之竭 未写"));

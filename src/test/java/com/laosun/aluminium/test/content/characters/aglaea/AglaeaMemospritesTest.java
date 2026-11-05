@@ -127,4 +127,44 @@ public class AglaeaMemospritesTest {
         Assertions.assertEquals(20.0, aglaea.getCurrentEnergy() - before, 1e-9,
                 "「衣匠消失时，使阿格莱雅恢复 20 点能量」");
     }
+
+    /**
+     * 忆灵技能 2's stacking half:「攻击处于【间隙织线】状态的敌人后，使自身的速度提高 55 点，最多叠加 6 层」.
+     *
+     * <p>The clause is one modifier on the MEMOSPRITE reading its own skill row's Lv10 cell (63.8; the prose quotes the
+     * Lv6 55). Two controls: a hit on an enemy that is not threaded adds nothing (the condition is the whole trigger),
+     * and a seventh attack at the cap adds nothing.
+     */
+    @Test
+    public void theMemospriteStacksSpeedOnlyOnAThreadedHit() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        Summon garmentmaker = battle.summonMemosprite(aglaea);
+        battle.processRequests();
+        double base = garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+
+        fireSummonAttack(battle, garmentmaker, enemy);
+        Assertions.assertEquals(base, garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
+                "「攻击处于【间隙织线】状态的敌人后」 — an unthreaded target adds no stack");
+
+        for (int hit = 0; hit < 6; hit++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            fireSummonAttack(battle, garmentmaker, enemy);
+        }
+        double capped = garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+        Assertions.assertEquals(base + 6 * 63.8, capped, 1e-6,
+                "six stacked layers of the Lv10 cell (63.8): " + base + " -> " + capped);
+
+        fireSummonAttack(battle, garmentmaker, enemy);
+        Assertions.assertEquals(capped, garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
+                "「该效果最多叠加 6 层」");
+    }
+
+    private static void fireSummonAttack(Battle battle, Summon summon, Enemy victim) {
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, summon, victim, 1, 0));
+        battle.processRequests();
+    }
 }
