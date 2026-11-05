@@ -113,11 +113,14 @@ public class MemospriteAttackTest {
      */
     @Test
     public void aMemospriteWithNoAttackStatedGetsNone() {
-        Summon tailor = SummonFactory.memosprite(CharacterFactory.create(AGLAEA, LEVEL));
+        // Note: 1512's 晴空乐手 is the witness since 2026-11-04 - 1402's 衣匠 states an attack now (忆灵技能 1), so the
+        // "nothing installed" case needs a spec that still states none.
+        int noAttack = 1512;
+        Summon singer = SummonFactory.memosprite(CharacterFactory.create(noAttack, LEVEL));
 
-        Assertions.assertNull(tailor.getSkills().get(SkillType.COMMON),
-                "memosprites/" + AGLAEA + ".json states no attack, so nothing is installed");
-        Assertions.assertEquals(Camp.PLAYER, tailor.getCamp(), "…and it is still one of ours");
+        Assertions.assertNull(singer.getSkills().get(SkillType.COMMON),
+                "memosprites/" + noAttack + ".json states no attack, so nothing is installed");
+        Assertions.assertEquals(Camp.PLAYER, singer.getCamp(), "…and it is still one of ours");
     }
 
     // ==================================================================

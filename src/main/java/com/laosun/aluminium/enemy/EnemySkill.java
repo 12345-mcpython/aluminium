@@ -61,6 +61,21 @@ public class EnemySkill extends Skill {
     private final double stanceDamage;
 
     /**
+     * What a <b>Blast's neighbours</b> take instead of {@link #multiplier}, or {@code null} for "the same".
+     *
+     * <p>Reader: 1402's 忆灵技能 1 - 「对敌方单体造成等同于…110%…，对其相邻目标造成 66%…」. One {@code multiplier} would
+     * over-hit every neighbour, which is a wrong number with no symptom (the aimed enemy is right).
+     */
+    private final Double neighbourMultiplier;
+
+    /**
+     * The toughness a Blast's neighbours lose instead of {@link #stanceDamage}, or {@code null} for "the same".
+     *
+     * <p>Reader: the same sentence's 破韧值 单体 30 / 扩散 15.
+     */
+    private final Double neighbourStanceDamage;
+
+    /**
      * @param element    damage element (already resolved at construction time from the data / the
      *                   monster's {@code stance_type}, never null)
      * @param multiplier multiplier (damage base = {@code baseAttribute} x multiplier)
@@ -98,6 +113,16 @@ public class EnemySkill extends Skill {
      */
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
                       SkillEffectType effect, AttributeType baseAttribute, double stanceDamage) {
+        this(element, multiplier, hits, type, effect, baseAttribute, stanceDamage, null, null);
+    }
+
+    /**
+     * @param neighbourMultiplier a Blast's neighbour share, or {@code null} for the same as the main target
+     * @param neighbourStanceDamage a Blast's neighbour toughness, or {@code null} for the same
+     */
+    public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
+                      SkillEffectType effect, AttributeType baseAttribute, double stanceDamage,
+                      Double neighbourMultiplier, Double neighbourStanceDamage) {
         this.element = element == null ? DamageElement.PHYSICAL : element;
         this.multiplier = multiplier;
         this.hits = Math.max(1, hits);
@@ -105,6 +130,8 @@ public class EnemySkill extends Skill {
         this.effect = effect == null ? SkillEffectType.SINGLE_ATTACK : effect;
         this.baseAttribute = baseAttribute == null ? AttributeType.ATTACK : baseAttribute;
         this.stanceDamage = stanceDamage;
+        this.neighbourMultiplier = neighbourMultiplier;
+        this.neighbourStanceDamage = neighbourStanceDamage;
     }
 
     @Override
@@ -151,7 +178,12 @@ public class EnemySkill extends Skill {
         Set<CanHit> hitTargets = new LinkedHashSet<>();
         double total = 0;
         for (CanHit struck : struckBy(victim, user, battle)) {
-            total += strike(battle, user, struck, hitTargets);
+            // "the aimed enemy takes 110%, the neighbours 66%": a Blast's neighbours may state their own numbers, and
+            // anything else (single target, AOE with no neighbour share) keeps the one multiplier it always had.
+            boolean neighbour = struck != victim;
+            double share = neighbour && neighbourMultiplier != null ? neighbourMultiplier : multiplier;
+            double stance = neighbour && neighbourStanceDamage != null ? neighbourStanceDamage : stanceDamage;
+            total += strike(battle, user, struck, hitTargets, share, stance);
         }
         // Memosprites (忆灵) / a summon's attack is an attack, so our side hears about it exactly once, after
         // every segment has been settled -- the same notification a character's skill raises. Otherwise a
@@ -232,12 +264,13 @@ public class EnemySkill extends Skill {
      * @param hitTargets collects the targets this segment reached, in hit order
      * @return the sum of the settled values of this target's segments
      */
-    private double strike(Battle battle, CanHit user, CanHit victim, Set<CanHit> hitTargets) {
+    private double strike(Battle battle, CanHit user, CanHit victim, Set<CanHit> hitTargets,
+                          double share, double stance) {
         if (victim == null || victim.isDeath()) {
             return 0;
         }
         hitTargets.add(victim);
-        double base = user.damageBase(baseAttribute) * multiplier;
+        double base = user.damageBase(baseAttribute) * share;
         double total = 0;
         for (int i = 0; i < hits; i++) {
             if (victim.isDeath()) {
@@ -247,8 +280,8 @@ public class EnemySkill extends Skill {
             // After the damage, like SkillExecutor.hit does: the bar comes off a hit that landed, and a break it
             // causes is settled by Battle.reduceToughness itself. Only a real toughness bar takes one -- an attack
             // on a character has none, which is why the enemy path has always carried 0 here.
-            if (stanceDamage > 0 && victim instanceof Enemy enemy) {
-                battle.reduceToughness(user, enemy, element, stanceDamage);
+            if (stance > 0 && victim instanceof Enemy enemy) {
+                battle.reduceToughness(user, enemy, element, stance);
             }
         }
         return total;

@@ -18,6 +18,15 @@
       "percent": 1.0
     }
   ],
+  "attack": {
+    "element": "Thunder",
+    "base": "ATTACK",
+    "percent": 1.54,
+    "neighbour_percent": 0.924,
+    "shape": "Blast",
+    "stance": 30,
+    "neighbour_stance": 15
+  },
   "servant_id": 11402,
   "skills": [
     {

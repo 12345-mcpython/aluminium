@@ -401,6 +401,8 @@ public final class SummonFactory {
                 type,
                 SkillEffectType.fromString(attack.shape()),
                 AttributeType.fromString(attack.base()),
-                attack.stance() == null ? 0 : attack.stance());
+                attack.stance() == null ? 0 : attack.stance(),
+                attack.neighbourPercent(),
+                attack.neighbourStance());
     }
 }

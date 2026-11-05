@@ -154,19 +154,34 @@ public record MemospriteSpec(@SerializedName("name") String name,
      * @param hits    how many segments land on each target, or {@code null} for one
      * @param shape   the {@link com.laosun.aluminium.enums.SkillEffectType} spelling ({@code "AoEAttack"}),
      *                or {@code null} for a single target
+     * @param neighbourPercent the share a <b>Blast's neighbours</b> take, or {@code null} for "the same as the main
+     *                target". Reader: 1402's 忆灵技能 1 「对敌方单体造成等同于「长夜」…110%…，对其相邻目标造成 66%」
+     *                - one figure for the aimed enemy, a smaller one for the neighbours, so a single {@code percent}
+     *                would over-hit every neighbour.
+     * @param neighbourStance  the toughness the neighbours lose, or {@code null} for the same as the main target.
+     *                Reader: the same sentence's 破韧值 单体 30 / 扩散 15.
      */
     public record Attack(@SerializedName("element") String element,
                          @SerializedName("base") String base,
                          @SerializedName("percent") Double percent,
                          @SerializedName("hits") Integer hits,
                          @SerializedName("shape") String shape,
-                         @SerializedName("stance") Double stance) {
+                         @SerializedName("stance") Double stance,
+                         @SerializedName("neighbour_percent") Double neighbourPercent,
+                         @SerializedName("neighbour_stance") Double neighbourStance) {
 
         /**
          * The same without a toughness value -- an attack that does not touch the bar, the default.
          */
         public Attack(String element, String base, Double percent, Integer hits, String shape) {
-            this(element, base, percent, hits, shape, null);
+            this(element, base, percent, hits, shape, null, null, null);
+        }
+
+        /**
+         * The same with only the main target's toughness value.
+         */
+        public Attack(String element, String base, Double percent, Integer hits, String shape, Double stance) {
+            this(element, base, percent, hits, shape, stance, null, null);
         }
     }
 }
