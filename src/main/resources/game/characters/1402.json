@@ -75,6 +75,28 @@
     },
     {
       "on": "ULT_CAST",
+      "id": "p1402_stance_speed_follows_the_layers",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent_from_skill_param": "ULTRA:0",
+          "per_stack": "summon_stacks:匠躯",
+          "per_stack_live": true,
+          "permanent": true,
+          "while_state": "至高之姿",
+          "buff": "至高之姿-速度",
+          "target": "self"
+        }
+      ],
+      "source": "1402 阿格莱雅 终结技 (强化前): 「【至高之姿】状态下，阿格莱雅获得衣匠忆灵天赋的速度提高层数，每层使自身速度提高15.00%…」",
+      "_note": "「**获得衣匠忆灵天赋的速度提高层数，每层使自身速度提高 15%**」—— 层数在**衣匠身上**（忆灵技能 2 的 `匠躯`，`max_stacks: 6`）⇒ 用本会话新增的 **`per_stack: summon_stacks:匠躯`** ✓（`TriggerInterpreter.summonStacks` 读**规则主人的忆灵**；忆灵不在场时答 0）。⭐ **`per_stack_live: true`** 是关键：层数在【至高之姿】期间会一直涨，快照只在挂上那一刻对 ⇒ 份额在**每次读取时**重算（判据 `theStanceSpeedFollowsTheLayersLive`：挂上之后再叠层，速度**立刻**变，不需要重放大招）。⚠ 寿命用 **`while_state: \"至高之姿\"`**（门问**规则主人**自己 ✓，这个状态就挂在她身上）：状态随忆灵消失而解除，于是修饰在**她下一个回合边界**被摘掉 —— 与 1307 星魂 1 同一种**回合粒度**的近似。⚠ **不能**用 `ticks_on: \"summon\"`：它在**施放时**就要解析忆灵，而这条规则必须排在 `ult_effect`（召唤那条）**之前** —— 否则先 ADVANCE 再加 SPD，队列会按新的速度重算行动值，「立即行动」就没了（判据实测 147.06）。⚠ 15% 是**字面值**（大招行第 2 格 = 0.15 恒定 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
       "when": [
         "actor == self"
       ],

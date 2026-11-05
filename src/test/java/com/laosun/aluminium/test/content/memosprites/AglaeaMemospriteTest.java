@@ -210,10 +210,11 @@ public class AglaeaMemospriteTest {
 
         List<TriggerTable.CompiledRule> ultimate = TriggerTables.of(AGLAEA).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(aglaea, aglaea, null, 0, 0, null, battle));
-        // Note: 2 since 2026-11-04 - the four-effect rule below plus 「普通攻击强化为【孤锋千吻】」, which is a rule of its own
-        // (a REPLACE_SKILL on the same event). The rule read here is the one that summons; the swap is judged by
-        // AglaeaStanceSkillSwapTest.
-        Assertions.assertEquals(2, ultimate.size());
+        // Note: 3 since 2026-11-05 - the four-effect rule below, 「普通攻击强化为【孤锋千吻】」 (a REPLACE_SKILL on the same
+        // event), and 「每层使自身速度提高 15%」 (the stance's speed, which reads the memosprite's own counter). The rule
+        // read here is the one that summons; the other two are judged by AglaeaStanceSkillSwapTest and
+        // AglaeaMemospriteTest.theStanceSpeedFollowsTheLayersLive.
+        Assertions.assertEquals(3, ultimate.size());
         TriggerTable.CompiledRule summoning = ultimate.stream()
                 .filter(rule -> rule.effects().stream().anyMatch(effect -> "SUMMON".equals(effect.getOp())))
                 .findFirst().orElseThrow();

@@ -49,7 +49,8 @@ public class AglaeaClauseCoverageTest {
     static {
         SECTION.put("普攻：刺纹之蜜", List.of(DATA + " the skill row 140201 deals it; no rule needed"));
         SECTION.put("战技：高举吧，升华的名讳", List.of(RULE + "skill_effect", RULE + "skill_effect_2"));
-        SECTION.put("终结技：共舞吧，命定的衣匠", List.of(RULE + "ult_effect", GAP + "【至高之姿】的「状态里做什么」"));
+        SECTION.put("终结技：共舞吧，命定的衣匠", List.of(RULE + "ult_effect",
+                RULE + "p1402_stance_speed_follows_the_layers", GAP + "【至高之姿】的「状态里做什么」"));
         SECTION.put("天赋：金玫之指", List.of(RULE + "talent_fissure_thread_applies_state",
                 RULE + "talent_fissure_thread_bonus", DATA + " the memosprite panel is MemospriteSpec 11402"));
         SECTION.put("地图攻击：攻击", List.of(DATA + " the map attack happens outside battle"));

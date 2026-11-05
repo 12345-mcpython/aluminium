@@ -167,4 +167,33 @@ public class AglaeaMemospritesTest {
                 com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, summon, victim, 1, 0));
         battle.processRequests();
     }
+
+    /**
+     * 【至高之姿】:「获得衣匠忆灵天赋的速度提高层数，每层使自身速度提高 15%」 - and the layers keep arriving while the stance
+     * holds, so the share must be read **live**: the same buff, no re-cast, and her SPD moves when the memosprite stacks.
+     */
+    @Test
+    public void theStanceSpeedFollowsTheLayersLive() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        double base = aglaea.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+
+        battle.castImmediate(aglaea.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                aglaea, List.of(enemy));
+        battle.processRequests();
+        Summon garmentmaker = battle.summonOf(aglaea);
+        Assertions.assertNotNull(garmentmaker, "precondition: the stance brought the memosprite out");
+        Assertions.assertEquals(base, aglaea.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
+                "no 【匠躯】 layers yet, so no speed");
+
+        for (int layer = 1; layer <= 3; layer++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            fireSummonAttack(battle, garmentmaker, enemy);
+            Assertions.assertEquals(base * (1 + 0.15 * layer),
+                    aglaea.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-6,
+                    "layer " + layer + " raises her speed without re-casting the Ultimate");
+        }
+    }
 }

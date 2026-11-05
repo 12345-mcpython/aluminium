@@ -1621,6 +1621,21 @@ public final class TriggerInterpreter {
         return stated.startsWith("self_stacks:") ? stated.substring("self_stacks:".length()).trim() : stated;
     }
 
+    /** The prefix that reads a counter on the rule owner's memosprite (see {@code perStackCount}). */
+    static final String SUMMON_STACKS_PREFIX = "summon_stacks:";
+
+    /**
+     * How many layers of {@code name} the rule owner's memosprite carries - {@code 0} when there is none on the field,
+     * which is the honest answer for an aura that reads it (the aura is gone with the summon).
+     */
+    static int summonStacks(TriggerContext ctx, String name) {
+        CanHit owner = ctx == null ? null : ctx.owner();
+        if (owner == null || ctx.battle() == null || name == null || name.isBlank()) {
+            return 0;
+        }
+        CanHit summon = ctx.battle().summonOf(owner);
+        return summon == null || summon.getBuffManager() == null ? 0 : summon.getBuffManager().stacksOf(name.trim());
+    }
     static double perStackFactor(EffectSpec effect, CanHit target, TriggerContext ctx) {
         return capPerStack(effect, perStackCount(effect, target, ctx));
     }
@@ -1646,6 +1661,12 @@ public final class TriggerInterpreter {
             String own = effect.getPerStack().trim().substring("self_stacks:".length()).trim();
             CanHit owner = ctx == null ? null : ctx.owner();
             return own.isEmpty() || owner == null ? 1 : owner.getBuffManager().stacksOf(own);
+        }
+        // A counter on the rule owner's MEMOSPRITE: 「获得衣匠忆灵天赋的速度提高层数，每层使自身速度提高 15%」 (1402's stance).
+        // The counted unit is neither the target nor the owner, so neither the bare name nor `self_stacks:` can say it.
+        if (effect.getPerStack() != null && effect.getPerStack().trim().startsWith(SUMMON_STACKS_PREFIX)) {
+            String own = effect.getPerStack().trim().substring(SUMMON_STACKS_PREFIX.length()).trim();
+            return own.isEmpty() ? 0 : summonStacks(ctx, own);
         }
         String name = effect.getPerStack();
         if (name == null || name.isBlank()) {

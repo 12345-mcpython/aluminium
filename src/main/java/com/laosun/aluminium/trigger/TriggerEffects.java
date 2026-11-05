@@ -243,9 +243,15 @@ final class TriggerEffects {
                 // was taken, and re-attaching on every change would stack the buff itself.
                 boolean derivedCounter = effect.getScale() != null
                         && effect.getScale().trim().startsWith("self_stacks:");
-                if (!derivedCounter && !TriggerInterpreter.ctxFreeCounter(effect)) {
+                // 「获得衣匠忆灵天赋的速度提高层数，每层使自身速度提高 15%」 (1402's stance): the counted unit is the
+                // MEMOSPRITE, so the reader needs the battle - but it still has no event dependency, so it is as live as
+                // the two counter forms beside it.
+                boolean summonCounter = effect.getPerStack() != null
+                        && effect.getPerStack().trim().startsWith(TriggerInterpreter.SUMMON_STACKS_PREFIX);
+                if (!derivedCounter && !summonCounter && !TriggerInterpreter.ctxFreeCounter(effect)) {
                     throw new IllegalStateException(
-                            "per_stack_live only exists for the counter forms (self_stacks:<NAME> or a bare name), but this "
+                            "per_stack_live only exists for the counter forms (self_stacks:<NAME>, summon_stacks:<NAME> or "
+                                    + "a bare name), but this "
                                     + "rule states per_stack='" + effect.getPerStack() + "' and scale='" + effect.getScale()
                                     + "'; the per-hit count forms are read from an event context and (source: "
                                     + ctx.ruleId() + ")");
@@ -259,6 +265,18 @@ final class TriggerEffects {
                         double pct = effect.getPercent() == null ? 0 : effect.getPercent();
                         liveBuff.makeLive(() -> pct
                                 * TriggerInterpreter.capPerStack(effect, target.getBuffManager().stacksOf(own)) + extra);
+                    } else if (summonCounter) {
+                        // Same arithmetic as the derived form (a SHARE per layer: 0.15 x layers), but the counter lives on
+                        // the rule owner's memosprite — 0 when it is not on the field, which is also when the aura is gone.
+                        String own = effect.getPerStack().trim()
+                                .substring(TriggerInterpreter.SUMMON_STACKS_PREFIX.length()).trim();
+                        double extra = effect.getAmount() == null ? 0 : effect.getAmount();
+                        // `shareOf`, not the raw field: 「每层使自身速度提高 15%」 reads that 15% out of the ultimate row
+                        // (ULTRA:0), and a share stated by SPELLING is invisible to `getPercent()`.
+                        double pct = TriggerMagnitudes.shareOf(effect, ctx);
+                        liveBuff.makeLive(() -> pct
+                                * TriggerInterpreter.capPerStack(effect,
+                                TriggerInterpreter.summonStacks(ctx, own)) + extra);
                     } else {
                         String counter = TriggerInterpreter.counterName(effect);
                         // Note: read through `perStackFactor`, not `stacksOf(counter)`: a `self_stacks:` spelling names the RULE
