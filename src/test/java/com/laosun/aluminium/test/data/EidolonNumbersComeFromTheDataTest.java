@@ -64,6 +64,7 @@ public class EidolonNumbersComeFromTheDataTest {
                 continue;
             }
             Set<Double> pool = pool(eidolons.get(cid), skills.get(cid));
+            collectMemoSpriteRows(cid, skills, pool);
             for (JsonElement element : rules.getAsJsonArray()) {
                 JsonObject rule = element.getAsJsonObject();
                 String source = rule.has("source") && rule.get("source").isJsonPrimitive()
@@ -96,6 +97,38 @@ public class EidolonNumbersComeFromTheDataTest {
 
     private static JsonObject read(Path path) throws Exception {
         return JsonParser.parseString(Files.readString(path, StandardCharsets.UTF_8)).getAsJsonObject();
+    }
+
+    /**
+     * The same rows for the character's <b>memosprite</b>, when it has one: 「忆灵天赋的速度提高效果」 states its number in
+     * the 忆灵's own skill row (1402's 63.8 lives in 1140203's parameter list), not in the summoner's.
+     *
+     * <p>Why the pool has to include them: this guard asks "does the number come from the data"; the sentence's subject is
+     * the memosprite's effect, so the memosprite's row IS that datum. Keeping the check narrow to the character's own
+     * columns would force a wrong reading of the sentence rather than catch a wrong number.
+     */
+    private static void collectMemoSpriteRows(String cid, JsonObject skills, Set<Double> pool) throws Exception {
+        Path spec = Path.of("src/main/resources/game/memosprites", cid + ".json");
+        if (!Files.exists(spec) || skills == null) {
+            return;
+        }
+        JsonElement servantId = read(spec).get("servant_id");
+        if (servantId == null || !servantId.isJsonPrimitive()) {
+            return;
+        }
+        JsonElement rows = skills.get(servantId.getAsString());
+        if (rows == null || !rows.isJsonObject()) {
+            return;
+        }
+        for (var slot : rows.getAsJsonObject().entrySet()) {
+            if (!slot.getValue().isJsonObject()) {
+                continue;
+            }
+            JsonElement list = slot.getValue().getAsJsonObject().get("param_list");
+            if (list != null && list.isJsonArray()) {
+                collect(list.getAsJsonArray(), pool);
+            }
+        }
     }
 
     private static Set<Double> pool(JsonElement eidolons, JsonElement skills) {

@@ -196,4 +196,33 @@ public class AglaeaMemospritesTest {
                     "layer " + layer + " raises her speed without re-casting the Ultimate");
         }
     }
+
+    /**
+     * 星魂 4:「忆灵天赋的速度提高效果层数上限提高 1 层」+「阿格莱雅施放攻击后也能使衣匠获得该效果」.
+     *
+     * <p>Both halves in one case because they are one sentence: her OWN attack grants the layer (the memosprite's attacks
+     * already do), and the cap is seven rather than six. The E3 control states the other side of the first half.
+     */
+    @Test
+    public void theEidolonFourCapAndHerOwnAttacks() {
+        Assertions.assertEquals(7, layersAfterHerAttack(4), "E4: her own attack on a threaded enemy stacks it, up to 7");
+        Assertions.assertEquals(0, layersAfterHerAttack(3), "E3: her attack grants nothing (the sentence is the Eidolon's)");
+    }
+
+    /** How many 【匠躯】 layers the memosprite reaches from her own attacks alone, at the given Eidolon rank. */
+    private static int layersAfterHerAttack(int eidolon) {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL, false, null, null, eidolon);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        Summon garmentmaker = battle.summonMemosprite(aglaea);
+        battle.processRequests();
+        for (int hit = 0; hit < 9; hit++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    com.laosun.aluminium.enums.TriggerEvent.ATTACK_FINISHED, aglaea, enemy, 1, 0));
+            battle.processRequests();
+        }
+        return garmentmaker.getBuffManager().stacksOf("匠躯");
+    }
 }
