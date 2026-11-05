@@ -44,6 +44,11 @@ tasks.withType(JavaCompile).configureEach {
 }
 
 repositories {
+    // Mirrors FIRST, `mavenCentral()` last: measured 2025-11-05, an unmirrored resolve spent minutes in TLS/connect
+    // timeouts before falling through (the build then looked "slow to start"). Aliyun mirrors Maven Central exactly, so a
+    // hit here is the same artifact; keeping `mavenCentral()` after them means the build still works anywhere else.
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/central' }
     mavenCentral()
 }
 
