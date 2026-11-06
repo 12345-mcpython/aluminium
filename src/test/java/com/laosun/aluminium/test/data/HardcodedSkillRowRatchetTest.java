@@ -79,7 +79,9 @@ public class HardcodedSkillRowRatchetTest {
     // cell of his own rows. An EIDOLON param has no level axis, so it stays literal - the same verdict as the entries above.
     // Note: 47 since 2026-11-06 - 1405's 必要的留白 states 「暴击伤害提高 140%」, and 1.4 is also a cell of his Basic row at Lv10.
     // The trace param has no level axis, so it stays literal - the same verdict as the entries above.
-    private static final int BASELINE = 47;
+    // Note: 48 since 2026-11-06 - 1304's 星魂 1 states 「持有【坚垣筹码】的我方目标暴击伤害提高 20%」, and 0.2 is also a cell of his
+    // own rows. The Eidolon param has no level axis, so it stays literal - the same verdict as the entries above.
+    private static final int BASELINE = 48;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

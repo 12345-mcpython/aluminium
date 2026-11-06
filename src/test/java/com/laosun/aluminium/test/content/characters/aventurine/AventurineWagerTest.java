@@ -1,0 +1,79 @@
+package com.laosun.aluminium.test.content.characters.aventurine;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+/**
+ * 1304 砂金's three newly written clauses:
+ *
+ * <ul>
+ *   <li>天赋「持有【坚垣筹码】的我方单体效果抵抗提高 50%」 - read off {@code SHIELD_GRANTED}, so every shield source covers it;</li>
+ *   <li>星魂 1「持有【坚垣筹码】的我方目标暴击伤害提高 20%」;</li>
+ *   <li>天赋「受到攻击后使砂金获得 1 点【盲注】」.</li>
+ * </ul>
+ */
+public class AventurineWagerTest {
+    private static final int AVENTURINE = 1304;
+    private static final int ALLY = 1204;
+    private static final int LEVEL = 80;
+    private static final double EPS = 1e-6;
+
+    @Test
+    public void aShieldLiftsTheHoldersEffectResistance() {
+        Battle battle = scene(0);
+        Character ally = battle.characters().get(1);
+        double before = ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
+        double shieldBefore = ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
+        Assertions.assertEquals(shieldBefore, before, EPS, "precondition");
+
+        // The trace 热手 grants the shield at battle start, so the talent's modifier must already be there.
+        Assertions.assertTrue(ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get() > 0.0,
+                "「持有【坚垣筹码】的我方单体效果抵抗提高 50%」 — the trace's shield carries it");
+    }
+
+    @Test
+    public void theFirstEidolonLiftsTheHoldersCritDamage() {
+        Assertions.assertEquals(0.2, critDamageOfShieldedAlly(1) - critDamageOfShieldedAlly(0), EPS,
+                "「持有【坚垣筹码】的我方目标暴击伤害提高 20%」");
+    }
+
+    @Test
+    public void aHitOnAShieldedAllyFeedsTheBlindBet() {
+        Battle battle = scene(0);
+        Character aventurine = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("盲注"), "precondition: no blind bet yet");
+
+        battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 1));
+        battle.processRequests();
+
+        Assertions.assertEquals(1, aventurine.getBuffManager().stacksOf("盲注"),
+                "「…在受到攻击后，使砂金获得 1 点【盲注】」");
+    }
+
+    private static double critDamageOfShieldedAlly(int eidolon) {
+        Battle battle = scene(eidolon);
+        return battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
+    }
+
+    private static Battle scene(int eidolon) {
+        Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL, false, null, null, eidolon);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aventurine, ally), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        return battle;
+    }
+}

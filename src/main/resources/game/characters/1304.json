@@ -3,11 +3,11 @@
   "character": 1304,
   "_status": "partial",
   "_gaps": [
-    "天赋·坚垣筹码条件整段：持有护盾者效果抵抗 +50%、受击 +1 盲注、砂金持盾抗控制、受击额外 +1 盲注未写（护盾不是 AbstractBuff，has_state 看不到）",
+    "⭐ **天赋的三段里两段已落地（2026-11-06）**：「持有【坚垣筹码】的我方单体**效果抵抗 +50%**」与「受到攻击后**使砂金获得 1 点【盲注】**」—— ⭐ 关键是不用把护盾做成状态：引擎有 **`SHIELD_GRANTED`** 事件（`actor` = 给盾的人）⇒ 修饰落在 `target` 上、时长 = 护盾寿命；盲注那条用 **`target has_shield`** 条件（1001 星魂 6 同一个）。判据 `AventurineWagerTest`。⛔ **仍开两句**：① 「砂金**持有【坚垣筹码】时能抵抗控制类负面状态**」—— 需要「按控制类型免疫」的写法（现有 `RESIST_DEBUFF kind control` 是**抗性**不是免疫）；② 「该效果在 2 回合后可再次触发…**额外获得 1 点**【盲注】」—— 需要**按回合数的触发间隔**（`once_per_turns`）。",
     "盲注 7 点阈值：消耗 7 点、7 段随机 25% 防御力追加攻击、上限 10 点未写",
     "行迹 热手：重复获得护盾的叠加上限 200% 未写",
     "终结技：随机获得 1–7 点盲注未写",
-    "星魂：未读、未写"
+    "⭐ **星魂 1（暴伤 20%）已落地（2026-11-06）**：`eidolon1_wager_lifts_the_holders_crit_damage`（`SHIELD_GRANTED` + E1 → `CRIT_ATTACK +0.2`）。⭐ **星魂 2** 的「普攻使目标全属性抗性降低 12%」与 `basic_all_type_res_down` **同一条数值**（行迹与星魂写的是同一件事）⇒ 不重复写第二条规则，判据沿用既有那条。⛔ **星魂 3/5** 是等级加成（原有）、**星魂 4**「触发天赋追加攻击时先使防御 +40%（2 回合）并使追加攻击多 3 段」与**星魂 6**（已在 `eidolon6_damage_per_shielded_ally`）—— 星魂 4 需要「追加攻击段数 +N」的写法（`DAMAGE` 的 `times` 是固定值）。"
   ],
   "rules": [
     {
@@ -188,6 +188,62 @@
       ],
       "source": "1304 砂金 星魂 6: 「每有1个队友持有护盾，砂金造成的伤害提高50%，最高不超过150%。」 参数 = [0.5, 1.5]",
       "_note": "「**每有 1 个队友持有护盾**，伤害提高 **50%**，最高 **150%**（`参数 = [0.5, 1.5]` ✓）」—— `BOOST_DAMAGE { value: min(units(shielded_allies) × 0.5, 1.5) }` ✓。⚠ **第一版写成 0.005 / 0.015**：我照描述里的「0.5%」读，而 `param[0]` 是 **0.5 = 50%** ✗ —— 差 100 倍，正是「不看 `param` 列」的典型错（AGENT §0.1.3）。"
+    },
+    {
+      "_note": "「**持有【坚垣筹码】的我方单体效果抵抗提高 50%**」—— 不必等「持盾」这个状态：`SHIELD_GRANTED`（`actor` = 给盾的人 ✓）就是「护盾落到谁身上」的那一刻 ⇒ 落在 `target` 上、时长 `turns: 3` = 护盾的寿命 ✓（战技/行迹/星魂 1 三个来源一次覆盖，不会重复写三条）。",
+      "on": "SHIELD_GRANTED",
+      "when": [
+        "actor == self"
+      ],
+      "id": "talent_wager_lifts_the_holders_effect_resistance",
+      "source": "1304 砂金 天赋 枪口以右:「持有【坚垣筹码】的我方单体效果抵抗提高50.00%…」",
+      "do": [
+        {
+          "target": "target",
+          "op": "MODIFY_ATTR",
+          "percent": 0.5,
+          "attribute": "EFFECT_RESISTANCE",
+          "turns": 3
+        }
+      ]
+    },
+    {
+      "_note": "同一条事件的第二条从句（暴击伤害 +20%）—— 与效果抵抗那条**不同属性**，所以不触 `SameEffectTwiceGuardTest`。",
+      "on": "SHIELD_GRANTED",
+      "min_eidolon": 1,
+      "id": "eidolon1_wager_lifts_the_holders_crit_damage",
+      "source": "1304 砂金 星魂 1 囚徒博弈:「持有【坚垣筹码】的我方目标暴击伤害提高20%。」",
+      "do": [
+        {
+          "target": "target",
+          "op": "MODIFY_ATTR",
+          "percent": 0.2,
+          "attribute": "CRIT_ATTACK",
+          "turns": 3
+        }
+      ],
+      "when": [
+        "actor == self"
+      ]
+    },
+    {
+      "_note": "「持有【坚垣筹码】的我方单体…**在受到攻击后，使砂金获得 1 点【盲注】**」—— `TAKING_HIT`（被打的是**队友** ✓）+ 条件 **`target has_shield`**（引擎有 `HasShield` ✓，1001 星魂 6 用的同一个）→ `ADD_STACK 盲注 +1`（上限 10 ✓，见 `_gaps` 里 7 点阈值那条）。⚠ 「额外获得 1 点」那半句在原始文档里跟着一句「该效果在 2 回合后可再次触发」，属于**触发次数限制**，未写（需 `once_per_turns`）。",
+      "on": "TAKING_HIT",
+      "when": [
+        "target has_shield"
+      ],
+      "id": "talent_attacked_wager_holder_feeds_the_blind_bet",
+      "source": "1304 砂金 天赋 枪口以右:「…并在受到攻击后，使砂金获得1点【盲注】…」",
+      "do": [
+        {
+          "buff": "盲注",
+          "op": "ADD_STACK",
+          "target": "self",
+          "amount": 1,
+          "max_stacks": 10,
+          "permanent": true
+        }
+      ]
     }
   ]
 }
