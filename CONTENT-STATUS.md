@@ -68,437 +68,70 @@
 | 1210 | 桂乃芬    | 未完全实现                              | 已逐句核；8 条规则、4 条缺口（3 条为引擎限制）   |
 | 1211 | 白露      | 未完全实现                              | 已逐句核；14 条规则、6 条记录、0 阻塞            |
 
-⭐ **2026-11-06 补**： **行迹 持明龙脉 已落地** —— `trace_dragon_vein_adds_one_invigoration_trigger`（`BATTLE_START` →
-`生息治疗额度 +1`，上限 3；天赋读 `TALENT:4` = 2 ⇒ **3 次**），判据 `BailuRegenTest.theDragonVeinAddsOneInvigorationTrigger`
-。⚠ 它和星魂 6 是两份额度（致命治疗 vs【生息】），互不占用。
 | 1212 | 镜流 | 未完全实现 | 已逐句核；8 条规则、5 条记录、0 阻塞 |
-星魂），其余未逐句核对 |
 | 1213 | 丹恒•饮月 | 未完全实现 | 已逐句核；5 条规则、6 条记录、0 阻塞 |
-✓）。⛔ **仍开**：星魂 1（【亢心】层数 +4 且每段额外 +1）、星魂 2（终结技后行动提前 100% + 额外 1 个【逆鳞】）、星魂
-4（【叱咤】持续到下一回合结束）、星魂 6（虚数抗性穿透，队友终结技后叠层）、战技强化阶梯、【叱咤】的段序号、秘技门槛 |
 | 1214 | 雪衣 | 未完全实现 | 已逐句核；15 条规则、7 条缺口（3 条为引擎限制） |
-⭐ **2026-11-06 再补**：「本次追加攻击无法叠加【恶报】」 **不需要开关** —— 唯一叠层的规则要求 `actor is_other_ally`
-，而追击的削韧归她自己 ⇒ 结构上已成立；判据 `theFollowUpDoesNotFeedItsOwnCounter`（8 层触发后剩 0）。
-⭐ **2026-11-06 逐节核 + 修一处静默 bug**：星魂 2 的回血原门槛是「恶报 ≥ 7」（8 层上限），而 **星魂 6 把上限降到 6** ⇒ E6 起回血
-**永久失效**；已按上限拆成两条（E2–E5 与 E6），并 **把 E6 那条排在消费规则之前**（同事件按文件顺序执行），判据
-`XueyiEidolonTwoHealTest`。仍开六条（终结技按削韧增伤、她自己削韧的层数换算、追击不叠层、行迹 预兆机杼/摧锋轴承/伺观中枢），每条都写明缺的机制。
-⭐ **2026-11-06 续**： **行迹 预兆机杼 已落地** ——
-`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 1, cap_amount: 2.4 }`；⭐「缺修饰上限」的说法
-**作废**（`cap_amount`/`cap_scale` 早就在，`applyDerivedCeiling` 对派生量直接比较）。 ⭐ **2026-11-06 再续**： **行迹 摧锋轴承
-已落地** —— 引擎新增条件变量 **`target_toughness_percent`**（韧性 ÷ 上限；无韧性条答 NaN），规则 = `DEALING_DAMAGE` +
-`from_skill_id == 3` + `>= 0.5` → `BOOST_DAMAGE 0.1`（`BOOST_DAMAGE` 只能挂 `DEALING_DAMAGE`），判据
-`XueyiThrustBearingTest`。 **本次攻击无视弱点属性削韧**」= 新 op **`IGNORE_WEAKNESS`**（`CAST_SETUP` +
-`from_category ULTRA`，判据
-`IgnoreWeaknessOnCastTest`：非弱点 **0 → 60** ✓、且 **只用一次** ✓）。⛔ **仍开 2 条**：① 她自己削韧的「削得越多叠越多」换算（正文/数据都不给）；②
-终结技「按 **削韧量**增伤最多 60%」—— 要求 **先削韧后定伤害**，与引擎时序相反 |
 | 1215 | 寒鸦 | 完全实现 | 已逐句核；18 条规则、0 缺口 |
-`BATTLE_START` + `self has_state 秘技` + 规则级 **`pick: random_enemy`** + 先清三个旧标记再把 `承负` 挂到 `pick`
-✓（「仅对最新被施加的目标生效」✓）；判据 `HanyaTechniqueTest`（随机一个敌人带承负、其余没有、无秘技则没有）✓ ——
-按文件现有覆盖与状态表，该角色已无登记缺口 |
 | 1217 | 藿藿 | 完全实现 | 已逐句核；17 条规则、0 缺口 |
-`MODIFY_ATTR SPEED 0.12 permanent **while_state: 禳命**` ✓ —— 修饰挂在 **全体**、 **门在藿藿**（`AbstractBuff.gateBroken`
-在每个回合边界被问一次，状态一离场缓冲即被摘掉 ✓）；不写 `turns` ✗（「拥有期间」不是回合数）。判据 `HuohuoSpeedAuraTest`（盟友
-+12% ✓、她自己也变快 ✓、失去禳命后 **精确回落** ✓、E0 无光环 ✓）。至此 1217 **完全实现** |
 | 1218 | 椒丘 | 完全实现 | 已逐句核；22 条规则、0 缺口 |
-未写，而且三条行迹整节无规则）： **星魂 4** 结界时敌方 ATK −15%（`while_state: 结界`，实测 662.784912 → 563.3671752）、 **星魂
-6** 层数上限 5→9（两条互斥规则，实测 5 vs 9）+ **击杀转移**（`lowest_stacks_enemy:烬煨`，实测「6 层的死掉、2 层的变 8」）、 **行迹
-爟火**（开战 +15 能量）、 **行迹 炙香**（`stacks` 新选项 `whose: highest_enemy`，实测新入场者拿到最高层 4）、 **行迹 举炊**（新
-`floor` 提供器按整台阶：实测 0.94→601.524、0.95→962.4384、1.10→1323.3528、1.40→2045.1816、1.60→仍 2045.1816）。判据
-`JiaoqiuClauseCoverageTest`（7 例）+ 引擎 `StacksRankingTest`/`NumberProviderTest` |
 | 1220 | 飞霄 | 未完全实现 | 已逐句核；9 条规则、5 条记录、0 阻塞 |
 | 1221 | 云璃 | 未完全实现 | 已逐句核；6 条规则、4 条记录、0 阻塞 |
-`target == self` → `MODIFY_ATTR EFFECT_RESISTANCE ratio: 0.5` ✓（判据 **0 → 0.5** ✓，与天赋反击 **同一事件**）；④ 星魂 3/5
-等级 ✓。⛔ **仍开**：星魂 1（【勘破】伤害 +20% 且额外次数 +3）、星魂 2（反击无视 20% 防御）、星魂 6（格挡期间暴击）、终结技整段、天赋反击的相邻
-60%、秘技 |
 | 1222 | 灵砂 | 未完全实现 | 已逐句核；7 条规则、1 条缺口（1 条为引擎限制） |
 | 1223 | 貊泽 | 未完全实现 | 已逐句核；14 条规则、5 条缺口（2 条为引擎限制） |
-发动追加攻击」= **`target_else_random_enemy`** ✓（首选已阵亡 ⇒ 改打存活随机敌方；旧 `_gaps` 的「兜底未写」过时 ✗）—— 判据
-`MozeFallbackTest`（两个敌人、A 先阵亡、B 承伤）✓；天赋附加伤害那条 **不加**兜底（它必须打【猎物】本身 ✓）。⛔ **仍开**
-：充能无上限无法声明资源；【猎物】的解除条件；秘技的隐身；星魂 2 / 其余星魂 **2026-11-03 逐节核**（`MozeClauseCoverageTest` 3
-例）： **星魂 2**（对【猎物】暴击伤害 +40%，⭐ **跨单位** `target: actor` + `instance: true`，实测经
-`Damage.getExtraCritDamage()` 读到 **0.4**）、 **星魂 4**（终结技后 +30% 伤害 / 2 回合）、 **星魂 6**（天赋追加攻击倍率 ×1.25，
-`MODIFY_RULE effect_percent_scale`）。⛔ 仍开：充能无上限/消耗链、【猎物】解除条件、秘技大地图效果。⚠ `SameEffectTwiceGuardTest`
-把「秘技 +30%/2 回合」与「星魂 4 +30%/2 回合」当成重复 ⇒ 已按「一句效果两个触发点」的既有族补进基线并写明理由。 |
 | 1224 | 三月七 | 未完全实现 | 已逐句核；8 条规则、7 条记录、0 阻塞 |
-强化普攻 / 星魂），其余未逐句核对 |
 | 1225 | 忘归人 | 未完全实现 | 已逐句核；8 条规则、6 条记录、0 阻塞 |
-终结技与星魂），其余未逐句核对 |
 | 1301 | 加拉赫 | 完全实现 | 已逐句核；14 条规则、0 缺口 |
-⭐ **2026-11-06 续**： **行迹 崭新配方 已落地** ——
-`MODIFY_ATTR OUTGOING_HEALING_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 0.5, cap_amount: 0.75 }`（与 1214
-预兆机杼同一个「已声明上限」机制）。仍开：星魂 6 后半（弱点击破效率无此属性）、星魂 4（延长 1 回合的写法未定）、行迹
-敬请干杯（缺「本次攻击治疗对全体生效」开关）。 ⭐ **2026-11-06 再续**： **星魂 4 已落地** ——
-`eidolon4_the_tipsy_lasts_one_turn_longer`（E4 用 `turns: 3` 的同形规则，替换掉大招那份 2 回合），判据
-`GallagherEidolonTest.theTipsyLastsThreeTurnsAtTheFourthEidolon`。⚠ 实测 `EXTEND_BUFF` **不能**用来延长【酩酊】状态（它按
-`buffName` 匹配，状态的 buffName 为空）。 ⭐ **2026-11-06 三续**： **星魂 6 后半已落地** —— 新增属性
-`WEAKNESS_BREAK_EFFICIENCY`（弱点击破效率），`BreakService.reduce` 在扣韧性前乘 `1 + efficiency`（默认 0 ⇒ 乘 1，既有读数不变），判据
-`GallagherEidolonTest.theSixthEidolonShortensTheBarFaster`（10 → 12）。 ⭐ **2026-11-06 四续**： **行迹 敬请干杯 已落地** ——
-`trace_toast_the_heal_reaches_every_ally`（`DEALING_DAMAGE` + `from_skill_id == 8` + `target has_state 酩酊` →
-`HEAL all_allies`，读天赋行 640），判据 `GallagherEnhancedAttackTest.theToastTraceHealsTheWholeParty`。 **1301 的 `⛔`
-已全部清零**（剩 1 条「星魂 6 后半已落地」的记录 + 2 条过期说明）。
-⭐ **2026-11-06 逐节核**： **星魂 2**（战技解 1 个负面效果 + 效果抵抗 +30%/2 回合）与 **星魂 6 前半**（击破特攻 +20%）落地，判据
-`GallagherEidolonTest`；并 **删掉两条过期缺口**（强化普攻的技能替换早在 `ult_tipsy`；15% 降攻早在 `enhanced_attack_down`
-）。仍开：星魂 6 后半（弱点击破效率无此属性）、星魂 4（延长 1 回合的写法未定）、行迹 崭新配方（缺「修饰上限」）、行迹
-敬请干杯（缺「本次攻击治疗对全体生效」开关）。
 | 1302 | 银枝 | 完全实现 | 已逐句核；16 条规则、0 缺口 |
-`REPLACE_SKILL`），施放后换回普通行（`remove: true`）✓。判据 `ArgentiEnhancedUltTest`：同一发终结技的伤害 **888.45 →
-1554.80（×1.75）** ✓。⚠ 判据换成 **行为读数**（伤害）而不是白盒读 skill id —— `Skill` 没有暴露数据行号的取值器，而「强化了没有」本来就该由伤害回答
-⭐ **2026-11-03 收口**：`_gaps` 里那条「其余技能从句与星魂」是 **过期条目** —— 16 条规则已覆盖 **全部**章节（天赋升格、行迹
-虔诚/勇气/慷慨、星魂 1–6、秘技、强化终结技），判据 `ArgentiClauseCoverageTest` 逐节映射；`_gaps` 清空。 |
 | 1303 | 阮•梅 | 未完全实现 | 已逐句核；12 条规则、4 条缺口（1 条为引擎限制） |
-`CAST_SETUP`**（结算之前！放 `DEALING_DAMAGE` 上无效，实测 1.0 ✗）+ `target has_state 弱点击破`，判据 `RuanMeiEidolonTwoTest`
-**×1.40** ✓；③ 星魂 4「敌方被击破时自身击破特攻 **+100%**，3 回合」= `BREAK` → `MODIFY_ATTR`，判据 **0.373 → 1.373** ✓；④ 星魂
-3/5 等级 ✓；⑤ 星魂 6 早已落地 ✓。⛔ **仍开**：天赋击破伤害 120%、战技跨单位状态、终结技【残梅绽】族、秘技 **2026-11-04 逐节核**：
-**秘技「自动触发一次战技」** 落地 —— 关键是 `skill_effects.json` 给她的战技补了 **`effect: Rules`** 登记（否则
-`SkillExecutor.canDeliver` 会拒绝「不造成伤害又无事可做」的技能），然后 `BATTLE_START` + `self has_state 秘技` →
-`CAST_SKILL { SKILL, target: self }`；判据 `RuanMeiTechniqueTest`（用秘技 ⇒ 战技真的施放并挂上状态；不用 ⇒ 没有）。⚠
-`CastSkillTest` 原本拿 1303 当「不可交付」的例子 ⇒ 换成 **1309**，并在注释里说明 1303 为什么不再是。⛔
-仍开：天赋的击破伤害、战技的跨单位条件、终结技【残梅绽】五句、模拟宇宙祝福缩放。 **2026-11-04 续**： **战技的跨单位条件落地** ——
-「当阮•梅拥有【弦外音】时我方全体伤害 +32%」= `while_state: 弦外音` + `all_allies`；关键认知： **`while_state` 的 gate
-检查的是规则主人的状态**（不是修饰持有者的）⇒ 「她持有 ⇒ 全队生效」本来就写得出，旧登记作废。⚠ `ratchet` 40→41（32%
-是技能正文的数、技能没有参数行可读）。⛔ 同句的「弱点击破效率 +50%」仍缺（引擎没有击破效率属性）。 |
 | 1304 | 砂金 | 未完全实现 | 已逐句核；8 条规则、5 条记录、0 阻塞 | **1.5%**」=
-`BOOST_DAMAGE { value: min(units(shielded_allies) × 0.005, 0.015) }` ✓ —— `units` 新增取值 **
-`shielded_allies`**（真数 `ShieldBuff.getAmount() > 0`）；判据 `AventurineEidolonSixTest` 对 0/1/3 面额外护盾各验一次，期望值由
-**实时护盾数**算出（他自己的技能本来就会给全队上盾，满 4 人 ⇒ 已达 1.5% 上限）✓。⛔ **仍开**：其余星魂与行迹 |
 | 1305 | 真理医生 | 未完全实现 | 已逐句核；17 条规则、5 条记录、0 阻塞 |
-`ALLY_ATTACK` + `from_skill SKILL` + 规则级 `chance: 0.4` ✓；「 **若追加攻击施放前目标被消灭则对敌方随机单体发动**」=
-`target_else_random_enemy` ✓ —— **早已落地**（旧 `_gaps` 的「兜底未写」是过时记录 ✗），判据 `DrRatioFallbackTest`
-（两个敌人、首选已阵亡 ⇒ 改打另一个）✓。⛔ **仍开**（4 条）：① 目标每 1 个负面使发动概率 +20%（`chance` 是静态字段，无
-delta/公式写法）；② 终结技「最多触发 2 次」被读成「每回合 2 次」（量纲差）；③ 秘技的领域 / 嘲讽；④ 星魂 1/2 与其余星魂
-**2026-11-03 逐节核**（`DrRatioClauseCoverageTest` 4 例）： **行迹 归纳**（
-`ADD_STACK { value: debuffs(target), max_stacks: 6 }` + `per_stack` 实时读层 → 每层 +2.5% 暴击率 / +5% 暴伤；实测 3
-个负面 ⇒ 3 层且暴击率 +7.5%、0 个 ⇒ 0 层）、 **行迹 演绎**（`APPLY_BUFF { base_chance: 1 }` + `target_when`，效果抵抗 −10%/2
-回合）、 **星魂 4**（触发天赋时额外 +15 能量，实测比 E0 多 15）。⚠ 夹具坑：`StateBuff.isDebuff()` 是 false，
-`target_debuff_count` 读不到 ⇒ 必须用真负面（三个不同名字的 `DotBuff`）。⛔ 仍开：行迹 推理、星魂 1/2/6、天赋概率随负面数、秘技。
-**2026-11-03 续**： **星魂 1**（开局 4 层 + 上限 6→10）与 **星魂 2**（`times_from: "target_debuffs"` + `times: 4` 上限）落地，判据加到
-6 例。⚠ 实测口径： **战技自己落的【演绎】也算一个负面** ⇒ 夹具 2 个负面时实际触发 **3** 次、6 个时封顶 **4** 次、0 个时 **1**
-次。 **2026-11-03 三续**： **行迹 推理**落地（`target_debuff_count >= 3` + `min(debuffs,5)×0.1` 实例修饰；判据用
-**同种子伤害总量对比**：3 个负面 > 0 个、2 个 == 0 个）＋ **星魂 6 的伤害半**（`effect_percent_scale 1.5`，⚠ 对行份额是
-**加** ⇒ 近似已注记）。⛔ 仍开：星魂 6 的「触发 +1 次」（缺 `effect_per_turn`）、天赋「概率随负面数」、秘技。 **2026-11-03 四续**：
-**天赋「概率随负面数」落地** —— 引擎新增 **`chance_from`**（在掷骰那一刻求值、钳到 [0,1]），本条 =
-`min(0.4 + 0.2 × debuffs(target), 1.0)`，判据 `ChanceFromTest`（含变异验证）。⚠ 顺带修正「推理」的判据：概率随负面数变化后，
-**总伤害**会被天赋追加次数带偏 ⇒ 改成只比 **第一发**（`damage.toValue()`）。 **2026-11-03 五续**： **星魂 6 的另一半**
-（【智者的短见】触发 +1 次）落地 —— 先查引擎再动手：`MODIFY_RULE` 的 **`amount`** 抬的就是 `per_turn`（无需新字段），写成
-`MODIFY_RULE { rule: ult_reaction_followup, amount: 1 }`；实测 **E0 两次 / E6 三次**（手动 fire `ALLY_ATTACK`
-计数，避开队友攻击的段数干扰）。 **2026-11-03 收口**： **秘技**「100% 基础概率」补齐 —— `APPLY_BUFF { base_chance: 1 }`
-走命中/抵抗管线 ＋ `MODIFY_ATTR` 用 **`while_state: 秘技减速`**（⚠ `target_when` 在 `BATTLE_START` 上不可用：该事件没有
-target）。剩余两条 `_gaps` 都是 **真近似**（【智者的短见】的量纲、星魂 6 对行份额是加），因此仍标「未完全实现」。 |
 | 1306 | 花火 | 未完全实现 | 已逐句核；12 条规则、8 条缺口（2 条为引擎限制） | **2026-11-03 逐节核**： **星魂 4** 落地（
-`RAISE_SKILL_POINT_CAP 1` + `GAIN_SKILL_POINT 1`，⚠ **顺序必须是先抬上限再给点**
-，否则那 1 点被旧上限钳掉——实测踩到），判据 `SparkleClauseCoverageTest` 2 例（上限 +1、终结技 4+1）。⛔ 仍开：星魂 1（【谜诡】时长
-+1 可写、持有者 +40% 攻击需「随状态存在」的修饰）、星魂 6（按暴击伤害 30% 追加到另一条效果 ⇒ 需要 `MODIFY_RULE` 接受提供器）。 |
 | 1307 | 黑天鹅 | 未完全实现 | 已逐句核；28 条规则、8 条缺口（4 条为引擎限制） |
-**终结技「【奥迹】目标视为同时陷入风化/裂伤/灼烧/触电」落地** —— 新引擎字段 `counts_as` / `counts_as_requires`（别名挂在
-**创建出来的那一层 buff** 上，只有 `has_state` 这类判词认它， **不**挂真 DOT），判据 `BuffAliasTest`（引擎三条）+
-`arcanaCountsAsWindShear`、`epiphanyMakesOnlyTheArcanaTargetsCount`（内容两条，各带「必须保持 0」的对照）。⭐ 同轮修掉三处
-**没有症状的错**：① 【奥迹】「重置为 1 层」此前其实重置成 **0 层**（`SET_STACKS` 向下走 `removeState`，一次清空整个计数器），判据只因断言
-`<= 1` 而没发现；② 「被消灭时叠 6 层」是 **星魂 2** 的句子，却被写成 `min_eidolon: 1`（E1 就拿到 E2 的效果）；③
-「【奥迹】每回合开始不重置层数、每窗口 1 次」是 **终结技**的话（ **E0 就有**），却被挂在 `min_eidolon: 6` 上 —— 现在合并成一条「额度
-≥1 就不重置」的规则，判据改成 `theEpiphanyKeepsTheLayersForOneTurnStart` + `theUltimateGrantsOneKeepAtEveryEidolonRank`。⭐
-补写三句：普攻的 65% 叠 1 层（`BASIC_ATTACK`，此前普攻根本不叠；顺带发现 `ADD_STACK` 收 `base_chance` 却 **从不掷骰**，已修）、行迹
-烛影朕兆（效果命中 ×60%，封顶 72%）、星魂 6「队友攻击时 65% 叠 1 层」。⛔ 仍开四块（共 4 条 `⛔`）：普攻／行迹 脏中躁动的「四种状态各
-65% 额外 1 层」（8 条，可写）、行迹 杯底端倪（进战 65% + 单次攻击内每跳 DOT 65%/上限 3）、星魂 6 的「50% 固定概率额外 +1
-层」（缺「本次叠加」作用域）、「强化后」整块（角色加强）。
 | 1308 | 黄泉 | 未完全实现 | 已逐句核；5 条规则、5 条记录、0 阻塞 |
-层 —— `ADD_STACK` 加 `"unbounded_stacks": true` 即不设上限；与 `max_stacks` 同时写会在装载期被拒。判据
-`UnboundedStacksTest`（不带该字段：5 个回合后仍 **1 层** ✓；带上： **5 层** ✓；两个上限同时写 **被拒** ✓）。⛔ **仍开**：终结技连招（3
-次【啼泽雨斩】+1 次【黄泉返渡】）、天赋「施放技能期间」事件、秘技的 `WAVE_START` 半、终结技期间的无视弱点/抗性 |
 | 1309 | 知更鸟 | 未完全实现 | 已逐句核；13 条规则、3 条缺口（1 条为引擎限制） |
-来源待核），其余未逐句核对 |
 | 1310 | 流萤 | 未完全实现 | 已逐句核；8 条规则、5 条记录、0 阻塞 |
-星魂），其余未逐句核对 |
 | 1312 | 米沙 | 未完全实现 | 已逐句核；17 条规则、2 条缺口（1 条为引擎限制） |
-`CAST_SETUP` + `RAISE_SKILL_HITS { value: min(units(enemies), 5) }` ✓ —— ⭐ 新增头数提供器 **
-`{"type": "units", "whose": "enemies"}`**；判据按 **增量**（同一发终结技的命中数差）：1 敌人 **+1**、3 敌人 **+3** ✓。⚠
-段数不能在施放 **后**读（她自己的规则会把它归零），所以判据数的是这一发 **实际打出的段数**。✅ **2026-11-01 补**：① 终结技「
-**每段**攻击前 **20%** 基础概率冻结」= `DEALING_DAMAGE` 逐段触发 `APPLY_CONTROL 冻结`，概率用新增的
-`base_chance_from_skill_param`（#3 随等级动：Lv1 0.12 → Lv10 0.2）✓；② 星魂 2「每段 24% 基础概率使目标防御力 −16%，3 回合」✓（实测敌方
-DEF 1100 → 924）；③ 星魂 4「每段伤害倍率 +6%」✓（3567.76 → 3742.65）；④ 星魂 6「终结技时自身伤害 +30%」✓（增伤区 0 → 0.3）。⛔
-**仍开**：星魂 6 的「 **下一次**施放战技后恢复 1 个战技点」（需要一次性延迟效果）、「持续至自身回合结束」用 2 回合近似、秘技
-**2026-11-02 逐节复核**（`MishaClauseCoverageTest` 5 例）：补 **行迹 锁接**（`CAST_SETUP` + `until: cast_end`，实测终结技 4
-段里效果命中恒 **0.6**、施放后回 **0**）、 **行迹 传冲**（对冻结目标 `CRIT_ATTACK` +0.3，`instance: true`）、 **星魂 6
-的「下一次战技返还 1 战技点」**（用一回合标记：实测战技点 3 → **4**、标记消失、第二次不再给）、 **星魂 6 的时长**改成
-`until: turn_end`，以及 **战技自己的「增加 1 段」**（原来整句没写！）。⛔ **仍开 2 条**：① 行迹 释放「终结技 **首段**冻结概率
-+80%」缺 **段序号**；② 段数复位仍是「减 6」近似（引擎只有加/减，没有「设回初值」）|
 | 1313 | 星期日 | 完全实现 | 已逐句核；20 条规则、0 缺口 |
-⭐ **2026-11-06 五续**： **星魂 6 第三句也落地** —— 用 `value` 表达式 `2 × max(暴击率 − 1, 0)`（`mul`/`max`/`sub`/
-`attr{whose: target}`），落在 E6 天赋的第二个效果（`MODIFY_ATTR CRIT_ATTACK`）；provider 代数早就有，只是没这么用过。判据
-`SundayEidolonSixTest.theOverflowCritRateBecomesCritDamage`。 **1313 的 `⛔` 已清零。** ⭐ **2026-11-06 收尾**：`_gaps`
-清空（每条从句的来龙去脉都在规则自己的 `_note` 与交接 §39–§51 里），`_status: implemented` —— **第 26 个完全实现**。
-⭐ **2026-11-06 续**： **行迹 主日渴慕 已落地** —— `RAISE_ENERGY_TO` 新增**固定点数 **写法（`amount: 40`），装载期放宽并夹到目标上限，判据
-`SundayLentenGiftTest`（上限 120 ⇒ 20%=24 < 40 ⇒ 读到 40）。 ⭐ **2026-11-06 再续**： **星魂 1 已落地** ——
-`MODIFY_ATTR DEFENCE_IGNORE` 两档（本人 0.16 / `target_summon` 0.4），引擎新增选择器 **`target_summon`**（只有被指定者的召唤物），判据
-`SundayEidolonOneTest`。 ⭐ **2026-11-06 三续**： **星魂 2 已落地** —— 三条规则（记号状态给「首次」→ +2 战技点；
-`while_holder_state: 蒙福者` 的 +30% 增伤），判据 `SundayEidolonTwoTest`。`⛔` 只剩 **星魂 6**（叠 3 层 / 持续 +1 /
-溢出暴击转暴伤，各缺一样写法）。 ⭐ **2026-11-06 四续**： **星魂 6 的前两句已落地** ——
-`eidolon6_the_crit_rate_stacks_three_and_lasts_four`（`stackable` + `max_stacks: 3` + `turns: 4`；天赋那条加
-`max_eidolon: 5` 互斥），判据 `SundayEidolonSixTest`。`⛔` 只剩第三句（溢出暴击转暴伤，缺「由另一个属性的溢出量派生」的写法）。
-**天赋**（战技使目标暴击率 +20%/3 回合，按等级读）、 **秘技**（首次对我方施放技能给 +50%/2 回合，用记号状态表达「首次」+
-`coexist` 防止替换战技那份）、 **行迹 崇高拂尘**（开战 +25 能量）、 **行迹 掌中安港**（战技解除目标 1 个负面效果）、 **星魂 4**
-（自己回合开始 +8 能量）；判据 `SundaySupportTest` / `SundayTechniqueTest`。⛔ 仍开： **行迹 主日渴慕**（「至少 40 点能量」需要固定值下限，
-`RAISE_ENERGY_TO` 只有百分比）、 **星魂 1**（角色 16%/召唤物 40% 两档无视防御）、 **星魂 2**（首次终结技 +2 战技点、蒙福者
-+30%）、 **星魂 6**（暴击率可叠 3 层 / 持续 +1 / 溢出暴击转暴伤） |
 | 1314 | 翡翠 | 未完全实现 | 已逐句核；12 条规则、5 条记录、0 阻塞 | **25% 攻击力**的量子附加伤害」= `ALLY_ATTACK` +
-`actor has_state 收债人` + `DAMAGE target: **all_hit_enemies**` ✓；②
-「消耗【收债人】 **生命上限 2%**」= `CONSUME_HP scale: target_max_hp`（份额是 **付账者**自己的上限 ✓）+ **`actor != self`**
-✓（翡翠自己当收债人不扣血 ✓）。判据 `JadeCollectorAttackTest`（盟友扣 2% 上限 = 21.168 ✓、附加伤害让这一击更大 ✓、翡翠扣 0
-✓）。⛔ **仍开**：持有时禁止施放战技、终结技强化、天赋充能与追加攻击、秘技、逆回购后半、星魂 1/3/5/6 |
 | 1315 | 波提欧 | 未完全实现 | 已逐句核；14 条规则、3 条记录、0 阻塞 |
-星魂6）；星魂2-5、嘲讽、禁技、不回能、双方受伤加成已补 |
 | 1317 | 乱破 | 未完全实现 | 已逐句核；14 条规则、5 条记录、0 阻塞 | **2026-10-31 易伤身份修正后**：天赋「击破伤害
-+50%」与行迹「+2%」现在 **相加**（1.52 ✓，canon 1 + Σ 易伤）；旧判据
-`RappaBreakTakenTest` 写的是 **1.02**（行迹顶掉天赋的错值）已改 |
 | 1321 | 大丽花 | 未完全实现 | 已逐句核；8 条规则、4 条记录、0 阻塞 |
 | 1401 | 大黑塔 | 未完全实现 | 已逐句核；6 条规则、4 条记录、0 阻塞 |
-`ENEMY_ENTERED` + `ADD_STACK 解读 1 max_stacks: 42 target: actor` ✓（ **落在入场者身上**，不是施法者、不是全体）；判据
-`HertaInsightTest`（开战名册 0 层、后加入的敌人 1 层、后来者不再重复计）✓。⛔ **仍开**：每波开始的 25 层与「优先精英」、按层数的倍率加成、「智识」命途
-≥2 名、重置为 1 层、离场转移 |
 | 1402 | 阿格莱雅 | 未完全实现 | 已逐句核；40 条规则、8 条缺口（2 条为引擎限制） |
-（开大 → `REPLACE_SKILL` 普攻槽 → 槽 8）与 `p1402_memosprite_leaving_restores_her_basic`（`SUMMON_LEFT` → `remove`），判据
-`AglaeaStanceSkillSwapTest`；⚠ 同时更正 §18 的误判：`skills.json` **本来就有**槽 8/9，「无法恢复战技点」由那一行的
-`bp_add: 0` 承载（不需要开关）； **衣匠那一半也落地** —— 先按 tbgd 的 `Servant_AglaeaServant_00_Config.json`（
-`SyncPropertyExceptList` 只有速度项 ⇒ 忆灵 **同步召唤者其余属性**）给 `memosprites/1402.json` 补 `ATTACK: 1.0×阿格莱雅`
-，再写 `p1402_garmentmaker_hits_the_same_target` / `..._the_neighbours`（`BASIC_ATTACK` + `from_skill_id == 8`，
-`attacker: summon` + `percent_from_skill_param: COMMON:2/3`），判据 `theMemoSpriteFightsWithHerAttack` +
-`theGarmentmakerDealsItsOwnHalfOfTheJointAttack`（3 个实例都归忆灵）。 **2026-11-04 逐节核（第一次真正逐节）**：旧行说「只差
-1415 忆灵技 12 的其余四部分，其余已覆盖」—— 两条都不对：① 那句话是 **贴错**的，1415 的【浪漫】之诗在本文件里写全了（标记 +
-攻击后消耗回 70 能量 + 增伤 + 无视防御 + 两条随【至高之姿】结束时摘除，判据 `MemospriteOdeTest`）；② 本角色
-**大半没有被覆盖**：战技（治疗 + 召唤 + 立即行动）、终结技（召唤/回满/进入【至高之姿】/立即行动）、天赋（【间隙织线】施加与「仅最新目标」+
-30% 附加伤害）有规则，而 **强化普攻【孤锋千吻】、忆灵技能 1/2、行迹 短视之惩/织运之竭、星魂 4/6 与忆灵等级加成一句规则都没有**
-（秘技、星魂 1/2、忆灵技能 3/4、行迹 飞驰之阳 本轮已补，见下）。现登记 7 条 `_gaps`（每条都写到「缺哪个词」：如忆灵技能卡在
-**忆灵没有自己的规则表**、行迹 飞驰之阳 卡在「把能量设到上限 N%」、强化普攻卡在「这次攻击不给战技点」），并新增判据
-`AglaeaClauseCoverageTest`： **每个小节 → 规则 id 或 `_gaps` 里的某条标记**，双向（没有规则的小节会红，没有小节的规则也会红）。⭐
-**2026-11-04 同日补写秘技**：`technique_meteoric_sunder`（召唤 + 读秘技行的 30 能量 + 100% 攻击力雷伤全体 + 规则级 `pick`
-给一个随机目标【间隙织线】，先摘后给），判据 `AglaeaTechniqueTest` 用「声明 / 不声明秘技」两侧对照（衣匠在场、全体掉血、能量
-+30、恰好 1 个目标带状态，对照 0）。⭐ **同日补写星魂 1**：`eidolon1_threaded_target_takes_more`（命名修饰
-**跟着【间隙织线】转移**，并加 `while_holder_state` 兜住状态自然到期）、`eidolon1_threaded_attack_pays_energy` +
-`..._for_the_garmentmaker`（`ATTACK_FINISHED`，每次攻击一次），判据 `AglaeaEidolonOneTest`（E1/E0 比值 =
-1.15、修饰转移后旧持有者归零、两条攻击各 +20 能量）。⭐ **同日补写忆灵技能 3/4**：
-`memosprite_speeding_summer_advances_itself`（`SUMMONED` + `ADVANCE target: summon`）与
-`memosprite_bloom_of_drying_grass_pays_energy`（`SUMMON_LEFT` + 20 能量），判据 `AglaeaMemospritesTest`
-（召唤后队列首位就是衣匠；它离场后能量正好 +20 —— 击杀由 **队友**完成，否则会混进 5 点击杀回能）。⚠ 这两条改动了
-**战斗开场的行动顺序**，连带修了两条旧判据的前提（`AglaeaMemospriteTest` 里「忆灵不提前」那句已过时、`SummonFieldTest`
-的夹具改成先开回合再召唤）。⭐ **同日补写行迹 飞驰之阳**：`trace_racing_sun_fills_half_the_energy` —— 用 **
-`RAISE_ENERGY_TO`**（下限而非加量，所以「若不足」无需条件），判据 `AglaeaTracesTest`。⚠ 它与秘技的 30 点 **会互相吞**（开战 0
-能量时 50% 的下限盖掉那 30 点），判据夹具因此把起点设在 60%。⚠ 同轮把两条 **数数型**旧判据改成 **相对**断言（
-`RelicTriggerTableTest` 以「无遗器的同一角色」为基线、`TriggerTableTest` 只更新了一个数并写明归属），因为它们都被新内容打红过。⭐
-**同日补写星魂 2**：`eidolon2_a_layer_when_she_acts` / `..._when_the_memosprite_acts`（每次行动给 **各自**加一层
-`DEFENCE_IGNORE 0.14`，`stackable` + `max_stacks: 3`）+ `eidolon2_another_units_skill_clears_it`（`SKILL_CAST` +
-`actor is_other_ally` ⇒ `REMOVE_STATE all_allies` 一次摘掉她和衣匠两份），判据 `AglaeaEidolonTwoTest`（0.14/0.28/0.42、第 4
-次不加、E1 恒 0、衣匠只叠自己那份、队友施法两份清零）。⚠ **登记一处窄**：敌方施法不清除（引擎只把我方施法送给规则表）。 | ⭐
-**2026-11-05**： **忆灵技能 1「刺纹之陷」已落地** —— `memosprites/1402.json` 新增 `attack` 块（Blast，Lv10 `1.54 / 0.924`，破韧
-`30 / 15`），引擎新增 `Attack.neighbour_percent` / `neighbour_stance`（`EnemySkill` 按目标选份额），判据
-`theMemospriteBlastHitsTheNeighboursForLess`（主目标/相邻损失比 = 1.1/0.66）。 | ⭐ **2026-11-05 续**： **忆灵技能 2
-的叠层半已落地** —— `p1402_memosprite_speed_stack_on_threaded_hit`（`SUMMON_ATTACK` + `target has_state 间隙织线` → 衣匠
-`SPEED +63.8`，`max_stacks: 6`），判据 `theMemospriteStacksSpeedOnlyOnAThreadedHit`（未织线的目标不叠、第 7 次不加）。⚠ 数值是字面值：
-`amount_from_summon_param` 不被 `MODIFY_ATTR` 读（装载期只认 `percent`/`amount`）。⛔ 仍开「行动时自动施放 / 优先目标」那一半（忆灵回合只有
-`attack`）。 ⭐ **2026-11-05 再续**： **【至高之姿】的「每层 +15% 速度」已落地** —— 引擎新增 **
-`per_stack: summon_stacks:<名>`**（`per_stack_live` 时 **实时**读 **忆灵的**层数，忆灵不在场答 0），规则
-`p1402_stance_speed_follows_the_layers`（`percent_from_skill_param: ULTRA:0` + `while_state: 至高之姿`），判据
-`theStanceSpeedFollowsTheLayersLive`（挂上之后再叠 3 层，速度 1.15/1.30/1.45 倍， **无需重放大招**）。⚠ 这条规则必须排在
-`ult_effect` **之前**：先 ADVANCE 再加 SPD 会让队列按新速度重算行动值，「立即行动」失效（实测 147.06）。 ⭐ **2026-11-05 三续**：
-**星魂 4 已落地** —— `p1402_eidolon4_her_attack_also_stacks_it`（她的攻击也给衣匠同一份 `匠躯` 层）+
-`p1402_eidolon4_the_cap_rises_by_one`（同形、`max_stacks: 7`；上限无条件写法，与 1218 星魂 6 同一个办法），判据
-`theEidolonFourCapAndHerOwnAttacks`（E4 能到 7 层、E3 不叠）。⚠ 顺带扩了 `EidolonNumbersComeFromTheDataTest` 的数值池：eidolon
-规则里出现的 **忆灵行**数值（如 63.8 = 1140203）现在也算「来自数据」。
-⭐ **2026-11-06**： **行迹 短视之惩 已落地** —— `p1402_trace_short_sighted_atk_for_her` / `..._for_the_garmentmaker`（
-`ULT_CAST` → `MODIFY_ATTR ATTACK`，`self_attr:SPEED × 7.2` + `summon_attr:SPEED × 3.6`，`while_state: 至高之姿`，双方各一份），判据
-`theTraceRaisesBothAttackValues`。⚠ 实测两个坑： **两条同属性修饰必须 `coexist: true`**（否则后挂的替换前一个，只剩
-360%），且这两条必须排在 `ult_effect` **之后**（要读衣匠）。⛔ 仍开：织运之竭（跨忆灵生命保留 1 层）、忆灵技能 2 的行动策略、星魂
-6、忆灵等级加成。 ⭐ **2026-11-06 又续**： **星魂 6 前半已落地** —— 引擎新增 **按元素的穿透常量**
-`DAMAGE_PENETRATION_<ELEMENT>` + `AttributeType.penetrationFor(element)`（与 1307 那组 `RESISTANCE_REDUCTION_*` 对称），
-`DamageService` 把「全类型穿透 + 元素穿透」 **相加**；规则 `p1402_eidolon6_thunder_penetration_while_in_the_stance`（雷穿透
-+20%，她与衣匠各一份，`while_state: 至高之姿`），判据 `AglaeaEidolonSixTest`（雷伤害变高、物理不动；还实测了 `add_percent`
-改不动穿透、必须用 `pure`）。⛔ 仍开：星魂 6 的 **后半句**（速度高于 160/240/320 时连携攻击 +10/30/60%）。 ⭐ **2026-11-06
-补正**： **星魂 3 / 5 的等级加成修了两处错映射** —— 旧规则把忆灵槽 `1140203`/`1140201` 当成 `ULTRA`/`COMMON`
-加了等级（装载期不报错，是个静默的错数字）；现在只加角色自己的槽（战技+2/普攻+1、终结技+2/天赋+2），强化行（140208/140209）由槽位继承，判据
-`AglaeaEidolonLevelsTest`（E2→E3 战技 10→12、普攻 6→7；E4→E5 终结技→12、天赋→12）。⛔ 忆灵技能等级仍开（忆灵技能钉在表的第 10
-行，+1 会越界）。 ⭐ **2026-11-06 再补**： **行迹 织运之竭 已落地** —— `SUMMON_LEFT` + `actor_stacks:匠躯 >= 1` → 记 1 层（
-`< 1` 则置 0）、`SUMMONED` → 新衣匠补回 1 层；引擎侧把 **`SET_STACKS` 也算作「创建计数器」**（它确实会建 `StackBuff`，否则「只
-set 不 add」的计数器会被装载期误报）。判据 `theKeptLayerComesBackOnTheNextSummon`（2 层走 ⇒ 留 1 层 ⇒ 新衣匠只有 1 层）。 ⭐
-**2026-11-06 三补**： **忆灵技能等级口径改成 6**（文档给忆灵技能写的就是 **第 6 行**：110%/66%、55；此前钉在第 10 行 = 表尾），于是
-**星魂 3/5 的忆灵等级加成也落地**（`RAISE_SKILL_LEVEL {memosprite: true}`，6 → 7），`attack` 的数值同步改回 **1.1/0.66**、
-`匠躯` 改回 **55**。判据 `theMemospriteSkillLevelsRiseAtTheirEidolons` + 既有
-`theMemospriteStacksSpeedOnlyOnAThreadedHit`（55）。 ⭐ **2026-11-06 四补**：
-**【至高之姿】③「衣匠免疫控制类负面状态」已落地** —— `memosprite_immune_to_control`（
-`RESIST_DEBUFF { kind: control, percent: 1.0 }` 就是引擎里的免疫，判据 `theGarmentmakerShrugsOffControl`）；同时把该缺口改写成盘点式（①
-速度层数 ✅、② 强化普攻 ✅、③ 免疫 ✅，只剩 ④ 倒计时/自毁与 ② 的后半「不能施放战技」）。 ⭐ **2026-11-06 五补**：【至高之姿】的**
-「无法施放战技」 **也落地了 —— `APPLY_BUFF { buff: 至高之姿, blocks: 技能 }`（`blocks` 词表本来就有 `skill`；
-`SkillCastability` 按槽位 2 查），判据 `theStanceBansHerSkillAndGivesItBack`。至此【至高之姿】只剩 ④「倒计时/回合开始使衣匠自毁」未写。
-⭐ **2026-11-06 六补**：**【至高之姿】④「倒计时/回合开始时使衣匠自毁」已落地** —— `START_COUNTDOWN { speed: 100 }` +
-`COUNTDOWN_TURN` + `actor == countdown` → `DISMISS_SUMMON`，判据 `theCountdownDestroysTheGarmentmaker`。至此【至高之姿】的
-**四句全部落地**（形态生命周期、速度层数、强化普攻+禁战技、免疫控制、倒计时自毁）。
 | 1403 | 缇宝 | 完全实现 | 已逐句核；21 条规则、0 缺口 | **`defer_until_wave: true`** ✓（敌方全灭时押到下一波、`WAVE_START`
-释放 ✓），判据 `TribbieDeferredFollowUpTest`（延后那一发与直接那一发 **数值完全相同** 71.13 = 71.13 ✓）。⚠ 先前记的「延后弱
-42%」是 **量错**：直接对照用的是同场较晚的一次命中，而她自己的追加攻击会先给一层 **×1.72 增伤** ⇒ 71.13 × 1.72 = 122.35 ✓
-已澄清（换到 **独立战场**的对照组后完全相等）|
 | 1404 | 万敌 | 未完全实现 | 已逐句核；15 条规则、5 条记录、0 阻塞 |
-150目标与1415忆灵技），其余未逐句核对 |
 | 1405 | 那刻夏 | 未完全实现 | 已逐句核；13 条规则、4 条记录、0 阻塞 |
-`APPLY_BUFF` + **效果级 `target_when: [「target_weakness_count >= 5」] ` **（逐目标筛选 ✓，规则级条件问不到每一个敌人）；②
-对【质性揭露】目标的伤害 **+30%** = `DEALING_DAMAGE` + `target has_state` → `BOOST_DAMAGE 0.3`；判据
-`AnaxaTrueKnowledgeTest`（4 种弱点**不施加** ✓、5 种 **施加** ✓；增伤区 **1.224 → 1.524 = +0.3** ✓）。⛔ **仍开**：额外施放 1
-次战技、弱点植入的回合数/控制抵抗、星魂 1「首次」、忆灵技 18 的命途选择器 **2026-11-04 逐节核**： **星魂 1 的「首次施放战技后恢复
-1 个战技点」落地** —— `once_per_battle: true` 就是「首次」的计数（旧登记说「缺『首次』计数」作废）。判据 `AnaxaEidolonOneTest`
-（第一次多给 1 点、第二次不多给）。⛔ 仍开：【升华】/【质性揭露】的弱点植入与控制抵抗、1415 忆灵技 18 的命途加成（选择器其实已有
-`allies_of_path:`，待核）。 |
 | 1406 | 赛飞儿 | 未完全实现 | 已逐句核；14 条规则、6 条记录、0 阻塞 |
-星魂1与2），其余未逐句核对 |
 | 1407 | 遐蝶 | 未完全实现 | 已逐句核；14 条规则、6 条记录、0 阻塞 |
-1415忆灵技17），其余未逐句核对 |
 | 1408 | 白厄 | 未完全实现 | 已逐句核；34 条规则、6 条记录、0 阻塞 |
-其余），其余未逐句核对 |
 | 1409 | 风堇 | 完全实现 | 已逐句核；39 条规则、0 缺口 |
-`eidolon_six_aura_covers_later_arrivals`，判据 `HyacineEidolonSixLateSummonTest`）；② 「免疫负面效果」= `RESIST_DEBUFF` **不写
-kind**（任意负面状态，含不带类别者）—— 为此开了引擎口径：`ClassResistBuff` 允许 null 类别、`BuffManager.debuffResistOf` 不再对
-null 早退，判据 `BuffAnyClassResistTest`（变异去掉 `kind == null` 分支即红）；③ 战技治疗两半： **我方全体**（
-`the_skill_heals_every_ally`，`skill_effects.json` 1409/2 改 `Rules`）+ **小伊卡自己**（
-`the_skill_also_heals_ikachi_itself`），判据 `HyacineSkillHealsTheWholePartyTest` / `HyacineIkachiSelfHealTest`
-（各自变异删规则即红）；④ 终结技治疗与天赋每层增伤读行（`ULTRA:0/1`+`ULTRA:5/6`、`TALENT:2`），判据 `HyacineRowLevelTest` 钉 E0
-与 E3/E5 两端 |
 | 1410 | 海瑟音 | 未完全实现 | 已逐句核；23 条规则、4 条记录、0 阻塞 |
 | 1412 | 刻律德菈 | 未完全实现（ **22 条规则 / 13 个判据文件、19 个用例**） | 已逐句核；23 条规则、2 条缺口（2 条为引擎限制） |
-：等级口径、战技授予【军功】（仅最新持有者）、天赋三段、终结技充能、 **终结技「无人持有时授给队伍下一位」**、星魂
-1、爵位升级、爵位战技的穿透与暴击伤害、奇袭及其结束、忆灵加成与两个读数器、星魂 3/5、秘技的「开场获得【军功】」、星魂 2 的两半、星魂
-6 的两段穿透。⛔ **星魂 4（终结技倍率 +240%）已撤下**：`BOOST_DAMAGE { percent: 2.4 }` 实测比值 **2.96**，而 `BOOST_DAMAGE` 是
-**同区相加**（`(3.4+B)/(1+B)=2.96` ⇒ B ≈ 0.2245）⇒ 正确读法应是 **缩放技能行份额**，待定。⛔ 其余仍开：秘技的「切换转移」（大地图）与「开战免费施放
-1 次战技」、星魂 6 的「【军功】触发的附加伤害倍率提高 300%」、20 次计数。⚠ **两处读法登记**：① 终结技的「第一位」用 `next_ally` 而不是
-`party_first`（后者会选中她自己，实测把充能从 6 推到 8）；② 两条 `any_ally has_state` 挂 `TURN_START`（`BATTLE_START`
-上读不到队友状态）。 |
 | 1413 | 长夜月 | 未完全实现 | 已逐句核；25 条规则、1 条缺口（1 条为引擎限制） |
-`EvernightMemoryFoldTest`）； ~~「迷梦，流失，如露」 (1141307/槽 7) 的三种形状~~ ✅ 已落地（`per_resource_share` ＋
-`DISMISS_SUMMON`，判据 `EvernightDreamDumpTest`）； ~~「【忆质】≥ #3 才可施放」这道 **门**~~ ✅ **已落地**（2026-10-29）：
-`skill_effects.json` 新开 `castable_when`（拼法与规则的 `when` 一致），`SkillCastability` 在 **两个施放入口**（
-`CastService.useSkill` / `Battle.castImmediate`）把关，判据 `EvernightCastabilityTest`（15 点 ⇒ 拒绝且不消耗；16 点 ⇒
-放行）✓ ⇒ **逐句核完，完全实现**。2026-10-31 格式迁移：22 条 `note` → `_note`，全部标 `_status: implemented`（
-`EvernightFormatMigrationTest`） ⚠ **2026-11-03 状态纠正**：`_status` 改回 **`partial`** —— 星魂只有 3/5 两条等级规则，1/2/4/6
-未写。 |
 | 1414 | 丹恒•腾荒 | 未完全实现 | 已逐句核；12 条规则、3 条缺口（1 条为引擎限制） |
-行迹与星魂），其余未逐句核对 |
 | 1415 | 昔涟 | 未完全实现 | 已逐句核；31 条规则、1 条缺口（1 条为引擎限制） | **行**（`cast_param` 1）；并给普通普攻那条加「
-**不在【往昔的涟漪】里**」的门 —— 否则强普会同时吃到 +1 与 +3（= 4）✗；判据
-`CyreneRecollectionTest`（涟漪内 3、涟漪外 1）✓。 ~~终结技的暴击率字面量 0.5~~ ✅ 改成读行（`skill_param ULTRA:2`）✓。 ~~「
-**单场战斗中只能施放 1 次**」~~ ✅ **已落地**（2026-10-29）：`skill_effects.json` 新开 **`once_per_battle`**（ **历史**
-类可施放性，与资源类的 `castable_when` 分开 ✓），由 `SkillCastability` 在两个施放入口把关、由 `Battle` 在 **施放提交**
-时记账（被拒的施放不消耗 ✓）；判据 `CyreneUltimateOnceTest`（首发放行 / 第二次拒绝 / 新战斗重置；变异验证 ✓）。 **仍差**： ~~②
-「仅能使用该普攻」~~ ✅ **已落地**（2026-10-29）：把「仅能」写在 **被排除的槽**上 —— 战技与终结技各加
-`castable_when: !has_state 往昔的涟漪`，强普那条反过来 `self has_state 往昔的涟漪`（"只在涟漪里存在"✓）；判据
-`CyreneRippleClosesOtherSlotsTest`（涟漪里战技被拒 / 涟漪外照常 / 强普在涟漪里可用）✓。⚠ **读法登记**
-：原句只点名普攻，涟漪形态是否保留战技没有行可证 ⇒ 这条读法写成 **每槽一行数据**，拿到完整技能表即可推翻而不动引擎。 ~~③ 强普
-**每段削韧**待核~~ ✅ **已收口**（2026-10-29）：游戏自己的 `AvatarSkillConfig.ShowStanceList`（141508，各级一致）= **
-`[30, 15, 0]`**，生成器按 `{single, all, spread}` 读 ⇒ **单段 30、全体段每敌 15** 正是官方表 ✓（"ConfigAbility 写死 15"是误读
-✗）。 **至此 1415 逐句核完 ⇒ 完全实现**。2026-10-31 格式迁移：28 条 `note` → `_note`，全部标 `_status: implemented`（
-`CyreneAndRobinFormatMigrationTest`） ⚠ **2026-11-03 状态纠正**：`_status` 改回 **`partial`** —— 星魂只有 3/5，1/2/4/6
-未写。 |
 | 1501 | 火花 | 未完全实现 | 已逐句核；5 条规则、2 条缺口（2 条为引擎限制） |
 | 1502 | 爻光 | 未完全实现 | 已逐句核；8 条规则、4 条缺口（2 条为引擎限制） |
-`APPLY_BUFF 结界` + **`ticks_on: 「self」`** ✓；② 「结界期间 **施放普攻、战技后获得 3 个笑点**」= 两条规则（`SKILL_CAST` /
-`BASIC_ATTACK`）+ 门槛 `self has_state 结界` ✓；判据 `YaoguangZoneTest`（战技后 **3**、再普攻 **6** ✓；无结界时 **0** ✓）。⛔
-**仍开**：结界期间我方 **欢愉度** +20%（跨单位派生修饰）、【大吉大利】（每次攻击追加 20%
-欢愉伤害、消耗战技点时再触发、「不视为一次攻击」）、终结技给阿哈的额外回合、星魂与行迹 | **2026-11-01 补天赋**：「每次攻击后，对
-**随机 1 个命中目标**追加 20% 攻击力的欢愉伤害」= `ATTACK_FINISHED` + **`random_hit_enemy`**（本轮补上的选择器实现）+
-`damage_type: ELATION` ✓。⛔ 仍开：结界的欢愉度派生、阿哈额外回合、天赋的「消耗战技点时再触发」、星魂与行迹 |
 | 1503 | 真珠 | 未完全实现 | 已逐句核；56 条规则、1 条缺口（1 条为引擎限制） | **已修**：强化普攻回血原写
-0.08/160（描述里的低等级值），而槽 8/10 的 Lv10 行是 [1.4, 0.112, 1, 224] ⇒ 已改成 11.2% x 防御 +
-224，判据 PearlEnhancedBasicHealAmountTest（变异回 0.08/160 会红）。⚠ 为何保留常量而不是读行：实测两种读法都不行（COMMON:1
-会读到普通普攻的 size=1 行；percent_from_cast_param 报 Pearl has no loaded skill at slot 8），引擎还没有「读被替换技能那一行」的拼法。⚠
-仍登记：引擎没有「按 **有效等级**读 **被替换技能**那一行」的拼法（实测 2026-10-19：替换槽的 **对象等级**是 1 ✗，而
-**有效等级**是 10 ✓ ⇒ 常量取的正是有效等级那一行 `[1.4, 0.112, 1, 224]` ✓； **E3 的 +1 被 10 行表夹掉 ⇒ 不漂移** ——
-上一版「E3 会漂移」的说法已撤回）。另：状态名「渲染理性，解构欢榆」的 **错字已修**（2026-10-19：原文文档里 **一次都没有**「欢榆」 ⇒
-那是仓库里的损坏字符，已连同 1513 的一处 **误引**与 `AttributeType` 的注释一起还原成「欢愉」；判据
-`PearlElationSkillCarrierTest` 的 CARRIER 常量随之改名）。 |
 | 1504 | 不死途 | 未完全实现； **2026-11-03 再核终结技**：① `CAST_SKILL` 的 `target` 原为 **`target`（敌方）** ⇒ 会让
-**敌人**去施放天赋并抛 `冰锋 has no TALENT skill`（真错，已改 `self`）；② 补「使指定敌方单体成为【饲饵】」（与战技同一招：先摘全体再给新目标，
-**在追加攻击之前**）与「获得 **3 点充能**」（`GAIN_RESOURCE`，上限钳位）。判据
-`AshveilClauseCoverageTest.theUltimateMarksTheBaitAndRefillsTheCharges`（实测：目标挂上【饲饵】、充能从 0 回到 **3**、血掉了 ⇒
-追加攻击真的落在【饲饵】上）。⛔ 仍开 3 条（星魂 2 返还、终结技「每 4 层」与击杀转标、战技「已为【饲饵】」的倍率列待核） **2026-11-04
-续**： **行迹 罪途 / 影肢** 落地 —— 罪途 = 战技 +1 层 / 终结技 +2 层；影肢 = `damage_is_additional` 上的
-`BOOST_DAMAGE { value: 0.8 + 0.1 × 层数 }`（`stacks whose: owner`）。行迹 头狼两条早已在。⚠ `AshveilTest` 的层数期望 4→
-**5**（战技施放本身也走 罪途）。⛔ 仍开：星魂 2 返还半、终结技「每 4 层」与致命转标、战技「已为【饲饵】」的列映射、罪途的「致命一击 +1
-层」。 |
 | 1505 | 绯英 | 未完全实现 | 已逐句核；16 条规则、3 条缺口（3 条为引擎限制） |
-2 前半（`CRIT_ATTACK` +0.36）、星魂 4（`DEFENCE_IGNORE` 0.15）落地，判据 `EvanesciaClauseCoverageTest`（3 例，实测 0.0→0.2 /
-0.5→0.86 / 0.0→0.15）。⛔ **仍开 3 条（已按「缺哪个词」登记）**：星魂 1 后半（【狐狸老师】额外欢愉技 + 10 点好活当赏）、星魂 2
-后半（按本次发放量的 50%/100% 再加成）、星魂 6 的三条（持续时间 / 按资源每 100 点缩放 / 每 4 次终结技的计数额度）
 | 1506 | 银狼LV.<unbreak>999</unbreak> | 未完全实现 | 已逐句核；31 条规则、1 条缺口（1 条为引擎限制） |
-15 隐藏分、终结技进【无敌玩家】+ 行动提前 + 结界 + 盲盒（概率衰减 / 三选一 / 均分 / 补触发）、天赋（笑点转隐藏分 / 暴击率 /
-暴击伤害 / 三次强化普攻退出 / 免疫控制 / 强化普攻与强化欢愉技两个交换）、行迹三条、星魂 1 结界易伤、星魂 2 两半、E3/E5
-等级、E4、E6 增笑、等级口径。 **2026-11-04 收官一条**：①「无法施放终结技」 **已落地** ——
-`APPLY_BUFF {buff: 无敌玩家, blocks: "ultimate"}`（`blocks` 词表里一直有 `ultimate`，旧登记说「词表没有」是错的），同轮修了
-`UltimateService.cast` 的「先 settle 再被拒」⇒ 被禁的大招不再白掉能量、且返回 `false`（判据
-`godmodeBansTheUltimateAndTheBanLeavesWithIt`）。 **仍登记**：②「强化普攻的技能伤害改为相同倍率的欢愉伤害」；③
-强化普攻的「按段触发盲盒 / 致命后再施放 / 每回合首次延长增益」四句；④ 星魂 6 的【禁限弱点】；⑤ 秘技的召唤切换与恐惧秒杀（地图层）；⑥
-槽 21 行的布局被引擎读反（引擎缺口，登记在 `AGENT.md` §4.3，缺口见证 `SilverWolfLV999ElationRowTest`）。判据：
-`SilverWolfLV999*Test` 一族（含变异过的门与份额） |
 | 1507 | 千冶•刃 | 未完全实现 | 已逐句核；8 条规则、3 条记录、0 阻塞 |
-`SKILL_CAST` + `from_skill_id == 150705` → `DELAY { target: 「countdown」, percent: 0.15 }` ✓；判据 `BladeZoneDelayTest`
-（倒计时剩余 **142.86 → 164.29**，正好 +15% 周期 ✓）。⭐ **引擎新增 `countdown` 选择器**（此前 `START_COUNTDOWN` 能造、
-`COUNTDOWN_TURN` 能看，却没有任何效果能作用于它）。⛔ **仍开**：普攻/战技/天赋/秘技未逐句、【无量忿怒】状态本身、星魂 2–6 |
 | 1508 | 远坂凛 | 完全未实现 | 无内容文件 |
 | 1509 | 吉尔伽美什 | 完全未实现 | 无内容文件 |
 | 1510 | 姬子•启行 | 未完全实现 | 已逐句核；4 条规则、5 条记录、0 阻塞 |
-行迹星魂），其余未逐句核对 |
 | 1512 | 知更鸟•晴歌 | 未完全实现 **2026-11-03 开始补**： **星魂 2 的抗性穿透半**（
-`DAMAGE_PENETRATION 0.18 target: all_allies`）与 **星魂 4 的气氛值半**（`SUMMONED` + `summon_count >= 3` 的
-`min_eidolon: 4` 规则 → `GAIN_RESOURCE 12`）落地，判据 `RobinEidolonTwoTest`。⛔ 仍开：星魂 1（记录 + 清 50%）、星魂 2 另两半（上限
-+20 会抛：待查；回合内首次 +2）、星魂 4 速度半（要能指名忆灵 + 按资源实时缩放）、星魂 6（倍率 ×2 / 储存 2 次 / 首次 Fever 回
-140）。 **2026-11-03 补订**：星魂 2 的 **上限 +20** 也已落地 —— `RAISE_RESOURCE_CAP { resource: 气氛值, amount: 20 }`；⚠
-该资源是 **PARTY 作用域**（在 battle 上，不在她的 `ResourceManager` 里），`raiseResourceCap` **本来就会回退到队级计数器** ⇒
-我上一轮把它误记成「会抛」，已订正。判据加了「上限 +20、数值仍为 0（容量不是白送）」。⛔ 星魂 2 只剩第三半（回合内首次 +2）。
-**2026-11-03 再续**： **星魂 6 的能量半**落地 —— 「本场第一次进入【Fever】固定恢复 140」= 与天赋同条件（`SUMMONED` +
-`summon_count >= 3`）+ 一次性标记 `首次狂热已触发`（`max_stacks: 1`）+ `GAIN_ENERGY { fixed: true }`；判据实测「第一次
-+140、第二次 +0」（⚠ 第一次尝试用手动 `SUMMONED` 事件驱动失败：规则读的是 **真实召唤数**，必须真的召唤两次战技才凑齐三人）。⛔
-星魂 6 只剩倍率 ×2 与「终结技储存 2 次」。 **2026-11-03 三续**： **星魂 2 三半全部落地** —— 第三半「任意目标回合内第一次施放技能
-+2」用一次性标记 `本回合已加成` + `TURN_START` 清标记实现；实测「同回合第二次只拿基础值、下一回合第一次又给」（⚠
-近似：原句前提是「使气氛值增加」，这里挂在任何我方技能施放上）。⛔ 1512 仍开：星魂 1（记录伤害 + 清 50%）、星魂 4 速度半、星魂 6
-的倍率与储存。 **2026-11-03 四续**： **星魂 1 落地** —— 资源 `记录` + `DAMAGE_SETTLED` 的 `amountFromEvent` 累加；忆灵技（
-`SKILL_CAST` + `actor is_summon`）对 `highest_hp_enemy` 造成 `记录 × (0.11 + 气氛值 × 0.001)` 的 TRUE 伤害，随后
-`REMOVE_RESOURCE { scale: self_resource:记录, percent: 0.5 }` 扣一半。⚠ 近似：「非真实伤害」未过滤 ⇒ 那一发也会被记入，判据只断言「约一半」。⛔
-1512 仍开：星魂 4 速度半（指名忆灵 + 按资源缩放）、星魂 6 的倍率 ×2 与终结技储存 2 次。 **2026-11-03 五续**： **星魂 4
-速度半**落地 —— `MODIFY_ATTR SPEED { percent_from: 0.2 + 气氛值×0.005, target: all_summons }`（`all_summons` 选择器
-**已有**；数值在进入 Fever 那一刻按「当前气氛值」算一次即可 ⇒ 上一轮误判成缺能力）。⚠ 近似补记：星魂 2 的「回合内首次
-+2」挂在任何我方技能施放上（原句要求「使气氛值增加」）。⛔ 1512 **只剩星魂 6 两半**（忆灵技倍率 ×2 要能放大 **数据行**份额；终结技储存
-2 次引擎没有）。 **2026-11-04 续**： **星魂 6 的倍率半**落地 —— `DEALING_DAMAGE` + `actor is_summon` →
-`BOOST_DAMAGE { percent: 1.0 }`（实例级替代数据行份额；判据实测 E6 最高一发 > E0）。⚠ `HardcodedSkillRowRatchetTest` 因此
-39→ **40**（已写明理由：这是 **星魂参数**、不是行份额）。⛔ 1512 只剩「【Fever】期间终结技最多储存 2
-次」（引擎没有可储存的终结技）。 |
 | 1513 | 砂金•戏浪 | 未完全实现 | 已逐句核；15 条规则、5 条缺口（4 条为引擎限制） |
-`AventurineWaveflairClauseCoverageTest` 4 例）： **行迹 极乐派对**（速度 ≥140 → 欢愉度 0.3 + 超出速度×1%，上限 +2.0；实测
-130/150/400 三档）、 **星魂 1 前半**（`DAMAGE_PENETRATION` 0.24）、 **星魂 6 前半**（`ELATION_DAMAGE_AMP` 0.25）、 **星魂 4**
-（战技后我方全体 `DEFENCE_IGNORE` 0.18 / 3 回合，实测落在 **队友**身上 ✓）。⛔ **仍开 5 条（全部按「缺哪个机制」登记）**：星魂 1
-后半的 **多阈值触发**、星魂 2（资源上限 + 40/50 阈值 + 施放后 +4 热意）、星魂 6 后半（2 次的 **计数** + 永久替换 +
-阿哈时刻外不耗热意）、行迹 纵享惊涛的两分支（含「视为追加攻击」「阿哈速度」）、欢愉技的「10 次 × 18%」段（引擎只取参数行第一列）
 | 8001 | 开拓者•毁灭 | 未完全实现 | 已逐句核；10 条规则、3 条记录、0 阻塞 |
-`from_skill ULTRA` + `per_attack: 1`）✓；② 星魂 2 物理弱点回 **5% 攻击力**生命（`HEAL scale: owner_attack`，物理
-**+39.74** / 冰 **0** ✓）；③ 星魂 3/5 等级 ✓；④ **星魂 6**「消灭敌方目标时 **也会触发天赋**」= `KILL` → 与天赋
-`talent_atk_on_break` **同形效果**（`ATTACK +20%`、`max_stacks: 2`、同名 `牵制盗垒`）✓；判据
-`TrailblazerDestructionEidolonSixTest`：攻击 **794.79 → 918.97**，增量 = **0.2 × 基础攻击 620.93** ✓（⚠ 面板比值只有
-1.156：+20% 是 **基础攻击**的份额，遗器已有加成时面板涨不到 20%）。⛔ **仍开**：终结技二选一形态、行迹、强化普攻/战技替换 |
 | 8002 | 开拓者•毁灭 | 未完全实现 | 已逐句核；10 条规则、3 条记录、0 阻塞 |
 | 8003 | 开拓者•存护 | 未完全实现 | 已逐句核；12 条规则、5 条缺口（3 条为引擎限制） |
-⭐ **2026-11-06 逐节核**：普攻 / 战技的「并叠加 1 层【灼热意志】」与星魂 1「开战 4 层」落地（两条文件同步）；仍开三条真缺口（≥4
-层强化普攻的按层数替换、终结技的混合基数、下一次普攻不消耗层数），每条写明缺的机制。
-星魂），其余未逐句核对 |
 | 8004 | 开拓者•存护（男） | 未完全实现 | 已逐句核；12 条规则、5 条记录、0 阻塞 |
-⭐ **2026-11-06 逐节核**：普攻 / 战技的「并叠加 1 层【灼热意志】」与星魂 1「开战 4 层」落地（两条文件同步）；仍开三条真缺口（≥4
-层强化普攻的按层数替换、终结技的混合基数、下一次普攻不消耗层数），每条写明缺的机制。
-星魂），其余未逐句核对 |
 | 8005 | 开拓者•同谐 | 完全实现 | 已逐句核；12 条规则、0 缺口 | **+0.25** ✓）。⛔ **仍开**：星魂 1/4/6、行迹其余 |
 | 8006 | 开拓者•同谐 | 完全实现 | 已逐句核；12 条规则、0 缺口 | **2**」= `RAISE_SKILL_HITS SKILL +2`（与桑博星魂 1 同形）✓。⚠
-**另发现**：星魂 1/2/3/4/5 **早已存在但都没有 `id`**
-，我按形状重写时造成了重复（等级 +4 而不是 +2）⇒ 现在给它们补上了 id（`eidolon1_skill_point_after_first_skill` /
-`eidolon2_energy_regen` / `eidolon3_levels` / `eidolon4_break_effect_for_others` / `eidolon5_levels`），重复规则已删。判据
-`TrailblazerHarmonyEidolonTest`（能量回复 +0.25 ✓、队友击破特攻 = 她的 15% ✓、四槽等级 ✓）|
 | 8007 | 开拓者•记忆 | 未完全实现 | 已逐句核；10 条规则、3 条记录、0 阻塞 |
 | 8008 | 开拓者•记忆（男） | 未完全实现 | 已逐句核；6 条规则、3 条记录、0 阻塞 |
 | 8009 | 开拓者•欢愉 | 未完全实现 | 已逐句核；12 条规则、1 条缺口（1 条为引擎限制） |
-天赋「战技额外 **30% 雷属性欢愉伤害**，按我方 **最高**【好活当赏】计算」= **新拼法 `max_party_resource:<NAME>`**（`DAMAGE`
-现已接受资源类 scale）+ `damage_type: ELATION` ✓。判据 `TrailblazerElationDamageTest`：额外给 0/20/40 点时，欢愉伤害
-**4.67 / 9.33 / 14.00 = 1 : 2 : 3** ✓（⚠ 战技自身先给 20 点，所以基线不是 0，比值才是这条句子的性质） ⚠ **2026-11-03
-状态纠正**：`_status` 改回 **`partial`** —— 星魂只有 3/5，1/2/4/6 未写；另「30% 那一支在测试里取不到」的权重近似仍开。 |
 | 8010 | 开拓者•欢愉 | 未完全实现 | 已逐句核；12 条规则、1 条缺口（1 条为引擎限制） | **两个 cid 各跑一遍** ✓ ⚠ **2026-11-03
-状态纠正**：`_status` 改回 **`partial`** —— 同 8009（星魂 1/2/4/6 未写）。 |
 
 ## 光锥（全部）
 
@@ -749,13 +382,4 @@ null 早退，判据 `BuffAnyClassResistTest`（变异去掉 `kind == null` 分�
 3. 找不到落点 ⇒ 补规则或补显式登记；顺手给无 `id` 的规则补 `id` + `note`；
 4. 能判的从句都要有判据，判据要能变异（改回旧行为必须红）；
 5. 回来把这一行改成「完全实现」，并在上面的清单里加一行依据。
-
-
-
-
-
-
-
-
-
 
