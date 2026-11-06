@@ -701,10 +701,14 @@ public final class TriggerInterpreter {
             case RAISE_ENERGY_TO -> {
                 // A FLOOR, not a gain: energy is raised to the stated share of the maximum and left alone
                 // when it is already at or above it. Adding a share instead would overshoot.
+                // 「若为目标恢复的能量不足 40 点，恢复的能量提高至 40 点」 (1313 Sunday (星期日)'s trace 主日渴慕) states the
+                // floor in POINTS instead of as a share, so a flat `amount` is the other spelling of the same op.
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    double floor = target.getMaxEnergy() * TriggerMagnitudes.shareOf(effect, ctx);
+                    double floor = effect.getAmount() != null
+                            ? effect.getAmount()
+                            : target.getMaxEnergy() * TriggerMagnitudes.shareOf(effect, ctx);
                     if (target.getCurrentEnergy() < floor) {
-                        target.setCurrentEnergy(floor);
+                        target.setCurrentEnergy(Math.min(floor, target.getMaxEnergy()));
                     }
                 }
             }

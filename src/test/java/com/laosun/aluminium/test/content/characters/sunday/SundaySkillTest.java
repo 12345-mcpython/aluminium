@@ -223,8 +223,9 @@ public class SundaySkillTest {
 
         castUltimate(battle, sunday, ally);
 
-        Assertions.assertEquals(Math.min(0.2 * max, max - before), ally.getCurrentEnergy() - before, EPS,
-                "20% of HER maximum (" + max + "), not of his, and not a literal");
+        // ⚠ Since 2026-11-06 the trace 主日渴慕 lifts this to a 40-POINT floor, so the reading is the larger of the two.
+        Assertions.assertEquals(Math.min(Math.max(0.2 * max, 40), max - before), ally.getCurrentEnergy() - before, EPS,
+                "20% of HER maximum (" + max + ") lifted to the trace's 40-point floor, not his maximum");
     }
 
     /**
@@ -299,8 +300,9 @@ public class SundaySkillTest {
         Assertions.assertEquals(7, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
                 "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 (The Beatified) refund"
                         + " + the talent's crit rate + the trace's dispel + the technique's first-ability share");
-        Assertions.assertEquals(1, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
-                "the 【蒙福者】 (The Beatified) clause; the energy restore is registered separately");
+        // Note: 2 since 2026-11-06 - the 【蒙福者】 clause plus the trace that lifts the restored energy to 40 points.
+        Assertions.assertEquals(2, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
+                "the 【蒙福者】 clause plus the trace that lifts the restored energy to 40 points");
     }
 
     // ==================================================================

@@ -6,7 +6,7 @@
     "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧的四条 `_gaps` 只写「未逐句读、未写」—— 等于没记。这次逐节读了文档（`1313_星期日.md`），已落地的见本文件规则与「⭐」条目，**仍开**的逐条记在下面，每条都说明缺的是哪个机制。",
     "⭐ **天赋已落地（2026-11-06）**：`talent_skill_raises_the_targets_crit_rate` —— `SKILL_CAST` + `target` → `MODIFY_ATTR CRIT_CHANCE {percent_from_skill_param: TALENT:0, turns: 3}`，判据 `SundaySupportTest.theTalentRaisesTheTargetsCritRate`（队友 +20%、他自己不变）。⛔ 星魂 6 那半（可叠 3 层、持续 +1 回合、溢出暴击转暴伤）仍未写：叠层上限与「溢出值转成另一个属性」都需要新写法。",
     "⭐ **秘技已落地（2026-11-06）**：`technique_arms_the_next_ability`（`BATTLE_START` + `self has_state 秘技` → 记号 `荣光之秘-待发`）与 `technique_first_ally_ability_grants_the_share`（首次 `SKILL_CAST` → 队友 `ALL_DAMAGE_TYPE_BOOST +0.5 / 2 回合`，随后摘记号）。⚠ 「首次」没有规则级开关（只有 `once_per_turn`）⇒ 用记号状态表达；⚠ 50% 必须 `coexist: true`，否则它会**替换**战技自己那 15%/40%（同属性同类的修饰默认互相替换 —— 实测：不加时只读到 1 个修饰）。判据 `SundayTechniqueTest`。",
-    "⭐ **行迹两条已落地（2026-11-06）**：`trace_glorious_whisk_starts_with_energy`（开战 +25 能量）与 `trace_safe_harbour_dispels_one_debuff`（战技解除目标 1 个负面效果），判据 `SundaySupportTest.theWhiskPaysTwentyFiveEnergyAtBattleStart` / `theHarbourDispelsOneDebuff`。⛔ **行迹 主日渴慕**（「若为目标恢复的能量不足 40 点，恢复的能量提高至 40 点」）仍未写：`RAISE_ENERGY_TO` 只有**百分比**下限，这句话要的是**固定 40 点**的「至少」写法，引擎没有。",
+    "⭐ **行迹两条已落地（2026-11-06）**：`trace_glorious_whisk_starts_with_energy`（开战 +25 能量）与 `trace_safe_harbour_dispels_one_debuff`（战技解除目标 1 个负面效果），判据 `SundaySupportTest.theWhiskPaysTwentyFiveEnergyAtBattleStart` / `theHarbourDispelsOneDebuff`。⭐ **行迹 主日渴慕 已落地（2026-11-06）**：`trace_sunday_lenten_gift_lifts_the_energy_to_forty` —— `ULT_CAST` + `actor == self` → `RAISE_ENERGY_TO { amount: 40, target: target }`。⭐ 这一轮给 `RAISE_ENERGY_TO` 补了**固定点数**的写法（原来只认 `percent` 份额），装载期同时放宽（`amount` 是一条合法拼法），并把结果夹到目标的能量上限（`Math.min(floor, maxEnergy)`）。判据 `SundayLentenGiftTest`（盟友上限 120 ⇒ 20% = 24 < 40 ⇒ 读到 **40**）。",
     "⭐ **星魂 3/4/5 已落地（2026-11-06）**：3/5 是等级加成（原有），4 = `eidolon4_pays_eight_energy_each_turn`（`TURN_START` + `actor == self` → +8 能量，判据 `SundaySupportTest.theFourthEidolonPaysEnergyOnHisTurn`）。⛔ **星魂 1**（战技使目标无视 16% 防御、召唤物 40%，2 回合）**未写**：`DEFENCE_IGNORE` 有，但「角色 16% / 他的召唤物 40%」是**两档**份额、要对 `target_and_summon` 分开写；可与现有战技规则合并，需要一次专门改动。⛔ **星魂 2**（首次终结技 +2 战技点、【蒙福者】伤害 +30%）**未写**：「首次」同上（记号状态可解），后半要给【蒙福者】加一个只对该状态持有者生效的增伤。⛔ **星魂 6** 见天赋那条。",
     "⚠ **终结技的细节**：`ult_effect` 已覆盖「20% 能量上限 + 【蒙福者】 + 暴伤加成 + 仅最新目标 + 他倒下时解除」，但**「每回合开始持续时间 -1，共 3 回合」用的是 `ticks_on: self` 的近似**（引擎按他的回合扣减 ✓），而**星魂 6 的「持续 +1」**没有写。"
   ],
@@ -249,6 +249,22 @@
       "source": "1313 星期日 终结技 轻与伤痕的赞颂 (skill 131303, Ultra/Support): 「…并使目标及其召唤物成为【蒙福者】，【蒙福者】的暴击伤害提高，提高数值等同于星期日#2[i]%暴击伤害+#4[i]%。星期日自身每回合开始时【蒙福者】状态持续回合减1，共持续#3[i]回合。且仅对除星期日自身外终结技最新的施放目标生效。当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除。」 param Lv1 = [0.2, 0.12, 3, 0.08] → #2 = 0.12, #3 = 3 回合, #4 = 0.08",
       "_note": "Three effects, in the order the sentence needs them. ⚠ **`REMOVE_STATE` first** is 「仅对…**最新的**施放目标生效」: the state goes off everybody, then onto the new pair -- there is no \"only one holder\" flag, the removal IS that clause. ⚠ **`target != self`** is 「除星期日自身外」: casting it on himself leaves the previous holder alone rather than clearing and re-granting nothing. ⚠ **`ticks_on: \"self\"` on both buffs** is 「星期日自身每回合开始时…持续回合减1」: the state sits on the ally and is spent by HIS turns (M-42 ④) -- without it the same sentence would last three of the ALLY's turns, which is a different number in every fight. ⚠ **「当星期日陷入无法战斗状态时…解除」 needs no rule**: an anchored buff whose clock will never come again is a leak, so the engine takes it off when the anchor dies (`Battle.releaseBuffsAnchoredToTheDead`, M-42 ③) -- and it COULD not be a rule on him, because `fireTriggers` skips dead units. ⚠ The CRIT DMG is **derived** from his own (`scale: \"self_attr:CRIT_ATTACK\"`, 12% of it + 8 percentage points, M-42 ①), read when the rule fires and then frozen. ⚠ The first effect is 「恢复等同于#1[f1]%**能量上限**的能量」: `scale: 「target_max_energy」` reads 20% of the ALLY's maximum (his own 130 is irrelevant), which is why it could not be a literal -- the maximum is per character (姬子 120 / 星期日 130 / 翡翠 140). ⚠ It targets `target` (the character), not the pair: the sentence says 「指定我方单体**角色**」, and a memosprite has no energy bar -- asking for a share of one is a loud failure, not a grant of 0. ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "ult_effect"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "trace_sunday_lenten_gift_lifts_the_energy_to_forty",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RAISE_ENERGY_TO",
+          "amount": 40,
+          "target": "target"
+        }
+      ],
+      "source": "1313 星期日 行迹 主日渴慕 (1313101): 「施放终结技时，若为目标恢复的能量不足40点，恢复的能量提高至40点。」",
+      "_note": "「施放终结技时，**若为目标恢复的能量不足 40 点，恢复的能量提高至 40 点**」—— `RAISE_ENERGY_TO` 是**下限**而不是加量（引擎原话：低于给定值才拉到该值，已经高于就不动）⇒ 「若…不足」这半句**不需要条件** ✓。⭐ 这一轮给这个 op 补了**固定点数**的写法（`amount`），因为原来只认 `percent`（占上限的份额）；句子给的是「40 点」、不是「40%」，所以份额拼法会错 ✗。⚠ 上限还要夹到她自己的能量上限（`Math.min(floor, maxEnergy)`），否则一个上限 30 的目标会被设成 40。"
     },
     {
       "on": "BATTLE_START",

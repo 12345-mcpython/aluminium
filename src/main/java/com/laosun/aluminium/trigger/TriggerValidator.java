@@ -340,12 +340,16 @@ final class TriggerValidator {
             case RAISE_ENERGY_TO -> {
                 // A plain share, because the handler reads it directly: accepting the
                 // percent_from_* spellings here would leave the share unresolved at run time.
-                requirePercent(effect, op, spec);
-                if (effect.getPercent() == null && effect.getValue() == null) {
+                // 「恢复的能量提高至 40 点」 (1313 Sunday (星期日) trace 主日渴慕) states the floor in POINTS, so a flat
+                // `amount` is the other legal spelling - the same handler reads it directly.
+                if (effect.getAmount() == null) {
+                    requirePercent(effect, op, spec);
+                }
+                if (effect.getPercent() == null && effect.getValue() == null && effect.getAmount() == null) {
                     throw new IllegalArgumentException(
-                            "Op " + op + " names the level to raise energy TO, so it needs a plain \"percent\" or "
-                                    + "\"value\": got a share from a cast parameter or a resource instead "
-                                    + "(source: " + spec.getSource() + ")");
+                            "Op " + op + " names the level to raise energy TO, so it needs a plain \"percent\", "
+                                    + "\"amount\" (points) or \"value\": got a share from a cast parameter or a resource "
+                                    + "instead (source: " + spec.getSource() + ")");
                 }
                 requireNoStackArguments(effect, op, spec);
             }
