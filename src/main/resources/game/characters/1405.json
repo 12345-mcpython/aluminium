@@ -6,7 +6,8 @@
     "⭐ **星魂 1 的「首次施放战技后恢复 1 个战技点」已落地（2026-11-04）**：`SKILL_CAST` + `actor == self` + **`once_per_battle: true`** → `GAIN_SKILL_POINT 1`。旧登记说「缺『首次』计数」**作废** —— `once_per_battle` 就是这个计数（每规则一个布尔）。⚠ 它的另一半「施放战技击中时目标防御 −16% / 2 回合」在 `eidolon1_defence_down_on_skill` 里已有 ✓。",
     "【升华】/【质性揭露】状态：弱点植入、控制抵抗 / 无法行动、至少 5 种不同弱点计数未写",
     "1415 忆灵技 18：所有「智识」命途角色攻击力 +30% 未写（缺命途选择器）",
-    "【升华】/【质性揭露】：**状态本身已按「≥5 种弱点」施加** ✓（天赋规则 `talent_true_knowledge_state`，每回合复查），但「弱点植入的持续回合/控制抵抗 / 无法行动」与**额外施放 1 次战技**仍未写"
+    "【升华】/【质性揭露】：**状态本身已按「≥5 种弱点」施加** ✓（天赋规则 `talent_true_knowledge_state`，每回合复查），但「弱点植入的持续回合/控制抵抗 / 无法行动」与**额外施放 1 次战技**仍未写",
+    "⛔ **星魂 6 的第二句仍未写**：「行迹【必要的留白】的 2 种效果都会直接触发，不再依赖队伍数量」—— 写法上要给「同一组数值的两个触发（有条件的 + 无条件的）」；守卫 `SameEffectTwiceGuardTest` 正是禁止「同一条数值出现在两条规则里」（除非登记 BASELINE 并说明），`allies_with_path` 又不能被「E6 时恒真」表达。⇒ 需要的是「条件本身可被某条星魂短路」的写法，或在该守卫的 BASELINE 里登记这一族。"
   ],
   "rules": [
     {
@@ -261,8 +262,7 @@
       "source": "1405 星魂 5: 等级加成（数据 skill_add_level: 140502=SKILL+2, 140504=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
-    }
-    ,
+    },
     {
       "on": "SKILL_CAST",
       "id": "eidolon1_first_skill_refunds_a_point",
@@ -279,6 +279,59 @@
       ],
       "source": "1405 夏洛特 星魂 1 月掩星夜的魔术师: 「首次施放战技后，恢复1个战技点。」 参数 = [1, 0.16, 2]",
       "_note": "「**首次**施放战技后，恢复 **1** 个战技点」—— ⭐ **2026-11-04 落地**：旧登记说「缺『首次』计数」✗ —— **`once_per_battle: true` 就是这个计数**（每条规则一个布尔，语义正是「这场战斗只发生一次」）。⚠ 它与「每场 **N** 次」不同（那是 1211 的缺口），但本句只要求一次。"
+    },
+    {
+      "on": "BATTLE_START",
+      "_note": "「**1 名**：那刻夏的**暴击伤害提高 140%**」—— 用 `allies_with_path:智识`（1503 的同一拼法 ✓）配 `>= 1` 与 `< 2` 两个条件 ⇒ 「恰好 1 名」✓。⚠ 暴击伤害的份额按本项目的口径写字面值（1015 的 +120% 就是 `percent: 1.2` ✓）⇒ `percent: 1.4`。",
+      "source": "1405 那刻夏 行迹 必要的留白 (1405102): 「根据我方队伍中「智识」命途角色的数量，在本场战斗中触发其中1个效果：1名：那刻夏的暴击伤害提高140%。」",
+      "do": [
+        {
+          "attribute": "CRIT_ATTACK",
+          "percent": 1.4,
+          "permanent": true,
+          "target": "self",
+          "op": "MODIFY_ATTR"
+        }
+      ],
+      "when": [
+        "allies_with_path:智识 >= 1",
+        "allies_with_path:智识 < 2"
+      ],
+      "id": "trace_necessary_blank_one_erudition_lifts_his_crit_damage"
+    },
+    {
+      "on": "BATTLE_START",
+      "_note": "「**至少 2 名**：我方**全体**造成的伤害提高 **50%**」—— `all_allies` ✓（句子里是「我方全体」，不是他自己 ✓）。",
+      "source": "1405 那刻夏 行迹 必要的留白 (1405102): 「至少2名：我方全体造成的伤害提高50%。」",
+      "do": [
+        {
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "permanent": true,
+          "target": "all_allies",
+          "op": "MODIFY_ATTR"
+        }
+      ],
+      "when": [
+        "allies_with_path:智识 >= 2"
+      ],
+      "id": "trace_necessary_blank_two_erudition_lifts_the_party"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "_note": "「造成的伤害为**原伤害的 130%**」—— 增伤区 +30%（`BOOST_DAMAGE` 只能挂 `DEALING_DAMAGE` ✓，与 1214 的摧锋轴承同一写法）。⚠ **口径**：句子的意思正是「乘 1.3」，在本引擎里等同 `BOOST_DAMAGE 0.3`（增伤区是乘算的）✓。",
+      "source": "1405 那刻夏 星魂 6 万物皆在万物之中:「那刻夏造成的伤害为原伤害的130%。」",
+      "do": [
+        {
+          "percent": 0.3,
+          "op": "BOOST_DAMAGE"
+        }
+      ],
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "id": "eidolon6_his_damage_is_one_point_three"
     }
   ],
   "resources": [
