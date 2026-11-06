@@ -66,8 +66,9 @@ public class AglaeaClauseCoverageTest {
                 GAP + "行动时自动施放"));
         SECTION.put("忆灵技能 3：飞驰之夏", List.of(RULE + "memosprite_speeding_summer_advances_itself"));
         SECTION.put("忆灵技能 4：枯草之盈", List.of(RULE + "memosprite_bloom_of_drying_grass_pays_energy"));
-        SECTION.put("行迹：短视之惩", List.of(GAP + "行迹 短视之惩 / 织运之竭 未写"));
-        SECTION.put("行迹：织运之竭", List.of(GAP + "行迹 短视之惩 / 织运之竭 未写"));
+        SECTION.put("行迹：短视之惩", List.of(RULE + "p1402_trace_short_sighted_atk_for_her",
+                RULE + "p1402_trace_short_sighted_atk_for_the_garmentmaker"));
+        SECTION.put("行迹：织运之竭", List.of(GAP + "仍开：织运之竭"));
         SECTION.put("行迹：飞驰之阳", List.of(RULE + "trace_racing_sun_fills_half_the_energy"));
         SECTION.put("星魂 1：飘曳金星的行列", List.of(RULE + "eidolon1_threaded_target_takes_more",
                 RULE + "eidolon1_threaded_attack_pays_energy",
