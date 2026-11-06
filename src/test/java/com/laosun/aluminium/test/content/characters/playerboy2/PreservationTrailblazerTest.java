@@ -103,10 +103,11 @@ public class PreservationTrailblazerTest {
         for (int cid : new int[]{TB3, TB4}) {
             var table = TriggerTables.of(cid);
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TAKING_HIT), "cid " + cid + ": the stack per hit");
-            Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BASIC_ATTACK), "cid " + cid + ": the basic-attack shield");
-            Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "cid " + cid + ": reduction+taunt and the shield");
+            // Note: 2 since 2026-11-06 - the shield plus 「普攻…并叠加 1 层【灼热意志】」.
+            Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BASIC_ATTACK), "cid " + cid + ": the basic-attack shield and the stack");
+            Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST), "cid " + cid + ": reduction+taunt, the shield, and the stack");
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "cid " + cid + ": the ultimate's shield");
-            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid + ": the technique and the convention");
+            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid + ": the technique, the convention, and 星魂 1's four stacks");
         }
     }
 
