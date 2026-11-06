@@ -84,6 +84,26 @@ public class AnaxaNecessaryBlankTest {
                 "「造成的伤害为原伤害的 130%」 — the ratio is " + (e6 / baseline) + " (additive boost zone)");
     }
 
+    /** 终结技「使敌方全体陷入【升华】状态…同时被添加物理、火、冰、雷、风、量子、虚数属性弱点」. */
+    @Test
+    public void theUltimateImplantsEveryWeakness() {
+        Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        enemy.setMaxStance(10_000);
+        Battle battle = new Battle(List.of(anaxa), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        anaxa.setCurrentEnergy(anaxa.getMaxEnergy());
+
+        battle.castImmediate(anaxa.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), anaxa, List.of(enemy));
+        battle.processRequests();
+
+        Assertions.assertTrue(enemy.getBuffManager().hasState("升华"), "「使敌方全体陷入【升华】状态」");
+        for (com.laosun.aluminium.enums.DamageElement element : com.laosun.aluminium.enums.DamageElement.values()) {
+            Assertions.assertTrue(enemy.isWeakTo(element),
+                    "「同时被添加物理、火、冰、雷、风、量子、虚数属性弱点」 — missing " + element);
+        }
+    }
+
     private static Battle scene(List<Character> allies) {
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
         Enemy enemy = BattleFixture.monster();
