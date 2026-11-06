@@ -5,7 +5,7 @@
   "_gaps": [
     "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧的四条 `_gaps` 里有两条**已经过期**——「终结技『下一次普攻强化为【酒花奔涌】』技能替换未写」早就在 `ult_tipsy` 里（`REPLACE_SKILL { skill: COMMON, skill_id: 8, until: next_attack }`，判据 `GallagherEnhancedAttackTest`），而「星魂 2–6 未读」现在只剩三条仍开。按文档（`1301_加拉赫.md`）逐节核对后的结果如下。",
     "⭐ **星魂 2 已落地（2026-11-06）**：`eidolon2_dispels_one_and_raises_effect_res` —— `SKILL_CAST` + `min_eidolon: 2` → `DISPEL { amount: 1 }` + `MODIFY_ATTR EFFECT_RESISTANCE 0.3 / turns: 2`，两个效果都落在 `target`（被指定的队友），判据 `GallagherEidolonTest.theSecondEidolonCleansesAndHardensTheTarget`。",
-    "⭐ **星魂 6 前半已落地（2026-11-06）**：`eidolon6_raises_break_effect` —— `BATTLE_START` + `min_eidolon: 6` → `MODIFY_ATTR BREAKING_EFFECT 0.2`，判据 `GallagherEidolonTest.theSixthEidolonRaisesHisBreakEffect`。⛔ **后半「弱点击破效率提高 20%」仍开**：`AttributeType` 没有这个量（只有 `BREAKING_EFFECT` 与 `BREAK_DAMAGE_BOOST`），要先确认伤害/削韧管线里谁读它才能加常量。",
+    "⭐ **星魂 6 前半已落地（2026-11-06）**：`eidolon6_raises_break_effect` —— `BATTLE_START` + `min_eidolon: 6` → `MODIFY_ATTR BREAKING_EFFECT 0.2`，判据 `GallagherEidolonTest.theSixthEidolonRaisesHisBreakEffect`。⭐ **星魂 6 后半也落地了（2026-11-06）**：新增属性 **`WEAKNESS_BREAK_EFFICIENCY`**（弱点击破效率），`BreakService.reduce` 在**扣韧性之前**把这一发的点数乘 `1 + efficiency`（默认 0 ⇒ 乘 1，既有读数不变），规则里给 `MODIFY_ATTR WEAKNESS_BREAK_EFFICIENCY 0.2`。判据 `GallagherEidolonTest.theSixthEidolonShortensTheBarFaster`（E5 打 10 点扣 10；E6 扣 12）。⚠ 它是**独立属性**、不是 `BREAKING_EFFECT` 的别名：后者放大击破**伤害**，它放大**削韧量**。",
     "⭐ **行迹 崭新配方 已落地（2026-11-06）**：`trace_fresh_recipe_raises_healing_from_break_effect` —— `MODIFY_ATTR OUTGOING_HEALING_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 0.5, cap_amount: 0.75 }`。⭐ **「缺修饰上限」的说法作废**：`cap_amount` / `cap_scale` + `cap_percent` **早就在**（`TriggerMagnitudes.applyDerivedCeiling`，派生量是绝对量、直接比较）。",
     "⛔ **行迹 敬请干杯 (1301103) 未写**：「加拉赫施放【酒花奔涌】攻击陷入【酩酊】状态的目标时，使此次天赋提供的生命回复效果**对我方队友也会生效**」—— 它要改的是**同一次攻击里天赋那条 `ALLY_ATTACK` 治疗的目标集合**（从「攻击者」扩到「全体队友」），而规则之间不能互相改目标集合；需要「本次攻击的天赋治疗对全体生效」这种一次性开关。",
     "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_the_tipsy_lasts_one_turn_longer` —— **E4 用 `turns: 3` 的同形规则**排在 `ult_tipsy` 之后（同一状态按 `isSameKind` 被替换成后挂的那份 ⇒ 净 3 回合；那份 12% 也重挂，因为它跟着状态走）。⚠ **`EXTEND_BUFF` 在这里不可用**：它按 `buffName` 匹配，而【酩酊】**状态**的名字存在自己的字段里、`buffName` 为空 ⇒ 它延长的是「12% 减伤」那条无名 buff（实测 printout：E4 时 `dur=3` 的是无名那条，`酩酊` 仍 2）。判据 `GallagherEidolonTest.theTipsyLastsThreeTurnsAtTheFourthEidolon`（E3⇒2、E4⇒3）。⚠ 新规则里的 12% 改成**读天赋行**（`percent_from_skill_param: TALENT:0`），否则 ratchet 会因为同一个字面量出现两次而 +1。",
@@ -208,6 +208,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "BREAKING_EFFECT",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "WEAKNESS_BREAK_EFFICIENCY",
           "percent": 0.2,
           "permanent": true,
           "target": "self"

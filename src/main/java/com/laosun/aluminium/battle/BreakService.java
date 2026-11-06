@@ -88,8 +88,13 @@ public final class BreakService {
         if (!ignoreWeakness && !enemy.isWeakTo(element)) {
             return Battle.StanceResult.NONE;
         }
-        double consumed = enemy.reduceStance(stanceDamage);
-        double overkill = stanceDamage - consumed;
+        // 「弱点击破效率提高 20%」 (1301 Gallagher Eidolon 6): the hit takes 20% MORE off the bar. Applied to the points
+        // before the bar is touched, so what the rules hear about (and the overkill) is the real reduction.
+        // Default 0 gives a multiplier of exactly 1, which is why every existing reading is unchanged.
+        double points = stanceDamage
+                * (1 + attacker.getAttribute(AttributeType.WEAKNESS_BREAK_EFFICIENCY).get());
+        double consumed = enemy.reduceStance(points);
+        double overkill = points - consumed;
         // "雪衣施放攻击削减敌方韧性时，会叠加【恶报】层数，削减的韧性越多叠加层数越多" (1214's Talent): the amount is the
         // number every toughness-scaled clause needs, and it used to exist only in this method's return value.
         // Fired BEFORE the break branch so a hit that empties the bar reports both.

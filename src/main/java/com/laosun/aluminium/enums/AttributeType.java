@@ -309,7 +309,16 @@ public enum AttributeType {
     @SerializedName("damage_penetration_thunder") DAMAGE_PENETRATION_THUNDER("damage_penetration_thunder"),
     @SerializedName("damage_penetration_wind") DAMAGE_PENETRATION_WIND("damage_penetration_wind"),
     @SerializedName("damage_penetration_quantum") DAMAGE_PENETRATION_QUANTUM("damage_penetration_quantum"),
-    @SerializedName("damage_penetration_imaginary") DAMAGE_PENETRATION_IMAGINARY("damage_penetration_imaginary");
+    @SerializedName("damage_penetration_imaginary") DAMAGE_PENETRATION_IMAGINARY("damage_penetration_imaginary"),
+    /**
+     * 弱点击破效率: how much MORE toughness a hit takes off ({@code 0.2} = +20%). Reader: 1301 Gallagher (加拉赫) Eidolon 6
+     * 「弱点击破效率提高 20%」.
+     *
+     * <p>A ratio attribute of its own rather than a reuse of {@link #BREAKING_EFFECT}: that one scales the break's
+     * <b>damage</b>, while this one scales the <b>toughness</b> a hit removes. The two are separate numbers in the game
+     * tables, and folding them would make every 「击破特攻」 bonus also shorten every bar.
+     */
+    @SerializedName("weakness_break_efficiency") WEAKNESS_BREAK_EFFICIENCY("weakness_break_efficiency");
 
     /**
      * The per-element penetration constant for {@code element}, or the all-type {@link #DAMAGE_PENETRATION} when the

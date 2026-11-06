@@ -84,4 +84,24 @@ public class GallagherEidolonTest {
                 .mapToInt(buff -> buff.duration())
                 .max().orElse(0);
     }
+
+    /** 星魂 6 后半「弱点击破效率提高 20%」: the same hit takes 20% more off the bar. */
+    @Test
+    public void theSixthEidolonShortensTheBarFaster() {
+        Assertions.assertEquals(10.0, stanceTaken(5, 10.0), 1e-9, "before 星魂 6 a 10-point hit takes 10");
+        Assertions.assertEquals(12.0, stanceTaken(6, 10.0), 1e-9, "「弱点击破效率提高 20%」 — 10 becomes 12");
+    }
+
+    /** How much of the enemy bar one {@code points}-sized reduction takes at the given Eidolon rank. */
+    private static double stanceTaken(int eidolon, double points) {
+        Character gallagher = CharacterFactory.create(GALLAGHER, LEVEL, false, null, null, eidolon);
+        com.laosun.aluminium.enemy.Enemy enemy = BattleFixture.monster();
+        enemy.setMaxStance(1000);
+        enemy.setStance(1000);
+        Battle battle = new Battle(List.of(gallagher), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        double before = enemy.getStance();
+        battle.reduceToughness(gallagher, enemy, com.laosun.aluminium.enums.DamageElement.FIRE, points, null);
+        return before - enemy.getStance();
+    }
 }
