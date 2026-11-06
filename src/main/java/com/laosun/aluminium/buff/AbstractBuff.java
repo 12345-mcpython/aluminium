@@ -323,6 +323,25 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     }
 
     /**
+     * The HP SHARE threshold this buff is conditional on, or {@code null}: 「当前生命值百分比大于等于 80% 时，提高自身 12% 的
+     * 冰属性抗性穿透」 (1209 Yanqing (彦卿)'s Eidolon 4).
+     *
+     * <p>The third live gate, and the one a HP bar needs: unlike a state or a counter, HP moves on almost every event, so the
+     * question has to be asked repeatedly - which is exactly what a gate does at the turn boundary. Fraction of the OWNER's
+     * maximum; a unit at full HP is {@code 1.0}.
+     */
+    private Double gateHpPercentMin;
+
+    /**
+     * @param min   the least HP share (0..1) that keeps the buff alive
+     * @param owner the unit whose HP bar is asked (the rule owner)
+     */
+    public void gateHpPercent(double min, CanHit owner) {
+        this.gateHpPercentMin = min;
+        this.gateOwner = owner;
+    }
+
+    /**
      * The state the <b>HOLDER</b> of this modifier must be in, or {@code null}: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
      * (1307's Ultimate) - the condition and the modifier on the SAME unit, which {@link #gateState} cannot express because that
      * one asks the rule's owner.
@@ -402,6 +421,13 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         }
         if (gateStacksName != null) {
             return gateOwner.getBuffManager().stacksOf(gateStacksName) < gateStacksMin;
+        }
+        if (gateHpPercentMin != null) {
+            double maxHp = gateOwner.getMaxHp();
+            if (maxHp <= 0) {
+                return true;
+            }
+            return gateOwner.getCurrentHp() / maxHp < gateHpPercentMin;
         }
         return gateState != null && !gateOwner.getBuffManager().hasState(gateState);
     }

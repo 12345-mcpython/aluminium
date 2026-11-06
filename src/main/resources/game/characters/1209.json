@@ -6,7 +6,7 @@
     "⭐ **「受到伤害后【智剑连心】消失」已落地（2026-11-06）**：`talent_soulsteel_ends_when_he_is_hit`（`TAKING_HIT` + `target == self` → `REMOVE_STATE`），并把天赋的两份修饰改挂 `while_state: 智剑连心` ⇒ 状态一走、加成一起走 ✓。⛔ **「受到攻击的概率降低」仍未写**：`AttributeType` 里没有仇恨/被瞄准概率这个量（1001 的护盾族用的是另一个机制），要先确认敌人的选目标逻辑读谁。",
     "天赋 65% 冻结 + 冻结状态每回合 50% 攻击力附加伤害未写 ⚠ 2026-11-06：这一条仍未动（冻结是控制状态 + 按状态的持续伤害，见 1109 的冻结族）；本轮只补了上下的两条。",
     "⭐ **秘技 已落地（2026-11-04）**：「对当前生命值百分比 ≥50% 的敌人伤害 +30%，2 回合」= `BATTLE_START` + `self has_state 秘技` → `APPLY_BUFF 御剑真诀 { turns: 2 }`，再由 `DEALING_DAMAGE` + `self has_state 御剑真诀` + **`target_hp_percent >= 0.5`** → `BOOST_DAMAGE 0.3`。旧登记说「条件与修饰单位不同，写不出」**作废** —— `target_hp_percent` 回答的正是「被打的那个的血线」。判据 `YanqingTechniqueTest`（同一发对满血/残血各打一次，残血不吃加成）。",
-    "⭐ **星魂 1 / 2 已落地（2026-11-06）**：`eidolon1_extra_hit_on_a_frozen_target`（`ALLY_ATTACK` + `actor == self` + `target has_state 冻结` → `DAMAGE` 60% 攻击力的冰属性附加伤害）与 `eidolon2_energy_regen_while_synced`（`SKILL_CAST` + E2 → `ENERGY_REGENERATION_RATE +0.1 / 1 回合`）。判据 `YanqingSoulsteelAndEidolonsTest`（冻结目标的骑乘伤害 = 追击的 1.2 倍；E2 有 0.1、E1 没有；挨打后状态消失）。⛔ **星魂 4 仍未写**：「当前生命 ≥80% 时，冰属性抗性穿透 +12%」—— 需要一个**按生命百分比持续生效**的门（不是事件上的条件），与 1214 的「健康韧性条」那类同族。"
+    "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_pierces_ice_resistance_while_healthy` —— 引擎新增**活门槛** `while_hp_percent`（`AbstractBuff.gateHpPercent`，与 `while_stacks` 同族：每次回合边界重问一遍）+ `MODIFY_ATTR DAMAGE_PENETRATION_ICE 0.12`。判据 `YanqingSoulsteelAndEidolonsTest`。"
   ],
   "rules": [
     {
@@ -307,6 +307,23 @@
         }
       ],
       "on": "ALLY_ATTACK"
+    },
+    {
+      "min_eidolon": 4,
+      "source": "1209 彦卿 星魂 4 霜厉:「当前生命值百分比大于等于80%时，提高自身12%的冰属性抗性穿透。」 参数 = [0.8, 0.12]",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION_ICE",
+          "percent": 0.12,
+          "target": "self",
+          "permanent": true,
+          "while_hp_percent": 0.8
+        }
+      ],
+      "id": "eidolon4_pierces_ice_resistance_while_healthy",
+      "_note": "「**当前生命值百分比 ≥80% 时**，提高自身 **12%** 的冰属性**抗性穿透**」—— 抗性穿透用 **`DAMAGE_PENETRATION_ICE`**（`DamageService.damage.resist(rawResist, DAMAGE_PENETRATION + penetrationFor(element))` ✓）；⭐ 「当前生命 ≥80%」这一句需要**活的**门槛（HP 几乎每个事件都在变），于是这一轮给 `AbstractBuff` 加了第三个活门槛 **`gateHpPercent`** + 内容里的 **`while_hp_percent: 0.8`**（与 `while_stacks` 同族，在每次回合边界重新问一遍 ✓）。⚠ 星魂参数无等级轴 ⇒ 字面 0.12 / 0.8。",
+      "on": "BATTLE_START"
     }
   ]
 }

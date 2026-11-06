@@ -107,4 +107,36 @@ public class YanqingSoulsteelAndEidolonsTest {
         battle.startBattle();
         return battle;
     }
+
+    /**
+     * 星魂 4:「当前生命值百分比 ≥80% 时，提高自身 12% 的冰属性抗性穿透」 - a LIVE gate on the HP bar.
+     *
+     * <p>Applied once at battle start (full HP, so it holds), then the owner is wounded below 80% and the gate is asked again
+     * at the next turn boundary - the modifier must be gone. That "asked again" is the whole point of `while_hp_percent`: a
+     * state or counter gate could not express a bar that moves on every event.
+     */
+    @Test
+    public void theFourthEidolonPiercesOnlyWhileHeIsHealthy() {
+        Battle battle = scene(4);
+        Character yanqing = battle.characters().getFirst();
+        Assertions.assertEquals(0.12, yanqing.getAttribute(AttributeType.DAMAGE_PENETRATION_ICE).get(), EPS,
+                "at full HP the gate holds");
+
+        battle.applyDamage(yanqing, new Damage(battle.enemies().getFirst(), yanqing, DamageElement.ICE,
+                DamageType.NORMAL, yanqing.getMaxHp() * 0.5));
+        battle.processRequests();
+        Assertions.assertTrue(yanqing.getCurrentHp() / yanqing.getMaxHp() < 0.8, "precondition: he is wounded");
+
+        // The gate is asked at the turn boundary, so one has to pass.
+        yanqing.getBuffManager().beforeMove();
+        battle.processRequests();
+        Assertions.assertEquals(0.0, yanqing.getAttribute(AttributeType.DAMAGE_PENETRATION_ICE).get(), EPS,
+                "below 80% HP the penetration is gone");
+
+        Assertions.assertEquals(0.0, penetrationAt(1), EPS, "before 星魂 4 there is none at all");
+    }
+
+    private static double penetrationAt(int eidolon) {
+        return scene(eidolon).characters().getFirst().getAttribute(AttributeType.DAMAGE_PENETRATION_ICE).get();
+    }
 }

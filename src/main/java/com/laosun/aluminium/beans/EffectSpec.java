@@ -163,6 +163,7 @@ public class EffectSpec {
         copy.countsAsRequires = this.countsAsRequires;
         copy.whileStacks = this.whileStacks;
         copy.whileStacksMin = this.whileStacksMin;
+        copy.whileHpPercent = this.whileHpPercent;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -643,11 +644,16 @@ public class EffectSpec {
     @SerializedName("while_stacks")
     private String whileStacks;
 
-    /**
-     * The least number of layers of {@link #whileStacks} that keeps the modifier alive.
-     */
     @SerializedName("while_stacks_min")
     private Integer whileStacksMin;
+
+    /**
+     * 「当前生命值百分比大于等于 80% 时…」 — a LIVE gate on the owner HP bar (1209 Eidolon 4). The third gate of this
+     * family, beside {@code while_state} and {@code while_stacks}: HP changes on almost every event, so the question is
+     * asked at every turn boundary instead of once.
+     */
+    @SerializedName("while_hp_percent")
+    private Double whileHpPercent;
     /**
      * A modifier that lives only <b>while the unit CARRYING it</b> holds this state: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
      * (1307's Ultimate). The mirror of {@link #whileState}, which asks the RULE OWNER - the difference matters when the condition

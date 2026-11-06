@@ -305,6 +305,11 @@ final class TriggerEffects {
             if (effect.getWhileHolderState() != null && !effect.getWhileHolderState().isBlank()) {
                 buff.gateHolder(effect.getWhileHolderState().trim());
             }
+            // "while the owner's HP bar is at least this share": HP moves on almost every event, so this is a LIVE gate like
+            // `while_stacks`. Reader: 1209 Eidolon 4, 「当前生命值百分比 ≥80% 时提高自身 12% 冰属性抗性穿透」.
+            if (effect.getWhileHpPercent() != null) {
+                buff.gateHpPercent(effect.getWhileHpPercent(), ctx.owner());
+            }
             // "with a 100% base chance, additionally lower the target's all-type RES by 10.00%": an attribute modifier may be ROLLED,
             // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes
