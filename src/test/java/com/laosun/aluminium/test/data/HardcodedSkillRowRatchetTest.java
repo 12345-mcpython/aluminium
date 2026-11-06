@@ -75,7 +75,9 @@ public class HardcodedSkillRowRatchetTest {
     // Note: 45 since 2026-11-06 - 1313's 星魂 2 states 「【蒙福者】造成的伤害提高 30%」, and 0.3 is also a cell of his own
     // Ultimate row (Lv10 = [0.2, 0.3, 3, 0.12]). The sentence's number is an EIDOLON param with no level axis, so it stays
     // literal - same verdict as the entries above.
-    private static final int BASELINE = 45;
+    // Note: 46 since 2026-11-06 - 1209's 星魂 1 states 「额外造成等同于彦卿 60% 攻击力的冰属性附加伤害」, and 0.6 is also a
+    // cell of his own rows. An EIDOLON param has no level axis, so it stays literal - the same verdict as the entries above.
+    private static final int BASELINE = 46;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
