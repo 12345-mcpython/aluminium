@@ -65,7 +65,8 @@ public class LynxTest {
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(LYNX);
         // Three since 2026-11-02: Eidolon 4 rides the same cast (「获得【求生反应】时…攻击力提高」).
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST), "the state, the base regeneration, and Eidolon 4");
+        // Five since 2026-11-06: Eidolons 2 and 6 also ride this cast (the debuff charge, and the max-HP / Effect RES pair).
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST), "the state, the regeneration, Eidolons 4, 2 and 6");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the cleanse and the regeneration half");
         // Four since 2026-11-02: the technique adds its own BATTLE_START clause.
         Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention and the technique");

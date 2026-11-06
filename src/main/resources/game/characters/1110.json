@@ -6,8 +6,8 @@
     "✅ **秘技已实现**（2026-11-02）：`technique_regen_on_the_party`。✅ **星魂 4 已实现**：`eidolon4_attack_on_survival_response`。",
     "⛔ **战技的软嘲讽未写**：文档只说「若该目标为「毁灭」或「存护」命途，被敌方攻击的概率大幅提高」，**通篇没有数值** —— 缺数据，不是缺能力。",
     "⛔ **星魂 1 未写**：「为当前生命值百分比 ≤50% 的我方目标提供治疗时，治疗量提高 20%，对持续治疗也生效」—— 需要对**治疗结算**加一个「受疗者 HP ≤ 50%」的倍率，引擎的 `BOOST_HEAL` 类修饰尚未核对是否带条件维度。",
-    "⛔ **星魂 2 未写**：「持有【求生反应】的目标被施加负面效果时**可抵抗 1 次**负面效果」—— 需要「抵消下一次负面」的机制，引擎没有。",
-    "⛔ **星魂 6 未写**：「【求生反应】的生命上限提高效果额外提高 6.00% 生命上限，并使**效果抵抗提高 30%**」—— 前半可写成第二条 HEALTH 修饰，后半要效果抵抗；两条都要与「只在持有求生反应时」绑定，需先核对条件。"
+    "⭐ **星魂 2 已落地（2026-11-06）**：`eidolon2_the_response_refuses_one_debuff` —— `SKILL_CAST` + E2 → **`RESIST_DEBUFF { charges: 1, cooldown: 0 }`**（引擎早有充能式抵抗 `DebuffShieldBuff`，1207 襄尺同一写法）。⚠ charges **必须**配 `cooldown`（非负）；这里取 `0` = 用掉即止、不再回来 —— 句子只说「可抵抗 **1** 次」、没说恢复，照实写。",
+    "⭐ **星魂 6 已落地（2026-11-06）**：`eidolon6_the_response_lifts_max_hp_and_effect_res` —— `SKILL_CAST` + E6 → `MODIFY_ATTR HEALTH { value: 0.06 × 我自己的 HEALTH }`（固定量，provider 代数写法）+ `MODIFY_ATTR EFFECT_RESISTANCE 0.3`，都落在持【求生反应】的目标上。"
   ],
   "rules": [
     {
@@ -193,6 +193,63 @@
       ],
       "source": "1110 玲可 星魂 4 露营篝火的薄暮 (Avatar_Lynx_00_Rank04): 「获得【求生反应】时，使该目标攻击力提高，提高数值等同于玲可3.00%生命上限的攻击力，持续1回合。」 param = [0.03, 1]",
       "_note": "「**获得【求生反应】时**，使该目标攻击力提高，提高数值等同于玲可 **3.00%** 生命上限的攻击力，持续 **1** 回合」= 与 `skill_survival_response` **同一个事件**（战技就是唯一施加求生反应的入口）→ `MODIFY_ATTR ATTACK { scale: 「owner_max_hp」, percent: 0.03, turns: 1, target: 「target」 }` ✓（`offset` 部分由数据行决定，这里 3% 是行值）。⚠ 「3.00% 生命上限的攻击力」是**绝对值**（不是百分比加成）—— `scale: owner_max_hp` + `percent` 给的正是「生命上限 × 3%」这个量 ✓。 ⚠ 写法修正：`scale` 只接受 `self_attr:<属性>`（不是 `owner_max_hp`，那个是 HEAL/REGEN 的份额词），生命上限在属性表里就是 **HEALTH** —— 与同一条战技里那条 `MODIFY_ATTR HEALTH { scale: 「self_attr:HEALTH」 }` 同一写法。"
+    },
+    {
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "target": "target",
+          "charges": 1,
+          "op": "RESIST_DEBUFF",
+          "cooldown": 0
+        }
+      ],
+      "source": "1110 玲可 星魂 2 便携炉具的正午:「持有【求生反应】的目标被施加负面效果时可抵抗1次负面效果。」 参数 = [1]",
+      "min_eidolon": 2,
+      "_note": "「持有【求生反应】的目标…**可抵抗 1 次负面效果**」—— 引擎有现成的**充能式抵抗**：`RESIST_DEBUFF { charges: 1 }`（`DebuffShieldBuff`，1207 的襄尺同一写法）✓，落点是**被挂上【求生反应】的那个目标**（与 `skill_survival_response` 同一次施放、同一个 `target` ✓）。",
+      "id": "eidolon2_the_response_refuses_one_debuff",
+      "on": "SKILL_CAST"
+    },
+    {
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "target": "target",
+          "permanent": true,
+          "attribute": "HEALTH",
+          "value": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "const",
+                "value": 0.06
+              },
+              {
+                "whose": "owner",
+                "attribute": "HEALTH",
+                "type": "attr"
+              }
+            ]
+          },
+          "op": "MODIFY_ATTR"
+        },
+        {
+          "target": "target",
+          "permanent": true,
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.3,
+          "op": "MODIFY_ATTR"
+        }
+      ],
+      "source": "1110 玲可 星魂 6 测绘图纸的黎明:「【求生反应】的生命上限提高效果额外提高，提高数值等同于玲可6.00%的生命上限，并使其效果抵抗提高30%。」 参数 = [0.06, 0.3]",
+      "min_eidolon": 6,
+      "_note": "「额外提高，**提高数值等同于玲可 6% 的生命上限**，并使其**效果抵抗提高 30%**」—— ① 生命上限那半是**固定量**（不是份额）⇒ `MODIFY_ATTR HEALTH { value: 0.06 × 我自己的 HEALTH }`（provider 代数：`mul(const 0.06, attr(whose: owner))`）✓；② 效果抵抗 `MODIFY_ATTR EFFECT_RESISTANCE 0.3` ✓；③ 两者都落在**持有【求生反应】的目标**上（与挂状态同一次施放 ✓）。",
+      "id": "eidolon6_the_response_lifts_max_hp_and_effect_res",
+      "on": "SKILL_CAST"
     }
   ]
 }
