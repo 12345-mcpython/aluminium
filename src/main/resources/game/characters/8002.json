@@ -4,8 +4,8 @@
   "_status": "partial",
   "_gaps": [
     "终结技「在两种攻击模式中选择其一」：二选一双形态未写",
-    "行迹：仅写「坚韧」，其余行迹未读",
-    "强化普攻 / 战技替换等其余基础 kit 从句未核"
+    "⭐ **行迹已全部落地（2026-11-06）**：蓄势 = `trace_momentum_starts_with_energy`（`BATTLE_START` → `GAIN_ENERGY 15`）、坚韧 = `trace_tough_defence_per_stack`（原有）、斗志 = `trace_fighting_spirit_lifts_the_aimed_damage`（`DEALING_DAMAGE` + `from_skill_id == 2` → `BOOST_DAMAGE 0.25`，只覆盖战技那一半）。⚠ ⚠ 两份文档的措辞不同：8001 写「**立即**恢复」、8002 写「**立刻**恢复」—— QuotedSourceExistsTest 逐字核对，引文必须按各自文档抄。",
+    "⭐ **基础 kit 已核（2026-11-06）**：普攻 100%、战技 125%（Blast）、终结技两形态 450% / 270%+162% —— **伤害全部由技能行结算**，无需规则；真正没写的是**终结技的二选一形态**（见下一条）与强化终结技的形态切换。"
   ],
   "rules": [
     {
@@ -205,6 +205,35 @@
       ],
       "source": "8002 开拓者•毁灭 星魂 6: 「开拓者消灭敌方目标时，也会触发天赋。」（天赋：击破后攻击力 +20%，最多 2 层）",
       "_note": "「**消灭敌方目标时，也会触发天赋**」—— 事件 `KILL` ✓ + `actor == self`（他自己击杀 ✓）+ `min_eidolon: 6` ✓；效果与天赋 `talent_atk_on_break` **逐字段一致**（`ATTACK +20%`、`max_stacks: 2`、同名 `牵制盗垒`）⇒ 两条合起来正是「击破**或**击杀都会触发」✓。⚠ 刻意**复制**而不是引用：引擎没有「在同一条规则上再挂一个事件」的写法，`MODIFY_RULE` 也只能改数值不能改事件 ⇒ 复制是对的做法；代价是天赋改数值时这里要跟着改（两条同 `buff` 名，面板上读得到是否同步 ✓）。 ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ **保留字面值**：这些场景的测试夹具**不启动战斗**（口径不生效 ⇒ 读行会读到第 1 行），见 AGENT §0.2 第 28 条。"
+    },
+    {
+      "on": "BATTLE_START",
+      "_note": "「战斗开始时，立即恢复 **15** 点能量」—— `BATTLE_START` → `GAIN_ENERGY 15` ✓（1313 的 崇高拂尘 同形）。",
+      "source": "8002 开拓者•毁灭 行迹 蓄势 (8001101): 「战斗开始时，立刻恢复15点能量。」",
+      "do": [
+        {
+          "amount": 15,
+          "op": "GAIN_ENERGY",
+          "target": "self"
+        }
+      ],
+      "id": "trace_momentum_starts_with_energy"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "_note": "「**施放战技**或终结技【全胜•安息全垒打】时，对指定敌方目标造成的伤害提高 **25%**」—— 战技那一半用 `DEALING_DAMAGE` + `from_skill_id == 2`（装载槽位 2 = 战技）→ `BOOST_DAMAGE 0.25` ✓；他的战技是 Blast，而这一发伤害实例正是**被指定的那个目标** ⇒ 与本句的「对指定敌方目标」吻合 ✓。⛔ 终结技【全胜•安息全垒打】那一半：需要**终结技的两种形态**（见 `_gaps` 的二选一），形态选定后才能给它一个独立的槽位号。",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "source": "8002 开拓者•毁灭 行迹 斗志 (8001103): 「施放战技或终结技【全胜•安息全垒打】时，对指定敌方目标造成的伤害提高25%。」",
+      "do": [
+        {
+          "percent": 0.25,
+          "op": "BOOST_DAMAGE"
+        }
+      ],
+      "id": "trace_fighting_spirit_lifts_the_aimed_damage"
     }
   ]
 }
