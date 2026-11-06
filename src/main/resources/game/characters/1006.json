@@ -3,8 +3,7 @@
   "character": 1006,
   "_status": "partial",
   "_gaps": [
-    "⛔ **秘技 `|强制结束进程|`（100607）整节未写**（2026-11-03 逐节扫描发现）：「立即攻击敌人，进入战斗后对**敌方全体**造成等同于银狼 **80%** 攻击力的量子伤害，并**无视弱点属性**削减敌方全体韧性，击破弱点时触发量子击破。」—— ① 伤害可写（`BATTLE_START` + `self has_state 秘技` + `DAMAGE target: all_enemies`）；② **数值有冲突**：文档写 **80%**，而 `skills.json` 的 100607 参数行是 `[0.5]`（Lv1）…`[0.8]`（Lv4），秘技的**最高等级是 1** ⇒ 按等级读会得到 **50%** ✗ ⇒ 先按数据核清「秘技读哪一行」再写（手抄 0.8 是唯一肯定错的写法）；③ 「无视弱点属性削韧」需要「本次攻击无视弱点」的标记（同 `next_casts_ignore_weakness` 那一族，需确认能否用于开场那条）。",
-
+    "⭐ **秘技已落地（2026-11-06）**：`technique_eighty_percent_and_unconditional_toughness` —— `BATTLE_START` + `self has_state 秘技` → `DAMAGE { skill: MAZE, damage_param: 0, element: Quantum, stance: 60, ignoreWeakness: true, target: all_enemies }`。⭐ 三个坑一次踩完：① 秘技的伤害在**槽 7（`Maze`，Lv1 = 0.8）**，不是槽 6（`MazeNormal`，地图攻击、无伤害）—— 按等级读就与文档的 80% 对齐，不必手抄；② 字段名是**驼峰 `ignoreWeakness`**，装载期会拒 snake_case；③ 削韧 `stance: 60` 来自文档的「破韧值：单体 60」。",
     "战技弱点植入：按该弱点属性降低 20% 抗性未写（RESISTANCE_REDUCTION 是全属性）",
     "战技弱点植入：「若添加的是原有属性则不触发」的例外未写",
     "战技弱点植入：「单个目标仅保留最新一个弱点」的不变量未写",
@@ -271,6 +270,26 @@
       ],
       "source": "1006 银狼 星魂 2 僵尸网络「**强化后**」后半句: 「当敌方目标受到我方目标攻击时，银狼有100%的基础概率给受到攻击的敌方目标植入1个随机【缺陷】。」",
       "_note": "「有 **100%** 的**基础概率**给**受到攻击的**敌方目标植入 **1 个随机【缺陷】**」—— 事件 `ALLY_ATTACK`（我方目标攻击）✓ + `target: 「all_hit_enemies」`（**被打到的**那些敌人，不是全体）✓ + `base_chance: 1.0` ✓ + `random_of`（三种里随机取一个，用战斗种子 ⇒ 回放一致）✓。⚠ `random_of` 是本轮新增的**字段**而非新 op：应用路径与 `APPLY_BUFF` 完全相同，只有名字要随机。⚠ 三种缺陷的**具体数值效果未建模**（数据里没有它们的参数），已登记在 `_gaps`。"
+    },
+    {
+      "_note": "「对**敌方全体**造成等同 **80%** 攻击力的量子伤害，并**无视弱点属性**削减敌方全体韧性」—— ① 伤害读**秘技行**（槽 7 = `Maze`，Lv1 = **0.8** ✓，与文档的 80% 对齐 ⇒ 不手抄）；② 削韧 `stance: 60` 来自同一份文档的「破韧值：单体 60」；③ **`ignoreWeakness: true`** 就是「无视弱点属性」✓（键名是**驼峰**，不是 `ignore_weakness`；1214 星魂 2 已验证这对字段）；④ 击破后的量子弱点击破由引擎的击破管线负责 ✓。",
+      "id": "technique_eighty_percent_and_unconditional_toughness",
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "DAMAGE",
+          "skill": "MAZE",
+          "damage_param": 0,
+          "target": "all_enemies",
+          "ignoreWeakness": true,
+          "element": "Quantum",
+          "stance": 60
+        }
+      ],
+      "source": "1006 银狼 秘技 |强制结束进程| (100607):「立即攻击敌人，进入战斗后对敌方全体造成等同于银狼80%攻击力的量子伤害，并无视弱点属性削减敌方全体韧性，击破弱点时触发量子击破。」",
+      "when": [
+        "self has_state 秘技"
+      ]
     }
   ]
 }
