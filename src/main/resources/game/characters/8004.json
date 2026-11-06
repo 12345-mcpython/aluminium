@@ -3,18 +3,19 @@
   "character": 8004,
   "_status": "partial",
   "_gaps": [
-    "天赋：【灼热意志】≥4 层时普攻强化为扩散，未写",
-    "终结技：100% 攻击力 + 150% 防御力的混合基数未写",
-    "终结技：下一次普攻自动强化且不消耗【灼热意志】未写",
-    "战技：施放时叠加 1 层【灼热意志】未写",
-    "星魂：未读、未写"
+    "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧五条里三条是「未写」而没有写清缺什么。这次按 `8003_开拓者.md` 逐节核对（8004 与它共用同一份文档、同一套技能，改动同步）。",
+    "⭐ **普攻 / 战技 / 星魂 1 的叠层已落地（2026-11-06）**：`talent_basic_stacks_one_will`（普攻「并叠加 1 层【灼热意志】」）、`talent_skill_stacks_one_will`（战技同句）、`eidolon1_four_stacks_at_battle_start`（星魂 1「战斗开始时立即获得 4 层」）；与天赋那条「每受到 1 次攻击」共用同一个计数器（上限 8）。判据 `PreservationTrailblazerTest.hisFileCarriesTheClauses` 的事件计数 + 既有护盾判据。",
+    "⭐ **天赋的「≥4 层 ⇒ 普攻强化」已落地（2026-11-06）**：三条同形规则（`TAKING_HIT` / `BASIC_ATTACK` / `SKILL_CAST` + `self_stacks:灼热意志 >= 4` → `REPLACE_SKILL { skill: COMMON, skill_id: 8 }`）＋ 两条反向（`< 4` → `remove: true`）＋ 一条「强化普攻消耗 4 层」（`BASIC_ATTACK` + `from_skill_id == 8` → `REMOVE_STACK 4`）。判据 `TrailblazerMagmaWillSwapTest`（挨 4 下 ⇒ 普攻槽 = 8；打一次强化普攻 ⇒ 层数 0、槽回 1）。⚠ 顺序是判据的一部分：涨层/扣层的规则必须排在判门槛的规则**之前**（同一事件按文件顺序执行）。",
+    "⛔ **终结技的混合基数未写**：「100% 攻击力 + 150% 防御力」是**两个基数相加**的一发伤害。`DAMAGE` 的一次结算只有一个 `scale`；两条 `DAMAGE` 会是**两个实例**（防御区/暴击各自结算一次），与「一发」的语义不同。引擎若要精确，需要「一个伤害可以有多个基数项」。",
+    "⛔ **终结技「下一次普攻自动强化且不消耗【灼热意志】」未写**：`REPLACE_SKILL { until: next_attack }` 可以给「强化」那半，但「**不消耗** 4 层」要改动强化普攻那条规则的消耗行为 —— 需要一个「本次替换的强化普攻不扣层」的开关（与 1301 的「本次治疗对全体生效」同类：一次性的行为覆盖）。"
   ],
   "rules": [
     {
       "on": "BASIC_ATTACK",
       "id": "talent_basic_stacks_one_will",
       "when": [
-        "actor == self"
+        "actor == self",
+        "from_skill_id != 8"
       ],
       "do": [
         {
@@ -26,7 +27,7 @@
           "target": "self"
         }
       ],
-      "source": "8004 开拓者•存护 普攻: 「…并叠加1层【灼热意志】。」（与 8003 同一份文档、同一套技能）",
+      "source": "8004 开拓者•存护 普攻: 「…并叠加1层【灼热意志】。」（与 8003 同一份文档、同一套技能） ⚠ 「强化普攻」那一行没有「并叠加 1 层」（文档的强化普攻只写「消耗 4 层」）⇒ 本条排除 `from_skill_id == 8`。",
       "_note": "与 8003 同形（两版存护开拓者共用一份文档）。"
     },
     {
@@ -267,6 +268,117 @@
       "source": "8004 星魂 5: 等级加成（数据 skill_add_level: 800401=COMMON+1, 800403=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "talent_enhanced_basic_at_four_stacks",
+      "when": [
+        "target == self",
+        "self_stacks:灼热意志 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 天赋: 「【灼热意志】层数不低于4时，普攻将获得强化…」 数据槽 8 = 800309（Blast，Lv10 = 135%/54%）",
+      "_note": "「层数不低于 4 时，普攻获得强化」—— REPLACE_SKILL { skill: COMMON, skill_id: 8 }（槽位号 8）。⚠ 本条必须排在 talent_magma_will（涨层那条）之后：同一事件里先涨层再判门槛，否则第 4 层那一次读到的是 3。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "talent_enhanced_basic_at_four_stacks_on_a_basic",
+      "when": [
+        "actor == self",
+        "self_stacks:灼热意志 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 天赋: 「…【灼热意志】层数不低于4时，普攻将获得强化…」",
+      "_note": "普攻自己涨 1 层之后的判门槛（同形不同事件）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "talent_enhanced_basic_at_four_stacks_on_a_skill",
+      "when": [
+        "actor == self",
+        "self_stacks:灼热意志 >= 4"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 战技: 「…并叠加1层【灼热意志】…」＋ 天赋的层数门槛",
+      "_note": "战技涨 1 层之后的判门槛（同形不同事件）。三条指向同一替换，REPLACE_SKILL 幂等 ⇒ 重复触发无害。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "talent_enhanced_basic_spends_four_stacks",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "灼热意志",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 强化普攻: 「消耗4层【灼热意志】，强化普攻…」",
+      "_note": "「消耗 4 层」—— 只在 from_skill_id == 8（强化普攻）时扣。⚠ 排在两条「摘替换」之前：同一事件里先扣层、再判门槛。"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "talent_plain_basic_below_four_stacks",
+      "when": [
+        "target == self",
+        "self_stacks:灼热意志 < 4"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "remove": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 天赋: 「【灼热意志】层数不低于4时，普攻将获得强化」（低于 4 层就没有强化）",
+      "_note": "反向：低于 4 层把替换摘掉（SkillSwapBuff 自己放回原来那一行）。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "talent_plain_basic_below_four_stacks_on_a_basic",
+      "when": [
+        "actor == self",
+        "self_stacks:灼热意志 < 4"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "remove": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 天赋: 「…（强化普攻）消耗4层【灼热意志】」",
+      "_note": "强化普攻打完、层数掉到 4 以下 ⇒ 摘掉替换（排在消耗那条之后）。"
     }
   ]
 }
