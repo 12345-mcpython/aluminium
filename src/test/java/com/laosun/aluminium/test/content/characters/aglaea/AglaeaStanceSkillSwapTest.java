@@ -49,6 +49,42 @@ public class AglaeaStanceSkillSwapTest {
     }
 
     /**
+     * 「普通攻击强化为【孤锋千吻】**且无法施放战技**」: the stance bans the Skill slot, and the ban leaves with it.
+     *
+     * <p>Read through {@code SkillCastability.allows}, the gate every cast path consults — a ban only the executor honoured
+     * would let the action bar schedule the cast anyway.
+     */
+    @Test
+    public void theStanceBansHerSkillAndGivesItBack() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        var skill = aglaea.getSkills().get(SkillType.SKILL);
+        Assertions.assertTrue(com.laosun.aluminium.trigger.SkillCastability.allows(skill, aglaea, battle),
+                "precondition: the Skill is castable before the stance");
+
+        battle.castImmediate(aglaea.getSkills().get(SkillType.ULTRA), aglaea, List.of(enemy));
+        battle.processRequests();
+        Assertions.assertTrue(aglaea.getBuffManager().hasState("至高之姿"), "precondition: the stance is on");
+        Assertions.assertFalse(com.laosun.aluminium.trigger.SkillCastability.allows(skill, aglaea, battle),
+                "「…且无法施放战技」");
+
+        // The stance is ANCHORED to the memosprite ("衣匠消失时…解除"), so it has to really leave for the ban to go: a
+        // hand-fired SUMMON_LEFT removes the swaps (they were placed by rules) but not an anchored buff.
+        Summon garmentmaker = battle.summonOf(aglaea);
+        Character ally = CharacterFactory.create(1001, LEVEL);
+        battle.applyDamage(garmentmaker,
+                new com.laosun.aluminium.damage.Damage(ally, garmentmaker,
+                        com.laosun.aluminium.enums.DamageElement.THUNDER,
+                        com.laosun.aluminium.enums.DamageType.NORMAL, 1_000_000));
+        battle.processRequests();
+        Assertions.assertFalse(aglaea.getBuffManager().hasState("至高之姿"), "precondition: the stance ended with it");
+        Assertions.assertTrue(com.laosun.aluminium.trigger.SkillCastability.allows(skill, aglaea, battle),
+                "the ban is the stance's, so it leaves with it");
+    }
+
+    /**
      * 「阿格莱雅与衣匠…**分别**造成…攻击力的雷属性伤害」: the memosprite's half exists as its own instances, attributed to the
      * summon (whose ATTACK is synced from hers), reading the enhanced row's 3rd/4th cells.
      *
