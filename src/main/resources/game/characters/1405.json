@@ -2,7 +2,9 @@
   "schema": 1,
   "character": 1405,
   "_status": "implemented",
-  "_gaps": [],
+  "_gaps": [
+    "⭐ **3001 逐节核（2026-11-06 收尾）**：全部小节都有规则或登记；`_gaps` 清空后由 `ImplementedCharacterCoversEveryDocumentSectionTest` 复核（它这一轮抓到了「秘技 / 星魂 2 既无规则也无登记」⇒ 已补齐）。⚠ 已知的口径近似写在对应规则的 `_note` 里：天赋的「随机属性弱点」用攻击者属性近似、星魂 6 的「原伤害 130%」写成增伤区 +30%（加算）、秘技的「恐惧」是大世界机制不进战斗模型。"
+  ],
   "rules": [
     {
       "on": "BATTLE_START",
@@ -414,6 +416,45 @@
       "id": "eidolon6_both_blanks_fire",
       "_note": "「留白的 **2 种效果都会直接触发**，不再依赖队伍数量」—— E6 时**无条件**给两份 ✓；同属性修饰会替换同来源的那份 ⇒ 排在条件版之后，最终以本条为准 ✓。⚠ 这条与两条条件版**同形**，是 `SameEffectTwiceGuardTest` 里「one effect, two triggers」那一族，已按规矩登记 BASELINE 并写明理由。",
       "min_eidolon": 6
+    },
+    {
+      "source": "1405 那刻夏 秘技 瞳扉之彩:「…我方主动攻击陷入恐惧状态的敌人总会视为利用弱点进入战斗，进入战斗后那刻夏为敌方每个单体目标添加1个攻击者属性的弱点，持续3回合。」",
+      "do": [
+        {
+          "target": "all_enemies",
+          "turns": 3,
+          "element": "Wind",
+          "op": "ADD_ELEMENTAL_WEAKNESS"
+        }
+      ],
+      "on": "BATTLE_START",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "id": "technique_implants_the_attackers_weakness",
+      "_note": "「进入战斗后那刻夏为敌方每个单体目标添加 **1 个攻击者属性的弱点**，持续 **3** 回合」—— 攻击者属性 = **风**（他唯一能造成伤害的元素）⇒ `ADD_ELEMENTAL_WEAKNESS { element: Wind, turns: 3, target: all_enemies }` ✓；用 `self has_state 秘技` 表示「用了秘技之后的下一场战斗」✓（与 1313/1402 同法）。⚠ 「恐惧」那半是**大世界**机制（逃跑 10 秒、主动攻击视为利用弱点入场），不进战斗模型 —— 登记在 `_gaps` 的旧记录里。"
+    },
+    {
+      "source": "1405 那刻夏 星魂 2 真实历史的自然人:「敌方目标入场时，触发1次天赋的弱点添加效果，并使其全属性抗性降低20%。」",
+      "do": [
+        {
+          "target": "actor",
+          "turns": 3,
+          "element": "Wind",
+          "op": "ADD_ELEMENTAL_WEAKNESS"
+        },
+        {
+          "attribute": "RESISTANCE_REDUCTION",
+          "op": "MODIFY_ATTR",
+          "target": "actor",
+          "permanent": true,
+          "percent": 0.2
+        }
+      ],
+      "on": "ENEMY_ENTERED",
+      "min_eidolon": 2,
+      "id": "eidolon2_newcomers_get_a_weakness_and_lose_resistance",
+      "_note": "「敌方目标**入场时**，触发 1 次天赋的**弱点添加**效果，并使其**全属性抗性降低 20%**」—— 事件 `ENEMY_ENTERED` ✓（1302 行迹同样用它），目标用 `actor`（入场的那一个 ✓）。⚠ 弱点仍按「攻击者属性 = 风」给出（天赋那条是「随机属性弱点」，引擎的随机与这句的「随机」不同族，已在天赋条目的 `_note` 里写明）；抗性用 `MODIFY_ATTR RESISTANCE_REDUCTION 0.2`（引擎的 `RESISTANCE_REDUCTION` 就是「全属性抗性」✓，1006 的同一课）。"
     }
   ],
   "resources": [
