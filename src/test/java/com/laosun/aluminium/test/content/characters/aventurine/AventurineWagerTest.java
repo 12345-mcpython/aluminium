@@ -80,6 +80,34 @@ public class AventurineWagerTest {
                 "「…并在受到攻击后额外获得 1 点【盲注】」 — one for the wager he holds, one extra");
     }
 
+    /** 天赋「【盲注】达到 7 点后…发动 7 段追加攻击，每段 25% 防御力」: seven instances, and the points are spent. */
+    @Test
+    public void sevenPointsFireTheFollowUp() {
+        Battle battle = scene(0);
+        Character aventurine = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        // Six points first: nothing must happen.
+        for (int i = 0; i < 6; i++) {
+            battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 1));
+            battle.processRequests();
+        }
+        Assertions.assertEquals(6, aventurine.getBuffManager().stacksOf("盲注"),
+                "precondition: six hits on the SHIELDED ALLY, six points, no follow-up yet");
+        double hpBefore = enemy.getCurrentHp();
+
+        // The seventh hit crosses the threshold.
+        battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 1));
+        battle.processRequests();
+
+        Assertions.assertTrue(enemy.getCurrentHp() < hpBefore,
+                "「【盲注】达到 7 点后…发动 7 段追加攻击」 — the enemy lost HP to the barrage");
+        // The hit pays its own point FIRST (that rule sits earlier in the file), so the seventh point arrives and is spent in
+        // the same firing: nothing is left over.
+        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("盲注"),
+                "「消耗 7 点」 — the seventh hit reached seven and all seven were spent");
+    }
+
     private static double critDamageOfShieldedAlly(int eidolon) {
         Battle battle = scene(eidolon);
         return battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();

@@ -81,7 +81,9 @@ public class HardcodedSkillRowRatchetTest {
     // The trace param has no level axis, so it stays literal - the same verdict as the entries above.
     // Note: 48 since 2026-11-06 - 1304's 星魂 1 states 「持有【坚垣筹码】的我方目标暴击伤害提高 20%」, and 0.2 is also a cell of his
     // own rows. The Eidolon param has no level axis, so it stays literal - the same verdict as the entries above.
-    private static final int BASELINE = 48;
+    // Note: 49 since 2026-11-06 - 1304's talent states 「每段攻击…等同于砂金 25% 防御力」, and 0.25 is also a cell of his own
+    // rows. The talent param has no level axis, so it stays literal - the same verdict as the entries above.
+    private static final int BASELINE = 49;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

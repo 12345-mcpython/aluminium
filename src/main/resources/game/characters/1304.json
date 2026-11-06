@@ -4,10 +4,10 @@
   "_status": "partial",
   "_gaps": [
     "⛔ **「砂金持有【坚垣筹码】时能抵抗控制类负面状态，该效果在 2 回合后可再次触发」仍未写** —— 两件事各缺一样：① 「**免疫**控制」不是抗性：引擎的 RESIST_DEBUFF { kind: control } 是**抗性**（提高抵抗概率），而句子是「抵抗」= 直接不给；需要一个「按类型免疫」的修饰。② 「2 回合后可再次触发」**有现成写法** —— 规则级 **cooldown: 2**（1002 天赋、1101、1203、1207 都在用）⇒ 这一半不是缺口。**「先数一遍」又一次生效。**",
-    "盲注 7 点阈值：消耗 7 点、7 段随机 25% 防御力追加攻击、上限 10 点未写",
+    "⭐ **7 点阈值已落地（2026-11-06）**：`talent_seven_points_fire_the_follow_up` —— `TAKING_HIT` + `self_stacks:盲注 >= 7` → `DAMAGE { scale: self_attr:DEFENCE, percent: 0.25, times: 7, target: random_enemy }` + `REMOVE_STACK 盲注 7`。判据 `AventurineWagerTest.sevenPointsFireTheFollowUp`（6 点无事；第 7 点触发 7 段、点数清零）。⛔ **星魂 4 的「额外 +3 段」仍未写**：`times` 是固定整数，没有「由修饰加出来的段数」（`times_from`）。",
     "行迹 热手：重复获得护盾的叠加上限 200% 未写",
     "终结技：随机获得 1–7 点盲注未写",
-    "⭐ **星魂 1（暴伤 20%）已落地（2026-11-06）**：`eidolon1_wager_lifts_the_holders_crit_damage`（`SHIELD_GRANTED` + E1 → `CRIT_ATTACK +0.2`）。⭐ **星魂 2** 的「普攻使目标全属性抗性降低 12%」与 `basic_all_type_res_down` **同一条数值**（行迹与星魂写的是同一件事）⇒ 不重复写第二条规则，判据沿用既有那条。⛔ **星魂 3/5** 是等级加成（原有）、**星魂 4**「触发天赋追加攻击时先使防御 +40%（2 回合）并使追加攻击多 3 段」与**星魂 6**（已在 `eidolon6_damage_per_shielded_ally`）—— 星魂 4 需要「追加攻击段数 +N」的写法（`DAMAGE` 的 `times` 是固定值）。"
+    "⛔ **星魂 4 仍未写**：「触发天赋的追加攻击时，先使砂金防御 +40%（2 回合），并使天赋的追加攻击**额外增加 3 段**」—— 防御那半可写（`DEALING_DAMAGE` + E4 → `MODIFY_ATTR DEFENCE`），但「**段数 +3**」需要一个**可加**的段数写法：`times` 是固定整数，`EffectSpec` 里没有 `times_from`。⇒ 要么加一个 provider 驱动的 `times`，要么在追击规则里写 `times: 10` 的 E4 变体（会与基础那条撞 `SameEffectTwiceGuardTest`）。"
   ],
   "rules": [
     {
@@ -263,6 +263,31 @@
         }
       ],
       "on": "TAKING_HIT"
+    },
+    {
+      "on": "TAKING_HIT",
+      "when": [
+        "self_stacks:盲注 >= 7"
+      ],
+      "id": "talent_seven_points_fire_the_follow_up",
+      "do": [
+        {
+          "percent": 0.25,
+          "element": "Imaginary",
+          "op": "DAMAGE",
+          "target": "random_enemy",
+          "scale": "self_attr:DEFENCE",
+          "times": 7
+        },
+        {
+          "op": "REMOVE_STACK",
+          "target": "self",
+          "amount": 7,
+          "buff": "盲注"
+        }
+      ],
+      "source": "1304 砂金 天赋 枪口以右:「【盲注】达到7点后，砂金消耗7点充能发动7段追加攻击，每段攻击对随机敌方单体造成等同于砂金25%防御力的虚数属性伤害，【盲注】上限10点。」",
+      "_note": "「【盲注】**达到 7 点后**…**消耗 7 点**充能发动 **7 段**追加攻击，每段对**随机敌方单体**造成等同于砂金 **25% 防御力**的虚数属性伤害」—— ① 触发点：盲注只在他/队友被打时增长 ⇒ 挂在 `TAKING_HIT` + `self_stacks:盲注 >= 7` ✓（引擎没有 `STACK_CHANGED` 事件，而这是**唯一**能长到 7 的路径 ✓）；② `DAMAGE { scale: owner_def, percent: 0.25, times: 7, target: random_enemy }` —— `times` 是「独立结算 7 次」✓、`random_enemy` 是现成选择器 ✓；③ 随后 `REMOVE_STACK 盲注 7` ✓（上限 10 由叠层那条的 `max_stacks` 管 ✓）。⛔ 星魂 4 的「**额外增加 3 段**」仍未写：`times` 是**固定整数**，没有「由修饰加出来的段数」这种写法（见 `_gaps`）。"
     }
   ]
 }
