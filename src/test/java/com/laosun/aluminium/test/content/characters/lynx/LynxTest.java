@@ -70,7 +70,8 @@ public class LynxTest {
         Assertions.assertEquals(7, table.ruleCount(TriggerEvent.SKILL_CAST), "the state, the regeneration, Eidolons 4/2/6, and the taunt pair");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the cleanse and the regeneration half");
         // Four since 2026-11-02: the technique adds its own BATTLE_START clause.
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention and the technique");
+        // Five since 2026-11-06: Eidolon 1's heal-taken boost rides battle start too.
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention, the technique and Eidolon 1");
     }
 
     // ==================================================================

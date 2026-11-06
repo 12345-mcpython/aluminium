@@ -342,6 +342,19 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     }
 
     /**
+     * The same gate, but asked about the unit the modifier SITS ON rather than the rule owner: 「为当前生命值百分比 ≤50% 的我方目标
+     * 提供治疗时」 (1110 Lynx (玲可) 星魂 1) - the condition is the HEALEE's bar, not the healer's.
+     */
+    private Double gateHolderHpPercentMin;
+
+    /**
+     * @param min the least HP share (0..1) the CARRIER must keep
+     */
+    public void gateHolderHp(double min) {
+        this.gateHolderHpPercentMin = min;
+    }
+
+    /**
      * The state the <b>HOLDER</b> of this modifier must be in, or {@code null}: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
      * (1307's Ultimate) - the condition and the modifier on the SAME unit, which {@link #gateState} cannot express because that
      * one asks the rule's owner.
@@ -410,6 +423,12 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * @return {@code true} only when a gate was set and is no longer satisfied
      */
     public boolean gateBroken(CanHit holder) {
+        if (gateHolderHpPercentMin != null) {
+            double maxHp = holder == null ? 0 : holder.getMaxHp();
+            if (maxHp <= 0 || holder.getCurrentHp() / maxHp < gateHolderHpPercentMin) {
+                return true;
+            }
+        }
         if (gateHolderState != null) {
             return holder == null || !holder.getBuffManager().hasState(gateHolderState);
         }

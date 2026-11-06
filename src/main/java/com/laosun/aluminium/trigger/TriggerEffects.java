@@ -310,6 +310,11 @@ final class TriggerEffects {
             if (effect.getWhileHpPercent() != null) {
                 buff.gateHpPercent(effect.getWhileHpPercent(), ctx.owner());
             }
+            // 「为当前生命值百分比 ≤50% 的我方目标提供治疗时」 (1110 Lynx (玲可) 星魂 1): the CARRIER's bar, not the rule owner's -
+            // the sibling of the line above for a condition that sits on the unit the modifier is attached to.
+            if (effect.getWhileHolderHpPercent() != null) {
+                buff.gateHolderHp(effect.getWhileHolderHpPercent());
+            }
             // "with a 100% base chance, additionally lower the target's all-type RES by 10.00%": an attribute modifier may be ROLLED,
             // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes

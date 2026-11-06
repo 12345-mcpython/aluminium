@@ -164,6 +164,7 @@ public class EffectSpec {
         copy.whileStacks = this.whileStacks;
         copy.whileStacksMin = this.whileStacksMin;
         copy.whileHpPercent = this.whileHpPercent;
+        copy.whileHolderHpPercent = this.whileHolderHpPercent;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -654,6 +655,13 @@ public class EffectSpec {
      */
     @SerializedName("while_hp_percent")
     private Double whileHpPercent;
+
+    /**
+     * 「为当前生命值百分比 **≤50%** 的我方目标提供治疗时」 (1110 Lynx (玲可) 星魂 1): the gate asks about the unit the modifier sits
+     * on, not the rule owner - the sibling of {@code while_holder_state} for a HP bar.
+     */
+    @SerializedName("while_holder_hp_percent")
+    private Double whileHolderHpPercent;
     /**
      * A modifier that lives only <b>while the unit CARRYING it</b> holds this state: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
      * (1307's Ultimate). The mirror of {@link #whileState}, which asks the RULE OWNER - the difference matters when the condition

@@ -1,11 +1,11 @@
 {
   "schema": 1,
   "character": 1110,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "✅ **秘技已实现**（2026-11-02）：`technique_regen_on_the_party`。✅ **星魂 4 已实现**：`eidolon4_attack_on_survival_response`。",
     "⭐ **战技的软嘲讽已落地（2026-11-06）**：`skill_soft_taunt_for_destruction` / `skill_soft_taunt_for_preservation` —— `SKILL_CAST` + `target has_path 毁灭`（或 存护）→ `MODIFY_ATTR AGGRO_ADDED_RATIO 5 / 1 回合`。⭐ ① **数值不是占位**：引擎注释写明 `AggroAddedRatio` **5** 读作 ×(1+5)=×6，正是「**大幅**提高」在数据里的样子；② 「毁灭**或**存护」写不出来（DSL 条件是 AND）⇒ 拆成两条，已按 `SameEffectTwiceGuardTest` 登记 BASELINE。",
-    "⛔ **星魂 1 未写**：「为当前生命值百分比 ≤50% 的我方目标提供治疗时，治疗量提高 20%，对持续治疗也生效」—— 需要对**治疗结算**加一个「受疗者 HP ≤ 50%」的倍率，引擎的 `BOOST_HEAL` 类修饰尚未核对是否带条件维度。",
+    "⭐ **星魂 1 已落地（2026-11-06）**：`eidolon1_heals_on_a_half_hp_target_land_harder` —— `BATTLE_START` + E1 → `MODIFY_ATTR HEAL_TAKEN_RATIO 0.2`（受疗量）+ **`while_holder_hp_percent: 0.5`**。⭐ 这一轮给引擎加了**第五个活门槛** `while_holder_hp_percent`（`AbstractBuff.gateHolderHp`）：问**载体自己**的血线，而不是规则主人的 —— 与 `while_holder_state` 同族。「对持续治疗也生效」不需要另写：持续治疗也走 `Battle.heal` ⇒ 同一个受疗区生效 ✓。",
     "⭐ **星魂 2 已落地（2026-11-06）**：`eidolon2_the_response_refuses_one_debuff` —— `SKILL_CAST` + E2 → **`RESIST_DEBUFF { charges: 1, cooldown: 0 }`**（引擎早有充能式抵抗 `DebuffShieldBuff`，1207 襄尺同一写法）。⚠ charges **必须**配 `cooldown`（非负）；这里取 `0` = 用掉即止、不再回来 —— 句子只说「可抵抗 **1** 次」、没说恢复，照实写。",
     "⭐ **星魂 6 已落地（2026-11-06）**：`eidolon6_the_response_lifts_max_hp_and_effect_res` —— `SKILL_CAST` + E6 → `MODIFY_ATTR HEALTH { value: 0.06 × 我自己的 HEALTH }`（固定量，provider 代数写法）+ `MODIFY_ATTR EFFECT_RESISTANCE 0.3`，都落在持【求生反应】的目标上。"
   ],
@@ -288,6 +288,23 @@
       ],
       "source": "1110 玲可 战技 盐渍野营罐头的可食用性: 「…若该目标为「毁灭」或「存护」命途，被敌方攻击的概率大幅提高…」",
       "id": "skill_soft_taunt_for_preservation"
+    },
+    {
+      "on": "BATTLE_START",
+      "_note": "「为**当前生命值百分比 ≤50%** 的我方目标提供治疗时，**治疗量提高 20%**，对持续治疗也生效」—— ① 「治疗量提高」落在**受疗者**身上：`MODIFY_ATTR HEAL_TAKEN_RATIO 0.2`（引擎里 `heal_taken_ratio` 就是「受疗量」）✓；② 条件是**受疗者**的生命 —— 于是这一轮加了**第五个活门槛** `while_holder_hp_percent`（`AbstractBuff.gateHolderHp`：问**载体自己**的血线，而不是规则主人的）✓，与 `while_holder_state` 同族；③ 「对持续治疗也生效」：持续治疗走的也是 `Battle.heal` ⇒ 同一个受疗区生效 ✓，不需要另写。",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "while_holder_hp_percent": 0.5,
+          "target": "all_allies",
+          "permanent": true,
+          "percent": 0.2,
+          "attribute": "HEAL_TAKEN_RATIO"
+        }
+      ],
+      "id": "eidolon1_heals_on_a_half_hp_target_land_harder",
+      "min_eidolon": 1,
+      "source": "1110 玲可 星魂 1 便携炉具的清晨:「为当前生命值百分比小于等于50%的我方目标提供治疗时，治疗量提高20%，对持续治疗也生效。」"
     }
   ]
 }
