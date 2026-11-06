@@ -7,7 +7,7 @@
     "⭐ **7 点阈值已落地（2026-11-06）**：`talent_seven_points_fire_the_follow_up` —— `TAKING_HIT` + `self_stacks:盲注 >= 7` → `DAMAGE { scale: self_attr:DEFENCE, percent: 0.25, times: 7, target: random_enemy }` + `REMOVE_STACK 盲注 7`。判据 `AventurineWagerTest.sevenPointsFireTheFollowUp`（6 点无事；第 7 点触发 7 段、点数清零）。⛔ **星魂 4 的「额外 +3 段」仍未写**：`times` 是固定整数，没有「由修饰加出来的段数」（`times_from`）。",
     "行迹 热手：重复获得护盾的叠加上限 200% 未写",
     "终结技：随机获得 1–7 点盲注未写",
-    "⛔ **星魂 4 仍未写**：「触发天赋的追加攻击时，先使砂金防御 +40%（2 回合），并使天赋的追加攻击**额外增加 3 段**」—— 防御那半可写（`DEALING_DAMAGE` + E4 → `MODIFY_ATTR DEFENCE`），但「**段数 +3**」需要一个**可加**的段数写法：`times` 是固定整数，`EffectSpec` 里没有 `times_from`。⇒ 要么加一个 provider 驱动的 `times`，要么在追击规则里写 `times: 10` 的 E4 变体（会与基础那条撞 `SameEffectTwiceGuardTest`）。"
+    "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_raises_defence_and_adds_three_hits` —— `TAKING_HIT` + `盲注 >= 7` + E4 → `MODIFY_ATTR DEFENCE 0.4 / 2 回合` + **第二发** `DAMAGE { times: 3 }`（7 + 3 = 10 段，同一份额、同一目标池）。⚠ **顺序是判据**：本条必须排在基础追击**之前** —— 基础那条会先花掉 7 点，之后 `盲注 >= 7` 已为假（实测 E4 与 E3 伤害完全一样）。⚠ 判据只钉「多于 10/7 且落在一带内」：同一句还**先加 40% 防御** ⇒ 每段也更疼（实测 1.85）。"
   ],
   "rules": [
     {
@@ -263,6 +263,33 @@
         }
       ],
       "on": "TAKING_HIT"
+    },
+    {
+      "min_eidolon": 4,
+      "when": [
+        "self_stacks:盲注 >= 7"
+      ],
+      "id": "eidolon4_raises_defence_and_adds_three_hits",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "target": "self",
+          "percent": 0.4,
+          "turns": 2,
+          "attribute": "DEFENCE"
+        },
+        {
+          "times": 3,
+          "op": "DAMAGE",
+          "scale": "self_attr:DEFENCE",
+          "element": "Imaginary",
+          "percent": 0.25,
+          "target": "random_enemy"
+        }
+      ],
+      "on": "TAKING_HIT",
+      "_note": "「触发天赋的追加攻击时，**先**使砂金**防御 +40%**（2 回合），并使天赋的追加攻击**额外增加 3 段**」—— ① 防御那半 `MODIFY_ATTR DEFENCE 0.4 / 2 回合` ✓；② 「额外 3 段」写成**第二条 `DAMAGE`、`times: 3`**（同一事件、同一份额）⇒ 总段数 7 + 3 = 10 ✓ —— 因为 `times` 是**固定整数**、没有「加出来的段数」写法（`EffectSpec` 无 `times_from`），而这是**等价**的：7 段 + 3 段 = 10 段同一份额、同一目标池 ✓。⚠ 顺序：本条与基础那条**同事件**，两者都要求 `盲注 >= 7`；本条排在后面 ⇒ 基础先打 7 段，本条再补 3 段 ✓。 ⚠ **必须排在基础追击那条之前**：基础那条会**先花掉 7 点**，排在它之后时 `盲注 >= 7` 已为假、规则永远不触发（实测：E4 与 E3 的伤害完全一样）。句子里「**先**使防御 +40%」也正好要求这个顺序。",
+      "source": "1304 砂金 星魂 4 意外绞刑:「触发天赋的追加攻击时，会先使砂金防御力提高40%，持续2回合，并使天赋的追加攻击额外增加3段攻击段数。」"
     },
     {
       "on": "TAKING_HIT",

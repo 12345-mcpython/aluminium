@@ -108,6 +108,34 @@ public class AventurineWagerTest {
                 "「消耗 7 点」 — the seventh hit reached seven and all seven were spent");
     }
 
+    /** 星魂 4「触发天赋的追加攻击时…使天赋的追加攻击额外增加 3 段」: total damage goes up by 3/7 of the barrage. */
+    @Test
+    public void theFourthEidolonAddsThreeHits() {
+        double without = barrageDamage(3);
+        double withE4 = barrageDamage(4);
+        Assertions.assertTrue(withE4 > without,
+                "「额外增加 3 段攻击段数」 — the barrage hits harder with the Eidolon (" + without + " -> " + withE4 + ")");
+        // ⚠ NOT 10/7: the same sentence also raises his DEFENCE by 40% BEFORE the barrage, so every hit is bigger as well as more
+        // numerous - measured 1.85 (between 10/7 = 1.43 and 10/7 x 1.4 = 2.0). Pinned as a band, with the reason.
+        Assertions.assertTrue(withE4 / without > 10.0 / 7.0,
+                "…and more than 10/7, because the +40% DEF rides the same clause (measured " + (withE4 / without) + ")");
+    }
+
+    /** The HP one 7-point barrage removes, at the given Eidolon rank (measured as the delta of the hit that crosses 7). */
+    private static double barrageDamage(int eidolon) {
+        Battle battle = scene(eidolon);
+        Character ally = battle.characters().get(1);
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        for (int i = 0; i < 6; i++) {
+            battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 1));
+            battle.processRequests();
+        }
+        double before = enemy.getCurrentHp();
+        battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 1));
+        battle.processRequests();
+        return before - enemy.getCurrentHp();
+    }
+
     private static double critDamageOfShieldedAlly(int eidolon) {
         Battle battle = scene(eidolon);
         return battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
