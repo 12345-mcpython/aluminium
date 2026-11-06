@@ -2369,7 +2369,7 @@ final class TriggerConditionParser {
      * {@link AttributeType}, the second for shape here and for existence where the character is assembled.
      */
     static final Set<String> NUMERIC_VARIABLES =
-            Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
+            Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_toughness_percent", "target_debuff_count", "self_summon_count",
                     // 「施放战技**解除增益效果时**」 (1106 Pela's trace 追歼 and her Eidolon 2): how many buffs the event's
                     // target carries that a dispel would REALLY remove. `target_debuff_count` cannot answer it (it counts the
                     // other half), and a `has_state` cannot either (a skill may strip a modifier no state name covers).

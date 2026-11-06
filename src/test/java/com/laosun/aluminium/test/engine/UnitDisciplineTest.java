@@ -43,6 +43,9 @@ public class UnitDisciplineTest {
             // condition belongs in BOTH -- that is the fifth place a condition name lives (closed set, switch, this list, and the docs that describe them).
             "damage_skill_key",
             "target_hp_percent_before", "enemy_count", "ally_count",
+            // 「敌方目标当前韧性 ≥ 其上限的 50%」 (1214 雪衣 行迹 摧锋轴承): a bar FRACTION, so it belongs in FRACTION below as
+            // well - the engine answers `stance / maxStance`, i.e. the same 0..1 scale as `hp_percent`.
+            "target_toughness_percent",
             "skill_point_max",   // the team pool's cap, for light cone 23046 (a count, not a fraction)
             // The CURRENT count of that same pool, added with 1015 Archer: his trace asks 「若战技点大于等于 4 点」 and his
             // Skill leaves the loop when 「战技点不足以再次施放战技」 - both about the count, neither about the cap.
@@ -66,7 +69,7 @@ public class UnitDisciplineTest {
      */
     // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
     private static final Set<String> FRACTION = Set.of("hp_percent", "target_hp_percent", "target_hp_percent_before",
-            "self_energy_percent");
+            "self_energy_percent", "target_toughness_percent");
 
     private static final Pattern COMPARISON =
             Pattern.compile("^\\s*([a-z_]+)\\s*(>=|<=|>|<|==)\\s*(-?[0-9.]+)\\s*$");

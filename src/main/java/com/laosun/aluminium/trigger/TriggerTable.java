@@ -2064,6 +2064,13 @@ public class TriggerTable {
                 // "若该目标当前生命值百分比大于等于 30%" -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());
+                // 「如果敌方目标**当前韧性大于等于其自身韧性上限的 50%**」 (1214 Xueyi (雪衣) 行迹 摧锋轴承): the toughness bar as a
+                // fraction. A separate name because the HP fraction above cannot answer it, and an enemy with no bar answers
+                // NaN (no bar = no percentage, and comparing against NaN is false - the clause simply does not hold).
+                case "target_toughness_percent" -> ctx.target() instanceof com.laosun.aluminium.enemy.Enemy enemy
+                        && enemy.getMaxStance() > 0
+                        ? enemy.getStance() / enemy.getMaxStance()
+                        : Double.NaN;
                 // The ACTOR's share (light cone 21055's "our target's current HP percentage
                 // is at or above 50%"): "our unit" there is the one dealing the damage, so the third subject.
                 case "actor_hp_percent" -> hpPercent(ctx.actor());
