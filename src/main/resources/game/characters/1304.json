@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "character": 1304,
-  "_status": "implemented",
+  "_status": "partial",
   "_gaps": [
     "⭐ **星魂 2 与行迹是同一句（2026-11-06 定案）**：「施放普攻时使目标的全属性抗性降低 12%，持续 3 回合」在**星魂 2**和**行迹**里各出现一次，数值完全相同 ⇒ **只写一条规则**（`basic_all_type_res_down`），星魂那句不另写规则（写了会撞 `SameEffectTwiceGuardTest` 与 `ContentDuplicateGuardTest`）✓。",
     "⛔ **秘技的三档随机未写（2026-11-06）**：「一定概率 +24% / 大概率 +36% / 小概率 +60% 防御力」是**按概率抽一档**：引擎的 `chance` 是「做不做」，不是「做哪一档」⇒ 规则里只写了**保底档 24%**（`technique_the_red_or_the_black_gives_defence`），三档抽取本身需要「按权重从若干档里抽一档」的写法。"
