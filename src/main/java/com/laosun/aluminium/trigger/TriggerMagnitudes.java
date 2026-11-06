@@ -67,6 +67,17 @@ final class TriggerMagnitudes {
      * path reads it directly.
      */
     static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect, TriggerContext ctx) {
+        // 「100% 攻击力 + 150% 防御力」 (8003/8004 Preservation Trailblazer Ultimate): several base terms that SUM into ONE
+        // instance. Each term is evaluated by the readers below, through a copy that states only that term, so a term may use
+        // any scale spelling a single-base damage may. The sum happens BEFORE settlement, which is the whole point: two
+        // separate DAMAGE effects would settle - and crit - twice.
+        if (effect.getParts() != null && !effect.getParts().isEmpty()) {
+            double total = 0;
+            for (EffectSpec.Part part : effect.getParts()) {
+                total += literalBase(attacker, victim, effect.forPart(part), ctx);
+            }
+            return total;
+        }
         if (effect.getValue() != null) {
             return valueOf(effect, ctx);
         }

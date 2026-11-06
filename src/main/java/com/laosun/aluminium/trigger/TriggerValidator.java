@@ -521,7 +521,29 @@ final class TriggerValidator {
                     // `target_max_hp`, added for "deal damage equal to X% of Max HP" -- 16 documents). `requireDerivedScale` stays strict because
                     // MODIFY_ATTR shares it and a modifier must not name a Max HP.
                     String literalScale = effect.getScale() == null ? "" : effect.getScale().trim();
-                    if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+                    if (effect.getParts() != null && !effect.getParts().isEmpty()) {
+                        // 「100% 攻击力 + 150% 防御力」 (8003/8004): several base terms summed into ONE instance. The rest of
+                        // this chain describes a SINGLE base, so the two spellings are mutually exclusive; every term faces
+                        // the same requirement a lone base would (a scale plus a share).
+                        if (!literalScale.isEmpty()) {
+                            throw new IllegalArgumentException(
+                                    "Op " + op + " states both \"parts\" and \"scale\": the parts ARE the base "
+                                            + "(source: " + spec.getSource() + ")");
+                        }
+                        for (EffectSpec.Part part : effect.getParts()) {
+                            if (part.getScale() == null || part.getScale().isBlank()) {
+                                throw new IllegalArgumentException(
+                                        "Op " + op + " has a part with no \"scale\": every term needs the base it is a share of "
+                                                + "(source: " + spec.getSource() + ")");
+                            }
+                            if (part.getPercent() == null && part.getPercentFromSkillParam() == null) {
+                                throw new IllegalArgumentException(
+                                        "Op " + op + " has a part stating no share: give it \"percent\" or "
+                                                + "\"percent_from_skill_param\" (source: " + spec.getSource() + ")");
+                            }
+                        }
+                        requireElement(effect, op, spec, false);
+                    } else if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
                         // 「等同于本次攻击总伤害值 #1% 的真实伤害」 (1408's Eidolon 6): the base is the number the event
                         // ANNOUNCES, and only one event announces an attack's settled total. Note: It is
                         // `amount_from_event` (+ `percent`) and NOT `scale: "event_amount"` - that magnitude spelling was

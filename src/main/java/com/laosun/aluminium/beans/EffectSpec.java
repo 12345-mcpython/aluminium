@@ -107,6 +107,8 @@ public class EffectSpec {
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
+        // The multi-base sum must survive a copy too: an amending rule that drops it would settle the FIRST term only.
+        copy.parts = this.parts;
         copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
         copy.value = NumberProviders.copyOf(this.value);
         copy.percentPerAllyState = this.percentPerAllyState;
@@ -1187,6 +1189,63 @@ public class EffectSpec {
 
     @SerializedName("percent_from_cast_param")
     private Integer percentFromCastParam;
+
+    /**
+     * Several base terms that SUM into ONE damage instance: 「100% 攻击力 + 150% 防御力」 (8003/8004 the Preservation Trailblazer's
+     * Ultimate, whose own skill row states both shares as two cells of `param_list`).
+     *
+     * <p>A rider written as two separate {@code DAMAGE} effects would settle TWICE - the defence zone and the crit roll each
+     * happen per instance - which is not what 「一发」 means. With {@code parts} the sum is formed <b>before</b> settlement, so
+     * one instance carries the whole base.
+     *
+     * <p>Each part accepts the same spellings a top-level {@code DAMAGE} does for its base: {@code scale} plus a share
+     * ({@code percent} or {@code percent_from_skill_param}).
+     */
+    @SerializedName("parts")
+    private java.util.List<Part> parts;
+
+    /**
+     * One term of a {@link #parts} sum.
+     */
+    public static class Part {
+        @SerializedName("scale")
+        private String scale;
+        @SerializedName("percent")
+        private Double percent;
+        @SerializedName("percent_from_skill_param")
+        private String percentFromSkillParam;
+
+        /** @return the scale spelling ({@code self_attr:ATTACK}, {@code owner_max_hp}, …) */
+        public String getScale() {
+            return scale;
+        }
+
+        /** @return the literal share, or {@code null} when it is read from a row */
+        public Double getPercent() {
+            return percent;
+        }
+
+        /** @return the slot whose row states this term's share ({@code ULTRA:1}), or {@code null} */
+        public String getPercentFromSkillParam() {
+            return percentFromSkillParam;
+        }
+    }
+
+    /**
+     * The same effect rewritten to state <b>one</b> of its {@link #parts} as an ordinary single-base effect, so the existing
+     * magnitude readers can evaluate that term unchanged.
+     *
+     * @param part the term to evaluate
+     * @return a copy whose base is that term and which has no {@code parts}
+     */
+    public EffectSpec forPart(Part part) {
+        EffectSpec piece = copy();
+        piece.parts = null;
+        piece.scale = part.getScale();
+        piece.percent = part.getPercent();
+        piece.percentFromSkillParam = part.getPercentFromSkillParam();
+        return piece;
+    }
 
     /**
      * The FLAT part of a magnitude, read from the skill that produced the event at its current level - the sibling of

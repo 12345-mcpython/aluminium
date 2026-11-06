@@ -431,6 +431,21 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | 裸属性名 | 等价于 `self_attr:<属性>` |
 | `owner_attack` / `owner_def` / `owner_max_hp` | 持有者的攻击 / 防御 / 生命上限 |
 | `target_max_hp` / `target_current_hp` / `target_lost_hp` | 目标的 |
+
+#### 5.3.1b 多个基数项：`parts`
+
+「造成等同于 **100% 攻击力 + 150% 防御力** 的伤害」= **一次结算**、基数由若干项相加：
+
+```json
+{ "op": "DAMAGE", "element": "Fire", "target": "all_enemies",
+  "parts": [
+    { "scale": "self_attr:ATTACK",  "percent_from_skill_param": "ULTRA:0" },
+    { "scale": "self_attr:DEFENCE", "percent_from_skill_param": "ULTRA:1" } ] }
+```
+
+- 每一项用它自己的 `scale` + 份额（`percent` 或 `percent_from_skill_param`），相加**在结算之前**发生 ⇒ **一个实例**（一次暴击、一次防御区）；
+- 与 `scale` / `percent` 互斥（`parts` 就是基数）—— 装载期会拒；
+- 与「两条 `DAMAGE`」的区别正是要点：那会是**两个实例**（各自暴击），期望值相近但语义不同。判据 `MultiBaseDamageTest`。
 | `actor_max_hp` / `actor_attr:<属性>` | 事件发起者的 |
 | `self_stacks:<名字>` / `target_stacks:<名字>` | 层数 |
 | `party_resource:<名字>` | 全队计数器 |
