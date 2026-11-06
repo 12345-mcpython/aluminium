@@ -7,7 +7,7 @@
     "⭐ **天赋已落地（2026-11-06）**：`talent_skill_raises_the_targets_crit_rate` —— `SKILL_CAST` + `target` → `MODIFY_ATTR CRIT_CHANCE {percent_from_skill_param: TALENT:0, turns: 3}`，判据 `SundaySupportTest.theTalentRaisesTheTargetsCritRate`（队友 +20%、他自己不变）。⛔ 星魂 6 那半（可叠 3 层、持续 +1 回合、溢出暴击转暴伤）仍未写：叠层上限与「溢出值转成另一个属性」都需要新写法。",
     "⭐ **秘技已落地（2026-11-06）**：`technique_arms_the_next_ability`（`BATTLE_START` + `self has_state 秘技` → 记号 `荣光之秘-待发`）与 `technique_first_ally_ability_grants_the_share`（首次 `SKILL_CAST` → 队友 `ALL_DAMAGE_TYPE_BOOST +0.5 / 2 回合`，随后摘记号）。⚠ 「首次」没有规则级开关（只有 `once_per_turn`）⇒ 用记号状态表达；⚠ 50% 必须 `coexist: true`，否则它会**替换**战技自己那 15%/40%（同属性同类的修饰默认互相替换 —— 实测：不加时只读到 1 个修饰）。判据 `SundayTechniqueTest`。",
     "⭐ **行迹两条已落地（2026-11-06）**：`trace_glorious_whisk_starts_with_energy`（开战 +25 能量）与 `trace_safe_harbour_dispels_one_debuff`（战技解除目标 1 个负面效果），判据 `SundaySupportTest.theWhiskPaysTwentyFiveEnergyAtBattleStart` / `theHarbourDispelsOneDebuff`。⭐ **行迹 主日渴慕 已落地（2026-11-06）**：`trace_sunday_lenten_gift_lifts_the_energy_to_forty` —— `ULT_CAST` + `actor == self` → `RAISE_ENERGY_TO { amount: 40, target: target }`。⭐ 这一轮给 `RAISE_ENERGY_TO` 补了**固定点数**的写法（原来只认 `percent` 份额），装载期同时放宽（`amount` 是一条合法拼法），并把结果夹到目标的能量上限（`Math.min(floor, maxEnergy)`）。判据 `SundayLentenGiftTest`（盟友上限 120 ⇒ 20% = 24 < 40 ⇒ 读到 **40**）。",
-    "⭐ **星魂 3/4/5 已落地（2026-11-06）**：3/5 是等级加成（原有），4 = `eidolon4_pays_eight_energy_each_turn`（`TURN_START` + `actor == self` → +8 能量，判据 `SundaySupportTest.theFourthEidolonPaysEnergyOnHisTurn`）。⛔ **星魂 1**（战技使目标无视 16% 防御、召唤物 40%，2 回合）**未写**：`DEFENCE_IGNORE` 有，但「角色 16% / 他的召唤物 40%」是**两档**份额、要对 `target_and_summon` 分开写；可与现有战技规则合并，需要一次专门改动。⛔ **星魂 2**（首次终结技 +2 战技点、【蒙福者】伤害 +30%）**未写**：「首次」同上（记号状态可解），后半要给【蒙福者】加一个只对该状态持有者生效的增伤。⛔ **星魂 6** 见天赋那条。",
+    "⭐ **星魂 3/4/5 已落地（2026-11-06）**：3/5 是等级加成（原有），4 = `eidolon4_pays_eight_energy_each_turn`（`TURN_START` + `actor == self` → +8 能量，判据 `SundaySupportTest.theFourthEidolonPaysEnergyOnHisTurn`）。⭐ **星魂 1 已落地（2026-11-06）**：`eidolon1_the_skill_pierces_defence_for_the_pair` —— `SKILL_CAST` + `min_eidolon: 1` → `MODIFY_ATTR DEFENCE_IGNORE 0.16`（`target`）+ `0.4`（**`target_summon`**，本轮新增的选择器：只有被指定者的召唤物；`target_and_summon` 是一对、`summon` 是规则主人的忆灵，两者都说不成这句）。判据 `SundayEidolonOneTest`（带忆灵的盟友：本人 0.16、忆灵 0.4；E0 施放则为 0）。⛔ **星魂 2**（首次终结技 +2 战技点、【蒙福者】伤害 +30%）**未写**：「首次」同上（记号状态可解），后半要给【蒙福者】加一个只对该状态持有者生效的增伤。⛔ **星魂 6** 见天赋那条。",
     "⚠ **终结技的细节**：`ult_effect` 已覆盖「20% 能量上限 + 【蒙福者】 + 暴伤加成 + 仅最新目标 + 他倒下时解除」，但**「每回合开始持续时间 -1，共 3 回合」用的是 `ticks_on: self` 的近似**（引擎按他的回合扣减 ✓），而**星魂 6 的「持续 +1」**没有写。"
   ],
   "rules": [
@@ -265,6 +265,32 @@
       ],
       "source": "1313 星期日 行迹 主日渴慕 (1313101): 「施放终结技时，若为目标恢复的能量不足40点，恢复的能量提高至40点。」",
       "_note": "「施放终结技时，**若为目标恢复的能量不足 40 点，恢复的能量提高至 40 点**」—— `RAISE_ENERGY_TO` 是**下限**而不是加量（引擎原话：低于给定值才拉到该值，已经高于就不动）⇒ 「若…不足」这半句**不需要条件** ✓。⭐ 这一轮给这个 op 补了**固定点数**的写法（`amount`），因为原来只认 `percent`（占上限的份额）；句子给的是「40 点」、不是「40%」，所以份额拼法会错 ✗。⚠ 上限还要夹到她自己的能量上限（`Math.min(floor, maxEnergy)`），否则一个上限 30 的目标会被设成 40。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon1_the_skill_pierces_defence_for_the_pair",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.16,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.4,
+          "turns": 2,
+          "target": "target_summon"
+        }
+      ],
+      "source": "1313 星期日 星魂 1 千纪沉寂之末: 「星期日施放战技时，使目标角色造成伤害时无视目标16%的防御力，召唤物造成伤害时无视目标40%的防御力，持续2回合。」 参数 = [2, 0.16, 0.4]",
+      "_note": "「施放战技时，使**目标角色**…无视 **16%** 防御力，**召唤物**…无视 **40%** 防御力，持续 **2** 回合」—— 两档份额 ⇒ 两条修饰：`target`（被指定的队友）与 **`target_summon`**（**本轮新增的选择器**：只有「他的召唤物」；`target_and_summon` 是**一对**、`summon` 是**规则主人的**忆灵，两者都说不成这句）。⚠ 目标没有召唤物时 `target_summon` 返回空 ⇒ 那半句自然不生效 ✓。⚠ 16% / 40% / 2 回合来自**星魂参数**（无等级轴）⇒ 字面值精确 ✓。"
     },
     {
       "on": "BATTLE_START",

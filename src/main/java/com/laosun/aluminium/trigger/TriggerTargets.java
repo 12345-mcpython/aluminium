@@ -404,6 +404,17 @@ final class TriggerTargets {
                 }
                 return battle.adjacentEnemies(ctx.target());
             }
+            // 「召唤物造成伤害时无视目标 40% 的防御力」 (1313 Sunday Eidolon 1): the CHOSEN ally summon ALONE, which
+            // `target_and_summon` cannot say (it hands over the pair) and `summon` cannot either (that one is the rule
+            // owner own memosprite). Empty when the ally has none - the clause simply does not apply.
+            case "target_summon" -> {
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets \"target_summon\" but no battle was supplied to look for that unit summons");
+                }
+                CanHit chosen = require(ctx.target(), "target_summon", ctx);
+                return List.copyOf(battle.summonsOf(chosen));
+            }
             case TriggerVocabulary.TARGET_AND_SUMMON -> {
                 if (battle == null) {
                     throw new IllegalStateException(

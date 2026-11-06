@@ -406,7 +406,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 |---|---|
 | 自己人 | `self` `target` `attacker` `actor` `all_allies` `party` `other_allies` `next_ally` `party_first` `lowest_hp_ally` `random_ally_below_half_energy` `other_map_attackers` `highest_break_effect_ally` `allies_with_summons` |
 | 敌人 | `all_enemies` `random_enemy` `random_hit_enemy` `highest_hp_enemy` `target_else_random_enemy` `random_adjacent_enemy` `adjacent_enemies` |
-| 召唤物 | `summon` `all_summons` `target_and_summon` |
+| 召唤物 | `summon`（规则主人自己的忆灵）`all_summons` `target_and_summon`（被指定者**与其**召唤物）`target_summon`（**只有**被指定者的召唤物；没有则空集）|
 | 按标记找人 | `holder_of:<状态>` `lowest_stacks_enemy:<状态>`（敌方中该状态层数**最低**的一个，平手按名册顺序） |
 | 按命途 / id | `allies_of_path:<命途>` `allies_of_path_except:<命途>:<名单>` `ally_cid:<id>` |
 | 按波次 | `wave_monster` `wave_monsters` |

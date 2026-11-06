@@ -79,7 +79,7 @@ final class TriggerVocabulary {
                     // "使【无量忿怒】倒计时行动延后 15%" (1507 Eidolon 1): the countdown the rule owner PLACED - a real unit
                     // on the action order, addressable at last.
                     "countdown",
-                    "target_and_summon", "all_enemies", "lowest_hp_ally",
+                    "target_and_summon", "target_summon", "all_enemies", "lowest_hp_ally",
                     // Note: `actor` is `attacker` under the name the condition language and the events use. Reader:
                     // 1503's extra-turn reward - "该额外回合开始时，【美学底本】获得 30 点【好活当赏】" - where the unit to be
                     // paid is the event's actor (the archetype whose extra turn just began), not the rule's owner.

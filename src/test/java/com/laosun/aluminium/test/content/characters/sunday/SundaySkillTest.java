@@ -295,12 +295,12 @@ public class SundaySkillTest {
     public void theAuthoredSkillIsThreeClauses() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
 
-        // Note: 7 since 2026-11-06 - the four Skill clauses above plus the talent's CRIT Rate, 掌中安港's dispel and the
+        // Note: 8 since 2026-11-06 - the seven below plus 星魂 1 (the pair's DEF ignore, also on SKILL_CAST).
         // technique's first-ability share (all three also on SKILL_CAST); they are judged by SundaySupportTest.
-        Assertions.assertEquals(7, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
+        Assertions.assertEquals(8, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
                 "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 (The Beatified) refund"
-                        + " + the talent's crit rate + the trace's dispel + the technique's first-ability share");
-        // Note: 2 since 2026-11-06 - the 【蒙福者】 clause plus the trace that lifts the restored energy to 40 points.
+                        + " + the talent's crit rate + the trace's dispel + the technique's first-ability share"
+                        + " + 星魂 1's defence ignore");
         Assertions.assertEquals(2, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
                 "the 【蒙福者】 clause plus the trace that lifts the restored energy to 40 points");
     }
