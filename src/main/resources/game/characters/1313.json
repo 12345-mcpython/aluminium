@@ -2,14 +2,8 @@
   "schema": 1,
   "character": 1313,
   "_status": "implemented",
-  "_gaps": [
-    "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧的四条 `_gaps` 只写「天赋 / 秘技 / 行迹 / 星魂：未逐句读、未写」—— 等于没记。这次逐节读了 `1313_星期日.md`：已落地的见下，**仍开**的只有星魂 6 一条。",
-    "⭐ **天赋已落地（2026-11-06）**：`talent_skill_raises_the_targets_crit_rate` —— `SKILL_CAST` + `target` → `MODIFY_ATTR CRIT_CHANCE { percent_from_skill_param: TALENT:0, turns: 3 }`，判据 `SundaySupportTest`。⭐ 星魂 6 的三句见下面那条记录（已全部落地）。",
-    "⭐ **秘技已落地（2026-11-06）**：`technique_arms_the_next_ability`（`BATTLE_START` + `self has_state 秘技` → 记号 `荣光之秘-待发`）与 `technique_first_ally_ability_grants_the_share`（首次 `SKILL_CAST` → 队友 `ALL_DAMAGE_TYPE_BOOST +0.5 / 2 回合`，随后摘记号）。⚠ 「首次」没有规则级开关（只有 `once_per_turn`）⇒ 用记号状态；⚠ 50% 必须 `coexist: true`，否则它会**替换**战技自己那 15%/40%。判据 `SundayTechniqueTest`。",
-    "⭐ **行迹已全部落地（2026-11-06）**：`trace_glorious_whisk_starts_with_energy`（开战 +25 能量）、`trace_safe_harbour_dispels_one_debuff`（战技解 1 个负面）、`trace_sunday_lenten_gift_lifts_the_energy_to_forty`（能量下限提到 **40 点** —— 这一轮给 `RAISE_ENERGY_TO` 补了**固定点数**写法）。判据 `SundaySupportTest` / `SundayLentenGiftTest`。",
-    "⭐ **星魂 1/2/3/4/5 已落地（2026-11-06）**：1 = `eidolon1_the_skill_pierces_defence_for_the_pair`（本人 0.16 / **`target_summon`** 0.4，选择器本轮新增）；2 = 三条（记号状态给「首次」+2 战技点、`while_holder_state: 蒙福者` 的 +30%）；3/5 = 等级加成；4 = `eidolon4_pays_eight_energy_each_turn`。判据 `SundayEidolonOneTest` / `SundayEidolonTwoTest` / `SundaySupportTest`。",
-    "⭐ **星魂 6 的前两句已落地（2026-11-06）**：`eidolon6_the_crit_rate_stacks_three_and_lasts_four` —— `SKILL_CAST` + `min_eidolon: 6` → `MODIFY_ATTR CRIT_CHANCE { percent_from_skill_param: TALENT:0, turns: 4, stackable: true, max_stacks: 3 }`，并把天赋那条加了 `max_eidolon: 5` 与它互斥。判据 `SundayEidolonSixTest`（E5 第二次施放替换 ⇒ 1 层 / 3 回合；E6 叠到 3 层、4 回合）。⭐ **第三句也落地了（2026-11-06）**：「当目标暴击率超过 100%，每溢出 1% 暴击率提高 2% 暴击伤害」—— 用 **`value` 表达式**写出来：`2 × max(暴击率 − 1, 0)`（`mul` + `max` + `sub` + `attr{whose: target, attribute: CRIT_CHANCE}` + `const`），落在 E6 那条天赋规则的**第二个效果**上（`MODIFY_ATTR CRIT_ATTACK`，`turns: 4`）。⭐ 这套 provider 代数（`add/sub/mul/min/max/const/attr`）**早就在**，所以「由另一个属性的溢出量派生」不是缺能力，只是没被这么用过。⚠ 语义是**快照**：值在天赋落地那一刻算一次（那时暴击率**已含**天赋自己的 +20%），不是持续跟随 —— 与项目里其它派生修饰同一口径。判据 `SundayEidolonSixTest.theOverflowCritRateBecomesCritDamage`（>100% 时 CRIT_ATTACK 上升且等于 2×溢出；<100% 时为 0）。"
-  ],
+  "_gaps": [],
+
   "rules": [
     {
       "on": "SKILL_CAST",
