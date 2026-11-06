@@ -83,7 +83,11 @@ public class HardcodedSkillRowRatchetTest {
     // own rows. The Eidolon param has no level axis, so it stays literal - the same verdict as the entries above.
     // Note: 49 since 2026-11-06 - 1304's talent states 「每段攻击…等同于砂金 25% 防御力」, and 0.25 is also a cell of his own
     // rows. The talent param has no level axis, so it stays literal - the same verdict as the entries above.
-    private static final int BASELINE = 49;
+    // Note: 50 since 2026-11-06 - 1304's 星魂 4 repeats the talent's 「25% 防御力」 for its three extra hits (the same literal, a
+    // second rule). The Eidolon param has no level axis, so it stays literal - the same verdict as the entries above.
+    // Note: 51 since 2026-11-06 - 1304's technique states 「防御力提高 24%」, and 0.24 is also a cell of his own rows. The
+    // technique param has no level axis, so it stays literal - the same verdict as the entries above.
+    private static final int BASELINE = 51;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
