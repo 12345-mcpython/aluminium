@@ -260,11 +260,36 @@ public class AglaeaMemospritesTest {
     }
 
     /**
-     * 「衣匠免疫控制类负面状态」: the memosprite carries the engine's own control-class resistance at its limit (1.0 = immune).
+     * 「行动序列上出现倒计时，倒计时固定拥有 100 速度…回合开始时使衣匠自毁」.
      *
-     * <p>Read as the buff the sentence names rather than as "a debuff failed to land": the resistance is rolled per
-     * application, and a test that rolls would be measuring the dice, not the clause.
+     * <p>The countdown is a real unit on the order, so the assertion is about the timeline: let the battle run, and the
+     * first thing the countdown's turn does is dismiss the memosprite — which also ends the stance, because that state is
+     * anchored to it.
      */
+    @Test
+    public void theCountdownDestroysTheGarmentmaker() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.castImmediate(aglaea.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), aglaea, List.of(enemy));
+        battle.processRequests();
+        Summon garmentmaker = battle.summonOf(aglaea);
+        Assertions.assertNotNull(garmentmaker, "precondition: the Ultimate brought it out");
+        Assertions.assertTrue(aglaea.getBuffManager().hasState("至高之姿"), "precondition: the stance is on");
+        Assertions.assertEquals(1, battle.countdownsOf(aglaea).size(),
+                "「行动序列上出现倒计时」 — placed by her");
+        var countdown = battle.countdownsOf(aglaea).getFirst();
+
+        // Its turn: the engine announces COUNTDOWN_TURN for it, and the rule answers by dismissing the memosprite. Fired
+        // directly rather than by stepping the queue, because this test is about the ANSWER - whether the countdown
+        // reaches its turn at all is the action order's job (BladeZoneDelayTest reads that side).
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.COUNTDOWN_TURN, countdown, null, 0, 0));
+        battle.processRequests();
+        Assertions.assertTrue(garmentmaker.isDeath(), "「回合开始时使衣匠自毁」 — the countdown's turn dismissed it");
+        Assertions.assertFalse(aglaea.getBuffManager().hasState("至高之姿"),
+                "「衣匠消失时阿格莱雅解除【至高之姿】状态」 — the state went with it");    }
     @Test
     public void theGarmentmakerShrugsOffControl() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);

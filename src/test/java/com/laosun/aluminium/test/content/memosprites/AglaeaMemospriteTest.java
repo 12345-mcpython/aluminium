@@ -218,11 +218,12 @@ public class AglaeaMemospriteTest {
         TriggerTable.CompiledRule summoning = ultimate.stream()
                 .filter(rule -> rule.effects().stream().anyMatch(effect -> "SUMMON".equals(effect.getOp())))
                 .findFirst().orElseThrow();
-        Assertions.assertEquals(List.of("SUMMON", "HEAL", "APPLY_BUFF", "ADVANCE"),
+        Assertions.assertEquals(List.of("SUMMON", "HEAL", "APPLY_BUFF", "START_COUNTDOWN", "ADVANCE"),
                 summoning.effects().stream().map(EffectSpec::getOp).toList(),
                 "the order the sentence writes them -- SUMMON must come first (the other three aim at the summon, "
-                        + "and the stance is ANCHORED to it, which needs it to exist), and the stance \"Aglaea enters that stance\" (「阿格莱雅进入"
-                        + "【至高之姿】 (Supreme Stance)状态」) precedes \"and makes herself act immediately\" (「并使自身立即行动」)");
+                        + "and the stance is ANCHORED to it, which needs it to exist), the stance \"Aglaea enters that stance\" (「阿格莱雅进入"
+                        + "【至高之姿】 (Supreme Stance)状态」) precedes \"and makes herself act immediately\" (「并使自身立即行动」), "
+                        + "and 「行动序列上出现倒计时」 joins them in the same sentence (2026-11-06)");
         Assertions.assertEquals(1.0, summoning.effects().get(1).getPercent(), EPS, "restores HP to the maximum (回复至上限)");
     }
 
