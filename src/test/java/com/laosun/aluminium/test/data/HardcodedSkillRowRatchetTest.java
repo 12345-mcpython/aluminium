@@ -68,7 +68,11 @@ public class HardcodedSkillRowRatchetTest {
     // 43 since 2026-11-04: 1402 Aglaea's Eidolon 1 writes 0.15 for 「受到的伤害提高 15%」 -- a STAR-SOUL parameter ([0.15, 20])
     // that happens to equal her Ultimate's Lv10 cell (0.15). Same verdict as 1307's above: the sentence's number is not in a
     // skill row, and there is no reader for an Eidolon row, so it stays literal.
-    private static final int BASELINE = 43;
+    // Note: 44 since 2026-11-06 - 1313's 秘技 荣光之秘 states 50% for "the first ability used on an ally", and 0.5 is
+    // also the Lv1 cell of every character's basic-attack column, so the scan cannot tell the technique constant from a row.
+    // There is no reader for a technique row (the sentence has no skill slot), so it stays literal. Same verdict as the two
+    // entries above.
+    private static final int BASELINE = 44;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

@@ -163,8 +163,12 @@ public class SundaySkillTest {
 
         cast(battle, sunday, ally);
 
-        List<StatModifierBuff> buffs = ally.getBuffManager().allBuffsOf(StatModifierBuff.class);
-        Assertions.assertEquals(1, buffs.size(), "one modifier, not two: the two clauses are disjoint rules");
+        // The talent now ALSO puts a CRIT_CHANCE modifier on the same ally (2026-11-06), so read the damage share by
+        // attribute: counting every modifier would make this assertion about the whole kit, not about the share.
+        List<StatModifierBuff> buffs = ally.getBuffManager().allBuffsOf(StatModifierBuff.class).stream()
+                .filter(buff -> buff.getAttribute() == com.laosun.aluminium.enums.AttributeType.ALL_DAMAGE_TYPE_BOOST)
+                .toList();
+        Assertions.assertEquals(1, buffs.size(), "one damage-share modifier, not two: the two clauses are disjoint rules");
         Assertions.assertEquals(2, buffs.getFirst().duration(), "\"lasts #3[i] turns\" (「持续#3[i]回合」) -- #3 = 2");
     }
 
@@ -290,8 +294,11 @@ public class SundaySkillTest {
     public void theAuthoredSkillIsThreeClauses() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
 
-        Assertions.assertEquals(4, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
-                "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 (The Beatified) refund");
+        // Note: 7 since 2026-11-06 - the four Skill clauses above plus the talent's CRIT Rate, 掌中安港's dispel and the
+        // technique's first-ability share (all three also on SKILL_CAST); they are judged by SundaySupportTest.
+        Assertions.assertEquals(7, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
+                "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 (The Beatified) refund"
+                        + " + the talent's crit rate + the trace's dispel + the technique's first-ability share");
         Assertions.assertEquals(1, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
                 "the 【蒙福者】 (The Beatified) clause; the energy restore is registered separately");
     }

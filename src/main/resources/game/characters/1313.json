@@ -3,12 +3,120 @@
   "character": 1313,
   "_status": "partial",
   "_gaps": [
-    "天赋：未逐句读、未写",
-    "秘技：未逐句读、未写",
-    "行迹：未读、未写",
-    "星魂 1–6：未读、未写"
+    "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧的四条 `_gaps` 只写「未逐句读、未写」—— 等于没记。这次逐节读了文档（`1313_星期日.md`），已落地的见本文件规则与「⭐」条目，**仍开**的逐条记在下面，每条都说明缺的是哪个机制。",
+    "⭐ **天赋已落地（2026-11-06）**：`talent_skill_raises_the_targets_crit_rate` —— `SKILL_CAST` + `target` → `MODIFY_ATTR CRIT_CHANCE {percent_from_skill_param: TALENT:0, turns: 3}`，判据 `SundaySupportTest.theTalentRaisesTheTargetsCritRate`（队友 +20%、他自己不变）。⛔ 星魂 6 那半（可叠 3 层、持续 +1 回合、溢出暴击转暴伤）仍未写：叠层上限与「溢出值转成另一个属性」都需要新写法。",
+    "⭐ **秘技已落地（2026-11-06）**：`technique_arms_the_next_ability`（`BATTLE_START` + `self has_state 秘技` → 记号 `荣光之秘-待发`）与 `technique_first_ally_ability_grants_the_share`（首次 `SKILL_CAST` → 队友 `ALL_DAMAGE_TYPE_BOOST +0.5 / 2 回合`，随后摘记号）。⚠ 「首次」没有规则级开关（只有 `once_per_turn`）⇒ 用记号状态表达；⚠ 50% 必须 `coexist: true`，否则它会**替换**战技自己那 15%/40%（同属性同类的修饰默认互相替换 —— 实测：不加时只读到 1 个修饰）。判据 `SundayTechniqueTest`。",
+    "⭐ **行迹两条已落地（2026-11-06）**：`trace_glorious_whisk_starts_with_energy`（开战 +25 能量）与 `trace_safe_harbour_dispels_one_debuff`（战技解除目标 1 个负面效果），判据 `SundaySupportTest.theWhiskPaysTwentyFiveEnergyAtBattleStart` / `theHarbourDispelsOneDebuff`。⛔ **行迹 主日渴慕**（「若为目标恢复的能量不足 40 点，恢复的能量提高至 40 点」）仍未写：`RAISE_ENERGY_TO` 只有**百分比**下限，这句话要的是**固定 40 点**的「至少」写法，引擎没有。",
+    "⭐ **星魂 3/4/5 已落地（2026-11-06）**：3/5 是等级加成（原有），4 = `eidolon4_pays_eight_energy_each_turn`（`TURN_START` + `actor == self` → +8 能量，判据 `SundaySupportTest.theFourthEidolonPaysEnergyOnHisTurn`）。⛔ **星魂 1**（战技使目标无视 16% 防御、召唤物 40%，2 回合）**未写**：`DEFENCE_IGNORE` 有，但「角色 16% / 他的召唤物 40%」是**两档**份额、要对 `target_and_summon` 分开写；可与现有战技规则合并，需要一次专门改动。⛔ **星魂 2**（首次终结技 +2 战技点、【蒙福者】伤害 +30%）**未写**：「首次」同上（记号状态可解），后半要给【蒙福者】加一个只对该状态持有者生效的增伤。⛔ **星魂 6** 见天赋那条。",
+    "⚠ **终结技的细节**：`ult_effect` 已覆盖「20% 能量上限 + 【蒙福者】 + 暴伤加成 + 仅最新目标 + 他倒下时解除」，但**「每回合开始持续时间 -1，共 3 回合」用的是 `ticks_on: self` 的近似**（引擎按他的回合扣减 ✓），而**星魂 6 的「持续 +1」**没有写。"
   ],
   "rules": [
+    {
+      "on": "SKILL_CAST",
+      "id": "talent_skill_raises_the_targets_crit_rate",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent_from_skill_param": "TALENT:0",
+          "turns": 3,
+          "target": "target"
+        }
+      ],
+      "source": "1313 星期日 天赋 倾诉之肉身: 「施放战技时，使目标的暴击率提高20.00%，持续3回合。」 参数 Lv10 = [0.2, 3]",
+      "_note": "「施放战技时，使**目标**的暴击率提高 20%，持续 3 回合」—— 挂 `SKILL_CAST` + **`target`**（这句说的是被指定的那个队友，不是他自己）✓；数值**按等级读**（`percent_from_skill_param: TALENT:0`，Lv10 = 0.2 = 文档的 20% ✓）。⚠ 星魂 6 让它**可叠 3 层**并把持续 +1 回合 —— 那是另一句，见 `_gaps`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_glorious_whisk_starts_with_energy",
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 25,
+          "target": "self"
+        }
+      ],
+      "source": "1313 星期日 行迹 崇高拂尘 (1313102): 「战斗开始时，星期日恢复25点能量。」",
+      "_note": "「战斗开始时，恢复 **25** 点能量」—— `BATTLE_START` + `GAIN_ENERGY { amount: 25 }` ✓（行迹没有等级轴 ⇒ 字面值精确 ✓）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "trace_safe_harbour_dispels_one_debuff",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "target"
+        }
+      ],
+      "source": "1313 星期日 行迹 掌中安港 (1313103): 「施放战技时，解除目标的1个负面效果。」",
+      "_note": "「施放战技时，**解除目标的 1 个负面效果**」—— `DISPEL { amount: 1 }` ✓（引擎的 `removeDebuffs(amount)`：不带 `kind` = 任意负面效果，正是这条不限定类别）；`target: target` = 被指定的那个队友 ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon4_pays_eight_energy_each_turn",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 8,
+          "target": "self"
+        }
+      ],
+      "source": "1313 星期日 星魂 4 雕塑的卷首语: 「回合开始时，恢复8点能量。」 参数 = [8]",
+      "_note": "「**回合开始时**，恢复 **8** 点能量」—— `TURN_START` + `actor == self`（只在他自己的回合）+ `GAIN_ENERGY { amount: 8 }` ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_arms_the_next_ability",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "荣光之秘-待发",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1313 星期日 秘技 荣光之秘: 「使用秘技后，下一次战斗星期日首次对我方目标施放技能时，使目标造成的伤害提高50%，持续2回合。」",
+      "_note": "「使用秘技后，**下一次战斗**…」—— `BATTLE_START` + `self has_state 秘技`（引擎在 BATTLE_START 之前盖这个状态 ✓，与 1402 秘技同一种门）⇒ 给他自己挂一个**一次性**的记号 `荣光之秘-待发`（`permanent`，用完由下一条摘掉）。⚠ 「首次」没有规则级开关（`once_per_turn` 有、跨战斗的首次没有）⇒ 用**状态记号**表达：它存在就说明还没用过。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "technique_first_ally_ability_grants_the_share",
+      "when": [
+        "actor == self",
+        "self has_state 荣光之秘-待发"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "turns": 2,
+          "coexist": true,
+          "target": "target"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "荣光之秘-待发",
+          "target": "self"
+        }
+      ],
+      "source": "1313 星期日 秘技 荣光之秘: 「…星期日首次对我方目标施放技能时，使目标造成的伤害提高50%，持续2回合。」 参数 = [0.5, 2]",
+      "_note": "「**首次对我方目标施放技能时**，使目标造成的伤害提高 50%，持续 2 回合」—— `SKILL_CAST` + 记号仍在（= 首次）+ `target`（被指定的队友）+ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.5 / turns: 2` ✓；随后 `REMOVE_STATE` 摘掉记号 ⇒ 同场第二次施放不再给。⚠ 50% 与 2 回合都是**秘技**的数字（没有等级轴）⇒ 字面值 ✓。"
+    },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
