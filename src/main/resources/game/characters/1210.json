@@ -5,7 +5,7 @@
   "_gaps": [
     "⭐ **秘技已落地（2026-11-06）**：`technique_four_random_hits_and_a_firekiss` —— `BATTLE_START` + `self has_state 秘技` → `DAMAGE { times: 4, target: random_enemy, percent: 0.5 }` + `APPLY_BUFF 吞火`。⚠ 【吞火】的归属是**近似**（四次结算**不能**逐次指向「那一次打中的是谁」，只能再抽一个 \random_enemy：期望分布一致、逐次归属不同）。",
     "⭐ **星魂 1 已落地（2026-11-06）**：`eidolon1_the_skill_lowers_effect_resistance` —— `SKILL_CAST` + E1 → `MODIFY_ATTR EFFECT_RESISTANCE -0.1 / 2 回合`。⛔ **星魂 2–6 仍未读**（尤以星魂 6 的「【吞火】层数」那一族为然，见最后一条）。",
-    "⛔ **【吞火】的「最多 3 层」未建模**：`MODIFY_DAMAGE_TAKEN` 不接受 `max_stacks`（只有 `MODIFY_ATTR` 支持层数）⇒ 每次触发只挂一层，触发三次仍是 +7% 而不是 +21%。要忠实表达需要「**易伤也能叠层**」这一引擎能力（把层数支持扩到 `MODIFY_DAMAGE_TAKEN`，约 = 在它上面复用 `MODIFY_ATTR` 的层数机制）。"
+    "⭐ **【吞火】的「最多 3 层」不需要新引擎能力（2026-11-06 核对）**：易伤**可以**随层数增长 —— `MODIFY_DAMAGE_TAKEN` 已经支持 **`per_stack`**（层数从哪读）+ **`per_stack_live: true`**（每次结算重读）+ **`per_stack_cap`**（封顶），1009 艾丝妲的天赋就是这套（`PER_STACK|self_stacks:蓄能|cap 5`）。⇒ 这把「引擎缺能力」降级成「**内容重构**」：把【吞火】改成**计数器**（`ADD_STACK 吞火 1 max 3`）+ **一条**易伤（`percent: 0.07, per_stack: target_stacks:吞火, per_stack_live: true, per_stack_cap: 3`）。⚠ 现有两条规则（`ult_settles_the_burn` / `talent_firekiss_on_burn_tick`）各自挂了状态 + 易伤，重构要一起改，所以本轮**只登记、不改**。"
   ],
   "rules": [
     {
