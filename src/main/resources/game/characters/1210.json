@@ -3,10 +3,9 @@
   "character": 1210,
   "_status": "partial",
   "_gaps": [
-    "✅ **已落地**（2026-11-02）：终结技的「灼烧立即产生 92%」（`ult_settles_the_burn`）、天赋【吞火】（`talent_firekiss_on_burn_tick`），加上原有的战技灼烧、行迹「投狭」「逾锋」、星魂 3/5 等级。",
-    "⛔ **秘技未写**：「进入战斗后造成 **4** 次伤害，每次对**随机单体**造成 **50%** 攻击力火伤，并有 100% 基础概率使目标陷入【吞火】」—— 4 次随机单体落在 `DAMAGE { times: 4, target: random_enemy }` 上是可做的，但【吞火】的叠层语义（每次命中叠一层、最多 3 层）需要先确认 `MODIFY_DAMAGE_TAKEN` 的 `max_stacks` 在**多次施放**之间的行为，下一轮核对后再写。",
-    "⛔ **星魂 1–6 未读**；**普攻 / 火 DoT 的数值口径未核**（`level_convention` 只说引用 Lv10 行，逐项没对）。",
-    "⛔ **【吞火】的「最多 3 层」未建模**：`MODIFY_DAMAGE_TAKEN` 不接受 `max_stacks`（只有 `MODIFY_ATTR` 支持层数），当前每次触发只挂一层 → 触发多次仍是 +7% 而不是 +21%。要忠实表达需要「易伤也能叠层」这一引擎能力。"
+    "⭐ **秘技已落地（2026-11-06）**：`technique_four_random_hits_and_a_firekiss` —— `BATTLE_START` + `self has_state 秘技` → `DAMAGE { times: 4, target: random_enemy, percent: 0.5 }` + `APPLY_BUFF 吞火`。⚠ 【吞火】的归属是**近似**（四次结算**不能**逐次指向「那一次打中的是谁」，只能再抽一个 \random_enemy：期望分布一致、逐次归属不同）。",
+    "⭐ **星魂 1 已落地（2026-11-06）**：`eidolon1_the_skill_lowers_effect_resistance` —— `SKILL_CAST` + E1 → `MODIFY_ATTR EFFECT_RESISTANCE -0.1 / 2 回合`。⛔ **星魂 2–6 仍未读**（尤以星魂 6 的「【吞火】层数」那一族为然，见最后一条）。",
+    "⛔ **【吞火】的「最多 3 层」未建模**：`MODIFY_DAMAGE_TAKEN` 不接受 `max_stacks`（只有 `MODIFY_ATTR` 支持层数）⇒ 每次触发只挂一层，触发三次仍是 +7% 而不是 +21%。要忠实表达需要「**易伤也能叠层**」这一引擎能力（把层数支持扩到 `MODIFY_DAMAGE_TAKEN`，约 = 在它上面复用 `MODIFY_ATTR` 的层数机制）。"
   ],
   "rules": [
     {
@@ -154,6 +153,51 @@
       ],
       "source": "1210 桂乃芬 天赋 古来君子养艺人: 「桂乃芬在场时，敌方受到的灼烧状态触发伤害后，有100%的基础概率陷入【吞火】状态，【吞火】状态下敌方目标受到的伤害提高7.00%，持续3回合，最多叠加3层。」",
       "_note": "「敌方受到的**灼烧状态触发伤害后**…陷入【吞火】，受到的伤害提高 **7%**，持续 **3** 回合，最多 **3** 层」= `DAMAGE_SETTLED` + **`damage_is_dot`**（灼烧那一次结算）+ `damage_element_is_self`（她的火）→ `MODIFY_DAMAGE_TAKEN { percent: 0.07, turns: 3, buff: 吞火 }` ✓。⚠ `damage_is_dot` 正是今天为卡芙卡加的那个条件词，这里第二次用上 —— 没有它这条会把**任何**伤害都当成「灼烧触发」。⚠ 近似：「桂乃芬**在场时**」没有单独的门（她不在场她的规则不会触发，这一点由规则所有者的身份天然保证）。 ⛔ **叠层未建模**：`MODIFY_DAMAGE_TAKEN` 不吃 `max_stacks`（校验器只允许 `MODIFY_ATTR` 带层数），所以「最多 3 层」现在是**一层**。登记在 `_gaps`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "id": "technique_four_random_hits_and_a_firekiss",
+      "do": [
+        {
+          "scale": "self_attr:ATTACK",
+          "percent": 0.5,
+          "element": "Fire",
+          "op": "DAMAGE",
+          "target": "random_enemy",
+          "times": 4
+        },
+        {
+          "base_chance": 1.0,
+          "turns": 3,
+          "buff": "吞火",
+          "target": "random_enemy",
+          "op": "APPLY_BUFF"
+        }
+      ],
+      "_note": "「进入战斗后造成 **4** 次伤害，每次对**随机单体**造成 **50%** 攻击力火伤，并有 **100% 基础概率**使目标陷入【吞火】」—— 伤害用 `DAMAGE { times: 4, target: random_enemy }` ✓；⚠ 【吞火】那半是**近似**：`times` 的四次是**一个效果**的四次结算，规则效果**不能**逐次指向「那一次打中的是谁」，只能用 `random_enemy` 再抽一个 ⇒ 期望分布一致、逐次归属不同（已登记）。",
+      "source": "1210 桂乃芬 秘技 耍耍把式卖卖艺:「立即攻击敌人，进入战斗后造成4次伤害，每次伤害对敌方随机单体造成等同于桂乃芬50%攻击力的火属性伤害并有100%的基础概率使目标陷入【吞火】状态。」"
+    },
+    {
+      "on": "SKILL_CAST",
+      "min_eidolon": 1,
+      "id": "eidolon1_the_skill_lowers_effect_resistance",
+      "do": [
+        {
+          "percent": -0.1,
+          "target": "target",
+          "attribute": "EFFECT_RESISTANCE",
+          "op": "MODIFY_ATTR",
+          "turns": 2
+        }
+      ],
+      "_note": "「施放战技时…使受到攻击的敌方目标**效果抵抗降低 10%**，持续 **2** 回合」—— `SKILL_CAST` + `target`（被打的那个 ✓）→ `MODIFY_ATTR EFFECT_RESISTANCE -0.1 / 2 回合` ✓。⚠ 句子的「100% 基础概率」= 必定生效（引擎的 `base_chance: 1.0` 与省略等价）。",
+      "when": [
+        "actor == self"
+      ],
+      "source": "1210 桂乃芬 星魂 1 倒立吃面条:「施放战技时，有100%的基础概率使受到攻击的敌方目标效果抵抗降低10%，持续2回合。」"
     }
   ]
 }
