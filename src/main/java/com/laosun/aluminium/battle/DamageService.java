@@ -202,7 +202,10 @@ public final class DamageService {
         // constant that names it. Read HERE because this is the one place where the instance's element and the victim meet.
         rawResist -= defender.getAttribute(AttributeType.resistanceReductionFor(damage.getElement())).get();
         rawResist += defender.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
-        damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
+        // …and the attacker-side twin, per element: 「自身与衣匠的雷属性抗性穿透提高 20%」 (1402 Eidolon 6). ADDED to the
+        // all-type penetration, not instead of it - a unit can carry both, and the sentence only adds one element.
+        damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get()
+                + attacker.getAttribute(AttributeType.penetrationFor(damage.getElement())).get());
 
         attacker.onDamage(battle, damage);
         defender.onDamage(battle, damage);

@@ -78,9 +78,10 @@ public class AglaeaClauseCoverageTest {
                 RULE + "eidolon2_another_units_skill_clears_it"));
         SECTION.put("星魂 3：华珠凝滞的礼物", List.of(RULE + "eidolon3_levels", GAP + "另：星魂 3/5 的**忆灵**等级加成"));
         SECTION.put("星魂 4：大理石内的闪烁", List.of(RULE + "p1402_eidolon4_her_attack_also_stacks_it",
-                RULE + "p1402_eidolon4_the_cap_rises_by_one", GAP + "星魂 6 未写"));
+                RULE + "p1402_eidolon4_the_cap_rises_by_one", GAP + "星魂 6 的后半句"));
         SECTION.put("星魂 5：漆黑苦难的织者", List.of(RULE + "eidolon5_levels", GAP + "另：星魂 3/5 的**忆灵**等级加成"));
-        SECTION.put("星魂 6：盈虚无常的金线", List.of(GAP + "星魂 6 未写"));
+        SECTION.put("星魂 6：盈虚无常的金线", List.of(RULE + "p1402_eidolon6_thunder_penetration_while_in_the_stance",
+                GAP + "星魂 6 的后半句"));
         // Not a section of HER document, but five rules of this file answer for it: 1415's poem is written on the
         // beneficiary's table, because the buff lands on Aglaea and the Garmentmaker.
         SECTION.put("1415 忆灵技 12（写在本文件的跨角色规则）", List.of(

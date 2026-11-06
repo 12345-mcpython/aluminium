@@ -295,7 +295,40 @@ public enum AttributeType {
     @SerializedName("resistance_reduction_thunder") RESISTANCE_REDUCTION_THUNDER("resistance_reduction_thunder"),
     @SerializedName("resistance_reduction_wind") RESISTANCE_REDUCTION_WIND("resistance_reduction_wind"),
     @SerializedName("resistance_reduction_quantum") RESISTANCE_REDUCTION_QUANTUM("resistance_reduction_quantum"),
-    @SerializedName("resistance_reduction_imaginary") RESISTANCE_REDUCTION_IMAGINARY("resistance_reduction_imaginary");
+    @SerializedName("resistance_reduction_imaginary") RESISTANCE_REDUCTION_IMAGINARY("resistance_reduction_imaginary"),
+    /**
+     * Per-element <b>penetration</b>: 「自身与衣匠的**雷**属性抗性穿透提高 20%」 (1402 Eidolon 6).
+     *
+     * <p>The attacker-side twin of the per-element reductions above, and for the same reason: the one read site
+     * ({@code DamageService}) has the instance's element in scope, so it can pick the constant that names it instead of
+     * applying an all-type penetration the sentence never stated.
+     */
+    @SerializedName("damage_penetration_physical") DAMAGE_PENETRATION_PHYSICAL("damage_penetration_physical"),
+    @SerializedName("damage_penetration_fire") DAMAGE_PENETRATION_FIRE("damage_penetration_fire"),
+    @SerializedName("damage_penetration_ice") DAMAGE_PENETRATION_ICE("damage_penetration_ice"),
+    @SerializedName("damage_penetration_thunder") DAMAGE_PENETRATION_THUNDER("damage_penetration_thunder"),
+    @SerializedName("damage_penetration_wind") DAMAGE_PENETRATION_WIND("damage_penetration_wind"),
+    @SerializedName("damage_penetration_quantum") DAMAGE_PENETRATION_QUANTUM("damage_penetration_quantum"),
+    @SerializedName("damage_penetration_imaginary") DAMAGE_PENETRATION_IMAGINARY("damage_penetration_imaginary");
+
+    /**
+     * The per-element penetration constant for {@code element}, or the all-type {@link #DAMAGE_PENETRATION} when the
+     * element is unknown.
+     */
+    public static AttributeType penetrationFor(com.laosun.aluminium.enums.DamageElement element) {
+        if (element == null) {
+            return DAMAGE_PENETRATION;
+        }
+        return switch (element) {
+            case PHYSICAL -> DAMAGE_PENETRATION_PHYSICAL;
+            case FIRE -> DAMAGE_PENETRATION_FIRE;
+            case ICE -> DAMAGE_PENETRATION_ICE;
+            case THUNDER -> DAMAGE_PENETRATION_THUNDER;
+            case WIND -> DAMAGE_PENETRATION_WIND;
+            case QUANTUM -> DAMAGE_PENETRATION_QUANTUM;
+            case IMAGINARY -> DAMAGE_PENETRATION_IMAGINARY;
+        };
+    }
 
     /**
      * The per-element resistance-reduction constant for {@code element}, or {@link #RESISTANCE_REDUCTION} when the element is

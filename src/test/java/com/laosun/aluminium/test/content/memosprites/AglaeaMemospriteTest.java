@@ -214,7 +214,7 @@ public class AglaeaMemospriteTest {
         // event), and 「每层使自身速度提高 15%」 (the stance's speed, which reads the memosprite's own counter). The rule
         // read here is the one that summons; the other two are judged by AglaeaStanceSkillSwapTest and
         // AglaeaMemospriteTest.theStanceSpeedFollowsTheLayersLive.
-        Assertions.assertEquals(5, ultimate.size());
+        Assertions.assertEquals(6, ultimate.size());
         TriggerTable.CompiledRule summoning = ultimate.stream()
                 .filter(rule -> rule.effects().stream().anyMatch(effect -> "SUMMON".equals(effect.getOp())))
                 .findFirst().orElseThrow();
