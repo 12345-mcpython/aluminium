@@ -301,8 +301,9 @@ public class SundaySkillTest {
                 "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 (The Beatified) refund"
                         + " + the talent's crit rate + the trace's dispel + the technique's first-ability share"
                         + " + 星魂 1's defence ignore");
-        Assertions.assertEquals(2, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
-                "the 【蒙福者】 clause plus the trace that lifts the restored energy to 40 points");
+        // Note: 5 since 2026-11-06 - the two above plus 星魂 2 (first-ultimate skill point, and the Beatified damage).
+        Assertions.assertEquals(4, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
+                "the 【蒙福者】 clause + the 40-point energy floor + 星魂 2 two rules");
     }
 
     // ==================================================================
