@@ -7,7 +7,7 @@
     "⭐ **普攻 / 战技 / 星魂 1 的叠层已落地（2026-11-06）**：`talent_basic_stacks_one_will`（普攻「并叠加 1 层【灼热意志】」）、`talent_skill_stacks_one_will`（战技同句）、`eidolon1_four_stacks_at_battle_start`（星魂 1「战斗开始时立即获得 4 层」）；与天赋那条「每受到 1 次攻击」共用同一个计数器（上限 8）。判据 `PreservationTrailblazerTest.hisFileCarriesTheClauses` 的事件计数 + 既有护盾判据。",
     "⭐ **天赋的「≥4 层 ⇒ 普攻强化」已落地（2026-11-06）**：三条同形规则（`TAKING_HIT` / `BASIC_ATTACK` / `SKILL_CAST` + `self_stacks:灼热意志 >= 4` → `REPLACE_SKILL { skill: COMMON, skill_id: 8 }`）＋ 两条反向（`< 4` → `remove: true`）＋ 一条「强化普攻消耗 4 层」（`BASIC_ATTACK` + `from_skill_id == 8` → `REMOVE_STACK 4`）。判据 `TrailblazerMagmaWillSwapTest`（挨 4 下 ⇒ 普攻槽 = 8；打一次强化普攻 ⇒ 层数 0、槽回 1）。⚠ 顺序是判据的一部分：涨层/扣层的规则必须排在判门槛的规则**之前**（同一事件按文件顺序执行）。",
     "⛔ **终结技的混合基数未写**：「100% 攻击力 + 150% 防御力」是**两个基数相加**的一发伤害。`DAMAGE` 的一次结算只有一个 `scale`；两条 `DAMAGE` 会是**两个实例**（防御区/暴击各自结算一次），与「一发」的语义不同。引擎若要精确，需要「一个伤害可以有多个基数项」。",
-    "⛔ **终结技「下一次普攻自动强化且不消耗【灼热意志】」未写**：`REPLACE_SKILL { until: next_attack }` 可以给「强化」那半，但「**不消耗** 4 层」要改动强化普攻那条规则的消耗行为 —— 需要一个「本次替换的强化普攻不扣层」的开关（与 1301 的「本次治疗对全体生效」同类：一次性的行为覆盖）。"
+    "⭐ **终结技「下一次普攻自动获得强化且不消耗层数」已落地（2026-11-06）**：`ult_free_enhanced_basic`（`ULT_CAST` → 记号 `免费强化` + `REPLACE_SKILL { COMMON, skill_id: 8, until: next_attack }`）与 `free_enhanced_basic_does_not_spend`（`BASIC_ATTACK` + `from_skill_id == 8` + 记号 → 只摘记号不扣层）；消耗那条加了 `!self has_state 免费强化`。判据 `TrailblazerFreeEnhancedBasicTest`（开大打一次普攻：层数 4 → 4，记号被摘）. ⚠ 顺序：摘记号那条必须排在消耗那条**之前**。"
   ],
   "rules": [
     {
@@ -331,7 +331,8 @@
       "id": "talent_enhanced_basic_spends_four_stacks",
       "when": [
         "actor == self",
-        "from_skill_id == 8"
+        "from_skill_id == 8",
+        "!self has_state 免费强化"
       ],
       "do": [
         {
@@ -379,6 +380,50 @@
       ],
       "source": "8003 开拓者•存护 天赋: 「…（强化普攻）消耗4层【灼热意志】」",
       "_note": "强化普攻打完、层数掉到 4 以下 ⇒ 摘掉替换（排在消耗那条之后）。"
+    },
+    {
+      "when": [
+        "actor == self"
+      ],
+      "source": "8004 开拓者•存护 终结技: 「…下一次施放普攻时，自动获得强化且不消耗【灼热意志】。」",
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "免费强化",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "until": [
+            "next_attack"
+          ],
+          "skill_id": 8,
+          "target": "self",
+          "skill": "COMMON"
+        }
+      ],
+      "on": "ULT_CAST",
+      "_note": "「下一次普攻**自动获得强化且不消耗**层数」—— ① `REPLACE_SKILL { until: next_attack }` 负责「下一次自动强化」✓；② 记号 `免费强化` 负责「不消耗」：消耗那条要求 `!self has_state 免费强化`，本批新增的 `free_enhanced_basic_does_not_spend` 只把记号摘掉、不扣层 ✓。",
+      "id": "ult_free_enhanced_basic"
+    },
+    {
+      "when": [
+        "actor == self",
+        "from_skill_id == 8",
+        "self has_state 免费强化"
+      ],
+      "source": "8004 开拓者•存护 终结技: 「…不消耗【灼热意志】。」",
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "免费强化",
+          "target": "self"
+        }
+      ],
+      "on": "BASIC_ATTACK",
+      "_note": "只摘记号、不扣层 ⇒ 「不消耗」✓。⚠ 必须排在消耗那条**之前**（同事件按文件顺序执行），否则层数先被扣掉。",
+      "id": "free_enhanced_basic_does_not_spend"
     }
   ]
 }

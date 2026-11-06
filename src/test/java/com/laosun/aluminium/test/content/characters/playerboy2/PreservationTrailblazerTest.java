@@ -106,9 +106,9 @@ public class PreservationTrailblazerTest {
             Assertions.assertEquals(3, table.ruleCount(TriggerEvent.TAKING_HIT), "cid " + cid + ": the stack per hit and the two swaps");
             // Note: 2 since 2026-11-06 - the shield plus 「普攻…并叠加 1 层【灼热意志】」.
             // Note: 5 since 2026-11-06 - the shield, the stack, the swap, the spend, and the restore.
-            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BASIC_ATTACK), "cid " + cid + ": shield, stack, swap, spend, restore");
-            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.SKILL_CAST), "cid " + cid + ": reduction+taunt, the shield, the stack, and the swap");
-            Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "cid " + cid + ": the ultimate's shield");
+            // Note: 6 since 2026-11-06 - plus the free enhanced basic that spends nothing.
+            Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BASIC_ATTACK), "cid " + cid + ": shield, stack, swap, spend, restore, free");
+            Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "cid " + cid + ": the ultimate shield and the free enhanced basic");
             Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid + ": the technique, the convention, and 星魂 1's four stacks");
         }
     }
