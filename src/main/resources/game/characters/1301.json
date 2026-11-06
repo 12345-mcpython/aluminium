@@ -7,7 +7,7 @@
     "⭐ **星魂 2 已落地（2026-11-06）**：`eidolon2_dispels_one_and_raises_effect_res` —— `SKILL_CAST` + `min_eidolon: 2` → `DISPEL { amount: 1 }` + `MODIFY_ATTR EFFECT_RESISTANCE 0.3 / turns: 2`，两个效果都落在 `target`（被指定的队友），判据 `GallagherEidolonTest.theSecondEidolonCleansesAndHardensTheTarget`。",
     "⭐ **星魂 6 前半已落地（2026-11-06）**：`eidolon6_raises_break_effect` —— `BATTLE_START` + `min_eidolon: 6` → `MODIFY_ATTR BREAKING_EFFECT 0.2`，判据 `GallagherEidolonTest.theSixthEidolonRaisesHisBreakEffect`。⭐ **星魂 6 后半也落地了（2026-11-06）**：新增属性 **`WEAKNESS_BREAK_EFFICIENCY`**（弱点击破效率），`BreakService.reduce` 在**扣韧性之前**把这一发的点数乘 `1 + efficiency`（默认 0 ⇒ 乘 1，既有读数不变），规则里给 `MODIFY_ATTR WEAKNESS_BREAK_EFFICIENCY 0.2`。判据 `GallagherEidolonTest.theSixthEidolonShortensTheBarFaster`（E5 打 10 点扣 10；E6 扣 12）。⚠ 它是**独立属性**、不是 `BREAKING_EFFECT` 的别名：后者放大击破**伤害**，它放大**削韧量**。",
     "⭐ **行迹 崭新配方 已落地（2026-11-06）**：`trace_fresh_recipe_raises_healing_from_break_effect` —— `MODIFY_ATTR OUTGOING_HEALING_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 0.5, cap_amount: 0.75 }`。⭐ **「缺修饰上限」的说法作废**：`cap_amount` / `cap_scale` + `cap_percent` **早就在**（`TriggerMagnitudes.applyDerivedCeiling`，派生量是绝对量、直接比较）。",
-    "⛔ **行迹 敬请干杯 (1301103) 未写**：「加拉赫施放【酒花奔涌】攻击陷入【酩酊】状态的目标时，使此次天赋提供的生命回复效果**对我方队友也会生效**」—— 它要改的是**同一次攻击里天赋那条 `ALLY_ATTACK` 治疗的目标集合**（从「攻击者」扩到「全体队友」），而规则之间不能互相改目标集合；需要「本次攻击的天赋治疗对全体生效」这种一次性开关。",
+    "⭐ **行迹 敬请干杯 已落地（2026-11-06）**：`trace_toast_the_heal_reaches_every_ally` —— `DEALING_DAMAGE` + `actor == self` + `from_skill_id == 8`（强化普攻的**装载槽位**）+ `target has_state 酩酊` → `HEAL { target: all_allies, amount_from_skill_param: TALENT:1 }`。⭐ **不需要「一次性开关」**：这句话的语义就是「同一份治疗再发给全队」⇒ 一条**并行的治疗规则**即可（天赋那条给攻击者，这条给全体），而 `DEALING_DAMAGE` 同时带目标与技能键（`ALLY_ATTACK` 两样都不带）。⚠ 酒花奔涌是单体 1 段 ⇒ `DEALING_DAMAGE` 只来一次，不会重复治疗。判据 `GallagherEnhancedAttackTest.theToastTraceHealsTheWholeParty`（旁观队友回血；普通普攻一次都不回）。",
     "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_the_tipsy_lasts_one_turn_longer` —— **E4 用 `turns: 3` 的同形规则**排在 `ult_tipsy` 之后（同一状态按 `isSameKind` 被替换成后挂的那份 ⇒ 净 3 回合；那份 12% 也重挂，因为它跟着状态走）。⚠ **`EXTEND_BUFF` 在这里不可用**：它按 `buffName` 匹配，而【酩酊】**状态**的名字存在自己的字段里、`buffName` 为空 ⇒ 它延长的是「12% 减伤」那条无名 buff（实测 printout：E4 时 `dur=3` 的是无名那条，`酩酊` 仍 2）。判据 `GallagherEidolonTest.theTipsyLastsThreeTurnsAtTheFourthEidolon`（E3⇒2、E4⇒3）。⚠ 新规则里的 12% 改成**读天赋行**（`percent_from_skill_param: TALENT:0`），否则 ratchet 会因为同一个字面量出现两次而 +1。",
     "⚠ **两处已过期、保留在规则注记里的登记**：① `ult_tipsy` 的 `_note` 末尾那三段「试写后被装载期拒绝」已被 2026-09-28 的正式补齐取代（现在写出来了）；② 同一注记里「使目标攻击力降低 15%」的「未写」也已由 `enhanced_attack_down`（`DEALING_DAMAGE` + `from_skill_id == 8` → `MODIFY_ATTR ATTACK -0.15 / 2 回合`）取代 —— `DEALING_DAMAGE` 现在同时带目标与技能键。"
   ],
@@ -139,6 +139,24 @@
       "source": "1301 加拉赫 天赋 鏖战正酣 (130104, Enhance/Restore): 「【酩酊】使目标受到的击破伤害提高12.00%。陷入【酩酊】状态的目标每次受到我方角色攻击后，会回复攻击者640点生命值。」",
       "_note": "「陷入【酩酊】状态的目标**每次受到我方角色攻击后**，会回复**攻击者** 640 点生命值」 — `ALLY_ATTACK` is 「我方角色攻击后」 (once per attack, not per hit) and `target: \"attacker\"` is 「攻击者」: ⚠ **`attacker` is a legal selector** and always was (`TriggerInterpreter.TARGET_SELECTORS`) — the earlier registration in this file claimed no spelling names the attacker for a heal, which was a **wrong assumption read off `TargetSelector.java`** (the selector table lives in the interpreter, and that class is a different thing). Corrections of exactly this kind are why the ledger is re-verified against the source rather than trusted. ⚠ The heal carries no `scale`: 「640 点」 is a flat number in the row, not a share of anything. ⚠ The other half of the same talent sentence — 「【酩酊】使目标**受到的击破伤害**提高 12%」 — stays registered: it is a **taken-side** vulnerability scoped to break damage (`BREAKING_EFFECT` is the dealer side, the same two-sided trap as `DOT_DAMAGE_BOOST` vs 「受到的持续伤害提高」). ⚠ **按等级读**（AGENT §0.1.3）。 ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "attack_effect"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_toast_the_heal_reaches_every_ally",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8",
+        "target has_state 酩酊"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "target": "all_allies",
+          "amount_from_skill_param": "TALENT:1"
+        }
+      ],
+      "source": "1301 加拉赫 行迹 敬请干杯 (1301103): 「加拉赫施放【酒花奔涌】攻击陷入【酩酊】状态的目标时，使此次天赋提供的生命回复效果对我方队友也会生效。」",
+      "_note": "「施放**酒花奔涌**攻击**陷入【酩酊】**的目标时，使此次天赋提供的生命回复效果**对我方队友也会生效**」—— ① 挂在 `DEALING_DAMAGE` 上，因为它**同时**带目标与技能键（`ALLY_ATTACK` 恰好两样都不带：它没有「被瞄准的单位」，`SkillExecutor` 的原话）；② `from_skill_id == 8` = 强化普攻的**装载槽位**（不是数据行 130108）✓；③ `target has_state 酩酊` ✓；④ 治疗量读**天赋行**（`TALENT:1` = 640，按等级 ✓），对象换成 **`all_allies`** —— 这正是「对我方队友也会生效」：天赋那条给的是**攻击者**，这条把同一份治疗发给全队。⚠ 酒花奔涌是单体 1 段 ⇒ `DEALING_DAMAGE` 只来一次，不会重复治疗 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",

@@ -75,4 +75,41 @@ public class GallagherEnhancedAttackTest {
             battle.startBattle();
         }
     }
+
+    /**
+     * 行迹 敬请干杯:「加拉赫施放【酒花奔涌】攻击陷入【酩酊】状态的目标时，使此次天赋提供的生命回复效果对我方队友也会生效」.
+     *
+     * <p>The talent heals the ATTACKER; this trace widens the same heal to the whole party. Measured as "a teammate that was
+     * not the attacker gains HP", which is exactly what the sentence adds - and the negative control is the ordinary basic
+     * attack, which must not heal anybody.
+     */
+    @Test
+    public void theToastTraceHealsTheWholeParty() {
+        Assertions.assertTrue(partyHealedByEnhanced(true) > 0,
+                "「…生命回复效果对我方队友也会生效」 — the bystander gains HP");
+        Assertions.assertEquals(0.0, partyHealedByEnhanced(false), 1e-9,
+                "and the ordinary basic attack (no 酒花奔涌) heals nobody");
+    }
+
+    /** How much HP a teammate OTHER than the attacker gains from one attack against a 【酩酊】 target. */
+    private static double partyHealedByEnhanced(boolean enhanced) {
+        Character gallagher = CharacterFactory.create(GALLAGHER, LEVEL);
+        Character bystander = CharacterFactory.create(1001, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(gallagher, bystander), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("酩酊", 3));
+        if (enhanced) {
+            // The enhanced basic lives in the COMMON slot only while the Ultimate's swap is on.
+            battle.castImmediate(gallagher.getSkills().get(SkillType.ULTRA), gallagher, List.of(enemy));
+        }
+        // A wound on the bystander, so a heal has somewhere to show.
+        battle.applyDamage(bystander, new com.laosun.aluminium.damage.Damage(enemy, bystander,
+                com.laosun.aluminium.enums.DamageElement.FIRE, com.laosun.aluminium.enums.DamageType.NORMAL, 300));
+        battle.processRequests();
+        double before = bystander.getCurrentHp();
+        battle.castImmediate(gallagher.getSkills().get(SkillType.COMMON), gallagher, List.of(enemy));
+        battle.processRequests();
+        return bystander.getCurrentHp() - before;
+    }
 }
