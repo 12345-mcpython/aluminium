@@ -63,6 +63,9 @@ public class SameEffectTwiceGuardTest {
             Map.entry("8002.json :: MODIFY_ATTR|ATTACK|0.2|self|-|true", 2),
             // 1405 那刻夏：星魂 6 说「留白的 2 种效果都会直接触发，不再依赖队伍数量」⇒ 同一条数值必须既有**带着 Path 条件**
             // 的那条、又有 **E6 无条件**的那条。这正是「one effect, two triggers」，不是抄错了规则。
+            // 1210 桂乃芬：星魂 6 把【吞火】的层数上限从 3 提到 4 ⇒ 天赋那条必须有一个 **E6 变体**（max_eidolon: 5 与 min_eidolon: 6
+            // 互斥，同一时刻只有一条生效）。两条的易伤形状相同，属于「one effect, two triggers」那一族。
+            Map.entry("1210.json :: MODIFY_DAMAGE_TAKEN||0.07|target|3|false", 2),
             Map.entry("1405.json :: MODIFY_ATTR|CRIT_ATTACK|1.4|self|-|true", 2),
             Map.entry("1405.json :: MODIFY_ATTR|ALL_DAMAGE_TYPE_BOOST|0.5|all_allies|-|true", 2),
             // 1223 貊泽：秘技开场 +30% 伤害（2 回合）与星魂 4「施放终结技后 +30% 伤害（2 回合）」是**两句不同的话**，恰好数值相同；

@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⭐ **秘技已落地（2026-11-06）**：`technique_four_random_hits_and_a_firekiss` —— `BATTLE_START` + `self has_state 秘技` → `DAMAGE { times: 4, target: random_enemy, percent: 0.5 }` + `APPLY_BUFF 吞火`。⚠ 【吞火】的归属是**近似**（四次结算**不能**逐次指向「那一次打中的是谁」，只能再抽一个 \random_enemy：期望分布一致、逐次归属不同）。",
-    "⭐ **星魂 3/5 是等级加成**（\u001bidolon3_levels / \u001bidolon5_levels ✓，原有）；⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_each_burn_tick_pays_two_energy` —— `DAMAGE_SETTLED` + `damage_is_dot` + `damage_element_is_self` → `GAIN_ENERGY 2`（判据 `GuineaifenFirekissStackTest.everyBurnTickPaysTwoEnergy`）。⛔ **星魂 2 仍未写**：「敌方处于灼烧状态时，桂乃芬的普攻与战技对其**施加的灼烧状态的伤害倍率提升 40%**」—— 要改的是**她施加的 DoT 的倍率**，引擎的 APPLY_DOT 有份额、但**没有「对已有 DoT 的倍率做修饰」**的写法（MODIFY_RULE 只改规则自己的 \u001bffect_percent，不是 DoT 实例）。⛔ **星魂 6 仍未写**：「【吞火】可叠加层数 +1」—— 层数写在 ADD_STACK 的 max_stacks 上，MODIFY_RULE 没有改它的口子；可行写法是 E6 的**同形规则**（max_stacks: 4），但与基础那条同形 ⇒ 需按 `SameEffectTwiceGuardTest` 登记 BASELINE。",
+    "⭐ **星魂 6 已落地（2026-11-06）**：`eidolon6_the_firekiss_caps_at_four` —— 天赋那条的 **E6 变体**（`min_eidolon: 6`、`max_stacks: 4`、`per_stack_cap: 4`），基础那条加 `max_eidolon: 5` 与它互斥（1313 星魂 6 的同一手法）。判据 `GuinaifenFirekissStackTest.theSixthEidolonRaisesTheCapToFour`。⚠ 两条同形 ⇒ 已按 `SameEffectTwiceGuardTest` 的规矩登记 BASELINE。⛔ **星魂 2 仍未写**（灼烧倍率 +40%）：见上一条。",
     "⭐ **【吞火】的「最多 3 层」已落地（2026-11-06）**：`talent_firekiss_on_burn_tick` 改成**计数器 + 实时读** —— 先 `ADD_STACK 吞火 1 max_stacks 3`，再挂**同一条**易伤但带 `per_stack: target_stacks:吞火` + `per_stack_live: true` + `per_stack_cap: 3` ⇒ 易伤 = 7% × 层数（最多 +21%）。判据 `GuinaifenFirekissStackTest`（真实灼烧结算后计数 ≥1 且**永不超过 3**）。⚠ 为什么不是「挂三个易伤」：`VulnerabilityBuff.isSameKind` 只保留一份同源易伤 ⇒ 必须让那一份随层数变大（1009 艾丝妲的同一套）。"
   ],
   "rules": [
@@ -163,7 +163,8 @@
         }
       ],
       "source": "1210 桂乃芬 天赋 古来君子养艺人: 「桂乃芬在场时，敌方受到的灼烧状态触发伤害后，有100%的基础概率陷入【吞火】状态，【吞火】状态下敌方目标受到的伤害提高7.00%，持续3回合，最多叠加3层。」",
-      "_note": "「敌方受到的**灼烧状态触发伤害后**…陷入【吞火】，受到的伤害提高 **7%**，持续 **3** 回合，最多 **3** 层」= `DAMAGE_SETTLED` + **`damage_is_dot`**（灼烧那一次结算）+ `damage_element_is_self`（她的火）→ `MODIFY_DAMAGE_TAKEN { percent: 0.07, turns: 3, buff: 吞火 }` ✓。⚠ `damage_is_dot` 正是今天为卡芙卡加的那个条件词，这里第二次用上 —— 没有它这条会把**任何**伤害都当成「灼烧触发」。⚠ 近似：「桂乃芬**在场时**」没有单独的门（她不在场她的规则不会触发，这一点由规则所有者的身份天然保证）。 ⛔ **叠层未建模**：`MODIFY_DAMAGE_TAKEN` 不吃 `max_stacks`（校验器只允许 `MODIFY_ATTR` 带层数），所以「最多 3 层」现在是**一层**。登记在 `_gaps`。 ⭐ **2026-11-06：层数用「计数器 + 实时读」表达** —— `ADD_STACK 吞火 1 max_stacks 3`（每次触发叠一层，封顶 3）之后跟**同一条**易伤，但它带 **`per_stack: target_stacks:吞火` + `per_stack_live: true` + `per_stack_cap: 3`** ⇒ 易伤 = **7% × 层数**（最多 3 层 = +21%）✓。为什么不是「挂三个易伤」：`VulnerabilityBuff.isSameKind` 会把同源的同一条判为同种 ⇒ 只保留一份，所以必须让**那一份**随层数变大（1009 艾丝妲的同一套）。"
+      "_note": "「敌方受到的**灼烧状态触发伤害后**…陷入【吞火】，受到的伤害提高 **7%**，持续 **3** 回合，最多 **3** 层」= `DAMAGE_SETTLED` + **`damage_is_dot`**（灼烧那一次结算）+ `damage_element_is_self`（她的火）→ `MODIFY_DAMAGE_TAKEN { percent: 0.07, turns: 3, buff: 吞火 }` ✓。⚠ `damage_is_dot` 正是今天为卡芙卡加的那个条件词，这里第二次用上 —— 没有它这条会把**任何**伤害都当成「灼烧触发」。⚠ 近似：「桂乃芬**在场时**」没有单独的门（她不在场她的规则不会触发，这一点由规则所有者的身份天然保证）。 ⛔ **叠层未建模**：`MODIFY_DAMAGE_TAKEN` 不吃 `max_stacks`（校验器只允许 `MODIFY_ATTR` 带层数），所以「最多 3 层」现在是**一层**。登记在 `_gaps`。 ⭐ **2026-11-06：层数用「计数器 + 实时读」表达** —— `ADD_STACK 吞火 1 max_stacks 3`（每次触发叠一层，封顶 3）之后跟**同一条**易伤，但它带 **`per_stack: target_stacks:吞火` + `per_stack_live: true` + `per_stack_cap: 3`** ⇒ 易伤 = **7% × 层数**（最多 3 层 = +21%）✓。为什么不是「挂三个易伤」：`VulnerabilityBuff.isSameKind` 会把同源的同一条判为同种 ⇒ 只保留一份，所以必须让**那一份**随层数变大（1009 艾丝妲的同一套）。",
+      "max_eidolon": 5
     },
     {
       "on": "BATTLE_START",
@@ -227,6 +228,37 @@
       ],
       "on": "DAMAGE_SETTLED",
       "_note": "「她施加的灼烧**每触发一次伤害**，使**自身**恢复 **2** 点能量」—— `DAMAGE_SETTLED` + **`damage_is_dot`**（灼烧那一次结算 ✓）+ **`damage_element_is_self`**（是她的火 ✓，即「她施加的」）→ `GAIN_ENERGY 2` 给自己 ✓。与天赋那条**同事件同条件、不同效果**（那条给易伤），不撞重复守卫。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "when": [
+        "damage_is_dot",
+        "damage_element_is_self"
+      ],
+      "do": [
+        {
+          "buff": "吞火",
+          "permanent": true,
+          "op": "ADD_STACK",
+          "max_stacks": 4,
+          "target": "target",
+          "amount": 1
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "buff": "吞火",
+          "per_stack_live": true,
+          "percent": 0.07,
+          "target": "target",
+          "turns": 3,
+          "per_stack": "target_stacks:吞火",
+          "per_stack_cap": 4
+        }
+      ],
+      "source": "1210 桂乃芬 星魂 6 徒手接子弹:「使【吞火】的可叠加层数增加1层。」 参数 = [1]",
+      "_note": "「使【吞火】的可叠加层数**增加 1 层**（3 → **4**）」—— 层数上限写在 `ADD_STACK.max_stacks` 上，`MODIFY_RULE` 没有改它的口子 ⇒ 写成**天赋那条的 E6 变体**（`min_eidolon: 6`、`max_stacks: 4`、`per_stack_cap: 4`），并把基础那条加 **`max_eidolon: 5`** 与它互斥，与 1313 星魂 6 的同一手法 ✓。⚠ 两条同形 ⇒ 已按 `SameEffectTwiceGuardTest` 的规矩登记 BASELINE 并写明理由。",
+      "id": "eidolon6_the_firekiss_caps_at_four",
+      "min_eidolon": 6
     }
   ]
 }

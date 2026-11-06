@@ -45,6 +45,25 @@ public class GuinaifenFirekissStackTest {
         }
     }
 
+    /** 星魂 6「使【吞火】的可叠加层数增加 1 层」: the cap moves from three to four. */
+    @Test
+    public void theSixthEidolonRaisesTheCapToFour() {
+        Battle battle = scene(6);
+        Character guinaifen = battle.characters().getFirst();
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        battle.castImmediate(guinaifen.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), guinaifen,
+                List.of(enemy));
+        battle.processRequests();
+
+        for (int tick = 1; tick <= 3; tick++) {
+            battle.tickDots(enemy);
+            battle.processRequests();
+        }
+        Assertions.assertTrue(enemy.getBuffManager().stacksOf("吞火") <= 4,
+                "「增加 1 层」 — the cap is four, never more");
+        Assertions.assertTrue(enemy.getBuffManager().stacksOf("吞火") >= 1, "the counter still fills");
+    }
+
     /** 星魂 4「她施加的灼烧每触发一次伤害，使自身恢复 2 点能量」. */
     @Test
     public void everyBurnTickPaysTwoEnergy() {
