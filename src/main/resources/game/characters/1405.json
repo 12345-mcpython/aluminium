@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⭐ **星魂 1 的「首次施放战技后恢复 1 个战技点」已落地（2026-11-04）**：`SKILL_CAST` + `actor == self` + **`once_per_battle: true`** → `GAIN_SKILL_POINT 1`。旧登记说「缺『首次』计数」**作废** —— `once_per_battle` 就是这个计数（每规则一个布尔）。⚠ 它的另一半「施放战技击中时目标防御 −16% / 2 回合」在 `eidolon1_defence_down_on_skill` 里已有 ✓。",
-    "⭐ **【升华】的弱点植入已落地（2026-11-06）**：`ult_sublimation_implants_every_weakness` —— `ULT_CAST` → `APPLY_BUFF 升华 { turns: 1 }` + **七条** `ADD_ELEMENTAL_WEAKNESS`（物理/火/冰/雷/风/量子/虚数）。⛔ **「若目标不具有控制抵抗则无法行动」仍未写**：控制表只有 冻结/纠缠/禁锢，借用 `冻结` 会与 1209 星魂 1 的 `target has_state 冻结` 串台 ⇒ 要给控制表加一条 `SUBLIMATED/升华`（`blocksAct: true`、无附伤、独立抗性键）才行。",
+    "⭐ **升华的控制半也落地了（2026-11-06）**：控制表新增 `SUBLIMATED / 升华`（`blocksAct: true`、无附伤、独立抗性键），规则里 `APPLY_CONTROL { control: 升华, turns: 1 }`；判据 `AnaxaNecessaryBlankTest.theSublimationStopsAnUnresistingTarget`（无抗性目标不能行动；默认带抗性的 fixture 不被挂上 —— 正是「若目标不具有控制抵抗」）。",
     "1415 忆灵技 18：所有「智识」命途角色攻击力 +30% 未写（缺命途选择器）",
     "【升华】/【质性揭露】：**状态本身已按「≥5 种弱点」施加** ✓（天赋规则 `talent_true_knowledge_state`，每回合复查），但「弱点植入的持续回合/控制抵抗 / 无法行动」与**额外施放 1 次战技**仍未写",
     "⛔ **星魂 6 的第二句仍未写**：「行迹【必要的留白】的 2 种效果都会直接触发，不再依赖队伍数量」—— 写法上要给「同一组数值的两个触发（有条件的 + 无条件的）」；守卫 `SameEffectTwiceGuardTest` 正是禁止「同一条数值出现在两条规则里」（除非登记 BASELINE 并说明），`allies_with_path` 又不能被「E6 时恒真」表达。⇒ 需要的是「条件本身可被某条星魂短路」的写法，或在该守卫的 BASELINE 里登记这一族。"
@@ -339,7 +339,7 @@
         "actor == self"
       ],
       "on": "ULT_CAST",
-      "_note": "「使敌方全体陷入【升华】状态…目标**同时被添加物理、火、冰、雷、风、量子、虚数属性弱点**」—— 状态 `APPLY_BUFF 升华` + **七条** `ADD_ELEMENTAL_WEAKNESS`（每个属性一条，`all_enemies`）✓；160% 那半由技能行结算 ✓。⛔ **同句后半「若目标不具有控制抵抗，则【升华】状态下无法行动」仍未写**：控制状态表 `Constant.CONTROL_EFFECTS` 只有 冻结/纠缠/禁锢 三种，而写 `control: 冻结` 会让**别的规则**（如 1209 星魂 1 的 `target has_state 冻结`）把被升华的目标当成冻结 ⇒ 语义串台，**不能**这么写。要精确需要给控制表加一条 `SUBLIMATED/升华`（`blocksAct: true`、无附伤、抗性键另开）—— 见 `_gaps`。",
+      "_note": "「使敌方全体陷入【升华】状态…目标**同时被添加物理、火、冰、雷、风、量子、虚数属性弱点**」—— 状态 `APPLY_BUFF 升华` + **七条** `ADD_ELEMENTAL_WEAKNESS`（每个属性一条，`all_enemies`）✓；160% 那半由技能行结算 ✓。⭐ **同句后半也落地了（2026-11-06）**：「若目标不具有控制抵抗，则【升华】状态下无法行动」—— 控制表 `Constant.CONTROL_EFFECTS` 新增 **`SUBLIMATED / 升华`**（`blocksAct: true`、无附伤、独立抗性键 `STAT_CTRL_Sublimation`），规则里一条 `APPLY_CONTROL { control: 升华, turns: 1 }` ✓。⚠ 「不具有控制抵抗」正是这个抗性键的骰子：抗性 ≥1 的目标永远不会被挂上（默认怪物 fixture 就是这种情况）。**不借用 `冻结`**：名字是 `has_state` 的接口，借用会让 1209 星魂 1 之类的规则对着被升华的目标误判。",
       "source": "1405 那刻夏 终结技 生息破土，世界塑造:「使敌方全体陷入【升华】状态，随后对敌方全体造成等同于那刻夏160%攻击力的风属性伤害。【升华】状态下，目标同时被添加物理、火、冰、雷、风、量子、虚数属性弱点，持续至目标回合开始时。」",
       "do": [
         {
@@ -389,6 +389,12 @@
           "target": "all_enemies",
           "element": "Imaginary",
           "op": "ADD_ELEMENTAL_WEAKNESS"
+        },
+        {
+          "target": "all_enemies",
+          "control": "升华",
+          "op": "APPLY_CONTROL",
+          "turns": 1
         }
       ]
     }

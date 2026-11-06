@@ -542,10 +542,15 @@ public final class Constant {
     public static final Map<String, ControlEffect> CONTROL_EFFECTS = Map.of(
             "FROZEN", new ControlEffect("FROZEN", "冻结", "STAT_CTRL_Frozen", 1, true, 0.0),
             "ENTANGLED", new ControlEffect("ENTANGLED", "纠缠", "STAT_Entangle", 1, false, 0.2),
-            "IMPRISONED", new ControlEffect("IMPRISONED", "禁锢", "STAT_Confine", 1, false, 0.1));
+            "IMPRISONED", new ControlEffect("IMPRISONED", "禁锢", "STAT_Confine", 1, false, 0.1),
+            // 「若目标不具有控制抵抗，则【升华】状态下无法行动」 (1405 Anaxa 那刻夏 Ultimate): a control that BLOCKS the turn
+            // like frozen does, but carries no per-turn payload and has its own resist key. It must be its own name: the state
+            // name is what `has_state` answers, and reusing 冻结 would make every "target has_state 冻结" rule (1209 Eidolon 1)
+            // answer about a sublimated enemy - a false pass, not an approximation.
+            "SUBLIMATED", new ControlEffect("SUBLIMATED", "升华", "STAT_CTRL_Sublimation", 1, true, 0.0));
 
     /**
-     * The same three states, keyed by the <b>name the documents spell</b> (frozen / entangled / imprisoned -- 冻结 / 纠缠 / 禁锢).
+     * The same states, keyed by the <b>name the documents spell</b> (frozen / entangled / imprisoned / sublimated -- 冻结 / 纠缠 / 禁锢).
      *
      * <p><b>Why a second index instead of a second table.</b> The two spellings are needed in different places and
      * must not be maintained twice: {@link BreakEffect#control} names an <i>engine key</i> (the element table is

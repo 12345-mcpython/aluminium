@@ -104,6 +104,35 @@ public class AnaxaNecessaryBlankTest {
         }
     }
 
+    /**
+     * 「若目标不具有控制抵抗，则【升华】状态下无法行动」: the control blocks the turn, and its own resist key decides who gets
+     * it - the stock fixture monster resists it (that is the 「具有控制抵抗」 case), a bare target does not.
+     */
+    @Test
+    public void theSublimationStopsAnUnresistingTarget() {
+        Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
+        Enemy bare = com.laosun.aluminium.enemy.Enemy.fromAttributes("Test Dummy", 20000, 100, 100, 90);
+        Battle battle = new Battle(List.of(anaxa), List.of(bare), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        anaxa.setCurrentEnergy(anaxa.getMaxEnergy());
+        battle.castImmediate(anaxa.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), anaxa, List.of(bare));
+        battle.processRequests();
+
+        Assertions.assertTrue(bare.getBuffManager().hasState("升华"), "the state is on");
+        Assertions.assertFalse(bare.getBuffManager().canAct(), "「【升华】状态下无法行动」");
+
+        Enemy resistant = BattleFixture.monster();
+        Character second = CharacterFactory.create(ANAXA, LEVEL);
+        Battle other = new Battle(List.of(second), List.of(resistant), BattleFixture.alwaysRoll(0.0));
+        other.startBattle();
+        second.setCurrentEnergy(second.getMaxEnergy());
+        other.castImmediate(second.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), second,
+                List.of(resistant));
+        other.processRequests();
+        Assertions.assertEquals(0.0, resistant.getBuffManager().stacksOf("升华"), 1e-9,
+                "「若目标不具有控制抵抗」 — a resisting target is not stopped (its stacks stay at zero)");
+    }
+
     private static Battle scene(List<Character> allies) {
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
         Enemy enemy = BattleFixture.monster();
