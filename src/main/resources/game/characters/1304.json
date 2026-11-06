@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "character": 1304,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "⭐ **星魂 2 与行迹是同一句（2026-11-06 定案）**：「施放普攻时使目标的全属性抗性降低 12%，持续 3 回合」在**星魂 2**和**行迹**里各出现一次，数值完全相同 ⇒ **只写一条规则**（`basic_all_type_res_down`），星魂那句不另写规则（写了会撞 `SameEffectTwiceGuardTest` 与 `ContentDuplicateGuardTest`）✓。",
     "⭐ **秘技的三档随机已落地（2026-11-06）**：`value` 提供器的 **`weighted_list`**（`distribution: [{weight, value}]`）本来就是给这件事写的 ⇒ `technique_the_red_or_the_black_gives_defence` 改成按权重在三档 0.24 / 0.36 / 0.6 里抽一档。判据 `AventurineWagerTest.theTechniqueDrawsOneDefenceTier`（不同种子下抽到的都是这三档之一）。⚠ **权重是占位**（0.5 / 0.35 / 0.15，文档只说「一定/大/小概率」）；⚠ **已知近似**：「重复使用时保留数值最高」在引擎里是**后抽覆盖前抽**（同属性同来源替换），不是真的取最大。"
