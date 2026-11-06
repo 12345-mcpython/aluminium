@@ -297,11 +297,11 @@ public class SundaySkillTest {
 
         // Note: 8 since 2026-11-06 - the seven below plus 星魂 1 (the pair's DEF ignore, also on SKILL_CAST).
         // technique's first-ability share (all three also on SKILL_CAST); they are judged by SundaySupportTest.
-        Assertions.assertEquals(8, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
-                "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 (The Beatified) refund"
+        // Note: 9 since 2026-11-06 - the eight below plus 星魂 6's talent variant (also on SKILL_CAST).
+        Assertions.assertEquals(9, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
+                "advance (unless Harmony) + share without a summon + share with one + the refund"
                         + " + the talent's crit rate + the trace's dispel + the technique's first-ability share"
-                        + " + 星魂 1's defence ignore");
-        // Note: 5 since 2026-11-06 - the two above plus 星魂 2 (first-ultimate skill point, and the Beatified damage).
+                        + " + 星魂 1's defence ignore + 星魂 6's talent variant");
         Assertions.assertEquals(4, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
                 "the 【蒙福者】 clause + the 40-point energy floor + 星魂 2 two rules");
     }

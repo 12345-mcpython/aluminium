@@ -8,12 +8,13 @@
     "⭐ **秘技已落地（2026-11-06）**：`technique_arms_the_next_ability`（`BATTLE_START` + `self has_state 秘技` → 记号 `荣光之秘-待发`）与 `technique_first_ally_ability_grants_the_share`（首次 `SKILL_CAST` → 队友 `ALL_DAMAGE_TYPE_BOOST +0.5 / 2 回合`，随后摘记号）。⚠ 「首次」没有规则级开关（只有 `once_per_turn`）⇒ 用记号状态；⚠ 50% 必须 `coexist: true`，否则它会**替换**战技自己那 15%/40%。判据 `SundayTechniqueTest`。",
     "⭐ **行迹已全部落地（2026-11-06）**：`trace_glorious_whisk_starts_with_energy`（开战 +25 能量）、`trace_safe_harbour_dispels_one_debuff`（战技解 1 个负面）、`trace_sunday_lenten_gift_lifts_the_energy_to_forty`（能量下限提到 **40 点** —— 这一轮给 `RAISE_ENERGY_TO` 补了**固定点数**写法）。判据 `SundaySupportTest` / `SundayLentenGiftTest`。",
     "⭐ **星魂 1/2/3/4/5 已落地（2026-11-06）**：1 = `eidolon1_the_skill_pierces_defence_for_the_pair`（本人 0.16 / **`target_summon`** 0.4，选择器本轮新增）；2 = 三条（记号状态给「首次」+2 战技点、`while_holder_state: 蒙福者` 的 +30%）；3/5 = 等级加成；4 = `eidolon4_pays_eight_energy_each_turn`。判据 `SundayEidolonOneTest` / `SundayEidolonTwoTest` / `SundaySupportTest`。",
-    "⛔ **星魂 6 仍未写**：「天赋的暴击率提高效果可以叠 **3** 层，天赋持续时间 **+1** 回合；星期日施放终结技时也可以为目标添加天赋的暴击率提高效果；天赋的暴击率提高效果生效时，当目标暴击率超过 100%，每溢出 1% 暴击率提高 **2%** 暴击伤害。」—— 三个子句各缺一样：① **只让某条规则叠层**（`MODIFY_ATTR` 的 `max_stacks` 是效果字段，但要的是「同一条天赋规则在 E6 变成 3 层」⇒ 可用「E6 同形规则 + `max_stacks: 3`」，写法可行但需与天赋那条互斥）；② **某条规则的持续时间 +1**（`MODIFY_RULE effect_turns` 只改 `effect_percent`/`effect_amount`，没有 `turns`）；③ **溢出暴击转暴伤**（要在结算时读目标的暴击率并与 1.0 相减，再喂给另一个属性 —— 需要一个「由数值派生的动态修饰」，目前没有）。"
+    "⭐ **星魂 6 的前两句已落地（2026-11-06）**：`eidolon6_the_crit_rate_stacks_three_and_lasts_four` —— `SKILL_CAST` + `min_eidolon: 6` → `MODIFY_ATTR CRIT_CHANCE { percent_from_skill_param: TALENT:0, turns: 4, stackable: true, max_stacks: 3 }`，并把天赋那条加了 `max_eidolon: 5` 与它互斥。判据 `SundayEidolonSixTest`（E5 第二次施放替换 ⇒ 1 层 / 3 回合；E6 叠到 3 层、4 回合）。⛔ **第三句仍未写**：「天赋的暴击率提高效果生效时，当目标暴击率超过 100%，每溢出 1% 暴击率提高 2% 暴击伤害」—— 需要在结算时读目标暴击率、与 1.0 相减，再把差额喂给**另一个属性**（暴伤）；引擎的修饰要么是常量/派生量、要么是层数驱动，**没有「由另一个属性的溢出量派生」**这种写法。"
   ],
   "rules": [
     {
       "on": "SKILL_CAST",
       "id": "talent_skill_raises_the_targets_crit_rate",
+      "max_eidolon": 5,
       "when": [
         "actor == self"
       ],
@@ -265,6 +266,27 @@
       ],
       "source": "1313 星期日 行迹 主日渴慕 (1313101): 「施放终结技时，若为目标恢复的能量不足40点，恢复的能量提高至40点。」",
       "_note": "「施放终结技时，**若为目标恢复的能量不足 40 点，恢复的能量提高至 40 点**」—— `RAISE_ENERGY_TO` 是**下限**而不是加量（引擎原话：低于给定值才拉到该值，已经高于就不动）⇒ 「若…不足」这半句**不需要条件** ✓。⭐ 这一轮给这个 op 补了**固定点数**的写法（`amount`），因为原来只认 `percent`（占上限的份额）；句子给的是「40 点」、不是「40%」，所以份额拼法会错 ✗。⚠ 上限还要夹到她自己的能量上限（`Math.min(floor, maxEnergy)`），否则一个上限 30 的目标会被设成 40。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon6_the_crit_rate_stacks_three_and_lasts_four",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent_from_skill_param": "TALENT:0",
+          "turns": 4,
+          "stackable": true,
+          "max_stacks": 3,
+          "target": "target"
+        }
+      ],
+      "source": "1313 星期日 星魂 6 群星喧哗之始: 「天赋的暴击率提高效果可以叠加，最多叠加3层，并使天赋的持续时间增加1回合。」 参数 = [3, 0.02, 1] ⇒ #1 = 3 层、#3 = 1 回合",
+      "_note": "「天赋的暴击率提高效果**可以叠加，最多 3 层**，并使天赋的**持续时间增加 1 回合**」—— 与天赋那条**互斥**（基础那条加了 `max_eidolon: 5`）：E6 走这条，`stackable` + `max_stacks: 3` 让第二次施放**叠**而不是替换 ✓，`turns: 4`（3 + 1）✓。⚠ 数值仍按等级读（`percent_from_skill_param: TALENT:0`）。⛔ 同一条星魂的**第三句**（「暴击率超过 100% 时，每溢出 1% 提高 2% 暴击伤害」）仍未写：那需要在结算时读目标暴击率、与 1.0 相减再喂给**另一个属性** —— 引擎没有「由数值派生的动态修饰」。"
     },
     {
       "on": "BATTLE_START",
