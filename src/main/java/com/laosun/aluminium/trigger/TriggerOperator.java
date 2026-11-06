@@ -93,6 +93,11 @@ public enum TriggerOperator {
     RESET_RULE_CHANCE(true),
     RESET_TRIGGER_LIMIT(true),
     RESIST_DEBUFF(true),
+    /**
+     * 「她施加的灼烧状态的**伤害倍率提升 40%**」 (1210 Guinaifen (桂乃芬) 星魂 2): multiplies the per-settlement damage of the DoTs
+     * already on the target, which {@code APPLY_DOT} cannot do (it fixes an amount once).
+     */
+    BOOST_DOT(true),
     SHIELD(true),
     SPEND_RESOURCE(true),
     SPEND_STEPS(true),

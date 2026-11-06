@@ -79,6 +79,29 @@ public class DotBuff extends AbstractBuff {
      */
     private final double baseDamage;
 
+    /**
+     * A multiplier applied on top of {@link #baseDamage}, or {@code 1.0} for none: 「她施加的灼烧状态的**伤害倍率提升 40%**」 (1210
+     * Guinaifen (桂乃芬) 星魂 2). Read at every settlement, because the sentence is about the state that is already on the target
+     * — `APPLY_DOT` fixes an amount once, and nothing could raise it afterwards.
+     */
+    private double multiplier = 1.0;
+
+    /**
+     * @param factor the multiplier to apply on top of what is already there (1.4 = +40%)
+     */
+    public void multiply(double factor) {
+        if (factor > 0) {
+            this.multiplier *= factor;
+        }
+    }
+
+    /**
+     * @return the damage this application deals per settlement, multiplier included (before the zones)
+     */
+    public double damagePerTick() {
+        return baseDamage * multiplier;
+    }
+
     /*
      * @param source     the applier ({@code Damage}'s attacker is not allowed to be null, so it MUST
      *                   be recorded; it decides who is credited with a DOT kill)

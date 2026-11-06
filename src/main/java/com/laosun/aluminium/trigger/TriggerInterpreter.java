@@ -927,6 +927,7 @@ public final class TriggerInterpreter {
             case APPLY_CONTROL -> TriggerEffects.applyControl(battle, effect, ctx);
             case APPLY_DOT -> TriggerEffects.applyDot(battle, effect, ctx);
             case EXTEND_BUFF -> TriggerEffects.extendBuff(battle, effect, ctx);
+            case BOOST_DOT -> boostDot(battle, effect, ctx);
             case RESIST_DEBUFF -> resistDebuff(battle, effect, ctx);
             case MODIFY_RULE -> modifyRule(effect, ctx);
             case RAISE_SKILL_LEVEL -> raiseSkillLevel(effect, ctx);
@@ -2337,6 +2338,30 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * 「她施加的灼烧状态的**伤害倍率提升 40%**」 (1210 Guinaifen (桂乃芬) 星魂 2): multiply what the DoTs ALREADY on the target settle
+     * for. Only the owner's own applications are touched - the sentence is about the burn SHE applied - and only the element the
+     * rule names.
+     */
+    private static void boostDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
+        double factor = 1 + TriggerMagnitudes.shareOf(effect, ctx);
+        com.laosun.aluminium.enums.DamageElement onlyElement =
+                effect.getElement() == null || effect.getElement().isBlank()
+                        ? null
+                        : com.laosun.aluminium.enums.DamageElement.valueOf(effect.getElement().trim().toUpperCase());
+        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+            for (com.laosun.aluminium.buff.DotBuff dot
+                    : target.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.DotBuff.class)) {
+                if (dot.getSource() != ctx.owner()) {
+                    continue;
+                }
+                if (onlyElement != null && dot.getElement() != onlyElement) {
+                    continue;
+                }
+                dot.multiply(factor);
+            }
+        }
+    }
+    /**
      * {@code RESIST_DEBUFF}: "raise the chance to resist <b>control-class</b> negative states by 35%" / "immune to <b>control-class</b> negative states" - the resolved targets
      * become harder to control (or burn), for the stated duration or for the whole battle.
      *
@@ -2352,6 +2377,7 @@ public final class TriggerInterpreter {
      * "raise the chance to resist control-class negative states by 35%" are the same mechanic at different strengths, and two spellings for one mechanic
      * is what the closed vocabularies exist to avoid.
      */
+
     private static void resistDebuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
         DebuffClass kind = DebuffClass.fromString(effect.getKind());
         // kind may be absent: RESIST_DEBUFF without a class means ANY negative state (1409s immunity clause).

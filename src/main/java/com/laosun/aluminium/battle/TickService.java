@@ -53,7 +53,7 @@ public final class TickService {
                 break;
             }
             Damage instance = new Damage(dot.getSource(), target, dot.getElement(),
-                    DamageType.DOT, dot.getBaseDamage());
+                    DamageType.DOT, dot.damagePerTick());
             total += damage.applyDamage(target, instance, DamageService.EnergyGrant.KILL_ONLY);
         }
         return total;
@@ -85,7 +85,7 @@ public final class TickService {
                 continue;
             }
             Damage instance = new Damage(dot.getSource(), target, dot.getElement(), DamageType.DOT,
-                    dot.getBaseDamage() * percent);
+                    dot.damagePerTick() * percent);
             total += damage.applyDamage(target, instance, DamageService.EnergyGrant.KILL_ONLY);
         }
         return total;

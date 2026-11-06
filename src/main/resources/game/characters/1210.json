@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "character": 1210,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "⭐ **秘技已落地（2026-11-06）**：`technique_four_random_hits_and_a_firekiss` —— `BATTLE_START` + `self has_state 秘技` → `DAMAGE { times: 4, target: random_enemy, percent: 0.5 }` + `APPLY_BUFF 吞火`。⚠ 【吞火】的归属是**近似**（四次结算**不能**逐次指向「那一次打中的是谁」，只能再抽一个 \random_enemy：期望分布一致、逐次归属不同）。",
-    "⭐ **星魂 6 已落地（2026-11-06）**：`eidolon6_the_firekiss_caps_at_four` —— 天赋那条的 **E6 变体**（`min_eidolon: 6`、`max_stacks: 4`、`per_stack_cap: 4`），基础那条加 `max_eidolon: 5` 与它互斥（1313 星魂 6 的同一手法）。判据 `GuinaifenFirekissStackTest.theSixthEidolonRaisesTheCapToFour`。⚠ 两条同形 ⇒ 已按 `SameEffectTwiceGuardTest` 的规矩登记 BASELINE。⛔ **星魂 2 仍未写**（灼烧倍率 +40%）：见上一条。",
+    "⭐ **星魂 2 已落地（2026-11-06）**：`eidolon2_her_burn_burns_hotter` —— `SKILL_CAST` + E2 → **`BOOST_DOT { percent: 0.4, element: Fire }`**。⭐ 这是本轮唯一新增的**引擎能力**：`DotBuff` 加了可变倍率（`multiply` / `damagePerTick`，每次结算读），新 op 只乘**规则主人施加的**、指定元素的 DoT。为什么必须新加：`APPLY_DOT` 只**设定额**，已挂上去的量没有任何写法能改。判据 `GuinaifenFirekissStackTest.theSecondEidolonMakesHerBurnHotter`（E2 的灼烧跳伤 = E1 的 1.4 倍）。",
     "⭐ **【吞火】的「最多 3 层」已落地（2026-11-06）**：`talent_firekiss_on_burn_tick` 改成**计数器 + 实时读** —— 先 `ADD_STACK 吞火 1 max_stacks 3`，再挂**同一条**易伤但带 `per_stack: target_stacks:吞火` + `per_stack_live: true` + `per_stack_cap: 3` ⇒ 易伤 = 7% × 层数（最多 +21%）。判据 `GuinaifenFirekissStackTest`（真实灼烧结算后计数 ≥1 且**永不超过 3**）。⚠ 为什么不是「挂三个易伤」：`VulnerabilityBuff.isSameKind` 只保留一份同源易伤 ⇒ 必须让那一份随层数变大（1009 艾丝妲的同一套）。"
   ],
   "rules": [
@@ -259,6 +259,24 @@
       "_note": "「使【吞火】的可叠加层数**增加 1 层**（3 → **4**）」—— 层数上限写在 `ADD_STACK.max_stacks` 上，`MODIFY_RULE` 没有改它的口子 ⇒ 写成**天赋那条的 E6 变体**（`min_eidolon: 6`、`max_stacks: 4`、`per_stack_cap: 4`），并把基础那条加 **`max_eidolon: 5`** 与它互斥，与 1313 星魂 6 的同一手法 ✓。⚠ 两条同形 ⇒ 已按 `SameEffectTwiceGuardTest` 的规矩登记 BASELINE 并写明理由。",
       "id": "eidolon6_the_firekiss_caps_at_four",
       "min_eidolon": 6
+    },
+    {
+      "id": "eidolon2_her_burn_burns_hotter",
+      "source": "1210 桂乃芬 星魂 2 刷牙吹口哨:「当敌方目标处于灼烧状态时，桂乃芬的普攻与战技对其施加的灼烧状态的伤害倍率提升40%。」 参数 = [0.4]",
+      "on": "SKILL_CAST",
+      "min_eidolon": 2,
+      "_note": "「她**施加的灼烧**的**伤害倍率提升 40%**」—— 这一轮给引擎加了 **`BOOST_DOT`**：它把目标身上**由规则主人施加**的、指定元素的 `DotBuff` 乘一个系数（`DotBuff.multiply`，每次结算读 `damagePerTick()`）✓。为什么必须新加：`APPLY_DOT` 只**设定额**，已挂上去的量没有任何写法能改。⚠ 触发点用 `SKILL_CAST`（句子说的是「普攻与战技**施加的**灼烧」⇒ 在她施加的那一刻放大那份 DoT）；⚠ 只影响**她自己的**灼烧（`dot.getSource() == ctx.owner()`）。",
+      "do": [
+        {
+          "percent": 0.4,
+          "element": "Fire",
+          "op": "BOOST_DOT",
+          "target": "target"
+        }
+      ],
+      "when": [
+        "actor == self"
+      ]
     }
   ]
 }

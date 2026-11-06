@@ -45,6 +45,30 @@ public class GuinaifenFirekissStackTest {
         }
     }
 
+    /** 星魂 2「她施加的灼烧伤害倍率提升 40%」: the same burn ticks 40% harder at E2. */
+    @Test
+    public void theSecondEidolonMakesHerBurnHotter() {
+        double without = burnTickDamage(1);
+        double withE2 = burnTickDamage(2);
+        Assertions.assertTrue(withE2 > without,
+                "「伤害倍率提升 40%」 — the burn ticks harder at E2 (" + without + " -> " + withE2 + ")");
+        Assertions.assertEquals(1.4, withE2 / without, 0.02, "…and the factor is 1.4");
+    }
+
+    /** The HP one burn tick removes at the given Eidolon rank. */
+    private static double burnTickDamage(int eidolon) {
+        Battle battle = scene(eidolon);
+        Character guinaifen = battle.characters().getFirst();
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        battle.castImmediate(guinaifen.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), guinaifen,
+                List.of(enemy));
+        battle.processRequests();
+        double before = enemy.getCurrentHp();
+        battle.tickDots(enemy);
+        battle.processRequests();
+        return before - enemy.getCurrentHp();
+    }
+
     /** 星魂 6「使【吞火】的可叠加层数增加 1 层」: the cap moves from three to four. */
     @Test
     public void theSixthEidolonRaisesTheCapToFour() {
