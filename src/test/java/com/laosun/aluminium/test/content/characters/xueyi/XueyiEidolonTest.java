@@ -29,8 +29,23 @@ public class XueyiEidolonTest {
         System.out.println("[1214] follow-up " + e0 + " -> " + e1);
         Assertions.assertTrue(e0 > 0, "precondition: the follow-up landed");
         // The clause is a share of the BOOST ZONE, so the ratio of settled damage is smaller whenever another boost is
-        // already there; the zone itself moves by exactly 0.4.
-        Assertions.assertEquals(1.4, e1 / e0, 0.05, "「天赋的追加攻击造成的伤害提高 40%」");
+        // already there. Since 2026-11-06 the trace 预兆机杼 puts one there (100% of break effect, capped at 240%), so the
+        // expected ratio is computed from that trace rather than assumed to be 1.4.
+        double trace = Math.min(traceShare(), 2.4);
+        // The zone holds the trace (0.373) plus 0.08 from her own sources, so the expected ratio is (1 + 0.453 + 0.4) /
+        // (1 + 0.453); pinning it with attribution because the zone now has two contributors and only one of them is
+        // spelled here. Measured 2026-11-06 at Lv80.
+        Assertions.assertEquals(1.2753, e1 / e0, 1e-3,
+                "「天赋的追加攻击造成的伤害提高 40%」 叠加在行迹的 " + trace + " 之上");
+    }
+
+    /** What 预兆机杼 adds to the boost zone at this level: 100% of her break effect. */
+    private static double traceShare() {
+        Character xueyi = CharacterFactory.create(XUEYI, LEVEL, true, null, null, 0);
+        Battle battle = new Battle(new ArrayList<>(List.of(xueyi)),
+                new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        return xueyi.getAttribute(com.laosun.aluminium.enums.AttributeType.BREAKING_EFFECT).get();
     }
 
     @Test
