@@ -133,6 +133,19 @@ public class AnaxaNecessaryBlankTest {
                 "「若目标不具有控制抵抗」 — a resisting target is not stopped (its stacks stay at zero)");
     }
 
+    /** 星魂 6「留白的 2 种效果都会直接触发」: at E6 both bonuses are there even with no Erudition ally. */
+    @Test
+    public void theSixthEidolonFiresBothBlanks() {
+        Character anaxa = CharacterFactory.create(ANAXA, LEVEL, false, null, null, 6);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(anaxa), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        Assertions.assertEquals(0.5 + 1.4, anaxa.getAttribute(AttributeType.CRIT_ATTACK).get(), EPS,
+                "the crit-damage blank fires");
+        Assertions.assertEquals(0.5, anaxa.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), EPS,
+                "…and so does the party-damage blank, with no Path condition at all");
+    }
+
     private static Battle scene(List<Character> allies) {
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
         Enemy enemy = BattleFixture.monster();

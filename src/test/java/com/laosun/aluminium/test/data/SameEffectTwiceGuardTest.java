@@ -61,6 +61,10 @@ public class SameEffectTwiceGuardTest {
             Map.entry("1512.json :: MODIFY_ATTR|ALL_DAMAGE_TYPE_BOOST|0.028|actor|1|false", 2),
             Map.entry("8001.json :: MODIFY_ATTR|ATTACK|0.2|self|-|true", 2),
             Map.entry("8002.json :: MODIFY_ATTR|ATTACK|0.2|self|-|true", 2),
+            // 1405 那刻夏：星魂 6 说「留白的 2 种效果都会直接触发，不再依赖队伍数量」⇒ 同一条数值必须既有**带着 Path 条件**
+            // 的那条、又有 **E6 无条件**的那条。这正是「one effect, two triggers」，不是抄错了规则。
+            Map.entry("1405.json :: MODIFY_ATTR|CRIT_ATTACK|1.4|self|-|true", 2),
+            Map.entry("1405.json :: MODIFY_ATTR|ALL_DAMAGE_TYPE_BOOST|0.5|all_allies|-|true", 2),
             // 1223 貊泽：秘技开场 +30% 伤害（2 回合）与星魂 4「施放终结技后 +30% 伤害（2 回合）」是**两句不同的话**，恰好数值相同；
             // 触发点不同（BATTLE_START vs ULT_CAST）、寿命来源也不同（一个来自秘技行，一个来自星魂 4 的参数）。
             Map.entry("1223.json :: MODIFY_ATTR|ALL_DAMAGE_TYPE_BOOST|0.3|self|2|false", 2));

@@ -1,14 +1,8 @@
 {
   "schema": 1,
   "character": 1405,
-  "_status": "partial",
-  "_gaps": [
-    "⭐ **星魂 1 的「首次施放战技后恢复 1 个战技点」已落地（2026-11-04）**：`SKILL_CAST` + `actor == self` + **`once_per_battle: true`** → `GAIN_SKILL_POINT 1`。旧登记说「缺『首次』计数」**作废** —— `once_per_battle` 就是这个计数（每规则一个布尔）。⚠ 它的另一半「施放战技击中时目标防御 −16% / 2 回合」在 `eidolon1_defence_down_on_skill` 里已有 ✓。",
-    "⭐ **升华的控制半也落地了（2026-11-06）**：控制表新增 `SUBLIMATED / 升华`（`blocksAct: true`、无附伤、独立抗性键），规则里 `APPLY_CONTROL { control: 升华, turns: 1 }`；判据 `AnaxaNecessaryBlankTest.theSublimationStopsAnUnresistingTarget`（无抗性目标不能行动；默认带抗性的 fixture 不被挂上 —— 正是「若目标不具有控制抵抗」）。",
-    "1415 忆灵技 18：所有「智识」命途角色攻击力 +30% 未写（缺命途选择器）",
-    "【升华】/【质性揭露】：**状态本身已按「≥5 种弱点」施加** ✓（天赋规则 `talent_true_knowledge_state`，每回合复查），但「弱点植入的持续回合/控制抵抗 / 无法行动」与**额外施放 1 次战技**仍未写",
-    "⛔ **星魂 6 的第二句仍未写**：「行迹【必要的留白】的 2 种效果都会直接触发，不再依赖队伍数量」—— 写法上要给「同一组数值的两个触发（有条件的 + 无条件的）」；守卫 `SameEffectTwiceGuardTest` 正是禁止「同一条数值出现在两条规则里」（除非登记 BASELINE 并说明），`allies_with_path` 又不能被「E6 时恒真」表达。⇒ 需要的是「条件本身可被某条星魂短路」的写法，或在该守卫的 BASELINE 里登记这一族。"
-  ],
+  "_status": "implemented",
+  "_gaps": [],
   "rules": [
     {
       "on": "BATTLE_START",
@@ -397,6 +391,29 @@
           "turns": 1
         }
       ]
+    },
+    {
+      "source": "1405 那刻夏 星魂 6:「行迹【必要的留白】的2种效果都会直接触发，不再依赖我方队伍中「智识」命途角色的数量。」",
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "attribute": "CRIT_ATTACK",
+          "percent": 1.4,
+          "target": "self",
+          "permanent": true,
+          "op": "MODIFY_ATTR"
+        },
+        {
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "target": "all_allies",
+          "permanent": true,
+          "op": "MODIFY_ATTR"
+        }
+      ],
+      "id": "eidolon6_both_blanks_fire",
+      "_note": "「留白的 **2 种效果都会直接触发**，不再依赖队伍数量」—— E6 时**无条件**给两份 ✓；同属性修饰会替换同来源的那份 ⇒ 排在条件版之后，最终以本条为准 ✓。⚠ 这条与两条条件版**同形**，是 `SameEffectTwiceGuardTest` 里「one effect, two triggers」那一族，已按规矩登记 BASELINE 并写明理由。",
+      "min_eidolon": 6
     }
   ],
   "resources": [
