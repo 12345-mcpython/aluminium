@@ -10,7 +10,7 @@
     "⭐ **忆灵技能 1 已落地（2026-11-05）**：`memosprites/1402.json` 新增 **`attack`** 块（`{element: Thunder, base: ATTACK, percent: 1.54, neighbour_percent: 0.924, shape: Blast, stance: 30, neighbour_stance: 15}` —— 取**忆灵技能 1 的 Lv10 行** 1.54/0.924，即文档 110%/66% 的 Lv10 值）；引擎为这句话新增 **`Attack.neighbour_percent` / `neighbour_stance`**，`EnemySkill` 按目标选份额（主目标 `multiplier`、相邻 `neighbourMultiplier`）—— 否则一个 `multiplier` 会把相邻也按 110% 打（没有症状的错数字）。判据 `theMemospriteBlastHitsTheNeighboursForLess`：**主目标损失 / 相邻损失 = 1.1/0.66**（同种怪物、每次都暴击 ⇒ 比值与防御/暴击区无关），两个相邻相等；破韧 30/15 也按目标分开。⭐ **忆灵技能 2 的叠层半已落地（2026-11-05）**：`p1402_memosprite_speed_stack_on_threaded_hit`（`SUMMON_ATTACK` + `actor is_summon` + `target has_state 间隙织线` → `MODIFY_ATTR SPEED {amount: 63.8, stackable, max_stacks: 6, permanent, target: summon}`）—— 数值是**字面值 63.8**（忆灵技能 2 的 **Lv10** 行；正文的 55 是 Lv6），因为 **`amount_from_summon_param` 不被 `MODIFY_ATTR` 读**（装载期只认 `percent`/`amount`，实测）。判据 `theMemospriteStacksSpeedOnlyOnAThreadedHit`（叠满 6 层 = +382.8，第 7 次不加，换一个没织线的目标不叠）。 ⛔ **仍开「行动策略」那一半**：**「衣匠行动时自动施放【刺纹之陷】、优先【间隙织线】目标」** —— 引擎的忆灵回合只有一条 `attack`，没有「按条件挑技能 / 挑目标」的写法；③ 飞驰之夏（被召唤时**行动提前 100%**）；④ 枯草之盈（衣匠**消失时**给阿格莱雅 **20 能量**）。⇒ ②是①的读者、也是【至高之姿】SPD 那一半的来源，所以它们是一组，缺的是一个**忆灵自己的规则表**（引擎的规则只挂在角色上）。⭐ **③④ 已落地（2026-11-04）**：`memosprite_speeding_summer_advances_itself`（`SUMMONED` + `when: actor == summon` + `ADVANCE target: summon` ⇒ 召唤物进队列**之后**才发事件，所以规则碰得到它的行动值）与 `memosprite_bloom_of_drying_grass_pays_energy`（`SUMMON_LEFT` + `GAIN_ENERGY 20`；⚠ 那一刻它已不在场上，所以**不能**用 `battle.summonOf`）。判据 `AglaeaMemospritesTest`：召唤后 `queue().peekNext()` 就是衣匠；它离场后她的能量**正好 +20**（⚠ 让**队友**补最后一刀 —— 由她自己击杀会额外拿 5 点击杀回能，实测 25）。",
     "⭐ **行迹 短视之惩 已落地（2026-11-06）**：`p1402_trace_short_sighted_atk_for_her` / `..._for_the_garmentmaker` —— `ULT_CAST` → 两条 `MODIFY_ATTR ATTACK`（`scale: self_attr:SPEED` × 7.2 + `scale: summon_attr:SPEED` × 3.6，`while_state: 至高之姿`），判据 `theTraceRaisesBothAttackValues`。⚠ **快照**：份额在施放那一刻取值；⚠ 必须排在 `ult_effect` **之后**（`summon_attr:` 要读衣匠，而衣匠是大招召唤出来的）。 ⭐ **行迹 织运之竭 已落地（2026-11-06）**：三条规则 —— `p1402_eidolon_trace_keeps_one_layer_when_it_leaves`（`SUMMON_LEFT` + `actor_stacks:匠躯 >= 1` → `SET_STACKS { 织运之竭-保留 = 1 }`）、`..._clears_the_kept_layer`（`< 1` → 置 0，否则上一次留下的 1 层会永久贴着她）、`..._gives_the_layer_back`（`SUMMONED` + `self_stacks:织运之竭-保留 >= 1` → 给新衣匠一份 `匠躯`）。⭐ 条件用 **`actor_stacks:`** 而不是 `summon_stacks:` —— 衣匠消失的那一刻 `summonOf(owner)` 已经查不到它，只有事件的 `actor` 还指着它。判据 `theKeptLayerComesBackOnTheNextSummon`。 ⚠ 顺带把装载期守卫扩了一步：**`SET_STACKS` 也算「创建计数器」**（它确实会建一个 `StackBuff`），否则「本文件只 set 不 add 的计数器」会被误报。 ③ 飞驰之阳 ⭐ **已落地（2026-11-04）**：`trace_racing_sun_fills_half_the_energy` —— **`RAISE_ENERGY_TO`** 就是「设到上限的 N%」那个拼法（引擎原话：它是**下限不是加量**，所以「若不足」无需条件），判据 `AglaeaTracesTest`；⚠ 它与秘技的 30 点**会互相吞**（开战能量为 0 时，50% 的下限把秘技那 30 点盖掉 ⇒ 差值读 0 —— 这是行迹在正常工作，不是秘技没付钱，判据因此把起点设在 60%）。",
     "⭐ **星魂 1 已落地（2026-11-04）**：`eidolon1_threaded_target_takes_more` —— **先摘后给**的命名修饰（`间隙织线易伤`）跟着【间隙织线】**转移**，另加 **`while_holder_state: 间隙织线`** 兜住「状态自然到期」那一侧（否则那 15% 会留在已经没状态的敌人身上，没有症状）；`eidolon1_threaded_attack_pays_energy` + `..._for_the_garmentmaker` —— 两条 `ATTACK_FINISHED`（**每次攻击一次**，不是每段），「阿格莱雅**或**衣匠」写成两条因为条件 DSL 没有析取。判据 `AglaeaEidolonOneTest`：E1/E0 同一发的**比值 = 1.15**、修饰随状态**转移**（旧持有者归零、新持有者为 1）、两条攻击各 **+20** 能量。",
-    "⭐ **星魂 2 已落地（2026-11-04）**：`eidolon2_a_layer_when_she_acts` / `..._when_the_memosprite_acts`（`TURN_START` + 各自的行动者，`MODIFY_ATTR DEFENCE_IGNORE {0.14, stackable, max_stacks: 3, permanent}`）+ `eidolon2_another_units_skill_clears_it`（`SKILL_CAST` + `actor is_other_ally` ⇒ `REMOVE_STATE` `all_allies` 同时摘掉她和衣匠那两份）。判据 `AglaeaEidolonTwoTest`：1/2/3 次行动 = 0.14/0.28/0.42、第 4 次不加、E1 恒 0；衣匠自己的回合只叠**它自己**那份；队友一次施法把两份都清零。⚠ **一处窄**：**敌方**施放技能不清除（引擎只把我方施法送给规则表）⇒ 已登记。⭐ **星魂 4 已落地（2026-11-05）**：`p1402_eidolon4_her_attack_also_stacks_it`（`ATTACK_FINISHED` + `actor == self` + `target has_state 间隙织线` → 给衣匠同一份 `匠躯` 层）+ `p1402_eidolon4_the_cap_rises_by_one`（同形规则、`max_stacks: 7` —— 上限没有条件写法，与 1218 星魂 6 同一个办法：**E4 再写一条只抬上限**）。判据 `theEidolonFourCapAndHerOwnAttacks`（E4 下她的攻击也叠层、能到第 7 层；E3 下她不叠）。⭐ **星魂 6 前半已落地（2026-11-06）**：`p1402_eidolon6_thunder_penetration_while_in_the_stance`（新增按元素的穿透常量 `DAMAGE_PENETRATION_THUNDER` + `AttributeType.penetrationFor`，`DamageService` 把它与全类型穿透相加），判据 `AglaeaEidolonSixTest`。⛔ **仍开：星魂 6 的后半句**： 【至高之姿】下双方雷属性**抗性穿透 +20%**，且速度高于 **160/240/320** 时**连携攻击**伤害 +10%/30%/60%（`DAMAGE_PENETRATION` 与阈值分段都有，但都依赖第 4 条那条「连携攻击」的归属）。另：星魂 3/5 的**忆灵**等级加成（`skill_add_level` 里的 1140201/1140203/1140205/1140206）也没写 —— `RAISE_SKILL_LEVEL` 的 `memosprite: true` 是现成的。"
+    "⭐ **星魂 2 已落地（2026-11-04）**：`eidolon2_a_layer_when_she_acts` / `..._when_the_memosprite_acts`（`TURN_START` + 各自的行动者，`MODIFY_ATTR DEFENCE_IGNORE {0.14, stackable, max_stacks: 3, permanent}`）+ `eidolon2_another_units_skill_clears_it`（`SKILL_CAST` + `actor is_other_ally` ⇒ `REMOVE_STATE` `all_allies` 同时摘掉她和衣匠那两份）。判据 `AglaeaEidolonTwoTest`：1/2/3 次行动 = 0.14/0.28/0.42、第 4 次不加、E1 恒 0；衣匠自己的回合只叠**它自己**那份；队友一次施法把两份都清零。⚠ **一处窄**：**敌方**施放技能不清除（引擎只把我方施法送给规则表）⇒ 已登记。⭐ **星魂 4 已落地（2026-11-05）**：`p1402_eidolon4_her_attack_also_stacks_it`（`ATTACK_FINISHED` + `actor == self` + `target has_state 间隙织线` → 给衣匠同一份 `匠躯` 层）+ `p1402_eidolon4_the_cap_rises_by_one`（同形规则、`max_stacks: 7` —— 上限没有条件写法，与 1218 星魂 6 同一个办法：**E4 再写一条只抬上限**）。判据 `theEidolonFourCapAndHerOwnAttacks`（E4 下她的攻击也叠层、能到第 7 层；E3 下她不叠）。⭐ **星魂 6 前半已落地（2026-11-06）**：`p1402_eidolon6_thunder_penetration_while_in_the_stance`（新增按元素的穿透常量 `DAMAGE_PENETRATION_THUNDER` + `AttributeType.penetrationFor`，`DamageService` 把它与全类型穿透相加），判据 `AglaeaEidolonSixTest`。⛔ **仍开：星魂 6 的后半句**： 【至高之姿】下双方雷属性**抗性穿透 +20%**，且速度高于 **160/240/320** 时**连携攻击**伤害 +10%/30%/60%（`DAMAGE_PENETRATION` 与阈值分段都有，但都依赖第 4 条那条「连携攻击」的归属）。⭐ **星魂 3/5 的忆灵等级加成已落地（2026-11-06）**：`RAISE_SKILL_LEVEL { memosprite: true, skill_id: 3/5/6 }`（星魂 3，「忆灵天赋等级+1」）与 `{ skill_id: 1 }`（星魂 5，「忆灵技等级+1」）。⭐ 这两条此前写不了，是因为忆灵技能被钉在参数表**最后一行**（10）；而文档给忆灵技能写的数字（110%/66%、55）正是**第 6 行** ⇒ 现在口径改成 6，+1 有地方可去。判据 `AglaeaEidolonLevelsTest.theMemospriteSkillLevelsRiseAtTheirEidolons`。"
   ],
   "rules": [    {
       "on": "BATTLE_START",
@@ -193,7 +193,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "amount": 63.8,
+          "amount": 55,
           "stackable": true,
           "max_stacks": 6,
           "permanent": true,
@@ -216,7 +216,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "amount": 63.8,
+          "amount": 55,
           "stackable": true,
           "max_stacks": 7,
           "permanent": true,
@@ -239,7 +239,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "amount": 63.8,
+          "amount": 55,
           "stackable": true,
           "max_stacks": 7,
           "permanent": true,
@@ -483,7 +483,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "amount": 63.8,
+          "amount": 55,
           "stackable": true,
           "max_stacks": 6,
           "permanent": true,
@@ -851,6 +851,24 @@
           "op": "RAISE_SKILL_LEVEL",
           "skill": "SKILL",
           "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 3,
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 5,
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 6,
+          "amount": 1
         }
       ],
       "source": "1402 阿格莱雅 星魂 3 华珠凝滞的礼物: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级；忆灵天赋等级+1，最多不超过10级。」 数据行 技能等级+{'140202': 2, '140201': 1, '1140203': 1, '140208': 1, '140209': 2, '1140205': 1, '1140206': 1}",
@@ -871,6 +889,12 @@
           "op": "RAISE_SKILL_LEVEL",
           "skill": "TALENT",
           "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 1,
+          "amount": 1
         }
       ],
       "source": "1402 阿格莱雅 星魂 5 漆黑苦难的织者: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级；忆灵技等级+1，最多不超过10级。」 数据行 技能等级+{'140203': 2, '140204': 2, '1140201': 1}",

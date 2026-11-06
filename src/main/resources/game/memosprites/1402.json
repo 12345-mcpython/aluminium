@@ -21,8 +21,8 @@
   "attack": {
     "element": "Thunder",
     "base": "ATTACK",
-    "percent": 1.54,
-    "neighbour_percent": 0.924,
+    "percent": 1.1,
+    "neighbour_percent": 0.66,
     "shape": "Blast",
     "stance": 30,
     "neighbour_stance": 15
@@ -31,19 +31,19 @@
   "skills": [
     {
       "slot": 1,
-      "level": 10
+      "level": 6
     },
     {
       "slot": 3,
-      "level": 10
+      "level": 6
     },
     {
       "slot": 5,
-      "level": 10
+      "level": 6
     },
     {
       "slot": 6,
-      "level": 10
+      "level": 6
     }
   ]
 }

@@ -154,8 +154,8 @@ public class AglaeaMemospritesTest {
             fireSummonAttack(battle, garmentmaker, enemy);
         }
         double capped = garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
-        Assertions.assertEquals(base + 6 * 63.8, capped, 1e-6,
-                "six stacked layers of the Lv10 cell (63.8): " + base + " -> " + capped);
+        Assertions.assertEquals(base + 6 * 55, capped, 1e-6,
+                "six stacked layers of the Lv6 cell (55): " + base + " -> " + capped);
 
         fireSummonAttack(battle, garmentmaker, enemy);
         Assertions.assertEquals(capped, garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
