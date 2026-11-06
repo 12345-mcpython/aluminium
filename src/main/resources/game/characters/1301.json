@@ -3,10 +3,13 @@
   "character": 1301,
   "_status": "partial",
   "_gaps": [
-    "终结技「下一次普攻强化为【酒花奔涌】」：技能替换未写",
-    "行迹 崭新配方：治疗量 +击破特攻 50%、上限 +75% 未写",
-    "行迹 敬请干杯：依赖【酒花奔涌】，未写",
-    "星魂 2–6：未逐句读、未写"
+    "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧的四条 `_gaps` 里有两条**已经过期**——「终结技『下一次普攻强化为【酒花奔涌】』技能替换未写」早就在 `ult_tipsy` 里（`REPLACE_SKILL { skill: COMMON, skill_id: 8, until: next_attack }`，判据 `GallagherEnhancedAttackTest`），而「星魂 2–6 未读」现在只剩三条仍开。按文档（`1301_加拉赫.md`）逐节核对后的结果如下。",
+    "⭐ **星魂 2 已落地（2026-11-06）**：`eidolon2_dispels_one_and_raises_effect_res` —— `SKILL_CAST` + `min_eidolon: 2` → `DISPEL { amount: 1 }` + `MODIFY_ATTR EFFECT_RESISTANCE 0.3 / turns: 2`，两个效果都落在 `target`（被指定的队友），判据 `GallagherEidolonTest.theSecondEidolonCleansesAndHardensTheTarget`。",
+    "⭐ **星魂 6 前半已落地（2026-11-06）**：`eidolon6_raises_break_effect` —— `BATTLE_START` + `min_eidolon: 6` → `MODIFY_ATTR BREAKING_EFFECT 0.2`，判据 `GallagherEidolonTest.theSixthEidolonRaisesHisBreakEffect`。⛔ **后半「弱点击破效率提高 20%」仍开**：`AttributeType` 没有这个量（只有 `BREAKING_EFFECT` 与 `BREAK_DAMAGE_BOOST`），要先确认伤害/削韧管线里谁读它才能加常量。",
+    "⛔ **行迹 崭新配方 (1301101) 未写**：「使自身提供的治疗量提高，提高数值等同于**击破特攻的 50%**，最多使提供的治疗量提高 **75%**」—— 派生量 `scale: self_attr:BREAKING_EFFECT` 有、`percent: 0.5` 有，但**上限 75%** 没有写法（`MODIFY_ATTR` 的修饰不带上限；`per_stack_cap` 只管层数）⇒ 需要「修饰上限」或一个 `min()` provider 才精确。",
+    "⛔ **行迹 敬请干杯 (1301103) 未写**：「加拉赫施放【酒花奔涌】攻击陷入【酩酊】状态的目标时，使此次天赋提供的生命回复效果**对我方队友也会生效**」—— 它要改的是**同一次攻击里天赋那条 `ALLY_ATTACK` 治疗的目标集合**（从「攻击者」扩到「全体队友」），而规则之间不能互相改目标集合；需要「本次攻击的天赋治疗对全体生效」这种一次性开关。",
+    "⛔ **星魂 4 未写**：「加拉赫终结技造成的【酩酊】状态持续时间延长 1 回合」—— `ult_tipsy` 用 `APPLY_BUFF turns: 2`，要在 E4 变 3；两条同事件规则**执行顺序**决定成败（先 APPLY 再 `EXTEND_BUFF +1`），而顺序依赖文件里的书写次序 ⇒ 未验证前不写（或者做成「E4 用 `turns: 3` 的同形规则」，但那样要复制整条大招规则）。",
+    "⚠ **两处已过期、保留在规则注记里的登记**：① `ult_tipsy` 的 `_note` 末尾那三段「试写后被装载期拒绝」已被 2026-09-28 的正式补齐取代（现在写出来了）；② 同一注记里「使目标攻击力降低 15%」的「未写」也已由 `enhanced_attack_down`（`DEALING_DAMAGE` + `from_skill_id == 8` → `MODIFY_ATTR ATTACK -0.15 / 2 回合`）取代 —— `DEALING_DAMAGE` 现在同时带目标与技能键。"
   ],
   "rules": [
     {
@@ -155,6 +158,46 @@
       ],
       "source": "1301 加拉赫 强化普攻 酒花奔涌 (130108 的技能描述): 「对指定敌方单体造成等同于加拉赫250%攻击力的火属性伤害。并使目标攻击力降低15.00%，持续2回合。」",
       "_note": "「并使目标攻击力降低 15.00%，持续 2 回合」—— 这句必须挂在 DEALING_DAMAGE 上：ALLY_ATTACK 刻意不带被瞄准的单位（执行时会报 Effect targets target but this event has no such party），而 DEALING_DAMAGE 既有目标、现在也带技能键（Damage.skillKey）。⚠ from_skill_id 的取值是装载键（强化普攻 = 槽位 8），不是数据行 130108。 ⚠ 条件里不写 target == target（装载器会拒绝：它只支持与队伍或数值字面量的比较）；目标由效果自己的 target 选择器决定。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon2_dispels_one_and_raises_effect_res",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1301 加拉赫 星魂 2 狮子之尾: 「施放战技时，解除指定我方单体的1个负面效果，同时使其效果抵抗提高30%，持续2回合。」 参数 = [1, 0.3, 2]",
+      "_note": "「施放战技时，**解除**指定我方单体的 **1** 个负面效果，同时使其**效果抵抗提高 30%**，持续 **2** 回合」—— ① `DISPEL { amount: 1 }`（不带 `kind` = 任意负面效果 ✓）；② `MODIFY_ATTR EFFECT_RESISTANCE 0.3 / turns: 2`；③ 两个效果都落在 **`target`**（被指定的那个队友）✓ —— 与星魂 1 那种「对自己」的区别就在这一行。⚠ 30% / 2 回合来自星魂参数（无等级轴）⇒ 字面值精确 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_raises_break_effect",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1301 加拉赫 星魂 6 血与沙: 「加拉赫的击破特攻提高20%，弱点击破效率提高20%。」",
+      "_note": "「**击破特攻提高 20%**」—— `MODIFY_ATTR BREAKING_EFFECT` ✓（**出伤侧**，与天赋那句「受到的**击破伤害**提高 12%」是两侧不同的量）。⛔ 同句后半「**弱点击破效率**提高 20%」未写：`AttributeType` 里没有这个量（只有 `BREAKING_EFFECT` 与 `BREAK_DAMAGE_BOOST`），加一个常量前要先确认伤害管线里谁读它，见 `_gaps`。"
     },
     {
       "on": "BATTLE_START",
