@@ -136,6 +136,18 @@ public class YanqingSoulsteelAndEidolonsTest {
         Assertions.assertEquals(0.0, penetrationAt(1), EPS, "before 星魂 4 there is none at all");
     }
 
+    /** 天赋「处于【智剑连心】时，受到攻击的概率降低」: the DIRECTION only - the document states no number. */
+    @Test
+    public void theSyncLowersHisAggro() {
+        Battle battle = scene(0);
+        Character yanqing = battle.characters().getFirst();
+        double before = battle.aggroOf(yanqing);
+        battle.castImmediate(yanqing.getSkills().get(SkillType.SKILL), yanqing, List.of(battle.enemies().getFirst()));
+        battle.processRequests();
+        Assertions.assertTrue(battle.aggroOf(yanqing) < before,
+                "「受到攻击的概率降低」 — the weight drops (the amount is a placeholder: the sentence states none)");
+    }
+
     private static double penetrationAt(int eidolon) {
         return scene(eidolon).characters().getFirst().getAttribute(AttributeType.DAMAGE_PENETRATION_ICE).get();
     }

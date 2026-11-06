@@ -3,7 +3,7 @@
   "character": 1209,
   "_status": "partial",
   "_gaps": [
-    "⭐ **「受到伤害后【智剑连心】消失」已落地（2026-11-06）**：`talent_soulsteel_ends_when_he_is_hit`（`TAKING_HIT` + `target == self` → `REMOVE_STATE`），并把天赋的两份修饰改挂 `while_state: 智剑连心` ⇒ 状态一走、加成一起走 ✓。⛔ **「受到攻击的概率降低」仍未写**：`AttributeType` 里没有仇恨/被瞄准概率这个量（1001 的护盾族用的是另一个机制），要先确认敌人的选目标逻辑读谁。",
+    "⭐ **「受到攻击的概率降低」已落地（2026-11-06，方向性）**：`talent_soulsteel_lowers_his_aggro` —— `MODIFY_ATTR AGGRO_ADDED_RATIO -0.5`（`turns: 1`，与状态同长）。⚠ 句子**没有数字**，-0.5 是占位取值（权重减半），判据 `YanqingSoulsteelAndEidolonsTest` 只钉**方向**（`Battle.aggroOf` 变小），不钉数值。",
     "天赋 65% 冻结 + 冻结状态每回合 50% 攻击力附加伤害未写 ⚠ 2026-11-06：这一条仍未动（冻结是控制状态 + 按状态的持续伤害，见 1109 的冻结族）；本轮只补了上下的两条。",
     "⭐ **秘技 已落地（2026-11-04）**：「对当前生命值百分比 ≥50% 的敌人伤害 +30%，2 回合」= `BATTLE_START` + `self has_state 秘技` → `APPLY_BUFF 御剑真诀 { turns: 2 }`，再由 `DEALING_DAMAGE` + `self has_state 御剑真诀` + **`target_hp_percent >= 0.5`** → `BOOST_DAMAGE 0.3`。旧登记说「条件与修饰单位不同，写不出」**作废** —— `target_hp_percent` 回答的正是「被打的那个的血线」。判据 `YanqingTechniqueTest`（同一发对满血/残血各打一次，残血不吃加成）。",
     "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_pierces_ice_resistance_while_healthy` —— 引擎新增**活门槛** `while_hp_percent`（`AbstractBuff.gateHpPercent`，与 `while_stacks` 同族：每次回合边界重问一遍）+ `MODIFY_ATTR DAMAGE_PENETRATION_ICE 0.12`。判据 `YanqingSoulsteelAndEidolonsTest`。"
@@ -324,6 +324,24 @@
       "id": "eidolon4_pierces_ice_resistance_while_healthy",
       "_note": "「**当前生命值百分比 ≥80% 时**，提高自身 **12%** 的冰属性**抗性穿透**」—— 抗性穿透用 **`DAMAGE_PENETRATION_ICE`**（`DamageService.damage.resist(rawResist, DAMAGE_PENETRATION + penetrationFor(element))` ✓）；⭐ 「当前生命 ≥80%」这一句需要**活的**门槛（HP 几乎每个事件都在变），于是这一轮给 `AbstractBuff` 加了第三个活门槛 **`gateHpPercent`** + 内容里的 **`while_hp_percent: 0.8`**（与 `while_stacks` 同族，在每次回合边界重新问一遍 ✓）。⚠ 星魂参数无等级轴 ⇒ 字面 0.12 / 0.8。",
       "on": "BATTLE_START"
+    },
+    {
+      "id": "talent_soulsteel_lowers_his_aggro",
+      "source": "1209 彦卿 天赋 呼剑如影:「彦卿处于【智剑连心】效果时，受到攻击的概率降低…」",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "percent": -0.5,
+          "turns": 1,
+          "target": "self",
+          "attribute": "AGGRO_ADDED_RATIO"
+        }
+      ],
+      "when": [
+        "actor == self"
+      ],
+      "on": "SKILL_CAST",
+      "_note": "「处于【智剑连心】时，**受到攻击的概率降低**」—— 用 ``AGGRO_ADDED_RATIO``（软仇恨权重，按比例加在权重上；1001 的护盾族用的是同一个量，方向相反）。⚠ 句子没给数字（只有「降低」）⇒ **-0.5 是本项目的占位取值**（写成负数 = 权重减半），与其它「没给数字」的从句同一处理方式，已在判据里写明它只验证**方向**。⚠ 寿命 ``turns: 1`` 与状态同长（战技是唯一来源）。"
     }
   ]
 }
