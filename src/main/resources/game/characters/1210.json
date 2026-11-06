@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⭐ **秘技已落地（2026-11-06）**：`technique_four_random_hits_and_a_firekiss` —— `BATTLE_START` + `self has_state 秘技` → `DAMAGE { times: 4, target: random_enemy, percent: 0.5 }` + `APPLY_BUFF 吞火`。⚠ 【吞火】的归属是**近似**（四次结算**不能**逐次指向「那一次打中的是谁」，只能再抽一个 \random_enemy：期望分布一致、逐次归属不同）。",
-    "⭐ **星魂 1 已落地（2026-11-06）**：`eidolon1_the_skill_lowers_effect_resistance` —— `SKILL_CAST` + E1 → `MODIFY_ATTR EFFECT_RESISTANCE -0.1 / 2 回合`。⛔ **星魂 2–6 仍未读**（尤以星魂 6 的「【吞火】层数」那一族为然，见最后一条）。",
+    "⭐ **星魂 3/5 是等级加成**（\u001bidolon3_levels / \u001bidolon5_levels ✓，原有）；⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_each_burn_tick_pays_two_energy` —— `DAMAGE_SETTLED` + `damage_is_dot` + `damage_element_is_self` → `GAIN_ENERGY 2`（判据 `GuineaifenFirekissStackTest.everyBurnTickPaysTwoEnergy`）。⛔ **星魂 2 仍未写**：「敌方处于灼烧状态时，桂乃芬的普攻与战技对其**施加的灼烧状态的伤害倍率提升 40%**」—— 要改的是**她施加的 DoT 的倍率**，引擎的 APPLY_DOT 有份额、但**没有「对已有 DoT 的倍率做修饰」**的写法（MODIFY_RULE 只改规则自己的 \u001bffect_percent，不是 DoT 实例）。⛔ **星魂 6 仍未写**：「【吞火】可叠加层数 +1」—— 层数写在 ADD_STACK 的 max_stacks 上，MODIFY_RULE 没有改它的口子；可行写法是 E6 的**同形规则**（max_stacks: 4），但与基础那条同形 ⇒ 需按 `SameEffectTwiceGuardTest` 登记 BASELINE。",
     "⭐ **【吞火】的「最多 3 层」已落地（2026-11-06）**：`talent_firekiss_on_burn_tick` 改成**计数器 + 实时读** —— 先 `ADD_STACK 吞火 1 max_stacks 3`，再挂**同一条**易伤但带 `per_stack: target_stacks:吞火` + `per_stack_live: true` + `per_stack_cap: 3` ⇒ 易伤 = 7% × 层数（最多 +21%）。判据 `GuinaifenFirekissStackTest`（真实灼烧结算后计数 ≥1 且**永不超过 3**）。⚠ 为什么不是「挂三个易伤」：`VulnerabilityBuff.isSameKind` 只保留一份同源易伤 ⇒ 必须让那一份随层数变大（1009 艾丝妲的同一套）。"
   ],
   "rules": [
@@ -209,6 +209,24 @@
         "actor == self"
       ],
       "source": "1210 桂乃芬 星魂 1 倒立吃面条:「施放战技时，有100%的基础概率使受到攻击的敌方目标效果抵抗降低10%，持续2回合。」"
+    },
+    {
+      "id": "eidolon4_each_burn_tick_pays_two_energy",
+      "min_eidolon": 4,
+      "source": "1210 桂乃芬 星魂 4 金枪锁咽喉:「桂乃芬施加的灼烧状态每触发一次伤害，使自身恢复2点能量。」 参数 = [2]",
+      "do": [
+        {
+          "target": "self",
+          "op": "GAIN_ENERGY",
+          "amount": 2
+        }
+      ],
+      "when": [
+        "damage_is_dot",
+        "damage_element_is_self"
+      ],
+      "on": "DAMAGE_SETTLED",
+      "_note": "「她施加的灼烧**每触发一次伤害**，使**自身**恢复 **2** 点能量」—— `DAMAGE_SETTLED` + **`damage_is_dot`**（灼烧那一次结算 ✓）+ **`damage_element_is_self`**（是她的火 ✓，即「她施加的」）→ `GAIN_ENERGY 2` 给自己 ✓。与天赋那条**同事件同条件、不同效果**（那条给易伤），不撞重复守卫。"
     }
   ]
 }

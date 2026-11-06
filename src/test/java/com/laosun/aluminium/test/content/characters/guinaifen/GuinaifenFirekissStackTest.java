@@ -45,8 +45,30 @@ public class GuinaifenFirekissStackTest {
         }
     }
 
+    /** 星魂 4「她施加的灼烧每触发一次伤害，使自身恢复 2 点能量」. */
+    @Test
+    public void everyBurnTickPaysTwoEnergy() {
+        Battle battle = scene(4);
+        Character guinaifen = battle.characters().getFirst();
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        battle.castImmediate(guinaifen.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), guinaifen,
+                List.of(enemy));
+        battle.processRequests();
+        double before = guinaifen.getCurrentEnergy();
+
+        battle.tickDots(enemy);
+        battle.processRequests();
+
+        Assertions.assertTrue(guinaifen.getCurrentEnergy() > before,
+                "「每触发一次伤害…恢复 2 点能量」 — energy went up (" + before + " -> " + guinaifen.getCurrentEnergy() + ")");
+    }
+
     private static Battle scene() {
-        Character guinaifen = CharacterFactory.create(GUINAIFEN, LEVEL);
+        return scene(0);
+    }
+
+    private static Battle scene(int eidolon) {
+        Character guinaifen = CharacterFactory.create(GUINAIFEN, LEVEL, false, null, null, eidolon);
         Enemy enemy = BattleFixture.monster();
         enemy.setMaxStance(10_000);
         Battle battle = new Battle(List.of(guinaifen), List.of(enemy), BattleFixture.alwaysRoll(0.0));
