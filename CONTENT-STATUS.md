@@ -104,8 +104,17 @@
 | 1213 | 丹恒•饮月 | 未完全实现 | **2026-10-31 补星魂 3/5**（等级：战技+2/普攻+1、终结技+2/天赋+2，判据 `LevelEidolonsTest`
 ✓）。⛔ **仍开**：星魂 1（【亢心】层数 +4 且每段额外 +1）、星魂 2（终结技后行动提前 100% + 额外 1 个【逆鳞】）、星魂
 4（【叱咤】持续到下一回合结束）、星魂 6（虚数抗性穿透，队友终结技后叠层）、战技强化阶梯、【叱咤】的段序号、秘技门槛 |
-| 1214 | 雪衣 | 未完全实现 | **2026-10-31**：天赋两条 ✓、星魂 1（ **×1.40**）/2（回血 + **无视弱点削韧**）/3/5/6 ✓、终结技「 ⭐ **2026-11-06 逐节核 + 修一处静默 bug**：星魂 2 的回血原门槛是「恶报 ≥ 7」（8 层上限），而**星魂 6 把上限降到 6** ⇒ E6 起回血**永久失效**；已按上限拆成两条（E2–E5 与 E6），并**把 E6 那条排在消费规则之前**（同事件按文件顺序执行），判据 `XueyiEidolonTwoHealTest`。仍开六条（终结技按削韧增伤、她自己削韧的层数换算、追击不叠层、行迹 预兆机杼/摧锋轴承/伺观中枢），每条都写明缺的机制。 ⭐ **2026-11-06 续**：**行迹 预兆机杼 已落地** —— `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 1, cap_amount: 2.4 }`；⭐「缺修饰上限」的说法**作废**（`cap_amount`/`cap_scale` 早就在，`applyDerivedCeiling` 对派生量直接比较）。 ⭐ **2026-11-06 再续**：**行迹 摧锋轴承 已落地** —— 引擎新增条件变量 **`target_toughness_percent`**（韧性 ÷ 上限；无韧性条答 NaN），规则 = `DEALING_DAMAGE` + `from_skill_id == 3` + `>= 0.5` → `BOOST_DAMAGE 0.1`（`BOOST_DAMAGE` 只能挂 `DEALING_DAMAGE`），判据 `XueyiThrustBearingTest`。
-**本次攻击无视弱点属性削韧**」= 新 op **`IGNORE_WEAKNESS`**（`CAST_SETUP` + `from_category ULTRA`，判据
+| 1214 | 雪衣 | 未完全实现 | **2026-10-31**：天赋两条 ✓、星魂 1（ **×1.40**）/2（回血 + **无视弱点削韧**）/3/5/6 ✓、终结技「
+⭐ **2026-11-06 逐节核 + 修一处静默 bug**：星魂 2 的回血原门槛是「恶报 ≥ 7」（8 层上限），而 **星魂 6 把上限降到 6** ⇒ E6 起回血
+**永久失效**；已按上限拆成两条（E2–E5 与 E6），并 **把 E6 那条排在消费规则之前**（同事件按文件顺序执行），判据
+`XueyiEidolonTwoHealTest`。仍开六条（终结技按削韧增伤、她自己削韧的层数换算、追击不叠层、行迹 预兆机杼/摧锋轴承/伺观中枢），每条都写明缺的机制。
+⭐ **2026-11-06 续**： **行迹 预兆机杼 已落地** ——
+`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 1, cap_amount: 2.4 }`；⭐「缺修饰上限」的说法
+**作废**（`cap_amount`/`cap_scale` 早就在，`applyDerivedCeiling` 对派生量直接比较）。 ⭐ **2026-11-06 再续**： **行迹 摧锋轴承
+已落地** —— 引擎新增条件变量 **`target_toughness_percent`**（韧性 ÷ 上限；无韧性条答 NaN），规则 = `DEALING_DAMAGE` +
+`from_skill_id == 3` + `>= 0.5` → `BOOST_DAMAGE 0.1`（`BOOST_DAMAGE` 只能挂 `DEALING_DAMAGE`），判据
+`XueyiThrustBearingTest`。 **本次攻击无视弱点属性削韧**」= 新 op **`IGNORE_WEAKNESS`**（`CAST_SETUP` +
+`from_category ULTRA`，判据
 `IgnoreWeaknessOnCastTest`：非弱点 **0 → 60** ✓、且 **只用一次** ✓）。⛔ **仍开 2 条**：① 她自己削韧的「削得越多叠越多」换算（正文/数据都不给）；②
 终结技「按 **削韧量**增伤最多 60%」—— 要求 **先削韧后定伤害**，与引擎时序相反 |
 | 1215 | 寒鸦 | 完全实现 | **2026-10-31 补秘技**：「进入战斗后对敌方 **随机单体**附上等同于战技效果的【承负】」=
@@ -140,7 +149,19 @@
 强化普攻 / 星魂），其余未逐句核对 |
 | 1225 | 忘归人 | 未完全实现 | 已登记六条具体缺口（强化普攻 / 无视弱点削韧 / 基础概率 / 秘技晕眩 / 云火昭与超击破 /
 终结技与星魂），其余未逐句核对 |
-| 1301 | 加拉赫 | 未完全实现 | 已登记四条具体缺口（酒花奔涌替换 / 崭新配方 / 敬请干杯 / 星魂2-6），其余未逐句核对 | ⭐ **2026-11-06 续**：**行迹 崭新配方 已落地** —— `MODIFY_ATTR OUTGOING_HEALING_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 0.5, cap_amount: 0.75 }`（与 1214 预兆机杼同一个「已声明上限」机制）。仍开：星魂 6 后半（弱点击破效率无此属性）、星魂 4（延长 1 回合的写法未定）、行迹 敬请干杯（缺「本次攻击治疗对全体生效」开关）。 ⭐ **2026-11-06 再续**：**星魂 4 已落地** —— `eidolon4_the_tipsy_lasts_one_turn_longer`（E4 用 `turns: 3` 的同形规则，替换掉大招那份 2 回合），判据 `GallagherEidolonTest.theTipsyLastsThreeTurnsAtTheFourthEidolon`。⚠ 实测 `EXTEND_BUFF` **不能**用来延长【酩酊】状态（它按 `buffName` 匹配，状态的 buffName 为空）。 ⭐ **2026-11-06 三续**：**星魂 6 后半已落地** —— 新增属性 `WEAKNESS_BREAK_EFFICIENCY`（弱点击破效率），`BreakService.reduce` 在扣韧性前乘 `1 + efficiency`（默认 0 ⇒ 乘 1，既有读数不变），判据 `GallagherEidolonTest.theSixthEidolonShortensTheBarFaster`（10 → 12）。 ⭐ **2026-11-06 四续**：**行迹 敬请干杯 已落地** —— `trace_toast_the_heal_reaches_every_ally`（`DEALING_DAMAGE` + `from_skill_id == 8` + `target has_state 酩酊` → `HEAL all_allies`，读天赋行 640），判据 `GallagherEnhancedAttackTest.theToastTraceHealsTheWholeParty`。**1301 的 `⛔` 已全部清零**（剩 1 条「星魂 6 后半已落地」的记录 + 2 条过期说明）。
+| 1301 | 加拉赫 | 未完全实现 | 已登记四条具体缺口（酒花奔涌替换 / 崭新配方 / 敬请干杯 / 星魂2-6），其余未逐句核对 |
+⭐ **2026-11-06 续**： **行迹 崭新配方 已落地** ——
+`MODIFY_ATTR OUTGOING_HEALING_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 0.5, cap_amount: 0.75 }`（与 1214
+预兆机杼同一个「已声明上限」机制）。仍开：星魂 6 后半（弱点击破效率无此属性）、星魂 4（延长 1 回合的写法未定）、行迹
+敬请干杯（缺「本次攻击治疗对全体生效」开关）。 ⭐ **2026-11-06 再续**： **星魂 4 已落地** ——
+`eidolon4_the_tipsy_lasts_one_turn_longer`（E4 用 `turns: 3` 的同形规则，替换掉大招那份 2 回合），判据
+`GallagherEidolonTest.theTipsyLastsThreeTurnsAtTheFourthEidolon`。⚠ 实测 `EXTEND_BUFF` **不能**用来延长【酩酊】状态（它按
+`buffName` 匹配，状态的 buffName 为空）。 ⭐ **2026-11-06 三续**： **星魂 6 后半已落地** —— 新增属性
+`WEAKNESS_BREAK_EFFICIENCY`（弱点击破效率），`BreakService.reduce` 在扣韧性前乘 `1 + efficiency`（默认 0 ⇒ 乘 1，既有读数不变），判据
+`GallagherEidolonTest.theSixthEidolonShortensTheBarFaster`（10 → 12）。 ⭐ **2026-11-06 四续**： **行迹 敬请干杯 已落地** ——
+`trace_toast_the_heal_reaches_every_ally`（`DEALING_DAMAGE` + `from_skill_id == 8` + `target has_state 酩酊` →
+`HEAL all_allies`，读天赋行 640），判据 `GallagherEnhancedAttackTest.theToastTraceHealsTheWholeParty`。 **1301 的 `⛔`
+已全部清零**（剩 1 条「星魂 6 后半已落地」的记录 + 2 条过期说明）。
 ⭐ **2026-11-06 逐节核**： **星魂 2**（战技解 1 个负面效果 + 效果抵抗 +30%/2 回合）与 **星魂 6 前半**（击破特攻 +20%）落地，判据
 `GallagherEidolonTest`；并 **删掉两条过期缺口**（强化普攻的技能替换早在 `ult_tipsy`；15% 降攻早在 `enhanced_attack_down`
 ）。仍开：星魂 6 后半（弱点击破效率无此属性）、星魂 4（延长 1 回合的写法未定）、行迹 崭新配方（缺「修饰上限」）、行迹
@@ -226,7 +247,15 @@ DEF 1100 → 924）；③ 星魂 4「每段伤害倍率 +6%」✓（3567.76 → 
 的「下一次战技返还 1 战技点」**（用一回合标记：实测战技点 3 → **4**、标记消失、第二次不再给）、 **星魂 6 的时长**改成
 `until: turn_end`，以及 **战技自己的「增加 1 段」**（原来整句没写！）。⛔ **仍开 2 条**：① 行迹 释放「终结技 **首段**冻结概率
 +80%」缺 **段序号**；② 段数复位仍是「减 6」近似（引擎只有加/减，没有「设回初值」）|
-| 1313 | 星期日 | 未完全实现 | **2026-11-06 逐节核（第一次）**：旧行只写「已登记四条（天赋/秘技/行迹/星魂）」= 等于没记。已落地： ⭐ **2026-11-06 续**：**行迹 主日渴慕 已落地** —— `RAISE_ENERGY_TO` 新增**固定点数**写法（`amount: 40`），装载期放宽并夹到目标上限，判据 `SundayLentenGiftTest`（上限 120 ⇒ 20%=24 < 40 ⇒ 读到 40）。 ⭐ **2026-11-06 再续**：**星魂 1 已落地** —— `MODIFY_ATTR DEFENCE_IGNORE` 两档（本人 0.16 / `target_summon` 0.4），引擎新增选择器 **`target_summon`**（只有被指定者的召唤物），判据 `SundayEidolonOneTest`。 ⭐ **2026-11-06 三续**：**星魂 2 已落地** —— 三条规则（记号状态给「首次」→ +2 战技点；`while_holder_state: 蒙福者` 的 +30% 增伤），判据 `SundayEidolonTwoTest`。`⛔` 只剩 **星魂 6**（叠 3 层 / 持续 +1 / 溢出暴击转暴伤，各缺一样写法）。 ⭐ **2026-11-06 四续**：**星魂 6 的前两句已落地** —— `eidolon6_the_crit_rate_stacks_three_and_lasts_four`（`stackable` + `max_stacks: 3` + `turns: 4`；天赋那条加 `max_eidolon: 5` 互斥），判据 `SundayEidolonSixTest`。`⛔` 只剩第三句（溢出暴击转暴伤，缺「由另一个属性的溢出量派生」的写法）。
+| 1313 | 星期日 | 未完全实现 | **2026-11-06 逐节核（第一次）**：旧行只写「已登记四条（天赋/秘技/行迹/星魂）」= 等于没记。已落地： ⭐ **2026-11-06 五续**：**星魂 6 第三句也落地** —— 用 `value` 表达式 `2 × max(暴击率 − 1, 0)`（`mul`/`max`/`sub`/`attr{whose: target}`），落在 E6 天赋的第二个效果（`MODIFY_ATTR CRIT_ATTACK`）；provider 代数早就有，只是没这么用过。判据 `SundayEidolonSixTest.theOverflowCritRateBecomesCritDamage`。**1313 的 `⛔` 已清零。**
+⭐ **2026-11-06 续**： **行迹 主日渴慕 已落地** —— `RAISE_ENERGY_TO` 新增**固定点数 **写法（`amount: 40`），装载期放宽并夹到目标上限，判据
+`SundayLentenGiftTest`（上限 120 ⇒ 20%=24 < 40 ⇒ 读到 40）。 ⭐ **2026-11-06 再续**： **星魂 1 已落地** ——
+`MODIFY_ATTR DEFENCE_IGNORE` 两档（本人 0.16 / `target_summon` 0.4），引擎新增选择器 **`target_summon`**（只有被指定者的召唤物），判据
+`SundayEidolonOneTest`。 ⭐ **2026-11-06 三续**： **星魂 2 已落地** —— 三条规则（记号状态给「首次」→ +2 战技点；
+`while_holder_state: 蒙福者` 的 +30% 增伤），判据 `SundayEidolonTwoTest`。`⛔` 只剩 **星魂 6**（叠 3 层 / 持续 +1 /
+溢出暴击转暴伤，各缺一样写法）。 ⭐ **2026-11-06 四续**： **星魂 6 的前两句已落地** ——
+`eidolon6_the_crit_rate_stacks_three_and_lasts_four`（`stackable` + `max_stacks: 3` + `turns: 4`；天赋那条加
+`max_eidolon: 5` 互斥），判据 `SundayEidolonSixTest`。`⛔` 只剩第三句（溢出暴击转暴伤，缺「由另一个属性的溢出量派生」的写法）。
 **天赋**（战技使目标暴击率 +20%/3 回合，按等级读）、 **秘技**（首次对我方施放技能给 +50%/2 回合，用记号状态表达「首次」+
 `coexist` 防止替换战技那份）、 **行迹 崇高拂尘**（开战 +25 能量）、 **行迹 掌中安港**（战技解除目标 1 个负面效果）、 **星魂 4**
 （自己回合开始 +8 能量）；判据 `SundaySupportTest` / `SundayTechniqueTest`。⛔ 仍开： **行迹 主日渴慕**（「至少 40 点能量」需要固定值下限，

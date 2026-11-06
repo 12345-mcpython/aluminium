@@ -71,4 +71,41 @@ public class SundayEidolonSixTest {
         battle.startBattle();
         return battle;
     }
+
+    /**
+     * The third sentence:「当目标暴击率超过 100%，每溢出 1% 暴击率提高 2% 暴击伤害」.
+     *
+     * <p>Measured with the ally crit rate forced over 100%: the CRIT DMG modifier must equal twice the overflow, and with the
+     * rate below 100% it must be zero - which is the `max(..., 0)` in the expression doing its job.
+     */
+    @Test
+    public void theOverflowCritRateBecomesCritDamage() {
+        // The exact figure is computed inside the helper from the rate the ally actually holds (a snapshot), so these two
+        // assertions only say WHICH WAY the clause goes.
+        Assertions.assertTrue(overflowCritDamage(1.04) > 0, "over 100% the overflow becomes CRIT DMG");
+        Assertions.assertEquals(0.0, overflowCritDamage(0.6), 1e-6, "below 100% nothing is converted");
+    }
+
+    /** The CRIT DMG the talent adds when the ally crit rate is pushed to {@code critRate} first. */
+    private static double overflowCritDamage(double critRate) {
+        Battle battle = scene(6);
+        Character sunday = battle.characters().get(0);
+        Character ally = battle.characters().get(1);
+        // "pure" is the value in the attribute's own units: a percent modifier is a share of the BASE and does not reliably
+        // cross 100% (measured: the first version left the ally near 10%, and the clause correctly paid nothing).
+        ally.getBuffManager().addBuff(com.laosun.aluminium.buff.StatModifierBuff.of(
+                AttributeType.CRIT_CHANCE, "pure", critRate - ally.getAttribute(AttributeType.CRIT_CHANCE).get(),
+                "buff", 3, false));
+        battle.processRequests();
+        double before = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
+        battle.castImmediate(sunday.getSkills().get(SkillType.SKILL), sunday, List.of(ally));
+        battle.processRequests();
+        // The clause is a SNAPSHOT of the crit rate at the moment the talent lands (which already includes the talent own
+        // +20%), so the expectation is computed from the rate the ally actually holds afterwards.
+        double critAfter = ally.getAttribute(AttributeType.CRIT_CHANCE).get();
+        double expected = 2 * Math.max(0, critAfter - 1);
+        double measured = ally.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
+        Assertions.assertEquals(expected, measured, 1e-6, "2 x the overflow (" + critAfter + ")");
+        return measured;
+    }
 }
