@@ -136,6 +136,33 @@ public class YanqingSoulsteelAndEidolonsTest {
         Assertions.assertEquals(0.0, penetrationAt(1), EPS, "before 星魂 4 there is none at all");
     }
 
+    /**
+     * 天赋「有 65% 的基础概率使其陷入冻结状态…不能行动…每回合开始时受到等同于彦卿 50% 攻击力的冰属性附加伤害」.
+     *
+     * <p>⚠ The stock fixture monster is IMMUNE to freeze (its debuff resistance for that key is 1.0, so `Battle.hitChance`
+     * clamps to 0) - the content is right and the enemy refuses. A bare target with no resistances is the only way to judge
+     * the clause, exactly as `GepardFreezeTest` documents for the same control.
+     */
+    @Test
+    public void theFollowUpCanFreeze() {
+        Character yanqing = CharacterFactory.create(YANQING, LEVEL);
+        Enemy enemy = Enemy.fromAttributes("Test Dummy", 20000, 100, 100, 90);
+        Battle battle = new Battle(List.of(yanqing), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, yanqing, enemy, 1, 0));
+        battle.processRequests();
+
+        Assertions.assertTrue(enemy.getBuffManager().hasState("冻结"),
+                "「有 65% 的基础概率使其陷入冻结状态」 — a zero roll on an unresisting target lands it");
+        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」");
+
+        double before = enemy.getCurrentHp();
+        battle.tickDots(enemy);
+        Assertions.assertTrue(enemy.getCurrentHp() < before,
+                "「每回合开始时受到等同于彦卿 50% 攻击力的冰属性附加伤害」");
+    }
+
     /** 天赋「处于【智剑连心】时，受到攻击的概率降低」: the DIRECTION only - the document states no number. */
     @Test
     public void theSyncLowersHisAggro() {

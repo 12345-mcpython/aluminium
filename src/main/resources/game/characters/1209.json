@@ -1,13 +1,8 @@
 {
   "schema": 1,
   "character": 1209,
-  "_status": "partial",
-  "_gaps": [
-    "⭐ **「受到攻击的概率降低」已落地（2026-11-06，方向性）**：`talent_soulsteel_lowers_his_aggro` —— `MODIFY_ATTR AGGRO_ADDED_RATIO -0.5`（`turns: 1`，与状态同长）。⚠ 句子**没有数字**，-0.5 是占位取值（权重减半），判据 `YanqingSoulsteelAndEidolonsTest` 只钉**方向**（`Battle.aggroOf` 变小），不钉数值。",
-    "天赋 65% 冻结 + 冻结状态每回合 50% 攻击力附加伤害未写 ⚠ 2026-11-06：这一条仍未动（冻结是控制状态 + 按状态的持续伤害，见 1109 的冻结族）；本轮只补了上下的两条。",
-    "⭐ **秘技 已落地（2026-11-04）**：「对当前生命值百分比 ≥50% 的敌人伤害 +30%，2 回合」= `BATTLE_START` + `self has_state 秘技` → `APPLY_BUFF 御剑真诀 { turns: 2 }`，再由 `DEALING_DAMAGE` + `self has_state 御剑真诀` + **`target_hp_percent >= 0.5`** → `BOOST_DAMAGE 0.3`。旧登记说「条件与修饰单位不同，写不出」**作废** —— `target_hp_percent` 回答的正是「被打的那个的血线」。判据 `YanqingTechniqueTest`（同一发对满血/残血各打一次，残血不吃加成）。",
-    "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_pierces_ice_resistance_while_healthy` —— 引擎新增**活门槛** `while_hp_percent`（`AbstractBuff.gateHpPercent`，与 `while_stacks` 同族：每次回合边界重问一遍）+ `MODIFY_ATTR DAMAGE_PENETRATION_ICE 0.12`。判据 `YanqingSoulsteelAndEidolonsTest`。"
-  ],
+  "_status": "implemented",
+  "_gaps": [],
   "rules": [
     {
       "on": "BATTLE_START",
@@ -342,6 +337,27 @@
       ],
       "on": "SKILL_CAST",
       "_note": "「处于【智剑连心】时，**受到攻击的概率降低**」—— 用 ``AGGRO_ADDED_RATIO``（软仇恨权重，按比例加在权重上；1001 的护盾族用的是同一个量，方向相反）。⚠ 句子没给数字（只有「降低」）⇒ **-0.5 是本项目的占位取值**（写成负数 = 权重减半），与其它「没给数字」的从句同一处理方式，已在判据里写明它只验证**方向**。⚠ 寿命 ``turns: 1`` 与状态同长（战技是唯一来源）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_followup_freezes",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_CONTROL",
+          "element": "Ice",
+          "target": "target",
+          "percent_from_skill_param": "TALENT:4",
+          "control": "冻结",
+          "base_chance": 0.65,
+          "turns": 1,
+          "scale": "self_attr:ATTACK"
+        }
+      ],
+      "source": "1209 彦卿 天赋 呼剑如影:「…并有65%的基础概率使其陷入冻结状态，持续1回合。冻结状态下，敌方目标不能行动，同时每回合开始时受到等同于彦卿50%攻击力的冰属性附加伤害。」 TALENT Lv10 = [0.2, 0.3, 0.6, 0.5, 0.5, 0.65] ⇒ #3 = 0.6（追击倍率）、#4 = 0.5（冻结附伤）、#5 = 0.65（基础概率）",
+      "_note": "「有 **65% 的基础概率**使其陷入**冻结**状态，持续 1 回合。冻结状态下…每回合开始时受到等同于彦卿 **50% 攻击力**的冰属性附加伤害」—— 与 1104 杰帕德同形：``APPLY_CONTROL { control: 冻结, turns: 1, base_chance: <读行>, element: Ice, scale, percent_from_skill_param }``，控制状态**自己**承担「不能行动」与「每回合的冰属性附加伤害」✓。⚠ 参数索引：TALENT 行（槽 4）的 Lv10 是 ``[0.2, 0.3, 0.6, 0.5, 0.5, 0.65]`` —— #4 之后的 0.65 是**基础概率**（`data/skill_traces.json` 与文档对齐；追击倍率 0.6 已经是 `TALENT:3`）。⚠ 基础概率还要过效果命中/抵抗的骰子（引擎内建 ✓）。"
     }
   ]
 }
