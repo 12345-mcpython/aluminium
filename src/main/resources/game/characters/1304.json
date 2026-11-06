@@ -1,14 +1,8 @@
 {
   "schema": 1,
   "character": 1304,
-  "_status": "partial",
-  "_gaps": [
-    "⭐ **「抵抗控制类负面状态」已落地（2026-11-06）**：`talent_the_wager_resists_control` —— `SHIELD_GRANTED` + `actor == self` + `target == self` → `RESIST_DEBUFF { kind: control, percent: 1, turns: 3 }`，`cooldown: 2`。⭐ **「抵抗 = 免疫」不需要新机制**：引擎原话（`TriggerInterpreter.resistDebuff`）：`percent: 1` is immunity in this vocabulary ⇒ 与「抗性 +35%」是**同一机制的两个强度**，闭集词汇表不允许为同一件事造两个拼法。判据 `AventurineWagerTest.theWagerShutsOutControl`。",
-    "⭐ **7 点阈值已落地（2026-11-06）**：`talent_seven_points_fire_the_follow_up` —— `TAKING_HIT` + `self_stacks:盲注 >= 7` → `DAMAGE { scale: self_attr:DEFENCE, percent: 0.25, times: 7, target: random_enemy }` + `REMOVE_STACK 盲注 7`。判据 `AventurineWagerTest.sevenPointsFireTheFollowUp`（6 点无事；第 7 点触发 7 段、点数清零）。⛔ **星魂 4 的「额外 +3 段」仍未写**：`times` 是固定整数，没有「由修饰加出来的段数」（`times_from`）。",
-    "行迹 热手：重复获得护盾的叠加上限 200% 未写",
-    "终结技：随机获得 1–7 点盲注未写",
-    "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_raises_defence_and_adds_three_hits` —— `TAKING_HIT` + `盲注 >= 7` + E4 → `MODIFY_ATTR DEFENCE 0.4 / 2 回合` + **第二发** `DAMAGE { times: 3 }`（7 + 3 = 10 段，同一份额、同一目标池）。⚠ **顺序是判据**：本条必须排在基础追击**之前** —— 基础那条会先花掉 7 点，之后 `盲注 >= 7` 已为假（实测 E4 与 E3 伤害完全一样）。⚠ 判据只钉「多于 10/7 且落在一带内」：同一句还**先加 40% 防御** ⇒ 每段也更疼（实测 1.85）。"
-  ],
+  "_status": "implemented",
+  "_gaps": [],
   "rules": [
     {
       "on": "BATTLE_START",
