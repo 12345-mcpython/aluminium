@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "character": 1313,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧的四条 `_gaps` 只写「天赋 / 秘技 / 行迹 / 星魂：未逐句读、未写」—— 等于没记。这次逐节读了 `1313_星期日.md`：已落地的见下，**仍开**的只有星魂 6 一条。",
-    "⭐ **天赋已落地（2026-11-06）**：`talent_skill_raises_the_targets_crit_rate` —— `SKILL_CAST` + `target` → `MODIFY_ATTR CRIT_CHANCE { percent_from_skill_param: TALENT:0, turns: 3 }`，判据 `SundaySupportTest`。⛔ 星魂 6 那半（可叠 3 层、持续 +1 回合、溢出暴击转暴伤）仍未写，见最后一条。",
+    "⭐ **天赋已落地（2026-11-06）**：`talent_skill_raises_the_targets_crit_rate` —— `SKILL_CAST` + `target` → `MODIFY_ATTR CRIT_CHANCE { percent_from_skill_param: TALENT:0, turns: 3 }`，判据 `SundaySupportTest`。⭐ 星魂 6 的三句见下面那条记录（已全部落地）。",
     "⭐ **秘技已落地（2026-11-06）**：`technique_arms_the_next_ability`（`BATTLE_START` + `self has_state 秘技` → 记号 `荣光之秘-待发`）与 `technique_first_ally_ability_grants_the_share`（首次 `SKILL_CAST` → 队友 `ALL_DAMAGE_TYPE_BOOST +0.5 / 2 回合`，随后摘记号）。⚠ 「首次」没有规则级开关（只有 `once_per_turn`）⇒ 用记号状态；⚠ 50% 必须 `coexist: true`，否则它会**替换**战技自己那 15%/40%。判据 `SundayTechniqueTest`。",
     "⭐ **行迹已全部落地（2026-11-06）**：`trace_glorious_whisk_starts_with_energy`（开战 +25 能量）、`trace_safe_harbour_dispels_one_debuff`（战技解 1 个负面）、`trace_sunday_lenten_gift_lifts_the_energy_to_forty`（能量下限提到 **40 点** —— 这一轮给 `RAISE_ENERGY_TO` 补了**固定点数**写法）。判据 `SundaySupportTest` / `SundayLentenGiftTest`。",
     "⭐ **星魂 1/2/3/4/5 已落地（2026-11-06）**：1 = `eidolon1_the_skill_pierces_defence_for_the_pair`（本人 0.16 / **`target_summon`** 0.4，选择器本轮新增）；2 = 三条（记号状态给「首次」+2 战技点、`while_holder_state: 蒙福者` 的 +30%）；3/5 = 等级加成；4 = `eidolon4_pays_eight_energy_each_turn`。判据 `SundayEidolonOneTest` / `SundayEidolonTwoTest` / `SundaySupportTest`。",
