@@ -50,7 +50,8 @@ public class AglaeaClauseCoverageTest {
         SECTION.put("普攻：刺纹之蜜", List.of(DATA + " the skill row 140201 deals it; no rule needed"));
         SECTION.put("战技：高举吧，升华的名讳", List.of(RULE + "skill_effect", RULE + "skill_effect_2"));
         SECTION.put("终结技：共舞吧，命定的衣匠", List.of(RULE + "ult_effect",
-                RULE + "p1402_stance_speed_follows_the_layers", GAP + "【至高之姿】的「状态里做什么」"));
+                RULE + "p1402_stance_speed_follows_the_layers",
+                RULE + "memosprite_immune_to_control", GAP + "【至高之姿】的「状态里做什么」"));
         SECTION.put("天赋：金玫之指", List.of(RULE + "talent_fissure_thread_applies_state",
                 RULE + "talent_fissure_thread_bonus", DATA + " the memosprite panel is MemospriteSpec 11402"));
         SECTION.put("地图攻击：攻击", List.of(DATA + " the map attack happens outside battle"));
@@ -78,10 +79,10 @@ public class AglaeaClauseCoverageTest {
         SECTION.put("星魂 2：行舟命运的眼睑", List.of(RULE + "eidolon2_a_layer_when_she_acts",
                 RULE + "eidolon2_a_layer_when_the_memosprite_acts",
                 RULE + "eidolon2_another_units_skill_clears_it"));
-        SECTION.put("星魂 3：华珠凝滞的礼物", List.of(RULE + "eidolon3_levels", GAP + "另：星魂 3/5 的**忆灵**等级加成"));
+        SECTION.put("星魂 3：华珠凝滞的礼物", List.of(RULE + "eidolon3_levels"));
         SECTION.put("星魂 4：大理石内的闪烁", List.of(RULE + "p1402_eidolon4_her_attack_also_stacks_it",
                 RULE + "p1402_eidolon4_the_cap_rises_by_one", GAP + "星魂 6 的后半句"));
-        SECTION.put("星魂 5：漆黑苦难的织者", List.of(RULE + "eidolon5_levels", GAP + "另：星魂 3/5 的**忆灵**等级加成"));
+        SECTION.put("星魂 5：漆黑苦难的织者", List.of(RULE + "eidolon5_levels"));
         SECTION.put("星魂 6：盈虚无常的金线", List.of(RULE + "p1402_eidolon6_thunder_penetration_while_in_the_stance",
                 GAP + "星魂 6 的后半句"));
         // Not a section of HER document, but five rules of this file answer for it: 1415's poem is written on the

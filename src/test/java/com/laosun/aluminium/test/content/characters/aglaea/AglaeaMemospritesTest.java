@@ -258,4 +258,27 @@ public class AglaeaMemospritesTest {
         Assertions.assertEquals(1, second.getBuffManager().stacksOf("匠躯"),
                 "「衣匠再次被召唤时获得对应层数」 — the replacement starts with the kept layer, not with two");
     }
+
+    /**
+     * 「衣匠免疫控制类负面状态」: the memosprite carries the engine's own control-class resistance at its limit (1.0 = immune).
+     *
+     * <p>Read as the buff the sentence names rather than as "a debuff failed to land": the resistance is rolled per
+     * application, and a test that rolls would be measuring the dice, not the clause.
+     */
+    @Test
+    public void theGarmentmakerShrugsOffControl() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        Summon garmentmaker = battle.summonMemosprite(aglaea);
+        battle.processRequests();
+
+        double resist = garmentmaker.getBuffManager().activeBuffs().stream()
+                .filter(buff -> buff instanceof com.laosun.aluminium.buff.ClassResistBuff)
+                .mapToDouble(buff -> ((com.laosun.aluminium.buff.ClassResistBuff) buff).getPercent())
+                .max().orElse(0);
+        Assertions.assertEquals(1.0, resist, 1e-9,
+                "「衣匠免疫控制类负面状态」 — percent 1.0 is immunity in this engine");
+    }
 }
