@@ -51,4 +51,29 @@ public class XueyiEidolonTwoStanceTest {
         battle.reduceToughness(battle.characters().get(1), enemy, DamageElement.THUNDER, 1, null);
         return before - enemy.getStance();
     }
+
+    /**
+     * 「本次追加攻击无法叠加【恶报】」: the follow-up does NOT feed its own counter.
+     *
+     * <p>No switch is needed for this - it falls out of the rules themselves: the only stacking rule that exists requires
+     * `actor is_other_ally`, and the follow-up toughness reduction is attributed to Xueyi (the rule owner). This test pins
+     * that reasoning, because the day her own half is written (it needs a per-point ratio the data does not state) that
+     * rule must not answer for the follow-up either.
+     */
+    @Test
+    public void theFollowUpDoesNotFeedItsOwnCounter() {
+        Character xueyi = CharacterFactory.create(XUEYI, LEVEL, true, null, null, 2);
+        Enemy enemy = BattleFixture.enemy(803201006, LEVEL);
+        Battle battle = new Battle(new ArrayList<>(List.of(xueyi, CharacterFactory.create(ALLY, LEVEL))),
+                new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        // Up to 7 stacks from the ally, then the 8th (which fires the follow-up).
+        for (int i = 0; i < 8; i++) {
+            battle.reduceToughness(battle.characters().get(1), enemy, DamageElement.THUNDER, 1, null);
+            enemy.setStance(300);
+        }
+        battle.processRequests();
+        Assertions.assertEquals(0, xueyi.getBuffManager().stacksOf("恶报"),
+                "the follow-up consumed all 8 and added none of its own");
+    }
 }
