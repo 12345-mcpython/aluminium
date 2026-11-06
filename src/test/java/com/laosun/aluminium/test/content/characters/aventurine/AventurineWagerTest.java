@@ -63,6 +63,23 @@ public class AventurineWagerTest {
                 "「…在受到攻击后，使砂金获得 1 点【盲注】」");
     }
 
+    /** 天赋「…并在受到攻击后额外获得 1 点【盲注】」: the SAME clause, but the one being hit is Aventurine himself. */
+    @Test
+    public void aHitOnHimselfAlsoFeedsTheBlindBet() {
+        Battle battle = scene(0);
+        Character aventurine = battle.characters().getFirst();
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("盲注"), "precondition");
+
+        battle.applyDamage(aventurine, new Damage(enemy, aventurine, DamageElement.FIRE, DamageType.NORMAL, 1));
+        battle.processRequests();
+
+        // TWO, not one: the trace 热手 shields the whole party at battle start, so Aventurine is BOTH a shielded ally being
+        // hit (+1) AND the one the extra clause speaks about (+1). The sentence says 「**额外**获得」, i.e. in addition.
+        Assertions.assertEquals(2, aventurine.getBuffManager().stacksOf("盲注"),
+                "「…并在受到攻击后额外获得 1 点【盲注】」 — one for the wager he holds, one extra");
+    }
+
     private static double critDamageOfShieldedAlly(int eidolon) {
         Battle battle = scene(eidolon);
         return battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
