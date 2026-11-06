@@ -68,7 +68,7 @@ public class BailuClauseCoverageTest {
         SECTION_TO_RULE.put("星魂 6：龙漦吐哺胜金丹",
                 "(registered: the lethal heal's count is `once_per_battle`, a boolean — no \"one more\" spelling)");
         SECTION_TO_RULE.put("行迹：岐黄精义", "(registered: no overheal observation — HEALED carries no overflow)");
-        SECTION_TO_RULE.put("行迹：持明龙脉", "(registered: rides on the same missing trigger count as the talent)");
+        SECTION_TO_RULE.put("行迹：持明龙脉", "trace_dragon_vein_adds_one_invigoration_trigger");
         SECTION_TO_RULE.put("行迹：鳞渊福泽", "ult_rebirth");
         SECTION_TO_RULE.put("行迹：生命 / 防御 / 效果抵抗（数值行迹）",
                 "(no rule needed: stat traces are folded into the panel by the loader)");

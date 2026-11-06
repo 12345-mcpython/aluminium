@@ -6,6 +6,7 @@
     "战技「然后白露随机为我方单体进行 2 次治疗，每提供 1 次治疗，下一次治疗回复的生命值会降低 15%」：缺「**随机目标序列** ＋ **逐次递减的倍率**」两样写法 —— 技能行只结算主目标那一次（11.70%+312，引擎自己读行 ✓），`HEAL` op 既没有随机选择器，也没有「第 N 次治疗 × (1−15%)^N」的链。读者：1211 战技（120702）。",
     "⭐ **天赋的【生息】回血已落地（2026-11-04）**：`TAKING_HIT` + `target has_state 生息` + `self_stacks:生息治疗额度 >= 1` → `HEAL { owner_max_hp × TALENT:0 + TALENT:1 }` + 扣一层。额度读**天赋行第 5 列**（`TALENT:4` = 2，全等级固定）。旧登记说「缺一个状态上带 N 次触发额度」**作废** —— 计数额度即可，不需要状态自带次数。判据 `BailuClauseCoverageTest.theInvigorationHealsTheHitAllyTwice`（前两次治、第三次不治、额度耗尽为 0）。",
     "⭐ **星魂 6 的「触发次数 +1」已落地（2026-11-04）**：天赋改用**额度计数**（`天赋治疗额度`）而不是 `once_per_battle` —— 两条同形规则按 `max_eidolon: 5` / `min_eidolon: 6` 各发 1 / 2 层，天赋本身 `self_stacks:天赋治疗额度 >= 1` + 治疗后悔一层 ⇒ E0–E5 一次、E6 两次。判据 `BailuClauseCoverageTest`（原「只触发一次」与新的「E6 触发两次」两端都钉）。",
+    "⭐ **行迹 持明龙脉 已落地（2026-11-06）**：`trace_dragon_vein_adds_one_invigoration_trigger` —— `BATTLE_START` → `ADD_STACK 生息治疗额度 +1`（上限 3）。天赋那份额度读 `TALENT:4` = 2，这条 +1 ⇒ **3 次** ✓。判据 `BailuRegenTest.theDragonVeinAddsOneInvigorationTrigger`（读额度计数，而不是「打四下数回血」）。⚠ 与星魂 6 是**两份额度**：星魂 6 加**致命治疗**（`天赋治疗额度`），行迹加**【生息】**（`生息治疗额度`），互不占用。",
     "行迹 岐黄精义 (1211101)「白露对我方目标造成**过量治疗**时会提高目标 10% 生命上限，持续 2 回合」：缺「**过量治疗**」这个观测 —— `HEALED` 的 `amount` 是**实际回复量**（已 clamp 到上限），溢出部分没有随事件发出 ⇒ 判不出「这次治疗有没有溢出」。",
     "**引擎登记（读者：本文件星魂 4）**：`HEALED` 不携带**施放类别**，所以「**战技**提供的治疗」无法在 `HEALED` 上表达 —— 写 `from_category BPSKILL` 时装载期直接拒绝：`Condition 'from_category BPSKILL' asks the cast's category, but HEALED carries none, so the condition could never hold; it works on ALLY_ATTACK / ATTACK_FINISHED / BREAK / CAST_SETUP / CRIT_DEALT / DAMAGE_SETTLED / DEALING_DAMAGE / KILL`。⇒ 现在把星魂 4 挂在 `SKILL_CAST` 上（等价：战技一次只治一个目标）；等「两次随机治疗」落地时，必须给 `HEALED` 补上施放类别。缺口见证：`BailuClauseCoverageTest.eidolon4StacksOncePerSkillCast`。"
   ],
@@ -254,6 +255,22 @@
       "_note": "「**触发次数增加 1 次**」⇒ 额度 **2** ✓（1 + 1 ✓）。⚠ 两条同形规则靠 `max_eidolon: 5` / `min_eidolon: 6` 互斥 ✓。"
     }
     ,
+    {
+      "on": "BATTLE_START",
+      "id": "trace_dragon_vein_adds_one_invigoration_trigger",
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "生息治疗额度",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1211 白露 行迹 持明龙脉 (1211102): 「【生息】效果的触发次数增加1次。」",
+      "_note": "「【生息】效果的**触发次数增加 1 次**」—— 天赋给 2 次（`talent_invigoration_heal_allowance` 读 `TALENT:4`），这条再 +**1** ⇒ **3** ✓（那条的 `max_stacks: 3` 正是为此留的上限）。⚠ 行迹没有等级轴 ⇒ `amount: 1` 字面且精确 ✓。⚠ 与星魂 6 加的是**另一份额度**：星魂 6 加**致命治疗**次数（`天赋治疗额度`），这条加**【生息】**次数（`生息治疗额度`），互不占用 ✓。"
+    },
     {
       "on": "BATTLE_START",
       "id": "talent_invigoration_heal_allowance",

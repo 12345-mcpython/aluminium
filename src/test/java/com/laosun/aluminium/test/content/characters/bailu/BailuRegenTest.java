@@ -59,9 +59,7 @@ public class BailuRegenTest {
                 "「this effect cannot stack」: the second branch EXTENDS the state instead of applying another one");
     }
 
-    /**
-     * trace Aquatic Benediction (鳞渊福泽) rides on the state: the bearer takes 10% less while it lasts.
-     */
+    /** trace Aquatic Benediction (鳞渊福泽) rides on the state: the bearer takes 10% less while it lasts. */
     @Test
     public void theTraceReducesDamageTakenForTheBearers() {
         Fixture f = new Fixture();
@@ -77,10 +75,22 @@ public class BailuRegenTest {
                 "「characters that have [生息] (Invigoration) take 10% less damage」 -- the reduction goes up with the state");
     }
 
+    /**
+     * trace Vidyadhara Ichor Lines (持明龙脉): 「【生息】效果的触发次数增加 1 次」 - the talent's 2 plus this one is 3.
+     *
+     * <p>Read off the allowance counter rather than by hitting the ally four times: the counter IS the trigger count the
+     * sentence raises, and a hit-based test would also depend on the heal landing on a wounded ally.
+     */
+    @Test
+    public void theDragonVeinAddsOneInvigorationTrigger() {
+        Fixture f = new Fixture();
+        Assertions.assertEquals(3, f.bailu.getBuffManager().stacksOf("生息治疗额度"),
+                "天赋 2 次（TALENT:4）+ 行迹 1 次 = 3");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
-
     private static final class Fixture {
         private final Character bailu = CharacterFactory.create(BAILU, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
