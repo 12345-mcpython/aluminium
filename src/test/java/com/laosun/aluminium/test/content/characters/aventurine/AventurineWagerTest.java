@@ -136,6 +136,26 @@ public class AventurineWagerTest {
         return before - enemy.getCurrentHp();
     }
 
+    /** 天赋「砂金持有【坚垣筹码】时能抵抗控制类负面状态」: `RESIST_DEBUFF { kind: control, percent: 1 }` IS immunity. */
+    @Test
+    public void theWagerShutsOutControl() {
+        Battle battle = scene(0);
+        Character aventurine = battle.characters().getFirst();
+        com.laosun.aluminium.enemy.Enemy enemy = (com.laosun.aluminium.enemy.Enemy) battle.enemies().getFirst();
+        // The trait grants a CLASS-wide resistance, and `percent: 1` is this vocabulary spelling of immunity (the engine says
+        // so itself in `TriggerInterpreter.resistDebuff`). What `Battle.tryApplyDebuff` then consults is the INCOMING state own
+        // class (`AbstractBuff.debuffClass()`), which is why the probe asks the carrier rather than inventing a state that has
+        // no class at all.
+        var resists = aventurine.getBuffManager()
+                .allBuffsOf(com.laosun.aluminium.buff.ClassResistBuff.class).stream()
+                .filter(resist -> resist.getKind() == com.laosun.aluminium.enums.DebuffClass.CONTROL)
+                .toList();
+        Assertions.assertFalse(resists.isEmpty(),
+                "「砂金持有【坚垣筹码】时能抵抗控制类负面状态」 — the wager grants a control-class resistance");
+        Assertions.assertEquals(1.0, resists.getFirst().getPercent(), 1e-9,
+                "…and percent 1 IS immunity in this vocabulary");
+    }
+
     private static double critDamageOfShieldedAlly(int eidolon) {
         Battle battle = scene(eidolon);
         return battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
