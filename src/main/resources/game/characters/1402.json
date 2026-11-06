@@ -12,8 +12,7 @@
     "⭐ **星魂 1 已落地（2026-11-04）**：`eidolon1_threaded_target_takes_more` —— **先摘后给**的命名修饰（`间隙织线易伤`）跟着【间隙织线】**转移**，另加 **`while_holder_state: 间隙织线`** 兜住「状态自然到期」那一侧（否则那 15% 会留在已经没状态的敌人身上，没有症状）；`eidolon1_threaded_attack_pays_energy` + `..._for_the_garmentmaker` —— 两条 `ATTACK_FINISHED`（**每次攻击一次**，不是每段），「阿格莱雅**或**衣匠」写成两条因为条件 DSL 没有析取。判据 `AglaeaEidolonOneTest`：E1/E0 同一发的**比值 = 1.15**、修饰随状态**转移**（旧持有者归零、新持有者为 1）、两条攻击各 **+20** 能量。",
     "⭐ **星魂 2 已落地（2026-11-04）**：`eidolon2_a_layer_when_she_acts` / `..._when_the_memosprite_acts`（`TURN_START` + 各自的行动者，`MODIFY_ATTR DEFENCE_IGNORE {0.14, stackable, max_stacks: 3, permanent}`）+ `eidolon2_another_units_skill_clears_it`（`SKILL_CAST` + `actor is_other_ally` ⇒ `REMOVE_STATE` `all_allies` 同时摘掉她和衣匠那两份）。判据 `AglaeaEidolonTwoTest`：1/2/3 次行动 = 0.14/0.28/0.42、第 4 次不加、E1 恒 0；衣匠自己的回合只叠**它自己**那份；队友一次施法把两份都清零。⚠ **一处窄**：**敌方**施放技能不清除（引擎只把我方施法送给规则表）⇒ 已登记。⭐ **星魂 4 已落地（2026-11-05）**：`p1402_eidolon4_her_attack_also_stacks_it`（`ATTACK_FINISHED` + `actor == self` + `target has_state 间隙织线` → 给衣匠同一份 `匠躯` 层）+ `p1402_eidolon4_the_cap_rises_by_one`（同形规则、`max_stacks: 7` —— 上限没有条件写法，与 1218 星魂 6 同一个办法：**E4 再写一条只抬上限**）。判据 `theEidolonFourCapAndHerOwnAttacks`（E4 下她的攻击也叠层、能到第 7 层；E3 下她不叠）。⭐ **星魂 6 前半已落地（2026-11-06）**：`p1402_eidolon6_thunder_penetration_while_in_the_stance`（新增按元素的穿透常量 `DAMAGE_PENETRATION_THUNDER` + `AttributeType.penetrationFor`，`DamageService` 把它与全类型穿透相加），判据 `AglaeaEidolonSixTest`。⛔ **仍开：星魂 6 的后半句**： 【至高之姿】下双方雷属性**抗性穿透 +20%**，且速度高于 **160/240/320** 时**连携攻击**伤害 +10%/30%/60%（`DAMAGE_PENETRATION` 与阈值分段都有，但都依赖第 4 条那条「连携攻击」的归属）。另：星魂 3/5 的**忆灵**等级加成（`skill_add_level` 里的 1140201/1140203/1140205/1140206）也没写 —— `RAISE_SKILL_LEVEL` 的 `memosprite: true` 是现成的。"
   ],
-  "rules": [
-    {
+  "rules": [    {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
@@ -792,15 +791,10 @@
           "op": "RAISE_SKILL_LEVEL",
           "skill": "SKILL",
           "amount": 2
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "ULTRA",
-          "amount": 1
         }
       ],
-      "source": "1402 星魂 3: 等级加成（数据 skill_add_level: 140201=COMMON+1, 140202=SKILL+2, 1140203=ULTRA+1）",
-      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "source": "1402 阿格莱雅 星魂 3 华珠凝滞的礼物: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级；忆灵天赋等级+1，最多不超过10级。」 数据行 技能等级+{'140202': 2, '140201': 1, '1140203': 1, '140208': 1, '140209': 2, '1140205': 1, '1140206': 1}",
+      "_note": "「战技等级 **+2**；普攻等级 **+1**」✓。⭐ **修正（2026-11-06）**：旧版本把数据行里的 **1140203** 映射成了 ULTRA +1 —— 1140203 是**忆灵**的第 2 个技能槽，不是终结技 ✗（装载期不报错，但那是个错数字）。⭐ 数据行的 **140208 / 140209**（强化普攻 / 强化战技）**不用单写**：替换技能**继承槽位的等级** ⇒ SKILL +2 也把槽 9 抬到 12、COMMON +1 也把槽 8 抬到 7 ✓。⛔ 1140203 / 1140205 / 1140206（忆灵天赋）**未写**：忆灵技能的行在 `skills.json[11402]` 里，而 `memosprites/1402.json` 把它的等级钉在 **10**（= 表的最后一行），再 +1 会越界 ⇒ 要先定忆灵技能的口径，见 `_gaps`。",
       "_status": "implemented"
     },
     {
@@ -817,15 +811,10 @@
           "op": "RAISE_SKILL_LEVEL",
           "skill": "TALENT",
           "amount": 2
-        },
-        {
-          "op": "RAISE_SKILL_LEVEL",
-          "skill": "COMMON",
-          "amount": 1
         }
       ],
-      "source": "1402 星魂 5: 等级加成（数据 skill_add_level: 140203=ULTRA+2, 140204=TALENT+2, 1140201=COMMON+1）",
-      "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "source": "1402 阿格莱雅 星魂 5 漆黑苦难的织者: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级；忆灵技等级+1，最多不超过10级。」 数据行 技能等级+{'140203': 2, '140204': 2, '1140201': 1}",
+      "_note": "「终结技 **+2**；天赋 **+2**」✓。⭐ **修正（2026-11-06）**：旧版本把数据行里的 **1140201** 映射成了 `COMMON +1` —— 1140201 是**忆灵**的第 1 个技能槽，不是普攻 ✗。⛔ 1140201（忆灵技）**未写**：忆灵技能的等级钉在表的最后一行 10，+1 会越界 ⇒ 见 `_gaps`。",
       "_status": "implemented"
     }
   ]
