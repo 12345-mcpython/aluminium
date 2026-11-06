@@ -57,4 +57,31 @@ public class GallagherEidolonTest {
         battle.startBattle();
         return gallagher.getAttribute(AttributeType.BREAKING_EFFECT).get();
     }
+
+    /** 星魂 4「加拉赫终结技造成的【酩酊】状态持续时间延长 1 回合」: 2 turns at E3, 3 at E4. */
+    @Test
+    public void theTipsyLastsThreeTurnsAtTheFourthEidolon() {
+        Assertions.assertEquals(2, tipsyTurns(3), "before 星魂 4: 「持续 2 回合」");
+        Assertions.assertEquals(3, tipsyTurns(4), "「持续时间延长 1 回合」 — 2 + 1");
+    }
+
+    /** How many turns 【酩酊】 has right after his ultimate, at the given Eidolon rank. */
+    private static int tipsyTurns(int eidolon) {
+        Character gallagher = CharacterFactory.create(GALLAGHER, LEVEL, false, null, null, eidolon);
+        com.laosun.aluminium.enemy.Enemy enemy = BattleFixture.dummy();
+        Battle battle = new Battle(List.of(gallagher), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        // Clear whatever the technique put there, so the reading is the Ultimate's own state.
+        for (com.laosun.aluminium.buff.AbstractBuff buff : List.copyOf(enemy.getBuffManager().activeBuffs())) {
+            if ("酩酊".equals(buff.getBuffName())) {
+                enemy.getBuffManager().removeBuff(buff);
+            }
+        }
+        battle.castImmediate(gallagher.getSkills().get(SkillType.ULTRA), gallagher, List.of(enemy));
+        battle.processRequests();
+        return enemy.getBuffManager().activeBuffs().stream()
+                .filter(buff -> "酩酊".equals(buff.getBuffName()))
+                .mapToInt(buff -> buff.duration())
+                .max().orElse(0);
+    }
 }

@@ -41,7 +41,8 @@ public class GallagherTest {
      */
     @Test
     public void hisFileCarriesTheClauses() {
-        Assertions.assertEquals(2, TriggerTables.of(GALLAGHER).ruleCount(TriggerEvent.ULT_CAST),
+        // Note: 3 since 2026-11-06 - 星魂 4 extends the 【酩酊】 duration on the same event (it must run after `ult_tipsy`).
+        Assertions.assertEquals(3, TriggerTables.of(GALLAGHER).ruleCount(TriggerEvent.ULT_CAST),
                 "\"puts all enemies into the Besotted state\" (「使敌方全体陷入【酩酊】状态」) and the Traces (行迹) Natural Yeast (天然酵母) trace's \"advances the action by 100%\" (「行动提前100%」)");
         Assertions.assertEquals(1, TriggerTables.of(GALLAGHER).ruleCount(TriggerEvent.ALLY_ATTACK),
                 "the talent's 「每次受到我方角色攻击后」 (after every time it is attacked by one of our characters) heal");

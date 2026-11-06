@@ -8,7 +8,7 @@
     "⭐ **星魂 6 前半已落地（2026-11-06）**：`eidolon6_raises_break_effect` —— `BATTLE_START` + `min_eidolon: 6` → `MODIFY_ATTR BREAKING_EFFECT 0.2`，判据 `GallagherEidolonTest.theSixthEidolonRaisesHisBreakEffect`。⛔ **后半「弱点击破效率提高 20%」仍开**：`AttributeType` 没有这个量（只有 `BREAKING_EFFECT` 与 `BREAK_DAMAGE_BOOST`），要先确认伤害/削韧管线里谁读它才能加常量。",
     "⭐ **行迹 崭新配方 已落地（2026-11-06）**：`trace_fresh_recipe_raises_healing_from_break_effect` —— `MODIFY_ATTR OUTGOING_HEALING_BOOST { scale: self_attr:BREAKING_EFFECT, percent: 0.5, cap_amount: 0.75 }`。⭐ **「缺修饰上限」的说法作废**：`cap_amount` / `cap_scale` + `cap_percent` **早就在**（`TriggerMagnitudes.applyDerivedCeiling`，派生量是绝对量、直接比较）。",
     "⛔ **行迹 敬请干杯 (1301103) 未写**：「加拉赫施放【酒花奔涌】攻击陷入【酩酊】状态的目标时，使此次天赋提供的生命回复效果**对我方队友也会生效**」—— 它要改的是**同一次攻击里天赋那条 `ALLY_ATTACK` 治疗的目标集合**（从「攻击者」扩到「全体队友」），而规则之间不能互相改目标集合；需要「本次攻击的天赋治疗对全体生效」这种一次性开关。",
-    "⛔ **星魂 4 未写**：「加拉赫终结技造成的【酩酊】状态持续时间延长 1 回合」—— `ult_tipsy` 用 `APPLY_BUFF turns: 2`，要在 E4 变 3；两条同事件规则**执行顺序**决定成败（先 APPLY 再 `EXTEND_BUFF +1`），而顺序依赖文件里的书写次序 ⇒ 未验证前不写（或者做成「E4 用 `turns: 3` 的同形规则」，但那样要复制整条大招规则）。",
+    "⭐ **星魂 4 已落地（2026-11-06）**：`eidolon4_the_tipsy_lasts_one_turn_longer` —— **E4 用 `turns: 3` 的同形规则**排在 `ult_tipsy` 之后（同一状态按 `isSameKind` 被替换成后挂的那份 ⇒ 净 3 回合；那份 12% 也重挂，因为它跟着状态走）。⚠ **`EXTEND_BUFF` 在这里不可用**：它按 `buffName` 匹配，而【酩酊】**状态**的名字存在自己的字段里、`buffName` 为空 ⇒ 它延长的是「12% 减伤」那条无名 buff（实测 printout：E4 时 `dur=3` 的是无名那条，`酩酊` 仍 2）。判据 `GallagherEidolonTest.theTipsyLastsThreeTurnsAtTheFourthEidolon`（E3⇒2、E4⇒3）。⚠ 新规则里的 12% 改成**读天赋行**（`percent_from_skill_param: TALENT:0`），否则 ratchet 会因为同一个字面量出现两次而 +1。",
     "⚠ **两处已过期、保留在规则注记里的登记**：① `ult_tipsy` 的 `_note` 末尾那三段「试写后被装载期拒绝」已被 2026-09-28 的正式补齐取代（现在写出来了）；② 同一注记里「使目标攻击力降低 15%」的「未写」也已由 `enhanced_attack_down`（`DEALING_DAMAGE` + `from_skill_id == 8` → `MODIFY_ATTR ATTACK -0.15 / 2 回合`）取代 —— `DEALING_DAMAGE` 现在同时带目标与技能键。"
   ],
   "rules": [
@@ -215,6 +215,32 @@
       ],
       "source": "1301 加拉赫 星魂 6 血与沙: 「加拉赫的击破特攻提高20%，弱点击破效率提高20%。」",
       "_note": "「**击破特攻提高 20%**」—— `MODIFY_ATTR BREAKING_EFFECT` ✓（**出伤侧**，与天赋那句「受到的**击破伤害**提高 12%」是两侧不同的量）。⛔ 同句后半「**弱点击破效率**提高 20%」未写：`AttributeType` 里没有这个量（只有 `BREAKING_EFFECT` 与 `BREAK_DAMAGE_BOOST`），加一个常量前要先确认伤害管线里谁读它，见 `_gaps`。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon4_the_tipsy_lasts_one_turn_longer",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "酩酊",
+          "turns": 3,
+          "target": "all_enemies"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent_from_skill_param": "TALENT:0",
+          "damage_type": "BREAK",
+          "turns": 3,
+          "buff": "酩酊",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1301 加拉赫 星魂 4 临终的轻语: 「加拉赫终结技造成的【酩酊】状态持续时间延长1回合。」 参数 = [1]",
+      "_note": "「终结技造成的【酩酊】**持续时间延长 1 回合**」—— 写成**同形规则的第二个触发**（状态与它那份 12% 一起给 **3 回合**），排在 `ult_tipsy`（2 回合）之后：同一状态按 `isSameKind` 会被**替换**成后挂的那份 ⇒ 净结果 3 回合 ✓。⚠ **为什么不用 `EXTEND_BUFF`**：实测（2026-11-06）它按 `buffName` 匹配，而【酩酊】**状态**把名字存在自己的字段里、`buffName` 为空 —— 于是它延长的是那条「12% 减伤」而不是状态本身（printout：E4 时 `dur=3` 的是一条无名 buff，`酩酊` 仍是 2 回合）。⚠ 两份效果都重挂，因为「状态延长」时那半句「受到的击破伤害 +12%」跟着状态走。判据 `GallagherEidolonTest.theTipsyLastsThreeTurnsAtTheFourthEidolon`。"
     },
     {
       "on": "BATTLE_START",
