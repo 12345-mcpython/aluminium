@@ -156,6 +156,26 @@ public class AventurineWagerTest {
                 "…and percent 1 IS immunity in this vocabulary");
     }
 
+    /** 秘技「一定/大/小概率获得防御力 +24% / +36% / +60%」: a WEIGHTED draw, one of the three tiers every time. */
+    @Test
+    public void theTechniqueDrawsOneDefenceTier() {
+        for (int seed = 0; seed < 6; seed++) {
+            Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
+            aventurine.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1));
+            Enemy enemy = BattleFixture.monster();
+            Battle battle = new Battle(List.of(aventurine), List.of(enemy),
+                    BattleFixture.alwaysRoll(seed / 10.0));
+            battle.startBattle();
+            battle.processRequests();
+            double bonus = aventurine.getAttribute(AttributeType.DEFENCE).get()
+                    - CharacterFactory.create(AVENTURINE, LEVEL).getAttribute(AttributeType.DEFENCE).get();
+            Assertions.assertTrue(Math.abs(bonus / 0.24 - Math.round(bonus / 0.24)) < 1e-6
+                            || Math.abs(bonus / 0.36 - Math.round(bonus / 0.36)) < 1e-6
+                            || Math.abs(bonus / 0.6 - Math.round(bonus / 0.6)) < 1e-6,
+                    "the draw must be one of the three tiers (got +" + bonus + " on DEF)");
+        }
+    }
+
     private static double critDamageOfShieldedAlly(int eidolon) {
         Battle battle = scene(eidolon);
         return battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
