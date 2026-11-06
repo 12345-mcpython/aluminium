@@ -11,6 +11,61 @@
   ],
   "rules": [
     {
+      "on": "BASIC_ATTACK",
+      "id": "talent_basic_stacks_one_will",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灼热意志",
+          "amount": 1,
+          "max_stacks": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8004 开拓者•存护 普攻: 「…并叠加1层【灼热意志】。」（与 8003 同一份文档、同一套技能）",
+      "_note": "与 8003 同形（两版存护开拓者共用一份文档）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "talent_skill_stacks_one_will",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灼热意志",
+          "amount": 1,
+          "max_stacks": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8004 开拓者•存护 战技: 「施放战技后…并叠加1层【灼热意志】…」",
+      "_note": "与 8003 同形。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_four_stacks_at_battle_start",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灼热意志",
+          "amount": 4,
+          "max_stacks": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8004 开拓者•存护 星魂 1: 「战斗开始时，立即获得4层【灼热意志】。」",
+      "_note": "与 8003 同形。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [

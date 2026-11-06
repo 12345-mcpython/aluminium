@@ -3,13 +3,68 @@
   "character": 8003,
   "_status": "partial",
   "_gaps": [
-    "天赋：【灼热意志】≥4 层时普攻强化为扩散，未写",
-    "终结技：100% 攻击力 + 150% 防御力的混合基数未写",
-    "终结技：下一次普攻自动强化且不消耗【灼热意志】未写",
-    "战技：施放时叠加 1 层【灼热意志】未写",
-    "星魂：未读、未写"
+    "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧五条里三条是「未写」而没有写清缺什么。这次按 `8003_开拓者.md` 逐节核对（8004 与它共用同一份文档、同一套技能，改动同步）。",
+    "⭐ **普攻 / 战技 / 星魂 1 的叠层已落地（2026-11-06）**：`talent_basic_stacks_one_will`（普攻「并叠加 1 层【灼热意志】」）、`talent_skill_stacks_one_will`（战技同句）、`eidolon1_four_stacks_at_battle_start`（星魂 1「战斗开始时立即获得 4 层」）；与天赋那条「每受到 1 次攻击」共用同一个计数器（上限 8）。判据 `PreservationTrailblazerTest.hisFileCarriesTheClauses` 的事件计数 + 既有护盾判据。",
+    "⛔ **天赋「【灼热意志】≥4 层时普攻强化」未写**：需要「按**层数门槛**替换技能」—— `REPLACE_SKILL` 与强化普攻的数据行都在，但**进入/退出该形态的判据**要跟着层数**上下穿越** 4 层，而规则只在事件上触发；可行路径是用 `TOUGHNESS_REDUCED`/`TAKING_HIT` 等事件上的「≥4 ⇒ REPLACE、<4 ⇒ remove」，但需要每次层数变化都重算，且**强化普攻本身消耗 4 层**（那一次要例外）。",
+    "⛔ **终结技的混合基数未写**：「100% 攻击力 + 150% 防御力」是**两个基数相加**的一发伤害。`DAMAGE` 的一次结算只有一个 `scale`；两条 `DAMAGE` 会是**两个实例**（防御区/暴击各自结算一次），与「一发」的语义不同。引擎若要精确，需要「一个伤害可以有多个基数项」。",
+    "⛔ **终结技「下一次普攻自动强化且不消耗【灼热意志】」未写**：`REPLACE_SKILL { until: next_attack }` 可以给「强化」那半，但「**不消耗** 4 层」要改动强化普攻那条规则的消耗行为 —— 需要一个「本次替换的强化普攻不扣层」的开关（与 1301 的「本次治疗对全体生效」同类：一次性的行为覆盖）。"
   ],
   "rules": [
+    {
+      "on": "BASIC_ATTACK",
+      "id": "talent_basic_stacks_one_will",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灼热意志",
+          "amount": 1,
+          "max_stacks": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 普攻: 「对指定敌方单体造成等同于开拓者100%攻击力的火属性伤害并叠加1层【灼热意志】。」",
+      "_note": "「…**并叠加 1 层【灼热意志】**」—— 普攻自己那一层：`BASIC_ATTACK` + `actor == self` → `ADD_STACK 1`（上限 8，与天赋那条共用计数器 ✓）。⚠ 与天赋的「每受到 1 次攻击」是**两个来源**（出手 vs 挨打），互不代替。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "talent_skill_stacks_one_will",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灼热意志",
+          "amount": 1,
+          "max_stacks": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 战技 炽燃不灭的琥珀: 「施放战技后，开拓者受到的伤害降低50%并叠加1层【灼热意志】…」",
+      "_note": "「施放战技后…**并叠加 1 层【灼热意志】**」—— `SKILL_CAST` + `actor == self` → `ADD_STACK 1` ✓。⚠ 同句的「受到的伤害降低 50%」与「嘲讽」已在 `skill_reduction_and_taunt` 里。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_four_stacks_at_battle_start",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灼热意志",
+          "amount": 4,
+          "max_stacks": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "8003 开拓者•存护 星魂 1: 「战斗开始时，立即获得4层【灼热意志】。」",
+      "_note": "「战斗开始时，立即获得 **4** 层【灼热意志】」—— `BATTLE_START` + `min_eidolon: 1` → `ADD_STACK 4`（上限同为 8 ✓）。"
+    },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
