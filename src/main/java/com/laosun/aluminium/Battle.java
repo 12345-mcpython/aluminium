@@ -1,7 +1,7 @@
 package com.laosun.aluminium;
 
 import com.laosun.aluminium.ai.TargetSelector;
-import com.laosun.aluminium.battle.WaveManager;
+import com.laosun.aluminium.battle.*;
 import com.laosun.aluminium.buff.AbstractBuff;
 import com.laosun.aluminium.damage.BattleDamage;
 import com.laosun.aluminium.damage.Damage;
@@ -218,56 +218,76 @@ public class Battle {
     /**
      * Observer registration and announcement.
      */
-    private final com.laosun.aluminium.battle.BattleObservers observers =
-            new com.laosun.aluminium.battle.BattleObservers();
-    private final com.laosun.aluminium.battle.UltimateService ultimates =
-            new com.laosun.aluminium.battle.UltimateService(this);
-    private final com.laosun.aluminium.battle.EnergyService energy =
-            new com.laosun.aluminium.battle.EnergyService(this::onEnergyCredited);
-    private final com.laosun.aluminium.battle.TriggerFacts triggerFacts =
-            new com.laosun.aluminium.battle.TriggerFacts();
-    private final com.laosun.aluminium.battle.DamageMarks damageMarks =
-            new com.laosun.aluminium.battle.DamageMarks();
-    private final com.laosun.aluminium.battle.WaveState waveState =
-            new com.laosun.aluminium.battle.WaveState();
-    private final com.laosun.aluminium.battle.TriggerBus triggerBus =
-            new com.laosun.aluminium.battle.TriggerBus(this, triggerFacts);
-    private final com.laosun.aluminium.battle.DamageService damageService =
-            new com.laosun.aluminium.battle.DamageService(this, triggerBus, damageMarks, energy,
+    private final BattleObservers observers =
+            new BattleObservers();
+    private final UltimateService ultimates =
+            new UltimateService(this);
+    private final EnergyService energy =
+            new EnergyService(this::onEnergyCredited);
+    private final TriggerFacts triggerFacts =
+            new TriggerFacts();
+    private final DamageMarks damageMarks =
+            new DamageMarks();
+    private final WaveState waveState =
+            new WaveState();
+    private final TriggerBus triggerBus =
+            new TriggerBus(this, triggerFacts);
+    private final DamageService damageService =
+            new DamageService(this, triggerBus, damageMarks, energy,
                     observers, this::broadcastHpLoss, this::broadcastKill);
-    private final com.laosun.aluminium.battle.BreakService breakService =
-            new com.laosun.aluminium.battle.BreakService(this, damageService, triggerBus,
+    private final BreakService breakService =
+            new BreakService(this, damageService, triggerBus,
                     this::broadcastBreak);
-    private final com.laosun.aluminium.battle.DeathService deathService =
-            new com.laosun.aluminium.battle.DeathService(this, triggerBus);
-    private final com.laosun.aluminium.battle.SustainService sustain =
-            new com.laosun.aluminium.battle.SustainService(this,
-                    this::onHealSettled, this::onShieldGranted);
-    private final com.laosun.aluminium.battle.TickService ticks =
-            new com.laosun.aluminium.battle.TickService(damageService, sustain);
-    private final com.laosun.aluminium.battle.Battlefield battlefield =
-            new com.laosun.aluminium.battle.Battlefield(this);
-    private final com.laosun.aluminium.battle.ChanceService chances =
-            new com.laosun.aluminium.battle.ChanceService(this);
-    private final com.laosun.aluminium.battle.DebuffService debuffs =
-            new com.laosun.aluminium.battle.DebuffService(this, triggerBus);
+    private final DeathService deathService =
+            new DeathService(this, triggerBus);
+    private final SustainService sustain =
+            new SustainService(this,
+                    // An anonymous class rather than the previous method reference: the heal notifier grew a SECOND
+                    // announcement (the overflow), and a lambda can carry only the one abstract method.
+                    new com.laosun.aluminium.battle.SustainService.HealNotifier() {
+                        @Override
+                        public void settled(CanHit healer, CanHit target, double healed) {
+                            onHealSettled(healer, target, healed);
+                        }
 
-    /** @param observer the damage observer */
+                        @Override
+                        public void overhealed(CanHit healer, CanHit target, double excess) {
+                            onOverheal(healer, target, excess);
+                        }
+                    }, this::onShieldGranted);
+    private final TickService ticks =
+            new TickService(damageService, sustain);
+    private final Battlefield battlefield =
+            new Battlefield(this);
+    private final ChanceService chances =
+            new ChanceService(this);
+    private final DebuffService debuffs =
+            new DebuffService(this, triggerBus);
+
+    /**
+     * @param observer the damage observer
+     */
     public void addDamageObserver(DamageObserver observer) {
         observers.addDamage(observer);
     }
 
-    /** @param observer the damage observer */
+    /**
+     * @param observer the damage observer
+     */
     public void removeDamageObserver(DamageObserver observer) {
         observers.removeDamage(observer);
     }
 
-    /** @param observer the break observer */
+    /**
+     * @param observer the break observer
+     */
     public void addBreakObserver(BreakObserver observer) {
         observers.addBreak(observer);
     }
 
-    /** @param observer the break observer */
+    /**
+     * @param observer the break observer
+     */
     public void removeBreakObserver(BreakObserver observer) {
         observers.removeBreak(observer);
     }
@@ -283,12 +303,16 @@ public class Battle {
         observers.announceBroken(attacker, target, element);
     }
 
-    /** @param observer the control observer */
+    /**
+     * @param observer the control observer
+     */
     public void addControlObserver(ControlObserver observer) {
         observers.addControl(observer);
     }
 
-    /** @param observer the control observer */
+    /**
+     * @param observer the control observer
+     */
     public void removeControlObserver(ControlObserver observer) {
         observers.removeControl(observer);
     }
@@ -304,12 +328,16 @@ public class Battle {
         observers.announceControl(applier, target, name);
     }
 
-    /** @param observer the skip observer */
+    /**
+     * @param observer the skip observer
+     */
     public void addSkipObserver(SkipObserver observer) {
         observers.addSkip(observer);
     }
 
-    /** @param observer the skip observer */
+    /**
+     * @param observer the skip observer
+     */
     public void removeSkipObserver(SkipObserver observer) {
         observers.removeSkip(observer);
     }
@@ -324,12 +352,16 @@ public class Battle {
         observers.announceTurnSkipped(unit, broken);
     }
 
-    /** @param observer the rule observer */
+    /**
+     * @param observer the rule observer
+     */
     public void addRuleObserver(RuleObserver observer) {
         observers.addRule(observer);
     }
 
-    /** @param observer the rule observer */
+    /**
+     * @param observer the rule observer
+     */
     public void removeRuleObserver(RuleObserver observer) {
         observers.removeRule(observer);
     }
@@ -344,27 +376,35 @@ public class Battle {
         observers.announceRuleFired(owner, op);
     }
 
-    /** @param observer the heal observer */
+    /**
+     * @param observer the heal observer
+     */
     public void addHealObserver(HealObserver observer) {
         observers.addHeal(observer);
     }
 
-    /** @param observer the heal observer */
+    /**
+     * @param observer the heal observer
+     */
     public void removeHealObserver(HealObserver observer) {
         observers.removeHeal(observer);
     }
 
-    /** @param observer the shield observer */
+    /**
+     * @param observer the shield observer
+     */
     public void addShieldObserver(ShieldObserver observer) {
         observers.addShield(observer);
     }
 
-    /** @param observer the shield observer */
+    /**
+     * @param observer the shield observer
+     */
     public void removeShieldObserver(ShieldObserver observer) {
         observers.removeShield(observer);
     }
 
-    private Queue queue;
+    private final Queue queue;
 
     /**
      * @return the action-order queue
@@ -507,6 +547,9 @@ public class Battle {
      * @return the living enemies immediately before and after it in roster order; empty when it has none
      */
     public List<CanHit> adjacentEnemies(CanHit center) {
+        if (!(center instanceof Enemy)) {
+            throw new IllegalArgumentException("Can't adjacent enemies of type " + center.getClass());
+        }
         List<com.laosun.aluminium.enemy.Enemy> enemies = enemyUnits().stream()
                 .filter(unit -> !unit.isDeath()).toList();
         int index = enemies.indexOf(center);
@@ -537,6 +580,7 @@ public class Battle {
         return battlefield.enemyUnits();
     }
 
+    @Setter
     private Signal currentMove;
 
     /**
@@ -544,13 +588,6 @@ public class Battle {
      */
     public Signal currentMove() {
         return currentMove;
-    }
-
-    /**
-     * @param signal the current action
-     */
-    public void setCurrentMove(Signal signal) {
-        currentMove = signal;
     }
 
     private final com.laosun.aluminium.battle.BattleResult battleResult =
@@ -575,8 +612,8 @@ public class Battle {
     @Setter
     private WaveManager waveManager;
 
-    private final com.laosun.aluminium.battle.PendingCombatants pendingCombatants =
-            new com.laosun.aluminium.battle.PendingCombatants(this);
+    private final PendingCombatants pendingCombatants =
+            new PendingCombatants(this);
 
     /**
      * The combatants queued to enter the action bar at the next settle, in entry order.
@@ -587,8 +624,8 @@ public class Battle {
         return pendingCombatants.view();
     }
 
-    private final com.laosun.aluminium.battle.Countdowns countdowns =
-            new com.laosun.aluminium.battle.Countdowns(this);
+    private final Countdowns countdowns =
+            new Countdowns(this);
 
     /**
      * The read-only entry point for countdowns (1408's transformation countdown predicate, and the like predicates at
@@ -600,19 +637,15 @@ public class Battle {
         return countdowns.all();
     }
 
-    /**
-     * Summons placed since the last settle, so {@link TriggerEvent#SUMMONED} can be fired once they are in the
-     * action bar (see {@link #fireSummoned}). Separate from {@link #addRequestItems} on purpose: that queue is
-     * shared with wave entries, and a wave arriving is not a summon.
-     */
-    private final com.laosun.aluminium.battle.SummonedBuffer summoned =
-            new com.laosun.aluminium.battle.SummonedBuffer();
+
+    private final SummonedBuffer summoned =
+            new SummonedBuffer();
 
     /**
      * The facts the caller declared before the battle started.
      */
-    private final com.laosun.aluminium.battle.PreBattle preBattle =
-            new com.laosun.aluminium.battle.PreBattle();
+    private final PreBattle preBattle =
+            new PreBattle();
 
     /**
      * The techniques the battle was CREATED with, or {@code null} when the caller marks them later.
@@ -905,6 +938,7 @@ public class Battle {
      */
     @Getter
     private final Random rng;
+
     /**
      * Starts a wave: the counter every per-wave limit is compared against. Called by WaveManager before WAVE_START.
      */
@@ -1032,10 +1066,10 @@ public class Battle {
      * could default. A technique consumes a limited map resource and the map decides; the engine's business
      * is only the battle-start consequence, which is the {@code 秘技} state.
      *
-     * @param released       whether each character released its technique, keyed by character id. A character
-     *                       absent from the map did not. {@code null} means none did.
+     * @param released        whether each character released its technique, keyed by character id. A character
+     *                        absent from the map did not. {@code null} means none did.
      * @param archetypeHolder the unit holding the technique archetype mark (「美学底本」), or {@code null}
-     *                       for none. Read by {@link #markArchetypeHolder} as well; only Pearl (真珠) reads it.
+     *                        for none. Read by {@link #markArchetypeHolder} as well; only Pearl (真珠) reads it.
      */
     public record Techniques(Map<Integer, Boolean> released, CanHit archetypeHolder) {
 
@@ -1174,7 +1208,9 @@ public class Battle {
      */
     private final java.util.Set<Integer> oncePerBattleSpent = new java.util.HashSet<>();
 
-    /** Bumped once per cast; every settlement made during it carries the number (see {@code Damage.castSequence}). */
+    /**
+     * Bumped once per cast; every settlement made during it carries the number (see {@code Damage.castSequence}).
+     */
     private long castSequence;
 
     /**
@@ -1211,7 +1247,9 @@ public class Battle {
         }
     }
 
-    /** A skill is identified by the pair (who, which slot): the row itself carries no unique id here. */
+    /**
+     * A skill is identified by the pair (who, which slot): the row itself carries no unique id here.
+     */
     private static int slotKey(Skill skill) {
         return skill.getCid() * 100 + skill.getSkillSlot();
     }
@@ -1237,17 +1275,23 @@ public class Battle {
      */
     private final java.util.ArrayDeque<CanHit> rulePicks = new java.util.ArrayDeque<>();
 
-    /** The innermost rule-level pick, or {@code null} outside a rule that stated one. */
+    /**
+     * The innermost rule-level pick, or {@code null} outside a rule that stated one.
+     */
     public CanHit currentRulePick() {
         return rulePicks.peek();
     }
 
-    /** Enters a firing whose rule stated {@code pick}; pair with {@link #endRulePick()}. */
+    /**
+     * Enters a firing whose rule stated {@code pick}; pair with {@link #endRulePick()}.
+     */
     public void beginRulePick(CanHit pick) {
         rulePicks.push(pick);
     }
 
-    /** Leaves the firing entered by {@link #beginRulePick(CanHit)}. */
+    /**
+     * Leaves the firing entered by {@link #beginRulePick(CanHit)}.
+     */
     public void endRulePick() {
         rulePicks.pop();
     }
@@ -1337,6 +1381,7 @@ public class Battle {
      * unit first, exactly as before, and fall back here -- so nothing changes for a resource a character owns itself.
      */
     /* The party counter's current value, or 0 when this battle has no such counter. */
+
     /**
      * The laugh-point factor of Elation damage: {@code 1 + 笑点×5/(笑点+240)}.
      *
@@ -1449,6 +1494,7 @@ public class Battle {
     }
 
     /* Notes which resource a change is about, then fires. */
+
     /**
      * Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}).
      */
@@ -1667,6 +1713,7 @@ public class Battle {
      * @param actor the unit that gets the extra turn
      * @return {@code true} = scheduled; {@code false} if the target is dead / not in the queue
      */
+
     /**
      * Makes a unit act at the next step, outside the action order (the game's {@code TurnInsertAction}).
      */
@@ -1797,6 +1844,7 @@ public class Battle {
      * @param target the unit carrying the DOTs (may be a character -- a boss burning us is the same path)
      * @return the total damage settled this time (the sum of all DOTs)
      */
+
     /**
      * Settles <b>one extra instance</b> of a damage-over-time state on a unit, right now, at {@code percent} of what that
      * state is currently dealing.
@@ -2039,10 +2087,10 @@ public class Battle {
         return settled;
     }
 
-    /** Depth guard for the shared-damage queue (one settlement at a time). */
+    /**
+     * Depth guard for the shared-damage queue (one settlement at a time).
+     */
     private int settlingShared;
-
-
 
 
     /**
@@ -2147,7 +2195,7 @@ public class Battle {
      *       judgement itself)</li>
      * </ul>
      *
-     * <p>The order of the break chain (later tasks add things here): broken state to break damage to 
+     * <p>The order of the break chain (later tasks add things here): broken state to break damage to
      * action delay to attach DOT to break energy gain.
      *
      * <p><b>The return value also gives the "excess part"</b>: let the skill's nominal toughness
@@ -2445,13 +2493,18 @@ public class Battle {
         return sustain.heal(healer, target, baseAmount);
     }
 
+
     /**
-     * Announces a heal that actually restored HP.
+     * Announces a heal that overflowed: {@code amount} is the part that had nowhere to go.
      *
      * @param healer who healed
-     * @param target who was healed
-     * @param healed how much was restored
+     * @param target who was being healed
+     * @param excess the part beyond the target maximum
      */
+    private void onOverheal(CanHit healer, CanHit target, double excess) {
+        fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.OVERHEAL, healer, target, excess));
+    }
+
     private void onHealSettled(CanHit healer, CanHit target, double healed) {
         broadcastHeal(healer, target, healed);
         fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.HEALED, healer, target, healed));
@@ -2477,6 +2530,7 @@ public class Battle {
      * @param amount the shield amount (<= 0 is treated as clearing the shield)
      * @return the shield value actually set
      */
+
     /**
      * Places a <b>countdown</b> on the action order: a unit that only exists to have a turn at a fixed speed.
      *
@@ -2549,6 +2603,7 @@ public class Battle {
      * @param ruleId the id of the rule granting it ({@code ""} = unnamed)
      * @return the shield value actually set
      */
+
     /**
      * The shield amount after the provider's own boost ("the shield granted is increased by X%").
      *
@@ -2755,12 +2810,14 @@ public class Battle {
      * @param event the event
      * @return how many rules fired in total
      */
+
     /**
      * The state named by the {@link TriggerEvent#STATE_ENDED} currently being fired, or {@code null}.
      */
     public String getLastStateEndedName() {
         return triggerFacts.stateEndedName();
     }
+
     /**
      * The counter named by the {@link TriggerEvent#STACK_GAINED} currently being fired, or {@code null}.
      */
@@ -2920,19 +2977,7 @@ public class Battle {
         return fireTriggers(event, actor, target, hitCount, amount, null, null);
     }
 
-    /**
-     * The same, for the one event that carries a <b>pending damage instance</b>
-     * ({@link TriggerEvent#DEALING_DAMAGE}), so a rule can still change it.
-     *
-     * <p><b>Private on purpose.</b> The pipeline's guardrail
-     * ({@code DamagePipelineTest.settlementHasExactlyOnePublicEntryPoint}) says the public API may contain
-     * exactly one method taking a {@code Damage} - {@code applyDamage} - so that "the same hit assembled twice"
-     * stays structurally impossible. This is the internal carrier for that context, not a second way in.
-     *
-     * @param damage   the instance being settled, or {@code null} for every other event (which is what the
-     *                 five-argument overload passes)
-     * @param fromCast the cast category that produced the event's instance, or {@code null} when nothing can name one
-     */
+
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage) {
         return fireTriggers(event, actor, target, hitCount, amount, damage, null);

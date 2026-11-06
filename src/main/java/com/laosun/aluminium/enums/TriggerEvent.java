@@ -192,6 +192,15 @@ public enum TriggerEvent {
      */
     HEALED("HEALED", true),
     /**
+     * A heal <b>overflowed</b>: part of it had nowhere to go because the target was already at its maximum HP.
+     *
+     * <p>{@code actor} = who healed, {@code target} = who was being healed, {@code amount} = the <b>excess</b>. A separate event
+     * rather than a wide {@link #HEALED}, because a heal that restores NOTHING still overflows - and `HEALED` deliberately does
+     * not fire for it (18 shipped rules would otherwise start firing on a no-op heal). Reader: 1211 Bailu (白露) trace 岐黄精义
+     * 「造成过量治疗时提高目标 10% 生命上限」.
+     */
+    OVERHEAL("OVERHEAL", true),
+    /**
      * A <b>shield was granted</b> to one of our characters.
      *
      * <p>{@code actor} = <b>who provided it</b>, {@code target} = who received it - the same convention

@@ -320,6 +320,10 @@ public class BailuClauseCoverageTest {
             if (ultimate) {
                 battle.castImmediate(bailu.getSkills().get(SkillType.ULTRA), bailu, List.of(ally, bailu));
             }
+            // Note: her Ultimate heals, and a heal at full HP now OVERFLOWS - which the trace 岐黄精义 turns into +10% Max HP. The
+            // ally is therefore no longer at 100% afterwards, and 「【生息】结束时若生命值等于其上限」 would read false. Top up, so
+            // the precondition the E1 cases need (full HP) really holds.
+            ally.heal(ally.getMaxHp());
         }
 
         private void castSkillOnAlly() {

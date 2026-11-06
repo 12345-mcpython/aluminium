@@ -24,6 +24,17 @@ public final class SustainService {
          * @param healed how much was restored
          */
         void settled(CanHit healer, CanHit target, double healed);
+
+        /**
+         * Announces the part of a heal that had nowhere to go (the target was already at its maximum). A default no-op so the
+         * single-method lambda at the construction site keeps working, and so a caller that does not care is not forced to.
+         *
+         * @param healer who healed
+         * @param target who was being healed
+         * @param excess the part beyond the target maximum
+         */
+        default void overhealed(CanHit healer, CanHit target, double excess) {
+        }
     }
 
     /**
@@ -73,6 +84,11 @@ public final class SustainService {
         double before = target.getCurrentHp();
         target.heal(amount);
         double healed = target.getCurrentHp() - before;
+        if (amount > healed) {
+            // 「造成过量治疗时…」: the part that had nowhere to go. Its own signal (see TriggerEvent.OVERHEAL), because a heal
+            // that restores NOTHING still overflows and HEALED deliberately stays silent for it.
+            onHeal.overhealed(healer, target, amount - healed);
+        }
         if (healed > 0) {
             onHeal.settled(healer, target, healed);
         }
