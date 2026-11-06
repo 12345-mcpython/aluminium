@@ -324,7 +324,10 @@ public class TriggerTable {
             // APPLY_DOT: a DOT that stacks is also a named counter - "the target has 5 or more layers of 风化" reads the
             // APPLY_DOT: a DOT that stacks is also a named counter - "5 or more layers of 风化" reads the layers
             // each application added, and the effect names it by element rather than by `buff`.
-            case ADD_STACK, APPLY_BUFF, APPLY_DOT, MODIFY_ATTR, RESIST_DEBUFF, SHIELD -> true;
+            // SET_STACKS joins them: it WRITES the named counter (creates a StackBuff when the goal is above the current
+            // count), so a condition may legitimately read a counter this file only ever sets (1402's 织运之竭 says "keep
+            // at most one layer" - a SET, not an ADD).
+            case ADD_STACK, APPLY_BUFF, APPLY_DOT, MODIFY_ATTR, RESIST_DEBUFF, SHIELD, SET_STACKS -> true;
             case null, default -> false;
         };
     }

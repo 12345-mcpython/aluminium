@@ -225,4 +225,37 @@ public class AglaeaMemospritesTest {
         }
         return garmentmaker.getBuffManager().stacksOf("匠躯");
     }
+
+    /**
+     * 行迹 织运之竭:「衣匠消失时，忆灵天赋的速度提高层数最多保留 1 层，衣匠再次被召唤时获得对应层数的速度提高效果」.
+     *
+     * <p>The layer count is two when it leaves, so 「最多保留 1 层」 is visible as the drop from two to one on the replacement:
+     * a rule that copied the whole counter would come back with two and pass any test that only checked "more than zero".
+     */
+    @Test
+    public void theKeptLayerComesBackOnTheNextSummon() {
+        Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(aglaea), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        Summon first = battle.summonMemosprite(aglaea);
+        battle.processRequests();
+        for (int layer = 0; layer < 2; layer++) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            fireSummonAttack(battle, first, enemy);
+        }
+        Assertions.assertEquals(2, first.getBuffManager().stacksOf("匠躯"), "precondition: two layers before it leaves");
+
+        // It leaves: the trace files "one layer kept" on her.
+        battle.applyDamage(first, new Damage(enemy, first, DamageElement.THUNDER, DamageType.NORMAL, 1_000_000));
+        battle.processRequests();
+        Assertions.assertTrue(first.isDeath(), "precondition: the memosprite is gone");
+        Assertions.assertEquals(1, aglaea.getBuffManager().stacksOf("织运之竭-保留"),
+                "「最多保留 1 层」 — two layers leave, one is kept");
+
+        Summon second = battle.summonMemosprite(aglaea);
+        battle.processRequests();
+        Assertions.assertEquals(1, second.getBuffManager().stacksOf("匠躯"),
+                "「衣匠再次被召唤时获得对应层数」 — the replacement starts with the kept layer, not with two");
+    }
 }
