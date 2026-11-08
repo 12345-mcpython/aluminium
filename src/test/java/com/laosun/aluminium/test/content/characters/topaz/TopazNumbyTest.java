@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.content.characters.topaz;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Signal;
 import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.entity.Summon;
 import com.laosun.aluminium.enums.AttributeType;
@@ -114,14 +115,131 @@ public class TopazNumbyTest {
                 "「受到**我方**追加攻击时」 - the enemy's own follow-up is not ours");
     }
 
-    /** How long until the summon's next action, read off the action bar. */
-    private static double remaining(Battle battle, Summon numby) {
+    /**
+     * 星魂 2:「账账自身行动并发动攻击后，托帕恢复 5 点能量」 (param [5]).
+     *
+     * <p>Judged as the DIFFERENCE between E2 and E1 on the same action: the attack itself settles energy of its own, so the
+     * absolute bar cannot be the criterion - the Eidolon's five points are what has to be there on top.
+     *
+     * <p>⚠ The gate 「**并发动攻击**」 is real: Numby only strikes enemies that carry 【负债证明】, so with no mark on the field
+     * it never swung and the Eidolon must not pay (a clause that paid for a turn nobody took would be an over-trigger with no
+     * symptom).
+     */
+    @Test
+    public void theSecondEidolonPaysAfterNumbysAttack() {
+        Assertions.assertEquals(5.0, energyAfterOneAction(2) - energyAfterOneAction(1), 1e-9,
+                "「账账自身行动并发动攻击后，托帕恢复 5 点能量」");
+        Assertions.assertEquals(0.0, energyAfterOneAction(2, false) - energyAfterOneAction(1, false), 1e-9,
+                "no 【负债证明】 on the field ⇒ no attack ⇒ no energy");
+    }
+
+    /**
+     * 星魂 4:「账账自身回合开始时，托帕的行动提前 20%」 (param [0.2]) - and unlike 星魂 2 it does NOT need the attack: the
+     * sentence says "when its turn starts", so an empty turn still advances her.
+     */
+    @Test
+    public void theFourthEidolonAdvancesHerOnNumbysTurn() {
+        Assertions.assertEquals(0.8, topazRemainingRatio(4), 1e-6,
+                "「账账自身回合开始时，托帕的行动提前 20%」 - a fifth of her remaining wait is skipped");
+        Assertions.assertEquals(1.0, topazRemainingRatio(3), 1e-9, "before 星魂 4 nothing happens");
+    }
+
+    /**
+     * 秘技:「主动施放秘技使下一场战斗中账账施放首次攻击后，托帕恢复 60 点能量」 (param [60, 10000]) - 「首次」 is
+     * {@code once_per_battle}, so the second attack pays nothing.
+     */
+    @Test
+    public void theTechniquePaysSixtyOnTheFirstAttack() {
+        Fixture guarded = new Fixture(0, true, true);
+        double first = guarded.act();
+        Assertions.assertEquals(60.0, first, 1e-9, "「账账施放首次攻击后，托帕恢复 60 点能量」");
+        Assertions.assertEquals(0.0, guarded.act(), 1e-9, "「首次」 - the second attack pays nothing");
+
+        Fixture control = new Fixture(0, true, false);
+        Assertions.assertEquals(0.0, control.act(), 1e-9, "control: no technique, no energy");
+    }
+
+    /** Energy 托帕 gains from one of Numby's actions, at the given Eidolon level. */
+    private static double energyAfterOneAction(int eidolon) {
+        return energyAfterOneAction(eidolon, true);
+    }
+
+    private static double energyAfterOneAction(int eidolon, boolean markTheTarget) {
+        Character topaz = CharacterFactory.create(TOPAZ, LEVEL, false, null, null, eidolon);
+        Enemy enemy = BattleFixture.monster();
+        enemy.setMaxStance(10_000);
+        Battle battle = new Battle(List.of(topaz), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Summon numby = battle.summonsOf(topaz).getFirst();
+        if (markTheTarget) {
+            battle.castImmediate(topaz.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), topaz, List.of(enemy));
+            battle.processRequests();
+        }
+        topaz.setCurrentEnergy(0);
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
+        battle.processRequests();
+        return topaz.getCurrentEnergy();
+    }
+
+    /** 托帕's remaining wait after Numby's turn start, as a share of what it was. */
+    private static double topazRemainingRatio(int eidolon) {
+        Character topaz = CharacterFactory.create(TOPAZ, LEVEL, false, null, null, eidolon);
+        Enemy enemy = BattleFixture.monster();
+        enemy.setMaxStance(10_000);
+        Battle battle = new Battle(List.of(topaz), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Summon numby = battle.summonsOf(topaz).getFirst();
+        double before = remaining(battle, topaz);
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
+        battle.processRequests();
+        return remaining(battle, topaz) / before;
+    }
+
+    /** A fight where 「负债证明」 may or may not be up and the technique may or may not have been declared. */
+    private static final class Fixture {
+        private final Character topaz;
+        private final Summon numby;
+        private final Battle battle;
+
+        private Fixture(int eidolon, boolean markTheTarget, boolean technique) {
+            topaz = CharacterFactory.create(TOPAZ, LEVEL, false, null, null, eidolon);
+            if (technique) {
+                // The engine stamps this permanent state before any BATTLE_START rule runs; it is the gate her Technique reads.
+                topaz.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1, true));
+            }
+            Enemy enemy = BattleFixture.monster();
+            enemy.setMaxStance(10_000);
+            battle = new Battle(List.of(topaz), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+            battle.startBattle();
+            battle.processRequests();
+            numby = battle.summonsOf(topaz).getFirst();
+            if (markTheTarget) {
+                battle.castImmediate(topaz.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), topaz,
+                        List.of(enemy));
+                battle.processRequests();
+            }
+            topaz.setCurrentEnergy(0);
+        }
+
+        /** One of Numby's actions; returns the energy it paid 托帕. */
+        private double act() {
+            topaz.setCurrentEnergy(0);
+            battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
+            battle.processRequests();
+            return topaz.getCurrentEnergy();
+        }
+    }
+
+    /** How long until that unit acts, read off the action bar. */
+    private static double remaining(Battle battle, CanHit unit) {
         for (Signal signal : battle.queue().snapshot()) {
-            if (signal.getCanHit() == numby) {
+            if (signal.getCanHit() == unit) {
                 return battle.queue().getTimeRemaining(signal);
             }
         }
-        throw new IllegalStateException("账账 is not in the action order");
+        throw new IllegalStateException(unit.getName() + " is not in the action order");
     }
 
     private static Battle scene() {

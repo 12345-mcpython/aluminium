@@ -6,7 +6,11 @@
     "✅ **星魂 1 已落地**（2026-11-02）：`eidolon1_executed_on_debt_target` + 新引擎属性 `CRIT_DAMAGE_TAKEN`。⚠ 近似：「单次攻击内最多生效 1 次」未表达。",
     "✅ 已落地：战技【负债证明】（`skill_proof_of_debt`）、行迹「金融动荡」（`trace_damage_vs_fire_weakness`）、星魂 1/3/5。",
     "⭐ **（已被下面两条取代，保留作记录）「负债证明目标受到我方追加攻击时」与「自身回合内不触发」**：本条正确的那一半是「`target has_state` 本来就够用」（`ctx.target()` 就是被打的那个）；同时它写着两个**当时为真、现在为假**的结论 —— ✗「条件语言不允许否定 `is_summon`」（现在可写，见 `talent_ally_followup_advances_numby` 的 `!actor is_summon`，引擎侧的守卫也一并放开）与 ✗「没有判据可写」。⭐ **判据已补（2026-11-08）**：`TopazNumbyTest#anAllyFollowUpOnADebtMarkedTargetAdvancesNumbyByHalf` —— 用 `queue().snapshot()` 读账账自己的信号，`FOLLOW_UP` 之后剩余等待**正好减半**，并钉住三个对照（目标没带【负债证明】/ 出招的是敌人 / 出招的是账账自己，三者都不提前）。⚠ 仍开的只剩星魂 2/4/6 与秘技（见下一条）。",
-    "⭐ **「负债证明目标受到我方追加攻击时，账账行动提前 50%，自身回合内不触发」已完整落地（2026-11-08）**：`FOLLOW_UP` + `actor is_ally` + `target has_state 负债证明` + `!actor is_summon` → `ADVANCE 0.5`（目标 `summon`）。✅ **判据已补（2026-11-08）**：`TopazNumbyTest#anAllyFollowUpOnADebtMarkedTargetAdvancesNumbyByHalf` —— 用 `queue().snapshot()` 读账账自己的信号，`FOLLOW_UP` 之后剩余等待**正好减半**；并钉住三个**对照**（目标没带【负债证明】/ 出招的是敌人 / 出招的是账账自己，三者都不提前）。⛔ **仍开**：星魂 2/4/6 与秘技里以账账为主体的条款。"
+    "⭐ **「负债证明目标受到我方追加攻击时，账账行动提前 50%，自身回合内不触发」已完整落地（2026-11-08）**：`FOLLOW_UP` + `actor is_ally` + `target has_state 负债证明` + `!actor is_summon` → `ADVANCE 0.5`（目标 `summon`）。✅ **判据已补（2026-11-08）**：`TopazNumbyTest#anAllyFollowUpOnADebtMarkedTargetAdvancesNumbyByHalf` —— 用 `queue().snapshot()` 读账账自己的信号，`FOLLOW_UP` 之后剩余等待**正好减半**；并钉住三个**对照**（目标没带【负债证明】/ 出招的是敌人 / 出招的是账账自己，三者都不提前）。⭐ **星魂 2 / 星魂 4 / 秘技（能量那半）也已落地（2026-11-08）**：`eidolon2_numby_attack_pays_energy`（TURN_START + `actor is_summon` + `enemy_state_count:负债证明 >= 1` → 托帕 +5 能量）、`eidolon4_numby_turn_advances_her`（同事件 → 托帕 `ADVANCE 0.2`）、`technique_first_attack_pays_energy`（+ `self has_state 秘技` + `once_per_battle` → +60 能量）。⚠ **不能**把这三条挂到 `SUMMON_ATTACK`：那个事件只由 `EnemySkill.execute` 发出，账账这一击是**规则**打的，挂上去会**永远不触发而没有症状**（本条上一轮已用这个理由把行动提前挪到 `FOLLOW_UP`）。",
+    "⛔ **终结技 扭亏为盈！整段没有规则，也没有登记 —— 2026-11-08 核出（本文件此前漏记）**：「使账账进入【涨幅惊人！】状态，**伤害倍率提高 150%**，**暴击伤害提高 25%**，且当陷入【负债证明】状态下的敌方目标受到我方的**普攻、战技或终结技**的攻击时，账账**行动提前 50%**。账账施放 **2** 次攻击后退出【涨幅惊人！】状态。」数值全在 ULTRA 行 `[1.5, 0.25, 0.5, 2]`（Lv10）。⚠ 这句**大部分有拼法**（`APPLY_BUFF` 到 `summon` + `while_holder_state` 门 + `ADD_STACK` 计数 + `ALLY_ATTACK` 的 `from_skill`/`from_category` 三条 + `ADVANCE`），但**先要量清一件事**：「伤害倍率提高 150%」落在**乘区**（`ALL_DAMAGE_TYPE_BOOST`，×2.5）还是**技能行倍率**（1.5 → 3.75）上，账账那一击的数字差 50%。⇒ 下一棒先做这个测量，再逐句核整段。",
+    "⛔ **星魂 6「账账处于【涨幅惊人！】状态的攻击次数增加 1 次，且攻击时火属性抗性穿透提高 10%」**：两半都有拼法（`ADD_STACK` +1、`MODIFY_ATTR RESISTANCE_REDUCTION 0.1` 挂 `summon` + 同一个 `while_holder_state` 门），但它**依赖上面那个还不存在的【涨幅惊人！】状态** —— 先落地终结技，这条就是两次追加。参数 `[1, 0.1]`。",
+    "⛔ **行迹 技术性调整「当账账处于【涨幅惊人！】状态施放攻击后，额外使托帕恢复 10 点能量」**：同样卡在【涨幅惊人！】状态不存在；状态落地后它是一条 `TURN_START` + `actor is_summon` + `holder has_state`（同族门）→ `GAIN_ENERGY 10`。数值 10 见行迹数据 `1112103`。",
+    "⭐ **不建模（战斗外行为）**：秘技的三句 —— 「托帕入场时召唤账账，账账会自动搜寻一定范围内的普通战利品与扑满」（大地图）、「主动施放秘技与大地图内的敌人战斗胜利后…额外获取少量信用点，每个地球日内最多 10000 点」、「模拟宇宙/差分宇宙内胜利后额外获取宇宙碎片并有小概率获得 1 个随机奇物」—— 三句都发生在**战斗之外**，本库只建模战斗内结算；秘技**战斗内**的那半句（账账首次攻击后回 60 能量）已由 `technique_first_attack_pays_energy` 落地。"
   ],
   "rules": [
     {
@@ -198,6 +202,63 @@
       ],
       "source": "1112 托帕&账账 天赋 猪市？！:「…陷入【负债证明】状态下的敌方目标受到我方的追加攻击时，账账行动提前50%。在账账自身回合内，无法触发行动提前效果。」",
       "_note": "「**负债证明**目标**受到我方追加攻击时**，账账**行动提前 50%**。**在账账自身回合内，无法触发行动提前效果**」—— 三个条件逐一落地：`actor is_ally`（出招的是我方）、`target has_state 负债证明`（被打的带着状态 ✓）、**`!actor is_summon`**（它自己打出的追加攻击不算 —— 否则会在**自己的回合里**把自己提前，正是句子禁止的）。⭐ 本轮让条件语言**允许否定 `is_summon`**：它是**布尔事实**，不是「读不到的数」，而 `is_summon` 的报错信息本来就建议写 `!actor is_summon`（此前被否定守卫挡掉，前后矛盾）。⭐ **判据（2026-11-08）**：`TopazNumbyTest#anAllyFollowUpOnADebtMarkedTargetAdvancesNumbyByHalf` —— 用 `queue().snapshot()` 读账账自己的剩余等待，`FOLLOW_UP` 之后**减半**，并带三个对照（无状态 / 敌人出招 / 账账自己出招）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon2_numby_attack_pays_energy",
+      "min_eidolon": 2,
+      "when": [
+        "actor is_summon",
+        "enemy_state_count:负债证明 >= 1"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5,
+          "target": "self"
+        }
+      ],
+      "source": "1112 托帕&账账 星魂 2 善意收购:「账账自身行动并发动攻击后，托帕恢复5点能量。」参数 = [5]",
+      "_note": "「账账**自身行动并发动攻击后**，托帕**恢复 5 点能量**」—— ① 触发用 ``TURN_START`` + ``actor is_summon``（账账没有技能行，它自己的回合就是它的行动点 —— 与天赋那条同一个读法；⚠ **不能**用 ``SUMMON_ATTACK``：那个事件只由 ``EnemySkill.execute`` 发出，账账这一击是**规则**打的，挂上去会**永远不触发而没有症状**）；② 「**并发动攻击**」用 ``enemy_state_count:负债证明 >= 1`` 守住 —— 账账那一击只打**带【负债证明】**的敌人（见 ``numby_strikes_a_debt_marked_target``），没人带状态时它**根本没出手**，因此也不该付能量；③ 数值 **5** = 星魂 2 的 ``param[0]``；④ 判据 `TopazNumbyTest#theSecondEidolonPaysAfterNumbysAttack`（E1 对照为 0，且「没人带状态」时不付）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon4_numby_turn_advances_her",
+      "min_eidolon": 4,
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.2,
+          "target": "self"
+        }
+      ],
+      "source": "1112 托帕&账账 星魂 4 敏捷处理:「账账自身回合开始时，托帕的行动提前20%。」参数 = [0.2]",
+      "_note": "「账账**自身回合开始时**，托帕的**行动提前 20%**」—— ① ``TURN_START`` + ``actor is_summon``，落点是 **``self``**（托帕自己，不是账账）；② 与其他「行动提前」同一个口径：``percent`` 是**剩余等待**的份额（1.0 = 立刻轮到她），所以 0.2 = 跳过 20%；③ 数值 **0.2** = 星魂 4 的 ``param[0]``；⚠ ④ 本条**不需要**「账账真的出手」那道门：句子说的是「回合**开始**时」，即使它这一回合没攻击（没人带【负债证明】）也提前。判据 `TopazNumbyTest#theFourthEidolonAdvancesHerOnNumbysTurn`（E3 对照不动，E4 的剩余等待 ×0.8）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "technique_first_attack_pays_energy",
+      "once_per_battle": true,
+      "when": [
+        "actor is_summon",
+        "self has_state 秘技",
+        "enemy_state_count:负债证明 >= 1"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 60,
+          "target": "self"
+        }
+      ],
+      "source": "1112 托帕&账账 秘技 明补:「主动施放秘技使下一场战斗中账账施放首次攻击后，托帕恢复60点能量。」参数 = [60, 10000]",
+      "_note": "「主动施放秘技使下一场战斗中账账**施放首次攻击后**，托帕**恢复 60 点能量**」—— ① ``self has_state 秘技`` 是引擎在战斗开始前盖的**永久**状态（``Battle.applyTechniqueStates`` 的 ``StateBuff(\"秘技\", 1, true)``），所以整场都在，不需要自己清；② 「**首次**」= ``once_per_battle: true``（规则级字段，整场只发一次）；③ 「施放**攻击**」用 ``enemy_state_count:负债证明 >= 1`` 守（同星魂 2 的理由：没人带状态时账账没有出手）；④ 数值 **60** = 秘技 ``param[0]``；⚠ ⑤ **秘技的其余三句是大地图行为**（入场召唤账账、战利品搜寻、信用点/宇宙碎片奖励），不属于战斗内、也不建模，已在 `_gaps` 记录；⑥ 判据 `TopazNumbyTest#theTechniquePaysSixtyOnTheFirstAttack`（第二次攻击不再付）。",
+      "_status": "implemented"
     }
   ]
 }
