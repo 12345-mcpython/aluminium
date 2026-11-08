@@ -428,6 +428,27 @@
       "on": "BATTLE_START",
       "_note": "阿哈是**非忆灵召唤物** ⇒ `SUMMON { memosprite_name: 阿哈, panel_less: true }`：装配守卫认得这个标记就放行（它与「召唤忆灵」的唯一区别是**没有 spec**，画面上两句话写得一样）。面板来自 `SummonFactory.panelLess`（召唤者属性、共享实时，判据 `PanelLessSummonTest`）。",
       "id": "trace_aha_takes_the_field"
+    },
+    {
+      "id": "trace_a_teammates_attack_pays_her_and_quickens_aha",
+      "when": [
+        "actor is_ally"
+      ],
+      "source": "1513 砂金•戏浪 行迹 纵享惊涛 (1513102):「队友施放攻击后，砂金•戏浪获得2点【好活当赏】和1个笑点，并使阿哈速度提高25，速度提高效果持续到阿哈时刻结束。」",
+      "on": "ALLY_ATTACK",
+      "do": [
+        {
+          "attribute": "SPEED",
+          "target": "summon",
+          "op": "MODIFY_ATTR",
+          "turns": 3,
+          "value": {
+            "value": 25,
+            "type": "const"
+          }
+        }
+      ],
+      "_note": "「队友施放攻击后…并使**阿哈速度提高 25**，速度提高效果**持续到阿哈时刻结束**」—— 本条只写**阿哈那一段**：`MODIFY_ATTR SPEED { value: const 25 }`，目标 **`summon`**（规则主人的召唤物 = 阿哈 ✓，这一轮它真的在场上了）。⚠ 「+**25 点**」是**绝对量**不是百分比 ⇒ 必须走 `value` 通道（写成 `percent: 0.25` 会变成 +25%，那是另一个意思）。⚠ 「持续到阿哈时刻结束」用 `turns: 3` 近似（阿哈时刻没有独立的事件边界）。⚠ **同句的「2 点【好活当赏】+ 1 个笑点」不由本条给**：本文件已有 `talent_fervor_on_teammate_attack` 管资源，且【好活当赏】由阿哈时刻的机制负责 —— 本轮试过一起写，结果两处判据立刻红（笑点 1→2、开大前就有奖励）⇒ 只留速度这一半。"
     }
   ]
 }

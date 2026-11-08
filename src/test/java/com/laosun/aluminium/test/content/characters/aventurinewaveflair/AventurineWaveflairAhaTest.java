@@ -22,6 +22,31 @@ public class AventurineWaveflairAhaTest {
     private static final int WAVEFLAIR = 1513;
     private static final int LEVEL = 80;
 
+    /**
+     * 行迹 纵享惊涛:「队友施放攻击后…使阿哈速度提高 25」 - an ABSOLUTE 25 points, not 25%.
+     */
+    @Test
+    public void aTeammatesAttackQuickensAha() {
+        Character waveflair = CharacterFactory.create(WAVEFLAIR, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Character ally = CharacterFactory.create(1204, LEVEL);
+        Battle battle = new Battle(List.of(waveflair, ally), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Summon aha = battle.summonsOf(waveflair).stream()
+                .filter(summon -> "阿哈".equals(summon.getName()))
+                .findFirst()
+                .orElseThrow();
+        double before = aha.getAttribute(AttributeType.SPEED).get();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0));
+        battle.processRequests();
+
+        Assertions.assertEquals(before + 25, aha.getAttribute(AttributeType.SPEED).get(), 1e-9,
+                "「速度提高25」 — twenty-five POINTS, not twenty-five percent");
+    }
+
     @Test
     public void ahaTakesTheFieldWithHerOwnPanel() {
         Character waveflair = CharacterFactory.create(WAVEFLAIR, LEVEL);
