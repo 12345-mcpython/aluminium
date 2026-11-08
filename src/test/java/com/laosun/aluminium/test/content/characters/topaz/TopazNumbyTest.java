@@ -1,6 +1,7 @@
 package com.laosun.aluminium.test.content.characters.topaz;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.Signal;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.entity.Summon;
@@ -56,6 +57,71 @@ public class TopazNumbyTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
         battle.processRequests();
         Assertions.assertTrue(enemy.getCurrentHp() < before, "「行动时发动追加攻击…造成火属性伤害」");
+    }
+
+    /**
+     * 天赋:「…陷入【负债证明】状态下的敌方目标受到我方的追加攻击时，账账行动提前 50%。在账账自身回合内，无法触发行动提前效果」.
+     *
+     * <p>An advance is visible in exactly one place - the action bar - so this reads the summon's own signal before and after
+     * (`queue().snapshot()` + `getTimeRemaining`, the probe 1222 introduced for the same clause family). The three controls are
+     * the conditions the sentence itself states, each of which would otherwise be an over-trigger with no symptom:
+     * <ol>
+     *   <li>the target does not carry 【负债证明】;</li>
+     *   <li>the attacker is not ours (an enemy's follow-up);</li>
+     *   <li>the attacker IS the summon - 「在账账自身回合内，无法触发」.</li>
+     * </ol>
+     */
+    @Test
+    public void anAllyFollowUpOnADebtMarkedTargetAdvancesNumbyByHalf() {
+        Character topaz = CharacterFactory.create(TOPAZ, LEVEL);
+        Enemy marked = BattleFixture.monster();
+        Enemy plain = BattleFixture.monster();
+        for (Enemy each : List.of(marked, plain)) {
+            each.setMaxStance(10_000);
+        }
+        Battle battle = new Battle(List.of(topaz), List.of(marked, plain), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Summon numby = battle.summonsOf(topaz).getFirst();
+        battle.castImmediate(topaz.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), topaz, List.of(marked));
+        battle.processRequests();
+        Assertions.assertTrue(marked.getBuffManager().hasState("负债证明"), "precondition: the Skill marks the target");
+
+        double before = remaining(battle, numby);
+        Assertions.assertTrue(before > 0, "precondition: it has time left to skip (" + before + ")");
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, topaz, marked, 1, 0));
+        battle.processRequests();
+        Assertions.assertEquals(before * 0.5, remaining(battle, numby), 1e-6,
+                "「…账账行动提前 50%」 - half of its remaining wait is skipped");
+
+        // Control 1: the same follow-up on a target WITHOUT the mark.
+        double armed = remaining(battle, numby);
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, topaz, plain, 1, 0));
+        battle.processRequests();
+        Assertions.assertEquals(armed, remaining(battle, numby), 1e-9,
+                "「陷入【负债证明】状态下的敌方目标」 - a target without the mark does not advance it");
+
+        // Control 2: the summon's own follow-up - 「在账账自身回合内，无法触发行动提前效果」.
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, numby, marked, 1, 0));
+        battle.processRequests();
+        Assertions.assertEquals(armed, remaining(battle, numby), 1e-9,
+                "「…自身回合内，无法触发」 - its own attack must not advance it (that is what `!actor is_summon` is for)");
+
+        // Control 3: an enemy's follow-up is not 「我方」.
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, marked, marked, 1, 0));
+        battle.processRequests();
+        Assertions.assertEquals(armed, remaining(battle, numby), 1e-9,
+                "「受到**我方**追加攻击时」 - the enemy's own follow-up is not ours");
+    }
+
+    /** How long until the summon's next action, read off the action bar. */
+    private static double remaining(Battle battle, Summon numby) {
+        for (Signal signal : battle.queue().snapshot()) {
+            if (signal.getCanHit() == numby) {
+                return battle.queue().getTimeRemaining(signal);
+            }
+        }
+        throw new IllegalStateException("账账 is not in the action order");
     }
 
     private static Battle scene() {
