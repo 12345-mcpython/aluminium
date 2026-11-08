@@ -5,7 +5,8 @@
   "_gaps": [
     "⛔ **【神君】的「段数变成攻击次数」仍未接，缺的是数据不是语法（2026-11-08 查证）**：① 入场这一関已经通了 —— `SUMMON { memosprite_name: 神君, panel_less: true }` 能把它放上场（面板是入场快照，判据 `PanelLessSummonTest`），战技/秘技的「增加段数」也已经记在 `攻击段数` 计数器上；② 真正卡住的是**它不会行动**：神君**没有 `ServantID`** —— tbgd 的 `ExcelOutput/AvatarServantConfig.json` 只有 7 条（11402 / 18007 / 11407 / 11409 / 11415 / 11413 / 11512），**没有 1204 的**；`AvatarServantSkillConfig.json` 里也没有 `1204*` 的技能行 ⇒ **没有攻击行可读**。③ 两条出路写在案上：(a) 手写一份 spec + 攻击行（像 1407/1503 那样），(b) 让 ``攻击段数`` 直接驱动 ``DAMAGE { times_from: \"resource:攻击段数\" }``（``times_from`` 已有 ``resource:`` 拼法 ✓）—— 但两者都要先有「神君行动」这个事件，而空面板召唤物没有技能 ⇒ **事件永远不会来**。⇒ 与 1504 的「致死转伤链」同族：**卡在「召唤物行动」这个动作**，不是卡在段数。",
     "⭐ **天赋「【神君】行动后，普攻/战技/终结技伤害 +20%，2 回合」已落地，且星魂/行迹也补齐了一批（2026-11-08）**：`talent_after_the_lord_acts`（`SUMMON_ATTACK` + `actor is_summon` → `ALL_DAMAGE_TYPE_BOOST 0.2 / 2 回合`）、`technique_three_more_hits`（秘技 → `ADD_STACK 攻击段数 +3`）、`trace_second_wind_starts_with_energy`（行迹 绸缪 → `GAIN_ENERGY 15`）。⚠ 遣将那条（施放战技后暴击率 +10%/2 回合）**本来就有**（`trace_dispatch_crit_chance`）—— 我又写了一条同形的，被 `SameEffectTwiceGuardTest` 与 `ContentDuplicateGuardTest` 双双击中，已删。⛔ **仍开**：① 段数**真的变成攻击次数**（神君的行动要读 `攻击段数`，它现在没有攻击行）；② 行迹 破阵「段数 ≥6 时下回合暴击伤害 +25%」（可按 `self_stacks:攻击段数 >= 6` 写，但「下回合」的口径要跟着①一起定）；③ 其余技能与星魂（多数也依赖①）。",
-    "⛔ **其余技能 / 星魂：尚未编写** —— 普攻（100% 攻击）、战技（Blast 65%/25% + 段数）、终结技（200% 全体 + 段数）、天赋的段数增伤、秘技（开战 +3 段）、六个星魂：**全部依赖【神君】这个单位**（段数、行动、伤害）⇒ 先把「无面板召唤物」做出来，再一次性铺开，否则只能写一半、另一半写成近似。"
+    "⛔ **其余技能 / 星魂：尚未编写** —— 普攻（100% 攻击）、战技（Blast 65%/25% + 段数）、终结技（200% 全体 + 段数）、天赋的段数增伤、秘技（开战 +3 段）、六个星魂：**全部依赖【神君】这个单位**（段数、行动、伤害）⇒ 先把「无面板召唤物」做出来，再一次性铺开，否则只能写一半、另一半写成近似。",
+    "⛔ **星魂 6 的「最多叠加 3 层」未做到（2026-11-08 实测）**：`eidolon6_every_hit_adds_a_vulnerable_stack` 已落地，12% 的幅度正确，但 4 段的一发在 E6 下只把总伤害抬到 **1.12 倍**（即**一层**）—— 同名 `VulnerabilityBuff` 走的是**替换**，`MODIFY_DAMAGE_TAKEN` 上的 `max_stacks` / `stackable` **被静默忽略**（装载期不报错，这正是本项目最忌讳的一类「没有症状的错」）。要补齐，得让这个 op 支持**按名合并 + 上限**（`ADD_STACK` 那条路已有 `max_stacks` 的语义，可以照抄）。"
   ],
   "rules": [
     {
@@ -226,6 +227,26 @@
         "actor is_summon"
       ],
       "min_eidolon": 4
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "do": [
+        {
+          "target": "target",
+          "percent": 0.12,
+          "turns": 1,
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "stackable": true,
+          "max_stacks": 3
+        }
+      ],
+      "when": [
+        "actor is_summon"
+      ],
+      "_note": "「【神君】**每段攻击后**使目标**额外陷入易伤**：受到的伤害提高 **12%**，**持续至本次攻击结束**，最多叠加 **3** 层」—— `DEALING_DAMAGE` + `actor is_summon`（每段一发，「谁出的手」靠 `attacker: actor`）→ `MODIFY_DAMAGE_TAKEN 0.12`。⚠ 实测（`JingYuanLordTurnTest.theVulnerabilityStacksAmplifyTheRestOfTheStrike`）：4 段的一发在 E6 下总伤害是 E0 的 **1.12 倍**，即**只叠了一层**，不是 3 层 —— 同名易伤区**替换**而不是叠加，`max_stacks` / `stackable` 在这个 op 上**没有生效**（也没有报错）。⇒ 12% 这一条是**对的**，「最多 3 层」这半是**没做到**的，已登记。",
+      "id": "eidolon6_every_hit_adds_a_vulnerable_stack",
+      "min_eidolon": 6,
+      "source": "1204 景元 星魂 6 威灵有应破敌雠:「【神君】每段攻击后会使指定敌方目标额外陷入易伤状态。易伤状态下的敌方目标受到的伤害提高12%，持续至【神君】本次攻击结束，该效果最多叠加3层。」 参数 = [0.12, 3]"
     }
   ]
 }

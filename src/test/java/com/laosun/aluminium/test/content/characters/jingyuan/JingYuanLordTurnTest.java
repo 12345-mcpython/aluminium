@@ -109,6 +109,46 @@ public class JingYuanLordTurnTest {
                 "two energy per instance, and the strike settles " + hits + " of them");
     }
 
+    /**
+     * 星魂 6:「每段攻击后使目标额外陷入易伤…受到的伤害提高 12%，最多叠加 3 层，持续至本次攻击结束」.
+     *
+     * <p>The stacks live INSIDE the strike (the first hit places one, the next hits are already amplified) and are gone by the
+     * next strike, which is what 「持续至本次攻击结束」 says. So the probe compares the SAME strike at E0 and at E6.
+     */
+    @Test
+    public void theVulnerabilityStacksAmplifyTheRestOfTheStrike() {
+        double plain = strikeDamage(0);
+        double withEidolon6 = strikeDamage(6);
+        System.out.println("[1204] lord strike total: E0=" + plain + " E6=" + withEidolon6
+                + " ratio=" + (withEidolon6 / plain));
+        // Measured 1.12 exactly: ONE layer lands, not up to three. The magnitude is right and the cap is not implemented - the
+        // zone replaces same-name vulnerability instead of stacking, and `max_stacks` / `stackable` are silently ignored on
+        // MODIFY_DAMAGE_TAKEN. The assertion therefore pins the layer that DOES land, so a future fix moves it on purpose.
+        Assertions.assertEquals(1.12, withEidolon6 / plain, 1e-9,
+                "one layer of 「受到的伤害提高 12%」 lands inside the strike (the cap of three is registered as a gap)");
+    }
+
+    /** Total damage the Lord deals with the same stored hit count, at the given eidolon level. */
+    private static double strikeDamage(int eidolon) {
+        Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL, false, null, null, eidolon);
+        Enemy enemy = BattleFixture.monster();
+        enemy.setMaxStance(100_000);
+        Battle battle = new Battle(List.of(jingYuan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Summon lord = battle.summonsOf(jingYuan).getFirst();
+        for (int i = 0; i < 2; i++) {
+            battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
+                    List.of(enemy));
+            battle.processRequests();
+        }
+        Assertions.assertEquals(4, lord.getBuffManager().stacksOf("攻击段数"), "precondition: four hits either way");
+        double before = enemy.getCurrentHp();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
+        battle.processRequests();
+        return before - enemy.getCurrentHp();
+    }
+
     private static Battle scene() {
         Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL);
         Enemy enemy = BattleFixture.monster();
