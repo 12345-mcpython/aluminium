@@ -87,6 +87,12 @@ final class TriggerConditionParser {
                                 + "condition, e.g. \"!target has_path 同谐\" (source: " + spec.getSource() + ")");
             }
             Condition negated = parseCondition(inner, spec);
+            // `is_summon` is a BOOLEAN about a party member, so "not a summon" is a fact and not the ambiguous "cannot read it"
+            // the guard below is about. Measured: 1112's 「在账账自身回合内，无法触发行动提前效果」 needs exactly this, and the
+            // `is_summon` parser already advertises the spelling ("write \"actor is_summon\", or \"!actor is_summon\" for the opposite").
+            if (negated instanceof IsSummon summons) {
+                return new Negated(summons, raw);
+            }
             if (!(negated instanceof PartyCondition party)) {
                 throw new IllegalArgumentException(
                         "Condition '" + raw + "' negates a condition that does not read a party "
@@ -1033,8 +1039,24 @@ final class TriggerConditionParser {
             this.raw = raw;
         }
 
+        /**
+         * A negation of a condition that answers a BOOLEAN about a party member without being a {@link PartyCondition} -
+         * {@code is_summon}. No party handle is involved: the inner condition already names its own subject.
+         *
+         * @param inner the condition to invert
+         * @param raw   the clause as written, for messages
+         */
+        Negated(Condition inner, String raw) {
+            this.inner = inner;
+            this.party = null;
+            this.raw = raw;
+        }
+
         @Override
         public boolean test(TriggerContext ctx) {
+            if (party == null) {
+                return !inner.test(ctx);
+            }
             return party.partyOf(ctx) != null && !inner.test(ctx);
         }
 
