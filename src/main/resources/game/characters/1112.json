@@ -7,9 +7,9 @@
     "✅ 已落地：战技【负债证明】（`skill_proof_of_debt`）、行迹「金融动荡」（`trace_damage_vs_fire_weakness`）、星魂 1/3/5。",
     "⭐ **（已被下面两条取代，保留作记录）「负债证明目标受到我方追加攻击时」与「自身回合内不触发」**：本条正确的那一半是「`target has_state` 本来就够用」（`ctx.target()` 就是被打的那个）；同时它写着两个**当时为真、现在为假**的结论 —— ✗「条件语言不允许否定 `is_summon`」（现在可写，见 `talent_ally_followup_advances_numby` 的 `!actor is_summon`，引擎侧的守卫也一并放开）与 ✗「没有判据可写」。⭐ **判据已补（2026-11-08）**：`TopazNumbyTest#anAllyFollowUpOnADebtMarkedTargetAdvancesNumbyByHalf` —— 用 `queue().snapshot()` 读账账自己的信号，`FOLLOW_UP` 之后剩余等待**正好减半**，并钉住三个对照（目标没带【负债证明】/ 出招的是敌人 / 出招的是账账自己，三者都不提前）。⚠ 仍开的只剩星魂 2/4/6 与秘技（见下一条）。",
     "⭐ **「负债证明目标受到我方追加攻击时，账账行动提前 50%，自身回合内不触发」已完整落地（2026-11-08）**：`FOLLOW_UP` + `actor is_ally` + `target has_state 负债证明` + `!actor is_summon` → `ADVANCE 0.5`（目标 `summon`）。✅ **判据已补（2026-11-08）**：`TopazNumbyTest#anAllyFollowUpOnADebtMarkedTargetAdvancesNumbyByHalf` —— 用 `queue().snapshot()` 读账账自己的信号，`FOLLOW_UP` 之后剩余等待**正好减半**；并钉住三个**对照**（目标没带【负债证明】/ 出招的是敌人 / 出招的是账账自己，三者都不提前）。⭐ **星魂 2 / 星魂 4 / 秘技（能量那半）也已落地（2026-11-08）**：`eidolon2_numby_attack_pays_energy`（TURN_START + `actor is_summon` + `enemy_state_count:负债证明 >= 1` → 托帕 +5 能量）、`eidolon4_numby_turn_advances_her`（同事件 → 托帕 `ADVANCE 0.2`）、`technique_first_attack_pays_energy`（+ `self has_state 秘技` + `once_per_battle` → +60 能量）。⚠ **不能**把这三条挂到 `SUMMON_ATTACK`：那个事件只由 `EnemySkill.execute` 发出，账账这一击是**规则**打的，挂上去会**永远不触发而没有症状**（本条上一轮已用这个理由把行动提前挪到 `FOLLOW_UP`）。",
-    "⛔ **终结技 扭亏为盈！整段没有规则，也没有登记 —— 2026-11-08 核出（本文件此前漏记）**：「使账账进入【涨幅惊人！】状态，**伤害倍率提高 150%**，**暴击伤害提高 25%**，且当陷入【负债证明】状态下的敌方目标受到我方的**普攻、战技或终结技**的攻击时，账账**行动提前 50%**。账账施放 **2** 次攻击后退出【涨幅惊人！】状态。」数值全在 ULTRA 行 `[1.5, 0.25, 0.5, 2]`（Lv10）。⚠ 这句**大部分有拼法**（`APPLY_BUFF` 到 `summon` + `while_holder_state` 门 + `ADD_STACK` 计数 + `ALLY_ATTACK` 的 `from_skill`/`from_category` 三条 + `ADVANCE`），但**先要量清一件事**：「伤害倍率提高 150%」落在**乘区**（`ALL_DAMAGE_TYPE_BOOST`，×2.5）还是**技能行倍率**（1.5 → 3.75）上，账账那一击的数字差 50%。⇒ 下一棒先做这个测量，再逐句核整段。",
-    "⛔ **星魂 6「账账处于【涨幅惊人！】状态的攻击次数增加 1 次，且攻击时火属性抗性穿透提高 10%」**：两半都有拼法（`ADD_STACK` +1、`MODIFY_ATTR RESISTANCE_REDUCTION 0.1` 挂 `summon` + 同一个 `while_holder_state` 门），但它**依赖上面那个还不存在的【涨幅惊人！】状态** —— 先落地终结技，这条就是两次追加。参数 `[1, 0.1]`。",
-    "⛔ **行迹 技术性调整「当账账处于【涨幅惊人！】状态施放攻击后，额外使托帕恢复 10 点能量」**：同样卡在【涨幅惊人！】状态不存在；状态落地后它是一条 `TURN_START` + `actor is_summon` + `holder has_state`（同族门）→ `GAIN_ENERGY 10`。数值 10 见行迹数据 `1112103`。",
+    "✅ **终结技 扭亏为盈！已落地（2026-11-08）**：`ult_windfall_bonanza`（`APPLY_BUFF 涨幅惊人` 到账账 + 计数器 `涨幅次数` 初值 `ULTRA:3`=2 + 两条 `MODIFY_ATTR` 挂账账、`while_holder_state` 门）＋ `windfall_advances_numby_on_a_{basic,skill,ultimate}_attack`（三条 `ALLY_ATTACK` + `from_skill` + `target has_state 负债证明` + entity 谓词 `summon.state` → `ADVANCE 0.5`）＋ `windfall_spends_an_attack` / `windfall_ends_when_spent`（扣次数、归零摘状态）。⚠ **一个读法需要记住**：「伤害倍率提高 150%」按**相对**读（`ALL_DAMAGE_TYPE_BOOST` +1.5 ⇒ 与既有火伤加成**相加**后约 ×2.23，暴击那一半另算），依据是本库对同一句式的先例（1210 的「灼烧伤害倍率提升 40%」= `BOOST_DOT` ⇒ ×1.4）；若按「倍率**加** 1.5（绝对值 ×2.0）」读，账账那一击会低 20%，文档没有更多信息 —— 判据 `TopazUltimateTest#windfallRaisesNumbysStrike` 把**现在的读法**钉住了（写的是 `(1+火伤+1.5)/(1+火伤) × 暴伤比`，不是硬编码 2.5）。",
+    "✅ **星魂 6 两半都已落地（2026-11-08）**：`eidolon6_windfall_extends_the_state`（`ADD_STACK 涨幅次数 +1`，排在终结技之后 ⇒ 2→3）、`eidolon6_windfall_pierces_resistance`（`MODIFY_ATTR RESISTANCE_REDUCTION 0.1` 挂账账、同一个 `while_holder_state` 门）。⚠ 近似已登记：`RESISTANCE_REDUCTION` 是**全属性**穿透（引擎没有「火属性穿透」这一维，1014 的同型从句同样这么记）。",
+    "✅ **行迹 技术性调整已落地（2026-11-08）**：`trace_technical_adjustment_pays_energy`（`TURN_START` + `actor is_summon` + entity 谓词 `summon.state` → 托帕 +10 能量；⚠ 必须排在扣次数那条**之前**，否则最后一击的 10 点会因为状态在同事件里被摘掉而付不出去）。",
     "⭐ **不建模（战斗外行为）**：秘技的三句 —— 「托帕入场时召唤账账，账账会自动搜寻一定范围内的普通战利品与扑满」（大地图）、「主动施放秘技与大地图内的敌人战斗胜利后…额外获取少量信用点，每个地球日内最多 10000 点」、「模拟宇宙/差分宇宙内胜利后额外获取宇宙碎片并有小概率获得 1 个随机奇物」—— 三句都发生在**战斗之外**，本库只建模战斗内结算；秘技**战斗内**的那半句（账账首次攻击后回 60 能量）已由 `technique_first_attack_pays_energy` 落地。"
   ],
   "rules": [
@@ -258,6 +258,240 @@
       ],
       "source": "1112 托帕&账账 秘技 明补:「主动施放秘技使下一场战斗中账账施放首次攻击后，托帕恢复60点能量。」参数 = [60, 10000]",
       "_note": "「主动施放秘技使下一场战斗中账账**施放首次攻击后**，托帕**恢复 60 点能量**」—— ① ``self has_state 秘技`` 是引擎在战斗开始前盖的**永久**状态（``Battle.applyTechniqueStates`` 的 ``StateBuff(\"秘技\", 1, true)``），所以整场都在，不需要自己清；② 「**首次**」= ``once_per_battle: true``（规则级字段，整场只发一次）；③ 「施放**攻击**」用 ``enemy_state_count:负债证明 >= 1`` 守（同星魂 2 的理由：没人带状态时账账没有出手）；④ 数值 **60** = 秘技 ``param[0]``；⚠ ⑤ **秘技的其余三句是大地图行为**（入场召唤账账、战利品搜寻、信用点/宇宙碎片奖励），不属于战斗内、也不建模，已在 `_gaps` 记录；⑥ 判据 `TopazNumbyTest#theTechniquePaysSixtyOnTheFirstAttack`（第二次攻击不再付）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_windfall_bonanza",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "涨幅惊人",
+          "permanent": true,
+          "target": "summon"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "涨幅次数",
+          "value": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 3
+          },
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "summon"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 0
+          },
+          "permanent": true,
+          "while_holder_state": "涨幅惊人",
+          "target": "summon"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 1
+          },
+          "permanent": true,
+          "while_holder_state": "涨幅惊人",
+          "target": "summon"
+        }
+      ],
+      "source": "1112 托帕&账账 终结技 扭亏为盈！:「使账账进入【涨幅惊人！】状态，伤害倍率提高150%，暴击伤害提高25%…账账施放2次攻击后退出【涨幅惊人！】状态。」参数 = [1.5, 0.25, 0.5, 2]",
+      "_note": "「使账账**进入【涨幅惊人！】状态**，**伤害倍率提高 150%**，**暴击伤害提高 25%**…账账施放 **2** 次攻击后退出」—— ① 状态用 ``APPLY_BUFF { permanent: true, target: summon }``：持有者是**账账**，所以两个修饰都用 **``while_holder_state: 涨幅惊人``**（问**载体自己**的状态；``while_state`` 问的是规则主人托帕，用错会**静默不生效**）；② 「伤害倍率提高 150%」= ``ALL_DAMAGE_TYPE_BOOST`` + ``percent_from ULTRA:0``（1.5）⇒ 伤害 ×2.5。⚠ **口径依据**：本库对「伤害倍率提高 X%」的既有读法是**相对**的 —— 1210 的「灼烧伤害倍率提升 40%」= ``BOOST_DOT`` ⇒ ×1.4（见那份文件的注记），这里沿用同一个读法；若按「倍率**加** 1.5（绝对值）」读则是 ×2.0，两者差 25%，**已登记为待核**（见 `_gaps`）；③ 「暴击伤害提高 25%」= ``CRIT_ATTACK`` + ``percent_from ULTRA:1``（比率属性 ⇒ +0.25 = +25 个百分点）；④ 「施放 **2** 次攻击」= 具名计数器 ``涨幅次数``，初值取 **``ULTRA:3`` = 2**（上限 5，给星魂 6 的 +1 留位），每回合结束前扣 1、见 ``windfall_spends_an_attack`` / ``windfall_ends_when_spent``；⑤ ``self_summon_count >= 1`` 是引擎守卫要求的那道门（指名 ``summon`` 而没有召唤物会直接抛异常）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_windfall_extends_the_state",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "涨幅次数",
+          "amount": 1,
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1112 托帕&账账 星魂 6 激励机制:「账账处于【涨幅惊人！】状态的攻击次数增加1次」参数 = [1, 0.1]",
+      "_note": "「账账处于【涨幅惊人！】状态的**攻击次数增加 1 次**」—— 一条 ``ADD_STACK``（+1，上限 5）加在终结技那条**之后**（文件顺序 = 执行顺序，所以它读到的是 2、加成 3；⭐ 这**不需要**「条件性加值」的新写法，两条规则天然先后）。数值 **1** = 星魂 6 的 ``param[0]``。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_windfall_pierces_resistance",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.1,
+          "permanent": true,
+          "while_holder_state": "涨幅惊人",
+          "target": "summon"
+        }
+      ],
+      "source": "1112 托帕&账账 星魂 6 激励机制:「…且攻击时火属性抗性穿透提高10%」参数 = [1, 0.1]",
+      "_note": "「且**攻击时**火属性抗性穿透提高 **10%**」—— 修饰挂在**账账**身上（``target: summon``）并带同一个 ``while_holder_state: 涨幅惊人`` 门：句子说的是「**攻击时**」，而账账的攻击只发生在它的回合里、也只在那个状态下加伤 ⇒ 状态在 = 攻击时的穿透在，状态走 = 一起走。⚠ 近似已登记：``RESISTANCE_REDUCTION`` 是**全属性**穿透（引擎没有「火属性穿透」这一维，1014 的同型从句也是这么记的）。数值 **0.1** = 星魂 6 的 ``param[1]``。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "windfall_advances_numby_on_a_basic_attack",
+      "when": [
+        "from_skill COMMON",
+        "target has_state 负债证明",
+        {
+          "type": "entity",
+          "entity": "summon",
+          "json": {
+            "state": "涨幅惊人"
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.5,
+          "target": "summon"
+        }
+      ],
+      "source": "1112 托帕&账账 终结技:「…且当陷入【负债证明】状态下的敌方目标受到我方的普攻、战技或终结技的攻击时，账账行动提前50%。」参数 = [1.5, 0.25, 0.5, 2]",
+      "_note": "「当**陷入【负债证明】**状态下的敌方目标**受到我方的普攻**…攻击时，账账**行动提前 50%**」—— ① ``ALLY_ATTACK``（每次施放**只发一次**，1206 的注记已量过）＋ ``from_skill COMMON`` 把「**普攻**」这一支挑出来（「战技」「终结技」是另外两条 —— DSL 没有跨事件的 OR，而这是同一句话按技能槽拆开，与 1009/1206 的既有做法一致）；② 「陷入【负债证明】的敌方目标」= ``target has_state 负债证明``（``ALLY_ATTACK`` 的 target 就是被打的目标）；③ ⚠ **「在【涨幅惊人！】时」这一半**：句子把它写在终结技里，但状态挂在**账账**身上、而这条规则是被**队友的普攻**触发的（actor 是队友）—— 所以用 **entity 谓词** ``{ entity: summon, json: { state: 涨幅惊人 } }``（``EntityPredicates.SUBJECTS`` 里本来就有 ``summon``，读的是 ``battle.summonOf(owner)``）。⚠ 不能写 ``summon has_state 涨幅惊人``：DSL 字符串的 ``STATE_SUBJECTS`` 只有 self/actor/target，那样会在装载期被拒。 ⭐ 判据 `TopazUltimateTest#anAllyHitAdvancesNumbyOnlyWhileInTheState`（状态内 / 状态外 / 没标记 三个对照）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "windfall_advances_numby_on_a_skill_attack",
+      "when": [
+        "from_skill SKILL",
+        "target has_state 负债证明",
+        {
+          "type": "entity",
+          "entity": "summon",
+          "json": {
+            "state": "涨幅惊人"
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.5,
+          "target": "summon"
+        }
+      ],
+      "source": "1112 托帕&账账 终结技:「…受到我方的普攻、**战技**或终结技的攻击时，账账行动提前50%。」",
+      "_note": "与普攻那条同形，只把 ``from_skill`` 换成 **SKILL**（「战技」）；三条规则各自对应句子里的一个技能槽 —— 不是「一句话写两遍」，三条的 ``when`` 两两不同（``ContentDuplicateGuardTest`` 的签名含 ``when``）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "windfall_advances_numby_on_an_ultimate_attack",
+      "when": [
+        "from_skill ULTRA",
+        "target has_state 负债证明",
+        {
+          "type": "entity",
+          "entity": "summon",
+          "json": {
+            "state": "涨幅惊人"
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.5,
+          "target": "summon"
+        }
+      ],
+      "source": "1112 托帕&账账 终结技:「…受到我方的普攻、战技或**终结技**的攻击时，账账行动提前50%。」",
+      "_note": "第三条，``from_skill ULTRA``（「终结技」）。⚠ 与天赋那条 ``FOLLOW_UP`` 的「行动提前 50%」**不冲突也不重复**：那条问的是「**追加攻击**」（``DamageType.ADDITIONAL`` 的 FOLLOW_UP 事件），这三条问的是「普攻 / 战技 / 终结技」的**直接攻击**（``ALLY_ATTACK``）—— 一次战技可能同时满足两边（1112 的战技被视为追加攻击），那正是句子里两句话各自成立的情况。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "trace_technical_adjustment_pays_energy",
+      "when": [
+        "actor is_summon",
+        {
+          "type": "entity",
+          "entity": "summon",
+          "json": {
+            "state": "涨幅惊人"
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "target": "self"
+        }
+      ],
+      "source": "1112 托帕&账账 行迹 技术性调整 (1112103):「当账账处于【涨幅惊人！】状态施放攻击后，额外使托帕恢复10点能量。」",
+      "_note": "「当账账**处于【涨幅惊人！】状态施放攻击后**，额外使托帕**恢复 10 点能量**」—— 触发与账账那一击同一个行动点（``TURN_START`` + ``actor is_summon``），状态门用同一个 entity 谓词。⚠ **顺序**：本条必须排在 ``windfall_spends_an_attack`` **之前**（文件顺序 = 执行顺序）—— 否则最后一击会先把计数器扣到 0、状态在同事件里被摘掉，这一击的 10 点就付不出去。数值 **10** 见行迹数据 ``1112103``。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "windfall_spends_an_attack",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "涨幅次数",
+          "amount": 1,
+          "target": "actor"
+        }
+      ],
+      "source": "1112 托帕&账账 终结技:「…账账施放2次攻击后退出【涨幅惊人！】状态。」",
+      "_note": "「账账**施放 2 次攻击后**退出」的**计数那半**：每攻击一次扣 1 层 ``涨幅次数``（``TURN_START`` + ``actor is_summon``，与它的攻击同一个行动点，排在那两条伤害规则与行迹之后）。⚠ 用 ``REMOVE_STACK`` 而不是 ``SET_STACKS``：后者要 ``scale``，而「减一」本来就有专门的 op。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "windfall_ends_when_spent",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:涨幅次数 <= 0"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "涨幅惊人",
+          "target": "actor"
+        }
+      ],
+      "source": "1112 托帕&账账 终结技:「…账账施放2次攻击后退出【涨幅惊人！】状态。」",
+      "_note": "「**退出**【涨幅惊人！】状态」的**摘除那半**：``actor_stacks:涨幅次数 <= 0`` → ``REMOVE_STATE``（排在 ``windfall_spends_an_attack`` **之后**，所以读到的是扣减后的层数）。⚠ 用 ``REMOVE_STATE`` 而不是 ``REMOVE_BUFF``：``removeBuffs`` 只摘**正面且非永久**的 buff（1203 的判据量过「永久加成不是增益效果」），而这两个状态是 ``permanent`` 的；按名字摘状态才摘得掉。状态一摘，挂在上面的两条 ``while_holder_state`` 修饰在**账账的下一个回合边界**被扫掉（``AbstractBuff.gateBroken``），与其余门槛同一种「晚一拍」。",
       "_status": "implemented"
     }
   ]
