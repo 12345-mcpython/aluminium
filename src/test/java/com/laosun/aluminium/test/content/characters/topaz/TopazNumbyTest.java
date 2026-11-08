@@ -32,12 +32,27 @@ public class TopazNumbyTest {
                 "「账账初始拥有 80 点速度」");
     }
 
+    /**
+     * 「行动时…**对陷入【负债证明】状态下的敌方单体**造成…」 - so the state has to be there first. Without it the strike has no
+     * legal target at all, which is the clause's own reading (and the reason `random_enemy` was wrong here).
+     */
     @Test
-    public void numbyStrikesOnItsOwnTurn() {
+    public void numbyStrikesOnlyADebtMarkedTarget() {
         Battle battle = scene();
-        Summon numby = battle.summonsOf(battle.characters().getFirst()).getFirst();
+        Character topaz = battle.characters().getFirst();
+        Summon numby = battle.summonsOf(topaz).getFirst();
         Enemy enemy = (Enemy) battle.enemies().getFirst();
         double before = enemy.getCurrentHp();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
+        battle.processRequests();
+        Assertions.assertEquals(before, enemy.getCurrentHp(), 1e-9,
+                "nobody holds 【负债证明】, so there is no target the sentence allows");
+
+        battle.castImmediate(topaz.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), topaz,
+                List.of(enemy));
+        battle.processRequests();
+        Assertions.assertTrue(enemy.getBuffManager().hasState("负债证明"), "precondition: the Skill marks the target");
+        before = enemy.getCurrentHp();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
         battle.processRequests();
         Assertions.assertTrue(enemy.getCurrentHp() < before, "「行动时发动追加攻击…造成火属性伤害」");

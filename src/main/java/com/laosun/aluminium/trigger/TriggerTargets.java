@@ -140,6 +140,10 @@ final class TriggerTargets {
             case TriggerVocabulary.TARGET_RANDOM_ENEMY ->
                     require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                             TriggerVocabulary.TARGET_RANDOM_ENEMY, ctx);
+            // 「对陷入【负债证明】状态下的敌方单体造成…」 (1112 托帕&账账): a random enemy HOLDING the state named by `require_state`,
+            // not just any enemy. `random_enemy` draws from the whole side and would hit a target the sentence excludes - the
+            // "wrong number with no symptom" this project refuses - so it gets its own spelling. Nobody holding it => no target.
+            case "random_enemy_with_state" -> randomEnemyWithState(ctx, effect);
             case "random_adjacent_enemy" ->
                     require(ctx.battle() == null ? null : ctx.battle().randomAdjacentEnemy(ctx.target()),
                             "random_adjacent_enemy", ctx);
@@ -360,6 +364,13 @@ final class TriggerTargets {
             return named == null ? List.of() : List.of(named);
         }
         switch (selector) {
+            // 「对陷入【负债证明】状态下的敌方单体造成…」 (1112 托帕&账账's 账账): the pool is the enemies HOLDING the state named by
+            // `require_state`, so an empty pool is an EMPTY resolution - the op then does nothing, which is what the sentence says.
+            // It must not go through the singular path, whose convention is to throw when there is no answer.
+            case "random_enemy_with_state" -> {
+                CanHit holder = randomEnemyWithState(ctx, effect);
+                return holder == null ? List.<CanHit>of() : List.<CanHit>of(holder);
+            }
             case TriggerVocabulary.TARGET_LOWEST_HP_ALLY -> {
                 if (battle == null) {
                     throw new IllegalStateException(
@@ -883,6 +894,31 @@ final class TriggerTargets {
      */
     static final String ENEMIES_WITH_STATE_PREFIX = "all_enemies_with_state:";
 
+
+    /**
+     * A random opponent HOLDING a named state ({@code require_state} on the effect), or {@code null} when nobody does.
+     *
+     * @param ctx    the trigger context
+     * @param effect the effect whose {@code require_state} names the state
+     * @return the drawn opponent, or {@code null}
+     */
+    private static CanHit randomEnemyWithState(TriggerContext ctx, EffectSpec effect) {
+        if (ctx.battle() == null) {
+            return null;
+        }
+        String state = effect.getRequireState();
+        if (state == null || state.isBlank()) {
+            throw new IllegalStateException(
+                    "a target of \"random_enemy_with_state\" needs \"require_state\" to say which one (e.g. 负债证明)");
+        }
+        java.util.List<CanHit> holders = new java.util.ArrayList<>();
+        for (CanHit candidate : ctx.battle().getOpponents(ctx.owner())) {
+            if (candidate != null && !candidate.isDeath() && candidate.getBuffManager().hasState(state.trim())) {
+                holders.add(candidate);
+            }
+        }
+        return holders.isEmpty() ? null : holders.get(ctx.battle().getRng().nextInt(holders.size()));
+    }
 }
 
 

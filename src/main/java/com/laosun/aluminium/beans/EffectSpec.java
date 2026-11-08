@@ -112,6 +112,7 @@ public class EffectSpec {
         copy.panelLess = this.panelLess;
         copy.blast = this.blast;
         copy.summonSpeed = this.summonSpeed;
+        copy.requireState = this.requireState;
         copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
         copy.value = NumberProviders.copyOf(this.value);
         copy.percentPerAllyState = this.percentPerAllyState;
@@ -1246,6 +1247,15 @@ public class EffectSpec {
      */
     @SerializedName("summon_speed")
     private Double summonSpeed;
+
+    /**
+     * A target selector that needs a STATE name ({@code random_enemy_with_state}): which state the victim must be holding.
+     *
+     * <p>Reader: 1112 「对陷入【负债证明】状态下的敌方单体造成…」 - the sentence excludes every other enemy, and drawing from all of them
+     * would be a wrong number with no symptom.
+     */
+    @SerializedName("require_state")
+    private String requireState;
 
 
     /**

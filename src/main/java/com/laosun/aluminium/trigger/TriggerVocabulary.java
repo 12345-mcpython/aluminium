@@ -85,6 +85,10 @@ final class TriggerVocabulary {
                     // paid is the event's actor (the archetype whose extra turn just began), not the rule's owner.
                     "actor",
                     "random_enemy", "random_hit_enemy",
+                    // 「对陷入【负债证明】状态下的敌方单体造成…」 (1112 托帕&账账's 账账): a random enemy HOLDING the state named by the
+                    // effect's `require_state`. `random_enemy` draws from the whole side and would hit a target the sentence
+                    // excludes - a wrong number with no symptom, which is what this set exists to prevent.
+                    "random_enemy_with_state",
                     // The attack's hit set MINUS its main target: "同时对其**相邻目标**造成…" (1005 Kafka's Skill, the
                     // enhanced form). `all_hit_enemies` would include the main target and pay it twice.
                     "other_hit_enemies",

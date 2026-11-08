@@ -5,7 +5,7 @@
   "_gaps": [
     "✅ **星魂 1 已落地**（2026-11-02）：`eidolon1_executed_on_debt_target` + 新引擎属性 `CRIT_DAMAGE_TAKEN`。⚠ 近似：「单次攻击内最多生效 1 次」未表达。",
     "✅ 已落地：战技【负债证明】（`skill_proof_of_debt`）、行迹「金融动荡」（`trace_damage_vs_fire_weakness`）、星魂 1/3/5。",
-    "⭐ **账账已上场并能出手（2026-11-08）**：`numby_takes_the_field`（`SUMMON panel_less` + 速度 80 点）、`numby_strikes_a_debt_marked_target`（`TURN_START` + `actor is_summon` → 150% 火伤）、`talent_ally_followup_advances_numby`（我方追加攻击 → 账账行动提前 50%）。⛔ **仍开**：① 出手目标应该**限定为带【负债证明】的那一个**（现为 `random_enemy`，引擎缺「带某状态」的目标过滤）；② 「账账**自身回合内**不触发行动提前」（缺「当前回合属于谁」的判定）；③ 星魂 2/4/6 与秘技里以账账为主体的条款（多数跟着①）。"
+    "⭐ **出手目标已限定（2026-11-08）**：`random_enemy_with_state` + `require_state: 负债证明` —— 只从持有该状态的敌人里抽，没人持有就没有目标。⛔ **仍开**：① 「账账**自身回合内**不触发行动提前」（缺「当前回合属于谁」的判定）；② 星魂 2/4/6 与秘技里以账账为主体的条款。"
   ],
   "rules": [
     {
@@ -173,11 +173,12 @@
           "percent": 1.5,
           "element": "Fire",
           "attacker": "actor",
-          "target": "random_enemy"
+          "require_state": "负债证明",
+          "target": "random_enemy_with_state"
         }
       ],
       "source": "1112 托帕&账账 天赋 猪市？！:「…行动时发动追加攻击，对陷入【负债证明】状态下的敌方单体造成等同于托帕150%攻击力的火属性伤害。」",
-      "_note": "「账账**行动时**发动追加攻击，对陷入【负债证明】的敌方单体造成等同于托帕 **150%** 攻击力的**火**属性伤害」—— `TURN_START` + `actor is_summon` → `DAMAGE { percent: 1.5, element: Fire, attacker: actor }`。⚠ 目标没写成「只打负债证明的那个」：引擎的 `random_enemy` 没有「带某个状态」的过滤版本（`target_debuffs` 是计数不是过滤），这是本条**已知近似**，已登记。"
+      "_note": "「账账行动时…**对陷入【负债证明】状态下的敌方单体**造成等同于托帕 **150%** 攻击力的火属性伤害」—— 本轮给目标选择器加了 **`random_enemy_with_state`**（配 `require_state: 负债证明`）：只从**持有该状态**的敌人里抽，没人持有就**没有目标**（这一发什么也不做，正是句子的意思）。⚠ 之前用 `random_enemy` 会打到句子排除的目标 —— 正是「没有症状的错」。"
     },
     {
       "on": "FOLLOW_UP",
