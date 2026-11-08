@@ -169,6 +169,26 @@
       ],
       "_note": "「战斗开始时，立即恢复 **15** 点能量」—— ``BATTLE_START`` → ``GAIN_ENERGY 15`` ✓（1313/8001 同一形）。",
       "id": "trace_second_wind_starts_with_energy"
+    },
+    {
+      "source": "1204 景元 天赋 抱朴守拙:「…【神君】行动时，对敌方随机单体造成等同于景元66%攻击力的雷属性伤害，攻击段数越多伤害次数越多…」",
+      "on": "TURN_START",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:攻击段数 >= 1"
+      ],
+      "id": "the_lord_strikes_on_its_turn",
+      "do": [
+        {
+          "times_from": "steps:actor_stacks:攻击段数/1",
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "target": "random_enemy",
+          "percent": 0.66,
+          "element": "Thunder"
+        }
+      ],
+      "_note": "「【神君】**行动时**，对敌方随机单体造成等同于景元 **66%** 攻击力的雷属性伤害，**攻击段数越多伤害次数越多**」—— ① 「神君行动」用 **`TURN_START` + `actor is_summon`**（召唤物也是战斗单位、有自己的回合 ✓）；② 次数用 **`times_from: \"steps:self_stacks:攻击段数/1\"`** —— 计数器每层一段（`steps:` 的 `floor(值/1)` 就是层数原值 ✓，这是本轮新加的拼法）；③ `66%` 与「随机单体」都是文档原话。⚠ `percent: 0.66` 是**字面值**：文档写的就是 66%，天赋参数行没有「段数/攻击力」这一列可读。⚠ 这是**近似**：真实游戏里神君的行动值独立于景元的回合表，这里用「它的回合开始」当行动点。"
     }
   ]
 }

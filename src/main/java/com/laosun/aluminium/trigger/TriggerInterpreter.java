@@ -201,6 +201,11 @@ public final class TriggerInterpreter {
         if (name.startsWith("self_stacks:")) {
             return owner.getBuffManager().stacksOf(name.substring("self_stacks:".length()).trim());
         }
+        if (name.startsWith("actor_stacks:")) {
+            CanHit counted = ctx == null ? null : ctx.actor();
+            return counted == null ? 0 : counted.getBuffManager().stacksOf(
+                    name.substring("actor_stacks:".length()).trim());
+        }
         if (name.startsWith("target_stacks:")) {
             CanHit counted = ctx == null ? null : ctx.target();
             return counted == null ? 0 : counted.getBuffManager().stacksOf(

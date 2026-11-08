@@ -87,7 +87,9 @@ public class HardcodedSkillRowRatchetTest {
     // second rule). The Eidolon param has no level axis, so it stays literal - the same verdict as the entries above.
     // Note: 51 since 2026-11-06 - 1304's technique states 「防御力提高 24%」, and 0.24 is also a cell of his own rows. The
     // technique param has no level axis, so it stays literal - the same verdict as the entries above.
-    private static final int BASELINE = 51;
+    // Note: 52 since 2026-11-08 - 1204 states 「造成等同于景元 66% 攻击力的雷属性伤害」 for the Lord's hits, and 0.66 is also a cell
+    // of his own rows. The talent param has no such column, so it stays literal - the same verdict as the entries above.
+    private static final int BASELINE = 52;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
