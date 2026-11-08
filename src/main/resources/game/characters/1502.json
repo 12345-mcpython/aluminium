@@ -6,7 +6,7 @@
     "⭐ **「结界期间我方全体欢愉度提高 = 爻光欢愉度的 20%」已落地**（2026-11-02）：`skill_opens_the_zone` 的 `do` 里追加 `MODIFY_ATTR ELATION_DAMAGE_BOOST { scale: 「self_attr:ELATION_DAMAGE_BOOST」, percent: 0.2, turns: 3, target: 「all_allies」 }` —— `self_attr:` 就是**爻光自己的**欢愉度（不需要新的跨单位词），`turns: 3` 与结界同长。判据 `YaoguangZoneElationTest`：她 0.6 时队友 +0.12 ✓（**断言写成「她的实时值 × 20%」**，因为她的欢愉度在开局还带别的加成 —— 写死 0.1 会误判）。",
     "⛔ **「使阿哈立即获得 1 个固定计入 20 笑点的额外回合」仍未写，两头都卡（2026-11-08）**：① 「让**阿哈**获得一个**额外回合**」—— 阿哈是欢愉的**场外实体**，名册里没有它的单位 ⇒ EXTRA_TURN 没有可指名的目标（与 1110/1505 的「伙伴/召唤物没有单位」同族）；② 「固定计入 **20** 笑点」看着能写（`GAIN_RESOURCE { resource: 笑点, amount: 20 }`），但**写上去就是错的**：那 20 点是**阿哈那一个额外回合里的计数**，不是「爻光施放终结技获得的 5 个笑点」那一笔。实测：加上去之后既有判据 `YaoGuangTest.theUltimateAlsoGivesThePartyFiveLaughs` 从 5 变成 **25** ⇒ 立刻红 —— **删掉**，并把判断写在这里。",
     "⭐ **天赋【大吉大利】已修正并落地**（2026-11-02）：条件改为 `[「actor is_ally」, 「self has_state 好活当赏」]`、`element` 改为 `attacker`（「对应属性」）。判据 `YaoguangTalentScopeTest`：队友普攻在**持有时**损失 **1494.74**、**不持有**时 **1341.06** ✓（差 153.68 = 那 20% 的一发）。",
-    "⛔ **星魂与行迹未读**。"
+    "⭐ **星魂已读（2026-11-08）**：星魂 2「结界持续期间，我方全体**速度 +12%**、**欢愉度额外 +16%**」已落地（`eidolon2_the_zone_lifts_speed_and_elation`，与结界同用 `turns: 3`，「额外」那份用 `coexist: true` 与 +20% 那条并存）。星魂 3/5 是等级加成（未写，因本文件没有等级规则）。⛔ **星魂 1 前半**（阿哈额外回合的笑点数提高到 **40**）与 **星魂 6** 未写，原因同下面那条「阿哈没有单位」。⛔ **行迹段落文档为空**（该角色文档未列行迹）⇒ 无可写。"
   ],
   "rules": [
     {
@@ -175,6 +175,33 @@
       ],
       "source": "1502 爻光 天赋 屏开千光，遍观自在: 「爻光持有【好活当赏】时：使我方目标施放攻击后触发【大吉大利】效果，对随机1个击中的目标额外造成1次20.00%的对应属性欢愉伤害，本次攻击若消耗战技点，则额外触发1次【大吉大利】效果。触发【大吉大利】效果时若攻击者欢愉度低于爻光，则该次欢愉伤害使用爻光欢愉度来计算。触发【大吉大利】效果不视为1次攻击。」 天赋 Lv10 = [0.2]",
       "_note": "「爻光**持有【好活当赏】时**：使我方目标施放攻击后触发【大吉大利】…对随机 1 个击中的目标额外造成 1 次 **20.00%** 的**对应属性**欢愉伤害」= `ATTACK_FINISHED` + `when: [「actor is_ally」, 「self has_state 好活当赏」]` → `DAMAGE { scale: 「self_attr:ATTACK」, percent_from_skill_param: 「TALENT:0」, element: 「attacker」, damage_type: 「ELATION」, target: 「random_hit_enemy」, cast_category: 「ADDITIONAL」 }` ✓。⚠ **两处修正（2026-11-02）**：① 条件原来是 `actor == self` —— 句子是「**我方目标**施放攻击后」，**队友的攻击也算**，而且必须**她持有【好活当赏】**（原写法两条都不满足，规则只在她自己普攻后触发）；② `element` 原来是写死的 `Physical` —— 句子是「**对应属性**」，即**攻击者的属性**，引擎有现成的 `element: 「attacker」`。⛔ 仍缺：「本次攻击若消耗战技点，则**额外触发 1 次**」（需要「这一发消耗了战技点」的条件，词表里没有）与「攻击者欢愉度低于爻光时改用爻光的欢愉度」（需要按欢愉度取大者的派生）。"
+    },
+    {
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "source": "1502 爻光 星魂 2 飞箭无目，青翎为瞳:「结界持续期间，我方全体目标速度提高12%，欢愉度额外提高16%。」",
+      "on": "SKILL_CAST",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "target": "all_allies",
+          "percent": 0.12,
+          "turns": 3,
+          "attribute": "SPEED"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "turns": 3,
+          "target": "all_allies",
+          "percent": 0.16,
+          "scale": "self_attr:ELATION_DAMAGE_BOOST",
+          "attribute": "ELATION_DAMAGE_BOOST"
+        }
+      ],
+      "_note": "「**结界持续期间**，我方全体目标**速度提高 12%**，**欢愉度额外提高 16%**」—— 结界由战技挂上（`skill_opens_the_zone`，`turns: 3`、`ticks_on: self`）⇒ 本条同用 `turns: 3` 与 `target: all_allies`，与结界**同生同灭** ✓（同文件已有的「欢愉度 +20%」那条同一手法）。「额外 16%」也是**按爻光自己的欢愉度**取份额 ⇒ `scale: self_attr:ELATION_DAMAGE_BOOST` ✓（与 +20% 那条同形；⚠ 两条会**叠**吗？—— 同属性同来源的修饰默认**替换**，所以本条的 16% 会顶掉 20% 那条；句子说「**额外**提高 16%」意味着应该**叠加** ⇒ 这条需要 `coexist: true` 才能两者都在。",
+      "id": "eidolon2_the_zone_lifts_speed_and_elation"
     }
   ],
   "resources": [
