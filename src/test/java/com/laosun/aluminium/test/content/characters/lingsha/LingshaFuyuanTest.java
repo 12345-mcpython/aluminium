@@ -5,6 +5,7 @@ import com.laosun.aluminium.Signal;
 import com.laosun.aluminium.buff.DotBuff;
 import com.laosun.aluminium.buff.StateBuff;
 import com.laosun.aluminium.buff.VulnerabilityBuff;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.entity.Summon;
 import com.laosun.aluminium.enemy.Enemy;
@@ -267,6 +268,60 @@ public class LingshaFuyuanTest {
         return before - enemy.getCurrentHp();
     }
 
+    /**
+     * 行迹 遗爇 (1222103):「【浮元】在场时，我方任意角色受到伤害**或**消耗生命值时，若队伍中有存在当前生命值百分比小于等于 60%
+     * 的角色，【浮元】会立即对敌人发动天赋的追加攻击，此次触发不消耗【浮元】行动次数，该效果在 2 回合后可再次触发」.
+     *
+     * <p>Four facts are pinned at once, and each has a state in which it would be silently wrong: the party condition (nobody
+     * wounded ⇒ shut), the two events of 「或」 (a hit, and the HP cost), the action budget (an answering strike does NOT spend
+     * one of 浮元's three - the budget is only charged at its own turn end), and the cooldown.
+     */
+    @Test
+    public void theTraceAnswersOnlyWhileSomebodyIsWounded() {
+        Scene scene = new Scene(0, 1);
+        scene.castSkill();
+        Summon fuyuan = scene.fuyuan();
+        Character ally = scene.ally;
+        Enemy enemy = scene.enemies.getFirst();
+
+        double before = enemy.getCurrentHp();
+        scene.fire(TriggerEvent.TAKING_HIT, enemy, ally);
+        Assertions.assertEquals(before, enemy.getCurrentHp(), 1e-9,
+                "nobody is at or below 60%: 「若队伍中有存在当前生命值百分比 ≤60% 的角色」 is false");
+
+        wound(ally);
+        Assertions.assertEquals(3, fuyuan.getBuffManager().stacksOf(ACTIONS), "precondition: the budget is untouched");
+        before = enemy.getCurrentHp();
+        scene.fire(TriggerEvent.TAKING_HIT, enemy, ally);
+        Assertions.assertTrue(enemy.getCurrentHp() < before, "「【浮元】会立即对敌人发动天赋的追加攻击」");
+        Assertions.assertEquals(3, fuyuan.getBuffManager().stacksOf(ACTIONS),
+                "「此次触发不消耗【浮元】行动次数」 - the budget is charged at the summon's own turn end, not here");
+
+        before = enemy.getCurrentHp();
+        scene.fire(TriggerEvent.TAKING_HIT, enemy, ally);
+        Assertions.assertEquals(before, enemy.getCurrentHp(), 1e-9,
+                "「该效果在 2 回合后可再次触发」 - the very next hit is refused");
+
+        // The OTHER half of 「或」 has its own event and therefore its own cooldown: paying HP still answers.
+        before = enemy.getCurrentHp();
+        scene.fireHpConsumed(ally, 500);
+        Assertions.assertTrue(enemy.getCurrentHp() < before, "「…或消耗生命值时」 - the HP cost answers too");
+
+        // Two of HER turns later the damage half is armed again.
+        scene.lingsha.tickTriggerCooldowns();
+        scene.lingsha.tickTriggerCooldowns();
+        before = enemy.getCurrentHp();
+        scene.fire(TriggerEvent.TAKING_HIT, enemy, ally);
+        Assertions.assertTrue(enemy.getCurrentHp() < before, "「2 回合后可再次触发」 - the cooldown has run out");
+    }
+
+    /** Drive a unit below 60% HP without killing it. */
+    private static void wound(Character unit) {
+        while (unit.getCurrentHp() / unit.getMaxHp() > 0.6) {
+            unit.takeDamage(unit.getCurrentHp() * 0.3);
+        }
+    }
+
     /** What one 浮元 action heals the weakest ally at the given eidolon level. */
     private static double healOnItsAction(int eidolon) {
         Character lingsha = CharacterFactory.create(LINGSHA, LEVEL, false, null, null, eidolon);
@@ -344,6 +399,17 @@ public class LingshaFuyuanTest {
                 }
             }
             throw new IllegalStateException("浮元 is not in the action order");
+        }
+
+        /** One event, announced the way the engine announces it (actor, target, hit count, amount). */
+        private void fire(TriggerEvent event, CanHit actor, CanHit target) {
+            battle.fire(TriggerPayload.Simple.of(event, actor, target, 1, 0));
+            battle.processRequests();
+        }
+
+        private void fireHpConsumed(CanHit payer, double amount) {
+            battle.fire(TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, payer, payer, 0, amount));
+            battle.processRequests();
         }
     }
 }

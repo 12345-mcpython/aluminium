@@ -3,9 +3,8 @@
   "character": 1222,
   "_status": "partial",
   "_gaps": [
-    "⭐ **2026-11-08：天赋的【浮元】与星魂 6 落地** —— 旧的登记「引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元解析不到单位，所以『行动提前』写不出来」已**被证伪**：`SUMMON { panel_less: true }` 就是「非忆灵召唤物」的入口（`SummonService.panelLess` → `addCombatant`），浮元进了名册与行动条之后 `target: \"summon\"` 照常解析。本轮共 14 条规则围着它：召唤（`self_summon_count == 0` 的门，因为非忆灵路径**不幂等**）、行动次数（上限 5）、它自己回合的全体 + 随机单体、解除 1 个负面、回复 12%+360、星魂 4 的 40%、每行动一次扣 1 并在归零时 `DISMISS_SUMMON`、战技 20% 与终结技 100% 的行动提前、秘技开场召唤 + 【醇醉】，以及**星魂 6 两半**（「在场时」全属性抗性 −20% 用本轮新加的 `while_summon_count` 活门槛；「攻击时额外 4 次」用 `times` + `stance`）。判据 `LingshaFuyuanTest` 与 `SummonCountGateTest`。⚠ **下面三条才是仍开的**。",
-    "⚠ **「优先选择韧性值大于0且有火属性弱点的目标」**（天赋的第二发随机单体、星魂 6 的 4 次额外伤害都这么写）：目标选择器是闭集，没有「按韧性 / 弱点优先挑一个」的拼法（`random_enemy` 抽任意存活敌人，`random_enemy_with_state` 只按状态过滤）。这是**优先级**不是**排除** ⇒ 不会打到句子禁止的目标，但也享受不到这条优先。要落地得新增一个选择器（例如给选择器加 `prefer` 字段，或 `random_enemy_preferring:<条件>`）。",
-    "⛔ **行迹 遗爇「【浮元】在场时，我方任意角色受到伤害或消耗生命值时，若队伍中有存在当前生命值百分比小于等于 60% 的角色，【浮元】会立即对敌人发动天赋的追加攻击…该效果在 2 回合后可再次触发」缺一个「全队存在量词」条件**。这句话的其余部分都有拼法：触发点是 `TAKING_HIT` / `HP_LOST`（两个事件都在）、追加攻击就是天赋那两条 `DAMAGE`、「2 回合后可再次触发」是 `cooldown: 2`、「此次触发不消耗行动次数」天然成立（次数只在 `TURN_END` 扣）、「【浮元】在场时」的条件侧有 `self_summon_count >= 1`。缺的只有那道门槛：`hp_percent` 读的是**自己**、`target_hp_percent` 读事件目标、`ally_count` 只数人头 —— 没有「队伍中有人 HP% ≤ N」这个量词。",
+    "⭐ **2026-11-08：天赋的【浮元】、星魂 6 与行迹 遗爇 都落地了** —— 旧的登记「引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元解析不到单位，所以『行动提前』写不出来」已**被证伪**：`SUMMON { panel_less: true }` 就是「非忆灵召唤物」的入口（`SummonService.panelLess` → `addCombatant`）。本轮共 21 条规则：召唤（`self_summon_count == 0` 的门，因为非忆灵路径**不幂等**）、行动次数（上限 5）、它自己回合的两发伤害、解除 1 个负面 + 回复 12%+360、星魂 4 的 40%、星魂 6 的两半（`while_summon_count` 活门槛 / `times` + `stance`）、遗爇的两半（`TAKING_HIT` / `HP_CONSUMED` + 本轮新加的 `lowest_ally_hp_percent`）、每行动一次扣 1 并在归零时 `DISMISS_SUMMON`、战技 20% 与终结技 100% 的行动提前、秘技开场召唤 + 【醇醉】。判据 `LingshaFuyuanTest`、`SummonCountGateTest`、`LowestAllyHpConditionTest`。⚠ **下面两条才是仍开的**。",
+    "⚠ **「优先选择韧性值大于0且有火属性弱点的目标」**（天赋的第二发随机单体、星魂 6 的 4 次额外伤害、遗爇的追加攻击都这么写）：目标选择器是闭集，没有「按韧性 / 弱点优先挑一个」的拼法（`random_enemy` 抽任意存活敌人，`random_enemy_with_state` 只按状态过滤）。这是**优先级**不是**排除** ⇒ 不会打到句子禁止的目标，但也享受不到这条优先。要落地得新增一个选择器（例如给选择器加 `prefer` 字段，或 `random_enemy_preferring:<条件>`）。",
     "⛔ **星魂 1「灵砂的弱点击破效率提高 50%。当有敌方单位的弱点被击破时，使其防御力降低 20%」两半都缺词**：① 属性表里有 `BREAKING_EFFECT`（击破特攻）与 `BREAK_DAMAGE_BOOST`（击破伤害），**没有**「弱点击破效率」（削韧效率）这一项；② 后半的触发（`BREAK` 事件，目标带得到）有拼法，但文档**没写**那 20% 防御降低持续多久（既不是「直到击破结束」，也不是「2 回合」），按本库纪律**不猜数字**。",
     "⭐ **以下不登记为缺口**：普攻 / 战技 / 终结技的**伤害与破韧**由技能行数据驱动（`skills.json` 的 `param_list` 与 `stance_list`），不写规则也不会漏；「灵砂陷入**无法战斗状态**时【浮元】消失」由 `DeathService.perishOrphanedSummons` 承担（引擎内置，主人死亡时召唤物随之下场）。"
   ],
@@ -316,6 +315,86 @@
       ],
       "source": "1222 灵砂 星魂 6 晓兰深藏，宿香暗贮: 「【浮元】在场时，使敌方全体全属性抗性降低20%」参数 = [0.2, 4, 0.5, 5]",
       "_note": "「【浮元】**在场时**，使敌方全体**全属性抗性降低 20%**」—— ① 属性用 **``RESISTANCE_REDUCTION``**（引擎里正是「全属性抗性降低」：它从受击者的抗性里**减掉**，所以正值 = 抗性更低；1006 的同类从句是它的首个读者）；② 「**在场时**」用本轮新加的活门槛 **``while_summon_count: 1``**：修饰挂在敌人身上，但门槛问的是**规则主人还有几个活着的召唤物** —— 这不是 `while_state`（问主人的状态）、也不是 `while_stacks`（问主人的计数器）能表达的，那四个门槛都没有「我的召唤物在不在场」这一问；③ 挂载点是 **``SUMMONED``**（浮元进场那一刻），``permanent: true`` 使它不被回合计数递减，**离开只由门槛负责**（``AbstractBuff.gateBroken`` 在**敌人自己的回合边界**被扫 ⇒ 浮元退场后最多晚一拍摘掉，与星魂 4 的 HP 门槛同一种「晚一拍」）；④ 数值 **0.2** = 星魂 6 的 ``param[0]``；⚠ ⑤ 浮元若被再次召唤（前一个已退场），``SUMMONED`` 会再发一次 ⇒ 修饰重新挂上，而旧的那份已由门槛摘除，不会叠成 40%。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "trace_the_wounded_party_gets_the_follow_up",
+      "cooldown": 2,
+      "when": [
+        "!target is_summon",
+        "self_summon_count >= 1",
+        "lowest_ally_hp_percent <= 0.6",
+        "enemy_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 7
+          },
+          "element": "Fire",
+          "target": "random_enemy",
+          "attacker": "summon"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 1
+          },
+          "element": "Fire",
+          "target": "all_enemies",
+          "attacker": "summon"
+        }
+      ],
+      "source": "1222 灵砂 行迹 遗爇 (1222103): 「【浮元】在场时，我方任意角色受到伤害或消耗生命值时，若队伍中有存在当前生命值百分比小于等于60%的角色，【浮元】会立即对敌人发动天赋的追加攻击，此次触发不消耗【浮元】行动次数，该效果在2回合后可再次触发。」",
+      "_note": "「【浮元】**在场时**，我方任意角色**受到伤害**或消耗生命值时，若**队伍中有存在当前生命值百分比 ≤60% 的角色**，【浮元】会立即对敌人**发动天赋的追加攻击**，此次触发**不消耗【浮元】行动次数**，该效果在 **2 回合后可再次触发**」—— ① 「**或**」在 DSL 里没有跨事件的 OR ⇒ 拆成两条规则（本条 = **受到伤害** = `TAKING_HIT`；下一条 = **消耗生命值** = `HP_CONSUMED`，引擎本来就把这两半分成两个事件 —— `CONSUME_HP` 的注释原话就是「take damage **or** consume HP: the second half gets its own event」）。两条各带自己的 `cooldown`，而一次伤害只会发 `TAKING_HIT`/`HP_LOST`、一次消耗只会发 `HP_CONSUMED` ⇒ **不会双触发**；② 「我方任意**角色**」—— `!target is_summon`（浮元自己挨打不算角色；`TAKING_HIT` 本来就只对我方播发）；③ 「【浮元】**在场时**」= `self_summon_count >= 1`；④ 「**队伍中有** HP% ≤60% 的角色」= 本轮新加的量词变量 **`lowest_ally_hp_percent <= 0.6`**（队伍里**最低**的那个角色的生命百分比；「有一个人 ≤N」与「最低的那个 ≤N」是同一句话，而 `hp_percent` 只读主人自己）；⑤ 「发动**天赋的追加攻击**」= 与 `fuyuan_strikes_all_foes` **同样的两个实例**（单体 `TALENT:7` → 全员 `TALENT:1`，顺序同理），`attacker: \"summon\"` 让它是**浮元**打的；⑥ 「**不消耗**行动次数」**天然成立** —— 次数只在 `TURN_END` 扣，本条不在那个事件上；⑦ 「**2 回合后可再次触发**」= `cooldown: 2`（按**持有者的回合**递减，即灵砂自己的两回合）；⚠ ⑧ 判据 ``LingshaFuyuanTest``：无伤时不开火、有人 ≤60% 时开火、紧接着的第二次挨打被冷却挡住、两回合后恢复。",
+      "_status": "implemented"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "trace_the_wounded_party_answers_an_hp_cost",
+      "cooldown": 2,
+      "when": [
+        "!target is_summon",
+        "self_summon_count >= 1",
+        "lowest_ally_hp_percent <= 0.6",
+        "enemy_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 7
+          },
+          "element": "Fire",
+          "target": "random_enemy",
+          "attacker": "summon"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 1
+          },
+          "element": "Fire",
+          "target": "all_enemies",
+          "attacker": "summon"
+        }
+      ],
+      "source": "1222 灵砂 行迹 遗爇 (1222103): 「…我方任意角色受到伤害或**消耗生命值**时…【浮元】会立即对敌人发动天赋的追加攻击…该效果在2回合后可再次触发。」",
+      "_note": "与 `trace_the_wounded_party_gets_the_follow_up` 是**同一句话的另一半**（「受到伤害**或**消耗生命值」）：`HP_CONSUMED` 是引擎为「消耗生命值」单开的事件（`CONSUME_HP` 发它，且它的 `amount` 是**实际付出**的值）。⚠ 为什么不用 `HP_LOST` 来代表这一半：`HP_LOST` 只由**伤害结算**发出（`DamageService`），`consumeHp` 不发它 —— 用它会让「消耗生命值」这一半**永不触发**；而不带 `HP_LOST` 又会让一次伤害同时命中 `TAKING_HIT` 与 `HP_LOST` ⇒ 双触发。两半正好是 `TAKING_HIT` + `HP_CONSUMED`，一一对应、互不重叠。其余条件与数值同那一条（含 `lowest_ally_hp_percent`、`attacker: summon`、`cooldown: 2`）。",
       "_status": "implemented"
     },
     {
