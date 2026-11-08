@@ -976,6 +976,16 @@ public final class TriggerInterpreter {
                     battle.summonAnotherMemosprite(owner);
                     break;
                 }
+                // 「非忆灵召唤物」 (神君 / 阿哈 / 浮元): the entity has no spec, so it is PLACED with the summoner own panel. The
+                // content says so with `panel_less`, because the two sentences read the same in the document.
+                if (Boolean.TRUE.equals(effect.getPanelLess())) {
+                    if (effect.getMemospriteName() == null || effect.getMemospriteName().isBlank()) {
+                        throw new IllegalStateException(
+                                "Op SUMMON states panel_less but names no entity: say which one (神君 / 阿哈 / 浮元)");
+                    }
+                    battle.placePanelLessSummon(owner, effect.getMemospriteName().trim());
+                    break;
+                }
                 if (effect.getMemospriteName() == null || effect.getMemospriteName().isBlank()) {
                     battle.summonMemosprite(owner);
                 } else {

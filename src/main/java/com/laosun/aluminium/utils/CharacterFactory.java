@@ -363,6 +363,26 @@ public final class CharacterFactory {
      */
     public static TriggerTable requireSummonable(int cid, TriggerTable table) {
         if (table.usesOp("SUMMON") && !Memosprites.exists(cid)) {
+            // A rule that marks its SUMMON `panel_less` needs NO spec: the entity inherits the character own attributes
+            // (神君 / 阿哈 / 浮元). Everything else still demands one - that is the case this guard exists for.
+            boolean panelLessOnly = true;
+            int summonEffects = 0;
+            for (com.laosun.aluminium.enums.TriggerEvent event : com.laosun.aluminium.enums.TriggerEvent.values()) {
+                for (TriggerTable.CompiledRule rule : table.rulesFor(event)) {
+                    for (com.laosun.aluminium.beans.EffectSpec effect : rule.effects()) {
+                        if (!"SUMMON".equalsIgnoreCase(effect.getOp())) {
+                            continue;
+                        }
+                        summonEffects++;
+                        if (!Boolean.TRUE.equals(effect.getPanelLess())) {
+                            panelLessOnly = false;
+                        }
+                    }
+                }
+            }
+            if (summonEffects > 0 && panelLessOnly) {
+                return table;
+            }
             throw new CharacterException(
                     "Character " + cid + " has a rule that uses the SUMMON op, but no memosprite spec: add "
                             + "resources/" + Memosprites.DIR + "/" + cid + ".json (or drop the rule). A "

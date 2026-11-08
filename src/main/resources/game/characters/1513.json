@@ -415,6 +415,19 @@
       "id": "trace_another_joy_path_lifts_her_own_elation_more",
       "source": "1513 砂金·戏浪 行迹 纵享惊涛 (1513102):「…砂金·戏浪额外提高80%。」",
       "on": "BATTLE_START"
+    },
+    {
+      "do": [
+        {
+          "op": "SUMMON",
+          "memosprite_name": "阿哈",
+          "panel_less": true
+        }
+      ],
+      "source": "1513 砂金·戏浪 行迹 纵享惊涛 (1513102):「…并使阿哈速度提高25，速度提高效果持续到阿哈时刻结束。」",
+      "on": "BATTLE_START",
+      "_note": "阿哈是**非忆灵召唤物** ⇒ `SUMMON { memosprite_name: 阿哈, panel_less: true }`：装配守卫认得这个标记就放行（它与「召唤忆灵」的唯一区别是**没有 spec**，画面上两句话写得一样）。面板来自 `SummonFactory.panelLess`（召唤者属性、共享实时，判据 `PanelLessSummonTest`）。",
+      "id": "trace_aha_takes_the_field"
     }
   ]
 }

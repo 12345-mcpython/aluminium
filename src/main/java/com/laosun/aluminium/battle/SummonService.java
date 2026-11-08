@@ -70,11 +70,27 @@ public final class SummonService {
     }
 
     /**
-     * Brings a character's memosprite onto the field.
+     * Brings a <b>panel-less</b> summon onto the field (神君 / 阿哈 / 浮元): it inherits the master own attributes and has no
+     * memosprite spec, so it is placed rather than built from data.
      *
-     * @param master the summoning character
-     * @return the memosprite, or the one already standing
+     * @param master the character it belongs to
+     * @param name   the entity name as the document spells it
+     * @return the summon on the field
      */
+    public Summon panelLess(Character master, String name) {
+        if (master == null) {
+            throw new IllegalArgumentException("A panel-less summon needs a summoner");
+        }
+        if (master.isDeath()) {
+            throw new IllegalArgumentException("A dead character cannot summon (" + master.getName() + ")");
+        }
+        Summon summon = SummonFactory.panelLess(master, name);
+        summon.setMaster(master);
+        battle.addCombatant(summon);
+        onSummoned.accept(summon);
+        return summon;
+    }
+
     public Summon memosprite(Character master) {
         if (master == null) {
             throw new IllegalArgumentException("A memosprite needs a summoner");

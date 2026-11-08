@@ -109,6 +109,7 @@ public class EffectSpec {
         copy.percentFromSkillParam = this.percentFromSkillParam;
         // The multi-base sum must survive a copy too: an amending rule that drops it would settle the FIRST term only.
         copy.parts = this.parts;
+        copy.panelLess = this.panelLess;
         copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
         copy.value = NumberProviders.copyOf(this.value);
         copy.percentPerAllyState = this.percentPerAllyState;
@@ -1217,6 +1218,13 @@ public class EffectSpec {
      */
     @SerializedName("parts")
     private java.util.List<Part> parts;
+
+    /**
+     * {@code SUMMON}: the named entity has <b>no memosprite spec</b> - it inherits the character own panel (神君 / 阿哈 / 浮元).
+     */
+    @SerializedName("panel_less")
+    private Boolean panelLess;
+
 
     /**
      * One term of a {@link #parts} sum.

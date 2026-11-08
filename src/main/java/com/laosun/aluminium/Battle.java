@@ -3501,6 +3501,18 @@ public class Battle {
         return summons.memosprite(master);
     }
 
+
+    /**
+     * Places a <b>panel-less</b> summon on the field (神君 / 阿哈 / 浮元): it inherits the character own attributes.
+     *
+     * @param master the character it belongs to
+     * @param name   the entity name as the document spells it
+     * @return the summon on the field
+     */
+    public Summon placePanelLessSummon(Character master, String name) {
+        return summons.panelLess(master, name);
+    }
+
     /**
      * Summons one <b>named</b> memosprite (1512's three 「晴空乐手」); see {@code SummonService#memosprite(Character, String)}.
      *
