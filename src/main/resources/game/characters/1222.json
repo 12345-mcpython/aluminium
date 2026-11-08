@@ -3,7 +3,13 @@
   "character": 1222,
   "_status": "partial",
   "_gaps": [
-    "⚠ **【浮元】是非忆灵召唤物 ⇒ 它沿用灵砂自身的属性、没有独立面板**。所以「行动提前」不该指望 `target: 「summon」`：引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元大概率解析不到单位（`self_summon_count >= 1` 会把它挡成永假，而**永假没有症状**）。正确的建模方向是**挂在灵砂自己身上的行动/计数器**，待定。原登记「引擎没有召唤物面板」应改为「引擎有忆灵模型，没有通用召唤物模型」。⛔ 仍开：普攻 / 天赋 / 其余星魂与秘技。"
+    "⭐ **2026-11-08：天赋的【浮元】落地，旧的这条登记已被证伪** —— 旧话是「引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元解析不到单位，所以『行动提前』写不出来」。真因不是模型，而是这条路**根本没用过**：`SUMMON { panel_less: true }` 就是「非忆灵召唤物」的入口（`SummonService.panelLess` → `addCombatant`），浮元进了名册与行动条之后 `target: \"summon\"` 照常解析。于是这一轮写出 10 条规则：召唤（`self_summon_count == 0` 的门，因为非忆灵路径**不幂等**、不加门会越放越多）、行动次数（上限 5）、它自己回合的全体 75% + 随机单体 75%、解除 1 个负面、回复 12%+360、星魂 4 的 40%、每行动一次扣 1 并在归零时 `DISMISS_SUMMON`、战技 20% 与终结技 100% 的行动提前、秘技开场召唤 + 【醇醉】。判据 `LingshaFuyuanTest`（8 个用例）。⚠ **下面五条才是仍开的从句**。",
+    "⛔ **星魂 6 前半「【浮元】在场时，使敌方全体全属性抗性降低 20%」缺一个「规则主人的召唤物在场」活门槛**（`while_summon_count` 或同族）。现有 `while_*` 只读**主人自己**的状态/层数/生命（`while_state` / `while_stacks` / `while_hp_percent`）或**载体自己**的状态/生命（`while_holder_state` / `while_holder_hp_percent`），没有一条问「场上有没有召唤物」。另一条路（`SUMMONED` 给全体敌人挂永久抗性修饰、`SUMMON_LEFT` 摘掉）走不通：`REMOVE_BUFF` 只摘**正面**的临时 buff，而这是挂在敌人身上的负面属性修饰 ⇒ 浮元耗尽次数退场后那 20% 会**永久留着**，且没有任何症状会发现。",
+    "⛔ **星魂 6 后半「【浮元】攻击时，额外造成 4 次伤害，每次 50% 攻击力 + 5 点削韧值」**：「额外 4 次」有拼法（`times_from` 重复整个效果）、「5 点削韧」也有（`DAMAGE` 的 `stance` 字段，规则伤害原本不动韧性，这个字段就是为这类句子加的）。真正缺的仍是**目标优先级**（下一条）；本轮没写是因为它与前半同属星魂 6 —— 只写后半会让「星魂 6 已实现」这句话变成半句。",
+    "⚠ **天赋「本次伤害优先选择韧性值大于0且有火属性弱点的目标」（浮元的第二发 75%）**：目标选择器是闭集，没有「按韧性 / 弱点优先挑一个」的拼法（`random_enemy` 抽任意存活敌人，`random_enemy_with_state` 只按状态过滤）。这是**优先级**不是**排除** ⇒ 不会打到句子禁止的目标，但也享受不到这条优先。要落地得新增一个选择器（例如给选择器加 `prefer` 字段，或 `random_enemy_preferring:<条件>`）。",
+    "⛔ **行迹 遗爇「【浮元】在场时，我方任意角色受到伤害或消耗生命值时，若队伍中有存在当前生命值百分比小于等于 60% 的角色，【浮元】会立即对敌人发动天赋的追加攻击…该效果在 2 回合后可再次触发」缺一个「全队存在量词」条件**。这句话的其余部分都有拼法：触发点是 `TAKING_HIT` / `HP_LOST`（两个事件都在）、追加攻击就是天赋那两条 `DAMAGE`、「2 回合后可再次触发」是 `cooldown: 2`、「此次触发不消耗行动次数」天然成立（次数只在 `TURN_END` 扣）。缺的只有那道门槛：`hp_percent` 读的是**自己**、`target_hp_percent` 读事件目标、`ally_count` 只数人头 —— 没有「队伍中有人 HP% ≤ N」这个量词。",
+    "⛔ **星魂 1「灵砂的弱点击破效率提高 50%。当有敌方单位的弱点被击破时，使其防御力降低 20%」两半都缺词**：① 属性表里有 `BREAKING_EFFECT`（击破特攻）与 `BREAK_DAMAGE_BOOST`（击破伤害），**没有**「弱点击破效率」（削韧效率）这一项；② 后半的触发（`BREAK` 事件，目标带得到）有拼法，但文档**没写**那 20% 防御降低持续多久（既不是「直到击破结束」，也不是「2 回合」），按本库纪律**不猜数字**。",
+    "⭐ **以下不登记为缺口**：普攻 / 战技 / 终结技的**伤害与破韧**由技能行数据驱动（`skills.json` 的 `param_list` 与 `stance_list`），不写规则也不会漏；「灵砂陷入**无法战斗状态**时【浮元】消失」由 `DeathService.perishOrphanedSummons` 承担（引擎内置，主人死亡时召唤物随之下场）。"
   ],
   "rules": [
     {
@@ -27,6 +33,84 @@
       ],
       "source": "1222 灵砂 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（战技 Lv10 = [0.8, 0.14, 420, 0.2]）",
       "_note": "与本项目其它角色文件一致：把技能等级抬到文档所引用的那一档，使数据行的数值与正文一致。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_refreshes_the_action_budget",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "行动次数",
+          "value": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 6
+          },
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1222 灵砂 天赋 烟斜雾横，氛氲化生: 「【浮元】在场时，施放战技会增加3次【浮元】的行动次数。」（TALENT Lv10 行 [90, 0.75, 0.12, 360, 5, 1, 3, 0.75] 的第 7 项 = 3、第 5 项 = 上限 5）",
+      "_note": "「【浮元】**在场时**，施放战技会增加 **3 次**行动次数」—— ``SKILL_CAST`` + ``self_summon_count >= 1``（**在场**⇒ 计数只问「她有没有活着的召唤物」）。⚠ **本条必须排在 ``skill_summons_fuyuan`` 之前**：同事件内条件逐条求值、能看到彼此的写入（§8.1），所以第一次施放时本条读到 0 而跳过，随后那条召唤并给初值 3；第二次施放时本条读到 1 ⇒ +3，那条因 ``== 0`` 不成立而不重复召唤。⚠ 顺序反过来会**一次施放就叠 6 层**（3 + 3），而「初始 3 次」与「在场时 +3」本是两句。⚠ 数值全部来自她自己 TALENT 行的第 7 项（=3）与第 5 项（上限 5），不是正文抄的 3/5。",
+      "_status": "implemented"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_summons_fuyuan",
+      "when": [
+        "actor == self",
+        "self_summon_count == 0"
+      ],
+      "do": [
+        {
+          "op": "SUMMON",
+          "memosprite_name": "浮元",
+          "panel_less": true,
+          "summon_speed": 90
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "行动次数",
+          "value": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 6
+          },
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1222 灵砂 天赋 烟斜雾横，氛氲化生: 「施放战技时召唤【浮元】，初始拥有90点速度以及3次行动次数。」（TALENT Lv10 行 [90, 0.75, 0.12, 360, 5, 1, 3, 0.75] 的第 1 项 = 90、第 7 项 = 3）",
+      "_note": "「**施放战技时召唤【浮元】**，初始拥有 **90 点速度**以及 **3 次行动次数**」—— ① 【浮元】是**非忆灵召唤物**（沿用灵砂自己的属性、没有独立面板）⇒ ``SUMMON { memosprite_name: 浮元, panel_less: true }``，速度用 **``summon_speed: 90``**（**绝对点数**，判据实测 90 而不是灵砂的 98）；② 初值 3 次行动次数是一条具名计数器 ``行动次数``（``ADD_STACK``，上限 5 来自同一行第 5 项，``permanent`` 使它不被回合边界递减）；③ ⚠ **``self_summon_count == 0`` 这道门是必需的**：``SummonService.panelLess`` 与忆灵路径**不同、不幂等**（它每次都 ``addCombatant``），没有这道门的话每一次战技都会再放一个浮元在场 —— 两个单位、一份玩家看不见的账。⚠ 忆灵路径的幂等性由 ``Battle.summonMemosprite`` 保证，非忆灵路径没有，所以幂等只能写在条件里。",
+      "_status": "implemented"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_advances_fuyuan",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "SKILL",
+            "index": 3
+          },
+          "target": "summon"
+        }
+      ],
+      "source": "1222 灵砂 战技 识烟飞彩 / Smoke and Splendor: 「使【浮元】行动提前20%」（SKILL Lv10 行 [0.8, 0.14, 420, 0.2] 的第 4 项 = 0.2）",
+      "_note": "「使【浮元】**行动提前 20%**」—— ① 份额取自她自己的 SKILL Lv10 行第 4 项（0.2），不抄正文；② ``ADVANCE`` + ``target: summon`` —— **这一句此前登记为「写不出来」**（旧 `_gaps`：引擎的 Summon 是忆灵模型、浮元解析不到单位）。⚠ 现在能写是因为``浮元``真的以 ``panel_less`` 的单位进了名册与行动条（``SummonService.panelLess`` 里有 ``addCombatant``），``summon`` 选择器于是解析得到它。⚠ ③ **召唤那一次施放上这条是 no-op**：``ADVANCE`` 走 ``Queue.advanceActionByPercent``，只对**已在堆里**的单位生效，而新召唤的单位此刻「在名册上但还没排进行动条」（``TriggerEvent.SUMMONED`` 的注释原话）；句子的意思也正是「使它提前」，还没有行动值可提前。④ 判据 ``LingshaFuyuanTest`` 用 ``queue().snapshot()`` 读两次行动值之差，钉住 20%（对照组：没有浮元在场时施放，什么也不发生）。⚠ ⑤ 条件里的 ``self_summon_count >= 1`` 是**引擎要求的**：``TriggerInterpreter`` 对「效果指名 summon、而规则主人场上没有召唤物」直接抛异常（报错原文就建议写这道门）—— 所以「浮元不在场」不是空集，而是装载期就说清的前提。",
+      "_status": "implemented"
     },
     {
       "on": "SKILL_CAST",
@@ -72,6 +156,158 @@
       ],
       "source": "1222 灵砂 终结技 幔亭缭霞 / Dripping Mistscape: 「使敌方全体陷入【醇醉】状态，【醇醉】状态下，使目标受到的击破伤害提高25%，持续2回合」",
       "_note": "「使敌方全体陷入【**醇醉**】状态，【醇醉】状态下，使目标**受到的击破伤害提高 25%**，持续 **2 回合**」—— ① 形状**照抄既有出货** ✓：**1301** 的同型从句 = `MODIFY_DAMAGE_TAKEN` + **`damage_type: \"BREAK\"`** ✓ + `turns` ✓ + **具名 `buff`** ✓ + `target: \"all_enemies\"` ✓（它说的正是\"受到的击破伤害提高\" ✓）；② 数值取自她自己的 Lv10 行 `[1.5, 0.12, 360, 0.25, 2, 1]` 的第 4、5 项（0.25 / 2 ✓）；③ **具名**是关键 ✓：名字让 `REMOVE_STATE` 之类能把它摘掉 ✓；⚠ ④ **登记**：「使【浮元】**行动提前 100%**」✗（浮元无面板 ✗）与终结技**自身的伤害** ✓（由引擎按技能数据计算 ✓，不属内容 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_fuyuan",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 5
+          },
+          "target": "summon"
+        }
+      ],
+      "source": "1222 灵砂 终结技 幔亭缭霞 / Dripping Mistscape: 「使【浮元】行动提前100%」（ULTRA Lv10 行 [1.5, 0.12, 360, 0.25, 2, 1] 的第 6 项 = 1）",
+      "_note": "「使【浮元】**行动提前 100%**」—— 份额取自 ULTRA Lv10 行第 6 项（1 ⇒ 整个剩余等待被跳过 = 立刻轮到她）。⚠ 与战技那条**共用**同一个 ``ADVANCE`` 写法、**不同技能行**（0.2 / 1.0）⇒ 两条不是重复：事件相同（``ULT_CAST`` vs ``SKILL_CAST`` 其实不同）、份额不同。⚠ 召唤物不在场时 ``summon`` 解析为空集，这一发什么也不做（句子的前提本来就是「使它提前」）。⚠ 条件 ``self_summon_count >= 1`` 是 ``TriggerInterpreter`` 的守卫要求的（「指名 summon 却没有召唤物」它会直接报错并建议写这道门）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "fuyuan_strikes_all_foes",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:行动次数 >= 1",
+        "enemy_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 7
+          },
+          "element": "Fire",
+          "target": "random_enemy",
+          "attacker": "actor"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 1
+          },
+          "element": "Fire",
+          "target": "all_enemies",
+          "attacker": "actor"
+        }
+      ],
+      "source": "1222 灵砂 天赋 烟斜雾横，氛氲化生: 「【浮元】行动时发动追加攻击，对敌方全体造成等同于灵砂75%攻击力的火属性伤害。额外对随机敌方单体造成等同于灵砂75%攻击力的火属性伤害。」（TALENT Lv10 行第 2 项 = 0.75、第 8 项 = 0.75）",
+      "_note": "「【浮元】**行动时**发动追加攻击，对**敌方全体**造成 **75%** 攻击力的火伤。**额外**对**随机敌方单体**造成 **75%** 攻击力」—— ① 「行动」= ``TURN_START`` + ``actor is_summon``（与 1204 神君 / 1112 账账同一个近似：浮元没有技能行、它自己的回合就是它的行动点）；② 两个基数都取自 TALENT Lv10 行（第 2 项与第 8 项，**两个不同的 75%**：句子写了两遍，数据里也是两格）；③ ``attacker: actor`` 让这一发记在**浮元**头上（规则打出的伤害默认记在规则主人身上）—— 与 1204 的 ``attacker: actor`` 同一理由；④ ``actor_stacks:行动次数 >= 1``：次数为 0 的浮元已经离场（下一节的 ``fuyuan_leaves_when_spent``），这条门槛只是让「没有次数就不打」在数据里也成立。⚠ ⑤ **登记为缺口**：「本次伤害**优先选择韧性值大于0且有火属性弱点的目标**」—— 目标选择器是闭集，没有「按韧性/弱点优先级抽一个」的拼法，``random_enemy`` 抽的是任意存活敌人（**优先级**而非**排除**，所以不会打到句子禁止的目标，但也享受不到这条优先）。见 `_gaps`。⚠ ⑥ 条件里的 ``enemy_count >= 1`` 是**实测加上的**：一次性对战判据（`BattleDriverRosterTest`）在敌人已经全部倒下、而浮元的回合仍被结算到的那一刻炸出「Effect targets random_enemy but this event has no such party」—— 没有这道门，这句话会在**战斗收尾**时把整场判据打红。⚠ ⑦ **顺序**：文件顺序 = 结算顺序，所以**单体那一发排在全员那一发前面**。原先是照句子顺序（先全体、后单体）写的，结果 `BattleDriverRosterTest` 里那一发全体正好**把最后一个敌人打死**，紧接着的 ``random_enemy`` 找不到存活目标 ⇒ ``TriggerTargets.require`` 抛异常（`all_enemies` 的空集是合法的，``random_enemy`` 不是）。两发本是同一次行动里的两个实例，先结算哪一发不改变总量与目标集，但**先单体**才保证两发都打得出去。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "fuyuan_cleanses_and_heals",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:行动次数 >= 1"
+      ],
+      "do": [
+        {
+          "op": "DISPEL",
+          "value": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 5
+          },
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 2
+          },
+          "amount_from": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 3
+          },
+          "target": "all_allies"
+        }
+      ],
+      "source": "1222 灵砂 天赋 烟斜雾横，氛氲化生: 「解除我方全体的1个负面效果，并回复等同于灵砂12.00%攻击力+360的生命值。」（TALENT Lv10 行 [90, 0.75, 0.12, 360, 5, 1, 3, 0.75] 的第 6 项 = 1、第 3 项 = 0.12、第 4 项 = 360）",
+      "_note": "「**解除我方全体的 1 个负面效果**，并**回复**等同于灵砂 **12.00% 攻击力 + 360** 的生命值」—— ① ``DISPEL`` 的语义正是「移除至多 N 个**负面效果**」（`AbstractBuff.isDebuff()` 逐类判定，所以它摘不掉护盾与增益）；数量也取自同一行第 6 项（=1），不是抄正文的 1；② 治疗的形状与她战技/终结技那两条**同族**（``scale: owner_attack`` + ``percent_from`` + ``amount_from``），但读的是 **TALENT 行**的第 3、4 项 ⇒ 三条规则的数值来源各不相同、不会互相覆盖；③ ``all_allies`` 是「我方全体」；④ 顺序：本条排在 ``fuyuan_strikes_all_foes`` **之后**（句子先说伤害、再说解除与回复），同事件内按文件顺序执行。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon4_fuyuan_mends_the_weakest",
+      "min_eidolon": 4,
+      "when": [
+        "actor is_summon",
+        "actor_stacks:行动次数 >= 1"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.4,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "1222 灵砂 星魂 4 横垂宝幄，半拂琼筵: 「【浮元】行动时，为当前生命值最低的我方目标回复等同于灵砂40%攻击力的生命值。」参数 = [0.4]",
+      "_note": "「【浮元】**行动时**，为**当前生命值最低的我方目标**回复等同于灵砂 **40% 攻击力**的生命值」—— ① 触发与浮元自己的伤害、解除、治疗共用同一个行动点（``TURN_START`` + ``actor is_summon``）；② 目标 **``lowest_hp_ally``** 就是「当前生命值最低的我方目标」（引擎已有的选择器）；③ 数值 **0.4** = `eidolons.json` 里 1222 星魂 4 的 ``param[0]``；④ 与 ``fuyuan_cleanses_and_heals`` 的治疗**不冲突**：那条是天赋的「我方全体 12%+360」，这条是星魂 4 的另一笔、只给最虚弱的一个人。判据 ``LingshaFuyuanTest`` 用 **E3 作对照**（不是 E0）：星魂 3 把**天赋**升 2 级，而天赋那句「我方全体 12.00%+360」读的就是 TALENT 行 —— Lv10 是 0.12/360，Lv12 是 0.128/400.5，拿 E0 比 E4 会把这 2 级差价算到这条星魂头上（实测差 345.3 而不是 298.8）。E3 与 E4 天赋同级，两者之差正好是这条。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_END",
+      "id": "fuyuan_spends_an_action",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STACK",
+          "buff": "行动次数",
+          "amount": 1,
+          "target": "actor"
+        }
+      ],
+      "source": "1222 灵砂 天赋 烟斜雾横，氛氲化生: 「【浮元】最多累计5次行动次数，当次数为0…时【浮元】消失。」（每行动一次消耗 1 次）",
+      "_note": "「最多累计 **5 次行动次数**，当次数为 **0** …时【浮元】消失」—— 「次数」是**剩余行动次数**，所以每行动一次扣 1：``TURN_END`` + ``actor is_summon`` → ``REMOVE_STACK 行动次数 1``。⚠ 选 ``TURN_END`` 而不是 ``TURN_START``：句子说的是「行动之后」的次数，且扣到 0 要在**这一发打完之后**才消失（同上，§8.1 的「同事件内按文件顺序求值」让下一条能读到扣减后的值）。⚠ 不用 ``SUMMON_ATTACK``：那个事件只由 ``EnemySkill.execute`` 发出（浮元没有技能行、它的一击是**规则**打的），用它会让这条规则**永远不触发而没有症状** —— 1204 的复位规则正是踩在这个坑上的写法，这里避开。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_END",
+      "id": "fuyuan_leaves_when_spent",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:行动次数 <= 0"
+      ],
+      "do": [
+        {
+          "op": "DISMISS_SUMMON",
+          "target": "actor"
+        }
+      ],
+      "source": "1222 灵砂 天赋 烟斜雾横，氛氲化生: 「当次数为0或灵砂陷入无法战斗状态时【浮元】消失。」",
+      "_note": "「**当次数为 0** 或灵砂陷入**无法战斗状态**时【浮元】消失」—— 前半：``TURN_END`` + ``actor_stacks:行动次数 <= 0`` → ``DISMISS_SUMMON { target: actor }``（**必须排在** ``fuyuan_spends_an_action`` **之后**，否则读到的还是扣减前的层数）。``DISMISS_SUMMON`` 走 ``Summon.perish()``，它会发 ``SUMMON_LEFT``（不是 ``DEATH``），与其他忆灵退场同一条缝。⚠ 后半「灵砂**陷入无法战斗状态**时消失」**不写规则**：``DeathService.perishOrphanedSummons`` 已经在主人死亡时让召唤物离场（引擎内置 ✓，见 AGENT §52 的「没有规则」第二种可能），再写一条会重复。",
+      "_status": "implemented"
     },
     {
       "on": "ULT_CAST",
@@ -155,6 +391,48 @@
       ],
       "source": "1222 星魂 5: 等级加成（数据 skill_add_level: 122201=COMMON+1, 122202=SKILL+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_summons_fuyuan_and_befogs",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "SUMMON",
+          "memosprite_name": "浮元",
+          "panel_less": true,
+          "summon_speed": 90
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "行动次数",
+          "value": {
+            "type": "skill_param",
+            "skill": "TALENT",
+            "index": 6
+          },
+          "max_stacks": 5,
+          "permanent": true,
+          "target": "summon"
+        },
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent_from": {
+            "type": "skill_param",
+            "skill": "ULTRA",
+            "index": 3
+          },
+          "damage_type": "BREAK",
+          "turns": 2,
+          "buff": "醇醉",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1222 灵砂 秘技 流翠散云 / Wisps of Aurora: 「使用秘技后，下一次战斗开始时立即召唤【浮元】，并使敌方全体陷入【醇醉】状态，持续2回合。」（TECHNIQUE 行 [2]，【醇醉】的定义与数值见终结技：受到的击破伤害提高 25%）",
+      "_note": "「使用秘技后，**下一次战斗开始时立即召唤【浮元】**，并使**敌方全体陷入【醇醉】**状态，持续 **2 回合**」—— ① 触发 ``BATTLE_START`` + ``self has_state 秘技``（引擎在**任何** ``BATTLE_START`` 规则之前盖这个状态，1204 的秘技同形）；② 召唤与初值 3 次与战技那条**同一组数字**（TALENT 行第 1 项 90、第 7 项 3、上限第 5 项 5）；③ 【醇醉】的**定义**在终结技那句里（「受到的击破伤害提高 25%」），所以份额读 **ULTRA 行第 4 项**（0.25）；持续 **2 回合**是 TECHNIQUE 行唯一的那个数（``[2]``）。⚠ ④ 与 ``ult_befog_break_damage_taken`` **不是重复**：事件不同（``BATTLE_START`` vs ``ULT_CAST``）、条件不同，一条是开场那一次、一条是每次终结技；⑤ 顺序：排在 ``level_convention``（与两条星魂等级规则）**之后**，所以 ``skill_param`` 读到的是被抬过的等级行。",
       "_status": "implemented"
     }
   ]
