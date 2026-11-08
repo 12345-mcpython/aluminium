@@ -80,6 +80,35 @@ public class JingYuanLordTurnTest {
                 "hits >= 6 means the crit damage rises this turn");
     }
 
+    /**
+     * 星魂 4:「【神君】每段攻击后，景元恢复 2 点能量」 - the energy is paid PER INSTANCE, so N hits pay 2N.
+     *
+     * <p>This is why the strike states `attacker: "actor"`: rule-fired damage is otherwise credited to the RULE OWNER, and
+     * `DEALING_DAMAGE` + `actor is_summon` could never be true.
+     */
+    @Test
+    public void everyLordHitPaysJingYuanTwoEnergy() {
+        Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL, false, null, null, 4);
+        Enemy enemy = BattleFixture.monster();
+        enemy.setMaxStance(10_000);
+        Battle battle = new Battle(List.of(jingYuan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Summon lord = battle.summonsOf(jingYuan).getFirst();
+        battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
+                List.of(enemy));
+        battle.processRequests();
+        int hits = lord.getBuffManager().stacksOf("攻击段数");
+        Assertions.assertTrue(hits >= 2, "precondition: hits are stored (" + hits + ")");
+        jingYuan.setCurrentEnergy(0);
+
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
+        battle.processRequests();
+
+        Assertions.assertEquals(2.0 * hits, jingYuan.getCurrentEnergy(), 1e-6,
+                "two energy per instance, and the strike settles " + hits + " of them");
+    }
+
     private static Battle scene() {
         Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL);
         Enemy enemy = BattleFixture.monster();
