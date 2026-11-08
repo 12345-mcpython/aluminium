@@ -383,7 +383,11 @@ public class CharacterFactoryTest {
                 java.util.List.of(jingYuan, seele), java.util.List.of(enemy), new java.util.Random(0));
         battle.startBattle();
 
-        Assertions.assertEquals(3, battle.queue().size(), "2 characters + 1 monster");
+        // Note: `characters().size() + enemies().size()` was the old fixed 3, which stops being true the moment a
+        // character brings a STANDING summon (景元's 神君). The action bar holds one entry per combatant on either side, so the
+        // assertion counts the allies (summons included) instead of naming a number.
+        Assertions.assertEquals(battle.allies().size() + battle.enemies().size(), battle.queue().size(),
+                "one queue entry per combatant on either side (summons included)");
         Assertions.assertEquals(com.laosun.aluminium.Battle.Status.RUNNING, battle.getStatus());
         // aggro comes from the data (Jing Yuan 5 / Seele 5), so the chance of being hit is even
         Assertions.assertEquals(75, battle.aggroOf(jingYuan));

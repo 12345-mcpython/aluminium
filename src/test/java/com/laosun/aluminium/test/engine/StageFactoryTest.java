@@ -47,7 +47,8 @@ public class StageFactoryTest {
         Assertions.assertEquals(3, battle.enemies().size(), "103201 wave 1 has 3 monsters");
         Assertions.assertEquals(0, battle.getWaveManager().getWaveIndex(), "wave 1 has been entered");
 
-        int expectedQueueSize = battle.characters().size() + battle.enemies().size();
+        // Summons stand on our side and take a queue entry too, so the count is per COMBATANT, not per character.
+        int expectedQueueSize = battle.allies().size() + battle.enemies().size();
         Assertions.assertEquals(expectedQueueSize, battle.queue().size(),
                 "our side + wave 1's monsters should all be in the action bar (missing processRequests loses people)");
     }
