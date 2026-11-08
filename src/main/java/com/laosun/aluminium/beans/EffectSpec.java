@@ -169,6 +169,7 @@ public class EffectSpec {
         copy.whileStacksMin = this.whileStacksMin;
         copy.whileHpPercent = this.whileHpPercent;
         copy.whileHolderHpPercent = this.whileHolderHpPercent;
+        copy.whileSummonCount = this.whileSummonCount;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -666,6 +667,21 @@ public class EffectSpec {
      */
     @SerializedName("while_holder_hp_percent")
     private Double whileHolderHpPercent;
+
+    /**
+     * 「【浮元】**在场时**，使敌方全体全属性抗性降低 20%」 (1222 Lingsha (灵砂) 星魂 6): a LIVE gate on how many <b>living
+     * summons the rule owner has on the field</b>.
+     *
+     * <p><b>Why it is its own field.</b> The other four gates ask about the owner's or the holder's <i>state</i>, <i>counter</i>
+     * or <i>HP bar</i>; none of them can say "an entity of mine is on the field". The state/counter routes cannot stand in either:
+     * a state stamped on summon is a second copy of the field fact, and a counter cannot be read on the enemies the modifier
+     * sits on. Its value is the least number of living summons that keeps the modifier alive ({@code 1} for 「在场时」).
+     *
+     * <p>⚠ Only {@code MODIFY_ATTR} attaches it today (the same asymmetry {@code while_hp_percent} already has).
+     */
+    @SerializedName("while_summon_count")
+    private Integer whileSummonCount;
+
     /**
      * A modifier that lives only <b>while the unit CARRYING it</b> holds this state: 「【揭露】状态下，敌方目标受到的伤害提高 25%」
      * (1307's Ultimate). The mirror of {@link #whileState}, which asks the RULE OWNER - the difference matters when the condition

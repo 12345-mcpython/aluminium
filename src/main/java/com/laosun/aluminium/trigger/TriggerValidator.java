@@ -140,6 +140,7 @@ final class TriggerValidator {
 
     static void validateOne(EffectSpec effect, TriggerSpec spec) {
         validateWhileStacks(effect, spec);
+        validateWhileSummonCount(effect, spec);
         // Note: A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
         // kind of mistake this interpreter's closed sets exist to prevent.
         if ((effect.getCapScale() != null || effect.getCapPercent() != null)
@@ -2767,6 +2768,30 @@ final class TriggerValidator {
                             + "no counter to compare it against (source: " + spec.getSource() + ")");
         }
     }
+    /**
+     * {@code while_summon_count} must state a least count of at least one: 「在场时」 means "one is there", and {@code 0} would
+     * be a gate that can never fail - a field that reads as a condition and behaves like "always on".
+     *
+     * <p>Its only reader today is {@code MODIFY_ATTR} (the same asymmetry {@code while_hp_percent} has), so a rule that writes
+     * it on another op would be accepted and never asked.
+     */
+    static void validateWhileSummonCount(EffectSpec effect, TriggerSpec spec) {
+        Integer least = effect.getWhileSummonCount();
+        if (least == null) {
+            return;
+        }
+        if (least < 1) {
+            throw new IllegalArgumentException(
+                    "Effect states \"while_summon_count\": " + least + "; it is the LEAST number of living summons that keeps "
+                            + "the modifier alive, so 0 would be a gate that never closes (source: " + spec.getSource() + ")");
+        }
+        if (!"MODIFY_ATTR".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())) {
+            throw new IllegalArgumentException(
+                    "Op " + effect.getOp() + " states \"while_summon_count\", which only MODIFY_ATTR attaches today "
+                            + "(source: " + spec.getSource() + ")");
+        }
+    }
+
     static void rejectAmendmentExtras(EffectSpec effect, String op, TriggerSpec spec, String kept) {
         boolean bothOrNeither = "amount".equals(kept) ? effect.getPercent() != null : effect.getAmount() != null;
         if (bothOrNeither || effect.getScale() != null || effect.getTurns() != null

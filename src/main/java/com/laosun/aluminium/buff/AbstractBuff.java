@@ -367,6 +367,33 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     }
 
     /**
+     * The least number of <b>living summons the rule owner has on the field</b> that keeps this modifier, or {@code null}:
+     * 「【浮元】在场时，使敌方全体全属性抗性降低 20%」 (1222 Lingsha (灵砂) 星魂 6).
+     *
+     * <p><b>Why the count is handed in as a closure.</b> Summons are a fact about the BATTLE - they live in its roster, keyed by
+     * their master - and a buff has no battle handle. The interpreter therefore builds the reader at attach time and the gate
+     * asks it at every turn boundary, which is the same late-read shape {@code makeLive} uses for a value that must not be
+     * snapshotted. Reading it here (from the owner) would need a back-pointer from every unit to its battle; the closure says
+     * exactly which question is being asked and nothing more.
+     *
+     * <p>The four sibling gates each ask a different fact: a state ({@link #gate}), a counter ({@link #gateStacks}), an HP bar
+     * ({@link #gateHpPercent}) and now <b>whether an entity of mine is on the field</b>. The last one cannot be spelled with the
+     * others: a state stamped at summon time would be a second copy of the same fact (and would have to be cleaned up by hand),
+     * and a counter lives on the owner, not on the enemies the modifier sits on.
+     */
+    private Integer gateSummonCountMin;
+    private java.util.function.IntSupplier gateSummonCount;
+
+    /**
+     * @param min     the least number of living summons that keeps the buff alive ({@code 1} = 「在场时」)
+     * @param counter how many the rule owner has right now, asked lazily (a {@code null} answer counts as zero)
+     */
+    public void gateSummons(int min, java.util.function.IntSupplier counter) {
+        this.gateSummonCountMin = min;
+        this.gateSummonCount = counter;
+    }
+
+    /**
      * The state names this buff <b>also answers to</b>, or an empty set: 「处于【奥迹】状态时，也会被视为陷入了风化状态」
      * and 「当敌方目标处于【奥迹】状态时，也会被视为同时陷入了风化、裂伤、灼烧、触电状态」 (1307 Black Swan (黑天鹅)).
      *
@@ -435,6 +462,11 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         return gateBroken();
     }
     public boolean gateBroken() {
+        // The summon gate is asked FIRST and needs no owner: the closure already names whose summons they are. A missing
+        // closure counts as zero, i.e. "the gate cannot be shown to hold" - the safe direction for a modifier.
+        if (gateSummonCountMin != null) {
+            return gateSummonCount == null || gateSummonCount.getAsInt() < gateSummonCountMin;
+        }
         if (gateOwner == null) {
             return false;
         }

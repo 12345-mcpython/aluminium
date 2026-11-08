@@ -315,6 +315,14 @@ final class TriggerEffects {
             if (effect.getWhileHolderHpPercent() != null) {
                 buff.gateHolderHp(effect.getWhileHolderHpPercent());
             }
+            // 「【浮元】在场时，使敌方全体全属性抗性降低 20%」 (1222 Lingsha (灵砂) 星魂 6): a LIVE gate on how many living summons
+            // the rule owner has. The count is handed in as a closure because summons live on the BATTLE (keyed by their master)
+            // and a buff has no battle handle - the same late-read shape the line above uses for a HP bar.
+            if (effect.getWhileSummonCount() != null) {
+                CanHit summoner = ctx.owner();
+                buff.gateSummons(effect.getWhileSummonCount(),
+                        () -> battle == null || summoner == null ? 0 : battle.summonCountOf(summoner));
+            }
             // "with a 100% base chance, additionally lower the target's all-type RES by 10.00%": an attribute modifier may be ROLLED,
             // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes

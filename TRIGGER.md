@@ -597,15 +597,16 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 其余 op 由解释器的效果循环重复（`EffectTimesTest`）。所以「每击中 1 个敌方目标获得 1 层」现在可以写成
 `ADD_STACK` / `MODIFY_ATTR` + `times_from: "hit_count"`。`times: 0` 在装载期拒绝。
 
-⚠ **五个「当…时持续生效」的门槛字段**（都是修饰的**生命周期**，不是条件）：
+⚠ **六个「当…时持续生效」的门槛字段**（都是修饰的**生命周期**，不是条件）：
 - `while_state`：**规则主人**持有该状态时修饰才在（读者 1217 星魂 1）；
 - `while_stacks` + `while_stacks_min`：**规则主人**的计数器 ≥ N 时（读者 1009 星魂 4「蓄能 ≥2 层」）——`per_stack` 是**连续**缩放，说不了门槛；
 - `while_holder_state`：**修饰的持有者自己**持有该状态时（读者 1307 终结技「【揭露】下受到的伤害 +25%」）；
 - `while_hp_percent`：**规则主人**的生命百分比 ≥ 该值时（读者 1209 星魂 4「当前生命 ≥80% ⇒ 冰抗穿透 +12%」）—— 生命几乎每个事件都在变，所以它与 `while_stacks` 一样是**活**门槛；
-- `while_holder_hp_percent`：**载体自己**的生命百分比 ≥ 该值时（读者 1110 星魂 1「为 ≤50% 生命的目标提供治疗时治疗量 +20%」）—— 与 `while_holder_state` 同族。
+- `while_holder_hp_percent`：**载体自己**的生命百分比 ≥ 该值时（读者 1110 星魂 1「为 ≤50% 生命的目标提供治疗时治疗量 +20%」）—— 与 `while_holder_state` 同族；
+- `while_summon_count`：**规则主人**场上**活着的召唤物** ≥ 该值时（读者 1222 星魂 6「【浮元】**在场时**，使敌方全体全属性抗性降低 20%」）—— 修饰挂在**敌人**身上，门槛问的是主人有没有召唤物；这四问（状态 / 层数 / 生命 / **在场实体**）彼此都替代不了。只被 `MODIFY_ATTR` 挂载，值必须 ≥ 1（0 在装载期拒绝：那是永不开的门槛）。
 
 
-三者都在**回合边界**被扫（`AbstractBuff.gateBroken`），所以状态/层数在两次边界之间变化时，修饰**晚一拍**才跟上。⚠ `while_stacks` 与 `while_stacks_min` 必须成对，缺一个会在装载期报错。
+它们都在**回合边界**被扫（`AbstractBuff.gateBroken`，按**修饰所在单位**的边界），所以状态/层数/召唤物在两次边界之间变化时，修饰**晚一拍**才跟上。⚠ `while_stacks` 与 `while_stacks_min` 必须成对，缺一个会在装载期报错。
 ⚠ `element` 与 `damage_type` 是两个问题：前者是火/冰/雷，后者是 DoT/击破/追加；可以同时出现。
 ⚠ `scope_element` 只被 `MODIFY_DAMAGE_TAKEN` 读，是另一个字段，不是复用 `element`。
 ⚠ 实例路径的 `MODIFY_DAMAGE_TAKEN` 也收**负** `percent`：负 = 这一发**减伤**（进 Reduction 区），正 = 易伤（读者：光锥 24002）。
