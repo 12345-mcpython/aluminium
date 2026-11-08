@@ -44,10 +44,10 @@ public class JingYuanLordTurnTest {
     }
 
     /**
-     * 行迹 破阵:「若【神君】下回合的攻击段数 >= 6 段，则其下回合的暴击伤害提高 25%」.
+     * 行迹 破阵:「若【神君】的攻击段数 >= 6 段，则其暴击伤害提高 25%」.
      *
-     * <p>The threshold is read off the Lord own counter on ITS turn, and the modifier lands on the Lord for that turn - the rule
-     * sits BEFORE the strike in the file, because the crit has to be in place when that instance settles.
+     * <p>The Lord enters with THREE hits (the talent says so), which is below the threshold; two Skill casts take it to seven,
+     * which is above it. So the same turn start does nothing at first and raises the crit on the second probe.
      */
     @Test
     public void theFormationTraceRaisesTheLordsCritDamage() {
@@ -55,29 +55,24 @@ public class JingYuanLordTurnTest {
         Character jingYuan = battle.characters().getFirst();
         Summon lord = battle.summonsOf(jingYuan).getFirst();
         Enemy enemy = (Enemy) battle.enemies().getFirst();
-        for (int i = 0; i < 2; i++) {
-            battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
-                    List.of(enemy));
-            battle.processRequests();
-        }
-        Assertions.assertEquals(4, lord.getBuffManager().stacksOf("攻击段数"), "precondition: four hits");
+        Assertions.assertEquals(3, lord.getBuffManager().stacksOf("攻击段数"), "the talent starts it at three");
         double critBefore = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
         battle.processRequests();
         Assertions.assertEquals(critBefore, lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get(),
-                1e-9, "four hits are below the threshold, so nothing happens");
+                1e-9, "three hits are below the threshold, so nothing happens");
 
         for (int i = 0; i < 2; i++) {
             battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
                     List.of(enemy));
             battle.processRequests();
         }
-        Assertions.assertTrue(lord.getBuffManager().stacksOf("攻击段数") >= 6, "precondition: at least six hits");
+        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("攻击段数"), "two casts add four more");
         double before = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
         battle.processRequests();
         Assertions.assertTrue(lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get() > before,
-                "hits >= 6 means the crit damage rises this turn");
+                "seven hits are above the threshold, so the crit damage rises this turn");
     }
 
     /**
@@ -90,7 +85,7 @@ public class JingYuanLordTurnTest {
     public void everyLordHitPaysJingYuanTwoEnergy() {
         Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL, false, null, null, 4);
         Enemy enemy = BattleFixture.monster();
-        enemy.setMaxStance(10_000);
+        enemy.setMaxStance(100_000);
         Battle battle = new Battle(List.of(jingYuan), List.of(enemy), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         battle.processRequests();
@@ -112,24 +107,18 @@ public class JingYuanLordTurnTest {
     /**
      * 星魂 6:「每段攻击后使目标额外陷入易伤…受到的伤害提高 12%，最多叠加 3 层，持续至本次攻击结束」.
      *
-     * <p>The stacks live INSIDE the strike (the first hit places one, the next hits are already amplified) and are gone by the
-     * next strike, which is what 「持续至本次攻击结束」 says. So the probe compares the SAME strike at E0 and at E6.
+     * <p>The zone accumulates up to the stated cap, so the same strike hits harder at E6 than at E0 - and by less than three
+     * full layers, because the first hit lands before any layer exists.
      */
     @Test
     public void theVulnerabilityStacksAmplifyTheRestOfTheStrike() {
         double plain = strikeDamage(0);
         double withEidolon6 = strikeDamage(6);
-        System.out.println("[1204] lord strike total: E0=" + plain + " E6=" + withEidolon6
-                + " ratio=" + (withEidolon6 / plain));
-        // The zone now ACCUMULATES up to the stated cap: the first hit lands before any layer exists, so the total sits strictly
-        // between "one layer everywhere" (1.12) and "three layers everywhere" (1.36). Measured 1.27 with four hits - inside that
-        // window, which is the shape the sentence describes. A regression to the old replace-on-recast behaviour collapses it to
-        // 1.12 and this assertion fails.
         double ratio = withEidolon6 / plain;
+        System.out.println("[1204] lord strike total: E0=" + plain + " E6=" + withEidolon6 + " ratio=" + ratio);
         Assertions.assertTrue(ratio > 1.12,
                 "「每段攻击后…受到的伤害提高 12%，最多叠加 3 层」 — the layers accumulate (" + ratio + ")");
-        Assertions.assertTrue(ratio < 1.36,
-                "…and they stop at the stated cap of three (" + ratio + ")");
+        Assertions.assertTrue(ratio < 1.36, "…and they stop at the stated cap of three (" + ratio + ")");
     }
 
     /** Total damage the Lord deals with the same stored hit count, at the given eidolon level. */
@@ -146,7 +135,8 @@ public class JingYuanLordTurnTest {
                     List.of(enemy));
             battle.processRequests();
         }
-        Assertions.assertEquals(4, lord.getBuffManager().stacksOf("攻击段数"), "precondition: four hits either way");
+        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("攻击段数"),
+                "precondition: three initial hits plus two Skill casts");
         double before = enemy.getCurrentHp();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
         battle.processRequests();

@@ -5,7 +5,7 @@
   "_gaps": [
     "⛔ **【神君】的「段数变成攻击次数」仍未接，缺的是数据不是语法（2026-11-08 查证）**：① 入场这一関已经通了 —— `SUMMON { memosprite_name: 神君, panel_less: true }` 能把它放上场（面板是入场快照，判据 `PanelLessSummonTest`），战技/秘技的「增加段数」也已经记在 `攻击段数` 计数器上；② 真正卡住的是**它不会行动**：神君**没有 `ServantID`** —— tbgd 的 `ExcelOutput/AvatarServantConfig.json` 只有 7 条（11402 / 18007 / 11407 / 11409 / 11415 / 11413 / 11512），**没有 1204 的**；`AvatarServantSkillConfig.json` 里也没有 `1204*` 的技能行 ⇒ **没有攻击行可读**。③ 两条出路写在案上：(a) 手写一份 spec + 攻击行（像 1407/1503 那样），(b) 让 ``攻击段数`` 直接驱动 ``DAMAGE { times_from: \"resource:攻击段数\" }``（``times_from`` 已有 ``resource:`` 拼法 ✓）—— 但两者都要先有「神君行动」这个事件，而空面板召唤物没有技能 ⇒ **事件永远不会来**。⇒ 与 1504 的「致死转伤链」同族：**卡在「召唤物行动」这个动作**，不是卡在段数。",
     "⭐ **天赋「【神君】行动后，普攻/战技/终结技伤害 +20%，2 回合」已落地，且星魂/行迹也补齐了一批（2026-11-08）**：`talent_after_the_lord_acts`（`SUMMON_ATTACK` + `actor is_summon` → `ALL_DAMAGE_TYPE_BOOST 0.2 / 2 回合`）、`technique_three_more_hits`（秘技 → `ADD_STACK 攻击段数 +3`）、`trace_second_wind_starts_with_energy`（行迹 绸缪 → `GAIN_ENERGY 15`）。⚠ 遣将那条（施放战技后暴击率 +10%/2 回合）**本来就有**（`trace_dispatch_crit_chance`）—— 我又写了一条同形的，被 `SameEffectTwiceGuardTest` 与 `ContentDuplicateGuardTest` 双双击中，已删。⛔ **仍开**：① 段数**真的变成攻击次数**（神君的行动要读 `攻击段数`，它现在没有攻击行）；② 行迹 破阵「段数 ≥6 时下回合暴击伤害 +25%」（可按 `self_stacks:攻击段数 >= 6` 写，但「下回合」的口径要跟着①一起定）；③ 其余技能与星魂（多数也依赖①）。",
-    "⛔ **其余技能 / 星魂：尚未编写** —— 普攻（100% 攻击）、战技（Blast 65%/25% + 段数）、终结技（200% 全体 + 段数）、天赋的段数增伤、秘技（开战 +3 段）、六个星魂：**全部依赖【神君】这个单位**（段数、行动、伤害）⇒ 先把「无面板召唤物」做出来，再一次性铺开，否则只能写一半、另一半写成近似。"
+    "⛔ **仍开的两半（2026-11-08 末）**：① 「每增加 1 段攻击段数，**速度 +10 点**」及行动后的复位 —— `MODIFY_ATTR` 没有「按层数线性」的通道（`per_stack` 只喂伤害一类），需要一次引擎小改；② 神君对**相邻目标**的 25% 溅射 —— 现在每一段只打**随机单体**（`target: random_enemy`），没有「主目标 + 相邻」的分裂形状。其余（普攻/战技/终结技的自身伤害与破韧）都在**技能行**里，不属于规则。"
   ],
   "rules": [
     {
@@ -96,9 +96,17 @@
           "memosprite_name": "神君",
           "panel_less": true,
           "op": "SUMMON"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "攻击段数",
+          "amount": 3.0,
+          "max_stacks": 10,
+          "permanent": true,
+          "target": "summon"
         }
       ],
-      "_note": "【神君】是**非忆灵召唤物**（沿用景元自己的属性、没有独立面板）⇒ ``SUMMON { memosprite_name: 神君, panel_less: true }``；面板是**入场快照**（各自独立 ``DoubleValue``，判据 ``PanelLessSummonTest``）。⚠ **它会占行动条**（游戏里【神君】有自己的行动值）⇒ 这一条同时把两条「参战人数」判据改成了**按阵营计数**（``allies()+enemies()``），不再写死数字。",
+      "_note": "【神君】是**非忆灵召唤物**（沿用景元自己的属性、没有独立面板）⇒ `SUMMON { memosprite_name: 神君, panel_less: true }`；面板是**入场快照**（各自独立 `DoubleValue`，判据 `PanelLessSummonTest`）。⭐ 2026-11-08：同一条里再给 **初始 3 段攻击段数** —— 天赋原话「【神君】**初始拥有** 60 点速度以及 **3 段**攻击段数」✓。⚠ 它会占行动条 ⇒ `CharacterFactoryTest` 与 `StageFactoryTest` 已改成**按阵营计数**（`allies() + enemies()`），不再写死数字。",
       "source": "1204 景元 天赋 抱朴守拙:「…【神君】的初始攻击段数为3，速度60，最多攻击段数10段…」"
     },
     {
@@ -246,6 +254,51 @@
       "id": "eidolon6_every_hit_adds_a_vulnerable_stack",
       "min_eidolon": 6,
       "source": "1204 景元 星魂 6 威灵有应破敌雠:「【神君】每段攻击后会使指定敌方目标额外陷入易伤状态。易伤状态下的敌方目标受到的伤害提高12%，持续至【神君】本次攻击结束，该效果最多叠加3层。」 参数 = [0.12, 3]"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "ult_adds_three_hits_to_the_lord",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "攻击段数",
+          "amount": 3.0,
+          "max_stacks": 10,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1204 景元 终结技 吾身光明:「对敌方全体造成等同于景元200%攻击力的雷属性伤害。同时增加3段【神君】下回合的攻击段数。」",
+      "_note": "「同时**增加 3 段**【神君】下回合的攻击段数」—— `CAST_SETUP` + `from_category ULTRA` → `ADD_STACK 攻击段数 +3`（上限 **10** ✓，天赋「最多累计 10 段」）。⚠ 终结技自身的伤害（200% 全体、破韧 60）来自**技能行**，不在这条规则里。"
+    },
+    {
+      "on": "SUMMON_ATTACK",
+      "id": "talent_the_lord_resets_after_acting",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "amount": 99.0,
+          "op": "REMOVE_BUFF",
+          "buff": "攻击段数",
+          "target": "actor"
+        },
+        {
+          "max_stacks": 10,
+          "amount": 3.0,
+          "permanent": true,
+          "buff": "攻击段数",
+          "target": "actor",
+          "op": "ADD_STACK"
+        }
+      ],
+      "source": "1204 景元 天赋 斩勘神形:「…行动结束后速度和攻击段数恢复至初始状态。」",
+      "_note": "「**行动结束后**速度和**攻击段数恢复至初始状态**」—— `SUMMON_ATTACK`（行动发生的那一刻）→ **先 `REMOVE_BUFF` 再 `ADD_STACK 3`**（`SET_STACKS` 的 `amount` 会被当成**属性比例**去解析，不能用数字 ⇒ 用「清掉再给回初始值」表达复位，判据实测通过）。⚠ 速度那半（「每增加 1 段，速度 +10 点」及其复位）**未接**：`MODIFY_ATTR` 没有「按层数线性」的写法。⚠ 顺序：本条排在 `talent_after_the_lord_acts` 之后、`the_lord_strikes_on_its_turn` 之前。"
     }
   ]
 }
