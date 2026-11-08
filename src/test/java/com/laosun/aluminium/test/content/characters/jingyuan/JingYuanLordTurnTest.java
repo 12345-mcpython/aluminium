@@ -121,11 +121,15 @@ public class JingYuanLordTurnTest {
         double withEidolon6 = strikeDamage(6);
         System.out.println("[1204] lord strike total: E0=" + plain + " E6=" + withEidolon6
                 + " ratio=" + (withEidolon6 / plain));
-        // Measured 1.12 exactly: ONE layer lands, not up to three. The magnitude is right and the cap is not implemented - the
-        // zone replaces same-name vulnerability instead of stacking, and `max_stacks` / `stackable` are silently ignored on
-        // MODIFY_DAMAGE_TAKEN. The assertion therefore pins the layer that DOES land, so a future fix moves it on purpose.
-        Assertions.assertEquals(1.12, withEidolon6 / plain, 1e-9,
-                "one layer of 「受到的伤害提高 12%」 lands inside the strike (the cap of three is registered as a gap)");
+        // The zone now ACCUMULATES up to the stated cap: the first hit lands before any layer exists, so the total sits strictly
+        // between "one layer everywhere" (1.12) and "three layers everywhere" (1.36). Measured 1.27 with four hits - inside that
+        // window, which is the shape the sentence describes. A regression to the old replace-on-recast behaviour collapses it to
+        // 1.12 and this assertion fails.
+        double ratio = withEidolon6 / plain;
+        Assertions.assertTrue(ratio > 1.12,
+                "「每段攻击后…受到的伤害提高 12%，最多叠加 3 层」 — the layers accumulate (" + ratio + ")");
+        Assertions.assertTrue(ratio < 1.36,
+                "…and they stop at the stated cap of three (" + ratio + ")");
     }
 
     /** Total damage the Lord deals with the same stored hit count, at the given eidolon level. */

@@ -1783,8 +1783,11 @@ public final class TriggerInterpreter {
             AbstractBuff zone = withSource(TriggerLifetimes.withTickOwner(TriggerLifetimes.withLifetime(percent > 0
                     // ⚠ The element scope goes to the VULNERABILITY branch only: measured, `ReductionBuff` has no scope
                     // field and no guard at all -- only the vulnerability half ever scoped.
+                    // 「该效果最多叠加 3 层」: the cap is stated by the clause (1204's Eidolon 6). Before this it was declared and
+                    // silently dropped - four hits of one strike measured 1.12x total instead of up to 1.36x, with no symptom.
                     ? new VulnerabilityBuff(turns, percent, permanent, scope, elementScope,
-                            Boolean.TRUE.equals(effect.getFromSelf()) ? ctx.owner() : null)
+                            Boolean.TRUE.equals(effect.getFromSelf()) ? ctx.owner() : null,
+                            effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
             // Note: `withTickOwner` joined this chain on. It was missing, so `ticks_on` was a SILENT no-op on
             // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant
