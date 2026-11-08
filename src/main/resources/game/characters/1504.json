@@ -5,7 +5,7 @@
   "_gaps": [
     "⛔ 星魂 2 **后半**：「每当不死途发动**强化天赋追加攻击**后，**返还所移除【婪酣】层数的 35%**」—— 缺「这一下移除了几层」这个事实：引擎没有「层数被移除」的事件，也没有「按刚移除的数量再加回」的写法。",
     "⭐ **行迹 罪途 / 影肢 已落地（2026-11-04）**：罪途 = 战技 +1 层 / 终结技 +2 层；影肢 = `damage_is_additional` 上的 `BOOST_DAMAGE { value: 0.8 + 0.1 × 层数 }`（`stacks whose: owner`）。行迹 头狼的两条（队伍暴伤 +40%、追加攻击暴伤 +80%）早已在 `trace_party_crit_damage_aura` 与 `trace_followup_crit_damage_extra_*` 里。⚠ 罪途的「追加攻击过程中每有 1 个敌人受到致命攻击时 +1 层」仍未写（需要「致命一击」的计数端）。",
-    "⛔ **终结技剩余两半仍未写**：①「拥有【婪酣】时，每**消耗 4 层**可额外造成 1 次 200% 雷伤，直至不足 4 层」—— 需要「按组消耗 + 每组再打一下、直到不够」的**循环**写法；②「对目标造成**致命攻击**时会继续对**新的【饲饵】**造成伤害」—— 需要「致死那一发把伤害转到新目标」的链条（DAMAGE_SETTLED + KILL 的组合时机）。",
+    "⛔ **终结技剩余两半仍未写，缺的东西已核清（2026-11-06）**：①「拥有【婪酣】时，每**消耗 4 层**可额外造成 1 次 200% 雷伤，直至不足 4 层」—— 需要「**按组**重复、且组数 = \floor(层数 / 4)」的写法。⚠ \times_from **是有的**（\u001bvent_amount / hit_count / distinct_hit_targets / \target_debuffs / \resource:<name>，见 TriggerInterpreter.timesCount），但它取的是**原始计数**、没有「除以 4 取整」这一档；steps 那种 \floor(value/step) 只存在于**数值提供器**、不在 \times_from 的闭集里 ⇒ 要精确表达需给 \times_from 加一个 steps:<counter>/<N> 拼法（约 = 复用 NumberProviders 的 steps）。②「对目标造成**致命攻击**时会继续对**新的【饲饵】**造成伤害」—— 需要「致死那一发把伤害转到新目标」的链条（DAMAGE_SETTLED + KILL 的组合时机）。",
     "⭐ **战技「若该目标为【饲饵】」已落地（2026-11-06）**：`skill_strikes_the_existing_bait_twice` —— `SKILL_CAST` + `target has_state 饲饵` → 100% 攻击力雷伤 + `GAIN_SKILL_POINT 1`，**排在 `skill_marks_the_bait` 之前**（同一次施放里先判旧状态、再摘再挂 ⇒ 文件顺序即执行顺序）。⚠ 100% 是**字面值**：`skills.json` 150402 那行的列映射仍未核清（旧的阻塞点），所以这里按**文档**写、不读行 —— 有意取舍。"
   ],
   "resources": [
