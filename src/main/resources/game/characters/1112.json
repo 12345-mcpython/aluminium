@@ -5,7 +5,7 @@
   "_gaps": [
     "✅ **星魂 1 已落地**（2026-11-02）：`eidolon1_executed_on_debt_target` + 新引擎属性 `CRIT_DAMAGE_TAKEN`。⚠ 近似：「单次攻击内最多生效 1 次」未表达。",
     "✅ 已落地：战技【负债证明】（`skill_proof_of_debt`）、行迹「金融动荡」（`trace_damage_vs_fire_weakness`）、星魂 1/3/5。",
-    "⛔ **1112 仍开（2026-11-08 末）**：① 「账账**自身回合内**不触发行动提前」—— 条件语言**不允许否定 `is_summon`**（装载期：只有 self/actor/target 那一族可否定），需要「当前回合属于谁」或可否定的 `is_summon`；② 「**负债证明**目标受到追加攻击时」—— 条件那一侧缺 `require_state` 同族；③ 星魂 2/4/6 与秘技里以账账为主体的条款。"
+    "⭐ **「负债证明目标受到我方追加攻击时」已落地（2026-11-08）**：`talent_ally_followup_advances_numby` 的条件是 `FOLLOW_UP` + `actor is_ally` + **`target has_state 负债证明`** —— `ctx.target()` 就是**被打的那个**，所以条件语言里 `target has_state` 本来就够用（我先前以为要新词汇，是错的）。⚠ 这条**暂无判据**：`ADVANCE` 的效果只能从行动条位置看出来，还没写那样的探针，登记在此。\n\n⛔ **仍开**：① 「账账**自身回合内**不触发行动提前」—— 条件语言**不允许否定 `is_summon`**（只有 self/actor/target 那一族可否定），需要「当前回合属于谁」或可否定的 `is_summon`；② 星魂 2/4/6 与秘技里以账账为主体的条款。"
   ],
   "rules": [
     {
@@ -184,7 +184,8 @@
       "on": "FOLLOW_UP",
       "id": "talent_ally_followup_advances_numby",
       "when": [
-        "actor is_ally"
+        "actor is_ally",
+        "target has_state 负债证明"
       ],
       "do": [
         {
@@ -194,7 +195,7 @@
         }
       ],
       "source": "1112 托帕&账账 天赋 猪市？！:「…陷入【负债证明】状态下的敌方目标受到我方的追加攻击时，账账行动提前50%。在账账自身回合内，无法触发行动提前效果。」",
-      "_note": "「负债证明目标**受到我方追加攻击时**，账账**行动提前 50%**」—— `FOLLOW_UP` + `actor is_ally` → `ADVANCE 0.5`，目标 `summon`。⛔ **同句两个限定未写**：① 「**账账自身回合内**无法触发」—— 想用 `!actor is_summon` 表达，但**条件语言不允许否定 `is_summon`**（装载期报「negates a condition that does not read a party」，只允许否定 self/actor/target 那一族）；需要一个「当前回合属于谁」或者可否定的 `is_summon`。② 「**负债证明**目标受到」—— `FOLLOW_UP` 的 actor 是出招的我方，要看**被打的目标**带不带状态，条件那一侧还没有 `require_state` 的同族。"
+      "_note": "「**负债证明**目标**受到我方追加攻击时**，账账**行动提前 50%**」—— `FOLLOW_UP` + `actor is_ally`（出招的是我方）+ **`target has_state 负债证明`**（**被打的那个**带着状态 ✓，`ctx.target()` 就是事件的目标）→ `ADVANCE 0.5`，目标 `summon`。⛔ 「**账账自身回合内**无法触发」仍未写：条件语言**不允许否定 `is_summon`**（只有 self/actor/target 那一族可否定），需要「当前回合属于谁」或可否定的 `is_summon`。"
     }
   ]
 }
