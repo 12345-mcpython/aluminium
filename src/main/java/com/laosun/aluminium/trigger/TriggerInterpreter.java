@@ -195,6 +195,17 @@ public final class TriggerInterpreter {
         } catch (IllegalArgumentException notAnAttribute) {
             // falls through to the counter readout below, exactly like the `self_attr_above` scale does
         }
+        // 「每消耗 4 层【婪酣】…」 (1504 later uses `steps:self_stacks:婪酣/4`): a COUNTER name, spelled the way the condition
+        // language spells it. Without these two prefixes a step count could only be taken over a bare attribute or the skill
+        // points, so "every N layers" was unwritable for the very thing most sentences count.
+        if (name.startsWith("self_stacks:")) {
+            return owner.getBuffManager().stacksOf(name.substring("self_stacks:".length()).trim());
+        }
+        if (name.startsWith("target_stacks:")) {
+            CanHit counted = ctx == null ? null : ctx.target();
+            return counted == null ? 0 : counted.getBuffManager().stacksOf(
+                    name.substring("target_stacks:".length()).trim());
+        }
         if (owner.getResources() != null && owner.getResources().has(name)) {
             return owner.getResources().value(name);
         }
@@ -2541,7 +2552,9 @@ public final class TriggerInterpreter {
      * would read 0 forever - the "wrong number with no symptom" this interpreter refuses everywhere else.
      */
     static CounterSteps parseCounterSteps(String written, String spelling) {
-        int colon = written.indexOf(':');
+        // The LAST colon, not the first: a counter name may itself carry one (`self_stacks:婪酣`), and the step is always the
+        // numeric tail. With `indexOf` such a name produced "step that is not a number" - the count could not be written at all.
+        int colon = written.lastIndexOf(':');
         if (colon <= 0 || colon == written.length() - 1) {
             throw new IllegalArgumentException(spelling + " must be \"<counter>:<step>\", e.g. \"隐藏分:120\", and this "
                     + "one is \"" + written + "\"");
@@ -2643,6 +2656,20 @@ public final class TriggerInterpreter {
             // which multiplies one magnitude.
             return Math.max(0, ctx.hitCount());
         }
+        // 「拥有【婪酣】时，每**消耗 4 层**可额外造成 1 次…，直至不足 4 层」 (1504 Ashveil 不死途 Ultimate): the repeat count is how many
+        // WHOLE groups of N the counter holds - floor(value / N) - which `resource:` cannot say (it returns the raw points).
+        // Delegates to the parser `steps` / `per_steps` / `SPEND_STEPS` already share, so one string keeps one meaning.
+        if (from.startsWith("steps:")) {
+            String rest = from.substring("steps:".length()).trim();
+            int slash = rest.lastIndexOf('/');
+            if (slash <= 0 || slash == rest.length() - 1) {
+                throw new IllegalStateException(
+                        "times_from '" + from + "' must be written \"steps:<counter>/<N>\"");
+            }
+            String counter = rest.substring(0, slash).trim();
+            String step = rest.substring(slash + 1).trim();
+            return Math.max(0, stepsOfCounter(counter + ":" + step, ctx));
+        }
         if (from.startsWith("resource:")) {
             // "as many extra hits as the counter has points" (reader: 1141526's extra hit).
             String id = from.substring("resource:".length()).trim();
@@ -2653,7 +2680,8 @@ public final class TriggerInterpreter {
             return resourceAmount(battle, ctx.actor(), id);
         }
         throw new IllegalStateException("times_from '" + effect.getTimesFrom()
-                + "' is not a spelling this engine has: \"event_amount\", \"hit_count\", \"target_debuffs\" or \"resource:<name>\"");
+                + "' is not a spelling this engine has: \"event_amount\", \"hit_count\", \"distinct_hit_targets\", "
+                + "\"target_debuffs\", \"resource:<name>\" or \"steps:<counter>/<N>\"");
     }
 
 
