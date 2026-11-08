@@ -298,6 +298,38 @@ public final class SummonFactory {
         return memospriteWith(master, spec, null);
     }
 
+    /**
+     * Builds a summon that <b>has no panel of its own</b>: it inherits the summoner's attributes (the game's 「非忆灵召唤物」 - 神君,
+     * 浮元, 阿哈 - "uses the character's own stats").
+     *
+     * <p><b>Why the third path.</b> The monster path reads `monster_config`, the memosprite path reads a `MemospriteSpec`; both
+     * answer "what numbers does this unit have" from data that a document does not give for these entities. The documents say
+     * the opposite - 神君 hits "for 66% of Jing Yuan's ATK", 浮元 "uses 灵砂's own attributes" - so the honest panel is the
+     * summoner's own, and any share is applied where the sentence states it (an ATTACK row), not here.
+     *
+     * @param master the character it belongs to
+     * @param name   the entity's name as the document spells it ({@code 神君})
+     * @return the summon, on the player's side, with the summoner's attributes
+     */
+    public static Summon panelLess(Character master, String name) {
+        if (master == null) {
+            throw new IllegalArgumentException("A panel-less summon needs a summoner");
+        }
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("A panel-less summon needs the name the document spells");
+        }
+        // The SAME DoubleValue instances, not a copy of their numbers: a panel-less summon follows its summoner live (buffs and
+        // all), which is what 「沿用灵砂自身的属性」 means. A copy would freeze the panel at the moment it was placed.
+        DoubleValue[] panel =
+                new DoubleValue[AttributeType.values().length];
+        for (AttributeType type : AttributeType.values()) {
+            panel[type.ordinal()] = master.getAttribute(type);
+        }
+        Summon summon = new Summon(name.trim(), Camp.PLAYER, panel);
+        summon.setLevel(master.getLevel());
+        return summon;
+    }
+
     private static Summon memospriteWith(Character master, MemospriteSpec spec, java.util.function.ToIntFunction<String> resourceValue) {
         if (master == null) {
             throw new IllegalArgumentException("A memosprite needs a summoner");
