@@ -1,11 +1,12 @@
 {
   "schema": 1,
   "character": 1204,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
-    "⛔ **【神君】的「段数变成攻击次数」仍未接，缺的是数据不是语法（2026-11-08 查证）**：① 入场这一関已经通了 —— `SUMMON { memosprite_name: 神君, panel_less: true }` 能把它放上场（面板是入场快照，判据 `PanelLessSummonTest`），战技/秘技的「增加段数」也已经记在 `攻击段数` 计数器上；② 真正卡住的是**它不会行动**：神君**没有 `ServantID`** —— tbgd 的 `ExcelOutput/AvatarServantConfig.json` 只有 7 条（11402 / 18007 / 11407 / 11409 / 11415 / 11413 / 11512），**没有 1204 的**；`AvatarServantSkillConfig.json` 里也没有 `1204*` 的技能行 ⇒ **没有攻击行可读**。③ 两条出路写在案上：(a) 手写一份 spec + 攻击行（像 1407/1503 那样），(b) 让 ``攻击段数`` 直接驱动 ``DAMAGE { times_from: \"resource:攻击段数\" }``（``times_from`` 已有 ``resource:`` 拼法 ✓）—— 但两者都要先有「神君行动」这个事件，而空面板召唤物没有技能 ⇒ **事件永远不会来**。⇒ 与 1504 的「致死转伤链」同族：**卡在「召唤物行动」这个动作**，不是卡在段数。",
-    "⭐ **天赋「【神君】行动后，普攻/战技/终结技伤害 +20%，2 回合」已落地，且星魂/行迹也补齐了一批（2026-11-08）**：`talent_after_the_lord_acts`（`SUMMON_ATTACK` + `actor is_summon` → `ALL_DAMAGE_TYPE_BOOST 0.2 / 2 回合`）、`technique_three_more_hits`（秘技 → `ADD_STACK 攻击段数 +3`）、`trace_second_wind_starts_with_energy`（行迹 绸缪 → `GAIN_ENERGY 15`）。⚠ 遣将那条（施放战技后暴击率 +10%/2 回合）**本来就有**（`trace_dispatch_crit_chance`）—— 我又写了一条同形的，被 `SameEffectTwiceGuardTest` 与 `ContentDuplicateGuardTest` 双双击中，已删。⛔ **仍开**：① 段数**真的变成攻击次数**（神君的行动要读 `攻击段数`，它现在没有攻击行）；② 行迹 破阵「段数 ≥6 时下回合暴击伤害 +25%」（可按 `self_stacks:攻击段数 >= 6` 写，但「下回合」的口径要跟着①一起定）；③ 其余技能与星魂（多数也依赖①）。",
-    "⭐ **1204 的空缺已清零（2026-11-08）**：神君对**相邻目标**的 25% 溅射已用新字段 `blast: 0.25` 表达（相邻按**主目标幅度的 25%** 结算，因为主目标是这一发里才抽出来的）。⚠ 保留一条**已知近似**：每段都会重新抽主目标，所以相邻也逐段变 —— 与「一次行动锁定一个主目标」略有差别（引擎没有「一次行动的主目标」这个概念）。"
+    "⭐ **「段数变成攻击次数」已落地（2026-11-08）**：`the_lord_strikes_on_its_turn` —— `TURN_START` + `actor is_summon` + `actor_stacks:攻击段数 >= 1` → `DAMAGE { percent: 0.66, times_from: \"steps:actor_stacks:攻击段数/1\", blast: 0.25 }`。「谁出的手」用 `attacker: actor`（规则打出的伤害默认记在规则主人头上，这是本条的关键）。⚠ 已知近似：每段重新抽主目标 ⇒ 相邻也逐段变（引擎没有「一次行动锁定一个主目标」这个概念）。",
+    "⭐ **天赋与行迹全部落地（2026-11-08）**：`talent_after_the_lord_acts`（`SUMMON_ATTACK` → 全体增伤 20%/2 回合）、`technique_three_more_hits`（秘技 +3 段）、`trace_second_wind_starts_with_energy`（绸缪 15 能量）、`trace_formation_raises_the_lords_crit_damage`（破阵：≥6 段时暴伤 +25%，排在出手之前）、`trace_dispatch_crit_chance`（遣将，**本来就有** —— 我又写了一条同形的被两个守卫击中，已删）。",
+    "⭐ **星魂与段数规则（2026-11-08）**：初始 3 段、战技 +2、终结技 +3、秘技 +3、行动后复位、每多 1 段速度 +10 点、星魂 4（每段回 2 能量）、星魂 6（每段一层易伤 12%，上限 3 层 —— 这一条同时修了 `VulnerabilityBuff` 的层数上限）。星魂 3/5 是等级加成（本库没有等级规则，未写）。",
+    "⭐ **技能自身的伤害与破韧**（普攻 100%、战技全体 100%、终结技全体 200%、破韧 30/60）来自**技能行**，不属于触发规则 —— 这也是本文件只有 16 条规则的原因。"
   ],
   "rules": [
     {
