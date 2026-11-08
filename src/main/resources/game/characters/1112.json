@@ -4,8 +4,8 @@
   "_status": "partial",
   "_gaps": [
     "✅ **星魂 1 已落地**（2026-11-02）：`eidolon1_executed_on_debt_target` + 新引擎属性 `CRIT_DAMAGE_TAKEN`。⚠ 近似：「单次攻击内最多生效 1 次」未表达。",
-    "⛔ **终结技、天赋、秘技、星魂 2/4/6 的账账相关条款全部未写** —— 依赖**账账（Numby）这一非忆灵召唤物**：**账账技能行不在 `skills.json`** ⇒ 倍率读不到，`SUMMON_ATTACK` 也没有可指向的单位。**数据缺口**。",
-    "✅ 已落地：战技【负债证明】（`skill_proof_of_debt`）、行迹「金融动荡」（`trace_damage_vs_fire_weakness`）、星魂 1/3/5。"
+    "✅ 已落地：战技【负债证明】（`skill_proof_of_debt`）、行迹「金融动荡」（`trace_damage_vs_fire_weakness`）、星魂 1/3/5。",
+    "⭐ **账账已上场并能出手（2026-11-08）**：`numby_takes_the_field`（`SUMMON panel_less` + 速度 80 点）、`numby_strikes_a_debt_marked_target`（`TURN_START` + `actor is_summon` → 150% 火伤）、`talent_ally_followup_advances_numby`（我方追加攻击 → 账账行动提前 50%）。⛔ **仍开**：① 出手目标应该**限定为带【负债证明】的那一个**（现为 `random_enemy`，引擎缺「带某状态」的目标过滤）；② 「账账**自身回合内**不触发行动提前」（缺「当前回合属于谁」的判定）；③ 星魂 2/4/6 与秘技里以账账为主体的条款（多数跟着①）。"
   ],
   "rules": [
     {
@@ -145,6 +145,55 @@
       ],
       "source": "1112 托帕&账账 星魂 1 未来市场 (Avatar_Topaz_Rank01): 「陷入【负债证明】状态下的敌方目标受到追加攻击时，将会陷入【被执行】状态，单次攻击内最多生效1次。【被执行】使敌方目标受到的追加攻击的暴击伤害提高25%，最多叠加2层。【负债证明】被移除时，【被执行】也会被移除。」 param = [0.25, 2]",
       "_note": "「受到**追加攻击**时陷入【被执行】；使其受到的**追加攻击的暴击伤害**提高 **25%**，最多 **2** 层」= `FOLLOW_UP` + `target has_state 负债证明` → `MODIFY_ATTR CRIT_DAMAGE_TAKEN { percent: 0.25, max_stacks: 2 }` ✓ —— ⚠ **为此新增了引擎属性 `CRIT_DAMAGE_TAKEN`（受伤侧暴击伤害）**：`VulnerabilityBuff` 缩放整次伤害，用它代替会把「只有暴击多 25%」放宽成「每次追加攻击都多 25%」；`CRIT_ATTACK` 是**攻击方**的倍率。判据 `CritDamageTakenAttributeTest` 实测比值 **1.1436781609196276**，与 `(1+cd+0.25)/(1+cd)` 的 **1.1436781609195403** 一致（cd≈0.75）✓。⚠ 近似：「单次攻击内最多生效 1 次」未表达。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "numby_takes_the_field",
+      "do": [
+        {
+          "op": "SUMMON",
+          "memosprite_name": "账账",
+          "panel_less": true,
+          "summon_speed": 80
+        }
+      ],
+      "source": "1112 托帕&账账 天赋 猪市？！:「战斗开始时召唤账账。账账初始拥有80点速度…」",
+      "_note": "「**战斗开始时召唤账账**。账账**初始拥有 80 点速度**」—— 账账是**非忆灵召唤物**（`panel_less: true`，面板 = 托帕入场时的属性快照），速度用 **`summon_speed: 80`**（本轮新加的字段：**绝对点数**，与忆灵 spec 里的 `flat` 同一个意思 —— 否则它会沿用托帕的速度，而这句话唯一说清的就是这个数）。⚠ 它的行动值独立于托帕，这里用「它自己的回合」当行动点。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "numby_strikes_a_debt_marked_target",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 1.5,
+          "element": "Fire",
+          "attacker": "actor",
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1112 托帕&账账 天赋 猪市？！:「…行动时发动追加攻击，对陷入【负债证明】状态下的敌方单体造成等同于托帕150%攻击力的火属性伤害。」",
+      "_note": "「账账**行动时**发动追加攻击，对陷入【负债证明】的敌方单体造成等同于托帕 **150%** 攻击力的**火**属性伤害」—— `TURN_START` + `actor is_summon` → `DAMAGE { percent: 1.5, element: Fire, attacker: actor }`。⚠ 目标没写成「只打负债证明的那个」：引擎的 `random_enemy` 没有「带某个状态」的过滤版本（`target_debuffs` 是计数不是过滤），这是本条**已知近似**，已登记。"
+    },
+    {
+      "on": "FOLLOW_UP",
+      "id": "talent_ally_followup_advances_numby",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.5,
+          "target": "summon"
+        }
+      ],
+      "source": "1112 托帕&账账 天赋 猪市？！:「…陷入【负债证明】状态下的敌方目标受到我方的追加攻击时，账账行动提前50%。在账账自身回合内，无法触发行动提前效果。」",
+      "_note": "「负债证明目标**受到我方追加攻击时**，账账**行动提前 50%**」—— `FOLLOW_UP` + `actor is_ally` → `ADVANCE 0.5`，目标 **`summon`**（账账 ✓）。⛔ 同句的两个限定**未写**：① 「**负债证明**目标受到」—— `FOLLOW_UP` 的 actor 是出招的我方，伤害目标要有状态，需要「事件目标带某状态」的条件；② 「**账账自身回合内**无法触发」—— 需要「当前回合属于谁」的判定。这两条都登记。"
     }
   ]
 }

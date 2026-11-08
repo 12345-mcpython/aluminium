@@ -89,7 +89,9 @@ public class HardcodedSkillRowRatchetTest {
     // technique param has no level axis, so it stays literal - the same verdict as the entries above.
     // Note: 52 since 2026-11-08 - 1204 states 「造成等同于景元 66% 攻击力的雷属性伤害」 for the Lord's hits, and 0.66 is also a cell
     // of his own rows. The talent param has no such column, so it stays literal - the same verdict as the entries above.
-    private static final int BASELINE = 52;
+    // Note: 53 since 2026-11-08 - 1112's 账账 has NO skill row in skills.json at all (that is the data gap the character file
+    // records), so its 150% can only be the sentence's own number. Reading a row is the rule; this is the case where no row exists.
+    private static final int BASELINE = 53;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

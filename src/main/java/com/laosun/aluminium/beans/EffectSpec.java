@@ -111,6 +111,7 @@ public class EffectSpec {
         copy.parts = this.parts;
         copy.panelLess = this.panelLess;
         copy.blast = this.blast;
+        copy.summonSpeed = this.summonSpeed;
         copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
         copy.value = NumberProviders.copyOf(this.value);
         copy.percentPerAllyState = this.percentPerAllyState;
@@ -1235,6 +1236,16 @@ public class EffectSpec {
      */
     @SerializedName("blast")
     private Double blast;
+
+    /**
+     * {@code SUMMON} with {@code panel_less}: the entity's own SPEED, in points.
+     *
+     * <p>「账账**初始拥有 80 点速度**」 (1112) - a stated ABSOLUTE, the same thing a memosprite spec says with {@code "flat"}.
+     * Without it the summon inherits its master's speed, which is a different number and the one thing the sentence is explicit
+     * about.
+     */
+    @SerializedName("summon_speed")
+    private Double summonSpeed;
 
 
     /**

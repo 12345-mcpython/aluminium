@@ -3514,6 +3514,18 @@ public class Battle {
     }
 
     /**
+     * The same, with the entity own SPEED stated in points (「账账初始拥有 80 点速度」).
+     *
+     * @param master the character it belongs to
+     * @param name   the entity name as the document spells it
+     * @param speed  its own speed in points, or {@code null} to keep the summoner share
+     * @return the summon on the field
+     */
+    public Summon placePanelLessSummon(Character master, String name, Double speed) {
+        return summons.panelLess(master, name, speed);
+    }
+
+    /**
      * Summons one <b>named</b> memosprite (1512's three 「晴空乐手」); see {@code SummonService#memosprite(Character, String)}.
      *
      * @param master the summoning character

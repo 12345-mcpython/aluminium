@@ -988,7 +988,8 @@ public final class TriggerInterpreter {
                         throw new IllegalStateException(
                                 "Op SUMMON states panel_less but names no entity: say which one (神君 / 阿哈 / 浮元)");
                     }
-                    battle.placePanelLessSummon(owner, effect.getMemospriteName().trim());
+                    battle.placePanelLessSummon(owner, effect.getMemospriteName().trim(),
+                            effect.getSummonSpeed());
                     break;
                 }
                 if (effect.getMemospriteName() == null || effect.getMemospriteName().isBlank()) {

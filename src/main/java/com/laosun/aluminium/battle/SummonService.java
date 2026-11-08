@@ -78,13 +78,25 @@ public final class SummonService {
      * @return the summon on the field
      */
     public Summon panelLess(Character master, String name) {
+        return panelLess(master, name, null);
+    }
+
+    /**
+     * The same, with the entity own SPEED stated in points (「账账初始拥有 80 点速度」).
+     *
+     * @param master the character it belongs to
+     * @param name   the entity name as the document spells it
+     * @param speed  its own speed in points, or {@code null} to keep the summoner share
+     * @return the summon on the field
+     */
+    public Summon panelLess(Character master, String name, Double speed) {
         if (master == null) {
             throw new IllegalArgumentException("A panel-less summon needs a summoner");
         }
         if (master.isDeath()) {
             throw new IllegalArgumentException("A dead character cannot summon (" + master.getName() + ")");
         }
-        Summon summon = SummonFactory.panelLess(master, name);
+        Summon summon = SummonFactory.panelLess(master, name, speed);
         summon.setMaster(master);
         battle.addCombatant(summon);
         onSummoned.accept(summon);

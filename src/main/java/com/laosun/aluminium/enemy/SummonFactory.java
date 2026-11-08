@@ -312,6 +312,18 @@ public final class SummonFactory {
      * @return the summon, on the player's side, with the summoner's attributes
      */
     public static Summon panelLess(Character master, String name) {
+        return panelLess(master, name, null);
+    }
+
+    /**
+     * The same, with the entity own SPEED stated in points.
+     *
+     * @param master the character it belongs to
+     * @param name   the entity name as the document spells it
+     * @param speed  its own speed in points, or {@code null} to keep the summoner share
+     * @return the summon
+     */
+    public static Summon panelLess(Character master, String name, Double speed) {
         if (master == null) {
             throw new IllegalArgumentException("A panel-less summon needs a summoner");
         }
@@ -325,6 +337,9 @@ public final class SummonFactory {
         for (AttributeType type : AttributeType.values()) {
             DoubleValue own = master.getAttribute(type);
             panel.setBase(type, own == null ? 0 : own.get());
+        }
+        if (speed != null) {
+            panel.setBase(AttributeType.SPEED, speed);
         }
         Summon summon = new Summon(name.trim(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
