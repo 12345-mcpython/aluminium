@@ -754,6 +754,7 @@ public class TriggerTable {
         // "against all enemies <b>in the shocked state</b>...": each effect may name conditions its TARGETS must satisfy. Parsed
         // here, with the rule's own event, so `from_skill` and friends mean the same thing inside a filter.
         List<List<Condition>> targetFilters = new ArrayList<>();
+        List<List<Condition>> preferences = new ArrayList<>();
         for (EffectSpec effect : effects) {
             List<Condition> filter = new ArrayList<>();
             if (effect.getTargetWhen() != null) {
@@ -762,13 +763,22 @@ public class TriggerTable {
                 }
             }
             targetFilters.add(List.copyOf(filter));
+            // 「优先选择…」: parsed by the same parser as the filter above, so the two families cannot drift apart in what a
+            // candidate question means; only the EMPTY answer differs (see EffectSpec.prefer).
+            List<Condition> preferred = new ArrayList<>();
+            if (effect.getPrefer() != null) {
+                for (String raw : effect.getPrefer()) {
+                    preferred.add(TriggerConditionParser.parseCondition(raw, spec));
+                }
+            }
+            preferences.add(List.copyOf(preferred));
         }
         int minEidolon = validateMinEidolon(spec);
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateId(spec), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
                 minEidolon, validateMaxEidolon(spec, minEidolon), validatePerTurn(spec), validatePerAttack(spec),
-                Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
+                Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters), List.copyOf(preferences),
                 validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec),
                 spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim(),
                 Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec), validatePick(spec, effects), spec.getChanceFrom()));
@@ -1302,7 +1312,8 @@ public class TriggerTable {
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
                                int maxEidolon,
                                int perTurn, int perAttack, boolean oncePerWave,
-                               List<List<Condition>> effectTargetFilters, String perSubject,
+                               List<List<Condition>> effectTargetFilters, List<List<Condition>> effectPreferences,
+                               String perSubject,
                                boolean oneOf, double chanceDecay, String oneOfNoRepeat, boolean deferUntilWave,
                                /*
                                 * How many independent rolls of {@link #chance} one firing makes - 1 unless the
@@ -1338,6 +1349,20 @@ public class TriggerTable {
             }
             List<Condition> filter = effectTargetFilters.get(index);
             return filter == null ? List.of() : filter;
+        }
+
+        /**
+         * The target <b>preference</b> of one effect ({@code prefer}), by that effect's index in {@link #effects}.
+         *
+         * <p>Parsed exactly like {@code target_when} (a misspelling is refused at load time), and kept per effect for the
+         * same reason: two effects of one rule may prefer different targets.
+         */
+        public List<Condition> preferAt(int index) {
+            if (effectPreferences == null || index < 0 || index >= effectPreferences.size()) {
+                return List.of();
+            }
+            List<Condition> preference = effectPreferences.get(index);
+            return preference == null ? List.of() : preference;
         }
 
         /**
@@ -1574,13 +1599,44 @@ public class TriggerTable {
         }
 
         /**
+         * The same context carrying the effect's target PREFERENCE ({@code prefer}) beside its filter.
+         *
+         * <p>Set once per effect like the filter above, and read only by the {@code random_enemy} selector: a preference
+         * narrows a random draw but never empties it (an empty preferred pool falls back to the whole side).
+         */
+        public TriggerContext withPreferences(List<Condition> preferences) {
+            return new TriggerContext(subject, eventFacts, battle, ruleScope.withPreferences(preferences), castFacts);
+        }
+
+        /** @return the effect's preference conditions (empty = "no preference") */
+        public List<Condition> preferences() {
+            return ruleScope.prefer();
+        }
+
+        /**
+         * Whether {@code candidate} satisfies the preference (an empty preference admits everything).
+         *
+         * <p>Tested in the candidate's own context, exactly like {@link #passesTargetFilter} - the difference is what an
+         * EMPTY answer means: a filter that admits nobody means "no target", a preference that admits nobody means "draw
+         * from everyone".
+         */
+        public boolean passesPreferences(CanHit candidate) {
+            for (Condition condition : ruleScope.prefer()) {
+                if (!condition.test(withSubject(candidate))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /**
          * The same context with a different subject and <b>no filter</b>: the context a per-target condition is tested
          * in (its {@code target} is the candidate). Note: The filter is dropped deliberately - asking a candidate about the
          * filter that is asking about it would recurse.
          */
         public TriggerContext withSubject(CanHit candidate) {
             return new TriggerContext(new TriggerSubject(subject.owner(), subject.actor(), candidate),
-                    eventFacts, battle, new RuleScope(ruleScope.ruleId(), List.of()),
+                    eventFacts, battle, new RuleScope(ruleScope.ruleId(), List.of(), List.of()),
                     castFacts.withSkillId(0).withAttackHitTargets(List.of()));
         }
 

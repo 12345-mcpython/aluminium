@@ -418,6 +418,15 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 
 ⚠ 选择器是闭集；拼错的 `target` 装载期拒绝（曾经会静默当成 `self`，那是没有症状的错误）。
 
+#### 5.2b `target_when`（过滤）与 `prefer`（优先）
+
+| 字段 | 语义 | 空集时 |
+|---|---|---|
+| `target_when: [...]` | 目标**必须**满足其中每条条件（逐候选判定，`target` 绑到该候选） | = 一个也不打（**排除**） |
+| `prefer: [...]` | `random_enemy` 抽签时**优先**从满足条件的候选里抽 | = 退回全体照抽（**只是优先**） |
+
+⚠ `prefer` 只被 `random_enemy` 读：写在别的选择器上装载期拒绝（没有抽签可收窄，那个字段就成了注释）。读者 1222 天赋「本次伤害**优先选择**韧性值大于0且有火属性弱点的目标」= `prefer: ["target has_weakness Fire", "target_toughness_percent > 0"]` —— ⚠ 这两条**不能**写成 `target_when`：没有火弱点敌人时 `target_when` 会让这一发**一个目标都没有**，而句子说的是「优先」。
+
 ### 5.3 数值
 
 #### 5.3.1 旧三件套：`scale` + `percent` / `amount`

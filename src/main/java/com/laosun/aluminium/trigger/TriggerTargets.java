@@ -137,9 +137,16 @@ final class TriggerTargets {
                         : require(ctx.battle() == null ? null
                         : ctx.battle().randomOpponent(ctx.owner()), "target_else_random_enemy", ctx);
             }
-            case TriggerVocabulary.TARGET_RANDOM_ENEMY ->
-                    require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
-                            TriggerVocabulary.TARGET_RANDOM_ENEMY, ctx);
+            case TriggerVocabulary.TARGET_RANDOM_ENEMY -> {
+                // 「本次伤害**优先选择**韧性值大于0且有火属性弱点的目标」 (1222's talent, 星魂 6 and 行迹 遗爇): a preference
+                // narrows the draw but must never EMPTY it. With no candidate satisfying it, the sentence still says the
+                // attack lands somewhere - hence the fallback to the whole side, which is the one difference between this
+                // and a `target_when` filter.
+                CanHit preferred = preferredRandomEnemy(ctx);
+                yield preferred != null ? preferred
+                        : require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
+                        TriggerVocabulary.TARGET_RANDOM_ENEMY, ctx);
+            }
             // 「对陷入【负债证明】状态下的敌方单体造成…」 (1112 托帕&账账): a random enemy HOLDING the state named by `require_state`,
             // not just any enemy. `random_enemy` draws from the whole side and would hit a target the sentence excludes - the
             // "wrong number with no symptom" this project refuses - so it gets its own spelling. Nobody holding it => no target.
@@ -894,6 +901,31 @@ final class TriggerTargets {
      */
     static final String ENEMIES_WITH_STATE_PREFIX = "all_enemies_with_state:";
 
+
+    /**
+     * The preferred half of a {@code random_enemy} draw, or {@code null} when the effect states no preference or nobody
+     * satisfies it.
+     *
+     * <p>读者: 1222 Lingsha (灵砂) - 「本次伤害优先选择韧性值大于0且有火属性弱点的目标」 - where the preference is stated as ordinary
+     * conditions ({@code target has_weakness Fire} + {@code target_toughness_percent > 0}) and read one candidate at a time
+     * through {@code TriggerContext#passesPreferences}. The draw uses the battle's own seeded RNG, like every other random
+     * selector here, so a judge can pin both determinism and genuine variation.
+     *
+     * @param ctx the firing context
+     * @return one living enemy that satisfies every preference, or {@code null} (the caller then draws from everyone)
+     */
+    private static CanHit preferredRandomEnemy(TriggerContext ctx) {
+        if (ctx.preferences().isEmpty() || ctx.battle() == null) {
+            return null;
+        }
+        java.util.List<CanHit> preferred = new java.util.ArrayList<>();
+        for (CanHit candidate : ctx.battle().getOpponents(ctx.owner())) {
+            if (candidate != null && !candidate.isDeath() && ctx.passesPreferences(candidate)) {
+                preferred.add(candidate);
+            }
+        }
+        return preferred.isEmpty() ? null : preferred.get(ctx.battle().getRng().nextInt(preferred.size()));
+    }
 
     /**
      * A random opponent HOLDING a named state ({@code require_state} on the effect), or {@code null} when nobody does.

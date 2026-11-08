@@ -141,6 +141,7 @@ final class TriggerValidator {
     static void validateOne(EffectSpec effect, TriggerSpec spec) {
         validateWhileStacks(effect, spec);
         validateWhileSummonCount(effect, spec);
+        validatePrefer(effect, spec);
         // Note: A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
         // kind of mistake this interpreter's closed sets exist to prevent.
         if ((effect.getCapScale() != null || effect.getCapPercent() != null)
@@ -2768,6 +2769,32 @@ final class TriggerValidator {
                             + "no counter to compare it against (source: " + spec.getSource() + ")");
         }
     }
+    /**
+     * {@code prefer} is read by the {@code random_enemy} selector alone.
+     *
+     * <p>「优先选择…」 narrows a random draw; on any other selector there is no draw to narrow, so the field would be accepted
+     * and never consulted - a condition that reads as one and behaves like a comment, which is exactly the family this
+     * validator exists for. The same reasoning as `cap_scale` (only {@code APPLY_DOT} reads it).
+     */
+    static void validatePrefer(EffectSpec effect, TriggerSpec spec) {
+        if (effect.getPrefer() == null || effect.getPrefer().isEmpty()) {
+            return;
+        }
+        String target = effect.getTarget() == null ? "" : effect.getTarget().trim();
+        if (!"random_enemy".equals(target)) {
+            throw new IllegalArgumentException(
+                    "Effect states \"prefer\" but its target is \"" + target + "\"; a preference only narrows the random draw "
+                            + "of \"random_enemy\" (source: " + spec.getSource() + ")");
+        }
+        for (String raw : effect.getPrefer()) {
+            if (raw == null || raw.isBlank()) {
+                throw new IllegalArgumentException(
+                        "Effect states \"prefer\" with a blank condition: every entry must say what makes a candidate "
+                                + "preferred (source: " + spec.getSource() + ")");
+            }
+        }
+    }
+
     /**
      * {@code while_summon_count} must state a least count of at least one: 「在场时」 means "one is there", and {@code 0} would
      * be a gate that can never fail - a field that reads as a condition and behaves like "always on".

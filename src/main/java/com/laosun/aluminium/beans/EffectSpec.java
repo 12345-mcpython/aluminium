@@ -152,6 +152,7 @@ public class EffectSpec {
         copy.effectTurns = this.effectTurns;
         copy.cooldownDelta = this.cooldownDelta;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
+        copy.prefer = this.prefer == null ? null : new java.util.ArrayList<>(this.prefer);
         copy.effectMaxStacks = this.effectMaxStacks;
         copy.effectAmount = this.effectAmount;
         copy.charges = this.charges;
@@ -1700,6 +1701,21 @@ public class EffectSpec {
      */
     @SerializedName("target_when")
     private List<String> targetWhen;
+
+    /**
+     * <b>A PREFERENCE, not a filter</b>: 「本次伤害<b>优先选择</b>韧性值大于0且有火属性弱点的目标」 (1222 Lingsha (灵砂)'s talent).
+     * The conditions are tested one candidate at a time, exactly like {@code target_when}, but an empty preferred pool is <b>not</b>
+     * "no target": the resolver falls back to the whole side. A filter excludes; a preference only orders.
+     *
+     * <p><b>Why the two need separate fields.</b> Reusing {@code target_when} would silently turn 「优先」 into 「只打」 - the
+     * wrong number with no symptom: whenever no enemy carries the preferred property the clause would do nothing at all,
+     * while the document says the attack still lands on somebody.
+     *
+     * <p>Read by the {@code random_enemy} selector only (refused elsewhere: a preference nothing consults is a field that
+     * looks like a condition and behaves like a comment).
+     */
+    @SerializedName("prefer")
+    private List<String> prefer;
     /**
      * "本次叠加的层数额外 +1 层": raises the LAYER COUNT an {@code ADD_STACK} application grants. Reader: 1218's
      * Eidolon 1, which raises the Talent's own one-layer application.

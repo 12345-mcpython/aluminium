@@ -383,9 +383,11 @@ public final class TriggerInterpreter {
                 continue;
             }
             effect = amendedEffect(effect, ctx);
-            // This effect's per-target conditions. The ops below take `effectCtx`, whose filter `resolveTargets`
-            // applies -- so the whole vocabulary cost four lines in the loop and one branch in the resolver.
-            TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));
+            // This effect's per-target conditions, and its target PREFERENCE (「优先选择…」). The ops below take
+            // `effectCtx`, whose filter `resolveTargets` applies -- so the whole vocabulary cost four lines in the loop
+            // and one branch in the resolver. The preference is read by the `random_enemy` selector alone.
+            TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect))
+                    .withPreferences(rule.preferAt(thisEffect));
             // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
             // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
             // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.

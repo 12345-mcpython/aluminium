@@ -37,7 +37,10 @@ public class TriggerContextShapeTest {
                 components(TriggerSubject.class));
         Assertions.assertEquals(List.of("hitCount", "amount", "damage", "fromCast"),
                 components(EventFacts.class));
-        Assertions.assertEquals(List.of("ruleId", "targetFilter"),
+        // `prefer` joins `targetFilter` because it is the same kind of fact - "which candidates does THIS effect reach" - and it is
+        // set in the same breath (once per effect). It is not a filter: an empty filter means "nobody", an empty preference means
+        // "anybody" (see TriggerTargets.preferredRandomEnemy).
+        Assertions.assertEquals(List.of("ruleId", "targetFilter", "prefer"),
                 components(RuleScope.class));
         Assertions.assertEquals(List.of("skillId", "weakHitCount", "attackHitTargets"),
                 components(CastFacts.class));
