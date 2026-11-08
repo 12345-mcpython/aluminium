@@ -2416,6 +2416,10 @@ final class TriggerConditionParser {
                     "skill_point",
                     // 「若不存在开战的队友」 (light cone 23050): our OTHER units that declared a map attack before the battle.
                     "map_attacker_count",
+                    // 「若队伍中有存在当前生命值百分比小于等于 60% 的角色」 (1222 Lingsha (灵砂) 行迹 遗爇): the LOWEST HP share
+                    // among the party's living characters. `hp_percent` reads the owner and `target_hp_percent` the event's
+                    // target; a sentence about "anybody on the team" needs a third subject - the party as a whole.
+                    "lowest_ally_hp_percent",
                     // 「与上一次施放的欢愉技不同」 (light cone 23064): the slot of the previous Elation-damage cast, recorded
                     // by SkillExecutor after each such cast. `from_skill_id` is the CURRENT one, so the comparison is
                     // `from_skill_id != last_elation_skill_id`.

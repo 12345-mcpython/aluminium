@@ -2090,6 +2090,10 @@ public class TriggerTable {
                 // "我方目标数量" -- the mirror of `enemy_count`, and the blocker set 321's entry names ("there is still no
                 // condition on the battlefield's PARTY SIZE, so the number of stacks cannot be computed").
                 case "ally_count" -> allyCount(ctx);
+                // 「若队伍中有存在当前生命值百分比小于等于 60% 的角色」 (1222 Lingsha (灵砂) 行迹 遗爇): the LOWEST HP share among
+                // the party's living CHARACTERS. "There is somebody at or below N%" is exactly "the minimum is at or below N%",
+                // so one scalar answers the sentence - and it spells "everybody is above N%" with the same operator.
+                case "lowest_ally_hp_percent" -> lowestAllyHpPercent(ctx);
                 // "若装备者的能量上限大于等于…" -- not an attribute (`CanHit.getMaxEnergy()` is a field, and the
                 // attribute table has no slot for it), which is exactly why it needed a variable of its own.
                 case "self_max_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getMaxEnergy();
@@ -2200,6 +2204,33 @@ public class TriggerTable {
                 return Double.NaN;
             }
             return ctx.battle().allies().stream().filter(ally -> ally != null && !ally.isDeath()).count();
+        }
+
+        /**
+         * 「若队伍中有存在当前生命值百分比小于等于 60% 的角色」 (1222 Lingsha (灵砂) 行迹 遗爇): the LOWEST HP share among the
+         * living party <b>characters</b>.
+         *
+         * <p><b>Why a minimum instead of a count.</b> "somebody is at or below N%" is exactly "the lowest share is at or below
+         * N%". One scalar therefore answers the sentence, and it also spells the negation ("everybody is above N%") with the
+         * same operator; a COUNT of units below the line would need its threshold restated in two places, which is how the two
+         * copies start to differ.
+         *
+         * <p>⚠ <b>Characters only.</b> The sentence says 角色, and a summon is not one - so this reads {@code Battle.characters}
+         * (the party) and not {@code allies()} (which also carries summons, and whose HP would otherwise drag the minimum down
+         * for a reason the sentence never states).
+         *
+         * <p>{@code NaN} with no battlefield, or when the party is empty - the rule every unreadable variable in this vocabulary
+         * follows: "cannot tell" must fail the condition, never read as "zero".
+         */
+        private static double lowestAllyHpPercent(TriggerContext ctx) {
+            if (ctx.battle() == null || ctx.battle().characters() == null) {
+                return Double.NaN;
+            }
+            return ctx.battle().characters().stream()
+                    .filter(ally -> ally != null && !ally.isDeath() && ally.getMaxHp() > 0)
+                    .mapToDouble(ally -> ally.getCurrentHp() / ally.getMaxHp())
+                    .min()
+                    .orElse(Double.NaN);
         }
 
         /**

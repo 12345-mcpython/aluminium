@@ -256,6 +256,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | 变量 | 读什么 |
 |---|---|
 | `hp_percent` | 自己当前生命百分比 |
+| `lowest_ally_hp_percent` | **队伍中生命百分比最低的那个角色**（只数角色，不含召唤物）—— 「队伍中**有** HP% ≤ N 的角色」就写成 `lowest_ally_hp_percent <= N`（读者 1222 行迹 遗爇）|
 | `target_hp_percent` / `actor_hp_percent` | 目标 / 事件发起者的生命百分比 |
 | `target_hp_percent_before` | 掉血【之前】的目标生命百分比；只在会掉血的事件上有意义 |
 | `target_toughness_percent` | 目标**当前韧性 ÷ 韧性上限**（0..1 的分数）；没有韧性条的敌人答 NaN ⇒ 比较为假（1214 行迹 摧锋轴承） |

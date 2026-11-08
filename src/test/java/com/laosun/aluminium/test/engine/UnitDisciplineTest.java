@@ -62,14 +62,17 @@ public class UnitDisciplineTest {
             "counted_laughs",
             // How many of the TARGET's buffs a 「解除增益效果」 would really remove. A COUNT (0..n), never a fraction:
             // 「解除增益效果时」 asks whether there was at least one. Added with 1106 Pela's trace 追歼 and Eidolon 2.
-            "target_buff_count");
+            "target_buff_count",
+            // The LOWEST HP share of the party's living characters -「队伍中有 HP% ≤ N 的角色」 (1222 Lingsha (灵砂) 行迹 遗爇).
+            // A FRACTION, so it is in FRACTION below as well: writing `>= 60` here is the same mistake Herta's file made.
+            "lowest_ally_hp_percent");
 
     /**
      * Of those, the ones that resolve to 0..1 rather than a count.
      */
     // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
     private static final Set<String> FRACTION = Set.of("hp_percent", "target_hp_percent", "target_hp_percent_before",
-            "self_energy_percent", "target_toughness_percent");
+            "self_energy_percent", "target_toughness_percent", "lowest_ally_hp_percent");
 
     private static final Pattern COMPARISON =
             Pattern.compile("^\\s*([a-z_]+)\\s*(>=|<=|>|<|==)\\s*(-?[0-9.]+)\\s*$");
