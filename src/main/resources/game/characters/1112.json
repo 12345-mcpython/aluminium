@@ -10,7 +10,8 @@
     "✅ **终结技 扭亏为盈！已落地（2026-11-08）**：`ult_windfall_bonanza`（`APPLY_BUFF 涨幅惊人` 到账账 + 计数器 `涨幅次数` 初值 `ULTRA:3`=2 + 两条 `MODIFY_ATTR` 挂账账、`while_holder_state` 门）＋ `windfall_advances_numby_on_a_{basic,skill,ultimate}_attack`（三条 `ALLY_ATTACK` + `from_skill` + `target has_state 负债证明` + entity 谓词 `summon.state` → `ADVANCE 0.5`）＋ `windfall_spends_an_attack` / `windfall_ends_when_spent`（扣次数、归零摘状态）。⚠ **一个读法需要记住**：「伤害倍率提高 150%」按**相对**读（`ALL_DAMAGE_TYPE_BOOST` +1.5 ⇒ 与既有火伤加成**相加**后约 ×2.23，暴击那一半另算），依据是本库对同一句式的先例（1210 的「灼烧伤害倍率提升 40%」= `BOOST_DOT` ⇒ ×1.4）；若按「倍率**加** 1.5（绝对值 ×2.0）」读，账账那一击会低 20%，文档没有更多信息 —— 判据 `TopazUltimateTest#windfallRaisesNumbysStrike` 把**现在的读法**钉住了（写的是 `(1+火伤+1.5)/(1+火伤) × 暴伤比`，不是硬编码 2.5）。",
     "✅ **星魂 6 两半都已落地（2026-11-08）**：`eidolon6_windfall_extends_the_state`（`ADD_STACK 涨幅次数 +1`，排在终结技之后 ⇒ 2→3）、`eidolon6_windfall_pierces_resistance`（`MODIFY_ATTR RESISTANCE_REDUCTION 0.1` 挂账账、同一个 `while_holder_state` 门）。⚠ 近似已登记：`RESISTANCE_REDUCTION` 是**全属性**穿透（引擎没有「火属性穿透」这一维，1014 的同型从句同样这么记）。",
     "✅ **行迹 技术性调整已落地（2026-11-08）**：`trace_technical_adjustment_pays_energy`（`TURN_START` + `actor is_summon` + entity 谓词 `summon.state` → 托帕 +10 能量；⚠ 必须排在扣次数那条**之前**，否则最后一击的 10 点会因为状态在同事件里被摘掉而付不出去）。",
-    "⭐ **不建模（战斗外行为）**：秘技的三句 —— 「托帕入场时召唤账账，账账会自动搜寻一定范围内的普通战利品与扑满」（大地图）、「主动施放秘技与大地图内的敌人战斗胜利后…额外获取少量信用点，每个地球日内最多 10000 点」、「模拟宇宙/差分宇宙内胜利后额外获取宇宙碎片并有小概率获得 1 个随机奇物」—— 三句都发生在**战斗之外**，本库只建模战斗内结算；秘技**战斗内**的那半句（账账首次攻击后回 60 能量）已由 `technique_first_attack_pays_energy` 落地。"
+    "⭐ **不建模（战斗外行为）**：秘技的三句 —— 「托帕入场时召唤账账，账账会自动搜寻一定范围内的普通战利品与扑满」（大地图）、「主动施放秘技与大地图内的敌人战斗胜利后…额外获取少量信用点，每个地球日内最多 10000 点」、「模拟宇宙/差分宇宙内胜利后额外获取宇宙碎片并有小概率获得 1 个随机奇物」—— 三句都发生在**战斗之外**，本库只建模战斗内结算；秘技**战斗内**的那半句（账账首次攻击后回 60 能量）已由 `technique_first_attack_pays_energy` 落地。",
+    "⛔ **战技的伤害会被结算两次（2026-11-08 实测）**：``skill_proof_of_debt`` 里那条 ``DAMAGE``（等同于托帕 150% 攻击力）**之外**，技能行数据自己还会展开（分段表写着「单目标 7 段 · 段数合计(含变体) 15」）。实测：对 90 级冰锋施放战技，敌人掉 **11424.77**，而她的攻击力是 **620.93**、150% 只有 **931.39** —— 差一个数量级，说明那 7 段也在打（这就是「数字错了却没有症状」：任何只看「伤害存在」的判据都发现不了）。⇒ 需要一次取舍：照 **1413 的做法**在 ``CAST_SETUP`` 上 ``DELEGATE_DAMAGE``（技能行不再结算，只留规则那一发），**同时**把规则那条的 ``attacker`` 改成 ``summon``（句子说的是「**账账**对该目标造成…伤害」，而它现在记在**托帕**头上 ⇒ 终结技的【涨幅惊人！】加伤与星魂 6 的穿透都吃不到这一发）。⚠ 两件事必须一起做：只删数据会让伤害消失，只改 attacker 不删数据仍是两发。"
   ],
   "rules": [
     {
@@ -492,6 +493,27 @@
       ],
       "source": "1112 托帕&账账 终结技:「…账账施放2次攻击后退出【涨幅惊人！】状态。」",
       "_note": "「**退出**【涨幅惊人！】状态」的**摘除那半**：``actor_stacks:涨幅次数 <= 0`` → ``REMOVE_STATE``（排在 ``windfall_spends_an_attack`` **之后**，所以读到的是扣减后的层数）。⚠ 用 ``REMOVE_STATE`` 而不是 ``REMOVE_BUFF``：``removeBuffs`` 只摘**正面且非永久**的 buff（1203 的判据量过「永久加成不是增益效果」），而这两个状态是 ``permanent`` 的；按名字摘状态才摘得掉。状态一摘，挂在上面的两条 ``while_holder_state`` 修饰在**账账的下一个回合边界**被扫掉（``AbstractBuff.gateBroken``），与其余门槛同一种「晚一拍」。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "skill_mark_is_renewed_when_missing",
+      "when": [
+        "actor is_ally",
+        "!actor is_summon",
+        "enemy_count >= 1",
+        "enemy_state_count:负债证明 == 0"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "负债证明",
+          "turns": 2,
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1112 托帕&账账 战技 支付困难？:「…我方目标回合开始或行动时，若场上不存在陷入【负债证明】状态的敌方目标，托帕使随机敌方目标陷入【负债证明】状态。」",
+      "_note": "「**我方目标回合开始或行动时**，若**场上不存在**陷入【负债证明】状态的敌方目标，托帕使**随机敌方目标**陷入【负债证明】状态」—— ① 「我方目标回合开始」= ``TURN_START`` + ``actor is_ally``（每个我方单位的回合边界都会经过，所以「**或行动时**」这一半不必再写一遍：回合开始就是行动的那一刻，引擎没有「所有人行动」的单一事件，而重复补一条 ``SKILL_CAST`` 会让同一句话在**一个回合里触发两次**）；② 「**场上不存在**」= 本轮新加的 ``enemy_state_count:负债证明 == 0``（它只数**活着**的敌人，所以「都死光了」也算「不存在」✓）；③ 落点 ``random_enemy``（句子说「随机敌方目标」）、时长 **2 回合**与战技那条一致；⚠ ④ 目标选择器**不**带 ``prefer``（句子没写优先级）；⚠ ⑤ 两道补充门都是**实测加上的**：``enemy_count >= 1``（敌人全倒下时 ``random_enemy`` 会抛「no such party」—— 一次判据当场红过）与 ``!actor is_summon``（账账自己的回合不算「我方**目标**的回合」，否则它每动一次都会把标记刷新到另一个敌人身上）；⚠ ⑥ **顺序**：本条排在所有 ``TURN_START`` 规则的**最后**，因为它会**改变**后续规则读到的事实（一旦它先补上标记，星魂 2 的「并发动攻击」那道门就会在同一次行动里读到「有标记」而**误付能量** —— 判据当初就是这样抓到的）；⑤ 判据 `TopazUltimateTest#theMarkRenewsItselfWhenNobodyCarriesIt`（开场无状态 ⇒ 下一次我方回合开始就补上；已有人带着 ⇒ **不再**改标）。",
       "_status": "implemented"
     }
   ]

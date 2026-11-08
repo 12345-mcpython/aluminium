@@ -160,6 +160,42 @@ public class TopazUltimateTest {
                 "「…额外使托帕恢复 10 点能量」 (" + withState + " vs " + withoutState + ")");
     }
 
+    /**
+     * 战技:「我方目标回合开始或行动时，若场上不存在陷入【负债证明】状态的敌方目标，托帕使随机敌方目标陷入【负债证明】状态」.
+     *
+     * <p>Two facts, and the second is what an over-eager version would get wrong: nobody carrying it ⇒ exactly one enemy gets
+     * it; somebody carrying it ⇒ the mark does not move.
+     */
+    @Test
+    public void theMarkRenewsItselfWhenNobodyCarriesIt() {
+        Character topaz = CharacterFactory.create(TOPAZ, LEVEL);
+        Enemy first = BattleFixture.monster();
+        Enemy second = BattleFixture.monster();
+        for (Enemy each : List.of(first, second)) {
+            each.setMaxStance(10_000);
+        }
+        Battle battle = new Battle(List.of(topaz), List.of(first, second), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Assertions.assertFalse(holdsMark(first) || holdsMark(second),
+                "control: nothing is marked before the first ally turn");
+
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, topaz, topaz, 0, 0));
+        battle.processRequests();
+        Assertions.assertEquals(1, (holdsMark(first) ? 1 : 0) + (holdsMark(second) ? 1 : 0),
+                "「若场上不存在…使随机敌方目标陷入【负债证明】」 - exactly one enemy is marked");
+
+        boolean firstWasMarked = holdsMark(first);
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, topaz, topaz, 0, 0));
+        battle.processRequests();
+        Assertions.assertEquals(firstWasMarked, holdsMark(first),
+                "somebody already carries it, so the clause does nothing - the mark does not move");
+    }
+
+    private static boolean holdsMark(Enemy enemy) {
+        return enemy.getBuffManager().hasState(MARK);
+    }
+
     // ==================================================================
 
     private static final class Scene {
