@@ -2742,6 +2742,16 @@ public final class TriggerInterpreter {
      *                see {@link EffectSpec#getSplit()})
      */
     private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
+        damage(battle, effect, ctx, victim, divisor, 1.0);
+    }
+
+    /**
+     * The same, with the whole magnitude scaled by {@code blastShare} - how the neighbours of a BLAST centre are settled.
+     *
+     * @param blastShare the fraction of the centre's magnitude a neighbour takes ({@code 1.0} for the centre itself)
+     */
+    private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor,
+                               double blastShare) {
         CanHit attacker = ctx.owner();
         // `"attacker": "summon"`: the sentence says the MEMOSPRITE deals it (1409's 忆灵技1: 「小伊卡对敌方全体造成…」).
         // `"attacker": "actor"`: the sentence says the unit that CAUSED this event deals it (1202 Tingyun (停云)'s
@@ -2773,6 +2783,18 @@ public final class TriggerInterpreter {
         }
         if (victim == null || victim.isDeath()) {
             return;
+        }
+        // 「同时对其相邻目标造成等同于**主目标** 25% 的雷属性伤害」 (1204 景元's 神君): a BLAST rider. The share is a fraction of the
+        // CENTRE's magnitude, not of the attacker's ATK - that is what 「等同于主目标 25%」 says - so the neighbours are settled
+        // from the same effect with the magnitude scaled down. Stated on the effect rather than as a second DAMAGE rule because
+        // the centre is drawn INSIDE this settlement: a separate rule cannot know which enemy the instance picked.
+        if (blastShare == 1.0 && effect.getBlast() != null && victim instanceof com.laosun.aluminium.enemy.Enemy centre) {
+            double share = effect.getBlast();
+            for (CanHit neighbour : battle.adjacentEnemies(centre)) {
+                if (neighbour != null && !neighbour.isDeath()) {
+                    damage(battle, effect, ctx, neighbour, divisor, share);
+                }
+            }
         }
         // ? A literal ratio states no skill at all: "deal damage equal to 80% of Sushang (素裳)'s ATK". The slot lookup is skipped, the multiplier comes
         // from `derivedMagnitude`, and `element` is required by the validator because there is no skill row to lend one.
@@ -2821,6 +2843,10 @@ public final class TriggerInterpreter {
         // each victim - and so the sum over the victims is the stated total, whatever N is.
         if (divisor > 1) {
             base /= divisor;
+        }
+        if (blastShare != 1.0) {
+            // 「等同于主目标 25%」 scales the whole instance, so the zones and crits still apply to the neighbour's own share.
+            base *= blastShare;
         }
         // The instance's type is the rule's own when it states one (reader: 1505's Elation (欢愉) riders). And because
         // `DamageType.ELATION` is deliberately not boostable, its own boost is folded into the BASE here, exactly as the cast

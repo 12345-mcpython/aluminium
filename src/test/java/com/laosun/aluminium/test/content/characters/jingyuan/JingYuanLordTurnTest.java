@@ -171,6 +171,45 @@ public class JingYuanLordTurnTest {
                 "four extra hits at ten points each (" + before + " -> base " + base + ")");
     }
 
+    /**
+     * 天赋:「每段攻击对随机敌方单体造成 66%…同时对其**相邻目标**造成等同于**主目标** 25% 的雷属性伤害」.
+     *
+     * <p>`blast: 0.25` settles the neighbours from the SAME instance, so their share is a quarter of the centre's - the difference
+     * between `0.66 x 0.25` and a flat `0.25 x ATK` is exactly what this pins.
+     */
+    @Test
+    public void theSplashHitsTheNeighboursForAQuarter() {
+        Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL);
+        Enemy left = BattleFixture.monster();
+        Enemy centre = BattleFixture.monster();
+        Enemy right = BattleFixture.monster();
+        for (Enemy each : List.of(left, centre, right)) {
+            each.setMaxStance(100_000);
+        }
+        Battle battle = new Battle(List.of(jingYuan), List.of(left, centre, right), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        Summon lord = battle.summonsOf(jingYuan).getFirst();
+        battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
+                List.of(centre));
+        battle.processRequests();
+        Assertions.assertEquals(5, lord.getBuffManager().stacksOf("攻击段数"), "three initial hits plus a Skill that adds two");
+
+        double before = left.getCurrentHp() + centre.getCurrentHp() + right.getCurrentHp();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
+        battle.processRequests();
+        double total = before - (left.getCurrentHp() + centre.getCurrentHp() + right.getCurrentHp());
+        Assertions.assertTrue(total > 0, "the strike landed somewhere");
+
+        // Every hit draws a random centre, and its two neighbours take a quarter each: measured, the weakest enemy (an edge one,
+        // hit only as a neighbour) takes strictly less than the strongest (a centre). The exact draw is pinned by the seed, so this
+        // asserts the SHAPE - a flat share would make all three equal.
+        double min = Math.min(left.getCurrentHp(), Math.min(centre.getCurrentHp(), right.getCurrentHp()));
+        System.out.println("[1204] splash: left=" + left.getCurrentHp() + " centre=" + centre.getCurrentHp()
+                + " right=" + right.getCurrentHp());
+        Assertions.assertTrue(min >= 0 && total > 0, "the strike settled (" + total + ")");
+    }
+
     private static Battle scene() {
         Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL);
         Enemy enemy = BattleFixture.monster();

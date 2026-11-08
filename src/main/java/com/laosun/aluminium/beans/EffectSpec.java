@@ -110,6 +110,7 @@ public class EffectSpec {
         // The multi-base sum must survive a copy too: an amending rule that drops it would settle the FIRST term only.
         copy.parts = this.parts;
         copy.panelLess = this.panelLess;
+        copy.blast = this.blast;
         copy.percentFrom = NumberProviders.copyOf(this.percentFrom);
         copy.value = NumberProviders.copyOf(this.value);
         copy.percentPerAllyState = this.percentPerAllyState;
@@ -1224,6 +1225,16 @@ public class EffectSpec {
      */
     @SerializedName("panel_less")
     private Boolean panelLess;
+
+    /**
+     * {@code DAMAGE}: a BLAST rider - the neighbours of the centre take this <b>fraction of the centre's magnitude</b>.
+     *
+     * <p>「同时对其相邻目标造成等同于**主目标** 25% 的雷属性伤害」 (1204 景元's 神君). Stated on the effect rather than as a second
+     * {@code DAMAGE} rule because the centre is drawn inside the settlement: a separate rule cannot know which enemy was picked,
+     * and `adjacent_enemies` would be asked for the neighbours of the rule owner instead.
+     */
+    @SerializedName("blast")
+    private Double blast;
 
 
     /**
