@@ -5,7 +5,7 @@
   "_gaps": [
     "⛔ **【神君】的「段数变成攻击次数」仍未接，缺的是数据不是语法（2026-11-08 查证）**：① 入场这一関已经通了 —— `SUMMON { memosprite_name: 神君, panel_less: true }` 能把它放上场（面板是入场快照，判据 `PanelLessSummonTest`），战技/秘技的「增加段数」也已经记在 `攻击段数` 计数器上；② 真正卡住的是**它不会行动**：神君**没有 `ServantID`** —— tbgd 的 `ExcelOutput/AvatarServantConfig.json` 只有 7 条（11402 / 18007 / 11407 / 11409 / 11415 / 11413 / 11512），**没有 1204 的**；`AvatarServantSkillConfig.json` 里也没有 `1204*` 的技能行 ⇒ **没有攻击行可读**。③ 两条出路写在案上：(a) 手写一份 spec + 攻击行（像 1407/1503 那样），(b) 让 ``攻击段数`` 直接驱动 ``DAMAGE { times_from: \"resource:攻击段数\" }``（``times_from`` 已有 ``resource:`` 拼法 ✓）—— 但两者都要先有「神君行动」这个事件，而空面板召唤物没有技能 ⇒ **事件永远不会来**。⇒ 与 1504 的「致死转伤链」同族：**卡在「召唤物行动」这个动作**，不是卡在段数。",
     "⭐ **天赋「【神君】行动后，普攻/战技/终结技伤害 +20%，2 回合」已落地，且星魂/行迹也补齐了一批（2026-11-08）**：`talent_after_the_lord_acts`（`SUMMON_ATTACK` + `actor is_summon` → `ALL_DAMAGE_TYPE_BOOST 0.2 / 2 回合`）、`technique_three_more_hits`（秘技 → `ADD_STACK 攻击段数 +3`）、`trace_second_wind_starts_with_energy`（行迹 绸缪 → `GAIN_ENERGY 15`）。⚠ 遣将那条（施放战技后暴击率 +10%/2 回合）**本来就有**（`trace_dispatch_crit_chance`）—— 我又写了一条同形的，被 `SameEffectTwiceGuardTest` 与 `ContentDuplicateGuardTest` 双双击中，已删。⛔ **仍开**：① 段数**真的变成攻击次数**（神君的行动要读 `攻击段数`，它现在没有攻击行）；② 行迹 破阵「段数 ≥6 时下回合暴击伤害 +25%」（可按 `self_stacks:攻击段数 >= 6` 写，但「下回合」的口径要跟着①一起定）；③ 其余技能与星魂（多数也依赖①）。",
-    "⛔ **仍开的两半（2026-11-08 末）**：① 「每增加 1 段攻击段数，**速度 +10 点**」及行动后的复位 —— `MODIFY_ATTR` 没有「按层数线性」的通道（`per_stack` 只喂伤害一类），需要一次引擎小改；② 神君对**相邻目标**的 25% 溅射 —— 现在每一段只打**随机单体**（`target: random_enemy`），没有「主目标 + 相邻」的分裂形状。其余（普攻/战技/终结技的自身伤害与破韧）都在**技能行**里，不属于规则。"
+    "⛔ **仍开的一半（2026-11-08 末）**：神君对**相邻目标**的 25% 溅射 —— 现在每一段只打**随机单体**（`target: random_enemy`），没有「主目标 + 相邻」的分裂形状（文档：「每段攻击对随机敌方单体造成…同时对其相邻目标造成等同于主目标 25% 的雷属性伤害」）。其余都已落地：初始 3 段、战技 +2、终结技 +3、秘技 +3、行动后复位、每多 1 段速度 +10、破阵、星魂 4、星魂 6。"
   ],
   "rules": [
     {
@@ -177,6 +177,45 @@
       ],
       "_note": "「战斗开始时，立即恢复 **15** 点能量」—— ``BATTLE_START`` → ``GAIN_ENERGY 15`` ✓（1313/8001 同一形）。",
       "id": "trace_second_wind_starts_with_energy"
+    },
+    {
+      "on": "TURN_START",
+      "id": "talent_every_extra_hit_adds_ten_speed",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:攻击段数 >= 4"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "target": "actor",
+          "turns": 1,
+          "value": {
+            "type": "mul",
+            "inputs": [
+              {
+                "type": "sub",
+                "left": {
+                  "type": "steps",
+                  "counter": "actor_stacks:攻击段数",
+                  "step": 1
+                },
+                "right": {
+                  "type": "const",
+                  "value": 3
+                }
+              },
+              {
+                "type": "const",
+                "value": 10
+              }
+            ]
+          }
+        }
+      ],
+      "source": "1204 景元 天赋 斩勘神形:「…每增加1段攻击段数，速度提高10点，行动结束后速度和攻击段数恢复至初始状态。」",
+      "_note": "「**每增加 1 段攻击段数，速度提高 10 点**」—— `TURN_START` + `actor is_summon` → `MODIFY_ATTR SPEED`，量走 **`value`**（绝对点数，不是份额）：`10 × (层数 − 3)` = `mul( sub( steps(actor_stacks:攻击段数, 1), 3 ), 10 )`。⚠ 门槛 `>= 4` 是「至少多出一段」；⚠ 复位那半由 `talent_the_lord_resets_after_acting` 负责（回合结束段数回 3 ⇒ 本条下次算出 0）。⚠ 与破阵/com strike 的相对顺序不影响伤害，但**排在它们之前**读起来更贴句子。"
     },
     {
       "_note": "「若【神君】**下回合的攻击段数 ≥ 6 段**，则**其下回合的暴击伤害提高 25%**」—— ``TURN_START`` + ``actor is_summon`` + **``actor_stacks:攻击段数 >= 6``** → ``MODIFY_ATTR CRIT_ATTACK 0.25 / 1 回合`` 落在 **``actor``**（神君自己 ✓）。⚠ **本条排在 ``the_lord_strikes_on_its_turn`` 之前**：暴伤要在**那一发结算之前**生效（文件顺序 = 执行顺序）。",

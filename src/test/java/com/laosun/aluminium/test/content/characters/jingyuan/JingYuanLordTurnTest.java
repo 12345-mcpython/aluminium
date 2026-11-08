@@ -143,6 +143,34 @@ public class JingYuanLordTurnTest {
         return before - enemy.getCurrentHp();
     }
 
+    /**
+     * 天赋:「每增加 1 段攻击段数，速度提高 10 点」 - ten POINTS per extra hit, measured against the initial three.
+     */
+    @Test
+    public void everyExtraHitAddsTenSpeed() {
+        Battle battle = scene();
+        Character jingYuan = battle.characters().getFirst();
+        Summon lord = battle.summonsOf(jingYuan).getFirst();
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        double base = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
+        battle.processRequests();
+        // The reset rule put it back to three hits, and the speed rule then applied ten times zero extra hits.
+        Assertions.assertEquals(3, lord.getBuffManager().stacksOf("攻击段数"), "the talent re-sets three hits");
+
+        for (int i = 0; i < 2; i++) {
+            battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
+                    List.of(enemy));
+            battle.processRequests();
+        }
+        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("攻击段数"), "precondition: seven hits");
+        double before = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
+        battle.processRequests();
+        Assertions.assertEquals(before + 40, lord.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-6,
+                "four extra hits at ten points each (" + before + " -> base " + base + ")");
+    }
+
     private static Battle scene() {
         Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL);
         Enemy enemy = BattleFixture.monster();
