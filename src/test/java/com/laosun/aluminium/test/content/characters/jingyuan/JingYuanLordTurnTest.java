@@ -43,6 +43,43 @@ public class JingYuanLordTurnTest {
                 "「【神君】行动时…造成雷属性伤害」 — the enemy lost HP on the Lord's turn");
     }
 
+    /**
+     * 行迹 破阵:「若【神君】下回合的攻击段数 >= 6 段，则其下回合的暴击伤害提高 25%」.
+     *
+     * <p>The threshold is read off the Lord own counter on ITS turn, and the modifier lands on the Lord for that turn - the rule
+     * sits BEFORE the strike in the file, because the crit has to be in place when that instance settles.
+     */
+    @Test
+    public void theFormationTraceRaisesTheLordsCritDamage() {
+        Battle battle = scene();
+        Character jingYuan = battle.characters().getFirst();
+        Summon lord = battle.summonsOf(jingYuan).getFirst();
+        Enemy enemy = (Enemy) battle.enemies().getFirst();
+        for (int i = 0; i < 2; i++) {
+            battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
+                    List.of(enemy));
+            battle.processRequests();
+        }
+        Assertions.assertEquals(4, lord.getBuffManager().stacksOf("攻击段数"), "precondition: four hits");
+        double critBefore = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
+        battle.processRequests();
+        Assertions.assertEquals(critBefore, lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get(),
+                1e-9, "four hits are below the threshold, so nothing happens");
+
+        for (int i = 0; i < 2; i++) {
+            battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
+                    List.of(enemy));
+            battle.processRequests();
+        }
+        Assertions.assertTrue(lord.getBuffManager().stacksOf("攻击段数") >= 6, "precondition: at least six hits");
+        double before = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
+        battle.processRequests();
+        Assertions.assertTrue(lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get() > before,
+                "hits >= 6 means the crit damage rises this turn");
+    }
+
     private static Battle scene() {
         Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL);
         Enemy enemy = BattleFixture.monster();

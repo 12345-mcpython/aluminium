@@ -171,6 +171,25 @@
       "id": "trace_second_wind_starts_with_energy"
     },
     {
+      "_note": "「若【神君】**下回合的攻击段数 ≥ 6 段**，则**其下回合的暴击伤害提高 25%**」—— ``TURN_START`` + ``actor is_summon`` + **``actor_stacks:攻击段数 >= 6``** → ``MODIFY_ATTR CRIT_ATTACK 0.25 / 1 回合`` 落在 **``actor``**（神君自己 ✓）。⚠ **本条排在 ``the_lord_strikes_on_its_turn`` 之前**：暴伤要在**那一发结算之前**生效（文件顺序 = 执行顺序）。",
+      "do": [
+        {
+          "attribute": "CRIT_ATTACK",
+          "turns": 1,
+          "op": "MODIFY_ATTR",
+          "target": "actor",
+          "percent": 0.25
+        }
+      ],
+      "on": "TURN_START",
+      "id": "trace_formation_raises_the_lords_crit_damage",
+      "source": "1204 景元 行迹 破阵 (1204101):「若【神君】下回合的攻击段数大于等于6段，则其下回合的暴击伤害提高25%。」",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:攻击段数 >= 6"
+      ]
+    },
+    {
       "source": "1204 景元 天赋 抱朴守拙:「…【神君】行动时，对敌方随机单体造成等同于景元66%攻击力的雷属性伤害，攻击段数越多伤害次数越多…」",
       "on": "TURN_START",
       "when": [
