@@ -318,14 +318,15 @@ public final class SummonFactory {
         if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("A panel-less summon needs the name the document spells");
         }
-        // The SAME DoubleValue instances, not a copy of their numbers: a panel-less summon follows its summoner live (buffs and
-        // all), which is what 「沿用灵砂自身的属性」 means. A copy would freeze the panel at the moment it was placed.
-        DoubleValue[] panel =
-                new DoubleValue[AttributeType.values().length];
+        // A SNAPSHOT: each attribute is read OFF the summoner at this moment and stored on the summon own sheet. Sharing the
+        // DoubleValue instances was tried first and is wrong - a buff placed on the summon then lands on the shared object and
+        // shows up on the character too (measured 2026-11-08: 阿哈's buff doubled 爻光's resistance penetration, 0.1 -> 0.2).
+        AttributeBuilder panel = new AttributeBuilder();
         for (AttributeType type : AttributeType.values()) {
-            panel[type.ordinal()] = master.getAttribute(type);
+            DoubleValue own = master.getAttribute(type);
+            panel.setBase(type, own == null ? 0 : own.get());
         }
-        Summon summon = new Summon(name.trim(), Camp.PLAYER, panel);
+        Summon summon = new Summon(name.trim(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
         return summon;
     }

@@ -202,6 +202,35 @@
       ],
       "_note": "「**结界持续期间**，我方全体目标**速度提高 12%**，**欢愉度额外提高 16%**」—— 结界由战技挂上（`skill_opens_the_zone`，`turns: 3`、`ticks_on: self`）⇒ 本条同用 `turns: 3` 与 `target: all_allies`，与结界**同生同灭** ✓（同文件已有的「欢愉度 +20%」那条同一手法）。「额外 16%」也是**按爻光自己的欢愉度**取份额 ⇒ `scale: self_attr:ELATION_DAMAGE_BOOST` ✓（与 +20% 那条同形；⚠ 两条会**叠**吗？—— 同属性同来源的修饰默认**替换**，所以本条的 16% 会顶掉 20% 那条；句子说「**额外**提高 16%」意味着应该**叠加** ⇒ 这条需要 `coexist: true` 才能两者都在。",
       "id": "eidolon2_the_zone_lifts_speed_and_elation"
+    },
+    {
+      "source": "1502 爻光 终结技 霓裳铁翎，六爻皆吉:「…并使阿哈立即获得1个固定计入20笑点的额外回合。」",
+      "id": "aha_takes_the_field",
+      "_note": "阿哈是**非忆灵召唤物** ⇒ ``SUMMON { memosprite_name: 阿哈, panel_less: true }``。面板是**入场那一刻的快照**（各自独立的 ``DoubleValue``）—— 共享实例试过，会让挂在阿哈身上的修饰顺着对象落到爻光身上（实测抗性穿透 0.1→0.2）。",
+      "on": "BATTLE_START",
+      "do": [
+        {
+          "op": "SUMMON",
+          "memosprite_name": "阿哈",
+          "panel_less": true
+        }
+      ]
+    },
+    {
+      "id": "ult_aha_gets_an_extra_turn",
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "on": "CAST_SETUP",
+      "_note": "「使阿哈**立即获得 1 个额外回合**」—— ``EXTRA_TURN`` + ``target: summon``（规则主人的召唤物 = 阿哈 ✓）。⚠ 同句的「固定计入 **20** 笑点」仍未写：那是阿哈那个回合里的计数，加进队伍共享笑点会让既有判据从 5 变 25（实测）。",
+      "source": "1502 爻光 终结技 霓裳铁翎，六爻皆吉:「…并使阿哈立即获得1个固定计入20笑点的额外回合。」",
+      "do": [
+        {
+          "op": "EXTRA_TURN",
+          "target": "summon"
+        }
+      ]
     }
   ],
   "resources": [

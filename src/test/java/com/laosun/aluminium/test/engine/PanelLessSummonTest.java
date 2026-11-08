@@ -41,21 +41,33 @@ public class PanelLessSummonTest {
         Assertions.assertEquals(carrier.getLevel(), lord.getLevel(), "the level comes along, so the defence zone agrees");
     }
 
+    /**
+     * The panel is a SNAPSHOT of the summoner numbers, and the two sheets are separate objects.
+     *
+     * <p>Sharing the summoner DoubleValue instances was tried first and is wrong: a modifier placed on the summon then lands on
+     * the shared object and shows up on the character too (measured 2026-11-08: a buff on 阿哈 doubled 爻光 resistance
+     * penetration, 0.1 -> 0.2). This probe pins both halves.
+     */
     @Test
-    public void theShareIsLiveRatherThanFrozen() {
+    public void thePanelIsASnapshotWithItsOwnSheet() {
         Character carrier = CharacterFactory.create(CARRIER, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(carrier), List.of(enemy), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         Summon lord = SummonFactory.panelLess(carrier, "神君");
-        double before = lord.getAttribute(AttributeType.ATTACK).get();
 
-        // A buff on the CHARACTER must move the summon too - that is what "uses the character's stats" means.
+        Assertions.assertNotSame(carrier.getAttribute(AttributeType.ATTACK), lord.getAttribute(AttributeType.ATTACK),
+                "the two sheets hold different objects - sharing them made a buff on one show up on the other");
+        double summonBefore = lord.getAttribute(AttributeType.ATTACK).get();
+        double carrierBefore = carrier.getAttribute(AttributeType.ATTACK).get();
+        Assertions.assertEquals(carrierBefore, summonBefore, 1e-9, "…but the same NUMBER at the moment it entered");
+
         carrier.getBuffManager().addBuff(com.laosun.aluminium.buff.StatModifierBuff.of(
                 AttributeType.ATTACK, "add_percent", 0.5, "buff", 3, false));
         battle.processRequests();
 
-        Assertions.assertTrue(lord.getAttribute(AttributeType.ATTACK).get() > before,
-                "the panel is shared live (" + before + " -> " + lord.getAttribute(AttributeType.ATTACK).get() + ")");
+        Assertions.assertTrue(carrier.getAttribute(AttributeType.ATTACK).get() > carrierBefore, "precondition: the buff landed");
+        Assertions.assertEquals(summonBefore, lord.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                "the panel was copied when the entity entered, so the summoner later buff does not move it");
     }
 }
