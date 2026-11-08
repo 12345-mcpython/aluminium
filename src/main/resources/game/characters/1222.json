@@ -3,8 +3,7 @@
   "character": 1222,
   "_status": "partial",
   "_gaps": [
-    "⭐ **2026-11-08：天赋的【浮元】、星魂 6 与行迹 遗爇 都落地了** —— 旧的登记「引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元解析不到单位，所以『行动提前』写不出来」已**被证伪**：`SUMMON { panel_less: true }` 就是「非忆灵召唤物」的入口（`SummonService.panelLess` → `addCombatant`）。本轮共 21 条规则：召唤（`self_summon_count == 0` 的门，因为非忆灵路径**不幂等**）、行动次数（上限 5）、它自己回合的两发伤害、解除 1 个负面 + 回复 12%+360、星魂 4 的 40%、星魂 6 的两半（`while_summon_count` 活门槛 / `times` + `stance`）、遗爇的两半（`TAKING_HIT` / `HP_CONSUMED` + 本轮新加的 `lowest_ally_hp_percent`）、每行动一次扣 1 并在归零时 `DISMISS_SUMMON`、战技 20% 与终结技 100% 的行动提前、秘技开场召唤 + 【醇醉】。判据 `LingshaFuyuanTest`、`SummonCountGateTest`、`LowestAllyHpConditionTest`。⚠ **下面两条才是仍开的**。",
-    "⚠ **「优先选择韧性值大于0且有火属性弱点的目标」**（天赋的第二发随机单体、星魂 6 的 4 次额外伤害、遗爇的追加攻击都这么写）：目标选择器是闭集，没有「按韧性 / 弱点优先挑一个」的拼法（`random_enemy` 抽任意存活敌人，`random_enemy_with_state` 只按状态过滤）。这是**优先级**不是**排除** ⇒ 不会打到句子禁止的目标，但也享受不到这条优先。要落地得新增一个选择器（例如给选择器加 `prefer` 字段，或 `random_enemy_preferring:<条件>`）。",
+    "⭐ **2026-11-08：天赋的【浮元】、星魂 6、行迹 遗爇、以及「优先选择韧性值大于0且有火属性弱点的目标」都落地了** —— 旧的登记「引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元解析不到单位，所以『行动提前』写不出来」已**被证伪**：`SUMMON { panel_less: true }` 就是「非忆灵召唤物」的入口（`SummonService.panelLess` → `addCombatant`）。本轮共 21 条规则：召唤（`self_summon_count == 0` 的门，因为非忆灵路径**不幂等**）、行动次数（上限 5）、它自己回合的两发伤害、解除 1 个负面 + 回复 12%+360、星魂 4 的 40%、星魂 6 的两半（`while_summon_count` 活门槛 / `times` + `stance`）、遗爇的两半（`TAKING_HIT` / `HP_CONSUMED` + `lowest_ally_hp_percent`）、每行动一次扣 1 并在归零时 `DISMISS_SUMMON`、战技 20% 与终结技 100% 的行动提前、秘技开场召唤 + 【醇醉】。四处「随机单体」都带 `prefer`（新字段：优先抽、空池退回全体）。判据 `LingshaFuyuanTest`、`SummonCountGateTest`、`LowestAllyHpConditionTest`、`TargetPreferenceTest`。⚠ **只剩下面一条**。",
     "⛔ **星魂 1「灵砂的弱点击破效率提高 50%。当有敌方单位的弱点被击破时，使其防御力降低 20%」两半都缺词**：① 属性表里有 `BREAKING_EFFECT`（击破特攻）与 `BREAK_DAMAGE_BOOST`（击破伤害），**没有**「弱点击破效率」（削韧效率）这一项；② 后半的触发（`BREAK` 事件，目标带得到）有拼法，但文档**没写**那 20% 防御降低持续多久（既不是「直到击破结束」，也不是「2 回合」），按本库纪律**不猜数字**。",
     "⭐ **以下不登记为缺口**：普攻 / 战技 / 终结技的**伤害与破韧**由技能行数据驱动（`skills.json` 的 `param_list` 与 `stance_list`），不写规则也不会漏；「灵砂陷入**无法战斗状态**时【浮元】消失」由 `DeathService.perishOrphanedSummons` 承担（引擎内置，主人死亡时召唤物随之下场）。"
   ],
@@ -195,6 +194,10 @@
           },
           "element": "Fire",
           "target": "random_enemy",
+          "prefer": [
+            "target has_weakness Fire",
+            "target_toughness_percent > 0"
+          ],
           "attacker": "actor"
         },
         {
@@ -232,6 +235,10 @@
           "stance": 5,
           "element": "Fire",
           "target": "random_enemy",
+          "prefer": [
+            "target has_weakness Fire",
+            "target_toughness_percent > 0"
+          ],
           "attacker": "actor"
         }
       ],
@@ -338,6 +345,10 @@
           },
           "element": "Fire",
           "target": "random_enemy",
+          "prefer": [
+            "target has_weakness Fire",
+            "target_toughness_percent > 0"
+          ],
           "attacker": "summon"
         },
         {
@@ -378,6 +389,10 @@
           },
           "element": "Fire",
           "target": "random_enemy",
+          "prefer": [
+            "target has_weakness Fire",
+            "target_toughness_percent > 0"
+          ],
           "attacker": "summon"
         },
         {

@@ -315,6 +315,56 @@ public class LingshaFuyuanTest {
         Assertions.assertTrue(enemy.getCurrentHp() < before, "「2 回合后可再次触发」 - the cooldown has run out");
     }
 
+    /**
+     * 天赋:「本次伤害**优先选择**韧性值大于0且有火属性弱点的目标」 - the random instance follows the WEAKNESS.
+     *
+     * <p>Two identical dummies, one of them fire-weak; the area instance hits both, the random one must land on the weak one. The
+     * mirror case (the weak one on the other side) is what a roster-order bias could not pass: a rule that simply picked the
+     * first enemy would satisfy one arrangement and fail the other.
+     */
+    @Test
+    public void theExtraInstancePrefersAFireWeakTargetWithToughness() {
+        double[] leftWeak = oneActionSplit(true);
+        System.out.println("[1222] preferred draw (left weak): " + leftWeak[0] + " / " + leftWeak[1]);
+        Assertions.assertEquals(2.0, leftWeak[0] / leftWeak[1], 0.01,
+                "「额外对随机敌方单体…」 - the second instance lands on the fire-weak enemy, so it loses twice the other's share");
+
+        double[] rightWeak = oneActionSplit(false);
+        System.out.println("[1222] preferred draw (right weak): " + rightWeak[0] + " / " + rightWeak[1]);
+        Assertions.assertEquals(2.0, rightWeak[1] / rightWeak[0], 0.01,
+                "…and it follows the weakness, not the roster order (the mirrored arrangement)");
+    }
+
+    /**
+     * One 浮元 action against two identical dummies, exactly one of them fire-weak and both with a toughness bar.
+     *
+     * @return each one's HP loss, left first
+     */
+    private static double[] oneActionSplit(boolean leftIsWeak) {
+        Character lingsha = CharacterFactory.create(LINGSHA, LEVEL);
+        Enemy left = BattleFixture.dummy();
+        Enemy right = BattleFixture.dummy();
+        for (Enemy each : List.of(left, right)) {
+            // 「韧性值大于0」: the bar has to be there AND be full - `setMaxStance` alone leaves it empty (0 / max = 0).
+            each.setMaxStance(10_000);
+            each.setStance(10_000);
+        }
+        (leftIsWeak ? left : right).addWeakness(DamageElement.FIRE);
+        Battle battle = new Battle(new ArrayList<>(List.of(lingsha)), new ArrayList<>(List.of(left, right)),
+                BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        battle.castImmediate(lingsha.getSkills().get(SkillType.SKILL), lingsha, List.of(left));
+        battle.processRequests();
+        Summon fuyuan = battle.summonsOf(lingsha).getFirst();
+
+        double leftBefore = left.getCurrentHp();
+        double rightBefore = right.getCurrentHp();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, fuyuan, fuyuan, 1, 0));
+        battle.processRequests();
+        return new double[]{leftBefore - left.getCurrentHp(), rightBefore - right.getCurrentHp()};
+    }
+
     /** Drive a unit below 60% HP without killing it. */
     private static void wound(Character unit) {
         while (unit.getCurrentHp() / unit.getMaxHp() > 0.6) {
