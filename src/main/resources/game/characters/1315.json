@@ -4,10 +4,32 @@
   "_status": "partial",
   "_gaps": [
     "⛔ 战技：「本回合不结束」未写",
-    "⛔ 天赋：每层【优势口袋】削韧 +50%、按层数 70% / 120% / 170% 击破伤害、16 倍韧性上限未写",
+    "✅ **「每层【优势口袋】削韧 +50%」已落地（2026-11-09）**：`talent_pocket_raises_the_enhanced_toughness`（`CAST_SETUP` + `from_skill_id == 8` → `BOOST_TOUGHNESS { percent: 0.5, per_stack: 优势口袋, per_stack_cap: 3, turns: 1 }`）。引擎这一轮给 `BOOST_TOUGHNESS` 补了 **`per_stack` / `per_stack_cap`**（`ToughnessBoostBuff.effectivePercent` 在**结算那一刻**读层数 —— 句子说的是「每层」= 当前层数）。判据 `BoothillPocketToughnessTest`：0 / 1 / 3 层的削韧量 **60 / 90 / 150**（= 1× / 1.5× / 2.5×）。",
+    "⛔ **同句的后半仍未写**：「施放强化普攻期间，若目标处于**弱点击破状态**，基于【优势口袋】层数，造成等同于波提欧 **70%/120%/170%** 物理属性击破伤害，该伤害计入的韧性上限不超过普攻【蹄铁裂颅】基础削韧值的 **16 倍**」—— 缺三样：① 按层数在 1/2/3 档之间选倍率（`one_of` 不接受「按层数」）；② 「弱点击破状态」这个条件（引擎有 `BREAK` 事件与击破管线，但没有「目标当前处于击破」的谓词）；③ 击破伤害的**韧性上限**折算。",
     "⛔ 星魂 6：未读、未写（2 / 3 / 4 / 5 已补）"
   ],
   "rules": [
+    {
+      "on": "CAST_SETUP",
+      "id": "talent_pocket_raises_the_enhanced_toughness",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "BOOST_TOUGHNESS",
+          "percent": 0.5,
+          "per_stack": "优势口袋",
+          "per_stack_cap": 3,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1315 波提欧 天赋 轮中五豆: 「每层【优势口袋】使强化普攻的削韧值提高50%，最多叠加3层。」",
+      "_note": "「**每层**【优势口袋】使**强化普攻**的削韧值提高 **50%**，最多叠加 **3 层**」—— `BOOST_TOUGHNESS` + **`per_stack: 优势口袋`** + **`per_stack_cap: 3`**（本轮给这个 op 补的按层数取值；`ToughnessBoostBuff.effectivePercent` 在**结算那一刻**读层数，因为句子说的是「每层」= 当前层数）。⚠ 事件必须是 **`CAST_SETUP` + `from_skill_id == 8`**：削韧发生在实例结算里，而 `CAST_SETUP` 是**结算之前**、且一次施放只发一次 —— 挂在 `DEALING_DAMAGE` 会按命中次数叠好几份（那会把 +50% 变成 +150%）。⚠ 寿命 `turns: 1`：句子说的「强化普攻的削韧值」只在这一次行动里成立。",
+      "_status": "implemented"
+    },
     {
       "on": "BATTLE_START",
       "id": "level_convention",

@@ -1127,7 +1127,8 @@ final class TriggerEffects {
                 continue;
             }
             AbstractBuff boost = TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
-                    new com.laosun.aluminium.buff.ToughnessBoostBuff(TriggerMagnitudes.shareOf(effect, ctx), effect.getTurns()),
+                    new com.laosun.aluminium.buff.ToughnessBoostBuff(TriggerMagnitudes.shareOf(effect, ctx), effect.getTurns(),
+                            effect.getPerStack(), effect.getPerStackCap() == null ? 0 : effect.getPerStackCap()),
                     effect), ctx);
             target.getBuffManager().addBuff(boost);
         }

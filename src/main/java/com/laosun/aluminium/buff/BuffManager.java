@@ -1110,7 +1110,7 @@ public class BuffManager {
         double total = 0;
         for (AbstractBuff buff : List.copyOf(buffs)) {
             if (buff instanceof com.laosun.aluminium.buff.ToughnessBoostBuff boost) {
-                total += boost.getPercent();
+                total += boost.effectivePercent(this);
             }
         }
         return total;

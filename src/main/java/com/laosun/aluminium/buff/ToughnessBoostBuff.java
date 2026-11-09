@@ -26,12 +26,54 @@ public class ToughnessBoostBuff extends AbstractBuff {
     private final double percent;
 
     /**
+     * The counter this bonus is PER STACK of («每层【优势口袋】使强化普攻的削韧值提高 50%», 1315 Boothill (波提欧)), or
+     * {@code null} for a flat bonus.
+     *
+     * <p><b>Why live.</b> The stacks move between the moment the buff lands and the moment the reduction settles, and the
+     * document says 「每层」 - about the CURRENT count - so the multiplier is read at settlement time rather than frozen when
+     * the buff was applied.
+     */
+    private final String perStack;
+
+    /** The cap on that stack count («最多叠加 3 层»), or {@code 0} for no cap. */
+    private final int perStackCap;
+
+    /**
      * @param percent how much extra reduction ({@code 1.0} = "提高 100%")
      * @param turns   how many of the owner's turns it lasts
      */
     public ToughnessBoostBuff(double percent, int turns) {
+        this(percent, turns, null, 0);
+    }
+
+    /**
+     * @param percent     how much extra reduction ({@code 1.0} = "提高 100%")
+     * @param turns       how many of the owner's turns it lasts
+     * @param perStack    the counter each stack multiplies by, or {@code null} for a flat bonus
+     * @param perStackCap the most stacks that count, or {@code 0} for no cap
+     */
+    public ToughnessBoostBuff(double percent, int turns, String perStack, int perStackCap) {
         super(turns, false);
         this.percent = percent;
+        this.perStack = perStack == null || perStack.isBlank() ? null : perStack.trim();
+        this.perStackCap = perStackCap;
+    }
+
+    /**
+     * The bonus this buff grants right now: the stated percent, times the stacks it names (capped).
+     *
+     * @param holder the manager carrying it (the reduction is about ITS attack)
+     * @return the effective extra reduction
+     */
+    public double effectivePercent(BuffManager holder) {
+        if (perStack == null || holder == null) {
+            return percent;
+        }
+        int stacks = holder.stacksOf(perStack);
+        if (perStackCap > 0) {
+            stacks = Math.min(stacks, perStackCap);
+        }
+        return percent * stacks;
     }
 
     @Override
