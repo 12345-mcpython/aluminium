@@ -115,6 +115,14 @@ public class SkillEffectSpec {
         /** The attribute the column is a percentage OF («攻击力» ⇒ ATTACK, «生命上限» ⇒ HEALTH). */
         @SerializedName("attribute")
         private String attribute;
+        /**
+         * A <b>resource</b> the column is a percentage of, for the terms whose base is not a panel number at all: 「#5% 本场战斗中
+         * 累计已损失生命值」 (1205 Blade 刃's ultimate) names the counter her own rules keep, not an attribute.
+         *
+         * <p>{@code null} = this term reads {@link #attribute}.
+         */
+        @SerializedName("resource")
+        private String resource;
         /** Column capping the attribute's own value («最多计算 #7% 击破特攻» ⇒ the column of that 360%); {@code null} = no cap. */
         @SerializedName("cap")
         private Integer cap;

@@ -499,18 +499,21 @@ public final class SkillExecutor {
         if (rowSpec != null && rowSpec.getBaseTerms() != null && !rowSpec.getBaseTerms().isEmpty()) {
             double centreSum = 0;
             double neighbourSum = 0;
-            for (var term : rowSpec.getBaseTerms()) {
-                AttributeType termAttribute = AttributeType.fromString(term.getAttribute());
-                int centreColumn = term.getMain() == null ? 0 : term.getMain();
-                int neighbourColumn = term.getAdjacent() == null ? centreColumn : term.getAdjacent();
-                double termValue = attacker.damageBase(termAttribute);
-                if (term.getCap() != null) {
-                    // 「最多计算 #7% 击破特攻」: the attribute itself is clamped before it is multiplied.
-                    termValue = Math.min(termValue, params.get(term.getCap()));
-                }
-                centreSum += params.get(centreColumn) * termValue;
-                neighbourSum += params.get(neighbourColumn) * termValue;
-            }
+              for (var term : rowSpec.getBaseTerms()) {
+                  int centreColumn = term.getMain() == null ? 0 : term.getMain();
+                  int neighbourColumn = term.getAdjacent() == null ? centreColumn : term.getAdjacent();
+                  // A term is priced either by a PANEL attribute («#1% 攻击力») or by a RESOURCE the rules keep
+                  // («#5% 本场战斗中累计已损失生命值», 1205's ultimate): the second has no attribute to read.
+                  double termValue = term.getResource() != null && !term.getResource().isBlank()
+                          ? attacker.getResources().value(term.getResource().trim())
+                          : attacker.damageBase(AttributeType.fromString(term.getAttribute()));
+                  if (term.getCap() != null) {
+                      // 「最多计算 #7% 击破特攻」: the attribute itself is clamped before it is multiplied.
+                      termValue = Math.min(termValue, params.get(term.getCap()));
+                  }
+                  centreSum += params.get(centreColumn) * termValue;
+                  neighbourSum += params.get(neighbourColumn) * termValue;
+              }
             base = centreSum;
             neighbourBase = neighbourSum;
         }
