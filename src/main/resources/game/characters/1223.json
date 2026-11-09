@@ -3,13 +3,20 @@
   "character": 1223,
   "_status": "partial",
   "_gaps": [
-    "⛔ 充能没有上限、无法声明为资源：战技 +9、天赋消耗 1 点 / 每 3 点追加攻击、0 点解除【猎物】均未写（`resources` 需要一个不带上限的声明，或改用计数器）。",
-    "⛔ 【猎物】的解除条件（0 充能 / 无其他可战斗角色）与离场状态未写。",
+    "✅ **【充能】机制已落地（2026-11-09）**：文件头声明资源 `充能`（`max: 2147483647` = **不设上限**，按 1408 【毁伤】的既有约定）＋ 四条规则 —— `skill_marks_prey` 追加 `GAIN_RESOURCE 9`、`talent_spends_a_charge_on_every_hit`（打【猎物】后 `REMOVE_RESOURCE 1` + `ADD_STACK 充能计数 +1`）、`talent_followup_every_third_charge`（`self_stacks:充能计数 >= 3` → `DAMAGE` × `TALENT:2`=160% + `REMOVE_STACK 充能计数 3`）、`talent_prey_leaves_at_zero_charge`（`self_resource:充能 <= 0` → `REMOVE_STATE 猎物` + 计数清零）。判据 `MozeChargeTest`：战技后 **8 点**（9 点入账、战技自己那一下就是第一次消耗）、每命中 -1、**第 3/6/9 次消耗**各带一发追加攻击（实测逐次伤害 `213, 1349, 213, 213, 1349, 213, 213, 1349`）、充能归零时【猎物】被解除。⚠ 两个实测出来的坑：① 计数器复位**不能**用 `REMOVE_BUFF`（层数不会归零 ⇒ 从第 3 次起**每一击**都触发追加攻击），要用 **`REMOVE_STACK { amount: 3 }`**；② 读充能要读**他自己的** store（`moze.getResources()`），`partyResourceValue` 是 0 —— 声明在单位上、不是队伍池。",
+    "⛔ **仍开的两半（2026-11-09 更新）**：① **【猎物】的第二个解除条件** ——「当场上**没有可以战斗的其他角色**时，貊泽**无法使用战技**，并解除敌人的【猎物】状态」：缺「场上还有没有其他可战斗角色」这个条件（`Strategy` 里没有这一项读取），也缺「禁用某个技能」的写法（`blocks` 词表只有 `ultimate`）。② **离场状态** ——「场上存在【猎物】时，貊泽会进入**离场**状态；离场：无法成为技能目标，且不会出现在行动序列上」：引擎没有「不可被选中 + 不占行动条」的状态层。⚠ 「0 充能解除【猎物】」那一半**已落地**（`talent_prey_leaves_at_zero_charge`，判据 `MozeChargeTest#theMarkLeavesWhenTheChargeReachesZero`），本条此前把两者写在一起、本轮拆开。",
     "⚠ 秘技「隐身状态下不会被敌人发现」是大地图效果，不建模。",
     "⭐ **星魂 2/4/6 已于 2026-11-03 落地**：② 对【猎物】的暴击伤害 +40%（跨单位 `target: actor`，`instance: true`）；④ 终结技后伤害 +30% / 2 回合；⑥ 天赋追加攻击倍率 ×1.25（`MODIFY_RULE effect_percent_scale`，对字面 `percent` 是乘）。判据 `MozeClauseCoverageTest`。",
     "⚠ 星魂 1 的「每触发 1 次天赋附加伤害 +2 能量」现已写成 `ALLY_ATTACK` + `target has_state 猎物` 上的第二条规则 —— ⚠ 它与天赋伤害那条**同条件**，但「触发 1 次」在天赋**未触发**时（例如没有充能）也会加能量 ⇒ 近似，已在规则 `_note` 记录。"
   ],
-  "rules": [
+  "resources": [
+    {
+      "id": "充能",
+      "max": 2147483647,
+      "source": "1223 貊泽 战技 迅羽掠袭: 「…并获得9点充能。」／天赋 伸天卑飞，折翅为芒: 「…并消耗1点充能。每消耗3点充能…当充能为0时…」",
+      "note": "文档通篇**没写上限**（战技只写「获得 9 点」、天赋只写「消耗 1 点」「每 3 点」）⇒ 按本库既有约定（1408 的【毁伤】）用 `Integer.MAX_VALUE` 表示「不设上限」，不臆造数值。⚠ 2026-11-09 之前这里登记的是「充能没有上限 ⇒ 不能声明 ⇒ 每一句都写不了」—— **那个结论是错的**：`ResourceSpec.max` 可以是 `Integer.MAX_VALUE`，1408 早就这么做了。"
+    }
+  ],  "rules": [
     {
       "on": "BATTLE_START",
       "id": "level_convention",
@@ -44,6 +51,11 @@
           "buff": "猎物",
           "permanent": true,
           "target": "target"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 9
         }
       ],
       "source": "1223 貊泽 战技 迅羽掠袭 (122302, BPSkill/SingleAttack): 「使指定敌方单体目标成为【猎物】，并对其造成等同于貊泽150%攻击力的雷属性伤害，并获得9点充能。当场上没有可以战斗的其他角色时，貊泽无法使用战技，并解除敌人的【猎物】状态。」",
@@ -66,6 +78,81 @@
       ],
       "source": "1223 貊泽 天赋 伸天卑飞，折翅为芒 (122304, Enhance/FollowUp): 「场上存在【猎物】时，貊泽会进入离场状态。我方目标攻击【猎物】后，貊泽会额外造成1次等同于自身30%攻击力的雷属性附加伤害，并消耗1点充能。每消耗3点充能，貊泽会对【猎物】发动1次追加攻击，造成等同于自身160%攻击力的雷属性伤害，当充能为0时，解除目标【猎物】状态，并重置计入发动追加攻击所需的充能点数。天赋的追加攻击不会消耗充能。」",
       "_note": "「**我方目标攻击【猎物】后**，貊泽会额外造成 1 次等同于自身 **30% 攻击力**的雷属性**附加伤害**」—— ① 事件 `ALLY_ATTACK` ✓ + 条件 **`target has_state 猎物`** ✓（**被打的是猎物** ✓）；⭐ **不写 `actor` 条件** ✓ —— 文档说\"**我方目标**攻击【猎物】后\" ✓，**任何人**打猎物都算 ✓（与 1201/1317 的同类判断 ✓）；② 伤害**字面倍率** ✓ + `Thunder` ✓（附加伤害正是 `DAMAGE` 的语义 ✓）。⚠ **登记**：① 「并**消耗 1 点充能**」✗ 与「**每消耗 3 点充能**，貊泽会对【猎物】发动 1 次追加攻击（**160% 攻击力**）」✗ —— **充能没有上限** ✗ ⇒ 资源不能声明 ✗ ⇒ 这两句**无从表达** ✗；② 「场上存在【猎物】时，貊泽会进入**离场状态**」✗（一个不可交互的状态 ✗）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_spends_a_charge_on_every_hit",
+      "when": [
+        "target has_state 猎物"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "充能计数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1223 貊泽 天赋 伸天卑飞，折翅为芒: 「…我方目标攻击【猎物】后，貊泽会额外造成1次…附加伤害，并消耗1点充能。」",
+      "_note": "「并**消耗 1 点充能**」—— `REMOVE_RESOURCE 充能 1`（资源在文件头声明，`max: 2147483647` 表示**不设上限**）。⚠ **必须排在 `talent_additional_damage_on_prey` 之后**：同事件按文件顺序执行，附加伤害先结算、再扣充能（句子就是「额外造成…，**并**消耗…」）。⚠ 计数器 `充能计数` 与 `ADD_STACK` 同一条：它数的是「这一轮已消耗几点」，`max_stacks: 3` 与「每消耗 **3** 点」一致。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_followup_every_third_charge",
+      "when": [
+        "target has_state 猎物",
+        "self_stacks:充能计数 >= 3"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "TALENT:2",
+          "element": "Thunder",
+          "target": "target"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "充能计数",
+          "amount": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1223 貊泽 天赋: 「每消耗3点充能，貊泽会对【猎物】发动1次追加攻击，造成等同于自身160%攻击力的雷属性伤害…」（TALENT Lv10 行 [0.3, 3, 1.6] 的第 3 项）",
+      "_note": "「**每消耗 3 点充能**，貊泽会对【猎物】发动 1 次追加攻击」—— 没有取模运算，所以用「计数到 3 就发一次并把计数清零」表达：本条排在扣充能那条之后（同一事件、文件顺序），门是 `self_stacks:充能计数 >= 3`，做完就 `REMOVE_BUFF 充能计数`（= 复位）。⚠ 倍率读**行**（`TALENT:2`），不是字面量 —— 星魂 6 会抬天赋倍率（`MODIFY_RULE`），读行才跟得上。⚠ 「天赋的追加攻击**不会**消耗充能」—— 本条**不带** `REMOVE_RESOURCE`，正因如此；同理它**不计入** `充能计数`（否则一次追加攻击会自己再触发一次）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_prey_leaves_at_zero_charge",
+      "when": [
+        "target has_state 猎物",
+        "self_resource:充能 <= 0"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "猎物",
+          "target": "target"
+        },
+        {
+          "op": "REMOVE_BUFF",
+          "buff": "充能计数",
+          "amount": 99,
+          "target": "self"
+        }
+      ],
+      "source": "1223 貊泽 天赋: 「…当充能为0时，解除目标【猎物】状态，并重置计入发动追加攻击所需的充能点数。」",
+      "_note": "「当充能为 **0** 时，解除目标【猎物】状态，并**重置**计入发动追加攻击所需的充能点数」—— `REMOVE_STATE 猎物` + 清掉 `充能计数`。⚠ **必须排在追加攻击那条之后**：第 3 点消耗完的那一下，追加攻击要先打出去、再解除【猎物】（句子顺序也是先追加攻击、后「当充能为 0 时」）。⚠ 这条**不**管「场上没有其他可战斗角色」那一半（另一个解除条件），那一条仍登记为未写。",
+      "_status": "implemented"
     },
     {
       "on": "ULT_CAST",
