@@ -80,8 +80,11 @@ public class HertaTheTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the ultimate's modifiers");
+        // Note: 2 since 2026-11-09 - the Ultimate also swaps the Skill to the enhanced form.
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the modifiers and the Skill swap");
         Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the technique and the convention");
+        // Note: 3 since 2026-11-09 - one adds insight, one spends inspiration, one puts the plain Skill back.
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST), "insight, the cost, and the revert");
     }
 
     private static Random fixed() {
