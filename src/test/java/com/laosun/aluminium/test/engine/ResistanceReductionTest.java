@@ -56,18 +56,23 @@ public class ResistanceReductionTest {
     }
 
     /**
-     * 1321's shipped aura: "大丽花在场时，敌方全体全属性抗性降低20%" - a stated 0.2 on every enemy.
-     */
+     * 1321's shipped aura is E2's: 「大丽花在场时，敌方全体全属性抗性降低20%」 - a stated 0.2 on every enemy, but only
+     * WITH Eidolon 2 (the sentence lives in her 星魂 2, not in the trace list; the file said 「行迹/光环」 and shipped it
+     * unconditionally until 2026-11-09, so an E0 Dahlia was lowering every enemy's resistance).
     @Test
-    public void herAuraStatesTwentyPercentOnEveryEnemy() {
-        Character dahlia = CharacterFactory.create(1321, LEVEL);
-        Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(dahlia), List.of(enemy), BattleFixture.seeded());
+    public void herAuraStatesTwentyPercentOnEveryEnemyOnlyWithTheEidolon() {
+        Character e0 = CharacterFactory.create(1321, LEVEL);
+        Enemy plain = BattleFixture.monster();
+        new Battle(List.of(e0), List.of(plain), BattleFixture.seeded()).startBattle();
+        Assertions.assertEquals(0.0, plain.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
+                "E0: 星魂 2 has not been unlocked, so no aura");
 
-        battle.startBattle();
-
-        Assertions.assertEquals(0.2, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "\\u300c\\u5927\\u4e3d\\u82b1\\u5728\\u573a\\u65f6\\uff0c\\u654c\\u65b9\\u5168\\u4f53\\u5168\\u5c5e\\u6027\\u6297\\u6027\\u964d\\u4f4e20%\\u300d");
+        Character e2 = CharacterFactory.create(1321, LEVEL);
+        e2.setEidolonRank(2);
+        Enemy reduced = BattleFixture.monster();
+        new Battle(List.of(e2), List.of(reduced), BattleFixture.seeded()).startBattle();
+        Assertions.assertEquals(0.2, reduced.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
+                "E2: 「大丽花在场时，敌方全体全属性抗性降低20%」");
     }
 
     /**
