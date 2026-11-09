@@ -57,6 +57,24 @@ public class ClaraTalentMarkTest {
                 "「战技施放后所有【反击标记】失效」");
     }
 
+    /**
+     * 星魂 1 高大的背影:「施放战技后，**不会**清除敌方目标的【反击标记】」.
+     *
+     * <p>The base Skill DOES clear every mark ({@link #theAttackerIsMarkedAndTheSkillClearsIt}), so this is the same act with the
+     * Eidolon on: the mark must survive. The rule states it the honest way - the clearing rule itself is gated
+     * {@code eidolon < 1}, so at rank 1 nothing clears rather than something "un-clearing".
+     */
+    @Test
+    public void eidolonOneKeepsTheMarkAfterTheSkill() {
+        Fixture f = new Fixture(1);
+        f.claraLosesHp();
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState(MARK), "precondition: the attacker is marked");
+
+        f.castSkill();
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState(MARK),
+                "「施放战技后，不会清除敌方目标的【反击标记】」 - with the Eidolon the mark stays");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -67,7 +85,11 @@ public class ClaraTalentMarkTest {
         private final Battle dummyBattle;
 
         private Fixture() {
-            clara = CharacterFactory.create(CLARA, LEVEL);
+            this(0);
+        }
+
+        private Fixture(int eidolon) {
+            clara = CharacterFactory.create(CLARA, LEVEL, true, null, null, eidolon);
             battle = new Battle(new ArrayList<>(List.of(clara, CharacterFactory.create(1001, LEVEL))),
                     new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.99));
             battle.startBattle();
