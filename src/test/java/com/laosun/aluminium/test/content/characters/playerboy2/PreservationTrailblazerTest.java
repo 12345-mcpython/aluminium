@@ -108,8 +108,79 @@ public class PreservationTrailblazerTest {
             // Note: 5 since 2026-11-06 - the shield, the stack, the swap, the spend, and the restore.
             // Note: 6 since 2026-11-06 - plus the free enhanced basic that spends nothing.
             Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BASIC_ATTACK), "cid " + cid + ": shield, stack, swap, spend, restore, free");
-            Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "cid " + cid + ": the ultimate shield and the free enhanced basic");
+            // Note: 3 since 2026-11-09 - the mixed-base damage rule joined the shield and the free enhanced basic.
+            Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
+                    "cid " + cid + ": the mixed-base damage, the shield, and the free enhanced basic");
+            Assertions.assertEquals(1, table.ruleCount(TriggerEvent.CAST_SETUP),
+                    "cid " + cid + ": the ultimate's row is handed away so `parts` can settle the damage once");
             Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid + ": the technique, the convention, and 星魂 1's four stacks");
+        }
+    }
+
+    /**
+     * 终结技:「对敌方全体造成等同于开拓者 **100% 攻击力 + 150% 防御力** 的火属性伤害」.
+     *
+     * <p><b>Why the comparison is an engine probe.</b> The base is a SUM of two attributes, so no single attribute can be
+     * checked against it. The criterion therefore settles the same instance by hand
+     * ({@code applyAdditionalDamage(ATK x 1.0 + DEF x 1.5)}) in an identical fight and requires the Ultimate to land exactly
+     * that number - which is simultaneously "one instance" (a second settlement from the row would double it) and "the base
+     * is both terms".
+     */
+    @Test
+    public void theUltimateSettlesOneMixedBase() {
+        for (int cid : new int[]{TB3, TB4}) {
+            Scene cast = new Scene(cid);
+            double before = cast.enemy.getCurrentHp();
+            cast.battle.castImmediate(cast.unit.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                    cast.unit, List.of(cast.enemy));
+            cast.battle.processRequests();
+            double settled = before - cast.enemy.getCurrentHp();
+
+            Scene probe = new Scene(cid);
+            double base = probe.unit.getAttribute(AttributeType.ATTACK).get()
+                    + 1.5 * probe.unit.getAttribute(AttributeType.DEFENCE).get();
+            double expected = probe.battle.applyAdditionalDamage(probe.unit, probe.enemy,
+                    com.laosun.aluminium.enums.DamageElement.FIRE, base);
+
+            System.out.println("[8003] cid=" + cid + " ult=" + settled + " probe=" + expected);
+            Assertions.assertTrue(settled > 0, "cid " + cid + ": the Ultimate dealt damage");
+            Assertions.assertEquals(expected, settled, Math.max(1e-6, expected * 1e-6),
+                    "cid " + cid + ": ONE instance whose base is ATK + 1.5 x DEF (the row no longer swings, and `parts` is what settled it)");
+        }
+    }
+
+    /**
+     * 终结技的韧性 60（数据 `stance_list.all`）：被交接的施放不削韧性，所以它必须由规则那一发带着。
+     */
+    @Test
+    public void theUltimateStillTakesSixtyToughness() {
+        for (int cid : new int[]{TB3, TB4}) {
+            Scene scene = new Scene(cid);
+            // Toughness only comes off an enemy that is WEAK to the element (the gate `reduceToughness` keeps) - the ultimate is Fire.
+            scene.enemy.addWeakness(com.laosun.aluminium.enums.DamageElement.FIRE);
+            double before = scene.enemy.getStance();
+            scene.battle.castImmediate(scene.unit.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                    scene.unit, List.of(scene.enemy));
+            scene.battle.processRequests();
+            Assertions.assertEquals(before - 60, scene.enemy.getStance(), 1e-6,
+                    "cid " + cid + ": 「破韧值 全体 60」 rides on the rule's instance");
+        }
+    }
+
+    /** A fight with a toughness bar big enough that a 60-point hit cannot break it (a break would add its own instance). */
+    private static final class Scene {
+        private final Character unit;
+        private final Enemy enemy;
+        private final Battle battle;
+
+        private Scene(int cid) {
+            unit = CharacterFactory.create(cid, LEVEL);
+            enemy = BattleFixture.monster();
+            enemy.setMaxStance(100_000);
+            enemy.setStance(100_000);
+            battle = new Battle(List.of(unit), List.of(enemy), fixed());
+            battle.startBattle();
+            battle.processRequests();
         }
     }
 

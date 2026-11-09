@@ -1,12 +1,12 @@
 {
   "schema": 1,
   "character": 8003,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧五条里三条是「未写」而没有写清缺什么。这次按 `8003_开拓者.md` 逐节核对（8004 与它共用同一份文档、同一套技能，改动同步）。",
     "⭐ **普攻 / 战技 / 星魂 1 的叠层已落地（2026-11-06）**：`talent_basic_stacks_one_will`（普攻「并叠加 1 层【灼热意志】」）、`talent_skill_stacks_one_will`（战技同句）、`eidolon1_four_stacks_at_battle_start`（星魂 1「战斗开始时立即获得 4 层」）；与天赋那条「每受到 1 次攻击」共用同一个计数器（上限 8）。判据 `PreservationTrailblazerTest.hisFileCarriesTheClauses` 的事件计数 + 既有护盾判据。",
     "⭐ **天赋的「≥4 层 ⇒ 普攻强化」已落地（2026-11-06）**：三条同形规则（`TAKING_HIT` / `BASIC_ATTACK` / `SKILL_CAST` + `self_stacks:灼热意志 >= 4` → `REPLACE_SKILL { skill: COMMON, skill_id: 8 }`）＋ 两条反向（`< 4` → `remove: true`）＋ 一条「强化普攻消耗 4 层」（`BASIC_ATTACK` + `from_skill_id == 8` → `REMOVE_STACK 4`）。判据 `TrailblazerMagmaWillSwapTest`（挨 4 下 ⇒ 普攻槽 = 8；打一次强化普攻 ⇒ 层数 0、槽回 1）。⚠ 顺序是判据的一部分：涨层/扣层的规则必须排在判门槛的规则**之前**（同一事件按文件顺序执行）。",
-    "⛔ **终结技的混合基数：引擎那一半已就绪（2026-11-06）** —— DAMAGE 现在支持 `parts`（若干 `{scale, percent_from_skill_param}` **相加成一个基数**，在结算**之前**求和 ⇒ 仍是一个实例、一次暴击），判据 `MultiBaseDamageTest`，文档见 `TRIGGER.md` §5.3.1b。⛔ **还差的另一半**：这一发伤害目前由**技能行自己**结算（只读 `param_list[damage_param]` = ATK 那格），规则再加一条 `DAMAGE` 就是**两个实例**（ATK 会被算两次）⇒ 要让 `parts` 真正顶上，需要「这一发改由规则结算、跳过行内那份」的开关。两个基数项本来就在行里：数据槽 3 的 Lv10 `[1.0, 1.5]`。",
+    "✅ **终结技的混合基数已完整落地（2026-11-09）**：`CAST_SETUP` + `actor == self` + `from_skill_id == 3` → `DELEGATE_DAMAGE { skill: ULTRA }`（技能行只读 `param_list[damage_param]` 的**一格**，ATK 那格，所以它不许自己结算），加一条 `ULT_CAST` 的 `ult_mixed_base`：`DAMAGE { parts: [{self_attr:ATTACK, ULTRA:0}, {self_attr:DEFENCE, ULTRA:1}], stance: 60 }` —— 两项在**结算之前**相加 ⇒ **一个实例、一次暴击**。⚠ 判据 `PreservationTrailblazerTest#theUltimateSettlesOneMixedBase`：真实施放的总伤害**等于** `applyAdditionalDamage(ATK×1.0 + DEF×1.5)`（实测 830.446 两边逐位相同）—— 相等同时证明「只结算一次」与「基数是两项之和」；`#theUltimateStillTakesSixtyToughness` 钉韧性 60（数据 `stance_list.all`，被交接的施放不削韧性）。",
     "⭐ **终结技「下一次普攻自动获得强化且不消耗层数」已落地（2026-11-06）**：`ult_free_enhanced_basic`（`ULT_CAST` → 记号 `免费强化` + `REPLACE_SKILL { COMMON, skill_id: 8, until: next_attack }`）与 `free_enhanced_basic_does_not_spend`（`BASIC_ATTACK` + `from_skill_id == 8` + 记号 → 只摘记号不扣层）；消耗那条加了 `!self has_state 免费强化`。判据 `TrailblazerFreeEnhancedBasicTest`（开大打一次普攻：层数 4 → 4，记号被摘）. ⚠ 顺序：摘记号那条必须排在消耗那条**之前**。"
   ],
   "rules": [
@@ -155,6 +155,51 @@
       ],
       "source": "%s 开拓者•存护 战技 炽燃不灭的琥珀 (800302, BPSkill/Defence): 「施放战技后，开拓者受到的伤害降低50%并叠加1层【灼热意志】，此外有100%%基础概率使敌方全体陷入嘲讽状态，持续1回合。」8003",
       "_note": "「施放战技后，开拓者**受到的伤害降低 50%**，此外有 **100% 基础概率**使敌方全体陷入**嘲讽**状态，持续 **1 回合**」—— ① 减伤用 `MODIFY_DAMAGE_TAKEN`（负值即降低 ✓）；② 嘲讽用 `TAUNT` ✓（引擎已有的操作 ✓）；③ 文档的\"100% **基础**概率\"由引擎的命中判定处理 ✓（效果命中 × 效果抵抗 ✓），规则**不写概率** ✗ —— 写 `base_chance: 1.0` 与不写**等价** ✓，而不写更贴近\"必定\"的表述 ✓。⚠ **登记**：战技自身还「叠加 1 层【灼热意志】」✗ —— 它与天赋的\"每受击 +1\"**同一状态** ✓，但\"施放战技也 +1\"这一条**未写** ✗（可在本规则追加一个 `ADD_STACK` ✓，待与天赋一并核对上限语义 ✓）；本条只写了文档中明确的两项效果 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "ult_damage_is_settled_by_the_rule",
+      "when": [
+        "actor == self",
+        "from_skill_id == 3"
+      ],
+      "do": [
+        {
+          "op": "DELEGATE_DAMAGE",
+          "skill": "ULTRA"
+        }
+      ],
+      "source": "8003 开拓者•存护 终结技 陷阵无回的炎枪: 「对敌方全体造成等同于开拓者100%攻击力+150%防御力的火属性伤害。…」",
+      "_note": "「对敌方全体造成等同于开拓者 **100% 攻击力 + 150% 防御力** 的火属性伤害」—— 这一发是**混合基数**，而技能行只会读 ``param_list[damage_param]`` 的**一格**（ATK 那一格），所以行**不许自己结算**：``CAST_SETUP`` 上 ``DELEGATE_DAMAGE { skill: ULTRA }``（⚠ 必须是 ``CAST_SETUP``：施放事件在那之后才发）。⚠ 这条把旧登记的那半句补完了 —— 「``parts`` 已就绪，但行还在自己结算 ⇒ 再加一条 DAMAGE 就是两个实例」；交接之后 ``parts`` 才真正顶上（``ult_mixed_base``）。⚠ 被交接的施放**不削韧性**，所以那条 DAMAGE 带了 ``stance: 60``（数据 ``stance_list.all``）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_mixed_base",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "parts": [
+            {
+              "scale": "self_attr:ATTACK",
+              "percent_from_skill_param": "ULTRA:0"
+            },
+            {
+              "scale": "self_attr:DEFENCE",
+              "percent_from_skill_param": "ULTRA:1"
+            }
+          ],
+          "element": "Fire",
+          "target": "all_enemies",
+          "stance": 60
+        }
+      ],
+      "source": "8003 开拓者•存护 终结技 陷阵无回的炎枪: 「对敌方全体造成等同于开拓者100%攻击力+150%防御力的火属性伤害」（ULTRA Lv10 行 [1, 1.5] 的第 1、2 项）",
+      "_note": "「**100% 攻击力 + 150% 防御力**」= ``parts``（两条基数项在**结算之前**相加 ⇒ 仍然是**一个实例**、一次暴击，见 `MultiBaseDamageTest` 与 TRIGGER.md §5.3.1b；换成两条 ``DAMAGE`` 会是两个实例、各自暴击）。两项都读她自己的 ULTRA 行（Lv10 = ``[1, 1.5]``），**不是字面量** —— 星魂 3/5 抬等级时它跟着走。⚠ 这条必须与 ``ult_damage_is_settled_by_the_rule`` **配对**：只写这条而技能行还在结算 ⇒ 两发（ATK 会被算两次，正是旧登记说的那个坑）；只交接不写这条 ⇒ 这一发**没有任何伤害**。⚠ ``stance: 60``（数据 ``stance_list.all``）。判据 `PreservationTrailblazerTest#theUltimateSettlesOneMixedBase`：真实施放的总伤害 **等于** ``applyAdditionalDamage(ATK×1.0 + DEF×1.5)`` 那一发 —— 相等即「只结算一次、且基数是两项之和」。",
+      "_status": "implemented"
     },
     {
       "on": "ULT_CAST",

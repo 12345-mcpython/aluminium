@@ -114,9 +114,9 @@ public class CastDamageDeliveryInventoryTest {
      * deleted delegation would look like.
      */
     @Test
-    public void theFourHandOversAreStillHandedOver() throws IOException {
+    public void theDocumentedHandOversAreStillHandedOver() throws IOException {
         Map<String, Set<String>> delegated = delegatedSlots();
-        for (String cid : List.of("1413", "1112", "8007", "8008")) {
+        for (String cid : List.of("1413", "1112", "8003", "8004", "8007", "8008")) {
             Assertions.assertTrue(delegated.containsKey(cid),
                     cid + " must keep a CAST_SETUP `DELEGATE_DAMAGE` rule: its document says the swing is somebody else's");
         }
@@ -124,6 +124,8 @@ public class CastDamageDeliveryInventoryTest {
         Assertions.assertTrue(delegated.get("1112").contains("SKILL"), "1112's Skill is handed to 账账");
         Assertions.assertTrue(delegated.get("8007").contains("ULTRA"), "8007's ultimate is handed to 迷迷");
         Assertions.assertTrue(delegated.get("8008").contains("ULTRA"), "8008's ultimate is handed to 迷迷");
+        Assertions.assertTrue(delegated.get("8003").contains("ULTRA"), "8003's ultimate is settled by the rule (a mixed ATK+DEF base)");
+        Assertions.assertTrue(delegated.get("8004").contains("ULTRA"), "8004's ultimate is settled by the rule (a mixed ATK+DEF base)");
     }
 
     // ==================================================================
