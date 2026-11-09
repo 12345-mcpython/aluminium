@@ -264,6 +264,8 @@
     {
       "on": "HP_LOST",
       "id": "eidolon_two_speed_on_hp_loss",
+      "when": ["target is_ally"],
+      "min_eidolon": 2,
       "_status": "implemented",
       "min_eidolon": 2,
       "do": [

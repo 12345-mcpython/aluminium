@@ -50,6 +50,7 @@
     {
       "on": "HP_LOST",
       "id": "talent_damage_up_on_hp_loss",
+      "when": ["target is_ally"],
       "do": [
         {
           "op": "MODIFY_ATTR",

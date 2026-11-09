@@ -312,7 +312,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1406, "DEALING_DAMAGE", "eidolon2_damage_taken", List.of("actor == self"));
         assertRule(1406, "BATTLE_START", "level_convention", List.of());
         assertRule(1406, "DEALING_DAMAGE", "trace_followup_crit_damage", List.of("actor == self"));
-        assertRule(1407, "HP_LOST", "talent_damage_up_on_hp_loss", List.of());
+        assertRule(1407, "HP_LOST", "talent_damage_up_on_hp_loss", List.of("target is_ally"));
         assertRule(1407, "BATTLE_START", "level_convention", List.of());
         assertRule(1408, "SKILL_CAST", "skill_coreflame", List.of("actor == self"));
         assertRule(1408, "BATTLE_START", "technique_energy_and_skill_point", List.of("self has_state 秘技"));

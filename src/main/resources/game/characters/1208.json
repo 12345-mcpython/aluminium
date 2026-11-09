@@ -303,6 +303,8 @@
     {
       "on": "HP_LOST",
       "id": "accumulate_the_lost_hp_of_the_whole_side",
+      "when": ["target is_ally"],
+      "min_eidolon": 6,
       "do": [
         {
           "op": "GAIN_RESOURCE",
