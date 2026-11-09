@@ -483,8 +483,12 @@ public final class SkillExecutor {
         // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%...and 160% to enemies adjacent to it".
         // Applying the centre value to the neighbours too would double the documented damage on every
         // blast skill in the corpus.
-        double neighbourBase = params.size() > 1
-                ? attacker.damageBase(baseAttribute) * params.get(1)
+        // Note: Which cell prices the neighbours is normally the second one, but a row may interleave a non-damage number
+        // (1212 Jingliu's Ultimate is `[3, 1, 1.5, 1]`: #2 is a stack count), so the curated table may name the column.
+        // Measured 2026-11-09: without it the neighbours were charged 1.0 instead of 1.5 - a plausible wrong number.
+        int adjacentColumn = rowSpec != null && rowSpec.getAdjacentParam() != null ? rowSpec.getAdjacentParam() : 1;
+        double neighbourBase = params.size() > adjacentColumn
+                ? attacker.damageBase(baseAttribute) * params.get(adjacentColumn)
                 : base;
         CanHit mainTarget = targets.getFirst();
 

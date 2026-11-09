@@ -87,6 +87,21 @@ public class SkillEffectSpec {
      */
     @SerializedName("executor")
     private String executor;
+    /**
+     * Which parameter prices a <b>blast's neighbours</b> (「对其相邻目标造成…」), 0-based - or {@code null} for the ordinary
+     * reading, which is the SECOND cell.
+     *
+     * <p><b>Why this exists.</b> A blast row normally states the centre and the neighbour in the first two cells
+     * ({@code [1.92, 0.96]}, where the second is exactly half the first), and the engine reads {@code params[1]}. Rows that
+     * interleave another number break that: 1212 Jingliu (镜流)'s Ultimate is {@code [3, 1, 1.5, 1]} - #1 = 300% centre, #2 = 1
+     * stack of 【朔望】, #3 = 150% neighbours - so the ordinary reading charged the neighbours 1.0 instead of 1.5. Measured
+     * 2026-11-09 by {@code JingliuUltimateSplashTest}: the neighbours took 1/3 of the centre where the document says 1/2.
+     *
+     * <p>Absent = every other blast row, which is why this is an override and not a required column.
+     */
+    @SerializedName("adjacent_param")
+    private Integer adjacentParam;
+
 
 
     /**
