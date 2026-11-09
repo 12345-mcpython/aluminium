@@ -54,4 +54,21 @@ public class JingliuUltimateSplashTest {
                 "「对其相邻目标造成等同于镜流 150% 攻击力的冰属性伤害」 - against the main target's 300%");
         Assertions.assertEquals(0.5, rightLoss / main, 1e-6, "and on the other side too");
     }
+
+    /**
+     * The enhanced Skill （寒川映月，data slot 9） has the same interleaved row {@code [2.5, 1, 1.25]} and therefore the same override.
+     *
+     * <p>⚠ It is not reachable in battle yet - 【转魄】's skill swap is still a registered gap - so this half judges the TABLE
+     * rather than a cast. That is deliberate: the read is wrong whether or not the skill can be cast today, and a later round that
+     * implements the swap would otherwise inherit a 20% undershoot with no symptom.
+     */
+    @Test
+    public void theEnhancedSkillNamesTheSameColumnInTheCuratedTable() {
+        var spec = com.laosun.aluminium.data.SkillEffects.forSkill(
+                CharacterFactory.create(JINGLIU, LEVEL).getSkills().get(SkillType.COMMON) == null
+                        ? null
+                        : new com.laosun.aluminium.skill.DefaultSkill(JINGLIU, 9, LEVEL));
+        Assertions.assertNotNull(spec, "the curated row for 1212/9 must exist");
+        Assertions.assertEquals(2, spec.getAdjacentParam(), "寒川映月's neighbours are #3 (125%), not #2 (the stack count)");
+    }
 }
