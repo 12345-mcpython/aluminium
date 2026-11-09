@@ -206,6 +206,21 @@
     },
     {
       "on": "BATTLE_START",
+      "id": "eidolon4_raises_the_blessed_extra_damage",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "skill_blessed_ally_extra_damage",
+          "effect_percent": 0.2
+        }
+      ],
+      "source": "1202 停云 星魂 4 鸣火机变，度时察势: 「【赐福】附加的伤害倍率提高20%。」 参数 = [0.2]",
+      "_note": "「【赐福】**附加的伤害倍率提高 20%**」—— ⭐ 2026-11-09 落地：`MODIFY_RULE` + **`effect_percent: 0.2`**（**百分点**，不是乘 1.2 ⇒ 40% → 60% ✓，与 1108 星魂 6 用同一个字段 ✓）。⚠ 挂在 `BATTLE_START`（`MODIFY_RULE` 只认它，见 `TriggerInterpreter.modifyRule`）且 `min_eidolon: 4` ✓ —— 修正案必须在**第一条附加伤害发出之前**就位 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
       "id": "eidolon3_levels",
       "min_eidolon": 3,
       "do": [

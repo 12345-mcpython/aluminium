@@ -76,8 +76,8 @@ public class TingyunTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the basic-attack bonus trace");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the energy trace");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "Eidolon 2's energy on a kill");
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the two Eidolon level raises, and the technique's energy");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the two Eidolon level raises, the technique's energy, and Eidolon 4's raise of the extra-damage share");
     }
 
     private static final class Fixture {
