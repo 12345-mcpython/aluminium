@@ -48,6 +48,9 @@ public class OrdinaryDamageTest {
         Enemy first = EnemyFactory.create(MONSTER, 90, 1);
         Enemy second = EnemyFactory.create(MONSTER, 90, 2);
         Battle battle = new Battle(List.of(elation, ally), List.of(first, second), BattleFixture.seeded());
+        // ⚠ WEARER's battle-start hit is the TECHNIQUE's: its rule carries `self has_state 秘技` since 2026-11-09, so
+        // the release has to be declared before the battle starts.
+        battle.markTechniqueUsed(elation);
         double before = first.getCurrentHp() + second.getCurrentHp();
         battle.startBattle();
         return before - (first.getCurrentHp() + second.getCurrentHp());

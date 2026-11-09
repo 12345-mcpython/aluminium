@@ -99,6 +99,9 @@ public class GallagherTest {
         private Fixture(int eidolon) {
             gallagher = CharacterFactory.create(GALLAGHER, LEVEL, true, null, null, eidolon);
             battle = new Battle(List.of(gallagher, ally), List.of(enemy), fixed());
+            // ⚠ 「进入战斗后…」 is the TECHNIQUE's clause: declare the release before the battle starts.
+            // (The rule was ungated until 2026-11-09.)
+            battle.markTechniqueUsed(gallagher);
             battle.startBattle();
         }
     }

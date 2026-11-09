@@ -32,6 +32,9 @@ public class EvanesciaUltRiderTest {
         Enemy second = EnemyFactory.create(MONSTER, 90, 2);
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)), List.of(first, second),
                 BattleFixture.seeded());
+        // ⚠ 1505's 「进入战斗后…获得 20 点【好活当赏】」 is the TECHNIQUE's clause: its rule carries self has_state 秘技, so
+        // the release must be declared BEFORE the battle starts (it was ungated until 2026-11-09).
+        battle.markTechniqueUsed(elation);
         battle.startBattle();
         if (!keepTheGifts) {
             elation.getResources().spend(GIFTS, elation.getResources().value(GIFTS));

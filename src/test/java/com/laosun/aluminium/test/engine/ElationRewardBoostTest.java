@@ -53,6 +53,9 @@ public class ElationRewardBoostTest {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, eidolonRank);
         Battle battle = new Battle(List.of(owner),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
+        // ⚠ 「进入战斗后…」 is the TECHNIQUE's clause: declare the release before the battle starts.
+        // (The rule was ungated until 2026-11-09.)
+        battle.markTechniqueUsed(owner);
         battle.startBattle();
         battle.processRequests();
         if (energy > 0) {

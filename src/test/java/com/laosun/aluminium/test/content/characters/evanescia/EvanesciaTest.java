@@ -48,6 +48,9 @@ public class EvanesciaTest {
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
+        // ⚠ 1505's 「进入战斗后…获得 20 点【好活当赏】」 is the TECHNIQUE's clause: its rule carries self has_state 秘技, so
+        // the release must be declared BEFORE the battle starts (it was ungated until 2026-11-09).
+        battle.markTechniqueUsed(elation);
         battle.startBattle();
         int elationValue = elation.getResources().value("欢愉度");
         int gifts = elation.getResources().value("好活当赏");

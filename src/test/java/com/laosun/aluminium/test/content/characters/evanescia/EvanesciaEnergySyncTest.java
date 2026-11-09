@@ -31,6 +31,9 @@ public class EvanesciaEnergySyncTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy),
                 BattleFixture.seeded());
+        // ⚠ 1505's 「进入战斗后…获得 20 点【好活当赏】」 is the TECHNIQUE's clause: its rule carries self has_state 秘技, so
+        // the release must be declared BEFORE the battle starts (it was ungated until 2026-11-09).
+        battle.markTechniqueUsed(elation);
         battle.startBattle();
         int giftsBefore = elation.getResources().value(GIFTS);
         double energyBefore = elation.getCurrentEnergy();
@@ -50,6 +53,9 @@ public class EvanesciaEnergySyncTest {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
+        // ⚠ The technique's 20 gifts need the release declared before the battle starts (`min_eidolon`-style gate is
+        // `self has_state 秘技`; the rule was ungated until 2026-11-09).
+        battle.markTechniqueUsed(elation);
         battle.startBattle();
         int gifts = elation.getResources().value(GIFTS);
         System.out.println("[1505-sync] before any energy is credited the gifts read " + gifts);

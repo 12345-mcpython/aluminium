@@ -352,13 +352,13 @@ public class CharacterConditionLiteralsTest {
         assertRule(1504, "DEALING_DAMAGE", "trace_followup_crit_damage_extra_self", List.of("actor == self"));
         assertRule(1504, "DEALING_DAMAGE", "trace_followup_crit_damage_extra_other_ally", List.of("actor is_other_ally"));
         assertRule(1505, "BATTLE_START", "p1505_elation_value", List.of());
-        assertRule(1505, "BATTLE_START", "p1505_technique_gift", List.of());
+        assertRule(1505, "BATTLE_START", "p1505_technique_gift", List.of("self has_state 秘技"));
         assertRule(1505, "ENERGY_GAINED", "p1505_energy_sync", List.of());
         assertRule(1505, "DEALING_DAMAGE", "p1505_skill_elation_rider", List.of("actor == self", "from_category BPSKILL", "self_resource:好活当赏 >= 1.0"));
         assertRule(1505, "CAST_SETUP", "p1505_ult_elation_rider", List.of("actor == self", "from_category ULTRA", "self_resource:好活当赏 >= 1.0"));
         assertRule(1505, "CAST_SETUP", "p1505_ult_random_rider", List.of("actor == self", "from_category ULTRA", "self_resource:好活当赏 >= 1.0"));
         assertRule(1505, "ENERGY_GAINED", "p1505_energy_accumulator", List.of());
-        assertRule(1505, "BATTLE_START", "p1505_technique_damage", List.of());
+        assertRule(1505, "BATTLE_START", "p1505_technique_damage", List.of("self has_state 秘技"));
         assertRule(1505, "CAST_SETUP", "p1505_skill_laughs", List.of("actor == self", "from_category BPSKILL"));
         assertRule(1506, "CAST_SETUP", "p1506_ult_advance", List.of("actor == self", "from_category ULTRA"));
         assertRule(1506, "RESOURCE_CHANGED", "p1506_laughs_to_hidden", List.of("resource_changed:笑点"));
