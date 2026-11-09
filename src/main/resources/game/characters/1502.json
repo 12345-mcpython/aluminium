@@ -6,7 +6,7 @@
     "⭐ **「结界期间我方全体欢愉度提高 = 爻光欢愉度的 20%」已落地**（2026-11-02）：`skill_opens_the_zone` 的 `do` 里追加 `MODIFY_ATTR ELATION_DAMAGE_BOOST { scale: 「self_attr:ELATION_DAMAGE_BOOST」, percent: 0.2, turns: 3, target: 「all_allies」 }` —— `self_attr:` 就是**爻光自己的**欢愉度（不需要新的跨单位词），`turns: 3` 与结界同长。判据 `YaoguangZoneElationTest`：她 0.6 时队友 +0.12 ✓（**断言写成「她的实时值 × 20%」**，因为她的欢愉度在开局还带别的加成 —— 写死 0.1 会误判）。",
     "⛔ **「阿哈额外回合」这轮试过、回滚了（2026-11-08）**：阿哈已经能上场（`SUMMON { memosprite_name: 阿哈, panel_less: true }`，判据 `AventurineWaveflairAhaTest`），但一放上场，既有判据 `YaoGuangTest.theUltimateLiftsTheWholePartysResistancePenetration` 立刻从 **0.1 变成 0.2** —— 说明 **`SummonFactory.panelLess` 的面板和召唤者仍然是同一个对象**：挂在阿哈身上的修饰会顺着共享的 `DoubleValue` 落到爻光身上。我改成「入场时快照」（`AttributeBuilder.setBase`）之后，新写的隔离判据**仍然读到自己被改了**（894 → 1341），说明 `Summon` 与召唤者之间**还有另一条纽带**没查清。⇒ 两处一起回滚，把问题留在这里：**先把「召唤物的属性从哪来」彻底查清**，再接 1502 的额外回合。⚠ 同句的「固定计入 20 笑点」另有独立原因不写（那是阿哈回合里的计数，加进队伍共享笑点会让 5 变成 25）。",
     "⭐ **天赋【大吉大利】已修正并落地**（2026-11-02）：条件改为 `[「actor is_ally」, 「self has_state 好活当赏」]`、`element` 改为 `attacker`（「对应属性」）。判据 `YaoguangTalentScopeTest`：队友普攻在**持有时**损失 **1494.74**、**不持有**时 **1341.06** ✓（差 153.68 = 那 20% 的一发）。",
-    "⛔ **星魂 1 与星魂 4 仍未写，而且两半卡在不同地方**：星魂 1 前半「终结技触发的**阿哈额外回合**固定计入**笑点 40 个**」✗ —— 它依赖 §星魂 1 的前提「阿哈的**额外回合**」，而那一族**整块在 2026-11-08 试过并回滚**（见上面 #1 那条 ⛔）；星魂 1 后半「我方全体造成**欢愉伤害**时**无视目标 20% 防御力**」✗ —— 缺一个「**这一发是欢愉伤害**」的判据（`from_category ElationDamage` 只出现在**带施放类别的事件**上，`DEALING_DAMAGE` 有它 ✓，但 `MODIFY_ATTR DEFENCE_IGNORE` 要给**攻击者**加，而规则主人是爻光 ⇒ 需要「把修饰给本次攻击者」或 `instance: true` + `all_allies` 的写法，**尚未验证**）；星魂 4「阿哈的额外回合中我方欢愉技伤害 150%」✗ 同样依赖额外回合。"
+    "✅ **星魂 1 的后半已落地（2026-11-09）**：「我方全体目标造成**欢愉伤害**时**无视目标 20% 防御力**」= `eidolon1_elation_damage_ignores_part_of_defence`（`DEALING_DAMAGE` + `from_category ElationDamage` + **`actor is_ally`** → `MODIFY_ATTR DEFENCE_IGNORE 0.2` + **`instance: true`** + `turns: 1` + **`target: actor`**）。⭐ 关键判断：规则主人是爻光，可句子说的是「**造成伤害的人**无视 20%」⇒ 修饰要落在**本次施放者**身上（`TriggerTargets` 的 `actor` 就是它），`instance: true` 让它只影响这一发；`actor is_ally` 不可省 —— `DEALING_DAMAGE` 对**每一发**都发，少了它敌人打我们时也会无视防御。⛔ **前半仍开**：「终结技触发的**阿哈额外回合**固定计入**笑点 40 个**」依赖额外回合那一族（见 #1）。"
   ],
   "rules": [
     {
@@ -114,6 +114,28 @@
       ],
       "source": "1502 爻光 战技: 「…爻光施放普攻、战技后获得3个笑点」",
       "_note": "同句的**普攻**那一半 ✓（`BASIC_ATTACK`）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon1_elation_damage_ignores_part_of_defence",
+      "min_eidolon": 1,
+      "when": [
+        "from_category ElationDamage",
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "turns": 1,
+          "target": "actor"
+        }
+      ],
+      "source": "1502 爻光 星魂 1 何处落玉，盈盈笑语: 「…我方全体目标造成欢愉伤害时无视目标20%防御力。」 参数 = [0.2, 40]",
+      "_note": "「我方全体目标造成**欢愉伤害**时**无视目标 20% 防御力**」—— ① 「欢愉伤害」= 施放类别 **`ElationDamage`**（数据侧拼写）⇒ `from_category ElationDamage` ✓；② 「**我方全体**」= **`actor is_ally`**，因为 `DEALING_DAMAGE` 对**每一发**都发（敌方的也算）—— 少了这个条件，敌人打我们时也会「无视防御」（一条没有症状的错）；③ ⭐ **修饰要加在攻击者身上**：规则主人是爻光，可这句话说的是「**造成伤害的人**无视 20%」⇒ `target: actor`（`TriggerTargets` 的 `actor` = 本次伤害的施放者 ✓，与 `attacker` 同义，见 `TriggerTargets:97`）+ **`instance: true`**（只影响这一发 ✓）。⚠ 同句前半「终结技触发的**阿哈额外回合**固定计入**笑点 40 个**」仍未写（依赖额外回合那一族，见该角色的 `_gaps`）。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
