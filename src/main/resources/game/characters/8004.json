@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "character": 8004,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "⭐ **2026-11-06 逐节核（本文件第一次真正逐节）**：旧五条里三条是「未写」而没有写清缺什么。这次按 `8003_开拓者.md` 逐节核对（8004 与它共用同一份文档、同一套技能，改动同步）。",
     "⭐ **普攻 / 战技 / 星魂 1 的叠层已落地（2026-11-06）**：`talent_basic_stacks_one_will`（普攻「并叠加 1 层【灼热意志】」）、`talent_skill_stacks_one_will`（战技同句）、`eidolon1_four_stacks_at_battle_start`（星魂 1「战斗开始时立即获得 4 层」）；与天赋那条「每受到 1 次攻击」共用同一个计数器（上限 8）。判据 `PreservationTrailblazerTest.hisFileCarriesTheClauses` 的事件计数 + 既有护盾判据。",
@@ -9,7 +9,7 @@
     "✅ **终结技的混合基数已完整落地（2026-11-09）**：`CAST_SETUP` + `actor == self` + `from_skill_id == 3` → `DELEGATE_DAMAGE { skill: ULTRA }`（技能行只读 `param_list[damage_param]` 的**一格**，ATK 那格，所以它不许自己结算），加一条 `ULT_CAST` 的 `ult_mixed_base`：`DAMAGE { parts: [{self_attr:ATTACK, ULTRA:0}, {self_attr:DEFENCE, ULTRA:1}], stance: 60 }` —— 两项在**结算之前**相加 ⇒ **一个实例、一次暴击**。⚠ 判据 `PreservationTrailblazerTest#theUltimateSettlesOneMixedBase`：真实施放的总伤害**等于** `applyAdditionalDamage(ATK×1.0 + DEF×1.5)`（实测 830.446 两边逐位相同）—— 相等同时证明「只结算一次」与「基数是两项之和」；`#theUltimateStillTakesSixtyToughness` 钉韧性 60（数据 `stance_list.all`，被交接的施放不削韧性）。",
     "⭐ **终结技「下一次普攻自动获得强化且不消耗层数」已落地（2026-11-06）**：`ult_free_enhanced_basic`（`ULT_CAST` → 记号 `免费强化` + `REPLACE_SKILL { COMMON, skill_id: 8, until: next_attack }`）与 `free_enhanced_basic_does_not_spend`（`BASIC_ATTACK` + `from_skill_id == 8` + 记号 → 只摘记号不扣层）；消耗那条加了 `!self has_state 免费强化`。判据 `TrailblazerFreeEnhancedBasicTest`（开大打一次普攻：层数 4 → 4，记号被摘）. ⚠ 顺序：摘记号那条必须排在消耗那条**之前**。",
     "✅ **星魂 1「施放普攻时，额外造成等同于开拓者25%防御力的火属性伤害；施放强化普攻时，额外造成等同于开拓者50%防御力的火属性伤害」已落地（2026-11-09）**：两条 `BASIC_ATTACK` 规则，用 `from_skill_id` 分辨两档（`== 1` 普通 / `== 8` 强化，强化普攻是 `REPLACE_SKILL` 换槽后的槽 8）—— `eidolon1_plain_basic_adds_defence_damage`（`percent: 0.25`）与 `eidolon1_enhanced_basic_adds_defence_damage`（`percent: 0.5`），都是 `DAMAGE { scale: self_attr:DEFENCE, element: Fire, target: target }`，**叠加**在普攻那一发之上（不是接管）。判据 `PreservationTrailblazerTest#eidolonOneAddsADefenceScaledInstanceToBothBasics`：实测额外伤害 **87.71 → 175.42**，比值正好 **2.0**（50% vs 25%），且 eidolon 0 的对照为 0。⚠ **不能**用「层数 ≥ 4」分辨强化普攻：终结技的免费强化也会换槽而层数可能是 4、也可能不是。",
-    "⛔ **星魂 2「触发天赋时，为我方全体提供的护盾能够额外抵消等同于开拓者防御力2%+27的伤害」未写**（2026-11-09 逐节审计新查出来）：天赋的护盾在三条规则里（`talent_shield_on_basic` / `_on_skill` / `_on_ult`），星魂 2 让**同一个护盾**多抵消 `2% 防御力 + 27`。⚠ 可写的两条路：① 把三条护盾规则的 `percent`/`amount` 换成 `add`（基准 + 星魂 2 的份额），但「星魂等级」不是规则里可读的量（`MODIFY_RULE` 只能改已有字段）；② 另写三条 `min_eidolon: 2` 的护盾规则、在数值上加 —— 与现有三条重复触发（两条都挂盾 ⇒ 后者覆盖前者，同一个 `SHIELD` 是覆盖不是叠加）⇒ **需要一个「按星魂加值」的写法**（`effect_amount_delta` 之类），或确认两条同源护盾的覆盖顺序可接受。先登记。",
+    "✅ **星魂 2「触发天赋时，为我方全体提供的护盾能够额外抵消等同于开拓者防御力2%+27的伤害」已落地（2026-11-09）**：三条 `eidolon2_shield_on_{basic,skill,ult}`（`min_eidolon: 2`），每条都用 `SHIELD` 的 **`value` 数值提供器**写**整面**护盾：`DEFENCE × (TALENT:0 + 0.02) + (TALENT:3 + 27)`（`add`/`mul`/`attr`/`skill_param`/`const`）。⚠ **为什么不能写成第二条 `SHIELD`**：护盾在引擎里是**覆盖**不是叠加（`ShieldState` 的注释原文「A shield overwrites rather than stacks」）——「额外抵消 2%+27」若单独发一面护盾，结果会**变小**成 2% 防御+27。⚠ 因此天赋那三条加上了 **`max_eidolon: 1`**：同一事件只能有一次 `SHIELD`，否则两条各自覆盖、谁在后面谁说了算（没有症状的错误）。判据 `PreservationTrailblazerTest#eidolonTwoRaisesTheTalentShieldByTwoPercentAndTwentySeven`：同一个战技在 E1 与 E2 下的护盾差**正好等于** `DEF×0.02 + 27`（实测 129.12 → 172.49，差 **43.372125**）。",
     "✅ **星魂 6「施放强化普攻或终结技后，开拓者的防御力提高10%，最多叠加3层」已落地（2026-11-09）**：两条规则 —— `eidolon6_enhanced_basic_raises_defence`（`BASIC_ATTACK` + `from_skill_id == 8` + `min_eidolon: 6`）与 `eidolon6_ultimate_raises_defence`（`ULT_CAST` + `actor == self`）—— 都做 `ADD_STACK 城垣`（上限 3）+ `MODIFY_ATTR DEFENCE 0.10` × `per_stack: 城垣` × `per_stack_cap: 3` × `per_stack_live`。两条**共用同一个计数器**，所以「最多 3 层」是跨两个来源的合计 ✓。判据 `PreservationTrailblazerTest#eidolonSixStacksDefenceOnEnhancedBasicsAndUltimates`：**每层增量恒定、第 4 层不再涨**（实测 1.0 → 1.0741 → 1.1481 → 1.2222 → 1.2222），强化普攻那一半同样 +1 层且 eidolon 0 的对照不动。⚠ **两个读法/陷阱**：① 面板比率**不是** 1.10 —— `percent` 作用在**白值**上（这里白值约占面板 74%），所以判据钉的是「恒定增量 + 上限」而不是一个会写死本夹具装备的比率；② 强化普攻必须用 `from_skill_id == 8` 认，**不能**写成「层数 ≥4」：那样没被换槽的普攻也会算进层数。⚠ 计数器名 `城垣` 是本文件起的（文档没给状态名）；**寿命是读法** —— 文档没写持续多久，本条按「本场战斗永久」记。"
   ],
   "rules": [
@@ -112,7 +112,69 @@
     },
     {
       "on": "BASIC_ATTACK",
+      "id": "eidolon2_shield_on_basic",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "SHIELD",
+          "value": {
+            "type": "add",
+            "inputs": [
+              {
+                "type": "mul",
+                "inputs": [
+                  {
+                    "type": "attr",
+                    "attribute": "DEFENCE",
+                    "whose": "owner"
+                  },
+                  {
+                    "type": "add",
+                    "inputs": [
+                      {
+                        "type": "skill_param",
+                        "skill": "TALENT",
+                        "index": 0
+                      },
+                      {
+                        "type": "const",
+                        "value": 0.02
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "add",
+                "inputs": [
+                  {
+                    "type": "skill_param",
+                    "skill": "TALENT",
+                    "index": 3
+                  },
+                  {
+                    "type": "const",
+                    "value": 27
+                  }
+                ]
+              }
+            ]
+          },
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "8004 开拓者•存护 星魂 2 古老寒铁的坚守: 「触发天赋时，为我方全体提供的护盾能够额外抵消等同于开拓者防御力2%+27的伤害。」 param = [0.02, 27] ＋ 天赋的 6% 防御力+80（同一面护盾，所以两个份额相加）",
+      "_note": "「触发天赋时，为我方全体提供的**护盾**能够**额外抵消**等同于开拓者防御力 **2%+27** 的伤害」—— ⚠ 护盾在引擎里是**覆盖**不是叠加（`ShieldState` 的注释：「A shield overwrites rather than stacks」），所以「额外抵消」不能写成第二条 `SHIELD` +2%+27（那会把护盾**改小**成 2% 防御+27），只能写**整面护盾**、把两个份额**相加**：`DEFENCE × (TALENT:0 + 0.02) + (TALENT:3 + 27)`。这正是 `value` 数值提供器的用处（`add`/`mul`/`attr`/`skill_param`/`const`，见 TRIGGER.md）。⚠ 因此**天赋那三条加了 `max_eidolon: 1`**：同一事件只能有一次 `SHIELD`，否则两条各自覆盖、谁在后面谁说了算（没有症状的错误）。⚠ 三个事件（普攻/战技/终结技）各一条，与天赋同形 —— 「触发天赋时」就是天赋那三种触发的同一句话。⚠ 判据 `PreservationTrailblazerTest#eidolonTwoRaisesTheTalentShield`：E1 与 E2 的护盾差 = `DEF×0.02 + 27`。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BASIC_ATTACK",
       "id": "talent_shield_on_basic",
+      "max_eidolon": 1,
       "when": [
         "actor == self"
       ],
@@ -309,7 +371,69 @@
     },
     {
       "on": "ULT_CAST",
+      "id": "eidolon2_shield_on_ult",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "SHIELD",
+          "value": {
+            "type": "add",
+            "inputs": [
+              {
+                "type": "mul",
+                "inputs": [
+                  {
+                    "type": "attr",
+                    "attribute": "DEFENCE",
+                    "whose": "owner"
+                  },
+                  {
+                    "type": "add",
+                    "inputs": [
+                      {
+                        "type": "skill_param",
+                        "skill": "TALENT",
+                        "index": 0
+                      },
+                      {
+                        "type": "const",
+                        "value": 0.02
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "add",
+                "inputs": [
+                  {
+                    "type": "skill_param",
+                    "skill": "TALENT",
+                    "index": 3
+                  },
+                  {
+                    "type": "const",
+                    "value": 27
+                  }
+                ]
+              }
+            ]
+          },
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "8004 开拓者•存护 星魂 2 古老寒铁的坚守: 「触发天赋时，为我方全体提供的护盾能够额外抵消等同于开拓者防御力2%+27的伤害。」 param = [0.02, 27] ＋ 天赋的 6% 防御力+80（同一面护盾，所以两个份额相加）",
+      "_note": "「触发天赋时，为我方全体提供的**护盾**能够**额外抵消**等同于开拓者防御力 **2%+27** 的伤害」—— ⚠ 护盾在引擎里是**覆盖**不是叠加（`ShieldState` 的注释：「A shield overwrites rather than stacks」），所以「额外抵消」不能写成第二条 `SHIELD` +2%+27（那会把护盾**改小**成 2% 防御+27），只能写**整面护盾**、把两个份额**相加**：`DEFENCE × (TALENT:0 + 0.02) + (TALENT:3 + 27)`。这正是 `value` 数值提供器的用处（`add`/`mul`/`attr`/`skill_param`/`const`，见 TRIGGER.md）。⚠ 因此**天赋那三条加了 `max_eidolon: 1`**：同一事件只能有一次 `SHIELD`，否则两条各自覆盖、谁在后面谁说了算（没有症状的错误）。⚠ 三个事件（普攻/战技/终结技）各一条，与天赋同形 —— 「触发天赋时」就是天赋那三种触发的同一句话。⚠ 判据 `PreservationTrailblazerTest#eidolonTwoRaisesTheTalentShield`：E1 与 E2 的护盾差 = `DEF×0.02 + 27`。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
       "id": "talent_shield_on_ult",
+      "max_eidolon": 1,
       "when": [
         "actor == self"
       ],
@@ -336,7 +460,69 @@
     },
     {
       "on": "SKILL_CAST",
+      "id": "eidolon2_shield_on_skill",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "SHIELD",
+          "value": {
+            "type": "add",
+            "inputs": [
+              {
+                "type": "mul",
+                "inputs": [
+                  {
+                    "type": "attr",
+                    "attribute": "DEFENCE",
+                    "whose": "owner"
+                  },
+                  {
+                    "type": "add",
+                    "inputs": [
+                      {
+                        "type": "skill_param",
+                        "skill": "TALENT",
+                        "index": 0
+                      },
+                      {
+                        "type": "const",
+                        "value": 0.02
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "add",
+                "inputs": [
+                  {
+                    "type": "skill_param",
+                    "skill": "TALENT",
+                    "index": 3
+                  },
+                  {
+                    "type": "const",
+                    "value": 27
+                  }
+                ]
+              }
+            ]
+          },
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "8004 开拓者•存护 星魂 2 古老寒铁的坚守: 「触发天赋时，为我方全体提供的护盾能够额外抵消等同于开拓者防御力2%+27的伤害。」 param = [0.02, 27] ＋ 天赋的 6% 防御力+80（同一面护盾，所以两个份额相加）",
+      "_note": "「触发天赋时，为我方全体提供的**护盾**能够**额外抵消**等同于开拓者防御力 **2%+27** 的伤害」—— ⚠ 护盾在引擎里是**覆盖**不是叠加（`ShieldState` 的注释：「A shield overwrites rather than stacks」），所以「额外抵消」不能写成第二条 `SHIELD` +2%+27（那会把护盾**改小**成 2% 防御+27），只能写**整面护盾**、把两个份额**相加**：`DEFENCE × (TALENT:0 + 0.02) + (TALENT:3 + 27)`。这正是 `value` 数值提供器的用处（`add`/`mul`/`attr`/`skill_param`/`const`，见 TRIGGER.md）。⚠ 因此**天赋那三条加了 `max_eidolon: 1`**：同一事件只能有一次 `SHIELD`，否则两条各自覆盖、谁在后面谁说了算（没有症状的错误）。⚠ 三个事件（普攻/战技/终结技）各一条，与天赋同形 —— 「触发天赋时」就是天赋那三种触发的同一句话。⚠ 判据 `PreservationTrailblazerTest#eidolonTwoRaisesTheTalentShield`：E1 与 E2 的护盾差 = `DEF×0.02 + 27`。",
+      "_status": "implemented"
+    },
+    {
+      "on": "SKILL_CAST",
       "id": "talent_shield_on_skill",
+      "max_eidolon": 1,
       "when": [
         "actor == self"
       ],

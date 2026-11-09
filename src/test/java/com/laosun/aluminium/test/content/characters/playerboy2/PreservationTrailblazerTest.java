@@ -107,17 +107,18 @@ public class PreservationTrailblazerTest {
             // Note: 2 since 2026-11-06 - the shield plus 「普攻…并叠加 1 层【灼热意志】」.
             // Note: 5 since 2026-11-06 - the shield, the stack, the swap, the spend, and the restore.
             // Note: 6 since 2026-11-06 - plus the free enhanced basic that spends nothing.
-            // Note: 9 since 2026-11-09 - eidolon 1 adds a defence-scaled instance on each of the two basics.
-            Assertions.assertEquals(9, table.ruleCount(TriggerEvent.BASIC_ATTACK),
-                    "cid " + cid + ": shield, stack, swap, spend, restore, free, eidolon 6, and eidolon 1 twice");
+            // Note: 10 since 2026-11-09 - eidolon 2 adds a variant of the talent shield per event (only one SHIELD may run).
+            Assertions.assertEquals(10, table.ruleCount(TriggerEvent.BASIC_ATTACK),
+                    "cid " + cid + ": shield, eidolon 2 shield, stack, swap, spend, restore, free, eidolon 6, eidolon 1 twice");
             // Note: 3 since 2026-11-09 - the mixed-base damage rule joined the shield and the free enhanced basic;
             // Note: 4 since 2026-11-09 - plus eidolon 6 defense stack per ultimate.
-            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
-                    "cid " + cid + ": the mixed-base damage, the shield, the free enhanced basic, and eidolon 6 defence");
+            // Note: 5 since 2026-11-09 - eidolon 2 adds the bigger talent shield on the ultimate too.
+            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.ULT_CAST),
+                    "cid " + cid + ": damage, shield, eidolon 2 shield, free enhanced basic, and eidolon 6 defence");
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.CAST_SETUP),
                     "cid " + cid + ": the row is handed away so `parts` settles the damage once");
             Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                    "cid " + cid + ": the technique, the convention, and eidolon 4 four stacks");
+                    "cid " + cid + ": the technique, the convention, eidolon 3, eidolon 5, and eidolon 4 four stacks");
         }
     }
     /**
@@ -217,6 +218,39 @@ public class PreservationTrailblazerTest {
                 scene.unit, List.of(scene.enemy));
         scene.battle.processRequests();
         return before - scene.enemy.getCurrentHp();
+    }
+
+    /**
+     * 星魂 2:「触发天赋时，为我方全体提供的护盾能够额外抵消等同于开拓者防御力 2%+27 的伤害」.
+     *
+     * <p><b>Why a difference and not a value.</b> The shield is the SAME shield, only bigger - so the criterion casts the same
+     * skill at Eidolon 1 and at Eidolon 2 and requires the difference to be exactly {@code DEF x 0.02 + 27}. That also pins the
+     * one thing that could go wrong silently: two {@code SHIELD} effects firing on the same event would <b>overwrite</b> rather
+     * than add (a shield does not stack), so the talent's three rules are gated at {@code max_eidolon: 1} and the Eidolon-2
+     * variants state the WHOLE shield with the two shares summed.
+     */
+    @Test
+    public void eidolonTwoRaisesTheTalentShieldByTwoPercentAndTwentySeven() {
+        for (int cid : new int[]{TB3, TB4}) {
+            double e1 = shieldAfterOneSkill(cid, 1);
+            double e2 = shieldAfterOneSkill(cid, 2);
+            Scene probe = new Scene(cid, 2);
+            double expected = probe.unit.getAttribute(AttributeType.DEFENCE).get() * 0.02 + 27;
+            System.out.println("[8003] cid=" + cid + " shield e1=" + e1 + " e2=" + e2 + " delta=" + (e2 - e1)
+                    + " expected=" + expected);
+            Assertions.assertTrue(e1 > 0, "cid " + cid + ": precondition - the talent grants a shield at Eidolon 1 too");
+            Assertions.assertEquals(expected, e2 - e1, expected * 1e-9,
+                    "cid " + cid + ": 「额外抵消等同于开拓者防御力 2%+27 的伤害」 - the same shield, bigger by exactly that");
+        }
+    }
+
+    /** The party's shield right after casting the Skill (which is one of the talent's three triggers). */
+    private static double shieldAfterOneSkill(int cid, int eidolon) {
+        Scene scene = new Scene(cid, eidolon);
+        scene.battle.castImmediate(scene.unit.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL),
+                scene.unit, List.of(scene.enemy));
+        scene.battle.processRequests();
+        return scene.unit.getShield();
     }
 
     /**
