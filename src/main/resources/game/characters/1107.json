@@ -6,7 +6,7 @@
     "✅ **星魂 1「施放战技后，不会清除敌方目标的【反击标记】」早已落地，本轮补判据（2026-11-09）**：这一条**不需要**新写法 —— 它的实现就是「把**清除**那条规则关掉」：`skill_clears_the_mark`（`SKILL_CAST` + `REMOVE_STATE 反击标记 all_enemies`）带条件 **`eidolon < 1`**。⚠ 当初登记成「未解」的理由是「`max_eidolon: 0` 表达不了『没有星魂』」—— 那个理由现在有更好的答案：**`eidolon` 条件变量**（`TriggerTable` 里读 `ctx.owner().getEidolonRank()`）。判据 `ClaraTalentMarkTest#eidolonOneKeepsTheMarkAfterTheSkill`（E1 时战技之后标记仍在）与 `#theAttackerIsMarkedAndTheSkillClearsIt`（E0 时被清掉）—— 一对正反面。",
     "终结技 / 星魂 6 的数据 modifier 也写 AggroAddedRatio，但正文未提，按约定不写（数据与正文差异）",
     "终结技的剩余两处：**被攻击概率提高**（正文不给数，数据的 AggroAddedRatio 与正文不符 ⇒ 不写）、反强化反击的**相邻 50%**（位置轴 ✗）",
-    "星魂 6 的两点残留：① 反击**不消耗**「强化反击」层数（原文「共用计数」这一层未写）；② 「并为其添加标记」未写（标记的消费端在天赋 `skill_extra_damage_on_marked`，但「加标记」这句的具体形状未核）"
+    "✅ **星魂 6 的第二句「并为其添加标记」已补（2026-11-09）**：`eidolon6_counter_on_other_ally_hit` 在反击伤害之后追加 `APPLY_BUFF 反击标记 { target: actor }`（与天赋那条 `hp_lost_effect` 同一个状态名与 `attacker` 取值），所以「我方其他目标被打 ⇒ 史瓦罗反击 ⇒ 攻击者被标记」现在是一条完整链路。⭐ **剩下的一点是读法、不是缺句**：「反击**不消耗**『强化反击』层数」—— 文档的星魂 6 原文**没有**这句话（它只说「额外增加 1 次强化反击的次数」），所以当前行为（这条反击不动终结技的层数）就是文档的读法；已在本条与 `ult_enhanced_counter` 的注释里写明。"
   ],
   "rules": [
     {
@@ -330,6 +330,12 @@
           "percent": 1,
           "element": "Physical",
           "damage_type": "TALENT",
+          "target": "actor"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "反击标记",
+          "permanent": true,
           "target": "actor"
         }
       ],

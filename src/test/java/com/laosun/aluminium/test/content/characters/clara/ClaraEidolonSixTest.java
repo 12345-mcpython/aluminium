@@ -43,6 +43,8 @@ public class ClaraEidolonSixTest {
                 SkillCategory.NORMAL, 0, 0, List.of(ally)));
         System.out.println("[1107] enemy hp " + hp + " -> " + enemy.getCurrentHp());
         Assertions.assertTrue(enemy.getCurrentHp() < hp, "「我方其他目标遭到攻击后…发动反击」");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("反击标记"),
+                "「…并对攻击目标添加【反击标记】」 - the counter marks the attacker it hit back");
     }
 
     @Test
