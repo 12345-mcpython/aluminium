@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⭐ **2026-11-08：天赋的【浮元】、星魂 6、行迹 遗爇、以及「优先选择韧性值大于0且有火属性弱点的目标」都落地了** —— 旧的登记「引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元解析不到单位，所以『行动提前』写不出来」已**被证伪**：`SUMMON { panel_less: true }` 就是「非忆灵召唤物」的入口（`SummonService.panelLess` → `addCombatant`）。本轮共 21 条规则：召唤（`self_summon_count == 0` 的门，因为非忆灵路径**不幂等**）、行动次数（上限 5）、它自己回合的两发伤害、解除 1 个负面 + 回复 12%+360、星魂 4 的 40%、星魂 6 的两半（`while_summon_count` 活门槛 / `times` + `stance`）、遗爇的两半（`TAKING_HIT` / `HP_CONSUMED` + `lowest_ally_hp_percent`）、每行动一次扣 1 并在归零时 `DISMISS_SUMMON`、战技 20% 与终结技 100% 的行动提前、秘技开场召唤 + 【醇醉】。四处「随机单体」都带 `prefer`（新字段：优先抽、空池退回全体）。判据 `LingshaFuyuanTest`、`SummonCountGateTest`、`LowestAllyHpConditionTest`、`TargetPreferenceTest`。⚠ **只剩下面一条**。",
-    "⛔ **星魂 1「灵砂的弱点击破效率提高 50%。当有敌方单位的弱点被击破时，使其防御力降低 20%」两半都缺词**：① 属性表里有 `BREAKING_EFFECT`（击破特攻）与 `BREAK_DAMAGE_BOOST`（击破伤害），**没有**「弱点击破效率」（削韧效率）这一项；② 后半的触发（`BREAK` 事件，目标带得到）有拼法，但文档**没写**那 20% 防御降低持续多久（既不是「直到击破结束」，也不是「2 回合」），按本库纪律**不猜数字**。",
+    "✅ **星魂 1 的前半已落地（2026-11-09）**：「灵砂的**弱点击破效率**提高 **50%**」= `eidolon1_raises_her_weakness_break_efficiency`（`BATTLE_START` + `min_eidolon: 1` → `MODIFY_ATTR WEAKNESS_BREAK_EFFICIENCY 0.5` + `permanent`）。⚠ 本条原登记说「属性表里没有『击破效率』」—— **已过期**：`AttributeType.WEAKNESS_BREAK_EFFICIENCY` 存在，1301 加拉赫星魂 6 一直在用。⛔ **后半仍未写**：「**当有敌方单位的弱点被击破时，使其防御力降低 20%**」—— 文档与参数行（`[0.2, 0.5]`）**都没给时长** ⇒ 写 `turns` 是编数、写 `permanent` 是永久减防（更错）；等文档或数据给出时长，或用「直到击破状态结束」这种引擎已有的寿命写法（`while_state: 弱点击破`？需要先确认 `BROKEN_STATE` 能被 `while_state` 读）。",
     "⭐ **以下不登记为缺口**：普攻 / 战技 / 终结技的**伤害与破韧**由技能行数据驱动（`skills.json` 的 `param_list` 与 `stance_list`），不写规则也不会漏；「灵砂陷入**无法战斗状态**时【浮元】消失」由 `DeathService.perishOrphanedSummons` 承担（引擎内置，主人死亡时召唤物随之下场）。"
   ],
   "rules": [
@@ -490,6 +490,23 @@
       ],
       "source": "1222 灵砂 星魂 2 欹枕垂云，烟奁红雪: 「施放终结技后，使我方全体击破特攻提高40%，持续3回合」（0.4 见 skill 122201 的 param）",
       "_note": "「**施放终结技后**，使我方全体**击破特攻提高 40%**，持续 **3 回合**」—— ① 触发 **`ULT_CAST`** ✓（⭐ 由**触发表**判定 ✓ —— 第 108/270 轮给扫描器加了「触发词 → 事件」表 ✓，**判不出就拒绝** ✗，不再默认 `SKILL_CAST` ✗）；作用域 **`all_allies`** ✓（\"我方全体\" ✓）、时长 **3 回合** ✓；② ⚠ **击破特攻是比率型属性** ✓ ⇒ `percent` 以**绝对加值**落地 ✓（第 97/270 轮实测：比率型给点数 ✓、平值型按基数缩放 ✗）⇒ 判据断言队友 **+0.40** ✓，而不是\"基数的 40%\"✗；③ ⭐ **数值经查找核实** ✓：`0.4` 出现在她**自己的技能 `122201`** 的 `param` 里 ✓；④ ⚠ **这是星魂 2 的内容** ✓（与本项目既有做法一致：星魂条款按\"已激活\"写成普通规则 ✓，例如 1013 的 `eidolon4_*` ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_raises_her_weakness_break_efficiency",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "WEAKNESS_BREAK_EFFICIENCY",
+          "percent": 0.5,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1222 灵砂 星魂 1 馨气当盛，除邪避讳: 「灵砂的弱点击破效率提高50%。当有敌方单位的弱点被击破时，使其防御力降低20%。」 参数 = [0.2, 0.5]",
+      "_note": "「**灵砂的弱点击破效率提高 50%**」—— ⭐ 2026-11-09 落地：这条曾登记为「属性表里没有『击破效率』」✗，**已过期** —— `AttributeType.WEAKNESS_BREAK_EFFICIENCY` 存在（它的注释就写着「a ratio attribute of its own rather than a reuse of `BREAKING_EFFECT`」✓），而且 **1301 加拉赫星魂 6 早就在用它** ✓（同一拼写、同一 `permanent: true` ✓）。⚠ 同句后半「当有敌方单位的弱点被击破时，使其**防御力降低 20%**」**仍未写**：文档与参数行都**没给时长** ✗（参数只有 `[0.2, 0.5]`）⇒ 写 `turns` 就是编数，写成 `permanent` 更错（永久减防 ✗）—— 已登记在该文件的 `_gaps`。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
