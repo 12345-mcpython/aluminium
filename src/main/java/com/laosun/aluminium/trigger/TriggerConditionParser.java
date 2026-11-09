@@ -340,6 +340,20 @@ final class TriggerConditionParser {
             return new TriggerTable.IsSlowed(requireStateSubject(subject, raw, spec), raw);
         }
 
+        // `is_debuffed`: "<who> is_debuffed" - the broad sibling of `target_debuff:<ATTR>`: ANY negative effect counts.
+        Matcher isDebuffed = IS_DEBUFFED.matcher(text);
+        if (isDebuffed.find()) {
+            String subject = normalize(text.substring(0, isDebuffed.start()));
+            String trailing = text.substring(isDebuffed.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_debuffed\": it takes no argument "
+                                + "(write \"target is_debuffed\", or \"!target is_debuffed\" for the opposite) "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new TriggerTable.IsDebuffed(requireStateSubject(subject, raw, spec), raw);
+        }
+
         // `from_skill COMMON|SKILL|ULTRA|TALENT`: the causing instance's cast category. No subject: the "who" is
         // already a separate condition (`actor == self`), and the sentence never names a second unit.
         // `self_is_actor_or_target`: a bare keyword. It is the ONE disjunction the language offers, because a clause whose
@@ -2710,6 +2724,17 @@ final class TriggerConditionParser {
      */
     private static final Pattern IS_SLOWED =
             Pattern.compile("(?<![\\w])is_slowed(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * The {@code is_debuffed} keyword: "<b>that unit carries any negative effect</b>" - argument-less like
+     * {@code is_slowed}, but broader: it asks {@code BuffManager.debuffCount() > 0}, the same fact "解除 N 个负面效果" reads, so
+     * controls and DoTs both count.
+     *
+     * <p>Reader: 1308 Acheron (黄泉) Eidolon 1 - 「对处于负面效果的敌方目标造成伤害时暴击率提高 18%」. The pre-existing spelling
+     * {@code target_debuff:<ATTR>} names ONE attribute ("减速" = SPEED), which cannot say "any debuff at all".
+     */
+    private static final Pattern IS_DEBUFFED =
+            Pattern.compile("(?<![\\w])is_debuffed(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
      * The {@code from_rule} qualifier of {@code has_shield}: the shield was created by the rule with this id.

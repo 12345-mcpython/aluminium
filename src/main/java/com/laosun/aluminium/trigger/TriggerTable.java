@@ -1761,6 +1761,42 @@ public class TriggerTable {
             return raw;
         }
     }
+    /**
+     * {@code <who> is_debuffed}: "that unit carries ANY negative effect" - broader than {@code target_debuff:<ATTR>}, which names
+     * one attribute. Reads {@code BuffManager.debuffCount()}, so controls and DoTs both count. Reader: 1308 Acheron (黄泉)
+     * Eidolon 1 「对处于负面效果的敌方目标造成伤害时暴击率提高 18%」.
+     */
+    static final class IsDebuffed implements Condition, PartyCondition {
+        private final String subject;
+        private final String raw;
+
+        IsDebuffed(String subject, String raw) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            return who != null && who.getBuffManager().debuffCount() > 0;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
 
 
     /**
@@ -2354,7 +2390,6 @@ public class TriggerTable {
         }
     }
 }
-
 
 
 

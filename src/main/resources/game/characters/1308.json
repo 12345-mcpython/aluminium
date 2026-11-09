@@ -188,6 +188,28 @@
       "_status": "implemented"
     },
     {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon1_crit_against_debuffed_enemies",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self",
+        "target is_debuffed"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.18,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1308 黄泉 星魂 1 高天寥落真言始: 「对处于负面效果的敌方目标造成伤害时暴击率提高18%。」 参数 = [0.18]",
+      "_note": "「对处于**负面效果**的敌方目标造成伤害时**暴击率提高 18%**」—— ① 事件 `DEALING_DAMAGE` + `actor == self` ✓；② **`target is_debuffed`** 是本轮新加的谓词（读 `BuffManager.debuffCount() > 0`，控制与持续伤害都算）—— 原有的 `target_debuff:<属性>` 只能问**某一个属性**被降低（如减速 = SPEED），说不出「**任何**负面效果」；③ `MODIFY_ATTR CRIT_CHANCE` + **`instance: true`** + `turns: 1`（只影响这一发 ✓，寿命字段是引擎要求的）。",
+      "_status": "implemented"
+    },
+    {
       "on": "BATTLE_START",
       "id": "eidolon3_levels",
       "min_eidolon": 3,
