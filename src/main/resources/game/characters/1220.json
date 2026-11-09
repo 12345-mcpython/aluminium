@@ -3,13 +3,85 @@
   "character": 1220,
   "_status": "partial",
   "_gaps": [
-    "⛔ 天赋/资源【飞黄】：每 2 次攻击 +1 点、终结技不计入、上限 12 未写，资源本身也未声明",
+    "✅ **【飞黄】的计数已落地（2026-11-09）**：文件头声明资源 `飞黄`（`max: 12` = 文档原话「最多累计12点」），三条规则 —— `talent_flying_aureus_counts_a_teammates_attack`（`ALLY_ATTACK` + `actor != self` → 计数 +1）、`talent_flying_aureus_counts_her_own_non_ultimate_attack`（`actor == self` + **`from_skill_id != 3`** → +1）、`talent_flying_aureus_pays_a_point_every_two_attacks`（计数 ≥ 2 → `GAIN_RESOURCE 1` + 清零）。⚠ **排除的是「她的」终结技**：「飞霄的终结技攻击不计入」⇒ 用槽位而不是 `from_category ULTRA`（后者会把**队友的**终结技也排除，而文档是计数的）。判据 `FeixiaoFlyingAureusTest`：两次队友攻击 = 1 点、她的终结技攻击不计数、队友的终结技算。⛔ **仍未写**：「【飞黄】达到 **6** 点时可**激活终结技**」—— 引擎的终结技只认能量，没有「按池子解锁」的闸门。",
     "⛔ 终结技：6 段连招 / 无视弱点削韧 / 未击破时削韧效率 +100% / 160% 收尾未写",
     "⛔ 秘技：每波开始、必定暴击、每多牵引 1 个敌人 +100% 最多 1000% 未写",
     "⛔ 行迹「解形」：终结技伤害视为追加攻击未写",
     "⛔ 星魂：未读、未写"
   ],
+  "resources": [
+    {
+      "id": "飞黄",
+      "max": 12,
+      "source": "1220 飞霄 天赋 雷狩: 「【飞黄】达到6点时可激活终结技，最多累计12点。我方目标每施放2次攻击，飞霄获得1点【飞黄】…」",
+      "note": "上限 **12** 是文档原话（「最多累计12点」）⇒ 可以声明。⚠ 「达到 6 点可激活终结技」这一半**不是资源的事**：引擎没有「按某个池子解锁终结技」的闸门（终结技只认能量），已登记在该角色的 `_gaps`。"
+    }
+  ],
   "rules": [
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_flying_aureus_counts_a_teammates_attack",
+      "when": [
+        "actor != self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "飞黄计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1220 飞霄 天赋 雷狩: 「我方目标每施放2次攻击，飞霄获得1点【飞黄】，飞霄的终结技攻击不计入次数。」",
+      "_note": "「我方目标**每施放 2 次攻击**，飞霄获得 1 点【飞黄】」的前半：**队友**的每一次攻击记 1 次。⚠ 队友的终结技**也计入**（文档只排除**飞霄自己的**终结技攻击）⇒ 本条不设技能类别门。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_flying_aureus_counts_her_own_non_ultimate_attack",
+      "when": [
+        "actor == self",
+        "from_skill_id != 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "飞黄计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1220 飞霄 天赋 雷狩: 「…我方目标每施放2次攻击，飞霄获得1点【飞黄】，飞霄的终结技攻击不计入次数。」",
+      "_note": "同句后半：**她自己的**攻击也计入，**除了她的终结技**。⚠ 用 **`from_skill_id != 3`**（3 = 终结技槽）而不是 `from_category ULTRA` —— 后者会把**队友的终结技**也排除掉，而文档排除的只有**她自己的**。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_flying_aureus_pays_a_point_every_two_attacks",
+      "when": [
+        "self_stacks:飞黄计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "飞黄",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "飞黄计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1220 飞霄 天赋 雷狩: 「我方目标每施放2次攻击，飞霄获得1点【飞黄】…最多累计12点。」",
+      "_note": "「**每 2 次**攻击 ⇒ 1 点」：计数到 2 就 `GAIN_RESOURCE 飞黄 1` 并把计数清零（与 1223 的「每 3 点充能」同一手法）。⚠ 顺序：本条排在两条计数规则**之后**（同一事件、文件顺序），否则会晚一次才结算。⚠ 上限 12 由**资源声明**承担（`max`），不在这里写。",
+      "_status": "implemented"
+    },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
