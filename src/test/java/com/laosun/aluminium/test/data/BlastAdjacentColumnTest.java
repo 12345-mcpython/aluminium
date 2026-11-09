@@ -41,7 +41,7 @@ public class BlastAdjacentColumnTest {
     private static final Pattern FIRST_REFERENCE = Pattern.compile("等同于[^#]{0,60}#(\\d)\\[");
 
     /** Rows still priced by something this test cannot compare - a running tally, or a mixed real-damage clause. */
-    private static final Set<String> UNRESOLVED = Set.of("1205/3", "1406/3");
+    private static final Set<String> UNRESOLVED = Set.of("1406/3");
     @Test
     public void everyBlastRowPricesItsNeighboursFromTheColumnTheSentenceNames() throws IOException {
         JsonObject skills = read("skills.json");
