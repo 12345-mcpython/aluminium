@@ -7,7 +7,7 @@
     "✅ **天赋的核心句已落地（2026-11-09）**：「**任意单位**施放技能期间使敌方目标陷入负面效果，黄泉获得 1 点【残梦】并为目标附上 1 层【集真赤】」= `talent_a_debuff_pays_a_dream_and_a_mark`（`DEBUFF_APPLIED` + `actor is_ally` + **`per_turn: 1`** → `GAIN_RESOURCE 残梦 1` + `ADD_STACK 集真赤 1`）。⭐ `DEBUFF_APPLIED` 是 `Battle.tryApplyDebuff` 的唯一出口（控制与持续伤害都走它），**此前语料里只有两个光锥用过**；而它**敌方给我们上负面时也发**，所以 `actor is_ally` 不能省。⚠ **两处近似已写进规则注记**：(a) 「**每次施放技能**最多 1 次」用 `per_turn: 1`（按**回合**计）—— 常规节奏等价，额外回合/队友连放时会少触发；(b) 「若使多个目标陷入负面，则为其中【集真赤】**最多**的目标附上 1 层」的动作**未实现**（`per_turn: 1` 只让第一次效，不挑层数最多的）。",
     "⛔ 【集真赤】：离场/死亡后转移到全场最多目标未写",
     "✅ **终结技的全属性抗性 −20% 已落地（2026-11-09）**：`ult_lowers_all_resistance_for_its_duration`（`ULT_CAST` + `actor == self` → `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + `turns: 1` + `all_enemies`）。⚠ 寿命是**近似**：引擎没有「到本次施放结束」的刻度 ⇒ 用 `turns: 1`（到她下个回合）。⛔ **同句前半仍开**：「**无视弱点属性**削减敌方韧性」—— 终结技的伤害与削韧由**技能行**交付，`ignoreWeakness` 只能写在 `DAMAGE` 效果上，内容层拿不到那一发。",
-    "✅ **星魂 4 已落地（2026-11-09）**：`eidolon4_the_newcomer_takes_more_from_ultimates`（`ENEMY_ENTERED` + `min_eidolon: 4` → `MODIFY_DAMAGE_TAKEN 0.08` + **`scope_category: ULTRA`** + `permanent`）。⭐ `scope_category` 是本轮给「受到的伤害提高」加的**第三个作用域**（与 `scope_element`、`from_self` 并列：**哪一次施放打出来的**既不是元素也不是伤害类型）；`VulnerabilityBuff.onDamage` 里读 `damage.getCastCategory()`。⛔ **仍未写**：星魂 2 前半（按命途数算行迹档位）、星魂 6（普攻/战技伤害视为终结技 + 无视弱点削韧）。"
+    "✅ **星魂 6 的第一句已落地（2026-11-09）**：`eidolon6_ultimates_pierce_further`（`DEALING_DAMAGE` + `actor == self` + **`from_category ULTRA`** + `min_eidolon: 6` → `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + `instance: true`）。⛔ **同句后半仍未写**：「施放普攻、战技造成的伤害**同时视为终结技伤害**」（要把一发实例的类别**改写**，而 `Damage.castCategory` 构造时定死）与「**无视弱点属性**削减敌方韧性」（要改**技能行交付的那一发**）。⛔ 星魂 2 前半（按命途数算行迹档位）同样未写。"
   ],
   "resources": [
     {
@@ -224,6 +224,28 @@
       ],
       "source": "1308 黄泉 星魂 4 亘焰燎照镜中人: 「在敌方目标进入战斗时，使其陷入终结技伤害易伤状态，受到的终结技伤害提高8%。」 参数 = [0.08]",
       "_note": "「**敌方目标进入战斗时**，使其陷入**终结技伤害**易伤状态，受到的**终结技伤害提高 8%**」—— ① 事件 `ENEMY_ENTERED`（`target` = 新入场的敌人 ✓）；② ⭐ **`scope_category: \"ULTRA\"`** 是本轮给 `MODIFY_DAMAGE_TAKEN` 加的作用域（与 `scope_element` 并列：**哪一次施放打出来的**既不是元素也不是伤害类型）⇒ 只有 `damage.getCastCategory() == ULTRA` 的那些发会吃到这 8%；③ `permanent: true`（「使其陷入…状态」没有回合数 ✓）。⚠ `scope_category` 白名单只有 `MODIFY_DAMAGE_TAKEN`（别的 op 写了会装载期拒绝，免得静默应用到所有类别）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon6_ultimates_pierce_further",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.2,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1308 黄泉 星魂 6 灾咎解桎梏: 「黄泉造成的终结技伤害全属性抗性穿透提高20%…」 参数 = [0.2]",
+      "_note": "「黄泉造成的**终结技伤害**全属性**抗性穿透提高 20%**」—— ① 事件 `DEALING_DAMAGE`（**逐发**，且带施放类别 ✓）+ `actor == self`；② **`from_category ULTRA`** 限定「只有终结技打出的那些发」✓（`DEALING_DAMAGE` 在可带类别的 8 个事件里 ✓）；③ `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + **`instance: true`**（只影响这一发 ✓）+ `turns: 1`（寿命字段是引擎要求的）。⚠ 同句后半「**施放普攻、战技造成的伤害同时视为终结技伤害**，并**无视弱点属性**削减敌方韧性」**未写**：前半要把一发实例的类别**改写**（引擎的 `Damage.castCategory` 是构造时定死的），后半要改**技能行交付的那一发**的削韧（内容层拿不到）⇒ 两条都登记。",
       "_status": "implemented"
     },
     {
