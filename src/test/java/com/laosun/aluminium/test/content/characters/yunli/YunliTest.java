@@ -58,16 +58,15 @@ public class YunliTest {
         Enemy bystander = BattleFixture.monster();
         Battle battle = new Battle(List.of(yunli), List.of(attacker, bystander), fixed());
         battle.startBattle();
+        double attackerBefore = attacker.getCurrentHp();
         double bystanderBefore = bystander.getCurrentHp();
         double energyBefore = yunli.getCurrentEnergy();
-
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100));
-
         Assertions.assertEquals(15.0, yunli.getCurrentEnergy() - energyBefore, 1e-6,
                 "「额外恢复15点能量」 (restores 15 extra Energy)");
-        Assertions.assertEquals(bystanderBefore, bystander.getCurrentHp(), 1e-9,
-                "and a bystander does not: `target: attacker` is what makes this exact");
-        Assertions.assertTrue(reference > 0, "the reference must land at all");
+        double attackerLoss = attackerBefore - attacker.getCurrentHp();
+        Assertions.assertEquals(0.5, (bystanderBefore - bystander.getCurrentHp()) / attackerLoss, 1e-6,
+                "「对其相邻目标造成等同于云璃60%攻击力的物理属性伤害」 - the bystander adjacent to the attacker takes half");
         Assertions.assertEquals(0.5, shipped / reference, 0.05,
                 "120% against a hand-built 240% reference: " + shipped + " vs " + reference
                         + " -- the ratio is what pins the MAGNITUDE (a surviving mutation proved a bare \"> 0\" did not)");
