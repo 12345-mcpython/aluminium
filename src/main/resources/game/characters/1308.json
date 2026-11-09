@@ -7,7 +7,7 @@
     "✅ **天赋的核心句已落地（2026-11-09）**：「**任意单位**施放技能期间使敌方目标陷入负面效果，黄泉获得 1 点【残梦】并为目标附上 1 层【集真赤】」= `talent_a_debuff_pays_a_dream_and_a_mark`（`DEBUFF_APPLIED` + `actor is_ally` + **`per_turn: 1`** → `GAIN_RESOURCE 残梦 1` + `ADD_STACK 集真赤 1`）。⭐ `DEBUFF_APPLIED` 是 `Battle.tryApplyDebuff` 的唯一出口（控制与持续伤害都走它），**此前语料里只有两个光锥用过**；而它**敌方给我们上负面时也发**，所以 `actor is_ally` 不能省。⚠ **两处近似已写进规则注记**：(a) 「**每次施放技能**最多 1 次」用 `per_turn: 1`（按**回合**计）—— 常规节奏等价，额外回合/队友连放时会少触发；(b) 「若使多个目标陷入负面，则为其中【集真赤】**最多**的目标附上 1 层」的动作**未实现**（`per_turn: 1` 只让第一次效，不挑层数最多的）。",
     "⛔ 【集真赤】：离场/死亡后转移到全场最多目标未写",
     "✅ **终结技的全属性抗性 −20% 已落地（2026-11-09）**：`ult_lowers_all_resistance_for_its_duration`（`ULT_CAST` + `actor == self` → `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + `turns: 1` + `all_enemies`）。⚠ 寿命是**近似**：引擎没有「到本次施放结束」的刻度 ⇒ 用 `turns: 1`（到她下个回合）。⛔ **同句前半仍开**：「**无视弱点属性**削减敌方韧性」—— 终结技的伤害与削韧由**技能行**交付，`ignoreWeakness` 只能写在 `DAMAGE` 效果上，内容层拿不到那一发。",
-    "✅ **星魂 1 已落地（2026-11-09）**：`eidolon1_crit_against_debuffed_enemies`（`DEALING_DAMAGE` + `actor == self` + **`target is_debuffed`** → `MODIFY_ATTR CRIT_CHANCE 0.18` + `instance: true`）。⭐ `is_debuffed` 是本轮加的新谓词（读 `BuffManager.debuffCount() > 0`，控制与持续伤害都算）—— 原有 `target_debuff:<属性>` 只能问**某一个属性**被降低，说不出「**任何**负面效果」。⛔ **仍未写**：星魂 2 前半（按命途数算行迹档位）、星魂 4（按施放类别限定受到的伤害）、星魂 6（普攻/战技伤害视为终结技 + 无视弱点削韧）。"
+    "✅ **星魂 4 已落地（2026-11-09）**：`eidolon4_the_newcomer_takes_more_from_ultimates`（`ENEMY_ENTERED` + `min_eidolon: 4` → `MODIFY_DAMAGE_TAKEN 0.08` + **`scope_category: ULTRA`** + `permanent`）。⭐ `scope_category` 是本轮给「受到的伤害提高」加的**第三个作用域**（与 `scope_element`、`from_self` 并列：**哪一次施放打出来的**既不是元素也不是伤害类型）；`VulnerabilityBuff.onDamage` 里读 `damage.getCastCategory()`。⛔ **仍未写**：星魂 2 前半（按命途数算行迹档位）、星魂 6（普攻/战技伤害视为终结技 + 无视弱点削韧）。"
   ],
   "resources": [
     {
