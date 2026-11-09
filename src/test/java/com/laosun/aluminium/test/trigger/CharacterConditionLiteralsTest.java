@@ -266,7 +266,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1314, "BATTLE_START", "technique_fifteen_goods", List.of("self has_state 秘技"));
         assertRule(1314, "BATTLE_START", "eidolon2_crit_chance_at_fifteen_goods", List.of("self_stacks:当品 >= 15.0"));
         assertRule(1315, "SKILL_CAST", "skill_standoff_on_both", List.of("actor == self"));
-        assertRule(1315, "KILL", "standoff_stack_on_kill", List.of());
+        assertRule(1315, "KILL", "standoff_stack_on_kill", List.of("actor == self"));
         assertRule(1315, "BREAK", "standoff_stack_on_break", List.of());
         assertRule(1315, "BATTLE_START", "level_convention", List.of());
         assertRule(1315, "ULT_CAST", "ult_adds_physical_weakness", List.of("actor == self"));

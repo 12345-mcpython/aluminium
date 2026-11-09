@@ -91,6 +91,7 @@
     {
       "on": "KILL",
       "id": "standoff_stack_on_kill",
+      "when": ["actor == self"],
       "do": [
         {
           "op": "ADD_STACK",
