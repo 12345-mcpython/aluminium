@@ -205,6 +205,8 @@
     {
       "on": "ULT_CAST",
       "id": "eidolon6_damage_up_and_refunds_a_point",
+      "when": ["actor == self"],
+      "min_eidolon": 6,
       "min_eidolon": 6,
       "do": [
         {

@@ -192,6 +192,7 @@
     {
       "on": "SKILL_CAST",
       "id": "skill_dot_ticks_now",
+      "when": ["actor == self"],
       "do": [
         {
           "op": "TICK_DOT",

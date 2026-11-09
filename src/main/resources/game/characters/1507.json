@@ -109,6 +109,8 @@
     {
       "on": "ULT_CAST",
       "id": "eidolon1_zone_enemy_res_down",
+      "when": ["actor == self"],
+      "min_eidolon": 1,
       "min_eidolon": 1,
       "do": [
         {

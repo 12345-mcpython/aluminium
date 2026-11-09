@@ -364,7 +364,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1506, "RESOURCE_CHANGED", "p1506_laughs_to_hidden", List.of("resource_changed:笑点"));
         assertRule(1507, "ULT_CAST", "ult_zone_and_thousand_forgings", List.of("actor == self"));
         assertRule(1507, "COUNTDOWN_TURN", "zone_ends_takes_thousand_forgings_off", List.of("actor == countdown"));
-        assertRule(1507, "ULT_CAST", "eidolon1_zone_enemy_res_down", List.of());
+        assertRule(1507, "ULT_CAST", "eidolon1_zone_enemy_res_down", List.of("actor == self"));
         assertRule(1510, "SKILL_CAST", "skill_navigators_semaphore", List.of("actor == self"));
         assertRule(1510, "BATTLE_START", "level_convention", List.of());
         assertRule(1512, "BATTLE_START", "technique_advance_vibes_and_damage", List.of("self has_state 秘技"));
