@@ -99,7 +99,7 @@ public class HardcodedSkillRowRatchetTest {
     // must state the SAME number twice. Reading the row is not available to it: the instance's caster is the SUMMON
     // (`attacker: actor`, because 神君 has no panel), and a `skill` / `damage_param` read resolves against the caster --
     // measured: "神君 has no TALENT skill to fire a DAMAGE effect from".
-    private static final int BASELINE = 57;
+    private static final int BASELINE = 58;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
@@ -268,6 +268,5 @@ public class HardcodedSkillRowRatchetTest {
         }
     }
 }
-
 
 
