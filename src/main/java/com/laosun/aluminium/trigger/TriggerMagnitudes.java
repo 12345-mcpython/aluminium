@@ -135,6 +135,36 @@ final class TriggerMagnitudes {
         if ("original_damage".equals(scale)) {
             return originalDamageOf(effect, ctx) * share + flat;
         }
+        // 「等同于【迷迷】240% 攻击力」 (8007/8008 Trailblazer (开拓者)'s Ultimate): the subject's OWN attribute, read before the
+        // attribute-of-the-owner branch below - which is `scaleAttribute`, and that method deliberately refuses every
+        // spelling that is not the OWNER's (`summon_attr:` / `actor_attr:` name a different unit, so "which attribute does
+        // this scale name" has an answer but "whose" does not).
+        //
+        // ⚠ Measured 2026-11-09: before this branch a DAMAGE stating `summon_attr:ATTACK` threw on every firing
+        // ("not a spelling this op knows") - the Trailblazer's Ultimate could not be cast at all. The magnitude path
+        // (`derivedMagnitude`) had handled these two spellings since 1415; only the DAMAGE base did not.
+        if (scale.startsWith(TriggerTable.SUMMON_ATTR_PREFIX) || scale.startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
+            boolean memosprite = scale.startsWith(TriggerTable.SUMMON_ATTR_PREFIX);
+            String prefix = memosprite ? TriggerTable.SUMMON_ATTR_PREFIX : TriggerTable.ACTOR_ATTR_PREFIX;
+            CanHit subject;
+            if (memosprite) {
+                subject = ctx == null || ctx.battle() == null || ctx.owner() == null
+                        ? null : ctx.battle().summonOf(ctx.owner());
+                if (subject == null) {
+                    // A share of a unit that is not on the field is not a number (the same rule `derivedMagnitude` states).
+                    throw new IllegalStateException("the damage states \"scale\": \"" + effect.getScale()
+                            + "\", which reads the rule owner's memosprite, but there is none on the field to read it from");
+                }
+            } else {
+                subject = ctx == null ? null : ctx.actor();
+                if (subject == null) {
+                    throw new IllegalStateException("the damage states \"scale\": \"" + effect.getScale()
+                            + "\", which reads the event's actor, but this event has none");
+                }
+            }
+            AttributeType from = AttributeType.fromString(scale.substring(prefix.length()).trim());
+            return subject.getAttribute(from).get() * share + flat;
+        }
         // ? The state-holder's own attribute (`holder_attr:<STATE>:<ATTRIBUTE>`, 1503's "该次欢愉伤害使用【美学底本】的属性值计算").
         // Routed to `derivedMagnitude` rather than copied here: that reader is where the share/flat arithmetic for a
         // subject attribute already lives (`actor_attr:`/`summon_attr:` reach `literalBase` the same way), and a second

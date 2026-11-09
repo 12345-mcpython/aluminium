@@ -5,7 +5,8 @@
   "_gaps": [
     "天赋：我方每累计恢复 10 点能量使迷迷获得 1% 充能未写（缺全队累计能量计数）",
     "秘技：大地图的特殊领域 / 时停未写（战斗层的延后 50% + 100% 冰伤已补；终结技 240% 冰伤已补）",
-    "忆灵 ATK 面板文档未给，按召唤者 100% 攻击力建模（假设）"
+    "忆灵 ATK 面板文档未给，按召唤者 100% 攻击力建模（假设）",
+    "✅ **终结技的伤害归属已修好（2026-11-09）**：`CAST_SETUP` + `actor == self` + `from_skill_id == 3` → `DELEGATE_DAMAGE { skill: ULTRA }` ⇒ 技能行（Ultra/AoEAttack）**不再自己结算**，只留规则那一发；规则另补 `stance: 60`（数据 `stance_list.all`；被交接的施放不削韧性）。⚠ 实测：修之前这个终结技**一放就抛异常** —— 规则里的 `scale: summon_attr:ATTACK` 当时不被 DAMAGE 接受（引擎这一轮补上了 `summon_attr:` / `actor_attr:` 作为 DAMAGE 基数的读法）；而且交接前还会**多打一发按开拓者攻击力算的伤害**（full=1464.2 vs 规则 509.7）。判据 `RemembranceTrailblazerTest#theUltimateSettlesOneInstanceOfMemsOwnDamage`（真实施放 vs 只发事件必须相等）与 `#theUltimateStillTakesSixtyToughness`。"
   ],
   "resources": [
     {
@@ -64,6 +65,23 @@
       "_note": "「**召唤忆灵迷迷**。若迷迷已在场，为迷迷回复等同于**迷迷生命上限 60%** 的生命值，并且使迷迷获得 **10% 充能**」—— ① 召唤用 `SUMMON` ✓；② 治疗用 `HEAL` + `scale: target_max_hp` + `target: summon`；③ 充能用 `GAIN_RESOURCE` + `target: summon`（忆灵的资源在 `memosprites/8008.json` 声明）。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
+      "on": "CAST_SETUP",
+      "id": "ult_damage_belongs_to_mem",
+      "when": [
+        "actor == self",
+        "from_skill_id == 3"
+      ],
+      "do": [
+        {
+          "op": "DELEGATE_DAMAGE",
+          "skill": "ULTRA"
+        }
+      ],
+      "source": "8008 开拓者•记忆 终结技 一起上吧，迷迷！: 「召唤忆灵迷迷。使迷迷获得40%充能，随后使迷迷对敌方全体造成等同于迷迷240%攻击力的冰属性伤害。」",
+      "_note": "与 8007 的同名规则一字不差（两份文件是同一个角色的两个性别版本）：`CAST_SETUP` + `actor == self` + `from_skill_id == 3` → `DELEGATE_DAMAGE { skill: ULTRA }`，并给规则那条补 `stance: 60`。⚠ 详细理由与实测数字见 `8007.json` 的同名 `_note`：技能行会按**开拓者**的攻击力多打一发，而且 `summon_attr:` 当时不被 DAMAGE 接受（一放就抛异常）。判据 `RemembranceTrailblazerTest` 两个 id 都跑。",
+      "_status": "implemented"
+    },
+    {
       "on": "ULT_CAST",
       "id": "ult_summon_mem",
       "when": [
@@ -85,6 +103,7 @@
           "attacker": "summon",
           "element": "Ice",
           "target": "all_enemies",
+          "stance": 60,
           "percent_from_skill_param": "ULTRA:0"
         }
       ],

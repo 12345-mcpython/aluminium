@@ -77,6 +77,73 @@ public class RemembranceTrailblazerTest {
         }
     }
 
+    /**
+     * 终结技:「召唤忆灵迷迷…随后**使迷迷**对敌方全体造成等同于迷迷 240% 攻击力的冰属性伤害」.
+     *
+     * <p><b>Two defects lived here until 2026-11-09.</b> The Ultimate's row is {@code Ultra/AoEAttack}, so without a hand-over it
+     * swung a second instance on top of the rule's - and scaled off the TRAILBLAZER's attack instead of Mem's (measured:
+     * full = 1464.2 against the rule's 509.7). Worse, the rule's {@code scale: "summon_attr:ATTACK"} was <b>refused by DAMAGE</b>,
+     * so the Ultimate <b>threw on every cast</b>. Both are fixed together; this criterion pins that the row no longer swings by
+     * comparing a real cast with the same event fired by hand (the rule alone) - equality is the whole assertion.
+     */
+    @Test
+    public void theUltimateSettlesOneInstanceOfMemsOwnDamage() {
+        for (int cid : new int[]{8007, 8008}) {
+            double cast = ultimateDamage(cid, true);
+            double ruleOnly = ultimateDamage(cid, false);
+            Assertions.assertTrue(ruleOnly > 0, "cid " + cid + ": the rule's instance settled (" + ruleOnly + ")");
+            Assertions.assertEquals(ruleOnly, cast, 1e-6,
+                    "cid " + cid + ": 「使迷迷对敌方全体造成…」 settles ONE instance - the row's own swing is handed away ("
+                            + cast + " vs " + ruleOnly + ")");
+        }
+    }
+
+    /** 终结技的韧性 60（数据 `stance_list.all`）：被交接的施放不削韧性，所以它必须由规则那一发带着。 */
+    @Test
+    public void theUltimateStillTakesSixtyToughness() {
+        for (int cid : new int[]{8007, 8008}) {
+            Scene scene = new Scene(cid);
+            // Toughness only comes off an enemy that is WEAK to the element (the gate `reduceToughness` itself keeps) - Mem's is Ice.
+            scene.enemy.addWeakness(com.laosun.aluminium.enums.DamageElement.ICE);
+            double before = scene.enemy.getStance();
+            scene.battle.castImmediate(scene.unit.getSkills().get(SkillType.ULTRA), scene.unit, List.of(scene.enemy));
+            scene.battle.processRequests();
+            Assertions.assertEquals(before - 60, scene.enemy.getStance(), 1e-6,
+                    "cid " + cid + ": 「破韧值 全体 60」 rides on the rule's instance");
+        }
+    }
+
+    /** Enemy HP lost to one Ultimate, either through a real cast or through the rule's own event. */
+    private static double ultimateDamage(int cid, boolean throughTheCast) {
+        Scene scene = new Scene(cid);
+        double before = scene.enemy.getCurrentHp();
+        if (throughTheCast) {
+            scene.battle.castImmediate(scene.unit.getSkills().get(SkillType.ULTRA), scene.unit, List.of(scene.enemy));
+        } else {
+            // The rule's own event: no cast token, so no row can swing - this IS the rule's single instance.
+            scene.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, scene.unit, scene.enemy, 1, 0));
+        }
+        scene.battle.processRequests();
+        return before - scene.enemy.getCurrentHp();
+    }
+
+    /** A fight with a toughness bar big enough that a 60-point hit cannot break it (breaking adds a BREAK instance). */
+    private static final class Scene {
+        private final Character unit;
+        private final Enemy enemy;
+        private final Battle battle;
+
+        private Scene(int cid) {
+            unit = CharacterFactory.create(cid, LEVEL);
+            enemy = BattleFixture.monster();
+            enemy.setMaxStance(100_000);
+            enemy.setStance(100_000);
+            battle = new Battle(List.of(unit), List.of(enemy), fixed());
+            battle.startBattle();
+        }
+    }
+
     private static Random fixed() {
         return BattleFixture.alwaysRoll(1.0);
     }
