@@ -75,6 +75,12 @@ public class CastDamageDeliveryInventoryTest {
                     "eidolon6_other_ult_talent_damage_boost")), // 天赋追击 + 星魂 6 的「提高 729%」
             Map.entry("1504", Set.of("skill_strikes_the_existing_bait_twice",
                     "ult_every_four_layers_add_one_more_hit")), // 战技「额外对其造成…」/ 终结技「每 4 层额外 1 次」
+            // 8003/8004 星魂 1「施放普攻时，**额外**造成等同于开拓者25%防御力的火属性伤害；施放强化普攻时…50%」——
+            // 一段**叠加**在普攻之上的防御力伤害，不是接管那一发（普攻行仍然要打），所以是 EXTRA 而不是交接。
+            Map.entry("8003", Set.of("eidolon1_plain_basic_adds_defence_damage",
+                    "eidolon1_enhanced_basic_adds_defence_damage")),
+            Map.entry("8004", Set.of("eidolon1_plain_basic_adds_defence_damage",
+                    "eidolon1_enhanced_basic_adds_defence_damage")),
             Map.entry("8009", Set.of("talent_elation_extra_damage")),               // 天赋「额外造成…欢愉伤害」
             Map.entry("8010", Set.of("talent_elation_extra_damage")));
 

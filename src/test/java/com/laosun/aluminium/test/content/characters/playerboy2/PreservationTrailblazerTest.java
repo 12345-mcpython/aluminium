@@ -107,9 +107,9 @@ public class PreservationTrailblazerTest {
             // Note: 2 since 2026-11-06 - the shield plus 「普攻…并叠加 1 层【灼热意志】」.
             // Note: 5 since 2026-11-06 - the shield, the stack, the swap, the spend, and the restore.
             // Note: 6 since 2026-11-06 - plus the free enhanced basic that spends nothing.
-            // Note: 7 since 2026-11-09 - eidolon 6 stacks DEF after an enhanced basic.
-            Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BASIC_ATTACK),
-                    "cid " + cid + ": shield, stack, swap, spend, restore, free, and eidolon 6 defence");
+            // Note: 9 since 2026-11-09 - eidolon 1 adds a defence-scaled instance on each of the two basics.
+            Assertions.assertEquals(9, table.ruleCount(TriggerEvent.BASIC_ATTACK),
+                    "cid " + cid + ": shield, stack, swap, spend, restore, free, eidolon 6, and eidolon 1 twice");
             // Note: 3 since 2026-11-09 - the mixed-base damage rule joined the shield and the free enhanced basic;
             // Note: 4 since 2026-11-09 - plus eidolon 6 defense stack per ultimate.
             Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
@@ -168,6 +168,55 @@ public class PreservationTrailblazerTest {
             Assertions.assertEquals(before - 60, scene.enemy.getStance(), 1e-6,
                     "cid " + cid + ": 「破韧值 全体 60」 rides on the rule's instance");
         }
+    }
+
+    /**
+     * 星魂 1:「施放普攻时，额外造成等同于开拓者 25% 防御力的火属性伤害；施放强化普攻时，额外造成等同于开拓者 50% 防御力的火属性伤害」.
+     *
+     * <p>The two halves differ ONLY in the share, and the only way to tell the casts apart is the swapped slot
+     * ({@code from_skill_id}: 1 for the plain basic, 8 for the enhanced one). So the criterion measures each cast's EXTRA
+     * damage against the same cast without the Eidolon - a ratio of 1.0 for the control and 2.0 between the two shares.
+     */
+    @Test
+    public void eidolonOneAddsADefenceScaledInstanceToBothBasics() {
+        for (int cid : new int[]{TB3, TB4}) {
+            double plainWithout = extraDamageOfABasic(cid, 0, false);
+            double plainWith = extraDamageOfABasic(cid, 1, false);
+            double enhancedWith = extraDamageOfABasic(cid, 1, true);
+            System.out.println("[8003] cid=" + cid + " extra: plain=" + plainWithout + " -> " + plainWith
+                    + " enhanced=" + enhancedWith);
+            Assertions.assertEquals(0.0, plainWithout, 1e-9,
+                    "cid " + cid + ": the control - a plain basic adds nothing without the Eidolon");
+            Assertions.assertTrue(plainWith > 0, "cid " + cid + ": 「额外造成等同于开拓者 25% 防御力的火属性伤害」");
+            Assertions.assertEquals(2.0, enhancedWith / plainWith, 1e-6,
+                    "cid " + cid + ": 50% vs 25% of the same defence - the enhanced basic's extra instance is twice the plain one's");
+        }
+    }
+
+    /** How much MORE an enemy loses to one basic, with the Eidolon, than to the same basic without it. */
+    private static double extraDamageOfABasic(int cid, int eidolon, boolean enhanced) {
+        double withEidolon = damageOfOneBasic(cid, eidolon, enhanced);
+        double without = damageOfOneBasic(cid, 0, enhanced);
+        return withEidolon - without;
+    }
+
+    /** One basic's total damage on a fresh, non-weak enemy (toughness pinned so nothing breaks). */
+    private static double damageOfOneBasic(int cid, int eidolon, boolean enhanced) {
+        Scene scene = new Scene(cid, eidolon);
+        if (enhanced) {
+            // The swap to slot 8 happens on the events around the stacks; one hit is enough when 星魂 4 already gave four.
+            int hits = Math.max(1, 4 - scene.unit.getBuffManager().stacksOf("灼热意志"));
+            for (int i = 0; i < hits; i++) {
+                scene.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                        TriggerEvent.TAKING_HIT, scene.enemy, scene.unit, 0, 0));
+            }
+            scene.battle.processRequests();
+        }
+        double before = scene.enemy.getCurrentHp();
+        scene.battle.castImmediate(scene.unit.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON),
+                scene.unit, List.of(scene.enemy));
+        scene.battle.processRequests();
+        return before - scene.enemy.getCurrentHp();
     }
 
     /**

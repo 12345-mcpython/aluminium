@@ -91,7 +91,11 @@ public class HardcodedSkillRowRatchetTest {
     // of his own rows. The talent param has no such column, so it stays literal - the same verdict as the entries above.
     // Note: 53 since 2026-11-08 - 1112's 账账 has NO skill row in skills.json at all (that is the data gap the character file
     // records), so its 150% can only be the sentence's own number. Reading a row is the rule; this is the case where no row exists.
-    private static final int BASELINE = 53;
+    // Note: 55 since 2026-11-09 - 8003/8004 星魂 1 states 「额外造成等同于开拓者 25% 防御力的火属性伤害；施放强化普攻时…50%」.
+    // Neither number comes from a skill row: they are the Eidolon's OWN two parameters ([0.25, 0.5]) in the document, with no
+    // level axis to follow (the Eidolon table has none). Reading "a row" is the rule where a row exists; here the sentence is
+    // the only source - the same verdict as 1112's 150% above. Two entries because both files carry the pair.
+    private static final int BASELINE = 55;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
