@@ -493,6 +493,22 @@ public final class SkillExecutor {
         double neighbourBase = params.size() > adjacentColumn
                 ? attacker.damageBase(baseAttribute) * params.get(adjacentColumn)
                 : base;
+        // A row may state its base as SEVERAL attribute-scaled terms («等同于刃 #2%攻击力+#4%生命上限»), each with its own column
+        // for the centre and for the neighbours. `damageBaseAttribute()` names one attribute, so a two-term row could only be
+        // settled by inventing a second instance - which would crit twice. The terms sum into ONE base, before settlement.
+        if (rowSpec != null && rowSpec.getBaseTerms() != null && !rowSpec.getBaseTerms().isEmpty()) {
+            double centreSum = 0;
+            double neighbourSum = 0;
+            for (var term : rowSpec.getBaseTerms()) {
+                AttributeType termAttribute = AttributeType.fromString(term.getAttribute());
+                int centreColumn = term.getMain() == null ? 0 : term.getMain();
+                int neighbourColumn = term.getAdjacent() == null ? centreColumn : term.getAdjacent();
+                centreSum += params.get(centreColumn) * attacker.damageBase(termAttribute);
+                neighbourSum += params.get(neighbourColumn) * attacker.damageBase(termAttribute);
+            }
+            base = centreSum;
+            neighbourBase = neighbourSum;
+        }
         CanHit mainTarget = targets.getFirst();
 
         double totalDamage = 0;

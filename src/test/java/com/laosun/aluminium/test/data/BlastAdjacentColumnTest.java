@@ -41,7 +41,7 @@ public class BlastAdjacentColumnTest {
     private static final Pattern FIRST_REFERENCE = Pattern.compile("等同于[^#]{0,60}#(\\d)\\[");
 
     /** Rows whose MAIN column is not #1 either - a separate gap, not this test's business. */
-    private static final Set<String> UNRESOLVED = Set.of("1205/8", "1205/3", "1406/3",
+    private static final Set<String> UNRESOLVED = Set.of("1205/3", "1406/3",
             // 1310/9 (SAM): the neighbours are priced by a FORMULA - 「装甲「萨姆」(#6*击破特攻 + #2%)攻击力」 - so no single column
             // can name them. That needs an expression, not an index; registered rather than approximated.
             "1310/9");
@@ -77,6 +77,11 @@ public class BlastAdjacentColumnTest {
                     continue;
                 }
                 int documentColumn = Integer.parseInt(matcher.group(1)) - 1;
+                if (curated.has(cid) && curated.getAsJsonObject(cid).has(slot)
+                        && curated.getAsJsonObject(cid).getAsJsonObject(slot).has("base_terms")) {
+                    checked++;   // a summed base names its own columns per term; there is no single "the" column to compare
+                    continue;
+                }
                 Integer tableColumn = curatedColumn(curated, cid, slot);
                 Integer mainTableColumn = curatedMainColumn(curated, cid, slot);
                 int engineMain = mainTableColumn == null ? 0 : mainTableColumn;

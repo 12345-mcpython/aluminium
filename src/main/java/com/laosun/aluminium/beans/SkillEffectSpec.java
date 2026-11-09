@@ -88,6 +88,36 @@ public class SkillEffectSpec {
     @SerializedName("executor")
     private String executor;
     /**
+     * A row whose damage base is the SUM of several attribute-scaled terms («等同于刃 #2%攻击力+#4%生命上限»), each with its own
+     * column for the centre and for the neighbours - or {@code null} for the ordinary reading (one attribute, one column).
+     *
+     * <p><b>Why.</b> {@code SkillData.damageBaseAttribute()} names ONE attribute, so a two-term row could only be settled by
+     * inventing a second instance - which would crit twice. Readers: 1205 刃 (Blade)'s enhanced Basic (attack + Max HP), and the
+     * same shape in his Ultimate.
+     */
+    @SerializedName("base_terms")
+    private java.util.List<BaseTerm> baseTerms;
+
+    /**
+     * One term of a {@link #baseTerms} sum: {@code params[main] x attribute} for the centre, {@code params[adjacent] x attribute}
+     * for the neighbours.
+     */
+    @lombok.Getter
+    public static class BaseTerm {
+        /** Column pricing the centre; {@code null} = 0. */
+        @SerializedName("main")
+        private Integer main;
+
+        /** Column pricing the neighbours; {@code null} = the centre's column (both sides share one number). */
+        @SerializedName("adjacent")
+        private Integer adjacent;
+
+        /** The attribute the column is a percentage OF («攻击力» ⇒ ATTACK, «生命上限» ⇒ HEALTH). */
+        @SerializedName("attribute")
+        private String attribute;
+    }
+
+    /**
      * Which parameter prices the <b>MAIN target</b> of a blast, 0-based - or {@code null} for the ordinary reading, the first cell.
      *
      * <p><b>Why this exists.</b> The same interleaving that made {@link #adjacentParam} necessary can push the centre off the first
