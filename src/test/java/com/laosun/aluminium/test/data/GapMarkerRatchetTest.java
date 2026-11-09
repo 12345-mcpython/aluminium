@@ -44,7 +44,7 @@ public class GapMarkerRatchetTest {
      * (3 大地图「不建模」 entries and 11 that are genuinely open and now carry the marker), so the ceiling was 112; 1401 added three records in the same style, so it was 109; 1306 turned four of its own over, so it is 105. ⚠ It may only go DOWN - lower it in the
      * same commit that marks or lands an entry.
      */
-    private static final int BASELINE = 52;
+    private static final int BASELINE = 36;
 
     @Test
     public void unmarkedOpenRecordsMayOnlyGoDown() throws IOException {
