@@ -51,16 +51,42 @@ public class SparkleClauseCoverageTest {
                 "control: at E0 the Ultimate pays 4");
     }
 
+    /**
+     * 战技:「…并使该目标行动提前 50%。**当花火对自身施放该技能时，无法触发行动提前效果**」.
+     *
+     * <p>The sentence splits ONE cast into two: the crit-damage share is granted either way, the advance only when the ally is
+     * someone else. That is an effect-level filter, so the criterion reads the ally's action value before and after - unchanged
+     * for a self-cast, pushed forward for a cast on a teammate.
+     */
+    @Test
+    public void theSkillAdvancesOnlyWhenCastOnSomeoneElse() {
+        Fixture self = new Fixture(0);
+        double selfBefore = self.allyActionValue();
+        self.castSkillOn(self.sparkle);
+        Assertions.assertEquals(selfBefore, self.allyActionValue(), 1e-6,
+                "「当花火对自身施放该技能时，无法触发行动提前效果」 - the caster is her own target, so nothing advances");
+        Assertions.assertTrue(self.sparkle.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get() > 0,
+                "and the crit-damage share is still granted to her");
+
+        Fixture ally = new Fixture(0);
+        double allyBefore = ally.allyActionValue();
+        ally.castSkillOn(ally.ally);
+        Assertions.assertTrue(ally.allyActionValue() < allyBefore,
+                "on a teammate the advance happens: " + allyBefore + " -> " + ally.allyActionValue());
+    }
+
     // ==================================================================
 
     private static final class Fixture {
         private final Character sparkle;
+        private final Character ally;
         private final Enemy enemy = BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL);
         private final Battle battle;
 
         private Fixture(int eidolon) {
             sparkle = CharacterFactory.create(SPARKLE, 80, false, null, null, eidolon);
-            battle = new Battle(List.of(sparkle), List.of(enemy), BattleFixture.seeded());
+            ally = CharacterFactory.create(1001, 80);
+            battle = new Battle(List.of(sparkle, ally), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
         }
@@ -69,8 +95,22 @@ public class SparkleClauseCoverageTest {
             battle.castImmediate(sparkle.getSkills().get(SkillType.ULTRA), sparkle, List.of(sparkle));
             battle.processRequests();
         }
+
+        private void castSkillOn(Character target) {
+            battle.castImmediate(sparkle.getSkills().get(SkillType.SKILL), sparkle, List.of(target));
+            battle.processRequests();
+        }
+
+        /** The ally's remaining wait on the action queue (smaller = further forward). */
+        private double allyActionValue() {
+            for (var signal : battle.queue().snapshot()) {
+                if (signal.getCanHit() == ally) {
+                    return battle.queue().getTimeRemaining(signal);
+                }
+            }
+            throw new AssertionError("the ally is not in the action order");
+        }
     }
 }
-
 
 
