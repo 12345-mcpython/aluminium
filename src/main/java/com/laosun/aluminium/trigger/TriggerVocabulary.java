@@ -197,6 +197,11 @@ final class TriggerVocabulary {
      */
     static final String LOWEST_STACKS_ENEMY_PREFIX = "lowest_stacks_enemy:";
     /**
+     * The enemy carrying the MOST of a named state («为【集真赤】最多的敌方附上 1 层», 1308 Acheron (黄泉) Eidolon 2):
+     * the mirror of {@link #LOWEST_STACKS_ENEMY_PREFIX}, written as {@code highest_stacks_enemy:<state>}.
+     */
+    static final String HIGHEST_STACKS_ENEMY_PREFIX = "highest_stacks_enemy:";
+    /**
      * "The unit this cast <b>aimed at</b>, and <b>its</b> summon" - "a designated single ally <b>and their summon</b>".
      *
      * <p>Its first user is Sunday (星期日)'s Skill (131302): "make the designated single ally <b>and their summon</b> act immediately". It is a
@@ -285,4 +290,3 @@ final class TriggerVocabulary {
      */
     static final java.util.Set<String> SCOPE_ELEMENT_READERS = java.util.Set.of("MODIFY_DAMAGE_TAKEN");
 }
-

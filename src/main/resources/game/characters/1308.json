@@ -7,7 +7,7 @@
     "✅ **天赋的核心句已落地（2026-11-09）**：「**任意单位**施放技能期间使敌方目标陷入负面效果，黄泉获得 1 点【残梦】并为目标附上 1 层【集真赤】」= `talent_a_debuff_pays_a_dream_and_a_mark`（`DEBUFF_APPLIED` + `actor is_ally` + **`per_turn: 1`** → `GAIN_RESOURCE 残梦 1` + `ADD_STACK 集真赤 1`）。⭐ `DEBUFF_APPLIED` 是 `Battle.tryApplyDebuff` 的唯一出口（控制与持续伤害都走它），**此前语料里只有两个光锥用过**；而它**敌方给我们上负面时也发**，所以 `actor is_ally` 不能省。⚠ **两处近似已写进规则注记**：(a) 「**每次施放技能**最多 1 次」用 `per_turn: 1`（按**回合**计）—— 常规节奏等价，额外回合/队友连放时会少触发；(b) 「若使多个目标陷入负面，则为其中【集真赤】**最多**的目标附上 1 层」的动作**未实现**（`per_turn: 1` 只让第一次效，不挑层数最多的）。",
     "⛔ 【集真赤】：离场/死亡后转移到全场最多目标未写",
     "✅ **终结技的全属性抗性 −20% 已落地（2026-11-09）**：`ult_lowers_all_resistance_for_its_duration`（`ULT_CAST` + `actor == self` → `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + `turns: 1` + `all_enemies`）。⚠ 寿命是**近似**：引擎没有「到本次施放结束」的刻度 ⇒ 用 `turns: 1`（到她下个回合）。⛔ **同句前半仍开**：「**无视弱点属性**削减敌方韧性」—— 终结技的伤害与削韧由**技能行**交付，`ignoreWeakness` 只能写在 `DAMAGE` 效果上，内容层拿不到那一发。",
-    "✅ **秘技的两条已落地（2026-11-09）**：`technique_hits_every_enemy_each_wave`（`WAVE_START` + `self has_state 秘技` → `DAMAGE { skill: MAZE, damage_param: 0, ignoreWeakness: true, stance: 60, all_enemies }`）与 `technique_state_pays_after_the_ult`（`ULT_CAST` → `GAIN_RESOURCE 残梦 1` + `ADD_STACK 集真赤 target: random_enemy`）。⚠ **近似**：状态【四相断我】本身没建（它的语义是「每波续上、被终结技消耗」），两条都用 `self has_state 秘技` 代替 —— 已登记。⛔ **星魂仍未读**。"
+    "✅ **星魂 2 的后半已落地（2026-11-09）**：`eidolon2_a_dream_and_a_mark_each_turn`（`TURN_START` + `actor == self` + `min_eidolon: 2` → `GAIN_RESOURCE 残梦 1` + `ADD_STACK 集真赤`，目标用**新选择器 `highest_stacks_enemy:集真赤`**）。⭐ 该选择器是 `lowest_stacks_enemy:` 的**镜像**，本轮写进 `TriggerVocabulary` + `TriggerTargets` + `TriggerValidator` 三处（选择器是**闭集**，漏一处装载期就会拒绝 —— 实测踩到了）。⛔ **仍未写**：星魂 1（「对处于**负面效果**的敌方目标造成伤害时暴击率 +18%」—— 引擎只有 `target_debuff:<属性>`，没有「身上有任何负面效果」这个谓词）、星魂 2 前半（按命途数算行迹档位）、星魂 4（终结技伤害易伤 8%：需要「按施放类别限定受到的伤害」）、星魂 6（普攻/战技伤害视为终结技 + 无视弱点削韧）。"
   ],
   "resources": [
     {
@@ -160,6 +160,31 @@
       ],
       "source": "1308 黄泉 秘技 四相断我: 「【四相断我】：施放终结技后黄泉获得1点【残梦】，并为敌方随机单体附上1层【集真赤】。」",
       "_note": "「【四相断我】：**施放终结技后**黄泉获得 **1 点【残梦】**，并为敌方**随机单体**附上 **1 层【集真赤】**」—— ① 事件 `ULT_CAST` + `actor == self` ✓；② `GAIN_RESOURCE 残梦 1` ✓；③ `ADD_STACK 集真赤` + **`target: random_enemy`**（「随机单体」✓）。⚠ **近似**：状态【四相断我】本身没建 —— 用 `self has_state 秘技` 代替「本波次开始时获得了它」。那状态的真语义（每波续上、被终结技消耗）需要「波次开始给状态、终结技后移除」两半，已登记。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon2_a_dream_and_a_mark_each_turn",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "残梦",
+          "amount": 1
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "集真赤",
+          "amount": 1,
+          "permanent": true,
+          "target": "highest_stacks_enemy:集真赤"
+        }
+      ],
+      "source": "1308 黄泉 星魂 2 霆鼓俱寂，瑟风亦止: 「…自身回合开始时获得1点【残梦】，同时为【集真赤】最多的敌方附上1层【集真赤】。」",
+      "_note": "「**自身回合开始时**获得 **1 点【残梦】**，同时为**【集真赤】最多**的敌方附上 **1 层【集真赤】**」—— ① `TURN_START` + `actor == self` + `min_eidolon: 2` ✓；② 目标用**新选择器 `highest_stacks_enemy:集真赤`**（`lowest_stacks_enemy:` 的镜像，同一天写进 `TriggerVocabulary`/`TriggerTargets`）—— 「【集真赤】**最多**的敌方」正是它；③ 同句前半「行迹【奈落】最高数值所需求『虚无』命途角色的数量减少 1 名」**未写**：引擎没有「按命途数计算行迹档位」这个概念。",
       "_status": "implemented"
     },
     {

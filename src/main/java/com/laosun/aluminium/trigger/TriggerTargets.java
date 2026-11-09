@@ -170,6 +170,10 @@ final class TriggerTargets {
                 // 「叠加给场上存活的【烬煨】层数最低的敌人」 (1218 Jiaoqiu's Eidolon 6): ONE enemy, picked by a counter rather than
                 // by health — the counterpart of `lowest_hp_ally`, which is our side and reads HP. Ties keep roster order.
                 if (selector.startsWith(TriggerVocabulary.LOWEST_STACKS_ENEMY_PREFIX)) {
+                if (selector.startsWith(TriggerVocabulary.HIGHEST_STACKS_ENEMY_PREFIX)) {
+                    String state = selector.substring(TriggerVocabulary.HIGHEST_STACKS_ENEMY_PREFIX.length()).trim();
+                    yield require(highestStackedEnemy(ctx, state), selector, ctx);
+                }
                     String state = selector.substring(TriggerVocabulary.LOWEST_STACKS_ENEMY_PREFIX.length()).trim();
                     yield require(lowestStackedEnemy(ctx, state), selector, ctx);
                 }
@@ -841,6 +845,30 @@ final class TriggerTargets {
         return lowest;
     }
 
+    /**
+     * The enemy carrying the MOST of a named state - the mirror of {@link #lowestStackedEnemy}, for «为【集真赤】最多的敌方附上
+     * 1 层» (1308 Acheron (黄泉) Eidolon 2).
+     *
+     * <p>Note: Ties keep roster order, for the same reason the lowest one does.
+     */
+    static CanHit highestStackedEnemy(TriggerContext ctx, String state) {
+        if (ctx.battle() == null || state == null || state.isBlank()) {
+            return null;
+        }
+        CanHit highest = null;
+        int most = Integer.MIN_VALUE;
+        for (CanHit enemy : ctx.battle().getOpponents(ctx.owner())) {
+            if (enemy == null || enemy.isDeath() || !ctx.passesTargetFilter(enemy)) {
+                continue;
+            }
+            int stacks = enemy.getBuffManager().stacksOf(state);
+            if (stacks > most) {
+                most = stacks;
+                highest = enemy;
+            }
+        }
+        return highest;
+    }
     static CanHit randomHitEnemy(TriggerContext ctx) {
         if (ctx.battle() == null) {
             return null;
@@ -952,6 +980,5 @@ final class TriggerTargets {
         return holders.isEmpty() ? null : holders.get(ctx.battle().getRng().nextInt(holders.size()));
     }
 }
-
 
 
