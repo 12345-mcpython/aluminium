@@ -219,7 +219,7 @@
     {
       "on": "BASIC_ATTACK",
       "id": "enhanced_basic_extra_on_two_enemies",
-      "when": [
+      "when": ["from_skill_id == 8", 
         "actor == self",
         "enemy_count == 2"
       ],
@@ -238,7 +238,7 @@
     {
       "on": "BASIC_ATTACK",
       "id": "enhanced_basic_extra_on_one_enemy",
-      "when": [
+      "when": ["from_skill_id == 8", 
         "actor == self",
         "enemy_count == 1"
       ],
@@ -257,6 +257,7 @@
     {
       "on": "BASIC_ATTACK",
       "id": "enhanced_basic_restores_the_plain_one",
+      "when": ["from_skill_id == 8"],
       "do": [
         {
           "op": "REPLACE_SKILL",
@@ -271,6 +272,7 @@
     {
       "on": "BASIC_ATTACK",
       "id": "enhanced_basic_pays_two_resonance",
+      "when": ["from_skill_id == 8"],
       "do": [
         {
           "op": "ADD_STACK",
@@ -414,7 +416,7 @@
     {
       "on": "BASIC_ATTACK",
       "id": "trace_dragon_knight_mana_after_enhanced_basic",
-      "when": [
+      "when": ["from_skill_id == 8", 
         "actor == self"
       ],
       "do": [
