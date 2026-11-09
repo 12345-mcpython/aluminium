@@ -107,16 +107,19 @@ public class PreservationTrailblazerTest {
             // Note: 2 since 2026-11-06 - the shield plus 「普攻…并叠加 1 层【灼热意志】」.
             // Note: 5 since 2026-11-06 - the shield, the stack, the swap, the spend, and the restore.
             // Note: 6 since 2026-11-06 - plus the free enhanced basic that spends nothing.
-            Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BASIC_ATTACK), "cid " + cid + ": shield, stack, swap, spend, restore, free");
-            // Note: 3 since 2026-11-09 - the mixed-base damage rule joined the shield and the free enhanced basic.
-            Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
-                    "cid " + cid + ": the mixed-base damage, the shield, and the free enhanced basic");
+            // Note: 7 since 2026-11-09 - eidolon 6 stacks DEF after an enhanced basic.
+            Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BASIC_ATTACK),
+                    "cid " + cid + ": shield, stack, swap, spend, restore, free, and eidolon 6 defence");
+            // Note: 3 since 2026-11-09 - the mixed-base damage rule joined the shield and the free enhanced basic;
+            // Note: 4 since 2026-11-09 - plus eidolon 6 defense stack per ultimate.
+            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
+                    "cid " + cid + ": the mixed-base damage, the shield, the free enhanced basic, and eidolon 6 defence");
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.CAST_SETUP),
-                    "cid " + cid + ": the ultimate's row is handed away so `parts` can settle the damage once");
-            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid + ": the technique, the convention, and 星魂 1's four stacks");
+                    "cid " + cid + ": the row is handed away so `parts` settles the damage once");
+            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                    "cid " + cid + ": the technique, the convention, and eidolon 4 four stacks");
         }
     }
-
     /**
      * 终结技:「对敌方全体造成等同于开拓者 **100% 攻击力 + 150% 防御力** 的火属性伤害」.
      *
@@ -167,20 +170,96 @@ public class PreservationTrailblazerTest {
         }
     }
 
+    /**
+     * 星魂 6:「施放强化普攻或终结技后，开拓者的防御力提高 10%，最多叠加 3 层」.
+     *
+     * <p>Three things this pins, none of which a "the rule exists" check can see: the step is 10% of the BASE per stack, the
+     * cap is three stacks <b>across both triggers</b> (they share one counter), and an un-enhanced basic does not count
+     * ({@code from_skill_id == 8} is the gate - taking four stacks of Magma Will is not the same as having the swapped slot).
+     */
+    @Test
+    public void eidolonSixStacksDefenceOnEnhancedBasicsAndUltimates() {
+        for (int cid : new int[]{TB3, TB4}) {
+            // ⚠ The observable ratio is NOT 1.10: `percent` on an attribute scales the WHITE base, and the white base is only
+            // ~74% of the panel here (the rest comes from the level table / relics). Measured on 2026-11-09: 1.0740.. per stack.
+            // So the criterion pins what the document actually says - a CONSTANT step of one tenth of the white base, three
+            // times, then nothing - rather than a ratio that would encode this fixture's gear.
+            double bare = defenceRatio(cid, 0, 0);
+            double one = defenceRatio(cid, 6, 1);
+            double two = defenceRatio(cid, 6, 2);
+            double three = defenceRatio(cid, 6, 3);
+            double four = defenceRatio(cid, 6, 4);
+            System.out.println("[8003] cid=" + cid + " e6 stacks: " + bare + " -> " + one + " " + two + " " + three + " " + four);
+            Assertions.assertEquals(1.0, bare, 1e-9, "cid " + cid + ": without the Eidolon nothing is added");
+            double step = one - bare;
+            Assertions.assertTrue(step > 0.05 && step < 0.15,
+                    "cid " + cid + ": one stack is about a tenth of the panel (measured " + step + ")");
+            Assertions.assertEquals(step, two - one, 1e-12, "cid " + cid + ": the second stack adds the same amount");
+            Assertions.assertEquals(step, three - two, 1e-12, "cid " + cid + ": the third stack adds the same amount");
+            Assertions.assertEquals(three, four, 1e-12, "cid " + cid + ": 「最多叠加 3 层」 - the fourth adds nothing");
+
+            Assertions.assertEquals(step, enhancedBasicDefenceRatio(cid, 6) - bare, 1e-12,
+                    "cid " + cid + ": 「施放强化普攻…后」 is a stack too");
+            Assertions.assertEquals(1.0, enhancedBasicDefenceRatio(cid, 0), 1e-12,
+                    "cid " + cid + ": the control - without the Eidolon the enhanced basic adds no defence");
+        }
+    }
+
+    /** DEF after N ultimate casts, divided by the same character's DEF at battle start. */
+    private static double defenceRatio(int cid, int eidolon, int ultimates) {
+        Scene scene = new Scene(cid, eidolon);
+        for (int i = 0; i < ultimates; i++) {
+            scene.battle.castImmediate(scene.unit.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
+                    scene.unit, List.of(scene.enemy));
+            scene.battle.processRequests();
+        }
+        return scene.unit.getAttribute(AttributeType.DEFENCE).get() / scene.baseDefence;
+    }
+
+    /** DEF after ONE enhanced basic (four Magma Will stacks first, so the slot is swapped to 8), divided by the base. */
+    private static double enhancedBasicDefenceRatio(int cid, int eidolon) {
+        Scene scene = new Scene(cid, eidolon);
+        // 星魂 4 hands out four stacks at battle start, so only the missing ones are fired here (the count is an input, not a
+        // constant: firing four more would sit at the cap of 8 and tell us nothing about the swap).
+        // ⚠ AT LEAST one: the swap to slot 8 happens on the events around the stacks, so a battle that already starts with four
+        // stacks (eidolon 4) still needs ONE event for the swap rule to run. Measured: skipping it left the basic un-enhanced.
+        // ⚠ Computed ONCE: re-reading the count per iteration would shrink the bound as the stacks grow (measured: 4 intended
+        // hits landed as 2, and the basic was never enhanced).
+        int hits = Math.max(1, 4 - scene.unit.getBuffManager().stacksOf("灼热意志"));
+        for (int i = 0; i < hits; i++) {
+            scene.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    TriggerEvent.TAKING_HIT, scene.enemy, scene.unit, 0, 0));
+        }
+        scene.battle.processRequests();
+        Assertions.assertTrue(scene.unit.getBuffManager().stacksOf("灼热意志") >= 4,
+                "precondition: four stacks so the basic is the enhanced one");
+        scene.battle.castImmediate(scene.unit.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON),
+                scene.unit, List.of(scene.enemy));
+        scene.battle.processRequests();
+        return scene.unit.getAttribute(AttributeType.DEFENCE).get() / scene.baseDefence;
+    }
+
     /** A fight with a toughness bar big enough that a 60-point hit cannot break it (a break would add its own instance). */
     private static final class Scene {
         private final Character unit;
         private final Enemy enemy;
         private final Battle battle;
 
+        private final double baseDefence;
+
         private Scene(int cid) {
-            unit = CharacterFactory.create(cid, LEVEL);
+            this(cid, 0);
+        }
+
+        private Scene(int cid, int eidolon) {
+            unit = CharacterFactory.create(cid, LEVEL, true, null, null, eidolon);
             enemy = BattleFixture.monster();
             enemy.setMaxStance(100_000);
             enemy.setStance(100_000);
             battle = new Battle(List.of(unit), List.of(enemy), fixed());
             battle.startBattle();
             battle.processRequests();
+            baseDefence = unit.getAttribute(AttributeType.DEFENCE).get();
         }
     }
 

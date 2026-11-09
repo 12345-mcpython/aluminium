@@ -73,7 +73,12 @@ public class SameEffectTwiceGuardTest {
             Map.entry("1405.json :: MODIFY_ATTR|ALL_DAMAGE_TYPE_BOOST|0.5|all_allies|-|true", 2),
             // 1223 貊泽：秘技开场 +30% 伤害（2 回合）与星魂 4「施放终结技后 +30% 伤害（2 回合）」是**两句不同的话**，恰好数值相同；
             // 触发点不同（BATTLE_START vs ULT_CAST）、寿命来源也不同（一个来自秘技行，一个来自星魂 4 的参数）。
-            Map.entry("1223.json :: MODIFY_ATTR|ALL_DAMAGE_TYPE_BOOST|0.3|self|2|false", 2));
+            Map.entry("1223.json :: MODIFY_ATTR|ALL_DAMAGE_TYPE_BOOST|0.3|self|2|false", 2),
+            // 8003/8004 存护开拓者：星魂 6 的原句是「施放**强化普攻或终结技**后，防御力提高 10%，最多叠加 3 层」——
+            // 两个触发点是**同一句话里的「或」**，而 DSL 的条件是 AND、没有「或」⇒ 必须拆成两条，数值当然相同。
+            // 与 1110 玲可的软嘲讽（「毁灭或存护」）是同一族：one effect, two triggers。
+            Map.entry("8003.json :: MODIFY_ATTR|DEFENCE|0.1|self|-|true", 2),
+            Map.entry("8004.json :: MODIFY_ATTR|DEFENCE|0.1|self|-|true", 2));
 
     @Test
     public void noFileStatesTheSameNumericEffectInTwoRules() throws IOException {
