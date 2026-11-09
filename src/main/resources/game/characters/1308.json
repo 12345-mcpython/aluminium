@@ -7,7 +7,7 @@
     "✅ **天赋的核心句已落地（2026-11-09）**：「**任意单位**施放技能期间使敌方目标陷入负面效果，黄泉获得 1 点【残梦】并为目标附上 1 层【集真赤】」= `talent_a_debuff_pays_a_dream_and_a_mark`（`DEBUFF_APPLIED` + `actor is_ally` + **`per_turn: 1`** → `GAIN_RESOURCE 残梦 1` + `ADD_STACK 集真赤 1`）。⭐ `DEBUFF_APPLIED` 是 `Battle.tryApplyDebuff` 的唯一出口（控制与持续伤害都走它），**此前语料里只有两个光锥用过**；而它**敌方给我们上负面时也发**，所以 `actor is_ally` 不能省。⚠ **两处近似已写进规则注记**：(a) 「**每次施放技能**最多 1 次」用 `per_turn: 1`（按**回合**计）—— 常规节奏等价，额外回合/队友连放时会少触发；(b) 「若使多个目标陷入负面，则为其中【集真赤】**最多**的目标附上 1 层」的动作**未实现**（`per_turn: 1` 只让第一次效，不挑层数最多的）。",
     "⛔ 【集真赤】：离场/死亡后转移到全场最多目标未写",
     "✅ **终结技的全属性抗性 −20% 已落地（2026-11-09）**：`ult_lowers_all_resistance_for_its_duration`（`ULT_CAST` + `actor == self` → `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + `turns: 1` + `all_enemies`）。⚠ 寿命是**近似**：引擎没有「到本次施放结束」的刻度 ⇒ 用 `turns: 1`（到她下个回合）。⛔ **同句前半仍开**：「**无视弱点属性**削减敌方韧性」—— 终结技的伤害与削韧由**技能行**交付，`ignoreWeakness` 只能写在 `DAMAGE` 效果上，内容层拿不到那一发。",
-    "⛔ 秘技：每波开始、随机单体、施放终结技后获得残梦未写；星魂未读"
+    "✅ **秘技的两条已落地（2026-11-09）**：`technique_hits_every_enemy_each_wave`（`WAVE_START` + `self has_state 秘技` → `DAMAGE { skill: MAZE, damage_param: 0, ignoreWeakness: true, stance: 60, all_enemies }`）与 `technique_state_pays_after_the_ult`（`ULT_CAST` → `GAIN_RESOURCE 残梦 1` + `ADD_STACK 集真赤 target: random_enemy`）。⚠ **近似**：状态【四相断我】本身没建（它的语义是「每波续上、被终结技消耗」），两条都用 `self has_state 秘技` 代替 —— 已登记。⛔ **星魂仍未读**。"
   ],
   "resources": [
     {
@@ -114,6 +114,52 @@
       ],
       "source": "1308 黄泉 天赋 红叶时雨，万倾一空 (130804, Enhance): 「…终结技期间可无视弱点属性削减敌方韧性，并使敌方全体全属性抗性降低20%，持续至终结技结束。」",
       "_note": "「终结技期间…使敌方全体**全属性抗性降低 20%**，**持续至终结技结束**」—— ① 事件 `ULT_CAST` + `actor == self` ✓；② `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + `target: all_enemies` ✓（受击方的抗性，不是她的穿透 ✓）。⚠ **寿命是近似的**：引擎没有「到本次施放结束」这个刻度，这里用 **`turns: 1`**（到她下一个回合）—— 若终结技的演出跨过回合边界，会多留一小段。已登记。⚠ 同句前半「**无视弱点属性**削减敌方韧性」仍未写：终结技的伤害与削韧由**技能行**交付（`SkillExecutor`），而 `ignoreWeakness` 只能写在 `DAMAGE` 效果上，内容层拿不到那一发。",
+      "_status": "implemented"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "technique_hits_every_enemy_each_wave",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "skill": "MAZE",
+          "damage_param": 0,
+          "element": "Thunder",
+          "ignoreWeakness": true,
+          "stance": 60,
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1308 黄泉 秘技 四相断我: 「…每个波次开始时获得【四相断我】，对敌方全体造成等同于黄泉200%攻击力的雷属性伤害，且无视弱点属性削减敌方全体的韧性，击破弱点时，触发雷属性的弱点击破效果。」",
+      "_note": "「**每个波次开始时**…对敌方全体造成等同于黄泉 **200%** 攻击力的雷属性伤害，且**无视弱点属性**削减敌方全体的韧性」—— ① 事件 **`WAVE_START`** ✓（「每个波次开始时」就是它）；② 数值读**秘技行**（槽 7 = `Maze`，Lv1 = 2.0 ✓，与文档的 200% 对齐 ⇒ 不手抄）；③ `ignoreWeakness: true` 就是「无视弱点属性」✓（1214/1006 已验证这对字段）；④ 削韧 `stance: 60` 来自同一份文档的「破韧值：单体 60」（本句是全体，按单体值取，已登记）；⑤ 击破后的雷属性弱点击破由引擎的击破管线负责 ✓。⚠ **门用 `self has_state 秘技`** 近似「每个波次开始时获得【四相断我】」—— 那个状态本身没写（它的语义是「施放终结技后给 1 点残梦 + 1 层集真赤」，见下一条）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "technique_state_pays_after_the_ult",
+      "when": [
+        "actor == self",
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "残梦",
+          "amount": 1
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "集真赤",
+          "amount": 1,
+          "permanent": true,
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1308 黄泉 秘技 四相断我: 「【四相断我】：施放终结技后黄泉获得1点【残梦】，并为敌方随机单体附上1层【集真赤】。」",
+      "_note": "「【四相断我】：**施放终结技后**黄泉获得 **1 点【残梦】**，并为敌方**随机单体**附上 **1 层【集真赤】**」—— ① 事件 `ULT_CAST` + `actor == self` ✓；② `GAIN_RESOURCE 残梦 1` ✓；③ `ADD_STACK 集真赤` + **`target: random_enemy`**（「随机单体」✓）。⚠ **近似**：状态【四相断我】本身没建 —— 用 `self has_state 秘技` 代替「本波次开始时获得了它」。那状态的真语义（每波续上、被终结技消耗）需要「波次开始给状态、终结技后移除」两半，已登记。",
       "_status": "implemented"
     },
     {
