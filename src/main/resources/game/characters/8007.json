@@ -3,8 +3,8 @@
   "character": 8007,
   "_status": "partial",
   "_gaps": [
-    "天赋：我方每累计恢复 10 点能量使迷迷获得 1% 充能未写（缺全队累计能量计数）",
-    "秘技：大地图的特殊领域 / 时停未写（战斗层的延后 50% + 100% 冰伤已补；终结技 240% 冰伤已补）",
+    "⛔ 天赋：我方每累计恢复 10 点能量使迷迷获得 1% 充能未写（缺全队累计能量计数）",
+    "⭐ **不建模（大地图）**：秘技的「大地图特殊领域 / 时停」是**战斗外**行为 —— 战斗层那两句（延后 50%、100% 冰伤与终结技 240%）都已落地，本条只登记为「不建模」。",
     "忆灵 ATK 面板文档未给，按召唤者 100% 攻击力建模（假设）",
     "✅ **终结技的伤害归属已修好（2026-11-09）**：`CAST_SETUP` + `actor == self` + `from_skill_id == 3` → `DELEGATE_DAMAGE { skill: ULTRA }` ⇒ 技能行（Ultra/AoEAttack）**不再自己结算**，只留规则那一发；规则另补 `stance: 60`（数据 `stance_list.all`；被交接的施放不削韧性）。⚠ 实测：修之前这个终结技**一放就抛异常** —— 规则里的 `scale: summon_attr:ATTACK` 当时不被 DAMAGE 接受（引擎这一轮补上了 `summon_attr:` / `actor_attr:` 作为 DAMAGE 基数的读法）；而且交接前还会**多打一发按开拓者攻击力算的伤害**（full=1464.2 vs 规则 509.7）。判据 `RemembranceTrailblazerTest#theUltimateSettlesOneInstanceOfMemsOwnDamage`（真实施放 vs 只发事件必须相等）与 `#theUltimateStillTakesSixtyToughness`。"
   ],

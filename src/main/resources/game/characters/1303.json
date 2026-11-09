@@ -3,9 +3,9 @@
   "character": 1303,
   "_status": "partial",
   "_gaps": [
-    "天赋：击破伤害 120% 冰属性（不是普通 DAMAGE）未写",
+    "⛔ 天赋：击破伤害 120% 冰属性（不是普通 DAMAGE）未写",
     "⭐ 战技的跨单位条件**已落地**（2026-11-04）：「当阮•梅拥有【弦外音】时，我方全体伤害提高 32%」= `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST { 0.32, while_state: 弦外音, all_allies }` —— **`while_state` 的 gate 检查的是规则主人的状态**（`AbstractBuff.gateBroken` 读 `gateOwner`），所以「她持有 ⇒ 全队生效」正好能写，且她状态一消失修饰即失效。⛔ 同句的「**弱点击破效率 +50%**」仍缺：引擎没有「击破效率」属性（`BREAKING_EFFECT` 是击破特攻、`BREAK_DAMAGE_BOOST` 是击破伤害加成，语义不同）。",
-    "终结技：【残梅绽】施加 / 从击破恢复时触发 / 延长击破 / 行动延后 / 50% 击破伤害未写",
+    "⛔ 终结技：【残梅绽】施加 / 从击破恢复时触发 / 延长击破 / 行动延后 / 50% 击破伤害未写",
     "⭐ 秘技的「自动触发一次战技」已落地（2026-11-04：`BATTLE_START` + `self has_state 秘技` → `CAST_SKILL { SKILL, target: self }`；前提是 `skill_effects.json` 给她补了 `Rules` 登记，否则 `canDeliver` 会拒）；模拟宇宙祝福缩放（每祝福 +100% 削韧、最多 20 个）未写，属模拟宇宙玩法"
   ],
   "rules": [

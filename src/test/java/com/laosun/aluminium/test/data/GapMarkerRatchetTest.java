@@ -40,10 +40,11 @@ public class GapMarkerRatchetTest {
     private static final Pattern OPEN_WORDS = Pattern.compile("未写|未读|未核实|尚未");
 
     /**
-     * Measured 2026-11-09: 126 entries describe open work without the marker. ⚠ This number may only go DOWN - lower it in the
+     * Measured 2026-11-09: 126 entries described open work without the marker; the same round turned 14 of them into real records
+     * (3 大地图「不建模」 entries and 11 that are genuinely open and now carry the marker), so the ceiling is 112. ⚠ It may only go DOWN - lower it in the
      * same commit that marks or lands an entry.
      */
-    private static final int BASELINE = 126;
+    private static final int BASELINE = 112;
 
     @Test
     public void unmarkedOpenRecordsMayOnlyGoDown() throws IOException {
