@@ -5,12 +5,39 @@
   "_gaps": [
     "⛔ 战技：相邻目标虚弱 + 120% 基础概率未写",
     "⛔ 天赋：记录我方对老主顾非真实伤害的 12%、不记溢出、终结技后清空未写",
-    "⛔ 终结技：按记录值 25% / 75% 真实伤害、多个目标均分未写",
+    "✅ **天赋的记录器已落地（2026-11-09）**：「赛飞儿会记录**我方目标**对【老主顾】造成的**非真实伤害的 12%**」= `talent_records_a_share_of_damage_to_the_patron`（`DEALING_DAMAGE` + `actor is_ally` + `target has_state 老主顾` → `GAIN_RESOURCE 记录值` + `amountFromEvent` × `amountPercent: 0.12`）；资源 `记录值` 在文件头声明。⛔ **仍未写**：(a) 「**非真实伤害**」—— 引擎没有 `damage_is_true` 谓词（只有 `damage_is_attack` / `_dot` / `_additional`）⇒ 目前真实伤害也会被记；(b) 「**不记录溢出伤害**」—— 需要「实际扣血」而非「结算量」；(c) 「施放终结技后**清空**」与终结技「按记录值 #2% 的真实伤害」—— 前者是时机问题（终极技要读它），后者需要「按资源取份额的伤害」，`percent_from_resource` 是**基点**语义、且 `DAMAGE` 上是否可用**尚未实测**。",
     "⛔ 天赋：无老主顾时选生命上限最高目标；仅最新老主顾未写",
     "⛔ 秘技：记录值提高 200%、大地图效果未写",
     "⛔ 星魂 1（记录 150% / 追击时攻击 +80%）、星魂 2（120% 基础概率 / 逐段差异）未写；其余星魂未读"
   ],
+  "resources": [
+    {
+      "id": "记录值",
+      "max": 2147483647,
+      "source": "1406 赛飞儿 天赋 热情好客的多洛斯人: 「赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
+      "note": "**记账**不是面板：`DEALING_DAMAGE` 打中【老主顾】时按事件量的 12% 累加。⚠ 「不记录**溢出**伤害」与「施放终结技后**清空**」未写（登记在该角色的 `_gaps`）。"
+    }
+  ],
   "rules": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "talent_records_a_share_of_damage_to_the_patron",
+      "when": [
+        "actor is_ally",
+        "target has_state 老主顾"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "记录值",
+          "amountFromEvent": true,
+          "amountPercent": 0.12
+        }
+      ],
+      "source": "1406 赛飞儿 天赋 热情好客的多洛斯人: 「赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
+      "_note": "「记录**我方目标**对【老主顾】造成的**非真实伤害的 12%**」—— ① 事件 `DEALING_DAMAGE`（**逐发**）；② `actor is_ally`（「我方目标」✓，敌人打它不算）+ `target has_state 老主顾` ✓；③ `amount_from_event: true` 取这一发的量、`amount_percent: 0.12` 取 12% ✓，累加进资源 `记录值` ✓。⚠ **两处近似/未写（登记）**：(a) 「**非真实伤害**」没有对应条件 —— 引擎有 `damage_is_attack` / `damage_is_dot` / `damage_is_additional`，**没有** `damage_is_true`，而真实伤害在本库里极罕见（`DamageType.TRUE` 只由少数规则产生）⇒ 目前**真实伤害也会被记**；(b) 「**不记录溢出伤害**」—— 需要「这一发实际扣了多少血」而不是「结算了多少」，`DEALING_DAMAGE` 给的是后者；(c) 「施放终结技后**清空**」—— 与 1205 同一个时机问题（终极技要读它，先清后算就错）。",
+      "_status": "implemented"
+    },
     {
       "on": "BATTLE_START",
       "id": "level_convention",
