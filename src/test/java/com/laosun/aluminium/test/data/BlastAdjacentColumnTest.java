@@ -41,7 +41,7 @@ public class BlastAdjacentColumnTest {
     private static final Pattern FIRST_REFERENCE = Pattern.compile("等同于[^#]{0,60}#(\\d)\\[");
 
     /** Rows whose MAIN column is not #1 either - a separate gap, not this test's business. */
-    private static final Set<String> UNRESOLVED = Set.of("1205/8", "1205/3", "1406/3", "1407/2", "1505/2",
+    private static final Set<String> UNRESOLVED = Set.of("1205/8", "1205/3", "1406/3",
             // 1310/9 (SAM): the neighbours are priced by a FORMULA - 「装甲「萨姆」(#6*击破特攻 + #2%)攻击力」 - so no single column
             // can name them. That needs an expression, not an index; registered rather than approximated.
             "1310/9");
@@ -78,8 +78,28 @@ public class BlastAdjacentColumnTest {
                 }
                 int documentColumn = Integer.parseInt(matcher.group(1)) - 1;
                 Integer tableColumn = curatedColumn(curated, cid, slot);
+                Integer mainTableColumn = curatedMainColumn(curated, cid, slot);
+                int engineMain = mainTableColumn == null ? 0 : mainTableColumn;
+                // The MAIN clause is the one immediately before 「并对其相邻」 - searching the whole sentence picks up an earlier,
+                // unrelated clause (measured: 1404/2 and 1404/3 both name a DoT share first).
+                Matcher before = FIRST_REFERENCE.matcher(intro.substring(Math.max(0, index - 150), index));
+                String mainReference = "";
+                String lastReference = null;
+                while (before.find()) {
+                    lastReference = before.group(1);
+                }
+                if (lastReference != null) {
+                    int documentMain = Integer.parseInt(lastReference) - 1;
+                    if (documentMain != engineMain) {
+                        mainReference = cid + "/" + slot + ": the sentence prices the MAIN target from #" + (documentMain + 1)
+                                + " but the table reads #" + (engineMain + 1) + "; ";
+                    }
+                }
                 int engineColumn = tableColumn == null ? 1 : tableColumn;
                 checked++;
+                if (!mainReference.isEmpty() && !UNRESOLVED.contains(cid + "/" + slot)) {
+                    wrong.add(mainReference);
+                }
                 if (engineColumn != documentColumn && !UNRESOLVED.contains(cid + "/" + slot)) {
                     wrong.add(cid + "/" + slot + ": the sentence prices the neighbours from #" + (documentColumn + 1)
                             + " but the table reads #" + (engineColumn + 1)
@@ -125,6 +145,14 @@ public class BlastAdjacentColumnTest {
 
     private static JsonObject read(String name) throws IOException {
         return JsonParser.parseString(Files.readString(DATA.resolve(name), StandardCharsets.UTF_8)).getAsJsonObject();
+    }
+
+    private static Integer curatedMainColumn(JsonObject curated, String cid, String slot) {
+        if (!curated.has(cid) || !curated.getAsJsonObject(cid).has(slot)) {
+            return null;
+        }
+        JsonElement column = curated.getAsJsonObject(cid).getAsJsonObject(slot).get("main_param");
+        return column == null ? null : column.getAsInt();
     }
 
     private static Integer curatedColumn(JsonObject curated, String cid, String slot) {

@@ -88,6 +88,19 @@ public class SkillEffectSpec {
     @SerializedName("executor")
     private String executor;
     /**
+     * Which parameter prices the <b>MAIN target</b> of a blast, 0-based - or {@code null} for the ordinary reading, the first cell.
+     *
+     * <p><b>Why this exists.</b> The same interleaving that made {@link #adjacentParam} necessary can push the centre off the first
+     * cell: 1407 遐蝶 (Castorice)'s Skill states "consumes #1% HP, deals #2% of Max HP... and #3% of Max HP to the neighbours", so
+     * the centre is cell 2 and the first cell is a cost; 1505 绯英 (Feixiao)'s Skill likewise names #2 for the centre. Reading cell
+     * 1 would charge both the cost and the main share as damage - a plausible wrong number with no symptom.
+     *
+     * <p>Absent = every other row, whose centre is the first cell.
+     */
+    @SerializedName("main_param")
+    private Integer mainParam;
+
+    /**
      * Which parameter prices a <b>blast's neighbours</b> (「对其相邻目标造成…」), 0-based - or {@code null} for the ordinary
      * reading, which is the SECOND cell.
      *

@@ -477,7 +477,10 @@ public final class SkillExecutor {
             // of turning a delegated cast into an engine fault.
             attacker = executedBy == null ? user : executedBy;
         }
-        double rowShare = params.getFirst() + resourceShareOf(skill, user, params);
+        // Note: The CENTRE column is normally the first cell, but a row may put a cost there (1407's Skill: "consumes #1% HP,
+        // deals #2% of Max HP"), so the curated table may name it - the same override the neighbours got.
+        int mainColumn = rowSpec != null && rowSpec.getMainParam() != null ? rowSpec.getMainParam() : 0;
+        double rowShare = params.get(mainColumn) + resourceShareOf(skill, user, params);
         double base = attacker.damageBase(baseAttribute) * rowShare;
         // Note: A blast states TWO multipliers: the centre and the neighbours. 1008's ultimate row is
         // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%...and 160% to enemies adjacent to it".
