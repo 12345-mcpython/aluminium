@@ -25,6 +25,7 @@ public class LingshaEidolonBreakEffectTest {
     @Test
     public void theUltimateRaisesThePartysBreakEffect() {
         Character lingsha = CharacterFactory.create(LINGSHA, LEVEL);
+        lingsha.setEidolonRank(2);   // 星魂 gated: the rule carries min_eidolon
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(lingsha, ally), List.of(enemy), BattleFixture.seeded());

@@ -32,6 +32,7 @@ public class BladeEidolonStateTest {
 
     private static double gain(boolean state) {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
+        unit.setEidolonRank(2);   // 星魂 gated: the rule carries min_eidolon
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();

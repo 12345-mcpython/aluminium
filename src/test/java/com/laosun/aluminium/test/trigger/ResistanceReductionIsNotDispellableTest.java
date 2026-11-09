@@ -43,6 +43,8 @@ public class ResistanceReductionIsNotDispellableTest {
     @Test
     public void theUltimatesOwnReductionSurvivesItsOwnDispel() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
+        // ⚠ 星魂 6: the reduction is an eidolon clause (`min_eidolon: 6`), not an E0 one.
+        luocha.setEidolonRank(6);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(luocha), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();

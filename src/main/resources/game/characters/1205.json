@@ -99,6 +99,7 @@
         "SKILL_CAST"
       ],
       "id": "eidolon2_crit_while_hellscape",
+      "min_eidolon": 2,
       "when": [
         "self has_state 地狱变"
       ],

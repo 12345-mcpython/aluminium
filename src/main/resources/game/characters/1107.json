@@ -106,6 +106,7 @@
     {
       "on": "ULT_CAST",
       "id": "eidolon2_attack_after_ult",
+      "min_eidolon": 2,
       "when": [
         "actor == self"
       ],

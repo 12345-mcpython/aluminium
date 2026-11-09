@@ -476,6 +476,7 @@
     {
       "on": "ULT_CAST",
       "id": "eidolon2_party_break_effect",
+      "min_eidolon": 2,
       "when": [
         "actor == self"
       ],

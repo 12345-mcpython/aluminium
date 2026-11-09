@@ -100,6 +100,9 @@ public class ResistanceReductionTest {
     @Test
     public void theTwoNewReadersStateTheirOwnPercentages() {
         Character fuxuan = CharacterFactory.create(1203, LEVEL);
+        // ⚠ Luocha's all-type RES reduction is 星魂 6, not an E0 clause: the rule carries `min_eidolon: 6`
+        // (it had none until 2026-11-09, which is why this test passed at E0).
+        fuxuan.setEidolonRank(6);
         Enemy first = BattleFixture.monster();
         Battle firstBattle = new Battle(List.of(fuxuan), List.of(first), BattleFixture.seeded());
         firstBattle.startBattle();

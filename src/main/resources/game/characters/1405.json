@@ -51,6 +51,7 @@
     {
       "on": "SKILL_CAST",
       "id": "eidolon4_attack",
+      "min_eidolon": 4,
       "when": [
         "actor == self"
       ],

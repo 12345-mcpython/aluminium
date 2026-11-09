@@ -55,6 +55,7 @@
     {
       "on": "ULT_CAST",
       "id": "eidolon4_breaking_effect",
+      "min_eidolon": 4,
       "when": [
         "actor == self"
       ],

@@ -21,21 +21,24 @@ public class EidolonBatchTest {
 
     @Test
     public void character1214Eidolon4GivesBREAKING_EFFECT() {
-        Assertions.assertEquals(0.4, gain(1214, TriggerEvent.ULT_CAST, AttributeType.BREAKING_EFFECT, false), 1e-6, "the data's own value");
+        Assertions.assertEquals(0.4, gain(1214, 4, TriggerEvent.ULT_CAST, AttributeType.BREAKING_EFFECT, false), 1e-6, "the data's own value");
     }
 
     @Test
     public void character1405Eidolon4GivesATTACK() {
-        Assertions.assertEquals(0.3, gain(1405, TriggerEvent.SKILL_CAST, AttributeType.ATTACK, true), 1e-6, "the data's own value");
+        Assertions.assertEquals(0.3, gain(1405, 4, TriggerEvent.SKILL_CAST, AttributeType.ATTACK, true), 1e-6, "the data's own value");
     }
 
     @Test
     public void character1013Eidolon6GivesATTACK() {
-        Assertions.assertEquals(0.25, gain(1013, TriggerEvent.ULT_CAST, AttributeType.ATTACK, true), 1e-6, "the data's own value");
+        Assertions.assertEquals(0.25, gain(1013, 6, TriggerEvent.ULT_CAST, AttributeType.ATTACK, true), 1e-6, "the data's own value");
     }
 
-    private static double gain(int cid, TriggerEvent event, AttributeType attribute, boolean flat) {
+    private static double gain(int cid, int eidolon, TriggerEvent event, AttributeType attribute, boolean flat) {
         Character unit = CharacterFactory.create(cid, LEVEL);
+        // ⚠ The rank has to be SET: these clauses are 星魂 effects, and until 2026-11-09 the rules behind them had no
+        // `min_eidolon` at all - so this test passed at E0, which is exactly what hid the bug.
+        unit.setEidolonRank(eidolon);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();

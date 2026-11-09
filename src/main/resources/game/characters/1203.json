@@ -80,6 +80,7 @@
     {
       "on": "ULT_CAST",
       "id": "ult_all_type_res_down",
+      "min_eidolon": 6,
       "when": [
         "actor == self"
       ],
