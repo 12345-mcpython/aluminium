@@ -174,6 +174,7 @@ public class EffectSpec {
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
+        copy.addToShield = this.addToShield;
         copy.skillId = this.skillId;
         copy.stance = this.stance;
         copy.ignoreWeakness = this.ignoreWeakness;
@@ -602,6 +603,16 @@ public class EffectSpec {
      */
     @SerializedName("cap_amount")
     private Double capAmount;
+
+    /**
+     * Whether this shield <b>adds to the one already standing</b> instead of replacing it («护盾量可以叠加», 1414 Dan Heng •
+     * Permansor Terrae (丹恒•腾荒)), with the {@code cap_*} fields bounding the total.
+     *
+     * <p><b>Why explicit.</b> {@code ShieldState} says it in one line: "a shield overwrites rather than stacks". That is the
+     * default for every other shield in the corpus, so the exception is stated by the one sentence that asks for it.
+     */
+    @SerializedName("add_to_shield")
+    private Boolean addToShield;
 
     /**
      * A skill <b>loader key</b> for a skill, used by {@code REPLACE_SKILL}.

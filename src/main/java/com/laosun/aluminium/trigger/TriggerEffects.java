@@ -381,7 +381,19 @@ final class TriggerEffects {
         // and those go through `SkillExecutor.dispatchNonDamaging`, which reads `skill_effects.json`. A skill the
         // engine has no definition for must fail HERE, loudly -- commanding it would be a cast that does nothing at
         // all, with no symptom (1414's own skill is a shield; 1303/1412's are buffs the table has no entry for).
-        if (!SkillExecutor.canDeliver(skill)) {
+        // ⚠ A `Defence`/`Restore` skill has TWO possible authors: the engine (from `skill_effects.json`) and the character's OWN
+        // trigger table (a commanded cast broadcasts SKILL_CAST / ULT_CAST, and the table answers with SHIELD / HEAL).
+        // 1414 carries both, and the duplicate was invisible under "a shield overwrites" - it surfaced only when stacking was
+        // tried, as exactly 2x. A rule that shields or heals IS an author, so its presence makes the cast deliverable.
+        boolean deliveredByItsOwnRules = false;
+        if (actor instanceof Character caster && caster.getTriggerTable() != null) {
+            TriggerEvent castEvent = slot == SkillType.ULTRA ? TriggerEvent.ULT_CAST : TriggerEvent.SKILL_CAST;
+            deliveredByItsOwnRules = caster.getTriggerTable().rulesFor(castEvent).stream()
+                    .flatMap(rule -> rule.effects().stream())
+                    .map(applied -> String.valueOf(applied.getOp()).trim())
+                    .anyMatch(applied -> "SHIELD".equalsIgnoreCase(applied) || "HEAL".equalsIgnoreCase(applied));
+        }
+        if (!SkillExecutor.canDeliver(skill) && !deliveredByItsOwnRules) {
             throw new IllegalStateException(
                     "CAST_SKILL effect points at " + slot + ", whose effect is " + skill.getData().getEffect()
                             + " and which the engine cannot deliver: a non-damaging skill needs an entry in "

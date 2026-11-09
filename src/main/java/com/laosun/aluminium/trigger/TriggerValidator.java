@@ -142,14 +142,26 @@ final class TriggerValidator {
         validateWhileStacks(effect, spec);
         validateWhileSummonCount(effect, spec);
         validatePrefer(effect, spec);
-        // Note: A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
-        // kind of mistake this interpreter's closed sets exist to prevent.
+        // Note: A derived ceiling is read by APPLY_DOT (a DoT's cap), MODIFY_ATTR and - since 1414's 「护盾量可以叠加」 - SHIELD.
+        // Every other op refuses it: silently ignoring a field is exactly the kind of mistake these closed sets exist to prevent.
+        // ⚠ `cap_amount` (a CONSTANT ceiling) is deliberately not in this check: it is read by MODIFY_DAMAGE_TAKEN as well (1218's
+        // 【烬煨】 and 1306's 【幻相】 state one), and listing it here would reject two files that have been correct for months.
         if ((effect.getCapScale() != null || effect.getCapPercent() != null)
                 && !"APPLY_DOT".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())
-                && !"MODIFY_ATTR".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())) {
+                && !"MODIFY_ATTR".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())
+                && !"SHIELD".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())) {
             throw new IllegalArgumentException(
                     "Op " + effect.getOp() + " states a derived ceiling (\"cap_scale\"/\"cap_percent\"), which only "
-                            + "APPLY_DOT reads today (source: " + spec.getSource() + ")");
+                            + "APPLY_DOT, MODIFY_ATTR and SHIELD read today (source: " + spec.getSource() + ")");
+        }
+        // 「最高不超过…的 300%」 only means something for a shield that ADDS to the standing one: a replacing shield has nothing
+        // to clamp against, so a ceiling without `add_to_shield` would be a field nobody reads.
+        if ("SHIELD".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())
+                && !Boolean.TRUE.equals(effect.getAddToShield())
+                && (effect.getCapScale() != null || effect.getCapPercent() != null || effect.getCapAmount() != null)) {
+            throw new IllegalArgumentException(
+                    "Op SHIELD states a ceiling but not \"add_to_shield\": a replacing shield overwrites, so there is nothing to "
+                            + "clamp (source: " + spec.getSource() + ")");
         }
 
         String op = TriggerInterpreter.normalizeOp(effect, spec);

@@ -745,16 +745,38 @@ public final class TriggerInterpreter {
             case SHIELD -> {
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
                     double amount = grantAmount(effect, target, ctx);
+                    // The TOTAL a shield install writes: overwrite ⇒ just this grant; stacking ⇒ the standing shield plus it.
+                    double installed = amount;
+                    // 「重复获得丹恒•腾荒的护盾时，护盾量可以叠加，最高不超过当前战技提供的护盾量的 300%」 (1414's Skill). A shield
+                    // normally OVERWRITES, so the stacking has to be stated; `cap_*` bounds the total. Only HIS shields stack
+                    // (「丹恒•腾荒的」), which is what `getShieldProvider` answers.
+                    if (Boolean.TRUE.equals(effect.getAddToShield()) && target != null && !target.isDeath()
+                            && (target.getShield() <= 0 || target.getShieldProvider() == ctx.owner())) {
+                        double standing = target.getShield();
+                        double wanted = standing + amount;
+                        if (effect.getCapScale() != null || effect.getCapPercent() != null || effect.getCapAmount() != null) {
+                            double ceiling = TriggerMagnitudes.resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx)
+                                    + (effect.getCapAmount() == null ? 0 : effect.getCapAmount());
+                            if (ceiling > 0) {
+                                wanted = Math.min(wanted, ceiling);
+                            }
+                        }
+                        if (wanted <= standing) {
+                            continue;   // already at the ceiling: no grant, and no fresh timer to reset
+                        }
+                        amount = wanted - standing;   // what this grant ANNOUNCES ...
+                        installed = wanted;           // ... while the shield itself becomes the sum
+                    }
                     // "lasting N turns" is a *timed* shield: the ShieldBuff installs the value and takes it off
                     // again, so the number and its lifetime stay one fact. Without `turns` the shield is the
                     // raw grant it has always been (it comes off only when it is used up).
                     // Note: Both arms name the provider (`ctx.owner()`): "the shield amount provided by the wearer is raised by X%" is about the
                     // *giver's* shields, so a grant with no provider would silently ignore the set bonus.
                     if (effect.getTurns() == null) {
-                        battle.grantShield(ctx.owner(), target, amount, ctx.ruleId());
+                        battle.grantShield(ctx.owner(), target, installed, ctx.ruleId());
                     } else if (target != null && !target.isDeath()) {
                         target.getBuffManager().addBuff(
-                                withSource(new ShieldBuff(ctx.owner(), amount, effect.getTurns()), ctx));
+                                withSource(new ShieldBuff(ctx.owner(), installed, effect.getTurns()), ctx));
                         // The timed path installs its shield through a buff, which has no Battle handle,
                         // so this is the only place that can announce it. Fired AFTER the buff is on, so a rule that
                         // answers "when a shield is gained" sees the shield it is reacting to.
