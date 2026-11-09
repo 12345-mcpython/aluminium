@@ -1,13 +1,13 @@
 {
   "schema": 1,
   "character": 1204,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "⭐ **「段数变成攻击次数」已落地（2026-11-08）**：`the_lord_strikes_on_its_turn` —— `TURN_START` + `actor is_summon` + `actor_stacks:攻击段数 >= 1` → `DAMAGE { percent: 0.66, times_from: \"steps:actor_stacks:攻击段数/1\", blast: 0.25 }`。「谁出的手」用 `attacker: actor`（规则打出的伤害默认记在规则主人头上，这是本条的关键）。⚠ 已知近似：每段重新抽主目标 ⇒ 相邻也逐段变（引擎没有「一次行动锁定一个主目标」这个概念）。",
     "⭐ **天赋与行迹全部落地（2026-11-08）**：`talent_after_the_lord_acts`（`SUMMON_ATTACK` → 全体增伤 20%/2 回合）、`technique_three_more_hits`（秘技 +3 段）、`trace_second_wind_starts_with_energy`（绸缪 15 能量）、`trace_formation_raises_the_lords_crit_damage`（破阵：≥6 段时暴伤 +25%，排在出手之前）、`trace_dispatch_crit_chance`（遣将，**本来就有** —— 我又写了一条同形的被两个守卫击中，已删）。",
     "⭐ **星魂与段数规则（2026-11-08）**：初始 3 段、战技 +2、终结技 +3、秘技 +3、行动后复位、每多 1 段速度 +10 点、星魂 4（每段回 2 能量）、星魂 6（每段一层易伤 12%，上限 3 层 —— 这一条同时修了 `VulnerabilityBuff` 的层数上限）。星魂 3/5 是等级加成（本库没有等级规则，未写）。",
     "⭐ **技能自身的伤害与破韧**（普攻 100%、战技全体 100%、终结技全体 200%、破韧 30/60）来自**技能行**，不属于触发规则 —— 这也是本文件只有 16 条规则的原因。",
-    "⛔ **星魂 1「【神君】施放攻击时，对指定敌方单体的相邻目标造成的伤害倍率额外提高，提高数值等同于对主目标伤害倍率的25%」未写**（2026-11-09 逐节审计查出来，本文件此前从未登记）：天赋给神君的溅射是 `blast: 0.25`（「同时对其相邻目标造成等同于主目标25%的雷属性伤害」），星魂 1 让**相邻那一份再加 25 个百分点**（即 50%）。⚠ 引擎的 `blast` 是**规则字段**（一次施放一个值），没有「按星魂改这个字段」的写法 ⇒ 需要「两条几乎相同的规则、只有 `blast` 不同」（`min_eidolon: 1` 的 0.5 / 没有的 0.25）—— 可写，但要先确认重复守卫放不放行（两条的 `when` 与 `blast` 都不同）。⚠ 同一条的「指定敌方单体」在引擎里就是主目标，含义不变。",
+    "✅ **星魂 1「【神君】施放攻击时，对指定敌方单体的相邻目标造成的伤害倍率额外提高，提高数值等同于对主目标伤害倍率的25%」已落地（2026-11-09）**：`blast` 是**规则字段**（一次施放一个值），没有「按星魂改这个字段」的写法，所以按 §134 的「整面重写」：原条 `the_lord_strikes_on_its_turn` 加条件 **`eidolon < 1`**、新条 `eidolon1_the_splash_grows_by_a_quarter` 用 **`eidolon >= 1`**，两条都写**完整**数值（`percent: 0.66` + `blast: 0.25` / `blast: 0.5`），`when`、`times_from`、`attacker` 逐字相同。⚠ **不能用 `max_eidolon: 0`**：装载期直接拒绝（「Eidolon ranks are 1-6」），所以这一对用 **`eidolon` 条件变量**分辨（`TriggerTable` 里那个读 `ctx.owner().getEidolonRank()` 的变量）。判据 `JingyuanEidolonOneTest`：① 形状 —— 表里正好两条溅射规则，`0.25` 那条带 `eidolon < 1`、`0.5` 那条带 `eidolon >= 1`；② 行为 —— 同一场景同一随机种子下神君一次行动的总伤害 **1517.48 → 2276.22**（E0 → E1）。⚠ 形状那一半**不能**用 `matching(event, ctx)` 读：手搭的上下文里没有召唤物的段数计数器，`actor_stacks:攻击段数 >= 1` 恒假 ⇒ 一条都匹配不到（实测 0 条）。",
     "⭐ **星魂 2 与「天赋」的归因已更正（2026-11-09）**：`talent_after_the_lord_acts` 的 `source` 原先写「天赋 抱朴守拙」，但文档的**天赋原文里没有「【神君】行动后…伤害提高 20%」这句** —— 那是**星魂 2**（戎戈动地开天阵）。已改 `source` 为星魂 2。⚠ **行为暂不设 `min_eidolon: 2`**：这是「【神君】行动后」唯一一次实现，加了门之后星魂 0/1 的景元就完全没有这个增伤，而文档并没有说「星魂 2 之前神君行动后什么都不发生」。⇒ 读法登记在此：要么给星魂 2 的门（并接受 E0/E1 少了它），要么认为它是天赋的一部分（现状）。星魂 2 的**判据**因此仍缺。"
   ],
   "rules": [
@@ -240,11 +240,37 @@
       ]
     },
     {
+      "on": "TURN_START",
+      "id": "eidolon1_the_splash_grows_by_a_quarter",
+      "when": [
+        "actor is_summon",
+        "actor_stacks:攻击段数 >= 1",
+        "eidolon >= 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.66,
+          "attacker": "actor",
+          "element": "Thunder",
+          "attacker": "actor",
+          "times_from": "steps:actor_stacks:攻击段数/1",
+          "blast": 0.5,
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1204 景元 星魂 1 星流霆击碎昆冈: 「【神君】施放攻击时，对指定敌方单体的相邻目标造成的伤害倍率额外提高，提高数值等同于对主目标伤害倍率的25%。」 param = [0.25]",
+      "_note": "「【神君】施放攻击时，对**相邻目标**造成的伤害倍率**额外提高**，提高数值等同于对主目标伤害倍率的 **25%**」—— 天赋给的是 **25%**，星魂 1 再加 **25 个百分点** ⇒ **50%**。⚠ `blast` 是**规则字段**（一次施放一个值），没有「按星魂改这个字段」的写法，所以按 §134 的「整面重写」手法：原条 `the_lord_strikes_on_its_turn` 加 `max_eidolon: 0`，本条 `min_eidolon: 1` 并写**完整**数值（`percent: 0.66` 与 `blast: 0.5`，不是增量）。⚠ 两条的 `when`、`times_from`、`attacker` 必须逐字相同，否则同一次行动会一段走这条、一段走那条。⚠ **`percent: 0.66` 只能写字面量**（`HardcodedSkillRowRatchetTest` 的 baseline 因此 55 → 56）：这一发的施放者是**召唤物**（`attacker: actor`，因为神君没有面板），而 `skill` + `damage_param` 的读法是对**施放者**查行 —— 实测报「神君 has no TALENT skill to fire a DAMAGE effect from」。⚠ 这一句的判据只能读**形状**（`matching` 出来的那一发的 `blast`）：相邻目标的伤害要靠「谁是主目标」才知道，而主目标是每段现抽的（见原条的登记）。",
+      "_status": "implemented"
+    },
+    {
       "source": "1204 景元 天赋 斩勘神形:「…每段攻击对随机敌方单体造成等同于景元攻击力66%的雷属性伤害，同时对其相邻目标造成等同于主目标25%的雷属性伤害。」",
       "on": "TURN_START",
       "when": [
         "actor is_summon",
-        "actor_stacks:攻击段数 >= 1"
+        "actor_stacks:攻击段数 >= 1",
+        "eidolon < 1"
       ],
       "id": "the_lord_strikes_on_its_turn",
       "do": [

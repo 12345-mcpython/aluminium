@@ -95,7 +95,11 @@ public class HardcodedSkillRowRatchetTest {
     // Neither number comes from a skill row: they are the Eidolon's OWN two parameters ([0.25, 0.5]) in the document, with no
     // level axis to follow (the Eidolon table has none). Reading "a row" is the rule where a row exists; here the sentence is
     // the only source - the same verdict as 1112's 150% above. Two entries because both files carry the pair.
-    private static final int BASELINE = 55;
+    // Note: 56 since 2026-11-09 - 1204 星魂 1 restates the talent's 66% (`blast` 0.25 -> 0.5 is the only change), so the pair
+    // must state the SAME number twice. Reading the row is not available to it: the instance's caster is the SUMMON
+    // (`attacker: actor`, because 神君 has no panel), and a `skill` / `damage_param` read resolves against the caster --
+    // measured: "神君 has no TALENT skill to fire a DAMAGE effect from".
+    private static final int BASELINE = 56;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of
