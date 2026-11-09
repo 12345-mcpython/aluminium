@@ -75,12 +75,12 @@ public class SiblingElationTest {
     public void theirFilesCarryTheClauses() {
         for (int cid : new int[]{8009, 8010}) {
             var table = com.laosun.aluminium.data.TriggerTables.of(cid);
-            //: FOUR clauses now, not two -- the document's other branch finally shipped. It waited on the
+            //: FIVE clauses now (2026-11-09): 星魂 2 added 「终结技额外使指定我方单体的欢愉度提高 12%，持续 2 回合」.
             // engine's reading of an Elation skill's row ("8 次随机单体 + 最后一次均分", whose leading column is a HIT
             // COUNT): before that, a commanded Elation cast settled as ONE 800% instance. See `ElationRowTest`.
-            Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
-                    "cid " + cid + ": the Ultimate now has four clauses -- the CRIT DMG buff, the action advance when there is no Elation Skill, "
-                            + "gains 5 Punchline, and \"if the target has an Elation Skill ... makes it immediately cast 1 Elation Skill\" (「若目标拥有欢愉技…使其立即施放 1 次欢愉技」)");
+            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.ULT_CAST),
+                    "cid " + cid + ": the Ultimate has five clauses -- the CRIT DMG buff, the action advance when there is no Elation Skill, "
+                            + "gains 5 Punchline, \"if the target has an Elation Skill ... makes it immediately cast 1 Elation Skill\", and E2's 「欢愉度提高 12%」");
             Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                     "cid " + cid + ": the talent pays 3 笑点 on its own attack");
             // Four since 2026-11-02: the technique joined them on BATTLE_START (「下一次战斗开始时，使我方全体提高对应数值的
@@ -175,5 +175,4 @@ public class SiblingElationTest {
         return BattleFixture.alwaysRoll(1.0);
     }
 }
-
 

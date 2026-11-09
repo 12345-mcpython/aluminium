@@ -184,6 +184,64 @@
       "_note": "「开拓者持有【好活当赏】时，战技对敌方全体额外造成 **30%** 雷属性**欢愉伤害**，此伤害使用**我方最高**的【好活当赏】数值计算」—— ① 条件 `self_resource:好活当赏 > 0` ✓；② 量 = **`max_party_resource:好活当赏`** × 0.3 ✓（跨单位资源最大值，`DAMAGE` 已接受该拼法 ✓）；③ `damage_type: ELATION` ✓。⚠ **实测（2026-10-31）**：结算量随「本队最高【好活当赏】」**线性变化** —— 战技自身先给 20 点，故「自带 0 / +20 / +40」对应最大值 20 / 40 / 60，基础值 6 / 12 / 18，落地面 4.67 / 9.33 / 14.00（比值 1 : 2 : 3 ✓）。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
+      "on": "ULT_CAST",
+      "id": "eidolon2_ult_raises_the_chosen_allies_elation",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.12,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "8009 开拓者•欢愉 星魂 2 名场面酝酿中……: 「终结技额外使指定我方单体的欢愉度提高12%，持续2回合。」 参数 = [0.12, 2]",
+      "_note": "「终结技**额外**使**指定我方单体**的**欢愉度提高 12%**，持续 **2 回合**」—— ① 事件与目标同 `ult_crit_damage_for_the_chosen_ally` ✓（`ULT_CAST` + `target: target` = 被指定的那个队友 ✓，不是全体 ✗）；② 属性 `ELATION_DAMAGE_BOOST` ✓（文件头 `technique_random_elation_boost` 用的就是它 ✓）；③ 门 `min_eidolon: 2` ✓。 ⚠ 与 8010 **同一套星魂** ⇒ 两文件同步。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "eidolon4_elation_skill_raises_damage_taken",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.1,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "8009 开拓者•欢愉 星魂 4 拯救世界，无需理由: 「施放欢愉技时，使敌方目标受到的伤害提高10%，持续2回合。」 参数 = [0.1, 2]",
+      "_note": "「**施放欢愉技时**，使敌方目标**受到的伤害提高 10%**，持续 **2 回合**」—— ⚠ 「欢愉技」不是普通战技：引擎的类别是 **`ELATION_DAMAGE`**（与 `1203` 的 `from_category` 同一拼写）⇒ **`from_category ELATION_DAMAGE`** 才把它与战技分开（少了这个条件，本条会变成「每次战技都给易伤」✗，一条没有症状的错）。② `MODIFY_DAMAGE_TAKEN` ✓（“受到的伤害提高”），`target: target` = 被欢愉技打中的那个 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "eidolon6_elation_skill_raises_crit_damage",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "from_category ElationDamage"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 1.0,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "8009 开拓者•欢愉 星魂 6 银河传奇，登场！: 「施放欢愉技时，使自身暴击伤害提高100%，持续3回合。」 参数 = [1, 3]",
+      "_note": "「施放**欢愉技**时，使**自身暴击伤害提高 100%**，持续 **3 回合**」—— 事件与类别同星魂 4 ✓（`from_category ELATION_DAMAGE`），属性 `CRIT_ATTACK` ✓（引擎里「暴击伤害」就是它，`1201` 等文件同拼写）、`percent: 1.0`（= 100% ✓，不是 1% ✗）、`target: self` ✓（是**她自己**的暴击伤害 ✓，与星魂 2 给队友的欢愉度不同）。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "eidolon3_levels",
       "min_eidolon": 3,
