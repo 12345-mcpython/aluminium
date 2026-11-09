@@ -527,7 +527,8 @@
         {
           "main": 4,
           "adjacent": 5,
-          "attribute": "BREAKING_EFFECT"
+          "attribute": "BREAKING_EFFECT",
+          "cap": 6
         },
         {
           "main": 0,

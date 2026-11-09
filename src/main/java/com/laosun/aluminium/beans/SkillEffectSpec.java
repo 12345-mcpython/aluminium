@@ -115,6 +115,10 @@ public class SkillEffectSpec {
         /** The attribute the column is a percentage OF («攻击力» ⇒ ATTACK, «生命上限» ⇒ HEALTH). */
         @SerializedName("attribute")
         private String attribute;
+        /** Column capping the attribute's own value («最多计算 #7% 击破特攻» ⇒ the column of that 360%); {@code null} = no cap. */
+        @SerializedName("cap")
+        private Integer cap;
+
     }
 
     /**

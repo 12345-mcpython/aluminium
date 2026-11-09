@@ -503,8 +503,13 @@ public final class SkillExecutor {
                 AttributeType termAttribute = AttributeType.fromString(term.getAttribute());
                 int centreColumn = term.getMain() == null ? 0 : term.getMain();
                 int neighbourColumn = term.getAdjacent() == null ? centreColumn : term.getAdjacent();
-                centreSum += params.get(centreColumn) * attacker.damageBase(termAttribute);
-                neighbourSum += params.get(neighbourColumn) * attacker.damageBase(termAttribute);
+                double termValue = attacker.damageBase(termAttribute);
+                if (term.getCap() != null) {
+                    // 「最多计算 #7% 击破特攻」: the attribute itself is clamped before it is multiplied.
+                    termValue = Math.min(termValue, params.get(term.getCap()));
+                }
+                centreSum += params.get(centreColumn) * termValue;
+                neighbourSum += params.get(neighbourColumn) * termValue;
             }
             base = centreSum;
             neighbourBase = neighbourSum;
