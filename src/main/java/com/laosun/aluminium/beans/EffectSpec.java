@@ -175,6 +175,7 @@ public class EffectSpec {
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
         copy.addToShield = this.addToShield;
+        copy.scopeCategory = this.scopeCategory;
         copy.skillId = this.skillId;
         copy.stance = this.stance;
         copy.ignoreWeakness = this.ignoreWeakness;
@@ -763,6 +764,16 @@ public class EffectSpec {
      */
     @SerializedName("from_self")
     private Boolean fromSelf;
+
+    /**
+     * For a damage-taken zone: the one CAST CATEGORY it applies to, e.g. 「受到的**终结技**伤害提高 8%」 (1308 Acheron (黄泉)
+     * Eidolon 4) -- a scope of its own beside {@code scope_element}, because "which cast produced the hit" is neither the hit's
+     * element nor its damage type.
+     *
+     * <p>Read by {@code MODIFY_DAMAGE_TAKEN} only; {@code null} means every category, as before.
+     */
+    @SerializedName("scope_category")
+    private String scopeCategory;
 
     /**
      * Duration in turns, where the op needs one.

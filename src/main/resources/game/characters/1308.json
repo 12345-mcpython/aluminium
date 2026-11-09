@@ -210,6 +210,23 @@
       "_status": "implemented"
     },
     {
+      "on": "ENEMY_ENTERED",
+      "id": "eidolon4_the_newcomer_takes_more_from_ultimates",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.08,
+          "scope_category": "ULTRA",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "1308 黄泉 星魂 4 亘焰燎照镜中人: 「在敌方目标进入战斗时，使其陷入终结技伤害易伤状态，受到的终结技伤害提高8%。」 参数 = [0.08]",
+      "_note": "「**敌方目标进入战斗时**，使其陷入**终结技伤害**易伤状态，受到的**终结技伤害提高 8%**」—— ① 事件 `ENEMY_ENTERED`（`target` = 新入场的敌人 ✓）；② ⭐ **`scope_category: \"ULTRA\"`** 是本轮给 `MODIFY_DAMAGE_TAKEN` 加的作用域（与 `scope_element` 并列：**哪一次施放打出来的**既不是元素也不是伤害类型）⇒ 只有 `damage.getCastCategory() == ULTRA` 的那些发会吃到这 8%；③ `permanent: true`（「使其陷入…状态」没有回合数 ✓）。⚠ `scope_category` 白名单只有 `MODIFY_DAMAGE_TAKEN`（别的 op 写了会装载期拒绝，免得静默应用到所有类别）。",
+      "_status": "implemented"
+    },
+    {
       "on": "BATTLE_START",
       "id": "eidolon3_levels",
       "min_eidolon": 3,

@@ -2970,6 +2970,30 @@ public final class TriggerInterpreter {
         }
         return total;
     }
+
+    /**
+     * The {@code scope_category} of a damage-taken zone, as {@code SkillCategory} («受到的终结技伤害提高 8%», 1308's Eidolon 4),
+     * or {@code null} when the rule states none.
+     *
+     * @param effect the effect
+     * @param op     the op, for the message
+     * @return the category, or {@code null}
+     */
+    static com.laosun.aluminium.enums.SkillCategory parseScopeCategory(EffectSpec effect, String op) {
+        String raw = effect.getScopeCategory();
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        com.laosun.aluminium.enums.SkillCategory category =
+                com.laosun.aluminium.enums.SkillCategory.fromString(raw.trim());
+        if (category == null || !category.isKnownValue()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names the scope category '" + raw
+                            + "', which is not a cast category this engine settles; write a data-side spelling such as "
+                            + "ElationDamage, or one of the enum's own names");
+        }
+        return category;
+    }
 }
 
 

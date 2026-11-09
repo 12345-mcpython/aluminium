@@ -224,7 +224,14 @@ final class TriggerValidator {
                             + " read it; an op that ignores it would silently apply to every element "
                             + "(source: " + spec.getSource() + ")");
         }
-        // `from_self` narrows a damage-taken zone to the owner's own damage. Only MODIFY_DAMAGE_TAKEN reads it, and only
+        // `scope_category` narrows a damage-taken zone to one CAST CATEGORY («受到的终结技伤害提高 8%»): only
+        // MODIFY_DAMAGE_TAKEN reads it, and an op that ignored it would apply to every category -- the silent reading.
+        if (effect.getScopeCategory() != null && !effect.getScopeCategory().isBlank()
+                && !"MODIFY_DAMAGE_TAKEN".equalsIgnoreCase(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"scope_category\", which only MODIFY_DAMAGE_TAKEN reads; ignoring it would apply the "
+                            + "effect to every cast category (source: " + spec.getSource() + ")");
+        }        // `from_self` narrows a damage-taken zone to the owner's own damage. Only MODIFY_DAMAGE_TAKEN reads it, and only
         // its VULNERABILITY arm does: a negative share builds a ReductionBuff, which has no source filter, so accepting it
         // there would silently ignore the scope.
         if (effect.getFromSelf() != null) {
