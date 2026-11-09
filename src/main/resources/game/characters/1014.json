@@ -64,6 +64,47 @@
       "_note": "星魂 5：战技 +2、天赋 +2 ✓。"
     },
     {
+      "on": "ULT_CAST",
+      "id": "eidolon4_the_ult_adds_a_penetration_layer",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "星魂4穿透",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1014 Saber 星魂 4 十六个冬日的奇遇: 「…施放终结技后，Saber的风属性抗性穿透提高4%，该效果最多叠加3层。」 参数 = [0.08, 0.04, 3]",
+      "_note": "「施放**终结技后**再 +**4%**，最多叠加 **3 层**」—— 层数用 `ADD_STACK`（上限 3 ✓），实际加成由 `eidolon4_penetration_per_layer` 的 `per_stack` 读它（**按当前层数实时取值** ✓）。⚠ 与前半同一个近似：引擎的 `RESISTANCE_REDUCTION` 是**全属性**，不区分风属性。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon4_penetration_per_layer",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.04,
+          "per_stack": "星魂4穿透",
+          "per_stack_cap": 3,
+          "per_stack_live": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1014 Saber 星魂 4 十六个冬日的奇遇: 「…风属性抗性穿透提高4%，该效果最多叠加3层。」 参数 = [0.08, 0.04, 3]",
+      "_note": "这条只负责**按层给值**：`per_stack: 星魂4穿透` + `per_stack_cap: 3` + `per_stack_live: true`（层数变了就跟着变 ✓，与 8003 星魂 6 的 `per_stack_live` 同一手法）。⚠ 0 层时它给 0，所以没有层也安全。",
+      "_status": "implemented"
+    },
+    {
       "on": "BATTLE_START",
       "id": "eidolon4_wind_resistance_penetration",
       "min_eidolon": 4,
@@ -77,7 +118,7 @@
         }
       ],
       "source": "1014 Saber 星魂 4 十六个冬日的奇遇: 「Saber的风属性抗性穿透提高8%。施放终结技后…提高4%，最多叠加3层。」 参数 = [0.08, 0.04, 3]",
-      "_note": "「**风属性抗性穿透提高 8%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.08, permanent: true }` ✓（近似：引擎的 `RESISTANCE_REDUCTION` 是全属性，不区分元素）。⛔ **未写**：「施放**终结技后**再 +4%，最多 3 层」—— 需要 `ULT_CAST` 上按层叠的修饰（可写，但同样只能全属性）。"
+      "_note": "「**风属性抗性穿透提高 8%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.08, permanent: true }` ✓（近似：引擎的 `RESISTANCE_REDUCTION` 是全属性，不区分元素）。✅ **后半也落地了（2026-11-09）**：`eidolon4_the_ult_adds_a_penetration_layer`（`ULT_CAST` + `min_eidolon: 4` → `ADD_STACK 星魂4穿透` 上限 3）与 `eidolon4_penetration_per_layer`（`BATTLE_START` → `MODIFY_ATTR RESISTANCE_REDUCTION 0.04` + `per_stack: 星魂4穿透` + `per_stack_cap: 3` + `per_stack_live: true`）—— 层数一变，加成跟着变。同样只能**全属性**（引擎没有风属性维度）。"
     },
     {
       "on": "BATTLE_START",
