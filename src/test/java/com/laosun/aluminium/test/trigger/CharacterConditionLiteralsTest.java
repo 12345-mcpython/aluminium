@@ -290,6 +290,17 @@ public class CharacterConditionLiteralsTest {
         assertRule(1314, "BATTLE_START", "trace_reverse_repo_one_goods", List.of());
         assertRule(1314, "BATTLE_START", "technique_fifteen_goods", List.of("self has_state 秘技"));
         assertRule(1314, "BATTLE_START", "eidolon2_crit_chance_at_fifteen_goods", List.of("self_stacks:当品 >= 15.0"));
+        assertRule(1314, "ALLY_ATTACK", "talent_charge_for_her_own_hits", List.of("actor == self"));
+        assertRule(1314, "ALLY_ATTACK", "talent_charge_for_the_collectors_hits",
+                List.of("actor has_state 收债人", "actor != self"));
+        assertRule(1314, "RESOURCE_CHANGED", "talent_follow_up_at_eight_charge",
+                List.of("resource_changed:充能", "self_resource:充能 >= 8.0"));
+        assertRule(1314, "ALLY_ATTACK", "eidolon1_two_targets_pay_one_more",
+                List.of("actor has_state 收债人", "hit_count == 2.0"));
+        assertRule(1314, "ALLY_ATTACK", "eidolon1_one_target_pays_two_more",
+                List.of("actor has_state 收债人", "hit_count == 1.0"));
+        assertRule(1314, "BATTLE_START", "eidolon1_the_talent_follow_up_hits_harder", List.of());
+        assertRule(1314, "BATTLE_START", "eidolon6_she_becomes_a_collector", List.of());
         assertRule(1315, "SKILL_CAST", "skill_standoff_on_both", List.of("actor == self"));
         assertRule(1315, "KILL", "standoff_stack_on_kill", List.of("actor == self"));
         assertRule(1315, "BREAK", "standoff_stack_on_break", List.of());

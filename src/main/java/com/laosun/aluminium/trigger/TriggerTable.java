@@ -424,7 +424,11 @@ public class TriggerTable {
             // trace reader loaded while 1218's burn multiplier did not).
             boolean statesShare = named.effects().stream().anyMatch(e -> e.getPercent() != null
                     || e.getPercentFromSkillParam() != null || e.getPercentFromCastParam() != null
-                    || e.getPercentFromResource() != null);
+                    || e.getPercentFromResource() != null
+                    // A `damage_param` IS a share: it names the row cell that multiplies the attack. The interpreter scales
+                    // it with `TriggerMagnitudes.amendmentScale` (reader: 1314 Jade Eidolon 1, whose 「倍率提高 32%」 hits
+                    // the talent follow-up's `damage_param`), so refusing it here would reject a rule that does work.
+                    || e.getDamageParam() != null);
             if (!statesShare) {
                 throw new IllegalArgumentException(
                         "MODIFY_RULE scales the values of rule \"" + target + "\", but none of that rule's effects states a "

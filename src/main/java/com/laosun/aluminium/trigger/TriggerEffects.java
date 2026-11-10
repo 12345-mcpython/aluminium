@@ -769,7 +769,12 @@ final class TriggerEffects {
         // means one mark unless it says otherwise, so no existing file changes.
         int wanted = effect.getValue() != null
                 ? Math.max(1, (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx)))
-                : effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
+                // 「立即获得 #4 层」 read out of a skill row: `amount_from_skill_param` is a magnitude like any other, and it
+                // used to be SILENTLY IGNORED here (one mark instead of the row count). Readers: every "gain N stacks"
+                // clause, including 1314 Jade talent 【当品】 at the follow-up.
+                : effect.getAmountFromSkillParam() != null
+                        ? Math.max(1, (int) Math.round(TriggerMagnitudes.constantTerm(effect, ctx)))
+                        : effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
         // "for each 1 skill point restored, gain 1 stack of [彩焰]" (cone 23021): the marks follow the EVENT's own amount, not the
         // number of times the event fired -- `Battle.gainSkillPoint(2)` raises one event carrying 2, and "each 1" means two
         // marks. `scale: event_amount` + `percent: 1` is the same "share of a live quantity" shape HEAL/SHIELD already use.

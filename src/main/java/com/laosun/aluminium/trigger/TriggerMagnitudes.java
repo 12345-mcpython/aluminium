@@ -696,17 +696,20 @@ final class TriggerMagnitudes {
         // A share CARRIED IN A RESOURCE, in basis points: how a number captured at cast time is used later.
         if (effect.getPercentFromResource() != null) {
             com.laosun.aluminium.entity.Character holder = requireCharacterOwner(effect, ctx);
-            return fractionOf(holder.getResources().value(effect.getPercentFromResource().trim()) / 10000.0, fraction);
+            return fractionOf(holder.getResources().value(effect.getPercentFromResource().trim()) / 10000.0
+                    * amendmentScale(effect, ctx), fraction);
         }
         if (effect.getPercentFromSkillParam() != null) {
             // The share out of one of the owner's OWN skills: "equal to Tribbie (缇宝)'s #3% Max HP", where #3 lives in HIS ultimate.
-            // Note: the amendment delta raises the ROW's share, so it is added before the fraction is taken.
-            return fractionOf(ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim())
-                    + amendmentDelta(effect, ctx), fraction);
+            // Note: the amendment delta raises the ROW's share, so it is added before the fraction is taken; a multiplicative
+            // amendment (`effect_percent_scale`) scales it here, because `amendedEffect` only scales a literal `percent`.
+            return fractionOf((ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim())
+                    + amendmentDelta(effect, ctx)) * amendmentScale(effect, ctx), fraction);
         }
         if (effect.getPercentFromSummonParam() != null) {
             // The share out of the owner's MEMOSPRITE: its skills are keyed by data slot, which no SkillType can name.
-            return fractionOf(summonSkillParamValue(effect, ctx, effect.getPercentFromSummonParam().trim()), fraction);
+            return fractionOf(summonSkillParamValue(effect, ctx, effect.getPercentFromSummonParam().trim())
+                    * amendmentScale(effect, ctx), fraction);
         }
         String spelled = effect.getPercentFromCastParam() == null ? null
                 : String.valueOf(effect.getPercentFromCastParam());
@@ -718,7 +721,7 @@ final class TriggerMagnitudes {
                     + "(\"percent_from_cast_param\" / \"percent_from_skill_param\" / \"percent_from_summon_param\" / "
                     + "\"percent_from_resource\") is stated");
         }
-        return fractionOf(castParamValue(effect, ctx, spelled), fraction);
+        return fractionOf(castParamValue(effect, ctx, spelled) * amendmentScale(effect, ctx), fraction);
     }
 
     /**
@@ -870,6 +873,29 @@ final class TriggerMagnitudes {
         }
         Double delta = owner.ruleEffectPercentBonus(ctx.ruleId());
         return delta == null ? 0 : delta;
+    }
+
+    /**
+     * The <b>multiplicative</b> amendment a {@code MODIFY_RULE{effect_percent_scale}} filed for the rule that is firing -
+     * or {@code 1} when none is filed.
+     *
+     * <p>Note: A <b>spelling</b> share has to be scaled HERE, not by {@code amendedEffect}: that path only multiplies a
+     * literal {@code percent}, so a {@code percent_from_skill_param} share would load a scale amendment and silently keep
+     * its row value. Reader: 1314 Jade (翡翠) Eidolon 1, 「**天赋的追加攻击**伤害提高 32%」 - the follow-up multiplier
+     * comes from her talent row (level-varying, so a literal would be a lie), and the sentence raises it by a percentage,
+     * not by points. When a literal {@code percent} is also stated ({@code shareOf} multiplies by it), this returns
+     * {@code 1}: {@code amendedEffect} has already scaled that fraction, and scaling both would apply the amendment twice.
+     */
+    static double amendmentScale(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getPercent() != null) {
+            return 1;
+        }
+        CanHit owner = ctx.owner();
+        if (owner == null || ctx.ruleId() == null) {
+            return 1;
+        }
+        Double scale = owner.ruleEffectPercentScale(ctx.ruleId());
+        return scale == null ? 1 : scale;
     }
 
     /**

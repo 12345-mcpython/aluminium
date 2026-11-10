@@ -4,10 +4,10 @@
   "_status": "partial",
   "_gaps": [
     "⛔ 战技剩余一句：「当场上存在【收债人】时，翡翠**无法施放战技**」未写 —— 需要「场上有该状态的角色 ⇒ 禁用某槽位」的写法",
-    "⛔ 终结技「追加攻击伤害倍率 +80%，生效 2 次」与天赋「充能 8 点后发动追加攻击 / 追加攻击立即获得 5 层【当品】」未写（终结技的强化次数是资源型寿命 ✓ 形状可写，天赋的充能与追加攻击需一并做）",
+    "✅ **天赋已写（2026-11-11）**：`talent_charge_for_her_own_hits` / `talent_charge_for_the_collectors_hits`（`ALLY_ATTACK` → `GAIN_RESOURCE 充能 1` + `times_from: hit_count`）、`talent_follow_up_at_eight_charge`（`RESOURCE_CHANGED` → `SPEND_RESOURCE 8` + `DAMAGE { skill: TALENT, damage_param: 4 }` + `ADD_STACK 当品 5`）、`talent_crit_damage_per_goods` 的**每层暴伤**实际上早就在 `trace_reverse_repo_one_goods` 里（`per_stack_live`）⇒ 不重复写 ✓。⛔ **终结技**「天赋的追加攻击伤害倍率 +80%，生效 2 次」仍未写（「生效 2 次」是**资源型寿命** ✓ 形状可写，但那 80% 要改**追加攻击**的倍率 —— 与星魂 1 同一条 `effect_percent_scale` 的形状，两处叠乘需要先定口径 ✗）。",
     "⛔ **秘技的战斗层伤害未写**：「10 段 / 0.5 份额」的伤害部分还没有规则（大地图效果不建模）。",
     "⛔ 行迹 逆回购 的第二半：「处于【收债人】状态的角色回合开始时，额外获得 3 层【当品】」未写 —— 【收债人】是她的战技给的合同状态，本档还没写那套合同",
-    "⛔ 星魂 1 / 3 / 5 / 6：未读、未写"
+    "✅ **星魂已读，1 / 2 / 3 / 4 / 5 / 6 全部落地（2026-11-11）**：1 = 三条（`eidolon1_two_targets_pay_one_more` / `eidolon1_one_target_pays_two_more` 两条充能档 + `eidolon1_the_talent_follow_up_hits_harder` 的 `effect_percent_scale: 1.32`）；2 = `eidolon2_crit_chance_at_fifteen_goods`（**早就在**）；3/5 = 等级（早就在）；4 = `eidolon4_ult`（`DEFENCE_IGNORE 0.12` 3 回合，**早就在**）；6 = `eidolon6_she_becomes_a_collector`（`APPLY_BUFF 收债人` + `DAMAGE_PENETRATION_QUANTUM 0.2`）。判据 `JadeTalentAndEidolonsTest`。⚠ **星魂 2 的近似仍在**：「叠加至 15 层时」只在 `BATTLE_START` 判一次（引擎没有 `STACK_CHANGED` 事件；她涨层的路径里只有秘技那条是开场就给 15 层 ✓）。"
   ],
   "rules": [
     {
@@ -276,6 +276,160 @@
       "source": "1314 星魂 5: 等级加成（数据 skill_add_level: 131401=COMMON+1, 131403=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
       "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_charge_for_her_own_hits",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1,
+          "times_from": "hit_count"
+        }
+      ],
+      "source": "1314 翡翠 天赋 有无之间: 「翡翠或成为【收债人】的目标施放攻击后，每击中1名敌方目标均可获得1点充能。」 param Lv10 = [0.024, 50, 8, 5, 1.2]",
+      "_note": "「**每击中 1 名敌方目标**均可获得 **1 点充能**」—— `GAIN_RESOURCE { amount: 1 }` + **`times_from: \"hit_count\"`** ✓（`times_from` 是「这个效果重复几次」，`hit_count` 是本次命中的目标数 ✓ —— 与 24004 光锥同法）。⚠ 三个独立数：`hit_count` = 命中数、`distinct_hit_targets` = 不同目标数、`amount` = 事件量 ⇒ 「每击中 1 名」是第一个 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_charge_for_the_collectors_hits",
+      "when": [
+        "actor has_state 收债人",
+        "actor != self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1,
+          "times_from": "hit_count"
+        }
+      ],
+      "source": "1314 翡翠 天赋: 「翡翠**或成为【收债人】的目标**施放攻击后，每击中1名敌方目标均可获得1点充能。」",
+      "_note": "「**翡翠或**成为【收债人】的目标」= **两个触发者** ⇒ 两条规则（条件列表是**与**，没有「或」群 ✓）：她自己那条在上面，收债人这条在这里。⚠ `actor != self` 是**去重**：星魂 6 之后她自己就是【收债人】，两条会同时成立 ⇒ 会多给一倍 ✗，所以收债人这条排除她自己（她那半由上面那条负责）✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "talent_follow_up_at_eight_charge",
+      "when": [
+        "resource_changed:充能",
+        "self_resource:充能 >= 8"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "充能",
+          "amount": 8
+        },
+        {
+          "op": "DAMAGE",
+          "skill": "TALENT",
+          "damage_param": 4,
+          "element": "Quantum",
+          "target": "all_enemies"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "当品",
+          "amount_from_skill_param": "TALENT:3",
+          "max_stacks": 50,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1314 翡翠 天赋: 「…当充能到达8点后，消耗8点充能，发动1次追加攻击，对敌方全体目标造成等同于翡翠120%攻击力的量子属性伤害…翡翠发动天赋的追加攻击时立即获得5层【当品】…」 param Lv10 = [0.024, 50, 8, 5, 1.2] → #3 = 8（阈值）、#4 = 5（层数）、#5 = 1.2（倍率）",
+      "_note": "「充能**到达 8 点后**，**消耗 8 点**充能，发动 1 次**追加攻击**，对**敌方全体**造成等同于翡翠 **120% 攻击力**的量子伤害…发动时立即获得 **5 层【当品】**」—— ① 触发点 `RESOURCE_CHANGED` + `resource_changed:充能` + `self_resource:充能 >= 8` ✓（充能只由攻击增长 ⇒ 与 1304 的「盲注到 7」同族：**不需要 STACK_CHANGED 之类的新事件** ✓）；② 「消耗 8 点」= `SPEND_RESOURCE 8`（不是 `spendAll` ✓ —— 溢出时会留下零头 ✓，所以资源上限声明得足够大，见 `resources`）；③ 「120% 攻击力」= `DAMAGE { skill: TALENT, damage_param: 5 }` —— **读行**（Lv10 的 #5 = 1.2 ✓），不是字面量 ✓；④ 「5 层【当品】」= `amount_from_skill_param: \"TALENT:3\"` ✓；⑤ 「本次追加攻击**无法获得充能**」**不需要写**：`DAMAGE` 是**结算实例**、不发 `ALLY_ATTACK` ✓ ⇒ 两个充电规则天然不会为它触发 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon1_two_targets_pay_one_more",
+      "min_eidolon": 1,
+      "when": [
+        "actor has_state 收债人",
+        "hit_count == 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
+      ],
+      "source": "1314 翡翠 星魂 1 无私？亦可交割: 「…持有【收债人】状态的角色施放攻击后击中敌方目标数量等于2/1名时，翡翠额外获得1/2点充能。」 参数 = [0.32, 1, 2]",
+      "_note": "「击中敌方目标数量**等于 2 名**时，翡翠**额外**获得 **1** 点充能」—— `hit_count == 2`（**恰好** 2，不是 ≥2 ✓ —— 3 名不在此列，句子只列了 2 与 1 两档）+ `actor has_state 收债人` ✓（这里**不**排除她自己：星魂 6 之后她也是收债人，她那半按句子也要给 ✓）。⚠ 「额外」= **加法**：天赋的「每命中 1 点」照给，这条是**再**给 1 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon1_one_target_pays_two_more",
+      "min_eidolon": 1,
+      "when": [
+        "actor has_state 收债人",
+        "hit_count == 1"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 2
+        }
+      ],
+      "source": "1314 翡翠 星魂 1: 「…击中敌方目标数量等于2/1名时，翡翠额外获得1/2点充能。」 参数 = [0.32, 1, 2]",
+      "_note": "「击中数量**等于 1 名**时额外获得 **2** 点」—— 少的命中给得多（句子是 2 名→1 点、1 名→2 点 ✓，不是笔误）。与上一条同形。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_the_talent_follow_up_hits_harder",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "talent_follow_up_at_eight_charge",
+          "effect_percent_scale": 1.32
+        }
+      ],
+      "source": "1314 翡翠 星魂 1: 「翡翠天赋的追加攻击伤害提高32%…」 参数 = [0.32, 1, 2]",
+      "_note": "「**天赋的追加攻击**伤害提高 **32%**」—— `MODIFY_RULE { rule: talent_follow_up_at_eight_charge, effect_percent_scale: 1.32 }` ✓（×1.32 是**乘**口径，不是 +0.32 的加点 ✓；那条规则里唯一带 `percent` 的效果就是追加攻击的倍率 ✓ —— `SPEND_RESOURCE`/`ADD_STACK` 没有 percent ✓）。⚠ 必须挂 `BATTLE_START`：`MODIFY_RULE` 改整场。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_she_becomes_a_collector",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "收债人",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION_QUANTUM",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1314 翡翠 星魂 6 公平？仍须保荐: 「场上有【收债人】状态的角色时，翡翠量子属性抗性穿透提高20%，同时翡翠获得【收债人】状态。」 参数 = [0.2]",
+      "_note": "两句：① 「同时翡翠获得【收债人】状态」= `APPLY_BUFF 收债人` + `permanent: true`（状态本身是永久的：它是**状态**不是 3 回合的合同 ✓ —— 战技给别人的那份才有 `turns: 3` ✓）；② 「场上**有**【收债人】时，翡翠**量子抗性穿透 +20%**」—— ① 一旦成立，场上就**一定**有收债人（她自己）✓ ⇒ 这条穿透可以**直接挂永久**，不需要「场上有没有」的额外判据 ✓（引擎没有「场上有某状态的角色」这个谓词；句子要的效果它已经蕴含 ✓）。⚠ 「量子」⇒ `DAMAGE_PENETRATION_QUANTUM`（按属性 ✓，不是全属性 ✗）。",
+      "_status": "implemented"
+    }
+  ],
+  "resources": [
+    {
+      "id": "充能",
+      "max": 8,
+      "source": "1314 翡翠 天赋 有无之间: 「每击中1名敌方目标均可获得1点充能。当充能到达8点后，消耗8点充能，发动1次追加攻击…」 ⇒ 上限 **8**（「到达 8 点后消耗 8 点」就是它需要的最大存量 ✓）。",
+      "note": "⚠ 文档只写「到达 8 点后消耗 8 点」，没有单列「上限 8 点」⇒ 这里按**消耗阈值**声明 8（多给的会先夹到 8 再被消耗，与「到达即消耗」等价 ✓）。⚠ 初始 0（文档没说初始值 ⇒ 默认 ✓）。"
     }
   ]
 }

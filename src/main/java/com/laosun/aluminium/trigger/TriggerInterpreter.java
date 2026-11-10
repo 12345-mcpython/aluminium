@@ -2900,7 +2900,11 @@ public final class TriggerInterpreter {
         }
         double base = skill == null
                 ? TriggerMagnitudes.literalBase(attacker, victim, effect, ctx)   // ? a literal ratio: off the SETTLED attribute, a Max HP share, or the triggering instance's settled value
-                : attacker.getAttribute(AttributeType.ATTACK).get() * TriggerMagnitudes.multiplierOf(skill, effect, attacker);
+                : attacker.getAttribute(AttributeType.ATTACK).get() * TriggerMagnitudes.multiplierOf(skill, effect, attacker)
+                        // A multiplicative `MODIFY_RULE` amendment scales the ROW multiplier here: this share comes from
+                        // `damage_param`, so `amendedEffect` (which only scales a literal `percent`) has nothing to multiply.
+                        // Reader: 1314 Jade Eidolon 1 on her talent follow-up.
+                        * TriggerMagnitudes.amendmentScale(effect, ctx);
         // 「该次欢愉伤害使用【美学底本】的属性值计算」: the formula's UN-UNDERLINED terms are borrowed from the holder of the
         // named state - the base (this table's row, at the HOLDER's level), 欢愉度 and 增笑 - while the underlined ones
         // (the laugh factor, the six zones and the multiplier) stay the instance's own. Note what is NOT borrowed:
