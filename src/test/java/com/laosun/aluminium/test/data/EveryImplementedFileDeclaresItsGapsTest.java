@@ -58,4 +58,31 @@ public class EveryImplementedFileDeclaresItsGapsTest {
                 "an implemented character must declare its gaps explicitly - `_gaps: []` means \"reviewed, none open\", "
                         + "while a missing array only means nobody looked: " + offenders);
     }
+
+    /**
+     * The other half: an {@code implemented} file may not carry an open clause. {@code ⛔} is the ledger's "still unresolved"
+     * marker, so a file that claims to be complete and marks something unresolved contradicts itself - and the count in
+     * {@code CONTENT-STATUS.md} ("未解阻塞 N 条") is derived from that glyph, so the two numbers would disagree.
+     */
+    @Test
+    public void everyImplementedCharacterHasNoOpenClause() throws IOException {
+        List<String> offenders = new ArrayList<>();
+        try (Stream<Path> paths = Files.list(CHARACTERS)) {
+            for (Path file : (Iterable<Path>) paths.filter(p -> p.toString().endsWith(".json")).sorted()::iterator) {
+                JsonObject root = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+                if (!root.has("_status") || !"implemented".equals(root.get("_status").getAsString())
+                        || !root.has("_gaps") || !root.get("_gaps").isJsonArray()) {
+                    continue;
+                }
+                for (JsonElement entry : root.getAsJsonArray("_gaps")) {
+                    if (entry.isJsonPrimitive() && entry.getAsString().contains("\u26D4")) {
+                        offenders.add(file.getFileName().toString());
+                        break;
+                    }
+                }
+            }
+        }
+        Assertions.assertTrue(offenders.isEmpty(),
+                "these files say `_status: implemented` but still mark a clause as unresolved (⛔): " + offenders);
+    }
 }
