@@ -68,6 +68,7 @@ public enum TriggerOperator {
     RAISE_ENERGY_TO(true),
     RAISE_RESOURCE_CAP(true),
     RAISE_RESOURCE_MAX(true),
+    RAISE_SKILL_MULTIPLIER(true),
     RAISE_SKILL_HITS(true),
     RAISE_SKILL_LEVEL(true),
     RAISE_SKILL_POINT_CAP(true),

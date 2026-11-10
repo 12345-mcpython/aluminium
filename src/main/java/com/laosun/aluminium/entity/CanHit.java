@@ -922,6 +922,42 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     private int ignoreWeaknessCasts;
 
+    /**
+    /**
+     * Files 「<b>that slot's</b> damage multiplier is raised by {@code percent}」 (2.4 = ×3.4), with an optional
+     * enemy-count window. The bookkeeping lives in {@link com.laosun.aluminium.state.SkillBonuses}.
+     *
+     * @param slot       the skill slot
+     * @param percent    the share the row is raised by
+     * @param minEnemies lower enemy-count bound, or {@code null}
+     * @param maxEnemies upper enemy-count bound, or {@code null}
+     */
+    public void amendSkillMultiplier(SkillType slot, double percent, Integer minEnemies, Integer maxEnemies) {
+        skillBonuses.raiseMultiplier(slot, percent, minEnemies, maxEnemies);
+    }
+
+    /**
+     * The factor one cast's row share is multiplied by: {@code 1} when nothing applies.
+     *
+     * <p>Read through the skill INSTANCE, because that is what the settlement holds: the slot is recovered from the
+     * character's own slot table, so an enhanced row installed into a slot is priced as the slot it now occupies.
+     *
+     * @param skill         the skill being cast
+     * @param livingEnemies how many enemies are alive right now
+     * @return the multiplier for that row
+     */
+    public double skillMultiplier(Skill skill, int livingEnemies) {
+        if (!(this instanceof Character character) || skill == null) {
+            return 1;
+        }
+        for (Map.Entry<SkillType, Skill> entry : character.getSkills().entrySet()) {
+            if (entry.getValue() == skill) {
+                return skillBonuses.multiplier(entry.getKey(), livingEnemies);
+            }
+        }
+        return 1;
+    }
+
     /** @param casts how many of the next casts ignore the weakness gate */
     public void markIgnoreWeaknessCasts(int casts) {
         ignoreWeaknessCasts = Math.max(0, ignoreWeaknessCasts + casts);

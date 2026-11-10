@@ -974,6 +974,15 @@ public final class TriggerInterpreter {
             case RESIST_DEBUFF -> resistDebuff(battle, effect, ctx);
             case MODIFY_RULE -> modifyRule(effect, ctx);
             case RAISE_SKILL_LEVEL -> raiseSkillLevel(effect, ctx);
+            case RAISE_SKILL_MULTIPLIER -> {
+                // 「终结技的伤害倍率提高 240%」: the ROW share of one slot is multiplied (x3.4). No zone, no MODIFY_ATTR and
+                // no MODIFY_RULE can say it - the row number is read at settlement, not by a rule. The optional
+                // enemy-count bounds let one sentence state disjoint tiers (1401 Eidolon 6: 3+/2/1 enemies).
+                SkillType multiplierSlot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+                ctx.owner().amendSkillMultiplier(multiplierSlot,
+                        TriggerMagnitudes.shareOf(effect, ctx),
+                        effect.getMinEnemies(), effect.getMaxEnemies());
+            }
             case RAISE_SKILL_HITS -> raiseSkillHits(effect, ctx);
             case START_COUNTDOWN -> startCountdown(battle, effect, ctx);
             case ADD_STACK -> TriggerEffects.addStack(battle, effect, ctx);

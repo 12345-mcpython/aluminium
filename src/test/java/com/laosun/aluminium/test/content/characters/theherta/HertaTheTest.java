@@ -83,9 +83,10 @@ public class HertaTheTest {
         // Note: 3 since 2026-11-11 - Eidolon 2 pays one more 【灵感】 on the same cast.
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
                 "the modifiers, the Skill swap, and Eidolon 2 inspiration");
-        // Note: 7 since 2026-11-11 - Eidolon 2s entry inspiration, Eidolon 4s speed aura, Eidolon 6s ice penetration.
-        Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the technique, the convention, and the three Eidolon passives");
+        // Note: 8 since 2026-11-11 - Eidolon 2s entry inspiration, Eidolon 4s speed aura, Eidolon 6s ice penetration
+        // and Eidolon 6s enemy-count multiplier tiers.
+        Assertions.assertEquals(8, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique, the convention, and the four Eidolon passives");
         // Note: 5 since 2026-11-11 - the ENHANCED cast also applies its own 1 layer of 【解读】.
         Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "insight, the cost, the revert, the advance, and the enhanced layer");

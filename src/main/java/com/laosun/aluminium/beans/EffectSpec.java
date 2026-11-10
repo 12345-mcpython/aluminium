@@ -159,6 +159,8 @@ public class EffectSpec {
         copy.charges = this.charges;
         copy.cooldown = this.cooldown;
         copy.damageType = this.damageType;
+        copy.minEnemies = this.minEnemies;
+        copy.maxEnemies = this.maxEnemies;
         copy.scopeElement = this.scopeElement;
         copy.fromSelf = this.fromSelf;
         copy.remove = this.remove;
@@ -759,6 +761,19 @@ public class EffectSpec {
 
     @SerializedName("damage_type")
     private String damageType;
+
+    /**
+     * The lower enemy-count bound of 「场上敌方目标数量等于 3 或以上/2/1 名时」 (1401 Eidolon 6) - a window read AT THE
+     * MOMENT the skill row is priced, so the tier follows the battlefield instead of freezing at battle start.
+     *
+     * <p>Only {@code RAISE_SKILL_MULTIPLIER} reads it; both bounds are optional and absent means "no bound".
+     */
+    @SerializedName("min_enemies")
+    private Integer minEnemies;
+
+    /** The upper enemy-count bound; see {@link #minEnemies}. */
+    @SerializedName("max_enemies")
+    private Integer maxEnemies;
 
     /**
      * The one ELEMENT a damage-taken zone is about, e.g. "increases the Fire DMG the target takes".
@@ -1834,5 +1849,4 @@ public class EffectSpec {
         return maxStacks != null ? maxStacks : stacks;
     }
 }
-
 

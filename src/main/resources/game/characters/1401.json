@@ -7,7 +7,7 @@
     "✅ **战技施放【解读】与【灵感】换形态都已落地（2026-11-09）**：`skill_applies_one_insight`（`SKILL_CAST` + `from_skill_id == 2` → `ADD_STACK 解读 1`，上限 42）、`ult_enhances_the_skill_while_inspired`（`ULT_CAST` → `REPLACE_SKILL { skill: SKILL, skill_id: 9 }`，数据槽 9 = 140109「我有一个大胆的想法」）、`enhanced_skill_spends_one_inspiration`（`from_skill_id == 9` → `REMOVE_STACK 灵感 1`）、`skill_reverts_without_inspiration`（同闸门 + `self_stacks:灵感 <= 0` → `REPLACE_SKILL { remove: true }`）。判据 `HertaSkillFormTest`：普通战技给敌人 **1 层【解读】**；终结技后战技槽 **2 → 9**、强化战技消耗 1 层【灵感】、层数归零后槽位**回 2**。⚠ 顺序是判据的一部分：扣层那条必须排在回退那条**之前**（回退要读「扣完还剩几层」），换形态那条必须排在「获得【灵感】」之后。",
     "⛔ **终结技的【解读】重排未写**：「将敌方全体的【解读】层数**重新排序**，较高层数的【解读】优先转移到**精英级别及以上**的目标」—— 缺两样：① 跨单位搬移一个计数器（引擎没有「把 A 的层数转给 B」的 op）；② 敌人是否「精英级别及以上」的判定（数据里有分级，但条件语言没有这一项）。",
     "⛔ **战技的链式重复与相邻扩散未写**：「对本次战技**命中过的目标**及其**相邻目标**造成…伤害，该效果**可重复 2 次**」—— 需要「这一发打中过谁」的集合 + 逐次对外扩散，引擎的 `blast` 只做一层相邻。✅ **强化战技的 1 层【解读】已落地（2026-11-11）**：`the_enhanced_skill_applies_one_insight`（`SKILL_CAST` + `from_skill_id == 9` → `ADD_STACK 解读 1`）。⚠ 旧登记「#2 层…要读数据行」**两处都错**：句子是 **1** 层（`#2` 是参数序号），也不需要读行。",
-    "✅ **星魂已读，2 / 3 / 4 / 5 / 6（前半）已落地（2026-11-11）**：2 = 三条（`eidolon2_one_more_inspiration_on_entry` 进战 +1 层【灵感】、`eidolon2_one_more_inspiration_on_ult` 终结技再 +1、`eidolon2_the_enhanced_skill_advances_her` 强化战技后 `ADVANCE 0.35`）；3/5 = 等级（早就在）；4 = `eidolon4_erudition_allies_are_faster`（`MODIFY_ATTR SPEED 0.12` + **`allies_of_path:智识`**）；6 前半 = `eidolon6_ice_penetration`（`DAMAGE_PENETRATION_ICE 0.2`）。判据 `HertaEruditionEidolonsTest`。⛔ **仍未写**：① 星魂 1「强化战技计算【解读】层数时，额外计算主目标及相邻目标中层数最高者的 50%；重置时改为 15 层」—— 要读「相邻目标里层数最高者」的**组内最大值**（`highest_stacks_enemy:` 是全体，不是相邻集）✗；② 星魂 6 **后半**「按敌方数量（3+/2/1）把终结技**伤害倍率**分别提高 140%/250%/400%」—— 终结技倍率来自**技能行**，`MODIFY_RULE` 改不了行，缺「按场上数量覆盖这一次施放的行份额」的写法 ✗。",
+    "✅ **星魂已读，2 / 3 / 4 / 5 / 6 全部落地（2026-11-11）**：2 = 三条（`eidolon2_one_more_inspiration_on_entry` 进战 +1 层【灵感】、`eidolon2_one_more_inspiration_on_ult` 终结技再 +1、`eidolon2_the_enhanced_skill_advances_her` 强化战技后 `ADVANCE 0.35`）；3/5 = 等级（早就在）；4 = `eidolon4_erudition_allies_are_faster`（`MODIFY_ATTR SPEED 0.12` + **`allies_of_path:智识`**）；6 = 两条（`eidolon6_ice_penetration` 的 `DAMAGE_PENETRATION_ICE 0.2` + `eidolon6_the_fewer_enemies_the_harder_the_ultimate` 的三档倍率窗）。判据 `HertaEruditionEidolonsTest`。⛔ **仍未写**：① 星魂 1「强化战技计算【解读】层数时，额外计算主目标及相邻目标中层数最高者的 50%；重置时改为 15 层」—— 要读「相邻目标里层数最高者」的**组内最大值**（`highest_stacks_enemy:` 是全体，不是相邻集）✗；② ✅ 星魂 6 后半的「按敌方数量提高终结技倍率」**也已落地**（`RAISE_SKILL_MULTIPLIER` 的三档 `min_enemies`/`max_enemies` 窗口，读行份额时求值）。",
     "⛔ 天赋【解读】其余部分：每波开始对随机目标施加 25 层且「**优先精英**」（⚠ 引擎的 `Enemy` 没有「精英」这一属性，选目标的选择器也没有按等级优先的形状 ⇒ 这一条要先有「敌人等级」才谈得上）；、强化战技按层数的倍率加成（每层 +8% 主目标 / +4% 其他）、「智识」命途 ≥2 名的追加、强化战技把主目标重置为 1 层、离场/被消灭后的转移（优先精英）"
   ],
   "rules": [
@@ -329,6 +329,35 @@
       ],
       "source": "1401 大黑塔 强化战技 我有一个大胆的想法 (140109): 「消耗1层【灵感】，对指定敌方单体造成等同于大黑塔80%攻击力的冰属性伤害并施加1层【解读】。」",
       "_note": "「消耗 1 层【灵感】…**施加 1 层【解读】**」—— `skill_applies_one_insight` 那条守的是**基础**战技（`from_skill_id == 2`），强化战技是**另一行**（槽 9 / 数据 140109）⇒ 单独一条 `from_skill_id == 9` → `ADD_STACK 解读 1` ✓。⚠ 旧登记说「强化战技的 `#2` 层【解读】…要读数据行」**两处都错**：① 句子是 **1** 层（不是 #2 层 —— 文档的 `#2` 是**参数序号**，不是层数）；② 不需要读行（层数是字面 1，与基础战技同）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_the_fewer_enemies_the_harder_the_ultimate",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "RAISE_SKILL_MULTIPLIER",
+          "skill": "ULTRA",
+          "percent": 1.4,
+          "min_enemies": 3
+        },
+        {
+          "op": "RAISE_SKILL_MULTIPLIER",
+          "skill": "ULTRA",
+          "percent": 2.5,
+          "min_enemies": 2,
+          "max_enemies": 2
+        },
+        {
+          "op": "RAISE_SKILL_MULTIPLIER",
+          "skill": "ULTRA",
+          "percent": 4.0,
+          "max_enemies": 1
+        }
+      ],
+      "source": "1401 大黑塔 星魂 6 甜饵般的答案: 「…当场上敌方目标数量等于3或以上/2/1名时，终结技的伤害倍率提高140%/250%/400%。」 参数 = [1.4, 2.5, 4, 0.2]",
+      "_note": "「场上敌方目标数量等于 **3 或以上/2/1** 名时，**终结技的伤害倍率**提高 **140%/250%/400%**」—— 三条 `RAISE_SKILL_MULTIPLIER`，**三档互斥的敌方数量窗口**（`min_enemies` / `max_enemies`）✓：3+ ⇒ ×2.4、恰好 2 ⇒ ×3.5、1 名 ⇒ ×5.0。⭐ **窗口在「读行份额」的那一刻求值**（`SkillExecutor.rowMultiplier`），所以档位**跟着战场走**，不是开场冻结 ✓ —— 这正是本条能写出来的原因。⚠ 窗口互斥由内容保证（引擎按**加算**读同一槽位的多条修正 ⇒ 若两条同时成立会一起加 ✗）。",
       "_status": "implemented"
     }
   ]

@@ -3,6 +3,7 @@ package com.laosun.aluminium.state;
 import com.laosun.aluminium.enums.SkillType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -79,4 +80,57 @@ public final class SkillBonuses {
         levels.clear();
         memospriteLevels.clear();
     }
+    /**
+     * One 「伤害倍率提高 N%」 clause on a slot's row share, with an optional enemy-count window.
+     *
+     * <p>Kept HERE (not on the combatant) because it is per-battle bookkeeping about skill slots, exactly like the level
+     * raises above - and because {@code CanHitCompositionTest} refuses raw collections on the combatant.
+     */
+    public record MultiplierAmendment(double percent, Integer minEnemies, Integer maxEnemies) {
+        boolean applies(int livingEnemies) {
+            return (minEnemies == null || livingEnemies >= minEnemies)
+                    && (maxEnemies == null || livingEnemies <= maxEnemies);
+        }
+    }
+
+    private final Map<SkillType, List<MultiplierAmendment>> multipliers = new HashMap<>();
+
+    /**
+     * Files 「<b>that slot's</b> damage multiplier is raised by {@code percent}」 (2.4 = ×3.4).
+     *
+     * <p>Several clauses may be filed for one slot; at read time the ones whose enemy-count window holds are ADDED
+     * (content uses disjoint windows - the tiers of one sentence - which is why a sum is the right reading).
+     *
+     * @param slot       the skill slot
+     * @param percent    the share the row is raised by
+     * @param minEnemies lower enemy-count bound, or {@code null}
+     * @param maxEnemies upper enemy-count bound, or {@code null}
+     */
+    public void raiseMultiplier(SkillType slot, double percent, Integer minEnemies, Integer maxEnemies) {
+        if (slot == null) {
+            return;
+        }
+        multipliers.computeIfAbsent(slot, key -> new java.util.ArrayList<>())
+                .add(new MultiplierAmendment(percent, minEnemies, maxEnemies));
+    }
+
+    /**
+     * @param slot          the skill slot
+     * @param livingEnemies how many enemies are alive right now
+     * @return the factor that slot's row share is multiplied by; {@code 1} when nothing applies
+     */
+    public double multiplier(SkillType slot, int livingEnemies) {
+        List<MultiplierAmendment> filed = multipliers.get(slot);
+        if (filed == null) {
+            return 1;
+        }
+        double factor = 1;
+        for (MultiplierAmendment amendment : filed) {
+            if (amendment.applies(livingEnemies)) {
+                factor += amendment.percent();
+            }
+        }
+        return factor;
+    }
+
 }

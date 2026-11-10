@@ -553,6 +553,21 @@
       ],
       "source": "1412 刻律德菈 终结技: 「…若场上不存在持有【军功】的角色，优先使当前队伍中的第一位角色获得【军功】。」",
       "_note": "「若场上**不存在**持有【军功】的角色，优先使当前队伍中的**第一位**角色获得【军功】」= 条件 `!any_ally has_state 「军功」` + `APPLY_BUFF 军功 target: 「next_ally」`（**队伍中下一位**：`party_first` 会选中刻律德菈自己，实测那样会让 `OdeToLawChargeTest` 的充能从 6 变 8 —— 授予自己会连带触发别的条款）。⚠ 读法登记：文档的「第一位」在只有她一人时无人可给。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon4_the_ultimates_multiplier_is_raised",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "RAISE_SKILL_MULTIPLIER",
+          "skill": "ULTRA",
+          "percent": 2.4
+        }
+      ],
+      "source": "1412 刻律德菈 星魂 4 重塑天地人间: 「终结技的伤害倍率提高240%。」 参数 = [2.4]",
+      "_note": "「终结技的**伤害倍率提高 240%**」= `RAISE_SKILL_MULTIPLIER { skill: ULTRA, percent: 2.4 }` ⇒ 那一行的份额 **×3.4** ✓。\n\n⚠ 为什么不是 `BOOST_DAMAGE 2.4`（2026-11-09 曾这么写过、实测比值 **2.96** 而不是 3.04/3.4 后撤下）：`BOOST_DAMAGE` 是**增伤区**里的一项（与元素/全属性增伤**相加**），而句子说的是**倍率**（乘在行的份额上）⇒ 落在错的区里，数字自然对不上。⚠ 为什么不是 `MODIFY_RULE`：终结技的伤害**没有规则**，它来自**技能行**（`SkillExecutor` 读行）⇒ 只有结算处能乘。\n\n⚠ 旧登记「已撤下…待核对」**已由这一条取代** ✓。",
+      "_status": "implemented"
     }
   ]
 }

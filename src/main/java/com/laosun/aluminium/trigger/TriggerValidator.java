@@ -1141,6 +1141,37 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
+            case RAISE_SKILL_MULTIPLIER -> {
+                // 「终结技的伤害倍率提高 240%」/ 「按敌方数量提高终结技倍率」: one slot's row share is multiplied. The
+                // bonus is filed on the unit and read at settlement, so it needs no duration; the optional enemy-count
+                // window is what lets one sentence state disjoint tiers.
+                requireSkill(effect, op, spec);
+                requirePercent(effect, op, spec);
+                if (effect.getPercent() != null && effect.getPercent() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " raises a row multiplier, so \"percent\" must be positive (1.0 = x2.0); a "
+                                    + "negative share would be a different sentence (source: " + spec.getSource() + ")");
+                }
+                Integer min = effect.getMinEnemies();
+                Integer max = effect.getMaxEnemies();
+                if (min != null && min < 1) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " bounds the enemy count, so \"min_enemies\" is at least 1 (source: "
+                                    + spec.getSource() + ")");
+                }
+                if (max != null && max < 1) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " bounds the enemy count, so \"max_enemies\" is at least 1 (source: "
+                                    + spec.getSource() + ")");
+                }
+                if (min != null && max != null && max < min) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states an empty enemy window: min_enemies " + min + " > max_enemies " + max
+                                    + " (source: " + spec.getSource() + ")");
+                }
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
             case RAISE_SKILL_HITS -> {
                 // The DATA SLOT, not a SkillType letter: the executor knows the slot number.
                 if (effect.getSkillId() == null || effect.getSkillId() <= 0) {

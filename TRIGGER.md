@@ -390,8 +390,8 @@ DISMISS_SUMMON         DISPEL                 EXTEND_BUFF            EXTRA_TURN
 GAIN_ENERGY            GAIN_RESOURCE          GAIN_SKILL_POINT       HEAL
 INSERT_ACTION          MODIFY_ATTR            MODIFY_DAMAGE_TAKEN    MODIFY_RULE
 RAISE_ENERGY_TO        RAISE_RESOURCE_CAP     RAISE_RESOURCE_MAX     RAISE_SKILL_HITS
-RAISE_SKILL_LEVEL      RAISE_SKILL_POINT_CAP  REGISTER_HEAL_BONUS    REMOVE_BUFF
-REMOVE_RESOURCE        REMOVE_STACK           REMOVE_STATE           REPLACE_SKILL
+RAISE_SKILL_LEVEL      RAISE_SKILL_MULTIPLIER RAISE_SKILL_POINT_CAP REGISTER_HEAL_BONUS
+REMOVE_BUFF            REMOVE_RESOURCE        REMOVE_STACK           REMOVE_STATE
 RESET_RESOURCE_CAP     RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF
 SHARE_DAMAGE           SHIELD                 SPEND_RESOURCE         SPEND_STEPS
 START_COUNTDOWN        SUMMON                 SUMMON_SERVANT         SUPER_BREAK
@@ -401,6 +401,7 @@ TAUNT                  TICK_DOT
 - `REDUCE_TOUGHNESS` 是**声明了但还没实现**的 op；写它会装载期报错并说明原因。
 - **`SHARE_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：`{"percent": 0.65, "target": "self"}` 表示「这一发的 65% **由目标承担**」—— 本发只保留 35%，并按**同元素/同攻击者/同 65% 基数**给 `target` 另开一发（走它自己的防御/抗性区，结算在当次之后）。读者：1208 符玄【穷观阵】。
 - `REPLACE_SKILL` 有两个方向：**装上**（`skill` + `skill_id` + 一个寿命）与 **`"remove": true`**（把该槽位的替换取下、恢复原来的行；不带 `skill_id`、不带寿命）。重复装上**同一**替换是 no-op（否则第二个会把强化行记成「原始」，卸下时反而装回去）。读者：1111 卢卡「≥2 层时强化 / <2 层时恢复」
+- **`RAISE_SKILL_MULTIPLIER`**：把**某个槽位的技能行份额**乘上去（`{ "skill": "ULTRA", "percent": 2.4 }` ⇒ 那一行的倍率 ×3.4）—— 句子的形状是「终结技的**伤害倍率**提高 240%」，它既不是增伤区（`BOOST_DAMAGE` 会与元素/全属性增伤**相加**，实测落在错的区里）也不是规则（`MODIFY_RULE` 只改规则，而这一发伤害来自**技能行**）⇒ 只有**结算处**能乘。可选 `min_enemies` / `max_enemies` 是**敌方数量窗口**，在**读行份额的那一刻**求值 ⇒ 「3+/2/1 名时分别提高 140%/250%/400%」用三条**互斥窗口**写。读者：1412 星魂 4、1401 星魂 6 后半。
 - **`RAISE_RESOURCE_MAX`**：把角色**声明**的资源上限抬高（`{ "resource": "热意", "amount": 20 }`）—— 与 **`RAISE_RESOURCE_CAP`** 不同：后者抬的是**溢出额度**（`max + maxOverflow` 那一层）。读者：1513 星魂 2「【热意】上限提高至 50 点」。
 - **`ADD_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：加的是一个**数值**（不是百分比）。默认进**基数层**（「伤害**值**提高」⇒ 会被暴击/增伤/防御/抗性放大）；**`"after_zones": true`** 改成在所有区**之后**加（「伤害**额外提高**，提高数值等同于…」⇒ 不暴击、不被任何区放大）。读者：1001 星魂 4（基数层）、1205 星魂 1 / 星魂 6（`after_zones`）。
 - **每个 op 的参数以 `TriggerInterpreter` 的类注释为准**，本文不复制。

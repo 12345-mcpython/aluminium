@@ -354,6 +354,27 @@ public final class SkillExecutor {
         return percents != 1 || flats > 1;
     }
 
+
+    /**
+     * 「<b>该槽位的</b>伤害倍率提高 N%」: the ROW share of the slot is multiplied. Content files it with
+     * {@code RAISE_SKILL_MULTIPLIER}; the enemy-count window is evaluated HERE, at pricing time, which is what makes the
+     * tiered sentence (1401 Eidolon 6) follow the battlefield.
+     *
+     * <p>Why this cannot be a zone or a rule: the number belongs to the DATA row the cast reads, so the only place that
+     * can apply it is the settlement itself. 1412's Eidolon 4 was first written as {@code BOOST_DAMAGE 2.4} and measured
+     * 2.96 instead of 3.4 - the wrong zone (that one adds into the damage-boost chain) - which is the evidence for this
+     * hook.
+     */
+    private static double rowMultiplier(Battle battle, Skill skill, CanHit user) {
+        int livingEnemies = 0;
+        for (CanHit enemy : battle.enemies()) {
+            if (!enemy.isDeath()) {
+                livingEnemies++;
+            }
+        }
+        return user.skillMultiplier(skill, livingEnemies);
+    }
+
     /**
      * Sums the terms of an effect: each parameter is either a percentage of {@link #scaleValue} or a
      * flat addition.
@@ -480,7 +501,7 @@ public final class SkillExecutor {
         // Note: The CENTRE column is normally the first cell, but a row may put a cost there (1407's Skill: "consumes #1% HP,
         // deals #2% of Max HP"), so the curated table may name it - the same override the neighbours got.
         int mainColumn = rowSpec != null && rowSpec.getMainParam() != null ? rowSpec.getMainParam() : 0;
-        double rowShare = params.get(mainColumn) + resourceShareOf(skill, user, params);
+        double rowShare = (params.get(mainColumn) + resourceShareOf(skill, user, params)) * rowMultiplier(battle, skill, user);
         double base = attacker.damageBase(baseAttribute) * rowShare;
         // Note: A blast states TWO multipliers: the centre and the neighbours. 1008's ultimate row is
         // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%...and 160% to enemies adjacent to it".
@@ -491,7 +512,7 @@ public final class SkillExecutor {
         // Measured 2026-11-09: without it the neighbours were charged 1.0 instead of 1.5 - a plausible wrong number.
         int adjacentColumn = rowSpec != null && rowSpec.getAdjacentParam() != null ? rowSpec.getAdjacentParam() : 1;
         double neighbourBase = params.size() > adjacentColumn
-                ? attacker.damageBase(baseAttribute) * params.get(adjacentColumn)
+                ? attacker.damageBase(baseAttribute) * params.get(adjacentColumn) * rowMultiplier(battle, skill, user)
                 : base;
         // A row may state its base as SEVERAL attribute-scaled terms («等同于刃 #2%攻击力+#4%生命上限»), each with its own column
         // for the centre and for the neighbours. `damageBaseAttribute()` names one attribute, so a two-term row could only be
@@ -514,8 +535,8 @@ public final class SkillExecutor {
                   centreSum += params.get(centreColumn) * termValue;
                   neighbourSum += params.get(neighbourColumn) * termValue;
               }
-            base = centreSum;
-            neighbourBase = neighbourSum;
+            base = centreSum * rowMultiplier(battle, skill, user);
+            neighbourBase = neighbourSum * rowMultiplier(battle, skill, user);
         }
         CanHit mainTarget = targets.getFirst();
 
@@ -528,7 +549,8 @@ public final class SkillExecutor {
         // Reader: 1415 Cyrene (昔涟)'s enhanced basic 141508; see the field's own javadoc.
         List<SkillEffectSpec.DamagePart> parts = damagePartsOf(skill);
         if (!parts.isEmpty()) {
-            totalDamage += settleParts(battle, data, skill, user, element, params, mainTarget, parts, hitTargets);
+            totalDamage += settleParts(battle, data, skill, user, element, params, mainTarget, parts, hitTargets,
+                    rowMultiplier(battle, skill, user));
             battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage, skill.getSkillSlot());
             return;
         }
@@ -780,7 +802,7 @@ public final class SkillExecutor {
      */
     private static double settleParts(Battle battle, SkillData data, Skill skill, CanHit user, DamageElement element,
                                       List<Double> params, CanHit mainTarget,
-                                      List<SkillEffectSpec.DamagePart> parts, Set<CanHit> hitTargets) {
+                                      List<SkillEffectSpec.DamagePart> parts, Set<CanHit> hitTargets, double rowMultiplier) {
         AttributeType baseAttribute = data.damageBaseAttribute();
         double total = 0;
         for (SkillEffectSpec.DamagePart part : parts) {
@@ -795,7 +817,7 @@ public final class SkillExecutor {
                 throw new IllegalStateException("skill_effects.json's damage part names the unknown shape '"
                         + part.getShape() + "'");
             }
-            double partBase = user.damageBase(baseAttribute) * params.get(index);
+            double partBase = user.damageBase(baseAttribute) * params.get(index) * rowMultiplier;
             // A part may be dealt in SEVERAL instances of its own share (1415's enhanced basic splits its area half 30/70):
             // each ratio is one instance reaching the same shape, and the part's toughness is spread over them, so the bar
             // moves by the column's value in total rather than once per instance.
