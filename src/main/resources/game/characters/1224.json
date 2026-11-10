@@ -7,7 +7,7 @@
     "✅ **天赋的充能状态机已落地（2026-11-10）**：两条规则 —— `talent_seven_charges_empower_her`（`RESOURCE_CHANGED` + `resource_changed:充能` + `self_resource:充能 >= 7` → `ADVANCE 100%` + `APPLY_BUFF 强化 {blocks: skill}` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.8 {while_state: 强化}` + `REPLACE_SKILL slot 8`）与 `talent_the_enhanced_basic_spends_seven`（`BASIC_ATTACK` + `from_skill_id == 8` → `SPEND_RESOURCE 7` + `REMOVE_STATE 强化` + 还原普攻槽）。⚠ **近似**：中间掉到 6 也不会自动解除（引擎没有「按资源值自动失效」的写法），已写在规则注记里。⛔ 仍开：秘技的队友计数、终结技的段数/固定概率、强化普攻的三段概率、星魂。",
     "天赋：攻击与终结技各回 1 点，但终结技也会发 ALLY_ATTACK ⇒ 一次终结技可能回 2 点（与文档读法不同）",
     "⛔ **秘技的前半仍未写**：「若三月七在队伍中，每当**队友施放 1 次秘技**，下一次战斗开始时三月七获得 **1 点充能**，最多 **3** 点」—— 需要「**全队这一场用了几次秘技**」这个**队伍级计数**：`Battle.Techniques.released(cid)` 只记**谁**放了，没有「几个队友放过 / 放过几次」的读数，也没有给规则读它的通道。⚠ 「使用秘技后，下一次战斗开始时恢复 **30** 点能量」这条**已实现**（`technique_energy`）。",
-    "⛔ **终结技的第二句仍开，但缺口比原来窄**：「使**下一次**强化普攻的**初始段数增加 2 段**，额外造成伤害的**固定概率提高 20%**」—— ① **引擎有 `RAISE_SKILL_HITS { skill_id, amount }`** ✓（`CanHit.raiseSkillHits`），但它**累加且不会自动还原**，而这句要的是「**下一次**」⇒ 第二次终结技会变成 +4 ✗；要落地得先有「一次性提升、被那一次强化普攻消费掉」的写法（与 §196「改写下一发实例」同族）。② 「固定概率提高 20%」是**强化普攻的概率参数**（不受命中/抵抗影响）⇒ 需要把修正案挂到**技能行**上，当前 `MODIFY_RULE` 只改**规则**、不改技能行。",
+    "✅ **「下一次强化普攻 +2 段」已落地（2026-11-10）**：**成对规则** —— `ult_lends_two_hits_to_the_next_enhanced_basic`（`ULT_CAST` → `RAISE_SKILL_HITS { skill_id: 8, amount: 2 }`）与 `basic_takes_the_two_hits_back`（`BASIC_ATTACK` + `from_skill_id == 8` → `amount: -2`）。⭐ 依据是 `CanHit.raiseSkillHits` 自己的注释：**A NEGATIVE delta takes them back, which is how a rule states a duration** ⇒ 「下一次」不需要新字段。⛔ **仍未写**：「额外造成伤害的**固定概率提高 20%**」—— 那是**强化普攻的概率参数**，`MODIFY_RULE` 只改**规则**、不改**技能行**。",
     "⛔ 强化普攻：3 段 80%、60% 固定概率续段最多 3 段、能量不随段数、不恢复战技点未写",
     "⛔ 星魂：未读、未写"
   ],
@@ -204,6 +204,43 @@
       ],
       "source": "1224 三月七 天赋 师父，我悟了！: 「施放强化普攻后，消耗7点充能。」",
       "_note": "「**施放强化普攻后，消耗 7 点充能**」—— ① `BASIC_ATTACK` + `actor == self` + **`from_skill_id == 8`**（只有**强化**普攻算 ✓；少了这一条普通普攻也会扣 7 点 ✗）；② `SPEND_RESOURCE 充能 7` ✓；③ 摘掉 `强化` 状态（禁战技 + 增伤随之失效 ✓）并把普攻槽**还原**（`REPLACE_SKILL { remove: true }` ✓，1014 同写法 ✓）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_lends_two_hits_to_the_next_enhanced_basic",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill_id": 8,
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1224 三月七 终结技 盖世女侠三月七: 「使下一次强化普攻的初始段数增加2段…」",
+      "_note": "「使**下一次**强化普攻的**初始段数增加 2 段**」—— ① `RAISE_SKILL_HITS { skill_id: 8, amount: 2 }` ✓（`CanHit.raiseSkillHits` 的注释原话：**A NEGATIVE delta takes them back, which is how a rule states a duration** ⇒ 「下一次」用**成对规则**表达）；② 还回去的那一半是 `basic_takes_the_two_hits_back`（强化普攻后 −2）。⚠ 为什么不是 `permanent`：这条路**累加**，第二次终结技会变成 +4，而成对规则保证每次终结技只借出 2 段、被那一次强化普攻用掉。⚠ 「固定概率提高 20%」仍**未写**（那是强化普攻的概率参数，`MODIFY_RULE` 只改规则、不改技能行）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "basic_takes_the_two_hits_back",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "RAISE_SKILL_HITS",
+          "skill_id": 8,
+          "amount": -2,
+          "target": "self"
+        }
+      ],
+      "source": "1224 三月七 终结技 盖世女侠三月七: 「使下一次强化普攻的初始段数增加2段…」",
+      "_note": "「**下一次**」的收尾：强化普攻打完就把那 2 段**还回去**（负增量）。⚠ 门必须 `from_skill_id == 8`（只有**强化**普攻消费它 ✓，普通普攻不该减）。⚠ 与 `ult_lends_two_hits_to_the_next_enhanced_basic` 成对：一个借、一个还 ⇒ 精确表达「下一次」而不需要一次性字段。",
       "_status": "implemented"
     },
     {
