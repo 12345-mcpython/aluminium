@@ -332,6 +332,12 @@ public class CharacterConditionLiteralsTest {
         assertRule(1404, "BATTLE_START", "technique_opening_aoe_and_charge", List.of("self has_state 秘技"));
         assertRule(1404, "ULT_CAST", "ult_heal_charge_and_taunt", List.of("actor == self"));
         assertRule(1404, "BATTLE_START", "level_convention", List.of());
+        assertRule(1404, "DEALING_DAMAGE", "eidolon2_the_bloodfeud_pierces_fifteen_percent",
+                List.of("actor == self", "self has_state 血仇"));
+        assertRule(1404, "DEALING_DAMAGE", "eidolon4_the_bloodfeud_crits_harder",
+                List.of("actor == self", "self has_state 血仇"));
+        assertRule(1404, "TAKING_HIT", "eidolon4_a_hit_heals_ten_percent", List.of("target == self"));
+        assertRule(1404, "BATTLE_START", "eidolon6_enters_bloodfeud_at_once", List.of());
         assertRule(1405, "ALLY_ATTACK", "eidolon1_defence_down_on_skill", List.of("actor == self", "from_skill SKILL"));
         assertRule(1405, "BATTLE_START", "level_convention", List.of());
         assertRule(1405, "SKILL_CAST", "eidolon4_attack", List.of("actor == self"));

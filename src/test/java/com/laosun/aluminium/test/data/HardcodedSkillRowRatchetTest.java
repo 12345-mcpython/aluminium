@@ -105,7 +105,10 @@ public class HardcodedSkillRowRatchetTest {
     // 66 since 2026-11-11: 1410 Hysilens Eidolon 4 writes 0.2 (「全属性抗性降低 20%」) - a STAR-SOUL parameter that happens
     // to equal a cell of her Skill and Talent rows (0.2). The row cell belongs to a different clause (the Skill damage
     // taken up), so reading the row would be wrong; the literal stays, as with 1309/1412/1106 above.
-    private static final int BASELINE = 66;
+    // 67 since 2026-11-11: 1404 Mydei Eidolon 6 re-states the 【血仇】 state's own +50% maximum HP (0.5), which happens to
+    // equal a cell of his Talent and enhanced-Basic rows. It is the SAME clause the talent already writes (the state has
+    // two entry paths - see SameEffectTwiceGuardTest's baseline), not a frozen row read.
+    private static final int BASELINE = 67;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

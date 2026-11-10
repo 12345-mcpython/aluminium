@@ -82,6 +82,9 @@ public class SameEffectTwiceGuardTest {
             // 1205 刃：星魂 4 的一句话是「当前生命值百分比**从大于 50% 降低至小于等于 50%** 时，生命上限提高 20%」——
             // 引擎把「掉血」分成**两个通道**：受到伤害 = `HP_LOST`，自己付的血（战技的 30%）= `HP_CONSUMED`。
             // 句子不问原因，所以同一条效果必须挂两次；两条的 `when`（跨越那一对）逐字相同。属于 one effect, two triggers。
+            // 1404 万敌：【血仇】有**两个入口**（天赋在 100 点充能时进、星魂 6 在开场进），而「进入【血仇】」就是
+            // 「状态 + 它的 生命上限 +50%」两件事 —— 只写状态会让 E6 的那份弱一半。属于 one effect, two triggers。
+            Map.entry("1404.json :: MODIFY_ATTR|HEALTH|0.5|self|-|true", 2),
             Map.entry("1205.json :: MODIFY_ATTR|HEALTH|0.2|self|-|true", 2));
 
     @Test

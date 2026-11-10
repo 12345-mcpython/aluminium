@@ -7,7 +7,7 @@
     "⛔ 天赋：每损失 1% 生命值积攒 1 点充能（按损失比例换算）未写",
     "⛔ 【血仇】「防御力保持为 0」未写（需要钉住/乘法修饰）",
     "⛔ 致命攻击不倒下、清空充能、退出【血仇】、回复 50% 生命上限未写",
-    "⛔ 150 点【弑神登神】优先攻击终结技标记目标 / 1415 忆灵技 8 免费施放未写；星魂未读"
+    "⛔ 150 点【弑神登神】优先攻击终结技标记目标 / 1415 忆灵技 8 免费施放未写。**星魂已读（2026-11-11）**：2 前半 = `eidolon2_the_bloodfeud_pierces_fifteen_percent`（`DEALING_DAMAGE` + `self has_state 血仇` + `MODIFY_ATTR DEFENCE_IGNORE 0.15` + `instance: true`）；4 = `eidolon4_the_bloodfeud_crits_harder`（同形，`CRIT_ATTACK 0.3`）+ `eidolon4_a_hit_heals_ten_percent`（`TAKING_HIT` → `HEAL 10% 生命上限`）；6 前半 = `eidolon6_enters_bloodfeud_at_once`（`APPLY_BUFF 血仇` + 状态自己的 `生命上限 +50%`）；3/5 = 等级（早就在）。判据 `MydeiEidolonsTest`。⛔ **仍未写**：① 星魂 1「【弑神登神】主目标**伤害倍率 +30%**，且**变成对敌方全体**造成等同主目标倍率的虚数伤害」—— 倍率与目标形状都来自**技能行**（`MODIFY_RULE` 改不了行）；② 星魂 2 后半「接受治疗后 **40%** 治疗数值转化为充能，累计不超过 **40** 点，任意单位行动后重置」—— 要一个**每次行动重置的累计器** ✗；③ 星魂 6 后半「【弑神登神】所需充能**降低至 100 点**」—— 150 是**规则条件里的字面量**，`MODIFY_RULE` 改不了条件阈值 ✗。"
   ],
   "resources": [
     {
@@ -399,6 +399,94 @@
       ],
       "source": "1404 星魂 5: 等级加成（数据 skill_add_level: 140403=ULTRA+2, 140404=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon2_the_bloodfeud_pierces_fifteen_percent",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "self has_state 血仇"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.15,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1404 万敌 星魂 2 纷争见证尸骸的喉鸣: 「【血仇】状态期间，万敌造成的伤害无视敌方目标15%的防御力…」 参数 = [0.15, 0.4, 40]",
+      "_note": "「【血仇】期间，万敌造成的伤害**无视敌方目标 15% 的防御力**」—— ① 事件 `DEALING_DAMAGE`（**逐发**）+ `actor == self` + **`self has_state 血仇`**（把「期间」写在**每一发**上 ⇒ 不需要给状态本身加寿命 ✓，也不会漏掉 E6 在开场就进【血仇】的那条路 ✓）；② `MODIFY_ATTR DEFENCE_IGNORE 0.15` + **`instance: true`**（只影响这一发 ✓）+ `turns: 1`（寿命字段是引擎要求的），与 1308 星魂 6 的逐发穿透**同一形状** ✓。⚠ 不是长期挂着的属性：挂了会在【血仇】结束（致命一击不死那条 `REMOVE_STATE 血仇`）时漏收 ✗。⛔ **同句后半未写**：「接受治疗后会将 **40%** 的治疗数值转化为充能，累计不超过 **40** 点，任意单位行动后重置」—— 后半要一个**每次行动重置的累计器**（不是充能本身，是「这一窗口里已转化多少」），引擎没有这个数 ✗。",
+      "_status": "implemented"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon4_the_bloodfeud_crits_harder",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "self has_state 血仇"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.3,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1404 万敌 星魂 4 号角惊觉缄默的狂狮: 「【血仇】状态期间暴击伤害提高30%…」 参数 = [0.1, 0.3]",
+      "_note": "「【血仇】期间**暴击伤害提高 30%**」—— 与星魂 2 的防御穿透**同一形状**（`DEALING_DAMAGE` + `self has_state 血仇` + `instance: true`），因为暴击伤害是在**这一发**结算时读的 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TAKING_HIT",
+      "id": "eidolon4_a_hit_heals_ten_percent",
+      "min_eidolon": 4,
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.1,
+          "target": "self"
+        }
+      ],
+      "source": "1404 万敌 星魂 4: 「…且受到来自敌方目标的攻击后回复等同于自身10%生命上限的生命值。」 参数 = [0.1, 0.3]",
+      "_note": "「**受到来自敌方目标的攻击后**，回复等同于自身 **10% 生命上限**的生命值」—— `TAKING_HIT` + `target == self` + `HEAL { scale: owner_max_hp, percent: 0.1 }` ✓（`TAKING_HIT` 只由**敌方**打我方时发 ✓ ⇒ 「来自敌方目标」不需要另写门）。⚠ 同一条句子里**没有**「【血仇】期间」的门（它只修饰前半的暴击伤害）⇒ 本条**不**加 `self has_state 血仇` ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_enters_bloodfeud_at_once",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "血仇",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "scale": "self_attr:HEALTH",
+          "percent": 0.5,
+          "permanent": true,
+          "buff": "血仇",
+          "target": "self"
+        }
+      ],
+      "source": "1404 万敌 星魂 6 往日攀陟沉积的血山: 「进入战斗时立刻进入【血仇】状态且【弑神登神】所需的充能值降低至100点。」",
+      "_note": "「**进入战斗时立刻进入【血仇】状态**」—— `BATTLE_START` + `APPLY_BUFF 血仇` + **状态自己的那条生命上限修饰**（`MODIFY_ATTR HEALTH` + `buff: 血仇`，与天赋进状态那一条**逐字同形** ✓：进入【血仇】就是「状态 + 它的 +50% 生命上限」两件事，只写状态会让 E6 的【血仇】比天赋的弱一半 ✗）。⚠ 天赋那条有 `!self has_state 血仇` 的门 ✓ ⇒ 开场已在【血仇】时不会被再进一次、也不会重复加生命上限 ✓。⛔ **同句后半未写**：「【弑神登神】所需的充能值**降低至 100 点**」—— 那个 150 是**规则条件里的字面量**（`self_resource:天赋充能 >= 150` + `SPEND_RESOURCE 150`），`MODIFY_RULE` 只改 amount / duration / chance，改不了**条件里的阈值** ✗。",
       "_status": "implemented"
     }
   ]
