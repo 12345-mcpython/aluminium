@@ -1029,6 +1029,10 @@ public class EffectSpec {
      *       <b>summon's</b> attack ends a buff on the <b>summon</b> the same way (a memosprite), and it does not
      *       end its summoner's: the notification asks {@code attacker == owner};</li>
      *   <li>{@code "next_skill"} - after the owner casts a Skill (set 122's "the next Skill");</li>
+     *   <li>{@code "next_skill:<slot>"} - after the owner casts the row in that <b>data slot</b> (「下一次强化普攻」,
+     *       1224 Eidolon 6: slot 8 is the enhanced basic). It exists because the two neighbours are both wrong there:
+     *       {@code next_attack} also ends on a Skill, and {@code next_skill} also ends on any Skill - only the slot can
+     *       say "that one row". The number is what a cast reports as {@code from_skill_id};</li>
      *   <li>{@code "next_ultimate"} - after the owner casts an Ultimate.</li>
      * </ul>
      *

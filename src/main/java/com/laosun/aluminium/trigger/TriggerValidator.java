@@ -2295,12 +2295,29 @@ final class TriggerValidator {
             // the second entry load (the buff would then end on one event while the file claims two).
             for (String name : effect.getUntil()) {
                 String normalized = name.trim().toLowerCase(Locale.ROOT);
+                // `next_skill:<slot>`: the lifetime that names ONE row (「下一次强化普攻」), not a category. Its parameter
+                // is the data slot a cast reports; "8x" or "0" would load and then never end, so the number is checked here.
+                if (normalized.startsWith(TriggerLifetimes.NEXT_SKILL_SLOT_PREFIX)) {
+                    String slot = normalized.substring(TriggerLifetimes.NEXT_SKILL_SLOT_PREFIX.length()).trim();
+                    try {
+                        if (Integer.parseInt(slot) <= 0) {
+                            throw new NumberFormatException();
+                        }
+                    } catch (NumberFormatException notANumber) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " has \"until\": '" + name + "', whose slot is not a positive integer; "
+                                        + "write it as \"next_skill:8\" (the data slot a cast reports) "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    continue;
+                }
                 if (!LIFETIMES.contains(normalized)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " has unknown \"until\": '" + name + "' in " + spellUntil(effect)
                                     + "; known lifetimes are "
                                     + String.join(", ", LIFETIMES.stream().sorted().toList())
-                                    + " (source: " + spec.getSource() + ")");
+                                    + " (or \"next_skill:<slot>\", see TRIGGER.md) "
+                                    + "(source: " + spec.getSource() + ")");
                 }
             }
             return;

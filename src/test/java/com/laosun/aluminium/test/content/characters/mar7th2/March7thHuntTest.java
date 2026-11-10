@@ -145,4 +145,35 @@ public class March7thHuntTest {
     private static Random fixed() {
         return BattleFixture.alwaysRoll(0.0);
     }
+    /**
+     * Eidolon 6's buff waits for the ENHANCED BASIC specifically (slot 8), not for any attack: after the Ultimate a
+     * Skill cast must leave it standing, and the slot-8 row must consume it.
+     *
+     * <p>With the old spelling ({@code until: next_attack}) the middle step would already have ended it - a wrong
+     * duration with no symptom, which is what the engine-side `BuffLifetimeTest` guards from the other side.
+     */
+    @Test
+    public void theSixthEidolonWaitsForTheEnhancedBasic() {
+        Character march = CharacterFactory.create(MARCH, LEVEL);
+        march.setEidolonRank(6);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(march, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), fixed());
+        battle.startBattle();
+        double base = march.getAttribute(AttributeType.CRIT_ATTACK).get();
+
+        battle.castImmediate(march.getSkills().get(SkillType.ULTRA), march, List.of(enemy));
+        Assertions.assertEquals(base + 0.5, march.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "the Ultimate arms it");
+
+        battle.castImmediate(march.getSkills().get(SkillType.SKILL), march, List.of(enemy));
+        Assertions.assertEquals(base + 0.5, march.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "a Skill is not the enhanced basic");
+
+        // Her talent pays seven charges for the enhanced basic; this case only needs the cast to happen.
+        march.getResources().gain("充能", 7);
+        battle.castImmediate(new com.laosun.aluminium.skill.DefaultSkill(MARCH, 8, LEVEL), march, List.of(enemy));
+        Assertions.assertEquals(base, march.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
+                "slot 8 is the enhanced basic, and it consumes the buff");
+    }
+
 }

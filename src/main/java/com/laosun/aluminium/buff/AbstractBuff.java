@@ -199,6 +199,24 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     protected Set<Lifetime> lifetimes = EnumSet.noneOf(Lifetime.class);
 
     /**
+     * The <b>slots</b> whose cast ends this buff - 「下一次强化普攻」 names one row, not the category "an attack".
+     *
+     * <p>Reader: 1224 March 7th (三月七) Eidolon 6 (「下一次<b>强化普攻</b>造成的暴击伤害提高 50%」), where
+     * {@code next_attack} would end on a 战技 as well. The value is the data slot the cast reports
+     * ({@code Skill.getSkillSlot()}: 8 for the enhanced basic, 20/21 for the two Elation rows), the same number
+     * {@code from_skill_id} reads.
+     */
+    @Getter
+    protected Set<Integer> untilSkillSlots = Set.of();
+
+    /**
+     * Replaces the slots whose cast ends this buff; empty means "no slot-based end".
+     */
+    public void setUntilSkillSlots(Collection<Integer> slots) {
+        this.untilSkillSlots = slots == null || slots.isEmpty() ? Set.of() : Set.copyOf(slots);
+    }
+
+    /**
      * Replaces the ending events with the ones a rule named; an empty collection means "no event-based end",
      * which is what a buff that states no {@code "until"} gets.
      */
@@ -240,6 +258,12 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         SkillCategory category = skill == null || skill.getData() == null
                 ? null
                 : skill.getData().getCategory();
+        // The slot spelling comes first: 「下一次强化普攻」 is a ROW, not a category (a 战技 is NEXT_SKILL; the enhanced
+        // basic is a basic attack that NEXT_ATTACK would also collect - only the slot tells them apart).
+        if (!untilSkillSlots.isEmpty() && skill != null && untilSkillSlots.contains(skill.getSkillSlot())) {
+            endNow();
+            return;
+        }
         if ((lifetimes.contains(Lifetime.NEXT_SKILL) && category == SkillCategory.BPSKILL)
                 || (lifetimes.contains(Lifetime.NEXT_ULTIMATE) && category == SkillCategory.ULTRA)
                 || (lifetimes.contains(Lifetime.NEXT_ELATION_SKILL) && category == SkillCategory.ELATION_DAMAGE)) {

@@ -572,7 +572,7 @@ TAUNT                  TICK_DOT
 |---|---|
 | `turns` | 持续 N 回合 |
 | `permanent` | 整场战斗，且不被回合边界递减 |
-| `until` | 由事件结束（如 `next_attack`）；与 `turns` 二选一 |
+| `until` | 由事件结束（如 `next_attack`；**`next_skill:<槽位>`** = 只由**那一行**的施放结束，读者 1224 星魂 6）；与 `turns` 二选一 |
 | `ticks_on` | 时长按谁的回合递减：`self` = 持有者 |
 
 ⚠ `turns` / `permanent` / `until` 三选一；`until` 时不能写 `turns`。

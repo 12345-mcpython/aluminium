@@ -60,6 +60,7 @@ final class TriggerLifetimes {
      */
     static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
         buff.setLifetimes(lifetimesOf(effect));
+        buff.setUntilSkillSlots(skillSlotsOf(effect));
         return buff;
     }
 
@@ -93,6 +94,37 @@ final class TriggerLifetimes {
 
 
     /**
+     * The lifetime spelling that names a <b>slot</b>: {@code next_skill:<n>} - 「下一次强化普攻」 (1224 Eidolon 6), where
+     * {@code next_skill} would end on any Skill and {@code next_attack} on any attack.
+     *
+     * <p>The number is the data slot the cast reports ({@code Skill.getSkillSlot()}), the same one {@code from_skill_id}
+     * reads: 8 for the enhanced basic rows, 20/21 for the two Elation rows of 1513.
+     */
+    static final String NEXT_SKILL_SLOT_PREFIX = "next_skill:";
+
+    /**
+     * The slots whose cast ends the buff ({@code next_skill:<n>} entries); empty when none is stated.
+     *
+     * <p>A malformed number cannot reach here: {@code TriggerValidator.requireDuration} checks every {@code until}
+     * entry at load time, so this is an engine-side inconsistency rather than a content error.
+     */
+    private static Set<Integer> skillSlotsOf(EffectSpec effect) {
+        List<String> until = effect.getUntil();
+        if (until == null || until.isEmpty()) {
+            return Set.of();
+        }
+        Set<Integer> slots = new java.util.HashSet<>();
+        for (String name : until) {
+            String normalized = name.trim().toLowerCase(Locale.ROOT);
+            if (!normalized.startsWith(NEXT_SKILL_SLOT_PREFIX)) {
+                continue;
+            }
+            slots.add(Integer.parseInt(normalized.substring(NEXT_SKILL_SLOT_PREFIX.length()).trim()));
+        }
+        return slots;
+    }
+
+    /**
      * The lifetimes a validated effect names; <b>empty</b> when it names none.
      *
      * <p>Every name has already been checked against {@link TriggerValidator} at load time, so anything else here is an
@@ -107,6 +139,10 @@ final class TriggerLifetimes {
         }
         Set<AbstractBuff.Lifetime> lifetimes = EnumSet.noneOf(AbstractBuff.Lifetime.class);
         for (String name : until) {
+            // The slot spellings are not in the enum (they carry a parameter); they ride the buff own slot set.
+            if (name.trim().toLowerCase(Locale.ROOT).startsWith(NEXT_SKILL_SLOT_PREFIX)) {
+                continue;
+            }
             lifetimes.add(switch (name.trim().toLowerCase(Locale.ROOT)) {
                 case "next_attack" -> AbstractBuff.Lifetime.NEXT_ATTACK;
                 case "next_skill" -> AbstractBuff.Lifetime.NEXT_SKILL;

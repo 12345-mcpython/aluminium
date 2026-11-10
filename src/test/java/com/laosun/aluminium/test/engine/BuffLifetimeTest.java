@@ -183,6 +183,25 @@ public class BuffLifetimeTest {
         battle.castImmediate(new DefaultSkill(1513, 20, 1), owner, List.of(monster()));
         Assertions.assertEquals(0, critRateBonus(owner), EPS, "the Elation cast is");
     }
+    /**
+     * {@code next_skill:<slot>}: the lifetime that names ONE row - 「下一次强化普攻」 (1224 Eidolon 6).
+     *
+     * <p>Reader-side: a Skill (slot 2) must not consume it, and the named row must. The named row here is 1513 Elation
+     * skill (slot 20), the same row the neighbouring case casts - a slot whose data the engine has, so the cast is a
+     * real one.
+     */
+    @Test
+    public void aNamedSlotIsItsOwnLifetime() {
+        Battle battle = battleWithBuff("next_skill:20");
+        Character owner = battle.characters().getFirst();
+
+        attack(battle, owner, 1);
+        Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "an ordinary basic is not the row");
+        attack(battle, owner, 2);
+        Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "a Skill is not the row");
+        battle.castImmediate(new DefaultSkill(1513, 20, 1), owner, List.of(monster()));
+        Assertions.assertEquals(0, critRateBonus(owner), EPS, "the named slot ends it");
+    }
 
     // ==================================================================
     // 1b. Several events at once: "普攻或战技"
