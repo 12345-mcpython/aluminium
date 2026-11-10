@@ -69,15 +69,17 @@ public class HertaTest {
     }
 
     /**
-     * Census: the threshold bonus, the frozen bonus, the resistance and the level convention.
+     * Census: the threshold bonus, the frozen bonus, the resistance, the level convention and the technique.
      */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "the threshold bonus and the frozen bonus");
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the resistance and the level convention");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the resistance, the level convention, and the technique's ATK raise");
     }
+
 
     private static final class Fixture {
         private final Character herta = CharacterFactory.create(HERTA, LEVEL);

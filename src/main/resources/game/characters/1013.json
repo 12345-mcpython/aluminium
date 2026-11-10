@@ -102,6 +102,25 @@
     },
     {
       "on": "BATTLE_START",
+      "id": "technique_raises_her_attack_next_battle",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.4,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1013 黑塔 秘技 可以优化一下: 「使用秘技后，下一次战斗开始时黑塔攻击力提高40%，持续3回合。」 参数 = [0.4, 3]",
+      "_note": "「使用秘技后，**下一次战斗开始时**黑塔**攻击力提高 40%**，持续 **3 回合**」—— ① 门是 **`self has_state 秘技`**（引擎在 `startBattle` 之前把「用过秘技」落成具名状态 ✓，所以这条**不会**在没有秘技时白给）；② `MODIFY_ATTR ATTACK 0.4` + `turns: 3` + `self` ✓。⚠ 数值按**秘技行**（`[0.4, 3]`，单行 ⇒ 字面量不是「冻结了会变的行」✓）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
       "id": "eidolon3_levels",
       "min_eidolon": 3,
       "do": [
