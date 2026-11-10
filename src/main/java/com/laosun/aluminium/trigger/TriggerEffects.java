@@ -300,6 +300,12 @@ final class TriggerEffects {
                 buff.gateStacks(effect.getWhileStacks().trim(),
                         effect.getWhileStacksMin() == null ? 1 : effect.getWhileStacksMin(), ctx.owner());
             }
+            // "while the owner's RESOURCE is at least N": the same threshold, for a tally that lives on the ResourceManager.
+            // Reader: 1224 March 7th (三月七)'s talent, 「充能大于等于 7 点时，造成伤害提高 80%」.
+            if (effect.getWhileResource() != null && !effect.getWhileResource().isBlank()) {
+                buff.gateResource(effect.getWhileResource().trim(),
+                        effect.getWhileResourceMin() == null ? 1 : effect.getWhileResourceMin(), ctx.owner());
+            }
             // "while the unit CARRYING this holds X": the mirror of `while_state`, for the case where the condition and the
             // modifier sit on the SAME unit (1307's Epiphany raises the damage its victims take).
             if (effect.getWhileHolderState() != null && !effect.getWhileHolderState().isBlank()) {

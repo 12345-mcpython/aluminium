@@ -75,6 +75,43 @@ public class March7thHuntTest {
     }
 
     /**
+     * 「充能大于等于 7 点时…造成的伤害提高 80%」 — the boost is gated on the RESOURCE, so it must disappear the moment the
+     * tally drops below 7, without any rule "removing" it.
+     *
+     * <p>This is the criterion for {@code while_resource}: the buff manager's own sweep is what retires the modifier, so the
+     * test has to (a) prove the boost is on at 7, (b) drop the tally to 6, and (c) fire a turn boundary so the sweep runs.
+     * A gate that only "never fired" would pass (a) and (b) but never retire anything - so the negative half is the real test.
+     */
+    @Test
+    public void sevenChargesRaiseHerDamageAndSixTakeItBack() {
+        Character march = CharacterFactory.create(MARCH, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(march, ally), List.of(enemy), fixed());
+        battle.startBattle();
+
+        double base = march.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+
+        // Reaching 7 fires the talent: the tally moves one point at a time, so the seventh point is what crosses the line.
+        for (int i = 0; i < 7; i++) {
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                    TriggerEvent.BASIC_ATTACK, march, enemy, 0, 0));
+        }
+        Assertions.assertTrue(chargeOf(march) >= 7, "the seven basics must reach the threshold, was " + chargeOf(march));
+        double raised = march.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        Assertions.assertTrue(raised > base, "「造成的伤害提高80%」: the boost must be on at 7 charges, base=" + base
+                + " raised=" + raised);
+
+        // Spend the charge by hand (the enhanced basic does this in play) and cross a turn boundary: the sweep must retire it.
+        march.getResources().get("充能").setValue(6);
+        // The gate is asked in the buff tick, i.e. at HER turn boundary - not on a bare TURN_START event.
+        march.getBuffManager().beforeMove();
+        double after = march.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        Assertions.assertEquals(base, after, 1e-9,
+                "「充能大于等于7点时」: at 6 charges the +80% must be gone (the resource gate is what retires it)");
+    }
+
+    /**
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int chargeOf(Character march) {

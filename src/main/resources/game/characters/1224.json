@@ -163,6 +163,8 @@
           "percent": 0.8,
           "permanent": true,
           "while_state": "强化",
+          "while_resource": "充能",
+          "while_resource_min": 7,
           "target": "self"
         },
         {
@@ -174,7 +176,7 @@
         }
       ],
       "source": "1224 三月七 天赋 师父，我悟了！: 「充能大于等于7点时，三月七立即行动，造成的伤害提高80%，普攻得到强化且无法施放战技。」",
-      "_note": "「**充能大于等于 7 点时**，三月七**立即行动**，造成的**伤害提高 80%**，**普攻得到强化**且**无法施放战技**」—— 四件事一条规则，各自一个 op：① `ADVANCE percent: 1`（「立即行动」= 行动提前 100%，1101 的布洛妮娅同写法 ✓）；② 状态 `强化` 带 **`blocks: \"skill\"`**（引擎的 `blocks` 词表里就有 `skill` ✓，1506 用的是 `ultimate` ✓）；③ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.8` + **`while_state: 强化`**（增伤跟着这个状态走 ✓，状态一摘就失效 ✓）；④ `REPLACE_SKILL` 把普攻槽换成 8（强化普攻的数据行 ✓）。⚠ 门要**两个**：`resource_changed:充能`（只在充能变化时看）+ `self_resource:充能 >= 7`（阈值）。⚠ **近似**：文档的「施放**强化普攻后**消耗 7 点」由下一条规则处理（`talent_the_enhanced_basic_spends_seven`），中间任何时刻掉到 6 也不会自动解除强化 —— 引擎没有「按资源值自动失效」的写法，已登记。",
+      "_note": "「**充能大于等于 7 点时**，三月七**立即行动**，造成的**伤害提高 80%**，**普攻得到强化**且**无法施放战技**」—— 四件事一条规则，各自一个 op：① `ADVANCE percent: 1`（「立即行动」= 行动提前 100%，1101 的布洛妮娅同写法 ✓）；② 状态 `强化` 带 **`blocks: \"skill\"`**（引擎的 `blocks` 词表里就有 `skill` ✓，1506 用的是 `ultimate` ✓）；③ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.8` + **`while_state: 强化`**（增伤跟着这个状态走 ✓，状态一摘就失效 ✓）；④ `REPLACE_SKILL` 把普攻槽换成 8（强化普攻的数据行 ✓）。⚠ 门要**两个**：`resource_changed:充能`（只在充能变化时看）+ `self_resource:充能 >= 7`（阈值）。⭐ **2026-11-10**：增伤现在挂 **`while_resource: 充能` + `while_resource_min: 7`**（本轮给 `AbstractBuff` 加的**资源阈值门**，`EffectSpec.while_resource`）⇒ 「掉到 6 点就自动失效」**不再是近似** ✓；消耗 7 点仍由 `talent_the_enhanced_basic_spends_seven` 处理 ✓。",
       "_status": "implemented"
     },
     {

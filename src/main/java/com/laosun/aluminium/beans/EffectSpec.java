@@ -168,6 +168,8 @@ public class EffectSpec {
         copy.countsAsRequires = this.countsAsRequires;
         copy.whileStacks = this.whileStacks;
         copy.whileStacksMin = this.whileStacksMin;
+        copy.whileResource = this.whileResource;
+        copy.whileResourceMin = this.whileResourceMin;
         copy.whileHpPercent = this.whileHpPercent;
         copy.whileHolderHpPercent = this.whileHolderHpPercent;
         copy.whileSummonCount = this.whileSummonCount;
@@ -673,6 +675,23 @@ public class EffectSpec {
      */
     @SerializedName("while_hp_percent")
     private Double whileHpPercent;
+
+    /**
+     * 「充能大于等于 **7** 点时…造成的伤害提高 80%」 (1224 March 7th (三月七)'s talent): a LIVE gate on the owner's
+     * <b>resource</b> value.
+     *
+     * <p><b>Why a resource needs its own gate.</b> {@code while_stacks} asks a counter that lives on the buff manager; a
+     * resource lives on {@code ResourceManager} and may be any integer (a charge tally, a recorded value). The sentence's
+     * own shape says the modifier ends when the tally drops below the threshold, which is exactly this gate.
+     *
+     * <p>⚠ Only {@code MODIFY_ATTR} attaches it today (the same asymmetry the other live gates have).
+     */
+    @SerializedName("while_resource")
+    private String whileResource;
+
+    /** The least resource value that keeps the modifier alive ({@code null} = 1). */
+    @SerializedName("while_resource_min")
+    private Integer whileResourceMin;
 
     /**
      * 「为当前生命值百分比 **≤50%** 的我方目标提供治疗时」 (1110 Lynx (玲可) 星魂 1): the gate asks about the unit the modifier sits
@@ -1795,6 +1814,5 @@ public class EffectSpec {
         return maxStacks != null ? maxStacks : stacks;
     }
 }
-
 
 

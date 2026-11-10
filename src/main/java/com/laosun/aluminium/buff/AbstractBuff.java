@@ -323,6 +323,26 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     }
 
     /**
+     * The RESOURCE threshold this buff is conditional on, or {@code null}: 「充能大于等于 7 点时…造成的伤害提高 80%」
+     * (1224 March 7th (三月七)'s talent). The sibling of {@link #gateStacksName} for a value that lives on the
+     * {@code ResourceManager} rather than on the buff manager - a charge tally, a recorded total, anything op
+     * {@code GAIN_RESOURCE} may move.
+     */
+    private String gateResourceName;
+    private Integer gateResourceMin;
+
+    /**
+     * @param resource the resource whose value the gate asks about
+     * @param min      the least value that keeps the buff alive
+     * @param owner    the unit whose resource it is (the rule owner)
+     */
+    public void gateResource(String resource, int min, CanHit owner) {
+        this.gateResourceName = resource;
+        this.gateResourceMin = min;
+        this.gateOwner = owner;
+    }
+
+    /**
      * The HP SHARE threshold this buff is conditional on, or {@code null}: 「当前生命值百分比大于等于 80% 时，提高自身 12% 的
      * 冰属性抗性穿透」 (1209 Yanqing (彦卿)'s Eidolon 4).
      *
@@ -472,6 +492,10 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         }
         if (gateStacksName != null) {
             return gateOwner.getBuffManager().stacksOf(gateStacksName) < gateStacksMin;
+        }
+        if (gateResourceName != null) {
+            return gateOwner.getResources() == null
+                    || gateOwner.getResources().value(gateResourceName) < gateResourceMin;
         }
         if (gateHpPercentMin != null) {
             double maxHp = gateOwner.getMaxHp();
