@@ -41,28 +41,33 @@ public class MemorySCurtainNeverFallsTest {
         return battle;
     }
 
-    private double partyBoost() {
-        return wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get()
-                + ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+    /**
+     * The ALLY's boost - the attributable reading.
+     *
+     * <p>⚠ Not the party sum: the wearer's OWN kit also moves its panel now (1205's Skill enters 【地狱变】, which grants
+     * him +40% damage), so a sum cannot isolate the cone's 8%. The ally is the unit only this cone's rule touches.
+     */
+    private double allyBoost() {
+        return ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
     @Test
     public void aSkillLiftsTheWholeParty() {
         Battle battle = battle(true);
-        double before = partyBoost();
+        double before = allyBoost();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
-        double after = partyBoost();
+        double after = allyBoost();
         System.out.println("[24005] party damage boost before=" + before + " after a Skill=" + after);
-        Assertions.assertEquals(2 * BOOST, after - before, 1e-9, "8% each for the wearer and the ally");
+        Assertions.assertEquals(BOOST, after - before, 1e-9, "8% each for the wearer and the ally");
     }
 
     @Test
     public void somebodyElsesSkillDoesNotCount() {
         Battle battle = battle(true);
-        double before = partyBoost();
+        double before = allyBoost();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, enemy, 0, 0));
-        System.out.println("[24005] after the ALLY's Skill: +" + (partyBoost() - before));
-        Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "the wearer's own cast (false case)");
+        System.out.println("[24005] after the ALLY's Skill: +" + (allyBoost() - before));
+        Assertions.assertEquals(0.0, allyBoost() - before, 1e-9, "the wearer's own cast (false case)");
     }
 
     @Test
@@ -90,9 +95,9 @@ public class MemorySCurtainNeverFallsTest {
     @Test
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
-        double before = partyBoost();
+        double before = allyBoost();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
-        System.out.println("[24005] without the cone: +" + (partyBoost() - before));
-        Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "no cone, no boost (false case)");
+        System.out.println("[24005] without the cone: +" + (allyBoost() - before));
+        Assertions.assertEquals(0.0, allyBoost() - before, 1e-9, "no cone, no boost (false case)");
     }
 }

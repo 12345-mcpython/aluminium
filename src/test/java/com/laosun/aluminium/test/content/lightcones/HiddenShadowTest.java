@@ -24,7 +24,12 @@ import java.util.List;
  */
 public class HiddenShadowTest {
     private static final int CONE = 20018;
-    private static final int WEARER = 1205;
+    /**
+     * The wearer must be a unit whose own kit does not move the same panel on the same event. It used to be 1205, but his
+     * Skill now enters 【地狱变】 (+40% damage), which would be inside the measured "extra" and would dilute the two ranks'
+     * ratio. 1001 (三月七)'s Skill only shields and raises aggro.
+     */
+    private static final int WEARER = 1001;
     private static final int LEVEL = 80;
     private static final double RANK_ONE = 0.6;
     private static final double RANK_TWO = 0.75;

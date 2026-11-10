@@ -74,6 +74,11 @@ public class ElationBrimmingWithBlessingsTest {
         for (var event : List.of(TriggerEvent.SKILL_CAST, TriggerEvent.ULT_CAST)) {
             for (var rule : wearer.getTriggerTable().matching(event,
                     new TriggerTable.TriggerContext(wearer, wearer, ally, 0, 0, null, battle, null))) {
+                // Only this cone's rules: the wearer's own kit also has MODIFY_ATTRs on these events (1205's Skill
+                // enters 【地狱变】 with a +40% boost), and this case is about the cone's spec, not the kit's.
+                if (!rule.id().startsWith("cone24006_")) {
+                    continue;
+                }
                 for (var effect : rule.effects()) {
                     if (!"MODIFY_ATTR".equals(effect.getOp())) {
                         continue;
