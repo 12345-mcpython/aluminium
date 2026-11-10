@@ -188,12 +188,67 @@ public class AventurineWaveflairMilestoneTest {
         Assertions.assertEquals(20, fervor(), "and nothing spent the counter");
     }
 
+    /**
+     * Eidolon 2: 「【热意】上限提高至 50 点，达到 40 点/50 点时，也会触发…」.
+     *
+     * <p>The cap has to move FIRST, or the two thresholds are unreachable: the declaration says 30, so a gain of 41
+     * clamps at 30 and the 40-point crossing never happens. That is why this case reads {@code getMax()}, not only the
+     * damage.
+     *
+     * <p>⚠ The counter after a crossing is 44, not 40: Eidolon 2's THIRD sentence pays 「施放欢愉技后额外获得 4 点」 on
+     * the auto-cast itself, which is a real Elation cast.
+     */
+    @Test
+    public void theSecondEidolonRaisesTheCapAndAddsTheFortyAndFiftyCrossings() {
+        build(2);
+        Assertions.assertEquals(50, wolf.getResources().get(FERVOR).getMax(),
+                "「【热意】上限提高至 50 点」 - the DECLARED cap, raised at battle start");
+
+        wolf.getResources().gain(FERVOR, 39);
+        double beforeForty = enemy.getCurrentHp();
+        alleyAttacks();                                  // 39 -> 40: a crossing at E2
+        Assertions.assertTrue(beforeForty - enemy.getCurrentHp() > 0, "「达到 40 点时…」");
+        Assertions.assertEquals(44, fervor(), "the base cast does not spend, and E2 pays 4 more after it");
+
+        double afterForty = enemy.getCurrentHp();
+        alleyAttacks();                                  // 44 -> 45: not a threshold
+        Assertions.assertEquals(0.0, afterForty - enemy.getCurrentHp(), 1e-9,
+                "only the crossing pays");
+
+        wolf.getResources().gain(FERVOR, 4);              // 45 -> 49
+        double beforeFifty = enemy.getCurrentHp();
+        alleyAttacks();                                  // 49 -> 50: the raised cap's own threshold
+        Assertions.assertTrue(beforeFifty - enemy.getCurrentHp() > 0, "「达到 50 点时…」");
+    }
+
+    /**
+     * The cap is an EIDOLON's: at E1 the same 41-point gain still clamps at 30, so the 40-point tier is unreachable.
+     */
+    @Test
+    public void withoutTheSecondEidolonTheCapStaysAtThirty() {
+        build(1);
+        Assertions.assertEquals(30, wolf.getResources().get(FERVOR).getMax(), "the declaration's cap");
+        wolf.getResources().gain(FERVOR, 41);
+        Assertions.assertEquals(30, fervor(), "「上限为30点」 clamps the gain");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
 
     private void build() {
+        build(0);
+    }
+
+    /**
+     * The same fixture with an Eidolon rank set BEFORE the battle starts.
+     *
+     * <p>⚠ Load-bearing: a BATTLE_START rule reads the rank when the battle starts, so setting it afterwards leaves the
+     * cap at the declaration (measured: the E2 cap stayed 30 when the rank was set after startBattle()).
+     */
+    private void build(int eidolon) {
         wolf = CharacterFactory.create(OWNER, 80);
+        wolf.setEidolonRank(eidolon);
         // A crit roll would make every damage ratio below a coin toss, so it is pinned off.
         wolf.setAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE,
                 new com.laosun.aluminium.DoubleValue(0));

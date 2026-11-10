@@ -869,6 +869,9 @@ public final class TriggerInterpreter {
                 }
             }
             case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
+            // The DECLARED cap, not the overflow tier above it. Reader: 1513 Aventurine · Waveflair Eidolon 2
+            // (「【热意】上限提高至 50 点」) -- the base declaration states 30 and an Eidolon raises it for the battle.
+            case RAISE_RESOURCE_MAX -> raiseResourceMax(effect, ctx);
             // The pool is team-level and its owner is the policy, so this is the one op that goes
             // straight to the policy rather than through a unit's resources.
             case RAISE_SKILL_POINT_CAP -> battle.getSkillPointPolicy().raiseMax(effect.getValue() != null
@@ -1266,6 +1269,33 @@ public final class TriggerInterpreter {
         return effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
     }
 
+    /**
+     * {@code RAISE_RESOURCE_MAX}: 「【热意】上限提高至 50 点」 - the <b>declared</b> cap, not the overflow tier above it.
+     *
+     * <p><b>Why a second op instead of a flag on {@link #raiseResourceCap}.</b> That one widens {@code maxOverflow}, the
+     * tier where 「可溢出点数」 lives (1407/1408/1512), and normal gains clamp at {@code getMax()} -- a different number.
+     * A flag would make one op mean two quantities, which is the class of ambiguity this vocabulary keeps refusing.
+     *
+     * <p>The raise is additive and lasts the battle ({@code Resource.raiseMax}); the resource must be declared by the
+     * unit or be a battle-level party counter, the same resolution {@code RAISE_RESOURCE_CAP} uses.
+     *
+     * @param effect the effect ({@code resource} + {@code amount}, or a {@code value} provider)
+     * @param ctx    the firing context
+     */
+    private static void raiseResourceMax(EffectSpec effect, TriggerContext ctx) {
+        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
+        com.laosun.aluminium.state.Resource resource = holder.getResources().get(effect.getResource());
+        if (resource == null) {
+            resource = ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource());
+        }
+        if (resource == null) {
+            throw new IllegalStateException("RAISE_RESOURCE_MAX names the resource '" + effect.getResource()
+                    + "', which this unit neither declares nor has at party level");
+        }
+        resource.raiseMax(effect.getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
+                : (int) Math.round(effect.getAmount()));
+    }
     /**
      * Widens a resource's OVERFLOW for its owner (reader: 114151"[新蕊] can overflow to #3%").
      *

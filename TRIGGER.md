@@ -389,18 +389,19 @@ COMMAND_SUMMON         CONSUME_HP             DAMAGE                 DELEGATE_DA
 DISMISS_SUMMON         DISPEL                 EXTEND_BUFF            EXTRA_TURN
 GAIN_ENERGY            GAIN_RESOURCE          GAIN_SKILL_POINT       HEAL
 INSERT_ACTION          MODIFY_ATTR            MODIFY_DAMAGE_TAKEN    MODIFY_RULE
-RAISE_ENERGY_TO        RAISE_RESOURCE_CAP     RAISE_SKILL_HITS       RAISE_SKILL_LEVEL
-RAISE_SKILL_POINT_CAP  REGISTER_HEAL_BONUS    REMOVE_BUFF            REMOVE_RESOURCE
-REMOVE_STACK           REMOVE_STATE           REPLACE_SKILL          RESET_RESOURCE_CAP
-RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF          SHARE_DAMAGE
-SHIELD
-SPEND_RESOURCE         SPEND_STEPS            START_COUNTDOWN        SUMMON
-SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
+RAISE_ENERGY_TO        RAISE_RESOURCE_CAP     RAISE_RESOURCE_MAX     RAISE_SKILL_HITS
+RAISE_SKILL_LEVEL      RAISE_SKILL_POINT_CAP  REGISTER_HEAL_BONUS    REMOVE_BUFF
+REMOVE_RESOURCE        REMOVE_STACK           REMOVE_STATE           REPLACE_SKILL
+RESET_RESOURCE_CAP     RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF
+SHARE_DAMAGE           SHIELD                 SPEND_RESOURCE         SPEND_STEPS
+START_COUNTDOWN        SUMMON                 SUMMON_SERVANT         SUPER_BREAK
+TAUNT                  TICK_DOT
 ```
 
 - `REDUCE_TOUGHNESS` 是**声明了但还没实现**的 op；写它会装载期报错并说明原因。
 - **`SHARE_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：`{"percent": 0.65, "target": "self"}` 表示「这一发的 65% **由目标承担**」—— 本发只保留 35%，并按**同元素/同攻击者/同 65% 基数**给 `target` 另开一发（走它自己的防御/抗性区，结算在当次之后）。读者：1208 符玄【穷观阵】。
 - `REPLACE_SKILL` 有两个方向：**装上**（`skill` + `skill_id` + 一个寿命）与 **`"remove": true`**（把该槽位的替换取下、恢复原来的行；不带 `skill_id`、不带寿命）。重复装上**同一**替换是 no-op（否则第二个会把强化行记成「原始」，卸下时反而装回去）。读者：1111 卢卡「≥2 层时强化 / <2 层时恢复」
+- **`RAISE_RESOURCE_MAX`**：把角色**声明**的资源上限抬高（`{ "resource": "热意", "amount": 20 }`）—— 与 **`RAISE_RESOURCE_CAP`** 不同：后者抬的是**溢出额度**（`max + maxOverflow` 那一层）。读者：1513 星魂 2「【热意】上限提高至 50 点」。
 - **`ADD_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：加的是一个**数值**（不是百分比）。默认进**基数层**（「伤害**值**提高」⇒ 会被暴击/增伤/防御/抗性放大）；**`"after_zones": true`** 改成在所有区**之后**加（「伤害**额外提高**，提高数值等同于…」⇒ 不暴击、不被任何区放大）。读者：1001 星魂 4（基数层）、1205 星魂 1 / 星魂 6（`after_zones`）。
 - **每个 op 的参数以 `TriggerInterpreter` 的类注释为准**，本文不复制。
 
@@ -519,7 +520,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 - 支持的范围：
   - **magnitude**：`DAMAGE` / `ADD_DAMAGE` / `HEAL` / `SHIELD` / `MODIFY_ATTR` / `APPLY_DOT` / `APPLY_CONTROL`（每回合伤害）/ `GAIN_ENERGY` / `GAIN_RESOURCE` / `SPEND_RESOURCE` / `REMOVE_RESOURCE` / `CONSUME_HP`；
   - **share**：`MODIFY_DAMAGE_TAKEN` / `BOOST_DAMAGE` / `ADVANCE` / `BOOST_TOUGHNESS` / `SUPER_BREAK` / `TICK_DOT` / `RAISE_ENERGY_TO` / `ABSORB_DAMAGE` / `RESIST_DEBUFF`（字面 `value` 必须在 `(0, 1]`，否则装载期拒绝）；
-  - **count**：`GAIN_SKILL_POINT` / `ADD_STACK` / `REMOVE_STACK` / `REMOVE_BUFF` / `DISPEL` / `RAISE_RESOURCE_CAP` / `RAISE_SKILL_HITS` / `RAISE_SKILL_POINT_CAP`（求值后四舍五入成整数）。
+  - **count**：`GAIN_SKILL_POINT` / `ADD_STACK` / `REMOVE_STACK` / `REMOVE_BUFF` / `DISPEL` / `RAISE_RESOURCE_CAP` / `RAISE_RESOURCE_MAX` / `RAISE_SKILL_HITS` / `RAISE_SKILL_POINT_CAP`（求值后四舍五入成整数）。
 - `GAIN_ENERGY` 的 `value` 仍受 `fixed` 控制：写 `fixed: true` 就是固定恢复，不写就走能量恢复效率。
 - 不读数值的 op（`MODIFY_RULE` 等）拒绝 `value`，不会静默忽略。
 - ratio 属性写 `{"type":"const","value":5}` 就是 +500%；速度写 `50` 就是 +50 点。

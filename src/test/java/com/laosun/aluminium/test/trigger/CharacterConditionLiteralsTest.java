@@ -404,6 +404,11 @@ public class CharacterConditionLiteralsTest {
                 List.of("resource_changed:热意", "self_resource:热意 >= 30.0", "self_resource_before:热意 < 30.0"));
         assertRule(1513, "CAST_SETUP", "fervor_extra_hit_per_point",
                 List.of("from_category ElationDamage", "actor == self", "from_skill_id == 21.0"));
+        assertRule(1513, "BATTLE_START", "eidolon2_the_cap_rises_to_fifty", List.of());
+        assertRule(1513, "RESOURCE_CHANGED", "eidolon2_autocasts_at_forty",
+                List.of("resource_changed:热意", "self_resource:热意 >= 40.0", "self_resource_before:热意 < 40.0"));
+        assertRule(1513, "RESOURCE_CHANGED", "eidolon2_autocasts_at_fifty",
+                List.of("resource_changed:热意", "self_resource:热意 >= 50.0", "self_resource_before:热意 < 50.0"));
         assertRule(8001, "BREAK", "talent_atk_on_break", List.of("actor == self"));
         assertRule(8001, "BATTLE_START", "level_convention", List.of());
         assertRule(8001, "BATTLE_START", "technique_party_heal", List.of("self has_state 秘技"));

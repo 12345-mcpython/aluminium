@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⛔ 星魂 1 的 **20/30 两档已落地（2026-11-11）**：`eidolon1_autocasts_at_twenty` / `_at_thirty`（`RESOURCE_CHANGED` + `resource_changed:热意` + `self_resource:热意 >= 20/30` + **新变量 `self_resource_before:热意 < 20/30`** —— 后者是「这一次变化**之前**的值」，`current - event_amount`，只在 `RESOURCE_CHANGED` 且资源同名时才是一个数，否则 NaN ⇒ 比较为假）。⚠ **旧登记作废**：「缺阈值跨越」是错的（HP 有 `target_hp_percent_before`，资源本来没有 —— 这一棒补的是**资源的那一个**，不是 HP 那个）。⛔ **仍未写**：星魂 2 的 **40/50** 两档 —— 它先要把【热意】**上限抬到 50**（`resources.max` 是静态声明，没有「星魂改上限」的写法）⇒ 在那之前 40/50 恒为假，不写。⚠ **近似**：一次变化**跨过两档**（如 9 → 25）时 10 与 20 两条都算「达到」⇒ 连放两次（句子的字面读法，未定夺）。",
-    "✅ **星魂 2 的第三句已落地（2026-11-09）**：「施放欢愉技后**额外获得 4 点【热意】**」= `eidolon2_the_elation_skill_pays_four_more_fervor`（**`CAST_SETUP`** + `actor == self` + `from_category ElationDamage` + `min_eidolon: 2` → `GAIN_RESOURCE 热意 4`）。⚠ 事件必须是 `CAST_SETUP`：`SKILL_CAST` **不携带施放类别**，装载期直接拒绝（§172 同一个坑）。⛔ **同句另两句仍未写**：(a)「【热意】**上限提高至 50 点**」—— 上限是 `resources[].max`，**静态**，没有「星魂改变上限」的写法；(b)「达到 **40/50 点**时**也会**触发天赋施放」—— 缺「**阈值跨越**」这个事实（现有那条 10 点规则靠「施放后花光热意」自我复位）。",
+    "✅ **星魂 2 的三句全部落地（2026-11-11）**：① 「施放欢愉技后**额外获得 4 点【热意】**」= `eidolon2_the_elation_skill_pays_four_more_fervor`（`CAST_SETUP` + `actor == self` + `from_category ElationDamage` + `min_eidolon: 2` → `GAIN_RESOURCE 热意 4`；事件必须是 `CAST_SETUP`，`SKILL_CAST` 不携带施放类别）；② 「【热意】**上限提高至 50 点**」= **`RAISE_RESOURCE_MAX { resource: 热意, amount: 20 }`**（`BATTLE_START` + `min_eidolon: 2` —— 抬的是**声明上限**，不是 `RAISE_RESOURCE_CAP` 的溢出额度）；③ 「达到 **40/50** 点时也会触发」= `eidolon2_autocasts_at_forty` / `_at_fifty`（与星魂 1 的 10/20/30 三条同形：`self_resource:热意 >= N` + **`self_resource_before:热意 < N`**）。判据 `AventurineWaveflairMilestoneTest`（含 E2 上限 = 50、39→40 与 49→50 的跨越、E1 上限仍是 30 的反例）。",
     "⛔ 星魂 6 **后半**：「砂金•戏浪施放 **2 次**欢愉技后，其后续施放的**所有**欢愉技均为【All in！敬炽烈一夏】，且在阿哈时刻外施放…**不再消耗【热意】**」—— 缺两样：① 「已施放 2 次」的**累计计数**（`CAST_COUNT` 那一族）；② 永久替换（`REPLACE_SKILL` 已支持 `permanent`，但它要**在第二次之后**才装，需要①来触发）。另「阿哈时刻外**不再消耗**」需要按场合开关 `SPEND_RESOURCE`。",
     "⭐ **行迹 纵享惊涛 的前半已落地（2026-11-08）**：`trace_another_joy_path_lifts_the_party_elation`（`BATTLE_START` + `self has_same_path_ally` → `ELATION_DAMAGE_BOOST +0.2`，`all_allies`）与 `trace_another_joy_path_lifts_her_own_elation_more`（同条件 → `+0.8`，`self`，**`coexist: true`** —— 不加会把全体那 20% 顶掉）。⛔ **后半仍未写**：① 「只有她一名「欢愉」角色时，她的欢愉技**被视为追加攻击**」—— 需要一个「本次伤害算作追加攻击」的标记（实例上可以写 `as_attack` 一族，但「欢愉技的伤害算追加攻击」还要落在**分类**上）；② 「队友攻击后，她获得 **2** 点【好活当赏】和 **1** 个笑点」—— 资源两项都现成，可写；③ 「使**阿哈**速度提高 25，持续到阿哈时刻结束」—— 阿哈没有单位（同 1502）。 ⛔ **行迹后半仍未写，其中「阿哈速度 +25」这轮试到一半、回滚了（2026-11-08）**：阿哈是**非忆灵召唤物**，引擎已经有 `SummonFactory.panelLess`（面板 = 召唤者属性、共享实时，判据 `PanelLessSummonTest` ✓），但**放上场这条路没打通**：`SUMMON` op 在 `CharacterFactory.requireSummonable` 有一道**装配守卫** ——「用了 `SUMMON` 却没有 `memosprite` spec 的角色直接拒绝」。我加了 `panel_less: true` 标记并让守卫放行，守卫**仍然开火**（原因没查到），于是整条链（标记 / 守卫 / 解释器回退 / 两条内容规则）**一起回滚**，只留下已经提交并有判据的 `SummonFactory.panelLess`。⇒ **下一棒从这里接**：先让守卫认得 `panel_less`（`table.rulesFor(event).stream().flatMap(rule -> rule.effects().stream())` 这条读法没能拿到标记，值得先打印一次再改）。",
     "⛔ ⚠ **欢愉技行里的「10 次 × 18%」那一段仍未写**：`SkillExecutor` 只取参数行的**第一列**（60% 的全体伤害），这段追加段既不是规则也不是段表能给的 ⇒ 与 1111 的强化普攻段表同一族（**数据/引擎缺口**）。⚠ 另：**基础【举杯】不消耗【热意】**（那句在**强化版【All in！】**的 151321 行里）—— 2026-11-11 已把 `fervor_extra_hit_per_point` 用 `from_skill_id == 21` 收窄到强化版；这是**旧内容的一处误归属**，判据 `AventurineWaveflairMilestoneTest`。"
@@ -46,6 +46,21 @@
       ],
       "source": "1513 砂金•戏浪 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100% 攻击力、战技 240%、终结技 400%、欢愉技 60% + 10×18.00%）",
       "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠⚠ **登记（这一族与第 206 轮 1501 同源）**：① **欢愉技**是一个**独立的技能栏** ✗ —— 「欢愉技：举杯！敬炽烈一夏」与「欢愉技·强化：All in！敬炽烈一夏」在文档里各占一节 ✓ ⇒ 引擎的技能栏里**没有\"欢愉技\"** ✗（与 8009/8010 登记过的同一件事 ✓）；② **「欢愉伤害」是一种伤害类型** ✗（`DamageType` 里没有它 ✓；文档把它与\"量子属性\"并列 ✓ ⇒ 属性是量子 ✓、类型是欢愉 ✗）；③ **「阿哈时刻」**✗（一个**阶段/回合外机制** ✗）；④ 欢愉技的内容本身也写不了 ✗：**10 次随机单体** ✗ + **按消耗热意逐点追加** ✗（\"每消耗 1 点…额外造成 1 次 21.00%\"）；⑤ **行迹**段落**为空** ✓（文档未列 ✓）⇒ 无可写 ✓；⑥ **星魂**未读 ✗。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon2_the_cap_rises_to_fifty",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "RAISE_RESOURCE_MAX",
+          "resource": "热意",
+          "amount": 20
+        }
+      ],
+      "source": "1513 砂金•戏浪 星魂 2 闲情如海潮涨落: 「【热意】上限提高至50点…」 参数 = [0.2, 3, 4]",
+      "_note": "「【热意】**上限提高至 50 点**」= **`RAISE_RESOURCE_MAX`**（`resource: 热意, amount: 20` —— 30 + 20 = 50）✓。⚠ 与 **`RAISE_RESOURCE_CAP`** 不是同一件事：那个抬的是**溢出额度**（`maxOverflow`，1407/1408/1512 的「可溢出点数」），而正常获取在 `getMax()` 处夹住 ⇒ 「提高**上限**」必须改**声明上限**那一层（`Resource.raiseMax`）。⚠ 数值 20 是**差值**（50 − 30），取自同一句的 50 与资源声明的 30 ✓。",
+      "_status": "implemented"
     },
     {
       "on": "ALLY_ATTACK",
@@ -213,6 +228,62 @@
       ],
       "source": "1513 砂金•戏浪 星魂 1: 「…【热意】达到10点/20点/30点时，都会立即施放【举杯！敬炽烈一夏】。」",
       "_note": "「达到 **30** 点」—— 30 是【热意】的**上限**（`resources.max` 原话「上限为30点」）⇒ 这是她在 E0 能到的最高一档 ✓。写法与 10/20 两条逐字同形 ✓。⚠ 星魂 2 的 40/50 两档仍**写不了**：它先要把上限抬到 50（`resources.max` 是**静态**声明，没有「星魂改上限」的写法），在那之前 40/50 的条件恒为假 ⇒ 不写（已登记）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "eidolon2_autocasts_at_forty",
+      "min_eidolon": 2,
+      "when": [
+        "resource_changed:热意",
+        "self_resource:热意 >= 40",
+        "self_resource_before:热意 < 40"
+      ],
+      "do": [
+        {
+          "op": "CAST_SKILL",
+          "skill": "ELATION_SKILL",
+          "cast_counted_laughs": 20,
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "ELATION_SKILL",
+          "skill_id": 21,
+          "until": "next_elation_skill",
+          "target": "self"
+        }
+      ],
+      "source": "1513 砂金•戏浪 星魂 2 闲情如海潮涨落: 「【热意】上限提高至50点，达到40点/50点时，也会触发天赋施放【举杯！敬炽烈一夏】。」 参数 = [0.2, 3, 4]",
+      "_note": "「达到 **40** 点/50 点时，**也会**触发天赋施放」—— 与星魂 1 的 10/20/30 三条**逐字同形**，只是 `min_eidolon: 2`（这两档要有星魂 2 抬高的 50 上限才够得到 ✓，见 `eidolon2_the_cap_rises_to_fifty`）。跨越条件同样用 `self_resource_before:热意 < 40` ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "eidolon2_autocasts_at_fifty",
+      "min_eidolon": 2,
+      "when": [
+        "resource_changed:热意",
+        "self_resource:热意 >= 50",
+        "self_resource_before:热意 < 50"
+      ],
+      "do": [
+        {
+          "op": "CAST_SKILL",
+          "skill": "ELATION_SKILL",
+          "cast_counted_laughs": 20,
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "ELATION_SKILL",
+          "skill_id": 21,
+          "until": "next_elation_skill",
+          "target": "self"
+        }
+      ],
+      "source": "1513 砂金•戏浪 星魂 2: 「…达到40点/50点时，也会触发天赋施放【举杯！敬炽烈一夏】。」",
+      "_note": "「达到 **50** 点」—— 50 就是星魂 2 抬高后的**上限**（`RAISE_RESOURCE_MAX +20`）✓ ⇒ 这是她能到的最高一档 ✓。写法与 40 那条逐字同形 ✓。",
       "_status": "implemented"
     },
     {

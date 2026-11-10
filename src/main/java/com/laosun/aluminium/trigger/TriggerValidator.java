@@ -444,7 +444,14 @@ final class TriggerValidator {
                                     + " (source: " + spec.getSource() + ")");
                 }
             }
-            case GAIN_RESOURCE, SPEND_RESOURCE, REMOVE_RESOURCE -> {
+            case RAISE_RESOURCE_MAX -> {
+                // 「【热意】上限提高至 50 点」: the DECLARED cap. Distinct from RAISE_RESOURCE_CAP, which widens the
+                // OVERFLOW tier above it (1407/1408/1512) -- one op must not mean two numbers.
+                requireResource(effect, op, spec);
+                requirePositiveAmount(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }            case GAIN_RESOURCE, SPEND_RESOURCE, REMOVE_RESOURCE -> {
                 if (Boolean.TRUE.equals(effect.getSpendAll())) {
                     // "consume all [X]": a spend with no stated SIZE -- and stating one
                     // beside it is a contradiction, so it is refused rather than silently preferring one.
