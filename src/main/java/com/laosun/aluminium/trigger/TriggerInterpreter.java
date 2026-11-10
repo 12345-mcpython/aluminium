@@ -1814,7 +1814,13 @@ public final class TriggerInterpreter {
                             Boolean.TRUE.equals(effect.getFromSelf()) ? ctx.owner() : null,
                             effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
+            // 「每有 1 个负面效果 … 最多 100%」 (1006 Silver Wolf (银狼)'s Eidolon 6): the zone's share is a MULTIPLE of the
+            // carrier's negative-effect count, so the buff has to read the count at settlement rather than store a number.
             // Note: `withTickOwner` joined this chain on. It was missing, so `ticks_on` was a SILENT no-op on
+            if (zone instanceof VulnerabilityBuff vulnerable && effect.getPerStack() != null
+                    && "target_debuff_count".equals(effect.getPerStack().trim()) && effect.getPerStackCap() != null) {
+                vulnerable.setPerDebuffStackCap(effect.getPerStackCap());
+            }
             // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant
             // "the zone is removed when 椒丘 enters the unable-to-fight state" could never fire -- measured at exactly 1.40x before and after she fell
             // (AnchorDeathTest). The other four buff-creating ops had it; this one did not.
