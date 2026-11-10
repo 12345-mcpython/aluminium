@@ -78,7 +78,11 @@ public class SameEffectTwiceGuardTest {
             // 两个触发点是**同一句话里的「或」**，而 DSL 的条件是 AND、没有「或」⇒ 必须拆成两条，数值当然相同。
             // 与 1110 玲可的软嘲讽（「毁灭或存护」）是同一族：one effect, two triggers。
             Map.entry("8003.json :: MODIFY_ATTR|DEFENCE|0.1|self|-|true", 2),
-            Map.entry("8004.json :: MODIFY_ATTR|DEFENCE|0.1|self|-|true", 2));
+            Map.entry("8004.json :: MODIFY_ATTR|DEFENCE|0.1|self|-|true", 2),
+            // 1205 刃：星魂 4 的一句话是「当前生命值百分比**从大于 50% 降低至小于等于 50%** 时，生命上限提高 20%」——
+            // 引擎把「掉血」分成**两个通道**：受到伤害 = `HP_LOST`，自己付的血（战技的 30%）= `HP_CONSUMED`。
+            // 句子不问原因，所以同一条效果必须挂两次；两条的 `when`（跨越那一对）逐字相同。属于 one effect, two triggers。
+            Map.entry("1205.json :: MODIFY_ATTR|HEALTH|0.2|self|-|true", 2));
 
     @Test
     public void noFileStatesTheSameNumericEffectInTwoRules() throws IOException {

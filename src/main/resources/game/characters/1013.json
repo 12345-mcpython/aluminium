@@ -3,10 +3,10 @@
   "character": 1013,
   "_status": "partial",
   "_gaps": [
-    "⛔ 天赋：需要「这一次攻击把目标生命降到 ≤50%」的阈值跨越观测；HP_LOST 会在低血量时反复触发",
+    "✅ **天赋已落地（2026-11-11）**：`talent_followup_when_an_enemy_crosses_half` —— `DAMAGE_SETTLED` + `damage_is_attack` + `target_hp_percent_before > 0.5` + `target_hp_percent <= 0.5`（**跨越**那一次，不是「正处于低位」）+ `actor is_ally` + `target is_enemy` → 敌方全体 40% 攻击力冰伤（`TALENT:1` 读行，`damage_type: TALENT`）。判据 `HertaTalentCrossingTest`（正面：跨越会打；反面：已经在半血以下再挨打不会）。⚠ **原登记作废**：① 「缺跨越事实」是**过期**的（`target_hp_percent_before` 第 181 轮就有，1203 先用）；② 真正卡住的是**事件**：`HP_LOST` 走 `TriggerBus.fireForAlly`，**目标不是 PLAYER 阵营时直接返回 0** ⇒ 敌方掉血**不发** `HP_LOST`，必须挂 `DAMAGE_SETTLED`。",
     "⛔ 行迹 效率：对另一条规则的增伤「额外再提高 25%」未写，MODIFY_RULE 的加/乘语义未核实",
     "✅ **秘技已落地（2026-11-10）**：`technique_raises_her_attack_next_battle`（`BATTLE_START` + **`self has_state 秘技`** → `MODIFY_ATTR ATTACK 0.4` + `turns: 3` + `self`）。⚠ 原登记说「缺『用过秘技』门槛」—— 那个门**一直有**（`startBattle` 之前会把「用过秘技」落成具名状态），所以这一条是**过期**的：真正缺的是**规则本身**。",
-    "✅ **星魂已读，1 / 3 / 5 / 6 已落（2026-11-10）**：1 = `eidolon1_the_basic_punishes_a_hurt_target`（`BASIC_ATTACK` + **`target_hp_percent <= 0.5`** → 40% 攻击力冰属性附加伤害）；6 = **早就在**（`eidolon6_attack`，同一条；我这一棒一度写成重复规则，被 `SameEffectTwiceGuardTest` + `ContentDuplicateGuardTest` **当场抓住**并撤回）；3/5 = 等级。⛔ **未写**：星魂 2 / 4（「天赋每触发 1 次」的层数/增伤）—— 她**天赋的追加攻击本身还没写**（`_gaps` 里登记），所以「每触发 1 次」没有触发点。",
+    "✅ **星魂已读，1 / 3 / 5 / 6 已落（2026-11-10）**：1 = `eidolon1_the_basic_punishes_a_hurt_target`（`BASIC_ATTACK` + **`target_hp_percent <= 0.5`** → 40% 攻击力冰属性附加伤害）；6 = **早就在**（`eidolon6_attack`，同一条；我这一棒一度写成重复规则，被 `SameEffectTwiceGuardTest` + `ContentDuplicateGuardTest` **当场抓住**并撤回）；3/5 = 等级。✅ **星魂 2 / 4 已落地（2026-11-11）**：2 = `eidolon2_each_talent_trigger_raises_her_crit`（每次触发 **+3% 暴击**，`max_stacks: 5`，判据同上：六次触发读 5 层）；4 = `eidolon4_the_talent_followup_hits_harder`（`BOOST_DAMAGE 0.1`，`when` 用 `damage_type_is TALENT` 只作用那一发）。",
     "✅ `BOOST_DAMAGE` 挂在 `DEALING_DAMAGE` 上**是生效的**（原登记作废）：实测对满血目标 **1243.41**、对低血目标 **1068.77**，比值 **1.163** —— 不是 1.2，因为 `BOOST_DAMAGE` **加进同区**（`(1.2+B)/(1+B)=1.163` ⇒ B≈0.23），与 1412 星魂 4 的 2.96 是同一现象。判据 `Herta13HealthyTargetTest` 钉的是**区间**（>1.10 且 ≤1.2），规则一旦不生效就会跌破 1.10。⛔ 仍开：行迹「冰结」那条的判据，与其余条款。"
   ],
   "rules": [
@@ -30,7 +30,7 @@
         }
       ],
       "source": "1013 黑塔 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 100% + 高血增伤 20%、终结技 200%、天赋 40%）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 天赋「当任意我方目标的攻击**使**敌方目标的当前生命值百分比**降到**小于等于 50% 时，黑塔发动**追加攻击**，对敌方全体造成 40% 攻击力冰伤」—— 引擎只能问**当前**值（`target_hp_percent` ✓），问不出\"**这一次攻击把它降到了**阈值以下\" ✗（即**阈值跨越** ✓）：挂在 `HP_LOST` 上会在目标维持在低血量时**每次受击都触发** ✗，而文档说的是**跨越那一次** ✓ ⇒ 需要\"跨越\"这一可观测；② 行迹「效率：施放战技时，对目标造成的伤害提高效果**额外再提高 25%**」是对**另一条规则**百分比的修改 ⇒ `MODIFY_RULE effect_percent` 存在 ✓，但它**是加还是乘**未核实 ✗ ⇒ 不猜 ✓；③ 秘技（缺\"用过秘技\"门槛 ✗）与星魂（未读 ✗）。 ⚠ **2026-09-29（第 158 轮）：战技的高血量增伤与行迹「冰结」**已撤下** ✗** —— 它们用 `BOOST_DAMAGE`，而实测发现**该 op 挂在 `DEALING_DAMAGE` 上没有任何效果** ✗：两只防御相同的木桩（一只满血、一只低血）在同一发 AOE 下掉血\n完全相等（712.5148800000024 vs 712.5148800000006，比值 1.0000000000000024 ✗）；把条件收窄到只剩 `actor == self` 后**比值依然是 1.0000** ✗ ⇒ 条件从来不是原因，而是**该效果本身没生效** ✗。⚠ 引擎自己的注释说 `DEALING_DAMAGE` 是\"在 `applyDamage` 内部\"**发出**的，**好让规则还能改它** ✓ —— 实测与此矛盾 ✗，下一武要读 `applyDamage` 的顺序（各区是否在事件之前已算完/快照 ✗）。⚠ 另记：**当前没有任何已出货内容使用 `BOOST_DAMAGE`** ✓（其余出现都在测试里 ✗）⇒ 这是一个**潜伏的、可能影响整类增伤句**的问题 ✗。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **登记**：① 天赋「当任意我方目标的攻击**使**敌方目标的当前生命值百分比**降到**小于等于 50% 时，黑塔发动**追加攻击**，对敌方全体造成 40% 攻击力冰伤」—— 引擎只能问**当前**值（`target_hp_percent` ✓），问不出\"**这一次攻击把它降到了**阈值以下\" ✗（即**阈值跨越** ✓）：挂在 `HP_LOST` 上会在目标维持在低血量时**每次受击都触发** ✗，而文档说的是**跨越那一次** ✓ ⇒ 需要\"跨越\"这一可观测；② 行迹「效率：施放战技时，对目标造成的伤害提高效果**额外再提高 25%**」是对**另一条规则**百分比的修改 ⇒ `MODIFY_RULE effect_percent` 存在 ✓，但它**是加还是乘**未核实 ✗ ⇒ 不猜 ✓；③ 秘技（缺\"用过秘技\"门槛 ✗）与星魂（未读 ✗）。 ⚠⚠ **下面这段「BOOST_DAMAGE 不生效」的结论已作废**（`_gaps` 里有实测：满血 1243.41 / 低血 1068.77）⇒ 只需要补判据，**不要**按「挂上去没效果」去重造。⚠ **2026-09-29（第 158 轮）：战技的高血量增伤与行迹「冰结」**已撤下** ✗** —— 它们用 `BOOST_DAMAGE`，而实测发现**该 op 挂在 `DEALING_DAMAGE` 上没有任何效果** ✗：两只防御相同的木桩（一只满血、一只低血）在同一发 AOE 下掉血\n完全相等（712.5148800000024 vs 712.5148800000006，比值 1.0000000000000024 ✗）；把条件收窄到只剩 `actor == self` 后**比值依然是 1.0000** ✗ ⇒ 条件从来不是原因，而是**该效果本身没生效** ✗。⚠ 引擎自己的注释说 `DEALING_DAMAGE` 是\"在 `applyDamage` 内部\"**发出**的，**好让规则还能改它** ✓ —— 实测与此矛盾 ✗，下一武要读 `applyDamage` 的顺序（各区是否在事件之前已算完/快照 ✗）。⚠ 另记：**当前没有任何已出货内容使用 `BOOST_DAMAGE`** ✓（其余出现都在测试里 ✗）⇒ 这是一个**潜伏的、可能影响整类增伤句**的问题 ✗。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
     },
     {
       "on": "BATTLE_START",
@@ -80,6 +80,74 @@
       ],
       "source": "1013 黑塔 行迹 冰结 (1013103): 「施放终结技时，对冻结状态下的敌人造成的伤害提高20%。」",
       "_note": "「**施放终结技时**，对**冻结状态**下的敌人造成的伤害提高 20%」—— `DEALING_DAMAGE` + `from_skill ULTRA` ✓ + `target has_state 冻结` ✓ + `BOOST_DAMAGE` ✓。⚠ 冻结是引擎**内建控制状态** ✓。⚠ 本条与战技那条**同事件**：按文件顺序，战技那条在前 ✓（两者条件不重叠 ✓）。"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "talent_followup_when_an_enemy_crosses_half",
+      "when": [
+        "actor is_ally",
+        "target is_enemy",
+        "damage_is_attack",
+        "target_hp_percent_before > 0.5",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "TALENT:1",
+          "element": "Ice",
+          "damage_type": "TALENT",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1013 黑塔 天赋 还是我来吧 (101304, Enhance/FollowUp): 「当任意我方目标的攻击使敌方目标的当前生命值百分比小于等于50%时，黑塔发动追加攻击，对敌方全体造成等同于黑塔40%攻击力的冰属性伤害。」 行 = [#1=0.5, #2=0.4]",
+      "_note": "「当**任意我方目标的攻击**使敌方目标的当前生命值百分比**降到**小于等于 **50%** 时，黑塔发动**追加攻击**，对敌方全体造成等同于黑塔 **40%** 攻击力的**冰**属性伤害」—— ① **触发 = 阈值跨越**：**`DAMAGE_SETTLED`** + `damage_is_attack` + `target_hp_percent_before > 0.5` + `target_hp_percent <= 0.5`（旧登记「缺跨越事实」是**过期**的 —— `target_hp_percent_before` 第 181 轮就有，1203 的 `skill_trigger_on_crossing` 是第一读者）✓；只写 `<= 0.5` 会在目标维持低血量时**每次受击都触发** ✗；② 归属：`actor is_ally`（「我方目标」）+ `target is_enemy` ✓ + `damage_is_attack`（「攻击」）✓；③ 伤害 = 天赋行 **#2**（Lv10 **0.40**）× 黑塔攻击力，**`TALENT:1`** 读行 ✓（不是字面量）；④ `damage_type: TALENT` ⇒ 这一发在引擎里就是**天赋的追击**，星魂 4 用 `damage_type_is TALENT` 认它 ✓。⚠ **为什么是 `DAMAGE_SETTLED` 而不是 `HP_LOST`**：`HP_LOST`/`TAKING_HIT`/`LETHAL_DAMAGE` 走 `TriggerBus.fireForAlly`，它在**目标不是 PLAYER 阵营时直接返回 0** ⇒ **敌方掉血根本不发 `HP_LOST`** ✗（1203 那条能挂是因为它问的是**队友**的血；这一条我先按 `HP_LOST` 写，实测不触发，才追到 `fireForAlly` 的第一行）。`DAMAGE_SETTLED` 每一发结算都发 ✓、还带着伤害实例 ⇒ `damage_is_attack` 把「攻击」从 DoT/击破/附加伤害里分出来 ✓（`HP_LOST` 没有实例，分不出 ✗）。⚠ 代价：「追加攻击」也是附加伤害 ⇒ **不会**由另一发追击连锁触发（游戏里会不会连锁不在本文档的句子里，先不猜）。⚠ 这一发**不削韧**（规则伤害的引擎约定，天赋行 `stance_list.all = 15` 未落地）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "DAMAGE_SETTLED",
+      "id": "eidolon2_each_talent_trigger_raises_her_crit",
+      "min_eidolon": 2,
+      "when": [
+        "actor is_ally",
+        "target is_enemy",
+        "damage_is_attack",
+        "target_hp_percent_before > 0.5",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_CHANCE",
+          "percent": 0.03,
+          "permanent": true,
+          "max_stacks": 5,
+          "target": "self"
+        }
+      ],
+      "source": "1013 黑塔 星魂 2 得胜必追击: 「天赋每触发1次，自身暴击率提高3%，该效果最多叠加5层。」 参数 = [0.03, 5]",
+      "_note": "「**天赋每触发 1 次**，自身暴击率提高 **3%**，最多叠加 **5 层**」—— 天赋的触发条件与 `talent_followup_when_an_enemy_crosses_half` **逐字相同**（同一句话的「每触发 1 次」：`DAMAGE_SETTLED` + `damage_is_attack` + 跨越那一对），所以本条的 `when` 复制它 ⇒ 每次触发叠一层 ✓；`MODIFY_ATTR CRIT_CHANCE percent 0.03` + **`max_stacks: 5`** + `permanent`（句子没给时长 ⇒ 整场）✓。⚠ 同条件两条规则、（不同效果）不撞重复守卫 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon4_the_talent_followup_hits_harder",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "damage_type_is TALENT"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 0.1,
+          "damage_type": "TALENT"
+        }
+      ],
+      "source": "1013 黑塔 星魂 4 打人要打脸: 「触发天赋时造成的伤害提高10%。」 参数 = [0.1]",
+      "_note": "「**触发天赋时**造成的伤害提高 **10%**」—— 认哪一发用 **`damage_type_is TALENT`**（天赋的追击规则自己盖的章 ✓），增伤用 `BOOST_DAMAGE percent 0.1` + **`damage_type: TALENT`** 双保险（`BOOST_DAMAGE` 真的按类型收窄 ✓ —— 本文件的 `_gaps` 第 5 条记过它「挂上去有效」的实测）。⚠ 「触发天赋时造成的伤害」= 那一发追击，不是「触发之后所有伤害」✓（后者要一个时长，句子没给）。",
+      "_status": "implemented"
     },
     {
       "on": "ULT_CAST",

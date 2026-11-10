@@ -7,7 +7,7 @@
     "⛔ 天赋的「**消耗生命值时**」那一半未写（受击那一半已落地）：`HP_CONSUMED` 事件存在（`CONSUME_HP` 自己发），但要在它上面再挂一对同形规则（E0–E5 的 `max_stacks: 5` / E6 的 `max_stacks: 4`），本轮未做；「**满层立即追加攻击并清空**」**已落地**（`talent_followup_at_full_charge` + `_eidolon6` 变体，判据 `BladeTalentFollowupTest`）。",
     "✅ **终结技的三项基座已落地（2026-11-09）**：「#1%攻击力 + #2%生命上限 + **#5%本场战斗中累计已损失生命值**」= 策展表 `1205/3` 的 **`base_terms` 三项**，第三项用**新字段 `resource: 累计损失生命`**（`base_terms` 的项原来只能读**属性**，读不了「一个记账」）。累加由 `talent_accumulates_the_life_he_lost`（`HP_LOST` + `target == self` + `amountFromEvent`）维护；资源在文件头声明（`max: Integer.MAX_VALUE`）。⛔ **仍未写**：① 「累计不超过刃生命上限的 **90%**」—— `GAIN_RESOURCE` 没有「按属性比例封顶」的写法；② 「施放终结技后**清空**并重新累计」—— 清零本身可写（`REMOVE_RESOURCE`），但终结技的伤害**要读它**，先清后算就错 ⇒ 需要「结算之后」的时机。",
     "✅ **强化普攻【无间剑树】的混合基数已落地（2026-11-09）**：行是 `[0.1, 0.56, 0.224, 1.4, 0.56]` —— #1 = 消耗 10% 生命上限（**不是伤害**）、主目标 = **#2 攻击力 + #4 生命上限**、相邻 = **#3 攻击力 + #5 生命上限**。引擎原来只读第 1 格当主份额、且只乘攻击力 ⇒ 生命上限那一项整个丢掉。修法：`SkillEffectSpec` 新增 **`base_terms`**（每项 `{main, adjacent, attribute}`，各项在**结算之前**相加 ⇒ 仍是一个实例、一次暴击），策展表给 `1205/8` 写了 ATTACK + HEALTH 两项。判据 `BladeEnhancedBasicBaseTest`：实测 `atk=543.312、maxHp=2118.917 ⇒ 基数 3270.74`，结算 **1682.09**（落在基数之下、且远高于「只乘攻击力」的 304）。",
-    "✅ **星魂已读（2026-11-10）；1 与 6 的两半已于本轮落地**：星魂 2 **早就在**（`eidolon2_crit_while_hellscape`：`TURN_START` + `on_any: SKILL_CAST` + `self has_state 地狱变` → 暴击率 +15%），3/5 是等级 ✓。**星魂 1** ✅ `eidolon1_the_ultimates_designated_target_takes_the_tally` —— 新条件词 **`damage_is_main_target`**（只给 Blast 的**指定**目标，相邻那一发不吃）+ 新字段 **`after_zones`**（绝对量加在**已结算**的实例上，不进暴击/增伤/防御/抗性区）。**星魂 6** ✅ 两半：① 上限降到 **4 层**用「E6 变体 + `max_eidolon: 5` 互斥」写成（`talent_charge_on_hit_eidolon6` / `talent_followup_at_full_charge_eidolon6`）；② 追击 **+50% 生命上限** = 又一处 `after_zones`（`eidolon6_the_talent_followup_takes_half_the_max_hp`，用 `damage_type_is TALENT` 认那一发）。⛔ **只剩星魂 4**：「生命值百分比**从 >50% 降到 ≤50% 时** +20% 生命上限，最多 2 层」—— 缺**跨越**事实：`HP_LOST` 在低血量会**反复**触发 ✗。"
+    "✅ **星魂已读（2026-11-10）；1 与 6 的两半已于本轮落地**：星魂 2 **早就在**（`eidolon2_crit_while_hellscape`：`TURN_START` + `on_any: SKILL_CAST` + `self has_state 地狱变` → 暴击率 +15%），3/5 是等级 ✓。**星魂 1** ✅ `eidolon1_the_ultimates_designated_target_takes_the_tally` —— 新条件词 **`damage_is_main_target`**（只给 Blast 的**指定**目标，相邻那一发不吃）+ 新字段 **`after_zones`**（绝对量加在**已结算**的实例上，不进暴击/增伤/防御/抗性区）。**星魂 6** ✅ 两半：① 上限降到 **4 层**用「E6 变体 + `max_eidolon: 5` 互斥」写成（`talent_charge_on_hit_eidolon6` / `talent_followup_at_full_charge_eidolon6`）；② 追击 **+50% 生命上限** = 又一处 `after_zones`（`eidolon6_the_talent_followup_takes_half_the_max_hp`，用 `damage_type_is TALENT` 认那一发）。✅ **星魂 4（2026-11-11）**：「生命值百分比**从 >50% 降到 ≤50% 时** +20% 生命上限，最多 2 层」= `eidolon4_the_crossing_raises_his_max_hp`（`HP_LOST`）+ `eidolon4_the_crossing_raises_his_max_hp_on_hp_cost`（`HP_CONSUMED`，战技付的血也是「生命值百分比降低」）—— 条件就是**跨越**那一对（`target_hp_percent_before > 0.5` + `target_hp_percent <= 0.5`）；⚠ 旧登记「缺跨越事实」**作废**：`target_hp_percent_before` 第 181 轮就有（1203 先用），这一条当时只是没查。判据 `BladeEidolonFourTest`。⇒ **六条星魂全部落地**；`_status` 仍是 partial，因为地狱变那六句、天赋的消耗那半、终结技的 90% 上限与清空还没写。"
   ],
   "resources": [
     {
@@ -291,6 +291,52 @@
       ],
       "source": "1205 刃 星魂 2 支离旧梦，万端遗恨: 「刃处于【地狱变】状态时，暴击率提高#1[i]%」（param = [0.15]）",
       "_note": "数值取自 `data/eidolons.json` 的 **1205 → rank \"2\"** 行 ✓，且该行的 `desc` **与从句逐字一致** ✓（这是本轮的归属确认方式 ✓ —— 按**小节标题切块**取从句 ✓，再用**数据行自己的 `desc`** 反证 ✓）。⚠ **`param = [0.15]` 本身就是份额** ✓（无需归一化 ✓）。⭐ 触发 **`TURN_START` + `on_any: SKILL_CAST`**：状态由战技规则挂上（同文件 `skill_hellscape_state` ✓，持续 3 回合 ✓），`turns: 1` ⇒ **状态在、效果在** ✓。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "eidolon4_the_crossing_raises_his_max_hp",
+      "min_eidolon": 4,
+      "when": [
+        "target == self",
+        "target_hp_percent_before > 0.5",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.2,
+          "permanent": true,
+          "max_stacks": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1205 刃 星魂 4 泉台歧路，百骸回春: 「当前生命值百分比从大于50%降低至小于等于50%时，生命上限提高20%，该效果最多叠加2层。」 参数 = [0.2, 2]",
+      "_note": "「当前生命值百分比**从大于 50% 降低至小于等于 50% 时**，生命上限提高 **20%**，最多叠加 **2 层**」—— ① **「降到」是阈值跨越**，不是「正处于低位」：`target_hp_percent_before > 0.5`（掉血**之前**）+ `target_hp_percent <= 0.5`（现在）✓ —— 这一对**引擎早就有**（第 181 轮加的 `target_hp_percent_before`，`HP_LOST` 用 `(当前 + 损失)/上限` 算）✓，1203 的 `skill_trigger_on_crossing` 是第一读者 ✓（所以旧登记「缺跨越事实」是**过期**的）；② 只写 `<= 0.5` 会在之后**每一次**受击都触发 ✗；③ 「生命上限提高 20%，最多 2 层」= `MODIFY_ATTR HEALTH { percent: 0.2, max_stacks: 2, permanent: true }` ✓（两层 = +40%）。⚠ **同一句话有两个掉血通道**：`HP_LOST`（受到伤害）与 `HP_CONSUMED`（他自己付的血，战技 30%）—— 引擎把它们分开发事件 ✓，所以同形规则写了两条（见 `eidolon4_the_crossing_raises_his_max_hp_on_hp_cost`）✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "eidolon4_the_crossing_raises_his_max_hp_on_hp_cost",
+      "min_eidolon": 4,
+      "when": [
+        "target == self",
+        "target_hp_percent_before > 0.5",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.2,
+          "permanent": true,
+          "max_stacks": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1205 刃 星魂 4 泉台歧路，百骸回春: 「当前生命值百分比从大于50%降低至小于等于50%时…」 —— 「消耗生命值」那一半（战技的 30%）也是「当前生命值百分比降低」",
+      "_note": "与上一条**同一句话**的第二个通道：`CONSUME_HP` 自己发 `HP_CONSUMED`（`amount` = 实际付掉的血），`target_hp_percent_before` 在这条事件上同样是 `(当前 + 付出)/上限` ✓ ⇒ 战技把血从 >50% 付到 ≤50% 也会触发 ✓。⚠ 两条同形 ⇒ 已按 `SameEffectTwiceGuardTest` 的规矩登记 BASELINE 并写明理由（one effect, two HP-loss channels）。⚠ **仍未写**：终结技「将当前生命值转化为生命上限的 50%」这条**改血**没落地（登记在 `level_convention` 的注释里）⇒ 那一句如果也跨过 50%，E4 不会响。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",

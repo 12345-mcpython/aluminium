@@ -74,8 +74,8 @@ public class HertaTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
-                "the threshold bonus and the frozen bonus");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "the threshold bonus, the frozen bonus, and the talent-follow-up bonus of eidolon 4");
         Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the resistance, the level convention, and the technique's ATK raise");
     }

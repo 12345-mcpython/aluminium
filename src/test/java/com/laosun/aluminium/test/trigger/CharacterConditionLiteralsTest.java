@@ -69,6 +69,14 @@ public class CharacterConditionLiteralsTest {
         assertRule(1013, "DEALING_DAMAGE", "skill_bonus_on_healthy_targets", List.of("actor == self", "from_skill SKILL", "target_hp_percent >= 0.5"));
         assertRule(1013, "DEALING_DAMAGE", "trace_ice_against_frozen", List.of("actor == self", "from_skill ULTRA", "target has_state 冻结"));
         assertRule(1013, "ULT_CAST", "eidolon6_attack", List.of("actor == self"));
+        assertRule(1013, "DAMAGE_SETTLED", "talent_followup_when_an_enemy_crosses_half",
+                List.of("actor is_ally", "target is_enemy", "damage_is_attack",
+                        "target_hp_percent_before > 0.5", "target_hp_percent <= 0.5"));
+        assertRule(1013, "DAMAGE_SETTLED", "eidolon2_each_talent_trigger_raises_her_crit",
+                List.of("actor is_ally", "target is_enemy", "damage_is_attack",
+                        "target_hp_percent_before > 0.5", "target_hp_percent <= 0.5"));
+        assertRule(1013, "DEALING_DAMAGE", "eidolon4_the_talent_followup_hits_harder",
+                List.of("actor == self", "damage_type_is TALENT"));
         assertRule(1101, "ULT_CAST", "ult_party_attack", List.of("actor == self"));
         assertRule(1101, "ULT_CAST", "ult_party_crit_damage", List.of("actor == self"));
         assertRule(1102, "HP_LOST", "trace_low_hp_aggro_down", List.of("target == self", "hp_percent <= 0.5"));
@@ -148,6 +156,10 @@ public class CharacterConditionLiteralsTest {
                 List.of("self stack_added 充能", "self_stacks:充能 >= 4.0"));
         assertRule(1205, "DEALING_DAMAGE", "eidolon6_the_talent_followup_takes_half_the_max_hp",
                 List.of("actor == self", "damage_type_is TALENT"));
+        assertRule(1205, "HP_LOST", "eidolon4_the_crossing_raises_his_max_hp",
+                List.of("target == self", "target_hp_percent_before > 0.5", "target_hp_percent <= 0.5"));
+        assertRule(1205, "HP_CONSUMED", "eidolon4_the_crossing_raises_his_max_hp_on_hp_cost",
+                List.of("target == self", "target_hp_percent_before > 0.5", "target_hp_percent <= 0.5"));
         assertRule(1206, "BREAK", "talent_speed_on_break", List.of());
         assertRule(1206, "ALLY_ATTACK", "skill_sword_stance_chance", List.of("actor == self", "from_skill SKILL", "!target has_state 弱点击破"));
         assertRule(1206, "ALLY_ATTACK", "skill_sword_stance_guaranteed", List.of("actor == self", "from_skill SKILL", "target has_state 弱点击破"));
