@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "✅ **战技的两个条件都已落地（2026-11-09 订正）**：① 「**除自身以外**」—— 用**逐效果 `target_when`「目标 != 自己」** 挡（`APPLY_BUFF` 与那条 `MODIFY_ATTR` 各挂一份，因为它们是一个效果一个效果应用的）；② 「**仅最新施放目标**被视为【师父】」—— 一直是 `REMOVE_STATE 师父`（全体）+ `APPLY_BUFF` 的顺序语义 ✓（`NewestHolderOnlyTest` 连同对照组证明过 ✓），本条原来的 ⛔ 是**过期**的。",
-    "⛔ 天赋：充能 ≥7 立即行动、伤害 +80%、强化普攻、禁施放战技、施放后消耗 7 点未写",
+    "✅ **天赋的充能状态机已落地（2026-11-10）**：两条规则 —— `talent_seven_charges_empower_her`（`RESOURCE_CHANGED` + `resource_changed:充能` + `self_resource:充能 >= 7` → `ADVANCE 100%` + `APPLY_BUFF 强化 {blocks: skill}` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.8 {while_state: 强化}` + `REPLACE_SKILL slot 8`）与 `talent_the_enhanced_basic_spends_seven`（`BASIC_ATTACK` + `from_skill_id == 8` → `SPEND_RESOURCE 7` + `REMOVE_STATE 强化` + 还原普攻槽）。⚠ **近似**：中间掉到 6 也不会自动解除（引擎没有「按资源值自动失效」的写法），已写在规则注记里。⛔ 仍开：秘技的队友计数、终结技的段数/固定概率、强化普攻的三段概率、星魂。",
     "天赋：攻击与终结技各回 1 点，但终结技也会发 ALLY_ATTACK ⇒ 一次终结技可能回 2 点（与文档读法不同）",
     "⛔ 秘技：队友施放秘技的计数、最多 3 点充能未写",
     "⛔ 终结技：强化普攻初始段数 +2、固定概率 +20% 未写",
@@ -136,6 +136,75 @@
       ],
       "source": "1224 三月七 秘技 一气化三餐 (122407, Maze/Enhance): 「…使用秘技后，下一次战斗开始时三月七恢复30点能量。」",
       "_note": "「**使用秘技后**，下一次战斗开始时三月七**恢复 30 点能量**」—— 门槛 `self has_state 秘技` ✓（第 178 轮 ✓）；`GAIN_ENERGY 30` ✓。⚠ **登记**：同一条秘技的前半「若三月七在队伍中，**每当队友施放 1 次秘技**，下一次战斗开始时三月七获得 1 点充能，**最多获得 3 点**」✗ （\"队友用了秘技\"的**计数** ✗ —— 引擎的秘技门槛是**每个角色一份** ✓，没有\"这一场里有几个队友用了\"这个整体 ✗）。"
+    },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "talent_seven_charges_empower_her",
+      "when": [
+        "resource_changed:充能",
+        "self_resource:充能 >= 7"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 1,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "强化",
+          "blocks": "skill",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.8,
+          "permanent": true,
+          "while_state": "强化",
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1224 三月七 天赋 师父，我悟了！: 「充能大于等于7点时，三月七立即行动，造成的伤害提高80%，普攻得到强化且无法施放战技。」",
+      "_note": "「**充能大于等于 7 点时**，三月七**立即行动**，造成的**伤害提高 80%**，**普攻得到强化**且**无法施放战技**」—— 四件事一条规则，各自一个 op：① `ADVANCE percent: 1`（「立即行动」= 行动提前 100%，1101 的布洛妮娅同写法 ✓）；② 状态 `强化` 带 **`blocks: \"skill\"`**（引擎的 `blocks` 词表里就有 `skill` ✓，1506 用的是 `ultimate` ✓）；③ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.8` + **`while_state: 强化`**（增伤跟着这个状态走 ✓，状态一摘就失效 ✓）；④ `REPLACE_SKILL` 把普攻槽换成 8（强化普攻的数据行 ✓）。⚠ 门要**两个**：`resource_changed:充能`（只在充能变化时看）+ `self_resource:充能 >= 7`（阈值）。⚠ **近似**：文档的「施放**强化普攻后**消耗 7 点」由下一条规则处理（`talent_the_enhanced_basic_spends_seven`），中间任何时刻掉到 6 也不会自动解除强化 —— 引擎没有「按资源值自动失效」的写法，已登记。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "talent_the_enhanced_basic_spends_seven",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "充能",
+          "amount": 7
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "强化",
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "remove": true,
+          "target": "self"
+        }
+      ],
+      "source": "1224 三月七 天赋 师父，我悟了！: 「施放强化普攻后，消耗7点充能。」",
+      "_note": "「**施放强化普攻后，消耗 7 点充能**」—— ① `BASIC_ATTACK` + `actor == self` + **`from_skill_id == 8`**（只有**强化**普攻算 ✓；少了这一条普通普攻也会扣 7 点 ✗）；② `SPEND_RESOURCE 充能 7` ✓；③ 摘掉 `强化` 状态（禁战技 + 增伤随之失效 ✓）并把普攻槽**还原**（`REPLACE_SKILL { remove: true }` ✓，1014 同写法 ✓）。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
