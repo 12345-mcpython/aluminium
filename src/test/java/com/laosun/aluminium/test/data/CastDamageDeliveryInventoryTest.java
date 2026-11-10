@@ -63,6 +63,7 @@ public class CastDamageDeliveryInventoryTest {
             Map.entry("1004", Set.of("eidolon1_empowered_basic", "eidolon1_empowered_skill",
                     "eidolon6_extra_hit_on_a_random_enemy")),   // 星魂 1「附加伤害」/ 星魂 6「额外造成1次」
             Map.entry("1009", Set.of("eidolon1_extra_skill_hit")),                 // 星魂 1「额外造成 1 次伤害」
+            Map.entry("1013", Set.of("eidolon1_the_basic_punishes_a_hurt_target")), // 星魂 1「额外造成…附加伤害」
             Map.entry("1014", Set.of("enhanced_basic_extra_on_two_enemies",
                     "enhanced_basic_extra_on_one_enemy")),      // 强化普攻「额外…」两档
             Map.entry("1105", Set.of("eidolon6_max_hp_additional_damage")),         // 星魂 6「额外造成…附加伤害」
