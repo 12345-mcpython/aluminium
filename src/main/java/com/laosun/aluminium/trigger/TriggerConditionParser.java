@@ -660,7 +660,7 @@ final class TriggerConditionParser {
                             + spec.getSource() + ")");
         }
         if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
-                && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
+                && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_RESOURCE_BEFORE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
                 && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)
                 && !variable.startsWith(SUMMON_RESOURCE_PREFIX)
                 && !variable.startsWith(ALLIES_WITH_PATH_PREFIX)
@@ -809,6 +809,7 @@ final class TriggerConditionParser {
 
     private static String selfResourceOf(String variable, String raw, TriggerSpec spec) {
         String prefix = variable.startsWith(SELF_RESOURCE_PREFIX) ? SELF_RESOURCE_PREFIX
+                : variable.startsWith(SELF_RESOURCE_BEFORE_PREFIX) ? SELF_RESOURCE_BEFORE_PREFIX
                 : variable.startsWith(SUMMON_RESOURCE_PREFIX) ? SUMMON_RESOURCE_PREFIX : null;
         if (prefix == null) {
             return null;
@@ -980,7 +981,7 @@ final class TriggerConditionParser {
             // The SAME closed check the single-variable form uses. Without it a term could name anything (my first
             // `self_energy` did not exist), resolve to NaN and make the whole comparison silently always false.
             if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
-                    && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
+                    && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_RESOURCE_BEFORE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
                     && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)
                     && !variable.startsWith(SUMMON_RESOURCE_PREFIX) && !variable.startsWith(ALLIES_WITH_PATH_PREFIX)
                     && !variable.startsWith(ENEMY_STATE_COUNT_PREFIX)) {
@@ -1048,7 +1049,7 @@ final class TriggerConditionParser {
     private static boolean isNumericVariable(String token) {
         String name = token == null ? "" : token.trim();
         return NUMERIC_VARIABLES.contains(name) || name.startsWith(SELF_ATTR_PREFIX)
-                || name.startsWith(SELF_RESOURCE_PREFIX) || name.startsWith(SELF_STACKS_PREFIX)
+                || name.startsWith(SELF_RESOURCE_PREFIX) || name.startsWith(SELF_RESOURCE_BEFORE_PREFIX) || name.startsWith(SELF_STACKS_PREFIX)
                 || name.startsWith(TARGET_STACKS_PREFIX) || name.startsWith(ACTOR_STACKS_PREFIX)
                 || name.startsWith(ALLIES_WITH_PATH_PREFIX)
                 || name.startsWith(ENEMY_STATE_COUNT_PREFIX);
@@ -2615,6 +2616,19 @@ final class TriggerConditionParser {
      * refuses a rule that reads a resource its character never declares.)
      */
     static final String SELF_RESOURCE_PREFIX = com.laosun.aluminium.trigger.TriggerInterpreter.SELF_RESOURCE_PREFIX;
+
+    /**
+     * The same resource <b>before this event change</b>: 「【热意】达到 20 点时」 is a CROSSING ("was below 20, now is
+     * not"), not "is at or above 20" - the latter fires again on every later gain.
+     *
+     * <p>The value is {@code current - the event amount}, which is exact on {@code RESOURCE_CHANGED}: that event carries
+     * the delta, and the change has already happened when the rules read it. On any other event, or on a change of a
+     * <b>different</b> resource, it answers {@code NaN} (and a comparison against NaN is false) - the same "unreadable"
+     * convention {@code target_hp_percent_before} follows.
+     *
+     * <p>Reader: 1513 Aventurine · Waveflair Eidolon 1, whose 10/20/30 tiers are three crossings of one counter.
+     */
+    static final String SELF_RESOURCE_BEFORE_PREFIX = "self_resource_before:";
 
     /**
      * A resource read off the rule owner's <b>summon</b> (1141526's [故事], which the sentence puts on the memosprite: "使德谬歌获得 1 点[故事]").

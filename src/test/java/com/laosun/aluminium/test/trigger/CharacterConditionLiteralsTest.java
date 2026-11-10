@@ -396,6 +396,14 @@ public class CharacterConditionLiteralsTest {
         assertRule(1513, "ULT_CAST", "ult_fervor_and_speed", List.of("actor == self"));
         assertRule(1513, "BATTLE_START", "technique_fervor", List.of("self has_state 秘技"));
         assertRule(1513, "BATTLE_START", "level_convention", List.of());
+        assertRule(1513, "RESOURCE_CHANGED", "talent_autocasts_elation",
+                List.of("resource_changed:热意", "self_resource:热意 >= 10.0", "self_resource_before:热意 < 10.0"));
+        assertRule(1513, "RESOURCE_CHANGED", "eidolon1_autocasts_at_twenty",
+                List.of("resource_changed:热意", "self_resource:热意 >= 20.0", "self_resource_before:热意 < 20.0"));
+        assertRule(1513, "RESOURCE_CHANGED", "eidolon1_autocasts_at_thirty",
+                List.of("resource_changed:热意", "self_resource:热意 >= 30.0", "self_resource_before:热意 < 30.0"));
+        assertRule(1513, "CAST_SETUP", "fervor_extra_hit_per_point",
+                List.of("from_category ElationDamage", "actor == self", "from_skill_id == 21.0"));
         assertRule(8001, "BREAK", "talent_atk_on_break", List.of("actor == self"));
         assertRule(8001, "BATTLE_START", "level_convention", List.of());
         assertRule(8001, "BATTLE_START", "technique_party_heal", List.of("self has_state 秘技"));

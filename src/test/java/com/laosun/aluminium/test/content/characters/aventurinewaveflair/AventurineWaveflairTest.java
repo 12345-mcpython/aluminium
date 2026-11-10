@@ -24,11 +24,11 @@ public class AventurineWaveflairTest {
     /**
      * Note: One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it.
      *
-     * <p>⚠ The cap is driven by ONE gain, and the reason is measured: 「【热意】达到10点时…立即施放…」 means each crossing casts
-     * and spends ALL of the counter, so forty-one single-point attacks never accumulate - they cycle (41 reads 1). While
-     * the milestone clause was still an approximation (it fired on TURN_START and spent nothing) this case could reach
-     * the cap by repetition; now the ceiling is what the DECLARATION does to one big gain, which is a different claim
-     * and is asserted as such. The cycling itself is pinned in {@code AventurineWaveflairMilestoneTest}.
+     * <p>⚠ The base 【举杯！敬炽烈一夏】 does NOT spend the counter: the spend sentence belongs to the ENHANCED
+     * 【All in！敬炽烈一夏】 (its own row, 151321), which is what the Eidolon/normal flow swaps in for the next Elation
+     * cast. So a crossing at ten casts and leaves the counter standing, and forty-one single points reach the CAP - the
+     * clamp and the accumulation are both true now. The crossing is pinned in {@code AventurineWaveflairMilestoneTest}.
+     *
      */
     @Test
     public void teammateAttacksFeedFervorUpToThirty() {
@@ -50,9 +50,8 @@ public class AventurineWaveflairTest {
         for (int i = 0; i < 40; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         }
-        Assertions.assertEquals(1, fervorOf(aventurine),
-                "forty-one single points cycle: every crossing at ten casts and spends ALL of it, leaving one");
-
+        Assertions.assertEquals(30, fervorOf(aventurine),
+                "forty-one single points reach the declared cap (the base cast does not spend the counter)");
         aventurine.getResources().gain("热意", 41);
         Assertions.assertEquals(30, fervorOf(aventurine),
                 "「【热意】上限为30点」 is the DECLARATION's clamp on one gain");

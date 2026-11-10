@@ -2070,7 +2070,17 @@ public class TriggerTable {
                 CanHit resourceHolder = variable.startsWith(TriggerConditionParser.SUMMON_RESOURCE_PREFIX) && ctx.battle() != null
                         ? ctx.battle().memospriteOf(ctx.owner())
                         : ctx.owner();
-                return resourceValue(resourceHolder == null ? ctx.owner() : resourceHolder, resource, ctx.battle());
+                double current = resourceValue(resourceHolder == null ? ctx.owner() : resourceHolder, resource, ctx.battle());
+                if (variable.startsWith(TriggerConditionParser.SELF_RESOURCE_BEFORE_PREFIX)) {
+                    // 「【热意】达到 20 点时」 is the CROSSING, not "is at or above 20" (which fires on every later gain).
+                    // The delta is this firing own amount, and `lastChangedResource` is scoped to the firing - so any
+                    // other event, or another resource change, answers NaN and the comparison is false.
+                    if (ctx.battle() == null || !resource.equals(ctx.battle().lastChangedResource())) {
+                        return Double.NaN;
+                    }
+                    return current - ctx.amount();
+                }
+                return current;
             }
             if (stacksName != null) {
                 // "每当我方目标对[承负]状态下的敌方目标施放 2 次…" reads the counter on the ENEMY (target), while a

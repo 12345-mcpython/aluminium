@@ -284,7 +284,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 |---|---|
 | `self_attr:` | `self_attr:ATTACK >= 1000` |
 | `self_stacks:` / `actor_stacks:` / `target_stacks:` | `self_stacks:白花之刻 >= 2` |
-| `self_resource:` / `summon_resource:` | `self_resource:充能 >= 3` |
+| `self_resource:` / `self_resource_before:` / `summon_resource:` | `self_resource:充能 >= 3` / `self_resource_before:热意 < 20`（**这一次变化之前**的值；只在 `RESOURCE_CHANGED` 且资源同名时可读，否则判假） |
 | `allies_with_path:` | 按命途数我方 |
 | `enemy_state_count:` | `enemy_state_count:冻结 >= 1` |
 
@@ -462,7 +462,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 | `actor_max_hp` / `actor_attr:<属性>` | 事件发起者的 |
 | `self_stacks:<名字>` / `target_stacks:<名字>` | 层数 |
 | `party_resource:<名字>` | 全队计数器 |
-| `self_resource:<名字>` | 持有者自己的计数器 |
+| `self_resource:<名字>` / `self_resource_before:<名字>` | 持有者自己的计数器 / 它**在这次变化之前**的值（阈值跨越用，读者 1513 星魂 1） |
 | `self_max_energy` / `owner_max_energy` | 能量上限 |
 | `elation_base` | 欢愉体系的基础值 |
 | `original_damage` | 触发这一发本身的伤害 |

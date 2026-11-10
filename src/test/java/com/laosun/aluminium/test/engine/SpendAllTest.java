@@ -20,6 +20,9 @@ import java.util.List;
  * {@code RESOURCE_CHANGED} one. That route is gone: the clause now lives on the cast itself (its own sentence is
  * "施放时会消耗所有【热意】，每消耗1点…"), where the counter is read at dispatch time - the value that cast is about to
  * spend. Both cases here therefore drive the real cast, at two amounts.
+ *
+ * <p>⚠ 2026-11-11: that sentence is the <b>enhanced</b> row (151321). The base 【举杯！敬炽烈一夏】(151320) carries no
+ * spend clause, so the cast driven below is data slot 21 - before the correction this case measured the base row.
  */
 public class SpendAllTest {
     private static final int OWNER = 1513;
@@ -36,19 +39,24 @@ public class SpendAllTest {
     }
 
     /**
-     * The cast route scales with the amount: seven points add far more than one.
+     * The cast route scales with the amount: more points pay strictly more.
+     *
+     * <p>⚠ The measured shape, not a guess: the per-point instance is ELATION damage, so its SIZE is multiplied by the
+     * laugh snapshot of the moment - and that snapshot grows with the 笑点 the same priming grants. So there is no clean
+     * "one unit per point" here (measured: the 1-point delta was 62.4 and the 7-point delta 1207.7, a 19.3x on a 6x
+     * difference in points). What can be asserted honestly is monotone growth plus "far more than one extra point".
      */
     @Test
     public void theRuleScalesWithTheAmount() {
         double one = lossByCast(1);
+        double two = lossByCast(2);
         double seven = lossByCast(7);
-        // Note: Asserted as a DIRECTION, not a multiple: this judge once measured 38.808 for one point and 329.868 for
-        // seven through the hand-fired route, and the exact multiple is still not a clean x through this one either
-        // (the per-point instants settle through the same zones as the cast around them). Registered, not asserted.
-        System.out.println("[spendAll] one point " + one + " ; seven points " + seven);
+        System.out.println("[spendAll] one point " + one + " ; two points " + two + " ; seven points " + seven);
         Assertions.assertTrue(one > 0, "precondition: the cast with one point lands (" + one + ")");
-        Assertions.assertTrue(seven > 5 * one,
-                "seven points must add far more than one (" + one + " -> " + seven + ")");
+        Assertions.assertTrue(two > one, "two points pay strictly more than one (" + one + " -> " + two + ")");
+        Assertions.assertTrue(seven > two, "seven points pay more again (" + two + " -> " + seven + ")");
+        Assertions.assertTrue(seven - one > 5 * (two - one),
+                "seven points pay far more than a single extra instance (" + (one) + " -> " + (seven) + ")");
     }
 
     // ==================================================================
@@ -72,7 +80,11 @@ public class SpendAllTest {
         Assertions.assertEquals(start, owner.getResources().value(RES),
                 "precondition: her own rule primed it to " + start);
         double before = enemy.getCurrentHp();
-        SkillExecutor.execute(battle, owner.getSkills().get(SkillType.ELATION_SKILL), owner, List.of(enemy));
+        // The clause 「施放时会消耗所有【热意】，每消耗1点…」 belongs to the ENHANCED row (151321), not to the base
+        // 【举杯！敬炽烈一夏】(151320): only the 「All in！」 block carries it. The cast driven here is data slot 21, the
+        // same row the talent swaps in for the next Elation cast.
+        SkillExecutor.execute(battle, new com.laosun.aluminium.skill.DefaultSkill(OWNER, 21, 80), owner,
+                List.of(enemy));
         battle.processRequests();
         Assertions.assertEquals(0, owner.getResources().value(RES),
                 "the cast spends ALL of it (" + start + " -> 0)");

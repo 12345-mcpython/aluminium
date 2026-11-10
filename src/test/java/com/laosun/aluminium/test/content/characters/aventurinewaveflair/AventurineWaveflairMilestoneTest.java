@@ -59,10 +59,10 @@ public class AventurineWaveflairMilestoneTest {
         System.out.println("[1513] the crossing: counter " + fervor() + ", the commanded cast dealt " + cast
                 + " (fixed " + FIXED_LAUGHS + "), the Elation slot now holds " + slotOf(wolf));
         Assertions.assertTrue(cast > 0, "「立即施放1次…欢愉技」: the crossing performs a cast");
-        Assertions.assertEquals(0, fervor(), "and that cast spends ALL of it, exactly as the skill's own sentence says");
+        Assertions.assertEquals(THRESHOLD, fervor(),
+                "the BASE cast does not spend: 「施放时会消耗所有【热意】」 is the ENHANCED row sentence (151321)");
         Assertions.assertEquals(21, slotOf(wolf),
                 "「下一次…强化为【All in！敬炽烈一夏】」 is installed in the Elation slot (data row 21)");
-
         // ⚠ The fixed 20 is pinned STRUCTURALLY here, and numerically by the ENGINE judge. Measured while writing this:
         // a cross-cast damage ratio cannot pin it in this fixture, because the content's own Aha Moment reward moves the
         // laugh snapshot between the two casts (the crossing's cast read 554.77, her own next one 1829.52) - the ratio
@@ -76,6 +76,8 @@ public class AventurineWaveflairMilestoneTest {
         battle.processRequests();
         System.out.println("[1513] after her own Elation cast the slot holds " + slotOf(wolf) + " and it dealt "
                 + (beforeOwn - enemy.getCurrentHp()) + " against the crossing's " + cast);
+        Assertions.assertEquals(0, fervor(),
+                "the ENHANCED row spends ALL of it (「施放时会消耗所有【热意】」 lives there)");
         Assertions.assertEquals(20, slotOf(wolf),
                 "next_elation_skill: the swap ends on the Elation cast it was waiting for");
     }
@@ -141,6 +143,49 @@ public class AventurineWaveflairMilestoneTest {
         Assertions.assertTrue(beforeEnemy - enemy.getCurrentHp() > 0, "precondition: the ally's cast really settled");
         Assertions.assertEquals(6, fervor(),
                 "one point from the ally's attack, and nothing spent: 「施放时会消耗所有【热意】」 is about HER cast");
+    }
+
+    /**
+     * Eidolon 1: 「【热意】达到10点/20点/30点时，都会立即施放」 - three CROSSINGS of one counter, not three levels.
+     *
+     * <p>⚠ The negative cases are the point: 21 is not a threshold, and at E0 there is no 20-point tier at all. A shape
+     * that read "at or above" would fire on every one of these gains.
+     */
+    @Test
+    public void theFirstEidolonAddsTheTwentyAndThirtyCrossings() {
+        build();
+        wolf.setEidolonRank(1);
+        wolf.getResources().gain(FERVOR, 19);
+
+        double beforeTwenty = enemy.getCurrentHp();
+        alleyAttacks();                                  // 19 -> 20: a crossing at E1
+        Assertions.assertTrue(beforeTwenty - enemy.getCurrentHp() > 0,
+                "「达到 20 点时…立即施放」");
+        Assertions.assertEquals(20, fervor(), "the BASE cast does not spend the counter");
+
+        double afterTwenty = enemy.getCurrentHp();
+        alleyAttacks();                                  // 20 -> 21: not a threshold
+        Assertions.assertEquals(0.0, afterTwenty - enemy.getCurrentHp(), 1e-9,
+                "only the crossing pays, not every gain above 20");
+
+        wolf.getResources().gain(FERVOR, 8);             // 21 -> 29
+        double beforeThirty = enemy.getCurrentHp();
+        alleyAttacks();                                  // 29 -> 30
+        Assertions.assertTrue(beforeThirty - enemy.getCurrentHp() > 0, "「达到 30 点时…」");
+    }
+
+    /**
+     * Eidolon 1's tiers do not exist at E0: 19 -> 20 pays nothing.
+     */
+    @Test
+    public void withoutTheFirstEidolonTwentyIsNotAThreshold() {
+        build();
+        wolf.getResources().gain(FERVOR, 19);
+        double before = enemy.getCurrentHp();
+        alleyAttacks();                                  // 19 -> 20 at E0
+        Assertions.assertEquals(0.0, before - enemy.getCurrentHp(), 1e-9,
+                "E0 states only the 10-point tier");
+        Assertions.assertEquals(20, fervor(), "and nothing spent the counter");
     }
 
     // ==================================================================
