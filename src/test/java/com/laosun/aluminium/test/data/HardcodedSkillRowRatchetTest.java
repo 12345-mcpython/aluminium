@@ -107,11 +107,11 @@ public class HardcodedSkillRowRatchetTest {
     // taken up), so reading the row would be wrong; the literal stays, as with 1309/1412/1106 above.
     // 67 since 2026-11-11: 1404 Mydei Eidolon 6 re-states the 【血仇】 state's own +50% maximum HP (0.5), which happens to
     // equal a cell of his Talent and enhanced-Basic rows. It is the SAME clause the talent already writes (the state has
-    // two entry paths - see SameEffectTwiceGuardTest's baseline), not a frozen row read.
-    // 69 since 2026-11-11: 1310 Firefly Eidolons 4 and 6 write 0.5 and 0.2 (「效果抵抗提高 50%」 / 「火属性抗性穿透提高
-    // equal her Ultimate row cell 0.5. That cell is the break-efficiency share (a different clause, and the rule that needs
-    // it reads the row with `percent_from_skill_param: "ULTRA:1"`), so the literal stays.
-    private static final int BASELINE = 69;
+    // 70 since 2026-11-11: 1310 Firefly writes 0.5 / 0.2 / 0.2 - Eidolon 4 and 6 parameters plus the Ultimate clause
+    // 「击破伤害提高 20%」 - all of which happen to equal cells of her rows. Those cells are other clauses (the
+    // break-efficiency share, which the rule that needs it reads with `percent_from_skill_param: "ULTRA:1"`), so the
+    // literals stay.
+    private static final int BASELINE = 70;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

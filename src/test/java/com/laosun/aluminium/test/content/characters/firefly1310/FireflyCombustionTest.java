@@ -158,7 +158,43 @@ public class FireflyCombustionTest {
                 "「…或使目标陷入弱点击破状态时」");
     }
 
+    /**
+     * 「使敌方目标受到装甲「萨姆」造成的**击破伤害**提高 20%」 - scoped to break damage by `damage_type: BREAK`, so an
+     * ordinary hit is untouched.
+     *
+     * <p>⚠ This clause was registered as unwritable for a while (「`MODIFY_DAMAGE_TAKEN` only narrows by element」). That
+     * was stale: the op has a `damage_type` scope, and it is listed in `TriggerVocabulary.DAMAGE_TYPE_READERS`.
+     */
+    @Test
+    public void anEnhancedCastRaisesBreakDamageTakenOnly() {
+        double plainBreak = damageOf(false, false);
+        double inCombustion = damageOf(false, true);
+        Assertions.assertEquals(1.2, inCombustion / plainBreak, 1e-6,
+                "「击破伤害提高 20%」 - a BREAK instance takes 20% more while the cast window is open");
+
+        double plainHit = damageOf(true, false);
+        double hitInCombustion = damageOf(true, true);
+        Assertions.assertEquals(plainHit, hitInCombustion, 1e-6,
+                "an ordinary hit is NOT break damage, so the zone does not touch it");
+    }
     // ==================================================================
+
+    /**
+     * The damage one instance deals to a fresh dummy: a BREAK or an ORDINARY hit, with or without the cast window open.
+     */
+    private static double damageOf(boolean ordinary, boolean inCombustion) {
+        Run run = new Run(0);
+        if (inCombustion) {
+            run.ult();
+            run.battle.fire(TriggerPayload.Simple.of(TriggerEvent.CAST_SETUP, run.firefly, run.enemy, 0, 0));
+        }
+        double before = run.enemy.getCurrentHp();
+        run.battle.applyDamage(run.enemy, new com.laosun.aluminium.damage.Damage(run.firefly, run.enemy,
+                com.laosun.aluminium.enums.DamageElement.PHYSICAL,
+                ordinary ? com.laosun.aluminium.enums.DamageType.NORMAL : com.laosun.aluminium.enums.DamageType.BREAK,
+                1000));
+        return before - run.enemy.getCurrentHp();
+    }
 
     private static final class Run {
         private final Character firefly;
