@@ -565,8 +565,10 @@ public final class SkillExecutor {
                 if (victim == null) {
                     break;
                 }
+                // Note: a random hit is not the cast's DESIGNATED target, so `mainTarget` is false here even when the
+                // draw happens to land on the aimed enemy - "指定敌方单体" names the choice, not the coincidence.
                 totalDamage += hit(battle, data, attacker, element, perHitBase, victim, hitTargets, elationStance,
-                        skill.getSkillSlot());
+                        skill.getSkillSlot(), false);
             }
             if (params.size() > 2) {
                 List<CanHit> everyone = battle.targetableEnemies();
@@ -574,7 +576,7 @@ public final class SkillExecutor {
                     double share = attacker.damageBase(baseAttribute) * params.get(2) / everyone.size();
                     for (CanHit victim : everyone) {
                         totalDamage += hit(battle, data, attacker, element, share, victim, hitTargets, elationStance,
-                                skill.getSkillSlot());
+                                skill.getSkillSlot(), victim == mainTarget);
                     }
                 }
             }
@@ -593,12 +595,12 @@ public final class SkillExecutor {
                 double stance = data.getStanceList().single();
                 if (segments.size() <= 1) {
                     totalDamage += hit(battle, data, attacker, element, base, mainTarget, hitTargets, stance,
-                            skill.getSkillSlot());
+                            skill.getSkillSlot(), true);
                 } else {
                     double perInstanceStance = stance / segments.size();
                     for (Double ratio : segments) {
                         totalDamage += hit(battle, data, attacker, element, base * ratio, mainTarget, hitTargets,
-                                perInstanceStance, skill.getSkillSlot());
+                                perInstanceStance, skill.getSkillSlot(), true);
                     }
                 }
             }
@@ -613,7 +615,7 @@ public final class SkillExecutor {
                             ? base
                             : perResourceBase(user, baseAttribute, params, perResource, target == mainTarget);
                     totalDamage += hit(battle, data, attacker, element, instanceBase, target, hitTargets, stance,
-                            skill.getSkillSlot());
+                            skill.getSkillSlot(), target == mainTarget);
                 }
             }
 
@@ -623,16 +625,18 @@ public final class SkillExecutor {
                 double centreStance = data.stanceFor(true);
                 double neighbourStance = data.stanceFor(false);
                 if (center < 0) {
-                    totalDamage += hit(battle, data, attacker, element, base, mainTarget, hitTargets, centreStance, skill.getSkillSlot());
+                    totalDamage += hit(battle, data, attacker, element, base, mainTarget, hitTargets, centreStance, skill.getSkillSlot(), true);
                 } else {
-                    totalDamage += hit(battle, data, attacker, element, base, alive.get(center), hitTargets, centreStance, skill.getSkillSlot());
+                    // 「对指定敌方单体…同时对其相邻目标…」: the centre IS the designated target, the neighbours are not -
+                    // the one fact that lets a per-instance clause name the centre alone (1205's Eidolon 1).
+                    totalDamage += hit(battle, data, attacker, element, base, alive.get(center), hitTargets, centreStance, skill.getSkillSlot(), true);
                     if (center > 0) {
                         totalDamage += hit(battle, data, attacker, element, neighbourBase, alive.get(center - 1),
-                                hitTargets, neighbourStance, skill.getSkillSlot());
+                                hitTargets, neighbourStance, skill.getSkillSlot(), false);
                     }
                     if (center < alive.size() - 1) {
                         totalDamage += hit(battle, data, attacker, element, neighbourBase, alive.get(center + 1),
-                                hitTargets, neighbourStance, skill.getSkillSlot());
+                                hitTargets, neighbourStance, skill.getSkillSlot(), false);
                     }
                 }
             }
@@ -660,7 +664,7 @@ public final class SkillExecutor {
                         break;                                     // all dead to the remaining hits are forfeited
                     }
                     totalDamage += hit(battle, data, attacker, element, bounceBase,
-                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets, perHitStance, skill.getSkillSlot());
+                            alive.get(battle.getRng().nextInt(alive.size())), hitTargets, perHitStance, skill.getSkillSlot(), false);
                 }
             }
 
@@ -812,7 +816,7 @@ public final class SkillExecutor {
                     for (int repetition = 0; repetition < times; repetition++) {
                         for (Double ratio : ratios) {
                             total += hit(battle, data, user, element, partBase * ratio, mainTarget, hitTargets,
-                                    data.getStanceList().single() / instances, skill.getSkillSlot());
+                                    data.getStanceList().single() / instances, skill.getSkillSlot(), true);
                         }
                     }
                 }
@@ -822,7 +826,7 @@ public final class SkillExecutor {
                         for (Double ratio : ratios) {
                             for (CanHit target : battle.targetableEnemies()) {
                                 total += hit(battle, data, user, element, partBase * ratio, target, hitTargets, stance,
-                                        skill.getSkillSlot());
+                                        skill.getSkillSlot(), target == mainTarget);
                             }
                         }
                     }
@@ -899,6 +903,9 @@ public final class SkillExecutor {
      *                     according to the skill shape and hit count: AOE uses {@code all}, BLAST's
      *                     center uses {@code single} / its neighbours {@code spread}, BOUNCE spreads
      *                     the total evenly over the hits)
+     * @param mainTarget whether this instance lands on the designated target of the cast (a Blast's
+     *                   centre, a single-target cast's target, the aimed slot of an area cast); the
+     *                   instance carries it so a per-instance clause can name the centre alone
      * @return the settled damage of this hit (0 if the target was dead / invulnerable)
      */
     /**
@@ -917,7 +924,8 @@ public final class SkillExecutor {
     }
 
     private static double hit(Battle battle, SkillData data, CanHit user, DamageElement element, double base,
-                              CanHit target, Set<CanHit> hitTargets, double stanceDamage, int skillKey) {
+                              CanHit target, Set<CanHit> hitTargets, double stanceDamage, int skillKey,
+                              boolean mainTarget) {
         if (target == null || target.isDeath()) {
             return 0;
         }
@@ -950,6 +958,9 @@ public final class SkillExecutor {
         // damage, and "this damage's toughness reduction value" has to be readable there -- 1321/8006's super-break clauses are exactly that.
         // Note: Set BEFORE the settlement below: `DEALING_DAMAGE` is fired from inside `battle.applyDamage`.
         damage.setStance(stanceDamage);
+        // 「对指定敌方单体」/「对其相邻目标」: the one fact that separates a Blast's centre from its neighbours on the
+        // instance a DEALING_DAMAGE rule is handed (1205's Eidolon 1). Set here because the shape logic lives here.
+        damage.setMainTarget(mainTarget);
         double settled = battle.applyDamage(target, damage);
         settled += applyStanceDamage(battle, user, element, damage, target, stanceDamage);
         return settled;

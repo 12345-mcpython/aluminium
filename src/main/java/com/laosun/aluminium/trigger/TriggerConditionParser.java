@@ -388,6 +388,52 @@ final class TriggerConditionParser {
             return new DamageIsAdditional(raw);
         }
 
+        // The instance lands on the cast's DESIGNATED target, not on a neighbour: 「对指定敌方单体造成的伤害额外提高」 says
+        // nothing about 「对其相邻目标」, and the two are instances of one Blast (1205 Blade (刃)'s Eidolon 1). Same bare-keyword
+        // shape as the two above; the fact rides on the instance (`Damage.setMainTarget`).
+        if (text.trim().equalsIgnoreCase(DAMAGE_IS_MAIN_TARGET)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance lands on the cast's designated target, but "
+                                + spec.getOn() + " carries no damage instance; it belongs on an event that settles one "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new DamageIsMainTarget(raw);
+        }
+
+        // 「天赋触发追加攻击造成的伤害」: the instance's own TYPE, named. The three bare keywords above answer fixed
+        // questions (is it an attack / additional / a DoT); this one is parameterised because a sentence may name any of
+        // the types the data has (NORMAL / ADDITIONAL / TALENT / DOT ...), and "TALENT" in particular is how the engine
+        // stamps a Talent's follow-up (readers: 1205 Blade (刃)'s Eidolon 6 and BattleDamage's follow-up boost).
+        Matcher damageTypeIs = DAMAGE_TYPE_IS_KEYWORD.matcher(text);
+        if (damageTypeIs.find()) {
+            String before = normalize(text.substring(0, damageTypeIs.start()));
+            String stated = text.substring(damageTypeIs.end()).trim();
+            if (!before.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something before \"damage_type_is\": the keyword takes no "
+                                + "subject - whose instance it is comes from its own condition (source: " + spec.getSource() + ")");
+            }
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks for the instance's damage type, but " + spec.getOn()
+                                + " carries no damage instance; it belongs on an event that settles one "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            com.laosun.aluminium.enums.DamageType named;
+            try {
+                named = com.laosun.aluminium.enums.DamageType.fromString(stated);
+            } catch (IllegalArgumentException unknown) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' names an unknown damage type '" + stated
+                                + "' (known: NORMAL / SKILL / ULTRA / ADDITIONAL / TALENT / BREAK / SUPER_BREAK / DOT / "
+                                + "EXTRA / TECHNIQUE / MEMORY / ELATION / TRUE) (source: " + spec.getSource() + ")");
+            }
+            return new DamageTypeIs(named, raw);
+        }
+
         // 「持续伤害产生伤害时」 - the instance is a DoT tick. Same bare-keyword shape as the two above: `DAMAGE_SETTLED`
         // fires for every settled instance (DoT ticks, break, additional damage), so "when the DoT deals damage" needs its
         // own guard or a rule would also pay out on ordinary attacks. See DAMAGE_IS_DOT.
@@ -1827,6 +1873,48 @@ final class TriggerConditionParser {
         }
     }
 
+    /** {@code damage_is_main_target}: the settled instance lands on the cast's designated target - see {@link #DAMAGE_IS_MAIN_TARGET}. */
+    static final class DamageIsMainTarget implements Condition {
+        private final String raw;
+
+        DamageIsMainTarget(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            // Note: A missing instance answers false rather than throwing, the same reading every other bare keyword uses:
+            // a question about a hit that is not there is not true.
+            return ctx.damage() != null && ctx.damage().isMainTarget();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /** {@code damage_type_is <TYPE>}: the instance's own damage type - see {@link #DAMAGE_TYPE_IS}. */
+    static final class DamageTypeIs implements Condition {
+        private final com.laosun.aluminium.enums.DamageType type;
+        private final String raw;
+
+        DamageTypeIs(com.laosun.aluminium.enums.DamageType type, String raw) {
+            this.type = type;
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.damage() != null && ctx.damage().getType() == type;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     static final class DamageElementIsSelf implements Condition {
         private final String raw;
 
@@ -2798,6 +2886,39 @@ final class TriggerConditionParser {
      * guard it was written to pass.
      */
     static final String DAMAGE_IS_ADDITIONAL = "damage_is_additional";
+
+    /**
+     * The bare keyword {@code damage_is_main_target}: "the instance being settled lands on the cast's DESIGNATED target".
+     *
+     * <p><b>Why it exists.</b> A Blast settles one instance per victim, and the documents say different things about the
+     * centre and the neighbours: 1205 Blade (刃)'s Eidolon 1 raises 「终结技对<b>指定敌方单体</b>造成的伤害」, while the
+     * neighbours' damage is a separate sentence the clause does not mention. Without this fact the only spellings are
+     * "every instance of the cast" (raises the neighbours too) or "the first one in roster order" (raises the wrong one
+     * when the centre is not first).
+     *
+     * <p>Note: The fact is set by the shape logic ({@code SkillExecutor.hit}), because that is the one place that knows
+     * which instance the shape priced as the centre ({@code SkillData.stanceFor(true)} reads the same distinction).
+     */
+    static final String DAMAGE_IS_MAIN_TARGET = "damage_is_main_target";
+
+    /**
+     * The keyword {@code damage_type_is <TYPE>}: "the instance being settled is of this damage type".
+     *
+     * <p><b>Why a parameterised keyword and not a fourth bare one.</b> The engine already answers "is it an attack",
+     * "is it additional" and "is it a DoT" as fixed questions. A sentence that names a specific other type - 「天赋触发
+     * 追加攻击造成的伤害额外提高」 (1205 Blade (刃)'s Eidolon 6), where the Talent's follow-up is stamped
+     * {@link com.laosun.aluminium.enums.DamageType#TALENT} by the rule that delivers it - had no spelling at all, and
+     * "additional damage" (the nearest bare keyword) would also match every other rider.
+     *
+     * <p>Note: The value is an engine damage type, checked at load time; it is not free text.
+     */
+    static final String DAMAGE_TYPE_IS = "damage_type_is";
+
+    /**
+     * The keyword of the named damage type: {@code damage_type_is <TYPE>} - see {@link #DAMAGE_TYPE_IS}.
+     */
+    private static final Pattern DAMAGE_TYPE_IS_KEYWORD =
+            Pattern.compile("(?<![\\w])damage_type_is(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
      * The bare keyword {@code damage_is_dot}: "the instance being settled is CONTINUOUS damage (a DoT tick)".

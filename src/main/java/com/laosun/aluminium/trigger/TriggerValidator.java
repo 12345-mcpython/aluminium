@@ -224,6 +224,13 @@ final class TriggerValidator {
                             + " read it; an op that ignores it would silently apply to every element "
                             + "(source: " + spec.getSource() + ")");
         }
+        // The same shape for ADD_DAMAGE's insertion point: only that op reads `after_zones`, and stating it elsewhere
+        // would look like a placement while being dropped - the "no unknown argument" hole this file closes one field at a time.
+        if (effect.getAfterZones() != null && !"ADD_DAMAGE".equalsIgnoreCase(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"after_zones\", but only ADD_DAMAGE reads it: this op would add its number "
+                            + "into the base layer and leave the flag unread (source: " + spec.getSource() + ")");
+        }
         // `scope_category` narrows a damage-taken zone to one CAST CATEGORY («受到的终结技伤害提高 8%»): only
         // MODIFY_DAMAGE_TAKEN reads it, and an op that ignored it would apply to every category -- the silent reading.
         if (effect.getScopeCategory() != null && !effect.getScopeCategory().isBlank()

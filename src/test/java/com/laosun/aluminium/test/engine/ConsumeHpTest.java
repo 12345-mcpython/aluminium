@@ -1,11 +1,8 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.entity.Character;
-import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -44,13 +41,11 @@ public class ConsumeHpTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        int guard = 0;
-        // Note: Small steps: `Damage`'s value is a SKILL BASE, not raw damage (round 193/240), so a big one-shot figure kills
-        // her and a dead unit answers nothing (0 HP for every reading).
-        while (unit.getCurrentHp() / unit.getMaxHp() > 0.05 && guard++ < 400 && !unit.isDeath()) {
-            battle.applyDamage(unit, new Damage(enemy, unit, DamageElement.PHYSICAL, DamageType.NORMAL,
-                    unit.getMaxHp() * 0.02));
-        }
+        // Note: `takeDamage` lowers HP WITHOUT announcing a hit. The old loop used `applyDamage` in small steps, which
+        // stopped working once the talent's follow-up landed: every fifth hit reaches the charge cap and heals 25% of
+        // Max HP, so damaging him down that way reaches an equilibrium instead of the floor. The op under test is
+        // `CONSUME_HP`'s floor, so the damage that sets it up must not run the talent.
+        unit.takeDamage(unit.getMaxHp() * 0.95);
         double before = unit.getCurrentHp();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double after = unit.getCurrentHp();

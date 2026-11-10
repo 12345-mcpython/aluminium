@@ -58,20 +58,34 @@ public class BladeTest {
 
     /**
      * Note: The charge cap, tested by exceeding it.
+     *
+     * <p>⚠ Since the talent's follow-up landed (2026-11-10), reaching the cap CONSUMES every layer - so the counter is
+     * 0 right after the fifth hit, never 5. What still holds is the cap itself: the counter must never read more than
+     * five, and the fifth layer is what pays the follow-up ({@code BladeTalentFollowupTest} measures that side).
      */
     @Test
-    public void theChargeStopsAtFive() {
+    public void theChargeNeverExceedsFive() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
-        Enemy enemy = BattleFixture.monster();
+        Enemy enemy = BattleFixture.dummy();
         Battle battle = new Battle(List.of(blade), List.of(enemy), fixed());
         battle.startBattle();
 
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 12; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, blade, 0, 0));
+            Assertions.assertTrue(blade.getBuffManager().stacksOf("充能") <= 5,
+                    "「最多叠加5层」 (stacks at most 5 times) - hit " + (i + 1) + " read "
+                            + blade.getBuffManager().stacksOf("充能"));
         }
-
-        Assertions.assertEquals(5, blade.getBuffManager().stacksOf("充能"),
-                "「最多叠加5层」 (stacks at most 5 times) -- six hits must still read five");
+        // And the layers are still being gained: four hits must read four (the follow-up empties them at five).
+        Character fresh = CharacterFactory.create(BLADE, LEVEL);
+        Battle second = new Battle(List.of(fresh), List.of(BattleFixture.dummy()), fixed());
+        second.startBattle();
+        for (int i = 0; i < 4; i++) {
+            second.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT,
+                    second.enemies().getFirst(), fresh, 0, 0));
+        }
+        Assertions.assertEquals(4, fresh.getBuffManager().stacksOf("充能"),
+                "below the cap every hit still adds a layer");
     }
 
     /**

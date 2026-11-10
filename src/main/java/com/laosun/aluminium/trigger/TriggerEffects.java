@@ -824,6 +824,10 @@ final class TriggerEffects {
      * <p>A negative {@code percent} is legal and means "this instance deals less" (the zone is {@code 1 + Σ},
      * and {@code assemble} floors the result at 1 anyway).
      *
+     * <p>Two insertion points, chosen by {@code after_zones}: the base layer by default (the amount is multiplied by
+     * every zone, "伤害值提高") or after all of them ({@code Damage.addSettledFlat}, "伤害额外提高，提高数值等同于…").
+     * The corpus states both, and they are different numbers unless the zones happen to multiply to 1.
+     *
      * @param effect the effect ({@code percent})
      * @param ctx    the context, which must carry the instance (guaranteed by the load-time event check)
      */
@@ -857,7 +861,14 @@ final class TriggerEffects {
                 magnitude *= TriggerInterpreter.laughFactor(ctx, effect);
             }
         }
-        damage.addFlat(magnitude);
+        // Note: WHERE the amount enters is the sentence's choice, and the two are different numbers. The default is the
+        // base layer (`addFlat`: it crits and is boosted, "提高数值等同于…"). `after_zones` is the other sentence: 「终结技
+        // 对指定敌方单体造成的伤害额外提高…」 (1205's Eidolon 1) names a settled number's raise, so it bypasses every zone.
+        if (Boolean.TRUE.equals(effect.getAfterZones())) {
+            damage.addSettledFlat(magnitude);
+        } else {
+            damage.addFlat(magnitude);
+        }
     }
 
     /**

@@ -530,6 +530,53 @@ public class Damage {
     private double flatAddend = 0;
 
     /**
+     * A flat amount added to this instance <b>after every zone</b> - the settled number's own addend.
+     *
+     * <p><b>Why {@link #addFlat} is not this.</b> {@code addFlat} enters the <b>base</b> layer, so the amount is
+     * multiplied by crit, DMG boost, defence and resistance. The documents also state a raise that is <b>not</b> part of
+     * the multiplier chain: 「终结技对指定敌方单体造成的伤害额外提高，提高数值等同于刃 150% 本场战斗中累计的已损失生命值」
+     * (1205 Blade (刃)'s Eidolon 1). Folding that into the base would make it crit and be boosted - a different number
+     * that looks right; and re-settling it as a second {@code DAMAGE} would roll a second crit, which is the other
+     * spelling the same sentence refuses.
+     *
+     * <p><b>Where it enters.</b> {@link #toValue()} adds it after every zone and after the element absorb, so it is
+     * exactly "the settled amount plus this number". The one-point floor stays at the settlement entry point
+     * ({@code DamageService.assemble}), so a value of 0 here still settles as 1.
+     *
+     * @param value the amount to add (may be negative; the result is floored at 0 here)
+     */
+    public void addSettledFlat(double value) {
+        this.settledAddend += value;
+    }
+
+    /**
+     * The absolute amount this instance carries on top of its <b>settled</b> value ({@code 0} = none).
+     *
+     * @see #addSettledFlat
+     */
+    @Getter
+    private double settledAddend = 0;
+
+    /**
+     * Whether this instance lands on the <b>designated</b> target of the cast that produced it.
+     *
+     * <p>Only a Blast (and the aimed slot of an area cast) distinguishes - the neighbours of a Blast are instances of
+     * the same cast on other units. Reader: 1205 Blade (刃)'s Eidolon 1, whose raise is stated for 「指定敌方单体」 and
+     * must not reach the neighbours. An instance built outside a cast (a hand-made probe, a DOT tick) answers
+     * {@code false}, which is the reading that never pays a clause the sentence did not state.
+     */
+    private boolean mainTarget;
+
+    /**
+     * Records whether this instance lands on the cast's designated target.
+     *
+     * @param value {@code true} for the centre of a Blast / the aimed target of a single-target cast
+     */
+    public void setMainTarget(boolean value) {
+        this.mainTarget = value;
+    }
+
+    /**
      * Vulnerability zone: additive; the cap is applied uniformly when the multiplier is read.
      */
     public Damage addVulnerable(double pct) {
@@ -758,7 +805,9 @@ public class Damage {
         // the zones, and it takes the addend the same way - a value is a value.
         double base = skillBaseValue + flatAddend;
         if (trueDamage && Constant.TRUE_DMG_SKIP_ZONES) {
-            return base;
+            // No zones to come after, so "after every zone" is the same place as here - and a settled addend that was
+            // silently dropped on true damage would be the "field no one reads" this project keeps refusing.
+            return base + settledAddend;
         }
         double value = base;
         for (Area area : damageArea) {
@@ -772,6 +821,12 @@ public class Damage {
         if (absorbed > 0 && type.isBoostable()) {
             value = Math.max(0, value - absorbed);
         }
+        // The settled addend comes after EVERY zone (and after the absorb): 「伤害额外提高，提高数值等同于…」 names a
+        // number of its own, not a factor - see addSettledFlat. A true-damage instance took its value above and returns
+        // earlier; a value is a value, and this one is added to whatever the zones produced.
+        if (settledAddend != 0) {
+            value = Math.max(0, value + settledAddend);
+        }
         return value;
     }
 
@@ -784,6 +839,9 @@ public class Damage {
     public Map<String, Double> breakdown() {
         Map<String, Double> breakdown = new LinkedHashMap<>();
         breakdown.put("base", skillBaseValue);
+        if (flatAddend != 0) {
+            breakdown.put("flat_addend", flatAddend);
+        }
         for (Area area : damageArea) {
             if (area.applies(type)) {
                 breakdown.put(area.getClass().getSimpleName(), area.getRate());
@@ -791,6 +849,9 @@ public class Damage {
         }
         if (absorbed > 0 && type.isBoostable()) {
             breakdown.put("absorb", -absorbed);
+        }
+        if (settledAddend != 0) {
+            breakdown.put("settled_addend", settledAddend);
         }
         breakdown.put("final", toValue());
         return breakdown;

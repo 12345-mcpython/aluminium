@@ -243,6 +243,8 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `damage_is_attack` | 这一发算不算一次攻击 |
 | `damage_did_not_crit` | 这一发**没有暴击**（只在 `DAMAGE_SETTLED` 上，掷骰已发生）|
 | `damage_is_additional` | 这一发是不是追加伤害 |
+| `damage_is_main_target` | 这一发是不是打在**指定目标**上（Blast 的**中心**为真、相邻为假；随机/弹射为假）|
+| `damage_type_is <类型>` | 这一发的伤害类型（`NORMAL` / `ADDITIONAL` / `TALENT` / `DOT` …；规则自己用 `damage_type` 盖的章也算） |
 | `damage_has_no_cast` | 这一发没有施放来源 |
 | `damage_element_is_self` | 这一发的属性 = 我自己的属性 |
 
@@ -399,6 +401,7 @@ SUMMON_SERVANT         SUPER_BREAK            TAUNT                  TICK_DOT
 - `REDUCE_TOUGHNESS` 是**声明了但还没实现**的 op；写它会装载期报错并说明原因。
 - **`SHARE_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：`{"percent": 0.65, "target": "self"}` 表示「这一发的 65% **由目标承担**」—— 本发只保留 35%，并按**同元素/同攻击者/同 65% 基数**给 `target` 另开一发（走它自己的防御/抗性区，结算在当次之后）。读者：1208 符玄【穷观阵】。
 - `REPLACE_SKILL` 有两个方向：**装上**（`skill` + `skill_id` + 一个寿命）与 **`"remove": true`**（把该槽位的替换取下、恢复原来的行；不带 `skill_id`、不带寿命）。重复装上**同一**替换是 no-op（否则第二个会把强化行记成「原始」，卸下时反而装回去）。读者：1111 卢卡「≥2 层时强化 / <2 层时恢复」
+- **`ADD_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：加的是一个**数值**（不是百分比）。默认进**基数层**（「伤害**值**提高」⇒ 会被暴击/增伤/防御/抗性放大）；**`"after_zones": true`** 改成在所有区**之后**加（「伤害**额外提高**，提高数值等同于…」⇒ 不暴击、不被任何区放大）。读者：1001 星魂 4（基数层）、1205 星魂 1 / 星魂 6（`after_zones`）。
 - **每个 op 的参数以 `TriggerInterpreter` 的类注释为准**，本文不复制。
 
 ### 5.2 目标（`target`）

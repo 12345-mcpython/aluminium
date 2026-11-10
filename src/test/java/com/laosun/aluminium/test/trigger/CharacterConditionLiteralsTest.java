@@ -139,6 +139,15 @@ public class CharacterConditionLiteralsTest {
         assertRule(1205, "TAKING_HIT", "talent_charge_on_hit", List.of("target == self"));
         assertRule(1205, "BATTLE_START", "level_convention", List.of());
         assertRule(1205, "TURN_START", "eidolon2_crit_while_hellscape", List.of("self has_state 地狱变"));
+        assertRule(1205, "DEALING_DAMAGE", "eidolon1_the_ultimates_designated_target_takes_the_tally",
+                List.of("from_category ULTRA", "damage_is_main_target"));
+        assertRule(1205, "TAKING_HIT", "talent_charge_on_hit_eidolon6", List.of("target == self"));
+        assertRule(1205, "STACK_GAINED", "talent_followup_at_full_charge",
+                List.of("self stack_added 充能", "self_stacks:充能 >= 5.0"));
+        assertRule(1205, "STACK_GAINED", "talent_followup_at_full_charge_eidolon6",
+                List.of("self stack_added 充能", "self_stacks:充能 >= 4.0"));
+        assertRule(1205, "DEALING_DAMAGE", "eidolon6_the_talent_followup_takes_half_the_max_hp",
+                List.of("actor == self", "damage_type_is TALENT"));
         assertRule(1206, "BREAK", "talent_speed_on_break", List.of());
         assertRule(1206, "ALLY_ATTACK", "skill_sword_stance_chance", List.of("actor == self", "from_skill SKILL", "!target has_state 弱点击破"));
         assertRule(1206, "ALLY_ATTACK", "skill_sword_stance_guaranteed", List.of("actor == self", "from_skill SKILL", "target has_state 弱点击破"));

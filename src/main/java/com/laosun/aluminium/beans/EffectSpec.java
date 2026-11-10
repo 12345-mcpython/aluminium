@@ -93,6 +93,7 @@ public class EffectSpec {
         copy.unbounded = this.unbounded;
         copy.fixed = this.fixed;
         copy.unboosted = this.unboosted;
+        copy.afterZones = this.afterZones;
         copy.maxPerRound = this.maxPerRound;
         copy.payer = this.payer;
         copy.until = this.until;
@@ -971,6 +972,21 @@ public class EffectSpec {
      */
     @SerializedName("unboosted")
     private Boolean unboosted;
+
+    /**
+     * For {@code ADD_DAMAGE}: whether the amount is added <b>after every zone</b> instead of into the base layer.
+     *
+     * <p>Absent/false keeps the historical reading - 「伤害<b>值</b>提高，提高数值等同于…」 enters the base, so it crits and is
+     * boosted like the skill multiplier ({@code Damage.addFlat}). {@code true} is the other sentence the corpus states:
+     * 「终结技对指定敌方单体造成的**伤害额外提高**，提高数值等同于刃 150% 本场战斗中累计的已损失生命值」 (1205 Blade (刃)'s
+     * Eidolon 1), where the raise is a number of its own added to the settled damage - it must not crit and must not be
+     * multiplied by the DMG boost, defence or resistance zones ({@code Damage.addSettledFlat}).
+     *
+     * <p>Note: Read by {@code TriggerEffects.addDamageFlat} only; stating it on any other op would be silently ignored, so
+     * {@code TriggerValidator} refuses it there.
+     */
+    @SerializedName("after_zones")
+    private Boolean afterZones;
 
     /**
      * For {@code GAIN_RESOURCE}: how much may be gained <b>within one round</b>, across every gain of this resource by
