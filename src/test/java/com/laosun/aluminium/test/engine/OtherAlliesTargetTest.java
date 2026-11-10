@@ -179,7 +179,9 @@ public class OtherAlliesTargetTest {
         // control immunity. A fourth rule (a 20% defence ignore under 「结界」) was removed that day: 知更鸟's document has no
         // such clause at all (0 mentions of 结界 - her state is 【协奏】), and the sentence it quoted belongs to 1303 阮•梅's
         // Eidolon 1, which already implements it.
-        Assertions.assertEquals(3, rules.size());
+        // Six since 2026-11-11: the three Eidolon auras (1: party penetration, 2: party speed, 4: party effect RES) are
+        // granted on this same cast - the one that ENTERS 【协奏】 - and are grouped by that name for removal.
+        Assertions.assertEquals(6, rules.size());
         List<EffectSpec> effects = rules.getFirst().effects();
         Assertions.assertEquals(1, effects.size());
         Assertions.assertEquals("ADVANCE", effects.getFirst().getOp());

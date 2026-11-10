@@ -99,7 +99,10 @@ public class HardcodedSkillRowRatchetTest {
     // must state the SAME number twice. Reading the row is not available to it: the instance's caster is the SUMMON
     // (`attacker: actor`, because 神君 has no panel), and a `skill` / `damage_param` read resolves against the caster --
     // measured: "神君 has no TALENT skill to fire a DAMAGE effect from".
-    private static final int BASELINE = 64;
+    // 65 since 2026-11-11: 1309 Robin (知更鸟)'s Eidolon 4 writes 0.5 (「效果抵抗提高 50%」) - a STAR-SOUL parameter that
+    // happens to equal her Skill row's Lv10 cell (0.5). No reader exists for an Eidolon row, so it stays literal, exactly
+    // like 1412's 2.4 and 1106's 0.4 above.
+    private static final int BASELINE = 65;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

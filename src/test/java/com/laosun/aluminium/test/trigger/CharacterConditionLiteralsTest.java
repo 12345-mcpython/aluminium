@@ -277,6 +277,10 @@ public class CharacterConditionLiteralsTest {
         assertRule(1308, "BATTLE_START", "level_convention", List.of());
         assertRule(1308, "BATTLE_START", "talent_ult_damage_taken", List.of());
         assertRule(1309, "DEALING_DAMAGE", "trace_followup_crit_aura", List.of("self has_state 协奏"));
+        assertRule(1309, "ULT_CAST", "eidolon1_party_pierces_more_while_concerto", List.of("actor == self"));
+        assertRule(1309, "BATTLE_START", "eidolon2_the_talent_pays_one_more_energy", List.of());
+        assertRule(1309, "ULT_CAST", "eidolon2_party_speed_while_concerto", List.of("actor == self"));
+        assertRule(1309, "ULT_CAST", "eidolon4_party_effect_resistance_while_concerto", List.of("actor == self"));
         assertRule(1310, "SKILL_CAST", "skill_action_advance", List.of("actor == self"));
         assertRule(1310, "ULT_CAST", "ult_action_advance", List.of("actor == self"));
         assertRule(1310, "BATTLE_START", "level_convention", List.of());

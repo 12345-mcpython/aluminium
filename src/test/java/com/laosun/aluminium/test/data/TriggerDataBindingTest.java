@@ -41,10 +41,10 @@ public class TriggerDataBindingTest {
         // three rules: the talent (ALLY_ATTACK) and two traces (BATTLE_START, SKILL_CAST). The counts
         // are asserted per event rather than as a total, so a rule that lands on the wrong event is
         // still caught.
-        Assertions.assertEquals(4, robin.ruleCount(TriggerEvent.BATTLE_START),
-                "plus the level convention every file now carries");
-        Assertions.assertEquals(4, robin.ruleCount(TriggerEvent.BATTLE_START),
-                "Coloratura Cadenza (华彩花腔): \"advances her own action by 25% at battle start\" (战斗开始时自身行动提前25%)");
+        // Five since 2026-11-11: the level convention, the 25% advance trace, the technique, Eidolons 3/5, and Eidolon 2's
+        // talent-energy amendment (which MUST sit on BATTLE_START: `MODIFY_RULE` changes the whole battle).
+        Assertions.assertEquals(5, robin.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the battle-start advance, the technique, Eidolons 3/5, Eidolon 2's energy amendment");
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.SKILL_CAST),
                 "Sequential Passage (模进乐段): \"restores 5 extra Energy when casting the Skill\" (施放战技时额外恢复5点能量)");
         // Note: two of them: the talent's "额外为自身恢复2点能量" (restores 2 extra energy for herself) and Concerto (协奏)'s additional-damage rider

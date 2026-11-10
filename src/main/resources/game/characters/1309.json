@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⛔ 秘技：「我方制造的领域效果最多存在 1 个」未写",
-    "⛔ 星魂：未读、未写",
+    "✅ **星魂已读，1 / 2 / 3 / 4（后半）/ 5 已落地（2026-11-11）**：1 = `eidolon1_party_pierces_more_while_concerto`（`ULT_CAST` → `MODIFY_ATTR DAMAGE_PENETRATION 0.24` + `all_allies` + **`buff: 协奏`**）；2 = 两条（`eidolon2_party_speed_while_concerto` 是状态期间的光环；`eidolon2_the_talent_pays_one_more_energy` 必须在 `BATTLE_START`，因为 `MODIFY_RULE` 改整场）；3/5 = 等级（早就在）；4 后半 = `eidolon4_party_effect_resistance_while_concerto`（`EFFECT_RESISTANCE 0.5` + `buff: 协奏`）。判据 `RobinEidolonsTest`（含「退出【协奏】时整组一起摘掉」）。⛔ **仍未写**：① 星魂 4 **前半**「解除我方全体的**控制类**负面状态」—— `DISPEL` 解除的是**所有**负面（比句子宽 ✗），`REMOVE_STATE` 的 `kind` 只分来源不分**类** ✗ ⇒ 缺「按类解除」；② 星魂 6「【协奏】期间终结技的物理附加伤害**暴击伤害 +450%**，最多触发 **8** 次、每次终结技重置」—— 要给**那一类实例**加暴伤（`instance` 只作用于本发；`MODIFY_ATTR CRIT_ATTACK` + `damage_type: ADDITIONAL` 的逐发形态**没有**）+ 一个每次终结技重置的计数 ✗。",
     "⛔ **删掉了一条不属于她的规则**（2026-11-02）：`ult_zone_defence_ignore`（`DEFENCE_IGNORE 20%`，`buff: 结界`）在**知更鸟的文档里没有出处** —— 全文「结界」0 处（她的是【协奏】）、「防御」4 处全是面板表。追查后确认那句话属于 **1303 阮•梅 星魂 1**：「终结技展开结界期间，我方全体造成伤害时无视目标 20% 的防御力」，而 1303 的 `eidolon1_defence_ignore_in_zone` 早已实现它（且带 `min_eidolon: 1`）。⇒ 1309 里那份是串档的副本，且**没有星魂门槛**（等于白送 20% 无视防御），已删除 —— 这是**有证据的删除**（句子归属 + 原实现已在）。"
   ],
   "rules": [
@@ -140,6 +140,84 @@
       "source": "1309 知更鸟 终结技 ③「处于【协奏】状态时，我方全体攻击力提高，提高数值等同于知更鸟攻击力的 22.80%+200 点」+ ⑤「处于【协奏】状态时，知更鸟免疫控制类负面状态」 param Lv10 = [0.228, 90, 200, 1.2, 1, 1.5] → #1 = 0.228, #3 = 200",
       "_note": "Clauses ③ and ⑤, the two effects that last <b>as long as the state does</b>. ⚠ Both carry `buff: 协奏` (2026-09-28), which is what makes that duration expressible at all: removal by name used to reach only <b>states</b>, so a modifier like this could only be written `permanent` -- a boost that never comes off, i.e. a wrong number with no symptom. Naming it means the countdown-turn rule's single `REMOVE_STATE 协奏` takes the state, the ATK boost AND the immunity off together. ⚠ ③ is a <b>derived</b> magnitude (22.8% of <i>her</i> ATK plus the flat 200), read when she casts and then frozen. ⚠ `all_allies` includes her (「我方全体」 says so); ② 「除自身以外」 is the ADVANCE rule above, a different sentence with a different selector. ⚠ `percent: 1.0` on the resistance is <b>immunity</b> -- the same mechanic at full strength. ⚠ **按等级读**（AGENT §0.1.3）。",
       "id": "ult_effect_3"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon1_party_pierces_more_while_concerto",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION",
+          "percent": 0.24,
+          "buff": "协奏",
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1309 知更鸟 星魂 1 微笑的国度: 「处于【协奏】状态时，我方全体全属性抗性穿透提高24%。」 参数 = [0.24]",
+      "_note": "「处于【协奏】状态时，我方全体**全属性抗性穿透**提高 **24%**」—— `MODIFY_ATTR DAMAGE_PENETRATION 0.24`（抗性**穿透**是攻击侧的属性；`RESISTANCE_REDUCTION` 是受击侧的抗性削减，两者不是一回事 ✓）+ `all_allies` + **`buff: 协奏`**（与同文件 `ult_effect_3` 的写法一致：名字就是**被 `REMOVE_STATE 协奏` 一起摘掉**的那一组 ✓，见 `countdown_effect`）。⚠ 「处于【协奏】状态时」不是独立条件：这条规则**只在施放终结技时**装一次，而终结技就是进入【协奏】的那一次 ✓，退出时名字被摘 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon2_the_talent_pays_one_more_energy",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "attack_effect",
+          "effect_amount": 1
+        }
+      ],
+      "source": "1309 知更鸟 星魂 2 两者的午茶: 「…天赋的能量恢复效果额外提高1点。」 参数 = [0.16, 1]",
+      "_note": "「天赋的**能量恢复效果额外提高 1 点**」= `MODIFY_RULE { rule: attack_effect, effect_amount: 1 }` ✓（那条规则就是 `GAIN_ENERGY amount: 2` 的 `ALLY_ATTACK`）。⚠ **必须挂在 `BATTLE_START`**：`MODIFY_RULE` 改的是**整场**的数（校验器原话：mid-battle 给的东西没有地方收回）⇒ 它不能和同句的「速度 +16%」写在同一条规则里 ✓。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon2_party_speed_while_concerto",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.16,
+          "buff": "协奏",
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1309 知更鸟 星魂 2 两者的午茶: 「处于【协奏】状态时，我方全体速度提高16%。…」 参数 = [0.16, 1]",
+      "_note": "「处于【协奏】状态时，我方全体**速度提高 16%**」= `MODIFY_ATTR SPEED 0.16` + `all_allies` + **`buff: 协奏`**（与星魂 1、4 同一组 ⇒ 退出【协奏】时一起摘掉 ✓）。⚠ 同句的「天赋能量 +1」在另一条 `BATTLE_START` 规则里（`MODIFY_RULE` 不能在 `ULT_CAST` 上，装载期会拒）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon4_party_effect_resistance_while_concerto",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.5,
+          "buff": "协奏",
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1309 知更鸟 星魂 4 雨滴的钥匙: 「施放终结技时，解除我方全体的控制类负面状态，使我方全体在知更鸟处于【协奏】状态期间的效果抵抗提高50%。」 参数 = [0.5]",
+      "_note": "后半句 ✅：「我方全体在【协奏】期间**效果抵抗提高 50%**」= `MODIFY_ATTR EFFECT_RESISTANCE 0.5` + `all_allies` + `buff: 协奏` ✓（与星魂 1/2 同一组，退出时一起摘）。⛔ **前半句未写**：「**解除**我方全体的**控制类**负面状态」——`DISPEL` 解除的是**所有负面效果**（会连带解除非控制类 ✗，比句子宽），而 `REMOVE_STATE` 的 `kind` 只分来源不分**类**（控制/持续伤害）✗ ⇒ 缺「按类解除」的写法，已登记。",
+      "_status": "implemented"
     },
     {
       "on": "ALLY_ATTACK",
