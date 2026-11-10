@@ -92,18 +92,33 @@ public class HertaEruditionEidolonsTest {
 
     // ==================================================================
 
+    /**
+     * 「对指定敌方单体…施加 1 层【解读】」 on the ENHANCED Skill too (a different data row than the base Skill).
+     */
+    @Test
+    public void theEnhancedSkillAppliesItsOwnInsight() {
+        Run run = new Run(0);
+        int before = run.enemy.getBuffManager().stacksOf("解读");
+        run.battle.castImmediate(new com.laosun.aluminium.skill.DefaultSkill(HERTA, 9, LEVEL), run.herta,
+                List.of((com.laosun.aluminium.entity.CanHit) run.enemy));
+        run.battle.processRequests();
+        Assertions.assertEquals(before + 1, run.enemy.getBuffManager().stacksOf("解读"),
+                "the enhanced cast's own layer - the base Skill's rule is gated on `from_skill_id == 2`");
+    }
+
     private static final class Run {
         private final Character herta;
         private final Character erudition;
         private final Character other;
         private final Battle battle;
+        private final Enemy enemy;
 
         Run(int eidolon) {
             herta = CharacterFactory.create(HERTA, LEVEL);
             herta.setEidolonRank(eidolon);
             erudition = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
             other = CharacterFactory.create(OTHER_ALLY, LEVEL);
-            Enemy enemy = BattleFixture.monster();
+            enemy = BattleFixture.monster();
             battle = new Battle(List.of(herta, erudition, other), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();

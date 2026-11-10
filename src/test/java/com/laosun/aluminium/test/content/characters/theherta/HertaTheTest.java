@@ -86,8 +86,9 @@ public class HertaTheTest {
         // Note: 7 since 2026-11-11 - Eidolon 2s entry inspiration, Eidolon 4s speed aura, Eidolon 6s ice penetration.
         Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the technique, the convention, and the three Eidolon passives");
-        // Note: 4 since 2026-11-11 - Eidolon 2s 35% advance on the ENHANCED Skill.
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.SKILL_CAST), "insight, the cost, the revert, and the advance");
+        // Note: 5 since 2026-11-11 - the ENHANCED cast also applies its own 1 layer of 【解读】.
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "insight, the cost, the revert, the advance, and the enhanced layer");
     }
 
     private static Random fixed() {
