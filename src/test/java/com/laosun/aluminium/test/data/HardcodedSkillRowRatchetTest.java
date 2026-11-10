@@ -102,7 +102,10 @@ public class HardcodedSkillRowRatchetTest {
     // 65 since 2026-11-11: 1309 Robin (知更鸟)'s Eidolon 4 writes 0.5 (「效果抵抗提高 50%」) - a STAR-SOUL parameter that
     // happens to equal her Skill row's Lv10 cell (0.5). No reader exists for an Eidolon row, so it stays literal, exactly
     // like 1412's 2.4 and 1106's 0.4 above.
-    private static final int BASELINE = 65;
+    // 66 since 2026-11-11: 1410 Hysilens Eidolon 4 writes 0.2 (「全属性抗性降低 20%」) - a STAR-SOUL parameter that happens
+    // to equal a cell of her Skill and Talent rows (0.2). The row cell belongs to a different clause (the Skill damage
+    // taken up), so reading the row would be wrong; the literal stays, as with 1309/1412/1106 above.
+    private static final int BASELINE = 66;
 
     /**
      * The ops whose magnitude is a <b>share of the skill row</b>. Counters are deliberately absent: "gain 1 point of

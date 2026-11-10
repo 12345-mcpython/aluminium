@@ -6,7 +6,7 @@
     "⛔ 战技：100% 基础概率未写（走命中/抵抗管线的差异）",
     "⛔ 天赋：四选一 DoT（风化/裂伤/灼烧/触电）+ 优先不同状态 + 100% 基础概率未写",
     "⛔ 1415 忆灵技 22 最后一句：使目标身上的持续伤害立即产生 #2%/#3% 伤害未写",
-    "⛔ 星魂：未读、未写"
+    "✅ **星魂已读，1（前半）/ 3 / 4 / 5 已落地（2026-11-11）**：1 前半 = `eidolon1_party_dot_damage_rises`（`MODIFY_ATTR DOT_DAMAGE_BOOST 0.16` + `all_allies` —— 「116%」是**加算区**里的 +16%）；3/5 = 等级（早就在）；4 = `eidolon4_zone_lowers_all_resistance`（`RESISTANCE_REDUCTION 0.2` + `all_enemies` + **`buff: 结界` / `turns: 3` / `ticks_on: self`**，与结界那两条**同寿**）。判据 `HysilensEidolonsTest`。⛔ **仍未写**：① 星魂 1 **后半**「天赋使敌人陷入风化/裂伤/灼烧/触电时，100% 基础概率**额外**使其中一次与原效果相同、且**可同时存在**的同类状态」—— 她**天赋的 DoT 植入本身还没写**（本文件 `_gaps` 第 1 条），没有触发点；② 星魂 2「**结界持续期间**，行迹【珍珠的琴弦】的造成伤害提高效果对**我方全体**生效」—— 那条行迹的规则不在本文件（尚未写 ✗）；③ 星魂 6「结界期间每回合开始或我方单体攻击后，物理持续伤害的触发次数上限提高到 **12**、伤害倍率 +**20%**」—— 要改**每一类 DoT 实例**的触发上限与倍率（按结界开关），引擎没有「DoT 触发计数的上限」这个数 ✗。"
   ],
   "rules": [
     {
@@ -511,6 +511,45 @@
       ],
       "source": "1410 星魂 5: 等级加成（数据 skill_add_level: 141002=SKILL+2, 141004=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_party_dot_damage_rises",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DOT_DAMAGE_BOOST",
+          "percent": 0.16,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1410 海瑟音 星魂 1 你问我心为何悲伤: 「海瑟音在场时，我方目标造成的持续伤害为原伤害的116%…」 参数 = [1.16, 1]",
+      "_note": "「我方目标造成的**持续伤害为原伤害的 116%**」—— `MODIFY_ATTR DOT_DAMAGE_BOOST 0.16` + `all_allies` ✓（这条属性在**施加者**的增伤区里，`1 + Σ` 的形态 ⇒ `0.16` 就是「116%」；不是 `0.16 ×` 的独立乘法）。⚠ 「海瑟音在场时」不需要单独的门：她的规则只在她活着时被问 ✓。⛔ **同句后半未写**：「天赋使敌人陷入风化/裂伤/灼烧/触电时有 100% 基础概率**额外**使其中一次与原效果相同、且**可同时存在**的同类状态」—— 她**天赋的 DoT 植入本身还没写**（`_gaps` 已登记），没有触发点。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon4_zone_lowers_all_resistance",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.2,
+          "buff": "结界",
+          "turns": 3,
+          "ticks_on": "self",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1410 海瑟音 星魂 4 看呀，时间为何流淌: 「结界持续期间，使敌方全体全属性抗性降低20%。」 参数 = [0.2]",
+      "_note": "「**结界持续期间**，使敌方全体**全属性抗性降低 20%**」—— `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + `all_enemies` + **`buff: 结界` / `turns: 3` / `ticks_on: self`**（与同文件结界那两条**逐字同寿**：同一次终结技、同样 3 回合、同样按她自己的回合减 ✓ ⇒ 「结界持续期间」不需要另一套计时 ✓）。⚠ `RESISTANCE_REDUCTION` **正数 = 降低抗性**（受击侧读数），与攻击侧的 `DAMAGE_PENETRATION` 不是一回事 ✓。",
       "_status": "implemented"
     }
   ],
