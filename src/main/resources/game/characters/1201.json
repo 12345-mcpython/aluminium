@@ -3,7 +3,7 @@
   "character": 1201,
   "_status": "partial",
   "_gaps": [
-    "⚠ **读法选择（未改）**：「我方目标回合开始时…抽取 1 张」—— **我方目标是否包含青雀自己**，文档没写死。现有实现取**排除自己**（`actor is_other_ally`），并有判据 `QingqueTest` 固定这一选择。",
+    "⭐ ⚠ **读法选择（未改）**：「我方目标回合开始时…抽取 1 张」—— **我方目标是否包含青雀自己**，文档没写死。现有实现取**排除自己**（`actor is_other_ally`），并有判据 `QingqueTest` 固定这一选择。",
     "⛔ 【暗杠】：需要在**三张花色计数**之间判定「4 张同花色」（三种花色的牌是资源，`琼玉牌` 现在只记总数）⇒ 强化普攻（槽位 8）在引擎里**造不出来**，星魂 6 的行为判据要等它。",
     "⭐ **星魂 6 已于 2026-11-03 落规则**：「施放强化普攻后恢复 1 个战技点」= `BASIC_ATTACK` + `from_skill_id == 8` + `min_eidolon: 6` → `GAIN_SKILL_POINT 1`（文档自己写着强化普攻「**无法恢复战技点**」⇒ 星魂 6 正是豁免这一句）。⚠ 只有形状判据（`QingqueClauseCoverageTest`），行为判据待【暗杠】。",
     "⭐ **星魂 4 已落地（2026-11-04）**：`SKILL_CAST` + **`chance: 0.24`**（「固定概率」⇒ 不是 `base_chance`）→ `APPLY_BUFF 不求人 { until: turn_end }`；效果半 = `ATTACK_FINISHED` + `from_skill COMMON` + `self has_state 不求人` → `DAMAGE { skill: COMMON, damage_param: 0, element: Quantum }`。⚠ **近似**：文档说「等同于**该次伤害**」（结算值），而引擎读结算总量那条路**强制 TRUE**（不吃抗性/防御）⇒ 改成**重打普攻那一行**（份额等价、暴击独立）。"

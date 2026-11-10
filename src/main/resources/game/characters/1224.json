@@ -5,7 +5,7 @@
   "_gaps": [
     "✅ **战技的两个条件都已落地（2026-11-09 订正）**：① 「**除自身以外**」—— 用**逐效果 `target_when`「目标 != 自己」** 挡（`APPLY_BUFF` 与那条 `MODIFY_ATTR` 各挂一份，因为它们是一个效果一个效果应用的）；② 「**仅最新施放目标**被视为【师父】」—— 一直是 `REMOVE_STATE 师父`（全体）+ `APPLY_BUFF` 的顺序语义 ✓（`NewestHolderOnlyTest` 连同对照组证明过 ✓），本条原来的 ⛔ 是**过期**的。",
     "✅ **天赋的充能状态机已落地（2026-11-10）**：两条规则 —— `talent_seven_charges_empower_her`（`RESOURCE_CHANGED` + `resource_changed:充能` + `self_resource:充能 >= 7` → `ADVANCE 100%` + `APPLY_BUFF 强化 {blocks: skill}` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.8 {while_state: 强化}` + `REPLACE_SKILL slot 8`）与 `talent_the_enhanced_basic_spends_seven`（`BASIC_ATTACK` + `from_skill_id == 8` → `SPEND_RESOURCE 7` + `REMOVE_STATE 强化` + 还原普攻槽）。⚠ **近似**：中间掉到 6 也不会自动解除（引擎没有「按资源值自动失效」的写法），已写在规则注记里。⛔ 仍开：秘技的队友计数、终结技的段数/固定概率、强化普攻的三段概率、星魂。",
-    "天赋：攻击与终结技各回 1 点，但终结技也会发 ALLY_ATTACK ⇒ 一次终结技可能回 2 点（与文档读法不同）",
+    "⭐ 天赋：攻击与终结技各回 1 点，但终结技也会发 ALLY_ATTACK ⇒ 一次终结技可能回 2 点（与文档读法不同）",
     "⛔ **秘技的前半仍未写**：「若三月七在队伍中，每当**队友施放 1 次秘技**，下一次战斗开始时三月七获得 **1 点充能**，最多 **3** 点」—— 需要「**全队这一场用了几次秘技**」这个**队伍级计数**：`Battle.Techniques.released(cid)` 只记**谁**放了，没有「几个队友放过 / 放过几次」的读数，也没有给规则读它的通道。⚠ 「使用秘技后，下一次战斗开始时恢复 **30** 点能量」这条**已实现**（`technique_energy`）。",
     "✅ **「下一次强化普攻 +2 段」已落地（2026-11-10）**：**成对规则** —— `ult_lends_two_hits_to_the_next_enhanced_basic`（`ULT_CAST` → `RAISE_SKILL_HITS { skill_id: 8, amount: 2 }`）与 `basic_takes_the_two_hits_back`（`BASIC_ATTACK` + `from_skill_id == 8` → `amount: -2`）。⭐ 依据是 `CanHit.raiseSkillHits` 自己的注释：**A NEGATIVE delta takes them back, which is how a rule states a duration** ⇒ 「下一次」不需要新字段。⛔ **仍未写**：「额外造成伤害的**固定概率提高 20%**」—— 那是**强化普攻的概率参数**，`MODIFY_RULE` 只改**规则**、不改**技能行**。",
     "⛔ 强化普攻：3 段 80%、60% 固定概率续段最多 3 段、能量不随段数、不恢复战技点未写",

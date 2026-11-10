@@ -5,9 +5,9 @@
   "_gaps": [
     "✅ **【充能】机制已落地（2026-11-09）**：文件头声明资源 `充能`（`max: 2147483647` = **不设上限**，按 1408 【毁伤】的既有约定）＋ 四条规则 —— `skill_marks_prey` 追加 `GAIN_RESOURCE 9`、`talent_spends_a_charge_on_every_hit`（打【猎物】后 `REMOVE_RESOURCE 1` + `ADD_STACK 充能计数 +1`）、`talent_followup_every_third_charge`（`self_stacks:充能计数 >= 3` → `DAMAGE` × `TALENT:2`=160% + `REMOVE_STACK 充能计数 3`）、`talent_prey_leaves_at_zero_charge`（`self_resource:充能 <= 0` → `REMOVE_STATE 猎物` + 计数清零）。判据 `MozeChargeTest`：战技后 **8 点**（9 点入账、战技自己那一下就是第一次消耗）、每命中 -1、**第 3/6/9 次消耗**各带一发追加攻击（实测逐次伤害 `213, 1349, 213, 213, 1349, 213, 213, 1349`）、充能归零时【猎物】被解除。⚠ 两个实测出来的坑：① 计数器复位**不能**用 `REMOVE_BUFF`（层数不会归零 ⇒ 从第 3 次起**每一击**都触发追加攻击），要用 **`REMOVE_STACK { amount: 3 }`**；② 读充能要读**他自己的** store（`moze.getResources()`），`partyResourceValue` 是 0 —— 声明在单位上、不是队伍池。",
     "⛔ **仍开的两半（2026-11-09 更新）**：① **【猎物】的第二个解除条件** ——「当场上**没有可以战斗的其他角色**时，貊泽**无法使用战技**，并解除敌人的【猎物】状态」：缺「场上还有没有其他可战斗角色」这个条件（`Strategy` 里没有这一项读取），也缺「禁用某个技能」的写法（`blocks` 词表只有 `ultimate`）。② **离场状态** ——「场上存在【猎物】时，貊泽会进入**离场**状态；离场：无法成为技能目标，且不会出现在行动序列上」：引擎没有「不可被选中 + 不占行动条」的状态层。⚠ 「0 充能解除【猎物】」那一半**已落地**（`talent_prey_leaves_at_zero_charge`，判据 `MozeChargeTest#theMarkLeavesWhenTheChargeReachesZero`），本条此前把两者写在一起、本轮拆开。",
-    "⚠ 秘技「隐身状态下不会被敌人发现」是大地图效果，不建模。",
+    "⭐ ⚠ 秘技「隐身状态下不会被敌人发现」是大地图效果，不建模。",
     "⭐ **星魂 2/4/6 已于 2026-11-03 落地**：② 对【猎物】的暴击伤害 +40%（跨单位 `target: actor`，`instance: true`）；④ 终结技后伤害 +30% / 2 回合；⑥ 天赋追加攻击倍率 ×1.25（`MODIFY_RULE effect_percent_scale`，对字面 `percent` 是乘）。判据 `MozeClauseCoverageTest`。",
-    "⚠ 星魂 1 的「每触发 1 次天赋附加伤害 +2 能量」现已写成 `ALLY_ATTACK` + `target has_state 猎物` 上的第二条规则 —— ⚠ 它与天赋伤害那条**同条件**，但「触发 1 次」在天赋**未触发**时（例如没有充能）也会加能量 ⇒ 近似，已在规则 `_note` 记录。"
+    "⭐ ⚠ 星魂 1 的「每触发 1 次天赋附加伤害 +2 能量」现已写成 `ALLY_ATTACK` + `target has_state 猎物` 上的第二条规则 —— ⚠ 它与天赋伤害那条**同条件**，但「触发 1 次」在天赋**未触发**时（例如没有充能）也会加能量 ⇒ 近似，已在规则 `_note` 记录。"
   ],
   "resources": [
     {

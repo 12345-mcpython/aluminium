@@ -3,7 +3,7 @@
   "character": 1015,
   "_status": "partial",
   "_gaps": [
-    "战技「本回合不会结束」：引擎没有「回合不结束」开关，回合由 afterMove 收尾",
+    "⛔ 战技「本回合不会结束」：引擎没有「回合不结束」开关，回合由 afterMove 收尾",
     "⭐ **星魂 1 已落地**（2026-11-03）：「单个回合内施放 3 次战技后恢复 2 个战技点」= 计数标记 `本回合战技次数`（结算规则**排在累加规则之前**）+ `TURN_START` 清零；实测第 3 次施放多给 2 点、新回合重新计数。⚠ 「per_turn 只是限流」这个说法**作废**：计数器+门槛就能表达「第 N 次」。",
     "⭐ **星魂 2 已落地（2026-11-04）**：`ADD_ELEMENTAL_WEAKNESS { element: Quantum, turns: 2 }` + `MODIFY_DAMAGE_TAKEN { percent: 0.2, element: Quantum }`。⚠ **近似已登记**：`RESISTANCE_REDUCTION` 是全属性、元素作用域只在 `MODIFY_DAMAGE_TAKEN` 上 ⇒ 「量子抗性 −20%」写成「对量子伤害易伤 +20%」，两者在伤害公式里位置不同，**不是同一个数**，但这是引擎今天唯一能按元素表达的地方。"
   ],
