@@ -4,10 +4,10 @@
   "_status": "partial",
   "_gaps": [
     "⛔ 战技：消耗 40% 生命上限、固定回复 60% 能量上限、不足时降至 1 点未写",
-    "⛔ 终结技：完全燃烧状态 / 强化普攻与战技 / 速度 +60 / 倒计时 / 禁施放终结技未写",
+    "✅ **终结技的【完全燃烧】已落地（2026-11-11）**：`ult_enters_complete_combustion`（`APPLY_BUFF 完全燃烧 { blocks: \"ultimate\" }` + 两个 `REPLACE_SKILL`（COMPON→8 / SKILL→9）+ `MODIFY_ATTR SPEED amount: 60` + `START_COUNTDOWN 完全燃烧倒计时 speed: 70`）、`the_countdown_ends_combustion`（`REMOVE_STATE` + 两条 `REPLACE_SKILL { remove: true }`）、`combustion_breaks_faster`（`CAST_SETUP` → `WEAKNESS_BREAK_EFFICIENCY 0.5` + **`until: cast_end`** = 「持续至本次攻击结束」）。判据 `FireflyCombustionTest`（7 例）。⚠ **一个读时活门的边界**：+60 速度可以靠 `while_state` 跟着状态走（下一个回合边界重算 ✓），但 `REPLACE_SKILL` 是**一次性动作**、没人重算 ⇒ 必须显式 `remove`。⛔ **仍未写**：① 同句「使敌方目标受到装甲「萨姆」造成的**击破伤害**提高 20%，持续至本次攻击结束」—— `MODIFY_DAMAGE_TAKEN` 只按**属性**收窄，没有「只对**击破伤害**」这一档（击破走 `BreakDamageCalculator` 的另一个乘区）✗；② 「自身行动提前 100%」早在 `ult_action_advance` ✓。",
     "⛔ 天赋：生命越低减伤最多 40%（寿命随血量，不是回合）；完全燃烧时效果抵抗 +30% 未写",
     "⛔ ✅ **强化战技的混合基数已落地（2026-11-09）**：火萤Ⅳ型-死星过载 的行是 `[2, 1, 0.25, 2, 0.2, 0.1, 3.6]` —— 主目标 = **#5×击破特攻 + #1% 攻击力**、相邻 = **#6×击破特攻 + #2% 攻击力**。用 `SkillEffectSpec.base_terms` 写成两项（击破特攻那项 `main: 4 / adjacent: 5`，攻击力那项 `main: 0 / adjacent: 1`），各项在**结算之前**相加 ⇒ 一个实例、一次暴击。⭐ **「最多计算 #7 = 360% 击破特攻」也落地了**：`base_terms` 的每一项可以带 **`cap`**（指向行里的某一格），引擎在**乘之前**把该属性夹到那一格 —— 击破特攻项写的是 `cap: 6`（= #7）。判据 `SamDeathstarBaseTest` 钉住两项的列号、封顶格与「攻击力那项**不**封顶」。⚠ 这条技能目前**还打不到**（【完全燃烧】的换槽未写），所以判据只读策展表。",
-    "⛔ 星魂：未读、未写"
+    "✅ **星魂已读，2 / 3 / 4 / 5 / 6 全部落地（2026-11-11）**：2 = 两条（`eidolon2_a_kill_in_combustion_earns_a_turn` 在 `KILL`、`eidolon2_a_break_in_combustion_earns_a_turn` 在 `BREAK`，各 `EXTRA_TURN` + `cooldown: 1`）；3/5 = 等级（早就在）；4 = `eidolon4_combustion_raises_effect_resistance`（`EFFECT_RESISTANCE 0.5` + `while_state`）；6 = `eidolon6_combustion_fire_penetration`（`DAMAGE_PENETRATION_FIRE 0.2` + `while_state`）—— 星魂 6 后半的「弱点击破效率 50%」是**同一条**（参数表只有 0.2 一个数）⇒ 不重复写。判据 `FireflyCombustionTest`。⛔ **仍未写**：星魂 2 的**强化后**版本（「每回合可触发 1 次，萨姆回合开始时重置」）—— 引擎有 `once_per_turn`，但没有「按回合重置」的显式写法；两版是同一句的两种版本 ⇒ 取「强化前」那版（`cooldown: 1`）。"
   ],
   "rules": [
     {
@@ -47,6 +47,52 @@
       ],
       "source": "1310 流萤 战技 指令-天火轰击 (131002, BPSkill/SingleAttack): 「消耗等同于自身生命上限40%的生命值固定恢复等同于自身60%能量上限的能量，对指定敌方单体造成等同于装甲「萨姆」200%攻击力的火属性伤害。若当前生命值不足，施放战技时装甲「萨姆」的当前生命值降至1点。使自身下一次行动提前25%。」",
       "_note": "「使自身**下一次行动提前 25%**」—— `ADVANCE percent: 0.25` ✓ + **`target: self`** ✓。⭐ **可精确观察** ✓：`Battle.advanceRequests` 是 **public** ✓，元素是 `AdvanceRequest(object, rate)` ✓ ⇒ 测试直接断言 **rate == 0.25** ✓（不是\"看起来快了\" ✗）。⚠ **登记**：① 「**消耗等同于自身生命上限 40% 的生命值**」✗（**自伤** ✗ —— 本项目已多次登记的 op 族 ✓，1205/1404 同理 ✓）；② 「**固定恢复等同于自身 60% 能量上限的能量**」✗（**按能量上限缩放的回能** ✗）；③ 「若当前生命值不足，施放战技时当前生命值**降至 1 点**」✗（**钳到 1 点** ✗）；④ 战技自身那 **200%** 伤害由技能数据结算 ✓ ⇒ 不写规则 ✓。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_enters_complete_combustion",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "完全燃烧",
+          "blocks": "ultimate",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "skill_id": 9,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 60,
+          "while_state": "完全燃烧",
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "START_COUNTDOWN",
+          "buff": "完全燃烧倒计时",
+          "speed": 70
+        }
+      ],
+      "source": "1310 流萤 终结技 火萤Ⅳ型-完全燃烧: 「进入「完全燃烧」状态，自身行动提前100%并获得强化普攻和强化战技。「完全燃烧」状态下速度提高60点…行动序列上出现「完全燃烧」倒计时，倒计时回合开始时装甲「萨姆」解除「完全燃烧」状态，倒计时固定拥有70速度。「完全燃烧」状态下装甲「萨姆」无法施放终结技。」 参数 Lv10 = [0.1, 0.5, 30, 70]",
+      "_note": "一条规则五件事，**四件挂在同一个活门上**（`while_state: 完全燃烧`）：\n\n① `APPLY_BUFF 完全燃烧 { blocks: \"ultimate\", permanent: true }` —— 「**无法施放终结技**」= `blocks` 的第三个词 ✓（它与 `skill` / `energy_gain` 同一个闭集，1317 的【结印】用过 `skill,ultimate` ✓）；\n② `REPLACE_SKILL COMMON → 8`、`SKILL → 9` —— 「获得**强化普攻和强化战技**」（8/9 是她自己的强化行，数据 `skill_add_level` 里 131008/131009 就是这两行 ✓）；\n③ `MODIFY_ATTR SPEED amount: 60` —— 「速度提高 **60 点**」= **固定点数**（`amount`），不是百分比 ✗；\n④ `START_COUNTDOWN { speed: 70 }` —— 「行动序列上出现倒计时…固定拥有 **70** 速度」✓（= 1317/1205 那一族的倒计时 idiom ✓）。\n\n⚠ 「自身行动提前 100%」不在这条里：`ult_action_advance` 早有它 ✓（同一次施放，两条规则各管一半）。⚠ ② 换槽**没有** `while_state`：它是**一次性动作**（装上那刻改槽），读时活门管不了它（实测：状态摘掉后槽仍停在 8 ✗）⇒ 倒计时那条要显式 `REPLACE_SKILL { remove: true }`；③ 的 +60 速度**有** `while_state` ✓（属性修饰在下一个回合边界被重算并摘掉 ✓）。",
+      "_status": "implemented"
     },
     {
       "on": "ULT_CAST",
@@ -149,6 +195,134 @@
       ],
       "source": "1310 星魂 5: 等级加成（数据 skill_add_level: 131003=ULTRA+2, 131004=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "COUNTDOWN_TURN",
+      "id": "the_countdown_ends_combustion",
+      "when": [
+        "actor == countdown"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "完全燃烧",
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "remove": true,
+          "target": "self"
+        },
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "SKILL",
+          "remove": true,
+          "target": "self"
+        }
+      ],
+      "source": "1310 流萤 终结技: 「行动序列上出现「完全燃烧」倒计时，倒计时回合开始时装甲「萨姆」解除「完全燃烧」状态…」",
+      "_note": "「**倒计时回合开始时**…**解除**「完全燃烧」状态」—— `COUNTDOWN_TURN` + `actor == countdown` + `REMOVE_STATE 完全燃烧` ✓，外加**两条 `REPLACE_SKILL { remove: true }`**（把强化普攻/强化战技两个槽退回去）。\n\n⚠ 为什么换槽**不能**靠 `while_state`：+60 速度那条**能**（属性修饰在下一个回合边界被重算并摘掉 ✓，实测 174 → 114 ✓），但 `REPLACE_SKILL` 是**装上去的那一刻就改槽**、之后**没有人重算它**（实测：状态摘掉后槽仍停在 8 ✗）⇒ 必须显式 `remove: true`。**读时活门只管「每次读都重新判」的东西，管不了「一次性动作」。**",
+      "_status": "implemented"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "combustion_breaks_faster",
+      "when": [
+        "self has_state 完全燃烧"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "WEAKNESS_BREAK_EFFICIENCY",
+          "percent_from_skill_param": "ULTRA:1",
+          "until": "cast_end",
+          "target": "self"
+        }
+      ],
+      "source": "1310 流萤 终结技: 「…且施放强化普攻、强化战技时自身弱点击破效率提高50%…持续至本次攻击结束。」 参数 Lv10 = [0.1, 0.5, 30, 70] → #2 = 0.5",
+      "_note": "「**施放**强化普攻、强化战技**时**自身**弱点击破效率提高 50%**…**持续至本次攻击结束**」—— `CAST_SETUP`（这一发**开始**的时机）+ `self has_state 完全燃烧` + `MODIFY_ATTR WEAKNESS_BREAK_EFFICIENCY 0.5` + **`until: cast_end`** ✓（正是「持续至本次攻击结束」：这一发的结算事件走完就摘 ✓）。⚠ 不必写 `from_skill_id == 8/9`：**完全燃烧期间那两槽本来就是强化行**（上面换了槽 ✓），状态门已经蕴含它 ✓。⚠ 同句的「使敌方目标受到装甲「萨姆」造成的**击破伤害**提高 20%」**未写**：`MODIFY_DAMAGE_TAKEN` 只按**属性**（`element`）收窄，没有「只对**击破伤害**」这一档（击破伤害走 `BreakDamageCalculator` 的另一个乘区）✗，已登记。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon4_combustion_raises_effect_resistance",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.5,
+          "while_state": "完全燃烧",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1310 流萤 星魂 4 我会看见，飞萤之火: 「「完全燃烧」状态下，装甲「萨姆」的效果抵抗提高50%。」 参数 = [0.5]",
+      "_note": "「**完全燃烧**状态下，效果抵抗提高 **50%**」—— `MODIFY_ATTR EFFECT_RESISTANCE 0.5` + **`while_state: 完全燃烧`** + `permanent: true` ✓（状态在→在、状态走→走 ✓）。⚠ 挂在**同一次终结技**上（就是进入状态那一次），与状态本身同时装 ✓ —— 不用等状态出现再装（`while_state` 是**读时**的活门 ✓）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_combustion_fire_penetration",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION_FIRE",
+          "percent": 0.2,
+          "while_state": "完全燃烧",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1310 流萤 星魂 6 绽放在终竟的明天: 「「完全燃烧」状态下装甲「萨姆」的火属性抗性穿透提高20%。施放强化普攻、强化战技时弱点击破效率提高50%。」 参数 = [0.2]",
+      "_note": "前半 ✅：「完全燃烧状态下**火属性抗性穿透**提高 **20%**」= `MODIFY_ATTR DAMAGE_PENETRATION_FIRE 0.2` + `while_state: 完全燃烧` ✓（**按属性**的穿透 ✓，不是全属性 ✗）。⚠ 后半「施放强化普攻、强化战技时**弱点击破效率**提高 **50%**」**不需要另写**：终结技那条（`combustion_breaks_faster`）本来就是同一个 50%，而星魂 6 的参数表**只有 0.2 一个数**（没有第二个 0.5）⇒ 这一句是**同一条的复述**而不是叠加 ✓（写成第二条会变成 +100% ✗）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "KILL",
+      "id": "eidolon2_a_kill_in_combustion_earns_a_turn",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "self has_state 完全燃烧"
+      ],
+      "do": [
+        {
+          "op": "EXTRA_TURN",
+          "target": "self"
+        }
+      ],
+      "cooldown": 1,
+      "source": "1310 流萤 星魂 2 自破碎的天空坠落: 「「完全燃烧」状态下施放强化普攻、强化战技消灭敌方目标或使目标陷入弱点击破状态时，装甲「萨姆」立即获得1个额外回合。该效果在1回合后可再次触发。」",
+      "_note": "「**消灭**敌方目标…时，立即获得 **1 个额外回合**，该效果在 **1 回合**后可再次触发」—— `KILL`（**击杀者**侧的事件 ✓）+ `actor == self` + `self has_state 完全燃烧` + `EXTRA_TURN` + **`cooldown: 1`** ✓（「1 回合后可再次触发」= 规则级冷却，1002 天赋同法 ✓）。⚠ 同句还有第二个触发点「或使目标陷入**弱点击破**状态」⇒ 另一条 `BREAK` 规则（下一条）。⚠ 文档给了**强化前/强化后**两版：强化前 =「1 回合后可再次触发」、强化后 =「**每回合**可触发 1 次，萨姆回合开始时重置」—— 本档写的是**强化前**那版（`cooldown: 1`）；「每回合 1 次」需要 `once_per_turn` 与「回合开始时清零」，引擎有 `once_per_turn` 但没有「按回合重置」的显式写法，且两版是同一句话的两种版本（不是叠加）⇒ 取一版，另一版登记。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BREAK",
+      "id": "eidolon2_a_break_in_combustion_earns_a_turn",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "self has_state 完全燃烧"
+      ],
+      "do": [
+        {
+          "op": "EXTRA_TURN",
+          "target": "self"
+        }
+      ],
+      "cooldown": 1,
+      "source": "1310 流萤 星魂 2: 「…消灭敌方目标**或使目标陷入弱点击破状态**时，装甲「萨姆」立即获得1个额外回合…」",
+      "_note": "「**或使目标陷入弱点击破状态**时」= `BREAK` 事件（引擎有 `BREAK` 与 `KILL` 两个事件 ✓ —— 前者是**破韧**那一刻、后者是**击杀**）。与上一条同形、同冷却 ✓。⚠ 两条**互不排斥**：一次攻击既可能击杀也可能破韧（不同敌人），各自按事件触发 ✓；冷却按规则各算 ⇒ 同一回合里「击杀 A + 破韧 B」会各自给回合 —— 句子把两个触发点并列，这是字面读法，已登记。",
       "_status": "implemented"
     }
   ]

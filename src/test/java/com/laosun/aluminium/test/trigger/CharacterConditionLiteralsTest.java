@@ -285,6 +285,15 @@ public class CharacterConditionLiteralsTest {
         assertRule(1310, "ULT_CAST", "ult_action_advance", List.of("actor == self"));
         assertRule(1310, "BATTLE_START", "level_convention", List.of());
         assertRule(1310, "WAVE_START", "technique_adds_fire_weakness", List.of("self has_state 秘技"));
+        assertRule(1310, "ULT_CAST", "ult_enters_complete_combustion", List.of("actor == self"));
+        assertRule(1310, "COUNTDOWN_TURN", "the_countdown_ends_combustion", List.of("actor == countdown"));
+        assertRule(1310, "CAST_SETUP", "combustion_breaks_faster", List.of("self has_state 完全燃烧"));
+        assertRule(1310, "ULT_CAST", "eidolon4_combustion_raises_effect_resistance", List.of("actor == self"));
+        assertRule(1310, "ULT_CAST", "eidolon6_combustion_fire_penetration", List.of("actor == self"));
+        assertRule(1310, "KILL", "eidolon2_a_kill_in_combustion_earns_a_turn",
+                List.of("actor == self", "self has_state 完全燃烧"));
+        assertRule(1310, "BREAK", "eidolon2_a_break_in_combustion_earns_a_turn",
+                List.of("actor == self", "self has_state 完全燃烧"));
         assertRule(1312, "SKILL_POINT_SPENT", "talent_energy_on_skill_point_spent", List.of());
         assertRule(1312, "BATTLE_START", "level_convention", List.of());
         assertRule(1314, "BATTLE_START", "trace_reverse_repo_one_goods", List.of());
