@@ -7,7 +7,7 @@
     "⛔ 终结技：6 段连招 / 无视弱点削韧 / 未击破时削韧效率 +100% / 160% 收尾未写",
     "⛔ 秘技：每波开始、必定暴击、每多牵引 1 个敌人 +100% 最多 1000% 未写",
     "⛔ 行迹「解形」：终结技伤害视为追加攻击未写",
-    "⛔ 星魂：未读、未写"
+    "✅ **星魂 4 与 6 的前半已落（2026-11-10）**：`eidolon4_the_talent_followup_breaks_harder_and_speeds_her`（速度 +8% / 2 回合）、`eidolon6_her_ultimates_pierce_resistance`（`DEALING_DAMAGE` + `from_category ULTRA` → `RESISTANCE_REDUCTION 0.2` + `instance`），3/5 是等级 ✓。⛔ 仍开：星魂 1（「每次【闪裂刃舞】/【钺贯天冲】后终结技伤害 +10%，最多 5 层，持续至终结技行动结束」—— 需要在**终结技行动内**累计的层数）、星魂 2（「每回合最多 6 次」的追加攻击计数 —— 与天赋那条共用事件，需要区分「追加攻击」这一种）、星魂 4 的**削韧 +100%**（要指定那一发）、星魂 6 后半（「追加攻击**视为**终结技伤害」= 改写实例类别 ✗）。"
   ],
   "resources": [
     {
@@ -215,6 +215,48 @@
       ],
       "source": "1220 飞霄 行迹「解形」(1220102): 「施放终结技对敌方目标造成伤害时，被视为发动了追加攻击。追加攻击的暴击伤害提高 36%」",
       "_note": "⭐⭐ 用刚落地的**实例路径 + 伤害类型域** ✓：`MODIFY_ATTR` + `instance: true` + **`damage_type: \"ADDITIONAL\"`** ✓ （引擎把追加攻击记成这个类型 ✓）⇒ 只给**追加攻击那一次伤害**加暴击伤害 ✓。⭐ 数值 **36%** 取自**数据行** ✓（`skill_traces.json` 的 `1220102 param=[0.36]` ✓，第 106 条 ✓）。⚠ 存活期写 `permanent: true` 仅为通过加载器校验 ✓（instance 路径不读它 ✓）。⚠ **登记**：同句前半「施放终结技造成伤害时**被视为发动了追加攻击**」✗ 未写 —— 那要求引擎把一次**终结技**伤害同时按\"追加攻击\"处理 ✗（维度只有 `ADDITIONAL` 一个值 ✗，无法叠加两种身份 ✗）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon4_the_talent_followup_breaks_harder_and_speeds_her",
+      "min_eidolon": 4,
+      "when": [
+        "actor != self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.08,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1220 飞霄 星魂 4 驱飓听冰: 「天赋的追加攻击的削韧值提高100%，并且发动时使自身速度提高8%，持续2回合。」 参数 = [1, 0.08, 2]",
+      "_note": "「天赋的**追加攻击**的**削韧值提高 100%**，并且**发动时**使自身**速度提高 8%**，持续 **2 回合**」—— ① 触发点：天赋的追加攻击由**我方目标攻击**发动 ⇒ 事件 `ALLY_ATTACK` + **`actor != self`**（她自己的攻击不算「我方目标施放」的那一半 —— 那一条另有规则 `talent_flying_aureus_counts_her_own_non_ultimate_attack` ✓）；② 速度 `MODIFY_ATTR SPEED 0.08` + `turns: 2` + `self` ✓。⚠ **削韧值 +100% 未写**：那是**追加攻击那一发**的削韧份额（`BOOST_TOUGHNESS` 挂在**本次发**上），要等「追加攻击」的实例在内容层可指定 —— 已登记。",
+      "_status": "implemented"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon6_her_ultimates_pierce_resistance",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "RESISTANCE_REDUCTION",
+          "percent": 0.2,
+          "instance": true,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1220 飞霄 星魂 6 惟首正丘: 「飞霄造成的终结技伤害的全属性抗性穿透提高20%。…」 参数 = [0.2, 1.4]",
+      "_note": "「飞霄造成的**终结技伤害**的全属性**抗性穿透提高 20%**」—— 逐发限定：`DEALING_DAMAGE` + `actor == self` + **`from_category ULTRA`** + `MODIFY_ATTR RESISTANCE_REDUCTION 0.2` + **`instance: true`**（只影响这一发 ✓，1308 星魂 6 同写法）。⚠ 同句后半「天赋的**追加攻击**伤害**同时视为终结技伤害**，并且伤害倍率提高 **140%**」**未写**：前半要把一发实例的**类别改写**（`Damage.castCategory` 构造时定死 ✗），后半是「视为」之后的连锁 ⇒ 已登记。",
+      "_status": "implemented"
     },
     {
       "on": "BATTLE_START",
