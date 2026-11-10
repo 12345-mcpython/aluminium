@@ -59,8 +59,8 @@ public class ImbibitorLunaeTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DHIL);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the per-hit stack");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the Squama grant: 「获得 2 个【逆鳞】」 - `amount` IS the layer count (the old note said otherwise)");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the Squama grant plus the second eidolon's extra one and its advance");
         Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the level convention, Eidolons 3 and 5, and the technique's AoE + scale");
     }
