@@ -147,6 +147,25 @@ public class JadeTalentAndEidolonsTest {
 
     // ==================================================================
 
+    /**
+     * 秘技: 「进入战斗后对敌方全体造成等同于翡翠 50% 攻击力的量子属性伤害」 - one hit, aimed at every enemy.
+     *
+     * <p>The old note called this 「10 段 / 0.5 份额」 and left it unwritten as a map-layer effect. Both parts were wrong: the
+     * row's `10` is the SECONDS of 【盲从】, and the battle-layer hit is ordinary vocabulary.
+     */
+    @Test
+    public void theTechniqueDealsOneQuantumHitAtBattleStart() {
+        Run plain = new Run(0);
+        Run withTechnique = new Run(0, true);
+
+        Assertions.assertEquals(0.0, plain.enemy.getCurrentHp() - plain.enemy.getAttribute(AttributeType.HEALTH).get(), 1e-6,
+                "without the technique the enemy is untouched at battle start");
+        Assertions.assertTrue(plain.enemy.getCurrentHp() - withTechnique.enemy.getCurrentHp() > 0,
+                "「对敌方全体造成等同于翡翠 50% 攻击力的量子属性伤害」");
+        // 15 from the technique plus the 1 her trace grants at battle start.
+        Assertions.assertEquals(16, withTechnique.jade.getBuffManager().stacksOf(GOODS), "「立即获得 15 层【当品】」");
+    }
+
     private static final class Run {
         private final Character jade;
         private final Character ally;
@@ -154,6 +173,10 @@ public class JadeTalentAndEidolonsTest {
         private final Battle battle;
 
         Run(int eidolon) {
+            this(eidolon, false);
+        }
+
+        Run(int eidolon, boolean technique) {
             jade = CharacterFactory.create(JADE, LEVEL);
             jade.setEidolonRank(eidolon);
             // A crit roll would make every damage ratio a coin toss, so it is pinned off.
@@ -161,6 +184,9 @@ public class JadeTalentAndEidolonsTest {
             ally = CharacterFactory.create(ALLY, LEVEL);
             ally.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
             enemy = BattleFixture.monster();
+            if (technique) {
+                jade.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1));
+            }
             battle = new Battle(List.of(jade, ally), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();

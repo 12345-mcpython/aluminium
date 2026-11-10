@@ -5,7 +5,7 @@
   "_gaps": [
     "⛔ 战技剩余一句：「当场上存在【收债人】时，翡翠**无法施放战技**」未写 —— 需要「场上有该状态的角色 ⇒ 禁用某槽位」的写法",
     "✅ **天赋已写（2026-11-11）**：`talent_charge_for_her_own_hits` / `talent_charge_for_the_collectors_hits`（`ALLY_ATTACK` → `GAIN_RESOURCE 充能 1` + `times_from: hit_count`）、`talent_follow_up_at_eight_charge`（`RESOURCE_CHANGED` → `SPEND_RESOURCE 8` + `DAMAGE { skill: TALENT, damage_param: 4 }` + `ADD_STACK 当品 5`）、`talent_crit_damage_per_goods` 的**每层暴伤**实际上早就在 `trace_reverse_repo_one_goods` 里（`per_stack_live`）⇒ 不重复写 ✓。⛔ **终结技**「天赋的追加攻击伤害倍率 +80%，生效 2 次」仍未写（「生效 2 次」是**资源型寿命** ✓ 形状可写，但那 80% 要改**追加攻击**的倍率 —— 与星魂 1 同一条 `effect_percent_scale` 的形状，两处叠乘需要先定口径 ✗）。",
-    "⛔ **秘技的战斗层伤害未写**：「10 段 / 0.5 份额」的伤害部分还没有规则（大地图效果不建模）。",
+    "✅ **秘技的战斗层伤害已落地（2026-11-11）**：`technique_fifteen_goods` 现在第一条 effect 是 `DAMAGE { skill: TECHNIQUE, damage_param: 1, element: Quantum, target: all_enemies }` = 「进入战斗后对敌方全体造成等同于翡翠 **50%** 攻击力的量子属性伤害」✓。⚠ 旧登记写「**10 段** / 0.5 份额」——参数行的 `10` 是**盲从的秒数**（数据行 `[10, 0.5, 15]` 的第 1 格），不是段数 ⇒ 伤害只有**一发** ✓。⛔ **仍未写**：秘技的**大地图层**（「一定区域内的敌人陷入 10 秒【盲从】、【盲从】不会主动攻击、主动攻击时同时进战」）—— 战斗外效果不建模。",
     "⛔ 行迹 逆回购 的第二半：「处于【收债人】状态的角色回合开始时，额外获得 3 层【当品】」未写 —— 【收债人】是她的战技给的合同状态，本档还没写那套合同",
     "✅ **星魂已读，1 / 2 / 3 / 4 / 5 / 6 全部落地（2026-11-11）**：1 = 三条（`eidolon1_two_targets_pay_one_more` / `eidolon1_one_target_pays_two_more` 两条充能档 + `eidolon1_the_talent_follow_up_hits_harder` 的 `effect_percent_scale: 1.32`）；2 = `eidolon2_crit_chance_at_fifteen_goods`（**早就在**）；3/5 = 等级（早就在）；4 = `eidolon4_ult`（`DEFENCE_IGNORE 0.12` 3 回合，**早就在**）；6 = `eidolon6_she_becomes_a_collector`（`APPLY_BUFF 收债人` + `DAMAGE_PENETRATION_QUANTUM 0.2`）。判据 `JadeTalentAndEidolonsTest`。⚠ **星魂 2 的近似仍在**：「叠加至 15 层时」只在 `BATTLE_START` 判一次（引擎没有 `STACK_CHANGED` 事件；她涨层的路径里只有秘技那条是开场就给 15 层 ✓）。"
   ],
@@ -91,6 +91,13 @@
         "self has_state 秘技"
       ],
       "do": [
+        {
+          "op": "DAMAGE",
+          "skill": "TECHNIQUE",
+          "damage_param": 1,
+          "element": "Quantum",
+          "target": "all_enemies"
+        },
         {
           "op": "ADD_STACK",
           "buff": "当品",
