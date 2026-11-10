@@ -313,6 +313,12 @@ public class CharacterConditionLiteralsTest {
         assertRule(1401, "BATTLE_START", "technique_opening_attack", List.of("self has_state 秘技"));
         assertRule(1401, "ULT_CAST", "ult_attack_advance_and_inspiration", List.of("actor == self"));
         assertRule(1401, "BATTLE_START", "level_convention", List.of());
+        assertRule(1401, "BATTLE_START", "eidolon2_one_more_inspiration_on_entry", List.of());
+        assertRule(1401, "ULT_CAST", "eidolon2_one_more_inspiration_on_ult", List.of("actor == self"));
+        assertRule(1401, "SKILL_CAST", "eidolon2_the_enhanced_skill_advances_her",
+                List.of("actor == self", "from_skill_id == 9.0"));
+        assertRule(1401, "BATTLE_START", "eidolon4_erudition_allies_are_faster", List.of());
+        assertRule(1401, "BATTLE_START", "eidolon6_ice_penetration", List.of());
         assertRule(1402, "DEALING_DAMAGE", "talent_fissure_thread_bonus", List.of("actor == self", "self_summon_count >= 1.0", "target has_state 间隙织线"));
         assertRule(1402, "DEALING_DAMAGE", "talent_fissure_thread_applies_state", List.of("actor == self", "self_summon_count >= 1.0"));
         assertRule(1403, "BATTLE_START", "trace_30_energy", List.of());

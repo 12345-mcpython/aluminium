@@ -7,7 +7,7 @@
     "✅ **战技施放【解读】与【灵感】换形态都已落地（2026-11-09）**：`skill_applies_one_insight`（`SKILL_CAST` + `from_skill_id == 2` → `ADD_STACK 解读 1`，上限 42）、`ult_enhances_the_skill_while_inspired`（`ULT_CAST` → `REPLACE_SKILL { skill: SKILL, skill_id: 9 }`，数据槽 9 = 140109「我有一个大胆的想法」）、`enhanced_skill_spends_one_inspiration`（`from_skill_id == 9` → `REMOVE_STACK 灵感 1`）、`skill_reverts_without_inspiration`（同闸门 + `self_stacks:灵感 <= 0` → `REPLACE_SKILL { remove: true }`）。判据 `HertaSkillFormTest`：普通战技给敌人 **1 层【解读】**；终结技后战技槽 **2 → 9**、强化战技消耗 1 层【灵感】、层数归零后槽位**回 2**。⚠ 顺序是判据的一部分：扣层那条必须排在回退那条**之前**（回退要读「扣完还剩几层」），换形态那条必须排在「获得【灵感】」之后。",
     "⛔ **终结技的【解读】重排未写**：「将敌方全体的【解读】层数**重新排序**，较高层数的【解读】优先转移到**精英级别及以上**的目标」—— 缺两样：① 跨单位搬移一个计数器（引擎没有「把 A 的层数转给 B」的 op）；② 敌人是否「精英级别及以上」的判定（数据里有分级，但条件语言没有这一项）。",
     "⛔ **战技的链式重复与相邻扩散未写**：「对本次战技**命中过的目标**及其**相邻目标**造成…伤害，该效果**可重复 2 次**」—— 需要「这一发打中过谁」的集合 + 逐次对外扩散，引擎的 `blast` 只做一层相邻。⚠ 强化战技（槽 9）的 `#2` 层【解读】也一并未写：那要读**数据行**给 `ADD_STACK`（`amount_from` 在 `ADD_STACK` 上的拼法未核实）。",
-    "⛔ **星魂未读**：1401 的星魂 1–6 尚未逐句核对（本文件的规则一条都还没有星魂门）。",
+    "✅ **星魂已读，2 / 3 / 4 / 5 / 6（前半）已落地（2026-11-11）**：2 = 三条（`eidolon2_one_more_inspiration_on_entry` 进战 +1 层【灵感】、`eidolon2_one_more_inspiration_on_ult` 终结技再 +1、`eidolon2_the_enhanced_skill_advances_her` 强化战技后 `ADVANCE 0.35`）；3/5 = 等级（早就在）；4 = `eidolon4_erudition_allies_are_faster`（`MODIFY_ATTR SPEED 0.12` + **`allies_of_path:智识`**）；6 前半 = `eidolon6_ice_penetration`（`DAMAGE_PENETRATION_ICE 0.2`）。判据 `HertaEruditionEidolonsTest`。⛔ **仍未写**：① 星魂 1「强化战技计算【解读】层数时，额外计算主目标及相邻目标中层数最高者的 50%；重置时改为 15 层」—— 要读「相邻目标里层数最高者」的**组内最大值**（`highest_stacks_enemy:` 是全体，不是相邻集）✗；② 星魂 6 **后半**「按敌方数量（3+/2/1）把终结技**伤害倍率**分别提高 140%/250%/400%」—— 终结技倍率来自**技能行**，`MODIFY_RULE` 改不了行，缺「按场上数量覆盖这一次施放的行份额」的写法 ✗。",
     "⛔ 天赋【解读】其余部分：每波开始对随机目标施加 25 层且「**优先精英**」（⚠ 引擎的 `Enemy` 没有「精英」这一属性，选目标的选择器也没有按等级优先的形状 ⇒ 这一条要先有「敌人等级」才谈得上）；、强化战技按层数的倍率加成（每层 +8% 主目标 / +4% 其他）、「智识」命途 ≥2 名的追加、强化战技把主目标重置为 1 层、离场/被消灭后的转移（优先精英）"
   ],
   "rules": [
@@ -216,6 +216,98 @@
       ],
       "source": "1401 星魂 5: 等级加成（数据 skill_add_level: 140101=COMMON+1, 140103=ULTRA+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon2_one_more_inspiration_on_entry",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灵感",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1401 大黑塔 星魂 2 穿过锁孔之风: 「大黑塔进入战斗和施放终结技后，额外获得1层【灵感】。」 参数 = [0.35, 42, 0.25]",
+      "_note": "「**进入战斗**…额外获得 **1 层【灵感】**」—— `ADD_STACK 灵感` + **`max_stacks: 4`**（与她的终结技那条同形；【灵感】是**计数状态**不是资源 ✓）+ `permanent: true` ✓。⚠ 同句的「施放终结技后」那半在另一条 `ULT_CAST` 规则里（同一句两个触发点，本引擎一行事件一条规则）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon2_one_more_inspiration_on_ult",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "灵感",
+          "amount": 1,
+          "max_stacks": 4,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1401 大黑塔 星魂 2: 「…施放终结技后，额外获得1层【灵感】。」",
+      "_note": "「施放终结技后，**额外**获得 1 层【灵感】」—— 与 `ult_attack_advance_and_inspiration`（终结技本身给 1 层）**相加**：E2 起一次终结技给 **2 层** ✓（「额外」二字是加法不是替换，与 1213 星魂 2 的「额外 1 个【逆鳞】」同族）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "eidolon2_the_enhanced_skill_advances_her",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "from_skill_id == 9"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.35,
+          "target": "self"
+        }
+      ],
+      "source": "1401 大黑塔 星魂 2: 「施放强化战技后，大黑塔的下一次行动提前35%。」",
+      "_note": "「施放**强化战技**后，大黑塔的**下一次行动提前 35%**」—— `SKILL_CAST` + **`from_skill_id == 9`**（强化战技的行/槽；同文件的层数规则用的也是这个门 ✓）+ `ADVANCE percent: 0.35 target: self` ✓（引擎的提前就是「下一次行动」的剩余时间按比例跳过）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon4_erudition_allies_are_faster",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.12,
+          "permanent": true,
+          "target": "allies_of_path:智识"
+        }
+      ],
+      "source": "1401 大黑塔 星魂 4 第十六把钥匙: 「队伍中的「智识」命途角色的速度提高12%。」 参数 = [0.12]",
+      "_note": "「队伍中的「**智识**」命途角色的**速度提高 12%**」—— 选择器 **`allies_of_path:智识`** ✓（它遍历在场全体、按命途取，**包含她自己** ✓）。⚠ 不是 `all_allies`（那会把其他命途也算进去 ✗）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_ice_penetration",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION_ICE",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1401 大黑塔 星魂 6 甜饵般的答案: 「大黑塔的冰属性抗性穿透提高20%，当场上敌方目标数量等于3或以上/2/1名时，终结技的伤害倍率提高140%/250%/400%。」 参数 = [1.4, 2.5, 4, 0.2]",
+      "_note": "前半 ✅：「**冰属性**抗性穿透提高 **20%**」= `MODIFY_ATTR DAMAGE_PENETRATION_ICE 0.2`（**按属性的穿透**，与 1402 星魂 6 同一列 ✓；不是全属性 `DAMAGE_PENETRATION` ✗）。⛔ **后半未写**：「场上敌方目标数量等于 3+/2/1 时，**终结技的伤害倍率**提高 140%/250%/400%」—— 终结技倍率来自**技能行**（不是规则），`MODIFY_RULE` 改不了行；要的是「按敌方数量给**这一次施放**的倍率加一个百分比」的写法，与 `blast` / `base_terms` 那种行覆盖同类，已登记。",
       "_status": "implemented"
     }
   ]

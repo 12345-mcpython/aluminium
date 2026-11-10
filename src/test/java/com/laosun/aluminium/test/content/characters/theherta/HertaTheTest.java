@@ -80,11 +80,14 @@ public class HertaTheTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);
-        // Note: 2 since 2026-11-09 - the Ultimate also swaps the Skill to the enhanced form.
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the modifiers and the Skill swap");
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START), "the technique and the convention");
-        // Note: 3 since 2026-11-09 - one adds insight, one spends inspiration, one puts the plain Skill back.
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST), "insight, the cost, and the revert");
+        // Note: 3 since 2026-11-11 - Eidolon 2 pays one more 【灵感】 on the same cast.
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the modifiers, the Skill swap, and Eidolon 2 inspiration");
+        // Note: 7 since 2026-11-11 - Eidolon 2s entry inspiration, Eidolon 4s speed aura, Eidolon 6s ice penetration.
+        Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique, the convention, and the three Eidolon passives");
+        // Note: 4 since 2026-11-11 - Eidolon 2s 35% advance on the ENHANCED Skill.
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.SKILL_CAST), "insight, the cost, the revert, and the advance");
     }
 
     private static Random fixed() {
