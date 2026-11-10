@@ -270,6 +270,8 @@ public class CharacterConditionLiteralsTest {
         assertRule(1306, "SKILL_POINT_SPENT", "eidolon2_defence_ignore_per_layer", List.of());
         assertRule(1306, "SKILL_POINT_SPENT", "talent_phantasm_stack", List.of());
         assertRule(1306, "SKILL_POINT_SPENT", "talent_phantasm_damage_taken", List.of());
+        assertRule(1306, "BATTLE_START", "eidolon1_the_phantasm_lasts_a_turn_longer", List.of());
+        assertRule(1306, "ULT_CAST", "eidolon1_the_phantasm_holders_hit_harder", List.of("actor == self"));
         assertRule(1307, "SKILL_CAST", "skill_arcana_stack", List.of("actor == self"));
         assertRule(1307, "SKILL_CAST", "skill_defence_down", List.of("actor == self"));
         assertRule(1307, "BATTLE_START", "level_convention", List.of());

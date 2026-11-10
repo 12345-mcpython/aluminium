@@ -4,11 +4,11 @@
   "_status": "partial",
   "_gaps": [
     "✅ **战技「对自身施放时不触发行动提前」已落地（2026-11-09）**：`ADVANCE` 那条效果带 **`target_when: [\"target != self\"]`** —— 效果级筛选器，所以同一条规则里「暴击伤害照给、行动提前跳过」可以分开表达（当初登记说这不可能，是因为没查 `target_when`）。判据 `SparkleClauseCoverageTest#theSkillAdvancesOnlyWhenCastOnSomeoneElse`（对自身施放：暴伤照给、行动值不动；对队友施放：行动值前移）。",
-    "⛔ **终结技的「谜诡每层 +10% 增伤」未写**：`MODIFY_ATTR` 没有「按另一条状态/资源的层数实时取增量」的拼法（`per_stack` 只跟**本次加成自己的**计数器，谜诡是**施加在别人身上的状态**）。",
+    "✅ **终结技的「谜诡每层 +10% 增伤」已落地（2026-11-11）**：`ult_skill_points_and_cipher` 第三条效果 `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST percent: 0.1` + **`per_stack: \"叙述性诡计\"`**（裸名 = **载体自己**的层数）+ `per_stack_cap: 3` + `per_stack_live: true` + **`while_holder_state: 谜诡`**。⚠ 旧登记「`per_stack` 只跟自己的计数器」**过期**。判据 `SparkleEidolonOneTest`。",
     "⭐ **「战技点上限 +2」其实早就落地（2026-11-09 更正）**：`talent_raises_skill_point_cap`（`BATTLE_START` → `RAISE_SKILL_POINT_CAP 2`）写的就是它 —— 旧登记把这条同时列成「未写」，是登记过期。⛔ 本条真正剩下的只有**强化后**的幻相「每层 4% 易伤」（强化形态整体未建模）。",
     "⛔ **秘技的大地图侧未写**：「迷误状态下不被发现」是战斗外效果；战斗层的 +20 能量（强化后）也未写（强化形态整体未建模）。",
     "⭐ **星魂 4 已于 2026-11-03 落地**（终结技额外 +1 战技点、天赋的战技点上限增加效果再 +1）：`RAISE_SKILL_POINT_CAP 1` **必须排在** `GAIN_SKILL_POINT 1` **之前** —— 反过来时那 1 点会被旧上限钳掉（实测踩过）。判据 `SparkleClauseCoverageTest`（上限 +1、终结技 4+1）。",
-    "⛔ 星魂 1：【谜诡】持续时间 +1 回合（`MODIFY_RULE effect_turns` 可写）+ 「持有【谜诡】的我方目标攻击力提高 40%」—— 后半需要一个**随状态存在**的修饰（现在的写法只能在施加时点给一次，谜诡转移后不会跟着走）。",
+    "✅ **星魂 1 两句都已落地（2026-11-11）**：「【谜诡】持续时间 +1 回合」= `eidolon1_the_phantasm_lasts_a_turn_longer`（`MODIFY_RULE { rule: ult_skill_points_and_cipher, effect_turns: 1 }`）；「持有【谜诡】的我方目标攻击力提高 40%」= `eidolon1_the_phantasm_holders_hit_harder`（`MODIFY_ATTR ATTACK 0.4` + **`while_holder_state: 谜诡`**）。⚠ 旧登记「只能在施加时点给一次」**过期**：`while_holder_state` 让修饰**跟着载体自己的状态**走。判据 `SparkleEidolonOneTest`（含「把状态从队友身上摘掉，只有他掉那 40%」）。",
     "⛔ 星魂 6：战技的暴击伤害提高效果**额外提高**（数值 = 花火暴击伤害的 30%）+ 施放战技时该效果也作用于持有【谜诡】的队友 + 施放终结技时扩散 —— 是「按某个属性的 30% 追加到**另一条效果**上」，需要 `MODIFY_RULE` 接受**提供器**（现在只收字面值）。",
     "⛔ ⚠ 星魂 2（强化前已写）+ 强化后形态未写（强化形态整体未建模）"
   ],
@@ -79,10 +79,22 @@
           "buff": "谜诡",
           "turns": 2,
           "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.1,
+          "per_stack": "叙述性诡计",
+          "per_stack_cap": 3,
+          "per_stack_live": true,
+          "while_holder_state": "谜诡",
+          "turns": 2,
+          "target": "all_allies"
         }
       ],
       "source": "1306 花火 终结技 一人千役 (130603, Ultra/Support): 「强化前：为我方恢复4个战技点，并使我方全体获得【谜诡】。持有【谜诡】的我方目标触发花火天赋造成的伤害提高效果每层额外提高10.00%，持续2回合。」",
-      "_note": "「为我方**恢复 4 个战技点**，并使我方**全体**获得【谜诡】…持续 **2 回合**」—— ① 战技点 `GAIN_SKILL_POINT 4` ✓（既有 op ✓）；② 状态 `APPLY_BUFF 谜诡 turns 2` + **`all_allies`** ✓（\"我方全体\" ✓）。⚠ **登记**：① 「持有【谜诡】的我方目标触发花火天赋造成的伤害提高效果**每层额外提高 10.00%**」✗（**按层数加成** ✗ —— 即\"每层缩放\"那一族 ✓）；② **强化后**「恢复 6 个战技点，**若恢复时战技点溢出，则记录溢出的战技点数，最多记录 10 点**。我方角色回合结束后若战技点小于上限，花火**消耗记录值为我方恢复战技点，直至恢复至上限**」✗（**溢出记录器** ✗ + **回合结束时自动补足** ✗）。"
+      "_note": "「为我方**恢复 4 个战技点**，并使我方**全体**获得【谜诡】…持续 **2 回合**」—— ① 战技点 `GAIN_SKILL_POINT 4` ✓；② 状态 `APPLY_BUFF 谜诡 turns 2` + `all_allies` ✓；③ 「持有【谜诡】的我方目标触发**花火天赋造成的伤害提高效果每层额外提高 10.00%**」= **再给一条修饰**：`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST percent: 0.1` + **`per_stack: \"叙述性诡计\"`**（**裸名 = 载体自己**的层数 ✓ —— 谜诡挂在每个队友身上，每条修饰就按**那个人**自己的天赋层数算 ✓）+ `per_stack_cap: 3` + `per_stack_live: true` + **`while_holder_state: 谜诡`**（只在**持有者**身上生效 ✓，2 回合后随状态一起走 ✓）。⚠ 旧登记「`per_stack` 只跟本次加成自己的计数器」**过期**：裸名读的正是**载体**的计数器（引擎里 `perStackCount` 的注释写着「a bare name the target」）✓。⛔ **仍未写**：**强化后**形态（恢复 6 个战技点 + 溢出记录器 + 回合结束时自动补足）✗（与强化形态整体一起登记）。",
+      "_status": "implemented"
     },
     {
       "on": "SKILL_POINT_SPENT",
@@ -218,6 +230,42 @@
       ],
       "source": "1306 星魂 5: 等级加成（数据 skill_add_level: 130603=ULTRA+2, 130604=TALENT+2）",
       "_note": "「等级 +N」取自 eidolons.json 的 `skill_add_level` ✓；⚠ 只映射 1/2/3/4 号槽，8/9/10/12 是强化行、没有 `SkillType` ⇒ 未写（见缺口）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_the_phantasm_lasts_a_turn_longer",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "ult_skill_points_and_cipher",
+          "effect_turns": 1
+        }
+      ],
+      "source": "1306 花火 星魂 1 独角戏: 「【谜诡】持续时间 +1 回合…」 参数 = [0.4]",
+      "_note": "「【谜诡】**持续时间 +1 回合**」= `MODIFY_RULE { rule: ult_skill_points_and_cipher, effect_turns: 1 }` ✓ —— 那条规则里带 `turns` 的两个效果（状态本身与「每层 +10%」那条修饰）**一起** +1 ✓（两者本来就是同寿的）。⚠ 必须挂 `BATTLE_START`：`MODIFY_RULE` 改整场。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon1_the_phantasm_holders_hit_harder",
+      "min_eidolon": 1,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.4,
+          "while_holder_state": "谜诡",
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1306 花火 星魂 1 独角戏: 「…持有【谜诡】的我方目标攻击力提高40%。」 参数 = [0.4]",
+      "_note": "「**持有【谜诡】的我方目标**攻击力提高 **40%**」—— `MODIFY_ATTR ATTACK 0.4` + **`while_holder_state: 谜诡`** ✓（第五个活门槛：问**载体自己**有没有那个状态，而不是规则主人 —— 与 `while_holder_state` 的既有读者 1110/1112 同法）。⚠ 旧登记「需要在施加时点给一次」**过期**：读时活门让修饰**跟着状态走**（谜诡转移/到期，加成随之）✓。⚠ `turns: 2` 与谜诡同寿（星魂 1 的 +1 回合由另一条 `MODIFY_RULE` 抬到 3 ✓ —— 但 `turns` 是**装入时**算的数，两者是否同步以判据为准）。",
       "_status": "implemented"
     }
     ,
