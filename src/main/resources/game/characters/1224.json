@@ -6,7 +6,7 @@
     "✅ **战技的两个条件都已落地（2026-11-09 订正）**：① 「**除自身以外**」—— 用**逐效果 `target_when`「目标 != 自己」** 挡（`APPLY_BUFF` 与那条 `MODIFY_ATTR` 各挂一份，因为它们是一个效果一个效果应用的）；② 「**仅最新施放目标**被视为【师父】」—— 一直是 `REMOVE_STATE 师父`（全体）+ `APPLY_BUFF` 的顺序语义 ✓（`NewestHolderOnlyTest` 连同对照组证明过 ✓），本条原来的 ⛔ 是**过期**的。",
     "✅ **天赋的充能状态机已落地（2026-11-10）**：两条规则 —— `talent_seven_charges_empower_her`（`RESOURCE_CHANGED` + `resource_changed:充能` + `self_resource:充能 >= 7` → `ADVANCE 100%` + `APPLY_BUFF 强化 {blocks: skill}` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST 0.8 {while_state: 强化}` + `REPLACE_SKILL slot 8`）与 `talent_the_enhanced_basic_spends_seven`（`BASIC_ATTACK` + `from_skill_id == 8` → `SPEND_RESOURCE 7` + `REMOVE_STATE 强化` + 还原普攻槽）。⚠ **近似**：中间掉到 6 也不会自动解除（引擎没有「按资源值自动失效」的写法），已写在规则注记里。⛔ 仍开：秘技的队友计数、终结技的段数/固定概率、强化普攻的三段概率、星魂。",
     "天赋：攻击与终结技各回 1 点，但终结技也会发 ALLY_ATTACK ⇒ 一次终结技可能回 2 点（与文档读法不同）",
-    "⛔ 秘技：队友施放秘技的计数、最多 3 点充能未写",
+    "⛔ **终结技的第二句仍开，但缺口比原来窄**：「使**下一次**强化普攻的**初始段数增加 2 段**，额外造成伤害的**固定概率提高 20%**」—— ① **引擎有 `RAISE_SKILL_HITS { skill_id, amount }`** ✓（`CanHit.raiseSkillHits`），但它是**累加且不会自动还原**的，而这句要的是「**下一次**」⇒ 第二次终结技会变成 +4 ✗；要落地得先有「一次性提升、被那一次强化普攻消费掉」的写法（与 §196「改写下一发实例」同族）。② 「固定概率提高 20%」是**强化普攻的概率参数**（不受命中/抵抗影响），引擎没有「提高某个技能某条概率」的 op ⇒ 需要 `MODIFY_RULE` 那样的修正案挂到**技能行**上，当前不支持。",
     "⛔ 终结技：强化普攻初始段数 +2、固定概率 +20% 未写",
     "⛔ 强化普攻：3 段 80%、60% 固定概率续段最多 3 段、能量不随段数、不恢复战技点未写",
     "⛔ 星魂：未读、未写"
