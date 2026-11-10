@@ -2791,10 +2791,26 @@ public final class TriggerInterpreter {
                             + "carries no actor to deal it; name \"summon\" or say nothing (the rule owner deals it)");
                 }
                 attacker = ctx.actor();
+            } else if (named.startsWith("holder_of:")) {
+                // 「获得【赐福】的目标立即对其造成…」 (1202 Tingyun (停云)'s TALENT): the damage belongs to a THIRD party - neither the
+                // rule's owner (who caused the event) nor the event's actor. The field's own javadoc named this sentence as the one
+                // it could not spell; the spelling is "the ally holding that state".
+                String state = named.substring("holder_of:".length()).trim();
+                if (state.isEmpty()) {
+                    throw new IllegalStateException(
+                            "a DAMAGE states \"attacker\": \"holder_of:\", which names no state; write the state the dealing unit "
+                                    + "holds, e.g. \"holder_of:赐福\"");
+                }
+                attacker = com.laosun.aluminium.trigger.TriggerTargets.holderOfOrNull(ctx.battle(), state, ctx.owner());
+                if (attacker == null) {
+                    throw new IllegalStateException("a DAMAGE states \"attacker\": \"holder_of:" + state + "\", but no living ally "
+                            + "carries that state; gate the rule with `any_ally has_state " + state + "` so it only fires while "
+                            + "somebody holds it");
+                }
             } else if (!"summon".equalsIgnoreCase(named)) {
                 throw new IllegalStateException("a DAMAGE states \"attacker\": \"" + named
-                        + "\", and the subjects this engine can name are \"summon\" (the rule owner's memosprite) and "
-                        + "\"actor\" (the unit the event is about)");
+                        + "\", and the subjects this engine can name are \"summon\" (the rule owner's memosprite), "
+                        + "\"actor\" (the unit the event is about) and \"holder_of:<state>\" (the ally holding it)");
             } else {
                 CanHit owner = ctx.owner();
                 CanHit summon = owner == null || ctx.battle() == null ? null : ctx.battle().summonOf(owner);
