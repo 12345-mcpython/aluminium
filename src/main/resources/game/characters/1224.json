@@ -9,7 +9,7 @@
     "⛔ **秘技的前半仍未写**：「若三月七在队伍中，每当**队友施放 1 次秘技**，下一次战斗开始时三月七获得 **1 点充能**，最多 **3** 点」—— 需要「**全队这一场用了几次秘技**」这个**队伍级计数**：`Battle.Techniques.released(cid)` 只记**谁**放了，没有「几个队友放过 / 放过几次」的读数，也没有给规则读它的通道。⚠ 「使用秘技后，下一次战斗开始时恢复 **30** 点能量」这条**已实现**（`technique_energy`）。",
     "✅ **「下一次强化普攻 +2 段」已落地（2026-11-10）**：**成对规则** —— `ult_lends_two_hits_to_the_next_enhanced_basic`（`ULT_CAST` → `RAISE_SKILL_HITS { skill_id: 8, amount: 2 }`）与 `basic_takes_the_two_hits_back`（`BASIC_ATTACK` + `from_skill_id == 8` → `amount: -2`）。⭐ 依据是 `CanHit.raiseSkillHits` 自己的注释：**A NEGATIVE delta takes them back, which is how a rule states a duration** ⇒ 「下一次」不需要新字段。⛔ **仍未写**：「额外造成伤害的**固定概率提高 20%**」—— 那是**强化普攻的概率参数**，`MODIFY_RULE` 只改**规则**、不改**技能行**。",
     "⛔ 强化普攻：3 段 80%、60% 固定概率续段最多 3 段、能量不随段数、不恢复战技点未写",
-    "⛔ 星魂：未读、未写"
+    "✅ **星魂已读，前四个已落（2026-11-10）**：星魂 1 = `eidolon1_she_is_faster_while_a_master_stands`（`TURN_START` + **`any_ally has_state 师父`** → 速度 +10%；⚠ 不能用 `while_state`，那个 gate 读的是**规则主人**的状态，而【师父】在队友身上）、星魂 2 = `eidolon2_the_master_attack_draws_her_follow_up`（`ALLY_ATTACK` + `actor has_state 师父` + `per_turn: 1` → 60% 攻击力虚数追加伤害 + 1 点充能）、星魂 4 = `eidolon4_pays_five_energy_each_turn`（`TURN_START` → `GAIN_ENERGY 5`）、3/5 = 等级 ✓。⛔ **未写**：星魂 2 的「根据【师父】的**命途**触发对应效果」（引擎没有「队友的命途」谓词）、星魂 6 的「施放终结技后，**下一次**强化普攻暴击伤害 +50%」（需要「下一次」的寿命，`turns: 1` 只是近似）。"
   ],
   "resources": [
     {
@@ -241,6 +241,70 @@
       ],
       "source": "1224 三月七 终结技 盖世女侠三月七: 「使下一次强化普攻的初始段数增加2段…」",
       "_note": "「**下一次**」的收尾：强化普攻打完就把那 2 段**还回去**（负增量）。⚠ 门必须 `from_skill_id == 8`（只有**强化**普攻消费它 ✓，普通普攻不该减）。⚠ 与 `ult_lends_two_hits_to_the_next_enhanced_basic` 成对：一个借、一个还 ⇒ 精确表达「下一次」而不需要一次性字段。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon1_she_is_faster_while_a_master_stands",
+      "min_eidolon": 1,
+      "when": [
+        "any_ally has_state 师父"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.1,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1224 三月七 星魂 1 初花学剑动星芒: 「场上存在【师父】时，三月七的速度提高10%。」 参数 = [0.1]",
+      "_note": "「**场上存在【师父】时**，三月七的速度提高 10%」—— ① **`any_ally has_state 师父`**（引擎就有这个条件主语 ✓，1111 用的是 `any_enemy has_state 裂伤` 的镜像）—— ⚠ **不能**写 `while_state: 师父`：那个 gate 读的是**规则主人**（三月七）的状态，而【师父】在**队友**身上 ✗；② 事件 `TURN_START` + `turns: 1` 是**近似**（「场上存在时」是持续态，引擎没有「按另一单位的站位持续」的修饰寿命）—— 每回合开头刷新一次，实际效果等价，但若师父在**回合中**被换掉，会多持续到本回合结束。",
+      "_status": "implemented"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon4_pays_five_energy_each_turn",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 5
+        }
+      ],
+      "source": "1224 三月七 星魂 4 龙飞凤舞不窝囊: 「回合开始时，恢复5点能量。」 参数 = [5]",
+      "_note": "「**回合开始时，恢复 5 点能量**」—— `TURN_START` + `actor == self` + `min_eidolon: 4` → `GAIN_ENERGY 5` ✓（数值是星魂参数，不是行数据）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon2_the_master_attack_draws_her_follow_up",
+      "min_eidolon": 2,
+      "per_turn": 1,
+      "when": [
+        "actor has_state 师父"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent": 0.6,
+          "element": "Imaginary",
+          "damage_type": "ADDITIONAL",
+          "target": "target"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1
+        }
+      ],
+      "source": "1224 三月七 星魂 2 白刃耀雪舞骇浪: 「每当【师父】施放普攻或战技攻击敌方目标后，三月七立即发动追加攻击，对本次攻击的主目标造成等同于三月七60%攻击力的虚数属性伤害…随后获得1点充能。…该效果每回合最多触发1次。」 参数 = [0.6, 5, 1, 15]",
+      "_note": "「每当【师父】**施放普攻或战技攻击敌方目标后**，三月七立即发动**追加攻击**，对**本次攻击的主目标**造成等同于三月七 **60%** 攻击力的虚数属性伤害…随后获得 **1** 点充能。…该效果**每回合最多触发 1 次**」—— ① `ALLY_ATTACK` + `actor has_state 师父` ✓（打出攻击的是师父 ✓）；② `per_turn: 1` ✓（「每回合最多 1 次」，在**三月七自己**的回合计数 —— 与「每回合」同义 ✓）；③ 伤害 `self_attr:ATTACK` + `percent: 0.6` + `element: Imaginary` + **`damage_type: ADDITIONAL`**（「追加攻击」不视为一次主动攻击 ✓）；④ 目标 `target` = **本次攻击的主目标** ✓；⑤ `GAIN_RESOURCE 充能 1` ✓。⚠ **未写**：「并**根据【师父】的命途**触发对应效果」—— 按命途分支 ✗（引擎没有「队友的命途」这个谓词）。",
       "_status": "implemented"
     },
     {
