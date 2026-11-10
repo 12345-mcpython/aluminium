@@ -4,7 +4,7 @@
   "_status": "partial",
   "_gaps": [
     "⛔ 秘技：「我方制造的领域效果最多存在 1 个」未写",
-    "✅ **星魂已读，1 / 2 / 3 / 4（后半）/ 5 已落地（2026-11-11）**：1 = `eidolon1_party_pierces_more_while_concerto`（`ULT_CAST` → `MODIFY_ATTR DAMAGE_PENETRATION 0.24` + `all_allies` + **`buff: 协奏`**）；2 = 两条（`eidolon2_party_speed_while_concerto` 是状态期间的光环；`eidolon2_the_talent_pays_one_more_energy` 必须在 `BATTLE_START`，因为 `MODIFY_RULE` 改整场）；3/5 = 等级（早就在）；4 后半 = `eidolon4_party_effect_resistance_while_concerto`（`EFFECT_RESISTANCE 0.5` + `buff: 协奏`）。判据 `RobinEidolonsTest`（含「退出【协奏】时整组一起摘掉」）。⛔ **仍未写**：① 星魂 4 **前半**「解除我方全体的**控制类**负面状态」—— `DISPEL` 解除的是**所有**负面（比句子宽 ✗），`REMOVE_STATE` 的 `kind` 只分来源不分**类** ✗ ⇒ 缺「按类解除」；② 星魂 6「【协奏】期间终结技的物理附加伤害**暴击伤害 +450%**，最多触发 **8** 次、每次终结技重置」—— 要给**那一类实例**加暴伤（`instance` 只作用于本发；`MODIFY_ATTR CRIT_ATTACK` + `damage_type: ADDITIONAL` 的逐发形态**没有**）+ 一个每次终结技重置的计数 ✗。",
+    "✅ **星魂已读，1 / 2 / 3 / 4 / 5 全部落地（2026-11-11）**：1 = `eidolon1_party_pierces_more_while_concerto`（`ULT_CAST` → `MODIFY_ATTR DAMAGE_PENETRATION 0.24` + `all_allies` + **`buff: 协奏`**）；2 = 两条（`eidolon2_party_speed_while_concerto` 光环 + `eidolon2_the_talent_pays_one_more_energy` 必须挂 `BATTLE_START`）；3/5 = 等级（早就在）；4 = `eidolon4_party_effect_resistance_while_concerto`（`DISPEL { kind: control }` 按**类**解除 + `EFFECT_RESISTANCE 0.5`）。判据 `RobinEidolonsTest`（含「退出【协奏】时整组一起摘掉」与「只解除控制类、非控制类的减益留下」）。⛔ **仍未写**：星魂 6「【协奏】期间终结技的物理**附加伤害**暴击伤害 +450%，最多触发 8 次、每次终结技重置」—— 要给**那一类实例**加暴伤（`instance` 只作用于本发；`MODIFY_ATTR CRIT_ATTACK` + `damage_type: ADDITIONAL` 的逐发形态没有）+ 一个每次终结技重置的计数 ✗。",
     "⛔ **删掉了一条不属于她的规则**（2026-11-02）：`ult_zone_defence_ignore`（`DEFENCE_IGNORE 20%`，`buff: 结界`）在**知更鸟的文档里没有出处** —— 全文「结界」0 处（她的是【协奏】）、「防御」4 处全是面板表。追查后确认那句话属于 **1303 阮•梅 星魂 1**：「终结技展开结界期间，我方全体造成伤害时无视目标 20% 的防御力」，而 1303 的 `eidolon1_defence_ignore_in_zone` 早已实现它（且带 `min_eidolon: 1`）。⇒ 1309 里那份是串档的副本，且**没有星魂门槛**（等于白送 20% 无视防御），已删除 —— 这是**有证据的删除**（句子归属 + 原实现已在）。"
   ],
   "rules": [
@@ -207,6 +207,11 @@
       ],
       "do": [
         {
+          "op": "DISPEL",
+          "kind": "control",
+          "target": "all_allies"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "EFFECT_RESISTANCE",
           "percent": 0.5,
@@ -216,7 +221,7 @@
         }
       ],
       "source": "1309 知更鸟 星魂 4 雨滴的钥匙: 「施放终结技时，解除我方全体的控制类负面状态，使我方全体在知更鸟处于【协奏】状态期间的效果抵抗提高50%。」 参数 = [0.5]",
-      "_note": "后半句 ✅：「我方全体在【协奏】期间**效果抵抗提高 50%**」= `MODIFY_ATTR EFFECT_RESISTANCE 0.5` + `all_allies` + `buff: 协奏` ✓（与星魂 1/2 同一组，退出时一起摘）。⛔ **前半句未写**：「**解除**我方全体的**控制类**负面状态」——`DISPEL` 解除的是**所有负面效果**（会连带解除非控制类 ✗，比句子宽），而 `REMOVE_STATE` 的 `kind` 只分来源不分**类**（控制/持续伤害）✗ ⇒ 缺「按类解除」的写法，已登记。",
+      "_note": "两句都落地。① 「**解除**我方全体的**控制类**负面状态」= **`DISPEL { kind: \"control\", target: all_allies }`** ✓ —— ⚠ 旧登记「`DISPEL` 只能解除所有负面」**过期**：该 op 早就支持**按类**（`DebuffClass`），且不写 `amount` 就是「该类的全部」（实现里就是 `removeDebuffs(amount, kind)`，读者是 1415 忆灵技 8）✓。② 「我方全体在【协奏】期间**效果抵抗提高 50%**」= `MODIFY_ATTR EFFECT_RESISTANCE 0.5` + `buff: 协奏` ✓（与星魂 1/2 同一组，退出时一起摘）。判据 `RobinEidolonsTest`。",
       "_status": "implemented"
     },
     {
