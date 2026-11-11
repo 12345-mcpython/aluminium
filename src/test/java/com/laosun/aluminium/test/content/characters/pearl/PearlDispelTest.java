@@ -17,16 +17,21 @@ import java.util.List;
 
 /**
  * Character 1503 (Pearl): her trait dispels a debuff on the Skill and on an enhanced basic.
+ *
+ * <p>Note: The enhanced-basic case <b>installs</b> the form through her Ultimate first - the heal half of the same rule
+ * reads the COMMON slot's row, so the form has to be there for the rule to be meaningful.
  */
 public class PearlDispelTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
+    private static final int ELATION = 1502;
 
     @Test
     public void theEnhancedBasicDispelsADebuffAndLeavesANamedState() {
         Battle battle = battle();
         Character pearl = battle.characters().getFirst();
         Character ally = battle.characters().get(1);
+        installTheSlotEightForm(battle, pearl);
         ally.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 100, 3));
         ally.getBuffManager().addBuff(new StateBuff("_probe_state", 3));
 
@@ -56,10 +61,21 @@ public class PearlDispelTest {
     }
 
     private static Battle battle() {
-        Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
+        Battle battle = new Battle(
+                List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80),
+                        CharacterFactory.create(ELATION, 80)),
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;
+    }
+
+    /** Her Ultimate aimed at the Elation ally REPLACE_SKILLs the slot-8 form into COMMON (asserted, not assumed). */
+    private static void installTheSlotEightForm(Battle battle, Character pearl) {
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                TriggerEvent.ULT_CAST, pearl, battle.characters().get(2), 0, 0));
+        battle.processRequests();
+        Assertions.assertEquals(8, pearl.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON).getSkillSlot(),
+                "precondition: the Elation archetype installs the slot-8 form");
     }
 }

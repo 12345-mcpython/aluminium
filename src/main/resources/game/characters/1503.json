@@ -1,9 +1,11 @@
 {
   "schema": 1,
   "character": 1503,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
-    "⛔ **强化普攻那两行的常量仍要保留，但缺口比原来窄**：`percent_from_skill_param` 的槽名走 `SkillType.valueOf` ⇒ **`ENHANCED_BASIC:1` 是可以拼的** ✓（`SkillType.ENHANCED_BASIC` 映射到数据槽 8，`Constant:200`）—— 但 `owner.getSkills().get(ENHANCED_BASIC)` 在**该槽未装备时是 null** ⇒ 读它会**直接抛**（「there is no loaded such skill」）✗。⇒ 真正缺的是「**按有效等级读一个当前未装备的槽**」这个拼法（读的是数据行、不要求装备）；在那之前，常量（11.2% × 防御 + 224 = 有效等级 10 的 `[1.4, 0.112, 1, 224]` 行）是**当前唯一不抛的写法**。"
+    "✅ **2026-11-11 收口：强化普攻那两行不再用常量，读的是装置里那一行** —— 缺口原文「引擎没有『读被替换技能在当前有效等级那一行』的拼法」**撤消**：强化形态由 `REPLACE_SKILL` 装进 **COMMON** 槽，所以 `percent_from_skill_param: \"COMMON:1\"` + `amount_from_skill_param: \"COMMON:3\"` 在**装上之后**读到的就是它；`from_skill_id == 8 / 10` 的门保证不会在装上之前读（普通普攻那一行只有 1 列）。⚠ 顺带改正一个**真错**：旧常量 `0.112 / 224` 取的是**第 10 行**，而文档的 8% / 160（连同 100% 防御力）与**普通普攻同一条口径** = **第 6 行** `[1.0, 0.08, 1, 160]` ⇒ 旧值满级多算约 **28%**，且不随 E3 的「普攻等级 +1」走。判据 `PearlEnhancedBasicRowLevelTest`（E0 比量与行；E3 验等级移动后量跟着走）。",
+    "✅ **其余全部落地**：普攻（防御力口径，行数据）/ 战技（15 点【好活当赏】+ 两段治疗）/ 终结技（20 点 + 【美学底本】+ 按欢愉命途人数 10/15/20% 行动提前、≥4 人的额外回合）/ 天赋（【好活当赏】当抵御值、每点 200、受击 60% 减免）/ 秘技 / 强化普攻两种形态（伤害、治疗、解控、按【美学底本】的额外伤害）/ 欢愉技（按人数档的全队倍率）/ 行迹 5 条 / 星魂 1–6。判据散布在 `pearl` 包的 28 个测试类里（`PearlEnhancedBasic*`、`PearlEidolon*`、`PearlDeepStudy*`、`PearlElation*`、`PearlTrace*`、`PearlRoundAllowance*` …）。",
+    "⭐ **两处登记的量纲**：① 「抵御值」建模成【好活当赏】×200 的可消费池，而不是独立的伤害吸收条；② 秘技的「特殊领域 / 嘲讽」是**大地图**事实，不进战斗层（战斗层那几句都写了）。"
   ],
   "resources": [
     {
@@ -464,15 +466,15 @@
           "op": "HEAL",
           "scale": "owner_def",
           "target": "all_allies",
-          "percent": 0.112,
-          "amount": 224
+          "percent_from_skill_param": "COMMON:1",
+          "amount_from_skill_param": "COMMON:3"
         },
         {
           "op": "HEAL",
           "scale": "owner_def",
           "target": "lowest_hp_ally",
-          "percent": 0.112,
-          "amount": 224
+          "percent_from_skill_param": "COMMON:1",
+          "amount_from_skill_param": "COMMON:3"
         },
         {
           "op": "DISPEL",
@@ -481,7 +483,7 @@
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，幻造星月】 (150308): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "_note": "「为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值」—— 描述里的 8% / 160 是低等级行的值。本文件的 level_convention 声明「语料页引用 Lv10」，而 150308 / 150310 的 Lv10 行是 [1.4, 0.112, 1, 224] → 11.2% 防御力 + 224 ⇒ 这里写的是 Lv10 的两个常量。⚠ 为什么不能读行（实测两次）：percent_from_skill_param: COMMON:1 会在强化普攻还没被 REPLACE_SKILL 装上时读到普通普攻的行（size=1，越界）；percent_from_cast_param 则报 the scale owner_def reads the skill that produced the event, but Pearl has no loaded skill at slot 8 —— 角色身上没有 8 号数据槽，8/10 号是 REPLACE_SKILL 装进 COMMON 的。⇒ 引擎目前没有「读被替换技能那一行」的拼法，所以保留常量并把值改成 Lv10 的正确值（原先写 0.08 / 160 是低等级行，满级少算约 28%）。⭐⭐ **CORRECTED（2026-10-19，探针实测）**：「E3 把普攻等级 +1 后这一行还会变，常量不会跟着走」**撤回** ✗ —— **实测**（E0 与 E3 各建一场、放大招装上替换）：替换槽的**对象等级**两处都是 **1** ✓，而 `CanHit.skillLevel` 的**有效等级**两处都是 **10** ✓（`RAISE_SKILL_LEVEL` 记在 `skillLevelBonus` 上 ✓，而 COMMON 的表只有 **10 行** ⇒ `min(level, rows)` 把 E3 那一级**夹掉**了 ✓）⇒ 有效等级那一行就是 `[1.4, 0.112, 1.0, 224.0]` ✓，**正是这两个常量** ✓ ⇒ **E3 不产生漂移** ✓。（⚠ 会漂移的是**对象等级**那一行 `[0.5, 0.04, 1.0, 80.0]` ✗ —— 那正是 `percent_from_cast_param` 读到的东西 ✓，所以常量不但没错，还比读行**更接近**原文 ✓。）⚠ **仍开的缺口**不变：引擎没有「读**被替换技能**在当前有效等级那一行」的拼法 ✗（`percent_from_skill_param: COMMON:1` 在替换装上之后本可以读对 ✓，但它在**装上之前**会读到普通普攻的 1 行表 ✗ ⇒ 需要一个「按有效等级读当前槽位」的拼法 ✓，登记在此 ✓）。判据 PearlEnhancedBasicHealAmountTest 钉 11.2% x 防御 + 224。"
+      "_note": "「为我方全体目标回复等同于真珠 **8.00% 防御力 + 160** 的生命值」——⭐ **2026-11-11 实测订正：这条注记此前是错的**。普通普攻的文档数字钉在**第 6 行**（AGENT §0.2 第 29 条），而强化普攻**也是普攻** —— `150308` / `150310` 的第 6 行正是 `[1.0, 0.08, 1, 160]`，**逐字就是文档的 100% / 8% / 160** ✓。旧常量 `0.112 / 224` 取的是**第 10 行**（`[1.4, 0.112, 1, 224]`），是照着「本文件按 Lv10 读」那条口径套到了**普攻不该用的那一行** ⇒ 满级多算约 **28%**。现在改成**读行**：`percent_from_skill_param: \"COMMON:1\"` + `amount_from_skill_param: \"COMMON:3\"` —— 强化形态由 `REPLACE_SKILL` 装进 **COMMON** 槽（实测 `getSkills().get(COMMON).getSkillSlot() == 10` ✓），所以「装上之后按 COMMON 那一行读」成立；`from_skill_id == 8 / 10` 这个门保证它**只在装上之后**才读（普通普攻那一行只有 1 列，装上之前读 `:1` 会越界 —— 那正是旧注记里那次实测的真因 ✓）。⭐ 附带好处：**E3「普攻等级 +1」现在会跟着走**（等级 6 → 7 ⇒ 8.8% + 176），常量则永远停在写死的那一行。判据 `PearlEnhancedBasicRowLevelTest`：先用终结技**装上**，再走 `requestSkill` 真实路径，断言治疗量 = **装置里那一行**在 `skillLevel` 上的值。"
     },
     {
       "on": "BASIC_ATTACK",
@@ -495,15 +497,15 @@
           "op": "HEAL",
           "scale": "owner_def",
           "target": "all_allies",
-          "percent": 0.112,
-          "amount": 224
+          "percent_from_skill_param": "COMMON:1",
+          "amount_from_skill_param": "COMMON:3"
         },
         {
           "op": "HEAL",
           "scale": "owner_def",
           "target": "lowest_hp_ally",
-          "percent": 0.112,
-          "amount": 224
+          "percent_from_skill_param": "COMMON:1",
+          "amount_from_skill_param": "COMMON:3"
         },
         {
           "op": "DISPEL",
@@ -512,7 +514,7 @@
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，绘制末浪】 (150310): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "_note": "「为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值」—— 描述里的 8% / 160 是低等级行的值。本文件的 level_convention 声明「语料页引用 Lv10」，而 150308 / 150310 的 Lv10 行是 [1.4, 0.112, 1, 224] → 11.2% 防御力 + 224 ⇒ 这里写的是 Lv10 的两个常量。⚠ 为什么不能读行（实测两次）：percent_from_skill_param: COMMON:1 会在强化普攻还没被 REPLACE_SKILL 装上时读到普通普攻的行（size=1，越界）；percent_from_cast_param 则报 the scale owner_def reads the skill that produced the event, but Pearl has no loaded skill at slot 8 —— 角色身上没有 8 号数据槽，8/10 号是 REPLACE_SKILL 装进 COMMON 的。⇒ 引擎目前没有「读被替换技能那一行」的拼法，所以保留常量并把值改成 Lv10 的正确值（原先写 0.08 / 160 是低等级行，满级少算约 28%）。⭐⭐ **CORRECTED（2026-10-19，探针实测）**：「E3 把普攻等级 +1 后这一行还会变，常量不会跟着走」**撤回** ✗ —— **实测**（E0 与 E3 各建一场、放大招装上替换）：替换槽的**对象等级**两处都是 **1** ✓，而 `CanHit.skillLevel` 的**有效等级**两处都是 **10** ✓（`RAISE_SKILL_LEVEL` 记在 `skillLevelBonus` 上 ✓，而 COMMON 的表只有 **10 行** ⇒ `min(level, rows)` 把 E3 那一级**夹掉**了 ✓）⇒ 有效等级那一行就是 `[1.4, 0.112, 1.0, 224.0]` ✓，**正是这两个常量** ✓ ⇒ **E3 不产生漂移** ✓。（⚠ 会漂移的是**对象等级**那一行 `[0.5, 0.04, 1.0, 80.0]` ✗ —— 那正是 `percent_from_cast_param` 读到的东西 ✓，所以常量不但没错，还比读行**更接近**原文 ✓。）⚠ **仍开的缺口**不变：引擎没有「读**被替换技能**在当前有效等级那一行」的拼法 ✗（`percent_from_skill_param: COMMON:1` 在替换装上之后本可以读对 ✓，但它在**装上之前**会读到普通普攻的 1 行表 ✗ ⇒ 需要一个「按有效等级读当前槽位」的拼法 ✓，登记在此 ✓）。判据 PearlEnhancedBasicHealAmountTest 钉 11.2% x 防御 + 224。"
+      "_note": "「为我方全体目标回复等同于真珠 **8.00% 防御力 + 160** 的生命值」——⭐ **2026-11-11 实测订正：这条注记此前是错的**。普通普攻的文档数字钉在**第 6 行**（AGENT §0.2 第 29 条），而强化普攻**也是普攻** —— `150308` / `150310` 的第 6 行正是 `[1.0, 0.08, 1, 160]`，**逐字就是文档的 100% / 8% / 160** ✓。旧常量 `0.112 / 224` 取的是**第 10 行**（`[1.4, 0.112, 1, 224]`），是照着「本文件按 Lv10 读」那条口径套到了**普攻不该用的那一行** ⇒ 满级多算约 **28%**。现在改成**读行**：`percent_from_skill_param: \"COMMON:1\"` + `amount_from_skill_param: \"COMMON:3\"` —— 强化形态由 `REPLACE_SKILL` 装进 **COMMON** 槽（实测 `getSkills().get(COMMON).getSkillSlot() == 10` ✓），所以「装上之后按 COMMON 那一行读」成立；`from_skill_id == 8 / 10` 这个门保证它**只在装上之后**才读（普通普攻那一行只有 1 列，装上之前读 `:1` 会越界 —— 那正是旧注记里那次实测的真因 ✓）。⭐ 附带好处：**E3「普攻等级 +1」现在会跟着走**（等级 6 → 7 ⇒ 8.8% + 176），常量则永远停在写死的那一行。判据 `PearlEnhancedBasicRowLevelTest`：先用终结技**装上**，再走 `requestSkill` 真实路径，断言治疗量 = **装置里那一行**在 `skillLevel` 上的值。"
     },
     {
       "on": "BATTLE_START",
