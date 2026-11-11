@@ -2148,6 +2148,12 @@ public class TriggerTable {
                     com.laosun.aluminium.damage.Damage hit = ctx.damage();
                     yield hit == null ? 0 : hit.getSkillKey();
                 }
+                // 「终结技首段」/「从第 4 段起」: which hit of the cast this instance is (0-based). A context with no
+                // instance answers -1, so a comparison is false rather than accidentally true for the first hit.
+                case "hit_index" -> {
+                    com.laosun.aluminium.damage.Damage segment = ctx.damage();
+                    yield segment == null ? -1 : segment.getHitIndex();
+                }
                 // 「若该效果消耗的生命值高于 500 点」 (light cone 23039): the amount the event itself carries.
                 case "event_amount" -> ctx.amount();
                 case "hp_percent" -> hpPercent(ctx.owner());

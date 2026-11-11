@@ -60,6 +60,9 @@ public class UnitDisciplineTest {
             // `self_resource:笑点`, which reads a POOL's value: the pool and the count differ whenever the pool has moved
             // since the state arrived, which is the case that state exists to describe.
             "counted_laughs",
+            // Which SEGMENT of its cast a settled instance is (0-based; -1 when there is no instance). A COUNT, never a
+            // fraction. Added with 1312 Misha trace 释放 - `hit_count` answers a different question (TARGETS).
+            "hit_index",
             // How many of the TARGET's buffs a 「解除增益效果」 would really remove. A COUNT (0..n), never a fraction:
             // 「解除增益效果时」 asks whether there was at least one. Added with 1106 Pela's trace 追歼 and Eidolon 2.
             "target_buff_count",

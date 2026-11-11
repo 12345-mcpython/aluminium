@@ -26,7 +26,11 @@ public class MishaFreezeTest {
     @Test
     public void eachSegmentRollsTheFreeze() {
         Assertions.assertTrue(frozenAfterUltimate(0.0), "with the roll forced to succeed the enemy is frozen");
-        Assertions.assertFalse(frozenAfterUltimate(0.99), "with the roll forced to fail it is not");
+        // Since the trace 释放 landed (2026-11-11) the FIRST segment is a certainty (20% + 80%), so a failing roll no
+        // longer means "nothing freezes" - it only says the plain per-segment 20% did not fire on segments 2+. That split
+        // is pinned by MishaFirstSegmentTest at the spec level (hit_index == 0 vs hit_index > 0).
+        Assertions.assertTrue(frozenAfterUltimate(0.99),
+                "a failing roll still freezes on the first segment - the trace's 100% base chance");
     }
 
     private static boolean frozenAfterUltimate(double roll) {

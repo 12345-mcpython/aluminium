@@ -983,6 +983,9 @@ public final class SkillExecutor {
         // 「对指定敌方单体」/「对其相邻目标」: the one fact that separates a Blast's centre from its neighbours on the
         // instance a DEALING_DAMAGE rule is handed (1205's Eidolon 1). Set here because the shape logic lives here.
         damage.setMainTarget(mainTarget);
+        // Which SEGMENT of this cast it is: 「终结技首段」/「从第 4 段起」 need the ordinal, and the settlement loop is the only
+        // place that knows it. `hit_count` cannot stand in - that counts TARGETS, not hits.
+        damage.setHitIndex(battle.nextHitIndex());
         double settled = battle.applyDamage(target, damage);
         settled += applyStanceDamage(battle, user, element, damage, target, stanceDamage);
         return settled;

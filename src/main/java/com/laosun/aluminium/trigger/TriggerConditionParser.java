@@ -2539,10 +2539,12 @@ final class TriggerConditionParser {
                     // can see it too.
                     "eidolon",
                     // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102). Distinct from
-                    // `self_resource:笑点`: that reads a POOL's current value, while this reads the count Elation damage is
-                    // actually computed from - the merged snapshots taken when 【好活当赏】 was granted. They differ whenever the
-                    // pool has moved since the state arrived, which is exactly the case the state exists to describe.
-                    "counted_laughs");
+                    // `self_resource:笑点`: that reads a POOL current value, while this reads the count Elation damage is
+                    // actually computed from - the merged snapshots taken when 【好活当赏】 was granted.
+                    "counted_laughs",
+                    // 「终结技首段攻击前…」(1312 行迹 释放) and 「从第 4 段攻击开始每段…」(1213): which hit of a multi-hit
+                    // CAST this settled instance is (0-based, -1 when there is no instance). `hit_count` counts TARGETS.
+                    "hit_index");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.

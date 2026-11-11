@@ -162,11 +162,38 @@ public class Damage {
     private int skillKey;
 
     /**
+     * Which SEGMENT of its cast this instance is: {@code 0} for the first hit settled, {@code 1} for the second, and so
+     * on. {@code -1} means "not from a settled cast" (a hand-built instance in a judge).
+     *
+     * <p><b>Why the instance carries it.</b> 「从<b>第 4 段攻击</b>开始每段攻击前获得一层…」 (1213) and 「终结技<b>首段</b>攻击前，
+     * 使目标陷入冻结状态的基础概率提高 80%」 (1312's trace) are sentences about ONE hit of a multi-hit cast; the trigger
+     * events already carry the skill, the aimed target and the hit SET, but not "which one of them is this". The ordinal
+     * belongs to the same place because only the settlement loop knows it - {@code hit_count} is the number of TARGETS,
+     * which is a different question.
+     */
+    private int hitIndex = -1;
+
+    /**
      * @see #skillKey
      */
     public int getSkillKey() {
         return skillKey;
     }
+    /**
+     * @return which segment of its cast this instance is ({@code 0} = the first hit), or {@code -1} when it was not
+     *         settled by a cast
+     */
+    public int getHitIndex() {
+        return hitIndex;
+    }
+
+    /**
+     * @param hitIndex the segment ordinal, {@code 0} for the first hit of the cast
+     */
+    public void setHitIndex(int hitIndex) {
+        this.hitIndex = hitIndex;
+    }
+
 
     /**
      * @see #skillKey

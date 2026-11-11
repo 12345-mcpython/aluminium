@@ -298,6 +298,10 @@ public class CharacterConditionLiteralsTest {
                 List.of("actor == self", "self has_state 完全燃烧"));
         assertRule(1312, "SKILL_POINT_SPENT", "talent_energy_on_skill_point_spent", List.of());
         assertRule(1312, "BATTLE_START", "level_convention", List.of());
+        assertRule(1312, "DEALING_DAMAGE", "ult_freeze_per_segment",
+                List.of("actor == self", "from_skill ULTRA", "hit_index > 0.0"));
+        assertRule(1312, "DEALING_DAMAGE", "trace_the_first_segment_freezes_almost_surely",
+                List.of("actor == self", "from_skill ULTRA", "hit_index == 0.0"));
         assertRule(1314, "BATTLE_START", "trace_reverse_repo_one_goods", List.of());
         assertRule(1314, "BATTLE_START", "technique_fifteen_goods", List.of("self has_state 秘技"));
         assertRule(1314, "BATTLE_START", "eidolon2_crit_chance_at_fifteen_goods", List.of("self_stacks:当品 >= 15.0"));

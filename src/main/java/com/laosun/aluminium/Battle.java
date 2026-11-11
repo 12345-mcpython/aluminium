@@ -784,8 +784,26 @@ public class Battle {
     public PendingCast beginCast(Skill skill, CanHit caster) {
         // A new cast's outcome starts empty, consuming the count a commanded cast claimed just before this call.
         castOutcome.begin();
+        // The SEGMENT ordinal restarts with the cast: 「终结技首段」/「从第 4 段起」 count hits of THIS cast, and a nested
+        // (commanded) cast is a cast of its own - its hits must not continue the outer ordinal.
+        hitOrdinalThisCast = 0;
         pendingCast = new PendingCast(caster, skill == null ? 0 : skill.getSkillSlot(), pendingCast);
         return pendingCast;
+    }
+
+    /** The number of hits settled so far in the current cast (see {@link #nextHitIndex()}). */
+    private int hitOrdinalThisCast;
+
+    /**
+     * Hands out the ordinal of one settled hit: 0 for the first, 1 for the second, and so on.
+     *
+     * <p>The settlement loop is the only place that knows this order, so it is counted here rather than passed through
+     * seven call sites. Reset by {@link #beginCast}, which is what makes the ordinal a fact about ONE cast.
+     *
+     * @return the ordinal of the next hit of the current cast
+     */
+    public int nextHitIndex() {
+        return hitOrdinalThisCast++;
     }
 
     /**

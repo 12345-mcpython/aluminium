@@ -277,6 +277,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `eidolon` | 星魂等级 |
 | `from_skill_id` / `damage_skill_key` | 技能 id / key |
 | `counted_laughs` | 【笑点】计数 |
+| `hit_index` | 这一发是**本次施放的第几段**（0 起；不在施放里为 −1）⇒ 「终结技首段」= `hit_index == 0`、「从第 4 段起」= `hit_index >= 3` |
 
 **带参数的变量**（写法是 `前缀:参数`）：
 

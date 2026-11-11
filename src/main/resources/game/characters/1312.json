@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "character": 1312,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
-    "⛔ 行迹 释放 (1312101)：「**终结技首段**攻击前，使目标陷入冻结状态的基础概率提高 **80%**」—— 缺「**第几段**」这个事实：引擎的事件不携带段序号（`hit_count` 数的是**目标数**），而这一句只改**首段**。⚠ 若把 +80% 写给每一段，第 2 段起也会变成 100% 冻结 ✗。⇒ 需要把段序号从结算层穿到 `TriggerContext`（跨层改动），先登记。缺口见证：`MishaClauseCoverageTest` 的 `theFirstSegmentTraceIsStillRegistered`。",
+    "✅ **行迹 释放 已落地（2026-11-11）**：「终结技**首段**攻击前，使目标陷入冻结状态的基础概率提高 **80%**」= `trace_the_first_segment_freezes_almost_surely`（`DEALING_DAMAGE` + `hit_index == 0` → `APPLY_CONTROL 冻结` + **`base_chance: 1.0`** = 基础概率 20% + 80%）。⭐ 这一棒给**实例**加了**段序号**（`Damage.hitIndex`，由 `Battle.beginCast` 归零、`SkillExecutor` 逐段递增）与条件 **`hit_index`** ⇒ 「第几段」这件事第一次可读。⚠ 逐段那条同时加了 **`hit_index > 0`**：否则首段会**摇两次骰**（20% 与 100%）✗。⚠ `hit_count` 不能代替 —— 它数的是**目标数**。判据 `MishaFirstSegmentTest`。",
     "⭐ ⚠ **段数复位是近似**（`ult_segments_reset`）：真正语义是「施放后把段数**设回** 3」，引擎只有 `RAISE_SKILL_HITS` 的「加/减 N」⇒ 现在减 6（在米沙的取值范围内等价）。要精确需要一个「**设回初值**」的 op；本角色段数上限 10、初始 3，减 6 覆盖到 9 段，只有在星魂 1 +满场敌人（+5）叠满时才会差一段。判据 `MishaClauseCoverageTest` 钉住「施放后回到 3」。"
   ],
   "rules": [
@@ -161,8 +161,33 @@
       "_note": "「**每段攻击前**有 **20%** 的基础概率使目标陷入**冻结**，持续 **1 回合**；冻结下每回合开始时受到等同于米沙 **30% 攻击力**的冰属性附加伤害」—— 事件 `DEALING_DAMAGE`（**每段结算前**各触发一次，正是「每段攻击前」）✓；概率用本轮新增的 `base_chance_from_skill_param: 「ULTRA:2」`（#3 = 0.2，Lv1 是 0.12 ⇒ **按等级读** ✓）；`APPLY_CONTROL 冻结` 自带「无法行动 + 每回合冰伤」，伤害份额 `#4` 按等级读 ✓。",
       "when": [
         "actor == self",
-        "from_skill ULTRA"
+        "from_skill ULTRA",
+        "hit_index > 0"
       ]
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "trace_the_first_segment_freezes_almost_surely",
+      "when": [
+        "actor == self",
+        "from_skill ULTRA",
+        "hit_index == 0"
+      ],
+      "do": [
+        {
+          "op": "APPLY_CONTROL",
+          "control": "冻结",
+          "turns": 1,
+          "element": "Ice",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "ULTRA:3",
+          "target": "target",
+          "base_chance": 1.0
+        }
+      ],
+      "source": "1312 米沙 行迹 释放 (1312101): 「终结技首段攻击前，使目标陷入冻结状态的基础概率提高80%。」",
+      "_note": "「终结技**首段**攻击前，使目标陷入冻结状态的**基础概率提高 80%**」—— 基础概率 20% + 80% = **100%** ⇒ `base_chance: 1.0`（仍然是**可抵抗的**：`base_chance` 是基础概率，不是必中 ✓）。⭐ 这条之所以能写，是因为这一棒给实例加了**段序号**（`Damage.hitIndex` + 条件 `hit_index`）：`DEALING_DAMAGE` 逐段触发，首段是 `hit_index == 0` ✓；**逐段那条**（`ult_freeze_per_segment`）同时加了 `hit_index > 0`，否则首段会**摇两次骰**（20% 与 100% 各一次）✗。`hit_count` 不能代替：它数的是**目标数**，不是段数。",
+      "_status": "implemented"
     },
     {
       "on": "DEALING_DAMAGE",
