@@ -43,6 +43,8 @@ public class LedgerCountsMatchJsonTest {
     private static final Pattern RECORDS = Pattern.compile("(\\d+) 条记录");
     private static final Pattern BLOCKERS = Pattern.compile("(\\d+) 条阻塞");
     private static final Pattern NO_GAP = Pattern.compile("0 缺口");
+    private static final Pattern DONE = Pattern.compile("\\*\\*完全实现\\*\\*");
+    private static final Pattern OPEN = Pattern.compile("未完全实现");
 
     @Test
     public void everyRowStatesTheFilesOwnNumbers() throws IOException {
@@ -92,7 +94,69 @@ public class LedgerCountsMatchJsonTest {
                         + String.join("\n", problems));
     }
 
+    /**
+     * The other column the counts guard cannot see: the row's <b>status word</b> against the file's {@code _status}.
+     *
+     * <p><b>Why it had to be added.</b> Measured on 2026-11-11: seven rows said 「未完全实现」 for a file that had said
+     * {@code implemented} with zero {@code ⛔} for weeks (1005 / 1107 / 1203 / 1204 / 1208 / 1405 / 1409). Every number in
+     * those rows was right, so the counts guard passed - and the ledger, which the file's own header calls "two-way
+     * consistent with the JSON", understated the finished work by seven characters. The status word is the column a reader
+     * consults to decide whether a character needs work at all, which makes it the most expensive one to get wrong.
+     *
+     * <p>It reads the same two spellings the table uses: {@code **完全实现**} (a finished file) and {@code 未完全实现}
+     * (one with an open clause). {@code 完全未实现} rows are about characters with no content file and are checked by
+     * {@code LedgerListsEveryShippedCharacterTest}, so they are skipped here.
+     */
+    @Test
+    public void everyRowAgreesWithTheFilesOwnStatus() throws IOException {
+        Map<String, Boolean> implemented = statusByCid();
+        List<String> problems = new ArrayList<>();
+        int rows = 0;
+        for (String line : Files.readAllLines(LEDGER, StandardCharsets.UTF_8)) {
+            Matcher row = RULE_ROW.matcher(line);
+            if (!row.find()) {
+                continue;
+            }
+            String cid = row.group(1);
+            Boolean done = implemented.get(cid);
+            if (done == null) {
+                continue; // no file: 完全未实现 rows are the other guard's business
+            }
+            rows++;
+            boolean ledgerSaysDone = DONE.matcher(line).find();
+            boolean ledgerSaysOpen = OPEN.matcher(line).find();
+            if (ledgerSaysDone == ledgerSaysOpen) {
+                problems.add(cid + ": the row states " + (ledgerSaysDone ? "both" : "neither") + " of 「完全实现」 / "
+                        + "「未完全实现», so it claims nothing a reader can act on");
+                continue;
+            }
+            if (ledgerSaysDone != done) {
+                problems.add(cid + ": the ledger says 「" + (ledgerSaysDone ? "完全实现" : "未完全实现")
+                        + "」 and the file's _status is " + (done ? "implemented" : "partial"));
+            }
+        }
+        Assertions.assertTrue(rows >= 90, "the guard must have read the character rows (read " + rows + ")");
+        Assertions.assertTrue(problems.isEmpty(),
+                "the ledger's status column must agree with the files' own _status (the file is authoritative):\n"
+                        + String.join("\n", problems));
+    }
+
     private record Counts(int rules, int records, int blockers) {
+    }
+
+    /**
+     * {@code cid -> is its file implemented} for every character file that exists.
+     */
+    private static Map<String, Boolean> statusByCid() throws IOException {
+        Map<String, Boolean> statuses = new LinkedHashMap<>();
+        try (var stream = Files.list(CHARACTERS)) {
+            for (Path file : stream.filter(p -> p.getFileName().toString().endsWith(".json")).sorted().toList()) {
+                String cid = file.getFileName().toString().replace(".json", "");
+                JsonObject object = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8)).getAsJsonObject();
+                statuses.put(cid, object.has("_status") && "implemented".equals(object.get("_status").getAsString()));
+            }
+        }
+        return statuses;
     }
 
     private static Map<String, Counts> countsByCid() throws IOException {
