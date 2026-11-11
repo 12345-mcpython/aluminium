@@ -334,6 +334,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `same_as` | `self` / `actor` / `target` / `summon` | 同一性 |
 | `team` | `own` / `other` | 相对规则主人的阵营 |
 | `attribute` | `{"name": "SPEED", "min"?: n, "max"?: n}` | 任意属性 |
+| `attribute_reduced` | `{"name": "DEFENCE"}` | 该单位的这个属性**当前被压低**（身上至少有一条负修饰）—— 「处于防御力降低状态」「被减速」这类句子问的是**修饰**而不是净值（同时 +20% 与 −12% 仍算「被压低」）。⚠ 引擎里**没有**名叫「防御力降低」的状态：防御降低**就是**一条 `DEFENCE` 修饰（读者：遗器 132 四件套的两句） |
 | `stacks` | `{"name": "充能", "min"?: n, "max"?: n}` | 层数 |
 | `state` / `path` / `element` | 字符串或字符串数组（数组 = 任一） | 状态 / 命途 / 属性 |
 

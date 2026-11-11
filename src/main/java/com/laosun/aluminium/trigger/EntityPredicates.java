@@ -55,7 +55,7 @@ final class EntityPredicates {
             "same_as", "summon_count", "enemy_count", "resource", "energy_pct", "debuff_count", "master_state",
             "hp", "hp_pct", "max_hp", "energy", "shield", "shield_pct", "has_shield", "shield_from",
             "level", "cid", "speed", "eidolon", "skill_level", "state_turns",
-            "attribute", "stacks", "state", "path", "element", "camp", "team");
+            "attribute", "attribute_reduced", "stacks", "state", "path", "element", "camp", "team");
 
     private EntityPredicates() {
     }
@@ -120,6 +120,10 @@ final class EntityPredicates {
                         requireAttributeName(entry.getValue().getAsJsonObject().get("name").getAsString(), where);
                     }
                 }
+                // 「处于防御力降低状态的敌方目标」 (relic set 132's 4-piece): an attribute the unit carries a NEGATIVE
+                // modifier on. The engine has no state named 「防御力降低」 - a DEF reduction IS a `DEFENCE` modifier, the
+                // same fact `is_slowed` records for SPEED - so the question is asked of the attribute.
+                case "attribute_reduced" -> requireNameOnly(key, entry.getValue(), where);
                 default -> throw new IllegalStateException("unhandled sub-predicate " + key);
             }
         }
@@ -309,6 +313,14 @@ final class EntityPredicates {
             case "attribute" -> {
                 JsonObject named = value.getAsJsonObject();
                 yield inRange(attribute(unit, attributeType(named.get("name").getAsString())), named);
+            }
+            // 「处于防御力降低状态」: the attribute carries a negative modifier. Asked of the MODIFIERS, not of the net
+            // value - a unit with +20% DEF from one buff and -12% from a reduction is still under the reduction, which is
+            // what the sentence names (the same reading `is_slowed` uses for SPEED).
+            case "attribute_reduced" -> {
+                String name = value.getAsJsonObject().get("name").getAsString();
+                var attribute = unit.getAttribute(attributeType(name));
+                yield attribute != null && attribute.isReduced();
             }
             case "stacks" -> {
                 JsonObject named = value.getAsJsonObject();
@@ -587,6 +599,29 @@ final class EntityPredicates {
         } catch (IllegalArgumentException unknown) {
             throw new IllegalArgumentException("the sub-predicate \"attribute\" names the unknown attribute \"" + name
                     + "\"" + where, unknown);
+        }
+    }
+
+    /**
+     * {@code {"name": <attribute>}} and nothing else: the shape of the "is it reduced" questions, where a threshold
+     * beside the name would read as a second claim the engine does not check.
+     */
+    private static void requireNameOnly(String key, JsonElement value, String where) {
+        if (!value.isJsonObject()) {
+            throw new IllegalArgumentException("the sub-predicate \"" + key + "\" takes {\"name\": <attribute>}, got "
+                    + value + where);
+        }
+        JsonObject named = value.getAsJsonObject();
+        unknownKeys(named, Set.of("name"), key, where);
+        JsonElement name = named.get("name");
+        if (name == null || !name.getAsJsonPrimitive().isString() || name.getAsString().isBlank()) {
+            throw new IllegalArgumentException("the sub-predicate \"" + key + "\" needs a non-empty \"name\"" + where);
+        }
+        try {
+            attributeType(name.getAsString());
+        } catch (IllegalArgumentException unknown) {
+            throw new IllegalArgumentException("the sub-predicate \"" + key + "\" names the unknown attribute \""
+                    + name.getAsString() + "\"" + where, unknown);
         }
     }
 

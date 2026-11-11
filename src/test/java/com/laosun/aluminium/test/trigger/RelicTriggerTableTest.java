@@ -232,7 +232,7 @@ public class RelicTriggerTableTest {
      * <p>Spans <b>both</b> kinds of ability-bearing effect: the pure ones ({@code properties} empty) and the
      * mixed ones ({@code properties} plus an ability).
      */
-    private static final Set<String> AUTHORED = Set.of("133/4", "134/4",
+    private static final Set<String> AUTHORED = Set.of("132/4", "133/4", "134/4",
             "126/4", "327/2", "130/4", "317/2", "325/2", "324/2", "129/4",
 
             "312/2", "119/4",
@@ -333,7 +333,7 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on when the shield-amount
      * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 1;
+    private static final int STILL_REGISTERED = 0;
 
     /**
      * Ability-only bonuses: {@code properties} empty, the ability is the whole effect.
@@ -765,7 +765,12 @@ public class RelicTriggerTableTest {
         }
 
         List<RelicTriggerTables.Unmodelled> entries = RelicTriggerTables.unmodelled();
-        Assertions.assertFalse(entries.isEmpty(), "the registry must be loaded from the classpath");
+        // The registry may legitimately be EMPTY now: 132 was the last set the vocabulary could not express, and it is
+        // authored (2026-11-12). What must not happen is the FILE going missing - an absent registry and an empty one
+        // would then look the same, and a forgotten entry would read as "everything is authored".
+        Assertions.assertNotNull(RelicTriggerTables.class.getResource(RelicTriggerTables.UNMODELLED_RESOURCE),
+                "the registry file must still be on the classpath, even when it lists nothing ("
+                        + RelicTriggerTables.UNMODELLED_RESOURCE + ")");
         for (RelicTriggerTables.Unmodelled entry : entries) {
             Assertions.assertTrue(
                     realAbilities.contains(entry.setId() + "|" + entry.require() + "|" + entry.ability()),

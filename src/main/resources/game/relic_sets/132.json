@@ -1,0 +1,70 @@
+{
+  "schema": 1,
+  "relic_set": 132,
+  "4": [
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "relic132_crit_damage_against_a_defence_reduced_enemy",
+      "when": [
+        "actor == self",
+        {
+          "type": "entity",
+          "entity": "target",
+          "json": {
+            "attribute_reduced": {
+              "name": "DEFENCE"
+            }
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.28,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 132 (叩问天工的名冶 / Divine-Querying Master Smith), 4-piece ability Ability51321: 「装备者对防御力降低状态的敌方目标造成的暴击伤害提高#1[i]%。…」 param = [0.28, 2, 0.15]",
+      "_note": "「对**防御力降低状态**的敌方目标造成的**暴击伤害**提高 **28%**」—— ① 条件用**新的实体子谓词 `attribute_reduced: {name: DEFENCE}`**：引擎里**没有**名叫「防御力降低」的状态（防御降低**就是**一条 `DEFENCE` 上的负修饰，与「减速就是 `SPEED` 上的负修饰」同一件事）⇒ 问题要问**属性身上的修饰**（`DoubleValue.isReduced()`，`is_slowed` 用的同一个）。⚠ 它问的是**修饰**不是净值：同时 +20% 与 −12% 的单位**仍算**处于降低状态 ✓（句子说的是状态，不是算术）。② 「**暴击伤害**提高」= `MODIFY_ATTR CRIT_ATTACK`（比例属性，`percent` 就是**百分点**本身 ✓）+ **`instance: true`** ⇒ 只作用于这一发（1223/1220 同一拼法）✓。③ 28 取自 `relic_sets.json` 的 `param[0]`（`Ability51321`）✓，无等级轴 ⇒ 字面量成立 ✓。判据 `Relic132ComburentTest`（同一场里一个被降低、一个没被降低的敌人各挨一发，比**暴击区的读数**）。",
+      "_status": "implemented"
+    },
+    {
+      "on": "DEBUFF_APPLIED",
+      "id": "relic132_comburent_for_everyone_after_a_defence_reduction",
+      "when": [
+        "actor == self",
+        {
+          "type": "entity",
+          "entity": "target",
+          "json": {
+            "attribute_reduced": {
+              "name": "DEFENCE"
+            }
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "助燃",
+          "turns": 2,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.15,
+          "turns": 2,
+          "while_holder_state": "助燃",
+          "target": "all_allies"
+        }
+      ],
+      "source": "relic set 132 (叩问天工的名冶), 4-piece ability Ability51321: 「…装备者对敌方目标施加防御力降低状态后，使我方全体获得【助燃】，持续#2[i]回合，该效果无法叠加，持有【助燃】的我方目标造成的伤害提高#3[i]%。该效果在装备者施放攻击后可再次触发。」 param = [0.28, 2, 0.15]",
+      "_note": "「施加**防御力降低状态**后，使我方全体获得【助燃】2 回合…造成的伤害提高 **15%**」—— ① 事件 `DEBUFF_APPLIED`（落地的负面效果都会经过 `DebuffService.tryApply`，`caster` = 施加者 ✓、`target` = 被施加者 ✓）+ `actor == self`（**装备者**施加的）+ 同一个 `attribute_reduced` 谓词（**被施加之后**目标身上确实有一条 DEFENCE 负修饰 ⇒ 这一条问的是「我刚施加的就是防御力降低」的**结果**，而不是去点一个不存在的状态名）✓。② 【助燃】给 `all_allies`，`turns: 2` ✓；每层/每次**无法叠加**：`APPLY_BUFF` 同名只有**一个**状态 ✓，而那条 +15% 的修饰身份是「属性 + 改法 + 方向」⇒ 再施加一次是**替换**（不是相加）⇒ 数值永远 15% ✓。③ 「持有【助燃】的我方目标造成的伤害提高 15%」= `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + **`while_holder_state: 助燃`**（问的是**载体**自己有没有这个状态 ✓，§256 的读时活门）⇒ 状态一结束读数就消失 ✓，所以这里**不需要**手写「持续到助燃结束」✓。⚠ **一处登记**：`turns: 2` 与活门**同时**写着 —— 时长负责正常到期，活门负责「被提前摘掉」的那一半（两半都要）。④ 「该效果在装备者施放**攻击后**可再次触发」= **不加任何次数上限**：`DEBUFF_APPLIED` 每落一次就重来一次 ✓（这一句是**放开**，不是限制 ⇒ 不写 `cooldown` 就是它的写法；若写成 `once_per_*` 会与原文相反）。⚠ 判据 `Relic132ComburentTest`。",
+      "_status": "implemented"
+    }
+  ]
+}
