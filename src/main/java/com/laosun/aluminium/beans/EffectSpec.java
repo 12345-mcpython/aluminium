@@ -161,6 +161,8 @@ public class EffectSpec {
         copy.damageType = this.damageType;
         copy.minEnemies = this.minEnemies;
         copy.maxEnemies = this.maxEnemies;
+        copy.overflowTo = this.overflowTo;
+        copy.overflowMax = this.overflowMax;
         copy.scopeElement = this.scopeElement;
         copy.fromSelf = this.fromSelf;
         copy.remove = this.remove;
@@ -774,6 +776,20 @@ public class EffectSpec {
     /** The upper enemy-count bound; see {@link #minEnemies}. */
     @SerializedName("max_enemies")
     private Integer maxEnemies;
+
+    /**
+     * The counter that banks the layers the main counter could not take: 「雪衣会**累计溢出的【恶报】层数**，最多累计 6 层」
+     * (1214 雪衣's trace 伺观中枢). Absent = the excess is dropped, which is what every other {@code ADD_STACK} does.
+     *
+     * <p>Why a field on {@code ADD_STACK} rather than an op: the overflow happens INSIDE the per-layer grant loop, at the
+     * moment the counter is full (and after the roll), so a second op could not see it without replaying the accounting.
+     */
+    @SerializedName("overflow_to")
+    private String overflowTo;
+
+    /** The ceiling of the bank named by {@link #overflowTo}; absent = no ceiling. */
+    @SerializedName("overflow_max")
+    private Integer overflowMax;
 
     /**
      * The one ELEMENT a damage-taken zone is about, e.g. "increases the Fire DMG the target takes".

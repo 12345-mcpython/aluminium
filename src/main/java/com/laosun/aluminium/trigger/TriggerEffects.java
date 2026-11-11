@@ -784,15 +784,26 @@ final class TriggerEffects {
         }
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             for (int i = 0; i < wanted; i++) {
-                if (target.getBuffManager().stacksOf(name) >= cap) {
+                // 「累计**溢出**的层数」 (1214 雪衣 行迹 伺观中枢): layers the counter cannot take go to a BANK counter
+                // instead of being dropped. No sentence elsewhere states one, so the field is opt-in and absent = old behaviour.
+                String credited = name;
+                int creditedCap = cap;
+                if (effect.getOverflowTo() != null && !effect.getOverflowTo().isBlank()
+                        && target.getBuffManager().stacksOf(credited) >= creditedCap) {
+                    credited = effect.getOverflowTo().trim();
+                    creditedCap = effect.getOverflowMax() == null ? Integer.MAX_VALUE : effect.getOverflowMax();
+                }
+                if (target.getBuffManager().stacksOf(credited) >= creditedCap) {
                     break;                      // "2 times" is a threshold, not an invitation to keep counting
                 }
+
+
                 boolean permanent = TriggerLifetimes.unticked(effect);
                 AbstractBuff stack = TriggerInterpreter.withSource(
                         TriggerLifetimes.withTickOwner(
                                 TriggerLifetimes.withLifetime(
                                         new com.laosun.aluminium.buff.StackBuff(
-                                                name, permanent ? 1 : effect.getTurns(), permanent, cap),
+                                                credited, permanent ? 1 : effect.getTurns(), permanent, creditedCap),
                                         effect),
                                 effect, ctx),
                         ctx);
@@ -810,7 +821,7 @@ final class TriggerEffects {
                 // ⚠ A rule that adds a counter itself must not listen to its own event without a guard — the same warning
                 // the DEALING_DAMAGE family carries.
                 if (battle != null) {
-                    battle.fireStackGained(target, name);
+                    battle.fireStackGained(target, credited);
                 }
             }
         }
