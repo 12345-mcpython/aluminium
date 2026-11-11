@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "character": 1015,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
-    "⛔ 战技「本回合不会结束」：引擎没有「回合不结束」开关，回合由 afterMove 收尾",
+    "✅ **战技「本回合不会结束」已落地（2026-11-12）**：`the_turn_does_not_end_inside_the_loop` = `ALLY_ATTACK`（这一发打完之后）+ `from_skill SKILL` + `self has_state 回路连接` + `self_resource:回路次数 < 5` → **`EXTRA_TURN { target: self }`**（免费回合：`beforeMove` 不扣任何时长 ⇒ 就是「不消耗回合数」）。⚠ 门里的次数条件让**第 5 发之后不再给**回合（那时该退出，而退出与它同事件、顺序不可靠）。判据 `ArcherLoopTurnTest`（三例：再动一次且 `hasPendingExtraTurn` 为真 / 免费回合不扣时长 / 星魂 6 不会一圈回五点）。⚠ **两处登记的近似**（要消掉得改引擎的「回合不结束」，不是改这一条）：① 插入的是一个**新回合** ⇒ 会再发 `TURN_START`（所以本文件的另两条 `TURN_START` 规则加了 `!self has_state 回路连接` 这个门）；② 持续伤害仍在该插入回合的 `beforeMove` 结算。",
     "⭐ **星魂 1 已落地**（2026-11-03）：「单个回合内施放 3 次战技后恢复 2 个战技点」= 计数标记 `本回合战技次数`（结算规则**排在累加规则之前**）+ `TURN_START` 清零；实测第 3 次施放多给 2 点、新回合重新计数。⚠ 「per_turn 只是限流」这个说法**作废**：计数器+门槛就能表达「第 N 次」。",
     "⭐ **星魂 2 已落地（2026-11-04）**：`ADD_ELEMENTAL_WEAKNESS { element: Quantum, turns: 2 }` + `MODIFY_DAMAGE_TAKEN { percent: 0.2, element: Quantum }`。⚠ **近似已登记**：`RESISTANCE_REDUCTION` 是全属性、元素作用域只在 `MODIFY_DAMAGE_TAKEN` 上 ⇒ 「量子抗性 −20%」写成「对量子伤害易伤 +20%」，两者在伤害公式里位置不同，**不是同一个数**，但这是引擎今天唯一能按元素表达的地方。"
   ],
@@ -225,6 +225,25 @@
       "_note": "槽 9 是**手动退出按钮** ✓（`skills.json` 1015 的槽 9 = `101509` ✓，`skill_effect: Enhance` ✓）；它能被施放的前提就是状态在 ✓ ⇒ 这一条只做「摘状态 ＋ 清计数 ＋ 清层数」✓。⚠ 事件用 `CAST_SETUP` ＋ `from_skill_id` ✓（槽 9 **没有 `SkillType`** ⇒ 不能用 `from_skill` ✓，而 `CAST_SETUP` 带槽位号 ✓）。⚠ **「并结束回合」不写** ✗：施放【结束】本身就是她的回合动作 ✓ ⇒ 回合在施放之后自然结束 ✓，再写一条是**第二套判据** ✗（与 1206「大招后立即行动」不同 —— 那一条的结束**不是**施放的自然结果 ✓）。"
     },
     {
+      "on": "ALLY_ATTACK",
+      "id": "the_turn_does_not_end_inside_the_loop",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "self has_state 回路连接",
+        "self_resource:回路次数 < 5"
+      ],
+      "do": [
+        {
+          "op": "EXTRA_TURN",
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「【回路连接】状态下施放战技后，**本回合不会结束**，并使Archer战技造成的伤害提高100%…」",
+      "_note": "「**本回合不会结束**」= 这一发打完之后**她马上再动一次**，中间不花回合 ⇒ 引擎的 **`EXTRA_TURN { target: self }`**（免费回合：`Battle.beforeMove` 对「本回合是额外回合」的单位**不扣任何时长** ✓，判据 `FreeTurnDoesNotSpendDurationsTest` 就是钉这件事的）。⚠ 事件用 `ALLY_ATTACK`（**这一发打完**）✓，与层数/计数同一条边界 ✓ —— 挂在 `CAST_SETUP` 会让她在**自己那一发还没结算**时就再动一次 ✗。⚠ 门里的 `self_resource:回路次数 < 5` 是**顺序无关的保险** ✓：第 5 发之后本来就要退出（`loop_ends_after_five_casts` 摘状态），若本条先跑而状态还在，就会白送一个回合 ✗（`ALL_LOW` 级顺序依赖在别的文件里坑过两次 ⇒ 这里用**条件**而不是靠文件顺序 ✓）。⚠⚠ **登记（近似，不是缺口）**：`EXTRA_TURN` 是**一个新回合**而不是「同一个回合接着打」⇒ 两处可观测差异：① 它会给**自己**再发一次 `TURN_START`（所以本文件的另外两条 `TURN_START` 规则都加了 `!self has_state 回路连接` 这个门 —— 否则星魂 6 的「回合开始回 1 点」会一圈回 5 次、星魂 1 的计数会被清零）；② 持续伤害仍会在每个插入回合的 `beforeMove` 结算（`tickDots` 在「免费回合」判断**之前**）。要消掉这两处，需要的是引擎级的「回合不结束」，而不是这条规则。判据 `ArcherLoopTurnTest`。",
+      "_status": "implemented"
+    },
+    {
       "on": "ULT_CAST",
       "id": "ult_grants_charge",
       "when": [
@@ -412,7 +431,8 @@
       "id": "eidolon6_skill_point_each_turn",
       "min_eidolon": 6,
       "when": [
-        "actor == self"
+        "actor == self",
+        "!self has_state 回路连接"
       ],
       "do": [
         {
@@ -510,7 +530,8 @@
       "id": "turn_start_resets_the_skill_counter",
       "_status": "implemented",
       "when": [
-        "self_stacks:本回合战技次数 >= 1"
+        "self_stacks:本回合战技次数 >= 1",
+        "!self has_state 回路连接"
       ],
       "do": [
         {
