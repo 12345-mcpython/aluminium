@@ -136,7 +136,7 @@ public final class DamageService {
         bus.fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.TAKING_HIT, damage.getAttacker(), target,
                 settled));
         if (hpLoss > 0) {
-            marks.markLostHp(target);
+            marks.markLostHp(target, hpLoss);
             hpLossSink.accept(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
             bus.fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.HP_LOST, damage.getAttacker(), target,
                     hpLoss));

@@ -3404,6 +3404,19 @@ public class Battle {
     }
 
     /**
+     * How much HP {@code unit} has lost in this action (the per-action SUM, not just "it happened").
+     *
+     * <p>Reader: light cone 21038 「单次受到攻击中累计损失的生命值」 - the question is about a sum over the instances of one
+     * action, while {@code HP_LOST} carries only one instance's amount.
+     *
+     * @param unit the unit to ask about
+     * @return the HP it lost in this action ({@code 0} if none)
+     */
+    public double hpLostThisAction(CanHit unit) {
+        return damageMarks.hpLostThisAction(unit);
+    }
+
+    /**
      * Queues a combatant to join its camp and enter the action bar at the next settle.
      *
      * <p><b>Why this is the entry point.</b> A unit that joins after construction used to be put in

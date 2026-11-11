@@ -2156,6 +2156,24 @@ public class TriggerTable {
                 }
                 // 「若该效果消耗的生命值高于 500 点」 (light cone 23039): the amount the event itself carries.
                 case "event_amount" -> ctx.amount();
+                // 「单次消耗自身生命值超过最大生命值的 25%」 (light cone 21038): the SAME event amount as a share of the rule
+                // owner's Max HP. A separate name because the threshold is a fraction of a level-varying number, and a
+                // comparison here is "variable vs literal" - `event_amount > 0.25 * maxHp` has no spelling.
+                case "event_amount_percent" -> {
+                    if (ctx.owner() == null || ctx.owner().getMaxHp() <= 0) {
+                        yield Double.NaN;      // no owner / no bar: the clause simply does not hold
+                    }
+                    yield ctx.amount() / ctx.owner().getMaxHp();
+                }
+                // 「单次受到攻击中累计损失的生命值超过最大生命值的 25%」 (light cone 21038): the SUM of this action's losses
+                // for the rule owner, as a share of its Max HP. The sum is kept by `DamageMarks` (cleared at the same
+                // boundary that defines "this action"), so the reading cannot drift from the boundary.
+                case "hp_lost_this_action_percent" -> {
+                    if (ctx.battle() == null || ctx.owner() == null || ctx.owner().getMaxHp() <= 0) {
+                        yield Double.NaN;
+                    }
+                    yield ctx.battle().hpLostThisAction(ctx.owner()) / ctx.owner().getMaxHp();
+                }
                 case "hp_percent" -> hpPercent(ctx.owner());
                 // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102): the laugh points
                 // that Elation damage is computed from - the merged, frozen snapshots of 【好活当赏】, NOT the party's live

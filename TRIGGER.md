@@ -268,6 +268,8 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `target_buff_count` | 目标身上**可被解除的增益**数（不含永久加成与负面状态，与 `REMOVE_BUFF` 同一个谓词）；写「解除增益效果时…」用它 |
 | `target_dots_from_self` | 目标身上由规则拥有者施加的持续伤害数 |
 | `event_amount` | 触发事件自带的数值（如 `HP_CONSUMED` 的实际消耗） |
+| `event_amount_percent` | 同一个数值**占规则主人生命上限的比例**（0..1）—— 「单次消耗自身生命值超过**最大生命值的 25%**」：门槛是比例、上限随等级变，而比较只认字面量 ⇒ 必须有这个按比例读的名字（读者：光锥 21038） |
+| `hp_lost_this_action_percent` | 规则主人**本次行动**内**累计**掉的血 ÷ 生命上限（`DamageMarks` 在同一个「本次行动」边界清空）—— 「单次受到攻击中**累计**损失的生命值超过最大生命值的 25%」：`event_amount` 只带**一笔**，句子问的是**几笔之和**（读者：光锥 21038） |
 | `self_summon_count` / `target_summon_count` | 召唤物数量 |
 | `enemy_count` / `ally_count` | 场上敌我数量 |
 | `map_attacker_count` | 除装备者外、本场「开战」的队友数（地图攻击的发起者）|

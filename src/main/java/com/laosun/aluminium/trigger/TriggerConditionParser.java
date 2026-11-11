@@ -2506,6 +2506,15 @@ final class TriggerConditionParser {
                     // 「若该效果消耗的生命值高于 500 点」 (light cone 23039): the AMOUNT the triggering event carries - for
                     // `HP_CONSUMED` that is the HP actually paid, which is the number the sentence branches on.
                     "event_amount",
+                    // 「单次消耗自身生命值超过最大生命值的 25%」 (light cone 21038 Flames Afar): the same event amount as a
+                    // SHARE of the owner's Max HP. The comparison language is "variable vs literal", so a threshold that
+                    // is a fraction of a level-varying number needs its own name - `event_amount > 0.25 * maxHp` cannot
+                    // be spelled, and writing the flat HP number would be wrong at every level.
+                    "event_amount_percent",
+                    // 「单次受到攻击中累计损失的生命值超过最大生命值的 25%」 (same cone, the other half): the SUM of this
+                    // action's losses for the owner, as a share of its Max HP. `HP_LOST` carries one instance's amount,
+                    // and no event carries the sum.
+                    "hp_lost_this_action_percent",
                     "actor_hp_percent",
                     // "when entering combat, if the allies' Skill Points limit is #2 or higher" (reader: light cone 23046):
                     // the cap is not a field of the unit -- it belongs to the battle's skill point policy -- so the value

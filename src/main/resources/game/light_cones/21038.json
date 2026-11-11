@@ -1,0 +1,344 @@
+{
+  "schema": 1,
+  "light_cone": 21038,
+  "1": [
+    {
+      "on": "HP_LOST",
+      "id": "cone21038_after_a_big_loss_in_one_attack",
+      "when": [
+        "target == self",
+        "hp_lost_this_action_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.25,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 1 阶（`weapons.json` 的 `weapon_skill_data` #1 = 0.25 / #2 = 0.25 / #3 = 0.15 / #4 = 2 / #5 = 3）✓。① 「**单次受到攻击中累计损失的生命值**超过最大生命值的 25%」= 事件 `HP_LOST`（它只对**我方**阵营发 ✓，而装备者就是我方 ✓）+ `target == self`（**掉血的是装备者**）+ **新变量 `hp_lost_this_action_percent`**（`DamageMarks` 记这一**行动**内的**累计**掉血，同一个边界清空 ⇒ 「单次」在引擎里就是「这一次行动」）。⚠ 为什么要新变量：`event_amount` 只带**单笔**掉血，而句子问的是**几笔之和**；`HP_LOST` 每笔发一次，没有一笔带着和。② 「**单次消耗自身生命值**超过 25%」见另一条（`HP_CONSUMED`，用 **`event_amount_percent`**）—— ⚠ 两半是**两种不同的量**（累计 vs 单笔），不能合并成一条求和（15% 挨打 + 15% 消耗 ≠ 30%，那是**两个条件都不成立**）。③ 「立即回复 15% 生命上限」= `HEAL { scale: owner_max_hp, percent: 0.15 }` ✓；「造成的伤害提高 25%，持续 2 回合」= `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` ✓。④ 「每 3 回合只能触发 1 次」用**共享的门状态** `爆燃已触发`（`turns: 3`），**不用**规则级 `cooldown` —— 两半是两条规则，各写一个 `cooldown` 会各有各的冷却，一个窗口内可以各触发一次（= 两次），而句子说的是一次 ✓。判据 `ConeTwentyOneThousandThirtyEightTest`。",
+      "_status": "implemented"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone21038_after_a_big_self_consume",
+      "when": [
+        "actor == self",
+        "event_amount_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.25,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 1 阶。① 「**单次消耗自身生命值**超过最大生命值的 25%」= `HP_CONSUMED`（`CONSUME_HP` 的付血事件，actor = target = 付血者）+ **新变量 `event_amount_percent`**（事件自带的量 ÷ 规则主人的生命上限）。⚠ 门槛是**上限的一个比例**、而上限随等级变 ⇒ 不能写成一个字面点数（那会在别的等级上错），而条件语言只有「变量 vs 字面量」⇒ 需要这个按比例读的变量。② 同一句的另一半见 `cone21038_after_a_big_loss_in_one_attack`（两条规则共用一个门状态，因此 3 回合内只触发一次）。③ 效果与冷却同另一条 ✓。判据 `ConeTwentyOneThousandThirtyEightTest.theSelfConsumeHalfFiresToo`。",
+      "_status": "implemented"
+    }
+  ],
+  "2": [
+    {
+      "on": "HP_LOST",
+      "id": "cone21038_after_a_big_loss_in_one_attack",
+      "when": [
+        "target == self",
+        "hp_lost_this_action_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3125,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 2 阶（#2 = 0.3125）✓。其余同第 1 阶：`target == self` + `hp_lost_this_action_percent > 0.25` ⇒ 治疗 15% + 增伤 + 门状态。",
+      "_status": "implemented"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone21038_after_a_big_self_consume",
+      "when": [
+        "actor == self",
+        "event_amount_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.3125,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 2 阶（#2 = 0.3125）✓。付血那一半，同第 1 阶。",
+      "_status": "implemented"
+    }
+  ],
+  "3": [
+    {
+      "on": "HP_LOST",
+      "id": "cone21038_after_a_big_loss_in_one_attack",
+      "when": [
+        "target == self",
+        "hp_lost_this_action_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.375,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 3 阶（#2 = 0.375）✓。其余同第 1 阶。",
+      "_status": "implemented"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone21038_after_a_big_self_consume",
+      "when": [
+        "actor == self",
+        "event_amount_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.375,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 3 阶（#2 = 0.375）✓。付血那一半，同第 1 阶。",
+      "_status": "implemented"
+    }
+  ],
+  "4": [
+    {
+      "on": "HP_LOST",
+      "id": "cone21038_after_a_big_loss_in_one_attack",
+      "when": [
+        "target == self",
+        "hp_lost_this_action_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4375,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 4 阶（#2 = 0.4375）✓。其余同第 1 阶。",
+      "_status": "implemented"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone21038_after_a_big_self_consume",
+      "when": [
+        "actor == self",
+        "event_amount_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.4375,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 4 阶（#2 = 0.4375）✓。付血那一半，同第 1 阶。",
+      "_status": "implemented"
+    }
+  ],
+  "5": [
+    {
+      "on": "HP_LOST",
+      "id": "cone21038_after_a_big_loss_in_one_attack",
+      "when": [
+        "target == self",
+        "hp_lost_this_action_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 5 阶（#2 = 0.5）✓。其余同第 1 阶。",
+      "_status": "implemented"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "cone21038_after_a_big_self_consume",
+      "when": [
+        "actor == self",
+        "event_amount_percent > 0.25",
+        "!self has_state 爆燃已触发"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.15,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "爆燃已触发",
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21038 在火的远处: 当装备者在单次受到攻击中累计损失的生命值超过最大生命值的#1[i]%，或单次消耗自身生命值超过最大生命值的#1[i]%，则立即回复等同于装备者生命上限#3[i]%的生命值，同时使装备者造成的伤害提高#2[i]%，持续#4[i]回合。该效果每#5[i]回合只能触发1次。",
+      "_note": "第 5 阶（#2 = 0.5）✓。付血那一半，同第 1 阶。",
+      "_status": "implemented"
+    }
+  ]
+}

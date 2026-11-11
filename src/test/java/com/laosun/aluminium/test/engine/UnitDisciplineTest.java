@@ -68,14 +68,19 @@ public class UnitDisciplineTest {
             "target_buff_count",
             // The LOWEST HP share of the party's living characters -「队伍中有 HP% ≤ N 的角色」 (1222 Lingsha (灵砂) 行迹 遗爇).
             // A FRACTION, so it is in FRACTION below as well: writing `>= 60` here is the same mistake Herta's file made.
-            "lowest_ally_hp_percent");
+            "lowest_ally_hp_percent",
+            // 「单次消耗自身生命值 / 单次受到攻击中累计损失的生命值 超过最大生命值的 25%」 (light cone 21038):
+            // both answer a SHARE of Max HP (0..1), so both are in FRACTION below as well.
+            "event_amount_percent",
+            "hp_lost_this_action_percent");
 
     /**
      * Of those, the ones that resolve to 0..1 rather than a count.
      */
     // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
     private static final Set<String> FRACTION = Set.of("hp_percent", "target_hp_percent", "target_hp_percent_before",
-            "self_energy_percent", "target_toughness_percent", "lowest_ally_hp_percent");
+            "self_energy_percent", "target_toughness_percent", "lowest_ally_hp_percent",
+            "event_amount_percent", "hp_lost_this_action_percent");
 
     private static final Pattern COMPARISON =
             Pattern.compile("^\\s*([a-z_]+)\\s*(>=|<=|>|<|==)\\s*(-?[0-9.]+)\\s*$");
