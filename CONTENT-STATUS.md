@@ -146,7 +146,7 @@
 | 20020 | 睿见               | 完全实现   | 判据 ConeDurationFamilyTest                                   |
 | 20021 | 焚影               | 完全实现   | 判据 ConeAuditBatchFourTest                                   |
 | 20022 | 溯忆               | 完全实现   | 判据 ConeTwentyThousandTwentyTwoTest                          |
-| 20023 | 嗤笑               | 完全未实现 | 无内容文件                                                    |
+| 20023 | 嗤笑               | 完全实现   | 判据 ConeTwentyThousandTwentyThreeTest                        |
 | 20024 | 残泪               | 完全实现   | 判据 LingeringTearTest                                        |
 | 21000 | 一场术后对话       | 完全实现   | **2026-10-19 逐句核**                                         |
 | 21001 | 晚安与睡颜         | 完全实现   | 判据 Cone21001Test                                            |

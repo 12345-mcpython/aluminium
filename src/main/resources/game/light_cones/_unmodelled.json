@@ -1,10 +1,2 @@
 {
-  "20023": [
-    {
-      "require": 1,
-      "ability": "Ability20023",
-      "name": "纵欢",
-      "reason": "GREPPED 2026-09-30, and RE-VERIFIED 2026-10-07 (this session's engine work changed nothing here): searched TriggerInterpreter.TARGET_SELECTORS (party_first, next_ally, self, target, attacker, all_allies, party, other_allies, summon, target_and_summon, all_enemies, lowest_hp_ally, random_enemy, random_hit_enemy), the op names in shipped content, the same-shaped shipped cone 23007, and all 38 constants of TriggerEvent (AHA / ELATION / SPEND have zero members; WAVE_START, EXTRA_TURN_STARTED/ENDED, HP_LOST, HP_CONSUMED, DAMAGE_SETTLED are the newest). 「阿哈时刻发动时，使装备者的欢愉度提高 #1=16%…32%，持续到阿哈时刻结束。」（E:\\turnbasedgamedata: EquipmentConfig 20023 -> SkillID 20023 -> EquipmentSkillConfig -> TextMap/TextMapCHS.json）The effect maps to ELATION_DAMAGE_BOOST, which the engine HAS; the missing pieces are an 阿哈时刻 event and a duration scoped to 'until it ends'. Reader count: 1 (this cone only) -- below the bar, so registered rather than built."
-    }
-  ]
 }
