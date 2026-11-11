@@ -192,6 +192,48 @@ public class DrRatioClauseCoverageTest {
     }
 
     /**
+     * 星魂 6's first half: 「天赋的追加攻击造成的伤害提高 50%」.
+     *
+     * <p>The clause raises a share that lives on the talent's own row ({@code TALENT:0}, level-varying), so it is written as
+     * {@code MODIFY_RULE effect_percent_scale} - and the reading that matters is whether that scale MULTIPLIES the row share
+     * or is added to it. Measured: exactly 1.5 times, so it multiplies.
+     *
+     * <p><b>Why E5 is the control and not E0.</b> A higher rank is not "the same board plus one clause": E5 already carries
+     * 天赋 +2 levels (2.7 → 2.97 on the row) and E1 already carries 「每层【归纳】暴击伤害 +5%」 (4 layers = +20 points of crit
+     * damage, which the forced crit multiplies). Measured against E0 the same clause reads 1.87 instead of 1.5 - the
+     * Eidolon's own contribution is the only thing E5 → E6 changes.
+     */
+    @Test
+    public void eidolon6RaisesTheTalentFollowUpByHalf() {
+        double e5 = followUpDamage(5);
+        double e6 = followUpDamage(6);
+        Assertions.assertTrue(e5 > 0, "precondition: the follow-up fired: " + e5);
+        Assertions.assertEquals(1.5, e6 / e5, 1e-9,
+                "「追加攻击造成的伤害提高 50%」 — the talent's row share is scaled: " + e5 + " -> " + e6);
+    }
+
+    /**
+     * The biggest instance one Skill cast settles: the follow-up (TALENT, 2.7 share) outweighs the Skill's own hit (SKILL,
+     * 1.5), so the maximum is the follow-up without needing to name the instance.
+     *
+     * <p>The roll is pinned to always pass, otherwise whether the follow-up happens at all depends on the seed.
+     */
+    private static double followUpDamage(int eidolon) {
+        Character ratio = CharacterFactory.create(DR_RATIO, 80, false, null, null, eidolon);
+        Character ally = CharacterFactory.create(1002, 80);
+        Enemy enemy = BattleFixture.enemy(BattleFixture.MONSTER_ID, BattleFixture.MONSTER_LEVEL);
+        Battle battle = new Battle(List.of(ratio, ally), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+        double[] biggest = {0};
+        battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) ->
+                biggest[0] = Math.max(biggest[0], applied));
+        battle.castImmediate(ratio.getSkills().get(SkillType.SKILL), ratio, List.of(enemy));
+        battle.processRequests();
+        return biggest[0];
+    }
+
+    /**
      * 秘技: 「100% 基础概率使敌方每个单体目标速度降低 15%，持续 2 回合」 — through the resistance pipeline, not around it.
      */
     @Test

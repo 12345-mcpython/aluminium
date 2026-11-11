@@ -832,6 +832,71 @@
       }
     ]
   },
+  "1202": {
+    "name": "Tingyun",
+    "sections": [
+      {
+        "section": "普攻：逐客令",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：祥音和韵（【赐福】与攻击力加成）",
+        "rule": "skill_benediction"
+      },
+      {
+        "section": "战技：获得【赐福】的目标施放攻击后的附加伤害",
+        "rule": "skill_blessed_ally_extra_damage"
+      },
+      {
+        "section": "终结技：庆云光覆仪祷",
+        "rule": "ult_energy_and_boost"
+      },
+      {
+        "section": "天赋：紫电扶摇",
+        "rule": "talent_the_blessed_ally_strikes_whoever_she_hits"
+      },
+      {
+        "section": "秘技：惠风和畅",
+        "rule": "technique_energy_on_entry"
+      },
+      {
+        "section": "星魂 1：春风得意，时运驰骋",
+        "rule": "eidolon1_blessed_ult_grants_speed"
+      },
+      {
+        "section": "星魂 2：君子惠渥，晏笑承之",
+        "rule": "eidolon2_blessed_kill_pays_energy"
+      },
+      {
+        "section": "星魂 3：青丘遗泽",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：鸣火机变，度时察势",
+        "rule": "eidolon4_raises_the_blessed_extra_damage"
+      },
+      {
+        "section": "星魂 5：绥绥狐魅",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：和气生财，泽盈四方",
+        "rule": "eidolon6_ult_restores_ten_more"
+      },
+      {
+        "section": "行迹：驻晴",
+        "rule": "trace_speed_on_skill"
+      },
+      {
+        "section": "行迹：止厄",
+        "rule": "trace_basic_attack_boost"
+      },
+      {
+        "section": "行迹：亨通",
+        "rule": "trace_energy_at_turn_start"
+      }
+    ]
+  },
   "1203": {
     "name": "Luocha",
     "sections": [
@@ -1397,6 +1462,83 @@
       {
         "section": "星魂 6：「你」的光芒",
         "rule": "eidolon6_on_damage"
+      }
+    ]
+  },
+  "1305": {
+    "name": "Dr. Ratio",
+    "sections": [
+      {
+        "section": "普攻：知识就是力量",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：精神助产术",
+        "why": "no rule needed: the Skill's own 150% is settled from its row; the follow-up it rolls is the 天赋 section"
+      },
+      {
+        "section": "终结技：三段悖论（240% 与【智者的短见】）",
+        "rule": "ult_marks_wisemans_folly"
+      },
+      {
+        "section": "终结技：队友攻击持有【智者的短见】的目标时触发追加攻击",
+        "rule": "ult_reaction_followup"
+      },
+      {
+        "section": "终结技：施放终结技后重置触发次数",
+        "rule": "ult_resets_the_marked_target_count"
+      },
+      {
+        "section": "天赋：我思故我在（40% 固定概率与 +20%/负面）",
+        "rule": "talent_chance_followup"
+      },
+      {
+        "section": "秘技：偶像塑造",
+        "rule": "technique_speed_down"
+      },
+      {
+        "section": "星魂 1：倨傲生祸患",
+        "rule": "eidolon1_starts_with_four_layers"
+      },
+      {
+        "section": "星魂 2：显微而阐幽",
+        "rule": "eidolon2_extra_damage_per_debuff"
+      },
+      {
+        "section": "星魂 3：认识你自己",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：盲目造痴愚",
+        "rule": "eidolon4_extra_energy_when_the_talent_fires"
+      },
+      {
+        "section": "星魂 5：海阔舟无楫",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：【智者的短见】触发效果额外增加 1 次",
+        "rule": "eidolon6_one_more_trigger_of_the_mark"
+      },
+      {
+        "section": "星魂 6：天赋的追加攻击造成的伤害提高 50%",
+        "rule": "eidolon6_raises_the_talent_multiplier"
+      },
+      {
+        "section": "行迹：归纳（每负面一层）",
+        "rule": "trace_induction_stacks_per_debuff"
+      },
+      {
+        "section": "行迹：归纳（每层暴击率与暴击伤害）",
+        "rule": "trace_induction_crit_aura"
+      },
+      {
+        "section": "行迹：演绎",
+        "rule": "trace_deduction_lowers_effect_resistance"
+      },
+      {
+        "section": "行迹：推理",
+        "rule": "trace_inference_damage_per_debuff"
       }
     ]
   },

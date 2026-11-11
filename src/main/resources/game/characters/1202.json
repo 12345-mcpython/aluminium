@@ -1,10 +1,12 @@
 {
   "schema": 1,
   "character": 1202,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
-    "⭐ **2026-11-04 逐节核**：旧 `_gaps` 三条里，②「秘技缺『用过秘技』门槛」是**错的**（那个门一直有）；③「星魂未读未写」已读并可写的写完。**本轮落地**：秘技（`technique_energy_on_entry`，`BATTLE_START` + `self has_state 秘技` → 50 能量）、星魂 1（`eidolon1_blessed_ult_grants_speed`：`ULT_CAST` + `actor has_state 赐福` → 速度 +20%/1 回合）、星魂 2（`eidolon2_blessed_kill_pays_energy`：`KILL` + 同条件 → +5 能量，`per_turn: 1`）、星魂 6（`eidolon6_ult_restores_ten_more`：+10 能量）。判据 `TingyunEidolonTest`（四组，秘技/星魂 6 各带「不声明 / 低星魂」对照，星魂 1 带「不带【赐福】」对照，星魂 2 钉「同回合第二次不再付」）。⚠ 另记：星魂 6 用**另加一条 `GAIN_ENERGY`** 而不是 `MODIFY_RULE effect_amount` —— 后者的读取是 `withAmount(δ)`（**替换**，不是相加），用它会把 50 变成 10。",
-    "✅ **天赋那一半也落地了（2026-11-10）**：`talent_the_blessed_ally_strikes_whoever_she_hits`（`ALLY_ATTACK` + `actor == self` + `any_ally has_state 赐福` → `DAMAGE { attacker: \"holder_of:赐福\", self_attr:ATTACK, TALENT:0, Thunder, ADDITIONAL }`）。⭐ **`attacker: holder_of:<state>`** 是引擎这一轮新加的**第三方主语** —— `EffectSpec.attacker` 的 javadoc 本来就把这句（「获得【赐福】的目标造成伤害」）列为「还没有拼法」的例子，现在有了：既不是规则主人（停云）也不事件 actor（被打的敌人），而是**持有状态的那位队友**，`self_attr` 因此读的是**他的**攻击力。"
+    "✅ **逐句核过（2026-11-11）**：普攻 / 战技 / 终结技 / 天赋 / 秘技，行迹 驻晴·止厄·亨通，星魂 1–6 —— 每一句都指得到规则或数据行。判据：`TingyunTest`（战技上限、终结技、天赋、最新持有者、驻晴的寿命、亨通）、`TingyunEidolonTest`（秘技、星魂 1/2/4/6、星魂 3/5 的等级行）。",
+    "⭐ **星魂 6 与基础终结技写成两条 `GAIN_ENERGY`（50 + 10）**：`MODIFY_RULE effect_amount` 的读取是 `withAmount(δ)` —— 是**替换**而不是相加 ⇒ 用它会把 50 变成 10。这不是缺口，是拼法选择，记在这里免得下一个人重犯。判据 `TingyunEidolonTest.eidolonSixPaysSixty`（E6 = 60，E5 = 50）。",
+    "⭐ **星魂 2 的「每回合只能触发 1 次」用 `per_turn: 1`**：引擎里唯一的多次上限就是它，与文档的字面口径一致（不是近似）。",
+    "⭐ **星魂 1 的「持续 1 回合」与秘技的「使用后立即」** 都按引擎自己的回合边界读：前者 `turns: 1`，后者 `BATTLE_START` + `self has_state 秘技`。不建模的是**大地图**事实（秘技的施放动作本身）。"
   ],
   "rules": [
     {
@@ -27,7 +29,7 @@
         }
       ],
       "source": "1202 停云 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 +50%/上限 25%、终结技 50 能量/+50% 伤害、天赋 60%）",
-      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 秘技（「使用秘技后立即为自身恢复50点能量」）缺**门槛** ✗；天赋与战技的\"附加伤害由**受赐福队友**打出\"两条见战技那条的登记 ✓；星魂未读 ✗。 ⚠ **2026-09-29：战技的【赐福】本轮未出货** ✗ —— 它需要\"有上限的属性修正\"（「攻击力提高50%，**最高不超过停云当前攻击力的25%**」），而引擎今天只有 `APPLY_DOT` 会读 `cap_scale`/`cap_percent` ✗。我试着把它放给 `MODIFY_ATTR` 并直接复用 DOT 的 clamp，结果让上限断言失败 ✗：**单位不同** —— `MODIFY_ATTR` 的 `percent` 是**份额**（目标攻击力的 50%），而 ceiling 解析出的是**绝对值**（停云攻击力的 25%），`min(份额, 绝对值)` 毫无意义。⇒ 正确的做法是**逐目标**把上限换算成份额（`cap绝对值 / 目标该属性值`），而不是在得到份额后直接 min ✗；该能力已登记为待做 ✓（读者：本句 + 语料里「最高不超过/至多不超过/上限为」**14 个文件** ✓）。 ⚠ **普攻钉第 6 行，其余三槽第 10 行**：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。"
+      "_note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 普攻钉第 6 行，其余三槽第 10 行：文档里每个角色的普攻都写「100% 攻击力」，而普攻表的**第 6 行**才是 1.0（第 10 行是 1.4）—— 逐角色比对，文档数值全部等于第 6 行（AGENT §0.2 第 29 条）。⭐ **2026-11-11 三条旧注记作废**：① 「秘技缺『用过秘技』门槛」—— 那个门一直有（`self has_state 秘技`）；② 「星魂未读」—— 星魂 1–6 已全部落地；③ 「战技的【赐福】攻击力上限写不了」—— `MODIFY_ATTR` 自 2026-09-29 起读 `cap_scale`/`cap_percent` 并**逐目标换算单位**，见战技那条。"
     },
     {
       "on": "SKILL_CAST",
@@ -299,7 +301,7 @@
         }
       ],
       "source": "1202 停云 战技 祥音和韵 (120202, BPSkill/Support): 「获得【赐福】的目标施放攻击后，会额外造成1次等同于其自身40%攻击力的雷属性附加伤害。」 param Lv10 = [0.4, 0.5, 3, 0.25]",
-      "_note": "「获得【赐福】的目标**施放攻击后**，会额外造成 1 次等同于**其自身 40% 攻击力**的雷属性**附加伤害**」—— 事件 `ALLY_ATTACK` ✓（我方任何人的施放都发）+ 条件 `actor has_state 赐福` ✓（被祝福的那位就是行动者 ✓）；⭐ **`attacker: \"actor\"`**（2026-11-04 新允许的第二个主语）+ `scale: self_attr:ATTACK` ⇒ **那一发读取的是攻击者（队友）的结算攻击力** ✓（`literalBase(attacker, …)` 用的是解析后的 attacker ✓，所以**不需要**新的 `attacker_attr:` 前缀）；份额读战技行 `SKILL:0` = 40% ✓（按等级 ✓）；`damage_type: ADDITIONAL` ✓（「附加伤害」= 不视为一次攻击 ⇒ 不会再触发本规则 ✓）。⚠ **同句的天赋那一半仍开**（见 `_gaps`）：那里的「造成伤害者」是**第三个人**（被祝福的队友），而本事件的行者是停云 ⇒ `attacker: \"actor\"` 解决不了。"
+      "_note": "「获得【赐福】的目标**施放攻击后**，会额外造成 1 次等同于**其自身 40% 攻击力**的雷属性**附加伤害**」—— 事件 `ALLY_ATTACK` ✓（我方任何人的施放都发）+ 条件 `actor has_state 赐福` ✓（被祝福的那位就是行动者 ✓）；⭐ **`attacker: \"actor\"`**（2026-11-04 新允许的第二个主语）+ `scale: self_attr:ATTACK` ⇒ **那一发读取的是攻击者（队友）的结算攻击力** ✓（`literalBase(attacker, …)` 用的是解析后的 attacker ✓，所以**不需要**新的 `attacker_attr:` 前缀）；份额读战技行 `SKILL:0` = 40% ✓（按等级 ✓）；`damage_type: ADDITIONAL` ✓（「附加伤害」= 不视为一次攻击 ⇒ 不会再触发本规则 ✓）。⭐ **同句的天赋那一半也已落地**（`talent_the_blessed_ally_strikes_whoever_she_hits`）：那里「造成伤害者」是**第三个人**（被祝福的队友），用 `attacker: holder_of:赐福` 表达 —— 与这里的 `attacker: actor` 是两种主语，不能合并成一条。判据 `TingyunTest.herTalentStrikesThroughTheBlessedAlly`（钉 instance 的 attacker 是那位队友）+ `TingyunEidolonTest.theBlessedAlliesAttackCarriesHerOwnShare`（钉 40% 读的是队友的攻击力）+ `eidolonFourRaisesTheBlessedAlliesExtraShare`（星魂 4 的 +20% ⇒ ×1.5）。"
     }
   ]
 }

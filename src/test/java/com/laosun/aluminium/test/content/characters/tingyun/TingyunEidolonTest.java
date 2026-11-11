@@ -130,6 +130,66 @@ public class TingyunEidolonTest {
         return new double[]{additional[0], removed[0]};
     }
 
+    /**
+     * 星魂 4:「【赐福】附加的伤害倍率提高 20%」 — 40% becomes 60%, so the same board deals 1.5 times as much.
+     *
+     * <p>The clause is a PERCENTAGE of a share that lives on a row, and it is used as an additive delta on that share
+     * ({@code MODIFY_RULE effect_percent}), not as a damage-zone boost: a zone would multiply the whole hit, which would
+     * move the ally's own basic attack too.
+     */
+    @Test
+    public void eidolonFourRaisesTheBlessedAlliesExtraShare() {
+        double e0 = blessedExtraShare(0);
+        double e4 = blessedExtraShare(4);
+        Assertions.assertTrue(e0 > 0, "precondition: the extra instance lands: " + e0);
+        Assertions.assertEquals(1.5, e4 / e0, 1e-6,
+                "「附加的伤害倍率提高 20%」 — 40% → 60% is a factor of 1.5: " + e0 + " -> " + e4);
+    }
+
+    /** 星魂 3 / 5: the two level rows, read off the slots the data names (120201 / 120203, then 120202 / 120204). */
+    @Test
+    public void eidolonThreeAndFiveRaiseTheSkillLevels() {
+        Character e3 = startedBattleAt(3);
+        Character e0 = startedBattleAt(0);
+        Assertions.assertEquals(1, e3.skillLevelBonus(SkillType.COMMON) - e0.skillLevelBonus(SkillType.COMMON),
+                "E3: 普攻等级 +1");
+        Assertions.assertEquals(2, e3.skillLevelBonus(SkillType.ULTRA) - e0.skillLevelBonus(SkillType.ULTRA),
+                "E3: 终结技等级 +2");
+
+        Character e5 = startedBattleAt(5);
+        Assertions.assertEquals(2, e5.skillLevelBonus(SkillType.SKILL) - e0.skillLevelBonus(SkillType.SKILL),
+                "E5: 战技等级 +2");
+        Assertions.assertEquals(2, e5.skillLevelBonus(SkillType.TALENT) - e0.skillLevelBonus(SkillType.TALENT),
+                "E5: 天赋等级 +2");
+    }
+
+    /** The damage the blessed ally's extra instance removes on one basic attack, at a given Eidolon rank. */
+    private static double blessedExtraShare(int eidolon) {
+        Character tingyun = CharacterFactory.create(TINGYUN, LEVEL, false, null, null, eidolon);
+        Character ally = CharacterFactory.create(1001, LEVEL);
+        ally.getBuffManager().addBuff(new StateBuff(BLESSING, 3));
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(tingyun, ally), List.of(enemy), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        double[] removed = {0};
+        battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> {
+            if (damage.getType() == com.laosun.aluminium.enums.DamageType.ADDITIONAL) {
+                removed[0] += applied;
+            }
+        });
+        battle.castImmediate(ally.getSkills().get(SkillType.COMMON), ally, List.of(enemy));
+        battle.processRequests();
+        return removed[0];
+    }
+
+    /** A Tingyun whose battle has started - the Eidolon's level rows are {@code BATTLE_START} rules. */
+    private static Character startedBattleAt(int eidolon) {
+        Character tingyun = CharacterFactory.create(TINGYUN, LEVEL, false, null, null, eidolon);
+        Battle battle = new Battle(List.of(tingyun), List.of(BattleFixture.monster()), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        return tingyun;
+    }
+
     private static double energyAfterOpening(Character tingyun) {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tingyun), List.of(enemy), BattleFixture.alwaysRoll(0.0));
