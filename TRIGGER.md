@@ -656,7 +656,13 @@ SUPER_BREAK            TAUNT                  TICK_DOT
       "on": "SKILL_CAST",
       "id": "skill_shield",
       "when": [
-        { "type": "entity", "entity": "actor", "json": { "same_as": "self" } }
+        {
+          "type": "entity",
+          "entity": "actor",
+          "json": {
+            "same_as": "self"
+          }
+        }
       ],
       "do": [
         {
@@ -664,10 +670,27 @@ SUPER_BREAK            TAUNT                  TICK_DOT
           "value": {
             "type": "add",
             "inputs": [
-              { "type": "mul", "inputs": [
-                  { "type": "attr", "attribute": "DEFENCE", "whose": "owner" },
-                  { "type": "skill_param", "skill": "SKILL", "index": 0 } ] },
-              { "type": "skill_param", "skill": "SKILL", "index": 3 } ]
+              {
+                "type": "mul",
+                "inputs": [
+                  {
+                    "type": "attr",
+                    "attribute": "DEFENCE",
+                    "whose": "owner"
+                  },
+                  {
+                    "type": "skill_param",
+                    "skill": "SKILL",
+                    "index": 0
+                  }
+                ]
+              },
+              {
+                "type": "skill_param",
+                "skill": "SKILL",
+                "index": 3
+              }
+            ]
           },
           "turns": 3,
           "target": "target"
