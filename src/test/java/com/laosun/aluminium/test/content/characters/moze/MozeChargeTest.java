@@ -80,6 +80,31 @@ public class MozeChargeTest {
                 "「当充能为 0 时，解除目标【猎物】状态」");
     }
 
+    /**
+     * 「…并**重置计入发动追加攻击所需的充能点数**」 - the 3-point tally restarts for the NEXT prey.
+     *
+     * <p>If the reset did nothing, the counter would still hold its old layers and the very first hit on the new prey
+     * would already launch the follow-up; this case pins the third-hit timing after a reset.
+     */
+    @Test
+    public void theFollowUpCounterRestartsForTheNextPrey() {
+        Fixture f = new Fixture();
+        for (int i = 0; i < 8; i++) {
+            f.allyHits();
+        }
+        Assertions.assertEquals(0, f.charge(), "precondition: the first prey was emptied");
+
+        f.remarkThePrey();
+        double plain = f.allyHits();
+        double second = f.allyHits();
+        double third = f.allyHits();
+        System.out.println("[1223] after reset: first=" + plain + " second=" + second + " third=" + third);
+        // The re-cast is itself the new prey FIRST spend (the Skill own hit), so the follow-up is due on the 2nd ally
+        // hit: 1 + the cast's = 3. Measured 213 / 1349 / 213 - the tally really did restart.
+        Assertions.assertTrue(second > plain * 1.5, "the follow-up lands on the 2nd ally hit (" + second + ")");
+        Assertions.assertEquals(plain, third, 1e-6, "and the 3rd is plain again");
+    }
+
     // ==================================================================
 
     private static final class Fixture {
@@ -108,6 +133,11 @@ public class MozeChargeTest {
             return moze.getResources().has(CHARGE) ? moze.getResources().value(CHARGE) : 0;
         }
 
+        /** Casts the Skill again: a fresh prey and nine charges (the 「重置」 case). */
+        private void remarkThePrey() {
+            battle.castImmediate(moze.getSkills().get(SkillType.SKILL), moze, List.of(enemy));
+            battle.processRequests();
+        }
         /** The ALLY hits the prey; returns the HP it took. */
         private double allyHits() {
             double before = enemy.getCurrentHp();
