@@ -420,6 +420,12 @@ final class TriggerValidator {
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
+            case DEPART, RETURN -> {
+                // 「离场」/「回到场上」: a pair of state toggles with no magnitude of its own - the target is the whole
+                // content. A duration would say nothing (the content removes it at the moment the sentence does).
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
             case DELAY -> {
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);

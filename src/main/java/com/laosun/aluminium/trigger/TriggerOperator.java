@@ -48,6 +48,7 @@ public enum TriggerOperator {
     DAMAGE(true),
     DELEGATE_DAMAGE(true),
     DELAY(true),
+    DEPART(true),
     /**
      * "本次攻击无视弱点属性削减敌方的韧性" (1214 Ultimate): the cast still reports throw, but the weakness gate stops
      * refusing it. Read by SkillExecutor where a nominal reduction becomes a settled one.
@@ -95,6 +96,7 @@ public enum TriggerOperator {
     RESET_RULE_CHANCE(true),
     RESET_TRIGGER_LIMIT(true),
     RESIST_DEBUFF(true),
+    RETURN(true),
     /**
      * 「她施加的灼烧状态的**伤害倍率提升 40%**」 (1210 Guinaifen (桂乃芬) 星魂 2): multiplies the per-settlement damage of the DoTs
      * already on the target, which {@code APPLY_DOT} cannot do (it fixes an amount once).

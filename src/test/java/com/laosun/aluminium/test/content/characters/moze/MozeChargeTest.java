@@ -105,7 +105,34 @@ public class MozeChargeTest {
         Assertions.assertEquals(plain, third, 1e-6, "and the 3rd is plain again");
     }
 
+    /**
+     * 「场上存在【猎物】时，貊泽会进入【离场】状态」 - untargetable and off the action order - and he comes back when the
+     * prey leaves.
+     */
+    @Test
+    public void departsWhileThePreyLivesAndReturnsWhenItLeaves() {
+        Fixture f = new Fixture();
+        Assertions.assertTrue(f.moze.isUntargetable(), "「无法成为技能目标」");
+        Assertions.assertFalse(inTheOrder(f.battle, f.moze), "「不会出现在行动序列上」");
+
+        for (int i = 0; i < 8; i++) {
+            f.allyHits();
+        }
+        Assertions.assertFalse(f.moze.isUntargetable(), "the prey is gone, so he is back on the field");
+        Assertions.assertTrue(inTheOrder(f.battle, f.moze), "and back in the action order");
+    }
+
     // ==================================================================
+
+    /** Whether the unit currently owns a signal in the action order. */
+    private static boolean inTheOrder(Battle battle, Character unit) {
+        for (com.laosun.aluminium.Signal signal : battle.queue().snapshot()) {
+            if (signal.getCanHit() == unit) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     private static final class Fixture {
         private final Character moze;

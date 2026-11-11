@@ -387,18 +387,19 @@ ABSORB_DAMAGE          ADD_DAMAGE             ADD_ELEMENTAL_WEAKNESS ADD_STACK
 ADVANCE                APPLY_BUFF             APPLY_CONTROL          APPLY_DOT
 APPLY_REGEN            BOOST_DAMAGE           BOOST_TOUGHNESS        CAST_SKILL
 COMMAND_SUMMON         CONSUME_HP             DAMAGE                 DELEGATE_DAMAGE
-DISMISS_SUMMON         DISPEL                 EXTEND_BUFF            EXTRA_TURN
-GAIN_ENERGY            GAIN_RESOURCE          GAIN_SKILL_POINT       HEAL
-INSERT_ACTION          MODIFY_ATTR            MODIFY_DAMAGE_TAKEN    MODIFY_RULE
+DELAY                  DISMISS_SUMMON         DISPEL                 DEPART
+EXTEND_BUFF            EXTRA_TURN             GAIN_ENERGY            GAIN_RESOURCE
+GAIN_SKILL_POINT       HEAL                   INSERT_ACTION          MODIFY_ATTR
 RAISE_ENERGY_TO        RAISE_RESOURCE_CAP     RAISE_RESOURCE_MAX     RAISE_SKILL_HITS
 RAISE_SKILL_LEVEL      RAISE_SKILL_MULTIPLIER RAISE_SKILL_POINT_CAP REGISTER_HEAL_BONUS
 REMOVE_BUFF            REMOVE_RESOURCE        REMOVE_STACK           REMOVE_STATE
 RESET_RESOURCE_CAP     RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF
-SHARE_DAMAGE           SHIELD                 SPEND_RESOURCE         SPEND_STEPS
-START_COUNTDOWN        SUMMON                 SUMMON_SERVANT         SUPER_BREAK
-TAUNT                  TICK_DOT
+RETURN                 SHARE_DAMAGE           SHIELD                 SPEND_RESOURCE
+SPEND_STEPS            START_COUNTDOWN        SUMMON                 SUMMON_SERVANT
+SUPER_BREAK            TAUNT                  TICK_DOT
 ```
 
+- **`DEPART` / `RETURN`**：「**离场**」与它精确的反向 - `DEPART` 把目标设为**不可被选为目标**（`CanHit.setUntargetable`）并从**行动序列**移除（`Queue.removeCombatant`）；`RETURN` 把两件事都撤回（`Queue.addCombatant`，按引擎「中途加入」的规则**排一整周期之后**）。读者：1223 貊泽 天赋「场上存在【猎物】时进入【离场】状态」。⚠ 这正是 §6 那条：**一次性动作**必须成对写，读时活门（`while_state`）管不了它。
 - `REDUCE_TOUGHNESS` 是**声明了但还没实现**的 op；写它会装载期报错并说明原因。
 - **`SHARE_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：`{"percent": 0.65, "target": "self"}` 表示「这一发的 65% **由目标承担**」—— 本发只保留 35%，并按**同元素/同攻击者/同 65% 基数**给 `target` 另开一发（走它自己的防御/抗性区，结算在当次之后）。读者：1208 符玄【穷观阵】。
 - `REPLACE_SKILL` 有两个方向：**装上**（`skill` + `skill_id` + 一个寿命）与 **`"remove": true`**（把该槽位的替换取下、恢复原来的行；不带 `skill_id`、不带寿命）。重复装上**同一**替换是 no-op（否则第二个会把强化行记成「原始」，卸下时反而装回去）。读者：1111 卢卡「≥2 层时强化 / <2 层时恢复」

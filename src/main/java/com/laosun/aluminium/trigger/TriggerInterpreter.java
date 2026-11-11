@@ -860,6 +860,24 @@ public final class TriggerInterpreter {
                     target.markIgnoreWeaknessCasts(casts);
                 }
             }
+            case DEPART -> {
+                // 「进入【离场】状态：无法成为技能目标，且不出现在行动序列上」 (1223 貊泽's talent, while 【猎物】 exists).
+                // Two engine facts, one op: the targeting flag and the action order. `RETURN` is its exact inverse; the
+                // content calls one at each end, so a state that never ends (a battle ending) does not leave a phantom.
+                for (CanHit leaving : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                    leaving.setUntargetable(true);
+                    battle.queue().removeCombatant(leaving);
+                }
+            }
+            case RETURN -> {
+                // 「回到场上」: targetable again and back in the order. The queue schedules it ONE FULL CYCLE from now,
+                // which is the engine's ordinary "joins mid-battle" rule (Queue.addCombatant) - the unit does not get its
+                // old slot back, and that is the honest reading of "回到原处" for a system that only tracks remaining time.
+                for (CanHit arriving : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                    arriving.setUntargetable(false);
+                    battle.queue().addCombatant(arriving);
+                }
+            }
             case DELAY -> {
                 // 「行动延后 X%」: a one-off push of the target's action bar by X% of its action period.
                 // Unlike ADVANCE there is no "advance_to_others" suppression: that sentence bans advances,
