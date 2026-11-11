@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 public class ImplementedCharacterCoversEveryDocumentSectionTest {
 
     private static final Path CORPUS = Path.of(
-            System.getenv().getOrDefault("ALUMINIUM_TEXTS", "E:/turnbasedgamedata/aluminium_texts"));
+            System.getenv().getOrDefault("ALUMINIUM_TEXTS", "E:/aluminium_texts"));
     private static final Path CHARACTERS = Path.of("src/main/resources/game/characters");
     /**
      * ⚠ <b>Both formats, since 2026-11-09.</b> The corpus ships a {@code .html} AND a {@code .md} per character, and the lookup

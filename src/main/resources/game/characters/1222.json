@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "character": 1222,
-  "_status": "partial",
+  "_status": "implemented",
   "_gaps": [
     "⭐ **2026-11-08：天赋的【浮元】、星魂 6、行迹 遗爇、以及「优先选择韧性值大于0且有火属性弱点的目标」都落地了** —— 旧的登记「引擎的 `Summon` 是**忆灵**模型，`summonOf(owner)` 对浮元解析不到单位，所以『行动提前』写不出来」已**被证伪**：`SUMMON { panel_less: true }` 就是「非忆灵召唤物」的入口（`SummonService.panelLess` → `addCombatant`）。本轮共 21 条规则：召唤（`self_summon_count == 0` 的门，因为非忆灵路径**不幂等**）、行动次数（上限 5）、它自己回合的两发伤害、解除 1 个负面 + 回复 12%+360、星魂 4 的 40%、星魂 6 的两半（`while_summon_count` 活门槛 / `times` + `stance`）、遗爇的两半（`TAKING_HIT` / `HP_CONSUMED` + `lowest_ally_hp_percent`）、每行动一次扣 1 并在归零时 `DISMISS_SUMMON`、战技 20% 与终结技 100% 的行动提前、秘技开场召唤 + 【醇醉】。四处「随机单体」都带 `prefer`（新字段：优先抽、空池退回全体）。判据 `LingshaFuyuanTest`、`SummonCountGateTest`、`LowestAllyHpConditionTest`、`TargetPreferenceTest`。⚠ **只剩下面一条**。",
-    "✅ **星魂 1 的前半已落地（2026-11-09）**：「灵砂的**弱点击破效率**提高 **50%**」= `eidolon1_raises_her_weakness_break_efficiency`（`BATTLE_START` + `min_eidolon: 1` → `MODIFY_ATTR WEAKNESS_BREAK_EFFICIENCY 0.5` + `permanent`）。⚠ 本条原登记说「属性表里没有『击破效率』」—— **已过期**：`AttributeType.WEAKNESS_BREAK_EFFICIENCY` 存在，1301 加拉赫星魂 6 一直在用。⛔ **后半仍未写**：「**当有敌方单位的弱点被击破时，使其防御力降低 20%**」—— 文档与参数行（`[0.2, 0.5]`）**都没给时长** ⇒ 写 `turns` 是编数、写 `permanent` 是永久减防（更错）；等文档或数据给出时长，或用「直到击破状态结束」这种引擎已有的寿命写法（`while_state: 弱点击破`？需要先确认 `BROKEN_STATE` 能被 `while_state` 读）。",
+    "✅ **星魂 1 两句都已落地（2026-11-11）**：① 「灵砂的**弱点击破效率**提高 **50%**」= `eidolon1_raises_her_weakness_break_efficiency`（`BATTLE_START` + E1 → `MODIFY_ATTR WEAKNESS_BREAK_EFFICIENCY 0.5` + `permanent`）；② 「**当有敌方单位的弱点被击破时，使其防御力降低 20%**」= `eidolon1_a_break_lowers_the_defence`（`BREAK` 事件 → `MODIFY_ATTR DEFENCE percent: -0.2` + **`while_holder_state: 弱点击破`**）。⭐ 时长问题**不需要编数**：减防跟着引擎的**击破状态**（`BuffManager.BROKEN_STATE`）走 —— 状态在就在、恢复时被摘 ✓。判据 `LingsoBreakDefenceTest`。",
     "⭐ **以下不登记为缺口**：普攻 / 战技 / 终结技的**伤害与破韧**由技能行数据驱动（`skills.json` 的 `param_list` 与 `stance_list`），不写规则也不会漏；「灵砂陷入**无法战斗状态**时【浮元】消失」由 `DeathService.perishOrphanedSummons` 承担（引擎内置，主人死亡时召唤物随之下场）。"
   ],
   "rules": [
@@ -589,6 +589,24 @@
       ],
       "source": "1222 灵砂 秘技 流翠散云 / Wisps of Aurora: 「使用秘技后，下一次战斗开始时立即召唤【浮元】，并使敌方全体陷入【醇醉】状态，持续2回合。」（TECHNIQUE 行 [2]，【醇醉】的定义与数值见终结技：受到的击破伤害提高 25%）",
       "_note": "「使用秘技后，**下一次战斗开始时立即召唤【浮元】**，并使**敌方全体陷入【醇醉】**状态，持续 **2 回合**」—— ① 触发 ``BATTLE_START`` + ``self has_state 秘技``（引擎在**任何** ``BATTLE_START`` 规则之前盖这个状态，1204 的秘技同形）；② 召唤与初值 3 次与战技那条**同一组数字**（TALENT 行第 1 项 90、第 7 项 3、上限第 5 项 5）；③ 【醇醉】的**定义**在终结技那句里（「受到的击破伤害提高 25%」），所以份额读 **ULTRA 行第 4 项**（0.25）；持续 **2 回合**是 TECHNIQUE 行唯一的那个数（``[2]``）。⚠ ④ 与 ``ult_befog_break_damage_taken`` **不是重复**：事件不同（``BATTLE_START`` vs ``ULT_CAST``）、条件不同，一条是开场那一次、一条是每次终结技；⑤ 顺序：排在 ``level_convention``（与两条星魂等级规则）**之后**，所以 ``skill_param`` 读到的是被抬过的等级行。",
+      "_status": "implemented"
+    },
+    {
+      "on": "BREAK",
+      "id": "eidolon1_a_break_lowers_the_defence",
+      "min_eidolon": 1,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": -0.2,
+          "while_holder_state": "弱点击破",
+          "permanent": true,
+          "target": "target"
+        }
+      ],
+      "source": "1222 灵砂 星魂 1 杜鹃啼时花扑扑: 「…当有敌方单位的弱点被击破时，使其防御力降低20%。」 参数 = [0.2, 0.5]",
+      "_note": "「当有敌方单位的**弱点被击破**时，**使其防御力降低 20%**」—— `BREAK` 事件（`actor` = 造成击破者、`target` = 被击破的敌人 ✓ 与 1206 素裳行迹同法）+ `MODIFY_ATTR DEFENCE percent: -0.2` 挂在**被击破的那个目标**上 ✓。\n\n⭐ **时长**：文档与参数行**都没给回合数** ⇒ 写 `turns` 是编数、写 `permanent` 是永久减防（更错）。这里用 **`while_holder_state: 弱点击破`**（引擎的 `BuffManager.BROKEN_STATE`，1004 已用它做条件）—— 减防**跟着击破状态**：状态在就在、恢复时被摘 ✓，正是「直到击破状态结束」的语义，而**不需要任何数字** ✓。⚠ 不加 `actor == self`：句子是「当**有**敌方单位的弱点被击破时」（不限定谁击破），而 `BREAK` 的 target 一定是敌方 ✓。",
       "_status": "implemented"
     }
   ]

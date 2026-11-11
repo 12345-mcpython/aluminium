@@ -16,7 +16,7 @@ import java.util.TreeSet;
  *
  * <h2>Where the numbers come from</h2>
  * {@code skill_segment_ratios.json} is a digest of {@code E:/code/python/data/skill_segments.json}
- * ({@code export_skill_segments.py}), which walks the ability scripts in {@code E:/turnbasedgamedata} and reads each
+ * ({@code export_skill_segments.py}), which walks the ability scripts in {@code E:/aluminium_texts} and reads each
  * {@code HitSplitRatio}. Its semantics are <b>multiplicative shares of the row's multiplier</b>
  * ({@code ModifyDamageDataBySplitRatio}), so the engine's {@code segments} array is exactly that list of ratios.
  *

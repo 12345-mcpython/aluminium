@@ -33,7 +33,7 @@ import java.util.stream.Stream;
 public class SourceNamesItsOwnCharacterTest {
 
     private static final Path CORPUS = Path.of(
-            System.getenv().getOrDefault("ALUMINIUM_TEXTS", "E:/turnbasedgamedata/aluminium_texts"));
+            System.getenv().getOrDefault("ALUMINIUM_TEXTS", "E:/aluminium_texts"));
     private static final Path CHARACTERS = Path.of("src/main/resources/game/characters");
     private static final Pattern PREFIX = Pattern.compile("^\\s*(\\d{4})\\s*([\\u4e00-\\u9fff·•]{2,8})");
     private static final Set<String> SECTIONS = Set.of(

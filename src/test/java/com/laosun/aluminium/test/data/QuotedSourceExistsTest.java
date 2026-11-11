@@ -29,14 +29,14 @@ import java.util.stream.Stream;
  * placeholder, no nested 「」. Those markers are how a <em>paraphrase</em> announces itself, and this guard must not call a
  * declared paraphrase a lie.
  *
- * <p><b>Why it skips.</b> The corpus lives OUTSIDE this repository ({@code E:/turnbasedgamedata/aluminium_texts}); without it
+ * <p><b>Why it skips.</b> The corpus lives OUTSIDE this repository ({@code E:/aluminium_texts}); without it
  * there is nothing to compare against, so the test reports itself as skipped rather than passing silently or failing on a
  * machine that never had the docs.
  */
 public class QuotedSourceExistsTest {
 
     private static final Path CORPUS = Path.of(
-            System.getenv().getOrDefault("ALUMINIUM_TEXTS", "E:/turnbasedgamedata/aluminium_texts"));
+            System.getenv().getOrDefault("ALUMINIUM_TEXTS", "E:/aluminium_texts"));
     private static final Path CHARACTERS = Path.of("src/main/resources/game/characters");
 
     /**

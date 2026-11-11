@@ -40,7 +40,7 @@ public class QingqueClauseCoverageTest {
      */
     @Test
     public void theEnhancedBasicIsTheOneThatNormallyRefundsNothing() throws IOException {
-        Path doc = Path.of("E:\\turnbasedgamedata\\aluminium_texts\\1201_青雀.md");
+        Path doc = Path.of("E:\\aluminium_texts\\1201_青雀.md");
         Assertions.assertTrue(Files.exists(doc), "the external corpus is where the sentence lives");
         String text = Files.readString(doc, StandardCharsets.UTF_8);
         Assertions.assertTrue(text.contains("【杠上开花！】无法恢复战技点"),
