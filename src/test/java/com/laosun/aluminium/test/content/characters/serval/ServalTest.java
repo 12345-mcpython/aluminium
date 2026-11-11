@@ -4,7 +4,7 @@ package com.laosun.aluminium.test.content.characters.serval;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.buff.StateBuff;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.entity.Character;
@@ -16,6 +16,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -31,7 +32,7 @@ import java.util.Random;
  * rolls, Eidolon 1 and Eidolon 4 - three of the four are the same missing piece (an effect reaches what a *selector*
  * names, so a per-target condition cannot filter the set).
  */
-public class ServalShockTest {
+public class ServalTest {
     private static final int SERVAL = 1103;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
@@ -96,6 +97,43 @@ public class ServalShockTest {
     }
 
     /**
+     * 1103 希露瓦's technique:「进入战斗后对敌方随机单体造成 50% 攻击力的雷属性伤害，同时有 100% 的基础概率使敌方每个单体目标陷入触电状态，持续 3 回合」.
+     */
+    @Test
+    public void theTechniqueShocksEveryoneAndDamagesOne() {
+        Character her = CharacterFactory.create(SERVAL, LEVEL);
+        her.getBuffManager().addBuff(new StateBuff("秘技", 1));
+        Battle battle = new Battle(new ArrayList<>(List.of(her)),
+                new ArrayList<>(List.of(BattleFixture.dummy(), BattleFixture.dummy())),
+                BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        int shocked = 0;
+        double lost = 0;
+        for (var enemy : battle.enemyUnits()) {
+            if (enemy.getBuffManager().hasState("触电")) {
+                shocked++;
+            }
+            lost += enemy.getMaxHp() - enemy.getCurrentHp();
+        }
+        System.out.println("[1103] shocked=" + shocked + " totalLost=" + lost);
+        Assertions.assertEquals(2, shocked, "「使敌方每个单体目标陷入触电状态」");
+        Assertions.assertTrue(lost > 0, "「对敌方随机单体造成…雷属性伤害」");
+    }
+
+    /**
+     * The control: no technique, no shock.
+     */
+    @Test
+    public void withoutTheTechniqueNothingHappens() {
+        Character her = CharacterFactory.create(SERVAL, LEVEL);
+        Battle battle = new Battle(new ArrayList<>(List.of(her)),
+                new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        Assertions.assertFalse(battle.enemyUnits().getFirst().getBuffManager().hasState("触电"),
+                "the control: no technique, no shock");
+    }
+
+    /**
      * How many times the shock settles over six of the enemy's turns, with or without the ultimate.
      */
     private static int settlements(boolean ultimate) {
@@ -113,21 +151,6 @@ public class ServalShockTest {
             }
         }
         return settlements;
-    }
-
-    /* The whole file is present, and the registered clauses are absent on purpose. */
-    /**
-     * The whole file is present, and the registered clauses are absent on purpose.
-     */
-    public void herFileCarriesWhatItSays() {
-        Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ATTACK_FINISHED),
-                "the shock, applied to every enemy the Skill hit (the blast's damage is the engine's own path)");
-        Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.DEALING_DAMAGE),
-                "Eidolon 6's conditional boost");
-        Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ALLY_ATTACK),
-                "her talent's rider -- written since 2026-09-28 because target_when can finally say 「对所有触电状态下的敌方目标」 (all enemy targets in the Shock state)");
-        Assertions.assertEquals(2, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ULT_CAST),
-                "the shock extension and Eidolon 4's spread to the unshocked ones");
     }
 
     // ==================================================================

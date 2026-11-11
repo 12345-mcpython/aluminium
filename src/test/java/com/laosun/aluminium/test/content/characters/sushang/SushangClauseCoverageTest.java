@@ -1,8 +1,5 @@
 package com.laosun.aluminium.test.content.characters.sushang;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -13,14 +10,7 @@ import com.laosun.aluminium.trigger.TriggerPayload;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1206 素裳 clause coverage: every section of {@code 1206_素裳.md}, plus the two readings that had never been pinned.
@@ -33,44 +23,6 @@ public class SushangClauseCoverageTest {
 
     private static final int SUSHANG = 1206;
     private static final int ALLY = 1002;
-
-    private static final Map<String, String> SECTION_TO_RULE = new LinkedHashMap<>();
-
-    static {
-        SECTION_TO_RULE.put("普攻：云骑剑经 • 素霓", "(no rule needed: the basic attack reads its own skill row)");
-        SECTION_TO_RULE.put("战技：云骑剑经 • 山倾", "skill_sword_stance_chance");
-        SECTION_TO_RULE.put("终结技：太虚形蕴 • 烛夜", "ult_acts_again_immediately");
-        SECTION_TO_RULE.put("天赋：游刃若水", "talent_speed_on_break");
-        SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
-        SECTION_TO_RULE.put("秘技：云骑剑经 • 叩阵", "technique_opening_damage");
-        SECTION_TO_RULE.put("行迹：赤子", "trace_low_hp_aggro_down");
-        SECTION_TO_RULE.put("行迹：逐寇", "trace_sword_stance_damage_per_stack");
-        SECTION_TO_RULE.put("行迹：破敌", "trace_breaking_advance_after_common");
-        SECTION_TO_RULE.put("行迹：击破特攻 / 攻击 / 效果抵抗（数值行迹）",
-                "(no rule needed: stat traces are folded into the panel by the loader)");
-        SECTION_TO_RULE.put("星魂 1：游刃有余", "eidolon1_skill_point_on_a_broken_target");
-        SECTION_TO_RULE.put("星魂 2：其身百炼", "eidolon2_damage_reduction_after_sword_stance");
-        SECTION_TO_RULE.put("星魂 3：传古剑流", "eidolon3_ultra_and_talent_levels");
-        SECTION_TO_RULE.put("星魂 4：其心百辟", "eidolon4_breaking_effect");
-        SECTION_TO_RULE.put("星魂 5：太虚神意", "eidolon5_skill_and_common_levels");
-        SECTION_TO_RULE.put("星魂 6：上善若水", "eidolon6_talent_speed_stacks_twice");
-    }
-
-    @Test
-    public void everyDocumentSectionHasItsRule() throws IOException {
-        JsonArray rules = rules();
-        int checked = 0;
-        for (Map.Entry<String, String> entry : SECTION_TO_RULE.entrySet()) {
-            if (entry.getValue().startsWith("(")) {
-                continue;
-            }
-            checked++;
-            Assertions.assertTrue(has(rules, entry.getValue()),
-                    entry.getKey() + " has no rule (expected " + entry.getValue() + ")");
-        }
-        System.out.println("[1206] sections covered = " + checked + " rule-backed + "
-                + (SECTION_TO_RULE.size() - checked) + " with a written reason");
-    }
 
     /**
      * 星魂 4: 「素裳的击破特攻提高 40%」. Measured: BREAKING_EFFECT <b>0</b> at E0, <b>0.4</b> at E4.
@@ -120,22 +72,6 @@ public class SushangClauseCoverageTest {
 
     private static Fixture fixture(int eidolon) {
         return new Fixture(eidolon);
-    }
-
-    private static boolean has(JsonArray rules, String id) {
-        for (var element : rules) {
-            JsonObject candidate = element.getAsJsonObject();
-            if (candidate.has("id") && id.equals(candidate.get("id").getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static JsonArray rules() throws IOException {
-        Path file = Path.of("src", "main", "resources", "game", "characters", "1206.json");
-        return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8))
-                .getAsJsonObject().getAsJsonArray("rules");
     }
 
     private static final class Fixture {

@@ -1,0 +1,1828 @@
+{
+  "1001": {
+    "name": "March7th",
+    "sections": [
+      {
+        "section": "普攻：极寒的弓矢",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：护盾",
+        "rule": "skill_shield"
+      },
+      {
+        "section": "战技：大于等于 30% 生命时被攻击概率提高",
+        "rule": "skill_soft_aggro"
+      },
+      {
+        "section": "终结技：冰刻箭雨之时",
+        "rule": "ultimate_freeze"
+      },
+      {
+        "section": "天赋：少女的特权（反击）",
+        "rule": "counter"
+      },
+      {
+        "section": "秘技：冻人的瞬间",
+        "rule": "technique_freeze"
+      },
+      {
+        "section": "星魂 1：记忆中的你",
+        "rule": "eidolon_one_gives_energy_per_frozen_target"
+      },
+      {
+        "section": "星魂 2：记忆中的它",
+        "rule": "eidolon_two_shields_the_lowest_hp_ally_at_battle_start"
+      },
+      {
+        "section": "星魂 3：记忆中的一切",
+        "rule": "eidolon_three_raises_the_ult_and_basic"
+      },
+      {
+        "section": "星魂 4：反击次数 +1",
+        "rule": "eidolon_four_allows_one_more_counter"
+      },
+      {
+        "section": "星魂 4：反击伤害按防御力提高",
+        "rule": "eidolon_four_adds_defence_scaled_counter_damage"
+      },
+      {
+        "section": "星魂 5：不想再忘却",
+        "rule": "eidolon_five_raises_the_skill_and_talent"
+      },
+      {
+        "section": "星魂 6：就这样，一直…",
+        "rule": "eidolon_six_heals_shielded_allies_each_turn"
+      },
+      {
+        "section": "行迹：纯洁",
+        "rule": "skill_cleanses_one_debuff"
+      },
+      {
+        "section": "行迹：加护",
+        "rule": "trace_grace_adds_one_turn_to_the_shield"
+      },
+      {
+        "section": "行迹：冰咒",
+        "rule": "trace_ice_curse_raises_the_freeze_chance"
+      }
+    ]
+  },
+  "1002": {
+    "name": "DanHeng",
+    "sections": [
+      {
+        "section": "普攻：云骑枪术•朔风",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：云骑枪术•疾雨",
+        "rule": "skill_crit_slows_the_target"
+      },
+      {
+        "section": "终结技：洞天幻化，长梦一觉",
+        "rule": "ult_ethereal_dream_hits_a_slowed_target"
+      },
+      {
+        "section": "天赋：寸长寸强",
+        "rule": "talent_wind_pen"
+      },
+      {
+        "section": "秘技：破敌锋芒",
+        "rule": "technique_opening_attack"
+      },
+      {
+        "section": "星魂 1：穷高极天，亢盈难久",
+        "rule": "eidolon1_crit_chance_against_a_healthy_target"
+      },
+      {
+        "section": "星魂 2：威制八毒，灭却炎烟",
+        "rule": "eidolon2_shortens_the_talent_cooldown"
+      },
+      {
+        "section": "星魂 3：幽明变化，自在蟠跃",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：奋迅三昧，如日空居",
+        "rule": "eidolon4_ult_kill_acts_again"
+      },
+      {
+        "section": "星魂 5：一渧天水，六虚洪流",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：须绳缚身，沉潜勿用",
+        "rule": "eidolon6_deepens_the_slow"
+      },
+      {
+        "section": "行迹：潜龙",
+        "rule": "trace_low_hp_aggro_down"
+      },
+      {
+        "section": "行迹：绝影",
+        "rule": "trace_fleeting_shadow_speed"
+      },
+      {
+        "section": "行迹：罡风",
+        "rule": "trace_gang_feng_hits_a_slowed_target"
+      }
+    ]
+  },
+  "1003": {
+    "name": "Himeko",
+    "sections": [
+      {
+        "section": "普攻：相向而行",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：流火织成",
+        "why": "no rule needed: the skill reads its own row; 行迹 灼热 adds its bonus"
+      },
+      {
+        "section": "终结技：留待残烬",
+        "rule": "on_kill_effect"
+      },
+      {
+        "section": "天赋：乘胜追击（击破获得充能）",
+        "rule": "on_break_effect"
+      },
+      {
+        "section": "天赋：乘胜追击（充能满发动追加攻击）",
+        "rule": "attack_effect"
+      },
+      {
+        "section": "天赋：乘胜追击（战斗开始时 1 点充能）",
+        "rule": "battle_start"
+      },
+      {
+        "section": "秘技：不完全燃烧",
+        "rule": "technique_incomplete_combustion"
+      },
+      {
+        "section": "星魂 1：童年",
+        "rule": "eidolon1_speed_after_the_follow_up"
+      },
+      {
+        "section": "星魂 2：邂逅",
+        "rule": "starhunt_low_hp_damage"
+      },
+      {
+        "section": "星魂 3：自我",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：坚守的心",
+        "rule": "eidolon4_on_break"
+      },
+      {
+        "section": "星魂 5：梦想",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：开拓！",
+        "rule": "eidolon6_two_extra_random_hits"
+      },
+      {
+        "section": "行迹：星火",
+        "rule": "trace_starfire_burns_on_attack"
+      },
+      {
+        "section": "行迹：灼热",
+        "rule": "trace_scorching_skill_vs_burning"
+      },
+      {
+        "section": "行迹：道标",
+        "rule": "trace_beacon_crit_above_hp_line"
+      }
+    ]
+  },
+  "1005": {
+    "name": "Kafka",
+    "sections": [
+      {
+        "section": "普攻：夜间独白",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：月光摩挲连绵",
+        "rule": "skill_dot_ticks_now"
+      },
+      {
+        "section": "终结技：悲剧尽头的颤音",
+        "rule": "ult_shock_and_tick"
+      },
+      {
+        "section": "天赋：温柔亦同残酷",
+        "rule": "talent_followup"
+      },
+      {
+        "section": "秘技：宽恕无关慈悲",
+        "rule": "technique_shock_on_every_enemy"
+      },
+      {
+        "section": "星魂 1：无穷动！无穷",
+        "rule": "eidolon1_dot_taken_on_followup"
+      },
+      {
+        "section": "星魂 2：狂想者，呜咽",
+        "rule": "eidolon2_party_dot_damage"
+      },
+      {
+        "section": "星魂 3：我赞美，即兴",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：把宣叙呈献给",
+        "rule": "eidolon4_energy_on_her_shock_tick"
+      },
+      {
+        "section": "星魂 5：只有今晚奏鸣",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：回旋，悄悄地",
+        "rule": "eidolon6_shock_multiplier"
+      },
+      {
+        "section": "行迹：触电持续 +1 回合",
+        "rule": "trace_shock_lasts_one_more_turn"
+      }
+    ]
+  },
+  "1009": {
+    "name": "Asta",
+    "sections": [
+      {
+        "section": "普攻：光谱射线",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：流星群落",
+        "rule": "skill_extra_hits_random"
+      },
+      {
+        "section": "终结技：星空祝言",
+        "rule": "ult_flat_speed_for_all_allies"
+      },
+      {
+        "section": "天赋：蓄能获取",
+        "rule": "talent_charge_per_distinct_target"
+      },
+      {
+        "section": "天赋：火弱点额外一层",
+        "rule": "talent_charge_on_fire_weakness"
+      },
+      {
+        "section": "天赋：每层加攻",
+        "rule": "talent_charge_raises_all_attack"
+      },
+      {
+        "section": "天赋：第 2 回合起每回合 -3 层",
+        "rule": "talent_charge_decays_from_second_turn"
+      },
+      {
+        "section": "秘技：灵光一现",
+        "rule": "technique_opening_aoe"
+      },
+      {
+        "section": "星魂 1：星有无言之歌",
+        "rule": "eidolon1_extra_skill_hit"
+      },
+      {
+        "section": "星魂 2：月见圆缺之意",
+        "rule": "eidolon2_ult_stops_the_decay_once"
+      },
+      {
+        "section": "星魂 3：黄道陨石之变",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 5：深空天体之谜",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：眠于银河之下",
+        "rule": "eidolon6_charge_decay_reduced"
+      }
+    ]
+  },
+  "1101": {
+    "name": "Bronya",
+    "sections": [
+      {
+        "section": "普攻：风隼",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：作战再部署（行动提前）",
+        "rule": "skill_effect"
+      },
+      {
+        "section": "战技：作战再部署（解除负面）",
+        "rule": "skill_effect_2"
+      },
+      {
+        "section": "终结技：攻击力提高",
+        "rule": "ult_party_attack"
+      },
+      {
+        "section": "终结技：暴击伤害提高",
+        "rule": "ult_party_crit_damage"
+      },
+      {
+        "section": "天赋：先人一步",
+        "rule": "talent_advance_after_basic"
+      },
+      {
+        "section": "秘技：攻击力提高 15%",
+        "rule": "technique_party_attack"
+      },
+      {
+        "section": "星魂 1：养精蓄锐",
+        "rule": "eidolon1_skill"
+      },
+      {
+        "section": "星魂 2：行动后速度提高",
+        "rule": "eidolon2_speed_on_skill_target"
+      },
+      {
+        "section": "星魂 3：终结技与天赋等级",
+        "rule": "eidolon3_ultra_and_talent_levels"
+      },
+      {
+        "section": "星魂 4：风弱普攻后追加攻击",
+        "rule": "eidolon4_followup_on_wind_weak_basic"
+      },
+      {
+        "section": "星魂 5：战技与普攻等级",
+        "rule": "eidolon5_skill_and_common_levels"
+      },
+      {
+        "section": "星魂 6：战技目标增伤",
+        "rule": "eidolon6_skill"
+      },
+      {
+        "section": "行迹：阵地",
+        "rule": "battle_start"
+      },
+      {
+        "section": "行迹：军势",
+        "rule": "trace_military_power"
+      },
+      {
+        "section": "行迹：号令",
+        "rule": "trace_command_full_crit_on_basic"
+      }
+    ]
+  },
+  "1103": {
+    "name": "Serval",
+    "sections": [
+      {
+        "section": "普攻：雷鸣音阶",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：电光石火间",
+        "rule": "skill_shock"
+      },
+      {
+        "section": "终结技：机械热潮登场！",
+        "rule": "ult_effect"
+      },
+      {
+        "section": "天赋：燃情和弦",
+        "rule": "attack_effect"
+      },
+      {
+        "section": "秘技：晚安，贝洛伯格",
+        "rule": "technique_shock_and_damage"
+      },
+      {
+        "section": "星魂 1：余音绕梁",
+        "rule": "eidolon1_adjacent_damage_on_basic"
+      },
+      {
+        "section": "星魂 2：安可！",
+        "rule": "eidolon2_energy_on_talent_additional_damage"
+      },
+      {
+        "section": "星魂 3：听，齿轮的心跳",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：制造噪音吧！",
+        "rule": "eidolon4_ult"
+      },
+      {
+        "section": "星魂 5：贝洛伯格最强音！",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：这一曲，贯穿天穹！",
+        "rule": "eidolon6_on_damage"
+      },
+      {
+        "section": "行迹：电音",
+        "rule": "battle_start"
+      },
+      {
+        "section": "行迹：狂热",
+        "rule": "on_kill_effect"
+      },
+      {
+        "section": "行迹：摇滚",
+        "rule": "battle_start_2"
+      }
+    ]
+  },
+  "1104": {
+    "name": "Gepard",
+    "sections": [
+      {
+        "section": "普攻：一意之拳",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：震慑之击",
+        "rule": "skill_daunting_smite"
+      },
+      {
+        "section": "终结技：永屹之壁",
+        "rule": "ult_enduring_bulwark"
+      },
+      {
+        "section": "天赋：不屈之身",
+        "rule": "trace_survives_a_lethal_hit_once"
+      },
+      {
+        "section": "秘技：有情之证",
+        "rule": "technique_opening_shield"
+      },
+      {
+        "section": "星魂 1：恪尽职守",
+        "rule": "eidolon1_freeze_chance"
+      },
+      {
+        "section": "星魂 2：余寒",
+        "rule": "eidolon2_slow_after_freeze_ends"
+      },
+      {
+        "section": "星魂 3：永不陷落",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：精诚所至",
+        "rule": "eidolon4_party_resistance"
+      },
+      {
+        "section": "星魂 5：拳似寒铁",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：不屈的决意",
+        "rule": "eidolon6_acts_and_heals_more"
+      },
+      {
+        "section": "行迹：刚正",
+        "rule": "trace_steadfast_aggro"
+      },
+      {
+        "section": "行迹：统领",
+        "rule": "trace_energy_to_full_when_the_talent_fires"
+      },
+      {
+        "section": "行迹：战意",
+        "rule": "trace_battle_will"
+      }
+    ]
+  },
+  "1105": {
+    "name": "Natasha",
+    "sections": [
+      {
+        "section": "普攻：仁慈的背面",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：爱，救护与抉择",
+        "rule": "skill_effect"
+      },
+      {
+        "section": "终结技：新生之礼",
+        "why": "no rule needed: the restore comes from the ultimate's own row"
+      },
+      {
+        "section": "天赋：生机焕发",
+        "rule": "talent_heal_bonus_below_thirty_percent"
+      },
+      {
+        "section": "秘技：催眠研习",
+        "rule": "technique_weaken_and_strike"
+      },
+      {
+        "section": "星魂 1：遍识药理",
+        "rule": "eidolon1_taking_hit"
+      },
+      {
+        "section": "星魂 2：临床研学",
+        "rule": "eidolon2_ult"
+      },
+      {
+        "section": "星魂 3：对症下药",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：妙手回春",
+        "rule": "eidolon4_energy_on_being_hit"
+      },
+      {
+        "section": "星魂 5：医治未病",
+        "rule": "eidolon5_ultra_and_talent_levels"
+      },
+      {
+        "section": "星魂 6：医者仁心",
+        "rule": "eidolon6_max_hp_additional_damage"
+      },
+      {
+        "section": "行迹：医者",
+        "rule": "battle_start"
+      },
+      {
+        "section": "行迹：调理",
+        "rule": "trace_conditioning"
+      }
+    ]
+  },
+  "1106": {
+    "name": "Pela",
+    "sections": [
+      {
+        "section": "普攻：冰点射击",
+        "why": "no rule needed: the basic attack reads its own skill row — two segments of 50%"
+      },
+      {
+        "section": "战技：低温妨害",
+        "rule": "skill_dispel_buff"
+      },
+      {
+        "section": "终结技：领域压制",
+        "rule": "ult_zone_suppression"
+      },
+      {
+        "section": "天赋：数据采集",
+        "rule": "attack_effect"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：先发制人",
+        "rule": "technique_preemptive_strike"
+      },
+      {
+        "section": "行迹：痛击",
+        "rule": "trace_hit_the_afflicted"
+      },
+      {
+        "section": "行迹：秘策",
+        "rule": "battle_start"
+      },
+      {
+        "section": "行迹：追歼",
+        "rule": "trace_next_attack_after_dispel"
+      },
+      {
+        "section": "行迹：冰伤 / 攻击 / 效果命中（数值行迹）",
+        "why": "no rule needed: stat traces are folded into the panel by the loader"
+      },
+      {
+        "section": "星魂 1：胜利反馈",
+        "rule": "eidolon1_energy_on_an_enemy_kill"
+      },
+      {
+        "section": "星魂 2：疾进不止",
+        "rule": "eidolon2_speed_after_the_dispel"
+      },
+      {
+        "section": "星魂 3：压制升级",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：完全剖析",
+        "rule": "eidolon4_ice_resistance_down_on_skill"
+      },
+      {
+        "section": "星魂 5：零度妨害",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：疲弱追击",
+        "rule": "eidolon6_extra_damage_on_a_debuffed_target"
+      }
+    ]
+  },
+  "1108": {
+    "name": "Sampo",
+    "sections": [
+      {
+        "section": "普攻：酷炫的刀花",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：反复横跳的爱",
+        "why": "no rule needed: the 4 extra hits come from slot 2's hit-count row"
+      },
+      {
+        "section": "终结技：惊喜礼盒",
+        "rule": "ult_present"
+      },
+      {
+        "section": "天赋：撕风的匕首",
+        "rule": "talent_windtorn"
+      },
+      {
+        "section": "秘技：你最闪亮",
+        "rule": "technique_delays_every_enemy"
+      },
+      {
+        "section": "星魂 1：加码的爱",
+        "rule": "eidolon1_extra_skill_hit"
+      },
+      {
+        "section": "星魂 2：热情会传染",
+        "rule": "eidolon2_windtorn_on_kill"
+      },
+      {
+        "section": "星魂 3：大数字！",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：爱之深，恨之切",
+        "rule": "eidolon4_tick_on_stacked_windtorn"
+      },
+      {
+        "section": "星魂 5：超大数字！",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：消费升级",
+        "rule": "eidolon6_stronger_windtorn"
+      },
+      {
+        "section": "行迹：圈套",
+        "rule": "trace_longer_windtorn"
+      },
+      {
+        "section": "行迹：后手",
+        "rule": "trace_extra_energy"
+      },
+      {
+        "section": "行迹：加料",
+        "rule": "trace_less_damage_from_windtorn"
+      }
+    ]
+  },
+  "1109": {
+    "name": "Hook",
+    "sections": [
+      {
+        "section": "普攻：请…请让一下！",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：嘿！记得虎克吗",
+        "rule": "skill_burn"
+      },
+      {
+        "section": "终结技：轰！飞来焰火",
+        "rule": "ult_enhances_the_next_skill"
+      },
+      {
+        "section": "强化战技：嘿！记得虎克吗",
+        "rule": "ult_enhances_the_next_skill"
+      },
+      {
+        "section": "天赋：哈！火上浇油",
+        "rule": "talent_followup_against_burning"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：哎！瞧这一团糟",
+        "rule": "technique_burn_on_entry"
+      },
+      {
+        "section": "行迹：童真",
+        "rule": "trace_childlike"
+      },
+      {
+        "section": "行迹：无邪",
+        "rule": "trace_innocence"
+      },
+      {
+        "section": "行迹：玩火",
+        "rule": "trace_play_with_fire"
+      },
+      {
+        "section": "行迹：冰伤 / 攻击 / 暴击（数值行迹）",
+        "why": "no rule needed: stat traces are folded into the panel by the loader"
+      },
+      {
+        "section": "星魂 1：早睡早起很健康",
+        "rule": "eidolon1_enhanced_skill_damage_up"
+      },
+      {
+        "section": "星魂 2：吃好喝好长身体",
+        "rule": "eidolon2_longer_burn"
+      },
+      {
+        "section": "星魂 3：不挑不选全都要",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：稀里糊涂没关系",
+        "rule": "eidolon4_adjacent_burn"
+      },
+      {
+        "section": "星魂 5：好事留名鼹鼠党",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：随时准备打坏人",
+        "rule": "eidolon6_bonus_against_burning"
+      }
+    ]
+  },
+  "1111": {
+    "name": "Luka",
+    "sections": [
+      {
+        "section": "普攻：直冲拳",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "强化普攻：直冲碎天拳",
+        "rule": "talent_enhance_basic"
+      },
+      {
+        "section": "战技：裂伤拳",
+        "rule": "skill_lacerate"
+      },
+      {
+        "section": "终结技：直冲碎天拳",
+        "rule": "ult_coup"
+      },
+      {
+        "section": "天赋：直冲拳",
+        "rule": "talent_start"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：裂伤拳",
+        "rule": "technique_damage_and_bleed_on_one_enemy"
+      },
+      {
+        "section": "行迹：动能过载",
+        "rule": "trace_overload"
+      },
+      {
+        "section": "行迹：循环制动",
+        "rule": "trace_recycle_energy_per_will_layer"
+      },
+      {
+        "section": "行迹：粉碎斗志",
+        "rule": "trace_crushing_will_extra_segment"
+      },
+      {
+        "section": "行迹：攻击 / 效果命中 / 防御（数值行迹）",
+        "why": "no rule needed: stat traces are folded into the panel by the loader"
+      },
+      {
+        "section": "星魂 1：裂伤拳",
+        "rule": "eidolon1_damage_up_while_bleeding"
+      },
+      {
+        "section": "星魂 2：直冲拳",
+        "rule": "eidolon2_will_on_physical_weakness"
+      },
+      {
+        "section": "星魂 3：裂伤拳",
+        "rule": "eidolon3_raises_skill_and_talent"
+      },
+      {
+        "section": "星魂 4：斗志",
+        "rule": "eidolon4_attack_per_will"
+      },
+      {
+        "section": "星魂 5：直冲拳",
+        "rule": "eidolon5_raises_ult_and_basic"
+      },
+      {
+        "section": "星魂 6：裂伤拳",
+        "rule": "eidolon6_laceration_ticks_per_segment"
+      }
+    ]
+  },
+  "1203": {
+    "name": "Luocha",
+    "sections": [
+      {
+        "section": "普攻：黑渊的棘刺",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：白花的祈望（治疗与花）",
+        "rule": "skill_abyss_flower"
+      },
+      {
+        "section": "战技：白花的祈望（自动触发）",
+        "rule": "skill_trigger_on_crossing"
+      },
+      {
+        "section": "终结技：归葬的遂愿",
+        "rule": "ult_dispel_and_abyss_flower"
+      },
+      {
+        "section": "天赋：生息的轮转（开花结界）",
+        "rule": "talent_zone_opens_at_two_stacks"
+      },
+      {
+        "section": "天赋：生息的轮转（结界治疗攻击者）",
+        "rule": "talent_zone_heals_the_attacker"
+      },
+      {
+        "section": "天赋：生息的轮转（罗刹倒下解结界）",
+        "rule": "talent_zone_ends_when_he_falls"
+      },
+      {
+        "section": "秘技：愚者的悲悯",
+        "rule": "technique_triggers_talent"
+      },
+      {
+        "section": "星魂 1：濯洗生者",
+        "rule": "eidolon1_attack_while_the_zone_is_up"
+      },
+      {
+        "section": "星魂 2：净庭赐礼（低于半血治疗量）",
+        "rule": "eidolon2_heal_boost_below_half"
+      },
+      {
+        "section": "星魂 2：净庭赐礼（不低于半血护盾）",
+        "rule": "eidolon2_shield_at_or_above_half"
+      },
+      {
+        "section": "星魂 3：愚人试探",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：荆冠审判",
+        "rule": "eidolon4_weaken_while_the_zone_is_up"
+      },
+      {
+        "section": "星魂 5：受难之痕",
+        "rule": "eidolon5_ultra_and_talent_levels"
+      },
+      {
+        "section": "星魂 6：皆归尘土",
+        "rule": "ult_all_type_res_down"
+      },
+      {
+        "section": "行迹：浸池苏生",
+        "rule": "trace_dispel_on_skill_trigger"
+      },
+      {
+        "section": "行迹：浇灌尘身",
+        "rule": "trace_zone_heals_the_others"
+      },
+      {
+        "section": "行迹：行过幽谷",
+        "rule": "trace_control_resist"
+      }
+    ]
+  },
+  "1206": {
+    "name": "Sushang",
+    "sections": [
+      {
+        "section": "普攻：云骑剑经 • 素霓",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：云骑剑经 • 山倾",
+        "rule": "skill_sword_stance_chance"
+      },
+      {
+        "section": "终结技：太虚形蕴 • 烛夜",
+        "rule": "ult_acts_again_immediately"
+      },
+      {
+        "section": "天赋：游刃若水",
+        "rule": "talent_speed_on_break"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：云骑剑经 • 叩阵",
+        "rule": "technique_opening_damage"
+      },
+      {
+        "section": "行迹：赤子",
+        "rule": "trace_low_hp_aggro_down"
+      },
+      {
+        "section": "行迹：逐寇",
+        "rule": "trace_sword_stance_damage_per_stack"
+      },
+      {
+        "section": "行迹：破敌",
+        "rule": "trace_breaking_advance_after_common"
+      },
+      {
+        "section": "行迹：击破特攻 / 攻击 / 效果抵抗（数值行迹）",
+        "why": "no rule needed: stat traces are folded into the panel by the loader"
+      },
+      {
+        "section": "星魂 1：游刃有余",
+        "rule": "eidolon1_skill_point_on_a_broken_target"
+      },
+      {
+        "section": "星魂 2：其身百炼",
+        "rule": "eidolon2_damage_reduction_after_sword_stance"
+      },
+      {
+        "section": "星魂 3：传古剑流",
+        "rule": "eidolon3_ultra_and_talent_levels"
+      },
+      {
+        "section": "星魂 4：其心百辟",
+        "rule": "eidolon4_breaking_effect"
+      },
+      {
+        "section": "星魂 5：太虚神意",
+        "rule": "eidolon5_skill_and_common_levels"
+      },
+      {
+        "section": "星魂 6：上善若水",
+        "rule": "eidolon6_talent_speed_stacks_twice"
+      }
+    ]
+  },
+  "1207": {
+    "name": "Yukong",
+    "sections": [
+      {
+        "section": "普攻：流镝",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：天阙鸣弦",
+        "rule": "skill_command"
+      },
+      {
+        "section": "终结技：贯云饮羽",
+        "rule": "ult_effect"
+      },
+      {
+        "section": "天赋：箭彻七札",
+        "rule": "basic_effect"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：云鸢逐风",
+        "rule": "technique_two_stacks_on_entry"
+      },
+      {
+        "section": "星魂 1：天舶飞将，枕弧待战",
+        "rule": "eidolon1_battle_start"
+      },
+      {
+        "section": "星魂 2：青霄驰骋，驱驭苍穹",
+        "rule": "eidolon2_energy_on_ally_full"
+      },
+      {
+        "section": "星魂 3：危弓未辍，执射不宁",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：百里闻风，九曲响镝",
+        "rule": "eidolon4_on_damage"
+      },
+      {
+        "section": "星魂 5：井仪贯侯，疾羽参连",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：弦栝如雷，铣珧激荡",
+        "rule": "eidolon6_ult"
+      },
+      {
+        "section": "行迹：气壮",
+        "rule": "turn_end_effect"
+      },
+      {
+        "section": "行迹：迟彝",
+        "rule": "battle_start"
+      },
+      {
+        "section": "行迹：archerion",
+        "rule": "trace_archerion_one_debuff_resist"
+      }
+    ]
+  },
+  "1211": {
+    "name": "Bailu",
+    "sections": [
+      {
+        "section": "普攻：望 、闻、问…蹴！",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：云吟乍涌坠珠露",
+        "why": "no rule needed for the first heal: the skill row pays it; the 2 random decaying heals are registered"
+      },
+      {
+        "section": "终结技：匏蛟跃渊先雷音",
+        "rule": "ult_rebirth"
+      },
+      {
+        "section": "天赋：奔走悬壶济世长",
+        "rule": "talent_heals_a_lethal_hit_on_a_teammate"
+      },
+      {
+        "section": "秘技：徜徉灵泽病恙短",
+        "rule": "technique_invigoration_for_the_whole_party"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "星魂 1：百脉甘津宁神久",
+        "rule": "eidolon1_energy_when_invigoration_ends_at_full_hp"
+      },
+      {
+        "section": "星魂 2：壶中洞天云螭眠",
+        "rule": "eidolon2_heal_boost"
+      },
+      {
+        "section": "星魂 3：掌间乾坤便通玄",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：肘后备急除外障",
+        "rule": "eidolon4_healed_ally_deals_more"
+      },
+      {
+        "section": "星魂 5：方定一倾浣俗尘",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：龙漦吐哺胜金丹",
+        "why": "registered: the lethal heal's count is `once_per_battle`, a boolean — no \"one more\" spelling"
+      },
+      {
+        "section": "行迹：岐黄精义",
+        "why": "registered: no overheal observation — HEALED carries no overflow"
+      },
+      {
+        "section": "行迹：持明龙脉",
+        "rule": "trace_dragon_vein_adds_one_invigoration_trigger"
+      },
+      {
+        "section": "行迹：鳞渊福泽",
+        "rule": "ult_rebirth"
+      },
+      {
+        "section": "行迹：生命 / 防御 / 效果抵抗（数值行迹）",
+        "why": "no rule needed: stat traces are folded into the panel by the loader"
+      }
+    ]
+  },
+  "1215": {
+    "name": "Hanya",
+    "sections": [
+      {
+        "section": "普攻：冥谶天笔",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：生灭系缚（承负）",
+        "rule": "skill_effect"
+      },
+      {
+        "section": "战技：触发计数（普攻）",
+        "rule": "attack_effect"
+      },
+      {
+        "section": "战技：触发计数（战技）",
+        "rule": "attack_effect_2"
+      },
+      {
+        "section": "战技：触发计数（终结技）",
+        "rule": "attack_effect_3"
+      },
+      {
+        "section": "战技：回战技点与自动解除",
+        "rule": "attack_effect_4"
+      },
+      {
+        "section": "终结技：十王敕令",
+        "rule": "ult_blessing"
+      },
+      {
+        "section": "天赋：罚恶（普攻）",
+        "rule": "talent_common"
+      },
+      {
+        "section": "天赋：罚恶（战技）",
+        "rule": "talent_skill"
+      },
+      {
+        "section": "天赋：罚恶（终结技）",
+        "rule": "talent_ultra"
+      },
+      {
+        "section": "秘技：判冥",
+        "rule": "technique_prey_on_a_random_enemy"
+      },
+      {
+        "section": "星魂 1：一心",
+        "rule": "eidolon1_on_kill"
+      },
+      {
+        "section": "星魂 2：二观",
+        "rule": "eidolon2_skill"
+      },
+      {
+        "section": "星魂 3：三尘",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：四谛",
+        "rule": "eidolon4_duration"
+      },
+      {
+        "section": "星魂 5：五阴",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：六正",
+        "rule": "eidolon6_talent"
+      },
+      {
+        "section": "行迹：幽府",
+        "rule": "on_kill_effect"
+      }
+    ]
+  },
+  "1217": {
+    "name": "Huohuo",
+    "sections": [
+      {
+        "section": "普攻：令旗•征风召雨",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：灵符•保命护身",
+        "rule": "skill_talisman"
+      },
+      {
+        "section": "终结技：尾巴•遣神役鬼",
+        "rule": "ult_tail"
+      },
+      {
+        "section": "天赋：凭附•气通天真（授予禳命）",
+        "rule": "skill_grants_talisman"
+      },
+      {
+        "section": "天赋：凭附•气通天真（每回合触发）",
+        "rule": "turn_start_effect"
+      },
+      {
+        "section": "秘技：凶煞•劾压鬼物",
+        "rule": "technique_attack_down"
+      },
+      {
+        "section": "星魂 1：禳命延长",
+        "rule": "eidolon1_longer_talisman"
+      },
+      {
+        "section": "星魂 1：全队速度提高",
+        "rule": "eidolon1_speed_aura_on_start"
+      },
+      {
+        "section": "星魂 2：判官书符",
+        "rule": "e2_saves_an_ally_with_the_talisman"
+      },
+      {
+        "section": "星魂 3：贞凶体质",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：坐卧不离",
+        "rule": "eidolon4_more_healing_for_the_hurt"
+      },
+      {
+        "section": "星魂 5：降妖捉鬼",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：同休共戚",
+        "rule": "eidolon6_healed_ally_deals_more"
+      },
+      {
+        "section": "行迹：不敢自专",
+        "rule": "trace_fearful_to_act"
+      },
+      {
+        "section": "行迹：贞凶之命",
+        "rule": "trace_cursed_one"
+      },
+      {
+        "section": "行迹：怯惧应激",
+        "rule": "trace_stress_reaction"
+      }
+    ]
+  },
+  "1218": {
+    "name": "Jiaoqiu",
+    "sections": [
+      {
+        "section": "普攻：火烈弹",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：仁者见仁",
+        "rule": "talent_ashen_roast_and_burn"
+      },
+      {
+        "section": "终结技：随时随地，突发奇想",
+        "rule": "ult_opens_the_domain"
+      },
+      {
+        "section": "天赋：四示八权，纤滋精味",
+        "rule": "talent_ashen_roast_and_burn"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：旺火却乱",
+        "rule": "technique_opening_aoe_and_stack"
+      },
+      {
+        "section": "行迹：爟火",
+        "rule": "trace_kindling_energy_at_battle_start"
+      },
+      {
+        "section": "行迹：举炊",
+        "rule": "trace_stoking_attack_per_fifteen_percent"
+      },
+      {
+        "section": "行迹：炙香",
+        "rule": "trace_fragrant_guide_copies_the_highest_layers"
+      },
+      {
+        "section": "行迹：效果命中 / 火伤 / 速度（数值行迹）",
+        "why": "no rule needed: stat traces are folded into the panel by the loader"
+      },
+      {
+        "section": "星魂 1：五味五走，生熟有定",
+        "rule": "eidolon1_more_damage_to_roasted"
+      },
+      {
+        "section": "星魂 2：执领烟火",
+        "rule": "eidolon2_burn_multiplier"
+      },
+      {
+        "section": "星魂 3：五味五走",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：藏腑和平，血气资荣",
+        "rule": "eidolon4_weaken_enemies_while_the_domain_is_up"
+      },
+      {
+        "section": "星魂 5：九沸九变",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：九沸九变，火为之纪",
+        "rule": "talent_ashen_roast_and_burn_at_eidolon_six"
+      },
+      {
+        "section": "星魂 6（击杀转移）",
+        "rule": "eidolon6_the_roast_moves_to_the_least_roasted_enemy"
+      }
+    ]
+  },
+  "1302": {
+    "name": "Argenti",
+    "sections": [
+      {
+        "section": "普攻：芬芳一现",
+        "rule": "talent_stack_basic"
+      },
+      {
+        "section": "战技：公正，此处盛放",
+        "rule": "talent_stack_skill"
+      },
+      {
+        "section": "终结技：驻于花庭，赐与尽美",
+        "rule": "talent_stack_ultra"
+      },
+      {
+        "section": "天赋：崇高的客体",
+        "rule": "talent_stack_ultra"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：纯粹高洁宣言",
+        "rule": "technique_damage_and_energy"
+      },
+      {
+        "section": "强化终结技：驻「我」华庭，授予至勋",
+        "rule": "enhanced_ult_available"
+      },
+      {
+        "section": "行迹：虔诚",
+        "rule": "turn_start_effect"
+      },
+      {
+        "section": "行迹：勇气",
+        "rule": "on_damage_effect"
+      },
+      {
+        "section": "行迹：慷慨",
+        "rule": "trace_generous_energy"
+      },
+      {
+        "section": "星魂 1：审美王国的缺口",
+        "rule": "eidolon1_battle_start"
+      },
+      {
+        "section": "星魂 2：玛瑙石的谦卑",
+        "rule": "eidolon2_attack_with_three_enemies"
+      },
+      {
+        "section": "星魂 3：荆棘路的荣光",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：号角的奉献",
+        "rule": "eidolon4_battle_start"
+      },
+      {
+        "section": "星魂 5：宇宙某处的雪",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：「你」的光芒",
+        "rule": "eidolon6_on_damage"
+      }
+    ]
+  },
+  "1312": {
+    "name": "Misha",
+    "sections": [
+      {
+        "section": "普攻：请…请让一下！",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：客…客房服务！",
+        "rule": "skill_adds_one_segment_to_the_next_ultimate"
+      },
+      {
+        "section": "终结技：要…要迟到了！",
+        "rule": "ult_freeze_per_segment"
+      },
+      {
+        "section": "天赋：擒纵机构",
+        "rule": "talent_extra_segment_per_point"
+      },
+      {
+        "section": "地图攻击：攻击",
+        "why": "no rule needed: the map attack happens outside battle"
+      },
+      {
+        "section": "秘技：停一停吧，你真美丽！",
+        "rule": "technique_dream_prison_raises_segments"
+      },
+      {
+        "section": "行迹：释放",
+        "why": "registered: no segment ordinal — it only raises the FIRST segment's chance"
+      },
+      {
+        "section": "行迹：锁接",
+        "rule": "trace_lockstep_effect_hit_during_the_ultimate"
+      },
+      {
+        "section": "行迹：传冲",
+        "rule": "trace_momentum_crit_damage_against_frozen"
+      },
+      {
+        "section": "行迹：冰伤 / 防御 / 暴击率（数值行迹）",
+        "why": "no rule needed: stat traces are folded into the panel by the loader"
+      },
+      {
+        "section": "星魂 1：飘忽的幻影",
+        "rule": "eidolon1_extra_segments_per_enemy"
+      },
+      {
+        "section": "星魂 2：青春的怅望",
+        "rule": "eidolon2_freeze_also_lowers_defence"
+      },
+      {
+        "section": "星魂 3：欢乐年光的影子",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：亲挚的音容",
+        "rule": "eidolon4_ult_segment_damage_up"
+      },
+      {
+        "section": "星魂 5：最初的爱与友谊",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：久已生疏的憧憬",
+        "rule": "eidolon6_damage_up_and_refunds_a_point"
+      }
+    ]
+  },
+  "1403": {
+    "name": "Tribbie",
+    "sections": [
+      {
+        "section": "普攻：一百层的小火箭",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：礼物都去哪儿了",
+        "rule": "skill_numinosity"
+      },
+      {
+        "section": "终结技：结界状态",
+        "rule": "ult_zone_state"
+      },
+      {
+        "section": "终结技：结界易伤",
+        "rule": "ult_zone_enemy_vulnerability"
+      },
+      {
+        "section": "终结技：结界的附加伤害",
+        "rule": "ult_zone_additional_damage"
+      },
+      {
+        "section": "天赋：追加攻击",
+        "rule": "talent_followup_on_other_ult"
+      },
+      {
+        "section": "天赋：终结技重置计数",
+        "rule": "ult_resets_the_per_actor_followup_count"
+      },
+      {
+        "section": "秘技：开心你就拍拍手",
+        "rule": "technique_numinosity"
+      },
+      {
+        "section": "星魂 1：额外真实伤害",
+        "rule": "eidolon1_true_damage_on_zone_target"
+      },
+      {
+        "section": "星魂 2：附加伤害提高",
+        "rule": "eidolon2_zone_additional_damage"
+      },
+      {
+        "section": "星魂 3：终结技与普攻等级",
+        "rule": "eidolon3_ultra_and_common_levels"
+      },
+      {
+        "section": "星魂 4：战技的无视防御",
+        "rule": "eidolon4_party_defence_ignore_on_skill"
+      },
+      {
+        "section": "星魂 4：秘技的无视防御",
+        "rule": "eidolon4_party_defence_ignore_on_technique"
+      },
+      {
+        "section": "星魂 5：战技与天赋等级",
+        "rule": "eidolon5_skill_and_talent_levels"
+      },
+      {
+        "section": "星魂 6：自己终结技后追加攻击",
+        "rule": "eidolon6_own_ult_talent_followup"
+      },
+      {
+        "section": "星魂 6：追加攻击增伤",
+        "rule": "eidolon6_other_ult_talent_damage_boost"
+      },
+      {
+        "section": "行迹：岔路旁的小石子？（开局 30 能量）",
+        "rule": "trace_30_energy"
+      },
+      {
+        "section": "行迹：岔路旁的小石子？（每目标回能）",
+        "rule": "trace_energy_per_target"
+      },
+      {
+        "section": "行迹：城墙外的羊羔儿…",
+        "rule": "trace_damage_boost_after_followup"
+      },
+      {
+        "section": "忆灵技：献予「门径」之诗（无视防御）",
+        "rule": "memosprite_ode_of_passage_makes_his_damage_ignore_defence"
+      },
+      {
+        "section": "忆灵技：献予「门径」之诗（额外附加伤害）",
+        "rule": "passage_ode_adds_one_more_zone_hit"
+      }
+    ]
+  },
+  "1409": {
+    "name": "Hyacine",
+    "sections": [
+      {
+        "section": "普攻：天气正好，万物可爱！",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：召唤 小伊卡",
+        "rule": "skill_summons_ica"
+      },
+      {
+        "section": "战技：治疗我方全体",
+        "rule": "the_skill_heals_every_ally"
+      },
+      {
+        "section": "战技：同时治疗小伊卡",
+        "rule": "the_skill_also_heals_ikachi_itself"
+      },
+      {
+        "section": "终结技：召唤 小伊卡",
+        "rule": "ult_summons_ica"
+      },
+      {
+        "section": "终结技：治疗我方与小伊卡",
+        "rule": "ult_heals_party_and_ikachi"
+      },
+      {
+        "section": "终结技：雨过天晴与生命上限",
+        "rule": "ult_state_and_max_hp"
+      },
+      {
+        "section": "天赋：治疗提高小伊卡伤害",
+        "rule": "talent_healing_raises_ikachis_damage"
+      },
+      {
+        "section": "秘技：治疗与生命上限",
+        "rule": "technique_heals_and_raises_max_hp"
+      },
+      {
+        "section": "星魂 1：雨过天晴提高生命上限",
+        "rule": "eidolon_one_raises_max_hp_while_rain_clear"
+      },
+      {
+        "section": "星魂 1：攻击后回复",
+        "rule": "eidolon_one_heals_after_an_attack_while_rain_clear"
+      },
+      {
+        "section": "星魂 2：掉血后加速",
+        "rule": "eidolon_two_speed_on_hp_loss"
+      },
+      {
+        "section": "星魂 3：终结技等级",
+        "rule": "eidolon_three_raises_the_ult"
+      },
+      {
+        "section": "星魂 4：超速加暴伤（她自己）",
+        "rule": "eidolon_four_adds_crit_damage_per_point_of_speed"
+      },
+      {
+        "section": "星魂 4：超速加暴伤（小伊卡）",
+        "rule": "eidolon_four_adds_ikachis_crit_damage_too"
+      },
+      {
+        "section": "星魂 5：战技与天赋等级",
+        "rule": "eidolon_five_raises_skill_and_talent"
+      },
+      {
+        "section": "星魂 6：全属性抗性穿透",
+        "rule": "eidolon_six_gives_the_party_all_type_resistance_penetration"
+      },
+      {
+        "section": "星魂 6：后入场者也覆盖",
+        "rule": "eidolon_six_aura_covers_later_arrivals"
+      },
+      {
+        "section": "星魂 6：小伊卡离场则结束",
+        "rule": "eidolon_six_aura_ends_when_ikachi_leaves"
+      },
+      {
+        "section": "星魂 6：清空改为 12%",
+        "rule": "eidolon_six_clears_twelve_percent_instead"
+      },
+      {
+        "section": "行迹：暴风停歇（生命上限）",
+        "rule": "trace_windstorm_raises_her_max_hp_above_200_speed"
+      },
+      {
+        "section": "行迹：暴风停歇（治疗量）",
+        "rule": "trace_windstorm_raises_her_healing_per_point_of_speed"
+      },
+      {
+        "section": "行迹：暴风停歇（小伊卡同享）",
+        "rule": "trace_windstorm_raises_ikachis_healing_too"
+      },
+      {
+        "section": "忆灵技 1：累计她自己治疗",
+        "rule": "tally_counts_hyacines_own_healing"
+      },
+      {
+        "section": "忆灵技 1：累计小伊卡治疗",
+        "rule": "tally_counts_ikachis_healing_too"
+      },
+      {
+        "section": "忆灵技 1：按累计造成伤害",
+        "rule": "memosprite_rainclouds_deals_a_share_of_the_tally"
+      },
+      {
+        "section": "忆灵技 1：清空一半",
+        "rule": "memosprite_rainclouds_clears_half_the_tally"
+      },
+      {
+        "section": "忆灵技 2：给小伊卡回血",
+        "rule": "ikachi_pays_and_heals_whoever_lost_hp"
+      },
+      {
+        "section": "忆灵技 2：雨过天晴后立即行动",
+        "rule": "ikachi_acts_right_after_she_uses_a_skill_in_the_rain"
+      },
+      {
+        "section": "忆灵技 2：行动后自身效果减 1",
+        "rule": "ikachi_shortens_its_own_effects_after_it_acts"
+      },
+      {
+        "section": "忆灵技 2：免疫负面",
+        "rule": "ikachi_is_immune_to_negative_effects"
+      },
+      {
+        "section": "忆灵技 3：被召唤回能",
+        "rule": "memosprite_soaring_gives_her_energy_when_it_arrives"
+      },
+      {
+        "section": "忆灵技 3：首次召唤额外回能",
+        "rule": "memosprite_soaring_gives_thirty_more_on_its_first_arrival"
+      },
+      {
+        "section": "忆灵技 4：消失时让她行动提前",
+        "rule": "memosprite_fall_advances_her_action"
+      },
+      {
+        "section": "忆灵技：献予「天空」之诗（回能）",
+        "rule": "memosprite_ode_of_sky_gives_her_energy"
+      },
+      {
+        "section": "忆灵技：献予「天空」之诗（战技消耗）",
+        "rule": "casting_a_skill_spends_one_layer_of_the_sky_ode"
+      },
+      {
+        "section": "忆灵技：献予「天空」之诗（终结技消耗）",
+        "rule": "casting_the_ultimate_spends_one_layer_of_the_sky_ode"
+      },
+      {
+        "section": "忆灵技：献予「天空」之诗（治疗份额）",
+        "rule": "sky_ode_captures_its_healing_share"
+      },
+      {
+        "section": "忆灵技：献予「天空」之诗（计入累计）",
+        "rule": "sky_ode_adds_a_share_of_each_heal_to_ikachis_total"
+      }
+    ]
+  },
+  "8005": {
+    "name": "TrailblazerHarmony",
+    "sections": [
+      {
+        "section": "普攻：摇摆的礼仪",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：中场馈赠的雨",
+        "rule": "skill_extra_hits_random"
+      },
+      {
+        "section": "终结技：喧嚣的舞灯巡游",
+        "rule": "ult_dance"
+      },
+      {
+        "section": "终结技：超击破",
+        "rule": "ult_super_break"
+      },
+      {
+        "section": "天赋：全屏段的高空踏歌",
+        "rule": "talent_energy_on_break"
+      },
+      {
+        "section": "秘技：即刻！独奏团",
+        "rule": "technique_breaking_effect"
+      },
+      {
+        "section": "星魂 1：您的最佳观众席",
+        "rule": "eidolon1_skill_point_after_first_skill"
+      },
+      {
+        "section": "星魂 2：越狱的跨洋彩虹",
+        "rule": "eidolon2_energy_regen"
+      },
+      {
+        "section": "星魂 3：休止符的疗养院",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：袒护白鸽的冠冕",
+        "rule": "eidolon4_break_effect_for_others"
+      },
+      {
+        "section": "星魂 5：包庇旧节拍的诗",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：明天，栖息聚光之下",
+        "rule": "eidolon6_extra_skill_hits"
+      }
+    ]
+  },
+  "8006": {
+    "name": "SiblingTrailblazerHarmony",
+    "sections": [
+      {
+        "section": "普攻：摇摆的礼仪",
+        "why": "no rule needed: the basic attack reads its own skill row"
+      },
+      {
+        "section": "战技：中场馈赠的雨",
+        "rule": "skill_extra_hits_random"
+      },
+      {
+        "section": "终结技：喧嚣的舞灯巡游",
+        "rule": "ult_dance"
+      },
+      {
+        "section": "终结技：超击破",
+        "rule": "on_damage_effect"
+      },
+      {
+        "section": "天赋：全屏段的高空踏歌",
+        "rule": "on_break_effect"
+      },
+      {
+        "section": "秘技：即刻！独奏团",
+        "rule": "technique_breaking_effect"
+      },
+      {
+        "section": "星魂 1：您的最佳观众席",
+        "rule": "eidolon1_skill_point_after_first_skill"
+      },
+      {
+        "section": "星魂 2：越狱的跨洋彩虹",
+        "rule": "eidolon2_energy_regen"
+      },
+      {
+        "section": "星魂 3：休止符的疗养院",
+        "rule": "eidolon3_levels"
+      },
+      {
+        "section": "星魂 4：袒护白鸽的冠冕",
+        "rule": "eidolon4_break_effect_for_others"
+      },
+      {
+        "section": "星魂 5：包庇旧节拍的诗",
+        "rule": "eidolon5_levels"
+      },
+      {
+        "section": "星魂 6：明天，栖息聚光之下",
+        "rule": "eidolon6_extra_skill_hits"
+      }
+    ]
+  }
+}

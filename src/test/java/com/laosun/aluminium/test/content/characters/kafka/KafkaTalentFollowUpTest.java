@@ -1,4 +1,4 @@
-package com.laosun.aluminium.test.content.kafka;
+package com.laosun.aluminium.test.content.characters.kafka;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;

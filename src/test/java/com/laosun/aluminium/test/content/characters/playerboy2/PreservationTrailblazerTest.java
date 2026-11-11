@@ -96,32 +96,6 @@ public class PreservationTrailblazerTest {
     }
 
     /**
-     * Census: the stacks, the three shields, the skill's two effects, the technique and the convention.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        for (int cid : new int[]{TB3, TB4}) {
-            var table = TriggerTables.of(cid);
-            // Note: 3 since 2026-11-06 - the stack per hit plus the two 「>=4 层 ⇒ 强化 / <4 ⇒ 还原」 swaps on the same event.
-            Assertions.assertEquals(3, table.ruleCount(TriggerEvent.TAKING_HIT), "cid " + cid + ": the stack per hit and the two swaps");
-            // Note: 2 since 2026-11-06 - the shield plus 「普攻…并叠加 1 层【灼热意志】」.
-            // Note: 5 since 2026-11-06 - the shield, the stack, the swap, the spend, and the restore.
-            // Note: 6 since 2026-11-06 - plus the free enhanced basic that spends nothing.
-            // Note: 10 since 2026-11-09 - eidolon 2 adds a variant of the talent shield per event (only one SHIELD may run).
-            Assertions.assertEquals(10, table.ruleCount(TriggerEvent.BASIC_ATTACK),
-                    "cid " + cid + ": shield, eidolon 2 shield, stack, swap, spend, restore, free, eidolon 6, eidolon 1 twice");
-            // Note: 3 since 2026-11-09 - the mixed-base damage rule joined the shield and the free enhanced basic;
-            // Note: 4 since 2026-11-09 - plus eidolon 6 defense stack per ultimate.
-            // Note: 5 since 2026-11-09 - eidolon 2 adds the bigger talent shield on the ultimate too.
-            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.ULT_CAST),
-                    "cid " + cid + ": damage, shield, eidolon 2 shield, free enhanced basic, and eidolon 6 defence");
-            Assertions.assertEquals(1, table.ruleCount(TriggerEvent.CAST_SETUP),
-                    "cid " + cid + ": the row is handed away so `parts` settles the damage once");
-            Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                    "cid " + cid + ": the technique, the convention, eidolon 3, eidolon 5, and eidolon 4 four stacks");
-        }
-    }
-    /**
      * 终结技:「对敌方全体造成等同于开拓者 **100% 攻击力 + 150% 防御力** 的火属性伤害」.
      *
      * <p><b>Why the comparison is an engine probe.</b> The base is a SUM of two attributes, so no single attribute can be

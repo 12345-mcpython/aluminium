@@ -20,33 +20,6 @@ import java.nio.file.Path;
  */
 public class CyreneAndRobinFormatMigrationTest {
 
-    @Test
-    public void rulesAreAnnotationsAndResourceNotesStayRuntime() throws Exception {
-        for (int cid : new int[]{1415, 1512}) {
-            Path file = Path.of("src", "main", "resources", "game", "characters", cid + ".json");
-            try (Reader reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
-                JsonObject root = JsonParser.parseReader(reader).getAsJsonObject();
-                JsonArray rules = root.getAsJsonArray("rules");
-                for (JsonElement element : rules) {
-                    JsonObject rule = element.getAsJsonObject();
-                    String id = cid + " / " + rule.get("id").getAsString();
-                    Assertions.assertFalse(rule.has("note"), "legacy note remains on " + id);
-                    Assertions.assertTrue(rule.has("_note"), "rule has no _note: " + id);
-                    Assertions.assertEquals("implemented", rule.get("_status").getAsString(), id);
-                }
-                JsonArray resources = root.getAsJsonArray("resources");
-                for (JsonElement element : resources) {
-                    JsonObject resource = element.getAsJsonObject();
-                    String id = cid + " / resource " + resource.get("id").getAsString();
-                    Assertions.assertFalse(resource.has("_status"), "resource is not a rule: " + id);
-                    if (resource.has("note")) {
-                        Assertions.assertFalse(resource.has("_note"), "ResourceSpec.note must stay: " + id);
-                    }
-                }
-            }
-        }
-    }
-
     /**
      * Cyrene's enhanced basic is data slot 8; it is the source of the ENHANCED_BASIC skill type.
      */

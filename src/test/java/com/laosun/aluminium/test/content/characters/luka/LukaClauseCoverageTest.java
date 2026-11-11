@@ -12,15 +12,12 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1111 卢卡 clause coverage: every section of {@code 1111_卢卡.md}, plus the one trace this round could write and the two it
@@ -34,45 +31,6 @@ import java.util.Map;
 public class LukaClauseCoverageTest {
 
     private static final int LUKA = 1111;
-
-    private static final Map<String, String> SECTION_TO_RULE = new LinkedHashMap<>();
-
-    static {
-        SECTION_TO_RULE.put("普攻：直冲拳", "(no rule needed: the basic attack reads its own skill row)");
-        SECTION_TO_RULE.put("强化普攻：直冲碎天拳", "talent_enhance_basic");
-        SECTION_TO_RULE.put("战技：裂伤拳", "skill_lacerate");
-        SECTION_TO_RULE.put("终结技：直冲碎天拳", "ult_coup");
-        SECTION_TO_RULE.put("天赋：直冲拳", "talent_start");
-        SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
-        SECTION_TO_RULE.put("秘技：裂伤拳", "technique_damage_and_bleed_on_one_enemy");
-        SECTION_TO_RULE.put("行迹：动能过载", "trace_overload");
-        SECTION_TO_RULE.put("行迹：循环制动", "trace_recycle_energy_per_will_layer");
-        SECTION_TO_RULE.put("行迹：粉碎斗志", "trace_crushing_will_extra_segment");
-        SECTION_TO_RULE.put("行迹：攻击 / 效果命中 / 防御（数值行迹）",
-                "(no rule needed: stat traces are folded into the panel by the loader)");
-        SECTION_TO_RULE.put("星魂 1：裂伤拳", "eidolon1_damage_up_while_bleeding");
-        SECTION_TO_RULE.put("星魂 2：直冲拳", "eidolon2_will_on_physical_weakness");
-        SECTION_TO_RULE.put("星魂 3：裂伤拳", "eidolon3_raises_skill_and_talent");
-        SECTION_TO_RULE.put("星魂 4：斗志", "eidolon4_attack_per_will");
-        SECTION_TO_RULE.put("星魂 5：直冲拳", "eidolon5_raises_ult_and_basic");
-        SECTION_TO_RULE.put("星魂 6：裂伤拳", "eidolon6_laceration_ticks_per_segment");
-    }
-
-    @Test
-    public void everyDocumentSectionHasItsRule() throws IOException {
-        JsonArray rules = rules();
-        int checked = 0;
-        for (Map.Entry<String, String> entry : SECTION_TO_RULE.entrySet()) {
-            if (entry.getValue().startsWith("(")) {
-                continue;
-            }
-            checked++;
-            Assertions.assertTrue(has(rules, entry.getValue()),
-                    entry.getKey() + " has no rule (expected " + entry.getValue() + ")");
-        }
-        System.out.println("[1111] sections covered = " + checked + " rule-backed + "
-                + (SECTION_TO_RULE.size() - checked) + " with a written reason");
-    }
 
     /**
      * 行迹 粉碎斗志: 「【直冲拳】的每 1 段攻击都有 50% 的固定概率使卢卡额外施放 1 段攻击」.
@@ -146,20 +104,6 @@ public class LukaClauseCoverageTest {
         return false;
     }
 
-    private static boolean has(JsonArray rules, String id) {
-        for (var element : rules) {
-            JsonObject candidate = element.getAsJsonObject();
-            if (candidate.has("id") && id.equals(candidate.get("id").getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static JsonArray rules() throws IOException {
-        return character().getAsJsonArray("rules");
-    }
-
     private static JsonArray gaps() throws IOException {
         return character().getAsJsonArray("_gaps");
     }
@@ -206,5 +150,4 @@ public class LukaClauseCoverageTest {
         }
     }
 }
-
 

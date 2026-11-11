@@ -1,6 +1,5 @@
 package com.laosun.compare;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -117,7 +116,7 @@ public final class DerivedCasts {
      */
     private static Map<String, Map<String, Integer>> skillIndex() {
         Map<String, Map<String, Integer>> index = new LinkedHashMap<>();
-        try (InputStream stream = DerivedCasts.class.getResourceAsStream("/game/data/skills.json")) {
+        try (InputStream stream = DerivedCasts.class.getResourceAsStream("/data/skills.json")) {
             if (stream == null) {
                 return index;
             }

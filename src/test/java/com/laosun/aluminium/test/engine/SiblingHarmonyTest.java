@@ -70,21 +70,6 @@ public class SiblingHarmonyTest {
                 "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
-    /**
-     * Census: the ultimate, the super-break rule, the talent, the technique and the convention.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        var table = com.laosun.aluminium.data.TriggerTables.of(TB);
-        Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST));
-        //: 2 -- 8005 gained the skill clause "额外造成 4 次伤害，每次对随机敌方单体" (times).
-        Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE));
-        Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BREAK));
-        // Seven since 2026-11-02: Eidolon 4 (the allies' break effect) and Eidolon 6 (two more skill hits) are BATTLE_START
-        // clauses too, and he gained Eidolon 1's first-skill skill point.
-        Assertions.assertEquals(7, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),
-                "the technique, the convention, and the four eidolon clauses that fire at battle start");
-    }
 
     private static Random fixed() {
         return BattleFixture.alwaysRoll(1.0);

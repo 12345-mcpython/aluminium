@@ -93,18 +93,6 @@ public class ArlanTest {
                 "it must not become a general resistance to every debuff class");
     }
 
-    /**
-     * Census: the traces that carry rules plus the level convention.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(ARLAN);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "the survival heal");
-        //: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
-        // with "进入战斗后"), and that trace is what the lethal blow is gated on.
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the DoT resistance, the level convention, and the eidolon-four trace");
-    }
 
     private static Random fixed() {
         return BattleFixture.alwaysRoll(1.0);

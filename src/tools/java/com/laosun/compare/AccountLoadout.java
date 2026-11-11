@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Builds a real character from <b>the account dump</b>: {@code resources/game/data/dump_data.json} carries, per cid, the
+ * Builds a real character from <b>the account dump</b>: {@code resources/data/dump_data.json} carries, per cid, the
  * six relics the account wears (set name, slot, main stat, sub stats at their promote/roll levels), in the engine's own
  * attribute names.
  *

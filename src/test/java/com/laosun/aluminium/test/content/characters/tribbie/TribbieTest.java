@@ -3,9 +3,12 @@ package com.laosun.aluminium.test.content.characters.tribbie;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.trigger.TriggerPayload;
 import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
@@ -13,6 +16,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -26,6 +30,7 @@ public class TribbieTest {
     private static final int TRIBBIE = 1403;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
+    private static final String ZONE = "结界";
 
     /**
      * Note: A teammate's ultimate triggers it; her own does not.
@@ -56,23 +61,6 @@ public class TribbieTest {
                 "「使用秘技后，进入战斗时获得【神启】」 (after using the Technique, gains Numinosity (【神启】) on entering battle)");
     }
 
-    /**
-     * Census: the ultimate, the skill, the technique, two traces and the convention all live on BATTLE_START/other events as stated.
-     */
-    @Test
-    public void herFileCarriesTheClauses() {
-        var table = TriggerTables.of(TRIBBIE);
-        // 6 since: `ult_zone_state` joins the three, and Eidolon 6 adds its own-ult follow-up plus the
-        // boosted other-ally follow-up. "结界持续期间" had no state to name, and 1415's ode of passage
-        // needs one ("缇宝的结界的附加伤害").
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the follow-up trigger, the zone, the reset, Eidolon 6's two follow-up rules, and the zone's "
-                        + "「敌方目标受到的伤害提高30%」 with `ticks_on: self` for the zone's own clock");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "Numinosity and Eidolon 4's penetration");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.FOLLOW_UP), "the damage boost");
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the energy trace, the technique, the level convention, Eidolons 3/5 and Eidolon 4's technique branch");
-    }
 
     /**
      * Fires ULT_CAST with either the teammate or Tribbie as the actor, and returns what the enemy lost.
@@ -103,6 +91,94 @@ public class TribbieTest {
         Assertions.assertTrue(reference > 0, "the reference must deal damage");
         Assertions.assertEquals(0.18 / 0.50, content / reference, 0.05,
                 "content " + content + " vs reference " + reference + " (expected " + (0.18 / 0.50) + ")");
+    }
+
+    /**
+     * 1403 缇宝's talent, last sentence: 「若追加攻击施放前目标被消灭则对<b>新入场</b>的敌方目标发动追加攻击」.
+     *
+     * <p>The shape is {@code defer_until_wave}: an other-ally Ultimate that finds no living enemy is HELD, and the next wave's
+     * {@code WAVE_START} releases it against the enemy that just entered. The yardstick is the SAME follow-up fired directly in
+     * a fresh battle - NOT a plain hit measured later in the same battle, because her own follow-up grants a damage boost that
+     * makes a later hit look stronger (measured 1.72x, which is what made an earlier reading look like a defect).
+     */
+    @Test
+    public void aFollowUpWithNoTargetWaitsForTheNextWave() {
+        Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy first = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(tribbie, ally)), new ArrayList<>(List.of(first)),
+                BattleFixture.alwaysRoll(0.99));
+        battle.startBattle();
+
+        // The only enemy dies; now the other ally casts their Ultimate - there is nobody to hit.
+        battle.applyTrueDamage(ally, first, DamageElement.PHYSICAL, first.getCurrentHp() * 10);
+        battle.processRequests();
+        Assertions.assertTrue(first.isDeath());
+        battle.fire(TriggerPayload.Cast.of(TriggerEvent.ULT_CAST, ally, first, 0, 0,
+                SkillCategory.ULTRA, 3, 0, List.of()));
+
+        Enemy fresh = BattleFixture.monster();
+        battle.addEnemy(fresh);
+        double beforeWave = fresh.getCurrentHp();
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.WAVE_START, tribbie, tribbie, 0, 0));
+        double deferred = beforeWave - fresh.getCurrentHp();
+
+        double direct = directFollowUp();
+        System.out.println("[1403] deferred=" + deferred + " direct=" + direct);
+        Assertions.assertEquals(direct, deferred, 1e-6,
+                "「对新入场的敌方目标发动追加攻击」 - the same follow-up, only later");
+    }
+
+    /**
+     * Tribbie's zone, as a state on him.
+     *
+     * <p>His ultimate (140303): "开启<b>结界</b>… <b>结界持续期间</b>，敌方目标受到的伤害提高 #2%… 结界持续 #4 回合，自身每回合开始时结界持续回合数减1。"
+     * Two readings: the state is on him right after his ultimate, and it runs out on its own -- a state that never ends would
+     * satisfy the first half while being wrong about the zone, which lasts #4 = 2 turns at every level of 140303.
+     */
+    @Test
+    public void theZoneIsAStateThatEndsOnItsOwn() {
+        Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
+        Battle battle = new Battle(List.of(tribbie, CharacterFactory.create(ALLY, LEVEL)),
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
+        battle.startBattle();
+        battle.processRequests();
+        Assertions.assertFalse(tribbie.getBuffManager().hasState(ZONE),
+                "precondition: no zone before the ultimate");
+
+        tribbie.setCurrentEnergy(tribbie.getMaxEnergy());
+        Assertions.assertTrue(battle.castUltra(tribbie, List.of(battle.enemies().getFirst())),
+                "precondition: the ultimate can be cast");
+        battle.processRequests();
+
+        boolean afterUlt = tribbie.getBuffManager().hasState(ZONE);
+        tribbie.afterMove(battle);
+        tribbie.getBuffManager().afterMove();
+        tribbie.afterMove(battle);
+        tribbie.getBuffManager().afterMove();
+        boolean afterTwoTurns = tribbie.getBuffManager().hasState(ZONE);
+        System.out.println("[zone_state] right after the ultimate = " + afterUlt
+                + " ; after two of his turns = " + afterTwoTurns);
+
+        Assertions.assertTrue(afterUlt, "「开启【" + ZONE + "】」 (opens the zone) -- the state says the zone is open");
+        Assertions.assertFalse(afterTwoTurns, "「【" + ZONE + "】持续 #4 回合」 (lasts #4 turns) -- #4 is 2 at every level, so it must end");
+    }
+
+    /**
+     * The same follow-up with a living enemy, in its own battle: same 18% of Max HP, same zones, and no boost from the
+     * follow-up itself (it has not landed yet when it is measured).
+     */
+    private static double directFollowUp() {
+        Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(tribbie, ally)), new ArrayList<>(List.of(enemy)),
+                BattleFixture.alwaysRoll(0.99));
+        battle.startBattle();
+        double before = enemy.getCurrentHp();
+        battle.fire(TriggerPayload.Cast.of(TriggerEvent.ULT_CAST, ally, enemy, 0, 0,
+                SkillCategory.ULTRA, 3, 0, List.of()));
+        return before - enemy.getCurrentHp();
     }
 
     /**

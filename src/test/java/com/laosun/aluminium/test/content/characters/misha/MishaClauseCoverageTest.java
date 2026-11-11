@@ -12,15 +12,12 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1312 米沙 clause coverage: every section of {@code 1312_米沙.md}, plus what this round added and what it could not.
@@ -36,44 +33,6 @@ import java.util.Map;
 public class MishaClauseCoverageTest {
 
     private static final int MISHA = 1312;
-
-    private static final Map<String, String> SECTION_TO_RULE = new LinkedHashMap<>();
-
-    static {
-        SECTION_TO_RULE.put("普攻：请…请让一下！", "(no rule needed: the basic attack reads its own skill row)");
-        SECTION_TO_RULE.put("战技：客…客房服务！", "skill_adds_one_segment_to_the_next_ultimate");
-        SECTION_TO_RULE.put("终结技：要…要迟到了！", "ult_freeze_per_segment");
-        SECTION_TO_RULE.put("天赋：擒纵机构", "talent_extra_segment_per_point");
-        SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
-        SECTION_TO_RULE.put("秘技：停一停吧，你真美丽！", "technique_dream_prison_raises_segments");
-        SECTION_TO_RULE.put("行迹：释放", "(registered: no segment ordinal — it only raises the FIRST segment's chance)");
-        SECTION_TO_RULE.put("行迹：锁接", "trace_lockstep_effect_hit_during_the_ultimate");
-        SECTION_TO_RULE.put("行迹：传冲", "trace_momentum_crit_damage_against_frozen");
-        SECTION_TO_RULE.put("行迹：冰伤 / 防御 / 暴击率（数值行迹）",
-                "(no rule needed: stat traces are folded into the panel by the loader)");
-        SECTION_TO_RULE.put("星魂 1：飘忽的幻影", "eidolon1_extra_segments_per_enemy");
-        SECTION_TO_RULE.put("星魂 2：青春的怅望", "eidolon2_freeze_also_lowers_defence");
-        SECTION_TO_RULE.put("星魂 3：欢乐年光的影子", "eidolon3_levels");
-        SECTION_TO_RULE.put("星魂 4：亲挚的音容", "eidolon4_ult_segment_damage_up");
-        SECTION_TO_RULE.put("星魂 5：最初的爱与友谊", "eidolon5_levels");
-        SECTION_TO_RULE.put("星魂 6：久已生疏的憧憬", "eidolon6_damage_up_and_refunds_a_point");
-    }
-
-    @Test
-    public void everyDocumentSectionHasItsRule() throws IOException {
-        JsonArray rules = rules();
-        int checked = 0;
-        for (Map.Entry<String, String> entry : SECTION_TO_RULE.entrySet()) {
-            if (entry.getValue().startsWith("(")) {
-                continue;
-            }
-            checked++;
-            Assertions.assertTrue(has(rules, entry.getValue()),
-                    entry.getKey() + " has no rule (expected " + entry.getValue() + ")");
-        }
-        System.out.println("[1312] sections covered = " + checked + " rule-backed + "
-                + (SECTION_TO_RULE.size() - checked) + " with a written reason");
-    }
 
     /**
      * 行迹 锁接: 「施放终结技时，效果命中提高 60%，持续至本次终结技行动结束」.
@@ -149,20 +108,6 @@ public class MishaClauseCoverageTest {
             }
         }
         return false;
-    }
-
-    private static boolean has(JsonArray rules, String id) {
-        for (var element : rules) {
-            JsonObject candidate = element.getAsJsonObject();
-            if (candidate.has("id") && id.equals(candidate.get("id").getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static JsonArray rules() throws IOException {
-        return character().getAsJsonArray("rules");
     }
 
     private static JsonArray gaps() throws IOException {

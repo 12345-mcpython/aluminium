@@ -1,8 +1,5 @@
 package com.laosun.aluminium.test.content.characters.bailu;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.buff.ReductionBuff;
 import com.laosun.aluminium.buff.StateBuff;
@@ -15,13 +12,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1211 白露 clause coverage: every section of {@code 1211_白露.md}, one line each, plus the readings that pin the
@@ -45,53 +36,6 @@ public class BailuClauseCoverageTest {
 
     private static final int BAILU = 1211;
     private static final int ALLY = 1002;
-
-    /**
-     * Section → the rule that answers it. A section whose answer is a registered gap says so in words, so that "not
-     * written" is never mistaken for "covered".
-     */
-    private static final Map<String, String> SECTION_TO_RULE = new LinkedHashMap<>();
-
-    static {
-        SECTION_TO_RULE.put("普攻：望 、闻、问…蹴！", "(no rule needed: the basic attack reads its own skill row)");
-        SECTION_TO_RULE.put("战技：云吟乍涌坠珠露",
-                "(no rule needed for the first heal: the skill row pays it; the 2 random decaying heals are registered)");
-        SECTION_TO_RULE.put("终结技：匏蛟跃渊先雷音", "ult_rebirth");
-        SECTION_TO_RULE.put("天赋：奔走悬壶济世长", "talent_heals_a_lethal_hit_on_a_teammate");
-        SECTION_TO_RULE.put("秘技：徜徉灵泽病恙短", "technique_invigoration_for_the_whole_party");
-        SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
-        SECTION_TO_RULE.put("星魂 1：百脉甘津宁神久", "eidolon1_energy_when_invigoration_ends_at_full_hp");
-        SECTION_TO_RULE.put("星魂 2：壶中洞天云螭眠", "eidolon2_heal_boost");
-        SECTION_TO_RULE.put("星魂 3：掌间乾坤便通玄", "eidolon3_levels");
-        SECTION_TO_RULE.put("星魂 4：肘后备急除外障", "eidolon4_healed_ally_deals_more");
-        SECTION_TO_RULE.put("星魂 5：方定一倾浣俗尘", "eidolon5_levels");
-        SECTION_TO_RULE.put("星魂 6：龙漦吐哺胜金丹",
-                "(registered: the lethal heal's count is `once_per_battle`, a boolean — no \"one more\" spelling)");
-        SECTION_TO_RULE.put("行迹：岐黄精义", "(registered: no overheal observation — HEALED carries no overflow)");
-        SECTION_TO_RULE.put("行迹：持明龙脉", "trace_dragon_vein_adds_one_invigoration_trigger");
-        SECTION_TO_RULE.put("行迹：鳞渊福泽", "ult_rebirth");
-        SECTION_TO_RULE.put("行迹：生命 / 防御 / 效果抵抗（数值行迹）",
-                "(no rule needed: stat traces are folded into the panel by the loader)");
-    }
-
-    /**
-     * Every section maps to a rule id that exists in the file (or to a written reason why none is needed).
-     */
-    @Test
-    public void everyDocumentSectionHasItsRule() throws IOException {
-        JsonArray rules = rules();
-        int checked = 0;
-        for (Map.Entry<String, String> entry : SECTION_TO_RULE.entrySet()) {
-            if (entry.getValue().startsWith("(")) {
-                continue;
-            }
-            checked++;
-            Assertions.assertTrue(has(rules, entry.getValue()),
-                    entry.getKey() + " has no rule (expected " + entry.getValue() + ")");
-        }
-        System.out.println("[1211] sections covered = " + checked + " rule-backed + "
-                + (SECTION_TO_RULE.size() - checked) + " with a written reason");
-    }
 
     /**
      * 「生命值/防御力/效果抵抗 +N%」: the stat traces are folded into the panel rather than written as rules.
@@ -280,22 +224,6 @@ public class BailuClauseCoverageTest {
 
     private static int reductionsOn(Character character) {
         return character.getBuffManager().allBuffsOf(ReductionBuff.class).size();
-    }
-
-    private static boolean has(JsonArray rules, String id) {
-        for (var element : rules) {
-            JsonObject candidate = element.getAsJsonObject();
-            if (candidate.has("id") && id.equals(candidate.get("id").getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static JsonArray rules() throws IOException {
-        Path file = Path.of("src", "main", "resources", "game", "characters", "1211.json");
-        return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8))
-                .getAsJsonObject().getAsJsonArray("rules");
     }
 
     private static final class Fixture {

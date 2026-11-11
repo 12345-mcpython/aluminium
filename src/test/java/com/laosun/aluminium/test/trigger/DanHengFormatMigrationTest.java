@@ -23,20 +23,6 @@ public class DanHengFormatMigrationTest {
 
     private static final int DAN_HENG = 1002;
 
-    @Test
-    public void everyRuleUsesUnderscoreNoteAndImplementedStatus() {
-        JsonArray rules = rules();
-        Assertions.assertTrue(rules.size() > 0);
-        for (JsonElement element : rules) {
-            JsonObject rule = element.getAsJsonObject();
-            String id = String.valueOf(rule.get("id"));
-            Assertions.assertFalse(rule.has("note"), "legacy note remains on " + id);
-            Assertions.assertTrue(rule.has("_note"), "rule has no _note: " + id);
-            Assertions.assertEquals("implemented", rule.get("_status").getAsString(), id);
-            Assertions.assertTrue(rule.has("source"), "source stays for error messages: " + id);
-        }
-    }
-
     /**
      * The Skill and Ultimate rows are the first two 1002 rules whose parameter row lives in the structured source.
      */

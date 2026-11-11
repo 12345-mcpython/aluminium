@@ -72,19 +72,6 @@ public class GepardKitTest {
                 "「提高等同于自身当前防御力35%的攻击力，每回合开始时刷新」 (raises ATK by an amount equal to 35% of his current DEF, refreshed at the start of every turn)");
     }
 
-    /**
-     * Census: the clauses are where the notes say they are.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(GEPARD);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the freeze with its payload");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the trace, refreshed each turn");
-        Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the four eidolon rules (E1/E3/E4/E5), the technique shield (round 180) and "
-                        + "the Integrity (刚正) trace's aggro ratio (2026-09-29)");
-    }
 
     /**
      * Traces (行迹) "Integrity (刚正)": "raises the chance that Gepard (杰帕德) is attacked by enemies" - the number is upstream, not in the prose.

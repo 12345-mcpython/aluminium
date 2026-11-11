@@ -125,11 +125,11 @@ public class HardcodedSkillRowRatchetTest {
     @Test
     public void noMoreRulesFreezeAlevelVaryingRow() throws Exception {
         JsonObject skills = JsonParser.parseString(Files.readString(
-                Path.of("src/main/resources/game/data/skills.json"), StandardCharsets.UTF_8)).getAsJsonObject();
+                Path.of("src/main/resources/data/skills.json"), StandardCharsets.UTF_8)).getAsJsonObject();
         // A trace's numbers are NOT leveled, so a rule that restates one is exact - they must count as "from the data"
         // or every trace constant that happens to equal a skill cell would be reported (1101's 阵地 is one).
         JsonObject traces = JsonParser.parseString(Files.readString(
-                Path.of("src/main/resources/game/data/skill_traces.json"), StandardCharsets.UTF_8)).getAsJsonObject();
+                Path.of("src/main/resources/data/skill_traces.json"), StandardCharsets.UTF_8)).getAsJsonObject();
         List<String> suspects = new ArrayList<>();
 
         List<Path> files;

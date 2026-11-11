@@ -12,7 +12,7 @@ import java.util.List;
 
 /**
  * The counters that belong to the <b>battle</b> rather than to one character - declared once, in
- * {@code game/data/battle_resources.json}.
+ * {@code data/battle_resources.json}.
  *
  * <p><b>Why such a file has to exist.</b> A party-scoped counter could only be declared by a CHARACTER file
  * ({@code "scope": "PARTY"}), so it existed only in parties that carried the declaring character. 笑点 (Punchline) is shared by
@@ -35,7 +35,7 @@ public final class BattleResources {
     }
 
     /**
-     * Reads {@code /game/battle_resources.json} - a HAND-WRITTEN file, which is why it does not live under {@code game/data/}:
+     * Reads {@code /game/battle_resources.json} - a HAND-WRITTEN file, which is why it does not live under {@code data/}:
      * that directory is gitignored because it holds the game's own dumps, and a declaration this project authors has to be in
      * the repository.
      *

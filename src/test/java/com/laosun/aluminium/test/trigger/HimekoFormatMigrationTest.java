@@ -20,19 +20,6 @@ import java.nio.file.Path;
  */
 public class HimekoFormatMigrationTest {
 
-    @Test
-    public void everyRuleUsesUnderscoreNoteAndImplementedStatus() {
-        JsonArray rules = rules();
-        Assertions.assertTrue(rules.size() > 0);
-        for (JsonElement element : rules) {
-            JsonObject rule = element.getAsJsonObject();
-            String id = rule.has("id") ? rule.get("id").getAsString() : rule.get("on").getAsString();
-            Assertions.assertFalse(rule.has("note"), "legacy note remains on " + id);
-            Assertions.assertTrue(rule.has("_note"), "rule has no _note: " + id);
-            Assertions.assertEquals("implemented", rule.get("_status").getAsString(), id);
-        }
-    }
-
     /**
      * The technique row is the first 1003 parameter row written as a structured source.
      */

@@ -36,7 +36,7 @@ import java.util.regex.Pattern;
  * {@code _gaps}. The list may only shrink: a row that moves out of it must become a curated entry.
  */
 public class BlastAdjacentColumnTest {
-    private static final Path DATA = Path.of("src/main/resources/game/data");
+    private static final Path DATA = Path.of("src/main/resources/data");
     /** The reference that prices the share right after 「等同于」 - the amount clause, not any number the sentence happens to name next. */
     private static final Pattern FIRST_REFERENCE = Pattern.compile("等同于[^#]{0,60}#(\\d)\\[");
 

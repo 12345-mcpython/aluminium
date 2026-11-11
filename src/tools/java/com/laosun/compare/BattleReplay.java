@@ -1420,7 +1420,7 @@ public final class BattleReplay {
         private static final com.google.gson.JsonObject VALUE = load();
 
         private static com.google.gson.JsonObject load() {
-            try (java.io.InputStream stream = BattleReplay.class.getResourceAsStream("/game/data/skills.json")) {
+            try (java.io.InputStream stream = BattleReplay.class.getResourceAsStream("/data/skills.json")) {
                 if (stream == null) {
                     return null;
                 }
@@ -1439,7 +1439,7 @@ public final class BattleReplay {
      * The row level the account states for this slot: {@code skills.basic/skill/ult/talent} for a character's own slot,
      * {@code memosprite.skill} for its 忆灵's data slots.
      *
-     * <p>Read from {@code game/data/account.json} (a digest of the account archive). {@code null} when the account does not
+     * <p>Read from {@code data/account.json} (a digest of the account archive). {@code null} when the account does not
      * name the character - the driver then uses the skill's own level, as before.
      *
      * @param actor  the casting character's cid
@@ -1486,7 +1486,7 @@ public final class BattleReplay {
         private static final com.google.gson.JsonObject VALUE = load();
 
         private static com.google.gson.JsonObject load() {
-            try (java.io.InputStream stream = BattleReplay.class.getResourceAsStream("/game/data/account.json")) {
+            try (java.io.InputStream stream = BattleReplay.class.getResourceAsStream("/data/account.json")) {
                 if (stream == null) {
                     return null;
                 }
@@ -1654,7 +1654,7 @@ public final class BattleReplay {
 
         private static com.google.gson.JsonObject load() {
             try (java.io.InputStream stream =
-                         BattleReplay.class.getResourceAsStream("/game/data/skill_effects.json")) {
+                         BattleReplay.class.getResourceAsStream("/data/skill_effects.json")) {
                 if (stream == null) {
                     return null;
                 }

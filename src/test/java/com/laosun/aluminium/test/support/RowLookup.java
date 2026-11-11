@@ -44,7 +44,7 @@ public final class RowLookup {
             default -> throw new IllegalStateException("unknown slot in \"" + spelling + "\"");
         };
         int column = Integer.parseInt(parts[1].trim());
-        try (InputStream stream = RowLookup.class.getResourceAsStream("/game/data/skills.json")) {
+        try (InputStream stream = RowLookup.class.getResourceAsStream("/data/skills.json")) {
             if (stream == null) {
                 throw new IllegalStateException("the bundled skills table is missing");
             }

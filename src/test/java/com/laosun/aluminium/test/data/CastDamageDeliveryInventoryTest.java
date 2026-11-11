@@ -44,8 +44,9 @@ import java.util.stream.Stream;
  * one that has since been handed away) fails too - the inventory must describe the corpus as it is, not as it was.
  */
 public class CastDamageDeliveryInventoryTest {
+    // ERROR hard-code path name!
     private static final Path CHARACTERS = Path.of("src", "main", "resources", "game", "characters");
-    private static final Path SKILLS = Path.of("src", "main", "resources", "game", "data", "skills.json");
+    private static final Path SKILLS = Path.of("src", "main", "resources", "data", "skills.json");
 
     /** The cast events that produce one settlement of a skill row, and the data slot each one belongs to. */
     private static final Map<String, String> CAST_SLOTS = Map.of(

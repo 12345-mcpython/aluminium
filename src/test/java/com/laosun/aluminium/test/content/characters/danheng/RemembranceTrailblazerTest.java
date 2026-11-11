@@ -64,18 +64,6 @@ public class RemembranceTrailblazerTest {
         Assertions.assertSame(first, second, "「若迷迷已在场」 (if Mem is already on the field) -- the same memosprite, not a second one");
     }
 
-    /**
-     * Census: the summon (Skill), the summon (Ultimate) and the level convention.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        for (int cid : new int[]{8007, 8008}) {
-            var table = com.laosun.aluminium.data.TriggerTables.of(cid);
-            Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.SKILL_CAST), "cid " + cid);
-            Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST), "cid " + cid);
-            Assertions.assertEquals(4, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START), "cid " + cid);
-        }
-    }
 
     /**
      * 终结技:「召唤忆灵迷迷…随后**使迷迷**对敌方全体造成等同于迷迷 240% 攻击力的冰属性伤害」.

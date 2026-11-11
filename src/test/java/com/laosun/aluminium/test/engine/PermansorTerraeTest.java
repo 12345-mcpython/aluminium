@@ -62,25 +62,6 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getShield() > 0, "「为我方全体提供…护盾」 (a shield for all of our side)");
     }
 
-    /**
-     * Census: his skill and its trace, the ultimate, the technique, and the two halves of the Sylvanity (葳蕤) trace.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(DHPT);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the Bondmate/shield rule AND (since 2026-10-02) the Empyreanity (神秀) trace that buffs whoever holds the Bondmate (【同袍】) -- "
-                        + "which is why the two are in this order in the file: the first designates, the second reads "
-                        + "`holder_of:同袍`");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the technique's Bondmate (【同袍】) (\"gaining the Bondmate after using the Technique\" (「使用秘技后获得【同袍】」)), Sylvanity (葳蕤)'s \"action advance 40%\" (「行动提前40%」) and "
-                        + "-- since 2026-10-02 -- the technique's auto-cast, i.e. \"at the start of the next battle it automatically casts 1 Skill on the holder of the Bondmate (【同袍】)\" (「下一次战斗开始时自动对持有【同袍】的"
-                        + "角色施放1次战技」), which CAST_SKILL can now deliver because it casts the skill through the "
-                        + "engine's own path: his skill is a DEFENCE shield, not a swing");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
-                "Sylvanity (葳蕤)'s second half: \"when the Bondmate (【同袍】) casts an attack, Dan Heng - Permansor Terrae restores 6 Energy\" (「【同袍】施放攻击时，丹恒•腾荒恢复6点能量」)");
-    }
 
     private static Random fixed() {
         return BattleFixture.alwaysRoll(1.0);

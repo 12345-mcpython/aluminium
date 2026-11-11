@@ -42,8 +42,8 @@ public class EidolonNumbersComeFromTheDataTest {
 
     @Test
     public void everyEidolonNumberExistsInThatCharactersData() throws Exception {
-        JsonObject eidolons = read(Path.of("src/main/resources/game/data/eidolons.json"));
-        JsonObject skills = read(Path.of("src/main/resources/game/data/skills.json"));
+        JsonObject eidolons = read(Path.of("src/main/resources/data/eidolons.json"));
+        JsonObject skills = read(Path.of("src/main/resources/data/skills.json"));
         List<String> violations = new ArrayList<>();
         int rulesSeen = 0;
 

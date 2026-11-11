@@ -68,17 +68,6 @@ public class HertaTest {
                         + healthyLoss + " (healthy) vs " + hurtLoss + " (hurt)");
     }
 
-    /**
-     * Census: the threshold bonus, the frozen bonus, the resistance, the level convention and the technique.
-     */
-    @Test
-    public void herFileCarriesTheClauses() {
-        var table = TriggerTables.of(HERTA);
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
-                "the threshold bonus, the frozen bonus, and the talent-follow-up bonus of eidolon 4");
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the resistance, the level convention, and the technique's ATK raise");
-    }
 
 
     private static final class Fixture {

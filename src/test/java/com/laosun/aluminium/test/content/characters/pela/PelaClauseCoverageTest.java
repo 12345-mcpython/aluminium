@@ -17,14 +17,11 @@ import com.laosun.aluminium.trigger.TriggerPayload;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1106 佩拉 clause coverage: every section of {@code 1106_佩拉.md}, plus the readings that pin the clauses no machine
@@ -50,45 +47,6 @@ public class PelaClauseCoverageTest {
 
     private static final int PELA = 1106;
     private static final int ALLY = 1002;
-
-    private static final Map<String, String> SECTION_TO_RULE = new LinkedHashMap<>();
-
-    static {
-        SECTION_TO_RULE.put("普攻：冰点射击",
-                "(no rule needed: the basic attack reads its own skill row — two segments of 50%)");
-        SECTION_TO_RULE.put("战技：低温妨害", "skill_dispel_buff");
-        SECTION_TO_RULE.put("终结技：领域压制", "ult_zone_suppression");
-        SECTION_TO_RULE.put("天赋：数据采集", "attack_effect");
-        SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
-        SECTION_TO_RULE.put("秘技：先发制人", "technique_preemptive_strike");
-        SECTION_TO_RULE.put("行迹：痛击", "trace_hit_the_afflicted");
-        SECTION_TO_RULE.put("行迹：秘策", "battle_start");
-        SECTION_TO_RULE.put("行迹：追歼", "trace_next_attack_after_dispel");
-        SECTION_TO_RULE.put("行迹：冰伤 / 攻击 / 效果命中（数值行迹）",
-                "(no rule needed: stat traces are folded into the panel by the loader)");
-        SECTION_TO_RULE.put("星魂 1：胜利反馈", "eidolon1_energy_on_an_enemy_kill");
-        SECTION_TO_RULE.put("星魂 2：疾进不止", "eidolon2_speed_after_the_dispel");
-        SECTION_TO_RULE.put("星魂 3：压制升级", "eidolon3_levels");
-        SECTION_TO_RULE.put("星魂 4：完全剖析", "eidolon4_ice_resistance_down_on_skill");
-        SECTION_TO_RULE.put("星魂 5：零度妨害", "eidolon5_levels");
-        SECTION_TO_RULE.put("星魂 6：疲弱追击", "eidolon6_extra_damage_on_a_debuffed_target");
-    }
-
-    @Test
-    public void everyDocumentSectionHasItsRule() throws IOException {
-        JsonArray rules = rules();
-        int checked = 0;
-        for (Map.Entry<String, String> entry : SECTION_TO_RULE.entrySet()) {
-            if (entry.getValue().startsWith("(")) {
-                continue;
-            }
-            checked++;
-            Assertions.assertTrue(has(rules, entry.getValue()),
-                    entry.getKey() + " has no rule (expected " + entry.getValue() + ")");
-        }
-        System.out.println("[1106] sections covered = " + checked + " rule-backed + "
-                + (SECTION_TO_RULE.size() - checked) + " with a written reason");
-    }
 
     /**
      * 「生命值/防御力/效果抵抗 +N%」are folded in; her five ice-damage traces add up to 22.4%.
@@ -248,16 +206,6 @@ public class PelaClauseCoverageTest {
     // Helpers
     // ==================================================================
 
-    private static boolean has(JsonArray rules, String id) {
-        for (var element : rules) {
-            JsonObject candidate = element.getAsJsonObject();
-            if (candidate.has("id") && id.equals(candidate.get("id").getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private static JsonObject rule(String id) throws IOException {
         for (var element : rules()) {
             JsonObject candidate = element.getAsJsonObject();
@@ -310,5 +258,4 @@ public class PelaClauseCoverageTest {
         }
     }
 }
-
 

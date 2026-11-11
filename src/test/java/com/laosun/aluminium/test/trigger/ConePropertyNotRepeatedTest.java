@@ -41,7 +41,8 @@ public class ConePropertyNotRepeatedTest {
 
     @Test
     public void noConeRepeatsItsOwnProperty() throws IOException {
-        JsonObject weapons = read(Path.of("src", "main", "resources", "game", "data", "weapons.json"))
+        // ERROR hard code path
+        JsonObject weapons = read(Path.of("src", "main", "resources", "data", "weapons.json"))
                 .getAsJsonObject();
         List<String> offenses = new ArrayList<>();
         try (var files = Files.list(Path.of("src", "main", "resources", "game", "light_cones"))) {

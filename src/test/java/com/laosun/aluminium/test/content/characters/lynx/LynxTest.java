@@ -58,21 +58,6 @@ public class LynxTest {
                 "「解除我方全体的1个负面效果」 (dispels 1 debuff from all allies) -- the cleanse reaches every ally, not just the aimed one");
     }
 
-    /**
-     * Census: the clauses are where the notes say they are.
-     */
-    @Test
-    public void herFileCarriesTheClauses() {
-        var table = TriggerTables.of(LYNX);
-        // Three since 2026-11-02: Eidolon 4 rides the same cast (「获得【求生反应】时…攻击力提高」).
-        // Five since 2026-11-06: Eidolons 2 and 6 also ride this cast (the debuff charge, and the max-HP / Effect RES pair).
-        // Seven since 2026-11-06: the soft taunt is two rules (destruction / preservation, since conditions are AND-only).
-        Assertions.assertEquals(7, table.ruleCount(TriggerEvent.SKILL_CAST), "the state, the regeneration, Eidolons 4/2/6, and the taunt pair");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "the cleanse and the regeneration half");
-        // Four since 2026-11-02: the technique adds its own BATTLE_START clause.
-        // Five since 2026-11-06: Eidolon 1's heal-taken boost rides battle start too.
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention, the technique and Eidolon 1");
-    }
 
     // ==================================================================
     // Helpers

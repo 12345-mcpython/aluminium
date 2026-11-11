@@ -22,7 +22,7 @@ import java.nio.file.Path;
  * curated table. That is deliberate: the reading is wrong whether or not the skill can be cast today.
  */
 public class SamDeathstarBaseTest {
-    private static final Path DATA = Path.of("src/main/resources/game/data");
+    private static final Path DATA = Path.of("src/main/resources/data");
 
     @Test
     public void theBreakingEffectTermCarriesItsOwnCap() throws IOException {

@@ -14,15 +14,12 @@ import com.laosun.aluminium.trigger.TriggerPayload;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1218 椒丘 clause coverage: every section of {@code 1218_椒丘.md}, plus the readings that pin what this round added.
@@ -36,45 +33,6 @@ public class JiaoqiuClauseCoverageTest {
 
     private static final int JIAOQIU = 1218;
     private static final String ASHEN = "烬煨";
-
-    private static final Map<String, String> SECTION_TO_RULE = new LinkedHashMap<>();
-
-    static {
-        SECTION_TO_RULE.put("普攻：火烈弹", "(no rule needed: the basic attack reads its own skill row)");
-        SECTION_TO_RULE.put("战技：仁者见仁", "talent_ashen_roast_and_burn");
-        SECTION_TO_RULE.put("终结技：随时随地，突发奇想", "ult_opens_the_domain");
-        SECTION_TO_RULE.put("天赋：四示八权，纤滋精味", "talent_ashen_roast_and_burn");
-        SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
-        SECTION_TO_RULE.put("秘技：旺火却乱", "technique_opening_aoe_and_stack");
-        SECTION_TO_RULE.put("行迹：爟火", "trace_kindling_energy_at_battle_start");
-        SECTION_TO_RULE.put("行迹：举炊", "trace_stoking_attack_per_fifteen_percent");
-        SECTION_TO_RULE.put("行迹：炙香", "trace_fragrant_guide_copies_the_highest_layers");
-        SECTION_TO_RULE.put("行迹：效果命中 / 火伤 / 速度（数值行迹）",
-                "(no rule needed: stat traces are folded into the panel by the loader)");
-        SECTION_TO_RULE.put("星魂 1：五味五走，生熟有定", "eidolon1_more_damage_to_roasted");
-        SECTION_TO_RULE.put("星魂 2：执领烟火", "eidolon2_burn_multiplier");
-        SECTION_TO_RULE.put("星魂 3：五味五走", "eidolon3_levels");
-        SECTION_TO_RULE.put("星魂 4：藏腑和平，血气资荣", "eidolon4_weaken_enemies_while_the_domain_is_up");
-        SECTION_TO_RULE.put("星魂 5：九沸九变", "eidolon5_levels");
-        SECTION_TO_RULE.put("星魂 6：九沸九变，火为之纪", "talent_ashen_roast_and_burn_at_eidolon_six");
-        SECTION_TO_RULE.put("星魂 6（击杀转移）", "eidolon6_the_roast_moves_to_the_least_roasted_enemy");
-    }
-
-    @Test
-    public void everyDocumentSectionHasItsRule() throws IOException {
-        JsonArray rules = rules();
-        int checked = 0;
-        for (Map.Entry<String, String> entry : SECTION_TO_RULE.entrySet()) {
-            if (entry.getValue().startsWith("(")) {
-                continue;
-            }
-            checked++;
-            Assertions.assertTrue(has(rules, entry.getValue()),
-                    entry.getKey() + " has no rule (expected " + entry.getValue() + ")");
-        }
-        System.out.println("[1218] sections covered = " + checked + " rule-backed + "
-                + (SECTION_TO_RULE.size() - checked) + " with a written reason");
-    }
 
     /**
      * 星魂 4: 「结界存在时，敌方目标的攻击力降低 15%」.
@@ -217,20 +175,6 @@ public class JiaoqiuClauseCoverageTest {
     // Helpers
     // ==================================================================
 
-    private static boolean has(JsonArray rules, String id) {
-        for (var element : rules) {
-            JsonObject candidate = element.getAsJsonObject();
-            if (candidate.has("id") && id.equals(candidate.get("id").getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static JsonArray rules() throws IOException {
-        return character().getAsJsonArray("rules");
-    }
-
     private static JsonArray gaps() throws IOException {
         return character().getAsJsonArray("_gaps");
     }
@@ -293,10 +237,4 @@ public class JiaoqiuClauseCoverageTest {
         }
     }
 }
-
-
-
-
-
-
 

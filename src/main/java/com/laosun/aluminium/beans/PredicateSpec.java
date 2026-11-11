@@ -43,7 +43,7 @@ public final class PredicateSpec {
     @SerializedName("term")
     private PredicateSpec term;
 
-    /** {@code ref}: a named predicate from {@code game/data/predicates.json}. */
+    /** {@code ref}: a named predicate from {@code data/predicates.json}. */
     @SerializedName("ref")
     private String ref;
 

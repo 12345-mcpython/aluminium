@@ -1,8 +1,5 @@
 package com.laosun.aluminium.test.content.characters.hook;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.entity.Character;
@@ -11,15 +8,8 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 1109 虎克 clause coverage: every section of {@code 1109_虎克.md}, plus the readings that pin the two Eidolons nobody had written.
@@ -37,45 +27,6 @@ import java.util.Map;
 public class HookClauseCoverageTest {
 
     private static final int HOOK = 1109;
-
-    private static final Map<String, String> SECTION_TO_RULE = new LinkedHashMap<>();
-
-    static {
-        SECTION_TO_RULE.put("普攻：请…请让一下！", "(no rule needed: the basic attack reads its own skill row)");
-        SECTION_TO_RULE.put("战技：嘿！记得虎克吗", "skill_burn");
-        SECTION_TO_RULE.put("终结技：轰！飞来焰火", "ult_enhances_the_next_skill");
-        SECTION_TO_RULE.put("强化战技：嘿！记得虎克吗", "ult_enhances_the_next_skill");
-        SECTION_TO_RULE.put("天赋：哈！火上浇油", "talent_followup_against_burning");
-        SECTION_TO_RULE.put("地图攻击：攻击", "(no rule needed: the map attack happens outside battle)");
-        SECTION_TO_RULE.put("秘技：哎！瞧这一团糟", "technique_burn_on_entry");
-        SECTION_TO_RULE.put("行迹：童真", "trace_childlike");
-        SECTION_TO_RULE.put("行迹：无邪", "trace_innocence");
-        SECTION_TO_RULE.put("行迹：玩火", "trace_play_with_fire");
-        SECTION_TO_RULE.put("行迹：冰伤 / 攻击 / 暴击（数值行迹）",
-                "(no rule needed: stat traces are folded into the panel by the loader)");
-        SECTION_TO_RULE.put("星魂 1：早睡早起很健康", "eidolon1_enhanced_skill_damage_up");
-        SECTION_TO_RULE.put("星魂 2：吃好喝好长身体", "eidolon2_longer_burn");
-        SECTION_TO_RULE.put("星魂 3：不挑不选全都要", "eidolon3_levels");
-        SECTION_TO_RULE.put("星魂 4：稀里糊涂没关系", "eidolon4_adjacent_burn");
-        SECTION_TO_RULE.put("星魂 5：好事留名鼹鼠党", "eidolon5_levels");
-        SECTION_TO_RULE.put("星魂 6：随时准备打坏人", "eidolon6_bonus_against_burning");
-    }
-
-    @Test
-    public void everyDocumentSectionHasItsRule() throws IOException {
-        JsonArray rules = rules();
-        int checked = 0;
-        for (Map.Entry<String, String> entry : SECTION_TO_RULE.entrySet()) {
-            if (entry.getValue().startsWith("(")) {
-                continue;
-            }
-            checked++;
-            Assertions.assertTrue(has(rules, entry.getValue()),
-                    entry.getKey() + " has no rule (expected " + entry.getValue() + ")");
-        }
-        System.out.println("[1109] sections covered = " + checked + " rule-backed + "
-                + (SECTION_TO_RULE.size() - checked) + " with a written reason");
-    }
 
     /**
      * Eidolon 1: 「战技强化后造成的伤害提高 20%」 — measured on the enhanced Skill's main target.
@@ -137,22 +88,6 @@ public class HookClauseCoverageTest {
         return new boolean[]{
                 f.enemies.get(0).getBuffManager().hasState("灼烧"),
                 f.enemies.get(2).getBuffManager().hasState("灼烧")};
-    }
-
-    private static boolean has(JsonArray rules, String id) {
-        for (var element : rules) {
-            JsonObject candidate = element.getAsJsonObject();
-            if (candidate.has("id") && id.equals(candidate.get("id").getAsString())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static JsonArray rules() throws IOException {
-        Path file = Path.of("src", "main", "resources", "game", "characters", "1109.json");
-        return JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8))
-                .getAsJsonObject().getAsJsonArray("rules");
     }
 
     private static final class Fixture {

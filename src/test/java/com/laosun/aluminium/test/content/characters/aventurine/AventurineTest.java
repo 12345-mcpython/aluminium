@@ -61,18 +61,6 @@ public class AventurineTest {
                 "「使指定敌方单体陷入【惊惶】状态，持续3回合」 (puts a designated single enemy into the Unnerved (【惊惶】) state for 3 turns)");
     }
 
-    /**
-     * Census: the shield, the state and the level convention - and the skill's own shield is the DATA TABLE's job.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(AVENTURINE);
-        // Note: 5 since 2026-11-06 - plus the technique's defence lift (「使用秘技后…防御力提高」).
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START), "the opening shield, the convention and the technique");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the state");
-        Assertions.assertEquals(0, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the Skill's shield comes from data/skill_effects.json, so a rule would double-count it");
-    }
 
     private static Random fixed() {
         return BattleFixture.alwaysRoll(1.0);

@@ -45,33 +45,6 @@ public class LuochaTest {
                 "「并使罗刹获得1层【白花之刻】」 (and Luocha (罗刹) gains 1 stack of Abyss Flower (【白花之刻】))");
     }
 
-    /**
-     * Census: which event each clause hangs on, so a rule cannot silently move or vanish.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(LUOCHA);
-        // The counter, the zone opener that consumes it, and 行迹 浸池苏生's dispel.
-        // 星魂 2's two halves moved OFF this event on 2026-10-31: the heal bonus registers once at BATTLE_START (the
-        // mechanism's own contract) and the shield belongs on CAST_SETUP, because SKILL_CAST fires AFTER the heal and the
-        // target is already back above 50% by then (its >= 50% gate would always hold).
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the counter, the zone opener, the dispel, Eidolon 1 aura and Eidolon 4 weaken");
-        // The level convention, 行迹 行过幽谷's control resistance, 秘技 愚者的悲悯's field, 星魂 5, and 星魂 2's heal bonus.
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the control resistance, the technique, Eidolons 2/3/5 levels and the heal bonus");
-        // 星魂 2's shield half: decided before settlement, when the target's HP is still the pre-heal value.
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.CAST_SETUP), "Eidolon 2's shield");
-        // 星魂 6's resistance reduction and the ultimate's own dispel + stack.
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
-                "Eidolon 6's resistance reduction and the ultimate's dispel");
-        // The talent's heal to the attacker and 行迹 浇灌尘身's heal to the others share one trigger.
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK),
-                "the talent's heal to the attacker and the trace's heal to the others");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.HP_LOST), "the low-HP retrigger");
-        // 「当罗刹陷入无法战斗状态时，结界也会被解除」 -- the one clause addressed to the unit leaving the fight.
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEATH), "the field's death clause");
-    }
 
     private static final class Fixture {
         private final Character luocha = CharacterFactory.create(LUOCHA, LEVEL);

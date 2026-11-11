@@ -34,6 +34,7 @@ public class BronyaEidolonTest {
      * Tingyun: a real ally with no rule file of her own, so only Bronya's table can act.
      */
     private static final int ALLY = 1202;
+    private static final int ULT_ALLY = 1001;
     private static final int LEVEL = 80;
     private static final double DEFENCE_TRACE = 0.2;
 
@@ -168,6 +169,28 @@ public class BronyaEidolonTest {
     // ==================================================================
     // Helpers
     // ==================================================================
+
+    /**
+     * 1101 Bronya (布洛妮娅)'s ultimate: an all-allies ATK share and a DERIVED CRIT DMG amount, both judged on a teammate.
+     */
+    @Test
+    public void theUltimateRaisesThePartysAttackAndDerivedCritDamage() {
+        Character bronya = CharacterFactory.create(BRONYA, LEVEL);
+        Character ally = CharacterFactory.create(ULT_ALLY, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(bronya, ally), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        double attackBefore = ally.getAttribute(AttributeType.ATTACK).get();
+        double critBefore = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
+        double herCritDamage = bronya.getAttribute(AttributeType.CRIT_ATTACK).get();
+        battle.castImmediate(bronya.getSkills().get(SkillType.ULTRA), bronya, List.of(enemy));
+        double attackAfter = ally.getAttribute(AttributeType.ATTACK).get();
+        double critAfter = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
+        Assertions.assertEquals(0.55 * attackBefore, attackAfter - attackBefore, Math.max(0.5, 0.02 * attackBefore),
+                "55% of the ally's base ATK: " + attackBefore + " -> " + attackAfter);
+        Assertions.assertEquals(0.16 * herCritDamage + 0.20, critAfter - critBefore, 1e-6,
+                "16% of her CRIT DMG (" + herCritDamage + ") plus 20%: " + critBefore + " -> " + critAfter);
+    }
 
     /**
      * The remaining durations of a unit's timed stat modifiers on one attribute.

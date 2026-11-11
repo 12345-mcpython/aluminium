@@ -115,7 +115,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 - 只认这八个确切名字；`_notee` 和别的拼错一样在装载期报错。
 - 旧的 `source` / `note` 仍然可读；`source` 是运行期保留的 provenance 字段，`note` 只作为注解、**不进 bean**。新注解用下划线形式。
 - **构建期剥离**：源文件保留注解；`processResources` 只给触发规则目录（`characters` / `light_cones` / `relic_sets`）的运行时副本剥掉注解，`source` 保留 ✓；`memosprites` 的 `note` 是运行期字段，不剥；资源声明的 `note` 也是 `ResourceSpec` 字段，不剥。
-- **参数行对账**：参数行写在 `source` 对象里（`skill` / `row` / `params`），`ParamAnnotationReconciliationTest` 拿它跟 `game/data/skills.json` 的对应行逐项比较；独立的 `_params` 注解已移除。它不是运行时字段，构建期同样剥掉。
+- **参数行对账**：参数行写在 `source` 对象里（`skill` / `row` / `params`），`ParamAnnotationReconciliationTest` 拿它跟 `data/skills.json` 的对应行逐项比较；独立的 `_params` 注解已移除。它不是运行时字段，构建期同样剥掉。
 - **结构化状态**：`_status` 的闭集是 `implemented` / `partial` / `registered` / `unmodelled`；`_gaps` / `_divergences` 是字符串数组；非空 gap 必须配 `_status`，且 `implemented` 不能带非空 gap、其余状态必须带一条。未知状态装载期拒绝。状态可写在**规则**上，也可写在**对象形式的文件顶层**：全部 95 个角色文件都有文件级 `_status`（12 个 `implemented`，83 个 `partial` + `_gaps`）。光锥 / 遗器暂未要求文件级状态，见 §1.1a。
 - `//` 与 `/* … */` 注释可以写；**尾逗号不行**（Gson 的 lenient 模式只放过注释）。
 
@@ -310,7 +310,7 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 | `not` | `term` | 取反；对 party 条件，“没有这一方”仍然判否 |
 | `entity` | `entity` + `json` | 实体谓词：`entity` 是 `self` / `actor` / `target`，`json` 是子谓词 → 值 |
 | `event` | `json` | 这次施放的事实（`from_skill` / `from_skill_id` / `from_category` / `damage_is_attack`） |
-| `ref` | `ref` | `game/data/predicates.json` 里的具名谓词 |
+| `ref` | `ref` | `data/predicates.json` 里的具名谓词 |
 
 **实体子谓词**（`json` 的键）：
 

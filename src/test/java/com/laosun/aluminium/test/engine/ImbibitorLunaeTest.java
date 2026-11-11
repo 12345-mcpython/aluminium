@@ -52,18 +52,6 @@ public class ImbibitorLunaeTest {
                 "the seventh hit must not push past the cap");
     }
 
-    /**
-     * Census: the talent, the ultimate's resource, the level convention and the technique.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(DHIL);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the per-hit stack");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the Squama grant plus the second eidolon's extra one and its advance");
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, Eidolons 3 and 5, and the technique's AoE + scale");
-    }
 
     private static Random fixed() {
         return BattleFixture.alwaysRoll(1.0);

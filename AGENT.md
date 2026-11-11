@@ -51,7 +51,7 @@
   ① `implemented ⇔ 无 ⛔`；② `CONTENT-STATUS.md` 与 JSON 双向一致；③ 每条规则都有 `id`。
 - 权威语料在仓库外：`E:\turnbasedgamedata\aluminium_texts\<cid>_<角色名>.md`，读 `.md`。
 - 角色内容：`src/main/resources/game/characters/<cid>.json`。
-- 派生数据：`src/main/resources/game/data/*.json`；`skill_effects.json` 是生成物，部分被跟踪，重生成时要保留手改项。
+- 派生数据：`src/main/resources/data`；`skill_effects.json` 是生成物，部分被跟踪，重生成时要保留手改项。
 - 引擎：`src/main/java/com/laosun/aluminium/`；判据：`src/test/java/.../content/characters/<角色>/`。
 - 沙箱：Gradle 要写 `C:\Users\laosu\.gradle`；workspace-write 会因 `.lck` 失败，需要 full access。
 

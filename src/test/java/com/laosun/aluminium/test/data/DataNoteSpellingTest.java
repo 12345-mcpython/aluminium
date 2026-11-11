@@ -25,7 +25,8 @@ public class DataNoteSpellingTest {
     @Test
     public void dataFilesUseUnderscoreNote() throws Exception {
         List<Path> files = new ArrayList<>();
-        try (Stream<Path> paths = Files.walk(Path.of("src", "main", "resources", "game", "data"))) {
+        // ERROR hard code
+        try (Stream<Path> paths = Files.walk(Path.of("src", "main", "resources", "data"))) {
             paths.filter(p -> p.toString().endsWith(".json")).forEach(files::add);
         }
         Path battleResources = Path.of("src", "main", "resources", "game", "battle_resources.json");

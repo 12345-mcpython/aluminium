@@ -74,25 +74,46 @@ public class HertaTheTest {
                 "「【灵感】最多持有4层」 ([灵感] can be held up to 4 stacks)");
     }
 
+
     /**
-     * Census: the technique, the ultimate and the convention.
+     * Her technique's +60% and her ult's +80% ATTACK must both count (1401).
+     *
+     * <p>FILE-DRIVEN, three readings, and the two ratios are the claim: 1.6 with the technique alone, 2.4 with both.
+     * `Note: `Technique (秘技)` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point;
+     * a hand-built `APPLY_BUFF` rule does not fire for a technique.
      */
     @Test
-    public void herFileCarriesTheClauses() {
-        var table = TriggerTables.of(HERTA);
-        // Note: 3 since 2026-11-11 - Eidolon 2 pays one more 【灵感】 on the same cast.
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the modifiers, the Skill swap, and Eidolon 2 inspiration");
-        // Note: 8 since 2026-11-11 - Eidolon 2s entry inspiration, Eidolon 4s speed aura, Eidolon 6s ice penetration
-        // and Eidolon 6s enemy-count multiplier tiers.
-        Assertions.assertEquals(8, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the technique, the convention, and the four Eidolon passives");
-        // Note: 5 since 2026-11-11 - the ENHANCED cast also applies its own 1 layer of 【解读】.
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "insight, the cost, the revert, the advance, and the enhanced layer");
+    public void bothAttackSourcesAreCounted() {
+        double plain = attack(false, false);
+        double techniqueOnly = attack(true, false);
+        double ultOnly = attack(false, true);
+        double both = attack(true, true);
+
+        Assertions.assertTrue(plain > 0, "precondition: a positive base (" + plain + ")");
+        Assertions.assertTrue(techniqueOnly > plain, "the technique's own share lands (" + plain + " -> " + techniqueOnly + ")");
+        Assertions.assertTrue(ultOnly > plain, "and the ult's lands on its own (" + plain + " -> " + ultOnly + ")");
+        Assertions.assertEquals((techniqueOnly - plain) + (ultOnly - plain), both - plain, 1e-6,
+                "with both present the two increments must ADD: (" + techniqueOnly + " - " + plain + ") + ("
+                        + ultOnly + " - " + plain + ") vs (" + both + " - " + plain + ")");
     }
 
     private static Random fixed() {
         return BattleFixture.alwaysRoll(1.0);
+    }
+
+    private static double attack(boolean usedTechnique, boolean castUlt) {
+        Character owner = CharacterFactory.create(HERTA, LEVEL, false, null, null, 0);
+        Battle battle = new Battle(List.of(owner),
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
+        if (usedTechnique) {
+            battle.markTechniqueUsed(owner);      // before startBattle: applyTechniqueStates runs before every BATTLE_START rule
+        }
+        battle.startBattle();
+        battle.processRequests();
+        if (castUlt) {
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, owner, 0, 0));
+            battle.processRequests();
+        }
+        return owner.getAttribute(AttributeType.ATTACK).get();
     }
 }

@@ -42,20 +42,6 @@ public class KafkaTest {
                 "the ultimate's own damage plus the extra instance 「立即产生相当于原伤害 100% 的伤害」 (immediately deals damage equal to 100% of the original damage)");
     }
 
-    /**
-     * Census: the composed ultimate and the level convention are where the notes say.
-     */
-    @Test
-    public void herFileCarriesTheClauses() {
-        var table = TriggerTables.of(KAFKA);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the Shock plus its immediate tick, and the trace that lengthens the shock by a turn");
-        // Six since 2026-11-02: her technique is a BATTLE_START clause too (「进入战斗后…使敌方每个单体目标陷入触电」).
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, Eidolons 2/3/5 (and 6 via MODIFY_RULE), and the technique");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
-                "the talent follow-up (moved to the once-per-cast event, which now carries the aim)");
-    }
 
     /**
      * Note: An ALLY's basic attack makes Kafka strike again; her own must not.

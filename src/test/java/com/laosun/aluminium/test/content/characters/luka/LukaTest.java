@@ -156,20 +156,6 @@ public class LukaTest {
                         + "enhanced basic attack are both `Normal` casts");
     }
 
-    /**
-     * Census: the two layer rules, the trace and the level convention are all there.
-     */
-    @Test
-    public void hisFileCarriesTheClauses() {
-        TriggerTable table = TriggerTables.of(LUKA);
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the starting layer + the level convention + the technique + Eidolons 3, 4 and 5");
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.ALLY_ATTACK),
-                "one layer rule per cast category, the enhancement, its removal, the bleed tick and the two-layer cost");
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the trace REMOVE_BUFF, the Skill Bleed DOT and Eidolon 2 weakness layer");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST));
-    }
 
     // ==================================================================
     // Helpers

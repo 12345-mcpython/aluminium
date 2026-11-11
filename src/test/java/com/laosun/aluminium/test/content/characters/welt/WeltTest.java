@@ -8,10 +8,12 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.buff.StatModifierBuff;
 import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -40,19 +42,39 @@ public class WeltTest {
                 "「有100%的基础概率使受到攻击的敌方目标陷入禁锢状态，持续1回合」 (a 100% base chance to put the attacked enemy target into the Imprisonment (禁锢) state for 1 turn)");
     }
 
+
+    /**
+     * 1004 瓦尔特's Eidolon 1 (「强化前」half):「施放终结技后…在随后 2 次施放普攻或战技时额外对敌方目标造成 1 次附加伤害」.
+     *
+     * <p>The judge counts the extra instances by damage: two empowered attacks add damage that a plain attack does not, and the
+     * third one is back to normal - which is what 「随后 2 次」 means.
+     */
     @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(WELT);
-        // Two since 2026-11-02: Eidolon 1 also fires on ULT_CAST (「施放终结技后，瓦尔特获得强化」).
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison, Eidolon 1's power-up, and the two trace rules");
-        // Two since 2026-11-02: Eidolon 2 rides the same slow-gated trigger (「触发天赋时，瓦尔特恢复 3 点能量」).
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
-                "the slow-gated talent, Eidolon 2 and trace 裁决");
-        // Four since 2026-11-02: the technique is a BATTLE_START clause too.
-        // Five since 2026-11-03: Eidolon 4 raises the slow's base chance at battle start (a MODIFY_RULE amendment).
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the technique, Eidolon 3/5 levels and Eidolon 4's amendment");
-        // Three ULT_CAST rules since the traces landed (惩戒 / 审判 beside the imprison and Eidolon 1's power-up).
+    public void theUltimateEmpowersExactlyTwoAttacks() {
+        double[] d = damages();
+        System.out.println("[1004] E1 after ult: #1=" + d[0] + " #2=" + d[1] + " #3=" + d[2] + " #4=" + d[3]);
+        Assertions.assertTrue(d[0] > d[2], "the first attack after the Ultimate carries the additional damage");
+        Assertions.assertTrue(d[1] > d[2], "the second one does too");
+        Assertions.assertEquals(d[2], d[3], 1e-9, "「随后 2 次」 - attacks three and four are the same ordinary attack");
+    }
+
+    /** Raw damage of four consecutive basic attacks in ONE battle, so the crit stream is the same for all of them. */
+    private static double[] damages() {
+        Character him = CharacterFactory.create(WELT, LEVEL, true, null, null, 1);
+        Battle battle = new Battle(new ArrayList<>(List.of(him)),
+                new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        var enemy = battle.enemyUnits().getFirst();
+        battle.castImmediate(him.getSkills().get(SkillType.ULTRA), him, List.of(enemy));
+        battle.processRequests();
+        double[] out = new double[4];
+        for (int i = 0; i < 4; i++) {
+            double before = enemy.getCurrentHp();
+            battle.castImmediate(him.getSkills().get(SkillType.COMMON), him, List.of(enemy));
+            battle.processRequests();
+            out[i] = before - enemy.getCurrentHp();
+        }
+        return out;
     }
 
     private static final class Fixture {

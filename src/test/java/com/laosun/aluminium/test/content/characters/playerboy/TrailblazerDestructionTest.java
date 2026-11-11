@@ -1,11 +1,13 @@
 package com.laosun.aluminium.test.content.characters.playerboy;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.enemy.Enemy;
+import com.laosun.aluminium.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -15,13 +17,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8001 Trailblazer (Destruction), from his own file: ATK that stacks on weakness breaks.
+ * 8001/8002 Trailblazer (Destruction): the ATK that stacks on Weakness Breaks, the trace's per-stack DEFENCE, and
+ * Eidolon 4's crit-rate boost against a Weakness-Broken target.
  *
- * <p>The case asserts the cap: two breaks give the full +40%, and a third changes nothing. Dropping `max_stacks` makes it red.
+ * <p>These were three small files in the same package; one class keeps the character together without changing any
+ * assertion.
  */
 public class TrailblazerDestructionTest {
     private static final int TB = 8001;
     private static final int LEVEL = 80;
+    private static final double EPS = 1e-9;
+    private static final String COUNTER_8001 = "牵制盗垒";
+    private static final String COUNTER_8002 = "牵制盗垒";
 
     /**
      * Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层".
@@ -48,15 +55,75 @@ public class TrailblazerDestructionTest {
     }
 
     /**
-     * Census: the talent and the level convention.
+     * Trailblazer - Destruction (开拓者(毁灭))'s trace Tenacity (坚韧): "each layer of the talent's effect also raises the Trailblazer's DEF by 10%" -- the counter scale again, on a counter the
+     * character's own talent marks.
      */
     @Test
-    public void hisFileCarriesTheClauses() {
-        var table = TriggerTables.of(TB);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
-                "the talent's ATK stack and (2026-09-29) the Tenacity (坚韧) trace's per-layer DEFENCE, both on BREAK");
-        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the technique heal (round 178) and the level convention");
+    public void eachLayerAddsTenPercentOfBaseDefence() {
+        assertDelta(8001, COUNTER_8001, 1, 0.10);
+        assertDelta(8001, COUNTER_8001, 2, 0.20);
+        assertDelta(8002, COUNTER_8002, 2, 0.20);
+    }
+
+    /**
+     * Trailblazer (Destruction) (开拓者 (毁灭))'s Eidolon 4: "击中处于弱点击破状态的敌方目标时，暴击率提高25%" -- a state-gated boost for that hit.
+     */
+    @Test
+    public void theBoostIsStatedOnlyAgainstABrokenTarget() {
+        for (int cid : new int[]{8001, 8002}) {
+            // Note: A difference, not an absolute: an intact unit still reads the game's inherent +0.05 crit chance
+            // (measured: 0.30 where the clause owns 0.25).
+            Assertions.assertEquals(0.25, critChance(cid, true) - critChance(cid, false), EPS,
+                    "cid " + cid + ": the clause's own 25%");
+            Assertions.assertEquals(0.05, critChance(cid, false), EPS,
+                    "cid " + cid + ": against an intact target only the inherent remains");
+        }
+    }
+
+    private static void assertDelta(int cid, String counter, int layers, double shareOfBase) {
+        Character trailblazer = CharacterFactory.create(cid, LEVEL);
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(trailblazer), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        double base = trailblazer.getAttribute(AttributeType.DEFENCE).baseValue();
+        double before = trailblazer.getAttribute(AttributeType.DEFENCE).get();
+        for (int i = 0; i < layers; i++) {
+            battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, trailblazer, enemy, 1, 1000));
+        }
+        Assertions.assertEquals(layers, trailblazer.getBuffManager().stacksOf(counter),
+                "precondition: the talent marked exactly " + layers + " layer(s)");
+        double after = trailblazer.getAttribute(AttributeType.DEFENCE).get();
+        Assertions.assertEquals(shareOfBase * base, after - before, EPS,
+                "\"each layer of the talent's effect also raises the Trailblazer's DEF by 10%\" with " + layers + " layer(s)");
+    }
+
+    private static double critChance(int cid, boolean broken) {
+        Character trailblazer = CharacterFactory.create(cid, LEVEL, true, null, null, 4);
+        DamageElement element = trailblazer.getSkills().get(SkillType.COMMON).getData().getElement();
+        // Note: A monster the element can actually break: breaking requires a weakness, and `reduceToughness` on a monster
+        // that is not weak to the element leaves the weakness break state off entirely (measured: hasState false).
+        Enemy enemy = null;
+        for (int id = 1002010; id < 1002100 && enemy == null; id++) {
+            try {
+                Enemy candidate = EnemyFactory.create(id, 90, 1);
+                if (candidate.isWeakTo(element)) {
+                    enemy = candidate;
+                }
+            } catch (RuntimeException ignored) {
+                // not in the data
+            }
+        }
+        Assertions.assertNotNull(enemy, "no enemy weak to " + element + " in the probed range");
+        Battle battle = new Battle(List.of(trailblazer), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        if (broken) {
+            battle.reduceToughness(trailblazer, enemy, element, 999);
+            Assertions.assertTrue(enemy.getBuffManager().hasState("弱点击破"),
+                    "precondition: emptying the bar of a weak enemy puts it in Weakness Break (弱点击破)");
+        }
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, trailblazer, enemy, 1, 1000));
+        return trailblazer.getAttribute(AttributeType.CRIT_CHANCE).get()
+                - trailblazer.getAttribute(AttributeType.CRIT_CHANCE).baseValue();
     }
 
     private static Random fixed() {

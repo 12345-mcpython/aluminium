@@ -59,6 +59,32 @@ public class HertaSkillFormTest {
                 "「持有」的相反面 - no stack left, so the plain Skill comes back");
     }
 
+    /**
+     * 1401 大黑塔's talent, first clause: 「敌方目标进入战斗时，大黑塔对其施加 1 层【解读】…最多可叠加 42 层」.
+     *
+     * <p>The layer lands on the unit that WALKED IN ({@code actor}), not on the caster and not on everybody - so the judge adds an
+     * enemy after the battle is under way and checks that one.
+     */
+    @Test
+    public void anEnemyThatWalksInGetsOneLayer() {
+        Character herta = CharacterFactory.create(HERTA, LEVEL);
+        Enemy first = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(herta, CharacterFactory.create(1001, LEVEL))),
+                new ArrayList<>(List.of(first)), BattleFixture.seeded());
+        battle.startBattle();
+        Assertions.assertEquals(0, first.getBuffManager().stacksOf(INSIGHT),
+                "the roster at battle start is not 「进入战斗」 by this event's definition");
+
+        Enemy late = BattleFixture.monster();
+        battle.addEnemy(late);
+        Assertions.assertEquals(1, late.getBuffManager().stacksOf(INSIGHT), "「对其施加 1 层【解读】」");
+
+        Enemy another = BattleFixture.monster();
+        battle.addEnemy(another);
+        Assertions.assertEquals(1, another.getBuffManager().stacksOf(INSIGHT), "and every later entry pays too");
+        Assertions.assertEquals(1, late.getBuffManager().stacksOf(INSIGHT), "the earlier one is not double-charged");
+    }
+
     // ==================================================================
 
     private static final class Scene {
