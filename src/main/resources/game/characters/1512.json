@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "character": 1512,
-  "_status": "partial",
+  "_status": "implemented",
   "resources": [
     {
       "id": "气氛值",
@@ -675,7 +675,7 @@
         }
       ],
       "source": "1512 知更鸟•晴歌 星魂 6 唱一首未命名的歌: 「…本场战斗中第一次进入【Fever】状态后…固定恢复140点能量。」 参数 = [140, 2]",
-      "_note": "「本场战斗中**第一次**进入【Fever】状态后…**固定恢复 140 点能量**」—— ① 触发点与天赋那条**同事件同条件**（`SUMMONED` + `summon_count >= 3` ✓）；② 「**第一次**」用一枚一次性标记（`self_stacks:首次狂热已触发 <= 0` ⇒ 放过；随后 `ADD_STACK max_stacks: 1` ✓）；③ 「**固定**恢复」= `fixed: true` ✓（不吃能量恢复效率加成 ✓）。⚠ 星魂 6 的其余两半（忆灵技倍率 ×2、【Fever】期间终结技储存 2 次）仍登记。⛔ 「…或【Fever】倒计时回合开始时」那一条并列触发点未写（倒计时没有建模）。"
+      "_note": "「本场战斗中**第一次**进入【Fever】状态后…**固定恢复 140 点能量**」—— ① 触发点与天赋那条**同事件同条件**（`SUMMONED` + `summon_count >= 3` ✓）；② 「**第一次**」用一枚一次性标记（`self_stacks:首次狂热已触发 <= 0` ⇒ 放过；随后 `ADD_STACK max_stacks: 1` ✓）；③ 「**固定**恢复」= `fixed: true` ✓（不吃能量恢复效率加成 ✓）。⭐ **星魂 6 的另外两半现在都落地了**：忆灵技倍率 ×2 = `eidolon6_doubles_the_memosprites_skill_damage`（实例级 `BOOST_DAMAGE`）✓；「【Fever】期间终结技**最多储存 2 次**」= **`eidolon6_fever_stores_a_second_ultimate`**（`RAISE_ENERGY_BANK`，额度 = **她自己的能量上限** ⇒ 条里一次 + 池里一次 = 2 次）+ **`eidolon6_the_stored_ultimate_pours_back`**（`ULT_CAST` 且在 Fever 里 → `DRAW_ENERGY_BANK`）✓。⛔ 「…或【Fever】倒计时回合开始时」那一条并列触发点未写（倒计时没有建模）。"
     }
     ,
     {
@@ -704,6 +704,53 @@
       ],
       "source": "1512 知更鸟•晴歌 星魂 2 心似一片湖水: 「…我方目标在任意目标回合内第一次施放技能使知更鸟•晴歌获得气氛值时额外获得2点。」 参数 = [0.18, 20, 2]",
       "_note": "「我方目标在**任意目标回合内第一次**施放技能使…获得气氛值时**额外获得 2 点**」—— ① 事件 `SKILL_CAST` + `actor is_ally` ✓；② 「**本回合第一次**」用一枚标记（`self_stacks:本回合已加成 <= 0` ⇒ 放过，随后 `ADD_STACK max_stacks: 1` ✓）；③ 标记在**任意**单位回合开始时清掉（下一条 ✓）——「**任意目标**回合内」= 不限于她的回合 ✓。⚠ **近似**：原句的前提是「**使气氛值增加**」，这里挂在**任何我方技能施放**上 ⇒ 那一发没加气氛值也会给 2 点。"
+    },
+    {
+      "on": "SUMMONED",
+      "id": "eidolon6_fever_stores_a_second_ultimate",
+      "min_eidolon": 6,
+      "when": [
+        {
+          "type": "entity",
+          "entity": "self",
+          "json": {
+            "summon_count": {
+              "min": 3
+            }
+          }
+        }
+      ],
+      "do": [
+        {
+          "op": "RAISE_ENERGY_BANK",
+          "value": {
+            "type": "energy",
+            "whose": "owner",
+            "relation": "max"
+          }
+        }
+      ],
+      "source": "1512 知更鸟•晴歌 星魂 6 唱一首未命名的歌: 「…处于【Fever】状态时，终结技最多储存2次。」 参数 = [140, 2]",
+      "_note": "「处于【Fever】状态时，终结技**最多储存 2 次**」—— ① 「2 次」= 条里一次 + **池里一次** ⇒ 池的额度取**她自己的能量上限**（`value: { type: energy, whose: owner, relation: max }`，不是字面量：上限随角色/等级变 ✓）。② 挂在与天赋**同一个开【Fever】的事件与条件**上（`SUMMONED` + `summon_count >= 3`）—— 「进入 Fever」在引擎里就是那一刻 ✓（与 `eidolon6_first_fever_restores_fixed_energy` 逐字同门 ✓）。⚠ **登记（近似）**：`RAISE_ENERGY_BANK` 只有「抬」没有「降」⇒ 一旦进过 Fever，这份储存额度**本场一直在**；原文限定「处于【Fever】状态时」。要消除它需要一个「在某个状态期间才生效的额度」，即 `while_state` 版的 `RAISE_*`。判据 `RobinEidolonSixStorageTest`。",
+      "_status": "implemented"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_the_stored_ultimate_pours_back",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "self has_state Fever"
+      ],
+      "do": [
+        {
+          "op": "DRAW_ENERGY_BANK",
+          "target": "self"
+        }
+      ],
+      "source": "1512 知更鸟•晴歌 星魂 6 唱一首未命名的歌: 「…处于【Fever】状态时，终结技最多储存2次。」 参数 = [140, 2]",
+      "_note": "同一句的另一半：终结技放完（能量已扣）之后把**存着的那一份**倒回条里 ⇒ 立刻又能放一次（= 「储存 2 次」）✓。② 门 `self has_state Fever` ✓ —— 原文限定在 Fever 期间。⚠ 与 1014 的湖之祝福**同两个 op**（`RAISE_ENERGY_BANK` / `DRAW_ENERGY_BANK`），差别只在**额度**（那里是 120/200 的固定池，这里是她一个满条）。判据 `RobinEidolonSixStorageTest`（E6 才有：E5 装不下、E6 装得下；E0 对照）。",
+      "_status": "implemented"
     },
     {
       "on": "TURN_START",
@@ -869,7 +916,7 @@
     }
   ],
   "_gaps": [
-    "⛔ **星魂 6 只剩一半**：「处于【Fever】状态时，终结技**最多储存 2 次**」—— 引擎没有「终结技可储存」这一层（能量满就必须施放）。⭐ 另一半（忆灵技倍率 ×2）已落地：`DEALING_DAMAGE` + `actor is_summon` → `BOOST_DAMAGE { percent: 1.0 }`（**实例级**替代数据行份额，判据实测 E6 的最高一发 > E0）。",
+    "✅ **星魂 6 的两半全部落地（2026-11-12）**：① 「忆灵技的伤害倍率提高原倍率的 100%」= `eidolon6_doubles_the_memosprites_skill_damage`（`DEALING_DAMAGE` + `actor is_summon` → 实例级 `BOOST_DAMAGE { percent: 1.0 }`）；② 「处于【Fever】状态时，终结技**最多储存 2 次**」= `eidolon6_fever_stores_a_second_ultimate`（进 Fever 那一刻 `RAISE_ENERGY_BANK`，额度 = **她自己的能量上限** ⇒ 条里一次 + 池里一次）+ `eidolon6_the_stored_ultimate_pours_back`（`ULT_CAST` 且在 Fever 里 → `DRAW_ENERGY_BANK`，放完立刻又满）。⚠ **近似（登记）**：池额度只有「抬」没有「降」⇒ 进过一次 Fever 后本场一直有；原文限定「处于【Fever】状态时」。判据 `RobinEidolonSixStorageTest`。",
     "⭐ **星魂 1 / 2 / 4 与星魂 6 的能量半均已落地（2026-11-03）**：星魂 1 = 资源 `记录` 累加 → 忆灵技掷 TRUE 伤害 → 扣一半；星魂 2 = 全属性穿透 +18% / 气氛值上限 +20 / 回合内首次 +2；星魂 4 = 进入 Fever +12 气氛值 + 忆灵速度 `0.2 + 气氛值×0.005`；星魂 6 = 本场首次 Fever 固定回 140 能量。判据 `RobinEidolonTwoTest`（7 例）。",
     "⭐ **两处已登记的近似**：① 星魂 1 的「**非真实伤害**」没有过滤（引擎不能按伤害类型筛事件）⇒ 那一发真实伤害也被记入；② 星魂 2 的「回合内首次 +2」挂在**任何我方技能施放**上，而原句要求「使气氛值增加」。"
   ]

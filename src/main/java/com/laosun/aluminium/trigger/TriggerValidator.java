@@ -49,6 +49,9 @@ final class TriggerValidator {
             "TICK_DOT", "RAISE_ENERGY_TO",
             "GAIN_SKILL_POINT", "ADD_STACK", "REMOVE_STACK", "REMOVE_BUFF", "DISPEL",
             "RAISE_RESOURCE_CAP", "RAISE_SKILL_HITS", "RAISE_SKILL_POINT_CAP",
+            // The energy bar's overflow allowance: 1512's 「终结技最多储存 2 次」 states it as ONE FULL BAR, so the magnitude
+            // has to be read off her own Max Energy rather than written as a number.
+            "RAISE_ENERGY_BANK",
             "ABSORB_DAMAGE", "RESIST_DEBUFF");
 
     /**
