@@ -66,7 +66,21 @@ public enum TriggerOperator {
     MODIFY_ATTR(true),
     MODIFY_DAMAGE_TAKEN(true),
     MODIFY_RULE(true),
+    /**
+     * 「施放终结技后清空并恢复相应的能量值」 (1014 Saber's trace 湖之祝福): empty the overflow bank into the energy bar.
+     *
+     * <p>It is a separate op from {@code GAIN_ENERGY} because the amount is not stated anywhere - it is what the unit
+     * happened to bank - and separate from {@code RAISE_ENERGY_TO} because that one names a target value.
+     */
+    DRAW_ENERGY_BANK(true),
     RAISE_ENERGY_TO(true),
+    /**
+     * 「可积攒最多 120 点溢出能量」 (1014: the trace, and its Eidolon 6 raising it to 200): raise the overflow allowance.
+     *
+     * <p>Distinct from {@code RAISE_RESOURCE_CAP}, which widens a <em>resource</em>'s overflow - this one is about the
+     * energy bar, and the two must not share a spelling.
+     */
+    RAISE_ENERGY_BANK(true),
     RAISE_RESOURCE_CAP(true),
     RAISE_RESOURCE_MAX(true),
     RAISE_SKILL_MULTIPLIER(true),

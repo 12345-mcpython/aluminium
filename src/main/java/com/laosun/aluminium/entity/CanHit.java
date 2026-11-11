@@ -705,6 +705,42 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return gainEnergy(EnergyGain.normal(amount));
     }
 
+    /**
+     * How much overflow energy this unit is holding ("可积攒最多 N 点溢出能量").
+     *
+     * @return the banked overflow, {@code 0} for a unit with no bank
+     */
+    public double getBankedEnergy() {
+        return energy.banked();
+    }
+
+    /**
+     * How much overflow energy this unit may hold ({@code 0} = gains above the cap are lost, the default).
+     *
+     * @return the overflow allowance
+     */
+    public double getEnergyBankCap() {
+        return energy.bankCap();
+    }
+
+    /**
+     * Sets the overflow allowance: how much energy may be kept beyond the bar's cap.
+     *
+     * @param cap the allowance ({@code 0} = gains above the cap are lost, the default)
+     */
+    public void setEnergyBankCap(double cap) {
+        energy.setBankCap(cap);
+    }
+
+    /**
+     * Empties the bank into the bar and returns what the bar actually took.
+     *
+     * @return the energy restored
+     */
+    public double drawEnergyBank() {
+        return energy.drawBank();
+    }
+
     @Override
     public void beforeMove(Battle battle) {
         beforeMove.run();

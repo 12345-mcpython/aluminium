@@ -887,6 +887,11 @@ public final class TriggerInterpreter {
                 }
             }
             case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
+            // 「可积攒最多 120 点溢出能量」: the bar's overflow allowance. Reader: 1014 Saber's trace 湖之祝福 and its
+            // Eidolon 6 (「提高到 200 点」 = the same op with the difference).
+            case RAISE_ENERGY_BANK -> energyBankCap(effect, ctx);
+            // 「施放终结技后清空并恢复相应的能量值」: hand the banked overflow back to the bar.
+            case DRAW_ENERGY_BANK -> energyBankDraw(effect, ctx);
             // The DECLARED cap, not the overflow tier above it. Reader: 1513 Aventurine · Waveflair Eidolon 2
             // (「【热意】上限提高至 50 点」) -- the base declaration states 30 and an Eidolon raises it for the battle.
             case RAISE_RESOURCE_MAX -> raiseResourceMax(effect, ctx);
@@ -1323,6 +1328,37 @@ public final class TriggerInterpreter {
                 ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
                 : (int) Math.round(effect.getAmount()));
     }
+    /**
+     * {@code RAISE_ENERGY_BANK}: 「可积攒最多 120 点溢出能量」 / 「【湖之祝福】可积攒的溢出能量提高到 200 点」.
+     *
+     * <p>The number is the ALLOWANCE itself, not a delta: both sentences state the total, and the corpus guard
+     * {@code EidolonNumbersComeFromTheDataTest} refuses a number that no param column carries (200 − 120 = 80 is exactly
+     * such a number). Two rules on one event therefore order-depend, which is the convention elsewhere in this project.
+     *
+     * @param effect the effect ({@code amount} = how many points of overflow may be kept in total)
+     * @param ctx    the firing context
+     */
+    private static void energyBankCap(EffectSpec effect, TriggerContext ctx) {
+        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
+        holder.setEnergyBankCap(effect.getValue() != null
+                ? TriggerMagnitudes.valueOf(effect, ctx)
+                : effect.getAmount());
+    }
+
+    /**
+     * {@code DRAW_ENERGY_BANK}: 「施放终结技后清空并恢复相应的能量值」.
+     *
+     * <p>The amount is whatever the unit banked, so nothing is stated here; the bar's own cap still applies (a refund is
+     * not a way past {@code max}). Readers: 1014 Saber's trace 湖之祝福.
+     *
+     * @param effect the effect (optionally a {@code target}; the owner by default)
+     * @param ctx    the firing context
+     */
+    private static void energyBankDraw(EffectSpec effect, TriggerContext ctx) {
+        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
+        holder.drawEnergyBank();
+    }
+
     /**
      * Widens a resource's OVERFLOW for its owner (reader: 114151"[新蕊] can overflow to #3%").
      *

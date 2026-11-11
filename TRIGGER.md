@@ -388,15 +388,16 @@ ADVANCE                APPLY_BUFF             APPLY_CONTROL          APPLY_DOT
 APPLY_REGEN            BOOST_DAMAGE           BOOST_TOUGHNESS        CAST_SKILL
 COMMAND_SUMMON         CONSUME_HP             DAMAGE                 DELEGATE_DAMAGE
 DELAY                  DISMISS_SUMMON         DISPEL                 DEPART
-EXTEND_BUFF            EXTRA_TURN             GAIN_ENERGY            GAIN_RESOURCE
-GAIN_SKILL_POINT       HEAL                   INSERT_ACTION          MODIFY_ATTR
-RAISE_ENERGY_TO        RAISE_RESOURCE_CAP     RAISE_RESOURCE_MAX     RAISE_SKILL_HITS
-RAISE_SKILL_LEVEL      RAISE_SKILL_MULTIPLIER RAISE_SKILL_POINT_CAP REGISTER_HEAL_BONUS
-REMOVE_BUFF            REMOVE_RESOURCE        REMOVE_STACK           REMOVE_STATE
-RESET_RESOURCE_CAP     RESET_RULE_CHANCE      RESET_TRIGGER_LIMIT    RESIST_DEBUFF
-RETURN                 SHARE_DAMAGE           SHIELD                 SPEND_RESOURCE
-SPEND_STEPS            START_COUNTDOWN        SUMMON                 SUMMON_SERVANT
-SUPER_BREAK            TAUNT                  TICK_DOT
+DRAW_ENERGY_BANK       EXTEND_BUFF            EXTRA_TURN             GAIN_ENERGY
+GAIN_RESOURCE          GAIN_SKILL_POINT       HEAL                   INSERT_ACTION
+MODIFY_ATTR            RAISE_ENERGY_BANK      RAISE_ENERGY_TO        RAISE_RESOURCE_CAP
+RAISE_RESOURCE_MAX     RAISE_SKILL_HITS       RAISE_SKILL_LEVEL      RAISE_SKILL_MULTIPLIER
+RAISE_SKILL_POINT_CAP  REGISTER_HEAL_BONUS    REMOVE_BUFF            REMOVE_RESOURCE
+REMOVE_STACK           REMOVE_STATE           RESET_RESOURCE_CAP     RESET_RULE_CHANCE
+RESET_TRIGGER_LIMIT    RESIST_DEBUFF          RETURN                 SHARE_DAMAGE
+SHIELD                 SPEND_RESOURCE         SPEND_STEPS            START_COUNTDOWN
+SUMMON                 SUMMON_SERVANT         SUPER_BREAK            TAUNT
+TICK_DOT
 ```
 
 - **`DEPART` / `RETURN`**：「**离场**」与它精确的反向 - `DEPART` 把目标设为**不可被选为目标**（`CanHit.setUntargetable`）并从**行动序列**移除（`Queue.removeCombatant`）；`RETURN` 把两件事都撤回（`Queue.addCombatant`，按引擎「中途加入」的规则**排一整周期之后**）。读者：1223 貊泽 天赋「场上存在【猎物】时进入【离场】状态」。⚠ 这正是 §6 那条：**一次性动作**必须成对写，读时活门（`while_state`）管不了它。
@@ -404,6 +405,7 @@ SUPER_BREAK            TAUNT                  TICK_DOT
 - **`SHARE_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：`{"percent": 0.65, "target": "self"}` 表示「这一发的 65% **由目标承担**」—— 本发只保留 35%，并按**同元素/同攻击者/同 65% 基数**给 `target` 另开一发（走它自己的防御/抗性区，结算在当次之后）。读者：1208 符玄【穷观阵】。
 - `REPLACE_SKILL` 有两个方向：**装上**（`skill` + `skill_id` + 一个寿命）与 **`"remove": true`**（把该槽位的替换取下、恢复原来的行；不带 `skill_id`、不带寿命）。重复装上**同一**替换是 no-op（否则第二个会把强化行记成「原始」，卸下时反而装回去）。读者：1111 卢卡「≥2 层时强化 / <2 层时恢复」
 - **`RAISE_SKILL_MULTIPLIER`**：把**某个槽位的技能行份额**乘上去（`{ "skill": "ULTRA", "percent": 2.4 }` ⇒ 那一行的倍率 ×3.4）—— 句子的形状是「终结技的**伤害倍率**提高 240%」，它既不是增伤区（`BOOST_DAMAGE` 会与元素/全属性增伤**相加**，实测落在错的区里）也不是规则（`MODIFY_RULE` 只改规则，而这一发伤害来自**技能行**）⇒ 只有**结算处**能乘。可选 `min_enemies` / `max_enemies` 是**敌方数量窗口**，在**读行份额的那一刻**求值 ⇒ 「3+/2/1 名时分别提高 140%/250%/400%」用三条**互斥窗口**写。读者：1412 星魂 4、1401 星魂 6 后半。
+- **`RAISE_ENERGY_BANK` / `DRAW_ENERGY_BANK`**：能量条的**溢出池**。`RAISE_ENERGY_BANK { amount }` 把「最多积攒 N 点溢出能量」的**额度**抬 N（池子默认 0 ⇒ 其它单位的溢出照旧丢弃）；`DRAW_ENERGY_BANK` 把池里的量倒回能量条并清空（**没有** `amount` —— 量就是池里剩多少；倒回不越过上限，且**不**乘回能效率，「恢复相应的能量值」是那个数本身）。⚠ 为什么不是「把上限调大」：那会让**下一次**终结技开场就充好，而句子说的是这一发放完**倒回去**。读者：1014 Saber 行迹 湖之祝福（120 / 星魂 6 的 200）＋ `ULT_CAST` 上的 `DRAW_ENERGY_BANK`。
 - **`RAISE_RESOURCE_MAX`**：把角色**声明**的资源上限抬高（`{ "resource": "热意", "amount": 20 }`）—— 与 **`RAISE_RESOURCE_CAP`** 不同：后者抬的是**溢出额度**（`max + maxOverflow` 那一层）。读者：1513 星魂 2「【热意】上限提高至 50 点」。
 - **`ADD_DAMAGE`**（只在 `DEALING_DAMAGE` 上）：加的是一个**数值**（不是百分比）。默认进**基数层**（「伤害**值**提高」⇒ 会被暴击/增伤/防御/抗性放大）；**`"after_zones": true`** 改成在所有区**之后**加（「伤害**额外提高**，提高数值等同于…」⇒ 不暴击、不被任何区放大）。读者：1001 星魂 4（基数层）、1205 星魂 1 / 星魂 6（`after_zones`）。
 - **每个 op 的参数以 `TriggerInterpreter` 的类注释为准**，本文不复制。

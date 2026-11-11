@@ -457,7 +457,27 @@ final class TriggerValidator {
                 requirePositiveAmount(effect, op, spec);
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
-            }            case GAIN_RESOURCE, SPEND_RESOURCE, REMOVE_RESOURCE -> {
+            }            case RAISE_ENERGY_BANK -> {
+                // 「可积攒最多 120 点溢出能量」: the ALLOWANCE itself (absolute), so a positive count, no duration, and no
+                // resource name (the bar is the unit's own - naming one would be a second thing the op could mean).
+                requirePositiveAmount(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+                if (effect.getResource() != null) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " sets the ENERGY bar's overflow allowance, so it takes no \"resource\" - "
+                                    + "resource overflow is RAISE_RESOURCE_CAP (source: " + spec.getSource() + ")");
+                }
+            }
+            case DRAW_ENERGY_BANK -> {
+                // No number and no resource: the amount is whatever was banked.
+                if (effect.getAmount() != null || effect.getResource() != null || effect.getValue() != null) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " restores what the energy bank holds, so it states neither \"amount\" nor "
+                                    + "\"resource\" (source: " + spec.getSource() + ")");
+                }
+            }
+            case GAIN_RESOURCE, SPEND_RESOURCE, REMOVE_RESOURCE -> {
                 if (Boolean.TRUE.equals(effect.getSpendAll())) {
                     // "consume all [X]": a spend with no stated SIZE -- and stating one
                     // beside it is a contradiction, so it is refused rather than silently preferring one.
