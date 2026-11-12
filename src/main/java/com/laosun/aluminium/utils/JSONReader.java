@@ -13,11 +13,15 @@ import java.nio.charset.StandardCharsets;
  *
  * <p>Uses Gson for deserialization. All resources are read with UTF-8 encoding.
  *
- * <p><b>The data files are not in the repository.</b> {@code src/main/resources/data/} is excluded by
- * {@code .gitignore} (the only one checked in is the patch file {@code monster_attack_modify_ratio.json}),
- * so right after a {@code git clone} none of these files exist and they must first be produced with the
- * generator script in the README. When a file is missing, this class throws {@link IllegalStateException}
- * carrying the file name and generation guidance - see {@link #fromJSON(String, Type)}.
+ * <p><b>Most data files are not in the repository.</b> {@code src/main/resources/data/*} is ignored by
+ * {@code .gitignore}, because the tables are produced by a generator that lives outside this repo. Four of them
+ * <b>are</b> checked in, and those are exactly the ones a clone cannot start without:
+ * {@code monster_attack_modify_ratio.json} (hand-written patch table), {@code skill_effects.json} (hand-maintained -
+ * the generator cannot produce it), {@code enemy_skills.json} (self-built, because the game data has no enemy skill
+ * table) and {@code skills.json} (generated, tracked only because nothing inside the repo could regenerate it). Any
+ * other table must first be produced with the generator script in the README. When a file is missing, this class
+ * throws {@link IllegalStateException} carrying the file name and generation guidance - see
+ * {@link #fromJSON(String, Type)}.
  *
  * <p>The same is true for the other way data can be unusable: a file that exists but parses to
  * {@code null} (zero bytes, or a literal {@code null}). It is reported at the same place, with the same
@@ -51,11 +55,7 @@ public final class JSONReader {
             // not prepared", not "the code has a bug", so the error MUST be self-explanatory - otherwise a
             // newcomer only sees an ExceptionInInitializerError unrelated to the real cause (any exception
             // thrown from Constant's static block turns into that).
-            throw new IllegalStateException("""
-                    缺少数据文件 %s（应位于 src/main/resources%s）
-                    游戏数据不在仓库里（.gitignore 排除了 src/main/resources/data/），\
-                    请先按 README 的 generator 一节生成数据，否则所有测试都会失败。"""
-                    .formatted(resourcePath, DATA_DIR));
+            throw new IllegalStateException("Missing data file %s/%s".formatted(resourcePath, DATA_DIR));
         }
         try (InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
             T parsed = GSON.fromJson(reader, type);
@@ -65,9 +65,7 @@ public final class JSONReader {
                 // back would put a null *table* into Constant (WEAPONS = frozen(null)) - it then blows
                 // up as an NPE on some unrelated line, or, worse, behaves like a silently empty table.
                 // A file that merely has no rows is unaffected: `{ }` parses to an empty map, not null.
-                throw new IllegalStateException("""
-                        数据文件 %s 解析结果为 null（文件是空的，或内容就是字面 null）
-                        通常是上一次生成数据被中断留下的空文件，请按 README 的 generator 一节重新生成。"""
+                throw new IllegalStateException("\"%s\" data is null"
                         .formatted(resourcePath));
             }
             return parsed;
