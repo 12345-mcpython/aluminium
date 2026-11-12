@@ -218,6 +218,16 @@ _note  _source  _status  _gaps  _divergences  _changelog  _literal_reason  _comm
 
 **比较**（对数值）：`==` `!=` `>` `>=` `<` `<=`
 
+⚠ **两侧都可以是算术式**：一项可以是 `变量`、`数字`，或 `变量 * 数字`；多项之间用 `+` 连接。**没有括号、没有优先级**（解析器原话：*term = variable [* literal], joined by +*）。
+例（1014 Saber 的战技与「否则」分支就是靠它写的）：
+
+```
+"self_energy + self_stacks:炉心共鸣 * 8 >= self_max_energy"     # 「消耗后能回满能量」
+"self_energy + self_stacks:炉心共鸣 * 8 <  self_max_energy"     # 同一条件的取反（`!` 只否定读队伍的条件）
+```
+
+⚠ 取反**不要**用 `!` 前缀：数值条件取反会把 `NaN` 翻成「成立」（解析器注释里有原话）。
+
 **状态 / 身份**：
 
 | 写法 | 含义 |
