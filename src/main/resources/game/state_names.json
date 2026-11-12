@@ -99,12 +99,84 @@
       ]
     },
     {
+      "name": "break:weakness",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "break:weakness",
+      "en": "Weakness Break",
+      "zh": "弱点击破"
+    },
+    {
+      "name": "ctrl:frozen",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "ctrl:frozen",
+      "en": "Frozen",
+      "zh": "冻结"
+    },
+    {
+      "name": "ctrl:imprisoned",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "ctrl:imprisoned",
+      "en": "Imprisoned",
+      "zh": "禁锢"
+    },
+    {
+      "name": "ctrl:sublimated",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "ctrl:sublimated",
+      "en": "Sublimated",
+      "zh": "升华"
+    },
+    {
+      "name": "dot:bleed",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:bleed",
+      "en": "Bleed",
+      "zh": "裂伤"
+    },
+    {
+      "name": "dot:burn",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:burn",
+      "en": "Burn",
+      "zh": "灼烧"
+    },
+    {
+      "name": "dot:shock",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:shock",
+      "en": "Shock",
+      "zh": "触电"
+    },
+    {
+      "name": "dot:wind_shear",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:wind_shear",
+      "en": "Wind Shear",
+      "zh": "风化"
+    },
+    {
       "name": "relic130_elation_used",
       "owner": "130",
       "kind": "char",
       "used_by": [
         "130"
       ]
+    },
+    {
+      "name": "sys:technique",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "sys:technique",
+      "en": "Technique",
+      "zh": "秘技"
     },
     {
       "name": "上上签",
@@ -205,15 +277,6 @@
     },
     {
       "name": "充能",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412",
-        "1415"
-      ]
-    },
-    {
-      "name": "充能",
       "owner": "1003",
       "kind": "char",
       "used_by": [
@@ -266,6 +329,15 @@
       "kind": "char",
       "used_by": [
         "1317"
+      ]
+    },
+    {
+      "name": "充能",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412",
+        "1415"
       ]
     },
     {
@@ -358,14 +430,6 @@
       ]
     },
     {
-      "name": "ctrl:frozen",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "ctrl:frozen",
-      "en": "Frozen",
-      "zh": "冻结"
-    },
-    {
       "name": "剑势",
       "owner": "1206",
       "kind": "char",
@@ -422,12 +486,12 @@
       ]
     },
     {
-      "name": "ctrl:sublimated",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "ctrl:sublimated",
-      "en": "Sublimated",
-      "zh": "升华"
+      "name": "升格",
+      "owner": "1302",
+      "kind": "char",
+      "used_by": [
+        "1302"
+      ]
     },
     {
       "name": "华彩",
@@ -467,6 +531,14 @@
       "kind": "char",
       "used_by": [
         "1408"
+      ]
+    },
+    {
+      "name": "叙述性诡计",
+      "owner": "1306",
+      "kind": "char",
+      "used_by": [
+        "1306"
       ]
     },
     {
@@ -740,14 +812,6 @@
       "used_by": [
         "1303"
       ]
-    },
-    {
-      "name": "break:weakness",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "break:weakness",
-      "en": "Weakness Break",
-      "zh": "弱点击破"
     },
     {
       "name": "强化",
@@ -1494,14 +1558,6 @@
       ]
     },
     {
-      "name": "dot:burn",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "dot:burn",
-      "en": "Burn",
-      "zh": "灼烧"
-    },
-    {
       "name": "灼热意志",
       "owner": "8003",
       "kind": "char",
@@ -1784,14 +1840,6 @@
       ]
     },
     {
-      "name": "ctrl:imprisoned",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "ctrl:imprisoned",
-      "en": "Imprisoned",
-      "zh": "禁锢"
-    },
-    {
       "name": "禳命",
       "owner": "1217",
       "kind": "char",
@@ -1830,14 +1878,6 @@
       "used_by": [
         "21032"
       ]
-    },
-    {
-      "name": "sys:technique",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "sys:technique",
-      "en": "Technique",
-      "zh": "秘技"
     },
     {
       "name": "秘技减速",
@@ -2237,28 +2277,12 @@
       ]
     },
     {
-      "name": "dot:bleed",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "dot:bleed",
-      "en": "Bleed",
-      "zh": "裂伤"
-    },
-    {
       "name": "解读",
       "owner": "1401",
       "kind": "char",
       "used_by": [
         "1401"
       ]
-    },
-    {
-      "name": "dot:shock",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "dot:shock",
-      "en": "Shock",
-      "zh": "触电"
     },
     {
       "name": "记录",
@@ -2554,14 +2578,6 @@
       "used_by": [
         "1408"
       ]
-    },
-    {
-      "name": "dot:wind_shear",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "dot:wind_shear",
-      "en": "Wind Shear",
-      "zh": "风化"
     },
     {
       "name": "风口",

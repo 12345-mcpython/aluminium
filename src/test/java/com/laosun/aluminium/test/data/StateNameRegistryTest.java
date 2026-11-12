@@ -67,6 +67,16 @@ public class StateNameRegistryTest {
             "amount_from_resource", "percent_from_resource", "amount_percent_from_resource", "control");
 
     /**
+     * Fields that name a <b>counter</b>, and may therefore spell it behind a prefix ({@code self_stacks:归纳}) or use one
+     * of the engine's own count variables ({@code enemy_count}) instead of a counter at all.
+     */
+    private static final List<String> COUNTER_FIELDS = List.of("per_stack", "counter");
+
+    /** The engine's own counts - values a counter field may hold that are <b>not</b> state names. */
+    private static final Set<String> COUNT_VARIABLES = Set.of(
+            "enemy_count", "shielded_count", "target_debuff_count", "target_dot_count", "target_weakness_count");
+
+    /**
      * The ops whose {@code buff} is a state <b>identity</b> - something {@code REMOVE_STATE} can take off later.
      *
      * <p>⚠ Every other op's {@code buff} is a display label for an otherwise unnamed modifier, and those read like prose
@@ -253,6 +263,17 @@ public class StateNameRegistryTest {
                         if (op.has(field) && op.get(field).isJsonPrimitive()) {
                             note(users, op.get(field).getAsString(), name);
                         }
+                    }
+                    for (String field : COUNTER_FIELDS) {
+                        if (!op.has(field) || !op.get(field).isJsonPrimitive()) {
+                            continue;
+                        }
+                        String spelled = op.get(field).getAsString().trim();
+                        if (spelled.isEmpty() || COUNT_VARIABLES.contains(spelled)) {
+                            continue;
+                        }
+                        int colon = spelled.indexOf(':');
+                        note(users, colon < 0 ? spelled : spelled.substring(colon + 1).trim(), name);
                     }
                     for (String selectorField : List.of("target", "scale")) {
                         if (op.has(selectorField) && op.get(selectorField).isJsonPrimitive()) {
