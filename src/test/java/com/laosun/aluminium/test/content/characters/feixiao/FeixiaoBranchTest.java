@@ -75,7 +75,7 @@ public class FeixiaoBranchTest {
         battle.startBattle();
         if (broken) {
             battle.reduceToughness(feixiao, victim, victim.getStanceWeak().iterator().next(), 999);
-            Assertions.assertTrue(victim.getBuffManager().hasState("弱点击破"), "precondition: the target is broken");
+            Assertions.assertTrue(victim.getBuffManager().hasState("break:weakness"), "precondition: the target is broken");
         }
         double before = victim.getCurrentHp();
         battle.castImmediate(feixiao.getSkills().get(SkillType.ULTRA), feixiao, List.of(victim));

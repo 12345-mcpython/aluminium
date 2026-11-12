@@ -73,7 +73,7 @@
       "on": "BATTLE_START",
       "id": "technique_energy_and_skill_point",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

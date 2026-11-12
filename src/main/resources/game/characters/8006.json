@@ -158,7 +158,7 @@
       "on": "DEALING_DAMAGE",
       "when": [
         "actor has_state 伴舞",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "do": [
         {
@@ -196,7 +196,7 @@
       "on": "BATTLE_START",
       "id": "technique_breaking_effect",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

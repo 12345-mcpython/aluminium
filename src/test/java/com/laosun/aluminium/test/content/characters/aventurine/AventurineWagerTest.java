@@ -161,7 +161,7 @@ public class AventurineWagerTest {
     public void theTechniqueDrawsOneDefenceTier() {
         for (int seed = 0; seed < 6; seed++) {
             Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
-            aventurine.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1));
+            aventurine.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("sys:technique", 1));
             Enemy enemy = BattleFixture.monster();
             Battle battle = new Battle(List.of(aventurine), List.of(enemy),
                     BattleFixture.alwaysRoll(seed / 10.0));

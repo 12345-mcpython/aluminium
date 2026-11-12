@@ -520,11 +520,11 @@ public class ConeConditionLiteralsTest {
         assertRule(21047, 3, "BATTLE_START", "cone21047_speed", List.of());
         assertRule(21047, 4, "BATTLE_START", "cone21047_speed", List.of());
         assertRule(21047, 5, "BATTLE_START", "cone21047_speed", List.of());
-        assertRule(21048, 1, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state 弱点击破"));
-        assertRule(21048, 2, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state 弱点击破"));
-        assertRule(21048, 3, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state 弱点击破"));
-        assertRule(21048, 4, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state 弱点击破"));
-        assertRule(21048, 5, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state 弱点击破"));
+        assertRule(21048, 1, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state break:weakness"));
+        assertRule(21048, 2, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state break:weakness"));
+        assertRule(21048, 3, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state break:weakness"));
+        assertRule(21048, 4, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state break:weakness"));
+        assertRule(21048, 5, "BASIC_ATTACK", "cone21048_energy", List.of("actor == self", "target has_state break:weakness"));
         assertRule(21050, 1, "SKILL_CAST", "cone21050_memosprite_support", List.of("actor == summon", "target is_ally"));
         assertRule(21050, 2, "SKILL_CAST", "cone21050_memosprite_support", List.of("actor == summon", "target is_ally"));
         assertRule(21050, 3, "SKILL_CAST", "cone21050_memosprite_support", List.of("actor == summon", "target is_ally"));

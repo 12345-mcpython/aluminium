@@ -74,7 +74,7 @@
       "on": "BATTLE_START",
       "id": "technique_arms_the_next_ability",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

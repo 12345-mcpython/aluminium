@@ -61,7 +61,7 @@ public class TechniqueGateTest {
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.startBattle();
 
-        Assertions.assertFalse(tb.getBuffManager().hasState("秘技"),
+        Assertions.assertFalse(tb.getBuffManager().hasState("sys:technique"),
                 "without the marker the state must not exist");
     }
 
@@ -76,7 +76,7 @@ public class TechniqueGateTest {
         battle.markTechniqueUsed(tb);
         battle.startBattle();
 
-        Assertions.assertTrue(tb.getBuffManager().hasState("秘技"),
+        Assertions.assertTrue(tb.getBuffManager().hasState("sys:technique"),
                 "「使用秘技后」 (after using the Technique) -- the declared technique must be visible as a state");
     }
 

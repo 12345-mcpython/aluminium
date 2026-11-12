@@ -413,7 +413,7 @@ public class LingshaFuyuanTest {
             ally = CharacterFactory.create(ALLY, LEVEL);
             if (technique) {
                 // The engine stamps this before any BATTLE_START rule runs; it is the gate her technique rule reads.
-                lingsha.getBuffManager().addBuff(new StateBuff("秘技", 1));
+                lingsha.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
             }
             // Dummies survive every hit (1,000,000 HP), so a routine opening cannot decide the measurement.
             for (int i = 0; i < enemyCount; i++) {

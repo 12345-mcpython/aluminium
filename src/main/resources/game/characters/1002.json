@@ -56,7 +56,7 @@
       "id": "technique_opening_attack",
       "_status": "implemented",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

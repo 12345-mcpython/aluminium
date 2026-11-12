@@ -166,7 +166,7 @@
       "when": [
         "actor == self",
         "from_skill ULTRA",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "do": [
         {
@@ -184,7 +184,7 @@
       "when": [
         "actor == self",
         "from_skill ULTRA",
-        "!target has_state 弱点击破"
+        "!target has_state break:weakness"
       ],
       "do": [
         {

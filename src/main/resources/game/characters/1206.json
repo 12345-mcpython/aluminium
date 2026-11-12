@@ -53,7 +53,7 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "!target has_state 弱点击破"
+        "!target has_state break:weakness"
       ],
       "chance": 0.33,
       "do": [
@@ -78,7 +78,7 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "do": [
         {
@@ -100,7 +100,7 @@
       "on": "BATTLE_START",
       "id": "technique_opening_damage",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -233,7 +233,7 @@
       "min_eidolon": 1,
       "when": [
         "actor == self",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "do": [
         {
@@ -349,7 +349,7 @@
       "when": [
         "actor == self",
         "from_skill COMMON",
-        "enemy_state_count:弱点击破 >= 1"
+        "enemy_state_count:break:weakness >= 1"
       ],
       "do": [
         {
@@ -367,7 +367,7 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "enemy_state_count:弱点击破 >= 1"
+        "enemy_state_count:break:weakness >= 1"
       ],
       "do": [
         {
@@ -405,7 +405,7 @@
         "actor == self",
         "from_skill SKILL",
         "self_stacks:剑势额外判定 >= 1",
-        "!target has_state 弱点击破"
+        "!target has_state break:weakness"
       ],
       "chance": 0.33,
       "chance_rolls": 2,
@@ -433,7 +433,7 @@
         "actor == self",
         "from_skill SKILL",
         "self_stacks:剑势额外判定 >= 1",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "chance": 1,
       "chance_rolls": 2,

@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * 1014 Saber's technique 骑士王的登场: 「使用秘技后，下一次战斗开始时 Saber 攻击力提高 35%，持续 2 回合，并获得 2 点【炉心共鸣】」.
  *
- * <p>The technique is a BATTLE_START rule gated on {@code self has_state 秘技}, so the check compares a battle opened
+ * <p>The technique is a BATTLE_START rule gated on {@code self has_state sys:technique}, so the check compares a battle opened
  * normally with one opened by the technique.
  */
 public class SaberTechniqueTest {
@@ -35,7 +35,7 @@ public class SaberTechniqueTest {
     private static Character saber(boolean technique) {
         Character saber = CharacterFactory.create(SABER, LEVEL);
         if (technique) {
-            saber.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1));
+            saber.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("sys:technique", 1));
         }
         Battle battle = new Battle(new ArrayList<>(List.of(saber)),
                 new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));

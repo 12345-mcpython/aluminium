@@ -27,7 +27,7 @@ import java.util.List;
  * which is how 1406 writes her own 10%. So the assertion is on the ATTRIBUTE, because a rule that only
  * applied the buff would produce a named state with no effect, and reading the buff's presence would pass.
  *
- * <p><b>Where the gate comes from.</b> {@code self has_state 秘技}, satisfied by
+ * <p><b>Where the gate comes from.</b> {@code self has_state sys:technique}, satisfied by
  * {@code Battle.applyTechniqueStates()} before any BATTLE_START rule runs -- so the battle has to be told the
  * technique was used. Every case here is therefore a contrast against the same battle without it.
  */
@@ -52,7 +52,7 @@ public class NatashaTechniqueTest {
         Assertions.assertEquals(3, weakened(with),
                 "「使敌方每个单体目标陷入虚弱状态」 -- all three enemies, not just the one hit");
         Assertions.assertEquals(0, weakened(without),
-                "without the technique the same battle must weaken nobody -- the `self has_state 秘技` "
+                "without the technique the same battle must weaken nobody -- the `self has_state sys:technique` "
                         + "gate is why it happened");
     }
 

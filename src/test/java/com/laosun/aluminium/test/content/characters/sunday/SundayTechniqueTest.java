@@ -26,7 +26,7 @@ public class SundayTechniqueTest {
     public void theTechniqueArmsOnlyTheFirstAbility() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        sunday.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1));
+        sunday.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("sys:technique", 1));
         Battle battle = new Battle(List.of(sunday, ally), List.of(BattleFixture.dummy()), BattleFixture.seeded());
         battle.startBattle();
 

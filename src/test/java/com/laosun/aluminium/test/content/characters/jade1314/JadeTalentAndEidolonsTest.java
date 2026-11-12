@@ -185,7 +185,7 @@ public class JadeTalentAndEidolonsTest {
             ally.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
             enemy = BattleFixture.monster();
             if (technique) {
-                jade.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1));
+                jade.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("sys:technique", 1));
             }
             battle = new Battle(List.of(jade, ally), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();

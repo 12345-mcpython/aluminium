@@ -553,7 +553,7 @@
       "on": "BATTLE_START",
       "id": "technique_summons_fuyuan_and_befogs",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -600,7 +600,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.2,
-          "while_holder_state": "弱点击破",
+          "while_holder_state": "break:weakness",
           "permanent": true,
           "target": "target"
         }

@@ -28,7 +28,7 @@ public class EvanesciaRiderTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy),
                 BattleFixture.seeded());
-        // ⚠ 1505's 「进入战斗后…获得 20 点【好活当赏】」 is the TECHNIQUE's clause: its rule carries self has_state 秘技, so
+        // ⚠ 1505's 「进入战斗后…获得 20 点【好活当赏】」 is the TECHNIQUE's clause: its rule carries self has_state sys:technique, so
         // the release must be declared BEFORE the battle starts (it was ungated until 2026-11-09).
         battle.markTechniqueUsed(elation);
         battle.startBattle();

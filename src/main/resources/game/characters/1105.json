@@ -171,7 +171,7 @@
       "on": "BATTLE_START",
       "id": "technique_weaken_and_strike",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

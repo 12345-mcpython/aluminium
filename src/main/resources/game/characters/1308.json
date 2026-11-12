@@ -120,7 +120,7 @@
       "on": "WAVE_START",
       "id": "technique_hits_every_enemy_each_wave",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -142,7 +142,7 @@
       "id": "technique_state_pays_after_the_ult",
       "when": [
         "actor == self",
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

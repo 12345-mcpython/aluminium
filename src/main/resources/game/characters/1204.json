@@ -164,7 +164,7 @@
         }
       ],
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "on": "BATTLE_START",
       "_note": "「使用秘技后，下一次战斗开始时【神君】**第 1 回合的攻击段数增加 3 段**」—— ``BATTLE_START`` + ``self has_state 秘技`` → ``ADD_STACK 攻击段数 +3``（上限 10 ✓，与战技共用同一个计数器）。⚠ 「**第 1 回合**」的限定未单独表达：段数在神君行动后不会自动回落到初始值（那属于「行动」的模型，见 `_gaps`）。"

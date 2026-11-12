@@ -62,7 +62,7 @@ public class LingsoBreakDefenceTest {
     // ==================================================================
 
     private static final class Run {
-        static final String BROKEN = "弱点击破";
+        static final String BROKEN = "break:weakness";
         private final Character lingso;
         private final Enemy enemy;
         private final Battle battle;

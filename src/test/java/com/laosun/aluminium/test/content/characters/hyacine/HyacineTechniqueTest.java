@@ -15,7 +15,7 @@ import java.util.List;
  * 的生命值并使生命上限提高 20%，持续 2 回合」.
  *
  * <p>The technique happens before the battle, so the engine is TOLD about it ({@code Battle.markTechniqueUsed} sets the
- * {@code 秘技} state); the rule then hangs on {@code BATTLE_START} behind {@code self has_state 秘技}.
+ * {@code 秘技} state); the rule then hangs on {@code BATTLE_START} behind {@code self has_state sys:technique}.
  */
 public class HyacineTechniqueTest {
 

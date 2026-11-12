@@ -6,7 +6,7 @@
       "on": "BASIC_ATTACK",
       "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": ["actor == self", "target has_state 弱点击破"],
+      "when": ["actor == self", "target has_state break:weakness"],
       "do": [
         { "op": "GAIN_ENERGY", "amount": 3.0, "target": "self" }
       ],
@@ -20,7 +20,7 @@
       "on": "BASIC_ATTACK",
       "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": ["actor == self", "target has_state 弱点击破"],
+      "when": ["actor == self", "target has_state break:weakness"],
       "do": [
         { "op": "GAIN_ENERGY", "amount": 3.5, "target": "self" }
       ],
@@ -34,7 +34,7 @@
       "on": "BASIC_ATTACK",
       "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": ["actor == self", "target has_state 弱点击破"],
+      "when": ["actor == self", "target has_state break:weakness"],
       "do": [
         { "op": "GAIN_ENERGY", "amount": 4.0, "target": "self" }
       ],
@@ -48,7 +48,7 @@
       "on": "BASIC_ATTACK",
       "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": ["actor == self", "target has_state 弱点击破"],
+      "when": ["actor == self", "target has_state break:weakness"],
       "do": [
         { "op": "GAIN_ENERGY", "amount": 4.5, "target": "self" }
       ],
@@ -62,7 +62,7 @@
       "on": "BASIC_ATTACK",
       "on_any": ["SKILL_CAST", "ULT_CAST"],
       "id": "cone21048_energy",
-      "when": ["actor == self", "target has_state 弱点击破"],
+      "when": ["actor == self", "target has_state break:weakness"],
       "do": [
         { "op": "GAIN_ENERGY", "amount": 5.0, "target": "self" }
       ],

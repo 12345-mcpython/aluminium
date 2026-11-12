@@ -102,7 +102,7 @@ public class ServalTest {
     @Test
     public void theTechniqueShocksEveryoneAndDamagesOne() {
         Character her = CharacterFactory.create(SERVAL, LEVEL);
-        her.getBuffManager().addBuff(new StateBuff("秘技", 1));
+        her.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
         Battle battle = new Battle(new ArrayList<>(List.of(her)),
                 new ArrayList<>(List.of(BattleFixture.dummy(), BattleFixture.dummy())),
                 BattleFixture.alwaysRoll(0.0));

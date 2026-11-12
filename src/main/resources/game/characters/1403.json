@@ -106,7 +106,7 @@
       "on": "BATTLE_START",
       "id": "technique_numinosity",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -386,7 +386,7 @@
       "on": "BATTLE_START",
       "id": "eidolon4_party_defence_ignore_on_technique",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

@@ -74,7 +74,7 @@
     {
       "on": "BATTLE_START",
       "id": "p1505_technique_gift",
-      "when": ["self has_state 秘技"],
+      "when": ["self has_state sys:technique"],
       "do": [
         {
           "op": "GAIN_RESOURCE",
@@ -186,7 +186,7 @@
     {
       "on": "BATTLE_START",
       "id": "p1505_technique_damage",
-      "when": ["self has_state 秘技"],
+      "when": ["self has_state sys:technique"],
       "do": [
         {
           "op": "DAMAGE",

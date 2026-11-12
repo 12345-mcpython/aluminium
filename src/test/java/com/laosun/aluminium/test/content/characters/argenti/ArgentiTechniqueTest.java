@@ -30,7 +30,7 @@ public class ArgentiTechniqueTest {
     private static double[] run(boolean technique) {
         Character him = CharacterFactory.create(1302, 80);
         if (technique) {
-            him.getBuffManager().addBuff(new StateBuff("秘技", 1));
+            him.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
         }
         Battle battle = new Battle(new ArrayList<>(List.of(him)),
                 new ArrayList<>(List.of(BattleFixture.dummy(), BattleFixture.dummy())),

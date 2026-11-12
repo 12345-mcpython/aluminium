@@ -26,7 +26,7 @@ import java.util.Map;
  * all six Eidolons and the two trace clauses were already there.
  *
  * <p><b>What it is, in the file.</b>
- * {@code on: BATTLE_START, when: ["self has_state 秘技"], op: APPLY_CONTROL, control: 冻结, turns: 1,
+ * {@code on: BATTLE_START, when: ["self has_state sys:technique"], op: APPLY_CONTROL, control: 冻结, turns: 1,
  * base_chance: 1.0, element: Ice, scale: self_attr:ATTACK, percent: 0.5, target: random_enemy} -- the same
  * vocabulary as her ultimate's freeze, which is the point: 「冻结状态」 must not mean one thing when her
  * ultimate applies it and another when her technique does.
@@ -103,7 +103,7 @@ public class March7thTechniqueTest {
         Assertions.assertTrue(frozenCount(true) >= 1,
                 "with the technique marked, the battle-start rule must freeze an enemy");
         Assertions.assertEquals(0, frozenCount(false),
-                "without the technique the same battle must freeze nobody -- the `self has_state 秘技` "
+                "without the technique the same battle must freeze nobody -- the `self has_state sys:technique` "
                         + "gate is the whole reason the freeze happened");
     }
 

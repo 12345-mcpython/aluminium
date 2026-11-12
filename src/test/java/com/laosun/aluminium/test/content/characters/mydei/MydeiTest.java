@@ -103,7 +103,7 @@ public class MydeiTest {
         TriggerSpecs.set(effect, "element", "Imaginary");
         TriggerSpecs.set(effect, "target", "all_enemies");
         mydei.setTriggerTable(new TriggerTable(MYDEI, List.of(TriggerSpecs.rule(
-                TriggerEvent.BATTLE_START.name(), List.of("self has_state 秘技"), effect))));
+                TriggerEvent.BATTLE_START.name(), List.of("self has_state sys:technique"), effect))));
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(mydei), List.of(enemy), fixed());
         battle.markTechniqueUsed(mydei);

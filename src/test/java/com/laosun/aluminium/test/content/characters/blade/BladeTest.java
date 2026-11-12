@@ -115,7 +115,7 @@ public class BladeTest {
         TriggerSpecs.set(effect, "element", "Wind");
         TriggerSpecs.set(effect, "target", "all_enemies");
         blade.setTriggerTable(new TriggerTable(BLADE, List.of(TriggerSpecs.rule(
-                TriggerEvent.BATTLE_START.name(), List.of("self has_state 秘技"), effect))));
+                TriggerEvent.BATTLE_START.name(), List.of("self has_state sys:technique"), effect))));
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(blade), List.of(enemy), fixed());
         battle.markTechniqueUsed(blade);

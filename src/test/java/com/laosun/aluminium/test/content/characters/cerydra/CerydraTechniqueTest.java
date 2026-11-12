@@ -27,7 +27,7 @@ public class CerydraTechniqueTest {
     private static boolean merit(boolean technique) {
         Character her = CharacterFactory.create(1412, 80);
         if (technique) {
-            her.getBuffManager().addBuff(new StateBuff("秘技", 1));
+            her.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
         }
         Battle battle = new Battle(new ArrayList<>(List.of(her)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));

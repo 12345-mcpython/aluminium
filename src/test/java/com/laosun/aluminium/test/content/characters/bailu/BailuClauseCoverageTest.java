@@ -239,7 +239,7 @@ public class BailuClauseCoverageTest {
         private Fixture(int eidolon, boolean technique, boolean ultimate) {
             bailu = CharacterFactory.create(BAILU, 80, false, null, null, eidolon);
             if (technique) {
-                bailu.getBuffManager().addBuff(new StateBuff("秘技", 1));
+                bailu.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
             }
             battle = new Battle(List.of(bailu, ally), List.of(BattleFixture.dummy()),
                     BattleFixture.alwaysRoll(0.0));

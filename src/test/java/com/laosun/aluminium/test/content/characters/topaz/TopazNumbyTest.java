@@ -207,7 +207,7 @@ public class TopazNumbyTest {
             topaz = CharacterFactory.create(TOPAZ, LEVEL, false, null, null, eidolon);
             if (technique) {
                 // The engine stamps this permanent state before any BATTLE_START rule runs; it is the gate her Technique reads.
-                topaz.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1, true));
+                topaz.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("sys:technique", 1, true));
             }
             Enemy enemy = BattleFixture.monster();
             enemy.setMaxStance(10_000);

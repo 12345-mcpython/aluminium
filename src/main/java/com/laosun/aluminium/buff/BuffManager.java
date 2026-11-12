@@ -445,7 +445,7 @@ public class BuffManager {
     /**
      * The document's name for "韧性被削减至 0" (see {@link #hasState}).
      */
-    public static final String BROKEN_STATE = "弱点击破";
+    public static final String BROKEN_STATE = "break:weakness";
 
     public static String dotStateName(DamageElement element) {
         return stateNameOf(element);

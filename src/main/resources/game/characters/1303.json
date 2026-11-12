@@ -134,7 +134,7 @@
       "min_eidolon": 2,
       "when": [
         "actor is_ally",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "do": [
         {
@@ -209,7 +209,7 @@
       "on": "BATTLE_START",
       "id": "technique_auto_casts_the_skill",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

@@ -122,7 +122,7 @@
       "on": "BATTLE_START",
       "id": "technique_grants_bondmate",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -168,7 +168,7 @@
       "on": "BATTLE_START",
       "id": "technique_autocasts_skill_on_the_bondmate",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

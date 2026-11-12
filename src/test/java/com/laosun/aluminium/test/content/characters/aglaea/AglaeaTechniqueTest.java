@@ -49,7 +49,7 @@ public class AglaeaTechniqueTest {
         aglaea.setCurrentEnergy(aglaea.getMaxEnergy() * 0.6);
         if (technique) {
             // The engine stamps this state before any BATTLE_START rule runs, which is the gate the rule reads.
-            aglaea.getBuffManager().addBuff(new StateBuff("秘技", 1));
+            aglaea.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
         }
         Enemy first = BattleFixture.dummy();
         Enemy second = BattleFixture.dummy();

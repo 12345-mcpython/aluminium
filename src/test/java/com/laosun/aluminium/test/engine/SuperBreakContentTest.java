@@ -48,7 +48,7 @@ public class SuperBreakContentTest {
         battle.castImmediate(harmony.getSkills().get(SkillType.ULTRA), harmony, List.of(ally, harmony));
         breakIt(battle, harmony, enemy);
         Assertions.assertTrue(ally.getBuffManager().hasState("伴舞"), "precondition: the ally carries 【伴舞】 (Backup Dancer)");
-        Assertions.assertTrue(enemy.getBuffManager().hasState("弱点击破"), "precondition: the target is broken");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("break:weakness"), "precondition: the target is broken");
 
         TriggerTable table = TriggerTables.of(HARMONY);
         Assertions.assertFalse(table.matching(TriggerEvent.DEALING_DAMAGE, ctx(harmony, ally, enemy, battle)).isEmpty(),

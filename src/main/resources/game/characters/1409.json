@@ -380,7 +380,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "秘技"
+            "state": "sys:technique"
           }
         }
       ],

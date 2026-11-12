@@ -158,7 +158,7 @@
       "on": "BATTLE_START",
       "id": "technique_regen_on_the_party",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

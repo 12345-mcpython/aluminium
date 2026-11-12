@@ -51,7 +51,7 @@ public class SilverWolfLV999TechniqueWaveBoxTest {
                 .filter(e -> "ELATION".equalsIgnoreCase(e.getDamageType() == null ? "" : e.getDamageType().trim()))
                 .findFirst().map(e -> e.getCountedLaughs()).orElse(null));
 
-        Assertions.assertTrue(conditions.contains("self has_state 秘技"),
+        Assertions.assertTrue(conditions.contains("self has_state sys:technique"),
                 "「【怪怪怪味豆】在场时」 is the technique state the engine applies before every BATTLE_START");
         Assertions.assertEquals(4, effects.size(),
                 "the same box as the skill-point route: the Elation hit, the sword, the skill points and the laughs");

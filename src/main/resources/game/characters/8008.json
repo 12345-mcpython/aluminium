@@ -114,7 +114,7 @@
       "on": "BATTLE_START",
       "id": "technique_delay_and_ice_damage",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

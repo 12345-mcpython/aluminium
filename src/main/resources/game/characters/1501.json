@@ -33,7 +33,7 @@
       "on": "BATTLE_START",
       "id": "technique_opening_aoe_and_skill_points",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

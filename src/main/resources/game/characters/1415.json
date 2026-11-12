@@ -1007,7 +1007,7 @@
       "on": "BATTLE_START",
       "id": "technique_deploys_the_zone",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

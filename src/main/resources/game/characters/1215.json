@@ -391,7 +391,7 @@
       "on": "BATTLE_START",
       "id": "technique_prey_on_a_random_enemy",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "pick": "random_enemy",
       "do": [

@@ -230,7 +230,7 @@
       "on": "BATTLE_START",
       "id": "technique_shock_on_every_enemy",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

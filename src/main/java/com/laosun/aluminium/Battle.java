@@ -3717,14 +3717,14 @@ public class Battle {
     }
 
     /**
-     * Gives every unit whose technique was used a permanent "秘技" state, before anything reads BATTLE_START.
+     * Gives every unit whose technique was used a permanent "sys:technique" state, before anything reads BATTLE_START.
      */
     private void applyTechniqueStates() {
         for (CanHit unit : preBattle.techniqueUsers()) {
             if (unit == null || unit.isDeath()) {
                 continue;
             }
-            unit.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("秘技", 1, true));
+            unit.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("sys:technique", 1, true));
         }
         // The technique's own mark, on the unit the caller named - 「使用秘技后获得【美学底本】」. Applied HERE rather than
         // by a rule because it exists BEFORE the battle does; the rules then read it (`self has_state 美学底本`) to find

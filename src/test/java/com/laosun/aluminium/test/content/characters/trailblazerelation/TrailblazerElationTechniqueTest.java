@@ -57,7 +57,7 @@ public class TrailblazerElationTechniqueTest {
      *  would replay the same single draw and the other branch could never be observed. */
     private static double boost(int cid, int run) {
         Character him = CharacterFactory.create(cid, 80);
-        him.getBuffManager().addBuff(new StateBuff("秘技", 1));
+        him.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
         Battle battle = new Battle(new ArrayList<>(List.of(him)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), new java.util.Random(run));
         battle.startBattle();

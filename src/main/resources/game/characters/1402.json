@@ -151,7 +151,7 @@
       "on": "BATTLE_START",
       "id": "technique_meteoric_sunder",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "pick": "random_enemy",
       "do": [

@@ -174,7 +174,7 @@
       "on": "BATTLE_START",
       "id": "technique_opening_shield",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

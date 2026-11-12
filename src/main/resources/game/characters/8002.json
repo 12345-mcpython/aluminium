@@ -54,7 +54,7 @@
       "on": "BATTLE_START",
       "id": "technique_party_heal",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -93,7 +93,7 @@
       "min_eidolon": 4,
       "when": [
         "actor == self",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "do": [
         {

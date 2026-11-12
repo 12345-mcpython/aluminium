@@ -53,7 +53,7 @@ public class XueyiTest {
             TriggerSpecs.set(effect, "element", "Quantum");
             TriggerSpecs.set(effect, "target", "all_enemies");
             xueyi.setTriggerTable(new TriggerTable(XUEYI, List.of(TriggerSpecs.rule(
-                    TriggerEvent.BATTLE_START.name(), List.of("self has_state 秘技"), effect))));
+                    TriggerEvent.BATTLE_START.name(), List.of("self has_state sys:technique"), effect))));
         }
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(xueyi), List.of(enemy), fixed());

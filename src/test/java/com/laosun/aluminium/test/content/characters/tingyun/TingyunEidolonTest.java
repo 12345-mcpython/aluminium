@@ -27,7 +27,7 @@ public class TingyunEidolonTest {
     @Test
     public void theTechniquePaysFiftyEnergy() {
         Character with = CharacterFactory.create(TINGYUN, LEVEL);
-        with.getBuffManager().addBuff(new StateBuff("秘技", 1));
+        with.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
         Character without = CharacterFactory.create(TINGYUN, LEVEL);
         double withEnergy = energyAfterOpening(with);
         double withoutEnergy = energyAfterOpening(without);

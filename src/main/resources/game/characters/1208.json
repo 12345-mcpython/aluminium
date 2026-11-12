@@ -193,7 +193,7 @@
       "on": "BATTLE_START",
       "id": "technique_starts_the_zone",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

@@ -131,7 +131,7 @@
       "on": "BATTLE_START",
       "id": "technique_imprison_on_entry",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -364,7 +364,7 @@
       "id": "trace_verdict_against_broken_targets",
       "when": [
         "actor == self",
-        "target has_state 弱点击破"
+        "target has_state break:weakness"
       ],
       "do": [
         {

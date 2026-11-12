@@ -34,7 +34,7 @@ public class SampoTechniqueTest {
     private static double wait(boolean technique) {
         Character him = CharacterFactory.create(1108, 80);
         if (technique) {
-            him.getBuffManager().addBuff(new StateBuff("秘技", 1));
+            him.getBuffManager().addBuff(new StateBuff("sys:technique", 1));
         }
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(new ArrayList<>(List.of(him)), new ArrayList<>(List.of(enemy)),

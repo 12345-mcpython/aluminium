@@ -86,7 +86,7 @@
       "on": "BATTLE_START",
       "id": "technique_enters_amplified_state",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

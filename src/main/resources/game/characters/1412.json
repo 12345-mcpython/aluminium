@@ -435,7 +435,7 @@
       "on": "BATTLE_START",
       "id": "technique_grants_merit_at_battle_start",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

@@ -41,13 +41,13 @@ public class SuperBreakTest {
     @Test
     public void theBrokenStateFollowsTheToughnessBar() {
         Char enemy = strongEnemy();
-        Assertions.assertFalse(enemy.enemy.getBuffManager().hasState("弱点击破"), "a healthy enemy is not broken");
+        Assertions.assertFalse(enemy.enemy.getBuffManager().hasState("break:weakness"), "a healthy enemy is not broken");
 
         enemy.breakIt();
 
-        Assertions.assertTrue(enemy.enemy.getBuffManager().hasState("弱点击破"),
+        Assertions.assertTrue(enemy.enemy.getBuffManager().hasState("break:weakness"),
                 "「韧性被削减至 0」 (toughness is reduced to 0) is what the state means -- it is a fact about the field, not a buff anyone applied");
-        Assertions.assertFalse(CharacterFactory.create(ALLY, LEVEL).getBuffManager().hasState("弱点击破"),
+        Assertions.assertFalse(CharacterFactory.create(ALLY, LEVEL).getBuffManager().hasState("break:weakness"),
                 "…and a character is never in it");
     }
 
@@ -110,7 +110,7 @@ public class SuperBreakTest {
         TriggerSpecs.set(effect, "op", "SUPER_BREAK");
         TriggerSpecs.set(effect, "percent", percent);
         TriggerSpecs.set(effect, "target", "target");
-        return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state 弱点击破"), effect);
+        return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state break:weakness"), effect);
     }
 
     /**

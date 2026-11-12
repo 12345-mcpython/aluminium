@@ -41,7 +41,7 @@ import java.util.stream.Stream;
  * </ul>
  *
  * <p><b>Why the walk is structural.</b> {@code _note} / {@code source} / {@code _gaps} quote conditions verbatim
- * (「`self has_state 秘技`」), so a text scan counts prose as usage - measured while building this: it turned 311 real
+ * (「`self has_state sys:technique`」), so a text scan counts prose as usage - measured while building this: it turned 311 real
  * identities into 372 with a dozen backtick-suffixed phantoms.
  */
 public class StateNameRegistryTest {
@@ -56,13 +56,14 @@ public class StateNameRegistryTest {
             Pattern.compile("\\bhas_state\\s+([^\\s]+)"),
             Pattern.compile("\\bstate_ended\\s+([^\\s]+)"),
             Pattern.compile("\\bstack_added\\s+([^\\s]+)"),
+            Pattern.compile("\\benemy_state_count:([^\\s<>=]+)"),
             Pattern.compile("\\b(?:self|actor|target|summon)_stacks:([^\\s<>=]+)"),
             Pattern.compile("\\b(?:self|summon|party|max_party)_resource(?:_before)?:([^\\s<>=]+)"));
 
     /** Fields whose value IS a name, on any op. */
     private static final List<String> NAME_FIELDS = List.of(
             "resource", "while_state", "while_holder_state", "counts_as",
-            "amount_from_resource", "percent_from_resource", "amount_percent_from_resource");
+            "amount_from_resource", "percent_from_resource", "amount_percent_from_resource", "control");
 
     /**
      * The ops whose {@code buff} is a state <b>identity</b> - something {@code REMOVE_STATE} can take off later.
@@ -221,6 +222,13 @@ public class StateNameRegistryTest {
             }
             for (JsonObject rule : rules) {
                 for (JsonElement when : arrayOf(rule, "when")) {
+                    if (when.isJsonObject()) {
+                        // A PREDICATE object names states too: {"type":"entity","json":{"state":"秘技"}}. The guard read
+                        // only string conditions at first, so a rename of 「秘技」 left 27 of these behind while the
+                        // guard stayed green - green because it could not see them (HANDOVER §270).
+                        predicateNames(when.getAsJsonObject(), users, name);
+                        continue;
+                    }
                     if (!when.isJsonPrimitive()) {
                         continue;
                     }
@@ -279,6 +287,52 @@ public class StateNameRegistryTest {
             }
         }
         return rules;
+    }
+
+    /**
+     * Notes every state name a <b>predicate object</b> mentions: {@code json.state} (a name or a list of names),
+     * {@code json.stacks.name} and {@code json.resource.name}, recursing through {@code all_of} / {@code any_of} /
+     * {@code not}.
+     *
+     * <p>⚠ {@code json.attribute.name} is deliberately <b>not</b> a state: it names an {@code AttributeType}.
+     *
+     * @param predicate the predicate object
+     * @param users     the name → files map being built
+     * @param file      the file being walked
+     */
+    private static void predicateNames(JsonObject predicate, Map<String, Set<String>> users, String file) {
+        if (predicate.has("term") && predicate.get("term").isJsonObject()) {
+            predicateNames(predicate.getAsJsonObject("term"), users, file);
+        }
+        for (JsonElement term : arrayOf(predicate, "terms")) {
+            if (term.isJsonObject()) {
+                predicateNames(term.getAsJsonObject(), users, file);
+            }
+        }
+        if (!predicate.has("json") || !predicate.get("json").isJsonObject()) {
+            return;
+        }
+        JsonObject json = predicate.getAsJsonObject("json");
+        if (json.has("state")) {
+            JsonElement state = json.get("state");
+            if (state.isJsonPrimitive()) {
+                note(users, state.getAsString(), file);
+            } else if (state.isJsonArray()) {
+                for (JsonElement one : state.getAsJsonArray()) {
+                    if (one.isJsonPrimitive()) {
+                        note(users, one.getAsString(), file);
+                    }
+                }
+            }
+        }
+        for (String key : List.of("stacks", "resource")) {
+            if (json.has(key) && json.get(key).isJsonObject()) {
+                JsonObject named = json.getAsJsonObject(key);
+                if (named.has("name") && named.get("name").isJsonPrimitive()) {
+                    note(users, named.get("name").getAsString(), file);
+                }
+            }
+        }
     }
 
     private static void collect(JsonArray array, List<JsonObject> out) {

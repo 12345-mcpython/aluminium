@@ -118,7 +118,7 @@ public class TrailblazerDestructionTest {
         battle.startBattle();
         if (broken) {
             battle.reduceToughness(trailblazer, enemy, element, 999);
-            Assertions.assertTrue(enemy.getBuffManager().hasState("弱点击破"),
+            Assertions.assertTrue(enemy.getBuffManager().hasState("break:weakness"),
                     "precondition: emptying the bar of a weak enemy puts it in Weakness Break (弱点击破)");
         }
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, trailblazer, enemy, 1, 1000));

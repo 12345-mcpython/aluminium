@@ -740,11 +740,12 @@
       ]
     },
     {
-      "name": "弱点击破",
+      "name": "break:weakness",
       "owner": "battle",
       "kind": "battle",
       "key": "break:weakness",
-      "en": "Weakness Break"
+      "en": "Weakness Break",
+      "zh": "弱点击破"
     },
     {
       "name": "强化",
@@ -1827,11 +1828,12 @@
       ]
     },
     {
-      "name": "秘技",
+      "name": "sys:technique",
       "owner": "battle",
       "kind": "battle",
       "key": "sys:technique",
-      "en": "Technique"
+      "en": "Technique",
+      "zh": "秘技"
     },
     {
       "name": "秘技减速",

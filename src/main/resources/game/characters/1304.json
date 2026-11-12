@@ -336,7 +336,7 @@
     {
       "id": "technique_the_red_or_the_black_gives_defence",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

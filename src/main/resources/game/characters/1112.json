@@ -250,7 +250,7 @@
       "once_per_battle": true,
       "when": [
         "actor is_summon",
-        "self has_state 秘技",
+        "self has_state sys:technique",
         "enemy_state_count:负债证明 >= 1"
       ],
       "do": [

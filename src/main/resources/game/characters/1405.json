@@ -431,7 +431,7 @@
       ],
       "on": "BATTLE_START",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "id": "technique_implants_the_attackers_weakness",
       "_note": "「进入战斗后那刻夏为敌方每个单体目标添加 **1 个攻击者属性的弱点**，持续 **3** 回合」—— 攻击者属性 = **风**（他唯一能造成伤害的元素）⇒ `ADD_ELEMENTAL_WEAKNESS { element: Wind, turns: 3, target: all_enemies }` ✓；用 `self has_state 秘技` 表示「用了秘技之后的下一场战斗」✓（与 1313/1402 同法）。⚠ 「恐惧」那半是**大世界**机制（逃跑 10 秒、主动攻击视为利用弱点入场），不进战斗模型 —— 登记在 `_gaps` 的旧记录里。"

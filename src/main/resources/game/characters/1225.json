@@ -120,7 +120,7 @@
       "on": "BATTLE_START",
       "id": "technique_advance_and_defence_down",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

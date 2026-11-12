@@ -43,7 +43,7 @@ public class HimekoTechniqueTest {
     /**
      * ⭐ The gate: a declared technique raises the Fire damage the enemies take by 10%.
      *
-     * <p>The pair is asserted together, because a rule gated on {@code self has_state 秘技} can only be trusted against its own
+     * <p>The pair is asserted together, because a rule gated on {@code self has_state sys:technique} can only be trusted against its own
      * control: "the zone appeared" alone would pass for the wrong reason if something else also applied it.
      */
     @Test

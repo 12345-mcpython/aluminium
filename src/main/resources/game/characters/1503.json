@@ -107,7 +107,7 @@
       "on": "BATTLE_START",
       "id": "technique_grants_the_opening_counter",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
@@ -1109,7 +1109,7 @@
       "on": "BATTLE_START",
       "id": "technique_deep_studies_the_archetype_holder",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

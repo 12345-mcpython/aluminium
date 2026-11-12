@@ -730,7 +730,7 @@
       "id": "p1506_technique_box_each_wave",
       "one_of": true,
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {

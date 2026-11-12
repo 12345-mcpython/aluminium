@@ -29,7 +29,7 @@ import com.laosun.aluminium.entity.CanHit;
  * needs the whole damage model to interpret -- a bad foundation for a test about wiring.
  *
  * <p>The cases are contrasts for the reason the technique gate forces: a rule gated on
- * {@code self has_state 秘技} fires only when the state was applied, so "the points went up" alone would pass
+ * {@code self has_state sys:technique} fires only when the state was applied, so "the points went up" alone would pass
  * for the wrong reason if some other part of the battle also granted them.
  */
 public class BattleDriverTechniqueTest {

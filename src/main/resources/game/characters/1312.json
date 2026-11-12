@@ -251,7 +251,7 @@
       "on": "BATTLE_START",
       "id": "technique_dream_prison_raises_segments",
       "when": [
-        "self has_state 秘技"
+        "self has_state sys:technique"
       ],
       "do": [
         {
