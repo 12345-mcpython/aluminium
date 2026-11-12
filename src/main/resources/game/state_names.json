@@ -1,1358 +1,2654 @@
 {
-  "schema": 1,
-  "_note": "状态 / 层数 / 资源名的**声明表**（唯一声明点，守卫是 `StateNameRegistryTest`）。每个在内容里被结构化使用的名字都必须在这里出现一次：`when` 里的 `has_state` / `state_ended` / `stack_added` / `*_stacks:` / `*_resource:`，以及 `do` 里**建状态或摘状态**的那几个 op 的 `buff`、`resource`、`while_state` / `while_holder_state`、`counts_as`、按名选择器（`holder_of:` 等）与 `resources[].id`。⚠ `MODIFY_ATTR` 那种**只是显示标签**的 `buff` 不算名字（它们读起来像散文），但它一旦会被 `REMOVE_STATE` 摘掉，就**是**身份 —— 1506 的 `1506天赋-暴击率` 就是这样进表的。\n\nkind 三选一：`engine`（引擎自造/已知）、`shared`（被多个内容文件用到的游戏术语）、`local`（只属于某一个文件的自造计数器，必须写 `file`）。`key` 是将来取代中文名的 ASCII 身份：`engine` 现在就必须有，`shared` / `local` 等该族迁移时再补。⚠ 名字一旦本身变成 key（`key == name`），必须保留 `zh` 原文，否则「句子 → 键」的对照就断了。",
-  "names": {
-    "1506天赋-暴击伤害": {
-      "kind": "local",
-      "file": "1506"
+  "schema": 2,
+  "_note": "状态 / 层数 / 资源名的**身份表**（唯一声明点，守卫是 `StateNameRegistryTest`）。⚠ 身份是 **(owner, name)**，不是 name：实测「充能」被 **8 个互不相同的机制**用着（上限 3/3/4/8/8/10/10/100/无上限），「结界」是 7 个角色各自的领域 —— 只按名字建表会把它们合成一个，而这正是本地化层最受不了的混淆。\n\n`owner` 三选一：`battle`（战斗模型自己的词汇：控制类、持续伤害、击破、秘技、欢愉子系统 —— 谁上场都用，所以没有归属）、一个 4 位 cid（该角色的术语，**专名与复用词都算**）、`internal`（本项目自造的记账计数器，没有显示语义）。`kind` 跟随 owner（battle / char / internal）。`used_by` 列出真正用到这条身份的文件（跨文件借用，如 1415 用 1412 的「充能」）。`key` 是将来取代中文名的 ASCII 身份：`battle` 现在就必须有，其余等该族迁移时再补；**键一旦等于名字，必须保留 `zh`**。\n\n守卫逐文件**结构化**扫描（只读 `when` 与 `do` 的字段，不读 `_note` / `source` / `_gaps` 散文），每个 (文件, 名字) 必须**恰好**对应一条身份。",
+  "entries": [
+    {
+      "name": "1506天赋-暴击伤害",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "1506天赋-暴击率": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "1506天赋-暴击率",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "1506行迹-强化普攻隐藏分1": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "1506行迹-强化普攻隐藏分1",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "1506行迹-强化普攻隐藏分2": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "1506行迹-强化普攻隐藏分2",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "1506行迹-强化普攻隐藏分3": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "1506行迹-强化普攻隐藏分3",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "1506行迹-强化普攻隐藏分4": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "1506行迹-强化普攻隐藏分4",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "23059_wave_energy": {
-      "kind": "local",
-      "file": "23059"
+    {
+      "name": "23059_wave_energy",
+      "owner": "23059",
+      "kind": "char",
+      "used_by": [
+        "23059"
+      ]
     },
-    "325_30": {
-      "kind": "local",
-      "file": "325"
+    {
+      "name": "325_30",
+      "owner": "325",
+      "kind": "char",
+      "used_by": [
+        "325"
+      ]
     },
-    "325_60": {
-      "kind": "local",
-      "file": "325"
+    {
+      "name": "325_60",
+      "owner": "325",
+      "kind": "char",
+      "used_by": [
+        "325"
+      ]
     },
-    "E2本回合已触发": {
-      "kind": "local",
-      "file": "1315"
+    {
+      "name": "E2本回合已触发",
+      "owner": "1315",
+      "kind": "internal",
+      "used_by": [
+        "1315"
+      ]
     },
-    "Fever": {
-      "kind": "local",
-      "file": "1512"
+    {
+      "name": "Fever",
+      "owner": "1512",
+      "kind": "char",
+      "used_by": [
+        "1512"
+      ]
     },
-    "MServant_CyreneServant_00_AmazingBuff_Aglaea": {
-      "kind": "local",
-      "file": "1402"
+    {
+      "name": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
     },
-    "relic130_elation_used": {
-      "kind": "local",
-      "file": "130"
+    {
+      "name": "relic130_elation_used",
+      "owner": "130",
+      "kind": "char",
+      "used_by": [
+        "130"
+      ]
     },
-    "上上签": {
-      "kind": "local",
-      "file": "23054"
+    {
+      "name": "上上签",
+      "owner": "23054",
+      "kind": "char",
+      "used_by": [
+        "23054"
+      ]
     },
-    "下一次普攻待命": {
-      "kind": "local",
-      "file": "20018"
+    {
+      "name": "下一次普攻待命",
+      "owner": "20018",
+      "kind": "char",
+      "used_by": [
+        "20018"
+      ]
     },
-    "下个战技返还战技点": {
-      "kind": "local",
-      "file": "1312"
+    {
+      "name": "下个战技返还战技点",
+      "owner": "1312",
+      "kind": "char",
+      "used_by": [
+        "1312"
+      ]
     },
-    "不求人": {
-      "kind": "local",
-      "file": "1201"
+    {
+      "name": "不求人",
+      "owner": "1201",
+      "kind": "char",
+      "used_by": [
+        "1201"
+      ]
     },
-    "乱蝶": {
-      "kind": "local",
-      "file": "1102"
+    {
+      "name": "乱蝶",
+      "owner": "1102",
+      "kind": "char",
+      "used_by": [
+        "1102"
+      ]
     },
-    "亿质": {
-      "kind": "local",
-      "file": "1413"
+    {
+      "name": "亿质",
+      "owner": "1413",
+      "kind": "char",
+      "used_by": [
+        "1413"
+      ]
     },
-    "从这位队友处得到过【追忆】": {
-      "kind": "local",
-      "file": "1415"
+    {
+      "name": "从这位队友处得到过【追忆】",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
     },
-    "以太编码": {
-      "kind": "local",
-      "file": "23007"
+    {
+      "name": "以太编码",
+      "owner": "23007",
+      "kind": "char",
+      "used_by": [
+        "23007"
+      ]
     },
-    "优势口袋": {
-      "kind": "local",
-      "file": "1315"
+    {
+      "name": "优势口袋",
+      "owner": "1315",
+      "kind": "char",
+      "used_by": [
+        "1315"
+      ]
     },
-    "伴舞": {
-      "kind": "shared",
-      "files": [
+    {
+      "name": "伴舞",
+      "owner": "8005",
+      "kind": "char",
+      "used_by": [
         "8005",
         "8006"
       ]
     },
-    "假面": {
-      "kind": "local",
-      "file": "23021"
+    {
+      "name": "假面",
+      "owner": "23021",
+      "kind": "char",
+      "used_by": [
+        "23021"
+      ]
     },
-    "偏偏希望无价之视": {
-      "kind": "local",
-      "file": "23028"
+    {
+      "name": "偏偏希望无价之视",
+      "owner": "23028",
+      "kind": "char",
+      "used_by": [
+        "23028"
+      ]
     },
-    "充能": {
-      "kind": "shared",
-      "files": [
-        "1003",
-        "1015",
-        "1205",
-        "1223",
-        "1224",
-        "1314",
-        "1317",
+    {
+      "name": "充能",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
         "1412",
-        "1415",
-        "1503",
-        "1504",
-        "8007",
-        "8008"
+        "1415"
       ]
     },
-    "充能计数": {
-      "kind": "local",
-      "file": "1223"
-    },
-    "先知": {
-      "kind": "local",
-      "file": "23022"
-    },
-    "免费强化": {
-      "kind": "shared",
-      "files": [
-        "8003",
-        "8004"
+    {
+      "name": "充能",
+      "owner": "1003",
+      "kind": "char",
+      "used_by": [
+        "1003"
       ]
     },
-    "军功": {
-      "kind": "local",
-      "file": "1412"
-    },
-    "军功-攻击力": {
-      "kind": "local",
-      "file": "1412"
-    },
-    "军功增伤": {
-      "kind": "local",
-      "file": "1412"
-    },
-    "军功穿透": {
-      "kind": "local",
-      "file": "1412"
-    },
-    "冻结": {
-      "kind": "engine",
-      "key": "ctrl:frozen",
-      "en": "Frozen"
-    },
-    "剑势": {
-      "kind": "local",
-      "file": "1206"
-    },
-    "剑势额外判定": {
-      "kind": "local",
-      "file": "1206"
-    },
-    "功勋": {
-      "kind": "local",
-      "file": "315"
-    },
-    "助力": {
-      "kind": "local",
-      "file": "126"
-    },
-    "助燃": {
-      "kind": "local",
-      "file": "132"
-    },
-    "匠躯": {
-      "kind": "local",
-      "file": "1402"
-    },
-    "千锻魂": {
-      "kind": "local",
-      "file": "1507"
-    },
-    "升华": {
-      "kind": "engine",
-      "key": "ctrl:sublimated",
-      "en": "Sublimated"
-    },
-    "华彩": {
-      "kind": "local",
-      "file": "23026"
-    },
-    "协奏": {
-      "kind": "local",
-      "file": "1309"
-    },
-    "卸甲": {
-      "kind": "local",
-      "file": "23029"
-    },
-    "反击标记": {
-      "kind": "local",
-      "file": "1107"
-    },
-    "变身": {
-      "kind": "local",
-      "file": "1408"
-    },
-    "同袍": {
-      "kind": "local",
-      "file": "1414"
-    },
-    "吞火": {
-      "kind": "local",
-      "file": "1210"
-    },
-    "吞纳沙砾": {
-      "kind": "local",
-      "file": "1503"
-    },
-    "回路层数": {
-      "kind": "local",
-      "file": "1015"
-    },
-    "回路次数": {
-      "kind": "local",
-      "file": "1015"
-    },
-    "回路连接": {
-      "kind": "local",
-      "file": "1015"
-    },
-    "圣咏": {
-      "kind": "local",
-      "file": "23034"
-    },
-    "地平线层数": {
-      "kind": "local",
-      "file": "22008"
-    },
-    "地狱变": {
-      "kind": "local",
-      "file": "1205"
-    },
-    "城垣": {
-      "kind": "shared",
-      "files": [
-        "8003",
-        "8004"
+    {
+      "name": "充能",
+      "owner": "1015",
+      "kind": "char",
+      "used_by": [
+        "1015"
       ]
     },
-    "增幅": {
-      "kind": "local",
-      "file": "1102"
-    },
-    "夜色": {
-      "kind": "local",
-      "file": "23049"
-    },
-    "夜行": {
-      "kind": "local",
-      "file": "1102"
-    },
-    "天空之诗的治疗份额": {
-      "kind": "local",
-      "file": "1409"
-    },
-    "天空应我的祈愿": {
-      "kind": "local",
-      "file": "1409"
-    },
-    "天赋充能": {
-      "kind": "local",
-      "file": "1404"
-    },
-    "天赋治疗额度": {
-      "kind": "local",
-      "file": "1211"
-    },
-    "奥词战技溢出": {
-      "kind": "local",
-      "file": "1410"
-    },
-    "奥词普攻溢出": {
-      "kind": "local",
-      "file": "1410"
-    },
-    "奥迹": {
-      "kind": "local",
-      "file": "1307"
-    },
-    "奥迹不重置额度": {
-      "kind": "local",
-      "file": "1307"
-    },
-    "好活当赏": {
-      "kind": "shared",
-      "files": [
-        "133",
-        "1502",
-        "1503",
-        "1505",
-        "1506",
-        "1513",
-        "8009",
-        "8010"
+    {
+      "name": "充能",
+      "owner": "1205",
+      "kind": "char",
+      "used_by": [
+        "1205"
       ]
     },
-    "好运": {
-      "kind": "local",
-      "file": "21037"
+    {
+      "name": "充能",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ]
     },
-    "婪酣": {
-      "kind": "local",
-      "file": "1504"
-    },
-    "孤立": {
-      "kind": "local",
-      "file": "1223"
-    },
-    "完全燃烧": {
-      "kind": "local",
-      "file": "1310"
-    },
-    "小伊卡累计治疗": {
-      "kind": "local",
-      "file": "1409"
-    },
-    "岁月之诗的亿质点数": {
-      "kind": "local",
-      "file": "1413"
-    },
-    "崩溃": {
-      "kind": "local",
-      "file": "23025"
-    },
-    "师父": {
-      "kind": "local",
-      "file": "1224"
-    },
-    "幸福傀儡": {
-      "kind": "local",
-      "file": "1412"
-    },
-    "幻相": {
-      "kind": "local",
-      "file": "1306"
-    },
-    "异梦": {
-      "kind": "local",
-      "file": "1412"
-    },
-    "弦外音": {
-      "kind": "local",
-      "file": "1303"
-    },
-    "弱点击破": {
-      "kind": "engine",
-      "key": "break:weakness",
-      "en": "Weakness Break"
-    },
-    "强化": {
-      "kind": "shared",
-      "files": [
-        "1004",
+    {
+      "name": "充能",
+      "owner": "1224",
+      "kind": "char",
+      "used_by": [
         "1224"
       ]
     },
-    "强化反击": {
-      "kind": "local",
-      "file": "1107"
+    {
+      "name": "充能",
+      "owner": "1314",
+      "kind": "char",
+      "used_by": [
+        "1314"
+      ]
     },
-    "强化普攻次数": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "充能",
+      "owner": "1317",
+      "kind": "char",
+      "used_by": [
+        "1317"
+      ]
     },
-    "强烈震荡": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "充能",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ]
     },
-    "归纳": {
-      "kind": "local",
-      "file": "1305"
+    {
+      "name": "充能",
+      "owner": "1504",
+      "kind": "char",
+      "used_by": [
+        "1504"
+      ]
     },
-    "当品": {
-      "kind": "local",
-      "file": "1314"
+    {
+      "name": "充能",
+      "owner": "8007",
+      "kind": "char",
+      "used_by": [
+        "8007"
+      ]
     },
-    "彩墨": {
-      "kind": "local",
-      "file": "1317"
+    {
+      "name": "充能",
+      "owner": "8008",
+      "kind": "char",
+      "used_by": [
+        "8008"
+      ]
     },
-    "彩焰": {
-      "kind": "local",
-      "file": "23021"
+    {
+      "name": "充能计数",
+      "owner": "1223",
+      "kind": "internal",
+      "used_by": [
+        "1223"
+      ]
     },
-    "影噬": {
-      "kind": "local",
-      "file": "23056"
+    {
+      "name": "先知",
+      "owner": "23022",
+      "kind": "char",
+      "used_by": [
+        "23022"
+      ]
     },
-    "往昔的涟漪": {
-      "kind": "local",
-      "file": "1415"
+    {
+      "name": "免费强化",
+      "owner": "8003",
+      "kind": "char",
+      "used_by": [
+        "8003",
+        "8004"
+      ]
     },
-    "御剑真诀": {
-      "kind": "local",
-      "file": "1209"
+    {
+      "name": "军功",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "忆灵技的额外一击": {
-      "kind": "local",
-      "file": "1415"
+    {
+      "name": "军功-攻击力",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "忘忧": {
-      "kind": "local",
-      "file": "23032"
+    {
+      "name": "军功增伤",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "怒噪": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "军功穿透",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "怨火灼身": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "冻结",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "ctrl:frozen",
+      "en": "Frozen"
     },
-    "恐惧": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "剑势",
+      "owner": "1206",
+      "kind": "char",
+      "used_by": [
+        "1206"
+      ]
     },
-    "恶报": {
-      "kind": "local",
-      "file": "1214"
+    {
+      "name": "剑势额外判定",
+      "owner": "1206",
+      "kind": "char",
+      "used_by": [
+        "1206"
+      ]
     },
-    "恶报溢出": {
-      "kind": "local",
-      "file": "1214"
+    {
+      "name": "功勋",
+      "owner": "315",
+      "kind": "char",
+      "used_by": [
+        "315"
+      ]
     },
-    "惊惶": {
-      "kind": "local",
-      "file": "1304"
+    {
+      "name": "助力",
+      "owner": "126",
+      "kind": "char",
+      "used_by": [
+        "126"
+      ]
     },
-    "惊魂夜攻击": {
-      "kind": "local",
-      "file": "23017"
+    {
+      "name": "助燃",
+      "owner": "132",
+      "kind": "char",
+      "used_by": [
+        "132"
+      ]
     },
-    "惩戒": {
-      "kind": "local",
-      "file": "1004"
+    {
+      "name": "匠躯",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
     },
-    "戏法": {
-      "kind": "local",
-      "file": "21041"
+    {
+      "name": "千锻魂",
+      "owner": "1507",
+      "kind": "char",
+      "used_by": [
+        "1507"
+      ]
     },
-    "战技点": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "升华",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "ctrl:sublimated",
+      "en": "Sublimated"
     },
-    "承负": {
-      "kind": "local",
-      "file": "1215"
+    {
+      "name": "华彩",
+      "owner": "23026",
+      "kind": "char",
+      "used_by": [
+        "23026"
+      ]
     },
-    "承负次数": {
-      "kind": "local",
-      "file": "1215"
+    {
+      "name": "协奏",
+      "owner": "1309",
+      "kind": "char",
+      "used_by": [
+        "1309"
+      ]
     },
-    "承负返还": {
-      "kind": "local",
-      "file": "1215"
+    {
+      "name": "卸甲",
+      "owner": "23029",
+      "kind": "char",
+      "used_by": [
+        "23029"
+      ]
     },
-    "技能层": {
-      "kind": "local",
-      "file": "23046"
+    {
+      "name": "反击标记",
+      "owner": "1107",
+      "kind": "internal",
+      "used_by": [
+        "1107"
+      ]
     },
-    "推流": {
-      "kind": "local",
-      "file": "23053"
+    {
+      "name": "变身",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ]
     },
-    "揭露": {
-      "kind": "local",
-      "file": "1307"
+    {
+      "name": "同袍",
+      "owner": "1414",
+      "kind": "char",
+      "used_by": [
+        "1414"
+      ]
     },
-    "揭露能量额度": {
-      "kind": "local",
-      "file": "1307"
+    {
+      "name": "吞火",
+      "owner": "1210",
+      "kind": "char",
+      "used_by": [
+        "1210"
+      ]
     },
-    "支配": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "吞纳沙砾",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ]
     },
-    "收债人": {
-      "kind": "local",
-      "file": "1314"
+    {
+      "name": "回路层数",
+      "owner": "1015",
+      "kind": "internal",
+      "used_by": [
+        "1015"
+      ]
     },
-    "攻击段数": {
-      "kind": "local",
-      "file": "1204"
+    {
+      "name": "回路次数",
+      "owner": "1015",
+      "kind": "internal",
+      "used_by": [
+        "1015"
+      ]
     },
-    "攻陷": {
-      "kind": "local",
-      "file": "21015"
+    {
+      "name": "回路连接",
+      "owner": "1015",
+      "kind": "char",
+      "used_by": [
+        "1015"
+      ]
     },
-    "故事": {
-      "kind": "local",
-      "file": "1415"
+    {
+      "name": "圣咏",
+      "owner": "23034",
+      "kind": "char",
+      "used_by": [
+        "23034"
+      ]
     },
-    "救主计数": {
-      "kind": "shared",
-      "files": [
+    {
+      "name": "地平线层数",
+      "owner": "22008",
+      "kind": "internal",
+      "used_by": [
+        "22008"
+      ]
+    },
+    {
+      "name": "地狱变",
+      "owner": "1205",
+      "kind": "char",
+      "used_by": [
+        "1205"
+      ]
+    },
+    {
+      "name": "城垣",
+      "owner": "8003",
+      "kind": "char",
+      "used_by": [
+        "8003",
+        "8004"
+      ]
+    },
+    {
+      "name": "增幅",
+      "owner": "1102",
+      "kind": "char",
+      "used_by": [
+        "1102"
+      ]
+    },
+    {
+      "name": "夜色",
+      "owner": "23049",
+      "kind": "char",
+      "used_by": [
+        "23049"
+      ]
+    },
+    {
+      "name": "夜行",
+      "owner": "1102",
+      "kind": "char",
+      "used_by": [
+        "1102"
+      ]
+    },
+    {
+      "name": "天空之诗的治疗份额",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
+        "1409"
+      ]
+    },
+    {
+      "name": "天空应我的祈愿",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
+        "1409"
+      ]
+    },
+    {
+      "name": "天赋充能",
+      "owner": "1404",
+      "kind": "char",
+      "used_by": [
+        "1404"
+      ]
+    },
+    {
+      "name": "天赋治疗额度",
+      "owner": "1211",
+      "kind": "char",
+      "used_by": [
+        "1211"
+      ]
+    },
+    {
+      "name": "奥词战技溢出",
+      "owner": "1410",
+      "kind": "internal",
+      "used_by": [
+        "1410"
+      ]
+    },
+    {
+      "name": "奥词普攻溢出",
+      "owner": "1410",
+      "kind": "internal",
+      "used_by": [
+        "1410"
+      ]
+    },
+    {
+      "name": "奥迹",
+      "owner": "1307",
+      "kind": "char",
+      "used_by": [
+        "1307"
+      ]
+    },
+    {
+      "name": "奥迹不重置额度",
+      "owner": "1307",
+      "kind": "internal",
+      "used_by": [
+        "1307"
+      ]
+    },
+    {
+      "name": "好活当赏",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:certified_banger",
+      "en": "Certified Banger"
+    },
+    {
+      "name": "好运",
+      "owner": "21037",
+      "kind": "char",
+      "used_by": [
+        "21037"
+      ]
+    },
+    {
+      "name": "婪酣",
+      "owner": "1504",
+      "kind": "char",
+      "used_by": [
+        "1504"
+      ]
+    },
+    {
+      "name": "孤立",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ]
+    },
+    {
+      "name": "完全燃烧",
+      "owner": "1310",
+      "kind": "char",
+      "used_by": [
+        "1310"
+      ]
+    },
+    {
+      "name": "小伊卡累计治疗",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
+        "1409"
+      ]
+    },
+    {
+      "name": "岁月之诗的亿质点数",
+      "owner": "1413",
+      "kind": "char",
+      "used_by": [
+        "1413"
+      ]
+    },
+    {
+      "name": "崩溃",
+      "owner": "23025",
+      "kind": "char",
+      "used_by": [
+        "23025"
+      ]
+    },
+    {
+      "name": "师父",
+      "owner": "1224",
+      "kind": "char",
+      "used_by": [
+        "1224"
+      ]
+    },
+    {
+      "name": "幸福傀儡",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
+    },
+    {
+      "name": "幻相",
+      "owner": "1306",
+      "kind": "char",
+      "used_by": [
+        "1306"
+      ]
+    },
+    {
+      "name": "异梦",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
+    },
+    {
+      "name": "弦外音",
+      "owner": "1303",
+      "kind": "char",
+      "used_by": [
+        "1303"
+      ]
+    },
+    {
+      "name": "弱点击破",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "break:weakness",
+      "en": "Weakness Break"
+    },
+    {
+      "name": "强化",
+      "owner": "1004",
+      "kind": "char",
+      "used_by": [
+        "1004"
+      ]
+    },
+    {
+      "name": "强化",
+      "owner": "1224",
+      "kind": "char",
+      "used_by": [
+        "1224"
+      ]
+    },
+    {
+      "name": "强化反击",
+      "owner": "1107",
+      "kind": "char",
+      "used_by": [
+        "1107"
+      ]
+    },
+    {
+      "name": "强化普攻次数",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [
+        "1506"
+      ]
+    },
+    {
+      "name": "强烈震荡",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
+    },
+    {
+      "name": "归纳",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
+      ]
+    },
+    {
+      "name": "当品",
+      "owner": "1314",
+      "kind": "char",
+      "used_by": [
+        "1314"
+      ]
+    },
+    {
+      "name": "彩墨",
+      "owner": "1317",
+      "kind": "char",
+      "used_by": [
+        "1317"
+      ]
+    },
+    {
+      "name": "彩焰",
+      "owner": "23021",
+      "kind": "char",
+      "used_by": [
+        "23021"
+      ]
+    },
+    {
+      "name": "影噬",
+      "owner": "23056",
+      "kind": "char",
+      "used_by": [
+        "23056"
+      ]
+    },
+    {
+      "name": "往昔的涟漪",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
+    },
+    {
+      "name": "御剑真诀",
+      "owner": "1209",
+      "kind": "char",
+      "used_by": [
+        "1209"
+      ]
+    },
+    {
+      "name": "忆灵技的额外一击",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
+    },
+    {
+      "name": "忘忧",
+      "owner": "23032",
+      "kind": "char",
+      "used_by": [
+        "23032"
+      ]
+    },
+    {
+      "name": "怒噪",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
+    },
+    {
+      "name": "怨火灼身",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
+    },
+    {
+      "name": "恐惧",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
+    },
+    {
+      "name": "恶报",
+      "owner": "1214",
+      "kind": "char",
+      "used_by": [
+        "1214"
+      ]
+    },
+    {
+      "name": "恶报溢出",
+      "owner": "1214",
+      "kind": "internal",
+      "used_by": [
+        "1214"
+      ]
+    },
+    {
+      "name": "惊惶",
+      "owner": "1304",
+      "kind": "char",
+      "used_by": [
+        "1304"
+      ]
+    },
+    {
+      "name": "惊魂夜攻击",
+      "owner": "23017",
+      "kind": "char",
+      "used_by": [
+        "23017"
+      ]
+    },
+    {
+      "name": "惩戒",
+      "owner": "1004",
+      "kind": "char",
+      "used_by": [
+        "1004"
+      ]
+    },
+    {
+      "name": "戏法",
+      "owner": "21041",
+      "kind": "char",
+      "used_by": [
+        "21041"
+      ]
+    },
+    {
+      "name": "战技点",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
+    },
+    {
+      "name": "承负",
+      "owner": "1215",
+      "kind": "char",
+      "used_by": [
+        "1215"
+      ]
+    },
+    {
+      "name": "承负次数",
+      "owner": "1215",
+      "kind": "internal",
+      "used_by": [
+        "1215"
+      ]
+    },
+    {
+      "name": "承负返还",
+      "owner": "1215",
+      "kind": "char",
+      "used_by": [
+        "1215"
+      ]
+    },
+    {
+      "name": "技能层",
+      "owner": "23046",
+      "kind": "char",
+      "used_by": [
+        "23046"
+      ]
+    },
+    {
+      "name": "推流",
+      "owner": "23053",
+      "kind": "char",
+      "used_by": [
+        "23053"
+      ]
+    },
+    {
+      "name": "揭露",
+      "owner": "1307",
+      "kind": "char",
+      "used_by": [
+        "1307"
+      ]
+    },
+    {
+      "name": "揭露能量额度",
+      "owner": "1307",
+      "kind": "char",
+      "used_by": [
+        "1307"
+      ]
+    },
+    {
+      "name": "支配",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
+    },
+    {
+      "name": "收债人",
+      "owner": "1314",
+      "kind": "char",
+      "used_by": [
+        "1314"
+      ]
+    },
+    {
+      "name": "攻击段数",
+      "owner": "1204",
+      "kind": "char",
+      "used_by": [
+        "1204"
+      ]
+    },
+    {
+      "name": "攻陷",
+      "owner": "21015",
+      "kind": "char",
+      "used_by": [
+        "21015"
+      ]
+    },
+    {
+      "name": "故事",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
+    },
+    {
+      "name": "救主计数",
+      "owner": "1217",
+      "kind": "char",
+      "used_by": [
         "1217",
         "1503"
       ]
     },
-    "敕令": {
-      "kind": "local",
-      "file": "1215"
+    {
+      "name": "敕令",
+      "owner": "1215",
+      "kind": "char",
+      "used_by": [
+        "1215"
+      ]
     },
-    "斗志": {
-      "kind": "local",
-      "file": "1111"
+    {
+      "name": "斗志",
+      "owner": "1111",
+      "kind": "char",
+      "used_by": [
+        "1111"
+      ]
     },
-    "新声": {
-      "kind": "local",
-      "file": "23063"
+    {
+      "name": "新声",
+      "owner": "23063",
+      "kind": "char",
+      "used_by": [
+        "23063"
+      ]
     },
-    "新蕊": {
-      "kind": "local",
-      "file": "1407"
+    {
+      "name": "新蕊",
+      "owner": "1407",
+      "kind": "char",
+      "used_by": [
+        "1407"
+      ]
     },
-    "施放计数": {
-      "kind": "local",
-      "file": "23034"
+    {
+      "name": "施放计数",
+      "owner": "23034",
+      "kind": "internal",
+      "used_by": [
+        "23034"
+      ]
     },
-    "无敌玩家": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "无敌玩家",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "无敌玩家-免疫控制": {
-      "kind": "local",
-      "file": "1506"
+    {
+      "name": "无敌玩家-免疫控制",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
     },
-    "早餐层数": {
-      "kind": "local",
-      "file": "21027"
+    {
+      "name": "早餐层数",
+      "owner": "21027",
+      "kind": "internal",
+      "used_by": [
+        "21027"
+      ]
     },
-    "星神层数": {
-      "kind": "local",
-      "file": "24000"
+    {
+      "name": "星神层数",
+      "owner": "24000",
+      "kind": "internal",
+      "used_by": [
+        "24000"
+      ]
     },
-    "星魂4穿透": {
-      "kind": "local",
-      "file": "1014"
+    {
+      "name": "星魂4穿透",
+      "owner": "1014",
+      "kind": "char",
+      "used_by": [
+        "1014"
+      ]
     },
-    "星魂二-待发": {
-      "kind": "local",
-      "file": "1313"
+    {
+      "name": "星魂二-待发",
+      "owner": "1313",
+      "kind": "char",
+      "used_by": [
+        "1313"
+      ]
     },
-    "星魂二穿防": {
-      "kind": "local",
-      "file": "1402"
+    {
+      "name": "星魂二穿防",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
     },
-    "普攻计数": {
-      "kind": "shared",
-      "files": [
-        "23033",
+    {
+      "name": "普攻计数",
+      "owner": "23033",
+      "kind": "char",
+      "used_by": [
+        "23033"
+      ]
+    },
+    {
+      "name": "普攻计数",
+      "owner": "23057",
+      "kind": "char",
+      "used_by": [
         "23057"
       ]
     },
-    "智剑连心": {
-      "kind": "local",
-      "file": "1209"
+    {
+      "name": "智剑连心",
+      "owner": "1209",
+      "kind": "char",
+      "used_by": [
+        "1209"
+      ]
     },
-    "智者的短见": {
-      "kind": "local",
-      "file": "1305"
+    {
+      "name": "智者的短见",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
+      ]
     },
-    "暖流": {
-      "kind": "local",
-      "file": "1410"
+    {
+      "name": "暖流",
+      "owner": "1410",
+      "kind": "char",
+      "used_by": [
+        "1410"
+      ]
     },
-    "月色": {
-      "kind": "local",
-      "file": "1212"
+    {
+      "name": "月色",
+      "owner": "1212",
+      "kind": "char",
+      "used_by": [
+        "1212"
+      ]
     },
-    "月茧": {
-      "kind": "local",
-      "file": "1407"
+    {
+      "name": "月茧",
+      "owner": "1407",
+      "kind": "char",
+      "used_by": [
+        "1407"
+      ]
     },
-    "月蚀": {
-      "kind": "local",
-      "file": "23014"
+    {
+      "name": "月蚀",
+      "owner": "23014",
+      "kind": "char",
+      "used_by": [
+        "23014"
+      ]
     },
-    "朔望": {
-      "kind": "local",
-      "file": "1212"
+    {
+      "name": "朔望",
+      "owner": "1212",
+      "kind": "char",
+      "used_by": [
+        "1212"
+      ]
     },
-    "未来": {
-      "kind": "local",
-      "file": "1415"
+    {
+      "name": "未来",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
     },
-    "本回合已加成": {
-      "kind": "local",
-      "file": "1512"
+    {
+      "name": "本回合已加成",
+      "owner": "1512",
+      "kind": "char",
+      "used_by": [
+        "1512"
+      ]
     },
-    "本回合战技次数": {
-      "kind": "local",
-      "file": "1015"
+    {
+      "name": "本回合战技次数",
+      "owner": "1015",
+      "kind": "internal",
+      "used_by": [
+        "1015"
+      ]
     },
-    "本回合施放战技": {
-      "kind": "local",
-      "file": "1207"
+    {
+      "name": "本回合施放战技",
+      "owner": "1207",
+      "kind": "char",
+      "used_by": [
+        "1207"
+      ]
     },
-    "本回合消耗": {
-      "kind": "shared",
-      "files": [
-        "23053",
-        "23061",
+    {
+      "name": "本回合消耗",
+      "owner": "23053",
+      "kind": "char",
+      "used_by": [
+        "23053"
+      ]
+    },
+    {
+      "name": "本回合消耗",
+      "owner": "23061",
+      "kind": "char",
+      "used_by": [
+        "23061"
+      ]
+    },
+    {
+      "name": "本回合消耗",
+      "owner": "324",
+      "kind": "char",
+      "used_by": [
         "324"
       ]
     },
-    "梦身": {
-      "kind": "local",
-      "file": "23010"
-    },
-    "欢愉度": {
-      "kind": "shared",
-      "files": [
-        "1505",
-        "21065"
+    {
+      "name": "梦身",
+      "owner": "23010",
+      "kind": "char",
+      "used_by": [
+        "23010"
       ]
     },
-    "欢愉技计数": {
-      "kind": "local",
-      "file": "23064"
+    {
+      "name": "欢愉度",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:elation_degree",
+      "en": "Elation"
     },
-    "歌咏": {
-      "kind": "local",
-      "file": "23026"
-    },
-    "残梦": {
-      "kind": "local",
-      "file": "1308"
-    },
-    "毁伤": {
-      "kind": "local",
-      "file": "1408"
-    },
-    "气氛值": {
-      "kind": "local",
-      "file": "1512"
-    },
-    "永续的燃烧": {
-      "kind": "local",
-      "file": "1408"
-    },
-    "求生反应": {
-      "kind": "local",
-      "file": "1110"
-    },
-    "泡影": {
-      "kind": "local",
-      "file": "23024"
-    },
-    "流光": {
-      "kind": "local",
-      "file": "23031"
-    },
-    "浪漫": {
-      "kind": "local",
-      "file": "1402"
-    },
-    "消耗层数": {
-      "kind": "local",
-      "file": "23053"
-    },
-    "涨幅惊人": {
-      "kind": "local",
-      "file": "1112"
-    },
-    "涨幅次数": {
-      "kind": "local",
-      "file": "1112"
-    },
-    "淘气值": {
-      "kind": "local",
-      "file": "21005"
-    },
-    "深度学习": {
-      "kind": "local",
-      "file": "1503"
-    },
-    "温驯": {
-      "kind": "local",
-      "file": "23016"
-    },
-    "渲染理性，解构欢愉": {
-      "kind": "local",
-      "file": "1503"
-    },
-    "游丝": {
-      "kind": "local",
-      "file": "23006"
-    },
-    "游丝加速": {
-      "kind": "local",
-      "file": "23006"
-    },
-    "演算": {
-      "kind": "local",
-      "file": "24004"
-    },
-    "演绎": {
-      "kind": "local",
-      "file": "1305"
-    },
-    "潜龙": {
-      "kind": "local",
-      "file": "1002"
-    },
-    "潮流": {
-      "kind": "local",
-      "file": "23064"
-    },
-    "火种": {
-      "kind": "local",
-      "file": "1408"
-    },
-    "火舞": {
-      "kind": "local",
-      "file": "23030"
-    },
-    "灵感": {
-      "kind": "local",
-      "file": "1401"
-    },
-    "灼烧": {
-      "kind": "shared",
-      "files": [
-        "1003",
-        "1109",
-        "1210",
-        "1307",
-        "21026",
-        "23022"
+    {
+      "name": "欢愉技计数",
+      "owner": "23064",
+      "kind": "internal",
+      "used_by": [
+        "23064"
       ]
     },
-    "灼热意志": {
-      "kind": "shared",
-      "files": [
+    {
+      "name": "歌咏",
+      "owner": "23026",
+      "kind": "char",
+      "used_by": [
+        "23026"
+      ]
+    },
+    {
+      "name": "残梦",
+      "owner": "1308",
+      "kind": "char",
+      "used_by": [
+        "1308"
+      ]
+    },
+    {
+      "name": "毁伤",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ]
+    },
+    {
+      "name": "气氛值",
+      "owner": "1512",
+      "kind": "char",
+      "used_by": [
+        "1512"
+      ]
+    },
+    {
+      "name": "永续的燃烧",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ]
+    },
+    {
+      "name": "求生反应",
+      "owner": "1110",
+      "kind": "char",
+      "used_by": [
+        "1110"
+      ]
+    },
+    {
+      "name": "泡影",
+      "owner": "23024",
+      "kind": "char",
+      "used_by": [
+        "23024"
+      ]
+    },
+    {
+      "name": "流光",
+      "owner": "23031",
+      "kind": "char",
+      "used_by": [
+        "23031"
+      ]
+    },
+    {
+      "name": "浪漫",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
+    },
+    {
+      "name": "消耗层数",
+      "owner": "23053",
+      "kind": "internal",
+      "used_by": [
+        "23053"
+      ]
+    },
+    {
+      "name": "涨幅惊人",
+      "owner": "1112",
+      "kind": "char",
+      "used_by": [
+        "1112"
+      ]
+    },
+    {
+      "name": "涨幅次数",
+      "owner": "1112",
+      "kind": "internal",
+      "used_by": [
+        "1112"
+      ]
+    },
+    {
+      "name": "淘气值",
+      "owner": "21005",
+      "kind": "char",
+      "used_by": [
+        "21005"
+      ]
+    },
+    {
+      "name": "深度学习",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ]
+    },
+    {
+      "name": "温驯",
+      "owner": "23016",
+      "kind": "char",
+      "used_by": [
+        "23016"
+      ]
+    },
+    {
+      "name": "渲染理性，解构欢愉",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ]
+    },
+    {
+      "name": "游丝",
+      "owner": "23006",
+      "kind": "char",
+      "used_by": [
+        "23006"
+      ]
+    },
+    {
+      "name": "游丝加速",
+      "owner": "23006",
+      "kind": "char",
+      "used_by": [
+        "23006"
+      ]
+    },
+    {
+      "name": "演算",
+      "owner": "24004",
+      "kind": "char",
+      "used_by": [
+        "24004"
+      ]
+    },
+    {
+      "name": "演绎",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
+      ]
+    },
+    {
+      "name": "潜龙",
+      "owner": "1002",
+      "kind": "char",
+      "used_by": [
+        "1002"
+      ]
+    },
+    {
+      "name": "潮流",
+      "owner": "23064",
+      "kind": "char",
+      "used_by": [
+        "23064"
+      ]
+    },
+    {
+      "name": "火种",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ]
+    },
+    {
+      "name": "火舞",
+      "owner": "23030",
+      "kind": "char",
+      "used_by": [
+        "23030"
+      ]
+    },
+    {
+      "name": "灵感",
+      "owner": "1401",
+      "kind": "char",
+      "used_by": [
+        "1401"
+      ]
+    },
+    {
+      "name": "灼烧",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:burn",
+      "en": "Burn"
+    },
+    {
+      "name": "灼热意志",
+      "owner": "8003",
+      "kind": "char",
+      "used_by": [
         "8003",
         "8004"
       ]
     },
-    "炉心共鸣": {
-      "kind": "local",
-      "file": "1014"
+    {
+      "name": "炉心共鸣",
+      "owner": "1014",
+      "kind": "char",
+      "used_by": [
+        "1014"
+      ]
     },
-    "炼狱": {
-      "kind": "local",
-      "file": "23059"
+    {
+      "name": "炼狱",
+      "owner": "23059",
+      "kind": "char",
+      "used_by": [
+        "23059"
+      ]
     },
-    "炽灼": {
-      "kind": "local",
-      "file": "1225"
+    {
+      "name": "炽灼",
+      "owner": "1225",
+      "kind": "char",
+      "used_by": [
+        "1225"
+      ]
     },
-    "烈阳": {
-      "kind": "local",
-      "file": "23044"
+    {
+      "name": "烈阳",
+      "owner": "23044",
+      "kind": "char",
+      "used_by": [
+        "23044"
+      ]
     },
-    "烬煨": {
-      "kind": "local",
-      "file": "1218"
+    {
+      "name": "烬煨",
+      "owner": "1218",
+      "kind": "char",
+      "used_by": [
+        "1218"
+      ]
     },
-    "热意": {
-      "kind": "local",
-      "file": "1513"
+    {
+      "name": "热意",
+      "owner": "1513",
+      "kind": "char",
+      "used_by": [
+        "1513"
+      ]
     },
-    "焚灼": {
-      "kind": "local",
-      "file": "23035"
+    {
+      "name": "焚灼",
+      "owner": "23035",
+      "kind": "char",
+      "used_by": [
+        "23035"
+      ]
     },
-    "爆燃已触发": {
-      "kind": "local",
-      "file": "21038"
+    {
+      "name": "爆燃已触发",
+      "owner": "21038",
+      "kind": "internal",
+      "used_by": [
+        "21038"
+      ]
     },
-    "爵位": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "爵位",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "特邀嘉宾": {
-      "kind": "local",
-      "file": "1512"
+    {
+      "name": "特邀嘉宾",
+      "owner": "1512",
+      "kind": "char",
+      "used_by": [
+        "1512"
+      ]
     },
-    "狐祈": {
-      "kind": "local",
-      "file": "1225"
+    {
+      "name": "狐祈",
+      "owner": "1225",
+      "kind": "char",
+      "used_by": [
+        "1225"
+      ]
     },
-    "猎物": {
-      "kind": "local",
-      "file": "1223"
+    {
+      "name": "猎物",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ]
     },
-    "献予「创世」之诗": {
-      "kind": "local",
-      "file": "8007"
+    {
+      "name": "献予「创世」之诗",
+      "owner": "8007",
+      "kind": "char",
+      "used_by": [
+        "8007"
+      ]
     },
-    "献予「大地」之诗": {
-      "kind": "local",
-      "file": "1414"
+    {
+      "name": "献予「大地」之诗",
+      "owner": "1414",
+      "kind": "char",
+      "used_by": [
+        "1414"
+      ]
     },
-    "献予「天空」之诗": {
-      "kind": "shared",
-      "files": [
+    {
+      "name": "献予「天空」之诗",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
         "1409",
         "1415"
       ]
     },
-    "献予「岁月」之诗": {
-      "kind": "local",
-      "file": "1415"
+    {
+      "name": "献予「岁月」之诗",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
     },
-    "献予「真我」之诗": {
-      "kind": "local",
-      "file": "1415"
+    {
+      "name": "献予「真我」之诗",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
     },
-    "献予「纷争」之诗": {
-      "kind": "local",
-      "file": "1404"
+    {
+      "name": "献予「纷争」之诗",
+      "owner": "1404",
+      "kind": "char",
+      "used_by": [
+        "1404"
+      ]
     },
-    "献予「门径」之诗": {
-      "kind": "local",
-      "file": "1403"
+    {
+      "name": "献予「门径」之诗",
+      "owner": "1403",
+      "kind": "char",
+      "used_by": [
+        "1403"
+      ]
     },
-    "王之娱乐": {
-      "kind": "local",
-      "file": "23062"
+    {
+      "name": "王之娱乐",
+      "owner": "23062",
+      "kind": "char",
+      "used_by": [
+        "23062"
+      ]
     },
-    "琼玉牌": {
-      "kind": "local",
-      "file": "1201"
+    {
+      "name": "琼玉牌",
+      "owner": "1201",
+      "kind": "char",
+      "used_by": [
+        "1201"
+      ]
     },
-    "生息": {
-      "kind": "local",
-      "file": "1211"
+    {
+      "name": "生息",
+      "owner": "1211",
+      "kind": "char",
+      "used_by": [
+        "1211"
+      ]
     },
-    "生息治疗额度": {
-      "kind": "local",
-      "file": "1211"
+    {
+      "name": "生息治疗额度",
+      "owner": "1211",
+      "kind": "char",
+      "used_by": [
+        "1211"
+      ]
     },
-    "生死之诗的溢出消耗": {
-      "kind": "local",
-      "file": "1407"
+    {
+      "name": "生死之诗的溢出消耗",
+      "owner": "1407",
+      "kind": "internal",
+      "used_by": [
+        "1407"
+      ]
     },
-    "白花之刻": {
-      "kind": "local",
-      "file": "1203"
+    {
+      "name": "白花之刻",
+      "owner": "1203",
+      "kind": "char",
+      "used_by": [
+        "1203"
+      ]
     },
-    "盲注": {
-      "kind": "local",
-      "file": "1304"
+    {
+      "name": "盲注",
+      "owner": "1304",
+      "kind": "char",
+      "used_by": [
+        "1304"
+      ]
     },
-    "真知": {
-      "kind": "local",
-      "file": "1405"
+    {
+      "name": "真知",
+      "owner": "1405",
+      "kind": "char",
+      "used_by": [
+        "1405"
+      ]
     },
-    "真知的战技增伤": {
-      "kind": "local",
-      "file": "1405"
+    {
+      "name": "真知的战技增伤",
+      "owner": "1405",
+      "kind": "char",
+      "used_by": [
+        "1405"
+      ]
     },
-    "睚准": {
-      "kind": "local",
-      "file": "21010"
+    {
+      "name": "睚准",
+      "owner": "21010",
+      "kind": "char",
+      "used_by": [
+        "21010"
+      ]
     },
-    "短视之惩-她-忆灵速度": {
-      "kind": "local",
-      "file": "1402"
+    {
+      "name": "短视之惩-她-忆灵速度",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
     },
-    "短视之惩-她-自身速度": {
-      "kind": "local",
-      "file": "1402"
+    {
+      "name": "短视之惩-她-自身速度",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
     },
-    "短视之惩-衣匠-忆灵速度": {
-      "kind": "local",
-      "file": "1402"
+    {
+      "name": "短视之惩-衣匠-忆灵速度",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
     },
-    "短视之惩-衣匠-自身速度": {
-      "kind": "local",
-      "file": "1402"
+    {
+      "name": "短视之惩-衣匠-自身速度",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
     },
-    "神启": {
-      "kind": "local",
-      "file": "1403"
+    {
+      "name": "神启",
+      "owner": "1403",
+      "kind": "char",
+      "used_by": [
+        "1403"
+      ]
     },
-    "禁锢": {
-      "kind": "engine",
+    {
+      "name": "禁锢",
+      "owner": "battle",
+      "kind": "battle",
       "key": "ctrl:imprisoned",
       "en": "Imprisoned"
     },
-    "禳命": {
-      "kind": "local",
-      "file": "1217"
+    {
+      "name": "禳命",
+      "owner": "1217",
+      "kind": "char",
+      "used_by": [
+        "1217"
+      ]
     },
-    "离场": {
-      "kind": "local",
-      "file": "1223"
+    {
+      "name": "离场",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ]
     },
-    "秘密-攻击力": {
-      "kind": "local",
-      "file": "21032"
+    {
+      "name": "秘密-攻击力",
+      "owner": "21032",
+      "kind": "char",
+      "used_by": [
+        "21032"
+      ]
     },
-    "秘密-暴击伤害": {
-      "kind": "local",
-      "file": "21032"
+    {
+      "name": "秘密-暴击伤害",
+      "owner": "21032",
+      "kind": "char",
+      "used_by": [
+        "21032"
+      ]
     },
-    "秘密-能量恢复": {
-      "kind": "local",
-      "file": "21032"
+    {
+      "name": "秘密-能量恢复",
+      "owner": "21032",
+      "kind": "char",
+      "used_by": [
+        "21032"
+      ]
     },
-    "秘技": {
-      "kind": "engine",
+    {
+      "name": "秘技",
+      "owner": "battle",
+      "kind": "battle",
       "key": "sys:technique",
       "en": "Technique"
     },
-    "秘技减速": {
-      "kind": "local",
-      "file": "1305"
-    },
-    "穷寇": {
-      "kind": "local",
-      "file": "23029"
-    },
-    "空白": {
-      "kind": "local",
-      "file": "23052"
-    },
-    "童心战技": {
-      "kind": "local",
-      "file": "21036"
-    },
-    "童心普攻": {
-      "kind": "local",
-      "file": "21036"
-    },
-    "童心终结技": {
-      "kind": "local",
-      "file": "21036"
-    },
-    "笑点": {
-      "kind": "shared",
-      "files": [
-        "1502",
-        "1503",
-        "1505",
-        "1506",
-        "1513",
-        "20024",
-        "23057",
-        "8009",
-        "8010"
+    {
+      "name": "秘技减速",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
       ]
     },
-    "笑点已触发": {
-      "kind": "local",
-      "file": "23057"
+    {
+      "name": "穷寇",
+      "owner": "23029",
+      "kind": "char",
+      "used_by": [
+        "23029"
+      ]
     },
-    "笑点达标": {
-      "kind": "local",
-      "file": "20024"
+    {
+      "name": "空白",
+      "owner": "23052",
+      "kind": "char",
+      "used_by": [
+        "23052"
+      ]
     },
-    "累计损失": {
-      "kind": "local",
-      "file": "1208"
+    {
+      "name": "童心战技",
+      "owner": "21036",
+      "kind": "char",
+      "used_by": [
+        "21036"
+      ]
     },
-    "累计损失生命": {
-      "kind": "local",
-      "file": "1205"
+    {
+      "name": "童心普攻",
+      "owner": "21036",
+      "kind": "char",
+      "used_by": [
+        "21036"
+      ]
     },
-    "累计能量": {
-      "kind": "local",
-      "file": "1505"
+    {
+      "name": "童心终结技",
+      "owner": "21036",
+      "kind": "char",
+      "used_by": [
+        "21036"
+      ]
     },
-    "累计追击": {
-      "kind": "local",
-      "file": "23056"
+    {
+      "name": "笑点",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:punchline",
+      "en": "Punchline"
     },
-    "织运之竭-保留": {
-      "kind": "local",
-      "file": "1402"
+    {
+      "name": "笑点已触发",
+      "owner": "23057",
+      "kind": "internal",
+      "used_by": [
+        "23057"
+      ]
     },
-    "织锦": {
-      "kind": "local",
-      "file": "23036"
+    {
+      "name": "笑点达标",
+      "owner": "20024",
+      "kind": "char",
+      "used_by": [
+        "20024"
+      ]
     },
-    "终结技已激活": {
-      "kind": "engine",
+    {
+      "name": "累计损失",
+      "owner": "1208",
+      "kind": "char",
+      "used_by": [
+        "1208"
+      ]
+    },
+    {
+      "name": "累计损失生命",
+      "owner": "1205",
+      "kind": "char",
+      "used_by": [
+        "1205"
+      ]
+    },
+    {
+      "name": "累计能量",
+      "owner": "1505",
+      "kind": "char",
+      "used_by": [
+        "1505"
+      ]
+    },
+    {
+      "name": "累计追击",
+      "owner": "23056",
+      "kind": "char",
+      "used_by": [
+        "23056"
+      ]
+    },
+    {
+      "name": "织运之竭-保留",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
+    },
+    {
+      "name": "织锦",
+      "owner": "23036",
+      "kind": "char",
+      "used_by": [
+        "23036"
+      ]
+    },
+    {
+      "name": "终结技已激活",
+      "owner": "battle",
+      "kind": "battle",
       "key": "sys:ultimate_activated",
       "en": "Ultimate Activated"
     },
-    "终结技计数": {
-      "kind": "local",
-      "file": "1014"
+    {
+      "name": "终结技计数",
+      "owner": "1014",
+      "kind": "internal",
+      "used_by": [
+        "1014"
+      ]
     },
-    "终结计数": {
-      "kind": "local",
-      "file": "23003"
+    {
+      "name": "终结计数",
+      "owner": "23003",
+      "kind": "internal",
+      "used_by": [
+        "23003"
+      ]
     },
-    "结印": {
-      "kind": "local",
-      "file": "1317"
+    {
+      "name": "结印",
+      "owner": "1317",
+      "kind": "char",
+      "used_by": [
+        "1317"
+      ]
     },
-    "结界": {
-      "kind": "shared",
-      "files": [
-        "1203",
-        "1218",
-        "1403",
-        "1415",
-        "1502",
-        "1506",
+    {
+      "name": "结界",
+      "owner": "1203",
+      "kind": "char",
+      "used_by": [
+        "1203"
+      ]
+    },
+    {
+      "name": "结界",
+      "owner": "1218",
+      "kind": "char",
+      "used_by": [
+        "1218"
+      ]
+    },
+    {
+      "name": "结界",
+      "owner": "1403",
+      "kind": "char",
+      "used_by": [
+        "1403"
+      ]
+    },
+    {
+      "name": "结界",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
+    },
+    {
+      "name": "结界",
+      "owner": "1502",
+      "kind": "char",
+      "used_by": [
+        "1502"
+      ]
+    },
+    {
+      "name": "结界",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
+    },
+    {
+      "name": "结界",
+      "owner": "1507",
+      "kind": "char",
+      "used_by": [
         "1507"
       ]
     },
-    "结界计数": {
-      "kind": "local",
-      "file": "1218"
+    {
+      "name": "结界计数",
+      "owner": "1218",
+      "kind": "internal",
+      "used_by": [
+        "1218"
+      ]
     },
-    "绝命对峙": {
-      "kind": "local",
-      "file": "1315"
+    {
+      "name": "绝命对峙",
+      "owner": "1315",
+      "kind": "char",
+      "used_by": [
+        "1315"
+      ]
     },
-    "绝处反击": {
-      "kind": "local",
-      "file": "1008"
+    {
+      "name": "绝处反击",
+      "owner": "1008",
+      "kind": "char",
+      "used_by": [
+        "1008"
+      ]
     },
-    "缅怀": {
-      "kind": "local",
-      "file": "20022"
+    {
+      "name": "缅怀",
+      "owner": "20022",
+      "kind": "char",
+      "used_by": [
+        "20022"
+      ]
     },
-    "缠禁": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "缠禁",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "缠绕": {
-      "kind": "local",
-      "file": "1412"
+    {
+      "name": "缠绕",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "缺陷": {
-      "kind": "local",
-      "file": "1006"
+    {
+      "name": "缺陷",
+      "owner": "1006",
+      "kind": "char",
+      "used_by": [
+        "1006"
+      ]
     },
-    "美学底本": {
-      "kind": "local",
-      "file": "1503"
+    {
+      "name": "美学底本",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ]
     },
-    "老主顾": {
-      "kind": "local",
-      "file": "1406"
-    },
-    "自身回合数": {
-      "kind": "local",
-      "file": "1009"
-    },
-    "至暗之谜": {
-      "kind": "local",
-      "file": "1413"
-    },
-    "至高之姿": {
-      "kind": "local",
-      "file": "1402"
-    },
-    "艺术壁垒": {
-      "kind": "local",
-      "file": "1503"
-    },
-    "荣光之秘-待发": {
-      "kind": "local",
-      "file": "1313"
-    },
-    "蒙福者": {
-      "kind": "local",
-      "file": "1313"
-    },
-    "蓄能": {
-      "kind": "local",
-      "file": "1009"
-    },
-    "蓄能不减": {
-      "kind": "local",
-      "file": "1009"
-    },
-    "虚弱": {
-      "kind": "shared",
-      "files": [
-        "1105",
-        "1203",
+    {
+      "name": "老主顾",
+      "owner": "1406",
+      "kind": "char",
+      "used_by": [
         "1406"
       ]
     },
-    "虹光累计消耗": {
-      "kind": "local",
-      "file": "23042"
-    },
-    "血仇": {
-      "kind": "local",
-      "file": "1404"
-    },
-    "血火": {
-      "kind": "local",
-      "file": "23039"
-    },
-    "血火超额": {
-      "kind": "local",
-      "file": "23039"
-    },
-    "行动次数": {
-      "kind": "local",
-      "file": "1222"
-    },
-    "行动锁定": {
-      "kind": "local",
-      "file": "1412"
-    },
-    "裂伤": {
-      "kind": "shared",
-      "files": [
-        "1111",
-        "1307",
-        "21026",
-        "23022"
+    {
+      "name": "自身回合数",
+      "owner": "1009",
+      "kind": "char",
+      "used_by": [
+        "1009"
       ]
     },
-    "解读": {
-      "kind": "local",
-      "file": "1401"
-    },
-    "触电": {
-      "kind": "shared",
-      "files": [
-        "1103",
-        "1307",
-        "21022",
-        "23022"
+    {
+      "name": "至暗之谜",
+      "owner": "1413",
+      "kind": "char",
+      "used_by": [
+        "1413"
       ]
     },
-    "记录": {
-      "kind": "local",
-      "file": "1512"
-    },
-    "记录值": {
-      "kind": "local",
-      "file": "1406"
-    },
-    "记录的治疗量": {
-      "kind": "local",
-      "file": "23013"
-    },
-    "论辩": {
-      "kind": "local",
-      "file": "23020"
-    },
-    "诗行": {
-      "kind": "local",
-      "file": "23052"
-    },
-    "谕示": {
-      "kind": "local",
-      "file": "23038"
-    },
-    "谜诡": {
-      "kind": "local",
-      "file": "1306"
-    },
-    "负债证明": {
-      "kind": "local",
-      "file": "1112"
-    },
-    "负面激化": {
-      "kind": "local",
-      "file": "117"
-    },
-    "败谢": {
-      "kind": "local",
-      "file": "1321"
-    },
-    "质性揭露": {
-      "kind": "local",
-      "file": "1405"
-    },
-    "赐福": {
-      "kind": "local",
-      "file": "1202"
-    },
-    "赤子": {
-      "kind": "local",
-      "file": "1206"
-    },
-    "转魄": {
-      "kind": "local",
-      "file": "1212"
-    },
-    "迷境饭层数": {
-      "kind": "local",
-      "file": "22005"
-    },
-    "迷迷的声援": {
-      "kind": "local",
-      "file": "8007"
-    },
-    "追加攻击": {
-      "kind": "local",
-      "file": "115"
-    },
-    "追忆": {
-      "kind": "local",
-      "file": "1415"
-    },
-    "送别的花": {
-      "kind": "local",
-      "file": "23040"
-    },
-    "逆鳞": {
-      "kind": "local",
-      "file": "1213"
-    },
-    "通解": {
-      "kind": "local",
-      "file": "1106"
-    },
-    "避厄": {
-      "kind": "local",
-      "file": "1208"
-    },
-    "避厄治疗次": {
-      "kind": "local",
-      "file": "1208"
-    },
-    "酩酊": {
-      "kind": "local",
-      "file": "1301"
-    },
-    "里程碑配额": {
-      "kind": "local",
-      "file": "1506"
-    },
-    "鉴知": {
-      "kind": "local",
-      "file": "1208"
-    },
-    "长夜的迷梦增伤": {
-      "kind": "local",
-      "file": "1413"
-    },
-    "闪耀王冠": {
-      "kind": "local",
-      "file": "23061"
-    },
-    "间隙织线": {
-      "kind": "local",
-      "file": "1402"
-    },
-    "间隙织线易伤": {
-      "kind": "local",
-      "file": "1402"
-    },
-    "阿哈时刻": {
-      "kind": "shared",
-      "files": [
-        "1501",
-        "1513",
-        "20023"
+    {
+      "name": "至高之姿",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
       ]
     },
-    "隐藏分": {
-      "kind": "local",
-      "file": "1506"
-    },
-    "集真赤": {
-      "kind": "local",
-      "file": "1308"
-    },
-    "雨过天晴": {
-      "kind": "local",
-      "file": "1409"
-    },
-    "雷遁": {
-      "kind": "local",
-      "file": "23033"
-    },
-    "领航旗语": {
-      "kind": "local",
-      "file": "1510"
-    },
-    "额外回合计数": {
-      "kind": "local",
-      "file": "1408"
-    },
-    "风化": {
-      "kind": "shared",
-      "files": [
-        "1108",
-        "1307",
-        "21022",
-        "23022"
+    {
+      "name": "艺术壁垒",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
       ]
     },
-    "风口": {
-      "kind": "local",
-      "file": "23064"
+    {
+      "name": "荣光之秘-待发",
+      "owner": "1313",
+      "kind": "char",
+      "used_by": [
+        "1313"
+      ]
     },
-    "飞黄": {
-      "kind": "local",
-      "file": "1220"
+    {
+      "name": "蒙福者",
+      "owner": "1313",
+      "kind": "char",
+      "used_by": [
+        "1313"
+      ]
     },
-    "飞黄计数": {
-      "kind": "local",
-      "file": "1220"
+    {
+      "name": "蓄能",
+      "owner": "1009",
+      "kind": "char",
+      "used_by": [
+        "1009"
+      ]
     },
-    "饲饵": {
-      "kind": "local",
-      "file": "1504"
+    {
+      "name": "蓄能不减",
+      "owner": "1009",
+      "kind": "char",
+      "used_by": [
+        "1009"
+      ]
     },
-    "首次狂热已触发": {
-      "kind": "local",
-      "file": "1512"
+    {
+      "name": "虚弱",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "debuff:weakened",
+      "en": "Weakened"
     },
-    "首次终结技已触发": {
-      "kind": "local",
-      "file": "1014"
+    {
+      "name": "虹光累计消耗",
+      "owner": "23042",
+      "kind": "char",
+      "used_by": [
+        "23042"
+      ]
     },
-    "魂迷": {
-      "kind": "local",
-      "file": "23047"
+    {
+      "name": "血仇",
+      "owner": "1404",
+      "kind": "char",
+      "used_by": [
+        "1404"
+      ]
     },
-    "魂迷之债": {
-      "kind": "local",
-      "file": "23047"
+    {
+      "name": "血火",
+      "owner": "23039",
+      "kind": "char",
+      "used_by": [
+        "23039"
+      ]
     },
-    "魔力放出": {
-      "kind": "local",
-      "file": "1014"
+    {
+      "name": "血火超额",
+      "owner": "23039",
+      "kind": "char",
+      "used_by": [
+        "23039"
+      ]
     },
-    "鸣弦号令": {
-      "kind": "local",
-      "file": "1207"
+    {
+      "name": "行动次数",
+      "owner": "1222",
+      "kind": "internal",
+      "used_by": [
+        "1222"
+      ]
     },
-    "鸣弦号令增益": {
-      "kind": "local",
-      "file": "1207"
+    {
+      "name": "行动锁定",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ]
     },
-    "龙吟": {
-      "kind": "local",
-      "file": "23015"
+    {
+      "name": "裂伤",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:bleed",
+      "en": "Bleed"
+    },
+    {
+      "name": "解读",
+      "owner": "1401",
+      "kind": "char",
+      "used_by": [
+        "1401"
+      ]
+    },
+    {
+      "name": "触电",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:shock",
+      "en": "Shock"
+    },
+    {
+      "name": "记录",
+      "owner": "1512",
+      "kind": "internal",
+      "used_by": [
+        "1512"
+      ]
+    },
+    {
+      "name": "记录值",
+      "owner": "1406",
+      "kind": "internal",
+      "used_by": [
+        "1406"
+      ]
+    },
+    {
+      "name": "记录的治疗量",
+      "owner": "23013",
+      "kind": "internal",
+      "used_by": [
+        "23013"
+      ]
+    },
+    {
+      "name": "论辩",
+      "owner": "23020",
+      "kind": "char",
+      "used_by": [
+        "23020"
+      ]
+    },
+    {
+      "name": "诗行",
+      "owner": "23052",
+      "kind": "char",
+      "used_by": [
+        "23052"
+      ]
+    },
+    {
+      "name": "谕示",
+      "owner": "23038",
+      "kind": "char",
+      "used_by": [
+        "23038"
+      ]
+    },
+    {
+      "name": "谜诡",
+      "owner": "1306",
+      "kind": "char",
+      "used_by": [
+        "1306"
+      ]
+    },
+    {
+      "name": "负债证明",
+      "owner": "1112",
+      "kind": "char",
+      "used_by": [
+        "1112"
+      ]
+    },
+    {
+      "name": "负面激化",
+      "owner": "117",
+      "kind": "char",
+      "used_by": [
+        "117"
+      ]
+    },
+    {
+      "name": "败谢",
+      "owner": "1321",
+      "kind": "char",
+      "used_by": [
+        "1321"
+      ]
+    },
+    {
+      "name": "质性揭露",
+      "owner": "1405",
+      "kind": "char",
+      "used_by": [
+        "1405"
+      ]
+    },
+    {
+      "name": "赐福",
+      "owner": "1202",
+      "kind": "char",
+      "used_by": [
+        "1202"
+      ]
+    },
+    {
+      "name": "赤子",
+      "owner": "1206",
+      "kind": "char",
+      "used_by": [
+        "1206"
+      ]
+    },
+    {
+      "name": "转魄",
+      "owner": "1212",
+      "kind": "char",
+      "used_by": [
+        "1212"
+      ]
+    },
+    {
+      "name": "迷境饭层数",
+      "owner": "22005",
+      "kind": "internal",
+      "used_by": [
+        "22005"
+      ]
+    },
+    {
+      "name": "迷迷的声援",
+      "owner": "8007",
+      "kind": "char",
+      "used_by": [
+        "8007"
+      ]
+    },
+    {
+      "name": "追加攻击",
+      "owner": "115",
+      "kind": "char",
+      "used_by": [
+        "115"
+      ]
+    },
+    {
+      "name": "追忆",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ]
+    },
+    {
+      "name": "送别的花",
+      "owner": "23040",
+      "kind": "char",
+      "used_by": [
+        "23040"
+      ]
+    },
+    {
+      "name": "逆鳞",
+      "owner": "1213",
+      "kind": "char",
+      "used_by": [
+        "1213"
+      ]
+    },
+    {
+      "name": "通解",
+      "owner": "1106",
+      "kind": "char",
+      "used_by": [
+        "1106"
+      ]
+    },
+    {
+      "name": "避厄",
+      "owner": "1208",
+      "kind": "char",
+      "used_by": [
+        "1208"
+      ]
+    },
+    {
+      "name": "避厄治疗次",
+      "owner": "1208",
+      "kind": "char",
+      "used_by": [
+        "1208"
+      ]
+    },
+    {
+      "name": "酩酊",
+      "owner": "1301",
+      "kind": "char",
+      "used_by": [
+        "1301"
+      ]
+    },
+    {
+      "name": "里程碑配额",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
+    },
+    {
+      "name": "鉴知",
+      "owner": "1208",
+      "kind": "char",
+      "used_by": [
+        "1208"
+      ]
+    },
+    {
+      "name": "长夜的迷梦增伤",
+      "owner": "1413",
+      "kind": "char",
+      "used_by": [
+        "1413"
+      ]
+    },
+    {
+      "name": "闪耀王冠",
+      "owner": "23061",
+      "kind": "char",
+      "used_by": [
+        "23061"
+      ]
+    },
+    {
+      "name": "间隙织线",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
+    },
+    {
+      "name": "间隙织线易伤",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ]
+    },
+    {
+      "name": "阿哈时刻",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:aha_instant",
+      "en": "Aha Instant"
+    },
+    {
+      "name": "隐藏分",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ]
+    },
+    {
+      "name": "集真赤",
+      "owner": "1308",
+      "kind": "char",
+      "used_by": [
+        "1308"
+      ]
+    },
+    {
+      "name": "雨过天晴",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
+        "1409"
+      ]
+    },
+    {
+      "name": "雷遁",
+      "owner": "23033",
+      "kind": "char",
+      "used_by": [
+        "23033"
+      ]
+    },
+    {
+      "name": "领航旗语",
+      "owner": "1510",
+      "kind": "char",
+      "used_by": [
+        "1510"
+      ]
+    },
+    {
+      "name": "额外回合计数",
+      "owner": "1408",
+      "kind": "internal",
+      "used_by": [
+        "1408"
+      ]
+    },
+    {
+      "name": "风化",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "dot:wind_shear",
+      "en": "Wind Shear"
+    },
+    {
+      "name": "风口",
+      "owner": "23064",
+      "kind": "char",
+      "used_by": [
+        "23064"
+      ]
+    },
+    {
+      "name": "飞黄",
+      "owner": "1220",
+      "kind": "char",
+      "used_by": [
+        "1220"
+      ]
+    },
+    {
+      "name": "飞黄计数",
+      "owner": "1220",
+      "kind": "internal",
+      "used_by": [
+        "1220"
+      ]
+    },
+    {
+      "name": "饲饵",
+      "owner": "1504",
+      "kind": "char",
+      "used_by": [
+        "1504"
+      ]
+    },
+    {
+      "name": "首次狂热已触发",
+      "owner": "1512",
+      "kind": "internal",
+      "used_by": [
+        "1512"
+      ]
+    },
+    {
+      "name": "首次终结技已触发",
+      "owner": "1014",
+      "kind": "internal",
+      "used_by": [
+        "1014"
+      ]
+    },
+    {
+      "name": "魂迷",
+      "owner": "23047",
+      "kind": "char",
+      "used_by": [
+        "23047"
+      ]
+    },
+    {
+      "name": "魂迷之债",
+      "owner": "23047",
+      "kind": "char",
+      "used_by": [
+        "23047"
+      ]
+    },
+    {
+      "name": "魔力放出",
+      "owner": "1014",
+      "kind": "char",
+      "used_by": [
+        "1014"
+      ]
+    },
+    {
+      "name": "鸣弦号令",
+      "owner": "1207",
+      "kind": "char",
+      "used_by": [
+        "1207"
+      ]
+    },
+    {
+      "name": "鸣弦号令增益",
+      "owner": "1207",
+      "kind": "char",
+      "used_by": [
+        "1207"
+      ]
+    },
+    {
+      "name": "龙吟",
+      "owner": "23015",
+      "kind": "char",
+      "used_by": [
+        "23015"
+      ]
     }
-  }
+  ]
 }

@@ -12,7 +12,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -24,38 +23,33 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * {@code game/state_names.json} is the <b>declaration site</b> every state / stack / resource name must appear in.
+ * {@code game/state_names.json} is the <b>declaration site</b> every state / stack / resource identity must appear in, and
+ * the {@code owner} it carries is the part that makes the table honest.
  *
- * <p><b>Why this exists.</b> Resources already declare themselves ({@code resources[]} with an {@code id}),
- * paths and controls already pair an ASCII identity with a Chinese name ({@code Path.fromName("欢愉") -> ELATION},
- * {@code new ControlEffect("FROZEN", "冻结", …)}). States did not: a name was a free string that appeared in whatever rule
- * used it, which cost two things at once -
+ * <p><b>Why an owner is needed at all.</b> Measured on the shipped content: {@code 充能} is the word used by
+ * <b>eight</b> different mechanisms (max 3 / 3 / 4 / 8 / 8 / 10 / 10 / 100 / unbounded) - 1503's 【深度学习】 charge,
+ * 1504's 不死途 charge, 1015's, 1223's, 1224's, 1314's, 1317's, 1412's (declared again by 1415 because a rule lives
+ * there) and 8007's memosprite charge. {@code 结界} is seven characters' own zone. A table keyed by the NAME alone would
+ * merge all of those, which is exactly the conflation a localization layer cannot survive. So the identity is
+ * <b>(owner, name)</b>:
  * <ul>
- *   <li>a localization layer has no anchor to join on, because the key and the displayed text are the same string;</li>
- *   <li>a single wrong character is a <b>silent</b> no-op ({@code BuffManager.hasState} is an exact match), which is the
- *       failure mode this project refuses everywhere else.</li>
+ *   <li>{@code battle} - the battle model's own vocabulary: controls, DoT kinds, break, the technique state, and the
+ *       Elation subsystem's counters. Shared by everybody, so no owner;</li>
+ *   <li>a cid ({@code 1202}) - that character's term, whether it is a proper noun (「赐福」) or a reused general word
+ *       (「充能」, 「结界」);</li>
+ *   <li>{@code internal} - this project's bookkeeping counter, which has no display meaning at all.</li>
  * </ul>
  *
- * <p><b>What a declared name carries.</b> {@code kind} decides where its ASCII key lives:
- * <ul>
- *   <li>{@code engine} - created or known by the engine itself (「秘技」, 「弱点击破」, the control and DoT families);</li>
- *   <li>{@code shared} - a game term that more than one content file uses (a party resource, a zone, a cross-file state);</li>
- *   <li>{@code local} - a counter this project invented for ONE file. Its key must carry that file
- *       ({@code local:<file>/<slug>}) and the guard refuses it the moment a second file reads it.</li>
- * </ul>
- *
- * <p><b>Why the guard reads structurally, not by scanning text.</b> {@code _note} / {@code source} / {@code _gaps} quote
- * conditions verbatim (「`self has_state 秘技`」), so a text scan counts prose as usage - measured while building this:
- * it turned 372 real names into 250 with a dozen backtick-suffixed phantoms. The walk below only visits the fields that
- * carry a name.
+ * <p><b>Why the walk is structural.</b> {@code _note} / {@code source} / {@code _gaps} quote conditions verbatim
+ * (「`self has_state 秘技`」), so a text scan counts prose as usage - measured while building this: it turned 311 real
+ * identities into 372 with a dozen backtick-suffixed phantoms.
  */
 public class StateNameRegistryTest {
 
     private static final Path GAME = Path.of("src", "main", "resources", "game");
     private static final Path REGISTRY = GAME.resolve("state_names.json");
-    private static final Set<String> KINDS = Set.of("engine", "shared", "local");
-    /** {@code sys:technique}, {@code break:weakness}, {@code local:1015/loop_layers}. */
-    private static final Pattern KEY = Pattern.compile("^[a-z][a-z0-9_]*(:[a-z0-9_.-]+)+$");
+    /** {@code sys:technique}, {@code break:weakness}, {@code char:1314/charge}, {@code local:1015/loop_layers}. */
+    private static final Pattern KEY = Pattern.compile("^[a-z][a-z0-9_]*(:[a-z0-9_./-]+)+$");
     private static final Pattern CJK = Pattern.compile("[\\u4e00-\\u9fff]");
 
     private static final List<Pattern> CONDITIONS = List.of(
@@ -71,133 +65,136 @@ public class StateNameRegistryTest {
             "amount_from_resource", "percent_from_resource", "amount_percent_from_resource");
 
     /**
-     * The ops whose {@code buff} is a <b>state identity</b> - something {@code REMOVE_STATE} can take off later.
+     * The ops whose {@code buff} is a state <b>identity</b> - something {@code REMOVE_STATE} can take off later.
      *
-     * <p>⚠ Every other op's {@code buff} is a <b>display label</b> for an otherwise unnamed modifier, and those read like
-     * prose (measured: {@code "113/4 暴击率"}, {@code "1506天赋-暴击伤害"}). Treating a label as a name would put that
-     * prose in the registry, and the registry's job is the identities only.
+     * <p>⚠ Every other op's {@code buff} is a display label for an otherwise unnamed modifier, and those read like prose
+     * (measured: {@code "113/4 暴击率"}, {@code "1506天赋-暴击伤害"}). A label is not an identity.
      */
     private static final Set<String> STATE_OPS = Set.of(
             "APPLY_BUFF", "REMOVE_STATE", "ADD_STACK", "REMOVE_STACK");
 
-    /** Fields whose value may carry a name behind a selector prefix ({@code holder_of:X}, {@code self_resource:X}). */
     private static final List<Pattern> SELECTOR_FIELDS = List.of(
             Pattern.compile("^(?:holder_of|highest_stacks_enemy|lowest_stacks_enemy):(.+)$"),
             Pattern.compile("^(?:self_resource|summon_resource|party_resource|max_party_resource):(.+)$"));
 
     @Test
-    public void everyNameUsedByContentIsDeclared() throws IOException {
-        Map<String, Set<String>> users = usageByFile();
-        JsonObject registry = read(REGISTRY);
-        JsonObject names = registry.getAsJsonObject("names");
-        Assertions.assertNotNull(names, "state_names.json must carry a \"names\" object");
-
-        List<String> undeclared = new ArrayList<>();
-        List<String> unused = new ArrayList<>();
-        for (Map.Entry<String, Set<String>> entry : users.entrySet()) {
-            if (!names.has(entry.getKey())) {
-                undeclared.add(entry.getKey() + " -> " + String.join(",", new TreeSet<>(entry.getValue())));
+    public void everyIdentityUsedByAFileIsDeclaredExactlyOnce() throws IOException {
+        Map<String, Set<String>> usage = usageByFile();
+        List<Entry> entries = entries();
+        List<String> problems = new ArrayList<>();
+        for (Map.Entry<String, Set<String>> byName : usage.entrySet()) {
+            for (String file : byName.getValue()) {
+                List<Entry> matches = new ArrayList<>();
+                for (Entry entry : entries) {
+                    if (entry.name.equals(byName.getKey()) && entry.serves(file)) {
+                        matches.add(entry);
+                    }
+                }
+                if (matches.isEmpty()) {
+                    problems.add(file + " uses \"" + byName.getKey() + "\" but no declared identity covers that file");
+                } else if (matches.size() > 1) {
+                    problems.add(file + " uses \"" + byName.getKey() + "\" and " + matches.size()
+                            + " identities claim it: " + matches.stream().map(entry -> entry.owner).toList());
+                }
             }
         }
-        for (String declared : names.keySet()) {
-            if (!users.containsKey(declared)) {
-                unused.add(declared);
-            }
-        }
-        dumpUsage(users);
-        System.out.println("[state-names] used=" + users.size() + " declared=" + names.size());
-        Assertions.assertTrue(undeclared.isEmpty(),
-                "these names are used by content but not declared in " + REGISTRY + " (name -> files):\n  "
-                        + String.join("\n  ", undeclared));
-        Assertions.assertTrue(unused.isEmpty(),
-                "these declared names are used by no rule any more, so the registry is stale: " + unused);
+        dumpUsage(usage);
+        System.out.println("[state-names] identities=" + entries.size() + " names=" + usage.size()
+                + " files=" + usage.values().stream().flatMap(Set::stream).distinct().count());
+        Assertions.assertTrue(problems.isEmpty(),
+                "every (file, name) pair must resolve to exactly one identity in " + REGISTRY + ":\n  "
+                        + String.join("\n  ", problems));
     }
 
     @Test
-    public void everyDeclarationStatesItsKindAndAnAsciiKey() throws IOException {
-        JsonObject names = read(REGISTRY).getAsJsonObject("names");
-        Map<String, Set<String>> users = usageByFile();
-        Map<String, String> keyOwners = new LinkedHashMap<>();
+    public void everyIdentityIsWellFormed() throws IOException {
+        Map<String, Set<String>> usage = usageByFile();
         List<String> problems = new ArrayList<>();
-        for (Map.Entry<String, JsonElement> entry : names.entrySet()) {
-            String name = entry.getKey();
-            JsonObject declaration = entry.getValue().getAsJsonObject();
-            String kind = declaration.has("kind") ? declaration.get("kind").getAsString() : "";
-            if (!KINDS.contains(kind)) {
-                problems.add(name + ": kind must be one of " + new TreeSet<>(KINDS) + ", got \"" + kind + "\"");
+        Map<String, String> keyOwners = new TreeMap<>();
+        for (Entry entry : entries()) {
+            if (!"battle".equals(entry.owner) && !entry.owner.matches("\\d{3,6}")) {
+                problems.add(entry.name + ": owner must be \"battle\" or a content id "
+                        + "(3-6 digits: a character, a light cone or a relic set), got \"" + entry.owner + "\"");
+            }
+            if (entry.kind == null || !Set.of("battle", "char", "internal").contains(entry.kind)) {
+                problems.add(entry.name + " (" + entry.owner + "): kind must be battle / char / internal, got \""
+                        + entry.kind + "\"");
+            }
+            if ("battle".equals(entry.owner) && !"battle".equals(entry.kind)) {
+                problems.add(entry.name + ": owner battle must carry kind battle");
+            }
+            // A battle identity is created by the engine, so its ASCII key is assigned now; a character's or an
+            // internal counter's key arrives when that family is migrated.
+            if ("battle".equals(entry.kind) && entry.key == null) {
+                problems.add(entry.name + ": a battle identity needs an ASCII \"key\"");
+            }
+            for (String file : entry.usedBy) {
+                if (!usage.getOrDefault(entry.name, Set.of()).contains(file)) {
+                    problems.add(entry.name + " (" + entry.owner + "): \"used_by\" lists " + file
+                            + ", which does not use it any more");
+                }
+            }
+            if (entry.key == null) {
                 continue;
             }
-            Set<String> files = users.getOrDefault(name, Set.of());
-            if ("local".equals(kind)) {
-                if (files.size() != 1) {
-                    problems.add(name + ": declared local but read by " + files.size() + " files "
-                            + new TreeSet<>(files) + " - a private counter that leaked becomes shared");
-                }
-                String file = declaration.has("file") ? declaration.get("file").getAsString() : "";
-                if (!file.equals(files.stream().findFirst().orElse(""))) {
-                    problems.add(name + ": local name must state \"file\" = " + files + ", got \"" + file + "\"");
-                }
-                if (declaration.has("key")) {
-                    String key = declaration.get("key").getAsString();
-                    if (!key.startsWith("local:" + file + "/")) {
-                        problems.add(name + ": a local key must start \"local:" + file + "/\", got \"" + key + "\"");
-                    }
-                    checkKey(name, key, keyOwners, problems);
-                }
-                continue;
+            if (!KEY.matcher(entry.key).matches() || CJK.matcher(entry.key).find()) {
+                problems.add(entry.name + " (" + entry.owner + "): key \"" + entry.key + "\" is not namespaced ASCII");
             }
-            // An `engine` name is created by the engine, so its ASCII key is assigned here and now. A `shared` name
-            // is still written in Chinese until its family is migrated (Phase D), so the key is optional for now - the
-            // moment it is present it must be well-formed and unique.
-            if (!declaration.has("key")) {
-                if ("engine".equals(kind)) {
-                    problems.add(name + ": an engine name needs an ASCII \"key\" (the engine creates it)");
-                }
-                continue;
+            String previous = keyOwners.put(entry.key, entry.owner + "/" + entry.name);
+            if (previous != null) {
+                problems.add("key \"" + entry.key + "\" is claimed by both " + previous + " and "
+                        + entry.owner + "/" + entry.name);
             }
-            String key = declaration.get("key").getAsString();
-            checkKey(name, key, keyOwners, problems);
-            if (key.equals(name) && !declaration.has("zh")) {
-                problems.add(name + ": once the key IS the name, the entry must keep the Chinese term in \"zh\" - "
-                        + "otherwise the sentence-to-key mapping is lost");
+            if (entry.key.equals(entry.name) && entry.zh == null) {
+                problems.add(entry.name + ": once the key IS the name, \"zh\" must keep the Chinese term");
             }
         }
-        Assertions.assertTrue(problems.isEmpty(),
-                "the state-name registry is malformed:\n  " + String.join("\n  ", problems));
+        Assertions.assertTrue(problems.isEmpty(), "the state-name registry is malformed:\n  "
+                + String.join("\n  ", problems));
     }
 
     // ==================================================================
 
-    /**
-     * Writes the structured usage list ({@code name<TAB>file,file}) to {@code build/} so a migration script can
-     * regenerate the registry from data instead of from a failure message - measured: one line of JUnit's appended
-     * "expected/but was" text ended up inside a file name that way.
-     *
-     * @param users name to the files that use it
-     * @throws IOException when build/ cannot be written
-     */
-    private static void dumpUsage(Map<String, Set<String>> users) throws IOException {
+    /** One declared identity. */
+    private record Entry(String name, String owner, String kind, String key, String zh, Set<String> usedBy) {
+        /** @return whether this identity is the one a given file's use of {@code name} refers to */
+        boolean serves(String file) {
+            return usedBy.isEmpty() ? "battle".equals(owner) : usedBy.contains(file);
+        }
+    }
+
+    private static List<Entry> entries() throws IOException {
+        JsonObject root = read(REGISTRY);
+        JsonArray array = root.getAsJsonArray("entries");
+        Assertions.assertNotNull(array, "state_names.json must carry an \"entries\" array");
+        List<Entry> entries = new ArrayList<>();
+        for (JsonElement element : array) {
+            JsonObject entry = element.getAsJsonObject();
+            Set<String> usedBy = new LinkedHashSet<>();
+            if (entry.has("used_by")) {
+                for (JsonElement file : entry.getAsJsonArray("used_by")) {
+                    usedBy.add(file.getAsString());
+                }
+            }
+            entries.add(new Entry(
+                    entry.get("name").getAsString(),
+                    entry.has("owner") ? entry.get("owner").getAsString() : "",
+                    entry.has("kind") ? entry.get("kind").getAsString() : null,
+                    entry.has("key") ? entry.get("key").getAsString() : null,
+                    entry.has("zh") ? entry.get("zh").getAsString() : null,
+                    usedBy));
+        }
+        return entries;
+    }
+
+    /** Writes {@code name<TAB>files} to {@code build/} so a migration script can work from data, not from a message. */
+    private static void dumpUsage(Map<String, Set<String>> usage) throws IOException {
         Path out = Path.of("build", "state-name-usage.txt");
         Files.createDirectories(out.getParent());
         StringBuilder text = new StringBuilder();
-        users.forEach((name, files) -> text.append(name).append('\t')
+        usage.forEach((name, files) -> text.append(name).append('\t')
                 .append(String.join(",", new TreeSet<>(files))).append('\n'));
         Files.writeString(out, text.toString(), StandardCharsets.UTF_8);
-    }
-
-    private static void checkKey(String name, String key, Map<String, String> keyOwners, List<String> problems) {
-        if (!KEY.matcher(key).matches()) {
-            problems.add(name + ": key \"" + key + "\" is not namespaced ASCII "
-                    + "(shape: <namespace>:<slug>, lower-case letters, digits, _ . - /)");
-            return;
-        }
-        if (CJK.matcher(key).find()) {
-            problems.add(name + ": key \"" + key + "\" still contains CJK");
-        }
-        String previous = keyOwners.put(key, name);
-        if (previous != null) {
-            problems.add(name + ": key \"" + key + "\" is already taken by \"" + previous + "\"");
-        }
     }
 
     /** @return name -> the file base names that use it, read structurally (never from prose) */
