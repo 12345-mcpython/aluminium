@@ -7,12 +7,12 @@
       "id": "cone22005_attack_stack_on_skill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "迷境饭层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:22005/dreamscape_meal_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "per_stack": "迷境饭层数",
+          "per_stack": "internal:22005/dreamscape_meal_layers",
           "permanent": true,
           "target": "self"
         }
@@ -27,12 +27,12 @@
       "id": "cone22005_attack_stack_on_skill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "迷境饭层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:22005/dreamscape_meal_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "per_stack": "迷境饭层数",
+          "per_stack": "internal:22005/dreamscape_meal_layers",
           "permanent": true,
           "target": "self"
         }
@@ -47,12 +47,12 @@
       "id": "cone22005_attack_stack_on_skill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "迷境饭层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:22005/dreamscape_meal_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "per_stack": "迷境饭层数",
+          "per_stack": "internal:22005/dreamscape_meal_layers",
           "permanent": true,
           "target": "self"
         }
@@ -67,12 +67,12 @@
       "id": "cone22005_attack_stack_on_skill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "迷境饭层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:22005/dreamscape_meal_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "per_stack": "迷境饭层数",
+          "per_stack": "internal:22005/dreamscape_meal_layers",
           "permanent": true,
           "target": "self"
         }
@@ -87,12 +87,12 @@
       "id": "cone22005_attack_stack_on_skill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "迷境饭层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:22005/dreamscape_meal_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "per_stack": "迷境饭层数",
+          "per_stack": "internal:22005/dreamscape_meal_layers",
           "permanent": true,
           "target": "self"
         }

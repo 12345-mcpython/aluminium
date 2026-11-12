@@ -7,12 +7,12 @@
       "id": "cone21041_trick_stack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:21041/trick", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.06,
-          "per_stack": "戏法",
+          "per_stack": "char:21041/trick",
           "turns": 1,
           "target": "self"
         }
@@ -37,12 +37,12 @@
       "id": "cone21041_trick_stack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:21041/trick", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.07,
-          "per_stack": "戏法",
+          "per_stack": "char:21041/trick",
           "turns": 1,
           "target": "self"
         }
@@ -67,12 +67,12 @@
       "id": "cone21041_trick_stack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:21041/trick", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.08,
-          "per_stack": "戏法",
+          "per_stack": "char:21041/trick",
           "turns": 1,
           "target": "self"
         }
@@ -97,12 +97,12 @@
       "id": "cone21041_trick_stack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:21041/trick", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.09,
-          "per_stack": "戏法",
+          "per_stack": "char:21041/trick",
           "turns": 1,
           "target": "self"
         }
@@ -127,12 +127,12 @@
       "id": "cone21041_trick_stack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "戏法", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:21041/trick", "amount": 1, "max_stacks": 3, "turns": 1, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.1,
-          "per_stack": "戏法",
+          "per_stack": "char:21041/trick",
           "turns": 1,
           "target": "self"
         }

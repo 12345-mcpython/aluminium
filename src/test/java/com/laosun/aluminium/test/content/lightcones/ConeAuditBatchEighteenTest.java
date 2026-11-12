@@ -123,13 +123,13 @@ public class ConeAuditBatchEighteenTest {
         Assertions.assertTrue(gain.get("on_any").toString().contains("SKILL_CAST"),
                 "「施放**战技**或终结技后」- both entries arm the state");
         Assertions.assertEquals(1, gain.getAsJsonArray("do").get(0).getAsJsonObject().get("max_stacks").getAsInt(),
-                "【梦身】 is one stack");
+                "【char:23010/dream_body】 is one stack");
 
         JsonObject spend = rule(23010, "cone23010_follow_up_damage");
         Assertions.assertEquals(0.48, spend.getAsJsonArray("do").get(0).getAsJsonObject().get("percent").getAsDouble(),
                 1e-12, "48%（叠影 1）");
         Assertions.assertEquals("REMOVE_STACK", spend.getAsJsonArray("do").get(1).getAsJsonObject().get("op")
-                .getAsString(), "「消耗【梦身】」 happens in the same firing as the boost");
+                .getAsString(), "「消耗【char:23010/dream_body】」 happens in the same firing as the boost");
     }
 
     // ==================================================================

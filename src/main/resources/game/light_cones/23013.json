@@ -11,7 +11,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "记录的治疗量",
+          "resource": "internal:23013/healing_recorded",
           "amountFromEvent": true,
           "target": "self"
         }
@@ -26,7 +26,7 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "self_resource:记录的治疗量",
+          "scale": "self_resource:internal:23013/healing_recorded",
           "percent": 0.36,
           "element": "Physical",
           "target": "random_hit_enemy",
@@ -48,7 +48,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "记录的治疗量",
+          "resource": "internal:23013/healing_recorded",
           "amountFromEvent": true,
           "target": "self"
         }
@@ -63,7 +63,7 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "self_resource:记录的治疗量",
+          "scale": "self_resource:internal:23013/healing_recorded",
           "percent": 0.36,
           "element": "Physical",
           "target": "random_hit_enemy",
@@ -85,7 +85,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "记录的治疗量",
+          "resource": "internal:23013/healing_recorded",
           "amountFromEvent": true,
           "target": "self"
         }
@@ -100,7 +100,7 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "self_resource:记录的治疗量",
+          "scale": "self_resource:internal:23013/healing_recorded",
           "percent": 0.36,
           "element": "Physical",
           "target": "random_hit_enemy",
@@ -122,7 +122,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "记录的治疗量",
+          "resource": "internal:23013/healing_recorded",
           "amountFromEvent": true,
           "target": "self"
         }
@@ -137,7 +137,7 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "self_resource:记录的治疗量",
+          "scale": "self_resource:internal:23013/healing_recorded",
           "percent": 0.36,
           "element": "Physical",
           "target": "random_hit_enemy",
@@ -159,7 +159,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "记录的治疗量",
+          "resource": "internal:23013/healing_recorded",
           "amountFromEvent": true,
           "target": "self"
         }
@@ -174,7 +174,7 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "self_resource:记录的治疗量",
+          "scale": "self_resource:internal:23013/healing_recorded",
           "percent": 0.36,
           "element": "Physical",
           "target": "random_hit_enemy",
@@ -188,7 +188,7 @@
   ],
   "resources": [
     {
-      "id": "记录的治疗量",
+      "id": "internal:23013/healing_recorded",
       "max": 2147483647,
       "initial": 0,
       "source": "光锥 23013 时节不居:「当装备者对我方目标提供治疗时，记录治疗量」—— 只记**实际回复量**（满血治疗不发 HEALED，与引擎既有约定一致）。"

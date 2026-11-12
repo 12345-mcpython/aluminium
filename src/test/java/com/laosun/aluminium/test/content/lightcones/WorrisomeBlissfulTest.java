@@ -30,7 +30,7 @@ public class WorrisomeBlissfulTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String TAME = "温驯";
+    private static final String TAME = "char:23016/meekness";
 
     private Character wearer;
     private Enemy enemy;

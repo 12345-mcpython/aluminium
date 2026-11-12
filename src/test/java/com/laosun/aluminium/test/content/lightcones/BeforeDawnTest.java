@@ -71,17 +71,17 @@ public class BeforeDawnTest {
         Battle battle = battle(true);
         var gains = wearer.getTriggerTable().rulesFor(TriggerEvent.ULT_CAST).stream()
                 .filter(r -> r.id().equals("cone23010_gain_dream_body")).toList();
-        Assertions.assertEquals(1, gains.size(), "施放终结技后获得【梦身】");
+        Assertions.assertEquals(1, gains.size(), "施放终结技后获得【char:23010/dream_body】");
         var stack = gains.getFirst().effects().getFirst();
         Assertions.assertEquals("ADD_STACK", stack.getOp());
-        Assertions.assertEquals("梦身", stack.getBuff());
+        Assertions.assertEquals("char:23010/dream_body", stack.getBuff());
         Assertions.assertEquals(1, stack.getMaxStacks(), "one stack at a time");
 
         var spends = wearer.getTriggerTable().rulesFor(TriggerEvent.DEALING_DAMAGE).stream()
                 .filter(r -> r.id().equals("cone23010_follow_up_damage")).toList();
-        Assertions.assertEquals(1, spends.size(), "触发追加攻击时消耗【梦身】");
+        Assertions.assertEquals(1, spends.size(), "触发追加攻击时消耗【char:23010/dream_body】");
         var rule = spends.getFirst();
-        Assertions.assertEquals(List.of("actor == self", "damage_is_additional", "self_stacks:梦身 >= 1.0"),
+        Assertions.assertEquals(List.of("actor == self", "damage_is_additional", "self_stacks:char:23010/dream_body >= 1.0"),
                 rule.conditions().stream().map(c -> c.source()).toList(),
                 "the follow-up is an ADDITIONAL instance, and the state must still be there");
         Assertions.assertEquals("BOOST_DAMAGE", rule.effects().getFirst().getOp());

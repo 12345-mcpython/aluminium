@@ -35,13 +35,13 @@ public class ConeAuditBatchTwentyTest {
         Assertions.assertEquals("FOLLOW_UP_DAMAGE_BOOST", followUp.get("attribute").getAsString(), "「追加攻击造成的伤害提高 30%」");
 
         JsonObject tame = rule(23016, "cone23016_tame_the_target").getAsJsonArray("do").get(0).getAsJsonObject();
-        System.out.println("[23016] 温驯: target=" + tame.get("target") + " max=" + tame.get("max_stacks"));
-        Assertions.assertEquals("target", tame.get("target").getAsString(), "「使**目标**陷入【温驯】」");
+        System.out.println("[23016] char:23016/meekness: target=" + tame.get("target") + " max=" + tame.get("max_stacks"));
+        Assertions.assertEquals("target", tame.get("target").getAsString(), "「使**目标**陷入【char:23016/meekness】」");
         Assertions.assertEquals(2, tame.get("max_stacks").getAsInt(), "「最多叠加 2 层」");
 
         JsonObject perLayer = rule(23016, "cone23016_crit_per_tame_layer").getAsJsonArray("do").get(0).getAsJsonObject();
         System.out.println("[23016] 每层暴伤: per_stack=" + perLayer.get("per_stack") + " instance=" + perLayer.get("instance"));
-        Assertions.assertEquals("温驯", perLayer.get("per_stack").getAsString(), "「**每层**【温驯】使暴击伤害提高」");
+        Assertions.assertEquals("char:23016/meekness", perLayer.get("per_stack").getAsString(), "「**每层**【char:23016/meekness】使暴击伤害提高」");
         Assertions.assertTrue(perLayer.get("instance").getAsBoolean(), "只作用在那一发上");
     }
 

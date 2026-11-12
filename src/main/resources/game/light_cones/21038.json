@@ -8,7 +8,7 @@
       "when": [
         "target == self",
         "hp_lost_this_action_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -26,7 +26,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -41,7 +41,7 @@
       "when": [
         "actor == self",
         "event_amount_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -59,7 +59,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -76,7 +76,7 @@
       "when": [
         "target == self",
         "hp_lost_this_action_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -94,7 +94,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -109,7 +109,7 @@
       "when": [
         "actor == self",
         "event_amount_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -127,7 +127,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -144,7 +144,7 @@
       "when": [
         "target == self",
         "hp_lost_this_action_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -162,7 +162,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -177,7 +177,7 @@
       "when": [
         "actor == self",
         "event_amount_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -195,7 +195,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -212,7 +212,7 @@
       "when": [
         "target == self",
         "hp_lost_this_action_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -230,7 +230,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -245,7 +245,7 @@
       "when": [
         "actor == self",
         "event_amount_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -263,7 +263,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -280,7 +280,7 @@
       "when": [
         "target == self",
         "hp_lost_this_action_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -298,7 +298,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }
@@ -313,7 +313,7 @@
       "when": [
         "actor == self",
         "event_amount_percent > 0.25",
-        "!self has_state 爆燃已触发"
+        "!self has_state internal:21038/burn_triggered"
       ],
       "do": [
         {
@@ -331,7 +331,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "爆燃已触发",
+          "buff": "internal:21038/burn_triggered",
           "turns": 3,
           "target": "self"
         }

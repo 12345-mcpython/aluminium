@@ -27,7 +27,7 @@ public class IShallBeMyOwnSwordTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String MOON = "月蚀";
+    private static final String MOON = "char:23014/eclipse";
     private static final int CAP = 3;
 
     private Character wearer;

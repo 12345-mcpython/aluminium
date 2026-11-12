@@ -134,7 +134,7 @@ public class ConeAuditBatchNineteenTest {
         Assertions.assertEquals(2, stack.get("turns").getAsInt(), "「持续 2 回合」");
         for (com.google.gson.JsonElement each : rule(23015, "cone23015_dragon_stack").getAsJsonArray("do")) {
             if ("MODIFY_ATTR".equals(each.getAsJsonObject().get("op").getAsString())) {
-                Assertions.assertEquals("龙吟", each.getAsJsonObject().get("per_stack").getAsString(),
+                Assertions.assertEquals("char:23015/dragon_roar", each.getAsJsonObject().get("per_stack").getAsString(),
                         "「**每层**使攻击力/能量恢复提高」");
             }
         }

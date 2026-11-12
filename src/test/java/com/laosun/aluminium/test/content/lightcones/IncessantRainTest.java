@@ -52,15 +52,15 @@ public class IncessantRainTest {
                 var effects = rules.getFirst().effects();
                 Assertions.assertEquals(2, effects.size(), id + " has two effects");
                 Assertions.assertEquals("APPLY_BUFF", effects.get(0).getOp(), id);
-                Assertions.assertEquals("以太编码", effects.get(0).getBuff(), id + ": the state's name");
+                Assertions.assertEquals("char:23007/aether_code", effects.get(0).getBuff(), id + ": the state's name");
                 Assertions.assertEquals(1, effects.get(0).getTurns(), id + ": 1 turn");
                 Assertions.assertEquals("random_hit_enemy", effects.get(0).getTarget(),
                         id + ": a random one of the targets that WAS HIT");
                 // The FILTER is a dimension of its own: the exclusion rides on the effect, tested per
                 // candidate -- and since round 245 the random selector applies it BEFORE rolling.
-                Assertions.assertEquals(List.of("!target has_state 以太编码"),
+                Assertions.assertEquals(List.of("!target has_state char:23007/aether_code"),
                         effects.get(0).getTargetWhen(), id + ": only targets NOT holding the state");
-                Assertions.assertEquals(List.of("target has_state 以太编码"),
+                Assertions.assertEquals(List.of("target has_state char:23007/aether_code"),
                         effects.get(1).getTargetWhen(), id + ": and only the holder takes more damage");
                 Assertions.assertEquals("MODIFY_DAMAGE_TAKEN", effects.get(1).getOp(), id);
                 Assertions.assertEquals(VULN[rank - 1], effects.get(1).getPercent(), 1e-9, id + ": the vulnerability");

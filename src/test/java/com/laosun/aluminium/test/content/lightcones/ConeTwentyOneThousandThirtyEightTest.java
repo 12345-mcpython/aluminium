@@ -36,7 +36,7 @@ public class ConeTwentyOneThousandThirtyEightTest {
     private static final int LEVEL = 80;
     /** 1002 Dan Heng (丹恒): a plain kit, so nothing of his own competes with the cone's damage boost. */
     private static final int WEARER = 1002;
-    private static final String GATE = "爆燃已触发";
+    private static final String GATE = "internal:21038/burn_triggered";
 
     /**
      * Half one: HP lost during one action, summed across its instances, over 25% of Max HP.

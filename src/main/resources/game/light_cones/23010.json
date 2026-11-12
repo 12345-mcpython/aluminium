@@ -46,7 +46,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -62,7 +62,7 @@
       "when": [
         "actor == self",
         "damage_is_additional",
-        "self_stacks:梦身 >= 1"
+        "self_stacks:char:23010/dream_body >= 1"
       ],
       "do": [
         {
@@ -71,7 +71,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "target": "self"
         }
@@ -125,7 +125,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -141,7 +141,7 @@
       "when": [
         "actor == self",
         "damage_is_additional",
-        "self_stacks:梦身 >= 1"
+        "self_stacks:char:23010/dream_body >= 1"
       ],
       "do": [
         {
@@ -150,7 +150,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "target": "self"
         }
@@ -204,7 +204,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -220,7 +220,7 @@
       "when": [
         "actor == self",
         "damage_is_additional",
-        "self_stacks:梦身 >= 1"
+        "self_stacks:char:23010/dream_body >= 1"
       ],
       "do": [
         {
@@ -229,7 +229,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "target": "self"
         }
@@ -283,7 +283,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -299,7 +299,7 @@
       "when": [
         "actor == self",
         "damage_is_additional",
-        "self_stacks:梦身 >= 1"
+        "self_stacks:char:23010/dream_body >= 1"
       ],
       "do": [
         {
@@ -308,7 +308,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "target": "self"
         }
@@ -362,7 +362,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -378,7 +378,7 @@
       "when": [
         "actor == self",
         "damage_is_additional",
-        "self_stacks:梦身 >= 1"
+        "self_stacks:char:23010/dream_body >= 1"
       ],
       "do": [
         {
@@ -387,7 +387,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "梦身",
+          "buff": "char:23010/dream_body",
           "amount": 1,
           "target": "self"
         }

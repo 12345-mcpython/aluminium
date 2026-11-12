@@ -73,8 +73,8 @@ public class ConeTwentyThreeThousandTenTest {
         run.battle.processRequests();
 
 
-        Assertions.assertEquals(0.48, run.followUp(), 1e-6, "the first follow-up spends 【梦身】 and is raised by 48%");
+        Assertions.assertEquals(0.48, run.followUp(), 1e-6, "the first follow-up spends 【char:23010/dream_body】 and is raised by 48%");
         Assertions.assertEquals(0.0, run.followUp(), 1e-9,
-                "the state is gone - 「触发追加攻击时消耗【梦身】」 pays once, not for the whole turn");
+                "the state is gone - 「触发追加攻击时消耗【char:23010/dream_body】」 pays once, not for the whole turn");
     }
 }

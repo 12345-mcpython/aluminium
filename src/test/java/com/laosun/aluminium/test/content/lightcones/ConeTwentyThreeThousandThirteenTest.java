@@ -33,13 +33,13 @@ public class ConeTwentyThreeThousandThirteenTest {
                 BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertTrue(wearer.getResources().has("记录的治疗量"), "the cone declares the counter");
-        Assertions.assertEquals(0, wearer.getResources().value("记录的治疗量"), "and it starts empty");
+        Assertions.assertTrue(wearer.getResources().has("internal:23013/healing_recorded"), "the cone declares the counter");
+        Assertions.assertEquals(0, wearer.getResources().value("internal:23013/healing_recorded"), "and it starts empty");
 
         ally.takeDamage(ally.getMaxHp() * 0.5);
         battle.heal(wearer, ally, ally.getMaxHp() * 0.3);
         battle.processRequests();
-        int recorded = wearer.getResources().value("记录的治疗量");
+        int recorded = wearer.getResources().value("internal:23013/healing_recorded");
         System.out.println("[23013] recorded after one 30%-MaxHP heal: " + recorded);
         Assertions.assertTrue(recorded > 0, "「记录治疗量」 - the heal landed in the counter");
 

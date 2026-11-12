@@ -26,7 +26,7 @@ public class ButTheBattleIsnTOverTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String COUNT = "终结计数";
+    private static final String COUNT = "internal:23003/ultimate_count";
 
     private Character wearer;
     private Enemy enemy;

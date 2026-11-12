@@ -232,7 +232,7 @@ public class StateNameRegistryTest {
                 rules.addAll(rulesOf(document.getAsJsonObject()));
             }
             for (JsonObject rule : rules) {
-                for (JsonElement when : arrayOf(rule, "when")) {
+                for (JsonElement when : conditionsOf(rule)) {
                     if (when.isJsonObject()) {
                         // A PREDICATE object names states too: {"type":"entity","json":{"state":"秘技"}}. The guard read
                         // only string conditions at first, so a rename of 「秘技」 left 27 of these behind while the
@@ -272,8 +272,7 @@ public class StateNameRegistryTest {
                         if (spelled.isEmpty() || COUNT_VARIABLES.contains(spelled)) {
                             continue;
                         }
-                        int colon = spelled.indexOf(':');
-                        note(users, colon < 0 ? spelled : spelled.substring(colon + 1).trim(), name);
+                        note(users, stripCounterPrefix(spelled), name);
                     }
                     for (String selectorField : List.of("target", "scale")) {
                         if (op.has(selectorField) && op.get(selectorField).isJsonPrimitive()) {
@@ -366,6 +365,33 @@ public class StateNameRegistryTest {
                 out.add(element.getAsJsonObject());
             }
         }
+    }
+
+    /**
+     * The name inside a counter spelling: {@code self_stacks:归纳} names 「归纳」, but a bare identity that happens to
+     * contain a colon ({@code char:21041/trick}) must be kept whole.
+     *
+     * @param spelled the counter field's value
+     * @return the name it refers to
+     */
+    private static String stripCounterPrefix(String spelled) {
+        for (String prefix : List.of("self_stacks:", "actor_stacks:", "target_stacks:", "summon_stacks:")) {
+            if (spelled.startsWith(prefix)) {
+                return spelled.substring(prefix.length()).trim();
+            }
+        }
+        return spelled;
+    }
+
+    /** Every condition list on a rule: `when` and the target-scoped `target_when`. */
+    private static List<JsonElement> conditionsOf(JsonObject rule) {
+        List<JsonElement> conditions = new ArrayList<>();
+        for (String key : List.of("when", "target_when")) {
+            for (JsonElement element : arrayOf(rule, key)) {
+                conditions.add(element);
+            }
+        }
+        return conditions;
     }
 
     private static JsonArray arrayOf(JsonObject object, String key) {

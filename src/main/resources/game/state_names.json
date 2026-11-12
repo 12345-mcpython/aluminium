@@ -107,6 +107,76 @@
       "zh": "弱点击破"
     },
     {
+      "name": "char:1015/loop_link",
+      "owner": "1015",
+      "kind": "char",
+      "used_by": [
+        "1015"
+      ],
+      "zh": "回路连接",
+      "key": "char:1015/loop_link"
+    },
+    {
+      "name": "char:21041/trick",
+      "owner": "21041",
+      "kind": "char",
+      "used_by": [
+        "21041"
+      ],
+      "zh": "戏法",
+      "key": "char:21041/trick"
+    },
+    {
+      "name": "char:23007/aether_code",
+      "owner": "23007",
+      "kind": "char",
+      "used_by": [
+        "23007"
+      ],
+      "zh": "以太编码",
+      "key": "char:23007/aether_code"
+    },
+    {
+      "name": "char:23010/dream_body",
+      "owner": "23010",
+      "kind": "char",
+      "used_by": [
+        "23010"
+      ],
+      "zh": "梦身",
+      "key": "char:23010/dream_body"
+    },
+    {
+      "name": "char:23014/eclipse",
+      "owner": "23014",
+      "kind": "char",
+      "used_by": [
+        "23014"
+      ],
+      "zh": "月蚀",
+      "key": "char:23014/eclipse"
+    },
+    {
+      "name": "char:23015/dragon_roar",
+      "owner": "23015",
+      "kind": "char",
+      "used_by": [
+        "23015"
+      ],
+      "zh": "龙吟",
+      "key": "char:23015/dragon_roar"
+    },
+    {
+      "name": "char:23016/meekness",
+      "owner": "23016",
+      "kind": "char",
+      "used_by": [
+        "23016"
+      ],
+      "zh": "温驯",
+      "key": "char:23016/meekness"
+    },
+    {
       "name": "ctrl:frozen",
       "owner": "battle",
       "kind": "battle",
@@ -161,6 +231,86 @@
       "key": "dot:wind_shear",
       "en": "Wind Shear",
       "zh": "风化"
+    },
+    {
+      "name": "internal:1015/loop_count",
+      "owner": "1015",
+      "kind": "internal",
+      "used_by": [
+        "1015"
+      ],
+      "zh": "回路次数",
+      "key": "internal:1015/loop_count"
+    },
+    {
+      "name": "internal:1015/loop_layers",
+      "owner": "1015",
+      "kind": "internal",
+      "used_by": [
+        "1015"
+      ],
+      "zh": "回路层数",
+      "key": "internal:1015/loop_layers"
+    },
+    {
+      "name": "internal:1015/skill_casts_this_turn",
+      "owner": "1015",
+      "kind": "internal",
+      "used_by": [
+        "1015"
+      ],
+      "zh": "本回合战技次数",
+      "key": "internal:1015/skill_casts_this_turn"
+    },
+    {
+      "name": "internal:21038/burn_triggered",
+      "owner": "21038",
+      "kind": "internal",
+      "used_by": [
+        "21038"
+      ],
+      "zh": "爆燃已触发",
+      "key": "internal:21038/burn_triggered"
+    },
+    {
+      "name": "internal:22005/dreamscape_meal_layers",
+      "owner": "22005",
+      "kind": "internal",
+      "used_by": [
+        "22005"
+      ],
+      "zh": "迷境饭层数",
+      "key": "internal:22005/dreamscape_meal_layers"
+    },
+    {
+      "name": "internal:22008/horizon_layers",
+      "owner": "22008",
+      "kind": "internal",
+      "used_by": [
+        "22008"
+      ],
+      "zh": "地平线层数",
+      "key": "internal:22008/horizon_layers"
+    },
+    {
+      "name": "internal:23003/ultimate_count",
+      "owner": "23003",
+      "kind": "internal",
+      "used_by": [
+        "23003"
+      ],
+      "zh": "终结计数",
+      "key": "internal:23003/ultimate_count"
+    },
+    {
+      "name": "internal:23013/healing_recorded",
+      "owner": "23013",
+      "kind": "internal",
+      "used_by": [
+        "23013"
+      ],
+      "zh": "记录的治疗量",
+      "key": "internal:23013/healing_recorded"
     },
     {
       "name": "relic130_elation_used",
@@ -232,14 +382,6 @@
       "kind": "char",
       "used_by": [
         "1415"
-      ]
-    },
-    {
-      "name": "以太编码",
-      "owner": "23007",
-      "kind": "char",
-      "used_by": [
-        "23007"
       ]
     },
     {
@@ -566,49 +708,11 @@
       ]
     },
     {
-      "name": "internal:1015/loop_layers",
-      "owner": "1015",
-      "kind": "internal",
-      "used_by": [
-        "1015"
-      ],
-      "zh": "回路层数",
-      "key": "internal:1015/loop_layers"
-    },
-    {
-      "name": "internal:1015/loop_count",
-      "owner": "1015",
-      "kind": "internal",
-      "used_by": [
-        "1015"
-      ],
-      "zh": "回路次数",
-      "key": "internal:1015/loop_count"
-    },
-    {
-      "name": "char:1015/loop_link",
-      "owner": "1015",
-      "kind": "char",
-      "used_by": [
-        "1015"
-      ],
-      "zh": "回路连接",
-      "key": "char:1015/loop_link"
-    },
-    {
       "name": "圣咏",
       "owner": "23034",
       "kind": "char",
       "used_by": [
         "23034"
-      ]
-    },
-    {
-      "name": "地平线层数",
-      "owner": "22008",
-      "kind": "internal",
-      "used_by": [
-        "22008"
       ]
     },
     {
@@ -996,14 +1100,6 @@
       ]
     },
     {
-      "name": "戏法",
-      "owner": "21041",
-      "kind": "char",
-      "used_by": [
-        "21041"
-      ]
-    },
-    {
       "name": "战技点",
       "owner": "1506",
       "kind": "char",
@@ -1269,14 +1365,6 @@
       ]
     },
     {
-      "name": "月蚀",
-      "owner": "23014",
-      "kind": "char",
-      "used_by": [
-        "23014"
-      ]
-    },
-    {
       "name": "朔望",
       "owner": "1212",
       "kind": "char",
@@ -1299,16 +1387,6 @@
       "used_by": [
         "1512"
       ]
-    },
-    {
-      "name": "internal:1015/skill_casts_this_turn",
-      "owner": "1015",
-      "kind": "internal",
-      "used_by": [
-        "1015"
-      ],
-      "zh": "本回合战技次数",
-      "key": "internal:1015/skill_casts_this_turn"
     },
     {
       "name": "本回合施放战技",
@@ -1340,14 +1418,6 @@
       "kind": "char",
       "used_by": [
         "324"
-      ]
-    },
-    {
-      "name": "梦身",
-      "owner": "23010",
-      "kind": "char",
-      "used_by": [
-        "23010"
       ]
     },
     {
@@ -1475,14 +1545,6 @@
       "kind": "char",
       "used_by": [
         "1503"
-      ]
-    },
-    {
-      "name": "温驯",
-      "owner": "23016",
-      "kind": "char",
-      "used_by": [
-        "23016"
       ]
     },
     {
@@ -1628,14 +1690,6 @@
       "kind": "char",
       "used_by": [
         "23035"
-      ]
-    },
-    {
-      "name": "爆燃已触发",
-      "owner": "21038",
-      "kind": "internal",
-      "used_by": [
-        "21038"
       ]
     },
     {
@@ -2022,14 +2076,6 @@
       ]
     },
     {
-      "name": "终结计数",
-      "owner": "23003",
-      "kind": "internal",
-      "used_by": [
-        "23003"
-      ]
-    },
-    {
       "name": "结印",
       "owner": "1317",
       "kind": "char",
@@ -2309,14 +2355,6 @@
       ]
     },
     {
-      "name": "记录的治疗量",
-      "owner": "23013",
-      "kind": "internal",
-      "used_by": [
-        "23013"
-      ]
-    },
-    {
       "name": "论辩",
       "owner": "23020",
       "kind": "char",
@@ -2402,14 +2440,6 @@
       "kind": "char",
       "used_by": [
         "1212"
-      ]
-    },
-    {
-      "name": "迷境饭层数",
-      "owner": "22005",
-      "kind": "internal",
-      "used_by": [
-        "22005"
       ]
     },
     {
@@ -2673,14 +2703,6 @@
       "kind": "char",
       "used_by": [
         "1207"
-      ]
-    },
-    {
-      "name": "龙吟",
-      "owner": "23015",
-      "kind": "char",
-      "used_by": [
-        "23015"
       ]
     }
   ]
