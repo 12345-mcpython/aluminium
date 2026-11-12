@@ -27,7 +27,7 @@ public class ArcherEidolonLevelsTest {
     private static final int ARCHER = 1015;
     private static final int ALLY = 1204;
     private static final String CHARGE = "充能";
-    private static final String LAYERS = "回路层数";
+    private static final String LAYERS = "internal:1015/loop_layers";
 
     /**
      * Eidolon 3: 战技 +2, 普攻 +1 (clamped by its own 9-row table). Eidolon 5: 终结技 +2, 天赋 +2.

@@ -566,28 +566,34 @@
       ]
     },
     {
-      "name": "回路层数",
+      "name": "internal:1015/loop_layers",
       "owner": "1015",
       "kind": "internal",
       "used_by": [
         "1015"
-      ]
+      ],
+      "zh": "回路层数",
+      "key": "internal:1015/loop_layers"
     },
     {
-      "name": "回路次数",
+      "name": "internal:1015/loop_count",
       "owner": "1015",
       "kind": "internal",
       "used_by": [
         "1015"
-      ]
+      ],
+      "zh": "回路次数",
+      "key": "internal:1015/loop_count"
     },
     {
-      "name": "回路连接",
+      "name": "char:1015/loop_link",
       "owner": "1015",
       "kind": "char",
       "used_by": [
         "1015"
-      ]
+      ],
+      "zh": "回路连接",
+      "key": "char:1015/loop_link"
     },
     {
       "name": "圣咏",
@@ -1295,12 +1301,14 @@
       ]
     },
     {
-      "name": "本回合战技次数",
+      "name": "internal:1015/skill_casts_this_turn",
       "owner": "1015",
       "kind": "internal",
       "used_by": [
         "1015"
-      ]
+      ],
+      "zh": "本回合战技次数",
+      "key": "internal:1015/skill_casts_this_turn"
     },
     {
       "name": "本回合施放战技",

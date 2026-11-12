@@ -30,7 +30,7 @@ public class ArcherLoopTurnTest {
 
     private static final int ARCHER = 1015;
     private static final int LEVEL = 80;
-    private static final String LOOP = "回路连接";
+    private static final String LOOP = "char:1015/loop_link";
 
     /**
      * Inside the loop a Skill cast hands him the next action immediately, and the loop's own counters survive it.
@@ -118,7 +118,7 @@ public class ArcherLoopTurnTest {
         }
 
         private int layers() {
-            return archer.getBuffManager().stacksOf("回路层数");
+            return archer.getBuffManager().stacksOf("internal:1015/loop_layers");
         }
 
         private double skillPoints() {

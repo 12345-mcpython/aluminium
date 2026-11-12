@@ -15,7 +15,7 @@
       "note": "上限 **4** 与每次 **2** 都来自同一行（`skills.json` 1015 槽 3 的 Lv10 = `[10, 2, 4]` ⇒ #2 = 2、#3 = 4 ✓）。⚠ 上限是**声明**（`GAIN_RESOURCE` 的钳位就在这里 ✓），不在规则里再写一次 ✗；⚠ 初始值文档没说 ⇒ 默认 **0** ✓，而「进入战斗时获得 1 点」是**行迹** 1015102 的一条规则 ✓（两条相加，不是把 initial 改成 1 ✗）。"
     },
     {
-      "id": "回路次数",
+      "id": "internal:1015/loop_count",
       "max": 5,
       "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「主动施放 5 次战技后…退出【回路连接】状态」（`skills.json` 1015 槽 2 各等级的 #5 = 5）",
       "note": "这是**本项目的计数器**，不是游戏资源 ✓（与 1408 的「额外回合计数」同一手法 ✓）：原文要数「在【回路连接】里施放了几次战技」✓，而引擎没有「某个状态存在期间的事件计数」✗。上限 **5** 直接取 #5 ✓；最后一发施放**照样结算**（伤害与加成都在），退出发生在**这一发之后** ✓（见 `loop_ends_after_five_casts` 的 note ✓）。"
@@ -54,7 +54,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "回路连接",
+          "buff": "char:1015/loop_link",
           "permanent": true,
           "target": "self"
         }
@@ -68,13 +68,13 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self_stacks:回路层数 >= 1"
+        "self_stacks:internal:1015/loop_layers >= 1"
       ],
       "do": [
         {
           "op": "BOOST_DAMAGE",
           "percent": 1,
-          "scale": "self_stacks:回路层数"
+          "scale": "self_stacks:internal:1015/loop_layers"
         }
       ],
       "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「【回路连接】状态下施放战技后…使Archer**战技造成的伤害提高 100%**，该效果可以叠加 **2** 层」",
@@ -86,12 +86,12 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self has_state 回路连接"
+        "self has_state char:1015/loop_link"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "回路层数",
+          "buff": "internal:1015/loop_layers",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -99,7 +99,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "回路次数",
+          "resource": "internal:1015/loop_count",
           "amount": 1,
           "target": "self"
         }
@@ -112,23 +112,23 @@
       "id": "loop_ends_after_five_casts",
       "when": [
         "actor == self",
-        "self_resource:回路次数 >= 5"
+        "self_resource:internal:1015/loop_count >= 5"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "回路连接",
+          "buff": "char:1015/loop_link",
           "target": "self"
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "回路次数",
+          "resource": "internal:1015/loop_count",
           "spendAll": true,
           "target": "self"
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "回路层数",
+          "buff": "internal:1015/loop_layers",
           "amount": 9,
           "target": "self"
         }
@@ -142,24 +142,24 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self has_state 回路连接",
+        "self has_state char:1015/loop_link",
         "skill_point <= 0"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "回路连接",
+          "buff": "char:1015/loop_link",
           "target": "self"
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "回路次数",
+          "resource": "internal:1015/loop_count",
           "spendAll": true,
           "target": "self"
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "回路层数",
+          "buff": "internal:1015/loop_layers",
           "amount": 9,
           "target": "self"
         }
@@ -171,23 +171,23 @@
       "on": "WAVE_START",
       "id": "loop_ends_when_the_wave_clears",
       "when": [
-        "self has_state 回路连接"
+        "self has_state char:1015/loop_link"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "回路连接",
+          "buff": "char:1015/loop_link",
           "target": "self"
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "回路次数",
+          "resource": "internal:1015/loop_count",
           "spendAll": true,
           "target": "self"
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "回路层数",
+          "buff": "internal:1015/loop_layers",
           "amount": 9,
           "target": "self"
         }
@@ -205,18 +205,18 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "回路连接",
+          "buff": "char:1015/loop_link",
           "target": "self"
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "回路次数",
+          "resource": "internal:1015/loop_count",
           "spendAll": true,
           "target": "self"
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "回路层数",
+          "buff": "internal:1015/loop_layers",
           "amount": 9,
           "target": "self"
         }
@@ -230,8 +230,8 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self has_state 回路连接",
-        "self_resource:回路次数 < 5"
+        "self has_state char:1015/loop_link",
+        "self_resource:internal:1015/loop_count < 5"
       ],
       "do": [
         {
@@ -432,7 +432,7 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "!self has_state 回路连接"
+        "!self has_state char:1015/loop_link"
       ],
       "do": [
         {
@@ -486,7 +486,7 @@
       "_status": "implemented",
       "when": [
         "actor == self",
-        "self_stacks:本回合战技次数 >= 2"
+        "self_stacks:internal:1015/skill_casts_this_turn >= 2"
       ],
       "do": [
         {
@@ -495,7 +495,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "本回合战技次数",
+          "buff": "internal:1015/skill_casts_this_turn",
           "amount": 3,
           "target": "self"
         }
@@ -510,12 +510,12 @@
       "_status": "implemented",
       "when": [
         "actor == self",
-        "self_stacks:本回合战技次数 <= 1"
+        "self_stacks:internal:1015/skill_casts_this_turn <= 1"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "本回合战技次数",
+          "buff": "internal:1015/skill_casts_this_turn",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -530,13 +530,13 @@
       "id": "turn_start_resets_the_skill_counter",
       "_status": "implemented",
       "when": [
-        "self_stacks:本回合战技次数 >= 1",
-        "!self has_state 回路连接"
+        "self_stacks:internal:1015/skill_casts_this_turn >= 1",
+        "!self has_state char:1015/loop_link"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "本回合战技次数",
+          "buff": "internal:1015/skill_casts_this_turn",
           "amount": 3,
           "target": "self"
         }

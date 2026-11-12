@@ -36,9 +36,9 @@ import java.util.List;
 public class ArcherLoopTest {
     private static final int ARCHER = 1015;
     private static final int ALLY = 1204;
-    private static final String LOOP = "回路连接";
-    private static final String CYCLES = "回路次数";
-    private static final String LAYERS = "回路层数";
+    private static final String LOOP = "char:1015/loop_link";
+    private static final String CYCLES = "internal:1015/loop_count";
+    private static final String LAYERS = "internal:1015/loop_layers";
     /** The manual exit button: {@code skills.json} 1015 slot 9 ({@code 101509}, effect {@code Enhance}). */
     private static final int EXIT_SLOT = 9;
 
@@ -133,7 +133,7 @@ public class ArcherLoopTest {
         f.battle.castImmediate(new DefaultSkill(ARCHER, EXIT_SLOT, 1), f.archer,
                 List.of(f.battle.enemyUnits().getFirst()));
         f.battle.processRequests();
-        Assertions.assertFalse(f.archer.getBuffManager().hasState(LOOP), "【结束】= 退出【回路连接】");
+        Assertions.assertFalse(f.archer.getBuffManager().hasState(LOOP), "【结束】= 退出【char:1015/loop_link】");
     }
 
     // ==================================================================
