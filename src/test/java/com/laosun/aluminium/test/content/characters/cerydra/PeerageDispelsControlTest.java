@@ -21,7 +21,7 @@ import java.util.List;
  * 1412: "when charge reaches 6 points, automatically upgrade the character's [军功] to [爵位] and remove their control-class negative states".
  *
  * <p>THE TWO-WAY THAT PROVES "control class" AND NOT "any debuff": the ally carries Frozen (a control, per the document's
- * own glossary) AND Shock (触电) (a DOT, not a control). Promotion must remove the first and LEAVE THE SECOND -- a `DISPEL` would
+ * own glossary) AND Shock (dot:shock) (a DOT, not a control). Promotion must remove the first and LEAVE THE SECOND -- a `DISPEL` would
  * have wiped both, which is exactly the approximation this judge exists to catch.
  *
  * <p>Note: The ally's table is rebuilt here on purpose. GAPS records that a rebuilt table drops `level_convention` and once caused a

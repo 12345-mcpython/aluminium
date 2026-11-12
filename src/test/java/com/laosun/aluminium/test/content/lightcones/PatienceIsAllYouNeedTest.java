@@ -19,9 +19,9 @@ import com.laosun.aluminium.DoubleValue;
 
 /**
  * Light cone 23006: a hit inflicts [游丝] -- a NAMED thunder damage-over-time -- and a target in [游丝]
- * "也会被视为陷入了触电状态".
+ * "也会被视为陷入了dot:shock状态".
  *
- * <p>The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's Shock (触电). The
+ * <p>The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's Shock (dot:shock). The
  * readings below make that attributable -- including the mirror case of a plain, unnamed thunder DOT.
  */
 public class PatienceIsAllYouNeedTest {
@@ -55,10 +55,10 @@ public class PatienceIsAllYouNeedTest {
         Battle battle = battle(true);
         attack(battle);
         boolean thread = enemy.getBuffManager().hasState("游丝");
-        boolean shock = enemy.getBuffManager().hasState("触电");
-        System.out.println("[23006] after one hit: has Erode (游丝)=" + thread + " has Shock (触电)=" + shock);
+        boolean shock = enemy.getBuffManager().hasState("dot:shock");
+        System.out.println("[23006] after one hit: has Erode (游丝)=" + thread + " has Shock (dot:shock)=" + shock);
         Assertions.assertTrue(thread, "the named DOT answers to its own name");
-        Assertions.assertTrue(shock, "and to Shock (触电) through the element table -- the alias costs nothing");
+        Assertions.assertTrue(shock, "and to Shock (dot:shock) through the element table -- the alias costs nothing");
     }
 
     @Test
@@ -70,9 +70,9 @@ public class PatienceIsAllYouNeedTest {
         enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(
                 wearer, DamageElement.THUNDER, 20, 2));
         boolean thread = enemy.getBuffManager().hasState("游丝");
-        boolean shock = enemy.getBuffManager().hasState("触电");
-        System.out.println("[23006] unnamed thunder DOT: has Erode (游丝)=" + thread + " has Shock (触电)=" + shock);
-        Assertions.assertTrue(shock, "an unnamed thunder DOT is still Shock (触电) -- the element path is untouched");
+        boolean shock = enemy.getBuffManager().hasState("dot:shock");
+        System.out.println("[23006] unnamed thunder DOT: has Erode (游丝)=" + thread + " has Shock (dot:shock)=" + shock);
+        Assertions.assertTrue(shock, "an unnamed thunder DOT is still Shock (dot:shock) -- the element path is untouched");
         Assertions.assertFalse(thread, "but it is NOT Erode (游丝): the name is what distinguishes them");
     }
 
@@ -96,7 +96,7 @@ public class PatienceIsAllYouNeedTest {
                     pinned++;
                     System.out.println("[23006] spec element=" + effect.getElement() + " name=" + effect.getBuff()
                             + " percent=" + effect.getPercent() + " turns=" + effect.getTurns());
-                    Assertions.assertEquals("Thunder", effect.getElement(), "thunder is what makes Shock (触电) true");
+                    Assertions.assertEquals("Thunder", effect.getElement(), "thunder is what makes Shock (dot:shock) true");
                     Assertions.assertEquals("游丝", effect.getBuff(), "the document's name for the state");
                     Assertions.assertEquals(1, effect.getTurns(), "one turn at rank 1");
                 }

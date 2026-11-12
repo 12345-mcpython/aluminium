@@ -17,8 +17,8 @@ import java.util.List;
 /**
  * 1109 虎克's Eidolon 2 and 6, the two clauses its file already states.
  *
- * <p>E2 「战技使敌方目标陷入的灼烧状态持续时间增加 1 回合」 is a {@code MODIFY_RULE} on the burn rule, so the check is the
- * burn's own duration (2 → 3). E6 「对灼烧状态下的敌方目标造成的伤害提高 20%」 is a {@code BOOST_DAMAGE} on the settling
+ * <p>E2 「战技使敌方目标陷入的dot:burn状态持续时间增加 1 回合」 is a {@code MODIFY_RULE} on the burn rule, so the check is the
+ * burn's own duration (2 → 3). E6 「对dot:burn状态下的敌方目标造成的伤害提高 20%」 is a {@code BOOST_DAMAGE} on the settling
  * instance, so the check is the damage ratio against a burning and a healthy enemy with otherwise identical stats.
  */
 public class HookEidolonTest {
@@ -37,13 +37,13 @@ public class HookEidolonTest {
 
     /**
      * Eidolon 6: the same hit is 20% stronger against a burning target - compared across EIDOLON RANKS, not across
-     * enemies. A burning enemy also draws the talent's extra instance (「对灼烧目标追加 100% 攻击力」), so the two enemies'
+     * enemies. A burning enemy also draws the talent's extra instance (「对dot:burn目标追加 100% 攻击力」), so the two enemies'
      * totals differ by 1.71 for a reason that has nothing to do with E6; the rank-to-rank ratio cancels it.
      */
     @Test
     public void eidolonSixBoostsDamageAgainstBurningTargets() {
         Assertions.assertEquals(1.0, rankRatio(false), 1e-6, "a healthy target: rank 6 changes nothing");
-        Assertions.assertEquals(1.2, rankRatio(true), 1e-6, "「对灼烧状态下的敌方目标造成的伤害提高 20%」");
+        Assertions.assertEquals(1.2, rankRatio(true), 1e-6, "「对dot:burn状态下的敌方目标造成的伤害提高 20%」");
     }
 
     private static double rankRatio(boolean burning) {
@@ -59,7 +59,7 @@ public class HookEidolonTest {
                 new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.99));
         battle.startBattle();
         if (burning) {
-            enemy.getBuffManager().addBuff(new DotBuff(hook, DamageElement.FIRE, 10, 3, 0, "灼烧"));
+            enemy.getBuffManager().addBuff(new DotBuff(hook, DamageElement.FIRE, 10, 3, 0, "dot:burn"));
         }
         double before = enemy.getCurrentHp();
         battle.castImmediate(hook.getSkills().get(SkillType.COMMON), hook, List.of(enemy));

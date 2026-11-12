@@ -20,7 +20,7 @@ import java.util.List;
 
 /**
  * 1005 卡芙卡's talent: 「当卡芙卡的队友对敌方目标施放普攻后，卡芙卡立即发动追加攻击…并有 100% 的基础概率使受到攻击的敌方目标
- * 陷入与终结技相同的触电状态，持续 2 回合，该效果每回合只能触发 1 次」.
+ * 陷入与终结技相同的dot:shock状态，持续 2 回合，该效果每回合只能触发 1 次」.
  *
  * <p>The rule shipped, but nothing judged it (the status row still lists it as unwritten). This test is the missing judge,
  * and it pins the three words the rule is built on - <b>teammate</b> (not herself), <b>basic attack</b> (not a skill), and
@@ -32,7 +32,7 @@ public class KafkaTalentFollowUpTest {
     private static final int LEVEL = 80;
     private static final int KAFKA = 1005;
     private static final int ALLY = 1002;
-    private static final String SHOCK = "触电";
+    private static final String SHOCK = "dot:shock";
     private static final String COUNTER = "追打次数";
 
     /**
@@ -44,7 +44,7 @@ public class KafkaTalentFollowUpTest {
         f.allyBasic();
 
         Assertions.assertEquals(1, f.followUps(), "one follow-up");
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState(SHOCK), "「陷入与终结技相同的触电状态」");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState(SHOCK), "「陷入与终结技相同的dot:shock状态」");
 
         f.allyBasic();
         Assertions.assertEquals(1, f.followUps(), "「该效果每回合只能触发 1 次」");

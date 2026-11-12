@@ -91,7 +91,7 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "do": [
         {
@@ -147,7 +147,7 @@
       "id": "talent_followup_against_burning",
       "when": [
         "actor == self",
-        "target has_state 灼烧",
+        "target has_state dot:burn",
         "damage_is_attack"
       ],
       "do": [
@@ -172,7 +172,7 @@
       "id": "trace_childlike",
       "when": [
         "actor == self",
-        "target has_state 灼烧",
+        "target has_state dot:burn",
         "damage_is_attack"
       ],
       "do": [
@@ -271,7 +271,7 @@
       "min_eidolon": 4,
       "when": [
         "actor == self",
-        "target has_state 灼烧",
+        "target has_state dot:burn",
         "damage_is_attack"
       ],
       "do": [

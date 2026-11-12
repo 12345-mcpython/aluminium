@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1218 椒丘's Eidolon 2: 「【烬煨】状态下的敌方目标受到的灼烧伤害倍率提高 300%」 - the talent's Burn scales x4.
+ * 1218 椒丘's Eidolon 2: 「【烬煨】状态下的敌方目标受到的dot:burn伤害倍率提高 300%」 - the talent's Burn scales x4.
  *
  * <p>Note: the fixture is the one `JiaoqiuTest` uses (narrow constructor, `alwaysRoll(0.0)`): an earlier probe with a wider
  * fixture and a 0.99 roll saw no Burn at all, which misread as an engine path problem rather than a scaffolding difference.

@@ -27,10 +27,10 @@ public class ReforgedRemembranceTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final String SEER = "先知";
-    private static final String WIND_NAME = "风化";
-    private static final String FIRE_NAME = "灼烧";
-    private static final String THUNDER_NAME = "触电";
-    private static final String PHYSICAL_NAME = "裂伤";
+    private static final String WIND_NAME = "dot:wind_shear";
+    private static final String FIRE_NAME = "dot:burn";
+    private static final String THUNDER_NAME = "dot:shock";
+    private static final String PHYSICAL_NAME = "dot:bleed";
 
     private Character wearer;
     private Enemy enemy;
@@ -70,9 +70,9 @@ public class ReforgedRemembranceTest {
         int allFour = wearer.getBuffManager().stacksOf(SEER);
         System.out.println("[23022] seer: burn=" + afterBurn + " burnAgain=" + burnAgain
                 + " +shock=" + afterShock + " +wind+physical=" + allFour);
-        Assertions.assertEquals(1, afterBurn, "Burn (灼烧) gives one layer");
+        Assertions.assertEquals(1, afterBurn, "Burn (dot:burn) gives one layer");
         Assertions.assertEquals(1, burnAgain, "and repeating it gives nothing (once per type)");
-        Assertions.assertEquals(2, afterShock, "Shock (触电) adds a second");
+        Assertions.assertEquals(2, afterShock, "Shock (dot:shock) adds a second");
         Assertions.assertEquals(4, allFour, "and all four types reach the cap of four");
     }
 

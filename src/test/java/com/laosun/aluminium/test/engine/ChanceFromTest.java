@@ -53,7 +53,7 @@ public class ChanceFromTest {
         battle.processRequests();
 
         for (int i = 0; i < debuffs; i++) {
-            enemy.getBuffManager().addBuff(new DotBuff(owner, DamageElement.QUANTUM, 10, 3, 1, "灼烧" + i));
+            enemy.getBuffManager().addBuff(new DotBuff(owner, DamageElement.QUANTUM, 10, 3, 1, "dot:burn" + i));
         }
 
         int[] fired = {0};

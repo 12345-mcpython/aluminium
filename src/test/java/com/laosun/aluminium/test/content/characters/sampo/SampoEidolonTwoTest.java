@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1108 桑博's Eidolon 2: 「风化状态下的敌方目标被消灭时，使敌方全体有 100% 的基础概率叠加 1 层等同于天赋的风化状态」.
+ * 1108 桑博's Eidolon 2: 「dot:wind_shear状态下的敌方目标被消灭时，使敌方全体有 100% 的基础概率叠加 1 层等同于天赋的dot:wind_shear状态」.
  *
  * <p>The dead unit still carries its buffs at {@code KILL}, the windshear lands on every LIVING opponent, and a clean corpse
  * pays nothing.
@@ -49,7 +49,7 @@ public class SampoEidolonTwoTest {
         int otherBefore = noWindshear.stacks(noWindshear.other);
         noWindshear.kill(noWindshear.corpse);
         Assertions.assertEquals(otherBefore, noWindshear.stacks(noWindshear.other),
-                "「风化状态下的」 - a clean corpse spreads nothing");
+                "「dot:wind_shear状态下的」 - a clean corpse spreads nothing");
     }
 
     private static final class Fixture {
@@ -67,12 +67,12 @@ public class SampoEidolonTwoTest {
 
         private void windtorn(Enemy enemy, int layers) {
             for (int i = 0; i < layers; i++) {
-                enemy.getBuffManager().addBuff(new DotBuff(sampo, DamageElement.WIND, 100, 3, 5, "风化"));
+                enemy.getBuffManager().addBuff(new DotBuff(sampo, DamageElement.WIND, 100, 3, 5, "dot:wind_shear"));
             }
         }
 
         private int stacks(Enemy enemy) {
-            return enemy.getBuffManager().stacksOf("风化");
+            return enemy.getBuffManager().stacksOf("dot:wind_shear");
         }
 
         private void kill(Enemy enemy) {

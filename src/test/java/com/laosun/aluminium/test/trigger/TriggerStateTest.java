@@ -91,10 +91,10 @@ public class TriggerStateTest {
      */
     @Test
     public void hasStateOnTheTargetReadsTheEventSubject() {
-        Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_state 触电"), gain(1)));
+        Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_state dot:shock"), gain(1)));
         Character owner = battle.characters().getFirst();
         Character ally = battle.characters().get(1);
-        ally.getBuffManager().addBuff(new StateBuff("触电", 2));
+        ally.getBuffManager().addBuff(new StateBuff("dot:shock", 2));
         drainSkillPoints(battle);
 
         Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)),
@@ -270,14 +270,14 @@ public class TriggerStateTest {
      */
     @Test
     public void removeStateUnderstandsTheDotSpelling() {
-        Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "触电"));
+        Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "dot:shock"));
         Character owner = battle.characters().getFirst();
         owner.getBuffManager().addBuff(new DotBuff(owner, DamageElement.THUNDER, 100, 2));
-        Assertions.assertTrue(owner.getBuffManager().hasState("触电"), "precondition: the thunder DoT is on");
+        Assertions.assertTrue(owner.getBuffManager().hasState("dot:shock"), "precondition: the thunder DoT is on");
 
         fire(battle, owner);
 
-        Assertions.assertFalse(owner.getBuffManager().hasState("触电"),
+        Assertions.assertFalse(owner.getBuffManager().hasState("dot:shock"),
                 "「removes ... the state」 works on the DoT names too -- one name, one meaning");
     }
 

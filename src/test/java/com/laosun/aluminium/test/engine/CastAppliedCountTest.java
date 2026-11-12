@@ -175,7 +175,7 @@ public class CastAppliedCountTest {
         TriggerSpecs.set(burn, "target", "all_enemies");
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, List.of(
                 TriggerSpecs.rule("ULT_CAST", null, burn),
-                TriggerSpecs.rule("ULT_CAST", null, countedEnergy("灼烧", 4)))));
+                TriggerSpecs.rule("ULT_CAST", null, countedEnergy("dot:burn", 4)))));
         Battle battle = ultimateBattle(hero, 3, 0);
 
         double gained = castUltimate(battle);

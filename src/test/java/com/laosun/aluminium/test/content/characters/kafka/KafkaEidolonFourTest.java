@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1005 卡芙卡's Eidolon 4:「当敌方目标承受的由卡芙卡造成的触电状态产生伤害时，额外为卡芙卡恢复 2 点能量」.
+ * 1005 卡芙卡's Eidolon 4:「当敌方目标承受的由卡芙卡造成的dot:shock状态产生伤害时，额外为卡芙卡恢复 2 点能量」.
  *
  * <p>The load-bearing part is the guard: {@code DAMAGE_SETTLED} fires for every settled instance, so without
  * {@code damage_is_dot} her ordinary attacks would pay the same 2 energy - which is what the second case checks.
@@ -51,7 +51,7 @@ public class KafkaEidolonFourTest {
         // Her SKILL only ticks existing DoTs (「立即产生 75%」); the SHOCK comes from the ULTIMATE.
         battle.castImmediate(her.getSkills().get(SkillType.ULTRA), her, List.of(enemy));
         battle.processRequests();
-        System.out.println("[1005] shocked=" + enemy.getBuffManager().hasState("触电"));
+        System.out.println("[1005] shocked=" + enemy.getBuffManager().hasState("dot:shock"));
         double before = her.getCurrentEnergy();
         battle.tickDots(enemy);
         battle.processRequests();

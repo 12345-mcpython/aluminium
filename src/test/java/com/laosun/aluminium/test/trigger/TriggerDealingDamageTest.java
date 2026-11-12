@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Damage-instance conditions: the {@code DEALING_DAMAGE} event, the {@code BOOST_DAMAGE} op, and the DoT
- * state names that make them useful together - i.e. "对处于灼烧状态的目标造成的伤害提高 20%".
+ * state names that make them useful together - i.e. "对处于dot:burn状态的目标造成的伤害提高 20%".
  *
  * <p><b>Why a new event was needed.</b> {@code ALLY_ATTACK} fires <i>after</i> an attack is fully settled, so
  * at that point the number is already final. A bonus that depends on the <b>target's state at the moment of
@@ -33,7 +33,7 @@ import java.util.List;
  * are read, and {@code BOOST_DAMAGE} changes <b>that instance</b> - the instance is the state, so there is no
  * buff to attach, nothing to remove, and nothing that can leak into the next hit.
  *
- * <p><b>The other half is the state name.</b> "灼烧" is not a {@code StateBuff}; it is a {@code DotBuff} of
+ * <p><b>The other half is the state name.</b> "dot:burn" is not a {@code StateBuff}; it is a {@code DotBuff} of
  * element Fire, and the engine has modelled it that way all along. {@code has_state} now resolves those four
  * names, which is what lets a rule ask about them without inventing a second fact for "this unit is burning".
  */
@@ -89,7 +89,7 @@ public class TriggerDealingDamageTest {
     @Test
     public void theActorConditionScopesItToTheOwnersOwnDamage() {
         Battle battle = withAlly(TriggerSpecs.rule("DEALING_DAMAGE",
-                List.of("target has_state 灼烧", "actor == self"), boostOp(BURN_RATIO)));
+                List.of("target has_state dot:burn", "actor == self"), boostOp(BURN_RATIO)));
         Character owner = battle.characters().getFirst();
         Character ally = battle.characters().get(1);
         Enemy target = dummy(battle);
@@ -145,18 +145,18 @@ public class TriggerDealingDamageTest {
         Character owner = battle.characters().getFirst();
         Enemy target = dummy(battle);
 
-        Assertions.assertFalse(target.getBuffManager().hasState("灼烧"), "nothing attached yet");
+        Assertions.assertFalse(target.getBuffManager().hasState("dot:burn"), "nothing attached yet");
 
         burn(target, owner);
-        Assertions.assertTrue(target.getBuffManager().hasState("灼烧"), "a Fire DOT is Burn (灼烧)");
-        Assertions.assertFalse(target.getBuffManager().hasState("触电"), "and it is not Shock (触电)");
+        Assertions.assertTrue(target.getBuffManager().hasState("dot:burn"), "a Fire DOT is Burn (dot:burn)");
+        Assertions.assertFalse(target.getBuffManager().hasState("dot:shock"), "and it is not Shock (dot:shock)");
         Assertions.assertFalse(target.getBuffManager().hasState("冻结"),
                 "control states are deliberately not resolved yet: models them as a buff plus a delay,"
                         + "so 'is it frozen' needs its own definition rather than a guess");
 
         target.getBuffManager().addBuff(new DotBuff(owner, DamageElement.THUNDER, 300, 2));
-        Assertions.assertTrue(target.getBuffManager().hasState("触电"), "a Thunder DOT is Shock (触电)");
-        Assertions.assertTrue(target.getBuffManager().hasState("灼烧"), "and the first one is still there");
+        Assertions.assertTrue(target.getBuffManager().hasState("dot:shock"), "a Thunder DOT is Shock (dot:shock)");
+        Assertions.assertTrue(target.getBuffManager().hasState("dot:burn"), "and the first one is still there");
     }
 
     @Test
@@ -166,7 +166,7 @@ public class TriggerDealingDamageTest {
 
         owner.getBuffManager().addBuff(new StateBuff("协奏", 2));
         Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
-        Assertions.assertFalse(owner.getBuffManager().hasState("灼烧"), "a named state is not a DOT");
+        Assertions.assertFalse(owner.getBuffManager().hasState("dot:burn"), "a named state is not a DOT");
         Assertions.assertFalse(owner.getBuffManager().hasState("没听说过"), "and an unknown name is nobody");
     }
 
@@ -207,13 +207,13 @@ public class TriggerDealingDamageTest {
      * The rule under test: while the target is burning, my damage against it is 20% higher.
      */
     private static TriggerSpec burnRule() {
-        return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state 灼烧"), boostOp(BURN_RATIO));
+        return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state dot:burn"), boostOp(BURN_RATIO));
     }
 
     private static TriggerSpec burnRuleWith(double percent, Integer turns) {
         EffectSpec effect = boostOp(percent);
         TriggerSpecs.set(effect, "turns", turns);
-        return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state 灼烧"), effect);
+        return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state dot:burn"), effect);
     }
 
     private static EffectSpec boostOp(double percent) {
@@ -224,7 +224,7 @@ public class TriggerDealingDamageTest {
     }
 
     /**
-     * Puts a Fire DoT on {@code target} - what "陷入灼烧状态" leaves behind.
+     * Puts a Fire DoT on {@code target} - what "陷入dot:burn状态" leaves behind.
      */
     private static void burn(Enemy target, Character source) {
         target.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));

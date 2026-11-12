@@ -244,7 +244,7 @@ public class HimekoChargeTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "「当我方目标施放攻击后」 (after one of our targets casts an attack)");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ATTACK_FINISHED),
-                "行迹 星火 (Starfire): her attack can set 灼烧 on fire (2026-10-19)");
+                "行迹 星火 (Starfire): her attack can set dot:burn on fire (2026-10-19)");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.ULT_CAST), "her ultimate is the engine's ordinary path");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "「每消灭1个敌方目标额外恢复5点能量」");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.FOLLOW_UP),

@@ -53,7 +53,7 @@ public class RelicAbilityBatchTest {
     /**
      * The "someone else" in the cases that need a second character. Deliberately the SAME rule-less character as
      * {@link #WEARER} rather than a colourful one: Guinaifen (桂乃芬, 1210) was the first draft and her own trace is
-     * "对陷入灼烧状态的敌方目标造成的伤害提高20%" -- which is exactly the debuff the Pioneer case applies, so she
+     * "对陷入dot:burn状态的敌方目标造成的伤害提高20%" -- which is exactly the debuff the Pioneer case applies, so she
      * boosted her own hit by 20% and the case measured her rule instead of the set's.
      */
     private static final int ALLY = WEARER;

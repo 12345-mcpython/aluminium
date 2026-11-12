@@ -90,7 +90,7 @@
       "do": [
         {
           "op": "EXTEND_BUFF",
-          "buff": "触电",
+          "buff": "dot:shock",
           "turns": 1,
           "target": "target"
         }

@@ -16,7 +16,7 @@ import java.util.List;
 
 /**
  * 1109 虎克's technique: 「进入战斗后对敌方随机单体造成 50% 攻击力的火属性伤害，同时有 100% 基础概率使敌方每个单体目标陷入
- * 灼烧状态，持续 3 回合（每回合 50% 攻击力火伤）」.
+ * dot:burn状态，持续 3 回合（每回合 50% 攻击力火伤）」.
  *
  * <p>Two halves, two different targets: the <b>damage</b> is one random enemy ({@code random_enemy}), the <b>burn</b> is
  * every enemy ({@code all_enemies}). The technique gate is the engine's own {@code 秘技} state, laid down before any
@@ -37,7 +37,7 @@ public class HookTechniqueTest {
         Assertions.assertEquals(1, hit.size(), "「对敌方随机单体造成…火属性伤害」 - exactly one enemy is hit");
         for (Enemy enemy : f.enemies) {
             Assertions.assertEquals(1, enemy.getBuffManager().countBuffs(DotBuff.class),
-                    enemy.getName() + ": 「使敌方每个单体目标陷入灼烧状态」");
+                    enemy.getName() + ": 「使敌方每个单体目标陷入dot:burn状态」");
         }
 
         Fixture bare = new Fixture(false);

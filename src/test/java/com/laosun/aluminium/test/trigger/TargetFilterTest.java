@@ -40,13 +40,13 @@ public class TargetFilterTest {
      */
     @Test
     public void onlyTheQualifyingCandidateIsReached() {
-        Fixture f = new Fixture("target has_state 触电");
+        Fixture f = new Fixture("target has_state dot:shock");
         f.markSecond();
 
         f.fire();
 
         Assertions.assertFalse(f.first.getBuffManager().hasState("印记"),
-                "the unmarked enemy was not reached: 「对所有触电状态下的敌方目标」 (all enemy targets in the Shock state)");
+                "the unmarked enemy was not reached: 「对所有dot:shock状态下的敌方目标」 (all enemy targets in the Shock state)");
         Assertions.assertTrue(f.second.getBuffManager().hasState("印记"), "…and the marked one was");
     }
 
@@ -55,7 +55,7 @@ public class TargetFilterTest {
      */
     @Test
     public void theNegatedFormExcludesTheQualifyingOne() {
-        Fixture f = new Fixture("!target has_state 触电");
+        Fixture f = new Fixture("!target has_state dot:shock");
         f.markSecond();
 
         f.fire();
@@ -112,7 +112,7 @@ public class TargetFilterTest {
         }
 
         /**
-         * Puts shock (触电) on the second enemy through the engine's own DOT path.
+         * Puts shock (dot:shock) on the second enemy through the engine's own DOT path.
          */
         private void markSecond() {
             EffectSpec dot = new EffectSpec();
@@ -124,8 +124,8 @@ public class TargetFilterTest {
             TriggerSpecs.set(dot, "target", "target");
             hero.setTriggerTable(new TriggerTable(CID, List.of(TriggerSpecs.rule("SKILL_CAST", null, dot))));
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, hero, second, 1, 0));
-            Assertions.assertTrue(second.getBuffManager().hasState("触电"), "precondition: the second enemy is shocked");
-            Assertions.assertFalse(first.getBuffManager().hasState("触电"), "precondition: the first is not");
+            Assertions.assertTrue(second.getBuffManager().hasState("dot:shock"), "precondition: the second enemy is shocked");
+            Assertions.assertFalse(first.getBuffManager().hasState("dot:shock"), "precondition: the first is not");
             hero.setTriggerTable(new TriggerTable(CID, List.of(rule(filter))));
         }
 

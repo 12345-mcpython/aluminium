@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 21026: "攻击力提高#1%,对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2%" (ATK raised by #1%, damage to a burning or wounded enemy raised by #2%) at rank 5.
+ * Light cone 21026: "攻击力提高#1%,对处于dot:burn或dot:bleed状态的敌方目标造成的伤害提高#2%" (ATK raised by #1%, damage to a burning or wounded enemy raised by #2%) at rank 5.
  *
  * <p>ATTACK is flat, so its share scales the post-start base; the disjunction is two rules, the second excluding the first state.
  */
@@ -36,8 +36,8 @@ public class WoofWalkTimeTest {
                 + " attackRatio=" + attackGain);
         // 2026-10-19: the share is the cone's own `attack_percent` property (it is in the panel before the battle starts),
         Assertions.assertTrue(true, "rank 5 share is the property - pinned in ConeAuditBatchNineTest");
-        Assertions.assertEquals(1.32, burning / clean, 2e-2, "Burn (灼烧)");
-        Assertions.assertEquals(1.32, wounded / clean, 2e-2, "Bleed (裂伤)");
+        Assertions.assertEquals(1.32, burning / clean, 2e-2, "Burn (dot:burn)");
+        Assertions.assertEquals(1.32, wounded / clean, 2e-2, "Bleed (dot:bleed)");
         Assertions.assertEquals(1.32, both / clean, 2e-2, "both states must not double the boost");
     }
 
@@ -52,7 +52,7 @@ public class WoofWalkTimeTest {
     }
 
     /**
-     * 0 = clean, 1 = burn (灼烧), 2 = bleed (裂伤), 3 = both.
+     * 0 = clean, 1 = burn (dot:burn), 2 = bleed (dot:bleed), 3 = both.
      */
     private static double settled(int which) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21026, LEVEL, false, 5));

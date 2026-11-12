@@ -216,19 +216,19 @@ public class DotTest {
     // ==================================================================
 
     /**
-     * "使目标陷入灼烧状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the {@code has_state}
-     * name follows from the element (Fire to burn (灼烧)) with no second field.
+     * "使目标陷入dot:burn状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the {@code has_state}
+     * name follows from the element (Fire to burn (dot:burn)) with no second field.
      *
      * <p>Before this op only a weakness break could attach a DOT ({@code attachBreakDot}), so the whole
-     * "使目标陷入灼烧/触电/裂伤/风化状态" family - 11 of the 9documents - had no spelling.
+     * "使目标陷入dot:burn/dot:shock/dot:bleed/dot:wind_shear状态" family - 11 of the 9documents - had no spelling.
      */
     @Test
     public void aRuleCanAttachABurn() {
         Fixture f = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, null));
 
         Assertions.assertEquals(1, f.fire(), "the rule fires");
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
-                "Fire + DotBuff IS Burn (灼烧): the engine's one translation is BuffManager.DOT_STATES");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("dot:burn"),
+                "Fire + DotBuff IS Burn (dot:burn): the engine's one translation is BuffManager.DOT_STATES");
         Assertions.assertEquals(500, f.dot().getBaseDamage(), EPS, "the flat amount the rule stated");
 
         double expected = 500 * 1000.0 / (100 + 1000.0);
@@ -274,7 +274,7 @@ public class DotTest {
     /**
      * A DOT may state a <b>base chance</b>, and it is the same per-target pipeline a control uses.
      *
-     * <p>"有一定基础概率使目标陷入灼烧状态" is common in the documents, so the field is read here too -
+     * <p>"有一定基础概率使目标陷入dot:burn状态" is common in the documents, so the field is read here too -
      * and when the roll fails, nothing is attached (not a DOT with 0 turns, which would still settle nothing but
      * would show up in "有几个负面效果").
      */
@@ -284,7 +284,7 @@ public class DotTest {
         resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
         resisted.fire();
         Assertions.assertEquals(0, resisted.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "100% effect resistance: 「陷入灼烧状态」 (falls into the Burn state) did not happen, so there is no DOT at all");
+                "100% effect resistance: 「陷入dot:burn状态」 (falls into the Burn state) did not happen, so there is no DOT at all");
 
         Fixture lands = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, 1.0));
         lands.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));

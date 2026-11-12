@@ -55,7 +55,7 @@
       "do": [
         {
           "op": "EXTEND_BUFF",
-          "buff": "触电",
+          "buff": "dot:shock",
           "turns": 2,
           "target": "all_enemies"
         }
@@ -109,7 +109,7 @@
       "on": "DEALING_DAMAGE",
       "when": [
         "actor == self",
-        "target has_state 触电"
+        "target has_state dot:shock"
       ],
       "do": [
         {
@@ -174,7 +174,7 @@
           "damage_param": 0,
           "target": "all_enemies",
           "target_when": [
-            "target has_state 触电"
+            "target has_state dot:shock"
           ],
           "element": "Thunder"
         }
@@ -197,7 +197,7 @@
           "base_chance": 1,
           "target": "all_enemies",
           "target_when": [
-            "!target has_state 触电"
+            "!target has_state dot:shock"
           ],
           "percent_from_skill_param": "SKILL:4"
         }
@@ -212,7 +212,7 @@
       "id": "eidolon2_energy_on_talent_additional_damage",
       "when": [
         "actor == self",
-        "enemy_state_count:触电 >= 1"
+        "enemy_state_count:dot:shock >= 1"
       ],
       "do": [
         {

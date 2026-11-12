@@ -417,17 +417,17 @@ public class BlackSwanTest {
     }
 
     /**
-     * 星魂 1: 「处于风化、裂伤、灼烧、触电状态下的敌方目标对应的风、物理、火、雷属性抗性分别降低 25%」.
+     * 星魂 1: 「处于dot:wind_shear、dot:bleed、dot:burn、dot:shock状态下的敌方目标对应的风、物理、火、雷属性抗性分别降低 25%」.
      *
      * <p>Measured per element: the SAME hit lands harder in its own element and unchanged in the others, which is the difference
      * between a per-element resistance reduction and an all-type one.
      */
     @Test
     public void eidolonOneLowersFourResistancesByElement() {
-        Assertions.assertEquals(-0.25, resistanceReduction(1, "WIND"), 1e-9, "风 for 风化 (stored negative: the attribute is a REDUCTION)");
-        Assertions.assertEquals(-0.25, resistanceReduction(1, "PHYSICAL"), 1e-9, "物理 for 裂伤");
-        Assertions.assertEquals(-0.25, resistanceReduction(1, "FIRE"), 1e-9, "火 for 灼烧");
-        Assertions.assertEquals(-0.25, resistanceReduction(1, "THUNDER"), 1e-9, "雷 for 触电");
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "WIND"), 1e-9, "风 for dot:wind_shear (stored negative: the attribute is a REDUCTION)");
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "PHYSICAL"), 1e-9, "物理 for dot:bleed");
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "FIRE"), 1e-9, "火 for dot:burn");
+        Assertions.assertEquals(-0.25, resistanceReduction(1, "THUNDER"), 1e-9, "雷 for dot:shock");
         Assertions.assertEquals(0.0, resistanceReduction(1, "ICE"), 1e-9, "冰 is not in the sentence");
         Assertions.assertEquals(0.0, resistanceReduction(0, "WIND"), 1e-9, "and nothing at E0");
     }
@@ -439,7 +439,7 @@ public class BlackSwanTest {
         battle.startBattle();
         // The reductions are applied at the victim's turn start while it is in the matching dot state, so the fixture puts all
         // four states on it and then starts its turn.
-        for (String state : new String[]{"风化", "裂伤", "灼烧", "触电"}) {
+        for (String state : new String[]{"dot:wind_shear", "dot:bleed", "dot:burn", "dot:shock"}) {
             enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(state, 2));
         }
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
@@ -489,33 +489,33 @@ public class BlackSwanTest {
                 TriggerEvent.TURN_START, enemy, enemy, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(0.0, enemy.getAttribute(wind).get(), 1e-9,
-                "「处于风化…的敌方目标」 — no state, no reduction");
+                "「处于dot:wind_shear…的敌方目标」 — no state, no reduction");
 
-        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("风化", 2));
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("dot:wind_shear", 2));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.TURN_START, enemy, enemy, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(-0.25, enemy.getAttribute(wind).get(), 1e-9, "with the state it applies");
 
-        enemy.getBuffManager().removeState("风化");
+        enemy.getBuffManager().removeState("dot:wind_shear");
         enemy.getBuffManager().beforeMove();
         Assertions.assertEquals(0.0, enemy.getAttribute(wind).get(), 1e-9, "and the gate takes it off again");
     }
 
     /**
-     * 「处于【奥迹】状态时，也会被视为陷入了风化状态」 (the 【奥迹】 keyword block): the alias is what makes a rule asking about
-     * 风化 see an enemy that only has Arcana.
+     * 「处于【奥迹】状态时，也会被视为陷入了dot:wind_shear状态」 (the 【奥迹】 keyword block): the alias is what makes a rule asking about
+     * dot:wind_shear see an enemy that only has Arcana.
      *
      * <p>Measured through 星魂 1, whose four reductions are gated on the victim's own state - the only place in this kit
-     * where "does it count as 风化" has a number attached. The control is the same fixture without the Skill, so the
+     * where "does it count as dot:wind_shear" has a number attached. The control is the same fixture without the Skill, so the
      * two numbers differ only by whether Arcana was applied.
      */
     @Test
     public void arcanaCountsAsWindShear() {
         Assertions.assertEquals(0.0, windReductionAfterTurnStart(false), 1e-9,
-                "control: no Arcana, so nothing is 视为风化 and no reduction lands");
+                "control: no Arcana, so nothing is 视为dot:wind_shear and no reduction lands");
         Assertions.assertEquals(-0.25, windReductionAfterTurnStart(true), 1e-9,
-                "「被视为陷入了风化状态」 - the Arcana layers alone answer for 风化 (the reduction is stored negative)");
+                "「被视为陷入了dot:wind_shear状态」 - the Arcana layers alone answer for dot:wind_shear (the reduction is stored negative)");
     }
 
     /** The wind reduction on a victim after one of its turn starts, with or without Arcana from the Skill. */
@@ -539,7 +539,7 @@ public class BlackSwanTest {
     }
 
     /**
-     * 终结技: 「当敌方目标处于【奥迹】状态时，也会被视为同时陷入了风化、裂伤、灼烧、触电状态」.
+     * 终结技: 「当敌方目标处于【奥迹】状态时，也会被视为同时陷入了dot:wind_shear、dot:bleed、dot:burn、dot:shock状态」.
      *
      * <p>Two numbers per side, and the control is the one that matters: 揭露 on its own must <b>not</b> grant the three
      * extra names (the sentence requires Arcana), so the same fixture without the Skill keeps all four at zero.
@@ -553,7 +553,7 @@ public class BlackSwanTest {
         double[] both = resistancesAfterEpiphany(true);
         for (int i = 0; i < both.length; i++) {
             Assertions.assertEquals(-0.25, both[i], 1e-9,
-                    "「会被视为同时陷入了风化、裂伤、灼烧、触电」 - every one of the four, index " + i);
+                    "「会被视为同时陷入了dot:wind_shear、dot:bleed、dot:burn、dot:shock」 - every one of the four, index " + i);
         }
     }
 

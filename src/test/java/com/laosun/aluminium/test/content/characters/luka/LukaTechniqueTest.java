@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1111 卢卡's technique: 「进入战斗后对敌方随机单体造成 50% 攻击力物理伤害，并有 100% 基础概率使该目标陷入与战技相同的裂伤状态。
+ * 1111 卢卡's technique: 「进入战斗后对敌方随机单体造成 50% 攻击力物理伤害，并有 100% 基础概率使该目标陷入与战技相同的dot:bleed状态。
  * 随后卢卡额外获得 1 层【斗志】」.
  *
  * <p>The two halves must land on <b>the same</b> randomly chosen enemy - that is what the rule-level pick is for (a
@@ -37,7 +37,7 @@ public class LukaTechniqueTest {
         Assertions.assertEquals(1, damaged.size(), "a single random enemy takes the hit");
         Enemy victim = damaged.getFirst();
         Assertions.assertEquals(1, victim.getBuffManager().countBuffs(DotBuff.class),
-                "「使该目标陷入…裂伤」 - the SAME enemy, not a second roll");
+                "「使该目标陷入…dot:bleed」 - the SAME enemy, not a second roll");
         for (Enemy enemy : f.enemies) {
             if (enemy != victim) {
                 Assertions.assertEquals(0, enemy.getBuffManager().countBuffs(DotBuff.class),

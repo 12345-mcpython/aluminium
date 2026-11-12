@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1111 卢卡's Eidolon 6: 「本次强化普攻使用的【直冲拳】每施放过 1 段攻击，则额外使其当前承受的裂伤状态立即产生 1 次相当于原伤害
+ * 1111 卢卡's Eidolon 6: 「本次强化普攻使用的【直冲拳】每施放过 1 段攻击，则额外使其当前承受的dot:bleed状态立即产生 1 次相当于原伤害
  * 8% 的伤害」.
  *
  * <p>The clause is per SEGMENT, which {@code DEALING_DAMAGE} already provides once per hit - no segment ordinal is needed.
@@ -25,7 +25,7 @@ public class LukaEidolonSixTest {
 
     private static final int LUKA = 1111;
     private static final int LEVEL = 80;
-    private static final String LACERATION = "裂伤";
+    private static final String LACERATION = "dot:bleed";
 
     @Test
     public void eachSegmentTicksTheLacerationOnce() {

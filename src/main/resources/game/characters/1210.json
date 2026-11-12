@@ -46,7 +46,7 @@
       "on": "DEALING_DAMAGE",
       "when": [
         "actor == self",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "do": [
         {

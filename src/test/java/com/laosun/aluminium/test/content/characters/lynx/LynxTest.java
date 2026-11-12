@@ -50,11 +50,11 @@ public class LynxTest {
     public void herUltimateCleansesTheParty() {
         Fixture f = new Fixture();
         f.ally.getBuffManager().addBuff(new DotBuff(f.lynx, DamageElement.FIRE, 10, 2));
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("灼烧"), "precondition: one negative effect");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("dot:burn"), "precondition: one negative effect");
 
         f.ultimate();
 
-        Assertions.assertFalse(f.ally.getBuffManager().hasState("灼烧"),
+        Assertions.assertFalse(f.ally.getBuffManager().hasState("dot:burn"),
                 "「解除我方全体的1个负面效果」 (dispels 1 debuff from all allies) -- the cleanse reaches every ally, not just the aimed one");
     }
 

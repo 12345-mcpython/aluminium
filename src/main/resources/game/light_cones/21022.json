@@ -5,7 +5,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.16, "target": "self" }
       ],
@@ -15,7 +15,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:wind_shear", "!target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.16, "target": "self" }
       ],
@@ -27,7 +27,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.2, "target": "self" }
       ],
@@ -37,7 +37,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:wind_shear", "!target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.2, "target": "self" }
       ],
@@ -49,7 +49,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.24, "target": "self" }
       ],
@@ -59,7 +59,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:wind_shear", "!target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.24, "target": "self" }
       ],
@@ -71,7 +71,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.28, "target": "self" }
       ],
@@ -81,7 +81,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:wind_shear", "!target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.28, "target": "self" }
       ],
@@ -93,7 +93,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_shocked",
-      "when": ["actor == self", "target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.32, "target": "self" }
       ],
@@ -103,7 +103,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone21022_boost_vs_winded",
-      "when": ["actor == self", "target has_state 风化", "!target has_state 触电"],
+      "when": ["actor == self", "target has_state dot:wind_shear", "!target has_state dot:shock"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.32, "target": "self" }
       ],

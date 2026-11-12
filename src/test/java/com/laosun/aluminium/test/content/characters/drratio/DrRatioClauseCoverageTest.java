@@ -121,7 +121,7 @@ public class DrRatioClauseCoverageTest {
     private static int instancesFor(int eidolon, int debuffs) {
         Fixture f = new Fixture(eidolon);
         for (int i = 0; i < debuffs; i++) {
-            f.enemy.getBuffManager().addBuff(new DotBuff(f.ratio, DamageElement.QUANTUM, 10, 3, 1, "灼烧" + i));
+            f.enemy.getBuffManager().addBuff(new DotBuff(f.ratio, DamageElement.QUANTUM, 10, 3, 1, "dot:burn" + i));
         }
         int[] instances = {0};
         f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> instances[0]++);
@@ -154,7 +154,7 @@ public class DrRatioClauseCoverageTest {
     private static double firstHitAgainst(int debuffs) {
         Fixture f = new Fixture(0);
         for (int i = 0; i < debuffs; i++) {
-            f.enemy.getBuffManager().addBuff(new DotBuff(f.ratio, DamageElement.QUANTUM, 10, 3, 1, "灼烧" + i));
+            f.enemy.getBuffManager().addBuff(new DotBuff(f.ratio, DamageElement.QUANTUM, 10, 3, 1, "dot:burn" + i));
         }
         double[] first = {-1};
         f.battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> {
@@ -276,7 +276,7 @@ public class DrRatioClauseCoverageTest {
          * condition counts debuffs, so a state-based fixture would read zero and "prove" the rule wrong.
          */
         private void putThreeDebuffsOnTheEnemy() {
-            for (String name : List.of("灼烧甲", "灼烧乙", "灼烧丙")) {
+            for (String name : List.of("dot:burn甲", "dot:burn乙", "dot:burn丙")) {
                 enemy.getBuffManager().addBuff(new DotBuff(ratio, DamageElement.QUANTUM, 10, 3, 1, name));
             }
         }

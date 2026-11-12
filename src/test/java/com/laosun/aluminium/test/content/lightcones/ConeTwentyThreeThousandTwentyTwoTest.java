@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 重塑时光之忆 (23022): 「对陷入风化/灼烧/触电/裂伤状态的敌方目标造成伤害时，分别获得 1 层【先知】，最多 4 层。
+ * 重塑时光之忆 (23022): 「对陷入dot:wind_shear/dot:burn/dot:shock/dot:bleed状态的敌方目标造成伤害时，分别获得 1 层【先知】，最多 4 层。
  * <b>单场战斗中，每种持续伤害状态类型仅可叠加 1 次</b>；每层使攻击力提高 5%」.
  *
  * <p><b>The 「每种类型仅 1 次」 that was called missing.</b> The rule-level {@code once_per_battle} already means exactly that, and
@@ -66,12 +66,12 @@ public class ConeTwentyThreeThousandTwentyTwoTest {
         Run run = new Run();
         double base = run.attack();
 
-        run.hitWhileCarrying("风化");
+        run.hitWhileCarrying("dot:wind_shear");
         Assertions.assertEquals(1, run.seer(), "the first wind-shear hit grants a stack");
-        run.hitWhileCarrying("风化");
+        run.hitWhileCarrying("dot:wind_shear");
         Assertions.assertEquals(1, run.seer(), "「每种状态类型仅可叠加 1 次」 - a second hit on the same type does not");
 
-        run.hitWhileCarrying("灼烧");
+        run.hitWhileCarrying("dot:burn");
         Assertions.assertEquals(2, run.seer(), "a different type pays again");
         // 「每层使攻击力提高 5%」 - the DIRECTION holds, the arithmetic does not. Measured: two layers read x1.078125 with
         // `per_stack` and x1.03906 with `per_stack_live`; the sentence wants x1.10. Both numbers are in the status row - this

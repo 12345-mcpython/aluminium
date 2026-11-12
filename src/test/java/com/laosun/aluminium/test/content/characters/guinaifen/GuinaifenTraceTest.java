@@ -24,7 +24,7 @@ import java.util.List;
  * at the moment of the hit</i>, which is neither a timed buff nor something {@code ALLY_ATTACK} could drive
  * (that event fires after the attack is settled). It is the first shipped rule that uses
  * {@code DEALING_DAMAGE} + {@code BOOST_DAMAGE}, and the first that reads a state name resolving to a DoT
- * (Burn ({@code 灼烧}) = a Fire {@code DotBuff}) rather than to a {@code StateBuff}.
+ * (Burn ({@code dot:burn}) = a Fire {@code DotBuff}) rather than to a {@code StateBuff}.
  *
  * <p>Her Bladed Hoop (投狭) (advance 25% at battle start) is in the same file, so this also keeps pinning "one character,
  * several mechanics, one table" - the property Robin's file established.

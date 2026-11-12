@@ -1307,10 +1307,10 @@ public class BuffManager {
      * only place that knows the two spellings are the same thing.
      */
     private static final Map<String, DamageElement> DOT_STATES = Map.of(
-            "灼烧", DamageElement.FIRE,
-            "触电", DamageElement.THUNDER,
-            "裂伤", DamageElement.PHYSICAL,
-            "风化", DamageElement.WIND);
+            "dot:burn", DamageElement.FIRE,
+            "dot:shock", DamageElement.THUNDER,
+            "dot:bleed", DamageElement.PHYSICAL,
+            "dot:wind_shear", DamageElement.WIND);
 
     /**
      * Takes the first buff of that type on us, or {@code null} if there is none: the

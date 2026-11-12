@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1108 桑博's Eidolon 4: 「战技击中风化状态大于等于 5 层的敌方目标时，使其当前承受的风化状态立即产生相当于原伤害 8% 的伤害」.
+ * 1108 桑博's Eidolon 4: 「战技击中dot:wind_shear状态大于等于 5 层的敌方目标时，使其当前承受的dot:wind_shear状态立即产生相当于原伤害 8% 的伤害」.
  *
- * <p>The threshold reads the DOT's own layers ({@code target_stacks:风化}). The expected extra is derived from a measured
+ * <p>The threshold reads the DOT's own layers ({@code target_stacks:dot:wind_shear}). The expected extra is derived from a measured
  * full tick rather than from the DOT's raw base: the settled tick passes the target's DEF and resistance like any damage.
  */
 public class SampoEidolonFourTest {
@@ -67,9 +67,9 @@ public class SampoEidolonFourTest {
                     new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.99));
             battle.startBattle();
             for (int i = 0; i < layers; i++) {
-                enemy.getBuffManager().addBuff(new DotBuff(sampo, DamageElement.WIND, TICK, 3, 0, "风化"));
+                enemy.getBuffManager().addBuff(new DotBuff(sampo, DamageElement.WIND, TICK, 3, 0, "dot:wind_shear"));
             }
-            Assertions.assertEquals(layers, enemy.getBuffManager().stacksOf("风化"),
+            Assertions.assertEquals(layers, enemy.getBuffManager().stacksOf("dot:wind_shear"),
                     "precondition: the windshear layers are readable by name");
         }
     }

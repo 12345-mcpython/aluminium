@@ -48,7 +48,7 @@ public class KafkaShockDurationTest {
     @Test
     public void herOwnUltimateBurnsOneLongerThanAnUnlengthenedDot() {
         Assertions.assertEquals(syntheticBurningTurns(HER_DOT_TURNS, 1), herBurningTurns(),
-                "the Shock (触电) state lasts 1 turn longer -- two turns plus the trace's one");
+                "the Shock (dot:shock) state lasts 1 turn longer -- two turns plus the trace's one");
     }
 
     private static int herBurningTurns() {
@@ -101,7 +101,7 @@ public class KafkaShockDurationTest {
     private static EffectSpec extension(int turns) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "EXTEND_BUFF");
-        TriggerSpecs.set(effect, "buff", "触电");
+        TriggerSpecs.set(effect, "buff", "dot:shock");
         TriggerSpecs.set(effect, "turns", turns);
         TriggerSpecs.set(effect, "target", "target");
         return effect;

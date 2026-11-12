@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
  * {@code skill_effects.json} carries an effect row for the skills whose work the executor can do ({@code Restore} a heal,
  * {@code Defence} a shield, {@code Rules} "the rule table handles it"), and it has <b>no</b> {@code Impair} entry at all.
  * The missing piece is not "how much", it is <b>which debuff</b>: an impair row states a base chance and a duration, and
- * the state it applies is only in the prose (「陷入【吞火】状态」 / 「风化/裂伤/灼烧/触电其中1种」). Reading that into a dispatch
+ * the state it applies is only in the prose (「陷入【吞火】状态」 / 「dot:wind_shear/dot:bleed/dot:burn/dot:shock其中1种」). Reading that into a dispatch
  * would be a guess with a state name in it - the one thing this project refuses.
  *
  * <p>So the two halves are pinned separately:
@@ -43,6 +43,11 @@ public class ImpairDebuffGapTest {
     /**
      * The in-battle states the shipped {@code Impair} descriptions name. Map states (目盲 / 晕眩 / 魄散 / 醉心) are
      * deliberately not counted: this engine has no overworld, so those sentences describe something it does not model.
+     *
+     * <p>⚠ The four DoTs are spelled in <b>Chinese</b> on purpose: this pattern reads the game's skill
+     * <b>descriptions</b> (corpus text), not the rule files. The rules now ask for {@code dot:burn} and friends, while
+     * the prose they are verified against still says 灼烧 - so both spellings live in the repo and a rename must leave
+     * this one alone.
      */
     private static final Pattern IN_BATTLE_STATE = Pattern.compile("【(吞火|烬煨)】|(风化|裂伤|灼烧|触电)");
 
@@ -77,7 +82,7 @@ public class ImpairDebuffGapTest {
     /**
      * Part 2: the skills whose description names an in-battle state - the content the missing rows would unlock.
      *
-     * <p>Note: 1210 Guinaifen (桂乃芬) 【吞火】, 1218 Jiaoqiu (椒丘) 【烬煨】 and 1410 Hysilens (海瑟音) 「风化/裂伤/灼烧/触电其中1种」
+     * <p>Note: 1210 Guinaifen (桂乃芬) 【吞火】, 1218 Jiaoqiu (椒丘) 【烬煨】 and 1410 Hysilens (海瑟音) 「dot:wind_shear/dot:bleed/dot:burn/dot:shock其中1种」
      * are the three. Each needs a REGENERATED row that names the state and its duration; until then each character's own
      * rule note registers what it would take.
      */

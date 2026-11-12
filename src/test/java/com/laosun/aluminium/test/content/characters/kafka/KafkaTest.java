@@ -35,8 +35,8 @@ public class KafkaTest {
 
         f.battle.castImmediate(f.kafka.getSkills().get(SkillType.ULTRA), f.kafka, List.of(f.enemy));
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("触电"),
-                "「有100%的基础概率使受到攻击的敌方目标陷入触电状态」 (a 100% base chance to put the attacked enemy target into the Shock (触电) state)");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("dot:shock"),
+                "「有100%的基础概率使受到攻击的敌方目标陷入dot:shock状态」 (a 100% base chance to put the attacked enemy target into the Shock (dot:shock) state)");
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…as a damage-over-time state");
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
                 "the ultimate's own damage plus the extra instance 「立即产生相当于原伤害 100% 的伤害」 (immediately deals damage equal to 100% of the original damage)");
@@ -64,8 +64,8 @@ public class KafkaTest {
 
         Assertions.assertTrue(afterAlly < before,
                 "the ally's basic attack lands and Kafka's follow-up adds to it: " + before + " -> " + afterAlly);
-        Assertions.assertTrue(enemy.getBuffManager().hasState("触电"),
-                "「并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的触电状态」 (and a 100% base chance to put the attacked enemy target into the same Shock state as the Ultimate) — the follow-up really fired");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("dot:shock"),
+                "「并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的dot:shock状态」 (and a 100% base chance to put the attacked enemy target into the same Shock state as the Ultimate) — the follow-up really fired");
     }
 
     /**
@@ -74,11 +74,11 @@ public class KafkaTest {
     @Test
     public void herOwnBasicAttackDoesNotTriggerTheFollowUp() {
         Fixture f = new Fixture();
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("触电"), "precondition: no Shock");
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("dot:shock"), "precondition: no Shock");
 
         f.battle.castImmediate(f.kafka.getSkills().get(SkillType.COMMON), f.kafka, List.of(f.enemy));
 
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("触电"),
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("dot:shock"),
                 "「当卡芙卡的**队友**对敌方目标施放普攻后」 (after Kafka's **ally** casts a Basic ATK on an enemy target) -- HER OWN attack is not an ally's, so no follow-up and no Shock");
     }
 

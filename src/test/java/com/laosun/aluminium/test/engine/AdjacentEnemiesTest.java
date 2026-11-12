@@ -20,7 +20,7 @@ import java.util.List;
 /**
  * The {@code adjacent_enemies} selector: <b>both</b> living neighbours of the event's target, in roster order.
  *
- * <p><b>Why it exists.</b> 1109 Hook's Eidolon 4 says 「使指定敌方目标的<b>相邻目标</b>也陷入…灼烧状态」 — every neighbour. The
+ * <p><b>Why it exists.</b> 1109 Hook's Eidolon 4 says 「使指定敌方目标的<b>相邻目标</b>也陷入…dot:burn状态」 — every neighbour. The
  * existing `random_adjacent_enemy` answers <b>one</b> of them (its reader, 1103 Serval's Eidolon 1, says 「其中一个随机相邻目标」),
  * and picking one of two would be a wrong number with no symptom.
  *

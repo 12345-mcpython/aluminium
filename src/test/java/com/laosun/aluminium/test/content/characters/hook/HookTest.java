@@ -31,12 +31,12 @@ public class HookTest {
     @Test
     public void hisBurnLandsAndHisUltimateTracePaysEnergy() {
         Fixture f = new Fixture(0);
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("灼烧"), "precondition: not burning (灼烧) yet");
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("dot:burn"), "precondition: not burning (dot:burn) yet");
 
         f.battle.castImmediate(f.hook.getSkills().get(SkillType.SKILL), f.hook, List.of(f.enemy));
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
-                "「有100%的基础概率使其陷入灼烧状态」 (100% base chance to put it in the burning state)");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("dot:burn"),
+                "「有100%的基础概率使其陷入dot:burn状态」 (100% base chance to put it in the burning state)");
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…as a damage-over-time state");
 
         double energyBefore = f.hook.getCurrentEnergy();

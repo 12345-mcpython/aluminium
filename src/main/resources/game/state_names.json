@@ -1492,11 +1492,12 @@
       ]
     },
     {
-      "name": "灼烧",
+      "name": "dot:burn",
       "owner": "battle",
       "kind": "battle",
       "key": "dot:burn",
-      "en": "Burn"
+      "en": "Burn",
+      "zh": "灼烧"
     },
     {
       "name": "灼热意志",
@@ -2233,11 +2234,12 @@
       ]
     },
     {
-      "name": "裂伤",
+      "name": "dot:bleed",
       "owner": "battle",
       "kind": "battle",
       "key": "dot:bleed",
-      "en": "Bleed"
+      "en": "Bleed",
+      "zh": "裂伤"
     },
     {
       "name": "解读",
@@ -2248,11 +2250,12 @@
       ]
     },
     {
-      "name": "触电",
+      "name": "dot:shock",
       "owner": "battle",
       "kind": "battle",
       "key": "dot:shock",
-      "en": "Shock"
+      "en": "Shock",
+      "zh": "触电"
     },
     {
       "name": "记录",
@@ -2550,11 +2553,12 @@
       ]
     },
     {
-      "name": "风化",
+      "name": "dot:wind_shear",
       "owner": "battle",
       "kind": "battle",
       "key": "dot:wind_shear",
-      "en": "Wind Shear"
+      "en": "Wind Shear",
+      "zh": "风化"
     },
     {
       "name": "风口",

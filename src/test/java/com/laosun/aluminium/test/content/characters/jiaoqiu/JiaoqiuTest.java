@@ -38,8 +38,8 @@ public class JiaoqiuTest {
 
         Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("烬煨") : enemy.getBuffManager().stacksOf("烬煨"),
                 "「【烬煨】最多叠加5层」 (Ashen Roast stacks at most 5 times) -- seven applications must still read five");
-        Assertions.assertTrue(enemy.getBuffManager().hasState("灼烧"),
-                "\"is also considered to be in the Burn state at the same time\" (「也会被视为同时陷入了灼烧状态」) -- a Fire DotBuff IS Burn (灼烧) by the engine's own translation");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("dot:burn"),
+                "\"is also considered to be in the Burn state at the same time\" (「也会被视为同时陷入了dot:burn状态」) -- a Fire DotBuff IS Burn (dot:burn) by the engine's own translation");
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
     }
 

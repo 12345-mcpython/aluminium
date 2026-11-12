@@ -131,7 +131,7 @@ public class DamageScopeBoostTest {
     }
 
     /**
-     * A DOT is not a cast either: shock (触电) / burn (灼烧) damage must not grow because the wearer boosted their basic
+     * A DOT is not a cast either: shock (dot:shock) / burn (dot:burn) damage must not grow because the wearer boosted their basic
      * attacks.
      */
     @Test

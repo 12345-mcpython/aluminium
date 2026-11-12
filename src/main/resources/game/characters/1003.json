@@ -206,7 +206,7 @@
       "do": [
         {
           "op": "APPLY_DOT",
-          "buff": "灼烧",
+          "buff": "dot:burn",
           "element": "Fire",
           "scale": "self_attr:ATTACK",
           "percent": 0.3,
@@ -225,7 +225,7 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "do": [
         {

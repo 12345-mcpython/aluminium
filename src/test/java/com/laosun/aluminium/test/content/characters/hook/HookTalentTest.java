@@ -48,7 +48,7 @@ public class HookTalentTest {
         battle.startBattle();
         if (burning) {
             battle.castImmediate(hook.getSkills().get(SkillType.SKILL), hook, List.of(enemy));
-            Assertions.assertTrue(enemy.getBuffManager().hasState("灼烧"), "precondition: the target burns");
+            Assertions.assertTrue(enemy.getBuffManager().hasState("dot:burn"), "precondition: the target burns");
         }
         double before = hook.getCurrentEnergy();
         battle.castImmediate(hook.getSkills().get(SkillType.COMMON), hook, List.of(enemy));

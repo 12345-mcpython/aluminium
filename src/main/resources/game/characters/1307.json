@@ -46,7 +46,7 @@
           "op": "ADD_STACK",
           "buff": "奥迹",
           "counts_as": [
-            "风化"
+            "dot:wind_shear"
           ],
           "amount": 1,
           "max_stacks": 50,
@@ -144,7 +144,7 @@
           "op": "ADD_STACK",
           "buff": "奥迹",
           "counts_as": [
-            "风化"
+            "dot:wind_shear"
           ],
           "amount": 1,
           "max_stacks": 50,
@@ -186,7 +186,7 @@
           "op": "ADD_STACK",
           "buff": "奥迹",
           "counts_as": [
-            "风化"
+            "dot:wind_shear"
           ],
           "amount": 1,
           "max_stacks": 50,
@@ -271,7 +271,7 @@
           "op": "ADD_STACK",
           "buff": "奥迹",
           "counts_as": [
-            "风化"
+            "dot:wind_shear"
           ],
           "amount": 1,
           "max_stacks": 50,
@@ -315,7 +315,7 @@
           "op": "ADD_STACK",
           "buff": "奥迹",
           "counts_as": [
-            "风化"
+            "dot:wind_shear"
           ],
           "amount": 1,
           "max_stacks": 50,
@@ -339,9 +339,9 @@
           "buff": "揭露",
           "turns": 2,
           "counts_as": [
-            "裂伤",
-            "灼烧",
-            "触电"
+            "dot:bleed",
+            "dot:burn",
+            "dot:shock"
           ],
           "counts_as_requires": "奥迹",
           "target": "all_enemies"
@@ -380,7 +380,7 @@
           "op": "ADD_STACK",
           "buff": "奥迹",
           "counts_as": [
-            "风化"
+            "dot:wind_shear"
           ],
           "amount": 1,
           "max_stacks": 50,
@@ -404,7 +404,7 @@
           "op": "ADD_STACK",
           "buff": "奥迹",
           "counts_as": [
-            "风化"
+            "dot:wind_shear"
           ],
           "amount": 6,
           "max_stacks": 50,
@@ -563,7 +563,7 @@
       "on": "TURN_START",
       "id": "eidolon1_wind_resist_for_windshear",
       "when": [
-        "actor has_state 风化"
+        "actor has_state dot:wind_shear"
       ],
       "min_eidolon": 1,
       "do": [
@@ -572,7 +572,7 @@
           "attribute": "RESISTANCE_REDUCTION_WIND",
           "percent": -0.25,
           "permanent": true,
-          "while_holder_state": "风化",
+          "while_holder_state": "dot:wind_shear",
           "target": "all_enemies"
         }
       ],
@@ -583,7 +583,7 @@
       "on": "TURN_START",
       "id": "eidolon1_physical_resist_for_bleed",
       "when": [
-        "actor has_state 裂伤"
+        "actor has_state dot:bleed"
       ],
       "min_eidolon": 1,
       "do": [
@@ -592,7 +592,7 @@
           "attribute": "RESISTANCE_REDUCTION_PHYSICAL",
           "percent": -0.25,
           "permanent": true,
-          "while_holder_state": "裂伤",
+          "while_holder_state": "dot:bleed",
           "target": "all_enemies"
         }
       ],
@@ -603,7 +603,7 @@
       "on": "TURN_START",
       "id": "eidolon1_fire_resist_for_burn",
       "when": [
-        "actor has_state 灼烧"
+        "actor has_state dot:burn"
       ],
       "min_eidolon": 1,
       "do": [
@@ -612,7 +612,7 @@
           "attribute": "RESISTANCE_REDUCTION_FIRE",
           "percent": -0.25,
           "permanent": true,
-          "while_holder_state": "灼烧",
+          "while_holder_state": "dot:burn",
           "target": "all_enemies"
         }
       ],
@@ -623,7 +623,7 @@
       "on": "TURN_START",
       "id": "eidolon1_thunder_resist_for_shock",
       "when": [
-        "actor has_state 触电"
+        "actor has_state dot:shock"
       ],
       "min_eidolon": 1,
       "do": [
@@ -632,7 +632,7 @@
           "attribute": "RESISTANCE_REDUCTION_THUNDER",
           "percent": -0.25,
           "permanent": true,
-          "while_holder_state": "触电",
+          "while_holder_state": "dot:shock",
           "target": "all_enemies"
         }
       ],

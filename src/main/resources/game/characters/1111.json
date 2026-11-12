@@ -169,7 +169,7 @@
       "when": [
         "actor == self",
         "from_skill_id == 8",
-        "target has_state 裂伤"
+        "target has_state dot:bleed"
       ],
       "do": [
         {
@@ -342,7 +342,7 @@
       "min_eidolon": 1,
       "when": [
         "actor == self",
-        "any_enemy has_state 裂伤"
+        "any_enemy has_state dot:bleed"
       ],
       "do": [
         {
@@ -366,7 +366,7 @@
       "when": [
         "actor == self",
         "from_skill COMMON",
-        "target has_state 裂伤"
+        "target has_state dot:bleed"
       ],
       "do": [
         {

@@ -21,8 +21,8 @@ import java.util.List;
  * {@code EXTEND_BUFF}: "... increases the duration by 1 turn".
  *
  * <p><b>Why the vocabulary needed it.</b> Documents lengthen a buff that is <b>already up</b> rather
- * than creating a new one - March 7th (三月七)'s "加护" (Reinforce) ("increases the duration of the shield provided by the Skill by 1 turn"), Bronya (布洛妮娅)'s eidolon 6, Sampo (桑博)'s Wind Shear (风化),
- * Himeko (姬子)'s Burn (灼烧), Bailu (白露)'s Invigoration (生息), Huohuo (藿藿)'s Divine Provision (禳命), Gallagher (加拉赫)'s Besotted (酩酊) ... Before this op the only way to write one was to <b>fold the +1 into the
+ * than creating a new one - March 7th (三月七)'s "加护" (Reinforce) ("increases the duration of the shield provided by the Skill by 1 turn"), Bronya (布洛妮娅)'s eidolon 6, Sampo (桑博)'s Wind Shear (dot:wind_shear),
+ * Himeko (姬子)'s Burn (dot:burn), Bailu (白露)'s Invigoration (生息), Huohuo (藿藿)'s Divine Provision (禳命), Gallagher (加拉赫)'s Besotted (酩酊) ... Before this op the only way to write one was to <b>fold the +1 into the
  * ability it lengthens</b>, which erases the trace's own line from the data and makes the base ability state a
  * duration that is not its own.
  *
@@ -67,7 +67,7 @@ public class ExtendBuffTest {
 
         Fixture dot = new Fixture(
                 TriggerSpecs.dot("Fire", 500.0, null, null, 2, null),
-                TriggerSpecs.extendBuff("灼烧", null, 1));
+                TriggerSpecs.extendBuff("dot:burn", null, 1));
         dot.fire();
         Assertions.assertEquals(3, dot.buff(DotBuff.class).duration(),
                 "the DOT's name is its element's (Fire -> Burning), translated in one place");
@@ -185,7 +185,7 @@ public class ExtendBuffTest {
         Assertions.assertTrue(missing.getMessage().contains("buff"), missing.getMessage());
 
         IllegalArgumentException both = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.extendBuff("灼烧", "ATTACK", 1)));
+                () -> tableOf(TriggerSpecs.extendBuff("dot:burn", "ATTACK", 1)));
         Assertions.assertTrue(both.getMessage().contains("both"), both.getMessage());
 
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -195,11 +195,11 @@ public class ExtendBuffTest {
     @Test
     public void turnsAreRequiredAndNothingElseIsAccepted() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.extendBuff("灼烧", null, null)), "no turns");
+                () -> tableOf(TriggerSpecs.extendBuff("dot:burn", null, null)), "no turns");
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.extendBuff("灼烧", null, 0)), "0 turns");
+                () -> tableOf(TriggerSpecs.extendBuff("dot:burn", null, 0)), "0 turns");
 
-        EffectSpec withAmount = TriggerSpecs.extendBuff("灼烧", null, 1);
+        EffectSpec withAmount = TriggerSpecs.extendBuff("dot:burn", null, 1);
         TriggerSpecs.set(withAmount, "amount", 5.0);
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> tableOf(withAmount));

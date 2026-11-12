@@ -20,7 +20,7 @@ import java.util.List;
  *   <li><b>Eidolon 1</b> — 「战技强化后造成的伤害提高 20%」. The gate is the enhanced form itself: {@code damage_skill_key == 9}
  *       (the loader's slot that {@code REPLACE_SKILL} installs). ⚠ {@code from_skill_id} does <b>not</b> work on
  *       {@code DEALING_DAMAGE}: its payload carries no cast facts — measured, the reading was identical at E0 and E1.</li>
- *   <li><b>Eidolon 4</b> — 「使指定敌方目标的相邻目标也陷入等同于战技的灼烧状态」. Needed a new selector,
+ *   <li><b>Eidolon 4</b> — 「使指定敌方目标的相邻目标也陷入等同于战技的dot:burn状态」. Needed a new selector,
  *       {@code adjacent_enemies}: {@code random_adjacent_enemy} answers only one of the two neighbours.</li>
  * </ul>
  */
@@ -47,7 +47,7 @@ public class HookClauseCoverageTest {
     }
 
     /**
-     * Eidolon 4: 「使指定敌方目标的相邻目标也陷入等同于战技的灼烧状态」.
+     * Eidolon 4: 「使指定敌方目标的相邻目标也陷入等同于战技的dot:burn状态」.
      *
      * <p>Measured with three enemies: after the Skill burns the middle one and a basic attack triggers the talent, both
      * neighbours are burning at E4 and neither is at E0.
@@ -57,7 +57,7 @@ public class HookClauseCoverageTest {
         Assertions.assertArrayEquals(new boolean[]{false, false},
                 neighboursBurning(0), "control: at E0 the neighbours are untouched");
         Assertions.assertArrayEquals(new boolean[]{true, true},
-                neighboursBurning(4), "「相邻目标也陷入…灼烧状态」 — both of them");
+                neighboursBurning(4), "「相邻目标也陷入…dot:burn状态」 — both of them");
     }
 
     // ==================================================================
@@ -86,8 +86,8 @@ public class HookClauseCoverageTest {
         f.battle.castImmediate(f.hook.getSkills().get(SkillType.COMMON), f.hook, List.of(f.enemies.get(1)));
         f.battle.processRequests();
         return new boolean[]{
-                f.enemies.get(0).getBuffManager().hasState("灼烧"),
-                f.enemies.get(2).getBuffManager().hasState("灼烧")};
+                f.enemies.get(0).getBuffManager().hasState("dot:burn"),
+                f.enemies.get(2).getBuffManager().hasState("dot:burn")};
     }
 
     private static final class Fixture {

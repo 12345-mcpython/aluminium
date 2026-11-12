@@ -30,7 +30,7 @@ public class SampoTraceTest {
      */
     @Test
     public void theTalentWindshearLastsOneTurnLonger() {
-        Assertions.assertEquals(3 + 1, windshearTurns(), "「天赋使敌方陷入风化状态的持续时间延长 1 回合」");
+        Assertions.assertEquals(3 + 1, windshearTurns(), "「天赋使敌方陷入dot:wind_shear状态的持续时间延长 1 回合」");
     }
 
     /**
@@ -85,7 +85,7 @@ public class SampoTraceTest {
     private static double lossFromAttacker(boolean windsheared) {
         Fixture f = new Fixture();
         if (windsheared) {
-            f.enemy.getBuffManager().addBuff(new DotBuff(f.enemy, DamageElement.WIND, 100, 3, 0, "风化"));
+            f.enemy.getBuffManager().addBuff(new DotBuff(f.enemy, DamageElement.WIND, 100, 3, 0, "dot:wind_shear"));
         }
         double before = f.sampo.getCurrentHp();
         f.battle.applyDamage(f.sampo, new Damage(f.enemy, f.sampo, DamageElement.PHYSICAL, DamageType.NORMAL, 1000));

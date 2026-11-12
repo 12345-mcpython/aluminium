@@ -38,7 +38,7 @@ public class HimekoAuditTest {
     }
 
     /**
-     * 行迹 星火: her attack can set 灼烧, and the burn's own damage is her 30% ATK per turn.
+     * 行迹 星火: her attack can set dot:burn, and the burn's own damage is her 30% ATK per turn.
      */
     @Test
     public void traceStarfireSetsTheBurn() {
@@ -49,12 +49,12 @@ public class HimekoAuditTest {
         battle.startBattle();
         battle.castImmediate(her.getSkills().get(SkillType.COMMON), her, List.of(victim));
         battle.processRequests();
-        boolean burning = victim.getBuffManager().hasState("灼烧") || victim.getBuffManager().stacksOf("灼烧") > 0;
-        System.out.println("[1003] 灼烧 landed=" + burning);
-        Assertions.assertTrue(burning, "「有 50% 基础概率使敌方目标陷入灼烧状态」");
+        boolean burning = victim.getBuffManager().hasState("dot:burn") || victim.getBuffManager().stacksOf("dot:burn") > 0;
+        System.out.println("[1003] dot:burn landed=" + burning);
+        Assertions.assertTrue(burning, "「有 50% 基础概率使敌方目标陷入dot:burn状态」");
 
         // ⚠ DOT 的每回合结算走敌方回合的真实流程，这个夹具不发那个事件 ⇒ 只钉「灼烧上了」与它自己的快照值。
-        System.out.println("[1003] 灼烧已挂上；每回合的 30% 伤害由该 DOT 自己结算（见状态表）");
+        System.out.println("[1003] dot:burn已挂上；每回合的 30% 伤害由该 DOT 自己结算（见状态表）");
     }
 
     /**

@@ -48,7 +48,7 @@ public class DebuffTest {
     @Test
     public void theClassificationIsDecidedPerBuffClass() {
         Assertions.assertTrue(new DotBuff(attacker(), DamageElement.FIRE, 100, 2).isDebuff(),
-                "Burn (灼烧) / Shock (触电) / ... are DoT Debuffs (持续伤害类负面状态)");
+                "Burn (dot:burn) / Shock (dot:shock) / ... are DoT Debuffs (持续伤害类负面状态)");
         Assertions.assertTrue(new StunBuff(1).isDebuff(), "a control state is negative on its bearer");
         Assertions.assertTrue(new TauntBuff(1).isDebuff(),
                 "Taunt (嘲讽) forces the bearer's targeting -- negative on the one carrying it");

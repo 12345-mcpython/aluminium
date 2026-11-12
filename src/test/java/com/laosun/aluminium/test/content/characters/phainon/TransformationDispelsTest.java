@@ -28,7 +28,7 @@ public class TransformationDispelsTest {
     private static final int OWNER = 1408;
     private static final int APPLIER = 1002;
     private static final String STATE = "变身";
-    private static final String DOT = "触电";
+    private static final String DOT = "dot:shock";
 
     /**
      * Transformed: her own cast strips the debuff.

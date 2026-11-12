@@ -7,7 +7,7 @@
       "id": "cone23022_seer_from_dot_1",
       "when": [
         "actor == self",
-        "target has_state 风化"
+        "target has_state dot:wind_shear"
       ],
       "once_per_battle": true,
       "do": [
@@ -36,7 +36,7 @@
       "id": "cone23022_seer_from_dot_2",
       "when": [
         "actor == self",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "once_per_battle": true,
       "do": [
@@ -65,7 +65,7 @@
       "id": "cone23022_seer_from_dot_3",
       "when": [
         "actor == self",
-        "target has_state 触电"
+        "target has_state dot:shock"
       ],
       "once_per_battle": true,
       "do": [
@@ -94,7 +94,7 @@
       "id": "cone23022_seer_from_dot_4",
       "when": [
         "actor == self",
-        "target has_state 裂伤"
+        "target has_state dot:bleed"
       ],
       "once_per_battle": true,
       "do": [
@@ -147,7 +147,7 @@
       "id": "cone23022_seer_from_dot_1",
       "when": [
         "actor == self",
-        "target has_state 风化"
+        "target has_state dot:wind_shear"
       ],
       "once_per_battle": true,
       "do": [
@@ -176,7 +176,7 @@
       "id": "cone23022_seer_from_dot_2",
       "when": [
         "actor == self",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "once_per_battle": true,
       "do": [
@@ -205,7 +205,7 @@
       "id": "cone23022_seer_from_dot_3",
       "when": [
         "actor == self",
-        "target has_state 触电"
+        "target has_state dot:shock"
       ],
       "once_per_battle": true,
       "do": [
@@ -234,7 +234,7 @@
       "id": "cone23022_seer_from_dot_4",
       "when": [
         "actor == self",
-        "target has_state 裂伤"
+        "target has_state dot:bleed"
       ],
       "once_per_battle": true,
       "do": [
@@ -287,7 +287,7 @@
       "id": "cone23022_seer_from_dot_1",
       "when": [
         "actor == self",
-        "target has_state 风化"
+        "target has_state dot:wind_shear"
       ],
       "once_per_battle": true,
       "do": [
@@ -316,7 +316,7 @@
       "id": "cone23022_seer_from_dot_2",
       "when": [
         "actor == self",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "once_per_battle": true,
       "do": [
@@ -345,7 +345,7 @@
       "id": "cone23022_seer_from_dot_3",
       "when": [
         "actor == self",
-        "target has_state 触电"
+        "target has_state dot:shock"
       ],
       "once_per_battle": true,
       "do": [
@@ -374,7 +374,7 @@
       "id": "cone23022_seer_from_dot_4",
       "when": [
         "actor == self",
-        "target has_state 裂伤"
+        "target has_state dot:bleed"
       ],
       "once_per_battle": true,
       "do": [
@@ -427,7 +427,7 @@
       "id": "cone23022_seer_from_dot_1",
       "when": [
         "actor == self",
-        "target has_state 风化"
+        "target has_state dot:wind_shear"
       ],
       "once_per_battle": true,
       "do": [
@@ -456,7 +456,7 @@
       "id": "cone23022_seer_from_dot_2",
       "when": [
         "actor == self",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "once_per_battle": true,
       "do": [
@@ -485,7 +485,7 @@
       "id": "cone23022_seer_from_dot_3",
       "when": [
         "actor == self",
-        "target has_state 触电"
+        "target has_state dot:shock"
       ],
       "once_per_battle": true,
       "do": [
@@ -514,7 +514,7 @@
       "id": "cone23022_seer_from_dot_4",
       "when": [
         "actor == self",
-        "target has_state 裂伤"
+        "target has_state dot:bleed"
       ],
       "once_per_battle": true,
       "do": [
@@ -567,7 +567,7 @@
       "id": "cone23022_seer_from_dot_1",
       "when": [
         "actor == self",
-        "target has_state 风化"
+        "target has_state dot:wind_shear"
       ],
       "once_per_battle": true,
       "do": [
@@ -596,7 +596,7 @@
       "id": "cone23022_seer_from_dot_2",
       "when": [
         "actor == self",
-        "target has_state 灼烧"
+        "target has_state dot:burn"
       ],
       "once_per_battle": true,
       "do": [
@@ -625,7 +625,7 @@
       "id": "cone23022_seer_from_dot_3",
       "when": [
         "actor == self",
-        "target has_state 触电"
+        "target has_state dot:shock"
       ],
       "once_per_battle": true,
       "do": [
@@ -654,7 +654,7 @@
       "id": "cone23022_seer_from_dot_4",
       "when": [
         "actor == self",
-        "target has_state 裂伤"
+        "target has_state dot:bleed"
       ],
       "once_per_battle": true,
       "do": [

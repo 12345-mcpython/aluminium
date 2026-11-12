@@ -103,11 +103,11 @@ public class CharacterConditionLiteralsTest {
         assertRule(1109, "SKILL_CAST", "skill_burn", List.of("actor == self"));
         assertRule(1109, "ULT_CAST", "trace_play_with_fire", List.of("actor == self"));
         assertRule(1109, "BATTLE_START", "eidolon2_longer_burn", List.of());
-        assertRule(1109, "DEALING_DAMAGE", "eidolon6_bonus_against_burning", List.of("actor == self", "target has_state 灼烧"));
+        assertRule(1109, "DEALING_DAMAGE", "eidolon6_bonus_against_burning", List.of("actor == self", "target has_state dot:burn"));
         assertRule(1109, "BATTLE_START", "eidolon3_levels", List.of());
         assertRule(1109, "BATTLE_START", "eidolon5_levels", List.of());
-        assertRule(1109, "DEALING_DAMAGE", "talent_followup_against_burning", List.of("actor == self", "target has_state 灼烧", "damage_is_attack"));
-        assertRule(1109, "DEALING_DAMAGE", "trace_childlike", List.of("actor == self", "target has_state 灼烧", "damage_is_attack"));
+        assertRule(1109, "DEALING_DAMAGE", "talent_followup_against_burning", List.of("actor == self", "target has_state dot:burn", "damage_is_attack"));
+        assertRule(1109, "DEALING_DAMAGE", "trace_childlike", List.of("actor == self", "target has_state dot:burn", "damage_is_attack"));
         assertRule(1109, "BATTLE_START", "trace_innocence", List.of());
         assertRule(1110, "SKILL_CAST", "skill_survival_response", List.of("actor == self"));
         assertRule(1110, "SKILL_CAST", "talent_regen_after_skill", List.of("actor == self"));
@@ -117,7 +117,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1111, "BATTLE_START", "talent_start", List.of());
         assertRule(1111, "ALLY_ATTACK", "talent_after_basic", List.of("actor == self", "from_skill COMMON"));
         assertRule(1111, "ALLY_ATTACK", "talent_enhance_basic", List.of("actor == self", "self_stacks:斗志 >= 2.0"));
-        assertRule(1111, "ALLY_ATTACK", "talent_enhanced_laceration", List.of("actor == self", "from_skill_id == 8.0", "target has_state 裂伤"));
+        assertRule(1111, "ALLY_ATTACK", "talent_enhanced_laceration", List.of("actor == self", "from_skill_id == 8.0", "target has_state dot:bleed"));
         assertRule(1111, "ALLY_ATTACK", "enhanced_costs_two_layers", List.of("actor == self", "from_skill_id == 8.0"));
         assertRule(1111, "ALLY_ATTACK", "talent_after_skill", List.of("actor == self", "from_skill SKILL"));
         assertRule(1111, "SKILL_CAST", "trace_overload", List.of("actor == self"));
