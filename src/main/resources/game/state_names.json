@@ -1,0 +1,1358 @@
+{
+  "schema": 1,
+  "_note": "状态 / 层数 / 资源名的**声明表**（唯一声明点，守卫是 `StateNameRegistryTest`）。每个在内容里被结构化使用的名字都必须在这里出现一次：`when` 里的 `has_state` / `state_ended` / `stack_added` / `*_stacks:` / `*_resource:`，以及 `do` 里**建状态或摘状态**的那几个 op 的 `buff`、`resource`、`while_state` / `while_holder_state`、`counts_as`、按名选择器（`holder_of:` 等）与 `resources[].id`。⚠ `MODIFY_ATTR` 那种**只是显示标签**的 `buff` 不算名字（它们读起来像散文），但它一旦会被 `REMOVE_STATE` 摘掉，就**是**身份 —— 1506 的 `1506天赋-暴击率` 就是这样进表的。\n\nkind 三选一：`engine`（引擎自造/已知）、`shared`（被多个内容文件用到的游戏术语）、`local`（只属于某一个文件的自造计数器，必须写 `file`）。`key` 是将来取代中文名的 ASCII 身份：`engine` 现在就必须有，`shared` / `local` 等该族迁移时再补。⚠ 名字一旦本身变成 key（`key == name`），必须保留 `zh` 原文，否则「句子 → 键」的对照就断了。",
+  "names": {
+    "1506天赋-暴击伤害": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "1506天赋-暴击率": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "1506行迹-强化普攻隐藏分1": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "1506行迹-强化普攻隐藏分2": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "1506行迹-强化普攻隐藏分3": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "1506行迹-强化普攻隐藏分4": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "23059_wave_energy": {
+      "kind": "local",
+      "file": "23059"
+    },
+    "325_30": {
+      "kind": "local",
+      "file": "325"
+    },
+    "325_60": {
+      "kind": "local",
+      "file": "325"
+    },
+    "E2本回合已触发": {
+      "kind": "local",
+      "file": "1315"
+    },
+    "Fever": {
+      "kind": "local",
+      "file": "1512"
+    },
+    "MServant_CyreneServant_00_AmazingBuff_Aglaea": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "relic130_elation_used": {
+      "kind": "local",
+      "file": "130"
+    },
+    "上上签": {
+      "kind": "local",
+      "file": "23054"
+    },
+    "下一次普攻待命": {
+      "kind": "local",
+      "file": "20018"
+    },
+    "下个战技返还战技点": {
+      "kind": "local",
+      "file": "1312"
+    },
+    "不求人": {
+      "kind": "local",
+      "file": "1201"
+    },
+    "乱蝶": {
+      "kind": "local",
+      "file": "1102"
+    },
+    "亿质": {
+      "kind": "local",
+      "file": "1413"
+    },
+    "从这位队友处得到过【追忆】": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "以太编码": {
+      "kind": "local",
+      "file": "23007"
+    },
+    "优势口袋": {
+      "kind": "local",
+      "file": "1315"
+    },
+    "伴舞": {
+      "kind": "shared",
+      "files": [
+        "8005",
+        "8006"
+      ]
+    },
+    "假面": {
+      "kind": "local",
+      "file": "23021"
+    },
+    "偏偏希望无价之视": {
+      "kind": "local",
+      "file": "23028"
+    },
+    "充能": {
+      "kind": "shared",
+      "files": [
+        "1003",
+        "1015",
+        "1205",
+        "1223",
+        "1224",
+        "1314",
+        "1317",
+        "1412",
+        "1415",
+        "1503",
+        "1504",
+        "8007",
+        "8008"
+      ]
+    },
+    "充能计数": {
+      "kind": "local",
+      "file": "1223"
+    },
+    "先知": {
+      "kind": "local",
+      "file": "23022"
+    },
+    "免费强化": {
+      "kind": "shared",
+      "files": [
+        "8003",
+        "8004"
+      ]
+    },
+    "军功": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "军功-攻击力": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "军功增伤": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "军功穿透": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "冻结": {
+      "kind": "engine",
+      "key": "ctrl:frozen",
+      "en": "Frozen"
+    },
+    "剑势": {
+      "kind": "local",
+      "file": "1206"
+    },
+    "剑势额外判定": {
+      "kind": "local",
+      "file": "1206"
+    },
+    "功勋": {
+      "kind": "local",
+      "file": "315"
+    },
+    "助力": {
+      "kind": "local",
+      "file": "126"
+    },
+    "助燃": {
+      "kind": "local",
+      "file": "132"
+    },
+    "匠躯": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "千锻魂": {
+      "kind": "local",
+      "file": "1507"
+    },
+    "升华": {
+      "kind": "engine",
+      "key": "ctrl:sublimated",
+      "en": "Sublimated"
+    },
+    "华彩": {
+      "kind": "local",
+      "file": "23026"
+    },
+    "协奏": {
+      "kind": "local",
+      "file": "1309"
+    },
+    "卸甲": {
+      "kind": "local",
+      "file": "23029"
+    },
+    "反击标记": {
+      "kind": "local",
+      "file": "1107"
+    },
+    "变身": {
+      "kind": "local",
+      "file": "1408"
+    },
+    "同袍": {
+      "kind": "local",
+      "file": "1414"
+    },
+    "吞火": {
+      "kind": "local",
+      "file": "1210"
+    },
+    "吞纳沙砾": {
+      "kind": "local",
+      "file": "1503"
+    },
+    "回路层数": {
+      "kind": "local",
+      "file": "1015"
+    },
+    "回路次数": {
+      "kind": "local",
+      "file": "1015"
+    },
+    "回路连接": {
+      "kind": "local",
+      "file": "1015"
+    },
+    "圣咏": {
+      "kind": "local",
+      "file": "23034"
+    },
+    "地平线层数": {
+      "kind": "local",
+      "file": "22008"
+    },
+    "地狱变": {
+      "kind": "local",
+      "file": "1205"
+    },
+    "城垣": {
+      "kind": "shared",
+      "files": [
+        "8003",
+        "8004"
+      ]
+    },
+    "增幅": {
+      "kind": "local",
+      "file": "1102"
+    },
+    "夜色": {
+      "kind": "local",
+      "file": "23049"
+    },
+    "夜行": {
+      "kind": "local",
+      "file": "1102"
+    },
+    "天空之诗的治疗份额": {
+      "kind": "local",
+      "file": "1409"
+    },
+    "天空应我的祈愿": {
+      "kind": "local",
+      "file": "1409"
+    },
+    "天赋充能": {
+      "kind": "local",
+      "file": "1404"
+    },
+    "天赋治疗额度": {
+      "kind": "local",
+      "file": "1211"
+    },
+    "奥词战技溢出": {
+      "kind": "local",
+      "file": "1410"
+    },
+    "奥词普攻溢出": {
+      "kind": "local",
+      "file": "1410"
+    },
+    "奥迹": {
+      "kind": "local",
+      "file": "1307"
+    },
+    "奥迹不重置额度": {
+      "kind": "local",
+      "file": "1307"
+    },
+    "好活当赏": {
+      "kind": "shared",
+      "files": [
+        "133",
+        "1502",
+        "1503",
+        "1505",
+        "1506",
+        "1513",
+        "8009",
+        "8010"
+      ]
+    },
+    "好运": {
+      "kind": "local",
+      "file": "21037"
+    },
+    "婪酣": {
+      "kind": "local",
+      "file": "1504"
+    },
+    "孤立": {
+      "kind": "local",
+      "file": "1223"
+    },
+    "完全燃烧": {
+      "kind": "local",
+      "file": "1310"
+    },
+    "小伊卡累计治疗": {
+      "kind": "local",
+      "file": "1409"
+    },
+    "岁月之诗的亿质点数": {
+      "kind": "local",
+      "file": "1413"
+    },
+    "崩溃": {
+      "kind": "local",
+      "file": "23025"
+    },
+    "师父": {
+      "kind": "local",
+      "file": "1224"
+    },
+    "幸福傀儡": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "幻相": {
+      "kind": "local",
+      "file": "1306"
+    },
+    "异梦": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "弦外音": {
+      "kind": "local",
+      "file": "1303"
+    },
+    "弱点击破": {
+      "kind": "engine",
+      "key": "break:weakness",
+      "en": "Weakness Break"
+    },
+    "强化": {
+      "kind": "shared",
+      "files": [
+        "1004",
+        "1224"
+      ]
+    },
+    "强化反击": {
+      "kind": "local",
+      "file": "1107"
+    },
+    "强化普攻次数": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "强烈震荡": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "归纳": {
+      "kind": "local",
+      "file": "1305"
+    },
+    "当品": {
+      "kind": "local",
+      "file": "1314"
+    },
+    "彩墨": {
+      "kind": "local",
+      "file": "1317"
+    },
+    "彩焰": {
+      "kind": "local",
+      "file": "23021"
+    },
+    "影噬": {
+      "kind": "local",
+      "file": "23056"
+    },
+    "往昔的涟漪": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "御剑真诀": {
+      "kind": "local",
+      "file": "1209"
+    },
+    "忆灵技的额外一击": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "忘忧": {
+      "kind": "local",
+      "file": "23032"
+    },
+    "怒噪": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "怨火灼身": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "恐惧": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "恶报": {
+      "kind": "local",
+      "file": "1214"
+    },
+    "恶报溢出": {
+      "kind": "local",
+      "file": "1214"
+    },
+    "惊惶": {
+      "kind": "local",
+      "file": "1304"
+    },
+    "惊魂夜攻击": {
+      "kind": "local",
+      "file": "23017"
+    },
+    "惩戒": {
+      "kind": "local",
+      "file": "1004"
+    },
+    "戏法": {
+      "kind": "local",
+      "file": "21041"
+    },
+    "战技点": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "承负": {
+      "kind": "local",
+      "file": "1215"
+    },
+    "承负次数": {
+      "kind": "local",
+      "file": "1215"
+    },
+    "承负返还": {
+      "kind": "local",
+      "file": "1215"
+    },
+    "技能层": {
+      "kind": "local",
+      "file": "23046"
+    },
+    "推流": {
+      "kind": "local",
+      "file": "23053"
+    },
+    "揭露": {
+      "kind": "local",
+      "file": "1307"
+    },
+    "揭露能量额度": {
+      "kind": "local",
+      "file": "1307"
+    },
+    "支配": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "收债人": {
+      "kind": "local",
+      "file": "1314"
+    },
+    "攻击段数": {
+      "kind": "local",
+      "file": "1204"
+    },
+    "攻陷": {
+      "kind": "local",
+      "file": "21015"
+    },
+    "故事": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "救主计数": {
+      "kind": "shared",
+      "files": [
+        "1217",
+        "1503"
+      ]
+    },
+    "敕令": {
+      "kind": "local",
+      "file": "1215"
+    },
+    "斗志": {
+      "kind": "local",
+      "file": "1111"
+    },
+    "新声": {
+      "kind": "local",
+      "file": "23063"
+    },
+    "新蕊": {
+      "kind": "local",
+      "file": "1407"
+    },
+    "施放计数": {
+      "kind": "local",
+      "file": "23034"
+    },
+    "无敌玩家": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "无敌玩家-免疫控制": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "早餐层数": {
+      "kind": "local",
+      "file": "21027"
+    },
+    "星神层数": {
+      "kind": "local",
+      "file": "24000"
+    },
+    "星魂4穿透": {
+      "kind": "local",
+      "file": "1014"
+    },
+    "星魂二-待发": {
+      "kind": "local",
+      "file": "1313"
+    },
+    "星魂二穿防": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "普攻计数": {
+      "kind": "shared",
+      "files": [
+        "23033",
+        "23057"
+      ]
+    },
+    "智剑连心": {
+      "kind": "local",
+      "file": "1209"
+    },
+    "智者的短见": {
+      "kind": "local",
+      "file": "1305"
+    },
+    "暖流": {
+      "kind": "local",
+      "file": "1410"
+    },
+    "月色": {
+      "kind": "local",
+      "file": "1212"
+    },
+    "月茧": {
+      "kind": "local",
+      "file": "1407"
+    },
+    "月蚀": {
+      "kind": "local",
+      "file": "23014"
+    },
+    "朔望": {
+      "kind": "local",
+      "file": "1212"
+    },
+    "未来": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "本回合已加成": {
+      "kind": "local",
+      "file": "1512"
+    },
+    "本回合战技次数": {
+      "kind": "local",
+      "file": "1015"
+    },
+    "本回合施放战技": {
+      "kind": "local",
+      "file": "1207"
+    },
+    "本回合消耗": {
+      "kind": "shared",
+      "files": [
+        "23053",
+        "23061",
+        "324"
+      ]
+    },
+    "梦身": {
+      "kind": "local",
+      "file": "23010"
+    },
+    "欢愉度": {
+      "kind": "shared",
+      "files": [
+        "1505",
+        "21065"
+      ]
+    },
+    "欢愉技计数": {
+      "kind": "local",
+      "file": "23064"
+    },
+    "歌咏": {
+      "kind": "local",
+      "file": "23026"
+    },
+    "残梦": {
+      "kind": "local",
+      "file": "1308"
+    },
+    "毁伤": {
+      "kind": "local",
+      "file": "1408"
+    },
+    "气氛值": {
+      "kind": "local",
+      "file": "1512"
+    },
+    "永续的燃烧": {
+      "kind": "local",
+      "file": "1408"
+    },
+    "求生反应": {
+      "kind": "local",
+      "file": "1110"
+    },
+    "泡影": {
+      "kind": "local",
+      "file": "23024"
+    },
+    "流光": {
+      "kind": "local",
+      "file": "23031"
+    },
+    "浪漫": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "消耗层数": {
+      "kind": "local",
+      "file": "23053"
+    },
+    "涨幅惊人": {
+      "kind": "local",
+      "file": "1112"
+    },
+    "涨幅次数": {
+      "kind": "local",
+      "file": "1112"
+    },
+    "淘气值": {
+      "kind": "local",
+      "file": "21005"
+    },
+    "深度学习": {
+      "kind": "local",
+      "file": "1503"
+    },
+    "温驯": {
+      "kind": "local",
+      "file": "23016"
+    },
+    "渲染理性，解构欢愉": {
+      "kind": "local",
+      "file": "1503"
+    },
+    "游丝": {
+      "kind": "local",
+      "file": "23006"
+    },
+    "游丝加速": {
+      "kind": "local",
+      "file": "23006"
+    },
+    "演算": {
+      "kind": "local",
+      "file": "24004"
+    },
+    "演绎": {
+      "kind": "local",
+      "file": "1305"
+    },
+    "潜龙": {
+      "kind": "local",
+      "file": "1002"
+    },
+    "潮流": {
+      "kind": "local",
+      "file": "23064"
+    },
+    "火种": {
+      "kind": "local",
+      "file": "1408"
+    },
+    "火舞": {
+      "kind": "local",
+      "file": "23030"
+    },
+    "灵感": {
+      "kind": "local",
+      "file": "1401"
+    },
+    "灼烧": {
+      "kind": "shared",
+      "files": [
+        "1003",
+        "1109",
+        "1210",
+        "1307",
+        "21026",
+        "23022"
+      ]
+    },
+    "灼热意志": {
+      "kind": "shared",
+      "files": [
+        "8003",
+        "8004"
+      ]
+    },
+    "炉心共鸣": {
+      "kind": "local",
+      "file": "1014"
+    },
+    "炼狱": {
+      "kind": "local",
+      "file": "23059"
+    },
+    "炽灼": {
+      "kind": "local",
+      "file": "1225"
+    },
+    "烈阳": {
+      "kind": "local",
+      "file": "23044"
+    },
+    "烬煨": {
+      "kind": "local",
+      "file": "1218"
+    },
+    "热意": {
+      "kind": "local",
+      "file": "1513"
+    },
+    "焚灼": {
+      "kind": "local",
+      "file": "23035"
+    },
+    "爆燃已触发": {
+      "kind": "local",
+      "file": "21038"
+    },
+    "爵位": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "特邀嘉宾": {
+      "kind": "local",
+      "file": "1512"
+    },
+    "狐祈": {
+      "kind": "local",
+      "file": "1225"
+    },
+    "猎物": {
+      "kind": "local",
+      "file": "1223"
+    },
+    "献予「创世」之诗": {
+      "kind": "local",
+      "file": "8007"
+    },
+    "献予「大地」之诗": {
+      "kind": "local",
+      "file": "1414"
+    },
+    "献予「天空」之诗": {
+      "kind": "shared",
+      "files": [
+        "1409",
+        "1415"
+      ]
+    },
+    "献予「岁月」之诗": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "献予「真我」之诗": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "献予「纷争」之诗": {
+      "kind": "local",
+      "file": "1404"
+    },
+    "献予「门径」之诗": {
+      "kind": "local",
+      "file": "1403"
+    },
+    "王之娱乐": {
+      "kind": "local",
+      "file": "23062"
+    },
+    "琼玉牌": {
+      "kind": "local",
+      "file": "1201"
+    },
+    "生息": {
+      "kind": "local",
+      "file": "1211"
+    },
+    "生息治疗额度": {
+      "kind": "local",
+      "file": "1211"
+    },
+    "生死之诗的溢出消耗": {
+      "kind": "local",
+      "file": "1407"
+    },
+    "白花之刻": {
+      "kind": "local",
+      "file": "1203"
+    },
+    "盲注": {
+      "kind": "local",
+      "file": "1304"
+    },
+    "真知": {
+      "kind": "local",
+      "file": "1405"
+    },
+    "真知的战技增伤": {
+      "kind": "local",
+      "file": "1405"
+    },
+    "睚准": {
+      "kind": "local",
+      "file": "21010"
+    },
+    "短视之惩-她-忆灵速度": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "短视之惩-她-自身速度": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "短视之惩-衣匠-忆灵速度": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "短视之惩-衣匠-自身速度": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "神启": {
+      "kind": "local",
+      "file": "1403"
+    },
+    "禁锢": {
+      "kind": "engine",
+      "key": "ctrl:imprisoned",
+      "en": "Imprisoned"
+    },
+    "禳命": {
+      "kind": "local",
+      "file": "1217"
+    },
+    "离场": {
+      "kind": "local",
+      "file": "1223"
+    },
+    "秘密-攻击力": {
+      "kind": "local",
+      "file": "21032"
+    },
+    "秘密-暴击伤害": {
+      "kind": "local",
+      "file": "21032"
+    },
+    "秘密-能量恢复": {
+      "kind": "local",
+      "file": "21032"
+    },
+    "秘技": {
+      "kind": "engine",
+      "key": "sys:technique",
+      "en": "Technique"
+    },
+    "秘技减速": {
+      "kind": "local",
+      "file": "1305"
+    },
+    "穷寇": {
+      "kind": "local",
+      "file": "23029"
+    },
+    "空白": {
+      "kind": "local",
+      "file": "23052"
+    },
+    "童心战技": {
+      "kind": "local",
+      "file": "21036"
+    },
+    "童心普攻": {
+      "kind": "local",
+      "file": "21036"
+    },
+    "童心终结技": {
+      "kind": "local",
+      "file": "21036"
+    },
+    "笑点": {
+      "kind": "shared",
+      "files": [
+        "1502",
+        "1503",
+        "1505",
+        "1506",
+        "1513",
+        "20024",
+        "23057",
+        "8009",
+        "8010"
+      ]
+    },
+    "笑点已触发": {
+      "kind": "local",
+      "file": "23057"
+    },
+    "笑点达标": {
+      "kind": "local",
+      "file": "20024"
+    },
+    "累计损失": {
+      "kind": "local",
+      "file": "1208"
+    },
+    "累计损失生命": {
+      "kind": "local",
+      "file": "1205"
+    },
+    "累计能量": {
+      "kind": "local",
+      "file": "1505"
+    },
+    "累计追击": {
+      "kind": "local",
+      "file": "23056"
+    },
+    "织运之竭-保留": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "织锦": {
+      "kind": "local",
+      "file": "23036"
+    },
+    "终结技已激活": {
+      "kind": "engine",
+      "key": "sys:ultimate_activated",
+      "en": "Ultimate Activated"
+    },
+    "终结技计数": {
+      "kind": "local",
+      "file": "1014"
+    },
+    "终结计数": {
+      "kind": "local",
+      "file": "23003"
+    },
+    "结印": {
+      "kind": "local",
+      "file": "1317"
+    },
+    "结界": {
+      "kind": "shared",
+      "files": [
+        "1203",
+        "1218",
+        "1403",
+        "1415",
+        "1502",
+        "1506",
+        "1507"
+      ]
+    },
+    "结界计数": {
+      "kind": "local",
+      "file": "1218"
+    },
+    "绝命对峙": {
+      "kind": "local",
+      "file": "1315"
+    },
+    "绝处反击": {
+      "kind": "local",
+      "file": "1008"
+    },
+    "缅怀": {
+      "kind": "local",
+      "file": "20022"
+    },
+    "缠禁": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "缠绕": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "缺陷": {
+      "kind": "local",
+      "file": "1006"
+    },
+    "美学底本": {
+      "kind": "local",
+      "file": "1503"
+    },
+    "老主顾": {
+      "kind": "local",
+      "file": "1406"
+    },
+    "自身回合数": {
+      "kind": "local",
+      "file": "1009"
+    },
+    "至暗之谜": {
+      "kind": "local",
+      "file": "1413"
+    },
+    "至高之姿": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "艺术壁垒": {
+      "kind": "local",
+      "file": "1503"
+    },
+    "荣光之秘-待发": {
+      "kind": "local",
+      "file": "1313"
+    },
+    "蒙福者": {
+      "kind": "local",
+      "file": "1313"
+    },
+    "蓄能": {
+      "kind": "local",
+      "file": "1009"
+    },
+    "蓄能不减": {
+      "kind": "local",
+      "file": "1009"
+    },
+    "虚弱": {
+      "kind": "shared",
+      "files": [
+        "1105",
+        "1203",
+        "1406"
+      ]
+    },
+    "虹光累计消耗": {
+      "kind": "local",
+      "file": "23042"
+    },
+    "血仇": {
+      "kind": "local",
+      "file": "1404"
+    },
+    "血火": {
+      "kind": "local",
+      "file": "23039"
+    },
+    "血火超额": {
+      "kind": "local",
+      "file": "23039"
+    },
+    "行动次数": {
+      "kind": "local",
+      "file": "1222"
+    },
+    "行动锁定": {
+      "kind": "local",
+      "file": "1412"
+    },
+    "裂伤": {
+      "kind": "shared",
+      "files": [
+        "1111",
+        "1307",
+        "21026",
+        "23022"
+      ]
+    },
+    "解读": {
+      "kind": "local",
+      "file": "1401"
+    },
+    "触电": {
+      "kind": "shared",
+      "files": [
+        "1103",
+        "1307",
+        "21022",
+        "23022"
+      ]
+    },
+    "记录": {
+      "kind": "local",
+      "file": "1512"
+    },
+    "记录值": {
+      "kind": "local",
+      "file": "1406"
+    },
+    "记录的治疗量": {
+      "kind": "local",
+      "file": "23013"
+    },
+    "论辩": {
+      "kind": "local",
+      "file": "23020"
+    },
+    "诗行": {
+      "kind": "local",
+      "file": "23052"
+    },
+    "谕示": {
+      "kind": "local",
+      "file": "23038"
+    },
+    "谜诡": {
+      "kind": "local",
+      "file": "1306"
+    },
+    "负债证明": {
+      "kind": "local",
+      "file": "1112"
+    },
+    "负面激化": {
+      "kind": "local",
+      "file": "117"
+    },
+    "败谢": {
+      "kind": "local",
+      "file": "1321"
+    },
+    "质性揭露": {
+      "kind": "local",
+      "file": "1405"
+    },
+    "赐福": {
+      "kind": "local",
+      "file": "1202"
+    },
+    "赤子": {
+      "kind": "local",
+      "file": "1206"
+    },
+    "转魄": {
+      "kind": "local",
+      "file": "1212"
+    },
+    "迷境饭层数": {
+      "kind": "local",
+      "file": "22005"
+    },
+    "迷迷的声援": {
+      "kind": "local",
+      "file": "8007"
+    },
+    "追加攻击": {
+      "kind": "local",
+      "file": "115"
+    },
+    "追忆": {
+      "kind": "local",
+      "file": "1415"
+    },
+    "送别的花": {
+      "kind": "local",
+      "file": "23040"
+    },
+    "逆鳞": {
+      "kind": "local",
+      "file": "1213"
+    },
+    "通解": {
+      "kind": "local",
+      "file": "1106"
+    },
+    "避厄": {
+      "kind": "local",
+      "file": "1208"
+    },
+    "避厄治疗次": {
+      "kind": "local",
+      "file": "1208"
+    },
+    "酩酊": {
+      "kind": "local",
+      "file": "1301"
+    },
+    "里程碑配额": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "鉴知": {
+      "kind": "local",
+      "file": "1208"
+    },
+    "长夜的迷梦增伤": {
+      "kind": "local",
+      "file": "1413"
+    },
+    "闪耀王冠": {
+      "kind": "local",
+      "file": "23061"
+    },
+    "间隙织线": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "间隙织线易伤": {
+      "kind": "local",
+      "file": "1402"
+    },
+    "阿哈时刻": {
+      "kind": "shared",
+      "files": [
+        "1501",
+        "1513",
+        "20023"
+      ]
+    },
+    "隐藏分": {
+      "kind": "local",
+      "file": "1506"
+    },
+    "集真赤": {
+      "kind": "local",
+      "file": "1308"
+    },
+    "雨过天晴": {
+      "kind": "local",
+      "file": "1409"
+    },
+    "雷遁": {
+      "kind": "local",
+      "file": "23033"
+    },
+    "领航旗语": {
+      "kind": "local",
+      "file": "1510"
+    },
+    "额外回合计数": {
+      "kind": "local",
+      "file": "1408"
+    },
+    "风化": {
+      "kind": "shared",
+      "files": [
+        "1108",
+        "1307",
+        "21022",
+        "23022"
+      ]
+    },
+    "风口": {
+      "kind": "local",
+      "file": "23064"
+    },
+    "飞黄": {
+      "kind": "local",
+      "file": "1220"
+    },
+    "飞黄计数": {
+      "kind": "local",
+      "file": "1220"
+    },
+    "饲饵": {
+      "kind": "local",
+      "file": "1504"
+    },
+    "首次狂热已触发": {
+      "kind": "local",
+      "file": "1512"
+    },
+    "首次终结技已触发": {
+      "kind": "local",
+      "file": "1014"
+    },
+    "魂迷": {
+      "kind": "local",
+      "file": "23047"
+    },
+    "魂迷之债": {
+      "kind": "local",
+      "file": "23047"
+    },
+    "魔力放出": {
+      "kind": "local",
+      "file": "1014"
+    },
+    "鸣弦号令": {
+      "kind": "local",
+      "file": "1207"
+    },
+    "鸣弦号令增益": {
+      "kind": "local",
+      "file": "1207"
+    },
+    "龙吟": {
+      "kind": "local",
+      "file": "23015"
+    }
+  }
+}
