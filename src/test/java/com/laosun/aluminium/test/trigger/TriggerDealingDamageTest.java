@@ -150,7 +150,7 @@ public class TriggerDealingDamageTest {
         burn(target, owner);
         Assertions.assertTrue(target.getBuffManager().hasState("dot:burn"), "a Fire DOT is Burn (dot:burn)");
         Assertions.assertFalse(target.getBuffManager().hasState("dot:shock"), "and it is not Shock (dot:shock)");
-        Assertions.assertFalse(target.getBuffManager().hasState("冻结"),
+        Assertions.assertFalse(target.getBuffManager().hasState("ctrl:frozen"),
                 "control states are deliberately not resolved yet: models them as a buff plus a delay,"
                         + "so 'is it frozen' needs its own definition rather than a guess");
 

@@ -31,7 +31,7 @@ public class RobinEidolonsTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     /** 「冻结」: a control-class state - the thing Eidolon 4 removes. */
-    private static final String CONTROL_MARK = "冻结";
+    private static final String CONTROL_MARK = "ctrl:frozen";
 
     /**
      * Eidolon 1: 「处于【协奏】状态时，我方全体全属性抗性穿透提高 24%」.

@@ -23,7 +23,7 @@ public class GepardEidolonTwoTest {
 
     private static final int GEPARD = 1104;
     private static final int LEVEL = 80;
-    private static final String FREEZE = "冻结";
+    private static final String FREEZE = "ctrl:frozen";
 
     @Test
     public void theEnemyIsSlowerOnceTheFreezeEnds() {

@@ -548,7 +548,7 @@ final class TriggerEffects {
                 battle.recordCastApplied(control.name());
                 // ⚠ Announced on the SUCCESS branch. The attempt is not the event: the state was rolled through the resist
                 // pipeline, and reporting a resisted application would claim a freeze that never happened.
-                battle.announceControl(ctx.owner(), target, control.name());
+                battle.announceControl(ctx.owner(), target, control.display());
             }
         }
     }

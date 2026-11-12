@@ -24,7 +24,7 @@ public class SummonedClearsControlTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
-    private static final String CONTROL = "冻结";
+    private static final String CONTROL = "ctrl:frozen";
     private static final String DOT = "dot:bleed";
 
     @Test

@@ -341,7 +341,7 @@
       "source": "1405 那刻夏 终结技 生息破土，世界塑造:「使敌方全体陷入【升华】状态，随后对敌方全体造成等同于那刻夏160%攻击力的风属性伤害。【升华】状态下，目标同时被添加物理、火、冰、雷、风、量子、虚数属性弱点，持续至目标回合开始时。」",
       "do": [
         {
-          "buff": "升华",
+          "buff": "ctrl:sublimated",
           "turns": 1,
           "target": "all_enemies",
           "op": "APPLY_BUFF"
@@ -390,7 +390,7 @@
         },
         {
           "target": "all_enemies",
-          "control": "升华",
+          "control": "ctrl:sublimated",
           "op": "APPLY_CONTROL",
           "turns": 1
         }

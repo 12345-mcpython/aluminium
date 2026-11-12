@@ -34,12 +34,12 @@ public class WeltTest {
     @Test
     public void hisUltimateImprisonsEveryEnemy() {
         Fixture f = new Fixture();
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("禁锢"), "precondition: not imprisoned yet");
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("ctrl:imprisoned"), "precondition: not imprisoned yet");
 
         f.battle.castImmediate(f.welt.getSkills().get(SkillType.ULTRA), f.welt, List.of(f.enemy));
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("禁锢"),
-                "「有100%的基础概率使受到攻击的敌方目标陷入禁锢状态，持续1回合」 (a 100% base chance to put the attacked enemy target into the Imprisonment (禁锢) state for 1 turn)");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:imprisoned"),
+                "「有100%的基础概率使受到攻击的敌方目标陷入ctrl:imprisoned状态，持续1回合」 (a 100% base chance to put the attacked enemy target into the Imprisonment (ctrl:imprisoned) state for 1 turn)");
     }
 
 

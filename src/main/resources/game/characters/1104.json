@@ -34,7 +34,7 @@
       "do": [
         {
           "op": "APPLY_CONTROL",
-          "control": "冻结",
+          "control": "ctrl:frozen",
           "turns": 1,
           "base_chance": 0.65,
           "element": "Ice",
@@ -211,7 +211,7 @@
       "on": "STATE_ENDED",
       "id": "eidolon2_slow_after_freeze_ends",
       "when": [
-        "target state_ended 冻结"
+        "target state_ended ctrl:frozen"
       ],
       "min_eidolon": 2,
       "do": [

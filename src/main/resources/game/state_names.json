@@ -358,11 +358,12 @@
       ]
     },
     {
-      "name": "冻结",
+      "name": "ctrl:frozen",
       "owner": "battle",
       "kind": "battle",
       "key": "ctrl:frozen",
-      "en": "Frozen"
+      "en": "Frozen",
+      "zh": "冻结"
     },
     {
       "name": "剑势",
@@ -421,11 +422,12 @@
       ]
     },
     {
-      "name": "升华",
+      "name": "ctrl:sublimated",
       "owner": "battle",
       "kind": "battle",
       "key": "ctrl:sublimated",
-      "en": "Sublimated"
+      "en": "Sublimated",
+      "zh": "升华"
     },
     {
       "name": "华彩",
@@ -1782,11 +1784,12 @@
       ]
     },
     {
-      "name": "禁锢",
+      "name": "ctrl:imprisoned",
       "owner": "battle",
       "kind": "battle",
       "key": "ctrl:imprisoned",
-      "en": "Imprisoned"
+      "en": "Imprisoned",
+      "zh": "禁锢"
     },
     {
       "name": "禳命",

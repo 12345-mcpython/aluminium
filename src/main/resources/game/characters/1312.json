@@ -148,7 +148,7 @@
       "do": [
         {
           "op": "APPLY_CONTROL",
-          "control": "冻结",
+          "control": "ctrl:frozen",
           "turns": 1,
           "element": "Ice",
           "scale": "self_attr:ATTACK",
@@ -176,7 +176,7 @@
       "do": [
         {
           "op": "APPLY_CONTROL",
-          "control": "冻结",
+          "control": "ctrl:frozen",
           "turns": 1,
           "element": "Ice",
           "scale": "self_attr:ATTACK",
@@ -293,7 +293,7 @@
       "id": "trace_momentum_crit_damage_against_frozen",
       "when": [
         "actor == self",
-        "target has_state 冻结"
+        "target has_state ctrl:frozen"
       ],
       "do": [
         {

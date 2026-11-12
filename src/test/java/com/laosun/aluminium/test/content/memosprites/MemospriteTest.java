@@ -304,7 +304,7 @@ public class MemospriteTest {
         boolean landedOnEvernight = battle.tryApplyDebuff(caster, evernight, frozen(), 1.0, null);
 
         Assertions.assertFalse(landedOnEvey, "Evey (「长夜」) is immune to Crowd Control debuffs (「长夜」免疫控制类负面状态)");
-        Assertions.assertFalse(evey.getBuffManager().hasState("冻结"));
+        Assertions.assertFalse(evey.getBuffManager().hasState("ctrl:frozen"));
         Assertions.assertTrue(evey.getBuffManager().canAct(), "and it keeps its turns");
         Assertions.assertTrue(landedOnEvernight,
                 "the same control, the same roll, lands on her -- so the refusal above is the immunity and not a "

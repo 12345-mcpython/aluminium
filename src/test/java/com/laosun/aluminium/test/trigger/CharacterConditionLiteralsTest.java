@@ -67,7 +67,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1013, "BATTLE_START", "trace_puppet_control_resist", List.of());
         assertRule(1013, "BATTLE_START", "level_convention", List.of());
         assertRule(1013, "DEALING_DAMAGE", "skill_bonus_on_healthy_targets", List.of("actor == self", "from_skill SKILL", "target_hp_percent >= 0.5"));
-        assertRule(1013, "DEALING_DAMAGE", "trace_ice_against_frozen", List.of("actor == self", "from_skill ULTRA", "target has_state 冻结"));
+        assertRule(1013, "DEALING_DAMAGE", "trace_ice_against_frozen", List.of("actor == self", "from_skill ULTRA", "target has_state ctrl:frozen"));
         assertRule(1013, "ULT_CAST", "eidolon6_attack", List.of("actor == self"));
         assertRule(1013, "DAMAGE_SETTLED", "talent_followup_when_an_enemy_crosses_half",
                 List.of("actor is_ally", "target is_enemy", "damage_is_attack",

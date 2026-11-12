@@ -97,12 +97,12 @@ public class DebuffResistTest {
      */
     @Test
     public void immunityStopsAControlTheRuleStatesNoProbabilityFor() {
-        Fixture f = new Fixture(0.0, resist(1.0), TriggerSpecs.applyControl("冻结", 1, null, "target"));
+        Fixture f = new Fixture(0.0, resist(1.0), TriggerSpecs.applyControl("ctrl:frozen", 1, null, "target"));
 
         f.fire();
 
         Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(ControlBuff.class));
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("冻结"));
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("ctrl:frozen"));
         Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "and the victim keeps its turn");
     }
 
@@ -275,12 +275,12 @@ public class DebuffResistTest {
      * (0.65 vs 0.) an assertion instead of a coin flip.
      */
     private static boolean freezeLands(double classResist, double roll) {
-        Fixture f = new Fixture(roll, TriggerSpecs.applyControl("冻结", 1, null, "target"));
+        Fixture f = new Fixture(roll, TriggerSpecs.applyControl("ctrl:frozen", 1, null, "target"));
         if (classResist > 0) {
             f.resist(DebuffClass.CONTROL, classResist);
         }
         f.fire();
-        return f.enemy.getBuffManager().hasState("冻结");
+        return f.enemy.getBuffManager().hasState("ctrl:frozen");
     }
 
     /**

@@ -289,7 +289,7 @@
       "_note": "「攻击**处于冻结状态**的目标时…造成等同 **60%** 攻击力的冰属性**附加伤害**」—— `ALLY_ATTACK` + `actor == self` + `target has_state 冻结` → `DAMAGE`（附加伤害 = 不视为一次攻击 ✓）。⚠ 星魂参数无等级轴 ⇒ 字面 0.6（ratchet 若报冲突再改读） 。",
       "when": [
         "actor == self",
-        "target has_state 冻结"
+        "target has_state ctrl:frozen"
       ],
       "min_eidolon": 1,
       "do": [
@@ -350,7 +350,7 @@
           "element": "Ice",
           "target": "target",
           "percent_from_skill_param": "TALENT:4",
-          "control": "冻结",
+          "control": "ctrl:frozen",
           "base_chance": 0.65,
           "turns": 1,
           "scale": "self_attr:ATTACK"

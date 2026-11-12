@@ -183,7 +183,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "冻结",
+          "buff": "ctrl:frozen",
           "target": "holder_of:军功"
         },
         {
@@ -193,7 +193,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "禁锢",
+          "buff": "ctrl:imprisoned",
           "target": "holder_of:军功"
         },
         {

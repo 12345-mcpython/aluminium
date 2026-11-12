@@ -28,7 +28,7 @@ public class ControlImmunityTest {
     private static final int OWNER = 1408;
     private static final int APPLIER = 1002;
     private static final String STATE = "变身";
-    private static final String FREEZE = "冻结";
+    private static final String FREEZE = "ctrl:frozen";
 
     /**
      * Transformed: the control does not land.

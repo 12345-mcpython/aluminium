@@ -43,7 +43,7 @@ public class MishaFreezeTest {
         battle.startBattle();
         battle.castImmediate(misha.getSkills().get(SkillType.ULTRA), misha, List.of(enemy));
         battle.processRequests();
-        boolean frozen = enemy.getBuffManager().hasState("冻结");
+        boolean frozen = enemy.getBuffManager().hasState("ctrl:frozen");
         System.out.println("[1312] roll " + roll + " -> frozen=" + frozen);
         return frozen;
     }

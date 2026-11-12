@@ -30,7 +30,7 @@ import java.util.List;
 public class PeerageDispelsControlTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
-    private static final String FREEZE = "冻结";
+    private static final String FREEZE = "ctrl:frozen";
     private static final String SHOCK = "电触";
     private static final String PEERAGE = "爵位";
 

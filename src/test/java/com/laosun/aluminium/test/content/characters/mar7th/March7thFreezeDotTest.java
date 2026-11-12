@@ -54,7 +54,7 @@ public class March7thFreezeDotTest {
         march.setCurrentEnergy(march.getMaxEnergy());
         Assertions.assertTrue(battle.castUltra(march, List.of(enemy)),
                 "precondition: her ultimate went off (base chance 50%, dice forced to pass)");
-        Assertions.assertTrue(enemy.getBuffManager().hasState("冻结"),
+        Assertions.assertTrue(enemy.getBuffManager().hasState("ctrl:frozen"),
                 "precondition: the freeze landed -- without it there is no per-turn payload to check");
 
         // The victim's own turn start is where the clause says the hit lands (the same tick as any DOT).
@@ -90,7 +90,7 @@ public class March7thFreezeDotTest {
         battle.processRequests();
         march.setCurrentEnergy(march.getMaxEnergy());
         battle.castUltra(march, List.of(enemy));
-        Assertions.assertFalse(enemy.getBuffManager().hasState("冻结"), "precondition: the roll failed, so no freeze");
+        Assertions.assertFalse(enemy.getBuffManager().hasState("ctrl:frozen"), "precondition: the roll failed, so no freeze");
 
         settled.clear();
         battle.tickDots(enemy);

@@ -87,7 +87,7 @@ public class ControlTest {
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasBuff(ControlBuff.class),
                 "the freeze state must attach an act lock");
-        Assertions.assertEquals("冻结", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
+        Assertions.assertEquals("ctrl:frozen", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
                 "and the state carries the NAME the documents use, which is what the freeze state is asked with");
         Assertions.assertFalse(f.enemy.getBuffManager().canAct(),
                 "the freeze state = cannot act; this is the same predicate performAction refuses on");
@@ -190,10 +190,10 @@ public class ControlTest {
         Applied f = new Applied(control(1.0));
         f.fire();
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"),
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"),
                 "the applied state answers has_state under the name the documents use");
-        Assertions.assertFalse(f.enemy.getBuffManager().canAct(), "Frozen (冻结) = cannot act (不能行动)");
-        Assertions.assertEquals("冻结", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName());
+        Assertions.assertFalse(f.enemy.getBuffManager().canAct(), "Frozen (ctrl:frozen) = cannot act (不能行动)");
+        Assertions.assertEquals("ctrl:frozen", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName());
     }
 
     /**
@@ -209,13 +209,13 @@ public class ControlTest {
         Applied lands = new Applied(control(1.0));
         lands.hero.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
         lands.fire();
-        Assertions.assertTrue(lands.enemy.getBuffManager().hasState("冻结"),
+        Assertions.assertTrue(lands.enemy.getBuffManager().hasState("ctrl:frozen"),
                 "50% base × (1 + 100% effect hit) = 100%, so it always lands");
 
         Applied resisted = new Applied(control(1.0));
         resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
         resisted.fire();
-        Assertions.assertFalse(resisted.enemy.getBuffManager().hasState("冻结"),
+        Assertions.assertFalse(resisted.enemy.getBuffManager().hasState("ctrl:frozen"),
                 "and 100% effect resistance takes it to 0, whatever the base chance was");
     }
 
@@ -236,7 +236,7 @@ public class ControlTest {
 
         Assertions.assertEquals(java.util.Map.of("STAT_CTRL_Frozen", 1.0), f.enemy.getDebuffResist(),
                 "precondition: this monster's data is what makes it unfreezable");
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("冻结"),
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("ctrl:frozen"),
                 "STAT_CTRL_Frozen = 1 means this monster cannot be frozen by a skill -- which is exactly what "
                         + "ControlEffect.resistKey is for (and what a BREAK deliberately ignores)");
     }
@@ -256,8 +256,8 @@ public class ControlTest {
         Applied applied = new Applied(control(1.0));
         applied.fire();
 
-        Assertions.assertTrue(broken.enemy.getBuffManager().hasState("冻结"), "the break's state has the name");
-        Assertions.assertTrue(applied.enemy.getBuffManager().hasState("冻结"), "and so does the skill's");
+        Assertions.assertTrue(broken.enemy.getBuffManager().hasState("ctrl:frozen"), "the break's state has the name");
+        Assertions.assertTrue(applied.enemy.getBuffManager().hasState("ctrl:frozen"), "and so does the skill's");
         Assertions.assertEquals(broken.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
                 applied.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
                 "one state, one name, whichever path applied it");
@@ -275,7 +275,7 @@ public class ControlTest {
     @Test
     public void aRuleCanGateOnTheFrozenState() {
         Applied f = new Applied(control(1.0),
-                TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state 冻结"),
+                TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state ctrl:frozen"),
                         TriggerSpecs.gainEnergy(1)));
 
         Assertions.assertEquals(1, f.fire(), "the freeze lands");
@@ -283,7 +283,7 @@ public class ControlTest {
                 "and a later event's rule sees the freeze state on the victim");
 
         Applied resisted = new Applied(control(1.0),
-                TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state 冻结"),
+                TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state ctrl:frozen"),
                         TriggerSpecs.gainEnergy(1)));
         resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
 
@@ -297,13 +297,13 @@ public class ControlTest {
      */
     @Test
     public void removingTheNamedStateTakesItsSlowWithIt() {
-        Applied f = new Applied(control("纠缠", null));
+        Applied f = new Applied(control("ctrl:entangled", null));
         double before = f.enemy.getAttribute(AttributeType.SPEED).get();
 
         f.fire();
         Assertions.assertTrue(f.enemy.getAttribute(AttributeType.SPEED).get() < before, "entanglement slows");
 
-        Assertions.assertEquals(1, f.enemy.getBuffManager().removeState("纠缠"), "the state is taken off by name");
+        Assertions.assertEquals(1, f.enemy.getBuffManager().removeState("ctrl:entangled"), "the state is taken off by name");
         Assertions.assertEquals(before, f.enemy.getAttribute(AttributeType.SPEED).get(), EPS,
                 "and the slow it attached goes with it -- one buff, so the parts cannot come apart");
     }
@@ -338,7 +338,7 @@ public class ControlTest {
 
         f.fire();
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"), "the state landed");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"), "the state landed");
         DotBuff dot = f.enemy.getBuffManager().findBuff(DotBuff.class);
         Assertions.assertNotNull(dot, "and so did its per-turn damage");
         Assertions.assertEquals(DamageElement.ICE, dot.getElement());
@@ -361,7 +361,7 @@ public class ControlTest {
         f.fire();
         Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(DotBuff.class), "precondition");
 
-        f.enemy.getBuffManager().removeState("冻结");
+        f.enemy.getBuffManager().removeState("ctrl:frozen");
 
         Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(DotBuff.class),
                 "one buff owns the state and its payload, so 「解除」 (remove) cannot leave half of it behind");
@@ -384,13 +384,13 @@ public class ControlTest {
                 () -> tableOf(TriggerSpecs.applyControl("冰冻", 1, null, "target")));
 
         Assertions.assertTrue(rejected.getMessage().contains("冰冻"), rejected.getMessage());
-        Assertions.assertTrue(rejected.getMessage().contains("冻结"), "the message lists the known states");
+        Assertions.assertTrue(rejected.getMessage().contains("ctrl:frozen"), "the message lists the known states");
     }
 
     @Test
     public void aControlWithoutATurnCountIsRejected() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.applyControl("冻结", null, null, "target")));
+                () -> tableOf(TriggerSpecs.applyControl("ctrl:frozen", null, null, "target")));
 
         Assertions.assertTrue(rejected.getMessage().contains("turns"), rejected.getMessage());
     }
@@ -398,9 +398,9 @@ public class ControlTest {
     @Test
     public void aBaseChanceOutsideZeroToOneIsRejected() {
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.applyControl("冻结", 1, 1.5, "target")), "a fraction of 1");
+                () -> tableOf(TriggerSpecs.applyControl("ctrl:frozen", 1, 1.5, "target")), "a fraction of 1");
         Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.applyControl("冻结", 1, 0.0, "target")),
+                () -> tableOf(TriggerSpecs.applyControl("ctrl:frozen", 1, 0.0, "target")),
                 "0 would read like 「never」, which is spelled by not writing the rule");
     }
 
@@ -409,7 +409,7 @@ public class ControlTest {
      */
     @Test
     public void theMagnitudeFieldsAreRejectedOnAControl() {
-        com.laosun.aluminium.beans.EffectSpec effect = TriggerSpecs.applyControl("冻结", 1, null, "target");
+        com.laosun.aluminium.beans.EffectSpec effect = TriggerSpecs.applyControl("ctrl:frozen", 1, null, "target");
         TriggerSpecs.set(effect, "amount", 100.0);
 
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -474,7 +474,7 @@ public class ControlTest {
      * A rule that freezes the event's subject with the given base chance ({@code null} = always).
      */
     private static com.laosun.aluminium.beans.TriggerSpec control(Double baseChance) {
-        return control("冻结", baseChance);
+        return control("ctrl:frozen", baseChance);
     }
 
     private static com.laosun.aluminium.beans.TriggerSpec control(String name, Double baseChance) {
@@ -489,7 +489,7 @@ public class ControlTest {
      */
     private static com.laosun.aluminium.beans.TriggerSpec controlWithDamage(Double baseChance) {
         com.laosun.aluminium.beans.EffectSpec effect =
-                TriggerSpecs.applyControl("冻结", 1, baseChance, "target");
+                TriggerSpecs.applyControl("ctrl:frozen", 1, baseChance, "target");
         TriggerSpecs.set(effect, "element", "Ice");
         TriggerSpecs.set(effect, "scale", "self_attr:ATTACK");
         TriggerSpecs.set(effect, "percent", 0.6);

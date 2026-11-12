@@ -57,6 +57,7 @@ public class StateNameRegistryTest {
             Pattern.compile("\\bstate_ended\\s+([^\\s]+)"),
             Pattern.compile("\\bstack_added\\s+([^\\s]+)"),
             Pattern.compile("\\benemy_state_count:([^\\s<>=]+)"),
+            Pattern.compile("\\bcast_applied:([^\\s<>=]+)"),
             Pattern.compile("\\b(?:self|actor|target|summon)_stacks:([^\\s<>=]+)"),
             Pattern.compile("\\b(?:self|summon|party|max_party)_resource(?:_before)?:([^\\s<>=]+)"));
 

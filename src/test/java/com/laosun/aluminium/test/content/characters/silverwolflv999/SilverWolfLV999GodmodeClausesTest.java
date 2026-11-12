@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class SilverWolfLV999GodmodeClausesTest {
     private static final int WOLF = 1506;
-    private static final String FREEZE = "冻结";
+    private static final String FREEZE = "ctrl:frozen";
     private static final String GOD = "无敌玩家";
     private static final String ZONE = "结界";
 
@@ -56,7 +56,7 @@ public class SilverWolfLV999GodmodeClausesTest {
         castUltimate(battle, wolf);
         Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "premise: the Ultimate puts her in 【无敌玩家】");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
-        System.out.println("[1506] in 【无敌玩家】, after the same control: 冻结="
+        System.out.println("[1506] in 【无敌玩家】, after the same control: ctrl:frozen="
                 + wolf.getBuffManager().hasState(FREEZE));
         Assertions.assertFalse(wolf.getBuffManager().hasState(FREEZE),
                 "「【无敌玩家】状态下，「银狼LV.999」免疫控制类负面状态」");
@@ -66,7 +66,7 @@ public class SilverWolfLV999GodmodeClausesTest {
         }
         Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "premise: three enhanced basics end the state");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
-        System.out.println("[1506] after leaving 【无敌玩家】, the same control: 冻结="
+        System.out.println("[1506] after leaving 【无敌玩家】, the same control: ctrl:frozen="
                 + wolf.getBuffManager().hasState(FREEZE));
         Assertions.assertTrue(wolf.getBuffManager().hasState(FREEZE),
                 "「【无敌玩家】状态下…免疫」 is scoped by the state, so the control lands again once it is gone");

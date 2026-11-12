@@ -81,12 +81,12 @@ public class NumberProviderDamageTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setCurrentEnergy(0);
         Battle battle = new Battle(List.of(owner), List.of(BattleFixture.monster()), BattleFixture.seeded());
-        battle.recordCastApplied("冻结");
-        battle.recordCastApplied("冻结");
+        battle.recordCastApplied("ctrl:frozen");
+        battle.recordCastApplied("ctrl:frozen");
 
         EffectSpec gain = new EffectSpec();
         TriggerSpecs.set(gain, "op", "GAIN_ENERGY");
-        TriggerSpecs.set(gain, "amountFrom", provider("cast_applied", p -> p.setState("冻结")));
+        TriggerSpecs.set(gain, "amountFrom", provider("cast_applied", p -> p.setState("ctrl:frozen")));
         TriggerSpecs.set(gain, "target", "self");
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("BATTLE_START", null, gain))));
         battle.startBattle();

@@ -15,7 +15,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "relic112_crit_damage_vs_imprisoned",
-      "when": ["actor == self", "target has_state 禁锢"],
+      "when": ["actor == self", "target has_state ctrl:imprisoned"],
       "do": [
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.2, "instance": true, "turns": 1, "target": "self" }
       ],

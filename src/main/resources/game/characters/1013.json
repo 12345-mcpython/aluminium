@@ -70,7 +70,7 @@
       "when": [
         "actor == self",
         "from_skill ULTRA",
-        "target has_state 冻结"
+        "target has_state ctrl:frozen"
       ],
       "do": [
         {

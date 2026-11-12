@@ -97,7 +97,7 @@ public class AnaxaNecessaryBlankTest {
         battle.castImmediate(anaxa.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), anaxa, List.of(enemy));
         battle.processRequests();
 
-        Assertions.assertTrue(enemy.getBuffManager().hasState("升华"), "「使敌方全体陷入【升华】状态」");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("ctrl:sublimated"), "「使敌方全体陷入【ctrl:sublimated】状态」");
         for (com.laosun.aluminium.enums.DamageElement element : com.laosun.aluminium.enums.DamageElement.values()) {
             Assertions.assertTrue(enemy.isWeakTo(element),
                     "「同时被添加物理、火、冰、雷、风、量子、虚数属性弱点」 — missing " + element);
@@ -118,8 +118,8 @@ public class AnaxaNecessaryBlankTest {
         battle.castImmediate(anaxa.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), anaxa, List.of(bare));
         battle.processRequests();
 
-        Assertions.assertTrue(bare.getBuffManager().hasState("升华"), "the state is on");
-        Assertions.assertFalse(bare.getBuffManager().canAct(), "「【升华】状态下无法行动」");
+        Assertions.assertTrue(bare.getBuffManager().hasState("ctrl:sublimated"), "the state is on");
+        Assertions.assertFalse(bare.getBuffManager().canAct(), "「【ctrl:sublimated】状态下无法行动」");
 
         Enemy resistant = BattleFixture.monster();
         Character second = CharacterFactory.create(ANAXA, LEVEL);
@@ -129,7 +129,7 @@ public class AnaxaNecessaryBlankTest {
         other.castImmediate(second.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), second,
                 List.of(resistant));
         other.processRequests();
-        Assertions.assertEquals(0.0, resistant.getBuffManager().stacksOf("升华"), 1e-9,
+        Assertions.assertEquals(0.0, resistant.getBuffManager().stacksOf("ctrl:sublimated"), 1e-9,
                 "「若目标不具有控制抵抗」 — a resisting target is not stopped (its stacks stay at zero)");
     }
 

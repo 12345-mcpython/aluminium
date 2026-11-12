@@ -133,7 +133,7 @@ public class CastAppliedCountTest {
 
         double first = castUltimate(battle);
         Assertions.assertEquals(12, first, EPS, "two of three frozen on the first cast");
-        Assertions.assertEquals(0, battle.castAppliedCount("冻结"),
+        Assertions.assertEquals(0, battle.castAppliedCount("ctrl:frozen"),
                 "once the cast's events are delivered, its record is cleared");
 
         double second = castUltimate(battle);
@@ -146,10 +146,10 @@ public class CastAppliedCountTest {
     @Test
     public void readingTheCountOutsideACastIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.rule("TAKING_HIT", null, countedEnergy("冻结", 6))));
+                () -> tableOf(TriggerSpecs.rule("TAKING_HIT", null, countedEnergy("ctrl:frozen", 6))));
 
         Assertions.assertTrue(refused.getMessage().contains("TAKING_HIT"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("cast_applied:冻结"), refused.getMessage());
+        Assertions.assertTrue(refused.getMessage().contains("cast_applied:ctrl:frozen"), refused.getMessage());
         Assertions.assertTrue(refused.getMessage().contains("ULT_CAST"), "the message lists the cast events");
     }
 
@@ -162,7 +162,7 @@ public class CastAppliedCountTest {
                 () -> tableOf(TriggerSpecs.rule("ULT_CAST", null, countedEnergy("冰冻", 6))));
 
         Assertions.assertTrue(refused.getMessage().contains("冰冻"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("冻结"), "the message lists the states it knows");
+        Assertions.assertTrue(refused.getMessage().contains("ctrl:frozen"), "the message lists the states it knows");
     }
 
     /**
@@ -199,7 +199,7 @@ public class CastAppliedCountTest {
         double withoutEidolon = shippedUltimateEnergy(0);
 
         Assertions.assertEquals(18, withEidolon - withoutEidolon, EPS,
-                "「终结技每冻结1个目标，为三月七恢复6点能量」 (for every target the Ultimate freezes, March 7th restores 6 Energy) × the 3 enemies her ultimate froze");
+                "「终结技每ctrl:frozen1个目标，为三月七恢复6点能量」 (for every target the Ultimate freezes, March 7th restores 6 Energy) × the 3 enemies her ultimate froze");
     }
 
     /**
@@ -219,7 +219,7 @@ public class CastAppliedCountTest {
                 .effects().getFirst();
 
         Assertions.assertEquals("GAIN_ENERGY", effect.getOp());
-        Assertions.assertEquals("cast_applied:冻结", effect.getScale());
+        Assertions.assertEquals("cast_applied:ctrl:frozen", effect.getScale());
         Assertions.assertEquals(6, effect.getPercent(), EPS);
         Assertions.assertNull(effect.getPerTarget(), "per_target would count the enemies it aimed at, not the ones it froze");
     }
@@ -271,8 +271,8 @@ public class CastAppliedCountTest {
         Character hero = hero();
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, List.of(
                 TriggerSpecs.rule("ULT_CAST", null,
-                        TriggerSpecs.applyControl("冻结", 1, 1.0, "all_enemies")),
-                TriggerSpecs.rule("ULT_CAST", null, countedEnergy("冻结", 6)))));
+                        TriggerSpecs.applyControl("ctrl:frozen", 1, 1.0, "all_enemies")),
+                TriggerSpecs.rule("ULT_CAST", null, countedEnergy("ctrl:frozen", 6)))));
         return hero;
     }
 
@@ -283,7 +283,7 @@ public class CastAppliedCountTest {
         Character hero = hero();
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, List.of(
                 TriggerSpecs.rule("ULT_CAST", null,
-                        TriggerSpecs.applyControl("冻结", 1, 1.0, "all_enemies")))));
+                        TriggerSpecs.applyControl("ctrl:frozen", 1, 1.0, "all_enemies")))));
         return hero;
     }
 
@@ -297,10 +297,10 @@ public class CastAppliedCountTest {
         Character hero = hero();
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, List.of(
                 TriggerSpecs.rule("TAKING_HIT", null,
-                        TriggerSpecs.applyControl("冻结", 1, 1.0, "attacker")),
+                        TriggerSpecs.applyControl("ctrl:frozen", 1, 1.0, "attacker")),
                 TriggerSpecs.rule("ULT_CAST", null,
-                        TriggerSpecs.applyControl("冻结", 1, 1.0, "all_enemies")),
-                TriggerSpecs.rule("ULT_CAST", null, countedEnergy("冻结", 6)))));
+                        TriggerSpecs.applyControl("ctrl:frozen", 1, 1.0, "all_enemies")),
+                TriggerSpecs.rule("ULT_CAST", null, countedEnergy("ctrl:frozen", 6)))));
         return hero;
     }
 

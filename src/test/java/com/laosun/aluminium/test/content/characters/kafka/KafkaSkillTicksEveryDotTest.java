@@ -50,7 +50,7 @@ public class KafkaSkillTicksEveryDotTest {
         battle.startBattle();
         DamageElement[] elements = {DamageElement.FIRE, DamageElement.ICE};
         for (int i = 0; i < dots; i++) {
-            enemy.getBuffManager().addBuff(new DotBuff(ally, elements[i], 20_000, 3, 0, i == 0 ? "dot:burn" : "冻结伤"));
+            enemy.getBuffManager().addBuff(new DotBuff(ally, elements[i], 20_000, 3, 0, i == 0 ? "dot:burn" : "ctrl:frozen伤"));
         }
         Assertions.assertFalse(enemy.isDeath(), "precondition: the target survives");
         double before = enemy.getCurrentHp();
@@ -73,7 +73,7 @@ public class KafkaSkillTicksEveryDotTest {
                 new ArrayList<>(List.of(neighbour, main)), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         neighbour.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 20_000, 3, 0, "dot:burn"));
-        main.getBuffManager().addBuff(new DotBuff(ally, DamageElement.ICE, 20_000, 3, 0, "冻结伤"));
+        main.getBuffManager().addBuff(new DotBuff(ally, DamageElement.ICE, 20_000, 3, 0, "ctrl:frozen伤"));
         double mainBefore = main.getCurrentHp();
         double neighbourBefore = neighbour.getCurrentHp();
         battle.castImmediate(kafka.getSkills().get(SkillType.SKILL), kafka, List.of(main));

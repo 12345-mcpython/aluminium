@@ -128,7 +128,7 @@ public class RuleAmendmentTest {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new TriggerTable(MARCH_7TH, List.of(
                         named("freeze", TriggerSpecs.rule("ULT_CAST", null,
-                                TriggerSpecs.applyControl("冻结", 1, null, "all_enemies"))),
+                                TriggerSpecs.applyControl("ctrl:frozen", 1, null, "all_enemies"))),
                         amendChance("freeze", 0.15))));
 
         Assertions.assertTrue(refused.getMessage().contains("base_chance"), refused.getMessage());
@@ -258,7 +258,7 @@ public class RuleAmendmentTest {
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
 
-        return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
+        return battle.enemyUnits().getFirst().getBuffManager().hasState("ctrl:frozen");
     }
 
     /**
@@ -268,7 +268,7 @@ public class RuleAmendmentTest {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
         List<TriggerSpec> specs = new ArrayList<>();
         specs.add(named("freeze", TriggerSpecs.rule("ULT_CAST", null,
-                TriggerSpecs.applyControl("冻结", 1, 0.5, "all_enemies"))));
+                TriggerSpecs.applyControl("ctrl:frozen", 1, 0.5, "all_enemies"))));
         if (raise > 0) {
             specs.add(amendChance("freeze", raise));
         }
@@ -278,7 +278,7 @@ public class RuleAmendmentTest {
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
 
-        return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
+        return battle.enemyUnits().getFirst().getBuffManager().hasState("ctrl:frozen");
     }
 
     /**

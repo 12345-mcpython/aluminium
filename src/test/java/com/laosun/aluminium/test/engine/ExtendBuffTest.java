@@ -163,7 +163,7 @@ public class ExtendBuffTest {
                 new Case(TriggerSpecs.modifyAttr("ATTACK", 0.2, 2, null, null, null, "target"), StatModifierBuff.class),
                 new Case(TriggerSpecs.modifyDamageTaken(0.2, 2), VulnerabilityBuff.class),
                 new Case(TriggerSpecs.taunt(1), TauntBuff.class),
-                new Case(TriggerSpecs.applyControl("冻结", 1, null, "target"), ControlBuff.class),
+                new Case(TriggerSpecs.applyControl("ctrl:frozen", 1, null, "target"), ControlBuff.class),
                 new Case(TriggerSpecs.dot("Ice", 500.0, null, null, 2, null), DotBuff.class));
 
         for (Case one : cases) {

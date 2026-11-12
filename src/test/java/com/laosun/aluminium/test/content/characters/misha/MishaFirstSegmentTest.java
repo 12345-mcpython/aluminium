@@ -82,6 +82,6 @@ public class MishaFirstSegmentTest {
         battle.startBattle();
         battle.castImmediate(misha.getSkills().get(SkillType.ULTRA), misha, List.of(enemy));
         battle.processRequests();
-        return enemy.getBuffManager().hasState("冻结");
+        return enemy.getBuffManager().hasState("ctrl:frozen");
     }
 }

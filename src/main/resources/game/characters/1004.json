@@ -39,7 +39,7 @@
       "do": [
         {
           "op": "APPLY_CONTROL",
-          "control": "禁锢",
+          "control": "ctrl:imprisoned",
           "turns": 1,
           "base_chance": 1,
           "target": "all_enemies"
@@ -136,7 +136,7 @@
       "do": [
         {
           "op": "APPLY_CONTROL",
-          "control": "禁锢",
+          "control": "ctrl:imprisoned",
           "turns": 1,
           "base_chance": 1,
           "target": "all_enemies"

@@ -35,12 +35,12 @@ public class GepardFreezeTest {
     @Test
     public void hisFreezeLandsOnAnUnresistingTarget() {
         Fixture f = new Fixture(1);
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("冻结"), "precondition: not frozen yet");
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("ctrl:frozen"), "precondition: not frozen yet");
 
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.SKILL), f.gepard, List.of(f.enemy));
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"),
-                "\"a 65% base chance to put the attacked enemy target into the Frozen state\" (「有65%的基础概率使受到攻击的敌方目标陷入冻结状态」) + the +35% from Eidolon (星魂) 1 ⇒ 100% base chance");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"),
+                "\"a 65% base chance to put the attacked enemy target into the Frozen state\" (「有65%的基础概率使受到攻击的敌方目标陷入ctrl:frozen状态」) + the +35% from Eidolon (星魂) 1 ⇒ 100% base chance");
     }
 
     /**
@@ -50,13 +50,13 @@ public class GepardFreezeTest {
     public void theFreezeCarriesItsPerTurnDamage() {
         Fixture f = new Fixture(1);
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.SKILL), f.gepard, List.of(f.enemy));
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"), "precondition: the freeze landed");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"), "precondition: the freeze landed");
 
         double before = f.enemy.getCurrentHp();
         f.battle.tickDots(f.enemy);
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "「冻结状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」 (while Frozen, the enemy target cannot act and takes additional Ice DMG equal to 60% of Gepard (杰帕德)'s ATK at the start of every turn)");
+                "「ctrl:frozen状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」 (while Frozen, the enemy target cannot act and takes additional Ice DMG equal to 60% of Gepard (杰帕德)'s ATK at the start of every turn)");
     }
 
     /**
@@ -67,7 +67,7 @@ public class GepardFreezeTest {
         Fixture f = new Fixture(0);
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.SKILL), f.gepard, List.of(f.enemy));
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"),
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"),
                 "65% base chance with a roll of 0.0 and no resistance: the plain clause works without any eidolon");
     }
 

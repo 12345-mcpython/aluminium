@@ -63,7 +63,7 @@ public class YanqingSoulsteelAndEidolonsTest {
         Battle battle = scene(1);
         Character yanqing = battle.characters().getFirst();
         Enemy enemy = (Enemy) battle.enemies().getFirst();
-        enemy.getBuffManager().addBuff(new StateBuff("冻结", 2));
+        enemy.getBuffManager().addBuff(new StateBuff("ctrl:frozen", 2));
 
         double before = enemy.getCurrentHp();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, yanqing, enemy, 1, 0));
@@ -153,9 +153,9 @@ public class YanqingSoulsteelAndEidolonsTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, yanqing, enemy, 1, 0));
         battle.processRequests();
 
-        Assertions.assertTrue(enemy.getBuffManager().hasState("冻结"),
-                "「有 65% 的基础概率使其陷入冻结状态」 — a zero roll on an unresisting target lands it");
-        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("ctrl:frozen"),
+                "「有 65% 的基础概率使其陷入ctrl:frozen状态」 — a zero roll on an unresisting target lands it");
+        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「ctrl:frozen状态下，敌方目标不能行动」");
 
         double before = enemy.getCurrentHp();
         battle.tickDots(enemy);

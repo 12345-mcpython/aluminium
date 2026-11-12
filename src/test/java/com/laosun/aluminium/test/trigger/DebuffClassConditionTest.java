@@ -25,7 +25,7 @@ import java.util.List;
 public class DebuffClassConditionTest {
     private static final int OWNER = 1002;
     private static final int MONSTER = 1002011;
-    private static final String FREEZE = "冻结";
+    private static final String FREEZE = "ctrl:frozen";
     private static final double EPS = 1e-9;
 
     /**

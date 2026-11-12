@@ -55,13 +55,13 @@ public class RobinConcertoTest {
         Assertions.assertEquals(1, counter.getBuffManager().stacksOf("计数"),
                 "ULT_CAST arrives at the tables once per cast (an event count -- it does NOT count the rules that match)");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, robin, 0, 0));
-        Assertions.assertFalse(robin.getBuffManager().hasState("冻结"),
+        Assertions.assertFalse(robin.getBuffManager().hasState("ctrl:frozen"),
                 "「处于【协奏】状态时，知更鸟免疫控制类负面状态」 (while in the Concerto (【协奏】) state, Robin is immune to Crowd Control debuffs)");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(robin).getFirst(), robin, 0, 0));
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, robin, 0, 0));
-        Assertions.assertTrue(robin.getBuffManager().hasState("冻结"),
+        Assertions.assertTrue(robin.getBuffManager().hasState("ctrl:frozen"),
                 "the immunity is named after the state, so the countdown takes it off -- the same control now lands");
     }
 
@@ -71,7 +71,7 @@ public class RobinConcertoTest {
     private static EffectSpec control() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_CONTROL");
-        TriggerSpecs.set(effect, "control", "冻结");
+        TriggerSpecs.set(effect, "control", "ctrl:frozen");
         TriggerSpecs.set(effect, "turns", 1);
         TriggerSpecs.set(effect, "baseChance", 1.0);
         TriggerSpecs.set(effect, "target", "target");
