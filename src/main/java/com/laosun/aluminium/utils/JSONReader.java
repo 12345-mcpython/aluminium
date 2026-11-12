@@ -15,12 +15,12 @@ import java.nio.charset.StandardCharsets;
  *
  * <p><b>Most data files are not in the repository.</b> {@code src/main/resources/data/*} is ignored by
  * {@code .gitignore}, because those tables are produced by the generator named in {@code README.md}. Three of them
- * <b>are</b> checked in, because the generator cannot produce them: {@code monster_attack_modify_ratio.json}
- * (hand-written patch table), {@code skill_effects.json} (hand-maintained - it says how to read a non-damaging skill)
- * and {@code enemy_skills.json} (self-built, because the game data has no enemy skill table). Everything else, the
- * skill rows included, must be generated before the engine can start; when a file is missing this class throws
- * {@link IllegalStateException} carrying the file name and the generation hint - see
- * {@link #fromJSON(String, Type)}.
+ * <b>are</b> checked in: {@code monster_attack_modify_ratio.json} and {@code enemy_skills.json} because the generator
+ * never writes them at all (a hand-written patch table, and an enemy skill table the game data does not contain), and
+ * {@code skill_effects.json} because the generator only <b>merges</b> it - hand-added keys and hand-written rows
+ * survive solely when the file already exists. Everything else, the skill rows included, must be generated before the
+ * engine can start; when a file is missing this class throws {@link IllegalStateException} carrying the file name and
+ * the generation hint - see {@link #fromJSON(String, Type)}.
  *
  * <p>The same is true for the other way data can be unusable: a file that exists but parses to
  * {@code null} (zero bytes, or a literal {@code null}). It is reported at the same place, with the same
