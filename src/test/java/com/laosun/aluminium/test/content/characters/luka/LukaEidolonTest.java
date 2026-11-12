@@ -25,7 +25,7 @@ public class LukaEidolonTest {
 
     private static final int LEVEL = 80;
     private static final int LUKA = 1111;
-    private static final String WILL = "斗志";
+    private static final String WILL = "char:1111/fighting_spirit";
 
     @Test
     public void eidolonThreeAndFiveRaiseTheSkillLevels() {
@@ -50,7 +50,7 @@ public class LukaEidolonTest {
             double before = luka.getAttribute(AttributeType.ATTACK).get();
             addWill(luka, 1);
             Assertions.assertEquals(0.05 * base, luka.getAttribute(AttributeType.ATTACK).get() - before, 1e-6,
-                    "layer " + layer + " of 「每获得 1 层【斗志】，攻击力提高 5%」");
+                    "layer " + layer + " of 「每获得 1 层【char:1111/fighting_spirit】，攻击力提高 5%」");
         }
 
         // Past the cap nothing moves.

@@ -20,7 +20,7 @@ public class XueyiEidolonTest {
     private static final int XUEYI = 1214;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-    private static final String KARMA = "恶报";
+    private static final String KARMA = "char:1214/retribution";
 
     @Test
     public void eidolonOneRaisesTheFollowupByFortyPercent() {

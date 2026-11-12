@@ -21,7 +21,7 @@ import java.util.List;
 public class TingyunEidolonTest {
     private static final int TINGYUN = 1202;
     private static final int LEVEL = 80;
-    private static final String BLESSING = "赐福";
+    private static final String BLESSING = "char:1202/blessing";
 
     /** 秘技:「使用秘技后立即为自身恢复 50 点能量」 - and nothing happens when the technique was not declared. */
     @Test
@@ -94,7 +94,7 @@ public class TingyunEidolonTest {
 
         double unblessed = extraDamageAtAlliedAttack(1_000, false)[1];
         Assertions.assertEquals(0.0, unblessed, 1e-9,
-                "control: without 【赐福】 the ally's attack carries nothing extra");
+                "control: without 【char:1202/blessing】 the ally's attack carries nothing extra");
     }
 
     /**

@@ -37,9 +37,9 @@ public class LynxTest {
 
         f.skill();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("求生反应"), "「附上【求生反应】」 (applies Survival Response (【求生反应】))");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("char:1110/survival_instinct"), "「附上【char:1110/survival_instinct】」 (applies Survival Response (【char:1110/survival_instinct】))");
         Assertions.assertTrue(f.ally.getMaxHp() > before, "「提高等同于玲可7.50%生命上限+200的生命上限」 (raises Max HP by an amount equal to 7.50% of Lynx (玲可)'s Max HP + 200)");
-        Assertions.assertFalse(f.lynx.getBuffManager().hasState("求生反应"),
+        Assertions.assertFalse(f.lynx.getBuffManager().hasState("char:1110/survival_instinct"),
                 "⚠ 「指定我方**单体**」 (a designated single **ally**): not party-wide");
     }
 

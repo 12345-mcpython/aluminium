@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class ArlanEidolonFourTest {
     private static final int ARLAN = 1008;
-    private static final String STATE = "绝处反击";
+    private static final String STATE = "char:1008/last_stand";
 
     /**
      * At E4 the first lethal blow restores him to a quarter of his Max HP.

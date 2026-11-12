@@ -30,7 +30,7 @@ public class TingyunTest {
     private static final int ALLY = 1002;
     private static final int OTHER_ALLY = 1003;
     private static final int LEVEL = 80;
-    private static final String BLESSING = "赐福";
+    private static final String BLESSING = "char:1202/blessing";
 
     /**
      * Note: "使其攻击力提高50%，最高不超过停云当前攻击力的25%": the gain must respect the ceiling.
@@ -43,7 +43,7 @@ public class TingyunTest {
         f.battle.castImmediate(f.tingyun.getSkills().get(SkillType.SKILL), f.tingyun, List.of(f.ally));
 
         double after = f.ally.getAttribute(AttributeType.ATTACK).get();
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("赐福"), "「为指定我方单体提供【赐福】」 (provides a designated single ally with [赐福])");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("char:1202/blessing"), "「为指定我方单体提供【char:1202/blessing】」 (provides a designated single ally with [char:1202/blessing])");
         Assertions.assertTrue(after > before, "\"raises its ATK by 50%\" (「使其攻击力提高50%」): " + before + " -> " + after);
         double ceiling = f.tingyun.getAttribute(AttributeType.ATTACK).get() * 0.25;
         Assertions.assertTrue(after - before <= ceiling + 1e-6,
@@ -82,7 +82,7 @@ public class TingyunTest {
         Assertions.assertEquals(2, f.instances.size(), "her basic attack, then the talent's one extra instance");
         Damage talent = f.instances.get(1);
         Assertions.assertSame(f.ally, talent.getAttacker(),
-                "「获得【赐福】的目标立即对其造成…」 — the blessed ally strikes, not Tingyun");
+                "「获得【char:1202/blessing】的目标立即对其造成…」 — the blessed ally strikes, not Tingyun");
         Assertions.assertEquals(DamageType.ADDITIONAL, talent.getType(), "「附加伤害」");
 
         Fixture plain = new Fixture();
@@ -107,7 +107,7 @@ public class TingyunTest {
 
         Assertions.assertFalse(f.ally.getBuffManager().hasState(BLESSING), "「仅对…最新的施放目标生效」");
         Assertions.assertEquals(allyBase, f.ally.getAttribute(AttributeType.ATTACK).get(), 1e-9,
-                "and the attack gain leaves with the state (its modifier is named 【赐福】)");
+                "and the attack gain leaves with the state (its modifier is named 【char:1202/blessing】)");
         Assertions.assertTrue(f.otherAlly.getBuffManager().hasState(BLESSING), "the newest target holds it");
     }
 

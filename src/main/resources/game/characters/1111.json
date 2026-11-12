@@ -35,7 +35,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "斗志",
+          "buff": "char:1111/fighting_spirit",
           "amount": 2,
           "max_stacks": 4,
           "target": "self",
@@ -58,7 +58,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "斗志",
+          "buff": "char:1111/fighting_spirit",
           "amount": 1,
           "max_stacks": 4,
           "target": "self",
@@ -78,7 +78,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "斗志",
+          "buff": "char:1111/fighting_spirit",
           "amount": 1,
           "max_stacks": 4,
           "target": "self",
@@ -93,7 +93,7 @@
       "id": "talent_enhance_basic",
       "when": [
         "actor == self",
-        "self_stacks:斗志 >= 2"
+        "self_stacks:char:1111/fighting_spirit >= 2"
       ],
       "do": [
         {
@@ -117,7 +117,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "斗志",
+          "buff": "char:1111/fighting_spirit",
           "amount": 2,
           "target": "self"
         }
@@ -135,7 +135,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "斗志",
+          "buff": "char:1111/fighting_spirit",
           "amount": 1,
           "max_stacks": 4,
           "target": "self",
@@ -150,7 +150,7 @@
       "id": "talent_restore_basic",
       "when": [
         "actor == self",
-        "self_stacks:斗志 < 2"
+        "self_stacks:char:1111/fighting_spirit < 2"
       ],
       "do": [
         {
@@ -248,7 +248,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "斗志",
+          "buff": "char:1111/fighting_spirit",
           "amount": 1,
           "max_stacks": 4,
           "permanent": true,
@@ -305,7 +305,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.05,
-          "per_stack": "斗志",
+          "per_stack": "char:1111/fighting_spirit",
           "per_stack_cap": 4,
           "per_stack_live": true,
           "permanent": true,
@@ -326,7 +326,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "斗志",
+          "buff": "char:1111/fighting_spirit",
           "amount": 1,
           "max_stacks": 6,
           "permanent": true,
@@ -407,7 +407,7 @@
       "on": "STACK_GAINED",
       "id": "trace_recycle_energy_per_will_layer",
       "when": [
-        "self stack_added 斗志"
+        "self stack_added char:1111/fighting_spirit"
       ],
       "do": [
         {

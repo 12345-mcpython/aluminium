@@ -20,7 +20,7 @@ public class LukaEidolonTwoTest {
 
     private static final int LUKA = 1111;
     private static final int LEVEL = 80;
-    private static final String WILL = "斗志";
+    private static final String WILL = "char:1111/fighting_spirit";
 
     @Test
     public void theSkillPaysALayerOnlyAgainstAPhysicalWeakness() {

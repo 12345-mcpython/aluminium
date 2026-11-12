@@ -12,7 +12,7 @@
   ],
   "resources": [
     {
-      "id": "逆鳞",
+      "id": "char:1213/reverse_scale",
       "max": 2147483647,
       "source": "1213 丹恒•饮月 秘技 掣空如虹: 「…并使自身获得1个【逆鳞】。」（文档未给上限 ⇒ 用 Integer.MAX_VALUE）",
       "note": "「获得 **1** 个【逆鳞】」是**计数**不是状态；上限文档没给 ⇒ `Integer.MAX_VALUE`（同 1506 的写法）。"
@@ -70,7 +70,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "逆鳞",
+          "buff": "char:1213/reverse_scale",
           "amount": 2,
           "max_stacks": 3,
           "permanent": true,
@@ -96,7 +96,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "逆鳞",
+          "resource": "char:1213/reverse_scale",
           "amount": 1
         }
       ],
@@ -119,7 +119,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "逆鳞",
+          "resource": "char:1213/reverse_scale",
           "amount": 1
         }
       ],

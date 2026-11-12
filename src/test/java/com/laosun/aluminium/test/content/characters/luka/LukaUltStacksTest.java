@@ -23,7 +23,7 @@ public class LukaUltStacksTest {
 
     private static final int LEVEL = 80;
     private static final int LUKA = 1111;
-    private static final String FIGHTING_SPIRIT = "斗志";
+    private static final String FIGHTING_SPIRIT = "char:1111/fighting_spirit";
 
     /**
      * One ultimate grants two layers on top of the talent's starting one, and the fourth layer is the cap.
@@ -34,7 +34,7 @@ public class LukaUltStacksTest {
         int before = f.luka.getBuffManager().stacksOf(FIGHTING_SPIRIT);
         f.castUltimate();
         Assertions.assertEquals(before + 2, f.luka.getBuffManager().stacksOf(FIGHTING_SPIRIT),
-                "「获得 2 层【斗志】」 - one application, two layers");
+                "「获得 2 层【char:1111/fighting_spirit】」 - one application, two layers");
 
         f.castUltimate();
         Assertions.assertEquals(4, f.luka.getBuffManager().stacksOf(FIGHTING_SPIRIT),

@@ -24,7 +24,7 @@ public class LukaEnhancedBasicCycleTest {
 
     private static final int LEVEL = 80;
     private static final int LUKA = 1111;
-    private static final String FIGHTING_SPIRIT = "斗志";
+    private static final String FIGHTING_SPIRIT = "char:1111/fighting_spirit";
 
     /**
      * The row changes one attack AFTER the layers move, and changes back when the enhanced attack spends them.

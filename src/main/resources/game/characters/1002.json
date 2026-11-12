@@ -88,7 +88,7 @@
           "attribute": "AGGRO_ADDED_RATIO",
           "percent": -0.5,
           "permanent": true,
-          "buff": "潜龙",
+          "buff": "char:1002/hidden_dragon",
           "target": "self"
         }
       ],
@@ -106,7 +106,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "潜龙",
+          "buff": "char:1002/hidden_dragon",
           "target": "self"
         }
       ],

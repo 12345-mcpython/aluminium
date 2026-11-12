@@ -40,12 +40,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "赐福",
+          "buff": "char:1202/blessing",
           "target": "all_allies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "赐福",
+          "buff": "char:1202/blessing",
           "turns": 3,
           "target": "target"
         },
@@ -56,7 +56,7 @@
           "cap_percent": 0.25,
           "turns": 3,
           "target": "target",
-          "buff": "赐福",
+          "buff": "char:1202/blessing",
           "percent_from_skill_param": "SKILL:1"
         }
       ],
@@ -157,7 +157,7 @@
       "id": "eidolon1_blessed_ult_grants_speed",
       "min_eidolon": 1,
       "when": [
-        "actor has_state 赐福"
+        "actor has_state char:1202/blessing"
       ],
       "do": [
         {
@@ -177,7 +177,7 @@
       "min_eidolon": 2,
       "per_turn": 1,
       "when": [
-        "actor has_state 赐福"
+        "actor has_state char:1202/blessing"
       ],
       "do": [
         {
@@ -226,12 +226,12 @@
       "id": "talent_the_blessed_ally_strikes_whoever_she_hits",
       "when": [
         "actor == self",
-        "any_ally has_state 赐福"
+        "any_ally has_state char:1202/blessing"
       ],
       "do": [
         {
           "op": "DAMAGE",
-          "attacker": "holder_of:赐福",
+          "attacker": "holder_of:char:1202/blessing",
           "scale": "self_attr:ATTACK",
           "percent_from_skill_param": "TALENT:0",
           "element": "Thunder",
@@ -287,7 +287,7 @@
       "on": "ALLY_ATTACK",
       "id": "skill_blessed_ally_extra_damage",
       "when": [
-        "actor has_state 赐福"
+        "actor has_state char:1202/blessing"
       ],
       "do": [
         {

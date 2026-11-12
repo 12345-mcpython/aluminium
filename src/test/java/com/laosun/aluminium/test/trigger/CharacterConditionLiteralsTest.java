@@ -116,7 +116,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1111, "ULT_CAST", "ult_coup", List.of("actor == self"));
         assertRule(1111, "BATTLE_START", "talent_start", List.of());
         assertRule(1111, "ALLY_ATTACK", "talent_after_basic", List.of("actor == self", "from_skill COMMON"));
-        assertRule(1111, "ALLY_ATTACK", "talent_enhance_basic", List.of("actor == self", "self_stacks:斗志 >= 2.0"));
+        assertRule(1111, "ALLY_ATTACK", "talent_enhance_basic", List.of("actor == self", "self_stacks:char:1111/fighting_spirit >= 2.0"));
         assertRule(1111, "ALLY_ATTACK", "talent_enhanced_laceration", List.of("actor == self", "from_skill_id == 8.0", "target has_state dot:bleed"));
         assertRule(1111, "ALLY_ATTACK", "enhanced_costs_two_layers", List.of("actor == self", "from_skill_id == 8.0"));
         assertRule(1111, "ALLY_ATTACK", "talent_after_skill", List.of("actor == self", "from_skill SKILL"));

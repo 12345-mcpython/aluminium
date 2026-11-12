@@ -73,7 +73,7 @@ public class XueyiEidolonTwoStanceTest {
             enemy.setStance(300);
         }
         battle.processRequests();
-        Assertions.assertEquals(0, xueyi.getBuffManager().stacksOf("恶报"),
+        Assertions.assertEquals(0, xueyi.getBuffManager().stacksOf("char:1214/retribution"),
                 "the follow-up consumed all 8 and added none of its own");
     }
 }

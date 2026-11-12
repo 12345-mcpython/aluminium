@@ -120,7 +120,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "通解",
+          "buff": "char:1106/general_solution",
           "base_chance": 1,
           "turns": 2,
           "target": "all_enemies"
@@ -130,10 +130,10 @@
           "attribute": "DEFENCE",
           "percent": -0.4,
           "turns": 2,
-          "buff": "通解",
+          "buff": "char:1106/general_solution",
           "target": "all_enemies",
           "target_when": [
-            "target has_state 通解"
+            "target has_state char:1106/general_solution"
           ],
           "max_stacks": 2
         }

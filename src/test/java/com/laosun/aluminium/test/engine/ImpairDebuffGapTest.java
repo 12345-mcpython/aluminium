@@ -49,7 +49,7 @@ public class ImpairDebuffGapTest {
      * the prose they are verified against still says 灼烧 - so both spellings live in the repo and a rename must leave
      * this one alone.
      */
-    private static final Pattern IN_BATTLE_STATE = Pattern.compile("【(吞火|烬煨)】|(风化|裂伤|灼烧|触电)");
+    private static final Pattern IN_BATTLE_STATE = Pattern.compile("【(char:1210/fire_swallow|烬煨)】|(风化|裂伤|灼烧|触电)");
 
     /**
      * Part 1: no {@code Impair} skill has an effect row, so no cast of one can deliver a debuff.

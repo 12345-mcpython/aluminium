@@ -73,7 +73,7 @@ public class RolledStateTest {
 
         EffectSpec state = new EffectSpec();
         TriggerSpecs.set(state, "op", "APPLY_BUFF");
-        TriggerSpecs.set(state, "buff", "通解");
+        TriggerSpecs.set(state, "buff", "char:1106/general_solution");
         TriggerSpecs.set(state, "turns", 2);
         TriggerSpecs.set(state, "target", "target");
         if (baseChance != null) {
@@ -89,7 +89,7 @@ public class RolledStateTest {
         });
         battle.startBattle();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, pela, enemy, 0, 0));
-        return enemy.getBuffManager().hasState("通解");
+        return enemy.getBuffManager().hasState("char:1106/general_solution");
     }
 
     private static Random fixed() {

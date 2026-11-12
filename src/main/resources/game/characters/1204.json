@@ -102,7 +102,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "攻击段数",
+          "buff": "internal:1204/attack_segments",
           "amount": 3.0,
           "max_stacks": 10,
           "permanent": true,
@@ -118,7 +118,7 @@
           "target": "summon",
           "max_stacks": 10,
           "amount": 2.0,
-          "buff": "攻击段数",
+          "buff": "internal:1204/attack_segments",
           "op": "ADD_STACK",
           "permanent": true
         }
@@ -160,7 +160,7 @@
           "permanent": true,
           "op": "ADD_STACK",
           "max_stacks": 10,
-          "buff": "攻击段数"
+          "buff": "internal:1204/attack_segments"
         }
       ],
       "when": [
@@ -187,7 +187,7 @@
       "id": "talent_every_extra_hit_adds_ten_speed",
       "when": [
         "actor is_summon",
-        "actor_stacks:攻击段数 >= 4"
+        "actor_stacks:internal:1204/attack_segments >= 4"
       ],
       "do": [
         {
@@ -202,7 +202,7 @@
                 "type": "sub",
                 "left": {
                   "type": "steps",
-                  "counter": "actor_stacks:攻击段数",
+                  "counter": "actor_stacks:internal:1204/attack_segments",
                   "step": 1
                 },
                 "right": {
@@ -237,7 +237,7 @@
       "source": "1204 景元 行迹 破阵 (1204101):「若【神君】下回合的攻击段数大于等于6段，则其下回合的暴击伤害提高25%。」",
       "when": [
         "actor is_summon",
-        "actor_stacks:攻击段数 >= 6"
+        "actor_stacks:internal:1204/attack_segments >= 6"
       ]
     },
     {
@@ -245,7 +245,7 @@
       "id": "eidolon1_the_splash_grows_by_a_quarter",
       "when": [
         "actor is_summon",
-        "actor_stacks:攻击段数 >= 1",
+        "actor_stacks:internal:1204/attack_segments >= 1",
         "eidolon >= 1"
       ],
       "do": [
@@ -256,7 +256,7 @@
           "attacker": "actor",
           "element": "Thunder",
           "attacker": "actor",
-          "times_from": "steps:actor_stacks:攻击段数/1",
+          "times_from": "steps:actor_stacks:internal:1204/attack_segments/1",
           "blast": 0.5,
           "target": "random_enemy"
         }
@@ -270,7 +270,7 @@
       "on": "TURN_START",
       "when": [
         "actor is_summon",
-        "actor_stacks:攻击段数 >= 1",
+        "actor_stacks:internal:1204/attack_segments >= 1",
         "eidolon < 1"
       ],
       "id": "the_lord_strikes_on_its_turn",
@@ -281,7 +281,7 @@
           "percent": 0.66,
           "element": "Thunder",
           "attacker": "actor",
-          "times_from": "steps:actor_stacks:攻击段数/1",
+          "times_from": "steps:actor_stacks:internal:1204/attack_segments/1",
           "blast": 0.25,
           "target": "random_enemy"
         }
@@ -335,7 +335,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "攻击段数",
+          "buff": "internal:1204/attack_segments",
           "amount": 3.0,
           "max_stacks": 10,
           "permanent": true,
@@ -355,14 +355,14 @@
         {
           "amount": 99.0,
           "op": "REMOVE_BUFF",
-          "buff": "攻击段数",
+          "buff": "internal:1204/attack_segments",
           "target": "actor"
         },
         {
           "max_stacks": 10,
           "amount": 3.0,
           "permanent": true,
-          "buff": "攻击段数",
+          "buff": "internal:1204/attack_segments",
           "target": "actor",
           "op": "ADD_STACK"
         }

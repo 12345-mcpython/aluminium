@@ -30,7 +30,7 @@ public class SilverWolfEidolonTwoDefectTest {
 
     @Test
     public void anAllysAttackImplantsOneRandomDefect() {
-        Assertions.assertEquals(1, implanted(2), "「植入 1 个随机【缺陷】」: exactly one of " + DEFECTS);
+        Assertions.assertEquals(1, implanted(2), "「植入 1 个随机【char:1006/defect】」: exactly one of " + DEFECTS);
         Assertions.assertEquals(0, implanted(1), "control: nothing before Eidolon 2");
     }
 

@@ -39,8 +39,8 @@ public class GuinaifenFirekissStackTest {
         for (int tick = 1; tick <= 3; tick++) {
             battle.tickDots(enemy);
             battle.processRequests();
-            int stacks = enemy.getBuffManager().stacksOf("吞火");
-            Assertions.assertTrue(stacks >= 1, "the burn tick applied 【吞火】 (tick " + tick + ")");
+            int stacks = enemy.getBuffManager().stacksOf("char:1210/fire_swallow");
+            Assertions.assertTrue(stacks >= 1, "the burn tick applied 【char:1210/fire_swallow】 (tick " + tick + ")");
             Assertions.assertTrue(stacks <= 3, "「最多叠加 3 层」 — the counter never passes three (tick " + tick + ": " + stacks + ")");
         }
     }
@@ -83,9 +83,9 @@ public class GuinaifenFirekissStackTest {
             battle.tickDots(enemy);
             battle.processRequests();
         }
-        Assertions.assertTrue(enemy.getBuffManager().stacksOf("吞火") <= 4,
+        Assertions.assertTrue(enemy.getBuffManager().stacksOf("char:1210/fire_swallow") <= 4,
                 "「增加 1 层」 — the cap is four, never more");
-        Assertions.assertTrue(enemy.getBuffManager().stacksOf("吞火") >= 1, "the counter still fills");
+        Assertions.assertTrue(enemy.getBuffManager().stacksOf("char:1210/fire_swallow") >= 1, "the counter still fills");
     }
 
     /** 星魂 4「她施加的dot:burn每触发一次伤害，使自身恢复 2 点能量」. */

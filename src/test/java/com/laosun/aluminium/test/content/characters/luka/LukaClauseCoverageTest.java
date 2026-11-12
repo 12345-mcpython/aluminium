@@ -65,12 +65,12 @@ public class LukaClauseCoverageTest {
     @Test
     public void theRecycleTracePaysThreeEnergyPerLayer() {
         Fixture f = new Fixture();
-        int layersBefore = f.luka.getBuffManager().stacksOf("斗志");
+        int layersBefore = f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit");
         double energyBefore = f.luka.getCurrentEnergy();
 
         f.castUlt();
 
-        Assertions.assertEquals(layersBefore + 2, f.luka.getBuffManager().stacksOf("斗志"),
+        Assertions.assertEquals(layersBefore + 2, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"),
                 "precondition: the Ultimate grants 2 layers");
         Assertions.assertEquals(energyBefore + 6, f.luka.getCurrentEnergy(), 1e-9,
                 "「每获得 1 层…额外恢复 3 点能量」 — two layers, two firings");

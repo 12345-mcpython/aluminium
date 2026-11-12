@@ -154,10 +154,10 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "恶报",
+          "buff": "char:1214/retribution",
           "amount": 1,
           "max_stacks": 8,
-          "overflow_to": "恶报溢出",
+          "overflow_to": "internal:1214/retribution_overflow",
           "overflow_max": 6,
           "permanent": true,
           "permanent": true,
@@ -171,12 +171,12 @@
       "on": "TOUGHNESS_REDUCED",
       "id": "talent_karma_overflow_followup",
       "when": [
-        "self_stacks:恶报 >= 8"
+        "self_stacks:char:1214/retribution >= 8"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "恶报",
+          "buff": "char:1214/retribution",
           "amount": 8,
           "target": "self"
         },
@@ -191,18 +191,18 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "恶报",
+          "buff": "char:1214/retribution",
           "amount": 1,
           "times_from": "resource:恶报溢出",
           "max_stacks": 8,
-          "overflow_to": "恶报溢出",
+          "overflow_to": "internal:1214/retribution_overflow",
           "overflow_max": 6,
           "permanent": true,
           "target": "self"
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "恶报溢出",
+          "buff": "internal:1214/retribution_overflow",
           "amount": 6,
           "target": "self"
         }
@@ -216,7 +216,7 @@
       "id": "eidolon2_followup_heal_at_the_six_stack_cap",
       "min_eidolon": 6,
       "when": [
-        "self_stacks:恶报 >= 6"
+        "self_stacks:char:1214/retribution >= 6"
       ],
       "do": [
         {
@@ -234,12 +234,12 @@
       "id": "eidolon6_karma_cap_six",
       "min_eidolon": 6,
       "when": [
-        "self_stacks:恶报 >= 6"
+        "self_stacks:char:1214/retribution >= 6"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "恶报",
+          "buff": "char:1214/retribution",
           "amount": 6,
           "target": "self"
         },
@@ -256,18 +256,18 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "恶报",
+          "buff": "char:1214/retribution",
           "amount": 1,
           "times_from": "resource:恶报溢出",
           "max_stacks": 8,
-          "overflow_to": "恶报溢出",
+          "overflow_to": "internal:1214/retribution_overflow",
           "overflow_max": 6,
           "permanent": true,
           "target": "self"
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "恶报溢出",
+          "buff": "internal:1214/retribution_overflow",
           "amount": 6,
           "target": "self"
         }
@@ -281,7 +281,7 @@
       "min_eidolon": 2,
       "max_eidolon": 5,
       "when": [
-        "self_stacks:恶报 >= 7"
+        "self_stacks:char:1214/retribution >= 7"
       ],
       "do": [
         {
@@ -298,12 +298,12 @@
       "on": "TOUGHNESS_REDUCED",
       "id": "talent_karma_overflow_followup_e2",
       "when": [
-        "self_stacks:恶报 >= 8"
+        "self_stacks:char:1214/retribution >= 8"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "恶报",
+          "buff": "char:1214/retribution",
           "amount": 8,
           "target": "self"
         },

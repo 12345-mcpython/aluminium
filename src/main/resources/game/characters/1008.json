@@ -70,7 +70,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "绝处反击",
+          "buff": "char:1008/last_stand",
           "turns": 2,
           "target": "self"
         }
@@ -84,7 +84,7 @@
       "min_eidolon": 4,
       "when": [
         "actor == self",
-        "self has_state 绝处反击"
+        "self has_state char:1008/last_stand"
       ],
       "do": [
         {
@@ -95,7 +95,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "绝处反击",
+          "buff": "char:1008/last_stand",
           "target": "self"
         }
       ],

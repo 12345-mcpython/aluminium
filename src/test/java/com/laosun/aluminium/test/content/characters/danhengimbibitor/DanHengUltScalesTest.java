@@ -21,13 +21,13 @@ public class DanHengUltScalesTest {
 
     private static final int LEVEL = 80;
     private static final int DAN_HENG = 1213;
-    private static final String SCALE = "逆鳞";
+    private static final String SCALE = "char:1213/reverse_scale";
 
     @Test
     public void theUltimateGrantsTwoScalesUpToThree() {
         Fixture f = new Fixture();
         f.ultimate();
-        Assertions.assertEquals(2, f.danHeng.getBuffManager().stacksOf(SCALE), "「获得 2 个【逆鳞】」");
+        Assertions.assertEquals(2, f.danHeng.getBuffManager().stacksOf(SCALE), "「获得 2 个【char:1213/reverse_scale】」");
 
         f.ultimate();
         Assertions.assertEquals(3, f.danHeng.getBuffManager().stacksOf(SCALE), "「最多持有 3 个」 - the cap holds");

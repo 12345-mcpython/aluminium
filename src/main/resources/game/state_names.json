@@ -107,6 +107,36 @@
       "zh": "弱点击破"
     },
     {
+      "name": "char:1002/hidden_dragon",
+      "owner": "1002",
+      "kind": "char",
+      "used_by": [
+        "1002"
+      ],
+      "zh": "潜龙",
+      "key": "char:1002/hidden_dragon"
+    },
+    {
+      "name": "char:1006/defect",
+      "owner": "1006",
+      "kind": "char",
+      "used_by": [
+        "1006"
+      ],
+      "zh": "缺陷",
+      "key": "char:1006/defect"
+    },
+    {
+      "name": "char:1008/last_stand",
+      "owner": "1008",
+      "kind": "char",
+      "used_by": [
+        "1008"
+      ],
+      "zh": "绝处反击",
+      "key": "char:1008/last_stand"
+    },
+    {
       "name": "char:1015/loop_link",
       "owner": "1015",
       "kind": "char",
@@ -115,6 +145,76 @@
       ],
       "zh": "回路连接",
       "key": "char:1015/loop_link"
+    },
+    {
+      "name": "char:1106/general_solution",
+      "owner": "1106",
+      "kind": "char",
+      "used_by": [
+        "1106"
+      ],
+      "zh": "通解",
+      "key": "char:1106/general_solution"
+    },
+    {
+      "name": "char:1110/survival_instinct",
+      "owner": "1110",
+      "kind": "char",
+      "used_by": [
+        "1110"
+      ],
+      "zh": "求生反应",
+      "key": "char:1110/survival_instinct"
+    },
+    {
+      "name": "char:1111/fighting_spirit",
+      "owner": "1111",
+      "kind": "char",
+      "used_by": [
+        "1111"
+      ],
+      "zh": "斗志",
+      "key": "char:1111/fighting_spirit"
+    },
+    {
+      "name": "char:1202/blessing",
+      "owner": "1202",
+      "kind": "char",
+      "used_by": [
+        "1202"
+      ],
+      "zh": "赐福",
+      "key": "char:1202/blessing"
+    },
+    {
+      "name": "char:1210/fire_swallow",
+      "owner": "1210",
+      "kind": "char",
+      "used_by": [
+        "1210"
+      ],
+      "zh": "吞火",
+      "key": "char:1210/fire_swallow"
+    },
+    {
+      "name": "char:1213/reverse_scale",
+      "owner": "1213",
+      "kind": "char",
+      "used_by": [
+        "1213"
+      ],
+      "zh": "逆鳞",
+      "key": "char:1213/reverse_scale"
+    },
+    {
+      "name": "char:1214/retribution",
+      "owner": "1214",
+      "kind": "char",
+      "used_by": [
+        "1214"
+      ],
+      "zh": "恶报",
+      "key": "char:1214/retribution"
     },
     {
       "name": "char:21041/trick",
@@ -261,6 +361,26 @@
       ],
       "zh": "本回合战技次数",
       "key": "internal:1015/skill_casts_this_turn"
+    },
+    {
+      "name": "internal:1204/attack_segments",
+      "owner": "1204",
+      "kind": "char",
+      "used_by": [
+        "1204"
+      ],
+      "zh": "攻击段数",
+      "key": "internal:1204/attack_segments"
+    },
+    {
+      "name": "internal:1214/retribution_overflow",
+      "owner": "1214",
+      "kind": "internal",
+      "used_by": [
+        "1214"
+      ],
+      "zh": "恶报溢出",
+      "key": "internal:1214/retribution_overflow"
     },
     {
       "name": "internal:21038/burn_triggered",
@@ -692,14 +812,6 @@
       ]
     },
     {
-      "name": "吞火",
-      "owner": "1210",
-      "kind": "char",
-      "used_by": [
-        "1210"
-      ]
-    },
-    {
       "name": "吞纳沙砾",
       "owner": "1503",
       "kind": "char",
@@ -1060,22 +1172,6 @@
       ]
     },
     {
-      "name": "恶报",
-      "owner": "1214",
-      "kind": "char",
-      "used_by": [
-        "1214"
-      ]
-    },
-    {
-      "name": "恶报溢出",
-      "owner": "1214",
-      "kind": "internal",
-      "used_by": [
-        "1214"
-      ]
-    },
-    {
       "name": "惊惶",
       "owner": "1304",
       "kind": "char",
@@ -1180,14 +1276,6 @@
       ]
     },
     {
-      "name": "攻击段数",
-      "owner": "1204",
-      "kind": "char",
-      "used_by": [
-        "1204"
-      ]
-    },
-    {
       "name": "攻陷",
       "owner": "21015",
       "kind": "char",
@@ -1218,14 +1306,6 @@
       "kind": "char",
       "used_by": [
         "1215"
-      ]
-    },
-    {
-      "name": "斗志",
-      "owner": "1111",
-      "kind": "char",
-      "used_by": [
-        "1111"
       ]
     },
     {
@@ -1476,14 +1556,6 @@
       ]
     },
     {
-      "name": "求生反应",
-      "owner": "1110",
-      "kind": "char",
-      "used_by": [
-        "1110"
-      ]
-    },
-    {
       "name": "泡影",
       "owner": "23024",
       "kind": "char",
@@ -1585,14 +1657,6 @@
       "kind": "char",
       "used_by": [
         "1305"
-      ]
-    },
-    {
-      "name": "潜龙",
-      "owner": "1002",
-      "kind": "char",
-      "used_by": [
-        "1002"
       ]
     },
     {
@@ -2156,14 +2220,6 @@
       ]
     },
     {
-      "name": "绝处反击",
-      "owner": "1008",
-      "kind": "char",
-      "used_by": [
-        "1008"
-      ]
-    },
-    {
       "name": "缅怀",
       "owner": "20022",
       "kind": "char",
@@ -2185,14 +2241,6 @@
       "kind": "char",
       "used_by": [
         "1412"
-      ]
-    },
-    {
-      "name": "缺陷",
-      "owner": "1006",
-      "kind": "char",
-      "used_by": [
-        "1006"
       ]
     },
     {
@@ -2419,14 +2467,6 @@
       ]
     },
     {
-      "name": "赐福",
-      "owner": "1202",
-      "kind": "char",
-      "used_by": [
-        "1202"
-      ]
-    },
-    {
       "name": "赤子",
       "owner": "1206",
       "kind": "char",
@@ -2472,22 +2512,6 @@
       "kind": "char",
       "used_by": [
         "23040"
-      ]
-    },
-    {
-      "name": "逆鳞",
-      "owner": "1213",
-      "kind": "char",
-      "used_by": [
-        "1213"
-      ]
-    },
-    {
-      "name": "通解",
-      "owner": "1106",
-      "kind": "char",
-      "used_by": [
-        "1106"
       ]
     },
     {

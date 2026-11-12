@@ -73,7 +73,7 @@ public class DanHengAggroDownTest {
         Assertions.assertEquals(0.0, danHeng.getAttribute(AttributeType.AGGRO_ADDED_RATIO).get(), EPS,
                 "above half HP the trace no longer applies");
         Assertions.assertEquals(before, battle.aggroOf(danHeng), EPS, "and the weight is back to what it was");
-        Assertions.assertFalse(danHeng.getBuffManager().hasState("潜龙"),
+        Assertions.assertFalse(danHeng.getBuffManager().hasState("char:1002/hidden_dragon"),
                 "the state itself is gone (the cleanup rule names it), so a later read cannot see a stale mark");
     }
 

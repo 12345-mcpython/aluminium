@@ -56,7 +56,7 @@ public class XueyiEidolonTwoHealTest {
         }
         battle.processRequests();
         double before = xueyi.getCurrentHp();
-        int karma = xueyi.getBuffManager().stacksOf("恶报");
+        int karma = xueyi.getBuffManager().stacksOf("char:1214/retribution");
         battle.reduceToughness(ally, enemy, DamageElement.THUNDER, 1, null);
         battle.processRequests();
         System.out.println("[1214] e" + eidolon + " cap=" + cap + " karma=" + karma + " hp " + before + " -> "

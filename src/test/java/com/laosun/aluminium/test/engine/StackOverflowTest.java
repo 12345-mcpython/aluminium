@@ -32,8 +32,8 @@ public class StackOverflowTest {
     @Test
     public void theExcessGoesToTheBank() {
         Run run = new Run(6, 5);              // 6 of 8 already, then gain 5 -> 2 fit, 3 banked
-        Assertions.assertEquals(8, run.wearer.getBuffManager().stacksOf("恶报"), "the counter is full");
-        Assertions.assertEquals(3, run.wearer.getBuffManager().stacksOf("恶报溢出"),
+        Assertions.assertEquals(8, run.wearer.getBuffManager().stacksOf("char:1214/retribution"), "the counter is full");
+        Assertions.assertEquals(3, run.wearer.getBuffManager().stacksOf("char:1214/retribution溢出"),
                 "the three layers the counter could not take were kept");
     }
 
@@ -43,8 +43,8 @@ public class StackOverflowTest {
     @Test
     public void theBankStopsAtItsOwnCap() {
         Run run = new Run(7, 20);             // room for 1, bank ceiling 6 -> 1 fits, 6 banked, the rest dropped
-        Assertions.assertEquals(8, run.wearer.getBuffManager().stacksOf("恶报"));
-        Assertions.assertEquals(6, run.wearer.getBuffManager().stacksOf("恶报溢出"),
+        Assertions.assertEquals(8, run.wearer.getBuffManager().stacksOf("char:1214/retribution"));
+        Assertions.assertEquals(6, run.wearer.getBuffManager().stacksOf("char:1214/retribution溢出"),
                 "the bank stops at six even though nineteen layers were offered");
     }
 
@@ -54,8 +54,8 @@ public class StackOverflowTest {
     @Test
     public void withoutTheFieldTheExcessIsStillDropped() {
         Run run = new Run(7, 20, false);
-        Assertions.assertEquals(8, run.wearer.getBuffManager().stacksOf("恶报"));
-        Assertions.assertEquals(0, run.wearer.getBuffManager().stacksOf("恶报溢出"), "nobody banked anything");
+        Assertions.assertEquals(8, run.wearer.getBuffManager().stacksOf("char:1214/retribution"));
+        Assertions.assertEquals(0, run.wearer.getBuffManager().stacksOf("char:1214/retribution溢出"), "nobody banked anything");
     }
 
     // ==================================================================
@@ -74,7 +74,7 @@ public class StackOverflowTest {
             battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
 
             EffectSpec seed = stack(start, null, null);
-            EffectSpec grant = stack(gain, overflow ? "恶报溢出" : null, overflow ? 6 : null);
+            EffectSpec grant = stack(gain, overflow ? "char:1214/retribution溢出" : null, overflow ? 6 : null);
             wearer.setTriggerTable(new TriggerTable(WEARER, List.of(
                     TriggerSpecs.rule("BATTLE_START", List.of(), seed),
                     TriggerSpecs.rule("TURN_START", List.of(), grant))));
@@ -87,7 +87,7 @@ public class StackOverflowTest {
         private static EffectSpec stack(int amount, String overflowTo, Integer overflowMax) {
             EffectSpec effect = new EffectSpec();
             TriggerSpecs.set(effect, "op", "ADD_STACK");
-            TriggerSpecs.set(effect, "buff", "恶报");
+            TriggerSpecs.set(effect, "buff", "char:1214/retribution");
             TriggerSpecs.set(effect, "amount", (double) amount);
             TriggerSpecs.set(effect, "maxStacks", 8);
             TriggerSpecs.set(effect, "permanent", true);

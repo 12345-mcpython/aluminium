@@ -41,7 +41,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "求生反应",
+          "buff": "char:1110/survival_instinct",
           "turns": 2,
           "target": "target"
         },

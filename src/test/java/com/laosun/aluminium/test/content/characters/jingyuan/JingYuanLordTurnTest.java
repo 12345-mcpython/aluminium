@@ -31,7 +31,7 @@ public class JingYuanLordTurnTest {
         battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
                 List.of((Enemy) battle.enemies().getFirst()));
         battle.processRequests();
-        int hits = lord.getBuffManager().stacksOf("攻击段数");
+        int hits = lord.getBuffManager().stacksOf("internal:1204/attack_segments");
         Assertions.assertTrue(hits >= 2, "precondition: the Skill added two hits (" + hits + ")");
 
         Enemy enemy = (Enemy) battle.enemies().getFirst();
@@ -55,7 +55,7 @@ public class JingYuanLordTurnTest {
         Character jingYuan = battle.characters().getFirst();
         Summon lord = battle.summonsOf(jingYuan).getFirst();
         Enemy enemy = (Enemy) battle.enemies().getFirst();
-        Assertions.assertEquals(3, lord.getBuffManager().stacksOf("攻击段数"), "the talent starts it at three");
+        Assertions.assertEquals(3, lord.getBuffManager().stacksOf("internal:1204/attack_segments"), "the talent starts it at three");
         double critBefore = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
         battle.processRequests();
@@ -67,7 +67,7 @@ public class JingYuanLordTurnTest {
                     List.of(enemy));
             battle.processRequests();
         }
-        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("攻击段数"), "two casts add four more");
+        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("internal:1204/attack_segments"), "two casts add four more");
         double before = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
         battle.processRequests();
@@ -93,7 +93,7 @@ public class JingYuanLordTurnTest {
         battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
                 List.of(enemy));
         battle.processRequests();
-        int hits = lord.getBuffManager().stacksOf("攻击段数");
+        int hits = lord.getBuffManager().stacksOf("internal:1204/attack_segments");
         Assertions.assertTrue(hits >= 2, "precondition: hits are stored (" + hits + ")");
         jingYuan.setCurrentEnergy(0);
 
@@ -135,7 +135,7 @@ public class JingYuanLordTurnTest {
                     List.of(enemy));
             battle.processRequests();
         }
-        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("攻击段数"),
+        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("internal:1204/attack_segments"),
                 "precondition: three initial hits plus two Skill casts");
         double before = enemy.getCurrentHp();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
@@ -156,14 +156,14 @@ public class JingYuanLordTurnTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
         battle.processRequests();
         // The reset rule put it back to three hits, and the speed rule then applied ten times zero extra hits.
-        Assertions.assertEquals(3, lord.getBuffManager().stacksOf("攻击段数"), "the talent re-sets three hits");
+        Assertions.assertEquals(3, lord.getBuffManager().stacksOf("internal:1204/attack_segments"), "the talent re-sets three hits");
 
         for (int i = 0; i < 2; i++) {
             battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
                     List.of(enemy));
             battle.processRequests();
         }
-        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("攻击段数"), "precondition: seven hits");
+        Assertions.assertEquals(7, lord.getBuffManager().stacksOf("internal:1204/attack_segments"), "precondition: seven hits");
         double before = lord.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));
         battle.processRequests();
@@ -193,7 +193,7 @@ public class JingYuanLordTurnTest {
         battle.castImmediate(jingYuan.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), jingYuan,
                 List.of(centre));
         battle.processRequests();
-        Assertions.assertEquals(5, lord.getBuffManager().stacksOf("攻击段数"), "three initial hits plus a Skill that adds two");
+        Assertions.assertEquals(5, lord.getBuffManager().stacksOf("internal:1204/attack_segments"), "three initial hits plus a Skill that adds two");
 
         double before = left.getCurrentHp() + centre.getCurrentHp() + right.getCurrentHp();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, lord, lord, 1, 0));

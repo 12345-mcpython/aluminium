@@ -26,7 +26,7 @@ public class ImbibitorLunaeTest {
     private static final int DHIL = 1213;
     private static final int LEVEL = 80;
     private static final String OUTROAR = "亢心";
-    private static final String SQUAMA = "逆鳞";
+    private static final String SQUAMA = "char:1213/reverse_scale";
 
     /**
      * Note: "施放每段攻击后获得1层[亢心]…可叠加6层": the count reaches the cap and stops there.

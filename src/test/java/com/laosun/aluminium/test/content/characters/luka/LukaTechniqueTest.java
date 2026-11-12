@@ -25,7 +25,7 @@ public class LukaTechniqueTest {
 
     private static final int LEVEL = 80;
     private static final int LUKA = 1111;
-    private static final String FIGHTING_SPIRIT = "斗志";
+    private static final String FIGHTING_SPIRIT = "char:1111/fighting_spirit";
 
     /**
      * Exactly one enemy is hit, and that same enemy is the one bleeding; 斗志 gains a layer.
@@ -47,7 +47,7 @@ public class LukaTechniqueTest {
         // The talent already grants a layer at battle start, so the technique is measured as one more.
         int bare = new Fixture(false).luka.getBuffManager().stacksOf(FIGHTING_SPIRIT);
         Assertions.assertEquals(bare + 1, f.luka.getBuffManager().stacksOf(FIGHTING_SPIRIT),
-                "「随后卢卡额外获得 1 层【斗志】」");
+                "「随后卢卡额外获得 1 层【char:1111/fighting_spirit】」");
     }
 
     /**

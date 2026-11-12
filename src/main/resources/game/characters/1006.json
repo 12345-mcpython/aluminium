@@ -279,7 +279,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "缺陷",
+          "buff": "char:1006/defect",
           "random_of": [
             "攻击力降低",
             "防御力降低",

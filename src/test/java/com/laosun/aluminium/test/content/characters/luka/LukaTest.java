@@ -38,12 +38,12 @@ public class LukaTest {
     @Test
     public void theLayersStartAtOneAndGrow() {
         Fixture f = new Fixture();
-        Assertions.assertEquals(1, f.luka.getBuffManager().stacksOf("斗志"), "「战斗开始时，卢卡持有1层【斗志】」 (at the start of battle, Luka holds 1 stack of Fighting Will (【斗志】))");
+        Assertions.assertEquals(1, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"), "「战斗开始时，卢卡持有1层【char:1111/fighting_spirit】」 (at the start of battle, Luka holds 1 stack of Fighting Will (【char:1111/fighting_spirit】))");
 
         f.ultimate();
 
-        Assertions.assertEquals(3, f.luka.getBuffManager().stacksOf("斗志"),
-                "「施放终结技时获得2层【斗志】」 (gains 2 stacks of Fighting Will when casting the Ultimate) -- one from the battle start plus two from the ultimate");
+        Assertions.assertEquals(3, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"),
+                "「施放终结技时获得2层【char:1111/fighting_spirit】」 (gains 2 stacks of Fighting Will when casting the Ultimate) -- one from the battle start plus two from the ultimate");
     }
 
     /**
@@ -56,8 +56,8 @@ public class LukaTest {
             f.ultimate();
         }
 
-        Assertions.assertEquals(4, f.luka.getBuffManager().stacksOf("斗志"),
-                "⚠ the cap is what makes 「最多可持有4层【斗志】」 (can hold at most 4 stacks of Fighting Will) true rather than decorative");
+        Assertions.assertEquals(4, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"),
+                "⚠ the cap is what makes 「最多可持有4层【char:1111/fighting_spirit】」 (can hold at most 4 stacks of Fighting Will) true rather than decorative");
     }
 
     /**
@@ -78,17 +78,17 @@ public class LukaTest {
     @Test
     public void eachCastCategoryAddsExactlyOneLayer() {
         Fixture f = new Fixture();
-        int start = f.luka.getBuffManager().stacksOf("斗志");
+        int start = f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit");
 
         f.basicAttack();
-        Assertions.assertEquals(start + 1, f.luka.getBuffManager().stacksOf("斗志"),
-                "「施放普攻【直冲拳】…后，获得1层【斗志】」 (after casting the Basic ATK [直冲拳] ... gains 1 stack of Fighting Will (【斗志】))");
+        Assertions.assertEquals(start + 1, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"),
+                "「施放普攻【直冲拳】…后，获得1层【char:1111/fighting_spirit】」 (after casting the Basic ATK [直冲拳] ... gains 1 stack of Fighting Will (【char:1111/fighting_spirit】))");
 
         f.skillCast();
-        Assertions.assertEquals(start + 2, f.luka.getBuffManager().stacksOf("斗志"), "…and the Skill adds one too");
+        Assertions.assertEquals(start + 2, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"), "…and the Skill adds one too");
 
         f.ultimate();
-        Assertions.assertEquals(start + 3, f.luka.getBuffManager().stacksOf("斗志"),
+        Assertions.assertEquals(start + 3, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"),
                 "⚠ exactly one: without `from_skill` the Basic ATK (普攻) and Skill (战技) rules would fire on the ultimate as well, "
                         + "because all three are 「attack」 events");
     }
@@ -140,19 +140,19 @@ public class LukaTest {
     public void theEnhancedAttackPaysTwoLayers() {
         Fixture f = new Fixture();
         f.skillCast();                                   // Skill (战技): applies bleed and adds a layer (battle start gave one)
-        Assertions.assertEquals(2, f.luka.getBuffManager().stacksOf("斗志"), "precondition: two layers");
+        Assertions.assertEquals(2, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"), "precondition: two layers");
 
         f.basicAttack();                                 // ordinary attack: +1 layer, and it INSTALLS the swap
         var swapped = f.luka.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON);
         Assertions.assertEquals(com.laosun.aluminium.enums.SkillCategory.NORMAL, swapped.getData().getCategory(),
                 "⚠ deep precondition: the swapped skill LOADS (a data-row id would have been EMPTY, and every identity "
                         + "assertion would still pass — the trap that cost rounds 99–114)");
-        int before = f.luka.getBuffManager().stacksOf("斗志");
+        int before = f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit");
 
         f.basicAttack();                                 // the enhanced row: +1 from the layer rule, −2 from the cost clause
 
-        Assertions.assertEquals(before + 1 - 2, f.luka.getBuffManager().stacksOf("斗志"),
-                "「强化普攻消耗 2 层【斗志】」 (the strengthened Basic ATK consumes 2 stacks of Fighting Will) — keyed on `from_skill_id == 111108`, because the ordinary and the "
+        Assertions.assertEquals(before + 1 - 2, f.luka.getBuffManager().stacksOf("char:1111/fighting_spirit"),
+                "「强化普攻消耗 2 层【char:1111/fighting_spirit】」 (the strengthened Basic ATK consumes 2 stacks of Fighting Will) — keyed on `from_skill_id == 111108`, because the ordinary and the "
                         + "enhanced basic attack are both `Normal` casts");
     }
 
