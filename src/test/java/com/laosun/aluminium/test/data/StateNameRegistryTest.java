@@ -85,9 +85,20 @@ public class StateNameRegistryTest {
     private static final Set<String> STATE_OPS = Set.of(
             "APPLY_BUFF", "REMOVE_STATE", "ADD_STACK", "REMOVE_STACK");
 
-    private static final List<Pattern> SELECTOR_FIELDS = List.of(
-            Pattern.compile("^(?:holder_of|highest_stacks_enemy|lowest_stacks_enemy):(.+)$"),
-            Pattern.compile("^(?:self_resource|summon_resource|party_resource|max_party_resource):(.+)$"));
+    /**
+     * Fields whose value may name a state behind a selector. They are scanned <b>anywhere</b> in the value: a
+     * {@code times_from} reads {@code steps:actor_stacks:攻击段数/1} and an {@code attacker} reads
+     * {@code holder_of:赐福}, so an anchored pattern finds neither (measured: the Lord struck zero times after a rename
+     * that skipped {@code times_from}, and 停云's talent refused to load).
+     */
+    private static final List<String> SELECTOR_FIELDS =
+            List.of("target", "scale", "times_from", "attacker", "victim", "holder");
+
+    /** The spellings a selector value may use to name a state. `/` is allowed: a key carries a slug after it. */
+    private static final List<Pattern> SELECTOR_PATTERNS = List.of(
+            Pattern.compile("(?:self|actor|target|summon)_stacks:([^\\s<>=]+)"),
+            Pattern.compile("(?:holder_of|highest_stacks_enemy|lowest_stacks_enemy):([^\\s<>=]+)"),
+            Pattern.compile("(?:self_resource|summon_resource|party_resource|max_party_resource):([^\\s<>=]+)"));
 
     @Test
     public void everyIdentityUsedByAFileIsDeclaredExactlyOnce() throws IOException {
@@ -274,14 +285,15 @@ public class StateNameRegistryTest {
                         }
                         note(users, stripCounterPrefix(spelled), name);
                     }
-                    for (String selectorField : List.of("target", "scale")) {
-                        if (op.has(selectorField) && op.get(selectorField).isJsonPrimitive()) {
-                            String spelled = op.get(selectorField).getAsString();
-                            for (Pattern pattern : SELECTOR_FIELDS) {
-                                Matcher matcher = pattern.matcher(spelled);
-                                if (matcher.matches()) {
-                                    note(users, matcher.group(1), name);
-                                }
+                    for (String selectorField : SELECTOR_FIELDS) {
+                        if (!op.has(selectorField) || !op.get(selectorField).isJsonPrimitive()) {
+                            continue;
+                        }
+                        String spelled = op.get(selectorField).getAsString();
+                        for (Pattern pattern : SELECTOR_PATTERNS) {
+                            Matcher matcher = pattern.matcher(spelled);
+                            while (matcher.find()) {
+                                note(users, withoutStepsDivisor(matcher.group(1)), name);
                             }
                         }
                     }
@@ -381,6 +393,22 @@ public class StateNameRegistryTest {
             }
         }
         return spelled;
+    }
+
+    /**
+     * A {@code steps:} expression ends with a numeric divisor ({@code actor_stacks:X/1}), while an identity's own key
+     * carries a slug after its slash ({@code char:1202/blessing}). Both arrive as one captured run, so the divisor is
+     * dropped and the slug kept.
+     *
+     * @param captured the text after a selector prefix
+     * @return the identity it names
+     */
+    private static String withoutStepsDivisor(String captured) {
+        int slash = captured.lastIndexOf('/');
+        if (slash > 0 && captured.substring(slash + 1).matches("\\d+")) {
+            return captured.substring(0, slash);
+        }
+        return captured;
     }
 
     /** Every condition list on a rule: `when` and the target-scoped `target_when`. */
