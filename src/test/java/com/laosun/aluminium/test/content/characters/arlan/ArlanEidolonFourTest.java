@@ -23,14 +23,24 @@ public class ArlanEidolonFourTest {
     private static final String STATE = "char:1008/last_stand";
 
     /**
-     * At E4 the first lethal blow restores him to a quarter of his Max HP.
+     * The Eidolon-4 clause in one scenario: the first lethal blow is answered at a quarter of his Max HP, the trace is
+     * spent after that single trigger, and it also expires once two of his own turns have elapsed.
      */
     @Test
-    public void atEidolonFourHeSurvivesAtAQuarter() {
-        double[] result = afterLethalBlows(4, 1, 0);
-        Assertions.assertTrue(result[0] > 0, "\"will not enter the unable-to-fight state\"");
-        Assertions.assertEquals(result[1] * 0.25, result[0], result[1] * 0.01,
-                "\"restore to 25% of one's own Max HP\"");
+    public void atEidolonFourTheLastStandAnswersOneBlowAndExpires() {
+        double[] firstBlow = afterLethalBlows(4, 1, 0);
+        double[] secondBlow = afterLethalBlows(4, 2, 0);
+        double[] afterTwoTurns = afterLethalBlows(4, 1, 2);
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(firstBlow[0] > 0, "\"will not enter the unable-to-fight state\""),
+                () -> Assertions.assertEquals(firstBlow[1] * 0.25, firstBlow[0], firstBlow[1] * 0.01,
+                        "\"restore to 25% of one's own Max HP\""),
+                () -> Assertions.assertTrue(firstBlow[0] > 0, "the first blow is answered"),
+                () -> Assertions.assertTrue(secondBlow[0] <= 0,
+                        "the second is **no longer** answered (\"automatically removed after triggering 1 time\")"),
+                () -> Assertions.assertTrue(firstBlow[0] > 0, "with no turns elapsed it is still answered"),
+                () -> Assertions.assertTrue(afterTwoTurns[0] <= 0,
+                        "after two turns it is **no longer** answered (\"automatically removed after lasting 2 turns\")"));
     }
 
     /**
@@ -39,28 +49,6 @@ public class ArlanEidolonFourTest {
     @Test
     public void belowEidolonFourHeFalls() {
         Assertions.assertTrue(afterLethalBlows(0, 1, 0)[0] <= 0, "only Eidolon 4 has this clause");
-    }
-
-    /**
-     * "this effect is automatically removed after triggering 1 time ...": the second blow in the same battle is NOT answered.
-     */
-    @Test
-    public void theFirstBlowConsumesTheTrace() {
-        double[] one = afterLethalBlows(4, 1, 0);
-        double[] two = afterLethalBlows(4, 2, 0);
-        Assertions.assertTrue(one[0] > 0, "the first blow is answered");
-        Assertions.assertTrue(two[0] <= 0, "the second is **no longer** answered (\"automatically removed after triggering 1 time\")");
-    }
-
-    /**
-     * "or automatically removed after lasting 2 turns": after two of HIS turns the trace is gone, even though it never triggered.
-     */
-    @Test
-    public void twoTurnsEndTheTraceUntriggered() {
-        double[] fresh = afterLethalBlows(4, 1, 0);
-        double[] late = afterLethalBlows(4, 1, 2);
-        Assertions.assertTrue(fresh[0] > 0, "with no turns elapsed it is still answered");
-        Assertions.assertTrue(late[0] <= 0, "after two turns it is **no longer** answered (\"automatically removed after lasting 2 turns\")");
     }
 
     // ==================================================================

@@ -58,6 +58,14 @@ import java.util.Random;
  * it fires (the same shape as 1223's "every three charges"). And the exclusion is <b>hers alone</b>: 「飞霄的终结技攻击不计入」 says
  * HER Ultimate, so this file gates with {@code from_skill_id != 3} rather than {@code from_category ULTRA} - the latter would
  * also drop a TEAMMATE's Ultimate, which the sentence counts.
+ *
+ * <p><b>L3.</b> The single-clause cases are folded into the scenario tests below, one {@code Assertions.assertAll} per
+ * fixture, so a failing clause still names itself: the teammate attack's follow-up with its per-turn cap, her own attack's
+ * silence and the 60% the same trigger grants (one feixiao + ally + monster board); the 解形 clause read both ways on one
+ * wearer and one monster (the compiled rule's scope / share / instance flag, and the measured 1.24 crit ratio); and 【飞黄】's
+ * every-two-attacks counter together with her own Ultimate's exclusion (one {@code Scene}). The fallback and the Ultimate's
+ * two weakness-broken branches keep their own tests, because each already is one scenario on one board. Nothing was dropped:
+ * every expected value, tolerance, message and precondition assertion is still asserted.
  */
 public class FeixiaoTest {
     private static final int FEIXIAO = 1220;
@@ -71,26 +79,16 @@ public class FeixiaoTest {
     // ==================================================================
 
     /**
-     * Note: The follow-up needs a TEAMMATE, and `per_turn: 1` caps it: the second firing in a turn does nothing.
+     * Note: One board (feixiao, a teammate, the standard monster) read four ways: a teammate's attack draws the follow-up,
+     * the second firing in the same turn does nothing, her OWN attack draws nothing, and the attack that draws it also raises
+     * her own DMG dealt by 60%.
      */
     @Test
-    public void theFollowUpNeedsATeammateAndFiresOncePerTurn() {
+    public void aTeammateAttackDrawsOneFollowUpPerTurnAndBoostsHer() {
         double first = followUpLoss(true, 1);
         double twice = followUpLoss(true, 2);
         double hers = followUpLoss(false, 1);
 
-        Assertions.assertTrue(first > 0, "a teammate's attack must draw it");
-        Assertions.assertEquals(first, twice, 1e-6,
-                "「该效果每回合最多触发1次」 (this effect triggers at most once per turn) -- two firings in the same turn must deal ONE instance");
-        Assertions.assertEquals(0.0, hers, 1e-9,
-                "「当飞霄的队友对敌方目标施放攻击后」 (after Feixiao's ally casts an attack on an enemy target) -- her OWN attack must not draw it");
-    }
-
-    /**
-     * Note: The boost the same trigger grants her: 60% for two turns.
-     */
-    @Test
-    public void theTriggerAlsoBoostsHerself() {
         Character feixiao = CharacterFactory.create(FEIXIAO, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -98,10 +96,18 @@ public class FeixiaoTest {
         battle.startBattle();
         double before = feixiao.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
+        double boost = feixiao.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before;
 
-        Assertions.assertEquals(0.6, feixiao.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-9,
-                "「发动此攻击时使自身造成的伤害提高60%」 (this attack raises her own DMG dealt by 60%)");
+        Assertions.assertAll("「当飞霄的队友对敌方目标施放攻击后」: the follow-up, its per-turn cap and the 60% it carries",
+                () -> Assertions.assertTrue(first > 0,
+                        "a teammate's attack must draw it"),
+                () -> Assertions.assertEquals(first, twice, 1e-6,
+                        "「该效果每回合最多触发1次」 (this effect triggers at most once per turn) -- two firings in the same turn must deal ONE instance"),
+                () -> Assertions.assertEquals(0.0, hers, 1e-9,
+                        "「当飞霄的队友对敌方目标施放攻击后」 (after Feixiao's ally casts an attack on an enemy target) -- her OWN attack must not draw it"),
+                () -> Assertions.assertEquals(0.6, boost, 1e-9,
+                        "「发动此攻击时使自身造成的伤害提高60%」 (this attack raises her own DMG dealt by 60%)"));
     }
 
     /**
@@ -152,9 +158,11 @@ public class FeixiaoTest {
     @Test
     public void aDeadMainTargetFallsBackToARandomEnemy() {
         double[] loss = lossesWithDeadTarget();
-        Assertions.assertEquals(0.0, loss[0], 1e-9, "the defeated main target must not be hit");
-        Assertions.assertTrue(loss[1] > 0,
-                "the fallback must reach another enemy, got " + loss[1]);
+        Assertions.assertAll("「若不存在可攻击的主目标，则攻击敌方随机单体」: with the main target defeated",
+                () -> Assertions.assertEquals(0.0, loss[0], 1e-9,
+                        "「若不存在可攻击的主目标」: the defeated main target must not be hit"),
+                () -> Assertions.assertTrue(loss[1] > 0,
+                        "「则攻击敌方随机单体」: the fallback must reach another enemy, got " + loss[1]));
         System.out.println("[1220] fallback ok: deadTargetLoss=" + loss[0] + " otherLoss=" + loss[1]);
     }
 
@@ -167,17 +175,20 @@ public class FeixiaoTest {
         double control = damage(false, false);
         double unbroken = damage(true, false);
         double broken = damage(true, true);
-        Assertions.assertTrue(control > 0, "precondition: the ultimate landed");
-        Assertions.assertTrue(unbroken > control, "the unbroken branch fired: " + control + " -> " + unbroken);
         // ⚠ The two runs differ in one more way than the branch: the broken target has toughness 0, so it does NOT take
         // the 10% toughness damage reduction and the unbroken one does. Normalizing by it is what leaves "the same +30%".
         double normalized = unbroken / (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
-        Assertions.assertEquals(normalized, broken, Math.max(1.0, 0.02 * normalized),
-                "either branch gives the same +30% once the toughness reduction is normalized away: unbroken "
-                        + unbroken + " (÷0.9 = " + normalized + ") vs broken " + broken);
-        Assertions.assertTrue(unbroken / control > 1.15 && unbroken / control < 1.6,
-                "the boost is in the +30% band (control " + control + ", unbroken " + unbroken + ", ratio "
-                        + (unbroken / control) + ")");
+
+        Assertions.assertAll("「伤害倍率提高30%」: both weakness-broken branches against the level-only control",
+                () -> Assertions.assertTrue(control > 0, "precondition (control arm): the ultimate landed"),
+                () -> Assertions.assertTrue(unbroken > control,
+                        "「若目标未处于弱点击破状态」: the unbroken branch fired: " + control + " -> " + unbroken),
+                () -> Assertions.assertEquals(normalized, broken, Math.max(1.0, 0.02 * normalized),
+                        "「若目标处于弱点击破状态」: either branch gives the same +30% once the toughness reduction is normalized away: unbroken "
+                                + unbroken + " (÷0.9 = " + normalized + ") vs broken " + broken),
+                () -> Assertions.assertTrue(unbroken / control > 1.15 && unbroken / control < 1.6,
+                        "the boost is in the +30% band (control " + control + ", unbroken " + unbroken + ", ratio "
+                                + (unbroken / control) + ")"));
     }
 
     private static double damage(boolean fullContent, boolean broken) {
@@ -216,31 +227,27 @@ public class FeixiaoTest {
     // 行迹 解形 (1220102): the follow-up's CRIT DMG
     // ==================================================================
 
+    /**
+     * Note: 行迹 解形 (1220102) on one wearer and one monster, read twice: the compiled rule's own scope / share / instance
+     * flag, and the measured ratio, which is exactly (1.5 + 0.36) / 1.5 when the modifier really is 36 PERCENTAGE POINTS of
+     * crit damage rather than a share of something.
+     */
     @Test
-    public void theRuleScopesCritDamageToFollowUpInstances() {
+    public void theTraceAdds36PointsOfCritDamageToFollowUpInstances() {
         Character unit = CharacterFactory.create(FEIXIAO, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        int seen = 0;
+        List<EffectSpec> critMods = new ArrayList<>();
         for (var rule : unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0))) {
             for (var effect : rule.effects()) {
                 if ("MODIFY_ATTR".equals(effect.getOp()) && "CRIT_ATTACK".equals(effect.getAttribute())) {
-                    seen++;
+                    critMods.add(effect);
                     System.out.println("[1220] id=" + rule.id() + " scope=" + effect.getDamageType()
                             + " percent=" + effect.getPercent() + " instance=" + effect.getInstance());
-                    Assertions.assertEquals("ADDITIONAL", effect.getDamageType(), "scoped to follow-up damage");
-                    Assertions.assertEquals(0.36, effect.getPercent(), 1e-9, "the data row states 0.36");
-                    Assertions.assertTrue(Boolean.TRUE.equals(effect.getInstance()), "it belongs to the instance");
                 }
             }
         }
-        Assertions.assertEquals(1, seen, "exactly one such modifier");
-    }
 
-    @Test
-    public void followUpCritDamageRisesAndPlainDamageDoesNot() {
-        Character unit = CharacterFactory.create(FEIXIAO, LEVEL);
-        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // NOT fixedCrit: that path bypasses the crit zone, so an instance's extra crit damage stays invisible
@@ -248,46 +255,67 @@ public class FeixiaoTest {
         unit.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
                 .addModifier(com.laosun.aluminium.DoubleValue.Modifier.pure(
                         2.0, com.laosun.aluminium.DoubleValue.Modifier.ModifierSource.BUFF, 122001));
-        Assertions.assertTrue(unit.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE).get() >= 1.0,
-                "precondition: every hit crits");
+        boolean alwaysCrits = unit.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE).get() >= 1.0;
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.WIND, DamageType.NORMAL, 1000));
         double additional = battle.applyAdditionalDamage(unit, enemy, DamageElement.WIND, 1000, null, null);
         System.out.println("[1220] normal=" + normal + " additional=" + additional + " ratio=" + (additional / normal));
         // MEASURED first, then pinned: with the guaranteed crit the factor is exactly (1.5 + 0.36) / 1.5, i.e. the
         // modifier really is 36 PERCENTAGE POINTS of crit damage rather than a share of anything.
-        Assertions.assertEquals(1.24, additional / normal, 1e-6,
-                "the follow-up instance crits for exactly 36 points more");
+
+        Assertions.assertAll("行迹 解形 (1220102): 「追加攻击的暴击伤害提高36%」 - the compiled rule and the measured ratio",
+                () -> critMods.forEach(effect -> Assertions.assertEquals("ADDITIONAL", effect.getDamageType(),
+                        "「追加攻击」: scoped to follow-up damage")),
+                () -> critMods.forEach(effect -> Assertions.assertEquals(0.36, effect.getPercent(), 1e-9,
+                        "「提高36%」: the data row states 0.36")),
+                () -> critMods.forEach(effect -> Assertions.assertTrue(Boolean.TRUE.equals(effect.getInstance()),
+                        "the instance flag: it belongs to the instance")),
+                () -> Assertions.assertEquals(1, critMods.size(), "exactly one such modifier"),
+                () -> Assertions.assertTrue(alwaysCrits, "precondition: every hit crits"),
+                () -> Assertions.assertEquals(1.24, additional / normal, 1e-6,
+                        "「追加攻击的暴击伤害提高36%」: the follow-up instance crits for exactly 36 points more"));
     }
 
     // ==================================================================
     // 【飞黄】: the every-two-attacks counter
     // ==================================================================
 
+    /**
+     * Note: 【飞黄】's counter on the same {@link Scene} shape, read three times: two attacks pay one point and the count keeps
+     * running from zero; her own Ultimate never counts while her non-ultimate attacks do; and a TEAMMATE's Ultimate still
+     * counts, because 「飞霄的终结技攻击不计入次数」 names hers alone.
+     */
     @Test
-    public void twoTeammateAttacksPayOnePoint() {
+    public void twoTeammateAttacksPayOnePointAndHerOwnUltimateIsExcluded() {
         Scene scene = new Scene();
-        Assertions.assertEquals(0, scene.aureus(), "it starts empty");
+        int startsEmpty = scene.aureus();
         scene.teammateAttacks(SkillCategory.NORMAL);
-        Assertions.assertEquals(0, scene.aureus(), "one attack is not yet two");
+        int afterOneAttack = scene.aureus();
         scene.teammateAttacks(SkillCategory.NORMAL);
-        Assertions.assertEquals(1, scene.aureus(), "「每施放 2 次攻击，飞霄获得 1 点【飞黄】」");
+        int afterTwoAttacks = scene.aureus();
         scene.teammateAttacks(SkillCategory.NORMAL, 2);
-        Assertions.assertEquals(2, scene.aureus(), "and it keeps counting from zero, not from two");
-    }
+        int afterFourAttacks = scene.aureus();
 
-    /** 「飞霄的终结技攻击不计入次数」 - her own Ultimate does not advance the counter; a teammate's still does. */
-    @Test
-    public void herOwnUltimateDoesNotCountButATeammatesDoes() {
-        Scene scene = new Scene();
-        scene.herAttack(SkillCategory.ULTRA, 3, 3);
-        Assertions.assertEquals(0, scene.aureus(), "a single Ultimate attack is not two, and must not count either");
-        scene.herAttack(SkillCategory.BPSKILL, 2, 2);
-        Assertions.assertEquals(1, scene.aureus(), "two of HER non-ultimate attacks do count");
+        Scene hers = new Scene();
+        hers.herAttack(SkillCategory.ULTRA, 3, 3);
+        int afterHerUltimates = hers.aureus();
+        hers.herAttack(SkillCategory.BPSKILL, 2, 2);
+        int afterHerNonUltimates = hers.aureus();
 
-        Scene other = new Scene();
-        other.teammateAttacks(SkillCategory.ULTRA, 2);
-        Assertions.assertEquals(1, other.aureus(),
-                "a TEAMMATE's Ultimate counts - only 飞霄's own is excluded");
+        Scene teammate = new Scene();
+        teammate.teammateAttacks(SkillCategory.ULTRA, 2);
+        int afterTeammateUltimates = teammate.aureus();
+
+        Assertions.assertAll("「我方目标每施放 2 次攻击，飞霄获得 1 点【飞黄】；飞霄的终结技攻击不计入次数」",
+                () -> Assertions.assertEquals(0, startsEmpty, "it starts empty"),
+                () -> Assertions.assertEquals(0, afterOneAttack, "one attack is not yet two"),
+                () -> Assertions.assertEquals(1, afterTwoAttacks, "「每施放 2 次攻击，飞霄获得 1 点【飞黄】」"),
+                () -> Assertions.assertEquals(2, afterFourAttacks, "and it keeps counting from zero, not from two"),
+                () -> Assertions.assertEquals(0, afterHerUltimates,
+                        "「飞霄的终结技攻击不计入次数」: a single Ultimate attack is not two, and must not count either"),
+                () -> Assertions.assertEquals(1, afterHerNonUltimates,
+                        "two of HER non-ultimate attacks do count"),
+                () -> Assertions.assertEquals(1, afterTeammateUltimates,
+                        "a TEAMMATE's Ultimate counts - only 飞霄's own is excluded"));
     }
 
     // ==================================================================

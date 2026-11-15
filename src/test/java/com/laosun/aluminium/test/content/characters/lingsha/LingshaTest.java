@@ -28,6 +28,15 @@ import java.util.List;
  * panel-less summon, its action budget, its two strike instances, 星魂 4, 星魂 6's two halves, the 秘技, the Skill's 20%
  * advance and 行迹 遗爇 - plus 星魂 1's defence reduction on a break and 星魂 2's party-wide break effect.
  *
+ * <p><b>L3.</b> The single-clause cases that read one board are folded into scenario tests ({@code Assertions.assertAll}),
+ * one message per clause reading: 【浮元】's arrival (90 speed, three actions), its five-action cap and the Skill's 20%
+ * advance - one fresh board and three Skill casts; its action's cleanse and heal together with the three charges that
+ * action spends until 【浮元】 leaves; and 星魂 1's defence reduction with its break-state lifetime beside the E0 control.
+ * Every assertion, expected value, tolerance and message is unchanged. The two party heals (the Skill's and the
+ * Ultimate's, different rows), the Ultimate's 【醇醉】 mark, the two 星魂 6 halves, 星魂 4, the 秘技 and the trace's
+ * trigger gates keep their own tests: each reads a different slot, a different board or a different quantity, and an
+ * {@code assertAll} is not where such a reading belongs.
+ *
  * <p>This file merges the former {@code LingshaHealTest}, {@code LingshaUltimateTest}, {@code LingshaFuyuanTest},
  * {@code LingshaEidolonBreakEffectTest} and {@code LingsoBreakDefenceTest} (the last one lived in the misspelled
  * {@code lingso1222} folder): every case and every assertion moved unchanged, and each former class note now sits on the
@@ -123,7 +132,7 @@ public class LingshaTest {
     // ==================================================================
 
     /**
-     * 1222 灵砂's 【浮元】: her talent's <b>panel-less</b> summon.
+     * 1222 灵砂's 【浮元】: her talent's <b>panel-less</b> summon, its action budget, and the Skill's 20% advance.
      *
      * <p>「施放战技时召唤【浮元】，初始拥有 90 点速度以及 3 次行动次数。【浮元】行动时发动追加攻击，对敌方全体造成 75% 攻击力的火伤，
      * 额外对随机敌方单体造成 75% 攻击力的火伤。解除我方全体的 1 个负面效果，并回复 12% 攻击力 + 360 的生命值。【浮元】最多累计 5 次行动次数，
@@ -131,53 +140,93 @@ public class LingshaTest {
      *
      * <p>It has no skill row (it is not a memosprite), so its action point is its own turn - the same reading 1204's 神君 and 1112's 账账 use.
      * The judge drives that turn directly and measures each half against a control.
+     *
+     * <p>「【浮元】最多累计 5 次行动次数…【浮元】在场时，施放战技会增加 3 次【浮元】的行动次数」: a second Skill does NOT summon
+     * a second 浮元 (the panel-less path is not idempotent, so the rule states `self_summon_count == 0`), and the budget tops up
+     * by three, capped at five.
+     *
+     * <p>「使【浮元】行动提前 20%」 (Skill) - read off the action bar, which is the only place an advance is visible.
+     * Control: the summoning cast itself advances nothing, because the unit is placed on the roster but not yet scheduled
+     * (`TriggerEvent.SUMMONED`'s own note). The measurement is therefore taken on the SECOND cast, against the same signal.
      */
     @Test
-    public void theSkillSummonsFuyuanAtNinetySpeedWithThreeActions() {
+    public void theSkillSummonsFuyuanTopsItsBudgetUpToFiveAndAdvancesIt() {
         Scene scene = new Scene(0, 1);
-        Assertions.assertNull(scene.battle.summonOf(scene.lingsha),
-                "control: she has nothing on the field before the Skill");
+        Summon beforeTheSkill = scene.battle.summonOf(scene.lingsha);
         scene.castSkill();
         Summon fuyuan = scene.fuyuan();
-        Assertions.assertEquals("浮元", fuyuan.getName());
-        Assertions.assertEquals(90, fuyuan.getAttribute(AttributeType.SPEED).get(), 1e-9,
-                "「初始拥有 90 点速度」 - its own speed, not her 98");
-        Assertions.assertEquals(3, fuyuan.getBuffManager().stacksOf(ACTIONS), "「以及 3 次行动次数」");
+        String name = fuyuan.getName();
+        double speed = fuyuan.getAttribute(AttributeType.SPEED).get();
+        int openingActions = fuyuan.getBuffManager().stacksOf(ACTIONS);
+        double before = scene.timeRemaining(fuyuan);
+        scene.castSkill();
+        double after = scene.timeRemaining(fuyuan);
+        int copies = scene.battle.summonsOf(scene.lingsha).size();
+        int toppedUp = fuyuan.getBuffManager().stacksOf(ACTIONS);
+        scene.castSkill();
+        int capped = fuyuan.getBuffManager().stacksOf(ACTIONS);
+
+        Assertions.assertAll(
+                "「施放战技时召唤【浮元】…初始拥有 90 点速度以及 3 次行动次数」, the five-action cap, and 「使【浮元】行动提前 20%」",
+                () -> Assertions.assertNull(beforeTheSkill, "control: she has nothing on the field before the Skill"),
+                () -> Assertions.assertEquals("浮元", name, "「施放战技时召唤【浮元】」 - the summon's own name"),
+                () -> Assertions.assertEquals(90, speed, 1e-9,
+                        "「初始拥有 90 点速度」 - its own speed, not her 98"),
+                () -> Assertions.assertEquals(3, openingActions, "「以及 3 次行动次数」"),
+                () -> Assertions.assertTrue(before > 0, "precondition: it has time left to skip (" + before + ")"),
+                () -> Assertions.assertEquals(before * 0.8, after, 1e-6,
+                        "「使【浮元】行动提前 20%」 - a fifth of the remaining wait is skipped (" + before + " -> " + after + ")"),
+                () -> Assertions.assertEquals(1, copies,
+                        "still ONE 浮元 on the field - 「在场时」, not a second copy"),
+                () -> Assertions.assertEquals(5, toppedUp, "3 + 3, and the talent's cap of five takes the rest"),
+                () -> Assertions.assertEquals(5, capped, "the cap holds on the third Skill"));
     }
 
     /**
-     * 「【浮元】最多累计 5 次行动次数…【浮元】在场时，施放战技会增加 3 次【浮元】的行动次数」.
+     * 「每行动一次消耗 1 次；当次数为 0…时【浮元】消失」 and 「解除我方全体的 1 个负面效果，并回复等同于灵砂 12.00% 攻击力 + 360 的生命值」.
      *
-     * <p>Two things at once: a second Skill does NOT summon a second 浮元 (the panel-less path is not idempotent, so the rule states
-     * `self_summon_count == 0`), and the budget tops up by three, capped at five.
+     * <p>One board and one summon: its first action cleanses exactly one of the ally's two negative effects, pays the
+     * party heal, and spends one of the three charges; the next two actions empty the budget and take 浮元 off the field.
      */
     @Test
-    public void aSecondSkillTopsTheBudgetUpToFive() {
+    public void itsActionCleansesHealsAndSpendsOneChargeAtATime() {
         Scene scene = new Scene(0, 1);
         scene.castSkill();
         Summon fuyuan = scene.fuyuan();
-        scene.castSkill();
-        Assertions.assertEquals(1, scene.battle.summonsOf(scene.lingsha).size(),
-                "still ONE 浮元 on the field - 「在场时」, not a second copy");
-        Assertions.assertEquals(5, fuyuan.getBuffManager().stacksOf(ACTIONS),
-                "3 + 3, and the talent's cap of five takes the rest");
-        scene.castSkill();
-        Assertions.assertEquals(5, fuyuan.getBuffManager().stacksOf(ACTIONS), "the cap holds on the third Skill");
-    }
+        Character ally = scene.ally;
+        // Two DIFFERENT negative effects: two vulnerability zones of the same scope collapse into one layer (they share a stack group),
+        // so the second one would not be a second effect at all. A burn plus a vulnerability are two.
+        ally.getBuffManager().addBuff(new DotBuff(scene.enemies.getFirst(), DamageElement.FIRE, 100, 3));
+        ally.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.1));
+        ally.takeDamage(ally.getCurrentHp() * 0.6);
+        double before = ally.getCurrentHp();
+        int debuffsBefore = ally.getBuffManager().debuffCount();
 
-    /** 「每行动一次消耗 1 次；当次数为 0…时【浮元】消失」. */
-    @Test
-    public void everyActionSpendsOneAndTheThirdOneSendsItAway() {
-        Scene scene = new Scene(0, 1);
-        scene.castSkill();
-        Summon fuyuan = scene.fuyuan();
-        for (int action = 1; action <= 3; action++) {
-            scene.act(fuyuan);
-            Assertions.assertEquals(3 - action, fuyuan.getBuffManager().stacksOf(ACTIONS),
-                    "action " + action + " spends one of the three");
-        }
-        Assertions.assertTrue(fuyuan.isDeath(), "「当次数为 0…时【浮元】消失」");
-        Assertions.assertTrue(scene.battle.summonsOf(scene.lingsha).isEmpty(), "and it is off the field");
+        scene.act(fuyuan);
+        int afterFirstAction = fuyuan.getBuffManager().stacksOf(ACTIONS);
+        int debuffsAfter = ally.getBuffManager().debuffCount();
+        double healed = ally.getCurrentHp() - before;
+        double expected = 0.12 * scene.lingsha.getAttribute(AttributeType.ATTACK).get() + 360;
+
+        scene.act(fuyuan);
+        int afterSecondAction = fuyuan.getBuffManager().stacksOf(ACTIONS);
+        scene.act(fuyuan);
+        int afterThirdAction = fuyuan.getBuffManager().stacksOf(ACTIONS);
+        boolean gone = fuyuan.isDeath();
+        boolean offTheField = scene.battle.summonsOf(scene.lingsha).isEmpty();
+
+        Assertions.assertAll(
+                "「【浮元】行动时…解除我方全体的 1 个负面效果，并回复 12% 攻击力 + 360」 and 「每行动一次消耗 1 次…当次数为 0…时【浮元】消失」",
+                () -> Assertions.assertEquals(2, debuffsBefore, "precondition: the ally carries two negative effects"),
+                () -> Assertions.assertEquals(2, afterFirstAction, "action 1 spends one of the three"),
+                () -> Assertions.assertEquals(debuffsBefore - 1, debuffsAfter,
+                        "「解除我方全体的 1 个负面效果」 - one, and only one"),
+                () -> Assertions.assertEquals(expected, healed, Math.max(2.0, 0.02 * expected),
+                        "12% of her ATK plus 360, on the summon's action: " + healed),
+                () -> Assertions.assertEquals(1, afterSecondAction, "action 2 spends one of the three"),
+                () -> Assertions.assertEquals(0, afterThirdAction, "action 3 spends one of the three"),
+                () -> Assertions.assertTrue(gone, "「当次数为 0…时【浮元】消失」"),
+                () -> Assertions.assertTrue(offTheField, "and it is off the field"));
     }
 
     /**
@@ -206,31 +255,6 @@ public class LingshaTest {
                 "「额外对随机敌方单体造成 75%…」 - one of them takes a second, equal instance");
     }
 
-    /** 「解除我方全体的 1 个负面效果，并回复等同于灵砂 12.00% 攻击力 + 360 的生命值」. */
-    @Test
-    public void itsActionCleansesOneDebuffAndHealsTheParty() {
-        Scene scene = new Scene(0, 1);
-        scene.castSkill();
-        Character ally = scene.ally;
-        // Two DIFFERENT negative effects: two vulnerability zones of the same scope collapse into one layer (they share a stack group),
-        // so the second one would not be a second effect at all. A burn plus a vulnerability are two.
-        ally.getBuffManager().addBuff(new DotBuff(scene.enemies.getFirst(), DamageElement.FIRE, 100, 3));
-        ally.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.1));
-        ally.takeDamage(ally.getCurrentHp() * 0.6);
-        double before = ally.getCurrentHp();
-        int debuffsBefore = ally.getBuffManager().debuffCount();
-        Assertions.assertEquals(2, debuffsBefore, "precondition: the ally carries two negative effects");
-
-        scene.act(scene.fuyuan());
-
-        Assertions.assertEquals(debuffsBefore - 1, ally.getBuffManager().debuffCount(),
-                "「解除我方全体的 1 个负面效果」 - one, and only one");
-        double healed = ally.getCurrentHp() - before;
-        double expected = 0.12 * scene.lingsha.getAttribute(AttributeType.ATTACK).get() + 360;
-        Assertions.assertEquals(expected, healed, Math.max(2.0, 0.02 * expected),
-                "12% of her ATK plus 360, on the summon's action: " + healed);
-    }
-
     /**
      * 星魂 4:「【浮元】行动时，为当前生命值最低的我方目标回复等同于灵砂 40% 攻击力的生命值」.
      *
@@ -252,25 +276,6 @@ public class LingshaTest {
         Assertions.assertTrue(extra > 0, "「为当前生命值最低的我方目标回复…」 - the Eidolon adds a heal");
         Assertions.assertEquals(expected, extra, Math.max(2.0, 0.02 * expected),
                 "40% of her ATK for the weakest ally: " + extra);
-    }
-
-    /**
-     * 「使【浮元】行动提前 20%」 (Skill) - read off the action bar, which is the only place an advance is visible.
-     *
-     * <p>Control: the summoning cast itself advances nothing, because the unit is placed on the roster but not yet scheduled
-     * (`TriggerEvent.SUMMONED`'s own note). The measurement is therefore taken on the SECOND cast, against the same signal.
-     */
-    @Test
-    public void theSkillAdvancesItByAFifth() {
-        Scene scene = new Scene(0, 1);
-        scene.castSkill();
-        Summon fuyuan = scene.fuyuan();
-        double before = scene.timeRemaining(fuyuan);
-        Assertions.assertTrue(before > 0, "precondition: it has time left to skip (" + before + ")");
-        scene.castSkill();
-        double after = scene.timeRemaining(fuyuan);
-        Assertions.assertEquals(before * 0.8, after, 1e-6,
-                "「使【浮元】行动提前 20%」 - a fifth of the remaining wait is skipped (" + before + " -> " + after + ")");
     }
 
     /**
@@ -560,9 +565,10 @@ public class LingshaTest {
     // ==================================================================
 
     /**
-     * 1222 灵砂's Eidolon 1, second half: 「当有敌方单位的弱点被击破时，使其防御力降低 20%」.
+     * 1222 灵砂's Eidolon 1, second half: 「当有敌方单位的弱点被击破时，使其防御力降低 20%」 - and the E0 control beside it.
      *
-     * <p>A weakness break lowers the broken enemy's DEFENCE by 20%, and the reduction leaves with the break.
+     * <p>A weakness break lowers the broken enemy's DEFENCE by 20%, and the reduction leaves with the break. At E0 the same
+     * break changes nothing.
      *
      * <p><b>Why the lifetime is the interesting half.</b> The document and the parameter row state no duration, so `turns`
      * would be invented and `permanent` would be plainly wrong. The clause is tied to the break STATE instead
@@ -570,34 +576,31 @@ public class LingshaTest {
      * long as the target is broken, and it needs no number at all.
      */
     @Test
-    public void aBreakLowersTheDefenceAndItLeavesWithTheBreak() {
-        Run run = new Run(1);
-        double bare = run.enemy.getAttribute(AttributeType.DEFENCE).get();
+    public void aBreakLowersTheDefenceAndOnlyWithTheFirstEidolon() {
+        Run withEidolon = new Run(1);
+        double bare = withEidolon.enemy.getAttribute(AttributeType.DEFENCE).get();
 
-        run.breakTheEnemy();
-        double broken = run.enemy.getAttribute(AttributeType.DEFENCE).get();
-        Assertions.assertEquals(0.2 * bare, bare - broken, 1e-6,
-                "「使其防御力降低 20%」 - 20% of the base DEF");
+        withEidolon.breakTheEnemy();
+        double broken = withEidolon.enemy.getAttribute(AttributeType.DEFENCE).get();
 
-        run.enemy.getBuffManager().removeState(Run.BROKEN);
-        run.battle.setCurrentMove(new Signal(run.enemy));
-        run.battle.beforeMove();
-        run.battle.processRequests();
+        withEidolon.enemy.getBuffManager().removeState(Run.BROKEN);
+        withEidolon.battle.setCurrentMove(new Signal(withEidolon.enemy));
+        withEidolon.battle.beforeMove();
+        withEidolon.battle.processRequests();
+        double recovered = withEidolon.enemy.getAttribute(AttributeType.DEFENCE).get();
 
-        Assertions.assertEquals(bare, run.enemy.getAttribute(AttributeType.DEFENCE).get(), 1e-6,
-                "the gate is `while_holder_state: 弱点击破`, so recovering takes the reduction with it");
-    }
+        Run control = new Run(0);
+        double bareWithoutIt = control.enemy.getAttribute(AttributeType.DEFENCE).get();
+        control.breakTheEnemy();
+        double brokenWithoutIt = control.enemy.getAttribute(AttributeType.DEFENCE).get();
 
-    /**
-     * The control: at E0 a break changes nothing.
-     */
-    @Test
-    public void withoutTheFirstEidolonABreakChangesNothing() {
-        Run run = new Run(0);
-        double bare = run.enemy.getAttribute(AttributeType.DEFENCE).get();
-        run.breakTheEnemy();
-        Assertions.assertEquals(bare, run.enemy.getAttribute(AttributeType.DEFENCE).get(), 1e-6,
-                "E0 states no such reduction");
+        Assertions.assertAll(
+                "星魂 1 的后半句: 「当有敌方单位的弱点被击破时，使其防御力降低 20%」, its lifetime, and the E0 control",
+                () -> Assertions.assertEquals(0.2 * bare, bare - broken, 1e-6,
+                        "「使其防御力降低 20%」 - 20% of the base DEF"),
+                () -> Assertions.assertEquals(bare, recovered, 1e-6,
+                        "the gate is `while_holder_state: 弱点击破`, so recovering takes the reduction with it"),
+                () -> Assertions.assertEquals(bareWithoutIt, brokenWithoutIt, 1e-6, "E0 states no such reduction"));
     }
 
     private static final class Run {

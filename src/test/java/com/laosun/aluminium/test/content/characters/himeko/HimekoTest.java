@@ -34,6 +34,10 @@ import java.util.Set;
  * {@code HimekoAuditTest} and {@code HimekoKillEnergyTest}. Nothing about the cases changed in the merge: none was
  * dropped, disabled, renamed or softened, and every expected value is the one its original class asserted. The
  * original framing of each group is quoted at the head of its section below.
+ *
+ * <p><b>L3 scenario consolidation.</b> The single-clause cases are folded into scenario tests that call
+ * {@code Assertions.assertAll}: each merged test keeps every assertion, expected value, tolerance and message of the
+ * cases it absorbed, and asserts them together only where the fixture and the observed object are shared.
  */
 public class HimekoTest {
     /**
@@ -104,59 +108,69 @@ public class HimekoTest {
     // ------------------------------------------------------------------
 
     /**
-     * "战斗开始时获得1点充能。"
-     */
-    @Test
-    public void theBattleStartsHerAtOneCharge() {
-        Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
-        Assertions.assertEquals(0, himeko.getResources().value(CHARGE),
-                "precondition: the declaration alone starts her at 0 -- the sentence is a rule, not an initial value");
-
-        Battle battle = new Battle(List.of(himeko), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-
-        Assertions.assertEquals(1, himeko.getResources().value(CHARGE), "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle)");
-    }
-
-    /**
-     * "当有敌方目标的弱点被击破时，姬子获得充能，上限3点。"
+     * The talent's charge in one run: "战斗开始时获得1点充能。" and "当有敌方目标的弱点被击破时，姬子获得充能，上限3点。"
      *
-     * <p>Driven through a <b>real</b> weakness break, not by firing the event: two of her Fire basic attacks empty
-     * Ice Edge's 60 toughness, and the rule has to fire from inside the engine's own break path.
+     * <p>The two clauses share one fixture - her alone against one Ice Edge, seeded - and one observed object, her
+     * 充能, so they are one scenario: the resource starts at 0, the battle start grants the first point, and a real
+     * weakness break grants the second. The break is <b>real</b>, not a fired event: two of her Fire basic attacks
+     * empty Ice Edge's 60 toughness, so the rule has to fire from inside the engine's own break path.
+     *
+     * <p>Absorbs {@code theBattleStartsHerAtOneCharge} and {@code abreakChargesHerAndTheCapHolds}.
      */
     @Test
-    public void abreakChargesHerAndTheCapHolds() {
+    public void herChargeStartsAtOneAndEveryBreakAddsOneUpToTheCap() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
         Enemy iceEdge = dummy();
         Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
+        int atDeclaration = himeko.getResources().value(CHARGE);
         battle.startBattle();
 
-        battle.castImmediate(new DefaultSkill(HIMEKO, 1, 1), himeko, List.of(iceEdge));
-        Assertions.assertFalse(iceEdge.isBroken(), "precondition: one basic attack does not empty the bar");
-        Assertions.assertEquals(1, himeko.getResources().value(CHARGE), "and no break means no charge");
+        Assertions.assertAll("「战斗开始时获得1点充能」",
+                () -> Assertions.assertEquals(0, atDeclaration,
+                        "precondition: the declaration alone starts her at 0 -- the sentence is a rule, not an initial value"),
+                () -> Assertions.assertEquals(1, himeko.getResources().value(CHARGE),
+                        "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle)"));
 
         battle.castImmediate(new DefaultSkill(HIMEKO, 1, 1), himeko, List.of(iceEdge));
-        Assertions.assertTrue(iceEdge.isBroken(), "the second one breaks it");
-        Assertions.assertEquals(2, himeko.getResources().value(CHARGE),
-                "BATTLE_START's 1 plus the break's 1 -- 「当有敌方目标的弱点被击破时，姬子获得充能」 (when an enemy target's Weakness is Broken, Himeko gains Charge)");
+        int afterOneAttack = himeko.getResources().value(CHARGE);
+        Assertions.assertAll("one attack, no break",
+                () -> Assertions.assertFalse(iceEdge.isBroken(), "precondition: one basic attack does not empty the bar"),
+                () -> Assertions.assertEquals(1, afterOneAttack, "and no break means no charge"));
+
+        battle.castImmediate(new DefaultSkill(HIMEKO, 1, 1), himeko, List.of(iceEdge));
+        int afterBreak = himeko.getResources().value(CHARGE);
+        Assertions.assertAll("「当有敌方目标的弱点被击破时，姬子获得充能」",
+                () -> Assertions.assertTrue(iceEdge.isBroken(), "the second one breaks it"),
+                () -> Assertions.assertEquals(2, afterBreak,
+                        "BATTLE_START's 1 plus the break's 1 -- 「当有敌方目标的弱点被击破时，姬子获得充能」 (when an enemy target's Weakness is Broken, Himeko gains Charge)"));
 
         // Two more breaks: the third point lands, the fourth is swallowed by the cap (overflow is 0 by default,
         // so "上限3点" is enforced by the declaration rather than by arithmetic in the rule).
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
-        Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "the cap is reached");
+        int atCap = himeko.getResources().value(CHARGE);
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
-        Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "and cannot be passed");
+        int pastCap = himeko.getResources().value(CHARGE);
+        Assertions.assertAll("「上限3点」 holds",
+                () -> Assertions.assertEquals(3, atCap, "the cap is reached"),
+                () -> Assertions.assertEquals(3, pastCap, "and cannot be passed"));
     }
 
     /**
-     * "当我方目标施放攻击后，若姬子的充能达到上限则立即发动1次追加攻击，对敌方全体目标造成 ...伤害，并消耗全部充能。"
+     * At the cap, one ally attack fires her follow-up on <b>every</b> enemy and spends the whole charge - and that
+     * follow-up is not an attack that can trigger itself.
      *
-     * <p>A real ally attack drives it, and the claim is about <b>both</b> enemies: "敌方全体" is the thing the
-     * selector had to learn, and the second enemy is the witness - the ally aims at the first one only, so
-     * anything the second one loses came from her follow-up.
+     * <p>Both clauses share one fixture - her, a single-target ally, and two enemies - and one observed object, her
+     * 充能 together with the enemies' HP, so they are one scenario, asserted as one. A real ally attack drives the
+     * first claim, and the claim is about <b>both</b> enemies: "敌方全体" is the thing the selector had to learn, and
+     * the second enemy is the witness - the ally aims at the first one only, so anything the second one loses came
+     * from her follow-up. The second claim is then measured on the same enemies: once the charge is spent, the next
+     * ally attack does nothing at all.
+     *
+     * <p>Absorbs {@code atTheCapAnAllyAttackFiresHerFollowUpOnEveryEnemyAndSpendsItAll} and
+     * {@code theFollowUpCannotRetriggerItself}.
      */
     @Test
-    public void atTheCapAnAllyAttackFiresHerFollowUpOnEveryEnemyAndSpendsItAll() {
+    public void atTheCapHerFollowUpHitsEveryEnemySpendsTheChargeAndCannotRetriggerItself() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy first = dummy();
@@ -164,19 +178,34 @@ public class HimekoTest {
         Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         chargeTo(himeko, first, battle);
-        Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "precondition: she is at the cap");
 
+        // 1. The follow-up cannot retrigger itself: the first ally attack spends the charge, the second finds none.
+        int firedOnce = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0));
+        double secondBeforeRetrigger = second.getCurrentHp();
+        int firedAgain = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0));
+        Assertions.assertAll("the follow-up cannot retrigger itself",
+                () -> Assertions.assertEquals(1, firedOnce, "the rule fires once"),
+                () -> Assertions.assertEquals(0, firedAgain, "the charge is gone, so nothing fires again"),
+                () -> Assertions.assertEquals(secondBeforeRetrigger, second.getCurrentHp(), EPS,
+                        "the second enemy takes no second hit once the charge is gone"));
+
+        // 2. 「对敌方全体目标」 and 「并消耗全部充能」, read on the same fixture brought back to the cap.
+        chargeTo(himeko, first, battle);
+        int atCap = himeko.getResources().value(CHARGE);
         double firstBefore = first.getCurrentHp();
         double secondBefore = second.getCurrentHp();
         double ourSideBefore = ourSideHp(battle);
 
         battle.castImmediate(new DefaultSkill(ALLY, 1, 1), ally, List.of(first));
 
-        Assertions.assertTrue(first.getCurrentHp() < firstBefore, "the first enemy was hit");
-        Assertions.assertTrue(second.getCurrentHp() < secondBefore,
-                "「对敌方全体目标」 (to all enemies) -- and so was the one the ally never aimed at");
-        Assertions.assertEquals(ourSideBefore, ourSideHp(battle), EPS, "on the enemies, not on our side");
-        Assertions.assertEquals(0, himeko.getResources().value(CHARGE), "「并消耗全部充能」 (and consumes all of the Charge)");
+        Assertions.assertAll("one ally attack at the cap",
+                () -> Assertions.assertEquals(3, atCap, "precondition: she is at the cap"),
+                () -> Assertions.assertTrue(first.getCurrentHp() < firstBefore, "the first enemy was hit"),
+                () -> Assertions.assertTrue(second.getCurrentHp() < secondBefore,
+                        "「对敌方全体目标」 (to all enemies) -- and so was the one the ally never aimed at"),
+                () -> Assertions.assertEquals(ourSideBefore, ourSideHp(battle), EPS, "on the enemies, not on our side"),
+                () -> Assertions.assertEquals(0, himeko.getResources().value(CHARGE),
+                        "「并消耗全部充能」 (and consumes all of the Charge)"));
     }
 
     /**
@@ -238,27 +267,6 @@ public class HimekoTest {
 
         Assertions.assertEquals(reference, dealt, EPS,
                 "the rule's damage is the skill row's share of her ATTACK, settled by the engine's own channel");
-    }
-
-    /**
-     * The follow-up is not an attack that can trigger itself: at 0 charge the next ally attack does nothing.
-     */
-    @Test
-    public void theFollowUpCannotRetriggerItself() {
-        Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
-        Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy first = dummy();
-        Enemy second = dummy();
-        Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), BattleFixture.seeded());
-        battle.startBattle();
-        chargeTo(himeko, first, battle);
-
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
-                "the rule fires once");
-        double secondBefore = second.getCurrentHp();
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
-                "the charge is gone, so nothing fires again");
-        Assertions.assertEquals(secondBefore, second.getCurrentHp(), EPS);
     }
 
     /**
@@ -340,48 +348,29 @@ public class HimekoTest {
      */
 
     /**
-     * ⭐ The gate: a declared technique raises the Fire damage the enemies take by 10%.
+     * ⭐ The zone 「不完全燃烧」: it exists only when the technique was declared, it raises the damage the enemies
+     * take by 10%, it is FIRE-only, and it lasts two turns.
      *
-     * <p>The pair is asserted together, because a rule gated on {@code self has_state sys:technique} can only be trusted against its own
-     * control: "the zone appeared" alone would pass for the wrong reason if something else also applied it.
+     * <p>All four claims read the same fixture she alone against the fixture's monster, with the technique optionally
+     * declared and the same object, the zone the 秘技 applies to that enemy, so they are one scenario, asserted as
+     * one. The pair is asserted together, because a rule gated on {@code self has_state sys:technique} can only be
+     * trusted against its own control: "the zone appeared" alone would pass for the wrong reason if something else
+     * also applied it. The duration is asserted as "the countdown it was given", not as "it expires after N of my
+     * calls": measured, a carrier's buffs are ticked by the turn loop on ITS OWN turn, and
+     * {@code Battle.afterMove()} acts on the battle's current actor rather than on a unit handed to it -- an earlier
+     * version called it repeatedly and watched a 2-turn zone sit unchanged through six calls, failing against a
+     * working rule.
+     *
+     * <p>Absorbs {@code aDeclaredTechniqueRaisesTheFireDamageTheEnemiesTake},
+     * {@code itLeavesOtherElementsUntouched} and {@code theZoneCarriesTheStatedDuration}.
      */
     @Test
-    public void aDeclaredTechniqueRaisesTheFireDamageTheEnemiesTake() {
-        double off = elementVulnerability(false, DamageElement.FIRE);
-        double on = elementVulnerability(true, DamageElement.FIRE);
-
-        Assertions.assertEquals(NO_ZONE, off, EPS_STRICT,
-                "「使用秘技后」 -- without the technique the zone must not exist at all");
-        Assertions.assertEquals(0.1, on - NO_ZONE, EPS_STRICT,
-                "「使敌方目标受到的火属性伤害提高10%」 -- 10%, and of the damage-taken zone rather than a boost");
-    }
-
-    /**
-     * ⭐ It is FIRE-only: the same battle leaves Ice and Physical damage untouched.
-     *
-     * <p>⚠ This is the case the element scope exists for. A 10% zone applying to every element would be wrong against every
-     * non-Fire attacker in the party, and the only way to tell is to compare the elements against each other.
-     */
-    @Test
-    public void itLeavesOtherElementsUntouched() {
-        Assertions.assertEquals(0.1, elementVulnerability(true, DamageElement.FIRE) - NO_ZONE, EPS_STRICT,
-                "Fire is raised");
-        Assertions.assertEquals(NO_ZONE, elementVulnerability(true, DamageElement.ICE), EPS_STRICT,
-                "and Ice is not -- 「火属性」 names one element, not all of them");
-        Assertions.assertEquals(NO_ZONE, elementVulnerability(true, DamageElement.PHYSICAL), EPS_STRICT,
-                "nor Physical");
-    }
-
-    /**
-     * The zone carries the duration the clause states.
-     *
-     * <p>⚠ Asserted as "the countdown it was given", not as "it expires after N of my calls": measured, a carrier's buffs are ticked
-     * by the turn loop on ITS OWN turn, and {@code Battle.afterMove()} acts on the battle's current actor rather than on a unit
-     * handed to it -- an earlier version of this case called it repeatedly and watched a 2-turn zone sit unchanged through six
-     * calls, failing against a working rule.
-     */
-    @Test
-    public void theZoneCarriesTheStatedDuration() {
+    public void theTechniqueZoneIsFireOnlyWorthTenPercentAndLastsTwoTurns() {
+        double fireOff = elementVulnerability(false, DamageElement.FIRE);
+        double fireOn = elementVulnerability(true, DamageElement.FIRE);
+        double fireOnAgain = elementVulnerability(true, DamageElement.FIRE);
+        double ice = elementVulnerability(true, DamageElement.ICE);
+        double physical = elementVulnerability(true, DamageElement.PHYSICAL);
         Battle battle = techniqueBattle(true);
         Enemy enemy = battle.enemyUnits().get(0);
 
@@ -389,7 +378,19 @@ public class HimekoTest {
                 .mapToInt(buff -> buff.duration())
                 .max()
                 .orElse(-1);
-        Assertions.assertEquals(2, duration, "「持续2回合」 -- the zone the technique applies lasts two turns");
+        Assertions.assertAll("the 秘技 「不完全燃烧」 zone",
+                () -> Assertions.assertEquals(NO_ZONE, fireOff, EPS_STRICT,
+                        "「使用秘技后」 -- without the technique the zone must not exist at all"),
+                () -> Assertions.assertEquals(0.1, fireOn - NO_ZONE, EPS_STRICT,
+                        "「使敌方目标受到的火属性伤害提高10%」 -- 10%, and of the damage-taken zone rather than a boost"),
+                () -> Assertions.assertEquals(0.1, fireOnAgain - NO_ZONE, EPS_STRICT,
+                        "Fire is raised"),
+                () -> Assertions.assertEquals(NO_ZONE, ice, EPS_STRICT,
+                        "and Ice is not -- 「火属性」 names one element, not all of them"),
+                () -> Assertions.assertEquals(NO_ZONE, physical, EPS_STRICT,
+                        "nor Physical"),
+                () -> Assertions.assertEquals(2, duration,
+                        "「持续2回合」 -- the zone the technique applies lasts two turns"));
     }
 
     /**

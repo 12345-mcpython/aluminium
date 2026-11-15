@@ -32,6 +32,11 @@ import java.util.Random;
  *
  * <p><b>The technique.</b> Its 60% is measured as 60% of the BASE attack (the engine's `add_percent` convention), and the pair
  * (declared / undeclared) is what makes it a measurement rather than a claim - the same trap round 19 hit with Dan Heng.
+ *
+ * <p><b>L3.</b> The single-clause cases that read one board are folded into scenario tests below, one {@code Assertions.assertAll}
+ * per step so a failing clause still names itself: the plain Skill's 【解读】 together with the Ultimate's swap of the form, and
+ * Eidolon 2's entry / Ultimate / enhanced-Skill clauses. A case whose fixture is not the same - the Talent's walk-in board, the
+ * Eidolon 4 and 6 panels, the technique's control pair, the Ultimate's own board - keeps its own test.
  */
 public class Herta1401Test {
     private static final int HERTA = 1401;
@@ -47,35 +52,35 @@ public class Herta1401Test {
     // The Skill form: the plain Skill's 【解读】, the Ultimate's 【灵感】 replacement, and the Talent's entry layer.
     // ==================================================================
 
-    /** 「战技…并施加 1 层【解读】」 - the plain Skill adds one stack to the enemy it hit. */
-    @Test
-    public void thePlainSkillAddsOneInsight() {
-        Scene scene = new Scene();
-        Assertions.assertEquals(0, scene.enemy.getBuffManager().stacksOf(INSIGHT), "the enemy enters with none");
-        scene.castSkill();
-        Assertions.assertEquals(1, scene.enemy.getBuffManager().stacksOf(INSIGHT),
-                "「施加 1 层【解读】」");
-    }
-
     /**
-     * 「持有【灵感】时，战技强化为【我有一个大胆的想法】」: the Ultimate swaps the slot, the enhanced cast spends a stack, and when the
-     * last one is gone the plain Skill is back.
+     * 「战技…并施加 1 层【解读】」 and 「持有【灵感】时，战技强化为【我有一个大胆的想法】」, the two ends of the Skill form: the plain
+     * Skill adds one stack to the enemy it hit, the Ultimate swaps the slot, and when the last stack is spent the plain Skill
+     * is back.
      */
     @Test
-    public void theUltimateEnhancesTheSkillUntilTheInspirationRunsOut() {
+    public void theSkillAddsItsInsightAndTheUltimateSwapsTheForm() {
         Scene scene = new Scene();
-        Assertions.assertEquals(PLAIN_SKILL_SLOT, scene.skillSlot(), "the plain Skill before the Ultimate");
-
-        scene.castUltimate();
-        Assertions.assertEquals(1, scene.herta.getBuffManager().stacksOf(INSPIRATION), "「获得 1 层【灵感】」");
-        Assertions.assertEquals(ENHANCED_SKILL_SLOT, scene.skillSlot(),
-                "「持有【灵感】时，战技强化为【我有一个大胆的想法】」");
+        Assertions.assertAll("the board before any cast",
+                () -> Assertions.assertEquals(0, scene.enemy.getBuffManager().stacksOf(INSIGHT), "the enemy enters with none"),
+                () -> Assertions.assertEquals(PLAIN_SKILL_SLOT, scene.skillSlot(), "the plain Skill before the Ultimate"));
 
         scene.castSkill();
-        Assertions.assertEquals(0, scene.herta.getBuffManager().stacksOf(INSPIRATION),
-                "「消耗 1 层【灵感】」");
-        Assertions.assertEquals(PLAIN_SKILL_SLOT, scene.skillSlot(),
-                "「持有」的相反面 - no stack left, so the plain Skill comes back");
+        Assertions.assertAll("「战技…并施加 1 层【解读】」",
+                () -> Assertions.assertEquals(1, scene.enemy.getBuffManager().stacksOf(INSIGHT),
+                        "「施加 1 层【解读】」"));
+
+        scene.castUltimate();
+        Assertions.assertAll("「持有【灵感】时，战技强化为【我有一个大胆的想法】」",
+                () -> Assertions.assertEquals(1, scene.herta.getBuffManager().stacksOf(INSPIRATION), "「获得 1 层【灵感】」"),
+                () -> Assertions.assertEquals(ENHANCED_SKILL_SLOT, scene.skillSlot(),
+                        "「持有【灵感】时，战技强化为【我有一个大胆的想法】」"));
+
+        scene.castSkill();
+        Assertions.assertAll("the enhanced cast and the return to the plain Skill",
+                () -> Assertions.assertEquals(0, scene.herta.getBuffManager().stacksOf(INSPIRATION),
+                        "「消耗 1 层【灵感】」"),
+                () -> Assertions.assertEquals(PLAIN_SKILL_SLOT, scene.skillSlot(),
+                        "「持有」的相反面 - no stack left, so the plain Skill comes back"));
     }
 
     /**
@@ -140,30 +145,28 @@ public class Herta1401Test {
     // ==================================================================
 
     /**
-     * Eidolon 2: +1 on entering the battle and +1 (on top of the Ultimate's own one) on the Ultimate.
+     * Eidolon 2 at rank: +1 on entering the battle and +1 (on top of the Ultimate's own one) on the Ultimate, and after the
+     * ENHANCED Skill (slot 9) her next action is advanced by 35%.
      */
     @Test
-    public void theSecondEidolonPaysOneMoreInspirationBothWays() {
-        Assertions.assertEquals(0, stacks(newRun(1)), "E1: nothing at battle start");
-        Assertions.assertEquals(1, stacks(newRun(2)), "「进入战斗…额外获得 1 层【灵感】」");
+    public void theSecondEidolonPaysMoreInspirationAndAdvancesTheEnhancedSkill() {
+        Assertions.assertAll("Eidolon 2, entry",
+                () -> Assertions.assertEquals(0, stacks(newRun(1)), "E1: nothing at battle start"),
+                () -> Assertions.assertEquals(1, stacks(newRun(2)), "「进入战斗…额外获得 1 层【灵感】」"));
 
-        Assertions.assertEquals(1, stacksAfterUlt(newRun(1)), "the Ultimate itself pays one");
-        // 1 from the Eidolon entry clause + 1 from the Ultimate itself + 1 from the Eidolon Ultimate clause.
-        Assertions.assertEquals(3, stacksAfterUlt(newRun(2)),
-                "「施放终结技后，额外获得 1 层」 - added, not replaced");
-    }
+        Assertions.assertAll("Eidolon 2, Ultimate",
+                () -> Assertions.assertEquals(1, stacksAfterUlt(newRun(1)), "the Ultimate itself pays one"),
+                // 1 from the Eidolon entry clause + 1 from the Ultimate itself + 1 from the Eidolon Ultimate clause.
+                () -> Assertions.assertEquals(3, stacksAfterUlt(newRun(2)),
+                        "「施放终结技后，额外获得 1 层」 - added, not replaced"));
 
-    /**
-     * Eidolon 2: after the ENHANCED Skill (slot 9) her next action is advanced by 35%.
-     */
-    @Test
-    public void theEnhancedSkillAdvancesHerOnlyAtE2() {
         double e1 = advanceAfterEnhancedSkill(1);
         double e2 = advanceAfterEnhancedSkill(2);
         System.out.println("[1401-E2] advance of the remaining time: E1=" + e1 + " ; E2=" + e2);
-        Assertions.assertEquals(0.0, e1, 1e-9, "E1 states no advance");
-        Assertions.assertEquals(0.35, e2, 1e-2,
-                "「下一次行动提前 35%」 - a share of the remaining time");
+        Assertions.assertAll("Eidolon 2, enhanced Skill",
+                () -> Assertions.assertEquals(0.0, e1, 1e-9, "E1 states no advance"),
+                () -> Assertions.assertEquals(0.35, e2, 1e-2,
+                        "「下一次行动提前 35%」 - a share of the remaining time"));
     }
 
     /**

@@ -56,18 +56,32 @@ public class Jade1314Test {
      * Note: 1314 翡翠's Skill, first clause: 「指定我方单体成为【收债人】，使其速度提高 30 点，持续 3 回合…若翡翠成为【收债人】时，
      * 无法获得速度提高效果…翡翠每回合开始时【收债人】状态持续回合数减 1」.
      *
-     * <p>Three things are pinned: the ally becomes the collector and is faster by 30 POINTS (not 30%), her own case gets the state
-     * but not the speed, and the duration is spent on HER turn boundaries ({@code ticks_on: "self"}), not the ally's.
+     * <p>What is pinned: the ally becomes the collector and is faster by 30 POINTS (not 30%), the state starts with 3 turns,
+     * and the duration is spent on HER turn boundaries ({@code ticks_on: "self"}), not the ally's -- three of her boundaries
+     * retire the state. Her own case gets the state but not the speed, and is judged on its own below.
      */
     @Test
-    public void anAllyBecomesTheCollectorAndGetsThirtySpeed() {
+    public void anAllyBecomesTheCollectorAndHerClockSpendsTheDuration() {
         DebtFixture f = new DebtFixture();
         double before = f.ally.getAttribute(AttributeType.SPEED).get();
         f.skill(f.ally);
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState(COLLECTOR), "「指定我方单体成为【收债人】」");
-        Assertions.assertEquals(before + 30, f.ally.getAttribute(AttributeType.SPEED).get(), 1e-6,
-                "「速度提高 30 点」 - points, not 30%");
+        Assertions.assertAll("the ally becomes the collector, is 30 points faster, and the state starts with 3 turns",
+                () -> Assertions.assertTrue(f.ally.getBuffManager().hasState(COLLECTOR), "「指定我方单体成为【收债人】」"),
+                () -> Assertions.assertEquals(before + 30, f.ally.getAttribute(AttributeType.SPEED).get(), 1e-6,
+                        "「速度提高 30 点」 - points, not 30%"),
+                () -> Assertions.assertEquals(3,
+                        f.ally.getBuffManager().allBuffsOf(StateBuff.class).getFirst().remainingTurns(),
+                        "precondition: 3 turns"));
+
+        // Three of HER turn boundaries (early + after). The state sits on the ally, its clock on Jade.
+        for (int i = 0; i < 3; i++) {
+            f.ally.getBuffManager().tickForeign(f.jade, true);
+            f.ally.getBuffManager().tickForeign(f.jade, false);
+        }
+        Assertions.assertAll("the duration is spent on HER turn boundaries, not the ally's",
+                () -> Assertions.assertFalse(f.ally.getBuffManager().hasState(COLLECTOR),
+                        "「翡翠每回合开始时【收债人】状态持续回合数减 1」 - 3 turns spent on HER boundaries"));
     }
 
     @Test
@@ -79,22 +93,6 @@ public class Jade1314Test {
         Assertions.assertTrue(f.jade.getBuffManager().hasState(COLLECTOR), "the state is applied to her too");
         Assertions.assertEquals(before, f.jade.getAttribute(AttributeType.SPEED).get(), 1e-6,
                 "「若翡翠成为【收债人】时，无法获得速度提高效果」");
-    }
-
-    @Test
-    public void herTurnSpendsTheCollectorsDuration() {
-        DebtFixture f = new DebtFixture();
-        f.skill(f.ally);
-        int before = f.ally.getBuffManager().allBuffsOf(StateBuff.class).getFirst().remainingTurns();
-        Assertions.assertEquals(3, before, "precondition: 3 turns");
-
-        // Three of HER turn boundaries (early + after). The state sits on the ally, its clock on Jade.
-        for (int i = 0; i < 3; i++) {
-            f.ally.getBuffManager().tickForeign(f.jade, true);
-            f.ally.getBuffManager().tickForeign(f.jade, false);
-        }
-        Assertions.assertFalse(f.ally.getBuffManager().hasState(COLLECTOR),
-                "「翡翠每回合开始时【收债人】状态持续回合数减 1」 - 3 turns spent on HER boundaries");
     }
 
     // ==================================================================
@@ -142,44 +140,37 @@ public class Jade1314Test {
 
     // ==================================================================
     // The 【当品】 counter: the trace's one layer, the technique's fifteen,
-    // and 2.40% critical damage per layer
+    // and 2.40% critical damage / 0.50% ATK per layer
     // ==================================================================
 
     /**
-     * Note: 1314 Jade (翡翠)'s [当品]: one layer at the enemy's battle entry, fifteen from her technique, and 2.40% critical damage each.
+     * Note: 1314 Jade (翡翠)'s [当品]: one layer at the enemy's battle entry, fifteen from her technique, 2.40% critical damage
+     * plus 0.50% ATK each.
      *
      * <p>Both the counter's name and the values come from the data; the technique half is measured with and without
      * `markTechniqueUsed`, which is what its `self has_state Technique (秘技)` gate reads.
-     */
-    @Test
-    public void theTechniqueGrantsFifteenAndTheTraceOne() {
-        Assertions.assertEquals(1, layers(false), "trace (行迹): one layer when a battle starts");
-        Assertions.assertEquals(16, layers(true), "technique (秘技): fifteen more, so sixteen in total");
-    }
-
-    /**
-     * 2.40% per layer.
      *
-     * <p>Note: The absolute delta carries the unit's own inherent +0.5 critical damage (measured: 0.524 for one layer, where
-     * the clause owns 0.024), so the clause's share is pinned twice: the measured one-layer total, and the difference
-     * between sixteen layers and one, which is 15 x 2.4% and does not care what the unit carries.
+     * <p>2.40% per layer: the absolute delta carries the unit's own inherent +0.5 critical damage (measured: 0.524 for one
+     * layer, where the clause owns 0.024), so the clause's share is pinned twice: the measured one-layer total, and the
+     * difference between sixteen layers and one, which is 15 x 2.4% and does not care what the unit carries. The ATK share is
+     * measured as a delta against the base for the same reason -- her panel already sits above that base.
      */
     @Test
-    public void eachLayerAddsTwoPointFourPercentCriticalDamage() {
-        Assertions.assertEquals(0.524, criticalDamage(false), EPS, "one layer on top of the inherent 0.5");
-        Assertions.assertEquals(0.36, criticalDamage(true) - criticalDamage(false), EPS,
-                "fifteen more layers are 15 x 2.40%");
-    }
-
-    @Test
-    public void eachLayerAddsHalfAPercentAttack() {
+    public void theGoodsCounterAndItsPerLayerShares() {
         StackFixture one = fixture(false);
         StackFixture sixteen = fixture(true);
         double base = one.jade.getAttribute(AttributeType.ATTACK).baseValue();
         double delta = sixteen.jade.getAttribute(AttributeType.ATTACK).get()
                 - one.jade.getAttribute(AttributeType.ATTACK).get();
-        Assertions.assertEquals(0.075 * base, delta, base * 1e-6,
-                "fifteen more layers are 15 x 0.50% of the base");
+
+        Assertions.assertAll("the 当品 counter, its layers and their per-layer shares",
+                () -> Assertions.assertEquals(1, layers(false), "trace (行迹): one layer when a battle starts"),
+                () -> Assertions.assertEquals(16, layers(true), "technique (秘技): fifteen more, so sixteen in total"),
+                () -> Assertions.assertEquals(0.524, criticalDamage(false), EPS, "one layer on top of the inherent 0.5"),
+                () -> Assertions.assertEquals(0.36, criticalDamage(true) - criticalDamage(false), EPS,
+                        "fifteen more layers are 15 x 2.40%"),
+                () -> Assertions.assertEquals(0.075 * base, delta, base * 1e-6,
+                        "fifteen more layers are 15 x 0.50% of the base"));
     }
 
     // ==================================================================
@@ -314,49 +305,58 @@ public class Jade1314Test {
     // ==================================================================
 
     /**
-     * 「每击中 1 名敌方目标均可获得 1 点充能」 - and it is per hit, not per attack.
+     * 「每击中 1 名敌方目标均可获得 1 点充能」 - and it is per hit, not per attack - and 「翡翠**或**成为【收债人】的目标」,
+     * so the collector's attacks pay her charge too.
      */
     @Test
-    public void theTalentPaysOneChargePerHit() {
-        Run run = new Run(0);
-        run.attack(run.jade, 2);
-        Assertions.assertEquals(2, run.charge(), "two targets hit, two points of charge");
-        run.attack(run.jade, 1);
-        Assertions.assertEquals(3, run.charge(), "a third hit is a third point");
+    public void theTalentPaysOneChargePerHitAndTheCollectorPaysToo() {
+        Assertions.assertAll("the talent's charge, per hit and from the collector",
+                () -> {
+                    Run run = new Run(0);
+                    run.attack(run.jade, 2);
+                    Assertions.assertEquals(2, run.charge(), "two targets hit, two points of charge");
+                    run.attack(run.jade, 1);
+                    Assertions.assertEquals(3, run.charge(), "a third hit is a third point");
+                },
+                () -> {
+                    Run run = new Run(0);
+                    run.attack(run.ally, 2);
+                    Assertions.assertEquals(0, run.charge(), "no state, no charge");
+                    run.makeAllyTheCollector();
+                    run.attack(run.ally, 2);
+                    Assertions.assertEquals(2, run.charge(), "now the collector's two hits pay");
+                });
     }
 
     /**
-     * 「翡翠**或**成为【收债人】的目标」 - the collector's attacks pay her charge too.
+     * 「充能到达 8 点后，消耗 8 点充能，发动 1 次追加攻击…立即获得 5 层【当品】」, and 「每层【当品】使暴击伤害提高 2.40%」 read
+     * LIVE: the stacks the follow-up just granted are already in the panel.
      */
     @Test
-    public void theCollectorsAttacksPayHerCharge() {
+    public void eightChargePaysTheFollowUpAndItsFiveGoods() {
         Run run = new Run(0);
-        run.attack(run.ally, 2);
-        Assertions.assertEquals(0, run.charge(), "no state, no charge");
-
-        run.makeAllyTheCollector();
-        run.attack(run.ally, 2);
-        Assertions.assertEquals(2, run.charge(), "now the collector's two hits pay");
-    }
-
-    /**
-     * 「充能到达 8 点后，消耗 8 点充能，发动 1 次追加攻击…立即获得 5 层【当品】」.
-     */
-    @Test
-    public void eightChargePaysTheFollowUpAndFiveGoods() {
-        Run run = new Run(0);
+        double bare = run.jade.getAttribute(AttributeType.CRIT_ATTACK).get();
         for (int i = 0; i < 3; i++) {
             run.attack(run.jade, 2);                      // 6 charge, below the threshold
         }
-        Assertions.assertEquals(6, run.charge());
         double before = run.enemy.getCurrentHp();
+
+        Assertions.assertAll("six points of charge are still below the threshold",
+                () -> Assertions.assertEquals(6, run.charge(), "three two-hit attacks are six points"));
 
         run.attack(run.jade, 2);                          // 8 charge: the follow-up fires
 
-        Assertions.assertEquals(0, run.charge(), "「消耗 8 点充能」");
-        Assertions.assertTrue(before - run.enemy.getCurrentHp() > 0, "the follow-up deals damage");
-        // 5 from the follow-up plus the 1 her trace (逆回购) grants at battle start.
-        Assertions.assertEquals(6, run.stacks(GOODS), "「发动…追加攻击时立即获得 5 层【当品】」");
+        Assertions.assertAll("the eighth point spends the charge and buys the follow-up",
+                () -> Assertions.assertEquals(0, run.charge(), "「消耗 8 点充能」"),
+                () -> Assertions.assertTrue(before - run.enemy.getCurrentHp() > 0, "the follow-up deals damage"),
+                () -> Assertions.assertEquals(6, run.stacks(GOODS), "「发动…追加攻击时立即获得 5 层【当品】」"),
+                // The crit-damage case pinned the same six: 5 from the follow-up plus the 1 her trace (逆回购) grants at
+                // battle start.
+                () -> Assertions.assertEquals(6, run.stacks(GOODS),
+                        "5 from the follow-up + 1 from the trace at battle start"),
+                // `bare` already carries the trace layer (1 当品 at battle start), so the DELTA is the five the follow-up added.
+                () -> Assertions.assertEquals(5 * 0.024, run.jade.getAttribute(AttributeType.CRIT_ATTACK).get() - bare,
+                        1e-6, "每层 +2.40% read through `per_stack_live`"));
     }
 
     /**
@@ -387,23 +387,6 @@ public class Jade1314Test {
         threeHitsE1.attack(threeHitsE1.ally, 3);
         Assertions.assertEquals(3, threeHitsE1.charge(),
                 "three hits are not one of the sentence tiers (exactly 2 or exactly 1)");
-    }
-
-    /**
-     * 「每层【当品】使暴击伤害提高 2.40%」 - a LIVE reading: the stacks the follow-up just granted are already in the panel.
-     */
-    @Test
-    public void everyGoodRaisesHerCritDamage() {
-        Run run = new Run(0);
-        double bare = run.jade.getAttribute(AttributeType.CRIT_ATTACK).get();
-        for (int i = 0; i < 3; i++) {
-            run.attack(run.jade, 2);                      // 6 charge
-        }
-        run.attack(run.jade, 2);                          // the follow-up grants 5 层
-        Assertions.assertEquals(6, run.stacks(GOODS), "5 from the follow-up + 1 from the trace at battle start");
-        // `bare` already carries the trace layer (1 当品 at battle start), so the DELTA is the five the follow-up added.
-        Assertions.assertEquals(5 * 0.024, run.jade.getAttribute(AttributeType.CRIT_ATTACK).get() - bare, 1e-6,
-                "每层 +2.40% read through `per_stack_live`");
     }
 
     public void theFirstEidolonRaisesTheFollowUpsDamageByThirtyTwoPercent() {

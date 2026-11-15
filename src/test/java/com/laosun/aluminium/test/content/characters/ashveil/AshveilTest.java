@@ -50,6 +50,13 @@ import java.util.Random;
  *       attempts, and the working one is a LOOP OF SMALL HITS - one big setup hit overkills the target because the settled damage
  *       carries the zones ({@code CanHit} has no {@code setCurrentHp}, and {@code consumeHp} leaves an enemy untouched).</li>
  * </ul>
+ *
+ * <p><b>L3.</b> The single-clause cases that read one board are folded into the scenario tests below, one
+ * {@code Assertions.assertAll} per fixture so a failing clause still names itself: the talent's layer count together with
+ * the Eidolon 2 cap that raises it (one {@code Fixture} board, one counter), and the two enemy-facing Eidolon clauses (E1's
+ * vulnerability layer and E6's resistance cut) on the one {@link #soloBoard(int)} board. A case whose fixture or observed
+ * object is not the same - the compiled data rows of the 头狼 trace, the Ultimate's own cast, the 36% tier that stands the
+ * enemy at a fraction of its HP, and every rejection - keeps its own test.
  */
 public class AshveilTest {
     private static final int ASHVEIL = 1504;
@@ -101,31 +108,34 @@ public class AshveilTest {
                 "the engine refuses to spend a charge she does not have");
     }
 
-    /** 「随后获得 2 层【婪酣】」 — one trigger, two layers. */
-    @Test
-    public void theTalentGrantsTwoLayers() {
-        Fixture f = new Fixture(0);
-        Assertions.assertEquals(0, f.layers(), "precondition: no layers yet");
-        f.triggerTalent();
-        Assertions.assertEquals(2, f.layers(), "「随后获得 2 层【婪酣】」 — two, not one");
-    }
-
     /**
-     * 星魂 2: 「【婪酣】叠加上限提高至 18 层」 — the base cap is 12, and ten triggers stop at the Eidolon's 18.
+     * 「随后获得 2 层【婪酣】」 — one trigger, two layers — and the bar that bounds it: the base cap of 12, and 星魂 2's
+     * 「【婪酣】叠加上限提高至 18 层」. One {@code Fixture} board, read before the first trigger, after it and at the cap,
+     * so the layer COUNT and the cap it runs into are the same counter rather than two readings.
      */
     @Test
-    public void eidolon2RaisesTheLayerCapToEighteen() {
+    public void theTalentGrantsTwoLayersUpToTheCap() {
         Fixture base = new Fixture(0);
-        for (int i = 0; i < 10; i++) {
+        int before = base.layers();
+        base.triggerTalent();
+        int afterOne = base.layers();
+        // Nine more firings: the same ten the cap needs, so the count above is the first of them, not an extra one.
+        for (int i = 0; i < 9; i++) {
             base.triggerTalent();
         }
-        Assertions.assertEquals(12, base.layers(), "the base cap is 12");
+        int capped = base.layers();
 
         Fixture e2 = new Fixture(2);
         for (int i = 0; i < 10; i++) {
             e2.triggerTalent();
         }
-        Assertions.assertEquals(18, e2.layers(), "「叠加上限提高至 18 层」");
+        int eidolonTwo = e2.layers();
+
+        Assertions.assertAll("「随后获得 2 层【婪酣】，最多叠加 12 层」, and Eidolon 2's 18",
+                () -> Assertions.assertEquals(0, before, "precondition: no layers yet"),
+                () -> Assertions.assertEquals(2, afterOne, "「随后获得 2 层【婪酣】」 — two, not one"),
+                () -> Assertions.assertEquals(12, capped, "the base cap is 12"),
+                () -> Assertions.assertEquals(18, eidolonTwo, "「叠加上限提高至 18 层」"));
     }
 
     // ------------------------------------------------------------------ technique and Ultimate
@@ -230,26 +240,28 @@ public class AshveilTest {
     // ------------------------------------------------------------------ Eidolons 1 and 6
 
     /**
-     * E1 「敌方全体受到的伤害提高 24%」: exactly ONE vulnerability layer appears when the rank is reached, and none
-     * before it.
+     * Eidolons 1 and 6, measured on the enemy the aura reaches and each compared against the rank BELOW it, so the
+     * character's other Eidolons cannot account for the difference: E1 「敌方全体受到的伤害提高 24%」 is exactly ONE
+     * vulnerability layer, and E6 「敌方全体的全属性抗性降低 20%」 lowers their all-type RES. Both readings stand on the one
+     * {@link #soloBoard(int)} fixture - one owner, the standard monster, a zero roll.
      *
-     * <p>⚠ Read as a LAYER COUNT, not as a damage ratio: the settled-damage ratio is (1 + z + 0.24) / (1 + z), so it is
+     * <p>⚠ E1 is read as a LAYER COUNT, not as a damage ratio: the settled-damage ratio is (1 + z + 0.24) / (1 + z), so it is
      * not 1.24 whenever anything else already sits in that zone. And read the FILE first - this clause already had a
      * rule (`eidolon1_enemies_take_more`); a second one written beside it made the enemy carry two layers and
      * looked exactly like an engine that applied the clause twice.
      */
     @Test
-    public void eidolonOneAddsExactlyOneVulnerabilityLayer() {
-        Assertions.assertEquals(0, vulnerabilityLayers(0), "control: nothing before Eidolon 1");
-        Assertions.assertEquals(1, vulnerabilityLayers(1), "E1's own 24%, exactly one layer");
-    }
-
-    @Test
-    public void eidolonSixLowersTheEnemysResistance() {
+    public void theEnemyFacingEidolonsDebuffTheEnemy() {
+        int beforeOne = vulnerabilityLayers(0);
+        int atOne = vulnerabilityLayers(1);
         double atFive = enemyResistance(5);
         double atSix = enemyResistance(6);
         System.out.println("[1504] enemy RES: E5 " + atFive + " ; E6 " + atSix);
-        Assertions.assertTrue(atSix > atFive, "「敌方全体的全属性抗性降低 20%」");
+
+        Assertions.assertAll("Eidolon 1: exactly one vulnerability layer; Eidolon 6: the all-type RES falls",
+                () -> Assertions.assertEquals(0, beforeOne, "control: nothing before Eidolon 1"),
+                () -> Assertions.assertEquals(1, atOne, "E1's own 24%, exactly one layer"),
+                () -> Assertions.assertTrue(atSix > atFive, "「敌方全体的全属性抗性降低 20%」"));
     }
 
     @Test
@@ -302,14 +314,24 @@ public class AshveilTest {
         return new double[]{normal, followUp};
     }
 
-    /** How many VulnerabilityBuff layers the enemy carries right after the battle starts. */
-    private static int vulnerabilityLayers(int eidolon) {
+    /**
+     * The Eidolon enemy-side board: one owner at the given rank, the standard monster, a zero roll, the battle started.
+     *
+     * <p>Both Eidolon readings below stand on it - E1's vulnerability rule is written at the start, E6's aura is gated on
+     * 「当场上存在【饲饵】时」 and therefore needs the Skill's bait first.
+     */
+    private static Battle soloBoard(int eidolon) {
         Character owner = CharacterFactory.create(ASHVEIL, LEVEL, true, null, null, eidolon);
         Battle battle = new Battle(new ArrayList<>(List.of(owner)),
                 new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
+        return battle;
+    }
+
+    /** How many VulnerabilityBuff layers the enemy carries right after the battle starts. */
+    private static int vulnerabilityLayers(int eidolon) {
         int count = 0;
-        for (var buff : battle.enemyUnits().getFirst().getBuffManager().activeBuffs()) {
+        for (var buff : soloBoard(eidolon).enemyUnits().getFirst().getBuffManager().activeBuffs()) {
             if (buff instanceof com.laosun.aluminium.buff.VulnerabilityBuff) {
                 count++;
             }
@@ -336,10 +358,8 @@ public class AshveilTest {
      * no bait exists and the aura is correctly absent.
      */
     private static double enemyResistance(int eidolon) {
-        Character owner = CharacterFactory.create(ASHVEIL, LEVEL, true, null, null, eidolon);
-        Battle battle = new Battle(new ArrayList<>(List.of(owner)),
-                new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));
-        battle.startBattle();
+        Battle battle = soloBoard(eidolon);
+        Character owner = battle.characters().getFirst();
         var enemy = battle.enemyUnits().getFirst();
         battle.castImmediate(owner.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), owner, List.of(enemy));
         battle.processRequests();

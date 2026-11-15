@@ -78,6 +78,14 @@ import java.util.Random;
  * own side's debuffs; removing an <i>enemy's</i> buff is the opposite direction) and the ultimate's [通解], which is a
  * state with a 100% <b>base chance</b> (a roll the {@code APPLY_BUFF} path does not have).
  *
+ * <p><b>L3.</b> Three pairs of single-clause cases that read one clause are folded into scenario tests below, one
+ * {@code Assertions.assertAll} per pair, so a failing clause still names itself: Eidolon 1's payout together with the gate
+ * its rule declares, the trace 追歼 armed by a real dispel and spent by the next attack, and 秘策's 10% effect hit on the
+ * ally's panel together with the {@code BATTLE_START} census that accounts for the rule. The rest — the stat traces,
+ * Eidolon 6, Eidolon 2's 10% SPD, the technique's two halves, Eidolon 4's 12%, the two defence sources, 痛击's boost delta,
+ * the debuff-gated rule counts and the Skill's one-directional strip — already are one reading on one board, so they keep
+ * their own tests. Nothing was dropped: every expected value, tolerance and message is still asserted.
+ *
  * <p>Merged from the former {@code PelaClauseCoverageTest}, {@code PelaEidolonFourTest},
  * {@code PelaDefenceStackingTest}, {@code PelaTraceNextAttackTest}, {@code PelaTraceTest},
  * {@code PelaTraceHittingDebuffedTest} and {@code PelaDebuffTest}; every test, assertion and Javadoc of measurement is
@@ -116,40 +124,42 @@ public class PelaTest {
      *
      * <p>Measured: at E1 an <b>ally's</b> kill pays her 5 (at E0 it pays nothing), and the same fixture without a kill pays
      * nothing — so the reading is about the kill, not about the fixture.
+     *
+     * <p>The other half of Eidolon 1's gate: our own deaths must not pay, which is what {@code !target is_ally} is for.
+     * Structural rather than behavioural (a dead unit's own table is skipped, so killing Pela herself cannot show it), so
+     * it is read off the rule the file ships, in the one {@code assertAll} that also states the payout it guards.
      */
     @Test
-    public void eidolon1PaysForAnyEnemyKill() {
+    public void eidolon1PaysForAnyEnemyKill() throws IOException {
         Fixture e1 = new Fixture(1);
-        double before = e1.pela.getCurrentEnergy();
+        double e1Before = e1.pela.getCurrentEnergy();
         e1.killBy(e1.ally);
-        Assertions.assertEquals(5.0, e1.pela.getCurrentEnergy() - before, 1e-9,
-                "「敌方目标被消灭时」 — no `actor == self`: somebody else's kill pays her too");
+        double e1Gain = e1.pela.getCurrentEnergy() - e1Before;
 
         Fixture e0 = new Fixture(0);
         double e0Before = e0.pela.getCurrentEnergy();
         e0.killBy(e0.ally);
-        Assertions.assertEquals(0.0, e0.pela.getCurrentEnergy() - e0Before, 1e-9,
-                "control: it is Eidolon 1");
+        double e0Gain = e0.pela.getCurrentEnergy() - e0Before;
 
         Fixture none = new Fixture(1);
         double noneBefore = none.pela.getCurrentEnergy();
         none.battle.processRequests();
-        Assertions.assertEquals(0.0, none.pela.getCurrentEnergy() - noneBefore, 1e-9,
-                "control: nothing died");
-    }
+        double noneGain = none.pela.getCurrentEnergy() - noneBefore;
 
-    /**
-     * The other half of Eidolon 1's gate: our own deaths must not pay, which is what {@code !target is_ally} is for.
-     *
-     * <p>Structural rather than behavioural: a dead unit's own table is skipped, so killing Pela herself cannot show it.
-     */
-    @Test
-    public void eidolon1ExcludesOurOwnDeaths() throws IOException {
         JsonObject rule = rule("eidolon1_energy_on_an_enemy_kill");
-        Assertions.assertTrue(rule.getAsJsonArray("when").toString().contains("!target is_ally"),
-                "the gate must be `!target is_ally` (not `target is_enemy`, which the vocabulary does not have)");
-        Assertions.assertFalse(rule.getAsJsonArray("when").toString().contains("actor == self"),
-                "and there must be NO killer gate: 「敌方目标被消灭时」 says nothing about who killed it");
+        String when = rule.getAsJsonArray("when").toString();
+
+        Assertions.assertAll("星魂 1 「敌方目标被消灭时，佩拉恢复 5 点能量」: any enemy kill pays, and the gate the rule declares",
+                () -> Assertions.assertEquals(5.0, e1Gain, 1e-9,
+                        "「敌方目标被消灭时」 — no `actor == self`: somebody else's kill pays her too"),
+                () -> Assertions.assertEquals(0.0, e0Gain, 1e-9,
+                        "control: it is Eidolon 1"),
+                () -> Assertions.assertEquals(0.0, noneGain, 1e-9,
+                        "control: nothing died"),
+                () -> Assertions.assertTrue(when.contains("!target is_ally"),
+                        "the gate must be `!target is_ally` (not `target is_enemy`, which the vocabulary does not have)"),
+                () -> Assertions.assertFalse(when.contains("actor == self"),
+                        "and there must be NO killer gate: 「敌方目标被消灭时」 says nothing about who killed it"));
     }
 
     /**
@@ -211,26 +221,6 @@ public class PelaTest {
     }
 
     /**
-     * The trace 追歼 reads the same gate: 「施放战技解除增益效果时，下一次攻击造成的伤害提高 20%」.
-     *
-     * <p>Measured: +0.2 with a buff to dispel, +0.0 without. ({@code theSkillArmsTheNextAttackOnly} below holds the
-     * "spent by the next attack" half.)
-     */
-    @Test
-    public void theTraceNeedsSomethingToDispel() {
-        Fixture withBuff = new Fixture(0);
-        withBuff.enemy.getBuffManager().addBuff(new StateBuff("敌方增益", 2));
-        withBuff.castSkill();
-        Assertions.assertEquals(0.2, withBuff.pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
-                "「下一次攻击造成的伤害提高 20%」");
-
-        Fixture nothing = new Fixture(0);
-        nothing.castSkill();
-        Assertions.assertEquals(0.0, nothing.pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
-                "nothing to dispel ⇒ no boost");
-    }
-
-    /**
      * The technique's two halves: 「对敌方随机单体造成 80% 攻击力的冰伤」 + 「防御力降低 20%」.
      *
      * <p>Measured: the enemy starts at <b>16498.2960225</b> and takes <b>216.634139685956</b> at battle start, and its
@@ -286,6 +276,10 @@ public class PelaTest {
     // The traces
     // ==================================================================
 
+    /**
+     * Trace 秘策: 「佩拉在场时，我方全体的效果命中提高 10%」 — the ally's own panel on the board that carries her, plus the
+     * rule the table ships (the file says so, not just the panel).
+     */
     @Test
     public void thePartyGainsTenPercentEffectHit() {
         Character pela = CharacterFactory.create(PELA, LEVEL);
@@ -293,8 +287,20 @@ public class PelaTest {
         Battle battle = new Battle(new ArrayList<>(List.of(pela, ally)),
                 new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        Assertions.assertTrue(ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get() > 0,
-                "「佩拉在场时，我方全体的效果命中提高 10%」");
+        double traceAllyEffectHit = ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get();
+
+        TriggerFixture f = new TriggerFixture();
+        double fixtureAllyEffectHit = f.ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get();
+        int battleStartRules = TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1;
+
+        Assertions.assertAll("秘策: 「佩拉在场时，我方全体的效果命中提高 10%」, both the panel and the compiled rule",
+                () -> Assertions.assertTrue(traceAllyEffectHit > 0,
+                        "「佩拉在场时，我方全体的效果命中提高 10%」"),
+                () -> Assertions.assertTrue(fixtureAllyEffectHit > 0,
+                        "「while Pela is on the field, the effect hit rate of all of our side is increased by 10%」"),
+                () -> Assertions.assertEquals(4, battleStartRules,
+                        "census: the Secret Strategy (秘策) rule, the level-convention rule, and (2026-09-29) the technique's "
+                                + "「defence reduced by 20%」 which rolls a base chance"));
     }
 
     @Test
@@ -305,29 +311,53 @@ public class PelaTest {
         Assertions.assertEquals(0.2, debuffed - bare, 1e-6, "「对处于负面效果的敌方目标造成的伤害提高 20%」");
     }
 
+    /**
+     * The trace 追歼: 「施放战技解除增益效果时，下一次攻击造成的伤害提高 20%」 — its gate and its lifetime are one clause.
+     *
+     * <p>Measured: +0.2 with a buff to dispel, +0.0 without, and the boost is gone one attack later — its lifetime is
+     * {@code next_attack}. The gate is read on the {@link Fixture} board, the lifetime on a board that arms the boost with
+     * the Skill and then attacks.
+     */
     @Test
-    public void theSkillArmsTheNextAttackOnly() {
+    public void theTraceNeedsSomethingToDispelAndTheNextAttackSpendsIt() {
+        Fixture withBuff = new Fixture(0);
+        withBuff.enemy.getBuffManager().addBuff(new StateBuff("敌方增益", 2));
+        withBuff.castSkill();
+        double armedByTheFixture = withBuff.pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+
+        Fixture nothing = new Fixture(0);
+        nothing.castSkill();
+        double noDispel = nothing.pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+
         Character pela = CharacterFactory.create(PELA, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(new ArrayList<>(List.of(pela, CharacterFactory.create(1001, LEVEL))),
                 new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         // Note: the sentence is 「施放战技**解除增益效果时**」 — so the fixture has to give the enemy something to dispel.
-        // Before 2026-11-02 the rule fired on every Skill (the engine had no way to ask), which is why this test did not
-        // need the buff; now the condition is real (`theTraceNeedsSomethingToDispel` above holds the "nothing to dispel" half).
-        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("敌方增益", 2));
+        // Before 2026-11-02 the rule fired on every Skill (the engine had no way to ask), which is why this board did not
+        // need the buff; now the condition is real (the `nothing` board above holds the "nothing to dispel" half).
+        enemy.getBuffManager().addBuff(new StateBuff("敌方增益", 2));
         double before = pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
         battle.castImmediate(pela.getSkills().get(SkillType.SKILL), pela, List.of(enemy));
         double armed = pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[1106] boost " + before + " -> " + armed);
-        Assertions.assertEquals(0.2, armed - before, 1e-9, "「下一次攻击造成的伤害提高 20%」");
 
         // Spend it: the lifetime is `next_attack`, so one attack later it is gone.
         battle.castImmediate(pela.getSkills().get(SkillType.COMMON), pela, List.of(enemy));
         battle.processRequests();
-        Assertions.assertEquals(before, pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
-                "the boost was spent on that attack");
+        double spent = pela.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+
+        Assertions.assertAll("追歼: 「施放战技解除增益效果时，下一次攻击造成的伤害提高 20%」, armed only by a real dispel and spent by the next attack",
+                () -> Assertions.assertEquals(0.2, armedByTheFixture, 1e-9,
+                        "「下一次攻击造成的伤害提高 20%」"),
+                () -> Assertions.assertEquals(0.0, noDispel, 1e-9,
+                        "nothing to dispel ⇒ no boost"),
+                () -> Assertions.assertEquals(0.2, armed - before, 1e-9,
+                        "「下一次攻击造成的伤害提高 20%」"),
+                () -> Assertions.assertEquals(before, spent, 1e-9,
+                        "the boost was spent on that attack"));
     }
 
     // ==================================================================
@@ -353,19 +383,6 @@ public class PelaTest {
         TriggerFixture clean = new TriggerFixture();
         Assertions.assertTrue(table.matching(TriggerEvent.DEALING_DAMAGE, clean.ctx(false)).isEmpty(),
                 "Note: with none it does not: 「to an enemy target in a **negative effect**」");
-    }
-
-    /**
-     * trace The Secret Strategy (秘策) hands the whole side the effect-hit rate, and the file says so.
-     */
-    @Test
-    public void herTraceRaisesThePartysEffectHitRate() {
-        TriggerFixture f = new TriggerFixture();
-        Assertions.assertTrue(f.ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get() > 0,
-                "「while Pela is on the field, the effect hit rate of all of our side is increased by 10%」");
-        Assertions.assertEquals(4, TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1,
-                "census: the Secret Strategy (秘策) rule, the level-convention rule, and (2026-09-29) the technique's "
-                        + "「defence reduced by 20%」 which rolls a base chance");
     }
 
     /**

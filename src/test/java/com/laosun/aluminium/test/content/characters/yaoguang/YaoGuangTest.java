@@ -20,9 +20,16 @@ import java.util.List;
  * 1502 爻光 (Yao Guang) in one class: the talent 「大吉大利」 and the 【好活当赏】 gate it hides behind, the ultimate's
  * party-wide resistance penetration with its five 笑点, and the Skill's 结界 with the three 笑点 it pays per action.
  *
- * <p>These were five files in the same package. Nothing was dropped: every {@code @Test} keeps its body and the note that
+ * <p>These were five files in the same package. Nothing was dropped: every case keeps its assertions and the note that
  * says what it measures, the duplicated 1502/80 constants became one of each, and the zone fixture's helper was renamed so
  * it no longer collides with the ultimate group's {@code battle} field.
+ *
+ * <p><b>L3.</b> The three ultimate readings share one fixture ({@code build()}), one clause and one cast, so they are one
+ * scenario test with an {@code Assertions.assertAll}: the compiled {@code p1502_} rule's numbers, the five 笑点 on the
+ * party counter, and the +10% resistance penetration on the caster and every ally. Every assertion, expected value,
+ * tolerance and message is preserved. The two talent cases, the zone's 20% elation share, the Skill's three 笑点 and the
+ * no-zone control keep their own tests - different fixtures, different observed objects, and an absence is not something
+ * to fold into the positive it guards.
  */
 public class YaoGuangTest {
     private static final int WEARER = 1502;
@@ -117,56 +124,53 @@ public class YaoGuangTest {
     }
 
     /**
-     * 1502 Yao Guang's (爻光) ultimate on both counts: "获得 5 个笑点…并使我方全体目标全属性抗性穿透提高 10%，持续 3 回合".
+     * 1502 Yao Guang's (爻光) ultimate on all three counts: 「获得 5 个笑点…并使我方全体目标全属性抗性穿透提高 10%，持续 3 回合」.
      *
-     * <p>The laughs are a PARTY counter (the capability shipped in the previous round), so the judge reads them from the BATTLE and
-     * checks that the caster does not carry a private copy -- the same discriminator that made the party store necessary.
+     * <p>The shipped rule is read off the compiled table (discipline 232) - one {@code p1502_} rule on the cast setup, 10%,
+     * three turns, {@code all_allies}, and the second effect is the five laughs. The laughs are a PARTY counter (the capability
+     * shipped in the previous round), so the judge reads them from the BATTLE and checks that the caster does not carry a private
+     * copy -- the same discriminator that made the party store necessary.
+     *
+     * <p>All three readings sit on one fixture ({@code build()}) and one cast, so they are one scenario: the rule's numbers are
+     * read before the cast, because they are what the cast promises.
      */
     @Test
-    public void theUltimateLiftsTheWholePartysResistancePenetration() {
+    public void theUltimatePaysFiveLaughsAndLiftsTheWholePartysResistancePenetration() {
         build();
-        double selfBefore = yaoguang.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        double allyBefore = ally.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        battle.castImmediate(yaoguang.getSkills().get(SkillType.ULTRA), yaoguang, List.of());
-        double selfAfter = yaoguang.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        double allyAfter = ally.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        System.out.println("[1502] resistance penetration: herself " + selfBefore + " -> " + selfAfter
-                + " ; the ally " + allyBefore + " -> " + allyAfter);
-        Assertions.assertEquals(selfBefore + 0.1, selfAfter, 1e-9, "the caster gains 10%");
-        Assertions.assertEquals(allyBefore + 0.1, allyAfter, 1e-9, "and so does every ally (我方全体目标)");
-    }
-
-    @Test
-    public void theUltimateAlsoGivesThePartyFiveLaughs() {
-        build();
-        int before = battle.partyResourceValue(LAUGH);
-        battle.castImmediate(yaoguang.getSkills().get(SkillType.ULTRA), yaoguang, List.of());
-        int after = battle.partyResourceValue(LAUGH);
-        System.out.println("[1502] Punchline (笑点) on the battle: " + before + " -> " + after
-                + " ; the caster holds it herself? " + yaoguang.getResources().has(LAUGH)
-                + " ; the ally? " + ally.getResources().has(LAUGH));
-        Assertions.assertEquals(0, before, "the battle starts with none");
-        Assertions.assertEquals(5, after, "the ultimate grants five to the SHARED counter");
-        Assertions.assertFalse(yaoguang.getResources().has(LAUGH), "which no single unit owns");
-    }
-
-    /**
-     * The shipped rule, read off the compiled table (discipline 232).
-     */
-    @Test
-    public void theShippedRuleCarriesTheNumbersAndDuration() {
-        build();
-        var rules = yaoguang.getTriggerTable().rulesFor(com.laosun.aluminium.enums.TriggerEvent.CAST_SETUP).stream()
+        var rules = yaoguang.getTriggerTable().rulesFor(TriggerEvent.CAST_SETUP).stream()
                 .filter(rule -> rule.id().startsWith("p1502_")).toList();
-        Assertions.assertEquals(1, rules.size(), "one shipped rule on a cast setup");
         var effects = rules.getFirst().effects();
         System.out.println("[1502] spec " + rules.getFirst().id() + " effects=" + effects.size()
                 + " percent=" + effects.getFirst().getPercent() + " turns=" + effects.getFirst().getTurns()
                 + " target=" + effects.getFirst().getTarget());
-        Assertions.assertEquals(0.1, effects.getFirst().getPercent(), 1e-9, "10% penetration");
-        Assertions.assertEquals(3.0, effects.getFirst().getTurns(), 1e-9, "for three turns");
-        Assertions.assertEquals("all_allies", effects.getFirst().getTarget(), "on the whole party");
-        Assertions.assertEquals(5.0, effects.get(1).getAmount(), 1e-9, "and the second effect is the five laughs");
+
+        double selfBefore = yaoguang.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        double allyBefore = ally.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        int laughsBefore = battle.partyResourceValue(LAUGH);
+        battle.castImmediate(yaoguang.getSkills().get(SkillType.ULTRA), yaoguang, List.of());
+        double selfAfter = yaoguang.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        double allyAfter = ally.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
+        int laughsAfter = battle.partyResourceValue(LAUGH);
+        System.out.println("[1502] resistance penetration: herself " + selfBefore + " -> " + selfAfter
+                + " ; the ally " + allyBefore + " -> " + allyAfter);
+        System.out.println("[1502] Punchline (笑点) on the battle: " + laughsBefore + " -> " + laughsAfter
+                + " ; the caster holds it herself? " + yaoguang.getResources().has(LAUGH)
+                + " ; the ally? " + ally.getResources().has(LAUGH));
+
+        Assertions.assertAll("「获得 5 个笑点…并使我方全体目标全属性抗性穿透提高 10%，持续 3 回合」: the shipped rule and the party it moves",
+                () -> Assertions.assertEquals(1, rules.size(), "shipped rule: one shipped rule on a cast setup"),
+                () -> Assertions.assertEquals(0.1, effects.getFirst().getPercent(), 1e-9, "shipped rule: 10% penetration"),
+                () -> Assertions.assertEquals(3.0, effects.getFirst().getTurns(), 1e-9, "shipped rule: for three turns"),
+                () -> Assertions.assertEquals("all_allies", effects.getFirst().getTarget(), "shipped rule: on the whole party"),
+                () -> Assertions.assertEquals(5.0, effects.get(1).getAmount(), 1e-9,
+                        "shipped rule: and the second effect is the five laughs"),
+                () -> Assertions.assertEquals(selfBefore + 0.1, selfAfter, 1e-9,
+                        "「全属性抗性穿透提高 10%」: the caster gains 10%"),
+                () -> Assertions.assertEquals(allyBefore + 0.1, allyAfter, 1e-9,
+                        "「全属性抗性穿透提高 10%」: and so does every ally (我方全体目标)"),
+                () -> Assertions.assertEquals(0, laughsBefore, "「获得 5 个笑点」: the battle starts with none"),
+                () -> Assertions.assertEquals(5, laughsAfter, "「获得 5 个笑点」: the ultimate grants five to the SHARED counter"),
+                () -> Assertions.assertFalse(yaoguang.getResources().has(LAUGH), "「获得 5 个笑点」: which no single unit owns"));
     }
 
     /**

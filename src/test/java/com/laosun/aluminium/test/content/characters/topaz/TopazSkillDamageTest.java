@@ -25,6 +25,11 @@ import java.util.List;
  *
  * <p>So this judge pins two things that are both invisible to a smoke test: the Skill's total equals <b>one</b> instance of the same 150%, and that
  * instance belongs to the summon - hence the Ultimate's boost raises it.
+ *
+ * <p><b>L3:</b> the two single-clause cases that read the same {@code Scene} fixture are now ONE scenario test, and its
+ * assertions sit inside {@link Assertions#assertAll} with a message naming the clause: <b>one</b> instance, and
+ * 【涨幅惊人！】's reach into it. Every assertion, expected value, tolerance and message is unchanged, and each half keeps
+ * its own {@code Scene} - the buffed one needs the Ultimate, the plain one is the ratio's baseline.
  */
 public class TopazSkillDamageTest {
     private static final int TOPAZ = 1112;
@@ -32,31 +37,25 @@ public class TopazSkillDamageTest {
     private static final double EPS = 1e-9;
 
     /**
-     * The Skill settles <b>one</b> instance - and that instance is the one the mark then amplifies.
+     * The Skill settles <b>one</b> instance - and that instance is the one the mark and 【涨幅惊人！】then amplify.
      *
      * <p>⚠ The comparison is {@code strike / skill == 1.5}, not equality: the Skill applies 【负债证明】(「受到的追加攻击伤害提高 50%」)
      * in the SAME rule, <b>after</b> its damage, so the strike that follows rides the 50% while the Skill's own instance does not.
      * Equality was the first draft and it failed on 2026-11-09 - for the right reason, once the toughness bar was also pinned
      * (a 60-point skill breaks the stock monster, and the break's 9688 would have swamped everything).
+     *
+     * <p>战技的伤害是账账的 ⇒ 【涨幅惊人！】的两条修饰能加到它上面（记在托帕头上时加不到）; the same plain settlement is the
+     * baseline of that ratio.
+     *
+     * <p>One scenario, because both readings are the same object (the Skill's settlement on the same {@code Scene}) and both
+     * halves use that same fixture shape - only the buffed half adds the Ultimate.
      */
     @Test
-    public void theSkillsDamageIsOneInstanceOfNumbys() {
-        Scene scene = new Scene();
-        double skill = scene.skillDamage();
-        double strike = scene.strikeDamage();
-        System.out.println("[1112] skill=" + skill + " strike=" + strike + " 1.5atk=" + 1.5 * scene.attack());
-        Assertions.assertTrue(skill > 0, "precondition: the Skill dealt damage");
-        Assertions.assertEquals(1.5, strike / skill, 0.01,
-                "one instance, and the 50% the Skill applies on top: " + (strike / skill));
-        Assertions.assertTrue(skill < 4 * 1.5 * scene.attack(),
-                "the Skill's own instance stays within one hit's zones (a second settlement would be an order of magnitude bigger): " + skill);
-    }
-
-    /** 战技的伤害是账账的 ⇒ 【涨幅惊人！】的两条修饰能加到它上面（记在托帕头上时加不到）。 */
-    @Test
-    public void windfallReachesTheSkillsDamageToo() {
+    public void theSkillsDamageIsOneInstanceOfNumbysAndWindfallReachesIt() {
         Scene plain = new Scene();
-        double without = plain.skillDamage();
+        double skill = plain.skillDamage();
+        double strike = plain.strikeDamage();
+        double attack = plain.attack();
 
         Scene buffed = new Scene();
         double fireBoost = buffed.summon().getAttribute(AttributeType.FIRE_DAMAGE_BOOST).get();
@@ -65,11 +64,19 @@ public class TopazSkillDamageTest {
         double critAfter = buffed.summon().getAttribute(AttributeType.CRIT_ATTACK).get();
         double with = buffed.skillDamage();
 
+        double ratio = strike / skill;
         double expected = (1 + fireBoost + 1.5) / (1 + fireBoost) * (1 + critAfter) / (1 + critBefore);
-        System.out.println("[1112] skill: plain=" + without + " windfall=" + with
-                + " ratio=" + (with / without) + " expected=" + expected);
-        Assertions.assertEquals(expected, with / without, 0.01,
-                "「伤害倍率提高 150%」 reaches the Skill's instance only because its attacker is the summon");
+        System.out.println("[1112] skill=" + skill + " strike=" + strike + " 1.5atk=" + 1.5 * attack);
+        System.out.println("[1112] skill: plain=" + skill + " windfall=" + with
+                + " ratio=" + (with / skill) + " expected=" + expected);
+        Assertions.assertAll("战技: one instance of the 150%, and 【涨幅惊人！】's reach into it",
+                () -> Assertions.assertTrue(skill > 0, "precondition: the Skill dealt damage"),
+                () -> Assertions.assertEquals(1.5, ratio, 0.01,
+                        "one instance, and the 50% the Skill applies on top: " + ratio),
+                () -> Assertions.assertTrue(skill < 4 * 1.5 * attack,
+                        "the Skill's own instance stays within one hit's zones (a second settlement would be an order of magnitude bigger): " + skill),
+                () -> Assertions.assertEquals(expected, with / skill, 0.01,
+                        "「伤害倍率提高 150%」 reaches the Skill's instance only because its attacker is the summon"));
     }
 
     private static final class Scene {

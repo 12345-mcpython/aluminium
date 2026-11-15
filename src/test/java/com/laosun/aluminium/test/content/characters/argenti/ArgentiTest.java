@@ -56,7 +56,7 @@ import java.util.Random;
  * <p><b>One witness, one fix.</b> Eidolon 1 is still a flat +4% crit damage instead of per layer; it is measured and
  * registered in the file's {@code _gaps}, and the witness at the bottom pins today's reading so that a fix turns it red.
  * The talent's "for each enemy hit, gain 1 layer" is fixed: {@code times_from: "hit_count"} makes the stack follow the
- * attack's hit count, and {@code threeEnemiesGiveThreeStacks} pins both the three-hit and the one-hit case.
+ * attack's hit count, and {@code theTalentStacksOncePerCastAndOncePerHit} pins both the three-hit and the one-hit case.
  *
  * <p><b>Technique.</b> 「进入战斗时，对敌方全体造成等同于银枝 80% 攻击力的物理属性伤害，并使银枝恢复 15 点能量」.
  */
@@ -113,51 +113,42 @@ public class ArgentiTest {
     // ==================================================================
 
     /**
-     * A mid-battle enemy, through either door, pays exactly the trace's 2 energy.
+     * A mid-battle enemy, through either door, pays exactly the trace's 2 energy; the same unit twice pays once; an ally
+     * joining is not an enemy entering; and a roster laid out before the battle starts has not "entered".
      */
     @Test
-    public void anEnemyEnteringPaysTheTrace() {
+    public void anEnteringEnemyPaysTheTrace() {
         GenerousFixture f = new GenerousFixture();
-        double before = f.argenti.getCurrentEnergy();
+        double baseline = f.argenti.getCurrentEnergy();
+
         f.battle.addEnemy(BattleFixture.monster());
-        Assertions.assertEquals(before + TRACE_ENERGY, f.argenti.getCurrentEnergy(), 1e-9,
-                "addEnemy: 「在敌方目标进入战斗时，立即恢复 2 点能量」");
-
-        double afterFirst = f.argenti.getCurrentEnergy();
+        double afterAddEnemy = f.argenti.getCurrentEnergy();
         f.battle.addCombatant(BattleFixture.monster());
-        Assertions.assertEquals(afterFirst + TRACE_ENERGY, f.argenti.getCurrentEnergy(), 1e-9,
-                "addCombatant: the other door into the enemy roster");
-    }
+        double afterAddCombatant = f.argenti.getCurrentEnergy();
 
-    /**
-     * The same unit twice pays once; an ally joining is not an enemy entering.
-     */
-    @Test
-    public void aRepeatOrAnAllyPaysNothing() {
-        GenerousFixture f = new GenerousFixture();
+        GenerousFixture repeat = new GenerousFixture();
         Enemy once = BattleFixture.monster();
-        f.battle.addEnemy(once);
-        double afterFirst = f.argenti.getCurrentEnergy();
-        f.battle.addEnemy(once);
-        Assertions.assertEquals(afterFirst, f.argenti.getCurrentEnergy(), 1e-9, "the same enemy twice pays once");
-
-        f.battle.addCombatant(CharacterFactory.create(GENEROUS_ALLY, LEVEL));
-        Assertions.assertEquals(afterFirst, f.argenti.getCurrentEnergy(), 1e-9, "an ally is not an entering enemy");
-    }
-
-    /**
-     * A roster laid out before the battle starts has not "entered": the opening pays nothing for it.
-     */
-    @Test
-    public void anEnemyAddedBeforeTheBattlePaysNothing() {
-        GenerousFixture f = new GenerousFixture();
-        double baselineAfterStart = f.argenti.getCurrentEnergy();
+        repeat.battle.addEnemy(once);
+        double afterOnce = repeat.argenti.getCurrentEnergy();
+        repeat.battle.addEnemy(once);
+        double afterRepeat = repeat.argenti.getCurrentEnergy();
+        repeat.battle.addCombatant(CharacterFactory.create(GENEROUS_ALLY, LEVEL));
+        double afterAlly = repeat.argenti.getCurrentEnergy();
 
         GenerousFixture pre = new GenerousFixture(false);
         pre.battle.addEnemy(BattleFixture.monster());
         pre.battle.startBattle();
-        Assertions.assertEquals(baselineAfterStart, pre.argenti.getCurrentEnergy(), 1e-9,
-                "added before startBattle: no ENEMY_ENTERED, so no trace energy");
+        double preBattleEnergy = pre.argenti.getCurrentEnergy();
+
+        Assertions.assertAll("trace 慷慨: only an enemy entering mid-battle pays 2 energy",
+                () -> Assertions.assertEquals(baseline + TRACE_ENERGY, afterAddEnemy, 1e-9,
+                        "addEnemy: 「在敌方目标进入战斗时，立即恢复 2 点能量」"),
+                () -> Assertions.assertEquals(afterAddEnemy + TRACE_ENERGY, afterAddCombatant, 1e-9,
+                        "addCombatant: the other door into the enemy roster"),
+                () -> Assertions.assertEquals(afterOnce, afterRepeat, 1e-9, "the same enemy twice pays once"),
+                () -> Assertions.assertEquals(afterOnce, afterAlly, 1e-9, "an ally is not an entering enemy"),
+                () -> Assertions.assertEquals(baseline, preBattleEnergy, 1e-9,
+                        "added before startBattle: no ENEMY_ENTERED, so no trace energy"));
     }
 
     // ==================================================================
@@ -185,41 +176,80 @@ public class ArgentiTest {
     // ==================================================================
 
     /**
-     * All three cast slots feed the talent: "when casting a basic attack, Skill or Ultimate ... gain 1 stack of [升格]".
+     * The talent's 「施放普攻、战技、终结技时，每击中 1 个敌方目标，获得 1 层【升格】」: every cast slot marks exactly once,
+     * and the number of layers follows the event's hit count (three targets hit give three, a single target gives one).
      *
-     * <p>Note: The energy half of the same sentence ("for each 1 enemy target hit ... restore 3 energy") is {@code per_target}, and its
-     * arithmetic already has its own pin in {@code CastAppliedCountTest} - the engine exposes no public "current energy"
-     * reader, and inventing one for a test would be a worse trade than pointing at the case that exists. What is pinned
-     * here is what this file adds: <b>three rules</b>, one per cast event, each marking exactly once.
+     * <p>Note: The energy half of the same sentence ("for each 1 enemy target hit ... restore 3 energy") is {@code per_target},
+     * and its arithmetic already has its own pin in {@code CastAppliedCountTest} - the engine exposes no public "current
+     * energy" reader, and inventing one for a test would be a worse trade than pointing at the case that exists. What is
+     * pinned here is what this file adds: <b>three rules</b>, one per cast event, each marking exactly once.
      */
     @Test
-    public void allThreeSlotsFeedTheTalent() {
-        StacksFixture f = new StacksFixture();
-        for (TriggerEvent cast : List.of(TriggerEvent.BASIC_ATTACK, TriggerEvent.SKILL_CAST, TriggerEvent.ULT_CAST)) {
-            int before = f.argenti.getBuffManager().stacksOf("升格");
-            f.fireCast(cast, 1);
-            int after = f.argenti.getBuffManager().stacksOf("升格");
-            Assertions.assertEquals(1, after - before, cast + " marks 【升格】 (Apotheosis) exactly once");
-        }
+    public void theTalentStacksOncePerCastAndOncePerHit() {
+        StacksFixture casts = new StacksFixture();
+        StacksFixture hits = new StacksFixture(0, 3);
+        hits.fireCast(TriggerEvent.BASIC_ATTACK, 3);
+        int threeHitStacks = hits.argenti.getBuffManager().stacksOf("升格");
+        double threeHitCrit = hits.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
+        hits.fireCast(TriggerEvent.SKILL_CAST, 1);
+        int oneHitStacks = hits.argenti.getBuffManager().stacksOf("升格");
+
+        Assertions.assertAll("talent 【升格】: one layer per cast event, one per target hit",
+                () -> {
+                    for (TriggerEvent cast : List.of(TriggerEvent.BASIC_ATTACK, TriggerEvent.SKILL_CAST,
+                            TriggerEvent.ULT_CAST)) {
+                        int before = casts.argenti.getBuffManager().stacksOf("升格");
+                        casts.fireCast(cast, 1);
+                        Assertions.assertEquals(1, casts.argenti.getBuffManager().stacksOf("升格") - before,
+                                cast + " marks 【升格】 (Apotheosis) exactly once");
+                    }
+                },
+                () -> Assertions.assertEquals(3, threeHitStacks, "three enemies hit: three layers, not one"),
+                () -> Assertions.assertEquals(0.05 + 3 * 0.025, threeHitCrit, 1e-9,
+                        "…and the attribute shows all three"),
+                () -> Assertions.assertEquals(4, oneHitStacks, "a single-target cast adds one more, not three"));
     }
 
-
     /**
-     * [升格] stacks up to its cap and each stack is a crit-rate step.
+     * [升格] stacks up to its cap and each stack is a crit-rate step; Eidolon 4's second half - "make the talent's effect
+     * <b>max stack count raise by 2</b>" - really does move that cap.
+     *
+     * <p>Note: the Eidolon-4 half is measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: Eidolon 4
+     * grants two layers at battle start and they share the talent's stack group, so a cap of 12 is reached by 2 + 10 -
+     * twelve more hits still only add ten. The probe printed, at E0 vs E4: 10 stacks / crit 0.30 against 12 stacks in the
+     * group / crit 0.35 - the raise is real, and an expectation of "base + 12  x  0.025" double-counts those two layers.
+     * Note: `stacksOf("升格")` is <b>not</b> usable there either: three modifier groups carry that name (the talent's crit
+     * rate, Eidolon 1's crit damage, Eidolon 4's battle-start pair), and a name count adds them up.
      */
     @Test
-    public void theStacksCapAtTen() {
-        StacksFixture f = new StacksFixture();
-        double base = f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
-
+    public void theStacksCapAtTenAndTheFourthEidolonRaisesTheCap() {
+        StacksFixture capped = new StacksFixture();
+        double base = capped.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
         for (int i = 0; i < 12; i++) {
-            f.fireCast(TriggerEvent.BASIC_ATTACK, 1);
+            capped.fireCast(TriggerEvent.BASIC_ATTACK, 1);
         }
+        double cappedCrit = capped.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
+        int cappedStacks = capped.argenti.getBuffManager().stacksOf("升格");
 
-        Assertions.assertEquals(base + 10 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
-                "「该效果最多叠加10层」 (this effect stacks at most 10 times): twelve hits give ten stacks, not twelve");
-        Assertions.assertEquals(10, f.argenti.getBuffManager().stacksOf("升格"),
-                "…and the count is readable by name, which is what Eidolon 4 and any removal would use");
+        StacksFixture fourthEidolon = new StacksFixture(4);
+        double fourthEidolonBase = fourthEidolon.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
+        for (int i = 0; i < 12; i++) {
+            fourthEidolon.fireCast(TriggerEvent.BASIC_ATTACK, 1);
+        }
+        double fourthEidolonCrit = fourthEidolon.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
+        // 0.028, not 0.025: at rank 4 her Eidolon 3 has already raised the TALENT by two, so the row the rule reads is
+        // Lv12 (0.025 at Lv10, 0.028 at Lv12). That difference is exactly why the rule reads the row instead of a literal.
+        int fourthEidolonBonus = fourthEidolon.argenti.ruleEffectMaxStacksBonus("talent_stack_basic");
+
+        Assertions.assertAll("【升格】 cap: ten layers, raised by Eidolon 4",
+                () -> Assertions.assertEquals(base + 10 * 0.025, cappedCrit, 1e-6,
+                        "「该效果最多叠加10层」 (this effect stacks at most 10 times): twelve hits give ten stacks, not twelve"),
+                () -> Assertions.assertEquals(10, cappedStacks,
+                        "…and the count is readable by name, which is what Eidolon 4 and any removal would use"),
+                () -> Assertions.assertEquals(fourthEidolonBase + 10 * 0.028, fourthEidolonCrit, 1e-6,
+                        "12 layers in the group: the two granted at battle start plus ten more from the hits"),
+                () -> Assertions.assertEquals(2, fourthEidolonBonus,
+                        "…and the amendment is filed against the named rule — the mechanism, not a coincidence"));
     }
 
     /**
@@ -249,31 +279,6 @@ public class ArgentiTest {
         Assertions.assertEquals(2, TriggerTables.of(ARGENTI).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "the trace Courage (勇气): the target's HP percentage -- no per-target vocabulary needed, because the condition's subject "
                         + "is already the unit being hit) and Eidolon 6's defence ignore");
-    }
-
-    /**
-     * Eidolon 4's second half: "make the talent's effect <b>max stack count raise by 2</b>" - the cap really does move.
-     *
-     * <p>Note: Measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: Eidolon 4 grants two layers at battle
-     * start and they share the talent's stack group, so a cap of 12 is reached by 2 + 10 - twelve more hits still only
-     * add ten. The probe printed, at E0 vs E4: 10 stacks / crit 0.30 against 12 stacks in the
-     * group / crit 0.35 - the raise is real, and an expectation of "base + 12  x  0.025" double-counts those two layers.
-     * Note: `stacksOf("升格")` is <b>not</b> usable here either: three modifier groups carry that name (the talent's crit
-     * rate, Eidolon 1's crit damage, Eidolon 4's battle-start pair), and a name count adds them up.
-     */
-    @Test
-    public void theFourthEidolonRaisesTheStackCap() {
-        StacksFixture f = new StacksFixture(4);
-        double base = f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
-        for (int i = 0; i < 12; i++) {
-            f.fireCast(TriggerEvent.BASIC_ATTACK, 1);
-        }
-        // 0.028, not 0.025: at rank 4 her Eidolon 3 has already raised the TALENT by two, so the row the rule reads is
-        // Lv12 (0.025 at Lv10, 0.028 at Lv12). That difference is exactly why the rule reads the row instead of a literal.
-        Assertions.assertEquals(base + 10 * 0.028, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
-                "12 layers in the group: the two granted at battle start plus ten more from the hits");
-        Assertions.assertEquals(2, f.argenti.ruleEffectMaxStacksBonus("talent_stack_basic"),
-                "…and the amendment is filed against the named rule — the mechanism, not a coincidence");
     }
 
     /**
@@ -381,27 +386,6 @@ public class ArgentiTest {
                 "「每层【升格】额外使暴击伤害提高 4%」 - five layers = +0.20 over the base 0.5");
         Assertions.assertEquals(0.175, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
                 "and the crit-rate half stacks the same way (0.025 x 5 over its base)");
-    }
-
-    /**
-     * The talent's stack follows the attack: 「每击中 1 个敌方目标，…获得 1 层【升格】」.
-     *
-     * <p>Three targets hit give three layers, one target gives one - the effect repeats on the event's hit count
-     * ({@code times_from: "hit_count"}), not once per cast.
-     */
-    @Test
-    public void threeEnemiesGiveThreeStacks() {
-        StacksFixture f = new StacksFixture(0, 3);
-        f.fireCast(TriggerEvent.BASIC_ATTACK, 3);
-
-        Assertions.assertEquals(3, f.argenti.getBuffManager().stacksOf("升格"),
-                "three enemies hit: three layers, not one");
-        Assertions.assertEquals(0.05 + 3 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
-                "…and the attribute shows all three");
-
-        f.fireCast(TriggerEvent.SKILL_CAST, 1);
-        Assertions.assertEquals(4, f.argenti.getBuffManager().stacksOf("升格"),
-                "a single-target cast adds one more, not three");
     }
 
     // ==================================================================
