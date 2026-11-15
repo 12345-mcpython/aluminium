@@ -78,7 +78,7 @@ public class HimekoTest {
     /**
      * The resource her Talent declares.
      */
-    private static final String CHARGE = "充能";
+    private static final String CHARGE = "char:1003/charge";
     /**
      * The row the document quotes for a maxed ability (its param tables are 1-based).
      */

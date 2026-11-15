@@ -67,6 +67,8 @@ public class CharacterResourceTest {
     private static final int PLAIN = 1002;
     private static final int LEVEL = 80;
     private static final String CHARGE = "充能";
+    /** Himeko's own charge, as her rule file spells it after the identity migration. */
+    private static final String HIMEKO_CHARGE = "char:1003/charge";
 
     /**
      * The fixture cids (see {@code src/test/resources/game/characters/}).
@@ -182,11 +184,11 @@ public class CharacterResourceTest {
         Character plain = CharacterFactory.create(PLAIN, LEVEL);
 
         Assertions.assertAll("declared = registered on the character",
-                () -> Assertions.assertTrue(himeko.getResources().has(CHARGE),
+                () -> Assertions.assertTrue(himeko.getResources().has(HIMEKO_CHARGE),
                         "himeko: she declares it in characters/1003.json"),
-                () -> Assertions.assertEquals(0, himeko.getResources().value(CHARGE),
+                () -> Assertions.assertEquals(0, himeko.getResources().value(HIMEKO_CHARGE),
                         "himeko: at 0: 「战斗开始时获得1点充能」 (gain 1 charge at battle start) is a rule, so it is the battle that fills it"),
-                () -> Assertions.assertEquals(3, himeko.getResources().get(CHARGE).getMax(),
+                () -> Assertions.assertEquals(3, himeko.getResources().get(HIMEKO_CHARGE).getMax(),
                         "himeko: with the declared cap"),
                 () -> Assertions.assertEquals(0, plain.getResources().size(),
                         "plain: a character without declarations has no resources"));

@@ -9,7 +9,7 @@
   ],
   "resources": [
     {
-      "id": "充能",
+      "id": "char:1015/charge",
       "max": 4,
       "source": "1015 Archer 终结技 无限剑制 (101503): 「对指定敌方单体造成等同于Archer 1000%攻击力的量子属性伤害，并获得 2 点充能，最多可拥有 4 点充能。」",
       "note": "上限 **4** 与每次 **2** 都来自同一行（`skills.json` 1015 槽 3 的 Lv10 = `[10, 2, 4]` ⇒ #2 = 2、#3 = 4 ✓）。⚠ 上限是**声明**（`GAIN_RESOURCE` 的钳位就在这里 ✓），不在规则里再写一次 ✗；⚠ 初始值文档没说 ⇒ 默认 **0** ✓，而「进入战斗时获得 1 点」是**行迹** 1015102 的一条规则 ✓（两条相加，不是把 initial 改成 1 ✗）。"
@@ -252,7 +252,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1015/charge",
           "amount": 2,
           "target": "self"
         }
@@ -265,12 +265,12 @@
       "id": "talent_follow_up_on_a_teammates_attack",
       "when": [
         "actor is_other_ally",
-        "self_resource:充能 >= 1"
+        "self_resource:char:1015/charge >= 1"
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1015/charge",
           "amount": 1,
           "target": "self"
         },
@@ -314,7 +314,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1015/charge",
           "amount": 1,
           "target": "self"
         }
@@ -341,7 +341,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1015/charge",
           "amount": 1,
           "target": "self"
         }

@@ -45,6 +45,16 @@
       "key": "char:1002/hidden_dragon"
     },
     {
+      "name": "char:1003/charge",
+      "owner": "1003",
+      "kind": "char",
+      "used_by": [
+        "1003"
+      ],
+      "zh": "充能",
+      "key": "char:1003/charge"
+    },
+    {
       "name": "char:1004/empower",
       "owner": "1004",
       "kind": "char",
@@ -105,6 +115,16 @@
       "key": "char:1014/mana_release"
     },
     {
+      "name": "char:1015/charge",
+      "owner": "1015",
+      "kind": "char",
+      "used_by": [
+        "1015"
+      ],
+      "zh": "充能",
+      "key": "char:1015/charge"
+    },
+    {
       "name": "char:1015/loop_link",
       "owner": "1015",
       "kind": "char",
@@ -153,6 +173,16 @@
       ],
       "zh": "赐福",
       "key": "char:1202/blessing"
+    },
+    {
+      "name": "char:1205/charge",
+      "owner": "1205",
+      "kind": "char",
+      "used_by": [
+        "1205"
+      ],
+      "zh": "充能",
+      "key": "char:1205/charge"
     },
     {
       "name": "char:1210/fire_swallow",
@@ -205,6 +235,16 @@
       "key": "char:1215/edict"
     },
     {
+      "name": "char:1223/charge",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ],
+      "zh": "充能",
+      "key": "char:1223/charge"
+    },
+    {
       "name": "char:1223/isolated",
       "owner": "1223",
       "kind": "char",
@@ -233,6 +273,16 @@
       ],
       "zh": "猎物",
       "key": "char:1223/prey"
+    },
+    {
+      "name": "char:1224/charge",
+      "owner": "1224",
+      "kind": "char",
+      "used_by": [
+        "1224"
+      ],
+      "zh": "充能",
+      "key": "char:1224/charge"
     },
     {
       "name": "char:1224/empower",
@@ -303,6 +353,26 @@
       ],
       "zh": "揭露",
       "key": "char:1307/epiphany"
+    },
+    {
+      "name": "char:1314/charge",
+      "owner": "1314",
+      "kind": "char",
+      "used_by": [
+        "1314"
+      ],
+      "zh": "充能",
+      "key": "char:1314/charge"
+    },
+    {
+      "name": "char:1317/charge",
+      "owner": "1317",
+      "kind": "char",
+      "used_by": [
+        "1317"
+      ],
+      "zh": "充能",
+      "key": "char:1317/charge"
     },
     {
       "name": "char:1402/amazing_buff",
@@ -785,6 +855,16 @@
       ],
       "zh": "吞纳沙砾",
       "key": "char:1503/sand_absorb"
+    },
+    {
+      "name": "char:1504/charge",
+      "owner": "1504",
+      "kind": "char",
+      "used_by": [
+        "1504"
+      ],
+      "zh": "充能",
+      "key": "char:1504/charge"
     },
     {
       "name": "char:1506/hidden_score",
@@ -1437,6 +1517,26 @@
       "key": "char:24004/calculation"
     },
     {
+      "name": "char:8007/charge",
+      "owner": "8007",
+      "kind": "char",
+      "used_by": [
+        "8007"
+      ],
+      "zh": "充能",
+      "key": "char:8007/charge"
+    },
+    {
+      "name": "char:8008/charge",
+      "owner": "8008",
+      "kind": "char",
+      "used_by": [
+        "8008"
+      ],
+      "zh": "充能",
+      "key": "char:8008/charge"
+    },
+    {
       "name": "ctrl:frozen",
       "owner": "battle",
       "kind": "battle",
@@ -2025,86 +2125,6 @@
       "used_by": [
         "8005",
         "8006"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1003",
-      "kind": "char",
-      "used_by": [
-        "1003"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1015",
-      "kind": "char",
-      "used_by": [
-        "1015"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1205",
-      "kind": "char",
-      "used_by": [
-        "1205"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1223",
-      "kind": "char",
-      "used_by": [
-        "1223"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1224",
-      "kind": "char",
-      "used_by": [
-        "1224"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1314",
-      "kind": "char",
-      "used_by": [
-        "1314"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1317",
-      "kind": "char",
-      "used_by": [
-        "1317"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "1504",
-      "kind": "char",
-      "used_by": [
-        "1504"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "8007",
-      "kind": "char",
-      "used_by": [
-        "8007"
-      ]
-    },
-    {
-      "name": "充能",
-      "owner": "8008",
-      "kind": "char",
-      "used_by": [
-        "8008"
       ]
     },
     {

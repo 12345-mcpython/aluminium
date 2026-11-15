@@ -124,7 +124,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "充能",
+          "buff": "char:1205/charge",
           "amount": 1,
           "max_stacks": 5,
           "permanent": true,
@@ -145,7 +145,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "充能",
+          "buff": "char:1205/charge",
           "amount": 1,
           "max_stacks": 4,
           "permanent": true,
@@ -161,8 +161,8 @@
       "id": "talent_followup_at_full_charge",
       "max_eidolon": 5,
       "when": [
-        "self stack_added 充能",
-        "self_stacks:充能 >= 5"
+        "self stack_added char:1205/charge",
+        "self_stacks:char:1205/charge >= 5"
       ],
       "do": [
         {
@@ -189,10 +189,10 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "充能",
+          "buff": "char:1205/charge",
           "value": {
             "type": "stacks",
-            "buff": "充能"
+            "buff": "char:1205/charge"
           },
           "target": "self"
         }
@@ -206,8 +206,8 @@
       "id": "talent_followup_at_full_charge_eidolon6",
       "min_eidolon": 6,
       "when": [
-        "self stack_added 充能",
-        "self_stacks:充能 >= 4"
+        "self stack_added char:1205/charge",
+        "self_stacks:char:1205/charge >= 4"
       ],
       "do": [
         {
@@ -234,10 +234,10 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "充能",
+          "buff": "char:1205/charge",
           "value": {
             "type": "stacks",
-            "buff": "充能"
+            "buff": "char:1205/charge"
           },
           "target": "self"
         }

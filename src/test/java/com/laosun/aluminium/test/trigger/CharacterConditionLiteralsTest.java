@@ -151,9 +151,9 @@ public class CharacterConditionLiteralsTest {
                 List.of("from_category ULTRA", "damage_is_main_target"));
         assertRule(1205, "TAKING_HIT", "talent_charge_on_hit_eidolon6", List.of("target == self"));
         assertRule(1205, "STACK_GAINED", "talent_followup_at_full_charge",
-                List.of("self stack_added 充能", "self_stacks:充能 >= 5.0"));
+                List.of("self stack_added char:1205/charge", "self_stacks:char:1205/charge >= 5.0"));
         assertRule(1205, "STACK_GAINED", "talent_followup_at_full_charge_eidolon6",
-                List.of("self stack_added 充能", "self_stacks:充能 >= 4.0"));
+                List.of("self stack_added char:1205/charge", "self_stacks:char:1205/charge >= 4.0"));
         assertRule(1205, "DEALING_DAMAGE", "eidolon6_the_talent_followup_takes_half_the_max_hp",
                 List.of("actor == self", "damage_type_is TALENT"));
         assertRule(1205, "HP_LOST", "eidolon4_the_crossing_raises_his_max_hp",
@@ -309,7 +309,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1314, "ALLY_ATTACK", "talent_charge_for_the_collectors_hits",
                 List.of("actor has_state 收债人", "actor != self"));
         assertRule(1314, "RESOURCE_CHANGED", "talent_follow_up_at_eight_charge",
-                List.of("resource_changed:充能", "self_resource:充能 >= 8.0"));
+                List.of("resource_changed:char:1314/charge", "self_resource:char:1314/charge >= 8.0"));
         assertRule(1314, "ALLY_ATTACK", "eidolon1_two_targets_pay_one_more",
                 List.of("actor has_state 收债人", "hit_count == 2.0"));
         assertRule(1314, "ALLY_ATTACK", "eidolon1_one_target_pays_two_more",

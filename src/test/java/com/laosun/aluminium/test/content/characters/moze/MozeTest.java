@@ -59,7 +59,7 @@ public class MozeTest {
     private static final int MOZE = 1223;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String CHARGE = "充能";
+    private static final String CHARGE = "char:1223/charge";
     private static final String PREY = "char:1223/prey";
 
     // ==================================================================

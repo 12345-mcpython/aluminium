@@ -84,7 +84,7 @@ public class BladeTest {
     private static final int LEVEL = 80;
     private static final String STATE = "地狱变";
     private static final String TALLY = "累计损失生命";
-    private static final String CHARGE = "充能";
+    private static final String CHARGE = "char:1205/charge";
 
     // ==================================================================
     // 【地狱变】 - the state and its three clauses
@@ -244,9 +244,9 @@ public class BladeTest {
 
         for (int i = 0; i < 12; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, blade, 0, 0));
-            Assertions.assertTrue(blade.getBuffManager().stacksOf("充能") <= 5,
+            Assertions.assertTrue(blade.getBuffManager().stacksOf("char:1205/charge") <= 5,
                     "「最多叠加5层」 (stacks at most 5 times) - hit " + (i + 1) + " read "
-                            + blade.getBuffManager().stacksOf("充能"));
+                            + blade.getBuffManager().stacksOf("char:1205/charge"));
         }
         // And the layers are still being gained: four hits must read four (the follow-up empties them at five).
         Character fresh = CharacterFactory.create(BLADE, LEVEL);
@@ -256,7 +256,7 @@ public class BladeTest {
             second.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT,
                     second.enemies().getFirst(), fresh, 0, 0));
         }
-        Assertions.assertEquals(4, fresh.getBuffManager().stacksOf("充能"),
+        Assertions.assertEquals(4, fresh.getBuffManager().stacksOf("char:1205/charge"),
                 "below the cap every hit still adds a layer");
     }
 

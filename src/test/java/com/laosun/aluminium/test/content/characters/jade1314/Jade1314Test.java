@@ -45,7 +45,7 @@ public class Jade1314Test {
     private static final double EPS = 1e-9;
     private static final String COLLECTOR = "收债人";
     private static final String GOODS = "当品";
-    private static final String CHARGE = "充能";
+    private static final String CHARGE = "char:1314/charge";
 
     // ==================================================================
     // The Skill, first clause: 指定我方单体成为【收债人】, the +30 SPEED,

@@ -293,7 +293,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1314/charge",
           "amount": 1,
           "times_from": "hit_count"
         }
@@ -312,7 +312,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1314/charge",
           "amount": 1,
           "times_from": "hit_count"
         }
@@ -325,13 +325,13 @@
       "on": "RESOURCE_CHANGED",
       "id": "talent_follow_up_at_eight_charge",
       "when": [
-        "resource_changed:充能",
-        "self_resource:充能 >= 8"
+        "resource_changed:char:1314/charge",
+        "self_resource:char:1314/charge >= 8"
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1314/charge",
           "amount": 8
         },
         {
@@ -365,7 +365,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1314/charge",
           "amount": 1
         }
       ],
@@ -384,7 +384,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1314/charge",
           "amount": 2
         }
       ],
@@ -433,7 +433,7 @@
   ],
   "resources": [
     {
-      "id": "充能",
+      "id": "char:1314/charge",
       "max": 8,
       "source": "1314 翡翠 天赋 有无之间: 「每击中1名敌方目标均可获得1点充能。当充能到达8点后，消耗8点充能，发动1次追加攻击…」 ⇒ 上限 **8**（「到达 8 点后消耗 8 点」就是它需要的最大存量 ✓）。",
       "note": "⚠ 文档只写「到达 8 点后消耗 8 点」，没有单列「上限 8 点」⇒ 这里按**消耗阈值**声明 8（多给的会先夹到 8 再被消耗，与「到达即消耗」等价 ✓）。⚠ 初始 0（文档没说初始值 ⇒ 默认 ✓）。"

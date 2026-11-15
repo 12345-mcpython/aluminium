@@ -13,7 +13,7 @@
   ],
   "resources": [
     {
-      "id": "充能",
+      "id": "char:1224/charge",
       "max": 10,
       "source": "1224 三月七 天赋 师父，我悟了！ (122404, Enhance): 「【师父】施放攻击或终结技后，三月七每次获得最多1点充能。充能大于等于7点时，三月七立即行动，造成的伤害提高80%，普攻得到强化且无法施放战技。施放强化普攻后，消耗7点充能。充能上限10点。」",
       "note": "上限 **10** 是**文档原话** ✓（「充能**上限 10 点**」✓）。⚠ 文档**没说初始值** ✗ ⇒ 保持声明的默认 **0** ✓（不编 ✓）。⚠ 本文件只声明容量 ✓ 与三处**固定**获取（普攻 +1 ✓、师父攻击 +1 ✓、师父终结技 +1 ✓）；「充能 ≥7 时的状态机」✗ 与「施放强化普攻后消耗 7 点」✗ 都登记在 `level_convention` 里 ✓。"
@@ -83,7 +83,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1224/charge",
           "amount": 1
         }
       ],
@@ -99,7 +99,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1224/charge",
           "amount": 1
         }
       ],
@@ -115,7 +115,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1224/charge",
           "amount": 1
         }
       ],
@@ -141,8 +141,8 @@
       "on": "RESOURCE_CHANGED",
       "id": "talent_seven_charges_empower_her",
       "when": [
-        "resource_changed:充能",
-        "self_resource:充能 >= 7"
+        "resource_changed:char:1224/charge",
+        "self_resource:char:1224/charge >= 7"
       ],
       "do": [
         {
@@ -163,7 +163,7 @@
           "percent": 0.8,
           "permanent": true,
           "while_state": "char:1224/empower",
-          "while_resource": "充能",
+          "while_resource": "char:1224/charge",
           "while_resource_min": 7,
           "target": "self"
         },
@@ -189,7 +189,7 @@
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1224/charge",
           "amount": 7
         },
         {
@@ -301,7 +301,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1224/charge",
           "amount": 1
         }
       ],

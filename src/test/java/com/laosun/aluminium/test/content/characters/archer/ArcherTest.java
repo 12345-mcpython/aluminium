@@ -70,7 +70,7 @@ public class ArcherTest {
     private static final int ARCHER = 1015;
     private static final int ALLY = 1204;
     private static final int LEVEL = 80;
-    private static final String CHARGE = "充能";
+    private static final String CHARGE = "char:1015/charge";
     private static final String LOOP = "char:1015/loop_link";
     private static final String CYCLES = "internal:1015/loop_count";
     private static final String LAYERS = "internal:1015/loop_layers";

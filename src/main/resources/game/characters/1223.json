@@ -11,7 +11,7 @@
   ],
   "resources": [
     {
-      "id": "充能",
+      "id": "char:1223/charge",
       "max": 2147483647,
       "source": "1223 貊泽 战技 迅羽掠袭: 「…并获得9点充能。」／天赋 伸天卑飞，折翅为芒: 「…并消耗1点充能。每消耗3点充能…当充能为0时…」",
       "note": "文档通篇**没写上限**（战技只写「获得 9 点」、天赋只写「消耗 1 点」「每 3 点」）⇒ 按本库既有约定（1408 的【毁伤】）用 `Integer.MAX_VALUE` 表示「不设上限」，不臆造数值。⚠ 2026-11-09 之前这里登记的是「充能没有上限 ⇒ 不能声明 ⇒ 每一句都写不了」—— **那个结论是错的**：`ResourceSpec.max` 可以是 `Integer.MAX_VALUE`，1408 早就这么做了。"
@@ -54,7 +54,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1223/charge",
           "amount": 9
         },
         {
@@ -98,7 +98,7 @@
       "do": [
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1223/charge",
           "amount": 1
         },
         {
@@ -145,7 +145,7 @@
       "id": "talent_prey_leaves_at_zero_charge",
       "when": [
         "target has_state char:1223/prey",
-        "self_resource:充能 <= 0"
+        "self_resource:char:1223/charge <= 0"
       ],
       "do": [
         {

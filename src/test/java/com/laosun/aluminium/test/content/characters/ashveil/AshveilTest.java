@@ -166,14 +166,14 @@ public class AshveilTest {
     @Test
     public void theUltimateMarksTheBaitAndRefillsTheCharges() {
         Fixture f = new Fixture(0);
-        f.ashveil.getResources().get("充能").setValue(0);
+        f.ashveil.getResources().get("char:1504/charge").setValue(0);
 
         double hpBefore = f.enemy.getCurrentHp();
         f.castUltimate();
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < hpBefore, "precondition: the Ultimate and its follow-up landed");
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("饲饵"), "「使指定敌方单体成为【饲饵】」");
-        Assertions.assertEquals(3, f.ashveil.getResources().get("充能").value(), 1e-9,
+        Assertions.assertEquals(3, f.ashveil.getResources().get("char:1504/charge").value(), 1e-9,
                 "「且不死途获得 3 点充能」 (clamped at the declared maximum of 3)");
     }
 
@@ -417,7 +417,7 @@ public class AshveilTest {
          */
         private void triggerTalent() {
             // the talent spends one charge per trigger; top it up so the fixture can fire it repeatedly
-            ashveil.getResources().get("充能").setValue(3);
+            ashveil.getResources().get("char:1504/charge").setValue(3);
             if (!enemy.getBuffManager().hasState("饲饵")) {
                 enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("饲饵", 99, true));
             }

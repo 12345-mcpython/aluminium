@@ -10,7 +10,7 @@
   ],
   "resources": [
     {
-      "id": "充能",
+      "id": "char:8008/charge",
       "max": 100,
       "source": "8008 开拓者•记忆 战技 / 终结技: 「使迷迷获得10%充能」/「使迷迷获得40%充能」；规则目标是 `summon`，资源声明在此以通过装配期检查。"
     }
@@ -56,7 +56,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:8008/charge",
           "amount": 10,
           "target": "summon"
         }
@@ -93,7 +93,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:8008/charge",
           "amount": 40,
           "target": "summon"
         },

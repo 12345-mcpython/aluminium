@@ -10,7 +10,7 @@
   ],
   "resources": [
     {
-      "id": "充能",
+      "id": "char:1504/charge",
       "max": 3,
       "initial": 2,
       "source": "1504 不死途 天赋 宿怨，切齿奉还 (150404, Enhance/FollowUp): 「不死途初始拥有2点充能，最多拥有3点充能。【饲饵】受到我方其他目标攻击后，不死途固定恢复8点能量，随后消耗1点充能对【饲饵】发动追加攻击，造成等同于不死途200%攻击力的雷属性伤害，随后获得2层【婪酣】，最多叠加12层。」",
@@ -55,7 +55,7 @@
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1504/charge",
           "amount": 1
         },
         {
@@ -92,7 +92,7 @@
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1504/charge",
           "amount": 1
         },
         {
@@ -130,7 +130,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1504/charge",
           "amount": 1
         }
       ],
@@ -286,7 +286,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1504/charge",
           "amount": 3
         }
       ],

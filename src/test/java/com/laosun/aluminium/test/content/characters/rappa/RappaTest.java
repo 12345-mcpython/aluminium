@@ -95,7 +95,7 @@ public class RappaTest {
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int chargeOf(Character rappa) {
-        return rappa.getResources().get("充能").getValue();
+        return rappa.getResources().get("char:1317/charge").getValue();
     }
 
     private static Random fixed() {

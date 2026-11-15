@@ -26,7 +26,7 @@ public class AttributeShareResourceTest {
     private static final int WEARER = 1003;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String RESOURCE = "充能";
+    private static final String RESOURCE = "char:1003/charge";
 
     private Character wearer;
     private Enemy enemy;

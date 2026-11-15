@@ -103,7 +103,7 @@ public class March7thHuntTest {
                 + " raised=" + raised);
 
         // Spend the charge by hand (the enhanced basic does this in play) and cross a turn boundary: the sweep must retire it.
-        march.getResources().get("充能").setValue(6);
+        march.getResources().get("char:1224/charge").setValue(6);
         // The gate is asked in the buff tick, i.e. at HER turn boundary - not on a bare TURN_START event.
         march.getBuffManager().beforeMove();
         double after = march.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
@@ -115,7 +115,7 @@ public class March7thHuntTest {
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int chargeOf(Character march) {
-        return march.getResources().get("充能").getValue();
+        return march.getResources().get("char:1224/charge").getValue();
     }
 
     /**
@@ -170,7 +170,7 @@ public class March7thHuntTest {
                 "a Skill is not the enhanced basic");
 
         // Her talent pays seven charges for the enhanced basic; this case only needs the cast to happen.
-        march.getResources().gain("充能", 7);
+        march.getResources().gain("char:1224/charge", 7);
         battle.castImmediate(new com.laosun.aluminium.skill.DefaultSkill(MARCH, 8, LEVEL), march, List.of(enemy));
         Assertions.assertEquals(base, march.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
                 "slot 8 is the enhanced basic, and it consumes the buff");

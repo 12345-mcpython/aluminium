@@ -51,7 +51,7 @@ public class SkillAttributionTest {
     private static final int SKILL_SLOT = 2;
     private static final int BASIC_SLOT = 1;
     private static final int ULTIMATE_SLOT = 3;
-    private static final String CHARGE = "充能";
+    private static final String CHARGE = "char:1003/charge";
     private static final int CAP = 3;
 
     /**
