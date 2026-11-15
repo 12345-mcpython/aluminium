@@ -444,7 +444,7 @@ public class CyreneCombatTest {
         battle.processRequests();
         Assertions.assertNotNull(battle.summonMemosprite(cyrene), "precondition: 德谬歌 is on the field");
         // The zone has to be up - the rider is gated on 「结界」 (1415's skill deploys it).
-        cyrene.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("结界", 99));
+        cyrene.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1415/barrier", 99));
 
         for (int marked = 0; marked <= 4; marked++) {
             if (marked > 0) {

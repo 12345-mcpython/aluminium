@@ -175,6 +175,16 @@
       "key": "char:1202/blessing"
     },
     {
+      "name": "char:1203/barrier",
+      "owner": "1203",
+      "kind": "char",
+      "used_by": [
+        "1203"
+      ],
+      "zh": "结界",
+      "key": "char:1203/barrier"
+    },
+    {
       "name": "char:1205/charge",
       "owner": "1205",
       "kind": "char",
@@ -233,6 +243,16 @@
       ],
       "zh": "敕令",
       "key": "char:1215/edict"
+    },
+    {
+      "name": "char:1218/barrier",
+      "owner": "1218",
+      "kind": "char",
+      "used_by": [
+        "1218"
+      ],
+      "zh": "结界",
+      "key": "char:1218/barrier"
     },
     {
       "name": "char:1223/charge",
@@ -485,6 +505,16 @@
       "key": "char:1402/supreme_posture"
     },
     {
+      "name": "char:1403/barrier",
+      "owner": "1403",
+      "kind": "char",
+      "used_by": [
+        "1403"
+      ],
+      "zh": "结界",
+      "key": "char:1403/barrier"
+    },
+    {
       "name": "char:1408/ember",
       "owner": "1408",
       "kind": "char",
@@ -717,6 +747,16 @@
       "key": "char:1412/strong_shock"
     },
     {
+      "name": "char:1415/barrier",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "结界",
+      "key": "char:1415/barrier"
+    },
+    {
       "name": "char:1415/future",
       "owner": "1415",
       "kind": "char",
@@ -797,6 +837,16 @@
       "key": "char:1415/story"
     },
     {
+      "name": "char:1502/barrier",
+      "owner": "1502",
+      "kind": "char",
+      "used_by": [
+        "1502"
+      ],
+      "zh": "结界",
+      "key": "char:1502/barrier"
+    },
+    {
       "name": "char:1503/aesthetic_original",
       "owner": "1503",
       "kind": "char",
@@ -867,6 +917,16 @@
       "key": "char:1504/charge"
     },
     {
+      "name": "char:1506/barrier",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "结界",
+      "key": "char:1506/barrier"
+    },
+    {
       "name": "char:1506/hidden_score",
       "owner": "1506",
       "kind": "char",
@@ -915,6 +975,16 @@
       ],
       "zh": "1506天赋-暴击伤害",
       "key": "char:1506/talent_crit_damage"
+    },
+    {
+      "name": "char:1507/barrier",
+      "owner": "1507",
+      "kind": "char",
+      "used_by": [
+        "1507"
+      ],
+      "zh": "结界",
+      "key": "char:1507/barrier"
     },
     {
       "name": "char:1512/atmosphere",
@@ -2725,62 +2795,6 @@
       "kind": "char",
       "used_by": [
         "1317"
-      ]
-    },
-    {
-      "name": "结界",
-      "owner": "1203",
-      "kind": "char",
-      "used_by": [
-        "1203"
-      ]
-    },
-    {
-      "name": "结界",
-      "owner": "1218",
-      "kind": "char",
-      "used_by": [
-        "1218"
-      ]
-    },
-    {
-      "name": "结界",
-      "owner": "1403",
-      "kind": "char",
-      "used_by": [
-        "1403"
-      ]
-    },
-    {
-      "name": "结界",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
-      "name": "结界",
-      "owner": "1502",
-      "kind": "char",
-      "used_by": [
-        "1502"
-      ]
-    },
-    {
-      "name": "结界",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "结界",
-      "owner": "1507",
-      "kind": "char",
-      "used_by": [
-        "1507"
       ]
     },
     {

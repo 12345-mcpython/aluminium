@@ -192,7 +192,7 @@ public class JiaoqiuKitTest {
         Assertions.assertEquals(662.784912, e4.enemy.getAttribute(AttributeType.ATTACK).get(), 1e-6,
                 "precondition: the enemy's panel before the Ultimate");
         e4.openDomain();
-        Assertions.assertTrue(e4.jiaoqiu.getBuffManager().hasState("结界"), "precondition: the domain is up");
+        Assertions.assertTrue(e4.jiaoqiu.getBuffManager().hasState("char:1218/barrier"), "precondition: the domain is up");
         Assertions.assertEquals(563.3671752, e4.enemy.getAttribute(AttributeType.ATTACK).get(), 1e-6,
                 "「结界存在时，敌方目标的攻击力降低 15%」 — exactly ×0.85");
 

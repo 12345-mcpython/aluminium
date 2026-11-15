@@ -26,7 +26,7 @@ public class ZoneAdditionalDamageTest {
     private static final int LEVEL = 80;
     private static final int TRIBBIE = 1403;
     private static final int ATTACKER = 1402;
-    private static final String ZONE = "结界";
+    private static final String ZONE = "char:1403/barrier";
 
     @Test
     public void theZoneAddsExactlyItsOwnInstance() {

@@ -225,7 +225,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1403/barrier",
           "turns": 2,
           "target": "self"
         }
@@ -237,7 +237,7 @@
       "id": "ult_zone_additional_damage",
       "on": "ATTACK_FINISHED",
       "when": [
-        "self has_state 结界"
+        "self has_state char:1403/barrier"
       ],
       "max_eidolon": 1,
       "do": [
@@ -260,7 +260,7 @@
       "id": "eidolon2_zone_additional_damage",
       "on": "ATTACK_FINISHED",
       "when": [
-        "self has_state 结界"
+        "self has_state char:1403/barrier"
       ],
       "do": [
         {
@@ -280,7 +280,7 @@
       "id": "eidolon1_true_damage_on_zone_target",
       "on": "ATTACK_FINISHED",
       "when": [
-        "self has_state 结界"
+        "self has_state char:1403/barrier"
       ],
       "do": [
         {
@@ -301,7 +301,7 @@
       "on": "DEALING_DAMAGE",
       "when": [
         "actor == self",
-        "self has_state 结界",
+        "self has_state char:1403/barrier",
         "self has_state 献予「门径」之诗",
         "damage_is_additional",
         "damage_has_no_cast"

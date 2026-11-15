@@ -171,7 +171,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1415/barrier",
           "turns": 2,
           "ticks_on": "self",
           "target": "self"
@@ -189,7 +189,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "结界"
+            "state": "char:1415/barrier"
           }
         },
         {
@@ -750,7 +750,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1415/barrier",
           "permanent": true,
           "ticks_on": "self",
           "target": "self"
@@ -1012,7 +1012,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1415/barrier",
           "turns": 2,
           "ticks_on": "self",
           "target": "self"

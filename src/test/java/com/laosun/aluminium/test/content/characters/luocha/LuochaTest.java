@@ -226,7 +226,7 @@ public class LuochaTest {
          */
         boolean fieldUp() {
             for (Enemy foe : battle.enemyUnits()) {
-                if (foe.getBuffManager().hasState("结界")) {
+                if (foe.getBuffManager().hasState("char:1203/barrier")) {
                     return true;
                 }
             }
@@ -265,18 +265,18 @@ public class LuochaTest {
         Assertions.assertAll(
                 () -> {
                     for (Enemy enemy : withTechnique.enemyUnits()) {
-                        Assertions.assertTrue(enemy.getBuffManager().hasState("结界"),
+                        Assertions.assertTrue(enemy.getBuffManager().hasState("char:1203/barrier"),
                                 "「立即触发天赋」 -- the talent expands the zone, and it lands on the ENEMIES, which is "
                                         + "where both «has_state 结界» rules read it; missing on " + enemy.getName());
                     }
                 },
-                () -> Assertions.assertFalse(luocha.getBuffManager().hasState("结界"),
+                () -> Assertions.assertFalse(luocha.getBuffManager().hasState("char:1203/barrier"),
                         "moving the zone onto Luocha is what made the technique heal nothing -- an ally never "
                                 + "satisfies «target has_state 结界», because the target is the enemy our attack was "
                                 + "aimed at"),
                 () -> {
                     for (Enemy enemy : withoutTechnique.enemyUnits()) {
-                        Assertions.assertFalse(enemy.getBuffManager().hasState("结界"),
+                        Assertions.assertFalse(enemy.getBuffManager().hasState("char:1203/barrier"),
                                 "「使用秘技后」 -- with no technique declared nothing must open the zone");
                     }
                 });

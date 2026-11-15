@@ -214,7 +214,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1218/barrier",
           "turns": 3,
           "ticks_on": "self",
           "target": "self"
@@ -230,7 +230,7 @@
       "min_eidolon": 4,
       "when": [
         "actor == self",
-        "self has_state 结界"
+        "self has_state char:1218/barrier"
       ],
       "do": [
         {
@@ -238,7 +238,7 @@
           "attribute": "ATTACK",
           "percent": -0.15,
           "permanent": true,
-          "while_state": "结界",
+          "while_state": "char:1218/barrier",
           "target": "all_enemies"
         }
       ],
@@ -266,7 +266,7 @@
       "id": "ult_domain_rolls_ashen_on_enemy_turn",
       "when": [
         "actor is_enemy",
-        "self has_state 结界",
+        "self has_state char:1218/barrier",
         "self_stacks:结界计数 < 6"
       ],
       "chance": 0.6,
@@ -426,7 +426,7 @@
       "on": "ENEMY_ENTERED",
       "id": "trace_fragrant_guide_copies_the_highest_layers",
       "when": [
-        "self has_state 结界"
+        "self has_state char:1218/barrier"
       ],
       "do": [
         {

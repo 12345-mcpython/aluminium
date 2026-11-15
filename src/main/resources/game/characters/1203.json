@@ -112,7 +112,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1203/barrier",
           "turns": 2,
           "target": "all_enemies",
           "ticks_on": "self"
@@ -134,7 +134,7 @@
       "id": "talent_zone_heals_the_attacker",
       "when": [
         "actor is_other_ally",
-        "target has_state 结界"
+        "target has_state char:1203/barrier"
       ],
       "do": [
         {
@@ -169,7 +169,7 @@
       "id": "trace_zone_heals_the_others",
       "when": [
         "actor is_other_ally",
-        "target has_state 结界"
+        "target has_state char:1203/barrier"
       ],
       "do": [
         {
@@ -231,7 +231,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1203/barrier",
           "turns": 2,
           "target": "all_enemies",
           "ticks_on": "self"
@@ -309,7 +309,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "结界",
+          "buff": "char:1203/barrier",
           "target": "self"
         }
       ],
@@ -341,7 +341,7 @@
       "id": "eidolon1_attack_while_the_zone_is_up",
       "when": [
         "actor == self",
-        "self has_state 结界"
+        "self has_state char:1203/barrier"
       ],
       "min_eidolon": 1,
       "do": [
@@ -350,7 +350,7 @@
           "attribute": "ATTACK",
           "percent": 0.2,
           "permanent": true,
-          "while_state": "结界",
+          "while_state": "char:1203/barrier",
           "target": "all_allies"
         }
       ],
@@ -362,7 +362,7 @@
       "id": "eidolon4_weaken_while_the_zone_is_up",
       "when": [
         "actor == self",
-        "self has_state 结界"
+        "self has_state char:1203/barrier"
       ],
       "min_eidolon": 4,
       "do": [
@@ -371,7 +371,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": -0.12,
           "permanent": true,
-          "while_state": "结界",
+          "while_state": "char:1203/barrier",
           "target": "all_enemies"
         }
       ],

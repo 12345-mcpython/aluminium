@@ -28,7 +28,7 @@ public class CyreneTechniqueTest {
         Battle battle = new Battle(new ArrayList<>(List.of(her)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        System.out.println("[1415] technique=" + technique + " zone=" + her.getBuffManager().hasState("结界"));
-        return her.getBuffManager().hasState("结界");
+        System.out.println("[1415] technique=" + technique + " zone=" + her.getBuffManager().hasState("char:1415/barrier"));
+        return her.getBuffManager().hasState("char:1415/barrier");
     }
 }

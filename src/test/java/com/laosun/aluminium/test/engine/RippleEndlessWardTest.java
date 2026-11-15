@@ -15,7 +15,7 @@ import java.util.List;
  * "展开战技的结界并使其没有持续时间".
  */
 public class RippleEndlessWardTest {
-    private static final String WARD = "结界";
+    private static final String WARD = "char:1415/barrier";
 
     @Test
     public void theUltimateMakesTheWardEndless() {

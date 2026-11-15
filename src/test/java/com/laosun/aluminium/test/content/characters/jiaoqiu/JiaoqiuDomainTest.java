@@ -41,7 +41,7 @@ public class JiaoqiuDomainTest {
     private static final int JIAOQIU = 1218;
     private static final int LEVEL = 80;
     private static final String ASHEN = "烬煨";
-    private static final String DOMAIN = "结界";
+    private static final String DOMAIN = "char:1218/barrier";
 
     /**
      * 1218 椒丘's Ultimate, the zone's lifetime: 「结界持续 3 回合，自身每回合开始时持续回合数减 1」,

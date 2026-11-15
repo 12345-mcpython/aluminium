@@ -679,7 +679,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1506/barrier",
           "permanent": true,
           "target": "self"
         }
@@ -698,7 +698,7 @@
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.2,
-          "buff": "结界",
+          "buff": "char:1506/barrier",
           "permanent": true,
           "target": "all_enemies"
         }
@@ -711,13 +711,13 @@
       "id": "p1506_e1_zone_covers_later_arrivals",
       "min_eidolon": 1,
       "when": [
-        "self has_state 结界"
+        "self has_state char:1506/barrier"
       ],
       "do": [
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.2,
-          "buff": "结界",
+          "buff": "char:1506/barrier",
           "permanent": true,
           "target": "all_enemies"
         }
@@ -789,7 +789,7 @@
       "id": "p1506_zone_loot_box_on_a_spent_point",
       "when": [
         "self_resource:好活当赏 >= 1",
-        "self has_state 结界",
+        "self has_state char:1506/barrier",
         "self has_state char:1506/invincible_player"
       ],
       "one_of": true,

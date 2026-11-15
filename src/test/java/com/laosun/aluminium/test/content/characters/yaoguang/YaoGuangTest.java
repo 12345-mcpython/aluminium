@@ -36,7 +36,7 @@ public class YaoGuangTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final String LAUGH = "笑点";
-    private static final String ZONE = "结界";
+    private static final String ZONE = "char:1502/barrier";
 
     // The ultimate group shares one fixture; build() fills these three.
     private Character yaoguang;

@@ -64,7 +64,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "结界",
+          "buff": "char:1502/barrier",
           "turns": 3,
           "ticks_on": "self",
           "target": "self"
@@ -86,7 +86,7 @@
       "id": "zone_pays_three_laughs_after_skill",
       "when": [
         "actor == self",
-        "self has_state 结界"
+        "self has_state char:1502/barrier"
       ],
       "do": [
         {
@@ -103,7 +103,7 @@
       "id": "zone_pays_three_laughs_after_basic",
       "when": [
         "actor == self",
-        "self has_state 结界"
+        "self has_state char:1502/barrier"
       ],
       "do": [
         {

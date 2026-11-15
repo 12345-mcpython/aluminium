@@ -30,7 +30,7 @@ public class TribbieTest {
     private static final int TRIBBIE = 1403;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String ZONE = "结界";
+    private static final String ZONE = "char:1403/barrier";
 
     /**
      * Note: A teammate's ultimate triggers it; her own does not.

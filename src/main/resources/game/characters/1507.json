@@ -99,7 +99,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "结界",
+          "buff": "char:1507/barrier",
           "target": "all_enemies"
         }
       ],
@@ -118,7 +118,7 @@
           "attribute": "RESISTANCE_REDUCTION",
           "percent": 0.2,
           "permanent": true,
-          "buff": "结界",
+          "buff": "char:1507/barrier",
           "target": "all_enemies"
         }
       ],

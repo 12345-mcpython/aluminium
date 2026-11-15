@@ -51,7 +51,7 @@ public class PassageOdeExtraZoneHitTest {
         com.laosun.aluminium.skill.SkillExecutor.execute(battle, ult, tribbie,
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(tribbie.getBuffManager().hasState("结界"), "precondition: the zone is open");
+        Assertions.assertTrue(tribbie.getBuffManager().hasState("char:1403/barrier"), "precondition: the zone is open");
         var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);

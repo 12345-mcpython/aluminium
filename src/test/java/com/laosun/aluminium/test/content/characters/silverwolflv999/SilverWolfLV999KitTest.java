@@ -69,7 +69,7 @@ public class SilverWolfLV999KitTest {
     private static final String CHARGES = "internal:1506/enhanced_basic_count";
     private static final String GOD = "char:1506/invincible_player";
     private static final String FREEZE = "ctrl:frozen";
-    private static final String ZONE = "结界";
+    private static final String ZONE = "char:1506/barrier";
     /**
      * 【好活当赏】 - a RESOURCE, because that is what her gates ask about ({@code self_resource:好活当赏 >= 1}): her two
      * riders' and the 【头号补给盲盒】's (「「银狼LV.999」持有【好活当赏】时」).
