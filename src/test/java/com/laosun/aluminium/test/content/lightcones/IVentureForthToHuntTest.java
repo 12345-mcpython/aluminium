@@ -22,7 +22,7 @@ public class IVentureForthToHuntTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String GLOW = "流光";
+    private static final String GLOW = "char:23031/flowing_light";
 
     private Character wearer;
     private Enemy enemy;

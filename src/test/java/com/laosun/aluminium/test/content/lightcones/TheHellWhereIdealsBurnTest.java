@@ -32,6 +32,6 @@ public class TheHellWhereIdealsBurnTest {
         Assertions.assertEquals(4, stack.stackCap(), "up to four stacks");
         Assertions.assertEquals("ATTACK", share.getAttribute(), "attack");
         Assertions.assertEquals(0.1, share.getPercent(), 1e-9, "10% per layer at rank 1");
-        Assertions.assertEquals("技能层", share.getPerStack(), "per layer");
+        Assertions.assertEquals("internal:23046/skill_layers", share.getPerStack(), "per layer");
 }
     }

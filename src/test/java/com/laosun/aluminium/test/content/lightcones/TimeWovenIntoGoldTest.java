@@ -32,7 +32,7 @@ public class TimeWovenIntoGoldTest {
     private static final int WEARER = 1402;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String BROCADE = "织锦";
+    private static final String BROCADE = "char:23036/brocade";
     private static final int CAP = 6;
 
     private Character wearer;

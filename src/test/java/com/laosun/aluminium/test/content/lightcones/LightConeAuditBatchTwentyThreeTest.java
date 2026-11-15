@@ -32,10 +32,10 @@ public class LightConeAuditBatchTwentyThreeTest {
     public void coneTwoThreeThreeOneGlowStacksAndDecays() {
         JsonObject stack = effect(23031, "cone23031_glow_on_follow_up", 0);
         JsonObject ignore = effect(23031, "cone23031_ult_defence_ignore", 0);
-        System.out.println("[23031] 流光: max=" + stack.get("max_stacks") + " ; 无视防御 per_stack=" + ignore.get("per_stack")
+        System.out.println("[23031] char:23031/flowing_light: max=" + stack.get("max_stacks") + " ; 无视防御 per_stack=" + ignore.get("per_stack")
                 + " from_category=" + rule(23031, "cone23031_ult_defence_ignore").getAsJsonArray("when"));
         Assertions.assertEquals(2, stack.get("max_stacks").getAsInt(), "「最多叠加 2 层」");
-        Assertions.assertEquals("self_stacks:流光", ignore.get("per_stack").getAsString(), "「**每层**使终结技无视防御」");
+        Assertions.assertEquals("self_stacks:char:23031/flowing_light", ignore.get("per_stack").getAsString(), "「**每层**使终结技无视防御」");
         Assertions.assertTrue(rule(23031, "cone23031_ult_defence_ignore").getAsJsonArray("when").toString()
                 .contains("ULTRA"), "「终结技伤害」");
         Assertions.assertEquals(1, effect(23031, "cone23031_glow_decay", 0).get("amount").getAsInt(), "「回合结束移除 1 层」");
@@ -54,7 +54,7 @@ public class LightConeAuditBatchTwentyThreeTest {
         Assertions.assertEquals(0.6, breaking, 1e-9, "「击破特攻提高 60%」—— 光锥属性给一次");
 
         JsonObject mark = effect(23032, "cone23032_forget_worry", 0);
-        System.out.println("[23032] 忘忧: turns=" + mark.get("turns") + " target=" + mark.get("target"));
+        System.out.println("[23032] char:23032/forget_sorrow: turns=" + mark.get("turns") + " target=" + mark.get("target"));
         Assertions.assertEquals(2, mark.get("turns").getAsInt(), "「持续 2 回合」");
         com.google.gson.JsonArray extra = rule(23032, "cone23032_extra_at_high_break").getAsJsonArray("when");
         Assertions.assertTrue(extra.toString().contains("BREAKING_EFFECT >= 1.5"), "「击破特攻 ≥ 150% 时额外提高」");
@@ -104,12 +104,12 @@ public class LightConeAuditBatchTwentyThreeTest {
     public void coneTwoThreeThreeFiveBurnScopesBreakDamage() {
         JsonObject stack = effect(23035, "cone23035_burn_the_broken", 0);
         JsonObject taken = effect(23035, "cone23035_burn_the_broken", 1);
-        System.out.println("[23035] 焚灼: chance=" + stack.get("base_chance") + " max=" + stack.get("max_stacks")
+        System.out.println("[23035] char:23035/scorch: chance=" + stack.get("base_chance") + " max=" + stack.get("max_stacks")
                 + " ; 增伤 damage_type=" + taken.get("damage_type") + " per_stack=" + taken.get("per_stack"));
         Assertions.assertEquals(1.0, stack.get("base_chance").getAsDouble(), 1e-12, "「100% 基础概率」");
         Assertions.assertEquals(2, stack.get("max_stacks").getAsInt(), "「可叠加 2 层」");
         Assertions.assertEquals("BREAK", taken.get("damage_type").getAsString(), "「受到的**击破伤害**提高」");
-        Assertions.assertEquals("焚灼", taken.get("per_stack").getAsString(), "「每层」");
+        Assertions.assertEquals("char:23035/scorch", taken.get("per_stack").getAsString(), "「每层」");
     }
 
     /**
@@ -121,11 +121,11 @@ public class LightConeAuditBatchTwentyThreeTest {
         JsonObject summon = rule(23036, "cone23036_summon_weaves");
         JsonObject crit = effect(23036, "cone23036_brocade_crit_damage", 0);
         JsonObject cap = rule(23036, "cone23036_cap_basic_attack");
-        System.out.println("[23036] 织锦: max=" + stack.get("max_stacks") + " ; 忆灵那条 when=" + summon.getAsJsonArray("when")
+        System.out.println("[23036] char:23036/brocade: max=" + stack.get("max_stacks") + " ; 忆灵那条 when=" + summon.getAsJsonArray("when")
                 + " ; 满层普攻 when=" + cap.getAsJsonArray("when"));
         Assertions.assertEquals(6, stack.get("max_stacks").getAsInt(), "「最多叠加 6 层」");
         Assertions.assertTrue(summon.getAsJsonArray("when").toString().contains("summon"), "「装备者和忆灵在攻击后」");
-        Assertions.assertEquals("self_stacks:织锦", crit.get("per_stack").getAsString(), "「每层暴伤提高」");
+        Assertions.assertEquals("self_stacks:char:23036/brocade", crit.get("per_stack").getAsString(), "「每层暴伤提高」");
         Assertions.assertTrue(cap.getAsJsonArray("when").toString().contains(">= 6"), "「叠加至上限时」");
     }
 

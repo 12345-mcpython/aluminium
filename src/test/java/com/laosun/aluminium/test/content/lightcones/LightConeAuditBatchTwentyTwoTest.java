@@ -109,11 +109,11 @@ public class LightConeAuditBatchTwentyTwoTest {
     public void coneTwoThreeThreeZeroFireDanceStacks() {
         JsonObject stack = rule(23030, "cone23030_fire_dance").getAsJsonArray("do").get(0).getAsJsonObject();
         JsonObject share = rule(23030, "cone23030_fire_dance").getAsJsonArray("do").get(1).getAsJsonObject();
-        System.out.println("[23030] 火舞: max=" + stack.get("max_stacks") + " turns=" + stack.get("turns")
+        System.out.println("[23030] char:23030/fire_dance: max=" + stack.get("max_stacks") + " turns=" + stack.get("turns")
                 + " ; 每层追加攻击 +" + share.get("percent") + " per_stack=" + share.get("per_stack"));
         Assertions.assertEquals(2, stack.get("max_stacks").getAsInt(), "「最多叠加 2 层」");
         Assertions.assertEquals(2, stack.get("turns").getAsInt(), "「持续 2 回合」");
-        Assertions.assertEquals("火舞", share.get("per_stack").getAsString(), "「**每层**使追加攻击伤害提高 36%」");
+        Assertions.assertEquals("char:23030/fire_dance", share.get("per_stack").getAsString(), "「**每层**使追加攻击伤害提高 36%」");
 
         Fixture f = new Fixture(23030);
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.AGGRO_ADDED_RATIO).get() > 0, "「受到攻击的概率大幅提高」");

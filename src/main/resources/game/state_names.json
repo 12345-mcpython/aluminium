@@ -367,6 +367,106 @@
       "key": "char:23024/bubble"
     },
     {
+      "name": "char:23025/collapse",
+      "owner": "23025",
+      "kind": "char",
+      "used_by": [
+        "23025"
+      ],
+      "zh": "崩溃",
+      "key": "char:23025/collapse"
+    },
+    {
+      "name": "char:23028/hope_priceless",
+      "owner": "23028",
+      "kind": "char",
+      "used_by": [
+        "23028"
+      ],
+      "zh": "偏偏希望无价之视",
+      "key": "char:23028/hope_priceless"
+    },
+    {
+      "name": "char:23030/fire_dance",
+      "owner": "23030",
+      "kind": "char",
+      "used_by": [
+        "23030"
+      ],
+      "zh": "火舞",
+      "key": "char:23030/fire_dance"
+    },
+    {
+      "name": "char:23031/flowing_light",
+      "owner": "23031",
+      "kind": "char",
+      "used_by": [
+        "23031"
+      ],
+      "zh": "流光",
+      "key": "char:23031/flowing_light"
+    },
+    {
+      "name": "char:23032/forget_sorrow",
+      "owner": "23032",
+      "kind": "char",
+      "used_by": [
+        "23032"
+      ],
+      "zh": "忘忧",
+      "key": "char:23032/forget_sorrow"
+    },
+    {
+      "name": "char:23035/scorch",
+      "owner": "23035",
+      "kind": "char",
+      "used_by": [
+        "23035"
+      ],
+      "zh": "焚灼",
+      "key": "char:23035/scorch"
+    },
+    {
+      "name": "char:23036/brocade",
+      "owner": "23036",
+      "kind": "char",
+      "used_by": [
+        "23036"
+      ],
+      "zh": "织锦",
+      "key": "char:23036/brocade"
+    },
+    {
+      "name": "char:23038/revelation",
+      "owner": "23038",
+      "kind": "char",
+      "used_by": [
+        "23038"
+      ],
+      "zh": "谕示",
+      "key": "char:23038/revelation"
+    },
+    {
+      "name": "char:23040/farewell_flower",
+      "owner": "23040",
+      "kind": "char",
+      "used_by": [
+        "23040"
+      ],
+      "zh": "送别的花",
+      "key": "char:23040/farewell_flower"
+    },
+    {
+      "name": "char:23044/blazing_sun",
+      "owner": "23044",
+      "kind": "char",
+      "used_by": [
+        "23044"
+      ],
+      "zh": "烈阳",
+      "key": "char:23044/blazing_sun"
+    },
+    {
       "name": "ctrl:frozen",
       "owner": "battle",
       "kind": "battle",
@@ -553,6 +653,26 @@
       "key": "internal:23013/healing_recorded"
     },
     {
+      "name": "internal:23042/iridescence_spent",
+      "owner": "23042",
+      "kind": "internal",
+      "used_by": [
+        "23042"
+      ],
+      "zh": "虹光累计消耗",
+      "key": "internal:23042/iridescence_spent"
+    },
+    {
+      "name": "internal:23046/skill_layers",
+      "owner": "23046",
+      "kind": "internal",
+      "used_by": [
+        "23046"
+      ],
+      "zh": "技能层",
+      "key": "internal:23046/skill_layers"
+    },
+    {
       "name": "relic130_elation_used",
       "owner": "130",
       "kind": "char",
@@ -639,14 +759,6 @@
       "kind": "char",
       "used_by": [
         "23021"
-      ]
-    },
-    {
-      "name": "偏偏希望无价之视",
-      "owner": "23028",
-      "kind": "char",
-      "used_by": [
-        "23028"
       ]
     },
     {
@@ -1084,14 +1196,6 @@
       ]
     },
     {
-      "name": "崩溃",
-      "owner": "23025",
-      "kind": "char",
-      "used_by": [
-        "23025"
-      ]
-    },
-    {
       "name": "师父",
       "owner": "1224",
       "kind": "char",
@@ -1236,14 +1340,6 @@
       ]
     },
     {
-      "name": "忘忧",
-      "owner": "23032",
-      "kind": "char",
-      "used_by": [
-        "23032"
-      ]
-    },
-    {
       "name": "怒噪",
       "owner": "1412",
       "kind": "char",
@@ -1313,14 +1409,6 @@
       "kind": "char",
       "used_by": [
         "1215"
-      ]
-    },
-    {
-      "name": "技能层",
-      "owner": "23046",
-      "kind": "char",
-      "used_by": [
-        "23046"
       ]
     },
     {
@@ -1628,14 +1716,6 @@
       ]
     },
     {
-      "name": "流光",
-      "owner": "23031",
-      "kind": "char",
-      "used_by": [
-        "23031"
-      ]
-    },
-    {
       "name": "浪漫",
       "owner": "1402",
       "kind": "char",
@@ -1732,14 +1812,6 @@
       ]
     },
     {
-      "name": "火舞",
-      "owner": "23030",
-      "kind": "char",
-      "used_by": [
-        "23030"
-      ]
-    },
-    {
       "name": "灵感",
       "owner": "1401",
       "kind": "char",
@@ -1781,14 +1853,6 @@
       ]
     },
     {
-      "name": "烈阳",
-      "owner": "23044",
-      "kind": "char",
-      "used_by": [
-        "23044"
-      ]
-    },
-    {
       "name": "烬煨",
       "owner": "1218",
       "kind": "char",
@@ -1802,14 +1866,6 @@
       "kind": "char",
       "used_by": [
         "1513"
-      ]
-    },
-    {
-      "name": "焚灼",
-      "owner": "23035",
-      "kind": "char",
-      "used_by": [
-        "23035"
       ]
     },
     {
@@ -2157,14 +2213,6 @@
       ]
     },
     {
-      "name": "织锦",
-      "owner": "23036",
-      "kind": "char",
-      "used_by": [
-        "23036"
-      ]
-    },
-    {
       "name": "终结技已激活",
       "owner": "battle",
       "kind": "battle",
@@ -2363,14 +2411,6 @@
       "en": "Weakened"
     },
     {
-      "name": "虹光累计消耗",
-      "owner": "23042",
-      "kind": "char",
-      "used_by": [
-        "23042"
-      ]
-    },
-    {
       "name": "血仇",
       "owner": "1404",
       "kind": "char",
@@ -2440,14 +2480,6 @@
       "kind": "char",
       "used_by": [
         "23052"
-      ]
-    },
-    {
-      "name": "谕示",
-      "owner": "23038",
-      "kind": "char",
-      "used_by": [
-        "23038"
       ]
     },
     {
@@ -2528,14 +2560,6 @@
       "kind": "char",
       "used_by": [
         "1415"
-      ]
-    },
-    {
-      "name": "送别的花",
-      "owner": "23040",
-      "kind": "char",
-      "used_by": [
-        "23040"
       ]
     },
     {

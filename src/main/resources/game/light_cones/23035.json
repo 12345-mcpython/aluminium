@@ -6,13 +6,13 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
+        { "op": "ADD_STACK", "buff": "char:23035/scorch", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.18,
           "damage_type": "BREAK",
-          "buff": "焚灼",
-          "per_stack": "焚灼",
+          "buff": "char:23035/scorch",
+          "per_stack": "char:23035/scorch",
           "turns": 2,
           "target": "target"
         }
@@ -26,13 +26,13 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
+        { "op": "ADD_STACK", "buff": "char:23035/scorch", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.21,
           "damage_type": "BREAK",
-          "buff": "焚灼",
-          "per_stack": "焚灼",
+          "buff": "char:23035/scorch",
+          "per_stack": "char:23035/scorch",
           "turns": 2,
           "target": "target"
         }
@@ -46,13 +46,13 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
+        { "op": "ADD_STACK", "buff": "char:23035/scorch", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.24,
           "damage_type": "BREAK",
-          "buff": "焚灼",
-          "per_stack": "焚灼",
+          "buff": "char:23035/scorch",
+          "per_stack": "char:23035/scorch",
           "turns": 2,
           "target": "target"
         }
@@ -66,13 +66,13 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
+        { "op": "ADD_STACK", "buff": "char:23035/scorch", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.27,
           "damage_type": "BREAK",
-          "buff": "焚灼",
-          "per_stack": "焚灼",
+          "buff": "char:23035/scorch",
+          "per_stack": "char:23035/scorch",
           "turns": 2,
           "target": "target"
         }
@@ -86,13 +86,13 @@
       "on": "BREAK",
       "id": "cone23035_burn_the_broken",
       "do": [
-        { "op": "ADD_STACK", "buff": "焚灼", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
+        { "op": "ADD_STACK", "buff": "char:23035/scorch", "base_chance": 1, "turns": 2, "target": "target", "max_stacks": 2 },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.3,
           "damage_type": "BREAK",
-          "buff": "焚灼",
-          "per_stack": "焚灼",
+          "buff": "char:23035/scorch",
+          "per_stack": "char:23035/scorch",
           "turns": 2,
           "target": "target"
         }

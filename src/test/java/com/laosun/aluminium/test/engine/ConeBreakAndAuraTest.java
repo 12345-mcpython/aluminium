@@ -101,7 +101,7 @@ public class ConeBreakAndAuraTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemyOf(battle, wearer), 0, 0));
         double afterFollowUp = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23038] ally crit damage baseline(no cone)=" + baseline + " with cone=" + afterFollowUp
-                + " ; state on the wearer=" + wearer.getBuffManager().hasState("谕示"));
+                + " ; state on the wearer=" + wearer.getBuffManager().hasState("char:23038/revelation"));
         Assertions.assertEquals(baseline + 0.48, afterFollowUp, 1e-9, "the aura gives the party 48 points of crit damage");
         // Note: The duration has to be PINNED: every reading here happens in the same turn, so shortening the aura is
         // invisible to them (measured: 2 -> 1 turn gave reds 0). Discipline 14.
@@ -119,7 +119,7 @@ public class ConeBreakAndAuraTest {
             }
         }
         Assertions.assertEquals(1, pinnedTurns, "exactly one party aura rule on FOLLOW_UP");
-        Assertions.assertTrue(wearer.getBuffManager().hasState("谕示"), "carried by the state");
+        Assertions.assertTrue(wearer.getBuffManager().hasState("char:23038/revelation"), "carried by the state");
         // A battle without the cone: the same stimulus changes nothing.
         plainBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, plainWearer, enemyOf(plainBattle, plainWearer), 0, 0));
         System.out.println("[23038] without the cone, after the same stimulus: "

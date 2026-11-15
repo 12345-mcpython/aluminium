@@ -16,12 +16,12 @@
       "id": "cone23030_fire_dance",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23030/fire_dance", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
           "percent": 0.36,
-          "per_stack": "火舞",
+          "per_stack": "char:23030/fire_dance",
           "turns": 2,
           "target": "self"
         }
@@ -45,12 +45,12 @@
       "id": "cone23030_fire_dance",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23030/fire_dance", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
           "percent": 0.42,
-          "per_stack": "火舞",
+          "per_stack": "char:23030/fire_dance",
           "turns": 2,
           "target": "self"
         }
@@ -74,12 +74,12 @@
       "id": "cone23030_fire_dance",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23030/fire_dance", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
           "percent": 0.48,
-          "per_stack": "火舞",
+          "per_stack": "char:23030/fire_dance",
           "turns": 2,
           "target": "self"
         }
@@ -103,12 +103,12 @@
       "id": "cone23030_fire_dance",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23030/fire_dance", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
           "percent": 0.54,
-          "per_stack": "火舞",
+          "per_stack": "char:23030/fire_dance",
           "turns": 2,
           "target": "self"
         }
@@ -132,12 +132,12 @@
       "id": "cone23030_fire_dance",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "火舞", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23030/fire_dance", "amount": 1, "max_stacks": 2, "turns": 2, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "FOLLOW_UP_DAMAGE_BOOST",
           "percent": 0.6,
-          "per_stack": "火舞",
+          "per_stack": "char:23030/fire_dance",
           "turns": 2,
           "target": "self"
         }

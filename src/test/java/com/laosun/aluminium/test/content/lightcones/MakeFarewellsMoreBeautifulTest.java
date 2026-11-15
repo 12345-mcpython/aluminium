@@ -130,7 +130,7 @@ public class MakeFarewellsMoreBeautifulTest {
         }
 
         boolean armed() {
-            return wearer.getBuffManager().stacksOf("送别的花") >= 1;
+            return wearer.getBuffManager().stacksOf("char:23040/farewell_flower") >= 1;
         }
     }
 

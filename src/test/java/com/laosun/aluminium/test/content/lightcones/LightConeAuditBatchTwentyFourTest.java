@@ -68,7 +68,7 @@ public class LightConeAuditBatchTwentyFourTest {
         double allyCrit = f.ally.getAttribute(AttributeType.CRIT_ATTACK).get()
                 - new Fixture(null).ally.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23038] 队友的暴伤增量 " + allyCrit);
-        Assertions.assertEquals(0.48, allyCrit, 1e-9, "「我方全体暴击伤害提高 48%」（开战也有【谕示】）");
+        Assertions.assertEquals(0.48, allyCrit, 1e-9, "「我方全体暴击伤害提高 48%」（开战也有【char:23038/revelation】）");
     }
 
     /**

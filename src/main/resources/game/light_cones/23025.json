@@ -7,7 +7,7 @@
       "id": "cone23025_collapse_on_break",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23025/collapse", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
@@ -46,7 +46,7 @@
       "id": "cone23025_collapse_on_break",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23025/collapse", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
@@ -85,7 +85,7 @@
       "id": "cone23025_collapse_on_break",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23025/collapse", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
@@ -124,7 +124,7 @@
       "id": "cone23025_collapse_on_break",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23025/collapse", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"
@@ -163,7 +163,7 @@
       "id": "cone23025_collapse_on_break",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "崩溃", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23025/collapse", "amount": 1, "max_stacks": 1, "permanent": true, "target": "target" }
       ],
       "source": "光锥 23025: 「当装备者对敌方目标造成击破伤容时，使敌方陷入【崩溃】状态。」",
       "_note": "⭐⭐ **现成词汇** ✓：「对敌方目标**造成击破伤容时**」= **`BREAK`** 事件 ✓（枚举里已有 ✓）⇒ **`ADD_STACK` 崩溃**（落在目标身上 ✓）+ `MODIFY_ATTR SPEED` **负值** ✓；「【崩溃】状态下受到的**击破伤容**提高」= `DEALING_DAMAGE` + **`target_stacks:崩溃 >= 1`** ✓ + **`damage_type: BREAK`** ✓ ⇒ 实例加成 ✓。⚠⚠ **读法已实测** ✓：该状态是**层数型** ✓ ⇒ **`has_state` 看不到它** ✗（同一次触发读数：`stacksOf=1` ✓ / `hasState=false` ✗）⇒ 门槛必须用 `target_stacks:` ✓。✅ 同句后半已写：`cone23025_collapse_break_vulnerability`（`damage_type: BREAK` + `from_self: true` 的易伤区，2 回合）✓ —— 击破伤害不吃 `DAMAGE_BOOST` 区 ✓，但**吃易伤区** ✓。"

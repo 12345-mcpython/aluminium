@@ -7,8 +7,8 @@
       "id": "cone23046_skill_stacks",
       "when": ["actor == self", "from_category BPSKILL"],
       "do": [
-        { "op": "ADD_STACK", "buff": "技能层", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.1, "per_stack": "技能层", "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23046/skill_layers", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.1, "per_stack": "internal:23046/skill_layers", "permanent": true, "target": "self" }
       ],
       "source": "light cone 23046: \"After each use of the wearer's Skill, increases the wearer's ATK by #4%, stacking up to #5 = 4 times\" (tbgd Ability23046). This file carries the MAX-RANK numbers under one key, which is what its judge pins (0.2 = ParamList #4 at rank 5).",
       "_note": "「装备者**每次施放战技后**，攻击力提高 #4%，**最多叠加 4 次**」—— `CAST_SETUP` ＋ `from_category BPSKILL` ＋ `actor == self` ＋ ⭐ `ADD_STACK{max_stacks: 4}` ＋ `MODIFY_ATTR ATTACK{per_stack: 技能层}` ✓（10/12.5/15/17.5/20% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只 +10% ✗）。"

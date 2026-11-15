@@ -37,7 +37,7 @@ public class WhereaboutsShouldDreamsRestTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String COLLAPSE = "崩溃";
+    private static final String COLLAPSE = "char:23025/collapse";
     private static final int CONE_WEARER = 1002;
     private static final int CONE_ALLY = 1001;
 

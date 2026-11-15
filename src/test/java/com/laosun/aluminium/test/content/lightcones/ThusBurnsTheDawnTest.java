@@ -31,7 +31,7 @@ public class ThusBurnsTheDawnTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String SUN = "烈阳";
+    private static final String SUN = "char:23044/blazing_sun";
 
     private Character wearer;
     private Enemy enemy;

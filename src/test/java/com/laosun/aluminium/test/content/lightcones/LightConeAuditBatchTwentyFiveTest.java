@@ -47,18 +47,18 @@ public class LightConeAuditBatchTwentyFiveTest {
     @Test
     public void coneTwoThreeFourFourSunUntilTurnStart() {
         JsonObject sun = effect(23044, "cone23044_sun_damage", 0);
-        System.out.println("[23044] 烈阳: percent=" + sun.get("percent") + " when="
+        System.out.println("[23044] char:23044/blazing_sun: percent=" + sun.get("percent") + " when="
                 + rule(23044, "cone23044_sun_damage").getAsJsonArray("when"));
         Assertions.assertEquals(0.6, sun.get("percent").getAsDouble(), 1e-12, "「造成的伤害提高 60%」（叠影 1）");
         Assertions.assertEquals(1, effect(23044, "cone23044_sun_on_ult", 0).get("max_stacks").getAsInt(),
-                "【烈阳】只有 1 层");
+                "【char:23044/blazing_sun】只有 1 层");
 
         Fixture f = new Fixture(23044);
         f.wearer.setCurrentEnergy(f.wearer.getMaxEnergy());
         f.battle.castUltra(f.wearer, List.of(f.battle.enemyUnits().getFirst()));
         f.battle.processRequests();
         f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
-        System.out.println("[23044] 回合开始后【烈阳】已被移除（形状由上面的规则钉住）");
+        System.out.println("[23044] 回合开始后【char:23044/blazing_sun】已被移除（形状由上面的规则钉住）");
         Assertions.assertTrue(f.wearer.getCurrentHp() > 0, "夹具可用");
     }
 
@@ -85,7 +85,7 @@ public class LightConeAuditBatchTwentyFiveTest {
         JsonObject share = effect(23046, "cone23046_skill_stacks", 1);
         System.out.println("[23046] 叠层: max=" + stack.get("max_stacks") + " per_stack=" + share.get("per_stack"));
         Assertions.assertEquals(4, stack.get("max_stacks").getAsInt(), "「最多叠加 4 次」");
-        Assertions.assertEquals("技能层", share.get("per_stack").getAsString(), "「每次战技后攻击提高 10%」按层");
+        Assertions.assertEquals("internal:23046/skill_layers", share.get("per_stack").getAsString(), "「每次战技后攻击提高 10%」按层");
 
         JsonArray gate = rule(23046, "cone23046_atk_when_cap_is_six").getAsJsonArray("when");
         System.out.println("[23046] 战技点上限那条: when=" + gate);

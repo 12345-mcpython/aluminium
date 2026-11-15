@@ -65,7 +65,7 @@ public class LongMayRainbowsAdornTheSkyHpCostTest {
         Assertions.assertTrue(consumed > 0, "「消耗我方全体当前生命值 1%」: something was consumed");
         Assertions.assertEquals(0.01 * before, consumed, 0.01 * before * 0.01,
                 "1% of the CURRENT total, not of Max HP");
-        Assertions.assertEquals(consumed, scene.wearer.getResources().get("虹光累计消耗").exactValue(), 0.5,
+        Assertions.assertEquals(consumed, scene.wearer.getResources().get("internal:23042/iridescence_spent").exactValue(), 0.5,
                 "「消耗总量」: the counter carries what the cast took, for the next memosprite attack");
     }
 
@@ -82,7 +82,7 @@ public class LongMayRainbowsAdornTheSkyHpCostTest {
         SkillExecutor.execute(scene.battle, scene.wearer.getSkills().get(SkillType.SKILL), scene.wearer,
                 List.of(scene.battle.enemies().getFirst()));
         scene.battle.processRequests();
-        double pooled = scene.wearer.getResources().get("虹光累计消耗").exactValue();
+        double pooled = scene.wearer.getResources().get("internal:23042/iridescence_spent").exactValue();
         Assertions.assertTrue(pooled > 0, "precondition: the cast pooled something");
 
         scene.battle.fire(TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, servant,
@@ -93,7 +93,7 @@ public class LongMayRainbowsAdornTheSkyHpCostTest {
         Assertions.assertEquals(1, riders.size(), "exactly ONE additional instance per attack");
         Assertions.assertEquals(0.025 * pooled, riders.getFirst().breakdown().get("base"), 0.5,
                 "2.5% of the pooled total");
-        Assertions.assertEquals(0, scene.wearer.getResources().get("虹光累计消耗").exactValue(), EPS,
+        Assertions.assertEquals(0, scene.wearer.getResources().get("internal:23042/iridescence_spent").exactValue(), EPS,
                 "「随后清空」: the pool is spent");
 
         int before = scene.settled.size();

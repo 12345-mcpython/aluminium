@@ -45,7 +45,7 @@ public class IVentureForthToHuntInstanceTest {
             Assertions.assertEquals("MODIFY_ATTR", effect.getOp());
             Assertions.assertEquals("DEFENCE_IGNORE", effect.getAttribute());
             Assertions.assertEquals(IGNORE[rank - 1], effect.getPercent(), 1e-9, "rank " + rank + ": the magnitude");
-            Assertions.assertEquals("self_stacks:流光", effect.getPerStack(),
+            Assertions.assertEquals("self_stacks:char:23031/flowing_light", effect.getPerStack(),
                     "rank " + rank + ": per stack of the cone's own counter");
             Assertions.assertEquals(Boolean.TRUE, effect.getInstance(),
                     "rank " + rank + ": a property of THIS hit -- without it the wearer's attribute moves and per_stack "

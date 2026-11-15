@@ -7,7 +7,7 @@
       "id": "cone23038_after_follow_up",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.48, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
@@ -19,7 +19,7 @@
       "id": "cone23038_at_battle_start",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.48, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
@@ -32,7 +32,7 @@
       "id": "cone23038_after_follow_up",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.6, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
@@ -44,7 +44,7 @@
       "id": "cone23038_at_battle_start",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.6, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
@@ -57,7 +57,7 @@
       "id": "cone23038_after_follow_up",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.72, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
@@ -69,7 +69,7 @@
       "id": "cone23038_at_battle_start",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.72, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
@@ -82,7 +82,7 @@
       "id": "cone23038_after_follow_up",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.84, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
@@ -94,7 +94,7 @@
       "id": "cone23038_at_battle_start",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.84, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
@@ -107,7 +107,7 @@
       "id": "cone23038_after_follow_up",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 12, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.96, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「装备者施放追加攻击后额外恢复#2[i]点能量，并获得【谕示】，持续#3[i]回合。当装备者持有【谕示】时，我方全体目标的暴击伤害提高#4[i]%」",
@@ -119,7 +119,7 @@
       "id": "cone23038_at_battle_start",
       "do": [
         { "op": "GAIN_ENERGY", "amount": 21, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "谕示", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23038/revelation", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.96, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23038: 「进入战斗时，装备者恢复#5[i]点能量，并获得【谕示】，持续#6[i]回合」",
