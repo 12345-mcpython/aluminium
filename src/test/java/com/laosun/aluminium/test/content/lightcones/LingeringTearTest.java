@@ -34,6 +34,9 @@ public class LingeringTearTest {
     private static final double BONUS = 0.2;
     private static final String LAUGHTER = "笑点";
 
+    /** The panel's layer counter: this cone's own bookkeeping, named in its rule file. */
+    private static final String PANEL_LAYER = "internal:20024/punchline_ready";
+
     private Character wearer;
     private Enemy enemy;
 
@@ -102,7 +105,7 @@ public class LingeringTearTest {
             for (var effect : rule.effects()) {
                 if ("MODIFY_ATTR".equals(effect.getOp())) {
                     Assertions.assertEquals(BONUS, effect.getPercent(), 1e-9, "20% at rank 1");
-                    Assertions.assertEquals(LAUGHTER + "达标", effect.getPerStack(), "read from the panel's layer");
+                    Assertions.assertEquals(PANEL_LAYER, effect.getPerStack(), "read from the panel's layer");
                 }
                 if ("ADD_STACK".equals(effect.getOp())) {
                     Assertions.assertEquals(1, effect.getMaxStacks(), "the panel's layer is capped at one");

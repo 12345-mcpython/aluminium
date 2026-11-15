@@ -61,12 +61,12 @@ public class LightConeAuditBatchTwentyOneTest {
 
         JsonObject effect = rule(23022, "cone23022_seer_from_dot_1").getAsJsonArray("do").get(1).getAsJsonObject();
         System.out.println("[23022] 攻击那条: per_stack=" + effect.get("per_stack") + " max_stacks=" + effect.get("max_stacks"));
-        Assertions.assertEquals("self_stacks:先知", effect.get("per_stack").getAsString(),
-                "「**每层**【先知】使攻击力提高 5%」");
+        Assertions.assertEquals("self_stacks:char:23022/oracle", effect.get("per_stack").getAsString(),
+                "「**每层**【char:23022/oracle】使攻击力提高 5%」");
         JsonObject ignore = rule(23022, "cone23022_dot_ignores_defence").getAsJsonArray("do").get(0).getAsJsonObject();
         System.out.println("[23022] 无视防御: damage_type=" + ignore.get("damage_type") + " per_stack=" + ignore.get("per_stack"));
         Assertions.assertEquals("DOT", ignore.get("damage_type").getAsString(), "「造成的**持续伤害**无视防御」");
-        Assertions.assertEquals("self_stacks:先知", ignore.get("per_stack").getAsString(), "「每层」");
+        Assertions.assertEquals("self_stacks:char:23022/oracle", ignore.get("per_stack").getAsString(), "「每层」");
     }
 
     /**
@@ -101,14 +101,14 @@ public class LightConeAuditBatchTwentyOneTest {
     @Test
     public void coneTwoThreeTwoFourBubbleOncePerAttack() {
         JsonObject bubble = rule(23024, "cone23024_bubble");
-        System.out.println("[23024] 泡影: per_attack=" + bubble.get("per_attack") + " turns="
+        System.out.println("[23024] char:23024/bubble: per_attack=" + bubble.get("per_attack") + " turns="
                 + bubble.getAsJsonArray("do").get(0).getAsJsonObject().get("turns"));
         Assertions.assertEquals(1, bubble.get("per_attack").getAsInt(), "「每次攻击时，对每个目标只可触发 1 次」");
 
         Fixture f = new Fixture(23024);
         double damage = rule(23024, "cone23024_bubble_damage").getAsJsonArray("do").get(0).getAsJsonObject()
                 .get("percent").getAsDouble();
-        System.out.println("[23024] 对泡影目标的加伤 " + damage);
+        System.out.println("[23024] 对char:23024/bubble目标的加伤 " + damage);
         Assertions.assertEquals(0.24, damage, 1e-12, "24%（叠影 1）");
         Assertions.assertTrue(f.wearer.getCurrentHp() > 0, "夹具可用");
     }

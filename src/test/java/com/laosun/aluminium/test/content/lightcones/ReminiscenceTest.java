@@ -40,7 +40,7 @@ public class ReminiscenceTest {
     private static final int FIXTURE_WEARER = 1409;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String MEMORIAL = "缅怀";
+    private static final String MEMORIAL = "char:20022/remembrance";
 
     private Character wearer;
     private Enemy enemy;
@@ -198,7 +198,7 @@ public class ReminiscenceTest {
 
         Assertions.assertTrue(f.summon.isDeath(), "the fixture's memosprite left");
         Assertions.assertEquals(0, f.stacks(f.wearer),
-                "「忆灵消失时移除装备者和忆灵的【缅怀】」 - the wearer's layers are cleared too");
+                "「忆灵消失时移除装备者和忆灵的【char:20022/remembrance】」 - the wearer's layers are cleared too");
     }
 
     // ==================================================================
@@ -230,7 +230,7 @@ public class ReminiscenceTest {
         }
 
         private int stacks(com.laosun.aluminium.entity.CanHit unit) {
-            return unit.getBuffManager().stacksOf("缅怀");
+            return unit.getBuffManager().stacksOf("char:20022/remembrance");
         }
 
         private double share(com.laosun.aluminium.entity.CanHit unit) {

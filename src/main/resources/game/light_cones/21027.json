@@ -7,12 +7,12 @@
       "id": "cone21027_attack_stack_on_kill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:21027/breakfast_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.04,
-          "per_stack": "早餐层数",
+          "per_stack": "internal:21027/breakfast_layers",
           "permanent": true,
           "target": "self"
         }
@@ -27,12 +27,12 @@
       "id": "cone21027_attack_stack_on_kill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:21027/breakfast_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.04,
-          "per_stack": "早餐层数",
+          "per_stack": "internal:21027/breakfast_layers",
           "permanent": true,
           "target": "self"
         }
@@ -47,12 +47,12 @@
       "id": "cone21027_attack_stack_on_kill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:21027/breakfast_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.04,
-          "per_stack": "早餐层数",
+          "per_stack": "internal:21027/breakfast_layers",
           "permanent": true,
           "target": "self"
         }
@@ -67,12 +67,12 @@
       "id": "cone21027_attack_stack_on_kill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:21027/breakfast_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.04,
-          "per_stack": "早餐层数",
+          "per_stack": "internal:21027/breakfast_layers",
           "permanent": true,
           "target": "self"
         }
@@ -87,12 +87,12 @@
       "id": "cone21027_attack_stack_on_kill",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "早餐层数", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:21027/breakfast_layers", "amount": 1, "max_stacks": 3, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.04,
-          "per_stack": "早餐层数",
+          "per_stack": "internal:21027/breakfast_layers",
           "permanent": true,
           "target": "self"
         }

@@ -62,7 +62,7 @@ public class LightConeAuditBatchElevenTest {
         System.out.println("[21037] 暴伤增量: 1 层 " + one + " ; 2 层 " + two + " ; 回合结束后 " + cleared);
         Assertions.assertEquals(0.08, one, 1e-9, "每层 8%（叠影 1）");
         Assertions.assertEquals(0.16, two, 1e-9, "两层 16%");
-        Assertions.assertEquals(0.0, cleared, 1e-9, "「【好运】在装备者的回合结束时移除」");
+        Assertions.assertEquals(0.0, cleared, 1e-9, "「【char:21037/luck】在装备者的回合结束时移除」");
     }
 
     /**

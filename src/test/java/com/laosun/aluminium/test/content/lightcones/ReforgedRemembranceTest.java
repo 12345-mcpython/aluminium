@@ -32,7 +32,7 @@ public class ReforgedRemembranceTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int RUN_WEARER = 1204;
-    private static final String SEER = "先知";
+    private static final String SEER = "char:23022/oracle";
     private static final String WIND_NAME = "dot:wind_shear";
     private static final String FIRE_NAME = "dot:burn";
     private static final String THUNDER_NAME = "dot:shock";
@@ -175,7 +175,7 @@ public class ReforgedRemembranceTest {
         }
 
         int seer() {
-            return wearer.getBuffManager().stacksOf("先知");
+            return wearer.getBuffManager().stacksOf("char:23022/oracle");
         }
 
         double attack() {

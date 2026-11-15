@@ -23,7 +23,7 @@ public class LightConeChannelTest {
     private static final int WEAPON_ID = 21005;
     private static final int WEARER = 1210;
     private static final int LEVEL = 80;
-    private static final String COUNTER = "淘气值";
+    private static final String COUNTER = "char:21005/mischief";
 
     @Test
     public void theWearerGainsACounterOnEachOfTheThreeAttacks() {

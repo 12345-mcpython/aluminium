@@ -29,7 +29,7 @@ public class SwordplayTest {
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
     private static final int FIRST = 1002011;
-    private static final String MARK = "睚准";
+    private static final String MARK = "char:21010/grudge";
 
     private Character wearer;
     private Enemy first;

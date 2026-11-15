@@ -25,7 +25,7 @@
       "id": "cone23020_debate_state",
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "论辩", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23020/argument", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.36, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
@@ -34,7 +34,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23020_ignore_defence_on_follow_up",
-      "when": ["actor == self", "self has_state 论辩"],
+      "when": ["actor == self", "self has_state char:23020/argument"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -74,7 +74,7 @@
       "id": "cone23020_debate_state",
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "论辩", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23020/argument", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.42, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
@@ -83,7 +83,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23020_ignore_defence_on_follow_up",
-      "when": ["actor == self", "self has_state 论辩"],
+      "when": ["actor == self", "self has_state char:23020/argument"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -123,7 +123,7 @@
       "id": "cone23020_debate_state",
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "论辩", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23020/argument", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.48, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
@@ -132,7 +132,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23020_ignore_defence_on_follow_up",
-      "when": ["actor == self", "self has_state 论辩"],
+      "when": ["actor == self", "self has_state char:23020/argument"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -172,7 +172,7 @@
       "id": "cone23020_debate_state",
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "论辩", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23020/argument", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.54, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
@@ -181,7 +181,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23020_ignore_defence_on_follow_up",
-      "when": ["actor == self", "self has_state 论辩"],
+      "when": ["actor == self", "self has_state char:23020/argument"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -221,7 +221,7 @@
       "id": "cone23020_debate_state",
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "论辩", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23020/argument", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.6, "turns": 2, "target": "self" }
       ],
       "source": "光锥 23020: 「施放终结技攻击敌方目标时，使装备者获得【论辩】效果，造成的伤害提高#4[i]%…该效果持续#6[i]回合」",
@@ -230,7 +230,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23020_ignore_defence_on_follow_up",
-      "when": ["actor == self", "self has_state 论辩"],
+      "when": ["actor == self", "self has_state char:23020/argument"],
       "do": [
         {
           "op": "MODIFY_ATTR",

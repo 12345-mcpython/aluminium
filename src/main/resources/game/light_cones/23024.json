@@ -8,7 +8,7 @@
       "per_attack": 1,
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "泡影", "turns": 1, "target": "target" }
+        { "op": "APPLY_BUFF", "buff": "char:23024/bubble", "turns": 1, "target": "target" }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
       "_note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
@@ -16,7 +16,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23024_bubble_damage",
-      "when": ["actor == self", "target has_state 泡影"],
+      "when": ["actor == self", "target has_state char:23024/bubble"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.24 }
       ],
@@ -41,7 +41,7 @@
       "per_attack": 1,
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "泡影", "turns": 1, "target": "target" }
+        { "op": "APPLY_BUFF", "buff": "char:23024/bubble", "turns": 1, "target": "target" }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
       "_note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
@@ -49,7 +49,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23024_bubble_damage",
-      "when": ["actor == self", "target has_state 泡影"],
+      "when": ["actor == self", "target has_state char:23024/bubble"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.28 }
       ],
@@ -74,7 +74,7 @@
       "per_attack": 1,
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "泡影", "turns": 1, "target": "target" }
+        { "op": "APPLY_BUFF", "buff": "char:23024/bubble", "turns": 1, "target": "target" }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
       "_note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
@@ -82,7 +82,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23024_bubble_damage",
-      "when": ["actor == self", "target has_state 泡影"],
+      "when": ["actor == self", "target has_state char:23024/bubble"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.32 }
       ],
@@ -107,7 +107,7 @@
       "per_attack": 1,
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "泡影", "turns": 1, "target": "target" }
+        { "op": "APPLY_BUFF", "buff": "char:23024/bubble", "turns": 1, "target": "target" }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
       "_note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
@@ -115,7 +115,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23024_bubble_damage",
-      "when": ["actor == self", "target has_state 泡影"],
+      "when": ["actor == self", "target has_state char:23024/bubble"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.36 }
       ],
@@ -140,7 +140,7 @@
       "per_attack": 1,
       "when": ["actor == self"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "泡影", "turns": 1, "target": "target" }
+        { "op": "APPLY_BUFF", "buff": "char:23024/bubble", "turns": 1, "target": "target" }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
       "_note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
@@ -148,7 +148,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23024_bubble_damage",
-      "when": ["actor == self", "target has_state 泡影"],
+      "when": ["actor == self", "target has_state char:23024/bubble"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.4 }
       ],

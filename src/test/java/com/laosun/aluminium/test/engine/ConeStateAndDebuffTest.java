@@ -47,9 +47,9 @@ public class ConeStateAndDebuffTest {
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 210150));
         double before = enemy.getAttribute(AttributeType.DEFENCE).get();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, unit, enemy, 0, 0));
-        System.out.println("[21015] state=" + enemy.getBuffManager().hasState("攻陷")
+        System.out.println("[21015] state=" + enemy.getBuffManager().hasState("char:21015/capture")
                 + " defence " + before + " -> " + enemy.getAttribute(AttributeType.DEFENCE).get());
-        Assertions.assertTrue(enemy.getBuffManager().hasState("攻陷"), "the state landed");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:21015/capture"), "the state landed");
         // The state rule fires on the same event, so the defence drop is visible immediately.
         Assertions.assertTrue(enemy.getAttribute(AttributeType.DEFENCE).get() <= before,
                 "the defence drop follows the state");
@@ -173,9 +173,9 @@ public class ConeStateAndDebuffTest {
         double additionalBefore = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
         double ordinaryBefore = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
-        System.out.println("[23020] debate state=" + unit.getBuffManager().hasState("论辩")
+        System.out.println("[23020] debate state=" + unit.getBuffManager().hasState("char:23020/argument")
                 + " damage boost=" + unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
-        Assertions.assertTrue(unit.getBuffManager().hasState("论辩"), "the debate state is on the wearer");
+        Assertions.assertTrue(unit.getBuffManager().hasState("char:23020/argument"), "the debate state is on the wearer");
         Assertions.assertEquals(0.36, unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
                 "36 points of damage while it lasts");
         double additionalAfter = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);

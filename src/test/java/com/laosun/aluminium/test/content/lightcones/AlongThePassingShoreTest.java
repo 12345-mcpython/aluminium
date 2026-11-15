@@ -23,7 +23,7 @@ public class AlongThePassingShoreTest {
     private static final int CONE = 23024;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final String BUBBLE = "泡影";
+    private static final String BUBBLE = "char:23024/bubble";
 
     private Character wearer;
     private Enemy enemy;
@@ -49,7 +49,7 @@ public class AlongThePassingShoreTest {
         boolean after = enemy.getBuffManager().hasState(BUBBLE);
         System.out.println("[23024] bubble before=" + before + " after a hit=" + after);
         Assertions.assertFalse(before, "nothing yet");
-        Assertions.assertTrue(after, "on hitting an enemy target, puts the enemy into Mirage Fizzle (【泡影】)");
+        Assertions.assertTrue(after, "on hitting an enemy target, puts the enemy into Mirage Fizzle (【char:23024/bubble】)");
     }
 
     @Test

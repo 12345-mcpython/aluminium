@@ -217,6 +217,56 @@
       "key": "char:1214/retribution"
     },
     {
+      "name": "char:20022/remembrance",
+      "owner": "20022",
+      "kind": "char",
+      "used_by": [
+        "20022"
+      ],
+      "zh": "缅怀",
+      "key": "char:20022/remembrance"
+    },
+    {
+      "name": "char:21005/mischief",
+      "owner": "21005",
+      "kind": "char",
+      "used_by": [
+        "21005"
+      ],
+      "zh": "淘气值",
+      "key": "char:21005/mischief"
+    },
+    {
+      "name": "char:21010/grudge",
+      "owner": "21010",
+      "kind": "char",
+      "used_by": [
+        "21010"
+      ],
+      "zh": "睚准",
+      "key": "char:21010/grudge"
+    },
+    {
+      "name": "char:21015/capture",
+      "owner": "21015",
+      "kind": "char",
+      "used_by": [
+        "21015"
+      ],
+      "zh": "攻陷",
+      "key": "char:21015/capture"
+    },
+    {
+      "name": "char:21037/luck",
+      "owner": "21037",
+      "kind": "char",
+      "used_by": [
+        "21037"
+      ],
+      "zh": "好运",
+      "key": "char:21037/luck"
+    },
+    {
       "name": "char:21041/trick",
       "owner": "21041",
       "kind": "char",
@@ -275,6 +325,46 @@
       ],
       "zh": "温驯",
       "key": "char:23016/meekness"
+    },
+    {
+      "name": "char:23017/nightmare_strike",
+      "owner": "23017",
+      "kind": "char",
+      "used_by": [
+        "23017"
+      ],
+      "zh": "惊魂夜攻击",
+      "key": "char:23017/nightmare_strike"
+    },
+    {
+      "name": "char:23020/argument",
+      "owner": "23020",
+      "kind": "char",
+      "used_by": [
+        "23020"
+      ],
+      "zh": "论辩",
+      "key": "char:23020/argument"
+    },
+    {
+      "name": "char:23022/oracle",
+      "owner": "23022",
+      "kind": "char",
+      "used_by": [
+        "23022"
+      ],
+      "zh": "先知",
+      "key": "char:23022/oracle"
+    },
+    {
+      "name": "char:23024/bubble",
+      "owner": "23024",
+      "kind": "char",
+      "used_by": [
+        "23024"
+      ],
+      "zh": "泡影",
+      "key": "char:23024/bubble"
     },
     {
       "name": "ctrl:frozen",
@@ -365,7 +455,7 @@
     {
       "name": "internal:1204/attack_segments",
       "owner": "1204",
-      "kind": "char",
+      "kind": "internal",
       "used_by": [
         "1204"
       ],
@@ -381,6 +471,36 @@
       ],
       "zh": "恶报溢出",
       "key": "internal:1214/retribution_overflow"
+    },
+    {
+      "name": "internal:20018/next_basic_pending",
+      "owner": "20018",
+      "kind": "internal",
+      "used_by": [
+        "20018"
+      ],
+      "zh": "下一次普攻待命",
+      "key": "internal:20018/next_basic_pending"
+    },
+    {
+      "name": "internal:20024/punchline_ready",
+      "owner": "20024",
+      "kind": "internal",
+      "used_by": [
+        "20024"
+      ],
+      "zh": "笑点达标",
+      "key": "internal:20024/punchline_ready"
+    },
+    {
+      "name": "internal:21027/breakfast_layers",
+      "owner": "21027",
+      "kind": "internal",
+      "used_by": [
+        "21027"
+      ],
+      "zh": "早餐层数",
+      "key": "internal:21027/breakfast_layers"
     },
     {
       "name": "internal:21038/burn_triggered",
@@ -454,14 +574,6 @@
       "kind": "char",
       "used_by": [
         "23054"
-      ]
-    },
-    {
-      "name": "下一次普攻待命",
-      "owner": "20018",
-      "kind": "char",
-      "used_by": [
-        "20018"
       ]
     },
     {
@@ -640,14 +752,6 @@
       "kind": "internal",
       "used_by": [
         "1223"
-      ]
-    },
-    {
-      "name": "先知",
-      "owner": "23022",
-      "kind": "char",
-      "used_by": [
-        "23022"
       ]
     },
     {
@@ -940,14 +1044,6 @@
       "en": "Certified Banger"
     },
     {
-      "name": "好运",
-      "owner": "21037",
-      "kind": "char",
-      "used_by": [
-        "21037"
-      ]
-    },
-    {
       "name": "婪酣",
       "owner": "1504",
       "kind": "char",
@@ -1180,14 +1276,6 @@
       ]
     },
     {
-      "name": "惊魂夜攻击",
-      "owner": "23017",
-      "kind": "char",
-      "used_by": [
-        "23017"
-      ]
-    },
-    {
       "name": "惩戒",
       "owner": "1004",
       "kind": "char",
@@ -1276,14 +1364,6 @@
       ]
     },
     {
-      "name": "攻陷",
-      "owner": "21015",
-      "kind": "char",
-      "used_by": [
-        "21015"
-      ]
-    },
-    {
       "name": "故事",
       "owner": "1415",
       "kind": "char",
@@ -1346,14 +1426,6 @@
       "kind": "char",
       "used_by": [
         "1506"
-      ]
-    },
-    {
-      "name": "早餐层数",
-      "owner": "21027",
-      "kind": "internal",
-      "used_by": [
-        "21027"
       ]
     },
     {
@@ -1556,14 +1628,6 @@
       ]
     },
     {
-      "name": "泡影",
-      "owner": "23024",
-      "kind": "char",
-      "used_by": [
-        "23024"
-      ]
-    },
-    {
       "name": "流光",
       "owner": "23031",
       "kind": "char",
@@ -1601,14 +1665,6 @@
       "kind": "internal",
       "used_by": [
         "1112"
-      ]
-    },
-    {
-      "name": "淘气值",
-      "owner": "21005",
-      "kind": "char",
-      "used_by": [
-        "21005"
       ]
     },
     {
@@ -1918,14 +1974,6 @@
       ]
     },
     {
-      "name": "睚准",
-      "owner": "21010",
-      "kind": "char",
-      "used_by": [
-        "21010"
-      ]
-    },
-    {
       "name": "短视之惩-她-忆灵速度",
       "owner": "1402",
       "kind": "char",
@@ -2069,14 +2117,6 @@
       ]
     },
     {
-      "name": "笑点达标",
-      "owner": "20024",
-      "kind": "char",
-      "used_by": [
-        "20024"
-      ]
-    },
-    {
       "name": "累计损失",
       "owner": "1208",
       "kind": "char",
@@ -2217,14 +2257,6 @@
       "kind": "char",
       "used_by": [
         "1315"
-      ]
-    },
-    {
-      "name": "缅怀",
-      "owner": "20022",
-      "kind": "char",
-      "used_by": [
-        "20022"
       ]
     },
     {
@@ -2400,14 +2432,6 @@
       "kind": "internal",
       "used_by": [
         "1406"
-      ]
-    },
-    {
-      "name": "论辩",
-      "owner": "23020",
-      "kind": "char",
-      "used_by": [
-        "23020"
       ]
     },
     {

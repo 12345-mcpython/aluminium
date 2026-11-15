@@ -17,8 +17,8 @@
       "id": "cone23017_healed_ally_attack",
       "when": ["target is_ally"],
       "do": [
-        { "op": "ADD_STACK", "buff": "惊魂夜攻击", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.024, "per_stack": "惊魂夜攻击", "turns": 2, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23017/nightmare_strike", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.024, "per_stack": "char:23017/nightmare_strike", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
       "_note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
@@ -40,8 +40,8 @@
       "id": "cone23017_healed_ally_attack",
       "when": ["target is_ally"],
       "do": [
-        { "op": "ADD_STACK", "buff": "惊魂夜攻击", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.028, "per_stack": "惊魂夜攻击", "turns": 2, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23017/nightmare_strike", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.028, "per_stack": "char:23017/nightmare_strike", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
       "_note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
@@ -63,8 +63,8 @@
       "id": "cone23017_healed_ally_attack",
       "when": ["target is_ally"],
       "do": [
-        { "op": "ADD_STACK", "buff": "惊魂夜攻击", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.032, "per_stack": "惊魂夜攻击", "turns": 2, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23017/nightmare_strike", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.032, "per_stack": "char:23017/nightmare_strike", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
       "_note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
@@ -86,8 +86,8 @@
       "id": "cone23017_healed_ally_attack",
       "when": ["target is_ally"],
       "do": [
-        { "op": "ADD_STACK", "buff": "惊魂夜攻击", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.036, "per_stack": "惊魂夜攻击", "turns": 2, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23017/nightmare_strike", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.036, "per_stack": "char:23017/nightmare_strike", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
       "_note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
@@ -109,8 +109,8 @@
       "id": "cone23017_healed_ally_attack",
       "when": ["target is_ally"],
       "do": [
-        { "op": "ADD_STACK", "buff": "惊魂夜攻击", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.04, "per_stack": "惊魂夜攻击", "turns": 2, "target": "target" }
+        { "op": "ADD_STACK", "buff": "char:23017/nightmare_strike", "amount": 1, "max_stacks": 5, "turns": 2, "target": "target" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.04, "per_stack": "char:23017/nightmare_strike", "turns": 2, "target": "target" }
       ],
       "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
       "_note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
