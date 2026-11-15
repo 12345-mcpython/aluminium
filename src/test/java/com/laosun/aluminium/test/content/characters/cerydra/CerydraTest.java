@@ -52,16 +52,16 @@ public class CerydraTest {
         Battle battle = new Battle(List.of(cerydra, ally), List.of(enemy), fixed());
         battle.startBattle();
         double allyAttackBefore = ally.getAttribute(AttributeType.ATTACK).get();
-        int chargeBefore = cerydra.getResources().get("充能").getValue();
+        int chargeBefore = cerydra.getResources().get("char:1412/charge").getValue();
         double expected = cerydra.getAttribute(AttributeType.ATTACK).get() * 0.24;
 
         battle.castImmediate(cerydra.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), cerydra, List.of(ally));
 
         double attackGain = ally.getAttribute(AttributeType.ATTACK).get() - allyAttackBefore;
-        int chargeAfter = cerydra.getResources().get("充能").getValue();
-        Assertions.assertAll("「使指定我方单体角色获得【军功】」: the mark, the ATTACK share and the Charge",
-                () -> Assertions.assertTrue(ally.getBuffManager().hasState("军功"),
-                        "「使指定我方单体角色获得【军功】」 (grants a designated single ally Military Merit (【军功】))"),
+        int chargeAfter = cerydra.getResources().get("char:1412/charge").getValue();
+        Assertions.assertAll("「使指定我方单体角色获得【char:1412/merit】」: the mark, the ATTACK share and the Charge",
+                () -> Assertions.assertTrue(ally.getBuffManager().hasState("char:1412/merit"),
+                        "「使指定我方单体角色获得【char:1412/merit】」 (grants a designated single ally Military Merit (【char:1412/merit】))"),
                 () -> Assertions.assertEquals(expected, attackGain, expected * 0.02,
                         "「提高数值等同于刻律德菈攻击力的24.00%」 (raises by an amount equal to 24.00% of Cerydra's ATK): expected " + expected),
                 () -> Assertions.assertEquals(chargeBefore + 1, chargeAfter,
@@ -76,9 +76,9 @@ public class CerydraTest {
         double unmarked = markedAttackLoss(false);
         double marked = markedAttackLoss(true);
 
-        Assertions.assertAll("「持有【军功】的角色施放攻击后」: the mark's reaction",
+        Assertions.assertAll("「持有【char:1412/merit】的角色施放攻击后」: the mark's reaction",
                 () -> Assertions.assertEquals(0.0, unmarked, 1e-9,
-                        "「持有【军功】的角色施放攻击后」 (after a character holding Military Merit casts an attack) -- without the mark, nothing"),
+                        "「持有【char:1412/merit】的角色施放攻击后」 (after a character holding Military Merit casts an attack) -- without the mark, nothing"),
                 () -> Assertions.assertTrue(marked > 0, "with the mark, the additional damage lands: " + marked));
     }
 
@@ -95,8 +95,8 @@ public class CerydraTest {
     public void theTechniqueGrantsMeritOnEntry() {
         boolean withTechnique = merit(true);
         boolean withoutTechnique = merit(false);
-        Assertions.assertAll("「使用秘技后获得【军功】」: the technique hands her the merit, and only it does",
-                () -> Assertions.assertTrue(withTechnique, "「使用秘技后获得【军功】」"),
+        Assertions.assertAll("「使用秘技后获得【char:1412/merit】」: the technique hands her the merit, and only it does",
+                () -> Assertions.assertTrue(withTechnique, "「使用秘技后获得【char:1412/merit】」"),
                 () -> Assertions.assertFalse(withoutTechnique, "the control: without the technique there is no merit"));
     }
 
@@ -121,14 +121,14 @@ public class CerydraTest {
         her.setCurrentEnergy(her.getMaxEnergy());
         battle.castImmediate(her.getSkills().get(SkillType.ULTRA), her, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();
-        System.out.println("[1412] ult: ally merit=" + ally.getBuffManager().hasState("军功")
-                + " ; her merit=" + her.getBuffManager().hasState("军功"));
-        boolean allyGotIt = ally.getBuffManager().hasState("军功");
+        System.out.println("[1412] ult: ally merit=" + ally.getBuffManager().hasState("char:1412/merit")
+                + " ; her merit=" + her.getBuffManager().hasState("char:1412/merit"));
+        boolean allyGotIt = ally.getBuffManager().hasState("char:1412/merit");
 
         Character holder = CharacterFactory.create(1412, 80);
         Character marked = CharacterFactory.create(1101, 80);
         Character other = CharacterFactory.create(1102, 80);
-        marked.getBuffManager().addBuff(new StateBuff("军功", 1));
+        marked.getBuffManager().addBuff(new StateBuff("char:1412/merit", 1));
         Battle withHolder = new Battle(new ArrayList<>(List.of(holder, marked, other)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
         withHolder.startBattle();
@@ -137,10 +137,10 @@ public class CerydraTest {
                 List.of(withHolder.enemyUnits().getFirst()));
         withHolder.processRequests();
 
-        Assertions.assertAll("「若场上不存在持有【军功】的角色…」",
-                () -> Assertions.assertTrue(allyGotIt, "「使…第一位角色获得【军功】」"),
-                () -> Assertions.assertTrue(marked.getBuffManager().hasState("军功"), "the existing holder keeps it"),
-                () -> Assertions.assertFalse(other.getBuffManager().hasState("军功"), "「若场上不存在…」: nobody else gets one"));
+        Assertions.assertAll("「若场上不存在持有【char:1412/merit】的角色…」",
+                () -> Assertions.assertTrue(allyGotIt, "「使…第一位角色获得【char:1412/merit】」"),
+                () -> Assertions.assertTrue(marked.getBuffManager().hasState("char:1412/merit"), "the existing holder keeps it"),
+                () -> Assertions.assertFalse(other.getBuffManager().hasState("char:1412/merit"), "「若场上不存在…」: nobody else gets one"));
     }
 
     // ==================================================================
@@ -162,7 +162,7 @@ public class CerydraTest {
         double without = boost(false);
         double belowRank = boostAt(1);
         System.out.println("[1412] E2 damage boost: ally has merit " + with + " ; nobody does " + without);
-        Assertions.assertAll("「场上存在持有【军功】的队友时，刻律德菈造成的伤害提高 160%」",
+        Assertions.assertAll("「场上存在持有【char:1412/merit】的队友时，刻律德菈造成的伤害提高 160%」",
                 () -> Assertions.assertEquals(1.6, with - without, 1e-9, "「提高 160%」"),
                 () -> Assertions.assertEquals(0.0, belowRank, 1e-9, "the control: nothing at Eidolon 1"));
     }
@@ -189,8 +189,8 @@ public class CerydraTest {
                 + " ; second " + second.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
         double firstAfterMove = first.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         double secondAfterMove = second.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        Assertions.assertAll("「持有【军功】的角色造成的伤害提高 40%」: the boost belongs to the holder",
-                () -> Assertions.assertEquals(0.4, firstAfterFirstCast, 1e-9, "「持有【军功】的角色造成的伤害提高 40%」"),
+        Assertions.assertAll("「持有【char:1412/merit】的角色造成的伤害提高 40%」: the boost belongs to the holder",
+                () -> Assertions.assertEquals(0.4, firstAfterFirstCast, 1e-9, "「持有【char:1412/merit】的角色造成的伤害提高 40%」"),
                 () -> Assertions.assertEquals(0.0, firstAfterMove, 1e-9,
                         "the boost MOVES with the merit, it does not stay behind"),
                 () -> Assertions.assertEquals(0.4, secondAfterMove, 1e-9, "and the new holder carries it"));
@@ -220,8 +220,8 @@ public class CerydraTest {
         battle.processRequests();
         double firstAfterMove = pen(first);
         double secondAfterMove = pen(second);
-        Assertions.assertAll("「持有【军功】的角色全属性抗性穿透提高 20%」: the penetration belongs to the holder",
-                () -> Assertions.assertEquals(0.2, firstAfterFirstCast, 1e-9, "「持有【军功】的角色全属性抗性穿透提高 20%」"),
+        Assertions.assertAll("「持有【char:1412/merit】的角色全属性抗性穿透提高 20%」: the penetration belongs to the holder",
+                () -> Assertions.assertEquals(0.2, firstAfterFirstCast, 1e-9, "「持有【char:1412/merit】的角色全属性抗性穿透提高 20%」"),
                 () -> Assertions.assertEquals(0.0, firstAfterMove, 1e-9, "the penetration moves with the merit"),
                 () -> Assertions.assertEquals(0.2, secondAfterMove, 1e-9, "and the new holder carries it"));
     }
@@ -243,7 +243,7 @@ public class CerydraTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, her, her, 0, 0));
         double after = pen(her);
         System.out.println("[1412] E6 self pen " + before + " -> " + after);
-        Assertions.assertEquals(0.2, after - before, 1e-9, "「场上存在持有【军功】的队友时…提高 20%」");
+        Assertions.assertEquals(0.2, after - before, 1e-9, "「场上存在持有【char:1412/merit】的队友时…提高 20%」");
     }
 
     // ==================================================================
@@ -282,8 +282,8 @@ public class CerydraTest {
         Battle battle = new Battle(new ArrayList<>(List.of(her)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        System.out.println("[1412] technique=" + technique + " merit=" + her.getBuffManager().hasState("军功"));
-        return her.getBuffManager().hasState("军功");
+        System.out.println("[1412] technique=" + technique + " merit=" + her.getBuffManager().hasState("char:1412/merit"));
+        return her.getBuffManager().hasState("char:1412/merit");
     }
 
     /**
@@ -301,7 +301,7 @@ public class CerydraTest {
         Character her = CharacterFactory.create(1412, 80, true, null, null, eidolon);
         Character ally = CharacterFactory.create(1101, 80);
         if (allyHasMerit) {
-            ally.getBuffManager().addBuff(new StateBuff("军功", 1));
+            ally.getBuffManager().addBuff(new StateBuff("char:1412/merit", 1));
         }
         Battle battle = new Battle(new ArrayList<>(List.of(her, ally)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));

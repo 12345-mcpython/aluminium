@@ -22,8 +22,8 @@ public class OdeToLawChargeTest {
     private static final int CERYDRA = 1412;
     private static final int CYRENE = 1415;
     private static final int LEVEL = 80;
-    private static final String CHARGE = "充能";
-    private static final String PEERAGE = "爵位";
+    private static final String CHARGE = "char:1412/charge";
+    private static final String PEERAGE = "char:1412/peerage";
 
     /**
      * After the coup: the charge she had, minus the six the coup costs, plus the one 1415 pays.

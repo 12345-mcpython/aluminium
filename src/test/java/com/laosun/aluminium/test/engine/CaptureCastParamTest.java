@@ -26,7 +26,7 @@ import com.laosun.aluminium.entity.Summon;
  */
 public class CaptureCastParamTest {
     private static final int LEVEL = 80;
-    private static final String CHARGE = "充能";
+    private static final String CHARGE = "char:1412/charge";
 
     @Test
     public void theChargeGainsTheOdeRowsValue() {

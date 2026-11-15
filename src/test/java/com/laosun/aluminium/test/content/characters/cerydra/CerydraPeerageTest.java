@@ -39,8 +39,8 @@ public class CerydraPeerageTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
-    private static final String MERIT = "军功";
-    private static final String PEERAGE = "爵位";
+    private static final String MERIT = "char:1412/merit";
+    private static final String PEERAGE = "char:1412/peerage";
     private static final String FREEZE = "ctrl:frozen";
     private static final String SHOCK = "电触";
 
@@ -77,9 +77,9 @@ public class CerydraPeerageTest {
         boolean meritAfterFive = ally.getBuffManager().hasState(MERIT);
         boolean peerageAfterFive = ally.getBuffManager().hasState(PEERAGE);
         Assertions.assertAll("five charges is below the threshold",
-                () -> Assertions.assertTrue(meritAfterFive, "precondition: the ally carries [军功] (Military Merit)"),
+                () -> Assertions.assertTrue(meritAfterFive, "precondition: the ally carries [char:1412/merit] (Military Merit)"),
                 () -> Assertions.assertFalse(peerageAfterFive,
-                        "five charges is below the threshold, so no [爵位] (Peerage) yet"));
+                        "five charges is below the threshold, so no [char:1412/peerage] (Peerage) yet"));
 
         cerydra.getSkills().get(SkillType.SKILL).execute(battle, cerydra, List.of(ally));
         battle.processRequests();
@@ -88,9 +88,9 @@ public class CerydraPeerageTest {
         boolean meritAfterSix = ally.getBuffManager().hasState(MERIT);
         Assertions.assertAll("the sixth charge promotes the holder",
                 () -> Assertions.assertTrue(peerageAfterSix,
-                        "the sixth charge upgrades [军功] (Military Merit) to [爵位] (Peerage)"),
+                        "the sixth charge upgrades [char:1412/merit] (Military Merit) to [char:1412/peerage] (Peerage)"),
                 () -> Assertions.assertTrue(meritAfterSix,
-                        "and [爵位] (Peerage) COUNTS AS [军功] (Military Merit), so both are on (the rule adds, it does not replace)"));
+                        "and [char:1412/peerage] (Peerage) COUNTS AS [char:1412/merit] (Military Merit), so both are on (the rule adds, it does not replace)"));
     }
 
     // ==================================================================
@@ -111,9 +111,9 @@ public class CerydraPeerageTest {
         double oneCast = resPenAfter(1);
         double fiveCasts = resPenAfter(5);
         double sixCasts = resPenAfter(6);
-        Assertions.assertAll("「持有[爵位]的角色…全属性抗性穿透提高 10.00%」",
+        Assertions.assertAll("「持有[char:1412/peerage]的角色…全属性抗性穿透提高 10.00%」",
                 () -> Assertions.assertEquals(0.10, sixCasts - oneCast, EPS,
-                        "\"a character holding Peerage (【爵位】) ... gains 10.00% All-Type RES PEN\" (「持有【爵位】的角色…全属性抗性穿透提高 10.00%」)"),
+                        "\"a character holding Peerage (【char:1412/peerage】) ... gains 10.00% All-Type RES PEN\" (「持有【char:1412/peerage】的角色…全属性抗性穿透提高 10.00%」)"),
                 () -> Assertions.assertEquals(oneCast, fiveCasts, EPS,
                         "below six Charge the sentence has not started"));
     }
@@ -217,9 +217,9 @@ public class CerydraPeerageTest {
             SkillExecutor.execute(battle, skill, owner, List.of(ally));
             battle.processRequests();
         }
-        Assertions.assertTrue(ally.getBuffManager().hasState("军功"),
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1412/merit"),
                 "precondition: the ally holds the merit");
-        Assertions.assertEquals(casts >= 6, ally.getBuffManager().hasState("爵位"),
+        Assertions.assertEquals(casts >= 6, ally.getBuffManager().hasState("char:1412/peerage"),
                 "precondition: six casts is what promotes the holder");
         return ally.getAttribute(AttributeType.DAMAGE_PENETRATION).get();
     }
@@ -277,7 +277,7 @@ public class CerydraPeerageTest {
             SkillExecutor.execute(battle, hers, owner, List.of(ally));
             battle.processRequests();
         }
-        Assertions.assertTrue(ally.getBuffManager().hasState("军功"),
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1412/merit"),
                 "precondition: the ally holds the merit");
         Assertions.assertTrue(ally.getBuffManager().hasState(PEERAGE),
                 "precondition: six casts promote the holder");

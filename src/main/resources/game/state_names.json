@@ -201,6 +201,167 @@
       "key": "char:1214/retribution"
     },
     {
+      "name": "char:1412/action_lock",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "行动锁定",
+      "key": "char:1412/action_lock"
+    },
+    {
+      "name": "char:1412/binding",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "缠禁",
+      "key": "char:1412/binding"
+    },
+    {
+      "name": "char:1412/charge",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412",
+        "1415"
+      ],
+      "zh": "充能",
+      "key": "char:1412/charge"
+    },
+    {
+      "name": "char:1412/dominate",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "支配",
+      "key": "char:1412/dominate"
+    },
+    {
+      "name": "char:1412/entwine",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "缠绕",
+      "key": "char:1412/entwine"
+    },
+    {
+      "name": "char:1412/fear",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "恐惧",
+      "key": "char:1412/fear"
+    },
+    {
+      "name": "char:1412/grudge_fire",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "怨火灼身",
+      "key": "char:1412/grudge_fire"
+    },
+    {
+      "name": "char:1412/merit",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "军功",
+      "key": "char:1412/merit"
+    },
+    {
+      "name": "char:1412/merit_attack",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "军功-攻击力",
+      "key": "char:1412/merit_attack"
+    },
+    {
+      "name": "char:1412/merit_damage_boost",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "军功增伤",
+      "key": "char:1412/merit_damage_boost"
+    },
+    {
+      "name": "char:1412/merit_penetration",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "军功穿透",
+      "key": "char:1412/merit_penetration"
+    },
+    {
+      "name": "char:1412/peerage",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "爵位",
+      "key": "char:1412/peerage"
+    },
+    {
+      "name": "char:1412/puppet_of_joy",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "幸福傀儡",
+      "key": "char:1412/puppet_of_joy"
+    },
+    {
+      "name": "char:1412/rage_noise",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "怒噪",
+      "key": "char:1412/rage_noise"
+    },
+    {
+      "name": "char:1412/strange_dream",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "异梦",
+      "key": "char:1412/strange_dream"
+    },
+    {
+      "name": "char:1412/strong_shock",
+      "owner": "1412",
+      "kind": "char",
+      "used_by": [
+        "1412"
+      ],
+      "zh": "强烈震荡",
+      "key": "char:1412/strong_shock"
+    },
+    {
       "name": "char:1503/aesthetic_original",
       "owner": "1503",
       "kind": "char",
@@ -1347,15 +1508,6 @@
     },
     {
       "name": "充能",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412",
-        "1415"
-      ]
-    },
-    {
-      "name": "充能",
       "owner": "1504",
       "kind": "char",
       "used_by": [
@@ -1393,38 +1545,6 @@
       "used_by": [
         "8003",
         "8004"
-      ]
-    },
-    {
-      "name": "军功",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
-      "name": "军功-攻击力",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
-      "name": "军功增伤",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
-      "name": "军功穿透",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
       ]
     },
     {
@@ -1684,27 +1804,11 @@
       ]
     },
     {
-      "name": "幸福傀儡",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
       "name": "幻相",
       "owner": "1306",
       "kind": "char",
       "used_by": [
         "1306"
-      ]
-    },
-    {
-      "name": "异梦",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
       ]
     },
     {
@@ -1745,14 +1849,6 @@
       "kind": "internal",
       "used_by": [
         "1506"
-      ]
-    },
-    {
-      "name": "强烈震荡",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
       ]
     },
     {
@@ -1801,30 +1897,6 @@
       "kind": "char",
       "used_by": [
         "1415"
-      ]
-    },
-    {
-      "name": "怒噪",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
-      "name": "怨火灼身",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
-      "name": "恐惧",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
       ]
     },
     {
@@ -1889,14 +1961,6 @@
       "kind": "char",
       "used_by": [
         "1307"
-      ]
-    },
-    {
-      "name": "支配",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
       ]
     },
     {
@@ -2170,14 +2234,6 @@
       "kind": "char",
       "used_by": [
         "1513"
-      ]
-    },
-    {
-      "name": "爵位",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
       ]
     },
     {
@@ -2516,22 +2572,6 @@
       ]
     },
     {
-      "name": "缠禁",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
-      "name": "缠绕",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
-      ]
-    },
-    {
       "name": "老主顾",
       "owner": "1406",
       "kind": "char",
@@ -2616,14 +2656,6 @@
       "kind": "internal",
       "used_by": [
         "1222"
-      ]
-    },
-    {
-      "name": "行动锁定",
-      "owner": "1412",
-      "kind": "char",
-      "used_by": [
-        "1412"
       ]
     },
     {

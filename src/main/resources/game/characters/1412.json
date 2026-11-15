@@ -8,7 +8,7 @@
   ],
   "resources": [
     {
-      "id": "充能",
+      "id": "char:1412/charge",
       "max": 8,
       "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202, BPSkill/Support): 「使指定我方单体角色获得【军功】并使刻律德菈获得1点充能。充能上限8点。当充能达到6点时，自动使角色的【军功】升级为【爵位】…」",
       "note": "上限 **8** 是**文档原话** ✓（「充能**上限 8 点**」✓）。⚠ 文档**没说初始值** ✗ ⇒ 保持默认 **0** ✓（与 1224 同一判断 ✓）。⚠ 本文件只声明容量 ✓ 与三处**固定**获取（战技 +1 ✓、军功角色攻击 +1 ✓、终结技 +2 ✓）；「达到 6 点自动升级为【爵位】」✗ 与「目标改变时重置为 0」✗ 都登记在 `level_convention` 里 ✓。"
@@ -46,18 +46,18 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "军功",
+          "buff": "char:1412/merit",
           "target": "all_allies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "军功",
+          "buff": "char:1412/merit",
           "permanent": true,
           "target": "target"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1412/charge",
           "amount": 1
         }
       ],
@@ -73,14 +73,14 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "军功-攻击力",
+          "buff": "char:1412/merit_attack",
           "kind": "own",
           "target": "target"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "buff": "军功-攻击力",
+          "buff": "char:1412/merit_attack",
           "scale": "self_attr:ATTACK",
           "permanent": true,
           "target": "target",
@@ -94,12 +94,12 @@
       "on": "ALLY_ATTACK",
       "id": "talent_charge_from_marked_ally",
       "when": [
-        "actor has_state 军功"
+        "actor has_state char:1412/merit"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1412/charge",
           "amount": 1
         }
       ],
@@ -110,7 +110,7 @@
       "on": "ALLY_ATTACK",
       "id": "talent_additional_damage_after_marked_attack",
       "when": [
-        "actor has_state 军功"
+        "actor has_state char:1412/merit"
       ],
       "do": [
         {
@@ -133,7 +133,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1412/charge",
           "amount": 2
         }
       ],
@@ -164,13 +164,13 @@
       "id": "peerage_upgrade_at_six_charge",
       "when": [
         "actor == self",
-        "self_resource:充能 >= 6"
+        "self_resource:char:1412/charge >= 6"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "爵位",
-          "target": "holder_of:军功",
+          "buff": "char:1412/peerage",
+          "target": "holder_of:char:1412/merit",
           "permanent": true
         },
         {
@@ -178,78 +178,78 @@
           "attribute": "DAMAGE_PENETRATION",
           "permanent": true,
           "max_stacks": 2,
-          "target": "holder_of:军功",
+          "target": "holder_of:char:1412/merit",
           "percent_from_skill_param": "SKILL:4"
         },
         {
           "op": "REMOVE_STATE",
           "buff": "ctrl:frozen",
-          "target": "holder_of:军功"
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "缠绕",
-          "target": "holder_of:军功"
+          "buff": "char:1412/entwine",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
           "buff": "ctrl:imprisoned",
-          "target": "holder_of:军功"
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "支配",
-          "target": "holder_of:军功"
+          "buff": "char:1412/dominate",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "怒噪",
-          "target": "holder_of:军功"
+          "buff": "char:1412/rage_noise",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "强烈震荡",
-          "target": "holder_of:军功"
+          "buff": "char:1412/strong_shock",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "异梦",
-          "target": "holder_of:军功"
+          "buff": "char:1412/strange_dream",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "缠禁",
-          "target": "holder_of:军功"
+          "buff": "char:1412/binding",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "恐惧",
-          "target": "holder_of:军功"
+          "buff": "char:1412/fear",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "行动锁定",
-          "target": "holder_of:军功"
+          "buff": "char:1412/action_lock",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "幸福傀儡",
-          "target": "holder_of:军功"
+          "buff": "char:1412/puppet_of_joy",
+          "target": "holder_of:char:1412/merit"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "怨火灼身",
-          "target": "holder_of:军功"
+          "buff": "char:1412/grudge_fire",
+          "target": "holder_of:char:1412/merit"
         }
       ],
       "source": "1412 刻律德菈 战技 升变，士皆可帅 (141202, BPSkill/Support): 「当充能达到 6 点时，自动使角色的【军功】升级为【爵位】并解除其控制类负面状态」\n⭐ 2026-10-02（文档 `:67`）：「持有【爵位】的角色…全属性**抗性穿透提高 10.00%**」✓\n⭐ 2026-10-02（文档 `:67`）：「当充能达到 6 点时，自动使角色的【军功】升级为【爵位】**并解除其控制类负面状态**」✓",
-      "_note": "「当充能达到 **6** 点时，自动使角色的【军功】升级为【爵位】」—— 事件 `RESOURCE_CHANGED` ✓ （已存在）＋ `self_resource:充能 >= 6` ✓ （条件已支持资源读取）＋ `holder_of:军功` ✓ （选择器已出货）；【爵位】**不写时长** ✓ （文档没给，与【军功】同为充能驱动）。⚠ **登记**：同句的「并解除其**控制类负面状态**」✗ —— 引擎今天没有“按**类**清除负面”的能力（`DISPEL` 是摘敌方增益、`RESIST_DEBUFF` 是抗性、`REMOVE_BUFF` 是按**数**不是按类）。⚠ **另一处登记**：文档说「持有【爵位】的角色**被视为同时持有【军功】**」✓ —— 本条只**加【爵位】、不摘【军功】** ✓，那句话因此**自然成立** （两个状态同时在）✓。⚠ 装载器**拒绝不写时长的 APPLY_BUFF** ✓ （“没有默认” ✓）⇒ 本条写 **permanent: true** ✓ （【爵位】直到被“消耗 6 点充能变回【军功】”摘掉 ✓ ）；⚠ 那条“变回来”的规则**尚未出货** ✗ —— 它要等「奇袭结束」那个时刻 ✗，已登记。\n⭐ 2026-10-02：加上**全属性抗性穿透 +10%** ✓ —— 形状照拄同一条规则里已有的写法（`target: \"holder_of:军功\"` ✓），而 `DAMAGE_PENETRATION` 对应文档 `:68` 的「抗性穿透」定义 ✓（同拼写已在 1502 出货过 ✓）。⚠ **仍登记**：同句的“**战技伤害的爆伤 +72%**”（带“战技”限定 ✗）与“**奇袭**”及其结束时的“消耗 6 点充能、爵位变回【军功】”。\n⭐ 2026-10-02：**逐名解除** 12 个状态 ✓（名单逐字取自文档 `:68` 的术语表 ✓）。⚠ **为何不用 `DISPEL`** ✗：它的落地是 `removeDebuffs(amount)` ✗，“移除最多 N 个**负面效果**”**没有任何过滤** ✗ —— 写在这里会连目标身上的**持续伤害或其他减益**一并洗掉 ✗，那不是这句话说的事 ✗。 ⚠ **按等级读**（AGENT §0.1.3）。"
+      "_note": "「当充能达到 **6** 点时，自动使角色的【军功】升级为【爵位】」—— 事件 `RESOURCE_CHANGED` ✓ （已存在）＋ `self_resource:char:1412/charge >= 6` ✓ （条件已支持资源读取）＋ `holder_of:军功` ✓ （选择器已出货）；【爵位】**不写时长** ✓ （文档没给，与【军功】同为充能驱动）。⚠ **登记**：同句的「并解除其**控制类负面状态**」✗ —— 引擎今天没有“按**类**清除负面”的能力（`DISPEL` 是摘敌方增益、`RESIST_DEBUFF` 是抗性、`REMOVE_BUFF` 是按**数**不是按类）。⚠ **另一处登记**：文档说「持有【爵位】的角色**被视为同时持有【军功】**」✓ —— 本条只**加【爵位】、不摘【军功】** ✓，那句话因此**自然成立** （两个状态同时在）✓。⚠ 装载器**拒绝不写时长的 APPLY_BUFF** ✓ （“没有默认” ✓）⇒ 本条写 **permanent: true** ✓ （【爵位】直到被“消耗 6 点充能变回【军功】”摘掉 ✓ ）；⚠ 那条“变回来”的规则**尚未出货** ✗ —— 它要等「奇袭结束」那个时刻 ✗，已登记。\n⭐ 2026-10-02：加上**全属性抗性穿透 +10%** ✓ —— 形状照拄同一条规则里已有的写法（`target: \"holder_of:军功\"` ✓），而 `DAMAGE_PENETRATION` 对应文档 `:68` 的「抗性穿透」定义 ✓（同拼写已在 1502 出货过 ✓）。⚠ **仍登记**：同句的“**战技伤害的爆伤 +72%**”（带“战技”限定 ✗）与“**奇袭**”及其结束时的“消耗 6 点充能、爵位变回【军功】”。\n⭐ 2026-10-02：**逐名解除** 12 个状态 ✓（名单逐字取自文档 `:68` 的术语表 ✓）。⚠ **为何不用 `DISPEL`** ✗：它的落地是 `removeDebuffs(amount)` ✗，“移除最多 N 个**负面效果**”**没有任何过滤** ✗ —— 写在这里会连目标身上的**持续伤害或其他减益**一并洗掉 ✗，那不是这句话说的事 ✗。 ⚠ **按等级读**（AGENT §0.1.3）。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "peerage_skill_extra_pierce",
       "when": [
-        "actor has_state 爵位",
+        "actor has_state char:1412/peerage",
         "from_category BPSKILL"
       ],
       "do": [
@@ -269,7 +269,7 @@
       "on": "CAST_SETUP",
       "id": "coup_de_main",
       "when": [
-        "actor has_state 爵位",
+        "actor has_state char:1412/peerage",
         "from_category BPSKILL"
       ],
       "do": [
@@ -286,29 +286,29 @@
       "on": "INSERTED_CAST_END",
       "id": "coup_de_main_ends",
       "when": [
-        "actor has_state 爵位",
-        "self_resource:充能 >= 6"
+        "actor has_state char:1412/peerage",
+        "self_resource:char:1412/charge >= 6"
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1412/charge",
           "amount": 6
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "爵位",
+          "buff": "char:1412/peerage",
           "target": "attacker"
         }
       ],
       "source": "1412 刻律德菈（文档 `:67`）：「**奇袭结束后，消耗 6 点充能使【爵位】变回【军功】**」",
-      "_note": "⭐ 2026-10-02：触发用**新建的 `INSERTED_CAST_END`** ✓（“被命令的施放结束” ✓）；“变回【军功】”就是**取消【爵位】** ✓（文档：「持有【爵位】的角色**被视为同时持有【军功】**」 ✓）；门槛 `self_resource:充能 >= 6` ✓ 保证不会花不起 ✗。"
+      "_note": "⭐ 2026-10-02：触发用**新建的 `INSERTED_CAST_END`** ✓（“被命令的施放结束” ✓）；“变回【军功】”就是**取消【爵位】** ✓（文档：「持有【爵位】的角色**被视为同时持有【军功】**」 ✓）；门槛 `self_resource:char:1412/charge >= 6` ✓ 保证不会花不起 ✗。"
     },
     {
       "on": "DEALING_DAMAGE",
       "id": "peerage_skill_crit_damage",
       "when": [
-        "actor has_state 爵位",
+        "actor has_state char:1412/peerage",
         "from_category BPSKILL"
       ],
       "do": [
@@ -343,7 +343,7 @@
           "permanent": true,
           "target": "all_allies",
           "target_when": [
-            "target has_state 军功"
+            "target has_state char:1412/merit"
           ]
         }
       ],
@@ -360,7 +360,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1412/charge",
           "scale": "cast_skill_param:1",
           "target": "self",
           "percent": 10000
@@ -381,7 +381,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent_from": {
             "type": "resource",
-            "resource": "充能",
+            "resource": "char:1412/charge",
             "basis_points": true
           },
           "permanent": true,
@@ -440,7 +440,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "军功",
+          "buff": "char:1412/merit",
           "permanent": true,
           "target": "self"
         }
@@ -453,7 +453,7 @@
       "id": "eidolon2_self_boost_while_an_ally_has_merit",
       "min_eidolon": 2,
       "when": [
-        "any_ally has_state 军功"
+        "any_ally has_state char:1412/merit"
       ],
       "do": [
         {
@@ -477,7 +477,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "军功增伤",
+          "buff": "char:1412/merit_damage_boost",
           "target": "all_allies"
         },
         {
@@ -485,7 +485,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.4,
           "permanent": true,
-          "buff": "军功增伤",
+          "buff": "char:1412/merit_damage_boost",
           "target": "target"
         }
       ],
@@ -502,7 +502,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "军功穿透",
+          "buff": "char:1412/merit_penetration",
           "target": "all_allies"
         },
         {
@@ -510,7 +510,7 @@
           "attribute": "RESISTANCE_REDUCTION",
           "percent": 0.2,
           "permanent": true,
-          "buff": "军功穿透",
+          "buff": "char:1412/merit_penetration",
           "target": "target"
         }
       ],
@@ -522,7 +522,7 @@
       "id": "eidolon6_self_penetration_while_an_ally_has_merit",
       "min_eidolon": 6,
       "when": [
-        "any_ally has_state 军功"
+        "any_ally has_state char:1412/merit"
       ],
       "do": [
         {
@@ -541,12 +541,12 @@
       "id": "ult_gives_merit_to_the_first_when_nobody_has_it",
       "when": [
         "actor == self",
-        "!any_ally has_state 军功"
+        "!any_ally has_state char:1412/merit"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "军功",
+          "buff": "char:1412/merit",
           "permanent": true,
           "target": "next_ally"
         }

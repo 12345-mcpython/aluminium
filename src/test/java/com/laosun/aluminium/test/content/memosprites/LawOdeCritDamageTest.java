@@ -25,7 +25,7 @@ public class LawOdeCritDamageTest {
     private static final int CYRENE = 1415;
     private static final int CERYDRA = 1412;
     private static final int PLAIN = 1002;
-    private static final String MARK = "军功";
+    private static final String MARK = "char:1412/merit";
 
     @Test
     public void onlyTheMarkedAllyGainsTheCritDamage() {
@@ -65,8 +65,8 @@ public class LawOdeCritDamageTest {
                 + " ; unmarked gain = " + plainGain);
 
         Assertions.assertEquals(row.get(0), markedGain, Math.abs(row.get(0)) * 1e-6,
-                "「持有【军功】的角色暴击伤害提高 #1%」 (a character holding Military Merit gets #1% more CRIT DMG)-- and #1 runs with level");
+                "「持有【char:1412/merit】的角色暴击伤害提高 #1%」 (a character holding Military Merit gets #1% more CRIT DMG)-- and #1 runs with level");
         Assertions.assertEquals(0.0, plainGain, 1e-9,
-                "and an ally WITHOUT it gains nothing -- 「持有【军功】的角色」 (a character holding Military Merit) names a subset");
+                "and an ally WITHOUT it gains nothing -- 「持有【char:1412/merit】的角色」 (a character holding Military Merit) names a subset");
     }
 }

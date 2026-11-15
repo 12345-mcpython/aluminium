@@ -390,8 +390,8 @@ public class CharacterConditionLiteralsTest {
         assertRule(1410, "ULT_CAST", "eidolon4_zone_lowers_all_resistance", List.of("actor == self"));
         assertRule(1412, "SKILL_CAST", "skill_grants_military_merit", List.of("actor == self"));
         assertRule(1412, "SKILL_CAST", "talent_attack_share_on_marked_ally", List.of("actor == self"));
-        assertRule(1412, "ALLY_ATTACK", "talent_charge_from_marked_ally", List.of("actor has_state 军功"));
-        assertRule(1412, "ALLY_ATTACK", "talent_additional_damage_after_marked_attack", List.of("actor has_state 军功"));
+        assertRule(1412, "ALLY_ATTACK", "talent_charge_from_marked_ally", List.of("actor has_state char:1412/merit"));
+        assertRule(1412, "ALLY_ATTACK", "talent_additional_damage_after_marked_attack", List.of("actor has_state char:1412/merit"));
         assertRule(1412, "ULT_CAST", "ult_charge", List.of("actor == self"));
         assertRule(1412, "BATTLE_START", "level_convention", List.of());
         assertRule(1412, "SKILL_CAST", "eidolon1_defence_ignore_for_marked", List.of("actor == self"));

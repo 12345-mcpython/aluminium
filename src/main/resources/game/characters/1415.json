@@ -11,7 +11,7 @@
       "overflow": 3
     },
     {
-      "id": "充能",
+      "id": "char:1412/charge",
       "max": 8,
       "source": "1412 刻律德菈 战技：「使指定我方单体角色获得【军功】并使刻律德菈获得 1 点充能。充能上限 8 点。」（本文件声明它，是因为**规则在本文件**而资源属于 1412 ✓；上限与 1412 文件一致 ✓）"
     },
@@ -341,7 +341,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1412/charge",
           "amount": 1,
           "target": "target"
         }

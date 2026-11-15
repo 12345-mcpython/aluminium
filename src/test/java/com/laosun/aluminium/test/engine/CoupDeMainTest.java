@@ -24,9 +24,9 @@ import java.util.List;
 public class CoupDeMainTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
-    private static final String PEERAGE = "爵位";
-    private static final String MERIT = "军功";
-    private static final String CHARGE = "充能";
+    private static final String PEERAGE = "char:1412/peerage";
+    private static final String MERIT = "char:1412/merit";
+    private static final String CHARGE = "char:1412/charge";
 
     /**
      * The peer's skill is cast twice -- the copy first, then the original -- and not forever.
@@ -69,12 +69,12 @@ public class CoupDeMainTest {
 
         Assertions.assertEquals(charge - 6 + 2, owner.getResources().value(CHARGE), 1e-9,
                 "\"consumes 6 points of Charge\" (「消耗 6 点充能」)—— ❗ and two casts (the copy + the original Skill)"
-                        + "+1 point each (the Military Merit (【军功】) clause: \"when casting a Basic ATK or Skill, Cerydra gains 1 point of Charge\" (「施放普攻或战技时使刻律德菈获得 1 点充能」))"
+                        + "+1 point each (the Military Merit (【char:1412/merit】) clause: \"when casting a Basic ATK or Skill, Cerydra gains 1 point of Charge\" (「施放普攻或战技时使刻律德菈获得 1 点充能」))"
                         + ", so the net change is -4 ✓ (before=" + charge + ")");
         Assertions.assertFalse(ally.getBuffManager().hasState(PEERAGE),
-                "\"turns Peerage (【爵位】) back into Military Merit (【军功】)\" (「使【爵位】变回【军功】」)");
+                "\"turns Peerage (【char:1412/peerage】) back into Military Merit (【char:1412/merit】)\" (「使【char:1412/peerage】变回【char:1412/merit】」)");
         Assertions.assertTrue(ally.getBuffManager().hasState(MERIT),
-                "\"turns back into Military Merit (【军功】)\" (「变回【军功】」) -- the merit is still there");
+                "\"turns back into Military Merit (【char:1412/merit】)\" (「变回【char:1412/merit】」) -- the merit is still there");
     }
 
     private static double damageDealt(boolean keepPeerage) {
