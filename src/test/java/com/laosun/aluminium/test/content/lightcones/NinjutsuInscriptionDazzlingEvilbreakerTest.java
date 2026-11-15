@@ -24,8 +24,8 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String MINE = "雷遁";
-    private static final String COUNT = "普攻计数";
+    private static final String MINE = "char:23033/lightning_escape";
+    private static final String COUNT = "internal:23033/basic_count";
     private static final double RANK_ONE = 0.5;
     private static final double RANK_TWO = 0.55;
 

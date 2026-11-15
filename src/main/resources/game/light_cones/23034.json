@@ -14,7 +14,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -24,7 +24,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.15,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -47,7 +47,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -57,7 +57,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.15,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -72,12 +72,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -93,7 +93,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -102,7 +102,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -116,12 +116,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -137,7 +137,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -146,7 +146,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -170,7 +170,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -180,7 +180,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.1725,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -203,7 +203,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -213,7 +213,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.1725,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -228,12 +228,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -249,7 +249,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -258,7 +258,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -272,12 +272,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -293,7 +293,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -302,7 +302,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -326,7 +326,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -336,7 +336,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.195,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -359,7 +359,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -369,7 +369,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.195,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -384,12 +384,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -405,7 +405,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -414,7 +414,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -428,12 +428,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -449,7 +449,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -458,7 +458,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -482,7 +482,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -492,7 +492,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.2175,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -515,7 +515,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -525,7 +525,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.2175,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -540,12 +540,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -561,7 +561,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -570,7 +570,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -584,12 +584,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -605,7 +605,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -614,7 +614,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -638,7 +638,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -648,7 +648,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.24,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -671,7 +671,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "圣咏",
+          "buff": "char:23034/chant",
           "amount": 1,
           "max_stacks": 3,
           "turns": 3,
@@ -681,7 +681,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.24,
-          "per_stack": "圣咏",
+          "per_stack": "char:23034/chant",
           "turns": 3,
           "target": "target"
         }
@@ -696,12 +696,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -717,7 +717,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -726,7 +726,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }
@@ -740,12 +740,12 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 < 2"
+        "self_stacks:internal:23034/cast_count < 2"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -761,7 +761,7 @@
       "when": [
         "actor == self",
         "target is_ally",
-        "self_stacks:施放计数 >= 2"
+        "self_stacks:internal:23034/cast_count >= 2"
       ],
       "do": [
         {
@@ -770,7 +770,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "施放计数",
+          "buff": "internal:23034/cast_count",
           "amount": 2,
           "target": "self"
         }

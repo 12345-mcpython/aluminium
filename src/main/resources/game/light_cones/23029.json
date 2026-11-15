@@ -15,13 +15,13 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "卸甲",
+          "buff": "char:23029/disarm",
           "turns": 2,
           "base_chance": 0.6,
           "target": "target",
           "target_when": [
-            "!target has_state 卸甲",
-            "!target has_state 穷寇"
+            "!target has_state char:23029/disarm",
+            "!target has_state char:23029/cornered_foe"
           ]
         },
         {
@@ -31,8 +31,8 @@
           "base_chance": 0.6,
           "target": "target",
           "target_when": [
-            "!target has_state 卸甲",
-            "!target has_state 穷寇"
+            "!target has_state char:23029/disarm",
+            "!target has_state char:23029/cornered_foe"
           ]
         }
       ],
@@ -48,19 +48,19 @@
       "id": "cone23029_armor_break_upgrades",
       "when": [
         "actor == self",
-        "target has_state 卸甲",
+        "target has_state char:23029/disarm",
         "target_dots_from_self >= 1"
       ],
       "chance": 0.6,
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "卸甲",
+          "buff": "char:23029/disarm",
           "target": "target"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "穷寇",
+          "buff": "char:23029/cornered_foe",
           "turns": 2,
           "target": "target"
         },

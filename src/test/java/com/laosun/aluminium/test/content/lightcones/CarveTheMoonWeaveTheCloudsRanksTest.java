@@ -26,7 +26,7 @@ public class CarveTheMoonWeaveTheCloudsRanksTest {
     private static final int WEARER = 1002;
     private static final int ALLY = 1001;
     private static final int CONE = 21032;
-    private static final List<String> SECRETS = List.of("秘密-攻击力", "秘密-暴击伤害", "秘密-能量恢复");
+    private static final List<String> SECRETS = List.of("char:21032/secret_attack", "char:21032/secret_crit_damage", "char:21032/secret_energy_regen");
 
     /**
      * The active share matches the rank's row: attack 10/12.5/15/17.5/20%, crit 12/15/18/21/24%, regeneration 6/7.5/9/10.5/12%.
@@ -43,8 +43,8 @@ public class CarveTheMoonWeaveTheCloudsRanksTest {
             String active = activeSecret(wearer);
             Assertions.assertNotNull(active, "rank " + rank + ": one effect must be up");
             double expected = switch (active) {
-                case "秘密-攻击力" -> attack[rank - 1];
-                case "秘密-暴击伤害" -> crit[rank - 1];
+                case "char:21032/secret_attack" -> attack[rank - 1];
+                case "char:21032/secret_crit_damage" -> crit[rank - 1];
                 default -> err[rank - 1];
             };
             Assertions.assertEquals(expected, share(wearer, active), 1e-6, "rank " + rank + " active " + active);
@@ -67,8 +67,8 @@ public class CarveTheMoonWeaveTheCloudsRanksTest {
      */
     private static double share(Character wearer, String effect) {
         AttributeType type = switch (effect) {
-            case "秘密-攻击力" -> AttributeType.ATTACK;
-            case "秘密-暴击伤害" -> AttributeType.CRIT_ATTACK;
+            case "char:21032/secret_attack" -> AttributeType.ATTACK;
+            case "char:21032/secret_crit_damage" -> AttributeType.CRIT_ATTACK;
             default -> AttributeType.ENERGY_REGENERATION_RATE;
         };
         double before = wearer.getAttribute(type).get();

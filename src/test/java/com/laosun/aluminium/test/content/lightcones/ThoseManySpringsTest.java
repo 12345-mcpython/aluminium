@@ -61,15 +61,15 @@ public class ThoseManySpringsTest {
         Run withMine = new Run();
         withMine.myDot();
         withMine.castSkill();
-        Assertions.assertFalse(withMine.enemy.getBuffManager().hasState("卸甲"), "【卸甲】 is gone - it was upgraded");
-        Assertions.assertTrue(withMine.enemy.getBuffManager().hasState("穷寇"), "and 【穷寇】 took its place");
+        Assertions.assertFalse(withMine.enemy.getBuffManager().hasState("char:23029/disarm"), "【char:23029/disarm】 is gone - it was upgraded");
+        Assertions.assertTrue(withMine.enemy.getBuffManager().hasState("char:23029/cornered_foe"), "and 【char:23029/cornered_foe】 took its place");
 
         Run withoutMine = new Run();
         withoutMine.anyoneElsesDot();
         withoutMine.castSkill();
-        Assertions.assertTrue(withoutMine.enemy.getBuffManager().hasState("卸甲"),
+        Assertions.assertTrue(withoutMine.enemy.getBuffManager().hasState("char:23029/disarm"),
                 "「装备者施加的持续伤害」 - somebody else's DoT does not upgrade it");
-        Assertions.assertFalse(withoutMine.enemy.getBuffManager().hasState("穷寇"));
+        Assertions.assertFalse(withoutMine.enemy.getBuffManager().hasState("char:23029/cornered_foe"));
     }
 
     // ==================================================================
@@ -86,7 +86,7 @@ public class ThoseManySpringsTest {
             battle = new Battle(new ArrayList<>(List.of(wearer)), new ArrayList<>(List.of(enemy)),
                     BattleFixture.alwaysRoll(0.0));
             battle.startBattle();
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("卸甲", 2));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:23029/disarm", 2));
         }
 
         void myDot() {

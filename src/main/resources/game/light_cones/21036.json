@@ -7,7 +7,7 @@
       "id": "cone21036_heart_from_normal",
       "when": ["actor == self", "from_category NORMAL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心普攻", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_basic", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
@@ -27,7 +27,7 @@
       "id": "cone21036_heart_from_bpskill",
       "when": ["actor == self", "from_category BPSKILL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心战技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_skill", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "SKILL_DAMAGE_BOOST",
@@ -47,7 +47,7 @@
       "id": "cone21036_heart_from_ultra",
       "when": ["actor == self", "from_category ULTRA"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心终结技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_ultimate", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ULTIMATE_DAMAGE_BOOST",
@@ -69,7 +69,7 @@
       "id": "cone21036_heart_from_normal",
       "when": ["actor == self", "from_category NORMAL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心普攻", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_basic", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
@@ -89,7 +89,7 @@
       "id": "cone21036_heart_from_bpskill",
       "when": ["actor == self", "from_category BPSKILL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心战技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_skill", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "SKILL_DAMAGE_BOOST",
@@ -109,7 +109,7 @@
       "id": "cone21036_heart_from_ultra",
       "when": ["actor == self", "from_category ULTRA"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心终结技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_ultimate", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ULTIMATE_DAMAGE_BOOST",
@@ -131,7 +131,7 @@
       "id": "cone21036_heart_from_normal",
       "when": ["actor == self", "from_category NORMAL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心普攻", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_basic", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
@@ -151,7 +151,7 @@
       "id": "cone21036_heart_from_bpskill",
       "when": ["actor == self", "from_category BPSKILL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心战技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_skill", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "SKILL_DAMAGE_BOOST",
@@ -171,7 +171,7 @@
       "id": "cone21036_heart_from_ultra",
       "when": ["actor == self", "from_category ULTRA"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心终结技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_ultimate", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ULTIMATE_DAMAGE_BOOST",
@@ -193,7 +193,7 @@
       "id": "cone21036_heart_from_normal",
       "when": ["actor == self", "from_category NORMAL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心普攻", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_basic", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
@@ -213,7 +213,7 @@
       "id": "cone21036_heart_from_bpskill",
       "when": ["actor == self", "from_category BPSKILL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心战技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_skill", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "SKILL_DAMAGE_BOOST",
@@ -233,7 +233,7 @@
       "id": "cone21036_heart_from_ultra",
       "when": ["actor == self", "from_category ULTRA"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心终结技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_ultimate", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ULTIMATE_DAMAGE_BOOST",
@@ -255,7 +255,7 @@
       "id": "cone21036_heart_from_normal",
       "when": ["actor == self", "from_category NORMAL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心普攻", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_basic", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
@@ -275,7 +275,7 @@
       "id": "cone21036_heart_from_bpskill",
       "when": ["actor == self", "from_category BPSKILL"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心战技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_skill", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "SKILL_DAMAGE_BOOST",
@@ -295,7 +295,7 @@
       "id": "cone21036_heart_from_ultra",
       "when": ["actor == self", "from_category ULTRA"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "童心终结技", "turns": 1 },
+        { "op": "APPLY_BUFF", "buff": "char:21036/childlike_ultimate", "turns": 1 },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ULTIMATE_DAMAGE_BOOST",

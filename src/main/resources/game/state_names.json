@@ -257,6 +257,66 @@
       "key": "char:21015/capture"
     },
     {
+      "name": "char:21032/secret_attack",
+      "owner": "21032",
+      "kind": "char",
+      "used_by": [
+        "21032"
+      ],
+      "zh": "秘密-攻击力",
+      "key": "char:21032/secret_attack"
+    },
+    {
+      "name": "char:21032/secret_crit_damage",
+      "owner": "21032",
+      "kind": "char",
+      "used_by": [
+        "21032"
+      ],
+      "zh": "秘密-暴击伤害",
+      "key": "char:21032/secret_crit_damage"
+    },
+    {
+      "name": "char:21032/secret_energy_regen",
+      "owner": "21032",
+      "kind": "char",
+      "used_by": [
+        "21032"
+      ],
+      "zh": "秘密-能量恢复",
+      "key": "char:21032/secret_energy_regen"
+    },
+    {
+      "name": "char:21036/childlike_basic",
+      "owner": "21036",
+      "kind": "char",
+      "used_by": [
+        "21036"
+      ],
+      "zh": "童心普攻",
+      "key": "char:21036/childlike_basic"
+    },
+    {
+      "name": "char:21036/childlike_skill",
+      "owner": "21036",
+      "kind": "char",
+      "used_by": [
+        "21036"
+      ],
+      "zh": "童心战技",
+      "key": "char:21036/childlike_skill"
+    },
+    {
+      "name": "char:21036/childlike_ultimate",
+      "owner": "21036",
+      "kind": "char",
+      "used_by": [
+        "21036"
+      ],
+      "zh": "童心终结技",
+      "key": "char:21036/childlike_ultimate"
+    },
+    {
       "name": "char:21037/luck",
       "owner": "21037",
       "kind": "char",
@@ -447,6 +507,26 @@
       "key": "char:23028/hope_priceless"
     },
     {
+      "name": "char:23029/cornered_foe",
+      "owner": "23029",
+      "kind": "char",
+      "used_by": [
+        "23029"
+      ],
+      "zh": "穷寇",
+      "key": "char:23029/cornered_foe"
+    },
+    {
+      "name": "char:23029/disarm",
+      "owner": "23029",
+      "kind": "char",
+      "used_by": [
+        "23029"
+      ],
+      "zh": "卸甲",
+      "key": "char:23029/disarm"
+    },
+    {
       "name": "char:23030/fire_dance",
       "owner": "23030",
       "kind": "char",
@@ -475,6 +555,26 @@
       ],
       "zh": "忘忧",
       "key": "char:23032/forget_sorrow"
+    },
+    {
+      "name": "char:23033/lightning_escape",
+      "owner": "23033",
+      "kind": "char",
+      "used_by": [
+        "23033"
+      ],
+      "zh": "雷遁",
+      "key": "char:23033/lightning_escape"
+    },
+    {
+      "name": "char:23034/chant",
+      "owner": "23034",
+      "kind": "char",
+      "used_by": [
+        "23034"
+      ],
+      "zh": "圣咏",
+      "key": "char:23034/chant"
     },
     {
       "name": "char:23035/scorch",
@@ -763,6 +863,26 @@
       "key": "internal:23013/healing_recorded"
     },
     {
+      "name": "internal:23033/basic_count",
+      "owner": "23033",
+      "kind": "internal",
+      "used_by": [
+        "23033"
+      ],
+      "zh": "普攻计数",
+      "key": "internal:23033/basic_count"
+    },
+    {
+      "name": "internal:23034/cast_count",
+      "owner": "23034",
+      "kind": "internal",
+      "used_by": [
+        "23034"
+      ],
+      "zh": "施放计数",
+      "key": "internal:23034/cast_count"
+    },
+    {
       "name": "internal:23042/iridescence_spent",
       "owner": "23042",
       "kind": "internal",
@@ -781,6 +901,16 @@
       ],
       "zh": "技能层",
       "key": "internal:23046/skill_layers"
+    },
+    {
+      "name": "internal:23057/basic_count",
+      "owner": "23057",
+      "kind": "internal",
+      "used_by": [
+        "23057"
+      ],
+      "zh": "普攻计数",
+      "key": "internal:23057/basic_count"
     },
     {
       "name": "internal:24000/aeon_layers",
@@ -1084,14 +1214,6 @@
       ]
     },
     {
-      "name": "卸甲",
-      "owner": "23029",
-      "kind": "char",
-      "used_by": [
-        "23029"
-      ]
-    },
-    {
       "name": "反击标记",
       "owner": "1107",
       "kind": "internal",
@@ -1129,14 +1251,6 @@
       "kind": "char",
       "used_by": [
         "1503"
-      ]
-    },
-    {
-      "name": "圣咏",
-      "owner": "23034",
-      "kind": "char",
-      "used_by": [
-        "23034"
       ]
     },
     {
@@ -1565,14 +1679,6 @@
       ]
     },
     {
-      "name": "施放计数",
-      "owner": "23034",
-      "kind": "internal",
-      "used_by": [
-        "23034"
-      ]
-    },
-    {
       "name": "无敌玩家",
       "owner": "1506",
       "kind": "char",
@@ -1610,22 +1716,6 @@
       "kind": "char",
       "used_by": [
         "1402"
-      ]
-    },
-    {
-      "name": "普攻计数",
-      "owner": "23033",
-      "kind": "char",
-      "used_by": [
-        "23033"
-      ]
-    },
-    {
-      "name": "普攻计数",
-      "owner": "23057",
-      "kind": "char",
-      "used_by": [
-        "23057"
       ]
     },
     {
@@ -2110,30 +2200,6 @@
       ]
     },
     {
-      "name": "秘密-攻击力",
-      "owner": "21032",
-      "kind": "char",
-      "used_by": [
-        "21032"
-      ]
-    },
-    {
-      "name": "秘密-暴击伤害",
-      "owner": "21032",
-      "kind": "char",
-      "used_by": [
-        "21032"
-      ]
-    },
-    {
-      "name": "秘密-能量恢复",
-      "owner": "21032",
-      "kind": "char",
-      "used_by": [
-        "21032"
-      ]
-    },
-    {
       "name": "秘技减速",
       "owner": "1305",
       "kind": "char",
@@ -2142,43 +2208,11 @@
       ]
     },
     {
-      "name": "穷寇",
-      "owner": "23029",
-      "kind": "char",
-      "used_by": [
-        "23029"
-      ]
-    },
-    {
       "name": "空白",
       "owner": "23052",
       "kind": "char",
       "used_by": [
         "23052"
-      ]
-    },
-    {
-      "name": "童心战技",
-      "owner": "21036",
-      "kind": "char",
-      "used_by": [
-        "21036"
-      ]
-    },
-    {
-      "name": "童心普攻",
-      "owner": "21036",
-      "kind": "char",
-      "used_by": [
-        "21036"
-      ]
-    },
-    {
-      "name": "童心终结技",
-      "owner": "21036",
-      "kind": "char",
-      "used_by": [
-        "21036"
       ]
     },
     {
@@ -2687,14 +2721,6 @@
       "kind": "char",
       "used_by": [
         "1409"
-      ]
-    },
-    {
-      "name": "雷遁",
-      "owner": "23033",
-      "kind": "char",
-      "used_by": [
-        "23033"
       ]
     },
     {

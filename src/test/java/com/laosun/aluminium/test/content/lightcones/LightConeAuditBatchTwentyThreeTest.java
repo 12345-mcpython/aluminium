@@ -71,7 +71,7 @@ public class LightConeAuditBatchTwentyThreeTest {
         JsonObject pay = effect(23033, "cone23033_mine_pays_out", 0);
         System.out.println("[23033] 行动提前 " + pay.get("percent"));
         Assertions.assertEquals(0.5, pay.get("percent").getAsDouble(), 1e-9, "「行动提前 50%」");
-        Assertions.assertEquals(1, effect(23033, "cone23033_mine_pays_out", 2).get("amount").getAsInt(), "「并移除【雷遁】」");
+        Assertions.assertEquals(1, effect(23033, "cone23033_mine_pays_out", 2).get("amount").getAsInt(), "「并移除【char:23033/lightning_escape】」");
     }
 
     /**
@@ -81,11 +81,11 @@ public class LightConeAuditBatchTwentyThreeTest {
     public void coneTwoThreeThreeFourChantBelongsToTheTarget() {
         JsonObject stack = effect(23034, "cone23034_chant_for_the_target_skill", 1);
         JsonObject share = effect(23034, "cone23034_chant_for_the_target_skill", 2);
-        System.out.println("[23034] 圣咏: target=" + stack.get("target") + " max=" + stack.get("max_stacks")
+        System.out.println("[23034] char:23034/chant: target=" + stack.get("target") + " max=" + stack.get("max_stacks")
                 + " ; 份额 per_stack=" + share.get("per_stack") + " target=" + share.get("target"));
-        Assertions.assertEquals("target", stack.get("target").getAsString(), "「技能**目标**获得 1 层【圣咏】」");
+        Assertions.assertEquals("target", stack.get("target").getAsString(), "「技能**目标**获得 1 层【char:23034/chant】」");
         Assertions.assertEquals(3, stack.get("max_stacks").getAsInt(), "「最多叠加 3 层」");
-        Assertions.assertEquals("圣咏", share.get("per_stack").getAsString(), "「每层使**持有者**造成的伤害提高」");
+        Assertions.assertEquals("char:23034/chant", share.get("per_stack").getAsString(), "「每层使**持有者**造成的伤害提高」");
 
         Fixture f = new Fixture(23034);
         f.wearer.setCurrentEnergy(0);
@@ -94,7 +94,7 @@ public class LightConeAuditBatchTwentyThreeTest {
         System.out.println("[23034] 对队友施放战技后的能量 " + f.wearer.getCurrentEnergy() + " ; 队友的增伤 "
                 + f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
         Assertions.assertTrue(f.wearer.getCurrentEnergy() >= 6, "「恢复 6 点能量」");
-        Assertions.assertTrue(f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() > 0, "队友吃到了【圣咏】");
+        Assertions.assertTrue(f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() > 0, "队友吃到了【char:23034/chant】");
     }
 
     /**

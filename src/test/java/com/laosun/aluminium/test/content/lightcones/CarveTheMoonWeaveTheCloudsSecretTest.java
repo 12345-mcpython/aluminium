@@ -40,7 +40,7 @@ public class CarveTheMoonWeaveTheCloudsSecretTest {
     /**
      * The three effects, as the document states them: name, attribute, magnitude.
      */
-    private static final String[] NAMES = {"秘密-攻击力", "秘密-暴击伤害", "秘密-能量恢复"};
+    private static final String[] NAMES = {"char:21032/secret_attack", "char:21032/secret_crit_damage", "char:21032/secret_energy_regen"};
     private static final AttributeType[] ATTRS = {
             AttributeType.ATTACK, AttributeType.CRIT_ATTACK, AttributeType.ENERGY_REGENERATION_RATE};
     private static final double[] SHARES = {0.10, 0.12, 0.06};

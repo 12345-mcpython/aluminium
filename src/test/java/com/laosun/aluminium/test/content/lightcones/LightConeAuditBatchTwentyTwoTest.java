@@ -90,7 +90,7 @@ public class LightConeAuditBatchTwentyTwoTest {
     @Test
     public void coneTwoThreeTwoNineArmorBreakWithItsChance() {
         JsonObject rule = rule(23029, "cone23029_armor_break_normal");
-        System.out.println("[23029] 卸甲: when=" + rule.getAsJsonArray("when") + " on_any=" + rule.get("on_any")
+        System.out.println("[23029] char:23029/disarm: when=" + rule.getAsJsonArray("when") + " on_any=" + rule.get("on_any")
                 + " chance=" + rule.getAsJsonArray("do").get(0).getAsJsonObject().get("base_chance")
                 + " percent=" + rule.getAsJsonArray("do").get(1).getAsJsonObject().get("percent"));
         Assertions.assertEquals("0.6", rule.getAsJsonArray("do").get(0).getAsJsonObject().get("base_chance").toString(),
