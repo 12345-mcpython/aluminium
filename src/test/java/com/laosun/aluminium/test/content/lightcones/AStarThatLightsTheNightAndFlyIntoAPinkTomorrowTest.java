@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * {@code instance: true}. Without that flag it would raise the WEARER's attribute, which is the defect 23031 shipped and
  * had to be repaired -- so this judge asserts the flag, and the sweep flips it.
  *
- * <p>22006: the crit damage is the cone property, judged once; the Trailblazer-Memory clauses live in\n * {@code ConeTwentyTwoThousandSixTest}.
+ * <p>22006: the crit damage is the cone property, judged once; the Trailblazer-Memory clauses live in\n * {@code FlyIntoAPinkTomorrowTest}.
  */
 public class AStarThatLightsTheNightAndFlyIntoAPinkTomorrowTest {
     private static final int LEVEL = 80;

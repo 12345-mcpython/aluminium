@@ -33,7 +33,7 @@ public class ConeSpeedEnergyTest {
         battle.startBattle();
         // 2026-10-19: the break share is the cone's own `breaking_effect` property (it is in the panel before the
         // battle starts), so no rule states it any more.
-        Assertions.assertTrue(true, "the break share is the property - pinned in ConeAuditBatchTwelveTest");
+        Assertions.assertTrue(true, "the break share is the property - pinned in LightConeAuditBatchTwelveTest");
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double speedBefore = unit.getAttribute(AttributeType.SPEED).get();

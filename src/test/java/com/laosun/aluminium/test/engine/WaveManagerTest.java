@@ -31,6 +31,11 @@ import com.laosun.aluminium.Signal;
  *   team does not equal a win (the seam between P-3 x P-4).</li>
  * </ol>
  *
+ * <p>Each test method below is one scenario: the clauses that share a fixture, a clause or an
+ * observed object are merged into one method and their assertions run together inside
+ * {@link Assertions#assertAll}. Sub-scenarios that build their own battle still get their own
+ * battle, so no clause is weakened by borrowing another clause's state.
+ *
  * <p>Note: Tests that depend on {@code stage.json} fall back to {@link Assumptions#assumeFalse}:
  * that table is produced by a generator, and when it has not been generated
  * {@link Constant#stages()} is an empty table (deliberately designed not to drag down the whole
@@ -48,200 +53,202 @@ public class WaveManagerTest {
                 wave(10, 20, 30),
                 wave(40)));
 
-        Assertions.assertEquals(2, stage.waveCount(), "two elements of monster = two waves");
-        Assertions.assertEquals(List.of(10, 20, 30), stage.monsterIds(0));
-        Assertions.assertEquals(List.of(40), stage.monsterIds(1));
-        Assertions.assertEquals(List.of(), stage.monsterIds(2), "out of range gives an empty list, does not throw");
-        Assertions.assertEquals(List.of(), stage.monsterIds(-1), "a negative index also gives an empty list");
+        Assertions.assertAll("StageBean reads monster elements as waves",
+                () -> Assertions.assertEquals(2, stage.waveCount(), "two elements of monster = two waves"),
+                () -> Assertions.assertEquals(List.of(10, 20, 30), stage.monsterIds(0),
+                        "wave 0 keeps the MonsterN order"),
+                () -> Assertions.assertEquals(List.of(40), stage.monsterIds(1),
+                        "wave 1 keeps the MonsterN order"),
+                () -> Assertions.assertEquals(List.of(), stage.monsterIds(2),
+                        "out of range gives an empty list, does not throw"),
+                () -> Assertions.assertEquals(List.of(), stage.monsterIds(-1),
+                        "a negative index also gives an empty list"));
     }
 
     /**
-     * The data layer: the real {@code stage.json} - stage 103201 is 1 wave of 3.
+     * The data layer: the real {@code stage.json} has the expected shape - stage 103201 is 1 wave of
+     * 3 at level 29 / hard level group 1, and 310030 is a multi-wave stage whose elements are waves.
      */
     @Test
-    public void stageDataHasTheExpectedShape() {
-        StageBean stage = stage(103201);
+    public void stageJsonReadsTheExpectedWaveShape() {
+        StageBean singleWave = stage(103201);
+        StageBean multiWave = stage(310030);
 
-        Assertions.assertEquals(1, stage.waveCount());
-        Assertions.assertEquals(3, stage.monsterIds(0).size());
-        Assertions.assertEquals(29, stage.level());
-        Assertions.assertEquals(1, stage.hardLevelGroup());
+        Assertions.assertAll("stage.json wave shape",
+                () -> Assertions.assertEquals(1, singleWave.waveCount(), "103201 is a single wave"),
+                () -> Assertions.assertEquals(3, singleWave.monsterIds(0).size(),
+                        "103201 wave 0 has 3 monsters"),
+                () -> Assertions.assertEquals(29, singleWave.level(), "103201 level is 29"),
+                () -> Assertions.assertEquals(1, singleWave.hardLevelGroup(),
+                        "103201 hard level group is 1"),
+                () -> Assertions.assertTrue(multiWave.waveCount() >= 2,
+                        "310030 should be a multi-wave stage"),
+                () -> Assertions.assertFalse(multiWave.monsterIds(0).isEmpty(),
+                        "310030 wave 0 is not empty"),
+                () -> Assertions.assertFalse(multiWave.monsterIds(1).isEmpty(),
+                        "310030 wave 1 is not empty"));
     }
 
     /**
-     * The data layer: a multi-wave stage (310030 has 3 waves) - the wave count comes directly from
-     * the number of elements of {@code monster}.
+     * Entering wave 1 of a single-wave stage (103201): the monsters are created, added to the enemy
+     * list and queued to enter; after entry they sit in the action bar next to the party. The same
+     * wave is also entered after {@code startBattle()}, where the party is alone at first.
      */
     @Test
-    public void multiWaveStageIsReadAsMultipleWaves() {
-        StageBean stage = stage(310030);
-
-        Assertions.assertTrue(stage.waveCount() >= 2, "310030 should be a multi-wave stage");
-        Assertions.assertFalse(stage.monsterIds(0).isEmpty());
-        Assertions.assertFalse(stage.monsterIds(1).isEmpty());
-    }
-
-    /**
-     * Entering a wave: the monsters are created, added to the enemy list, and queued to enter.
-     */
-    @Test
-    public void nextWaveSpawnsTheWaveAndQueuesIt() {
+    public void enteringTheFirstWaveQueuesItAlongsideTheParty() {
         Battle battle = waveBattle(103201);
         WaveManager waves = battle.getWaveManager();
 
-        Assertions.assertTrue(waves.hasNextWave(), "wave 1 has not been entered yet");
-        Assertions.assertEquals(-1, waves.getWaveIndex(), "not a single wave has been entered yet");
+        Assertions.assertAll("before the first wave is entered",
+                () -> Assertions.assertTrue(waves.hasNextWave(), "wave 1 has not been entered yet"),
+                () -> Assertions.assertEquals(-1, waves.getWaveIndex(),
+                        "not a single wave has been entered yet"));
 
-        Assertions.assertTrue(waves.nextWave());
-        Assertions.assertEquals(0, waves.getWaveIndex());
-        Assertions.assertEquals(3, battle.enemies().size(), "103201 wave 1 has 3 monsters");
-        Assertions.assertEquals(3, battle.pendingCombatants().size(), "all queued waiting to enter");
+        Assertions.assertTrue(waves.nextWave(), "there is a wave 1 to enter");
+        Assertions.assertAll("entering wave 1 spawns and queues its monsters",
+                () -> Assertions.assertEquals(0, waves.getWaveIndex(),
+                        "the first entered wave sets the index to 0"),
+                () -> Assertions.assertEquals(3, battle.enemies().size(),
+                        "103201 wave 1 has 3 monsters"),
+                () -> Assertions.assertEquals(3, battle.pendingCombatants().size(),
+                        "all queued waiting to enter"));
 
         battle.processRequests();
-        Assertions.assertEquals(4, battle.queue().size(),
-                "after entering they are in the action bar: 1 character + 3 monsters (the character joined the queue at construction)");
-        Assertions.assertEquals(3, battle.targetableEnemies().size());
+        Assertions.assertAll("the entered wave is in the action bar",
+                () -> Assertions.assertEquals(4, battle.queue().size(),
+                        "after entering they are in the action bar: 1 character + 3 monsters (the character joined the queue at construction)"),
+                () -> Assertions.assertEquals(3, battle.targetableEnemies().size(),
+                        "all 3 monsters are targetable"));
+
+        Battle startedBattle = waveBattle(103201);
+        startedBattle.startBattle();
+        Assertions.assertAll("the party is alone in the queue before any wave",
+                () -> Assertions.assertEquals(1, startedBattle.queue().size(),
+                        "at the start only our 1 character"));
+
+        startedBattle.getWaveManager().nextWave();
+        startedBattle.processRequests();
+        Assertions.assertAll("the wave joins the queue alongside the party",
+                () -> Assertions.assertEquals(4, startedBattle.queue().size(),
+                        "1 character + 3 monsters"),
+                () -> Assertions.assertEquals(3, startedBattle.targetableEnemies().size(),
+                        "the 3 monsters of the wave are targetable"));
     }
 
     /**
-     * The standard usage: enter a wave after {@code startBattle()}, and the action bar holds
-     * "our side + this wave's monsters".
+     * A single-wave stage (103201): once its only wave is entered there is no next wave, and the
+     * battle is judged won only after that wave is cleared.
      */
     @Test
-    public void wavesJoinTheQueueAlongsideTheParty() {
-        Battle battle = waveBattle(103201);
-        battle.startBattle();
-        Assertions.assertEquals(1, battle.queue().size(), "at the start only our 1 character");
-
-        battle.getWaveManager().nextWave();
-        battle.processRequests();
-
-        Assertions.assertEquals(4, battle.queue().size(), "1 character + 3 monsters");
-        Assertions.assertEquals(3, battle.targetableEnemies().size());
-    }
-
-    /**
-     * A single-wave stage: once entered, there is no next wave.
-     */
-    @Test
-    public void singleWaveStageHasNoNextWave() {
+    public void singleWaveStageHasNoNextWaveAndWinsWhenCleared() {
         Battle battle = waveBattle(103201);
         WaveManager waves = battle.getWaveManager();
 
-        Assertions.assertTrue(waves.nextWave());
-        Assertions.assertFalse(waves.hasNextWave());
+        Assertions.assertTrue(waves.nextWave(), "the only wave is entered");
         Assertions.assertFalse(waves.nextWave(), "returns false when there is no next wave");
-        Assertions.assertEquals(3, battle.enemies().size(), "monsters are not spawned twice");
+        Assertions.assertAll("the single wave is the last wave",
+                () -> Assertions.assertFalse(waves.hasNextWave(),
+                        "there is no next wave after the only one"),
+                () -> Assertions.assertEquals(3, battle.enemies().size(),
+                        "monsters are not spawned twice"));
+
+        Battle winBattle = waveBattle(103201);
+        WaveManager winWaves = winBattle.getWaveManager();
+        winBattle.startBattle();
+        winWaves.nextWave();
+        winBattle.processRequests();
+
+        // Kill the whole wave
+        for (Enemy enemy : winBattle.enemyUnits()) {
+            enemy.takeDamage(999_999_999);
+        }
+        winBattle.processRequests();
+
+        Assertions.assertAll("the battle is won only after the last wave is cleared",
+                () -> Assertions.assertFalse(winWaves.hasNextWave(),
+                        "there is only one wave and it has already been entered"),
+                () -> Assertions.assertEquals(Battle.Status.WIN, winBattle.getStatus(),
+                        "the only wave is cleared, so the battle is won"));
     }
 
     /**
-     * A multi-wave stage: enter them one at a time, and each time only that wave's monsters are added.
+     * A multi-wave stage (310030) from spawn to result: one wave is entered at a time and appended,
+     * pending waves are not a win, clearing an intermediate wave keeps the battle running, and a
+     * wiped party still loses while waves remain.
      */
     @Test
-    public void multiWaveStageSpawnsOneWaveAtATime() {
-        Battle battle = waveBattle(310030);
-        WaveManager waves = battle.getWaveManager();
+    public void multiWaveStageSpawnsOneWaveAtATimeAndJudgesTheResult() {
+        // Waves are spawned one at a time; each nextWave() appends its own monsters.
+        Battle spawnBattle = waveBattle(310030);
+        WaveManager spawnWaves = spawnBattle.getWaveManager();
 
         StageBean stage = Constant.stages().get(310030);
         int firstWaveSize = stage.monsterIds(0).size();
         int secondWaveSize = stage.monsterIds(1).size();
 
-        Assertions.assertTrue(waves.nextWave());
-        Assertions.assertEquals(firstWaveSize, battle.enemies().size());
+        Assertions.assertTrue(spawnWaves.nextWave(), "wave 1 is entered");
+        Assertions.assertEquals(firstWaveSize, spawnBattle.enemies().size(),
+                "after wave 1 only wave 1's monsters are on the field");
+        Assertions.assertTrue(spawnWaves.nextWave(), "wave 2 is entered");
+        Assertions.assertAll("the second wave is appended to the first",
+                () -> Assertions.assertEquals(firstWaveSize + secondWaveSize, spawnBattle.enemies().size(),
+                        "the second wave is **appended**, not a replacement"),
+                () -> Assertions.assertEquals(1, spawnWaves.getWaveIndex(),
+                        "after the second wave the wave index is 1"));
 
-        Assertions.assertTrue(waves.nextWave());
-        Assertions.assertEquals(firstWaveSize + secondWaveSize, battle.enemies().size(),
-                "the second wave is **appended**, not a replacement");
-        Assertions.assertEquals(1, waves.getWaveIndex());
-    }
+        // The seam: pending waves are not a win.
+        Battle pendingBattle = waveBattle(310030);
+        pendingBattle.startBattle();
+        Assertions.assertAll("pending waves do not count as a won battle",
+                () -> Assertions.assertTrue(pendingBattle.getWaveManager().hasPendingWaves(),
+                        "310030 still has un-entered waves"),
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, pendingBattle.getStatus(),
+                        "the enemy team is empty, but waves remain un-entered → must not judge a win"),
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, pendingBattle.checkResult(),
+                        "checkResult() still judges RUNNING while waves remain"));
 
-    /**
-     * The core seam: an empty enemy team != a win. While waves remain unentered, {@code checkResult()}
-     * must not judge a win.
-     *
-     * <p>This is the easiest place to trip between P-3 and P-4: P-3's criterion is "one side is
-     * wiped out", whereas in wave mode "the enemy team is empty" merely means this wave has not
-     * entered yet.
-     */
-    @Test
-    public void pendingWavesDoNotCountAsAWonBattle() {
-        Battle battle = waveBattle(310030);
+        // Clearing wave 1 does not end the battle; entering wave 2 continues it.
+        Battle clearBattle = waveBattle(310030);
+        WaveManager clearWaves = clearBattle.getWaveManager();
+        clearBattle.startBattle();
+        clearWaves.nextWave();
+        clearBattle.processRequests();
 
-        Assertions.assertTrue(battle.getWaveManager().hasPendingWaves());
-        battle.startBattle();
-
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
-                "the enemy team is empty, but waves remain unentered → must not judge a win");
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.checkResult());
-    }
-
-    /**
-     * The battle is only judged won after the last wave is cleared.
-     */
-    @Test
-    public void theBattleIsWonOnlyAfterTheLastWave() {
-        Battle battle = waveBattle(103201);
-        WaveManager waves = battle.getWaveManager();
-        battle.startBattle();
-        waves.nextWave();
-        battle.processRequests();
-
-        // Kill the whole wave
-        for (Enemy enemy : battle.enemyUnits()) {
+        for (Enemy enemy : clearBattle.enemyUnits()) {
             enemy.takeDamage(999_999_999);
         }
-        battle.processRequests();
+        clearBattle.processRequests();
 
-        Assertions.assertFalse(waves.hasNextWave(), "there is only one wave and it has already been entered");
-        Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
-    }
+        Assertions.assertAll("clearing an intermediate wave does not end the battle",
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, clearBattle.getStatus(),
+                        "wave 2 is still to come → must not judge a win"),
+                () -> Assertions.assertTrue(clearWaves.isCurrentWaveCleared(), "wave 1 is cleared"));
 
-    /**
-     * In a multi-wave stage, wiping out wave 1 does not judge a win; after entering wave 2 the
-     * battle continues.
-     */
-    @Test
-    public void clearingAnIntermediateWaveDoesNotEndTheBattle() {
-        Battle battle = waveBattle(310030);
-        WaveManager waves = battle.getWaveManager();
-        battle.startBattle();
-        waves.nextWave();
-        battle.processRequests();
+        int before = clearBattle.enemies().size();
+        Assertions.assertTrue(clearWaves.nextWave(), "wave 2 can be entered");
+        clearBattle.processRequests();
 
-        for (Enemy enemy : battle.enemyUnits()) {
-            enemy.takeDamage(999_999_999);
-        }
-        battle.processRequests();
+        Assertions.assertAll("a new wave has entered and the battle continues",
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, clearBattle.getStatus(),
+                        "a new wave has entered, keep fighting"),
+                () -> Assertions.assertTrue(clearBattle.enemies().size() > before,
+                        "the field holds more monsters than before wave 2"),
+                () -> Assertions.assertFalse(clearWaves.isCurrentWaveCleared(),
+                        "the new wave is alive"),
+                () -> Assertions.assertFalse(clearWaves.aliveEnemies().isEmpty(),
+                        "the new wave has living enemies"));
 
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
-                "wave 2 is still to come → must not judge a win");
-        Assertions.assertTrue(waves.isCurrentWaveCleared());
-
-        int before = battle.enemies().size();
-        Assertions.assertTrue(waves.nextWave());
-        battle.processRequests();
-
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(), "a new wave has entered, keep fighting");
-        Assertions.assertTrue(battle.enemies().size() > before);
-        Assertions.assertFalse(waves.isCurrentWaveCleared(), "the new wave is alive");
-        Assertions.assertFalse(waves.aliveEnemies().isEmpty());
-    }
-
-    /**
-     * When our side is wiped out, it is a loss even if waves remain unentered - "should we enter
-     * another wave" cannot save a team wipe.
-     */
-    @Test
-    public void aWipedPartyStillLosesWithPendingWaves() {
-        Battle battle = waveBattle(310030);
-        battle.startBattle();
-
-        for (Character c : battle.characters()) {
+        // A wiped party loses even with waves still pending.
+        Battle wipeBattle = waveBattle(310030);
+        wipeBattle.startBattle();
+        for (Character c : wipeBattle.characters()) {
             c.takeDamage(999_999_999);
         }
-        battle.processRequests();
+        wipeBattle.processRequests();
 
-        Assertions.assertEquals(Battle.Status.LOSE, battle.getStatus());
+        Assertions.assertAll("a wiped party still loses with pending waves",
+                () -> Assertions.assertEquals(Battle.Status.LOSE, wipeBattle.getStatus(),
+                        "party wiped → LOSE even though waves remain un-entered"));
     }
 
     /**
@@ -257,17 +264,20 @@ public class WaveManagerTest {
         battle.stepForward();
         battle.afterMove();                              // the clock has advanced a bit (the 132-speed enemy acts first)
         double elapsedBefore = battle.queue().getElapsed();
-        Assertions.assertTrue(elapsedBefore > 0);
+        Assertions.assertAll("the clock has already advanced",
+                () -> Assertions.assertTrue(elapsedBefore > 0,
+                        "some action value has elapsed before the wave enters"));
 
         waves.nextWave();
         battle.processRequests();
 
         for (Enemy enemy : battle.enemyUnits()) {
             double remaining = battle.queue().getTimeRemaining(signalOf(battle, enemy));
-            Assertions.assertTrue(remaining > 0 && remaining < Double.MAX_VALUE,
-                    "a new monster's remaining action value is positive and finite");
-            Assertions.assertTrue(battle.queue().getElapsed() >= elapsedBefore,
-                    "spawning monsters does not wind the clock back");
+            Assertions.assertAll("monster " + enemy.getName() + " enters from the current action value",
+                    () -> Assertions.assertTrue(remaining > 0 && remaining < Double.MAX_VALUE,
+                            "a new monster's remaining action value is positive and finite"),
+                    () -> Assertions.assertTrue(battle.queue().getElapsed() >= elapsedBefore,
+                            "spawning monsters does not wind the clock back"));
         }
     }
 
@@ -279,39 +289,43 @@ public class WaveManagerTest {
         Battle battle = new Battle(List.of(character()),
                 List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
 
-        Assertions.assertNull(battle.getWaveManager());
+        Assertions.assertNull(battle.getWaveManager(), "a hand-built battle has no wave manager");
         battle.startBattle();
 
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus());
-        Assertions.assertEquals(1, battle.enemies().size());
+        Assertions.assertAll("a battle without waves behaves as before",
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
+                        "with no pending waves the ordinary result check applies"),
+                () -> Assertions.assertEquals(1, battle.enemies().size(),
+                        "the enemy given at construction is still on the field"));
     }
 
     /**
-     * The stage table is parsed at most once; repeated access hits the cache.
+     * The stage table is parsed at most once; repeated access hits the cache, and the table holds the
+     * whole data set.
      *
      * <p>The lazy-loading guardrail ("the static block does not parse stage.json") is in
      * {@link StageLazyLoadTest} - that is a separate class because other cases in this class would
      * load the table first.
+     *
+     * <p>The cache clauses run before the "whole data set" premise, so a missing {@code stage.json}
+     * only skips the size clause, not the cache clauses.
      */
     @Test
-    public void stageTableIsLoadedAtMostOnceAndCached() {
+    public void stageTableIsLoadedAtMostOnceAndHasTheWholeDataSet() {
         Map<Integer, StageBean> first = Constant.stages();
         Map<Integer, StageBean> second = Constant.stages();
 
-        Assertions.assertSame(first, second, "repeated access must hit the same cache, not re-parse");
-        Assertions.assertEquals(1, Constant.stageLoadAttempts(),
-                "stage.json is parsed only once, actually " + Constant.stageLoadAttempts() + " times");
-    }
+        Assertions.assertAll("the stage table is loaded at most once and cached",
+                () -> Assertions.assertSame(first, second,
+                        "repeated access must hit the same cache, not re-parse"),
+                () -> Assertions.assertEquals(1, Constant.stageLoadAttempts(),
+                        "stage.json is parsed only once, actually " + Constant.stageLoadAttempts() + " times"));
 
-    /**
-     * The stage table has at least 10,000 stages (a data-integrity sanity check).
-     */
-    @Test
-    public void stageTableHasTheWholeDataSet() {
         Assumptions.assumeFalse(Constant.stages().isEmpty(), "stage.json has not been generated");
 
-        Assertions.assertTrue(Constant.stages().size() > 10_000,
-                "stage.json should have tens of thousands of stages, actual " + Constant.stages().size());
+        Assertions.assertAll("the stage table has the whole data set",
+                () -> Assertions.assertTrue(Constant.stages().size() > 10_000,
+                        "stage.json should have tens of thousands of stages, actual " + Constant.stages().size()));
     }
 
     // ==================================================================

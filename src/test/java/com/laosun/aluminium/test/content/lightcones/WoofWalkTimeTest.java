@@ -35,7 +35,7 @@ public class WoofWalkTimeTest {
         System.out.println("[21026] clean=" + clean + " burning=" + burning + " wounded=" + wounded + " both=" + both
                 + " attackRatio=" + attackGain);
         // 2026-10-19: the share is the cone's own `attack_percent` property (it is in the panel before the battle starts),
-        Assertions.assertTrue(true, "rank 5 share is the property - pinned in ConeAuditBatchNineTest");
+        Assertions.assertTrue(true, "rank 5 share is the property - pinned in LightConeAuditBatchNineTest");
         Assertions.assertEquals(1.32, burning / clean, 2e-2, "Burn (dot:burn)");
         Assertions.assertEquals(1.32, wounded / clean, 2e-2, "Bleed (dot:bleed)");
         Assertions.assertEquals(1.32, both / clean, 2e-2, "both states must not double the boost");

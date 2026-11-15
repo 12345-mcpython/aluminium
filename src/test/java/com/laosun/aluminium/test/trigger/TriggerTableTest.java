@@ -56,11 +56,11 @@ public class TriggerTableTest {
     private static final int NO_TRIGGERS = 999999;
 
     /**
-     * An ally whose ultimate connects with <b>every</b> enemy - the driver for the "per target hit" pair.
+     * An ally whose ultimate connects with <b>every</b> enemy - the driver for the "per target hit" case.
      *
      * <p>Named rather than looked up, because the property being asked for is a fact about one character's
      * <b>skill data</b> (1003's ultimate is all-target attack (全体攻击), 60 toughness, Fire), not about the engine. Note: She has a rule
-     * file of her own, and that is deliberately acceptable here: the number each test measures is
+     * file of her own, and that is deliberately acceptable here: the number each scenario measures is
      * <em>Tribbie's</em> or <em>Robin's</em> energy, which only their own tables can credit, and none of her rules
      * grants energy to anybody ({@code resources/game/characters/1003.json}).
      */
@@ -72,109 +72,82 @@ public class TriggerTableTest {
     // ==================================================================
 
     /**
-     * Tribbie's opening trace: 30 energy at the start of battle, before anything else happens.
+     * Tribbie's trace 1403103 as data: 30 energy at the start of battle, 1.50 energy <b>per target hit</b>
+     * by <b>another</b> ally, and nothing when Tribbie herself attacks.
+     *
+     * <p>Three targets hit => 4.5, not 1.5. That is the case that distinguishes "per hit" from "per attack",
+     * which is the difference between Tribbie and Robin. The own-attack half is what the {@code actor != self}
+     * condition is for.
      */
     @Test
-    public void tribbieGainsThirtyEnergyAtBattleStart() {
+    public void tribbieTraceCreditsBattleStartAndPerTargetHits() {
         Character tribbie = CharacterFactory.create(TRIBBIE, 80);
-        Battle battle = newBattle(List.of(tribbie), 1);
-
+        Battle soloBattle = newBattle(List.of(tribbie), 1);
         // Battle.startBattle() has already run inside newBattle, so the trigger has fired.
-        assertEnergyEquals(tribbie, 30, "trace 1403103: 30 energy at battle start");
-    }
+        double battleStartEnergy = tribbie.getCurrentEnergy();
 
-    /**
-     * Tribbie's in-battle half: 1.50 energy <b>per target hit</b> by <b>another</b> ally.
-     *
-     * <p>Three targets hit => 4.5, not 1.5. This is the assertion that distinguishes "per hit" from
-     * "per attack", which is the difference between Tribbie and Robin.
-     */
-    @Test
-    public void tribbieGainsPerTargetHitWhenAnAllyAttacks() {
-        Character tribbie = CharacterFactory.create(TRIBBIE, 80);
+        double beforeOwnAttack = tribbie.getCurrentEnergy();
+        strike(soloBattle, tribbie, soloBattle.enemies().getFirst());
+        double ownAttackGain = tribbie.getCurrentEnergy() - beforeOwnAttack;
+        double skillEnergy = 20 * (1 + tribbie.getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get());
+
+        Character tribbieUnderAoeAlly = CharacterFactory.create(TRIBBIE, 80);
         Character attacker = CharacterFactory.create(AOE_ALLY, 80);
-        Battle battle = newBattle(List.of(tribbie, attacker), 3);
+        Battle threeTargets = newBattle(List.of(tribbieUnderAoeAlly, attacker), 3);
+        double beforeThreeTargets = tribbieUnderAoeAlly.getCurrentEnergy();
+        attackAllEnemies(threeTargets, attacker);
+        double threeTargetGain = tribbieUnderAoeAlly.getCurrentEnergy() - beforeThreeTargets;
 
-        double before = tribbie.getCurrentEnergy();
-        attackAllEnemies(battle, attacker);
-        double gained = tribbie.getCurrentEnergy() - before;
-
-        assertEnergyEquals(gained, 1.5 * 3, "1.5 per target x 3 targets");
-    }
-
-    /**
-     * One target hit => exactly 1.5 (the same rule, smaller count).
-     */
-    @Test
-    public void tribbieScalesWithTheNumberOfTargets() {
-        Character tribbie = CharacterFactory.create(TRIBBIE, 80);
+        Character tribbieUnderSingleStrike = CharacterFactory.create(TRIBBIE, 80);
         Character himeko = CharacterFactory.create(1002, 80);
-        Battle battle = newBattle(List.of(tribbie, himeko), 1);
+        Battle oneTarget = newBattle(List.of(tribbieUnderSingleStrike, himeko), 1);
+        double beforeOneTarget = tribbieUnderSingleStrike.getCurrentEnergy();
+        strike(oneTarget, himeko, oneTarget.enemies().getFirst());
+        double oneTargetGain = tribbieUnderSingleStrike.getCurrentEnergy() - beforeOneTarget;
 
-        double before = tribbie.getCurrentEnergy();
-        strike(battle, himeko, battle.enemies().getFirst());
-        double gained = tribbie.getCurrentEnergy() - before;
-
-        assertEnergyEquals(gained, 1.5, "1.5 per target x 1 target");
+        Assertions.assertAll("Tribbie trace 1403103",
+                () -> Assertions.assertEquals(30, battleStartEnergy, 1e-6,
+                        "trace 1403103: 30 energy at battle start"),
+                () -> Assertions.assertEquals(1.5 * 3, threeTargetGain, 1e-6,
+                        "1.5 per target x 3 targets"),
+                () -> Assertions.assertEquals(1.5, oneTargetGain, 1e-6,
+                        "1.5 per target x 1 target"),
+                () -> Assertions.assertEquals(skillEnergy, ownAttackGain, 1e-6,
+                        "own attack grants no trace energy"));
     }
 
     /**
-     * Robin's talent: a <b>flat 2</b> when an ally attacks, regardless of how many targets.
+     * Robin's talent as data: a <b>flat 2</b> whenever an ally attacks, regardless of how many targets, and
+     * never on her own attack ("我方目标", our targets, excludes Robin herself).
      *
-     * <p>Deliberately the same setup as Tribbie's three-target case, so the pair proves the two
-     * numbers are modelled differently rather than both being "some energy per attack".
+     * <p>Deliberately the same setup as Tribbie's three-target case, so the pair proves the two numbers are
+     * modelled differently rather than both being "some energy per attack". The own-attack half pins the
+     * {@code actor != self} condition, the kind of rule a table without conditions would get wrong.
      */
     @Test
-    public void robinGainsTwoEnergyPerAllyAttackNotPerTarget() {
+    public void robinTalentGrantsFlatEnergyPerAllyAttackOnly() {
         Character robin = CharacterFactory.create(ROBIN, 80);
         Character attacker = CharacterFactory.create(AOE_ALLY, 80);
-        Battle battle = newBattle(List.of(robin, attacker), 3);
+        Battle withAlly = newBattle(List.of(robin, attacker), 3);
+        double beforeAllyAttack = robin.getCurrentEnergy();
+        attackAllEnemies(withAlly, attacker);
+        double allyAttackGain = robin.getCurrentEnergy() - beforeAllyAttack;
 
-        double before = robin.getCurrentEnergy();
-        attackAllEnemies(battle, attacker);
-        double gained = robin.getCurrentEnergy() - before;
+        Character soloRobin = CharacterFactory.create(ROBIN, 80);
+        Battle soloBattle = newBattle(List.of(soloRobin), 1);
+        double beforeOwnAttack = soloRobin.getCurrentEnergy();
+        strike(soloBattle, soloRobin, soloBattle.enemies().getFirst());
+        double ownAttackGain = soloRobin.getCurrentEnergy() - beforeOwnAttack;
 
-        assertEnergyEquals(gained, 2, "flat 2 per attack, even when 3 targets were hit");
-    }
+        // Her own attack still grants the ordinary skill energy (20), so compare against that rather than 0 --
+        // the point is that no *talent* energy was added on top.
+        double skillEnergy = 20 * (1 + soloRobin.getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get());
 
-    /**
-     * "我方目标" (our targets) excludes Robin herself: her own attack must not feed her talent.
-     *
-     * <p>This is what the {@code actor != self} condition is for, and it is exactly the kind of rule
-     * that a table without conditions would get wrong.
-     */
-    @Test
-    public void robinDoesNotTriggerOnHerOwnAttack() {
-        Character robin = CharacterFactory.create(ROBIN, 80);
-        Battle battle = newBattle(List.of(robin), 1);
-
-        double before = robin.getCurrentEnergy();
-        strike(battle, robin, battle.enemies().getFirst());
-        double gained = robin.getCurrentEnergy() - before;
-
-        // Her own attack still grants the ordinary skill energy (20), so compare against that rather
-        // than 0 -- the point is that no *talent* energy was added on top.
-        double skillEnergy = 20 * (1 + robin.getAttribute(
-                com.laosun.aluminium.enums.AttributeType.ENERGY_REGENERATION_RATE).get());
-        assertEnergyEquals(gained, skillEnergy,
-                "only the base skill energy: the talent must not fire on Robin's own attack");
-    }
-
-    /**
-     * The same exclusion for Tribbie: her own attack must not feed her trace.
-     */
-    @Test
-    public void tribbieDoesNotTriggerOnHerOwnAttack() {
-        Character tribbie = CharacterFactory.create(TRIBBIE, 80);
-        Battle battle = newBattle(List.of(tribbie), 1);
-
-        double before = tribbie.getCurrentEnergy();
-        strike(battle, tribbie, battle.enemies().getFirst());
-        double gained = tribbie.getCurrentEnergy() - before;
-
-        double skillEnergy = 20 * (1 + tribbie.getAttribute(
-                com.laosun.aluminium.enums.AttributeType.ENERGY_REGENERATION_RATE).get());
-        assertEnergyEquals(gained, skillEnergy, "own attack grants no trace energy");
+        Assertions.assertAll("Robin talent: flat 2 per ally attack, never on her own",
+                () -> Assertions.assertEquals(2, allyAttackGain, 1e-6,
+                        "flat 2 per attack, even when 3 targets were hit"),
+                () -> Assertions.assertEquals(skillEnergy, ownAttackGain, 1e-6,
+                        "only the base skill energy: the talent must not fire on Robin's own attack"));
     }
 
     // ==================================================================
@@ -204,7 +177,7 @@ public class TriggerTableTest {
         strike(battle, plain, battle.enemies().getFirst());
 
         double skillEnergy = 20 * (1 + plain.getAttribute(
-                com.laosun.aluminium.enums.AttributeType.ENERGY_REGENERATION_RATE).get());
+                AttributeType.ENERGY_REGENERATION_RATE).get());
         assertEnergyEquals(plain.getCurrentEnergy() - before, skillEnergy,
                 "an empty table changes nothing");
     }
@@ -258,45 +231,8 @@ public class TriggerTableTest {
         Assertions.assertEquals(1, fired, "only Robin's table has an ALLY_ATTACK rule");
     }
 
-    // ==================================================================
-    // 4. Fail fast: a bad table is rejected at load, not silently ignored
-    // ==================================================================
-
     /**
-     * An unknown event name is a typo and must be reported, not skipped.
-     */
-    @Test
-    public void unknownEventIsRejected() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("NO_SUCH_EVENT", List.of("self"), energy(1)))));
-        Assertions.assertTrue(e.getMessage().contains("NO_SUCH_EVENT"), e.getMessage());
-    }
-
-    /**
-     * An event the engine does not emit yet is rejected too, with the reason.
-     *
-     * <p>Otherwise a content author would write a rule, see nothing happen, and have no way to tell
-     * "my condition is wrong" from "the engine never fires this".
-     *
-     * <p>The event is taken from the enum instead of being hard-coded: it has an emitter. The
-     * companion assertion {@link #everyDeclaredTriggerEventIsEmitted()} is what keeps the vocabulary
-     * honest - without it the day every event is wired this test would silently stop covering the
-     * rejection path.
-     */
-    @Test
-    public void eventThatIsNotWiredYetIsRejectedWithAReason() {
-        TriggerEvent unwired = unwiredEvent();
-        if (unwired == null) {
-            return;                                  // guarded by everyDeclaredTriggerEventIsEmitted()
-        }
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger(unwired.value(), List.of("self"), energy(1)))));
-        Assertions.assertTrue(e.getMessage().contains("not emitted"), e.getMessage());
-        Assertions.assertTrue(e.getMessage().contains(unwired.value()), e.getMessage());
-    }
-
-    /**
-     * The other half of the guard above: <b>every event the vocabulary declares is emitted</b>.
+     * The other half of the vocabulary guard: <b>every event the vocabulary declares is emitted</b>.
      *
      * <p>The enum is a closed vocabulary content may use, so a declared-but-unemitted event is a trap:
      * the rule loads nowhere and fails only when an author writes it. Wiring {@code TURN_START} and
@@ -318,25 +254,88 @@ public class TriggerTableTest {
                 .orElse(null);
     }
 
-    /**
-     * An unknown condition variable is rejected rather than evaluating to false forever.
-     */
-    @Test
-    public void unknownConditionVariableIsRejected() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of("hp < 50"), energy(1)))));
-        Assertions.assertTrue(e.getMessage().contains("hp"), e.getMessage());
-    }
+    // ==================================================================
+    // 4. Fail fast: a bad table is rejected at load, not silently ignored
+    // ==================================================================
 
     /**
-     * A malformed condition is rejected.
+     * Every way a raw rule can be wrong at load time is reported, never skipped: an unknown event name, an
+     * event the engine does not emit yet, an unknown condition variable, a malformed condition, an unknown
+     * op, an op whose prerequisite phase has not landed, a missing required argument, and a rule with no
+     * effects.
+     *
+     * <p>Otherwise a content author would write a rule, see nothing happen, and have no way to tell
+     * "my condition is wrong" from "the engine never fires this". An unknown event name is a typo; a planned
+     * op names the phase so the author learns what to wait for; a missing argument and an unknown condition
+     * variable are named in the message.
+     *
+     * <p>The event is taken from the enum instead of being hard-coded: it has an emitter. The
+     * companion assertion {@link #everyDeclaredTriggerEventIsEmitted()} is what keeps the vocabulary
+     * honest - without it the day every event is wired this case would silently stop covering the
+     * rejection path.
      */
     @Test
-    public void malformedConditionIsRejected() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of("actor !="), energy(1)))));
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of("nonsense"), energy(1)))));
+    public void invalidTriggerRulesAreRejectedAtLoad() {
+        Assertions.assertAll("a bad trigger table is rejected at load",
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(1,
+                                    List.of(trigger("NO_SUCH_EVENT", List.of("self"), energy(1)))));
+                    Assertions.assertTrue(e.getMessage().contains("NO_SUCH_EVENT"),
+                            "an unknown event is rejected and named: " + e.getMessage());
+                },
+                () -> {
+                    TriggerEvent unwired = unwiredEvent();
+                    if (unwired == null) {
+                        return;                  // guarded by everyDeclaredTriggerEventIsEmitted()
+                    }
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(1,
+                                    List.of(trigger(unwired.value(), List.of("self"), energy(1)))));
+                    Assertions.assertTrue(e.getMessage().contains("not emitted"),
+                            "an unwired event is rejected with the reason: " + e.getMessage());
+                    Assertions.assertTrue(e.getMessage().contains(unwired.value()),
+                            "an unwired event is rejected by name: " + e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(1,
+                                    List.of(trigger("ALLY_ATTACK", List.of("hp < 50"), energy(1)))));
+                    Assertions.assertTrue(e.getMessage().contains("hp"),
+                            "an unknown condition variable is rejected and named: " + e.getMessage());
+                },
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> new TriggerTable(1,
+                                List.of(trigger("ALLY_ATTACK", List.of("actor !="), energy(1)))),
+                        "a condition with a missing right operand is rejected"),
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> new TriggerTable(1,
+                                List.of(trigger("ALLY_ATTACK", List.of("nonsense"), energy(1)))),
+                        "a condition with no operator is rejected"),
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(1,
+                                    List.of(trigger("ALLY_ATTACK", List.of(), op("TELEPORT", null)))));
+                    Assertions.assertTrue(e.getMessage().contains("TELEPORT"),
+                            "an unknown op is rejected and named: " + e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(1,
+                                    List.of(trigger("ALLY_ATTACK", List.of(), op("REDUCE_TOUGHNESS", 1.0)))));
+                    Assertions.assertTrue(e.getMessage().contains("roadmap"),
+                            "a planned-but-unwired op says what to wait for: " + e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(1,
+                                    List.of(trigger("ALLY_ATTACK", List.of(), op("GAIN_ENERGY", null)))));
+                    Assertions.assertTrue(e.getMessage().contains("amount"),
+                            "a missing required argument is rejected and named: " + e.getMessage());
+                },
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of(), null))),
+                        "a rule with no effects is rejected"));
     }
 
     /**
@@ -380,65 +379,40 @@ public class TriggerTableTest {
         Assertions.assertTrue(twoVariables.getMessage().contains("two variables"), twoVariables.getMessage());
     }
 
-    /**
-     * An unknown op is rejected.
-     */
-    @Test
-    public void unknownOpIsRejected() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of(), op("TELEPORT", null)))));
-        Assertions.assertTrue(e.getMessage().contains("TELEPORT"), e.getMessage());
-    }
-
-    /**
-     * An op whose prerequisite phase has not landed is rejected <b>with the phase named</b>, so the
-     * author learns what to wait for instead of debugging a rule that can never work.
-     *
-     * <p>Note: {@code REDUCE_TOUGHNESS} is the op left without a phase, and it is spelled out here rather than
-     * derived from the interpreter's private set, because this test is about the <i>message</i>.
-     */
-    @Test
-    public void plannedButUnwiredOpIsRejectedWithThePhaseNamed() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(
-                        trigger("ALLY_ATTACK", List.of(), op("REDUCE_TOUGHNESS", 1.0)))));
-        Assertions.assertTrue(e.getMessage().contains("roadmap"), e.getMessage());
-    }
-
-    /**
-     * A required argument that is missing is reported.
-     */
-    @Test
-    public void missingArgumentIsRejected() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of(), op("GAIN_ENERGY", null)))));
-        Assertions.assertTrue(e.getMessage().contains("amount"), e.getMessage());
-    }
-
-    /**
-     * A rule with no effects is meaningless and is rejected.
-     */
-    @Test
-    public void ruleWithoutEffectsIsRejected() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(trigger("ALLY_ATTACK", List.of(), null))));
-    }
-
     // ==================================================================
     // 4b. MODIFY_ATTR: the generic stat buff
     // ==================================================================
 
     /**
-     * The op writes a real modifier onto the owner's attribute.
+     * The op writes a real modifier onto the owner: +50% ATK is 450. A <b>ratio</b> reading is not a factor
+     * either - a negative percent becomes a {@code DEBUFF}, landing on the other half of the attribute so a
+     * debuff does not silently overwrite a buff on the same stat - and an attribute name is normalised before
+     * lookup, because {@code AttributeType.fromString} documents itself as case-insensitive.
      */
     @Test
-    public void modifyAttrOpBuffsTheOwner() {
-        Character owner = character("owner");
+    public void modifyAttrOpAppliesPercentToTheOwner() {
+        Character buffed = character("owner");
+        fireAttr(null, buffed, buffed, attrOp(AttributeType.ATTACK, 0.5, 2, null));
 
-        fireAttr(null, owner, owner, attrOp(AttributeType.ATTACK, 0.5, 2, null));
+        Character debuffed = character("owner");
+        fireAttr(null, debuffed, debuffed, attrOp(AttributeType.DEFENCE, -0.25, 2, null));
 
-        Assertions.assertEquals(450, owner.getAttribute(AttributeType.ATTACK).get(), 1e-9,
-                "ATK 300 with +50% is 450");
+        Character mixedCase = character("owner");
+        fireAttr(null, mixedCase, mixedCase, attrOp("Attack", 0.5, 2, null));
+
+        Assertions.assertAll("MODIFY_ATTR buffs the owner",
+                () -> Assertions.assertEquals(450, buffed.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                        "ATK 300 with +50% is 450"),
+                () -> Assertions.assertEquals(150, debuffed.getAttribute(AttributeType.DEFENCE).get(), 1e-9,
+                        "DEF 200 with -25% is 150"),
+                () -> Assertions.assertEquals(0, debuffed.getAttribute(AttributeType.DEFENCE)
+                                .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF).size(),
+                        "a negative percent lands in the debuff half, so no buff is installed"),
+                () -> Assertions.assertEquals(1, debuffed.getAttribute(AttributeType.DEFENCE)
+                                .filterBySource(DoubleValue.Modifier.ModifierSource.DEBUFF).size(),
+                        "and exactly one debuff modifier is installed"),
+                () -> Assertions.assertEquals(450, mixedCase.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                        "a mixed-case attribute name is normalised, so ATK 300 with +50% is 450"));
     }
 
     /**
@@ -471,55 +445,34 @@ public class TriggerTableTest {
     }
 
     /**
-     * A negative percent becomes a {@code DEBUFF}: it lands on the other half of the attribute, so a
-     * debuff does not silently overwrite a buff on the same stat.
+     * The {@code target} field decides who receives the buff: {@code "target"} is the event's subject
+     * (leaving the owner untouched), and {@code "all_allies"} is what makes a party-wide buff expressible -
+     * party-wide is the majority of buff talents in the real data, so this selector decides whether the op
+     * is actually useful.
      */
     @Test
-    public void negativePercentBecomesADebuff() {
-        Character owner = character("owner");
-
-        fireAttr(null, owner, owner, attrOp(AttributeType.DEFENCE, -0.25, 2, null));
-
-        Assertions.assertEquals(150, owner.getAttribute(AttributeType.DEFENCE).get(), 1e-9,
-                "DEF 200 with -25% is 150");
-        Assertions.assertEquals(0, owner.getAttribute(AttributeType.DEFENCE)
-                .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF).size());
-        Assertions.assertEquals(1, owner.getAttribute(AttributeType.DEFENCE)
-                .filterBySource(DoubleValue.Modifier.ModifierSource.DEBUFF).size());
-    }
-
-    /**
-     * {@code target: "target"} sends the buff to the event's subject instead of the table's owner.
-     */
-    @Test
-    public void modifyAttrOpCanTargetTheEventsSubject() {
+    public void modifyAttrOpSelectsWhoReceivesTheBuff() {
         Character owner = character("owner");
         Character ally = character("ally");
-
         fireAttr(null, owner, ally, attrOp(AttributeType.ATTACK, 1.0, 2, "target"));
 
-        Assertions.assertEquals(600, ally.getAttribute(AttributeType.ATTACK).get(), 1e-9);
-        Assertions.assertEquals(300, owner.getAttribute(AttributeType.ATTACK).get(), 1e-9,
-                "the owner must be untouched when the effect names the subject");
-    }
-
-    /**
-     * {@code all_allies} is what makes a party-wide buff expressible - and party-wide is the majority
-     * of buff talents in the real data, so this selector decides whether the op is actually useful.
-     */
-    @Test
-    public void modifyAttrOpCanReachTheWholeParty() {
-        Character owner = character("owner");
+        Character partyOwner = character("owner");
         Character allyOne = character("ally1");
         Character allyTwo = character("ally2");
-        Battle battle = newBattle(List.of(owner, allyOne, allyTwo), 1);
+        Battle battle = newBattle(List.of(partyOwner, allyOne, allyTwo), 1);
+        fireAttr(battle, partyOwner, partyOwner, attrOp(AttributeType.ATTACK, 0.5, 2, "all_allies"));
 
-        fireAttr(battle, owner, owner, attrOp(AttributeType.ATTACK, 0.5, 2, "all_allies"));
-
-        for (Character member : List.of(owner, allyOne, allyTwo)) {
-            Assertions.assertEquals(450, member.getAttribute(AttributeType.ATTACK).get(), 1e-9,
-                    member.getName() + " should have received the party buff");
-        }
+        Assertions.assertAll("MODIFY_ATTR target selector",
+                () -> Assertions.assertEquals(600, ally.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                        "target: \"target\" gives the event's subject ATK 300 with +100% = 600"),
+                () -> Assertions.assertEquals(300, owner.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                        "the owner must be untouched when the effect names the subject"),
+                () -> Assertions.assertEquals(450, partyOwner.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                        "owner should have received the party buff"),
+                () -> Assertions.assertEquals(450, allyOne.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                        "ally1 should have received the party buff"),
+                () -> Assertions.assertEquals(450, allyTwo.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                        "ally2 should have received the party buff"));
     }
 
     /**
@@ -537,71 +490,46 @@ public class TriggerTableTest {
     }
 
     /**
-     * A misspelled attribute is a load-time error, not a silently missing buff.
+     * {@code MODIFY_ATTR}'s inputs are closed sets checked when the table is read: an unknown attribute, one
+     * of the four {@code *_PERCENT} builder-only names ({@code getAttribute} returns {@code null} for them,
+     * so a buff on one would blow up mid-battle), a missing or non-positive {@code turns} (no duration
+     * default exists, and a zero-turn buff would expire before it could do anything), and an unknown
+     * {@code target} selector - which must be refused rather than falling back to "the owner", because that
+     * would make {@code "atacker"} behave exactly like {@code "self"} and report nothing.
      */
     @Test
-    public void modifyAttrOpRejectsAnUnknownAttribute() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(attrOp("ATTCK", 0.5, 2, null)));
-        Assertions.assertTrue(e.getMessage().contains("ATTCK"), e.getMessage());
-    }
-
-    /**
-     * The four {@code *_PERCENT} variants are builder inputs, not runtime attributes:
-     * {@code getAttribute} returns {@code null} for them, so a buff on one would blow up mid-battle.
-     * It is rejected when the table is read instead.
-     */
-    @Test
-    public void modifyAttrOpRejectsABuilderOnlyPercentAttribute() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(attrOp("ATTACK_PERCENT", 0.5, 2, null)));
-        Assertions.assertTrue(e.getMessage().contains("ATTACK_PERCENT"), e.getMessage());
-    }
-
-    /**
-     * No duration default exists, for the same reason {@code damage_param} has none.
-     */
-    @Test
-    public void modifyAttrOpRequiresTurns() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(attrOp(AttributeType.ATTACK, 0.5, null, null)));
-        Assertions.assertTrue(e.getMessage().contains("turns"), e.getMessage());
-    }
-
-    /**
-     * A zero-turn buff would expire before it could do anything, so it is rejected.
-     */
-    @Test
-    public void modifyAttrOpRejectsNonPositiveTurns() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(attrOp(AttributeType.ATTACK, 0.5, 0, null)));
-        Assertions.assertTrue(e.getMessage().contains("turns"), e.getMessage());
-    }
-
-    /**
-     * {@code AttributeType.fromString} documents itself as case-insensitive: the lookup table is lower-cased,
-     * so the input has to be lower-cased too, or a mixed-case attribute name simply fails to load.
-     * Mixed case is used here so the normalisation itself is what is under test.
-     */
-    @Test
-    public void modifyAttrOpAcceptsAMixedCaseAttributeName() {
-        Character owner = character("owner");
-
-        fireAttr(null, owner, owner, attrOp("Attack", 0.5, 2, null));
-
-        Assertions.assertEquals(450, owner.getAttribute(AttributeType.ATTACK).get(), 1e-9);
-    }
-
-    /**
-     * A misspelled {@code target} is refused instead of falling back to "the owner", which would make
-     * {@code "atacker"} behave exactly like {@code "self"} - the rule fires and nothing is reported. It is
-     * a closed set like the condition variables.
-     */
-    @Test
-    public void unknownTargetSelectorIsRejected() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(attrOp(AttributeType.ATTACK, 0.5, 2, "atacker")));
-        Assertions.assertTrue(e.getMessage().contains("atacker"), e.getMessage());
+    public void modifyAttrOpRejectsInvalidInput() {
+        Assertions.assertAll("MODIFY_ATTR load-time validation",
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(attrOp("ATTCK", 0.5, 2, null)));
+                    Assertions.assertTrue(e.getMessage().contains("ATTCK"),
+                            "a misspelled attribute is rejected and named: " + e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(attrOp("ATTACK_PERCENT", 0.5, 2, null)));
+                    Assertions.assertTrue(e.getMessage().contains("ATTACK_PERCENT"),
+                            "a builder-only percent attribute is rejected and named: " + e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(attrOp(AttributeType.ATTACK, 0.5, null, null)));
+                    Assertions.assertTrue(e.getMessage().contains("turns"),
+                            "a missing duration is rejected and names turns: " + e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(attrOp(AttributeType.ATTACK, 0.5, 0, null)));
+                    Assertions.assertTrue(e.getMessage().contains("turns"),
+                            "a non-positive duration is rejected and names turns: " + e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(attrOp(AttributeType.ATTACK, 0.5, 2, "atacker")));
+                    Assertions.assertTrue(e.getMessage().contains("atacker"),
+                            "a misspelled target selector is rejected and named: " + e.getMessage());
+                });
     }
 
     // ==================================================================
@@ -609,63 +537,52 @@ public class TriggerTableTest {
     // ==================================================================
 
     /**
-     * {@code actor != self} lets an ally's attack through and blocks the owner's own.
+     * Conditions select exactly the rules the data says: {@code actor != self} lets an ally's attack through
+     * and blocks the owner's own, {@code hit_count > 0} rejects an attack that hit nothing, the literal may
+     * sit on either side of a numeric comparison, and the bare {@code self} shorthand means "the actor is me".
      */
     @Test
-    public void conditionsDiscriminateBetweenSelfAndOthers() {
-        TriggerTable table = new TriggerTable(1, List.of(
+    public void conditionsMatchAsTheDataImplies() {
+        TriggerTable selfAndHitCount = new TriggerTable(1, List.of(
                 trigger("ALLY_ATTACK", List.of("actor != self", "hit_count > 0"), energy(2))));
-
-        Character owner = CharacterFactory.create(1002, 80);
-        Character other = CharacterFactory.create(1002, 80);
-
-        Assertions.assertEquals(1, table.matching(TriggerEvent.ALLY_ATTACK,
-                        new TriggerTable.TriggerContext(owner, other, null, 1, 0)).size(),
-                "an ally's attack matches");
-        Assertions.assertEquals(0, table.matching(TriggerEvent.ALLY_ATTACK,
-                        new TriggerTable.TriggerContext(owner, owner, null, 1, 0)).size(),
-                "the owner's own attack is excluded");
-        Assertions.assertEquals(0, table.matching(TriggerEvent.ALLY_ATTACK,
-                        new TriggerTable.TriggerContext(owner, other, null, 0, 0)).size(),
-                "and an attack that hit nothing is excluded by hit_count > 0");
-    }
-
-    /**
-     * The literal may sit on either side of a numeric comparison.
-     */
-    @Test
-    public void numericConditionAcceptsEitherOperandOrder() {
-        TriggerTable left = new TriggerTable(1, List.of(
-                trigger("ALLY_ATTACK", List.of("0 < hit_count"), energy(1))));
-        TriggerTable right = new TriggerTable(1, List.of(
-                trigger("ALLY_ATTACK", List.of("hit_count > 0"), energy(1))));
 
         Character owner = CharacterFactory.create(1002, 80);
         Character other = CharacterFactory.create(1002, 80);
         TriggerTable.TriggerContext oneHit = new TriggerTable.TriggerContext(owner, other, null, 1, 0);
         TriggerTable.TriggerContext noHit = new TriggerTable.TriggerContext(owner, other, null, 0, 0);
 
-        Assertions.assertEquals(1, left.matching(TriggerEvent.ALLY_ATTACK, oneHit).size());
-        Assertions.assertEquals(1, right.matching(TriggerEvent.ALLY_ATTACK, oneHit).size());
-        Assertions.assertEquals(0, left.matching(TriggerEvent.ALLY_ATTACK, noHit).size());
-        Assertions.assertEquals(0, right.matching(TriggerEvent.ALLY_ATTACK, noHit).size());
-    }
+        TriggerTable left = new TriggerTable(1, List.of(
+                trigger("ALLY_ATTACK", List.of("0 < hit_count"), energy(1))));
+        TriggerTable right = new TriggerTable(1, List.of(
+                trigger("ALLY_ATTACK", List.of("hit_count > 0"), energy(1))));
 
-    /**
-     * The bare {@code self} shorthand means "the actor is me".
-     */
-    @Test
-    public void bareSelfShorthandMeansTheActorIsMe() {
-        TriggerTable table = new TriggerTable(1, List.of(
+        TriggerTable selfShorthand = new TriggerTable(1, List.of(
                 trigger("SKILL_CAST", List.of("self"), energy(5))));
 
-        Character owner = CharacterFactory.create(1002, 80);
-        Character other = CharacterFactory.create(1002, 80);
-
-        Assertions.assertEquals(1, table.matching(TriggerEvent.SKILL_CAST,
-                new TriggerTable.TriggerContext(owner, owner, null, 0, 0)).size());
-        Assertions.assertEquals(0, table.matching(TriggerEvent.SKILL_CAST,
-                new TriggerTable.TriggerContext(owner, other, null, 0, 0)).size());
+        Assertions.assertAll("condition vocabulary",
+                () -> Assertions.assertEquals(1, selfAndHitCount.matching(TriggerEvent.ALLY_ATTACK,
+                                new TriggerTable.TriggerContext(owner, other, null, 1, 0)).size(),
+                        "an ally's attack matches"),
+                () -> Assertions.assertEquals(0, selfAndHitCount.matching(TriggerEvent.ALLY_ATTACK,
+                                new TriggerTable.TriggerContext(owner, owner, null, 1, 0)).size(),
+                        "the owner's own attack is excluded"),
+                () -> Assertions.assertEquals(0, selfAndHitCount.matching(TriggerEvent.ALLY_ATTACK,
+                                new TriggerTable.TriggerContext(owner, other, null, 0, 0)).size(),
+                        "and an attack that hit nothing is excluded by hit_count > 0"),
+                () -> Assertions.assertEquals(1, left.matching(TriggerEvent.ALLY_ATTACK, oneHit).size(),
+                        "0 < hit_count accepts the literal on the left"),
+                () -> Assertions.assertEquals(1, right.matching(TriggerEvent.ALLY_ATTACK, oneHit).size(),
+                        "hit_count > 0 accepts the literal on the right"),
+                () -> Assertions.assertEquals(0, left.matching(TriggerEvent.ALLY_ATTACK, noHit).size(),
+                        "0 < hit_count rejects an attack that hit nothing"),
+                () -> Assertions.assertEquals(0, right.matching(TriggerEvent.ALLY_ATTACK, noHit).size(),
+                        "hit_count > 0 rejects an attack that hit nothing"),
+                () -> Assertions.assertEquals(1, selfShorthand.matching(TriggerEvent.SKILL_CAST,
+                                new TriggerTable.TriggerContext(owner, owner, null, 0, 0)).size(),
+                        "bare self matches when the actor is the owner"),
+                () -> Assertions.assertEquals(0, selfShorthand.matching(TriggerEvent.SKILL_CAST,
+                                new TriggerTable.TriggerContext(owner, other, null, 0, 0)).size(),
+                        "bare self does not match another actor"));
     }
 
     // ==================================================================

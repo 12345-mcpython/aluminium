@@ -60,161 +60,150 @@ public class ShieldDurationTest {
     private static final double ALLY_SPEED = 50;
 
     // ==================================================================
-    // 1. The lifetime
+    // 1. The lifetime: spent by the carrier's turns
     // ==================================================================
 
     /**
-     * "持续2回合": the shield is up, survives one of its carrier's turns, and is gone after the second.
+     * "持续N回合": the duration is spent in the carrier's turns - up while they remain, gone after the last one,
+     * and a partly drained shield still expires on schedule.
      */
     @Test
-    public void aTimedShieldIsUpUntilItsCarriersTurnsAreSpent() {
-        Fixture f = new Fixture(shieldRule(500, 2, "target"));
+    public void theDurationIsSpentByItsCarriersTurns() {
+        // "持续2回合": up, survives one of the carrier's turns, gone after the second.
+        Fixture twoTurns = new Fixture(shieldRule(500, 2, "target"));
+        Assertions.assertAll("持续2回合: the timed shield's lifetime",
+                () -> Assertions.assertEquals(1, twoTurns.fire(), "the rule fires"),
+                () -> Assertions.assertEquals(500, twoTurns.ally.getShield(), EPS, "the shield is installed by the buff"),
+                () -> {
+                    TestTurns.take(twoTurns.battle, twoTurns.ally);
+                    Assertions.assertEquals(500, twoTurns.ally.getShield(), EPS, "one of two turns spent: still up");
+                },
+                () -> {
+                    TestTurns.take(twoTurns.battle, twoTurns.ally);
+                    Assertions.assertEquals(0, twoTurns.ally.getShield(), EPS, "the second turn is the last one");
+                });
 
-        Assertions.assertEquals(1, f.fire(), "the rule fires");
-        Assertions.assertEquals(500, f.ally.getShield(), EPS, "the shield is installed by the buff");
+        // Whose turns: the carrier's, not the caster's - "为指定我方单体提供…持续3回合的护盾".
+        Fixture casterTurn = new Fixture(shieldRule(500, 1, "target"));
+        casterTurn.fire();
+        TestTurns.take(casterTurn.battle, casterTurn.caster);
+        Assertions.assertAll("the caster's turns do not spend the shield",
+                () -> Assertions.assertEquals(500, casterTurn.ally.getShield(), EPS,
+                        "the shield is on the ally, so only the ally's turns count it down"));
 
-        TestTurns.take(f.battle, f.ally);
-        Assertions.assertEquals(500, f.ally.getShield(), EPS, "one of two turns spent: still up");
-
-        TestTurns.take(f.battle, f.ally);
-        Assertions.assertEquals(0, f.ally.getShield(), EPS, "the second turn is the last one");
-    }
-
-    /**
-     * Whose turns: the carrier's, not the caster's - "为指定我方单体提供…持续3回合的护盾".
-     */
-    @Test
-    public void theCastersTurnsDoNotSpendTheShieldsDuration() {
-        Fixture f = new Fixture(shieldRule(500, 1, "target"));
-        f.fire();
-
-        TestTurns.take(f.battle, f.caster);
-
-        Assertions.assertEquals(500, f.ally.getShield(), EPS,
-                "the shield is on the ally, so only the ally's turns count it down");
-    }
-
-    /**
-     * A shield with no {@code turns} is the raw grant it always was: only being used up removes it.
-     */
-    @Test
-    public void aShieldWithoutTurnsIsOnlyRemovedByBeingUsedUp() {
-        Fixture f = new Fixture(shieldRule(500, null, "target"));
-        f.fire();
-        Assertions.assertFalse(f.ally.getBuffManager().hasBuff(ShieldBuff.class),
-                "no duration, no buff: the value is a plain grant");
-
-        TestTurns.take(f.battle, f.ally);
-        TestTurns.take(f.battle, f.ally);
-        TestTurns.take(f.battle, f.ally);
-        Assertions.assertEquals(500, f.ally.getShield(), EPS, "turns do not touch it");
-
-        f.ally.takeDamage(5000);
-        Assertions.assertEquals(0, f.ally.getShield(), EPS, "being used up does");
-    }
-
-    /**
-     * A shield that has been partly drained still expires on schedule - its duration is not "until used up".
-     */
-    @Test
-    public void aPartlyUsedTimedShieldStillExpires() {
-        Fixture f = new Fixture(shieldRule(500, 1, "target"));
-        f.fire();
-
-        f.ally.takeDamage(200);
-        Assertions.assertEquals(300, f.ally.getShield(), EPS, "precondition: partly drained");
-
-        TestTurns.take(f.battle, f.ally);
-        Assertions.assertEquals(0, f.ally.getShield(), EPS, "the rest goes with the duration");
-    }
-
-    /**
-     * Note: A <b>raw</b> shield granted after a timed one is not taken off by that one's expiry.
-     *
-     * <p>This is what the ownership record is for: the value alone cannot say whose shield is standing there, and
-     * {@code Battle.grantShield} (a permanent grant) is a different promise from a timed one.
-     */
-    @Test
-    public void aRawGrantIsNotTakenOffByAnExpiringTimedShield() {
-        Fixture f = new Fixture(shieldRule(500, 1, "target"));
-        f.fire();
-
-        f.battle.grantShield(f.ally, 700);                 // a raw grant overwrites and owns the shield
-        TestTurns.take(f.battle, f.ally);                  // the timed buff expires here
-
-        Assertions.assertEquals(700, f.ally.getShield(), EPS,
-                "the timed shield took off its own value, not the raw one that replaced it");
-    }
-
-    /**
-     * Casting a second timed shield replaces the first, exactly like the value itself does.
-     */
-    @Test
-    public void aSecondTimedShieldReplacesTheFirst() {
-        Fixture f = new Fixture(shieldRule(500, 5, "target"), shieldRule(900, 1, "target"));
-        f.fire();
-
-        Assertions.assertEquals(900, f.ally.getShield(), EPS, "the later shield wins");
-        Assertions.assertEquals(1, f.ally.getBuffManager().countBuffs(ShieldBuff.class),
-                "and only one timed shield is attached: same kind replaces");
-
-        TestTurns.take(f.battle, f.ally);
-        Assertions.assertEquals(0, f.ally.getShield(), EPS, "the lasting one is the second, with 1 turn");
+        // A shield that has been partly drained still expires on schedule - its duration is not "until used up".
+        Fixture partlyUsed = new Fixture(shieldRule(500, 1, "target"));
+        partlyUsed.fire();
+        partlyUsed.ally.takeDamage(200);
+        Assertions.assertAll("a partly used shield still expires",
+                () -> Assertions.assertEquals(300, partlyUsed.ally.getShield(), EPS, "precondition: partly drained"),
+                () -> {
+                    TestTurns.take(partlyUsed.battle, partlyUsed.ally);
+                    Assertions.assertEquals(0, partlyUsed.ally.getShield(), EPS, "the rest goes with the duration");
+                });
     }
 
     // ==================================================================
-    // 2. The condition: "持有护盾的…"
+    // 2. The lifetime: whose grant owns the standing shield
     // ==================================================================
 
     /**
-     * {@code target has_shield} is true while a shield is up and false once it is gone.
+     * The duration belongs to the grant that installed the shield: a shield with no {@code turns} is a plain
+     * grant, a raw grant is not taken off by a timed shield's expiry, and a second timed shield replaces the first.
      */
     @Test
-    public void theConditionAsksWhetherTheShieldIsStillUp() {
-        // Note: The shield is granted by hand rather than by a second rule in the same table: rules fire in order
+    public void theDurationBelongsToTheGrantThatInstalledTheShield() {
+        // No turns: the raw grant it always was - only being used up removes it.
+        Fixture noTurns = new Fixture(shieldRule(500, null, "target"));
+        noTurns.fire();
+        Assertions.assertAll("no duration, no buff: the value is a plain grant",
+                () -> Assertions.assertFalse(noTurns.ally.getBuffManager().hasBuff(ShieldBuff.class),
+                        "no duration, no buff: the value is a plain grant"),
+                () -> {
+                    TestTurns.take(noTurns.battle, noTurns.ally);
+                    TestTurns.take(noTurns.battle, noTurns.ally);
+                    TestTurns.take(noTurns.battle, noTurns.ally);
+                    Assertions.assertEquals(500, noTurns.ally.getShield(), EPS, "turns do not touch it");
+                },
+                () -> {
+                    noTurns.ally.takeDamage(5000);
+                    Assertions.assertEquals(0, noTurns.ally.getShield(), EPS, "being used up does");
+                });
+
+        // A raw grant after a timed one is not taken off by that one's expiry: the value alone cannot say whose
+        // shield is standing there, and Battle.grantShield (a permanent grant) is a different promise.
+        Fixture rawGrant = new Fixture(shieldRule(500, 1, "target"));
+        rawGrant.fire();
+        rawGrant.battle.grantShield(rawGrant.ally, 700);                 // a raw grant overwrites and owns the shield
+        TestTurns.take(rawGrant.battle, rawGrant.ally);                  // the timed buff expires here
+        Assertions.assertAll("a raw grant is not taken off by an expiring timed shield",
+                () -> Assertions.assertEquals(700, rawGrant.ally.getShield(), EPS,
+                        "the timed shield took off its own value, not the raw one that replaced it"));
+
+        // A second timed shield replaces the first, exactly like the value itself does.
+        Fixture replacement = new Fixture(shieldRule(500, 5, "target"), shieldRule(900, 1, "target"));
+        replacement.fire();
+        Assertions.assertAll("a second timed shield replaces the first",
+                () -> Assertions.assertEquals(900, replacement.ally.getShield(), EPS, "the later shield wins"),
+                () -> Assertions.assertEquals(1, replacement.ally.getBuffManager().countBuffs(ShieldBuff.class),
+                        "and only one timed shield is attached: same kind replaces"),
+                () -> {
+                    TestTurns.take(replacement.battle, replacement.ally);
+                    Assertions.assertEquals(0, replacement.ally.getShield(), EPS, "the lasting one is the second, with 1 turn");
+                });
+    }
+
+    // ==================================================================
+    // 3. The condition: "持有护盾的…"
+    // ==================================================================
+
+    /**
+     * {@code target has_shield} asks whether the named subject still holds a shield; the negation is the same
+     * question the other way, and {@code self} is the rule's owner, not the event's target.
+     */
+    @Test
+    public void theConditionTracksWhetherTheNamedSubjectHoldsAShield() {
+        // The shield is granted by hand rather than by a second rule in the same table: rules fire in order
         // within one event, so a shield rule would have made the first firing below carry a shield already --
         // and the test would have been measuring the ordering instead of the condition.
-        Fixture f = new Fixture(conditionRule("target has_shield"));
+        Fixture condition = new Fixture(conditionRule("target has_shield"));
+        Assertions.assertAll("target has_shield",
+                () -> Assertions.assertEquals(0, fireCondition(condition),
+                        "no shield yet: 「持有护盾的」 (one that holds a shield) is false"),
+                () -> {
+                    condition.battle.grantShield(condition.ally, 500);
+                    Assertions.assertEquals(1, fireCondition(condition), "with a shield, the condition holds");
+                },
+                () -> {
+                    condition.ally.takeDamage(5000);
+                    Assertions.assertEquals(0, fireCondition(condition),
+                            "a shield that has been used up is gone -- otherwise 「持有护盾的」 (one that holds a shield) would stay true forever");
+                });
 
-        Assertions.assertEquals(0, fireCondition(f), "no shield yet: 「持有护盾的」 (one that holds a shield) is false");
+        // Its negation is the other half of the same question, and is read the same way.
+        Fixture negated = new Fixture(conditionRule("!target has_shield"));
+        Assertions.assertAll("!target has_shield",
+                () -> Assertions.assertEquals(1, fireCondition(negated),
+                        "no shield: 「没有护盾的」 (one that has no shield) holds"),
+                () -> {
+                    negated.battle.grantShield(negated.ally, 500);
+                    Assertions.assertEquals(0, fireCondition(negated), "and stops holding once one is up");
+                });
 
-        f.battle.grantShield(f.ally, 500);
-        Assertions.assertEquals(1, fireCondition(f), "with a shield, the condition holds");
-
-        f.ally.takeDamage(5000);
-        Assertions.assertEquals(0, fireCondition(f),
-                "a shield that has been used up is gone -- otherwise 「持有护盾的」 (one that holds a shield) would stay true forever");
-    }
-
-    /**
-     * Its negation is the other half of the same question, and is read the same way.
-     */
-    @Test
-    public void theNegatedConditionAsksTheOpposite() {
-        Fixture f = new Fixture(conditionRule("!target has_shield"));
-
-        Assertions.assertEquals(1, fireCondition(f), "no shield: 「没有护盾的」 (one that has no shield) holds");
-
-        f.battle.grantShield(f.ally, 500);
-        Assertions.assertEquals(0, fireCondition(f), "and stops holding once one is up");
-    }
-
-    /**
-     * Note: The subject decides whose shield is asked about: {@code self} is the rule's owner, not the event's target.
-     */
-    @Test
-    public void theConditionReadsTheSubjectItNames() {
-        Fixture f = new Fixture(conditionRule("self has_shield"));
-        f.battle.grantShield(f.ally, 500);
-
-        Assertions.assertEquals(0, fireCondition(f), "the ALLY holds the shield, and `self` is the caster");
-
-        f.battle.grantShield(f.caster, 500);
-        Assertions.assertEquals(1, fireCondition(f), "now the caster holds one");
+        // The subject decides whose shield is asked about: `self` is the rule's owner, not the event's target.
+        Fixture subject = new Fixture(conditionRule("self has_shield"));
+        subject.battle.grantShield(subject.ally, 500);
+        Assertions.assertAll("self has_shield reads the rule owner",
+                () -> Assertions.assertEquals(0, fireCondition(subject),
+                        "the ALLY holds the shield, and `self` is the caster"),
+                () -> {
+                    subject.battle.grantShield(subject.caster, 500);
+                    Assertions.assertEquals(1, fireCondition(subject), "now the caster holds one");
+                });
     }
 
     // ==================================================================
-    // 3. Fail fast
+    // 4. Fail fast
     // ==================================================================
 
     /**

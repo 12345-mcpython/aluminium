@@ -34,7 +34,7 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
         System.out.println("[21042] breakEffect=" + breakEffect + " critAfterUlt=" + crit);
         // 2026-10-19: the break share is the cone's own `breaking_effect` property (it is in the panel before the
         // battle starts), so no rule states it any more.
-        Assertions.assertTrue(true, "rank 5's break share is the property - pinned in ConeAuditBatchTwelveTest");
+        Assertions.assertTrue(true, "rank 5's break share is the property - pinned in LightConeAuditBatchTwelveTest");
         Assertions.assertEquals(0.3, crit, 1e-6, "rank 5 states 30% crit for two turns");
     }
 
@@ -52,9 +52,9 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
         double healing = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - healingBefore;
         System.out.println("[22001] healthGain=" + health + " base=" + base + " healingAfterSkill=" + healing);
         // 2026-10-19: the health share is the cone's own health_percent property (it is in the panel before the battle
-        // starts), so this gain is 0 - pinned against a cone-less wearer in ConeAuditBatchSixteenTest.
+        // starts), so this gain is 0 - pinned against a cone-less wearer in LightConeAuditBatchSixteenTest.
         Assertions.assertTrue(true, "the health share is the property");
         // 2026-10-19: the health share is the cone's own health_percent property (in the panel before the battle starts),
-        Assertions.assertTrue(true, "the health share is the property - pinned in ConeAuditBatchSixteenTest");
+        Assertions.assertTrue(true, "the health share is the property - pinned in LightConeAuditBatchSixteenTest");
     }
 }

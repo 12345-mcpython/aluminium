@@ -23,7 +23,7 @@ import java.util.List;
  *   <li><b>The Eidolon 1 rule paid the wrong unit.</b> It was written {@code self state_ended 生息} + {@code hp_percent >= 1} +
  *       {@code target: self} — both the "whose [生息] ended" and the "whose HP is full" ends of the sentence were read on
  *       <b>Bailu herself</b>, so she collected 8 energy whenever <i>she</i> was full. Measured three ways before changing
- *       anything (see {@link #eidolon1PaysTheAllyWhoseInvigorationEndsAtFullHp} and its two neighbours).</li>
+ *       anything (see {@link #eidolon1PaysTheFullHpCarrierAndNothingWhenHurt} and its E0 neighbour).</li>
  *   <li><b>The talent's "1 time per battle" had never been written</b>, so every lethal blow healed again. Now
  *       {@code once_per_battle: true}; the Eidolon 6 "one more time" is registered (a boolean cannot say "2").</li>
  *   <li><b>Eidolon 4 cannot ride {@code HEALED}</b>: the loader refuses {@code from_category BPSKILL} there ("HEALED carries
@@ -31,6 +31,10 @@ import java.util.List;
  * </ol>
  *
  * <p>The rest of her document is registered in {@code 1211.json}'s {@code _gaps}; nothing is left silent.
+ *
+ * <p><b>L3:</b> the two readings of the Eidolon 1 sentence now sit in one scenario test over its one {@code Fixture(1,
+ * false, true)} board, each assertion inside {@code Assertions.assertAll} with the message that names its clause. The E0
+ * gate stays its own test: a different board is what that case is about.
  */
 public class BailuClauseCoverageTest {
 
@@ -55,40 +59,39 @@ public class BailuClauseCoverageTest {
     }
 
     /**
-     * Eidolon 1 (「【生息】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标8点能量」): <b>the carrier</b> is paid, not Bailu.
+     * Eidolon 1 (「【生息】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标8点能量」): <b>the carrier</b> is paid, not Bailu —
+     * and the reverse half, 「若…生命值等于其生命上限」, pays nothing for an ally below full HP even though Bailu is full.
      *
-     * <p>Measured before the fix: with both at full HP the old rule gave <b>Bailu</b> +8 and the ally +0. Now the ally gets
-     * the 8 and Bailu gets nothing.
+     * <p>Both halves are the one clause on the same {@code Fixture(1, false, true)} board; the second only wounds the ally
+     * first. Measured before the fix: with both at full HP the old rule gave <b>Bailu</b> +8 and the ally +0; with the ally
+     * hurt it still paid Bailu 8.
      */
     @Test
-    public void eidolon1PaysTheAllyWhoseInvigorationEndsAtFullHp() {
-        Fixture f = new Fixture(1, false, true);
-        double bailuBefore = f.bailu.getCurrentEnergy();
-        double allyBefore = f.ally.getCurrentEnergy();
+    public void eidolon1PaysTheFullHpCarrierAndNothingWhenHurt() {
+        Fixture full = new Fixture(1, false, true);
+        double bailuBefore = full.bailu.getCurrentEnergy();
+        double allyBefore = full.ally.getCurrentEnergy();
 
-        f.battle.fireStateEnded(f.ally, "生息");
+        full.battle.fireStateEnded(full.ally, "生息");
 
-        Assertions.assertEquals(8.0, f.ally.getCurrentEnergy() - allyBefore, 1e-9,
-                "「额外恢复目标 8 点能量」 — the target is the one whose [生息] ended");
-        Assertions.assertEquals(0.0, f.bailu.getCurrentEnergy() - bailuBefore, 1e-9,
-                "and it is NOT the rule's owner (the old reading paid Bailu)");
-    }
+        Assertions.assertAll("「【生息】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标8点能量」",
+                () -> Assertions.assertEquals(8.0, full.ally.getCurrentEnergy() - allyBefore, 1e-9,
+                        "「额外恢复目标 8 点能量」 — the target is the one whose [生息] ended"),
+                () -> Assertions.assertEquals(0.0, full.bailu.getCurrentEnergy() - bailuBefore, 1e-9,
+                        "and it is NOT the rule's owner (the old reading paid Bailu)"));
 
-    /**
-     * The reverse half: 「若…生命值等于其生命上限」 — an ally below full HP pays nothing, even though Bailu is full.
-     */
-    @Test
-    public void eidolon1PaysNothingWhenTheCarrierIsHurt() {
-        Fixture f = new Fixture(1, false, true);
-        f.ally.takeDamage(f.ally.getCurrentHp() * 0.5);
-        double bailuBefore = f.bailu.getCurrentEnergy();
-        double allyBefore = f.ally.getCurrentEnergy();
+        Fixture hurt = new Fixture(1, false, true);
+        hurt.ally.takeDamage(hurt.ally.getCurrentHp() * 0.5);
+        double hurtBailuBefore = hurt.bailu.getCurrentEnergy();
+        double hurtAllyBefore = hurt.ally.getCurrentEnergy();
 
-        f.battle.fireStateEnded(f.ally, "生息");
+        hurt.battle.fireStateEnded(hurt.ally, "生息");
 
-        Assertions.assertEquals(0.0, f.ally.getCurrentEnergy() - allyBefore, 1e-9,
-                "the carrier is below full HP ⇒ nothing (measured: the old rule still paid Bailu 8 here)");
-        Assertions.assertEquals(0.0, f.bailu.getCurrentEnergy() - bailuBefore, 1e-9, "...and nothing to Bailu either");
+        Assertions.assertAll("「若…生命值等于其生命上限」 — an ally below full HP pays nothing",
+                () -> Assertions.assertEquals(0.0, hurt.ally.getCurrentEnergy() - hurtAllyBefore, 1e-9,
+                        "the carrier is below full HP ⇒ nothing (measured: the old rule still paid Bailu 8 here)"),
+                () -> Assertions.assertEquals(0.0, hurt.bailu.getCurrentEnergy() - hurtBailuBefore, 1e-9,
+                        "...and nothing to Bailu either"));
     }
 
     /**

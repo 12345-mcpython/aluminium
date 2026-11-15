@@ -11,7 +11,9 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,42 +46,37 @@ public class DamageScopeBoostTest {
     // 1. Each cast is raised by its own attribute, and only by it
     // ==================================================================
 
+    /**
+     * One scenario over the real cast harness: the three scoped cast boosts are applied in turn to a real
+     * cast, so the whole "raised by exactly X%, and the other casts are untouched" matrix is observed on the
+     * same fixture.
+     */
     @Test
-    public void basicAttackBoostRaisesTheBasicAttackByExactlyThatAmount() {
-        double plain = settledDamage(SkillType.COMMON, null, 0);
-        double boosted = settledDamage(SkillType.COMMON, AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4);
-
-        Assertions.assertTrue(plain > 0, "precondition: the basic attack deals damage");
-        Assertions.assertEquals(plain * 1.4, boosted, EPS);
-    }
-
-    @Test
-    public void basicAttackBoostLeavesASkillAlone() {
-        Assertions.assertEquals(settledDamage(SkillType.SKILL, null, 0),
-                settledDamage(SkillType.SKILL, AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS,
-                "「普攻造成的伤害提高」 (DMG dealt by Basic ATKs is raised) must not reach a skill: that is what \"scoped\" means here");
-    }
-
-    @Test
-    public void skillBoostRaisesTheSkillAndNothingElse() {
+    public void eachScopedCastBoostRaisesItsOwnCastAndNothingElse() {
+        double plainBasic = settledDamage(SkillType.COMMON, null, 0);
+        double boostedBasic = settledDamage(SkillType.COMMON, AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4);
+        double skillUnderBasicBoost = settledDamage(SkillType.SKILL, AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4);
         double plainSkill = settledDamage(SkillType.SKILL, null, 0);
         double boostedSkill = settledDamage(SkillType.SKILL, AttributeType.SKILL_DAMAGE_BOOST, 0.4);
-        Assertions.assertEquals(plainSkill * 1.4, boostedSkill, EPS);
+        double commonUnderSkillBoost = settledDamage(SkillType.COMMON, AttributeType.SKILL_DAMAGE_BOOST, 0.4);
+        double plainUltimate = settledDamage(SkillType.ULTRA, null, 0);
+        double boostedUltimate = settledDamage(SkillType.ULTRA, AttributeType.ULTIMATE_DAMAGE_BOOST, 0.4);
+        double ultimateUnderSkillBoost = settledDamage(SkillType.ULTRA, AttributeType.SKILL_DAMAGE_BOOST, 0.4);
 
-        Assertions.assertEquals(settledDamage(SkillType.COMMON, null, 0),
-                settledDamage(SkillType.COMMON, AttributeType.SKILL_DAMAGE_BOOST, 0.4), EPS,
-                "and not a basic attack either");
-    }
-
-    @Test
-    public void ultimateBoostRaisesTheUltimateAndNothingElse() {
-        double plainUlt = settledDamage(SkillType.ULTRA, null, 0);
-        double boostedUlt = settledDamage(SkillType.ULTRA, AttributeType.ULTIMATE_DAMAGE_BOOST, 0.4);
-        Assertions.assertEquals(plainUlt * 1.4, boostedUlt, EPS);
-
-        Assertions.assertEquals(plainUlt,
-                settledDamage(SkillType.ULTRA, AttributeType.SKILL_DAMAGE_BOOST, 0.4), EPS,
-                "the ultimate is not a skill: ULTRA and BPSKILL are separate categories");
+        Assertions.assertAll("scoped cast DMG boosts stay inside the cast they name",
+                () -> Assertions.assertTrue(plainBasic > 0, "precondition: the basic attack deals damage"),
+                () -> Assertions.assertEquals(plainBasic * 1.4, boostedBasic, EPS,
+                        "「普攻造成的伤害提高」: +40% basic ATK DMG raises the basic attack by exactly 40%"),
+                () -> Assertions.assertEquals(plainSkill, skillUnderBasicBoost, EPS,
+                        "「普攻造成的伤害提高」 (DMG dealt by Basic ATKs is raised) must not reach a skill: that is what \"scoped\" means here"),
+                () -> Assertions.assertEquals(plainSkill * 1.4, boostedSkill, EPS,
+                        "「战技造成的伤害提高」: +40% skill DMG raises the skill by exactly 40%"),
+                () -> Assertions.assertEquals(plainBasic, commonUnderSkillBoost, EPS,
+                        "and not a basic attack either"),
+                () -> Assertions.assertEquals(plainUltimate * 1.4, boostedUltimate, EPS,
+                        "「终结技造成的伤害提高」: +40% ultimate DMG raises the ultimate by exactly 40%"),
+                () -> Assertions.assertEquals(plainUltimate, ultimateUnderSkillBoost, EPS,
+                        "the ultimate is not a skill: ULTRA and BPSKILL are separate categories"));
     }
 
     // ==================================================================
@@ -88,32 +85,41 @@ public class DamageScopeBoostTest {
 
     @Test
     public void eachCastCategoryMapsToItsOwnAttribute() {
-        Assertions.assertEquals(AttributeType.BASIC_ATTACK_DAMAGE_BOOST,
-                SkillCategory.NORMAL.damageBoost());
-        Assertions.assertEquals(AttributeType.SKILL_DAMAGE_BOOST,
-                SkillCategory.BPSKILL.damageBoost());
-        Assertions.assertEquals(AttributeType.ULTIMATE_DAMAGE_BOOST,
-                SkillCategory.ULTRA.damageBoost());
+        List<Executable> checks = new ArrayList<>();
+        checks.add(() -> Assertions.assertEquals(AttributeType.BASIC_ATTACK_DAMAGE_BOOST,
+                SkillCategory.NORMAL.damageBoost(),
+                "NORMAL (普攻) maps to the basic-attack DMG boost"));
+        checks.add(() -> Assertions.assertEquals(AttributeType.SKILL_DAMAGE_BOOST,
+                SkillCategory.BPSKILL.damageBoost(),
+                "BPSKILL (战技) maps to the skill DMG boost"));
+        checks.add(() -> Assertions.assertEquals(AttributeType.ULTIMATE_DAMAGE_BOOST,
+                SkillCategory.ULTRA.damageBoost(),
+                "ULTRA (终结技) maps to the ultimate DMG boost"));
 
         for (SkillCategory notACast : List.of(SkillCategory.MAZE, SkillCategory.MAZE_NORMAL,
                 SkillCategory.ASSIST, SkillCategory.ELATION_DAMAGE, SkillCategory.UNSPECIFIED)) {
-            Assertions.assertNull(notACast.damageBoost(),
-                    notACast + " is not one of the three casts the texts name, so it has no scoped boost");
+            checks.add(() -> Assertions.assertNull(notACast.damageBoost(),
+                    notACast + " is not one of the three casts the texts name, so it has no scoped boost"));
         }
+        Assertions.assertAll("cast category -> scoped boost attribute", checks);
     }
 
     @Test
     public void theLegacyConstructorsProduceAnUnscopedInstance() {
-        Assertions.assertEquals(SkillCategory.UNSPECIFIED,
-                new Damage(null, null, DamageElement.FIRE, DamageType.NORMAL, 100).getCastCategory());
-        Assertions.assertEquals(SkillCategory.UNSPECIFIED,
-                new Damage(null, null, DamageElement.FIRE, 100).getCastCategory());
-        Assertions.assertEquals(SkillCategory.UNSPECIFIED,
-                new Damage(null, null, DamageElement.FIRE, DamageType.NORMAL, 100, null).getCastCategory(),
-                "a null category is normalised, so no caller has to null-check and assemble cannot NPE");
-        Assertions.assertEquals(SkillCategory.BPSKILL,
-                new Damage(null, null, DamageElement.FIRE, DamageType.NORMAL, 100, SkillCategory.BPSKILL)
-                        .getCastCategory());
+        Assertions.assertAll("the legacy Damage constructors default to an unscoped instance",
+                () -> Assertions.assertEquals(SkillCategory.UNSPECIFIED,
+                        new Damage(null, null, DamageElement.FIRE, DamageType.NORMAL, 100).getCastCategory(),
+                        "the 5-arg constructor leaves the cast category unscoped"),
+                () -> Assertions.assertEquals(SkillCategory.UNSPECIFIED,
+                        new Damage(null, null, DamageElement.FIRE, 100).getCastCategory(),
+                        "the 4-arg constructor leaves the cast category unscoped"),
+                () -> Assertions.assertEquals(SkillCategory.UNSPECIFIED,
+                        new Damage(null, null, DamageElement.FIRE, DamageType.NORMAL, 100, null).getCastCategory(),
+                        "a null category is normalised, so no caller has to null-check and assemble cannot NPE"),
+                () -> Assertions.assertEquals(SkillCategory.BPSKILL,
+                        new Damage(null, null, DamageElement.FIRE, DamageType.NORMAL, 100, SkillCategory.BPSKILL)
+                                .getCastCategory(),
+                        "an explicit cast category is carried through unchanged"));
     }
 
     /**
@@ -124,10 +130,11 @@ public class DamageScopeBoostTest {
     public void aFollowUpUsesItsOwnBoostAndNoScopedOne() {
         double plain = additionalDamage(AttributeType.FOLLOW_UP_DAMAGE_BOOST, 0);
         double withFollowUpBoost = additionalDamage(AttributeType.FOLLOW_UP_DAMAGE_BOOST, 0.2);
-        Assertions.assertEquals(plain * 1.2, withFollowUpBoost, EPS, "set 115's 2-piece, in one line");
 
-        Assertions.assertEquals(plain, additionalDamage(AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS,
-                "follow-up attack (追加攻击) damage is not Basic ATK (普攻) damage, even when the follow-up came from one");
+        Assertions.assertAll("a follow-up attacks with its own boost and stays out of the cast vocabulary",
+                () -> Assertions.assertEquals(plain * 1.2, withFollowUpBoost, EPS, "set 115's 2-piece, in one line"),
+                () -> Assertions.assertEquals(plain, additionalDamage(AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS,
+                        "follow-up attack (追加攻击) damage is not Basic ATK (普攻) damage, even when the follow-up came from one"));
     }
 
     /**
@@ -137,7 +144,8 @@ public class DamageScopeBoostTest {
     @Test
     public void aDotIsNotBoostedByAScopedBoost() {
         double plain = dotDamage(AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0);
-        Assertions.assertEquals(plain, dotDamage(AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS);
+        Assertions.assertEquals(plain, dotDamage(AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS,
+                "shock / burn (dot:shock / dot:burn) damage is not a cast, so a basic-attack boost leaves it alone");
     }
 
     // ==================================================================

@@ -26,7 +26,7 @@ public class WhatIsRealTest {
     @Test
     public void cone21035GivesBreakEffectAndBothHealTerms() {
         // 2026-10-19: the break share is the cone's own `breaking_effect` property (in the panel before the battle starts).
-        Assertions.assertTrue(true, "rank 1's break share is the property - pinned in ConeAuditBatchElevenTest");
+        Assertions.assertTrue(true, "rank 1's break share is the property - pinned in LightConeAuditBatchElevenTest");
         // 2026-10-19: likewise rank 5 - the share is the property.
         Assertions.assertTrue(true, "rank 5's break share is the property too");
         Assertions.assertEquals(0.02 * maxHp(1) + 800.0, healed(1), 1.0, "rank 1: share plus flat");

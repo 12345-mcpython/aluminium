@@ -13,6 +13,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,12 +23,21 @@ import java.util.List;
  * <p>The op is {@code MODIFY_DAMAGE_TAKEN} WITHOUT a damage type: the sentence says "受到的伤害", not elation damage --
  * unlike 21064, which names elation explicitly. The reading compares an ORDINARY instance, so a wrong damage_type
  * scoping would show up.
+ *
+ * <p>Its energy clause reads 邂逅于下一个花季 (23058): 「能量恢复效率提高 #4%。装备者的能量上限大于 120 时，每超出 10 点能量上限额外使能量恢复效率
+ * 提高 #6%，最多计入 360 点超出的能量上限」. <b>What it needed.</b> Two things. First, the two shares must ADD; two same-attribute
+ * {@code MODIFY_ATTR}s with no name replace each other (measured), so both effects carry the same {@code buff} name and
+ * {@code max_stacks} - they are then two stackable instances and add. Second, the stair counts a cap that is not an attribute,
+ * so the interpreter's {@code counterValue} gained {@code max_energy}.
+ *
+ * <p>Threshold: 「大于 120」 means 120 exactly is still zero layers (the same "above the line" arithmetic as 23001).
  */
 public class UntilTheFlowersBloomAgainTest {
     private static final int CONE = 23058;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
     private static final double SHARE = 0.15;
+    private static final int CONE_WEARER = 1002;
 
     private Character wearer;
     private Enemy enemy;
@@ -110,5 +120,41 @@ public class UntilTheFlowersBloomAgainTest {
         elationCast(battle, SkillCategory.ELATION_DAMAGE);
         System.out.println("[23058] without the cone: before=" + before);
         Assertions.assertEquals(before, ordinaryHit(battle), 1e-9, "no cone, no change (false case)");
+    }
+
+    /**
+     * The fixed share plus the stair, at the ranks' own #4 values.
+     */
+    @Test
+    public void theFixedShareAndTheStairAdd() {
+        Assertions.assertEquals(0.10, err(1, 120), 1e-9,
+                "at exactly 120: 「大于 120」 does not hold, so only the fixed 10%");
+        Assertions.assertEquals(0.106, err(1, 140), 1e-9,
+                "140 -> two 10-point steps above 120 -> 0.10 + 2 x 0.003");
+        Assertions.assertEquals(0.118, err(1, 180), 1e-9, "180 -> six steps");
+        Assertions.assertEquals(0.16 + 0.006, err(5, 140), 1e-9,
+                "rank 5's fixed share is 16% and the step is the same 0.3%");
+    }
+
+    /**
+     * 「最多计入 360 点」: past the cap the stair stops, at 36 steps.
+     */
+    @Test
+    public void theStairStopsAtThreeHundredSixtyPoints() {
+        Assertions.assertEquals(0.208, err(1, 480), 1e-9,
+                "480 is exactly 360 above 120 -> 36 steps");
+        Assertions.assertEquals(0.208, err(1, 600), 1e-9,
+                "600 is 480 above 120, but only the first 360 count");
+    }
+
+    // ==================================================================
+
+    private static double err(int rank, double maxEnergy) {
+        Character wearer = CharacterFactory.create(CONE_WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
+        wearer.setMaxEnergy(maxEnergy);
+        Battle battle = new Battle(new ArrayList<>(List.of(wearer, CharacterFactory.create(1001, LEVEL))),
+                new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.seeded());
+        battle.startBattle();
+        return wearer.getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get();
     }
 }

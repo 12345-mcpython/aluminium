@@ -54,7 +54,7 @@ public class ConeAttackEnergyTest {
         Assertions.assertEquals(4.0, firstEventGain(20012, TriggerEvent.SKILL_CAST), 1e-6, "after a skill, via on_any");
         // ⚠ The 「受到攻击」 half is NOT asserted here any more: the rule now says `actor == self` (without it, a teammate's
         // every attack paid the wearer), and `TAKING_HIT` carries the ATTACKER as `actor`, so that half cannot be expressed in
-        // the same rule. Registered in §4.3; the new `ConeAuditBatchThreeTest` carries the witness for what being hit pays. 
+        // the same rule. Registered in §4.3; the new `LightConeAuditBatchThreeTest` carries the witness for what being hit pays. 
         Assertions.assertEquals(0.0, secondEventGain(20012), 1e-6, "and only once per turn");
     }
 

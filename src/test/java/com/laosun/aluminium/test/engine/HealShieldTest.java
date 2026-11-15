@@ -5,6 +5,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.entity.Character;
+import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.enemy.Enemy;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Random;
-import com.laosun.aluminium.entity.CanHit;
 
 /**
  * acceptance: the healing damage zone and shields.
@@ -32,15 +32,35 @@ public class HealShieldTest {
     // ==================================================================
 
     @Test
-    public void healIsBaseTimesOutgoingTimesTaken() {
+    public void healingAppliesBothZonesAndRestoresHpUpToTheCap() {
         Character healer = character("healer");
         Character target = character("target");
         healer.setAttribute(AttributeType.OUTGOING_HEALING_BOOST, new DoubleValue(0.3));
         target.setAttribute(AttributeType.HEAL_TAKEN_RATIO, new DoubleValue(0.2));
         Battle battle = newBattle(healer, target);
 
-        Assertions.assertEquals(1560, battle.calculateHeal(healer, target, 1000), EPS,
-                "1000 × 1.3 × 1.2 = 1560");
+        double calculated = battle.calculateHeal(healer, target, 1000);
+
+        target.takeDamage(2000);
+        double before = target.getCurrentHp();
+        double healed = battle.heal(healer, target, 1000);
+        double hpAfterFirstHeal = target.getCurrentHp();
+
+        // Heal once more: this time it hits the cap, and what is returned is the actual amount restored
+        double healed2 = battle.heal(healer, target, 100_000);
+        double hpAfterSecondHeal = target.getCurrentHp();
+
+        Assertions.assertAll("healing = base × (1 + outgoing) × (1 + taken), then applied and capped",
+                () -> Assertions.assertEquals(1560, calculated, EPS,
+                        "1000 × 1.3 × 1.2 = 1560"),
+                () -> Assertions.assertEquals(1560, healed, EPS,
+                        "the actual amount restored = the heal amount after the damage zones"),
+                () -> Assertions.assertEquals(before + 1560, hpAfterFirstHeal, EPS,
+                        "HP rises by exactly the amount healed"),
+                () -> Assertions.assertEquals(target.getMaxHp(), hpAfterSecondHeal, EPS,
+                        "does not exceed the cap"),
+                () -> Assertions.assertEquals(target.getMaxHp() - (before + 1560), healed2, EPS,
+                        "the return value is the actual amount restored, not the theoretical heal amount"));
     }
 
     @Test
@@ -55,28 +75,6 @@ public class HealShieldTest {
     }
 
     @Test
-    public void healActuallyRestoresHpAndIsCappedAtMaxHp() {
-        Character healer = character("healer");
-        Character target = character("target");
-        healer.setAttribute(AttributeType.OUTGOING_HEALING_BOOST, new DoubleValue(0.3));
-        target.setAttribute(AttributeType.HEAL_TAKEN_RATIO, new DoubleValue(0.2));
-        Battle battle = newBattle(healer, target);
-
-        target.takeDamage(2000);
-        double before = target.getCurrentHp();
-        double healed = battle.heal(healer, target, 1000);
-
-        Assertions.assertEquals(1560, healed, EPS, "the actual amount restored = the heal amount after the damage zones");
-        Assertions.assertEquals(before + 1560, target.getCurrentHp(), EPS);
-
-        // Heal once more: this time it hits the cap, and what is returned is the actual amount restored
-        double healed2 = battle.heal(healer, target, 100_000);
-        Assertions.assertEquals(target.getMaxHp(), target.getCurrentHp(), EPS, "does not exceed the cap");
-        Assertions.assertEquals(target.getMaxHp() - (before + 1560), healed2, EPS,
-                "the return value is the actual amount restored, not the theoretical heal amount");
-    }
-
-    @Test
     public void deadTargetIsNotHealed() {
         Character healer = character("healer");
         Character target = character("target");
@@ -85,55 +83,58 @@ public class HealShieldTest {
         target.takeDamage(999_999);
         Assertions.assertTrue(target.isDeath());
 
-        Assertions.assertEquals(0, battle.heal(healer, target, 1000), EPS, "a dead man cannot be healed");
-        Assertions.assertEquals(0, target.getCurrentHp(), EPS);
+        double healed = battle.heal(healer, target, 1000);
+        double hp = target.getCurrentHp();
+
+        Assertions.assertAll("a dead target is never healed",
+                () -> Assertions.assertEquals(0, healed, EPS, "a dead man cannot be healed"),
+                () -> Assertions.assertEquals(0, hp, EPS, "the HP stays at 0"));
     }
 
     // ==================================================================
     // shield
     // ==================================================================
 
-    @Test
-    public void shieldAbsorbsDamageBeforeHp() {
-        Character target = character("target");
-        Battle battle = newBattle(character("ally"), target);
-
-        Assertions.assertEquals(500, battle.grantShield(target, 500), EPS);
-        target.takeDamage(300);
-
-        Assertions.assertEquals(200, target.getShield(), EPS, "shield 500 - 300 = 200");
-        Assertions.assertEquals(target.getMaxHp(), target.getCurrentHp(), EPS, "HP did not drop at all");
-    }
-
-    @Test
-    public void overflowAfterTheShieldBreaksHitsHp() {
-        Character target = character("target");
-        Battle battle = newBattle(character("ally"), target);
-        battle.grantShield(target, 500);
-
-        target.takeDamage(300);                                  // shield to 200
-        boolean died = target.takeDamage(300);                   // the shield eats 200, the remaining 100 goes into HP
-
-        Assertions.assertFalse(died, "breaking the shield does not kill");
-        Assertions.assertEquals(0, target.getShield(), EPS, "the shield is empty");
-        Assertions.assertEquals(target.getMaxHp() - 100, target.getCurrentHp(), EPS, "HP -100");
-        Assertions.assertFalse(target.isDeath());
-    }
-
     /**
-     * Shields do not stack: a new shield overwrites the old value instead of adding to it.
+     * A shield absorbs damage before HP, so it breaks before the target can die; a new shield
+     * overwrites the old value instead of adding to it.
      */
     @Test
-    public void shieldDoesNotStack() {
+    public void shieldAbsorbsDamageBeforeHpAndDoesNotStack() {
         Character target = character("target");
         Battle battle = newBattle(character("ally"), target);
+
+        double granted = battle.grantShield(target, 500);
+        target.takeDamage(300);
+        double shieldAfterFirstHit = target.getShield();
+        double hpAfterFirstHit = target.getCurrentHp();
+
+        Assertions.assertAll("a shield absorbs damage before HP",
+                () -> Assertions.assertEquals(500, granted, EPS, "granting 500 sets a 500-point shield"),
+                () -> Assertions.assertEquals(200, shieldAfterFirstHit, EPS, "shield 500 - 300 = 200"),
+                () -> Assertions.assertEquals(target.getMaxHp(), hpAfterFirstHit, EPS, "HP did not drop at all"));
+
+        boolean died = target.takeDamage(300);                   // the shield eats 200, the remaining 100 goes into HP
+        double shieldAfterBreak = target.getShield();
+        double hpAfterBreak = target.getCurrentHp();
+        boolean deadAfterBreak = target.isDeath();
+
+        Assertions.assertAll("overflow past the broken shield goes into HP",
+                () -> Assertions.assertFalse(died, "breaking the shield does not kill"),
+                () -> Assertions.assertEquals(0, shieldAfterBreak, EPS, "the shield is empty"),
+                () -> Assertions.assertEquals(target.getMaxHp() - 100, hpAfterBreak, EPS, "HP -100"),
+                () -> Assertions.assertFalse(deadAfterBreak, "the target survives the overflow"));
 
         battle.grantShield(target, 500);
         battle.grantShield(target, 300);
+        double overwritten = target.getShield();
+        double cleared = battle.grantShield(target, -50);
+        double shieldAfterClear = target.getShield();
 
-        Assertions.assertEquals(300, target.getShield(), EPS, "overwrite, not 800");
-        Assertions.assertEquals(0, battle.grantShield(target, -50), EPS, "≤ 0 is treated as clearing the shield");
-        Assertions.assertEquals(0, target.getShield(), EPS);
+        Assertions.assertAll("a new shield overwrites instead of stacking",
+                () -> Assertions.assertEquals(300, overwritten, EPS, "overwrite, not 800"),
+                () -> Assertions.assertEquals(0, cleared, EPS, "≤ 0 is treated as clearing the shield"),
+                () -> Assertions.assertEquals(0, shieldAfterClear, EPS, "the shield is gone"));
     }
 
     /**
@@ -158,10 +159,14 @@ public class HealShieldTest {
         double levelTerm = com.laosun.aluminium.Constant.DEFENCE_CONST
                 + com.laosun.aluminium.Constant.DEFENCE_PER_LEVEL * attacker.getLevel();
         double settled = 1000 * levelTerm / (100 + levelTerm);
+        double hpAfter = target.getCurrentHp();
+        double absorbed = target.getLastShieldAbsorbed();
 
-        Assertions.assertEquals(hpBefore, target.getCurrentHp(), EPS, "HP did not move (all eaten by the shield)");
-        Assertions.assertEquals(settled, target.getLastShieldAbsorbed(), EPS);
-        Assertions.assertEquals(settled, dealt, EPS, "what is returned is \"settled value + shield absorbed\"");
+        Assertions.assertAll("damage eaten by a shield still counts as damage dealt",
+                () -> Assertions.assertEquals(hpBefore, hpAfter, EPS, "HP did not move (all eaten by the shield)"),
+                () -> Assertions.assertEquals(settled, absorbed, EPS, "the shield absorbed the fully settled hit"),
+                () -> Assertions.assertEquals(settled, dealt, EPS,
+                        "what is returned is \"settled value + shield absorbed\""));
     }
 
     @Test
@@ -171,9 +176,13 @@ public class HealShieldTest {
         battle.grantShield(target, 500);
 
         target.setInvulnerable(true);
-        Assertions.assertEquals(0, battle.applyDamage(target, new Damage(
-                character("x"), target, DamageElement.ICE, DamageType.NORMAL, 1000)), EPS);
-        Assertions.assertEquals(500, target.getShield(), EPS, "while invulnerable not even the shield drops");
+        double dealt = battle.applyDamage(target, new Damage(
+                character("x"), target, DamageElement.ICE, DamageType.NORMAL, 1000));
+        double shield = target.getShield();
+
+        Assertions.assertAll("an invulnerable target loses no HP and no shield",
+                () -> Assertions.assertEquals(0, dealt, EPS, "the settled damage is 0"),
+                () -> Assertions.assertEquals(500, shield, EPS, "while invulnerable not even the shield drops"));
     }
 
     // ==================================================================
@@ -182,11 +191,10 @@ public class HealShieldTest {
         return Character.fromAttributes(name, 3000, 100, 100, 100);
     }
 
-    private static Battle newBattle(com.laosun.aluminium.entity.CanHit a,
-                                    com.laosun.aluminium.entity.CanHit b) {
+    private static Battle newBattle(CanHit a, CanHit b) {
         List<Character> characters = new java.util.ArrayList<>();
         List<Enemy> enemies = new java.util.ArrayList<>();
-        for (com.laosun.aluminium.entity.CanHit c : List.of(a, b)) {
+        for (CanHit c : List.of(a, b)) {
             if (c instanceof Character character) {
                 characters.add(character);
             } else if (c instanceof Enemy enemy) {

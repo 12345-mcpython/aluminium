@@ -24,43 +24,53 @@ import java.util.List;
  *   <li>a runtime max-HP spelling - {@code HEALTH_PERCENT} is a builder-only key that the loader refuses, while
  *       {@code AttributeSheet.maxHp()} reads {@code HEALTH}.</li>
  * </ul>
+ *
+ * <p><b>L3:</b> the two readings of this one clause - an overflowing heal and a fully-used one - are one scenario test
+ * over two {@code scene()} boards, each assertion inside {@code Assertions.assertAll}; every expected value, tolerance
+ * and message is the one the separate case carried.
  */
 public class BailuOverhealTraceTest {
     private static final int BAILU = 1211;
     private static final int ALLY = 1204;
     private static final int LEVEL = 80;
 
+    /**
+     * 「造成过量治疗时…提高目标 10% 生命上限」: the overflowing heal lifts the target's max HP, and a heal that is fully
+     * used does not.
+     *
+     * <p>Both readings are the one clause on the same {@code scene()}: the ally at full HP takes a heal that restores
+     * nothing, and the ally that was wounded first swallows all 10 points.
+     */
     @Test
-    public void aHealThatOverflowsLiftsTheTargetsMaxHp() {
-        Battle battle = scene();
-        Character bailu = battle.characters().getFirst();
-        Character ally = battle.characters().get(1);
+    public void theOverhealTraceLiftsMaxHpOnlyWhenTheHealOverflows() {
+        Battle overflowing = scene();
+        Character bailu = overflowing.characters().getFirst();
+        Character ally = overflowing.characters().get(1);
         double before = ally.getMaxHp();
 
         // The ally is at full HP, so every point of this heal is excess and NOTHING is restored - the exact case HEALED is
         // silent about.
-        battle.heal(bailu, ally, ally.getMaxHp() * 0.5);
-        battle.processRequests();
+        overflowing.heal(bailu, ally, ally.getMaxHp() * 0.5);
+        overflowing.processRequests();
 
-        Assertions.assertTrue(ally.getMaxHp() > before,
-                "「造成过量治疗时…提高目标 10% 生命上限」 — max HP rose (" + before + " -> " + ally.getMaxHp() + ")");
-    }
+        Assertions.assertAll("「造成过量治疗时…提高目标 10% 生命上限」",
+                () -> Assertions.assertTrue(ally.getMaxHp() > before,
+                        "「造成过量治疗时…提高目标 10% 生命上限」 — max HP rose (" + before + " -> " + ally.getMaxHp() + ")"));
 
-    @Test
-    public void aHealThatIsFullyUsedDoesNot() {
-        Battle battle = scene();
-        Character bailu = battle.characters().getFirst();
-        Character ally = battle.characters().get(1);
-        Enemy enemy = (Enemy) battle.enemies().getFirst();
-        battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 200));
-        battle.processRequests();
-        double before = ally.getMaxHp();
+        Battle fullyUsed = scene();
+        Character fullyUsedBailu = fullyUsed.characters().getFirst();
+        Character fullyUsedAlly = fullyUsed.characters().get(1);
+        Enemy enemy = (Enemy) fullyUsed.enemies().getFirst();
+        fullyUsed.applyDamage(fullyUsedAlly, new Damage(enemy, fullyUsedAlly, DamageElement.FIRE, DamageType.NORMAL, 200));
+        fullyUsed.processRequests();
+        double fullyUsedBefore = fullyUsedAlly.getMaxHp();
 
-        battle.heal(bailu, ally, 10);
-        battle.processRequests();
+        fullyUsed.heal(fullyUsedBailu, fullyUsedAlly, 10);
+        fullyUsed.processRequests();
 
-        Assertions.assertEquals(before, ally.getMaxHp(), 1e-9,
-                "no overflow, no bonus: the rule only subscribes to OVERHEAL");
+        Assertions.assertAll("no overflow, no bonus",
+                () -> Assertions.assertEquals(fullyUsedBefore, fullyUsedAlly.getMaxHp(), 1e-9,
+                        "no overflow, no bonus: the rule only subscribes to OVERHEAL"));
     }
 
     private static Battle scene() {

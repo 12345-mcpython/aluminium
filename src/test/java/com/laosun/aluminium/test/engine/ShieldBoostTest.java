@@ -47,152 +47,142 @@ public class ShieldBoostTest {
     private static final int MONSTER = 1002011;
 
     /**
-     * The register's own example: relic 103's 4-piece, "increases the shield amount provided by the wearer by 20%".
-     */
-    @Test
-    public void theProvidersBoostMultipliesTheShield() {
-        Battle battle = fixture();
-        Character giver = battle.characters().getFirst();
-        giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
-
-        double installed = battle.grantShield(giver, giver, 100);
-
-        Assertions.assertEquals(120, installed, EPS);
-        Assertions.assertEquals(120, giver.getShield(), EPS, "and that is what the damage path will drain");
-    }
-
-    /**
-     * Note: The boost belongs to the <b>giver</b>, not to the one being shielded.
+     * The register's own example and the boundary around it: relic 103's 4-piece, "increases the shield amount provided
+     * by the wearer by 20%", read at grant time from the <b>provider</b>.
      *
-     * <p>This is the case that separates "the shield amount provided" from every damage/healing modifier in the engine: a
-     * strengthened <i>receiver</i> must change nothing at all, or the same 20% would quietly apply to shields handed
-     * out by teammates and by light cones nobody is wearing.
-     */
-    @Test
-    public void aBoostOnTheReceiverChangesNothing() {
-        Battle battle = fixture();
-        Character giver = battle.characters().getFirst();
-        Character shielded = battle.characters().getLast();
-        shielded.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.5));
-
-        double installed = battle.grantShield(giver, shielded, 100);
-
-        Assertions.assertEquals(100, installed, EPS, "the giver states no boost, so the shield is what was asked for");
-        Assertions.assertEquals(100, shielded.getShield(), EPS);
-    }
-
-    /**
-     * No provider means no boost: the raw entry point the fixtures and demos use stays exactly as it was.
-     */
-    @Test
-    public void anUnknownProviderAppliesNoBoost() {
-        Battle battle = fixture();
-        Character shielded = battle.characters().getFirst();
-        shielded.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.5));
-
-        Assertions.assertEquals(100, battle.grantShield(shielded, 100), EPS,
-                "a boost that cannot be attributed to a giver must not strengthen the shield");
-    }
-
-    /**
-     * Two statements about one stat <b>add</b>, because both are contributions to one quantity.
+     * <p>Every sub-case below builds the same {@link #fixture()} and asks the same raw entry point
+     * {@code Battle.grantShield}; only the attribute setup differs, so the assertions share one
+     * {@link Assertions#assertAll} block. The claims are: the amount is multiplied by {@code 1 + provider's boost};
+     * the boost belongs to the <b>giver</b>, so a strengthened <i>receiver</i> changes nothing and a grant with no
+     * provider at all applies none; two statements about one stat <b>add</b>, because both are contributions to one
+     * quantity (relic 103's 20% and 128's 10% cannot be worn together, but a light cone's 12% can sit next to a set
+     * bonus, so the arithmetic has to be addition rather than "the strongest wins"); and a boost cannot conjure a
+     * shield - 0 stays 0 and the "{@code <= 0} clears it" reading is unchanged.
      *
-     * <p>relic 103's 20% and 128's 10% cannot be worn together (one relic per slot), but a light cone's "the shield amount provided is increased
-     * by 12%" can sit next to a set bonus, so the arithmetic has to be addition rather than "the strongest wins".
-     *
-     * <p>Note: The modifiers are <b>pure</b> ones, which is not a detail of the fixture: SHIELD_BOOST is a ratio
-     * attribute, and the engine's own {@code MODIFY_ATTR} gives a ratio attribute a flat modifier rather than an
-     * additive percentage ({@code statModifier}: {@code attribute.isPercent ? "pure" : "add_percent"}), because a
-     * percentage of a zero base is zero. Writing this case with {@code addPercent} would have "proved" that two
-     * boosts cancel out - and it did, until it was measured.
+     * <p><b>Pure modifiers.</b> SHIELD_BOOST is a ratio attribute, and the engine's own {@code MODIFY_ATTR} gives a
+     * ratio attribute a flat modifier rather than an additive percentage ({@code statModifier}:
+     * {@code attribute.isPercent ? "pure" : "add_percent"}), because a percentage of a zero base is zero. Writing the
+     * additive sub-case with {@code addPercent} would have "proved" that two boosts cancel out - and it did, until it
+     * was measured.
      */
     @Test
-    public void twoBoostsOnTheSameProviderAdd() {
-        Battle battle = fixture();
-        Character giver = battle.characters().getFirst();
-        giver.getAttribute(AttributeType.SHIELD_BOOST)
+    public void theGrantReadsTheProvidersBoost() {
+        Battle providerBattle = fixture();
+        Character provider = providerBattle.characters().getFirst();
+        provider.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
+        double boostedInstall = providerBattle.grantShield(provider, provider, 100);
+        double drainedByDamage = provider.getShield();
+
+        Battle receiverBattle = fixture();
+        Character plainGiver = receiverBattle.characters().getFirst();
+        Character boostedReceiver = receiverBattle.characters().getLast();
+        boostedReceiver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.5));
+        double unboostedInstall = receiverBattle.grantShield(plainGiver, boostedReceiver, 100);
+        double receiverShield = boostedReceiver.getShield();
+
+        Battle anonymousBattle = fixture();
+        Character anonymousGiver = anonymousBattle.characters().getFirst();
+        anonymousGiver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.5));
+        double anonymousInstall = anonymousBattle.grantShield(anonymousGiver, 100);
+
+        Battle additiveBattle = fixture();
+        Character additiveGiver = additiveBattle.characters().getFirst();
+        additiveGiver.getAttribute(AttributeType.SHIELD_BOOST)
                 .addModifier(DoubleValue.Modifier.pure(0.1, DoubleValue.Modifier.ModifierSource.BUFF));
-        giver.getAttribute(AttributeType.SHIELD_BOOST)
+        additiveGiver.getAttribute(AttributeType.SHIELD_BOOST)
                 .addModifier(DoubleValue.Modifier.pure(0.12, DoubleValue.Modifier.ModifierSource.BUFF));
+        double addedInstall = additiveBattle.grantShield(additiveGiver, additiveGiver, 100);
 
-        Assertions.assertEquals(122, battle.grantShield(giver, giver, 100), EPS);
+        Battle clearingBattle = fixture();
+        Character clearingGiver = clearingBattle.characters().getFirst();
+        clearingGiver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
+        double zeroInstall = clearingBattle.grantShield(clearingGiver, clearingGiver, 0);
+        clearingBattle.grantShield(clearingGiver, clearingGiver, 100);
+        double negativeInstall = clearingBattle.grantShield(clearingGiver, clearingGiver, -50);
+        double clearedShield = clearingGiver.getShield();
+
+        Assertions.assertAll("the provider's SHIELD_BOOST is read at grant time",
+                () -> Assertions.assertEquals(120, boostedInstall, EPS, "20% turns a 100 shield into 120"),
+                () -> Assertions.assertEquals(120, drainedByDamage, EPS,
+                        "and that is what the damage path will drain"),
+                () -> Assertions.assertEquals(100, unboostedInstall, EPS,
+                        "the giver states no boost, so the shield is what was asked for"),
+                () -> Assertions.assertEquals(100, receiverShield, EPS,
+                        "a boost on the receiver changes nothing - the number belongs to the giver"),
+                () -> Assertions.assertEquals(100, anonymousInstall, EPS,
+                        "a boost that cannot be attributed to a giver must not strengthen the shield"),
+                () -> Assertions.assertEquals(122, addedInstall, EPS,
+                        "two boosts on the same provider add: 10% + 12% = 22%"),
+                () -> Assertions.assertEquals(0, zeroInstall, EPS, "a boost cannot conjure a shield from 0"),
+                () -> Assertions.assertEquals(0, negativeInstall, EPS, "≤ 0 still clears, not −60"),
+                () -> Assertions.assertEquals(0, clearedShield, EPS, "the cleared grant leaves no shield behind"));
     }
 
     /**
-     * A boost cannot conjure a shield: 0 stays 0, and the "{@code <= 0} clears it" reading is unchanged.
+     * <b>Both rule paths, one number.</b> The {@code SHIELD} op reaches the field in two shapes - a raw grant when the
+     * rule states no {@code turns}, and a timed {@link ShieldBuff} when it does - and a boost that only applied to one
+     * of them would make March 7th (三月七)'s "lasting 3 turns" shield 120 for three turns and 100 forever after. Both
+     * sub-cases fire the same {@code ALLY_ATTACK} rule on the same {@link #fixture()}; the untimed shape is checked
+     * through the op's own call site rather than the API directly.
      */
     @Test
-    public void aBoostDoesNotCreateOrUnclearAShield() {
-        Battle battle = fixture();
-        Character giver = battle.characters().getFirst();
-        giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
-
-        Assertions.assertEquals(0, battle.grantShield(giver, giver, 0), EPS);
-        battle.grantShield(giver, giver, 100);
-        Assertions.assertEquals(0, battle.grantShield(giver, giver, -50), EPS, "≤ 0 still clears, not −60");
-        Assertions.assertEquals(0, giver.getShield(), EPS);
-    }
-
-    /**
-     * Note: <b>Both paths, one number.</b> The {@code SHIELD} op reaches the field in two shapes - a raw grant when the
-     * rule states no {@code turns}, and a timed {@link ShieldBuff} when it does - and a boost that only applied to
-     * one of them would make March 7th (三月七)'s "lasting 3 turns" shield 120 for three turns and 100 forever after.
-     */
-    @Test
-    public void theTimedShieldInstallsTheSameBoostedNumber() {
-        Battle battle = fixture();
-        Character giver = battle.characters().getFirst();
-        Character shielded = battle.characters().getLast();
-        giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
-        giver.setTriggerTable(new TriggerTable(WEARER,
+    public void bothRuleShapesInstallTheBoostedNumber() {
+        Battle timedBattle = fixture();
+        Character timedGiver = timedBattle.characters().getFirst();
+        Character timedReceiver = timedBattle.characters().getLast();
+        timedGiver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
+        timedGiver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shieldWithTurns(100, 3)))));
+        timedBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, timedGiver, timedReceiver, 1, 0));
 
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
+        ShieldBuff timedBuff = timedReceiver.getBuffManager().allBuffsOf(ShieldBuff.class).getFirst();
+        double buffAmount = timedBuff.getAmount();
+        double timedShield = timedReceiver.getShield();
 
-        ShieldBuff buff = shielded.getBuffManager().allBuffsOf(ShieldBuff.class).getFirst();
-        Assertions.assertEquals(120, buff.getAmount(), EPS, "the buff's amount is the boosted one");
-        Assertions.assertEquals(120, shielded.getShield(), EPS, "…and that is what it installed");
-    }
-
-    /**
-     * …and the untimed shape of the same rule agrees, through the op's own call site rather than the API directly.
-     */
-    @Test
-    public void theRawGrantFromARuleIsBoostedToo() {
-        Battle battle = fixture();
-        Character giver = battle.characters().getFirst();
-        Character shielded = battle.characters().getLast();
-        giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
-        giver.setTriggerTable(new TriggerTable(WEARER,
+        Battle rawBattle = fixture();
+        Character rawGiver = rawBattle.characters().getFirst();
+        Character rawReceiver = rawBattle.characters().getLast();
+        rawGiver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
+        rawGiver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shield(100)))));
+        rawBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
+                com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, rawGiver, rawReceiver, 1, 0));
 
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
+        double rawShield = rawReceiver.getShield();
+        int rawBuffCount = rawReceiver.getBuffManager().allBuffsOf(ShieldBuff.class).size();
 
-        Assertions.assertEquals(120, shielded.getShield(), EPS);
-        Assertions.assertEquals(0, shielded.getBuffManager().allBuffsOf(ShieldBuff.class).size(),
-                "no turns stated, so no buff — the number is the whole effect");
+        Assertions.assertAll("both SHIELD shapes install the giver's boosted number",
+                () -> Assertions.assertEquals(120, buffAmount, EPS, "the timed buff's amount is the boosted one"),
+                () -> Assertions.assertEquals(120, timedShield, EPS, "…and that is what it installed"),
+                () -> Assertions.assertEquals(120, rawShield, EPS, "the untimed rule grant is boosted too"),
+                () -> Assertions.assertEquals(0, rawBuffCount,
+                        "no turns stated, so no buff — the number is the whole effect"));
     }
 
     /**
      * The shipped content, read back through the loader: relic 103's 4-piece is 20% on its <b>wearer</b>.
      *
-     * <p>Note: This is the assertion the register could not make before: the ability was registered for days as
+     * <p>This is the assertion the register could not make before: the ability was registered for days as
      * "not expressible", and a file that loads is not the same claim as a file whose number is right. It also pins
-     * the <b>side</b>: the rule must land on the wearer (self), because "provided by the wearer" shields are the wearer's own.
+     * the <b>side</b>: the rule must land on the wearer (self), because "provided by the wearer" shields are the
+     * wearer's own.
      *
-     * <p>Note: The number is read <b>after</b> {@code startBattle()}, and that is not a detail of the fixture: the bonus is
-     * an ability rule, not a {@code properties} stat, so it is applied by the {@code BATTLE_START} rule it was written
-     * as. Reading the sheet of a character who has not entered a battle would read 0 and "prove" the file wrong.
+     * <p>The number is read <b>after</b> {@code startBattle()}, and that is not a detail of the fixture: the bonus is an
+     * ability rule, not a {@code properties} stat, so it is applied by the {@code BATTLE_START} rule it was written as.
+     * Reading the sheet of a character who has not entered a battle would read 0 and "prove" the file wrong.
      */
     @Test
     public void theKnightsFourthPieceBoostsTheWearersOwnShields() {
         Character wearer = wearing(RELIC_SET_103);
         Battle battle = battleWith(List.of(wearer));
+        double boost = wearer.getAttribute(AttributeType.SHIELD_BOOST).get();
+        double granted = battle.grantShield(wearer, wearer, 100);
 
-        Assertions.assertEquals(0.2, wearer.getAttribute(AttributeType.SHIELD_BOOST).get(), EPS,
-                "「increases the shield amount provided by the wearer by 20%」");
-        Assertions.assertEquals(120, battle.grantShield(wearer, wearer, 100), EPS,
-                "…and a shield that wearer grants really is a fifth larger");
+        Assertions.assertAll("relic 103's 4-piece lands on the wearer",
+                () -> Assertions.assertEquals(0.2, boost, EPS, "「increases the shield amount provided by the wearer by 20%」"),
+                () -> Assertions.assertEquals(120, granted, EPS,
+                        "…and a shield that wearer grants really is a fifth larger"));
     }
 
     /**
@@ -202,16 +192,19 @@ public class ShieldBoostTest {
     public void theReclusesTwoTiersAddUp() {
         Character full = wearing(RELIC_SET_128);
         Character twoPiece = wearingTwoPieces(RELIC_SET_128);
+        double fullBoost = full.getAttribute(AttributeType.SHIELD_BOOST).get();
+        double twoPieceBoost = twoPiece.getAttribute(AttributeType.SHIELD_BOOST).get();
 
-        Assertions.assertEquals(0.22, full.getAttribute(AttributeType.SHIELD_BOOST).get(), EPS,
-                "the 4-piece sentence is +12% ON TOP of the 2-piece's 10% (see the file's note for why it is "
-                        + "written as the accumulated total)");
-        Assertions.assertEquals(0.1, twoPiece.getAttribute(AttributeType.SHIELD_BOOST).get(), EPS,
-                "the 2-piece alone is 10%, not a share of the 22%");
+        Assertions.assertAll("relic 128's two tiers state their own numbers",
+                () -> Assertions.assertEquals(0.22, fullBoost, EPS,
+                        "the 4-piece sentence is +12% ON TOP of the 2-piece's 10% (see the file's note for why it is "
+                                + "written as the accumulated total)"),
+                () -> Assertions.assertEquals(0.1, twoPieceBoost, EPS,
+                        "the 2-piece alone is 10%, not a share of the 22%"));
     }
 
     /**
-     * Note: A set the wearer's shield does not come from changes nothing.
+     * A set the wearer's shield does not come from changes nothing.
      *
      * <p>relic 103's bonus is about <b>the wearer's own</b> shields only, so a teammate wearing 103 who shields
      * somebody else must be the one who gets the boost - and a wearer who shields nobody must not have the attribute
@@ -222,15 +215,19 @@ public class ShieldBoostTest {
         Character knight = wearing(RELIC_SET_103);
         Character teammate = CharacterFactory.create(WEARER, LEVEL);
         Battle battle = battleWith(List.of(knight, teammate));
+        double knightBoost = knight.getAttribute(AttributeType.SHIELD_BOOST).get();
+        double teammateBoost = teammate.getAttribute(AttributeType.SHIELD_BOOST).get();
+        double teammateGrant = battle.grantShield(teammate, knight, 100);
 
-        Assertions.assertEquals(0.2, knight.getAttribute(AttributeType.SHIELD_BOOST).get(), EPS);
-        Assertions.assertEquals(0, teammate.getAttribute(AttributeType.SHIELD_BOOST).get(), EPS);
-        Assertions.assertEquals(100, battle.grantShield(teammate, knight, 100), EPS,
-                "the teammate states no boost, so the shield they give is unboosted even though the carrier wears 103");
+        Assertions.assertAll("the set bonus belongs to the unit that owns it",
+                () -> Assertions.assertEquals(0.2, knightBoost, EPS, "the 103 wearer carries the 20%"),
+                () -> Assertions.assertEquals(0, teammateBoost, EPS, "the teammate carries none of it"),
+                () -> Assertions.assertEquals(100, teammateGrant, EPS,
+                        "the teammate states no boost, so the shield they give is unboosted even though the carrier wears 103"));
     }
 
     /**
-     * Note: <b>The other shield path.</b> A shield can also be installed by the <b>skill data</b> rather than by a rule:
+     * <b>The other shield path.</b> A shield can also be installed by the <b>skill data</b> rather than by a rule:
      * {@code SkillExecutor}'s non-damaging arm reads a {@code Defence} effect's parameters (March 7th's 100102 is one:
      * "38% defence + 190") and grants it directly. That arm must name its caster as the provider too, or a data-driven
      * Shield skill would be the one shield in the fight that "the shield amount provided is increased" does not reach.
@@ -249,9 +246,11 @@ public class ShieldBoostTest {
         double plain = skillShield(false);
         double boosted = skillShield(true);
 
-        Assertions.assertTrue(plain > 0, "precondition: the Defence skill really installs a shield (" + plain + ")");
-        Assertions.assertEquals(1.22 * plain, boosted, EPS,
-                "the skill-data path names the caster as the provider, so 「the shield amount provided is increased」 reaches it");
+        Assertions.assertAll("the skill-data shield path names its caster as the provider",
+                () -> Assertions.assertTrue(plain > 0,
+                        "precondition: the Defence skill really installs a shield (" + plain + ")"),
+                () -> Assertions.assertEquals(1.22 * plain, boosted, EPS,
+                        "the skill-data path names the caster as the provider, so 「the shield amount provided is increased」 reaches it"));
     }
 
     // ==================================================================

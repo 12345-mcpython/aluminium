@@ -99,96 +99,97 @@ public class QueueActionManipulationTest {
     // ==================================================================
 
     /**
-     * Speed boost mid-battle: the remaining wait is converted by the progress already accumulated.
+     * E2 scenario: a speed change re-schedules the action time immediately, in all three ways the
+     * engine can trigger it - a buff arriving, a buff leaving, and a direct attribute write - instead
+     * of waiting for the next cycle scheduling.
      *
-     * <p>Speed 100 to cycle 100, first round next = 150 (progress ledger = 1/1.5 = 2/3).
+     * <p>Buff arriving: speed 100 to cycle 100, first round next = 150 (progress ledger = 1/1.5 = 2/3).
      * The enemy in the team has 132 speed (first round 113.64) and acts first; after running
      * {@code move()} twice, elapsed = 150 and hero has just finished acting (next = 250, progress
-     * back to 0).
+     * back to 0). Doubling the speed to 200 (cycle 50) makes the new next = elapsed + (1 - 0) × 50 = 200.
      *
-     * <p>Now double the speed to 200 (cycle 50): the new next = elapsed + (1 - 0)  x  50 = 200.
+     * <p>Buff leaving: hero at speed 200 to first round 5, earlier than the 132-speed enemy's 113.64,
+     * so this time hero really does act first; removing the boost falls back to the original cycle
+     * immediately.
+     *
+     * <p>Direct attribute write: the trigger point is {@code CanHit.setAttribute}, and the first-round
+     * coefficient is preserved - a unit at speed 100 has a first-round reservation length of
+     * {@code 100 × 1.5 = 150}, i.e. 150 squares left on the action bar. After changing the speed to
+     * 200 (cycle 50), those remaining 150 squares are walked at the new speed:
+     * {@code 150 / 200 × 10000 = 75}. A wrong implementation computes something else: using
+     * {@code cycleTime()} (100) as the denominator to back out the progress gives 1.5, which clamps to
+     * 1 and becomes "act immediately" (0); simply dropping the first-round coefficient gives 50.
      */
     @Test
-    public void speedChangeReSchedulesTheSignalImmediately() {
-        Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
-        Queue q = battle.queue();
+    public void speedChangesReScheduleTheActionTimeImmediately() {
+        Assertions.assertAll("E2: a speed change re-schedules the action time immediately",
+                () -> {
+                    // buff arrives mid-battle: the remaining wait is converted by the accumulated progress
+                    Character hero = character("hero", 100);
+                    Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
+                    Queue q = battle.queue();
 
-        // enemy at 132 speed to first round 10000/132  x  1.5; earlier than hero's 150, so it acts first
-        Assertions.assertEquals(10000.0 / 132 * 1.5, signalOf(q, dummyOf(battle)).getNextActionTime(), 1e-6);
+                    // enemy at 132 speed to first round 10000/132 × 1.5; earlier than hero's 150, so it acts first
+                    Assertions.assertEquals(10000.0 / 132 * 1.5, signalOf(q, dummyOf(battle)).getNextActionTime(), 1e-6,
+                            "E2: the 132-speed enemy's first round (113.64) comes before the hero's 150");
 
-        q.move();                                        // the enemy acts
-        Assertions.assertNotEquals(hero, q.getCurrentActor().getCanHit());
-        q.setTopZero();
-        q.move();                                        // now it is hero's turn, elapsed = 150
-        Assertions.assertEquals(hero, q.getCurrentActor().getCanHit());
-        q.setTopZero();                                  // hero to next = 250
+                    q.move();                                        // the enemy acts
+                    Assertions.assertNotEquals(hero, q.getCurrentActor().getCanHit(),
+                            "E2: the enemy acts first");
+                    q.setTopZero();
+                    q.move();                                        // now it is hero's turn, elapsed = 150
+                    Assertions.assertEquals(hero, q.getCurrentActor().getCanHit(),
+                            "E2: the hero acts second, at elapsed = 150");
+                    q.setTopZero();                                  // hero to next = 250
 
-        Signal heroSignal = signalOf(q, hero);
-        Assertions.assertEquals(250, heroSignal.getNextActionTime(), EPS);
+                    Signal heroSignal = signalOf(q, hero);
+                    Assertions.assertEquals(250, heroSignal.getNextActionTime(), EPS,
+                            "E2: after acting, the hero is booked at 250");
 
-        hero.getBuffManager().addBuff(new SpeedBoostBuff(2, 1.0));   // speed 100 to 200
+                    hero.getBuffManager().addBuff(new SpeedBoostBuff(2, 1.0));   // speed 100 to 200
 
-        Assertions.assertEquals(200, heroSignal.getNextActionTime(), EPS,
-                "immediately re-scheduled: 150 + (1 - 0) × 50 = 200 (instead of waiting for the next cycle scheduling)");
-        Assertions.assertEquals(200, hero.getAttribute(AttributeType.SPEED).get(), EPS,
-                "the stat sheet really did become 200");
-    }
+                    Assertions.assertEquals(200, heroSignal.getNextActionTime(), EPS,
+                            "immediately re-scheduled: 150 + (1 - 0) × 50 = 200 (instead of waiting for the next cycle scheduling)");
+                    Assertions.assertEquals(200, hero.getAttribute(AttributeType.SPEED).get(), EPS,
+                            "the stat sheet really did become 200");
+                },
+                () -> {
+                    // the buff leaves: falls back to the original cycle immediately
+                    Character hero = character("hero", 100);
+                    Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
+                    Queue q = battle.queue();
 
-    /**
-     * Removing the speed boost likewise falls back to the original cycle immediately.
-     *
-     * <p>hero at speed 200 to first round 5, earlier than the 132-speed enemy's 113.64, so this time
-     * hero really does act first.
-     */
-    @Test
-    public void removingTheSpeedBuffReSchedulesBack() {
-        Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
-        Queue q = battle.queue();
+                    SpeedBoostBuff buff = new SpeedBoostBuff(2, 1.0);
+                    hero.getBuffManager().addBuff(buff);             // hero speed 200 to cycle 50, first round 5
+                    q.move();                                        // hero acts first (5 < enemy's 113.64)
+                    Assertions.assertEquals(hero, q.getCurrentActor().getCanHit(),
+                            "E2: at speed 200 the hero's first round (5) comes before the enemy's 113.64");
+                    q.setTopZero();                                  // hero to 5 + 50 = 125
 
-        SpeedBoostBuff buff = new SpeedBoostBuff(2, 1.0);
-        hero.getBuffManager().addBuff(buff);             // hero speed 200 to cycle 50, first round 5
-        q.move();                                        // hero acts first (5 < enemy's 113.64)
-        Assertions.assertEquals(hero, q.getCurrentActor().getCanHit());
-        q.setTopZero();                                  // hero to 5 + 50 = 125
+                    Assertions.assertEquals(125, signalOf(q, hero).getNextActionTime(), EPS,
+                            "E2: after acting, the hero is booked at 125");
 
-        Assertions.assertEquals(125, signalOf(q, hero).getNextActionTime(), EPS);
+                    hero.getBuffManager().removeBuff(buff);          // speed back to 100
 
-        hero.getBuffManager().removeBuff(buff);          // speed back to 100
+                    // just acted (progress 0) to new next = 5 + (1 - 0) x 100 = 15
+                    Assertions.assertEquals(175, signalOf(q, hero).getNextActionTime(), EPS,
+                            "removing the speed boost also takes effect immediately");
+                },
+                () -> {
+                    // direct attribute write: the first-round coefficient is preserved
+                    Character hero = character("hero", 100);
+                    Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
+                    Queue q = battle.queue();
+                    Signal signal = signalOf(q, hero);
 
-        // just acted (progress 0) to new next = 5 + (1 - 0) x 100 = 15
-        Assertions.assertEquals(175, signalOf(q, hero).getNextActionTime(), EPS,
-                "removing the speed boost also takes effect immediately");
-    }
+                    Assertions.assertEquals(150, signal.getNextActionTime(), EPS, "before the change: first round 150");
+                    Assertions.assertEquals(150, signal.getRemaining(), EPS, "there are still 150 squares left on the action bar");
 
-    /**
-     * Changing the attribute directly (not through a buff) also triggers the re-scheduling - the
-     * trigger point is {@code CanHit.setAttribute}.
-     *
-     * <p>What this asserts is that the first-round coefficient is preserved: a unit at speed 100
-     * has a first-round reservation length of {@code 100  x  1.5 = 150}, i.e. 150 squares left on the
-     * action bar. After changing the speed to 200 (cycle 50), those remaining 150 squares are walked
-     * at the new speed: {@code 150 / 200 x 10000 = 5}.
-     *
-     * <p>A wrong implementation computes something else: using {@code cycleTime()} (100) as the
-     * denominator to back out the progress gives 1.5, which clamps to 1 and becomes "act immediately"
-     * (0); simply dropping the first-round coefficient gives 50.
-     */
-    @Test
-    public void settingTheSpeedAttributeDirectlyAlsoReSchedules() {
-        Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
-        Queue q = battle.queue();
-        Signal signal = signalOf(q, hero);
+                    hero.setAttribute(AttributeType.SPEED, new DoubleValue(200));
 
-        Assertions.assertEquals(150, signal.getNextActionTime(), EPS, "before the change: first round 150");
-        Assertions.assertEquals(150, signal.getRemaining(), EPS, "there are still 150 squares left on the action bar");
-
-        hero.setAttribute(AttributeType.SPEED, new DoubleValue(200));
-
-        Assertions.assertEquals(75, signal.getNextActionTime(), EPS,
-                "the remaining 150 squares are walked at speed 200: 150 / 200 × 10000 = 75");
+                    Assertions.assertEquals(75, signal.getNextActionTime(), EPS,
+                            "the remaining 150 squares are walked at speed 200: 150 / 200 × 10000 = 75");
+                });
     }
 
     // ==================================================================
@@ -196,58 +197,65 @@ public class QueueActionManipulationTest {
     // ==================================================================
 
     /**
-     * {@code advanceActionByPercent(..., 1.0)} pushes the action time exactly down to {@code elapsed}:
-     * the clock does not go backwards, and the actor is not repeatedly consumed by {@code move()}
-     * for "lying in the past".
-     */
-    @Test
-    public void advanceByPercentNeverGoesBelowElapsed() {
-        Character a = character("A", 100);
-        Queue q = new Queue(List.of(a));
-
-        q.move();                                        // elapsed = 150
-        q.setTopZero();                                  // A to 250
-        q.advanceActionByPercent(a, 1.0);                // 100%: should land exactly on elapsed
-
-        Assertions.assertEquals(150, signalOf(q, a).getNextActionTime(), EPS, "clamped to elapsed");
-
-        Assertions.assertEquals(0, q.move(), EPS, "the clock is already at 150, so it neither goes back nor forward");
-        Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "A acts again immediately");
-        Assertions.assertEquals(150, q.getElapsed(), EPS, "the clock does not go backwards");
-    }
-
-    /**
-     * The necessity of the clamp: when a signal that already lies before {@code elapsed} (even
+     * E3 scenario: the clamp and the clock guard keep the timeline monotonic, so the actor is not
+     * consumed twice in a row for "lying in the past".
+     *
+     * <p>(a) {@code advanceActionByPercent(..., 1.0)} pushes the action time exactly down to
+     * {@code elapsed}: the clock does not go backwards, and the actor is not repeatedly consumed by
+     * {@code move()} for "lying in the past".
+     *
+     * <p>(b) The necessity of the clamp: when a signal that already lies before {@code elapsed} (even
      * by a single ulp) is advanced by a percentage again, {@code remaining} MUST be maxed to 0 -
      * otherwise the "difference" is negative and the advance would push it further into the past,
-     * and {@link Queue#move()} would then wind the global clock backwards.
+     * and {@link Queue#move()} would then wind the global clock backwards. This is not hypothetical:
+     * in binary64 {@code a - (a-e)-p >= e} holds mathematically but is not guaranteed in floating
+     * point, and action-bar manipulation (action advance / extra turn) already schedules signals onto
+     * {@code elapsed}, so stacking one more advance on top lands right here.
      *
-     * <p>This is not hypothetical: in binary64 {@code a - (a-e)-p >= e} holds mathematically but is
-     * not guaranteed in floating point, and action-bar manipulation (action advance /
-     * extra turn) already schedules signals onto {@code elapsed}, so stacking one more advance on top
-     * lands right here.
-     *
-     * <p>How it is constructed: take the signal reference out of the heap (the {@code Queue}'s
+     * <p>How (b) is constructed: take the signal reference out of the heap (the {@code Queue}'s
      * "remaining distance" ledger is only synchronised on move/setTopZero/refreshSpeed, so changing
      * {@code nextActionTime} directly does not break the logic this test verifies -
      * {@code advanceActionByPercent} only reads {@code nextActionTime}).
      */
     @Test
-    public void advanceByPercentClampsASignalThatIsAlreadyInThePast() {
-        Character a = character("A", 100);
-        Queue q = new Queue(List.of(a));
-        Signal signal = signalOf(q, a);
+    public void advanceByPercentClampsToElapsedAndKeepsTheClockFromGoingBackwards() {
+        Assertions.assertAll("E3: advanceActionByPercent clamps and move() keeps the clock monotonic",
+                () -> {
+                    // (a) a 100% advance lands exactly on elapsed
+                    Character a = character("A", 100);
+                    Queue q = new Queue(List.of(a));
 
-        signal.setNextActionTime(q.getElapsed() - 1e-7);   // already lies in the past
+                    q.move();                                        // elapsed = 150
+                    q.setTopZero();                                  // A to 250
+                    q.advanceActionByPercent(a, 1.0);                // 100%: should land exactly on elapsed
 
-        q.advanceActionByPercent(a, 0.5);
+                    Assertions.assertEquals(150, signalOf(q, a).getNextActionTime(), EPS, "clamped to elapsed");
 
-        Assertions.assertEquals(0, signal.getNextActionTime(), EPS,
-                "clamped to elapsed(0), instead of being pushed further into the past");
+                    Assertions.assertEquals(0, q.move(), EPS, "the clock is already at 150, so it neither goes back nor forward");
+                    Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "A acts again immediately");
+                    Assertions.assertEquals(150, q.getElapsed(), EPS, "the clock does not go backwards");
+                },
+                () -> {
+                    // (b) a signal that is already in the past is clamped instead of pushed further back
+                    Character a = character("A", 100);
+                    Queue q = new Queue(List.of(a));
+                    Signal signal = signalOf(q, a);
 
-        Assertions.assertEquals(0, q.move(), EPS, "the clock does not go backwards");
-        Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "it acts immediately");
+                    signal.setNextActionTime(q.getElapsed() - 1e-7);   // already lies in the past
+
+                    q.advanceActionByPercent(a, 0.5);
+
+                    Assertions.assertEquals(0, signal.getNextActionTime(), EPS,
+                            "clamped to elapsed(0), instead of being pushed further into the past");
+
+                    Assertions.assertEquals(0, q.move(), EPS, "the clock does not go backwards");
+                    Assertions.assertEquals(a, q.getCurrentActor().getCanHit(), "it acts immediately");
+                });
     }
+
+    // ==================================================================
+    // E1 (continued): the actor is the one reset, even with a tied signal
+    // ==================================================================
 
     /**
      * The core assertion: after pulling another person onto the action point (the same value as

@@ -67,73 +67,149 @@ public class ExtraTrueDamageTest {
     }
 
     @Test
-    public void concertoStyleAdditionalDamageHitsTheMainTargetExactlyOnce() {
+    public void concertoStyleAdditionalDamageHitsTheMainTargetOnceWithFixedCritAndNoRetrigger() {
+        // clause 1: the additional damage lands only on the main target, exactly once per attack cast
         Character robin = character();
         Character mainC = character();
         Enemy first = enemy("e1");
         Enemy main = enemy("e2");
         Enemy third = enemy("e3");
-        Battle battle = battle(List.of(robin, mainC), List.of(first, main, third));
+        Battle aoeBattle = battle(List.of(robin, mainC), List.of(first, main, third));
         ConcertoBuff concerto = new ConcertoBuff(2, robin);
         robin.getBuffManager().addBuff(concerto);
 
-        battle.castImmediate(aoeAttack(), mainC, List.of(main));    // main target = e2
+        aoeBattle.castImmediate(aoeAttack(), mainC, List.of(main));    // main target = e2
 
         // mainC's AOE: 90 per enemy; additional damage triggers only 1 time and lands only on the main target
         // 120 (120%  x  Robin's ATK 100)  x  fixed crit 2.5 (100% crit rate / 150% crit DMG) = 300
-        Assertions.assertEquals(90, damageTaken(first), EPS);
-        Assertions.assertEquals(90 + 300, damageTaken(main), EPS);
-        Assertions.assertEquals(90, damageTaken(third), EPS);
-        Assertions.assertEquals(1, concerto.triggerCount, "triggers only once after each attack cast");
+        double firstTaken = damageTaken(first);
+        double mainTaken = damageTaken(main);
+        double thirdTaken = damageTaken(third);
+        int aoeTriggerCount = concerto.triggerCount;
+
+        // clause 2: the fixed crit is not overwritten by the attacker's panel; attacker's panel crit rate = 0,
+        // so if assemble still rolled by the panel, additional damage would be only 120 instead of 300
+        Character robinFixedCrit = character();
+        Character mainCFixedCrit = character();
+        Enemy boss = enemy("boss");
+        Battle fixedCritBattle = battle(List.of(robinFixedCrit, mainCFixedCrit), List.of(boss));
+        robinFixedCrit.getBuffManager().addBuff(new ConcertoBuff(2, robinFixedCrit));
+
+        fixedCritBattle.castImmediate(singleAttack(), mainCFixedCrit, List.of(boss));
+
+        double fixedCritTaken = damageTaken(boss);
+
+        // clause 3: the additional damage instance "is not considered to have dealt 1 attack" to no recursive trigger
+        Character robinNoRetrigger = character();
+        Character mainCNoRetrigger = character();
+        Enemy bossNoRetrigger = enemy("boss");
+        Battle noRetriggerBattle = battle(List.of(robinNoRetrigger, mainCNoRetrigger), List.of(bossNoRetrigger));
+        ConcertoBuff noRetrigger = new ConcertoBuff(2, robinNoRetrigger);
+        robinNoRetrigger.getBuffManager().addBuff(noRetrigger);
+
+        noRetriggerBattle.castImmediate(singleAttack(), mainCNoRetrigger, List.of(bossNoRetrigger));
+
+        int noRetriggerCount = noRetrigger.triggerCount;
+        double noRetriggerTaken = damageTaken(bossNoRetrigger);
+
+        Assertions.assertAll("concerto additional damage on the main target",
+                () -> Assertions.assertEquals(90, firstTaken, EPS,
+                        "concerto: a non-main AOE target takes only the AOE hit"),
+                () -> Assertions.assertEquals(90 + 300, mainTaken, EPS,
+                        "concerto: the main target takes the AOE hit plus one 120% ATK instance at fixed crit"),
+                () -> Assertions.assertEquals(90, thirdTaken, EPS,
+                        "concerto: the other non-main AOE target takes only the AOE hit"),
+                () -> Assertions.assertEquals(1, aoeTriggerCount,
+                        "concerto: triggers only once after each attack cast"),
+                () -> Assertions.assertEquals(50 + 300, fixedCritTaken, EPS,
+                        "concerto: the fixed 100% / 150% crit is not overwritten by the 0% panel crit"),
+                () -> Assertions.assertEquals(1, noRetriggerCount,
+                        "concerto: the additional instance does not retrigger the attack event"),
+                () -> Assertions.assertEquals(50 + 300, noRetriggerTaken, EPS,
+                        "concerto: the additional instance still lands once alongside the basic attack"));
     }
 
     @Test
-    public void fixedCritIsNotOverwrittenByThePanel() {
+    public void additionalDamageStopsWhenTheMainDamageAlreadyKilledTheTarget() {
         Character robin = character();
         Character mainC = character();
-        Enemy boss = enemy("boss");
-        Battle battle = battle(List.of(robin, mainC), List.of(boss));
-        robin.getBuffManager().addBuff(new ConcertoBuff(2, robin));
-
-        // attacker's panel crit rate = 0: if assemble still rolled by the panel, additional damage would be only 120 instead of 300
-        battle.castImmediate(singleAttack(), mainC, List.of(boss));
-
-        Assertions.assertEquals(50 + 300, damageTaken(boss), EPS);
-    }
-
-    @Test
-    public void additionalDamageDoesNotRetriggerTheAttackEvent() {
-        Character robin = character();
-        Character mainC = character();
-        Enemy boss = enemy("boss");
-        Battle battle = battle(List.of(robin, mainC), List.of(boss));
+        Enemy fragile = enemy("boss", 50, 0);        // mainC's basic attack is exactly 50 to killed on the spot
+        Battle battle = battle(List.of(robin, mainC), List.of(fragile));
         ConcertoBuff concerto = new ConcertoBuff(2, robin);
         robin.getBuffManager().addBuff(concerto);
 
-        battle.castImmediate(singleAttack(), mainC, List.of(boss));
+        battle.castImmediate(singleAttack(), mainC, List.of(fragile));
 
-        // the additional damage instance "is not considered to have dealt 1 attack" to no recursive trigger
-        Assertions.assertEquals(1, concerto.triggerCount);
-        Assertions.assertEquals(50 + 300, damageTaken(boss), EPS);
+        // the event fires as usual (an attack did happen), but the main target is already dead to no more additional damage
+        Assertions.assertAll("concerto additional damage on an already dead main target",
+                () -> Assertions.assertEquals(1, concerto.triggerCount,
+                        "concerto: the attack event still fires when the main target dies"),
+                () -> Assertions.assertEquals(50, damageTaken(fragile), EPS,
+                        "concerto: no additional damage instance is applied to the corpse"));
     }
 
     @Test
-    public void zoneStyleZoneHitsTheHighestHpTargetOncePerHitTarget() {
+    public void zoneStyleAdditionalDamageHitsTheHighestHpSurvivorAndFallsBackWhenItDies() {
+        // clause 1: the zone fires once per hit target and each instance picks the highest current HP
         Character tribbie = character();
         Character mainC = character();
         Enemy high = enemy("e1", 300_000, 0);
         Enemy mid = enemy("e2", 200_000, 0);
         Enemy low = enemy("e3", 100_000, 0);
-        Battle battle = battle(List.of(tribbie, mainC), List.of(high, mid, low));
+        Battle aoeBattle = battle(List.of(tribbie, mainC), List.of(high, mid, low));
         tribbie.getBuffManager().addBuff(new TribbieZoneBuff(2, tribbie));
 
-        battle.castImmediate(aoeAttack(), mainC, List.of(mid));
+        aoeBattle.castImmediate(aoeAttack(), mainC, List.of(mid));
 
         // AOE  x 0.9 to 90 each; the zone fires "for each target that is attacked" to 3 times  x  (12%  x  MaxHP 1000 = 120)
         // each time it picks the "highest current HP among the hit targets" to all of them land on e1
-        Assertions.assertEquals(90 + 360, damageTaken(high), EPS);
-        Assertions.assertEquals(90, damageTaken(mid), EPS);
-        Assertions.assertEquals(90, damageTaken(low), EPS);
+        double highTaken = damageTaken(high);
+        double midTaken = damageTaken(mid);
+        double lowTaken = damageTaken(low);
+
+        // clause 2: a killed highest-HP target is skipped and the instances fall back to the survivors
+        Character tribbieFallback = character();
+        Character mainCFallback = character();
+        Enemy fragile = enemy("e1", 50, 0);          // the highest current-HP target, but it will be killed by the main damage
+        Enemy survivor = enemy("e2", 200_000, 0);
+        Enemy lowFallback = enemy("e3", 100_000, 0);
+        Battle fallbackBattle = battle(List.of(tribbieFallback, mainCFallback), List.of(fragile, survivor, lowFallback));
+        tribbieFallback.getBuffManager().addBuff(new TribbieZoneBuff(2, tribbieFallback));
+
+        fallbackBattle.castImmediate(aoeAttack(), mainCFallback, List.of(survivor));
+
+        // AOE 90 per enemy: e1 is killed to all 3 additional damage instances land on e2, the "currently alive + highest HP" one
+        double fragileTaken = damageTaken(fragile);
+        double survivorTaken = damageTaken(survivor);
+        double lowFallbackTaken = damageTaken(lowFallback);
+
+        Assertions.assertAll("zone-style additional damage on the highest-HP hit target",
+                () -> Assertions.assertEquals(90 + 360, highTaken, EPS,
+                        "zone: the highest-HP hit target takes the AOE hit plus 3 x 12% MaxHP"),
+                () -> Assertions.assertEquals(90, midTaken, EPS,
+                        "zone: the main target takes only the AOE hit"),
+                () -> Assertions.assertEquals(90, lowTaken, EPS,
+                        "zone: the lowest-HP hit target takes only the AOE hit"),
+                () -> Assertions.assertEquals(50, fragileTaken, EPS,
+                        "zone: a corpse takes no more damage"),
+                () -> Assertions.assertEquals(90 + 360, survivorTaken, EPS,
+                        "zone: all 3 instances fall back to the highest-HP survivor"),
+                () -> Assertions.assertEquals(90, lowFallbackTaken, EPS,
+                        "zone: the other survivor takes only the AOE hit"));
+    }
+
+    @Test
+    public void zoneStyleAdditionalDamageDoesNotTriggerWhenEveryHitTargetDies() {
+        Character tribbie = character();
+        Character mainC = character();
+        Enemy fragile = enemy("boss", 50, 0);
+        Battle battle = battle(List.of(tribbie, mainC), List.of(fragile));
+        tribbie.getBuffManager().addBuff(new TribbieZoneBuff(2, tribbie));
+
+        battle.castImmediate(aoeAttack(), mainC, List.of(fragile));
+
+        // every hit target dies to none of the 3 additional damage instances is produced (no retargeting to targets that were not attacked)
+        Assertions.assertEquals(50, damageTaken(fragile), EPS);
     }
 
     @Test
@@ -155,54 +231,6 @@ public class ExtraTrueDamageTest {
     }
 
     @Test
-    public void additionalDamageStopsWhenTheMainDamageAlreadyKilledTheTarget() {
-        Character robin = character();
-        Character mainC = character();
-        Enemy fragile = enemy("boss", 50, 0);        // mainC's basic attack is exactly 50 to killed on the spot
-        Battle battle = battle(List.of(robin, mainC), List.of(fragile));
-        ConcertoBuff concerto = new ConcertoBuff(2, robin);
-        robin.getBuffManager().addBuff(concerto);
-
-        battle.castImmediate(singleAttack(), mainC, List.of(fragile));
-
-        // the event fires as usual (an attack did happen), but the main target is already dead to no more additional damage
-        Assertions.assertEquals(1, concerto.triggerCount);
-        Assertions.assertEquals(50, damageTaken(fragile), EPS);
-    }
-
-    @Test
-    public void zoneStyleAdditionalDamageSkipsKilledTargetsAndFallsBackToSurvivors() {
-        Character tribbie = character();
-        Character mainC = character();
-        Enemy fragile = enemy("e1", 50, 0);          // the highest current-HP target, but it will be killed by the main damage
-        Enemy survivor = enemy("e2", 200_000, 0);
-        Enemy low = enemy("e3", 100_000, 0);
-        Battle battle = battle(List.of(tribbie, mainC), List.of(fragile, survivor, low));
-        tribbie.getBuffManager().addBuff(new TribbieZoneBuff(2, tribbie));
-
-        battle.castImmediate(aoeAttack(), mainC, List.of(survivor));
-
-        // AOE 90 per enemy: e1 is killed to all 3 additional damage instances land on e2, the "currently alive + highest HP" one
-        Assertions.assertEquals(50, damageTaken(fragile), EPS);          // a corpse takes no more damage
-        Assertions.assertEquals(90 + 360, damageTaken(survivor), EPS);
-        Assertions.assertEquals(90, damageTaken(low), EPS);
-    }
-
-    @Test
-    public void zoneStyleAdditionalDamageDoesNotTriggerWhenEveryHitTargetDies() {
-        Character tribbie = character();
-        Character mainC = character();
-        Enemy fragile = enemy("boss", 50, 0);
-        Battle battle = battle(List.of(tribbie, mainC), List.of(fragile));
-        tribbie.getBuffManager().addBuff(new TribbieZoneBuff(2, tribbie));
-
-        battle.castImmediate(aoeAttack(), mainC, List.of(fragile));
-
-        // every hit target dies to none of the 3 additional damage instances is produced (no retargeting to targets that were not attacked)
-        Assertions.assertEquals(50, damageTaken(fragile), EPS);
-    }
-
-    @Test
     public void additionalDamageGoesThroughZonesWhileTrueDamageSkipsThem() {
         Character attacker = character();
         Enemy armoured = enemy("boss", 1_000_000, 1150);                  // DEFENCE 1150
@@ -212,8 +240,11 @@ public class ExtraTrueDamageTest {
         double trueDamage = battle.applyTrueDamage(attacker, armoured, DamageElement.PHYSICAL, 1000);
 
         // additional damage's base is a panel value to goes through the defence zone; true damage to as-is
-        Assertions.assertEquals(1000.0 * 1000.0 / 2150.0, additional, EPS);
-        Assertions.assertEquals(1000, trueDamage, EPS);
+        Assertions.assertAll("zones on the same armoured target",
+                () -> Assertions.assertEquals(1000.0 * 1000.0 / 2150.0, additional, EPS,
+                        "additional damage: goes through the defence zone"),
+                () -> Assertions.assertEquals(1000, trueDamage, EPS,
+                        "true damage: skips the defence zone as-is"));
     }
 
     // ==================================================================

@@ -32,7 +32,7 @@ public class ConeKillGroupTest {
         double critBefore = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
         // 2026-10-19: the cone's +16% attack is its own bility_property, which Weapon.build puts in the panel BEFORE the
         // battle starts - so this gain is 0 now that the duplicate rule is gone (the share is read against a cone-less wearer in
-        // ConeAuditBatchEightTest).
+        // LightConeAuditBatchEightTest).
         Assertions.assertEquals(0.0, unit.getAttribute(AttributeType.ATTACK).get() - attackBefore, 1e-6,
                 "no attack is added at battle start (the property is already in the panel)");
         battle.setCurrentMove(new Signal(unit));

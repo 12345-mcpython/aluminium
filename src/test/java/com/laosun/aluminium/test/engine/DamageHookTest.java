@@ -24,6 +24,10 @@ import com.laosun.aluminium.DoubleValue;
  *
  * <p>Every defender here has DEFENCE = 0 and the attacker has no boost / crit attributes,
  * so a base of 1000 isolates the hooked zone.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the scenarios below, one {@code assertAll} per
+ * fixture/clause group so a failing clause still names itself. Every case stays a positive settlement
+ * check; there is no rejection path in this class, so nothing here needs its own exception test.
  */
 public class DamageHookTest {
     private static final double EPS = 1e-6;
@@ -47,42 +51,41 @@ public class DamageHookTest {
                 .applyDamage(defender, damage);
     }
 
+    // ==================================================================
+    // 1. Vulnerability injects its zone, and its duration is a lifetime, not a turn counter
+    // ==================================================================
+
+    /**
+     * One fixture ({@code VulnerabilityBuff(2, 0.5)} on the defender) and one observable (the settled
+     * damage): the zone raises the hit, a buff added after the move boundary is not ticked by
+     * {@code beforeMove}, and once its duration runs out the modifier is removed again.
+     */
     @Test
-    public void vulnerabilityRaisesIncomingDamage() {
-        Enemy enemy = enemy();
-        enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+    public void vulnerabilityLifecycleScalesIncomingDamage() {
+        Enemy raisedEnemy = enemy();
+        raisedEnemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+        double raised = settle(attacker(), raisedEnemy);
 
-        Assertions.assertEquals(1500, settle(attacker(), enemy), EPS);
-    }
+        Enemy lateEnemy = enemy();
+        lateEnemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+        lateEnemy.getBuffManager().beforeMove();     // a late buff: beforeMove does not touch it
+        double afterBeforeMove = settle(attacker(), lateEnemy);
 
-    @Test
-    public void lateBuffDoesNotTickOnBeforeMove() {
-        Enemy enemy = enemy();
-        enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+        Enemy expiringEnemy = enemy();
+        expiringEnemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+        double whileActive = settle(attacker(), expiringEnemy);
+        expiringEnemy.getBuffManager().afterMove();
+        expiringEnemy.getBuffManager().afterMove();      // duration 2 to 0; on expiry the modifier is removed
+        double afterExpiry = settle(attacker(), expiringEnemy);
 
-        enemy.getBuffManager().beforeMove();     // a late buff: beforeMove does not touch it
-
-        Assertions.assertEquals(1500, settle(attacker(), enemy), EPS);
-    }
-
-    @Test
-    public void vulnerabilityExpiresAfterItsDuration() {
-        Enemy enemy = enemy();
-        enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
-        Assertions.assertEquals(1500, settle(attacker(), enemy), EPS);
-
-        enemy.getBuffManager().afterMove();
-        enemy.getBuffManager().afterMove();      // duration 2 to 0; on expiry the modifier is removed
-
-        Assertions.assertEquals(1000, settle(attacker(), enemy), EPS);
-    }
-
-    @Test
-    public void reductionLowersIncomingDamage() {
-        Enemy enemy = enemy();
-        enemy.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
-
-        Assertions.assertEquals(700, settle(attacker(), enemy), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1500, raised, EPS, "vulnerability raises incoming damage"),
+                () -> Assertions.assertEquals(1500, afterBeforeMove, EPS,
+                        "a late buff is not ticked by beforeMove"),
+                () -> Assertions.assertEquals(1500, whileActive, EPS,
+                        "vulnerability is active while its duration lasts"),
+                () -> Assertions.assertEquals(1000, afterExpiry, EPS,
+                        "vulnerability expires after its duration"));
     }
 
     @Test
@@ -92,6 +95,62 @@ public class DamageHookTest {
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.9));
 
         Assertions.assertEquals(1900, settle(attacker(), enemy), EPS);
+    }
+
+    // ==================================================================
+    // C-1: a buff that injects a damage zone must look only at which side it stands on
+    //   Battle.assemble broadcasts DamageEvent to both the attacking and defending sides, so "which
+    //   side it is attached to" must be judged by the buff itself; otherwise vulnerability attached
+    //   to an enemy would also raise its own output, and reduction attached to a character would
+    //   weaken its own output.
+    // ==================================================================
+
+    @Test
+    public void vulnerabilityZoneRespectsTheOwningSide() {
+        // attached to the attacker it must not boost that same character's own output
+        Character attackerOwned = attacker();
+        attackerOwned.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+        // the defending side has no vulnerability, so this hit is a clean 1000 (vulnerability only counts for "the hit I take")
+        double onAttacker = settle(attackerOwned, enemy());
+
+        // paired with the previous case: attached to the right side it must still take effect
+        // (guards against a fake fix that just disables everything)
+        Character attacker = attacker();
+        Enemy enemy = enemy();
+        enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
+        double onDefender = settle(attacker, enemy);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1000, onAttacker, EPS,
+                        "vulnerability on the attacker does not boost its own attacks"),
+                () -> Assertions.assertEquals(1500, onDefender, EPS,
+                        "vulnerability still applies when its owner is the defender"));
+    }
+
+    @Test
+    public void reductionZoneOnlyAppliesToTheHitItsOwnerTakes() {
+        // attached to the defender it lowers the incoming hit
+        Enemy loweredEnemy = enemy();
+        loweredEnemy.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
+        double onDefender = settle(attacker(), loweredEnemy);
+
+        // attached to the attacker it must not weaken its own output
+        Character attackerOwned = attacker();
+        attackerOwned.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
+        double onAttacker = settle(attackerOwned, enemy());
+
+        // paired with the previous case: the defending side is still the side it belongs to
+        Character attacker = attacker();
+        Enemy defenderOwnedEnemy = enemy();
+        defenderOwnedEnemy.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
+        double onOwnerDefender = settle(attacker, defenderOwnedEnemy);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(700, onDefender, EPS, "reduction lowers incoming damage"),
+                () -> Assertions.assertEquals(1000, onAttacker, EPS,
+                        "reduction only blocks 「the hit I take」"),
+                () -> Assertions.assertEquals(700, onOwnerDefender, EPS,
+                        "reduction still applies when its owner is the defender"));
     }
 
     @Test
@@ -110,50 +169,6 @@ public class DamageHookTest {
         attacker.getBuffManager().addBuff(new WeaknessBuff(2, 0.4));
 
         Assertions.assertEquals(600, settle(attacker, enemy()), EPS);
-    }
-
-    // ==================================================================
-    // C-1: a buff that injects a damage zone must look only at which side it stands on
-    //   Battle.assemble broadcasts DamageEvent to both the attacking and defending sides, so "which
-    //   side it is attached to" must be judged by the buff itself; otherwise vulnerability attached
-    //   to an enemy would also raise its own output, and reduction attached to a character would
-    //   weaken its own output.
-    // ==================================================================
-
-    @Test
-    public void vulnerabilityOnTheAttackerDoesNotBoostItsOwnAttacks() {
-        Character attacker = attacker();
-        attacker.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
-
-        // the defending side has no vulnerability to this hit is a clean 1000 (vulnerability only counts for "the hit I take")
-        Assertions.assertEquals(1000, settle(attacker, enemy()), EPS);
-    }
-
-    @Test
-    public void vulnerabilityStillAppliesWhenItsOwnerIsTheDefender() {
-        // paired with the previous case: attached to the right side it must still take effect (guards against a fake fix that just disables everything)
-        Character attacker = attacker();
-        Enemy enemy = enemy();
-        enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
-
-        Assertions.assertEquals(1500, settle(attacker, enemy), EPS);
-    }
-
-    @Test
-    public void reductionOnTheAttackerDoesNotWeakenItsOwnAttacks() {
-        Character attacker = attacker();
-        attacker.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
-
-        Assertions.assertEquals(1000, settle(attacker, enemy()), EPS, "reduction only blocks 「the hit I take」");
-    }
-
-    @Test
-    public void reductionStillAppliesWhenItsOwnerIsTheDefender() {
-        Character attacker = attacker();
-        Enemy enemy = enemy();
-        enemy.getBuffManager().addBuff(new ReductionBuff(2, 0.3));
-
-        Assertions.assertEquals(700, settle(attacker, enemy), EPS);
     }
 
     /**

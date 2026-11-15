@@ -37,6 +37,11 @@ import com.laosun.aluminium.DoubleValue;
  * {@link ResourceManager} each combatant owns, the "became full" signal, the two trigger ops
  * ({@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}), and - the piece that actually unlocks the
  * characters - an energy-provider hook that can gate an ultimate on a resource instead of on energy.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the nine scenarios below, one
+ * {@code assertAll} per clause group so a failing clause still names itself. The rejection paths
+ * stay their own tests: an {@code assertThrows} is not a positive clause and must not hide behind
+ * one.
  */
 public class ResourceTest {
 
@@ -51,156 +56,145 @@ public class ResourceTest {
     private static final int ACHERON_STACKS = 9;
 
     // ==================================================================
-    // 1. The manager: registration, scope, gain/spend
+    // 1. The manager: gain/spend, the became-full signal, registration
     // ==================================================================
 
     /**
-     * A registered resource can be gained and spent through the manager.
+     * The manager's positive contract: a registered resource is gained and spent with the pool cap
+     * doing the clamping; an unregistered id is inert rather than a crash; the "became full" signal
+     * fires once on arrival, not while sitting at the cap; and a spend re-arms it.
      */
     @Test
-    public void managerGainsAndSpends() {
+    public void resourceManagerGainsSpendsAndSignalsFull() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
         ResourceManager manager = hero.getResources();
 
         manager.register("stacks", 5, 0);
-        Assertions.assertEquals(0, manager.value("stacks"));
+        int beforeAnyGain = manager.value("stacks");
+        int gained = manager.gain("stacks", 2);
+        int afterGain = manager.value("stacks");
+        int spent = manager.spend("stacks", 1);
+        int afterSpend = manager.value("stacks");
+        int overSpend = manager.spend("stacks", 10);
+        int afterOverSpend = manager.value("stacks");
 
-        Assertions.assertEquals(2, manager.gain("stacks", 2));
-        Assertions.assertEquals(2, manager.value("stacks"));
+        int unknownGain = manager.gain("nope", 3);
+        int unknownSpend = manager.spend("nope", 3);
+        int unknownValue = manager.value("nope");
+        boolean unknownFull = manager.isFull("nope");
+        Resource unknownResource = manager.get("nope");
+        boolean unknownHas = manager.has("nope");
 
-        Assertions.assertEquals(1, manager.spend("stacks", 1));
-        Assertions.assertEquals(1, manager.value("stacks"));
+        Resource edge = manager.register("edge", 3, 0);
+        edge.setMaxOverflow(3);                         // allows storing up to 6
+        int[] fired = {0};
+        manager.onBecameFull("edge", r -> fired[0]++);
+        manager.gain("edge", 1);
+        int firedBeforeFull = fired[0];
+        manager.gain("edge", 2);
+        int firedOnArrival = fired[0];
+        boolean edgeFull = edge.isFull();
+        manager.gain("edge", 1);                        // 4, into overflow
+        manager.gain("edge", 2);                        // 6, absolute cap
+        int firedInOverflow = fired[0];
+        manager.gain("edge", 5);                        // entirely clamped away
+        int firedAfterClampedGain = fired[0];
 
-        // spending more than available drains to 0 but reports only what was taken
-        Assertions.assertEquals(1, manager.spend("stacks", 10));
-        Assertions.assertEquals(0, manager.value("stacks"));
+        manager.register("refill", 2, 0);
+        int[] refillFired = {0};
+        manager.onBecameFull("refill", r -> refillFired[0]++);
+        manager.gain("refill", 2);
+        manager.spend("refill", 2);
+        manager.gain("refill", 2);
+        int arrivals = refillFired[0];
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0, beforeAnyGain,
+                        "a freshly registered resource starts at 0"),
+                () -> Assertions.assertEquals(2, gained, "gain credits the full amount"),
+                () -> Assertions.assertEquals(2, afterGain, "the value follows the gain"),
+                () -> Assertions.assertEquals(1, spent, "spend returns what it took"),
+                () -> Assertions.assertEquals(1, afterSpend, "the value follows the spend"),
+                () -> Assertions.assertEquals(1, overSpend,
+                        "spending more than available drains to 0 but reports only what was taken"),
+                () -> Assertions.assertEquals(0, afterOverSpend, "the drained value never goes negative"));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0, unknownGain, "gaining an unregistered id is a no-op"),
+                () -> Assertions.assertEquals(0, unknownSpend, "spending an unregistered id is a no-op"),
+                () -> Assertions.assertEquals(0, unknownValue, "an unregistered id reads as 0"),
+                () -> Assertions.assertFalse(unknownFull, "an unregistered id is never full"),
+                () -> Assertions.assertNull(unknownResource, "an unregistered id has no Resource"),
+                () -> Assertions.assertFalse(unknownHas, "an unregistered id is not registered"));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0, firedBeforeFull, "not full yet"),
+                () -> Assertions.assertEquals(1, firedOnArrival, "arrived at the cap"),
+                () -> Assertions.assertTrue(edgeFull, "reaching the cap is full, even with overflow allowed"),
+                () -> Assertions.assertEquals(1, firedInOverflow,
+                        "the edge fires once per arrival, not per gain"),
+                () -> Assertions.assertEquals(1, firedAfterClampedGain,
+                        "a gain that is entirely clamped away is not an arrival"));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2, arrivals, "each arrival counts"));
     }
 
     /**
-     * Asking about a resource that was never registered is a no-op, not a crash.
+     * Registering the same id twice, or declaring a scope the engine cannot own, is a content bug
+     * and is reported.
      */
     @Test
-    public void unknownResourceIsInert() {
-        Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
-        Assertions.assertEquals(0, hero.getResources().gain("nope", 3));
-        Assertions.assertEquals(0, hero.getResources().spend("nope", 3));
-        Assertions.assertEquals(0, hero.getResources().value("nope"));
-        Assertions.assertFalse(hero.getResources().isFull("nope"));
-        Assertions.assertNull(hero.getResources().get("nope"));
-        Assertions.assertFalse(hero.getResources().has("nope"));
-    }
-
-    /**
-     * Registering the same id twice is a bug in the content, and is reported.
-     */
-    @Test
-    public void duplicateRegistrationIsRejected() {
+    public void registrationIsRejected() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
         hero.getResources().register("stacks", 3, 0);
 
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> hero.getResources().register("stacks", 3, 0));
-        Assertions.assertTrue(e.getMessage().contains("already registered"), e.getMessage());
-    }
-
-    /**
-     * Note: A {@code PARTY}-scoped resource is <b>refused</b> rather than silently treated as personal.
-     *
-     * <p>Hanging a shared pool on each character would give the team as many independent counters as
-     * it has members - and nothing at runtime would report it.
-     */
-    @Test
-    public void partyScopedResourceIsRefusedUntilItHasARealOwner() {
-        Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
         Resource party = new Resource("charge", ResourceScope.PARTY, 5, 0);
 
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> hero.getResources().register(party));
-        Assertions.assertTrue(e.getMessage().contains("does not support"), e.getMessage());
-        Assertions.assertFalse(ResourceScope.PARTY.isWired());
-        Assertions.assertTrue(ResourceScope.SELF.isWired());
+        IllegalArgumentException duplicate = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> hero.getResources().register("stacks", 3, 0),
+                "registering the same id twice is reported");
+        // Note: A PARTY-scoped resource is refused rather than silently treated as personal:
+        // hanging a shared pool on each character would give the team as many independent counters
+        // as it has members - and nothing at runtime would report it.
+        IllegalArgumentException partyScoped = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> hero.getResources().register(party),
+                "a PARTY-scoped resource is refused");
+
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(duplicate.getMessage().contains("already registered"),
+                        duplicate.getMessage()),
+                () -> Assertions.assertTrue(partyScoped.getMessage().contains("does not support"),
+                        partyScoped.getMessage()),
+                () -> Assertions.assertFalse(ResourceScope.PARTY.isWired(),
+                        "PARTY scope has no real owner yet"),
+                () -> Assertions.assertTrue(ResourceScope.SELF.isWired(), "SELF scope is wired"));
     }
 
     /**
-     * The "became full" signal fires on the rising edge, once.
-     */
-    @Test
-    public void becameFullFiresOnceOnArrival() {
-        Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
-        Resource stacks = hero.getResources().register("stacks", 3, 0);
-
-        int[] fired = {0};
-        hero.getResources().onBecameFull("stacks", r -> fired[0]++);
-
-        hero.getResources().gain("stacks", 1);
-        Assertions.assertEquals(0, fired[0], "not full yet");
-        hero.getResources().gain("stacks", 2);
-        Assertions.assertEquals(1, fired[0], "arrived at the cap");
-        Assertions.assertTrue(stacks.isFull());
-    }
-
-    /**
-     * Note: Sitting at the cap does <b>not</b> keep re-firing.
-     *
-     * <p>This is why the signal is a rising edge rather than a level: Cyrene can keep collecting into
-     * overflow above her pool (24 to 2), so a level signal would fire on every one of those gains even
-     * though she arrived at the cap only once.
-     */
-    @Test
-    public void stayingAtTheCapDoesNotRefire() {
-        Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
-        Resource stacks = hero.getResources().register("stacks", 3, 0);
-        stacks.setMaxOverflow(3);                       // allows storing up to 6
-
-        int[] fired = {0};
-        hero.getResources().onBecameFull("stacks", r -> fired[0]++);
-
-        hero.getResources().gain("stacks", 3);          // 3 = cap, arrival
-        hero.getResources().gain("stacks", 1);          // 4, into overflow
-        hero.getResources().gain("stacks", 2);          // 6, absolute cap
-        Assertions.assertEquals(1, fired[0], "the edge fires once per arrival, not per gain");
-
-        // A gain that is entirely clamped away is not an arrival either.
-        hero.getResources().gain("stacks", 5);
-        Assertions.assertEquals(1, fired[0]);
-    }
-
-    /**
-     * Spending below the cap and coming back re-arms the edge.
-     */
-    @Test
-    public void refillsAfterSpendingFireAgain() {
-        Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
-        hero.getResources().register("stacks", 2, 0);
-
-        int[] fired = {0};
-        hero.getResources().onBecameFull("stacks", r -> fired[0]++);
-
-        hero.getResources().gain("stacks", 2);
-        hero.getResources().spend("stacks", 2);
-        hero.getResources().gain("stacks", 2);
-        Assertions.assertEquals(2, fired[0], "each arrival counts");
-    }
-
-    /**
-     * Cyrene's shape: pool 24 that may overflow to 2.
+     * Cyrene's shape: a pool of 24 that may overflow by 3.
      */
     @Test
     public void overflowAllowsStoringAboveThePool() {
         Character cyrene = CharacterFactory.create(1415, 80);
         Resource memories = cyrene.getResources().register("memories", 24, 0);
-        memories.setMaxOverflow(3);                     // pool 24, may store up to 2
+        memories.setMaxOverflow(3);                     // pool 24, may store up to 27
 
-        Assertions.assertEquals(24, cyrene.getResources().gain("memories", 24));
-        Assertions.assertTrue(memories.isFull());
-        Assertions.assertFalse(memories.isCapped());
+        int gainedToCap = cyrene.getResources().gain("memories", 24);
+        boolean fullAtCap = memories.isFull();
+        boolean cappedAtCap = memories.isCapped();
 
-        Assertions.assertEquals(3, cyrene.getResources().gain("memories", 3));
-        Assertions.assertEquals(27, memories.getValue());
-        Assertions.assertTrue(memories.isCapped());
+        int gainedToOverflow = cyrene.getResources().gain("memories", 3);
+        int stored = memories.getValue();
+        boolean cappedAtOverflow = memories.isCapped();
+        boolean fullAtOverflow = memories.isFull();
 
-        // 24 is enough to activate even while below the overflow ceiling.
-        Assertions.assertTrue(memories.isFull());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(24, gainedToCap, "a full pool takes all 24"),
+                () -> Assertions.assertTrue(fullAtCap, "24 is the full pool"),
+                () -> Assertions.assertFalse(cappedAtCap, "full is not capped while overflow is allowed"),
+                () -> Assertions.assertEquals(3, gainedToOverflow, "the overflow allowance is credited"),
+                () -> Assertions.assertEquals(27, stored, "pool 24 plus overflow 3 = 27 stored"),
+                () -> Assertions.assertTrue(cappedAtOverflow, "27 is the absolute cap"),
+                () -> Assertions.assertTrue(fullAtOverflow,
+                        "24 is enough to activate even while below the overflow ceiling"));
     }
 
     // ==================================================================
@@ -208,48 +202,39 @@ public class ResourceTest {
     // ==================================================================
 
     /**
-     * A stack character can cast once the <b>resource</b> is full, and cannot before.
+     * A stack character can cast once the <b>resource</b> is full, and cannot before. The stand-in
+     * provider gains no conventional energy, so her bar stays empty the whole time: the resource,
+     * not the bar, is the gate.
      *
-     * <p>This is the acceptance criterion. The test uses a stand-in provider because
-     * the engine's job is the hook; wiring a specific character's numbers belongs with that
-     * character's data.
+     * <p>This is the acceptance criterion. The test uses a stand-in provider because the engine's
+     * job is the hook; wiring a specific character's numbers belongs with that character's data.
      */
     @Test
-    public void resourceFullMakesTheUltimateAvailable() {
+    public void resourceFullGatesTheUltimate() {
         Character acheron = CharacterFactory.create(ACHERON, 80);
         acheron.getResources().register("residue", ACHERON_STACKS, 0);
         // The stand-in provider is what a stack character gets: energy is irrelevant, the resource gates.
         acheron.setEnergyProvider(new StackGatedEnergyProvider("residue"));
 
         Battle battle = newBattle(acheron);
-
         Assertions.assertFalse(battle.isUltraReady(acheron), "empty stacks -> not ready");
+
+        battle.castImmediate(acheron.getSkills().get(SkillType.COMMON), acheron,
+                List.of(firstEnemy(battle)));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0, acheron.getCurrentEnergy(), 1e-9,
+                        "a stack character's energy must never move"),
+                () -> Assertions.assertFalse(battle.isUltraReady(acheron),
+                        "and that alone cannot unlock the ultimate"));
+
         acheron.getResources().gain("residue", ACHERON_STACKS - 1);
         Assertions.assertFalse(battle.isUltraReady(acheron), "one short -> still not ready");
 
         acheron.getResources().gain("residue", 1);
-        Assertions.assertTrue(battle.isUltraReady(acheron), "full stacks -> ready");
-
-        Assertions.assertTrue(battle.castUltra(acheron, List.of(firstEnemy(battle))),
-                "and the ultimate can actually be cast");
-    }
-
-    /**
-     * The stand-in provider gains no conventional energy, so her bar stays empty the whole time.
-     */
-    @Test
-    public void stackCharacterGainsNoConventionalEnergy() {
-        Character acheron = CharacterFactory.create(ACHERON, 80);
-        acheron.getResources().register("residue", ACHERON_STACKS, 0);
-        acheron.setEnergyProvider(new StackGatedEnergyProvider("residue"));
-
-        Battle battle = newBattle(acheron);
-        battle.castImmediate(acheron.getSkills().get(SkillType.COMMON), acheron,
-                List.of(firstEnemy(battle)));
-
-        Assertions.assertEquals(0, acheron.getCurrentEnergy(), 1e-9,
-                "a stack character's energy must never move");
-        Assertions.assertFalse(battle.isUltraReady(acheron), "and that alone cannot unlock the ultimate");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(battle.isUltraReady(acheron), "full stacks -> ready"),
+                () -> Assertions.assertTrue(battle.castUltra(acheron, List.of(firstEnemy(battle))),
+                        "and the ultimate can actually be cast"));
     }
 
     /**
@@ -266,42 +251,77 @@ public class ResourceTest {
     }
 
     // ==================================================================
-    // 3. Sources: the trigger table fills the resource
+    // 3. Sources: the trigger table fills (and spends) the resource
     // ==================================================================
 
     /**
-     * {@code HP_LOST} really reaches the owner's table: the wiring is byte-for-byte (real enemy turn to
-     * {@code Battle.applyDamage} to the event to the rule to the manager).
-     *
-     * <p>Driven through a real enemy turn rather than firing the event by hand, so the test covers
-     * the whole chain.
-     *
-     * <p>Note: Scope note: the rule below grants a <b>fixed 1</b> stack per HP-loss event. That is the
-     * strongest rule the current vocabulary can express - the effect's amount is a literal, so
-     * "grant as many stacks as HP lost" needs amount arithmetic it does not have yet. The 1:1
-     * conversion itself is a manager-level property and is pinned by
-     * {@link #oneStackPerPointOfLossIsAManagerCall()}.
+     * The trigger table is the resource source, for the whole team: {@code HP_LOST} reaches the
+     * victim's own table through the real damage path (a real enemy turn, not a hand-fired event)
+     * and every ally's table, the condition DSL cannot yet single out "only my own wounds", and
+     * {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} work through the same pathway.
      */
     @Test
-    public void hpLossReachesTheOwnersTriggerTable() {
-        Character hero = CharacterFactory.create(TRIBBIE, 80);
-        hero.getResources().register("grief", 999, 0);
-        hero.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
+    public void triggerTableIsTheResourceSource() {
+        Character victim = CharacterFactory.create(TRIBBIE, 80);
+        victim.getResources().register("grief", 999, 0);
+        victim.getResources().register("charge", 5, 0);
+        victim.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
                 rule("HP_LOST", null, gainResource("grief", 1.0, false)))));
 
-        Battle battle = newBattle(hero);
+        Character watcher = CharacterFactory.create(NO_TRIGGERS, 80);
+        watcher.getResources().register("grief", 999, 0);
+        watcher.setTriggerTable(new TriggerTable(NO_TRIGGERS, List.of(
+                rule("HP_LOST", null, gainResource("grief", 1.0, false)))));
+
+        Character selfWatcher = CharacterFactory.create(NO_TRIGGERS, 80);
+        selfWatcher.getResources().register("grief", 999, 0);
+        // `self` here means "the actor is me"; for HP_LOST the actor is whoever caused the loss, so
+        // this does NOT mean "the loss happened to me".
+        selfWatcher.setTriggerTable(new TriggerTable(NO_TRIGGERS, List.of(
+                rule("HP_LOST", List.of("self"), gainResource("grief", 1.0, false)))));
+
+        Battle battle = newBattle(List.of(victim, watcher, selfWatcher));
         Enemy enemy = firstEnemy(battle);
 
-        double hpBefore = hero.getCurrentHp();
-        letEnemyAttack(battle, enemy, hero);
+        double hpBefore = victim.getCurrentHp();
+        letEnemyAttack(battle, enemy, victim);
+        double hpAfter = victim.getCurrentHp();
+        int victimGrief = victim.getResources().value("grief");
+        int watcherGrief = watcher.getResources().value("grief");
+        int selfWatcherGrief = selfWatcher.getResources().value("grief");
 
-        Assertions.assertTrue(hero.getCurrentHp() < hpBefore, "the enemy attack should have hurt");
-        Assertions.assertEquals(1, hero.getResources().value("grief"),
-                "one HP-loss event -> one stack, through the real damage path");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(hpAfter < hpBefore, "the enemy attack should have hurt"),
+                () -> Assertions.assertTrue(hpAfter < victim.getMaxHp(), "the victim was hurt"),
+                () -> Assertions.assertEquals(1, victimGrief,
+                        "one HP-loss event -> one stack, through the real damage path"),
+                () -> Assertions.assertEquals(1, watcherGrief,
+                        "an ally does see a teammate's HP loss — that is the point of a team event"),
+                () -> Assertions.assertEquals(0, selfWatcherGrief,
+                        "`self` excludes it because the enemy is the actor — but that is an accident of wording, "
+                                + "not a subject filter: a teammate-caused loss would still fire it"));
+
+        // GAIN_RESOURCE / SPEND_RESOURCE through the trigger pathway, on the same table.
+        victim.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
+                rule("ALLY_ATTACK", List.of("actor != self"), gainResource("charge", 3, false)))));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
+        int chargeGained = victim.getResources().value("charge");
+
+        // A second rule spends it: a spend that fits succeeds.
+        victim.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
+                rule("ALLY_ATTACK", List.of("actor != self"), spendResource("charge", 3)))));
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
+        int chargeSpent = victim.getResources().value("charge");
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(3, chargeGained,
+                        "GAIN_RESOURCE credits the rule's amount"),
+                () -> Assertions.assertEquals(0, chargeSpent, "spent back to 0"));
     }
 
     /**
-     * The "1 stack per 1 HP lost" arithmetic itself, at the level that can actually express it.
+     * The "1 stack per 1 HP lost" arithmetic itself, at the level that can actually express it: a
+     * manager call, clamped to the pool.
      *
      * <p>Castorice's [新蕊] converts loss at 1:1, and that is a property of the manager
      * ({@code gain(id, lost)}); what the trigger vocabulary supplies is the *event*. Splitting the two
@@ -313,128 +333,49 @@ public class ResourceTest {
         hero.getResources().register("grief", 999, 0);
 
         int lost = 398;
-        Assertions.assertEquals(lost, hero.getResources().gain("grief", lost));
-        Assertions.assertEquals(398, hero.getResources().value("grief"));
+        int gainedByLoss = hero.getResources().gain("grief", lost);
+        int afterLoss = hero.getResources().value("grief");
+        int gainedBeyondCap = hero.getResources().gain("grief", 9999);
+        int afterCap = hero.getResources().value("grief");
 
-        // Clamped to the pool, never past it.
-        Assertions.assertEquals(601, hero.getResources().gain("grief", 9999));
-        Assertions.assertEquals(999, hero.getResources().value("grief"));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(lost, gainedByLoss, "1 point of loss credits 1 stack"),
+                () -> Assertions.assertEquals(398, afterLoss, "the value follows the 1:1 credit"),
+                () -> Assertions.assertEquals(601, gainedBeyondCap, "the last gain is clamped to the pool"),
+                () -> Assertions.assertEquals(999, afterCap, "the pool never passes its cap"));
     }
 
     /**
-     * {@code HP_LOST} is a team event: it reaches the victim *and* every ally, which is what lets a
-     * healer or an off-field stack character react to a teammate's wounds.
-     *
-     * <p>Note: This is the opposite of what I first assumed (I wrote a test asserting a bystander stays at
-     * 0 stacks, and it failed). The engine's broadcast rule for this event is guarded by
-     * this class as "related parties + our whole side", so an ally *does* see it.
-     * A character that only cares about its own wounds therefore needs a subject filter
-     * ({@code target == self}) - see {@link #subjectFilterIsNotExpressibleYet()} for where that stands.
-     */
-    @Test
-    public void hpLossReachesEveryAllyNotJustTheVictim() {
-        Character victim = CharacterFactory.create(TRIBBIE, 80);
-        Character watcher = CharacterFactory.create(NO_TRIGGERS, 80);
-        watcher.getResources().register("grief", 999, 0);
-        watcher.setTriggerTable(new TriggerTable(NO_TRIGGERS, List.of(
-                rule("HP_LOST", null, gainResource("grief", 1.0, false)))));
-
-        Battle battle = newBattle(List.of(victim, watcher));
-        Enemy enemy = firstEnemy(battle);
-
-        letEnemyAttack(battle, enemy, victim);
-
-        Assertions.assertTrue(victim.getCurrentHp() < victim.getMaxHp(), "the victim was hurt");
-        Assertions.assertEquals(1, watcher.getResources().value("grief"),
-                "an ally does see a teammate's HP loss — that is the point of a team event");
-    }
-
-    /**
-     * Note: Known limit: the condition DSL cannot yet say "only my own wounds".
-     *
-     * <p>{@code self} compares the actor (who caused the event) with the table's owner, and the
-     * numeric variables only cover {@code hit_count}. A rule watching {@code HP_LOST} therefore cannot
-     * distinguish "I was hit" from "an ally was hit", so it fires for both. That is fine for Castorice
-     * (who wants the whole team's losses) but wrong for a personal-stacks character.
-     *
-     * <p>This test documents the gap rather than hiding it: when a {@code target} variable lands, move
-     * this test to asserting the filtered behaviour.
-     */
-    @Test
-    public void subjectFilterIsNotExpressibleYet() {
-        Character victim = CharacterFactory.create(TRIBBIE, 80);
-        Character watcher = CharacterFactory.create(NO_TRIGGERS, 80);
-        watcher.getResources().register("grief", 999, 0);
-        // `self` here means "the actor is me"; for HP_LOST the actor is whoever caused the loss, so
-        // this does NOT mean "the loss happened to me".
-        watcher.setTriggerTable(new TriggerTable(NO_TRIGGERS, List.of(
-                rule("HP_LOST", List.of("self"), gainResource("grief", 1.0, false)))));
-
-        Battle battle = newBattle(List.of(victim, watcher));
-        Enemy enemy = firstEnemy(battle);
-
-        letEnemyAttack(battle, enemy, victim);
-
-        Assertions.assertEquals(0, watcher.getResources().value("grief"),
-                "`self` excludes it because the enemy is the actor — but that is an accident of wording, "
-                        + "not a subject filter: a teammate-caused loss would still fire it");
-    }
-
-    /**
-     * {@code GAIN_RESOURCE} and {@code SPEND_RESOURCE} work through the trigger pathway.
-     */
-    @Test
-    public void triggerCanGainAndSpendResource() {
-        Character hero = CharacterFactory.create(TRIBBIE, 80);
-        hero.getResources().register("charge", 5, 0);
-
-        hero.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
-                rule("ALLY_ATTACK", List.of("actor != self"), gainResource("charge", 3, false)))));
-
-        Battle battle = newBattle(hero);
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
-        Assertions.assertEquals(3, hero.getResources().value("charge"));
-
-        // A second rule spends it: a spend that fits succeeds.
-        hero.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
-                rule("ALLY_ATTACK", List.of("actor != self"), spendResource("charge", 3)))));
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
-        Assertions.assertEquals(0, hero.getResources().value("charge"), "spent back to 0");
-    }
-
-    /**
-     * A spend that does <b>not</b> fit is reported, not silently swallowed.
+     * A spend that does <b>not</b> fit, or that names a resource nobody registered, is reported
+     * rather than silently swallowed.
      *
      * <p>Skill points legitimately mean "you cannot press the button" when short; a trigger rule
      * spending a resource was written believing the stacks would be there, so failing quietly would
      * hide a content bug.
      */
     @Test
-    public void spendingMoreThanAvailableIsReported() {
+    public void spendFailuresAreReported() {
         Character hero = CharacterFactory.create(TRIBBIE, 80);
         hero.getResources().register("charge", 5, 0);
         hero.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
                 rule("ALLY_ATTACK", null, spendResource("charge", 5)))));
 
         Battle battle = newBattle(hero);
-        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
-        Assertions.assertTrue(e.getMessage().contains("needs 5"), e.getMessage());
-    }
+        IllegalStateException tooShort = Assertions.assertThrows(IllegalStateException.class,
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)),
+                "a spend of more than is available is reported");
 
-    /**
-     * Spending a resource that was never registered is reported too.
-     */
-    @Test
-    public void spendingAnUnknownResourceIsReported() {
-        Character hero = CharacterFactory.create(TRIBBIE, 80);
         hero.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
                 rule("ALLY_ATTACK", null, spendResource("ghost", 1)))));
+        IllegalStateException unknownResource = Assertions.assertThrows(IllegalStateException.class,
+                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)),
+                "a spend on an unregistered resource is reported");
 
-        Battle battle = newBattle(hero);
-        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
-        Assertions.assertTrue(e.getMessage().contains("no such resource"), e.getMessage());
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(tooShort.getMessage().contains("needs 5"),
+                        tooShort.getMessage()),
+                () -> Assertions.assertTrue(unknownResource.getMessage().contains("no such resource"),
+                        unknownResource.getMessage()));
     }
 
     /**
@@ -444,7 +385,8 @@ public class ResourceTest {
     public void resourceOpWithoutANameIsRejected() {
         EffectSpec incomplete = op("GAIN_RESOURCE", 1.0);
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(1, List.of(rule("ALLY_ATTACK", null, incomplete))));
+                () -> new TriggerTable(1, List.of(rule("ALLY_ATTACK", null, incomplete))),
+                "an op without a resource name is rejected");
         Assertions.assertTrue(e.getMessage().contains("resource"), e.getMessage());
     }
 

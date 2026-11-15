@@ -40,6 +40,11 @@ import java.util.List;
  *       silently dropped ({@code amount} without a {@code scale}).</li>
  * </ol>
  *
+ * <p><b>L3:</b> the single-clause cases are grouped into the scenarios below, one {@code assertAll} per fixture
+ * family and observable so a failing clause still names itself. The five load-time refusals share one rejection
+ * scenario of their own - they never hide behind a passing grant. The identity-condition refusal keeps its own test
+ * because it also states the positive control.
+ *
  * <p>The shipped user is The Dahlia (大丽花)'s trace "又一场葬礼" (checked end to end below).
  */
 public class DerivedModifierTest {
@@ -61,55 +66,49 @@ public class DerivedModifierTest {
     private static final double OWNER_BREAK = 2.0;
 
     // ==================================================================
-    // 1. The arithmetic
+    // 1. The arithmetic, and whose attribute it reads
     // ==================================================================
 
     /**
-     * {@code percent  x  the owner's attribute + amount}, in the attribute's own units.
+     * {@code percent  x  the owner's attribute + amount}, in the attribute's own units - with the flat part optional,
+     * and read from the <b>rule owner</b> even when the grant is party-wide.
+     *
+     * <p>The single fixture is Himeko carrying one {@code BATTLE_START} rule and a starting Break Effect of
+     * {@code 2.0}; the observable is the grant as a delta off that starting value. The three tables below differ only
+     * in the clause under test (the addend, and whether the effect names {@code all_allies}), so they are one
+     * scenario and each assertion's message names its clause.
      */
     @Test
-    public void theValueIsAShareOfTheOwnersAttributePlusAFlatPart() {
-        Battle battle = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
+    public void theGrantedMagnitudeIsTheOwnersSharePlusAFlatPart() {
+        Battle withFlatPart = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
                         new DoubleValue(OWNER_BREAK)),
                 rule("BATTLE_START", derived("BREAKING_EFFECT", "BREAKING_EFFECT", 0.5, 0.1, null)));
-
-        Assertions.assertEquals(0.5 * OWNER_BREAK + 0.1,
-                grantedTo(battle, 0, AttributeType.BREAKING_EFFECT, OWNER_BREAK), EPS,
-                "0.5 x 2.0 + 0.1 = 1.1 -- the document's own arithmetic (\"equal to X% ... + Y%\")");
-    }
-
-    /**
-     * The part that has to be stated: {@code amount} is optional, the percentage is not.
-     */
-    @Test
-    public void theFlatPartIsOptional() {
-        Battle battle = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
+        Battle withoutFlatPart = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
                         new DoubleValue(OWNER_BREAK)),
                 rule("BATTLE_START", derived("BREAKING_EFFECT", "BREAKING_EFFECT", 0.5, null, null)));
-
-        Assertions.assertEquals(1.0, grantedTo(battle, 0, AttributeType.BREAKING_EFFECT, OWNER_BREAK), EPS,
-                "0.5 x 2.0, with no addend");
-    }
-
-    // ==================================================================
-    // 2. Whose attribute, and in what units
-    // ==================================================================
-
-    /**
-     * The value comes from the <b>rule owner</b> and is granted to somebody else - the arrangement that makes the
-     * two roles distinguishable.
-     */
-    @Test
-    public void itReadsTheOwnersAttributeNotTheReceivers() {
-        Battle battle = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
+        Battle partyWide = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
                         new DoubleValue(OWNER_BREAK)),
                 rule("BATTLE_START", derived("BREAKING_EFFECT", "BREAKING_EFFECT", 0.5, 0.0, "all_allies")));
         double allyBare = CharacterFactory.create(ALLY, LEVEL).getAttribute(AttributeType.BREAKING_EFFECT).get();
-        Assertions.assertEquals(1.0, grantedTo(battle, 0, AttributeType.BREAKING_EFFECT, OWNER_BREAK), EPS,
-                "the owner's own grant");
-        Assertions.assertEquals(1.0, grantedTo(battle, 1, AttributeType.BREAKING_EFFECT, allyBare), EPS,
-                "the ally receives the OWNER's number, whatever its own Break Effect happens to be");
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0.5 * OWNER_BREAK + 0.1,
+                        grantedTo(withFlatPart, 0, AttributeType.BREAKING_EFFECT, OWNER_BREAK), EPS,
+                        "0.5 x 2.0 + 0.1 = 1.1 -- the document's own arithmetic (\"equal to X% ... + Y%\")"),
+                () -> Assertions.assertEquals(1.0,
+                        grantedTo(withoutFlatPart, 0, AttributeType.BREAKING_EFFECT, OWNER_BREAK), EPS,
+                        "0.5 x 2.0, with no addend -- the flat part is optional"),
+                () -> Assertions.assertEquals(1.0,
+                        grantedTo(partyWide, 0, AttributeType.BREAKING_EFFECT, OWNER_BREAK), EPS,
+                        "the owner's own grant"),
+                () -> Assertions.assertEquals(1.0,
+                        grantedTo(partyWide, 1, AttributeType.BREAKING_EFFECT, allyBare), EPS,
+                        "the ally receives the OWNER's number, whatever its own Break Effect happens to be"));
     }
+
+    // ==================================================================
+    // 2. Units, and when the value is computed
+    // ==================================================================
 
     /**
      * On a <b>base</b> attribute the derived value is an absolute amount.
@@ -142,8 +141,10 @@ public class DerivedModifierTest {
         Character owner = battle.characters().getFirst();
         List<StatModifierBuff> buffs = owner.getBuffManager().allBuffsOf(StatModifierBuff.class);
 
-        Assertions.assertEquals(1, buffs.size(), "precondition: one derived modifier");
-        Assertions.assertEquals(1.1, buffs.getFirst().getValue(), EPS, "0.5 x 2.0 + 0.1, computed at fire time");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, buffs.size(), "precondition: one derived modifier"),
+                () -> Assertions.assertEquals(1.1, buffs.getFirst().getValue(), EPS,
+                        "0.5 x 2.0 + 0.1, computed at fire time"));
 
         owner.setAttribute(AttributeType.BREAKING_EFFECT, new DoubleValue(8.0));
 
@@ -182,59 +183,38 @@ public class DerivedModifierTest {
     // ==================================================================
 
     /**
-     * A flat part with no scale has nothing to derive from, so it is refused rather than dropped silently.
+     * Every way of spelling a derived magnitude wrong is refused while the file is read: an {@code amount} with no
+     * {@code scale} (which would otherwise be dropped silently), a heal/shield scale on an attribute, a builder-only
+     * attribute, a scale with no {@code percent}, and a misspelled attribute.
+     *
+     * <p>These share the fixture (one rule read through a {@link TriggerTable}) and the observable (the
+     * {@link IllegalArgumentException} message), so they are one rejection scenario. It stays apart from the positive
+     * scenarios above: a rejection must never hide behind a passing grant.
      */
     @Test
-    public void anAmountWithoutAScaleIsRefused() {
-        EffectSpec effect = new EffectSpec();
-        TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
-        TriggerSpecs.set(effect, "attribute", "BREAKING_EFFECT");
-        TriggerSpecs.set(effect, "percent", 0.5);
-        TriggerSpecs.set(effect, "amount", 0.1);
+    public void malformedDerivedMagnitudesAreRefusedWhileTheFileIsRead() {
+        EffectSpec amountWithoutScale = new EffectSpec();
+        TriggerSpecs.set(amountWithoutScale, "op", "MODIFY_ATTR");
+        TriggerSpecs.set(amountWithoutScale, "attribute", "BREAKING_EFFECT");
+        TriggerSpecs.set(amountWithoutScale, "percent", 0.5);
+        TriggerSpecs.set(amountWithoutScale, "amount", 0.1);
 
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("BATTLE_START", null, effect))));
+        EffectSpec healScale = new EffectSpec();
+        TriggerSpecs.set(healScale, "op", "MODIFY_ATTR");
+        TriggerSpecs.set(healScale, "attribute", "BREAKING_EFFECT");
+        TriggerSpecs.set(healScale, "scale", "target_max_hp");
+        TriggerSpecs.set(healScale, "percent", 0.5);
+        TriggerSpecs.set(healScale, "turns", 1);
 
-        Assertions.assertTrue(refused.getMessage().contains("scale"), refused.getMessage());
-    }
-
-    /**
-     * A scale this op cannot read (the heal/shield family) is refused rather than silently ignored.
-     */
-    @Test
-    public void aHealScaleOnAnAttributeIsRefused() {
-        EffectSpec effect = new EffectSpec();
-        TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
-        TriggerSpecs.set(effect, "attribute", "BREAKING_EFFECT");
-        TriggerSpecs.set(effect, "scale", "target_max_hp");
-        TriggerSpecs.set(effect, "percent", 0.5);
-        TriggerSpecs.set(effect, "turns", 1);
-
-        assertRefused(effect, "target_max_hp");
-    }
-
-    /**
-     * A builder-only input key is not a runtime attribute.
-     */
-    @Test
-    public void aBuilderOnlyAttributeIsRefused() {
-        assertRefused(derived("BREAKING_EFFECT", "ATTACK_PERCENT", 0.5, null, null), "ATTACK_PERCENT");
-    }
-
-    /**
-     * A scale with no magnitude is not a number.
-     */
-    @Test
-    public void aScaleWithoutAPercentIsRefused() {
-        assertRefused(derived("BREAKING_EFFECT", "BREAKING_EFFECT", null, null, null), "percent");
-    }
-
-    /**
-     * A misspelled attribute is refused where the file is read, not when the rule fires.
-     */
-    @Test
-    public void anUnknownAttributeInTheScaleIsRefused() {
-        assertRefused(derived("BREAKING_EFFECT", "BREAK_EFFECT", 0.5, null, null), "BREAK_EFFECT");
+        Assertions.assertAll(
+                () -> assertRefused(amountWithoutScale, "scale", "an amount without a scale"),
+                () -> assertRefused(healScale, "target_max_hp", "a heal/shield scale on an attribute"),
+                () -> assertRefused(derived("BREAKING_EFFECT", "ATTACK_PERCENT", 0.5, null, null),
+                        "ATTACK_PERCENT", "a builder-only attribute"),
+                () -> assertRefused(derived("BREAKING_EFFECT", "BREAKING_EFFECT", null, null, null),
+                        "percent", "a scale without a percent"),
+                () -> assertRefused(derived("BREAKING_EFFECT", "BREAK_EFFECT", 0.5, null, null),
+                        "BREAK_EFFECT", "an unknown attribute in the scale"));
     }
 
     // ==================================================================
@@ -343,10 +323,15 @@ public class DerivedModifierTest {
         return effect;
     }
 
-    private static void assertRefused(EffectSpec effect, String expectedInMessage) {
+    /**
+     * A derived magnitude the loader must refuse, with the clause and the fragment its message has to name.
+     */
+    private static void assertRefused(EffectSpec effect, String expectedInMessage, String clause) {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(rule("BATTLE_START", effect))));
-        Assertions.assertTrue(refused.getMessage().contains(expectedInMessage), refused.getMessage());
+                () -> new TriggerTable(OWNER, List.of(rule("BATTLE_START", effect))),
+                clause + " is refused");
+        Assertions.assertTrue(refused.getMessage().contains(expectedInMessage),
+                clause + ": " + refused.getMessage());
     }
 
     private static double boostOf(Character who, AttributeType attribute) {

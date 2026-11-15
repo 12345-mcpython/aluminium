@@ -42,6 +42,11 @@ import com.laosun.aluminium.DoubleValue;
  * <p>313 (无主荒星茨冈尼亚, Sigonia, the Unclaimed Desolation) stays registered, and its reason is rewritten: "when an enemy target is killed" needs "the one
  * who died is an ENEMY", and {@code KILL} fires for any death with the victim as {@code target} - the condition
  * DSL has no camp variable (F-5). A wrong number and a missing spelling in one entry.
+ *
+ * <p><b>Scenario grouping (L3 consolidation).</b> Each test method below is one scenario over one fixture
+ * shape - the wearer alone, the wearer with a teammate, the wearer with its memosprite, or the wearer casting on
+ * an ally - and each clause that used to stand alone is now an {@code assertAll} entry whose message starts with
+ * the relic set number. No expected value, tolerance or wording was dropped in the fold.
  */
 public class RelicAbilityBatchTest {
     private static final double EPS = 1e-6;
@@ -100,184 +105,239 @@ public class RelicAbilityBatchTest {
     private static final int REVELRY = 322;
 
     // ==================================================================
-    // 102 - basic attack damage +10%
+    // 102 / 122 / 107 - the wearer alone: scoped damage boosts
     // ==================================================================
 
     /**
-     * The Basic ATK half is a rule; the SPD half is the data path's `properties` stat (and is not repeated).
-     */
-    @Test
-    public void theMusketeerBoostsBasicAttacksAndNotSkills() {
-        Character wearer = wearing(MUSKETEER);
-        new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded()).startBattle();
-
-        Assertions.assertEquals(0.1, boostOf(wearer, AttributeType.BASIC_ATTACK_DAMAGE_BOOST), EPS,
-                "param #2 is 0.1 -- the registered reason's 12% came from the English sentence");
-        Assertions.assertEquals(0, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
-                "「普攻造成的伤害」 (DMG dealt by Basic ATKs) is one scope, not every cast");
-    }
-
-    // ==================================================================
-    // 111 - energy back after breaking a weakness
-    // ==================================================================
-
-    /**
-     * Only the wearer's own break pays, and the amount is the parameter's 3.
-     */
-    @Test
-    public void theThiefRegainsEnergyOnItsOwnBreak() {
-        Character wearer = wearing(THIEF);
-        Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        double before = wearer.getCurrentEnergy();
-
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, ally, dummy(), 0, 0));
-        Assertions.assertEquals(before, wearer.getCurrentEnergy(), EPS,
-                "「装备者击破」 (a break by the wearer): a teammate's break is not hers");
-
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, dummy(), 0, 0));
-        Assertions.assertEquals(before + 3, wearer.getCurrentEnergy(), EPS,
-                "param #2 is 3 -- the registered reason's 8 has no parameter behind it");
-    }
-
-    // ==================================================================
-    // 11- increased damage against an enemy affected by a negative state
-    // ==================================================================
-
-    /**
-     * The boost is 12%, it reaches the instance being settled, and it is <b>hers</b>.
+     * One lone wearer, three suits: the Basic ATK scope of 102, the Skill/Ultimate scope of 122 and the
+     * next-attack window of 107.
      *
-     * <p>Measured against an identical monster without a debuff: the two settle through the same zones, so the
-     * ratio is the boost itself. Crit is pinned to 0 so the ratio is exact.
+     * <p>Same fixture in all three - a single character, no teammate, no memosprite - so the three clauses are one
+     * scenario; each assertion still names its suit, its parameter and the trap it guards against.
      */
     @Test
-    public void thePioneerBoostsHerDamageAgainstDebuffedEnemies() {
-        Character wearer = wearing(PIONEER);
-        wearer.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
-        Character ally = CharacterFactory.create(ALLY, LEVEL);
-        ally.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
-        Enemy debuffed = dummy();
-        Enemy clean = dummy();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(debuffed, clean), BattleFixture.seeded());
-        battle.startBattle();
-        debuffed.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(
-                wearer, DamageElement.FIRE, 1, 2));      // any debuff: the count is what the text asks for
+    public void theWearerAloneGainsItsScopedDamageBoosts() {
+        Character musketeer = wearing(MUSKETEER);
+        new Battle(List.of(musketeer), List.of(dummy()), BattleFixture.seeded()).startBattle();
 
-        double onDebuffed = hit(battle, wearer, debuffed);
-        double onClean = hit(battle, wearer, clean);
+        Character scholar = wearing(SCHOLAR);
+        Battle scholarBattle = new Battle(List.of(scholar), List.of(dummy()), BattleFixture.seeded());
+        scholarBattle.startBattle();
+        double scholarSkill = boostOf(scholar, AttributeType.SKILL_DAMAGE_BOOST);
+        double scholarUltimate = boostOf(scholar, AttributeType.ULTIMATE_DAMAGE_BOOST);
+        scholarBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, scholar, null, 0, 0));
+        double scholarSkillAfterUltimate = boostOf(scholar, AttributeType.SKILL_DAMAGE_BOOST);
 
-        Assertions.assertTrue(onClean > 0, "precondition: the clean hit landed");
-        Assertions.assertEquals(0.12, onDebuffed / onClean - 1, 1e-6,
-                "param #1 is 0.12 and it applies to the instance being settled");
-
-        // "装备者造成的伤害": the wearer's rule must not boost a teammate's hit on the same enemy.
-        double allyOnDebuffed = hit(battle, ally, debuffed);
-        double allyOnClean = hit(battle, ally, clean);
-        Assertions.assertEquals(allyOnClean, allyOnDebuffed, EPS,
-                "a rule on the wearer's table is not a rule on everyone's damage");
-    }
-
-    // ==================================================================
-    // 122 - Skill/Ultimate damage increased, and after the Ultimate the next Skill gets an extra +25%
-    // ==================================================================
-
-    /**
-     * The two scoped boosts are permanent, and the extra 25% <b>adds</b> to the 20% rather than replacing it.
-     *
-     * <p>This is the case that would have shipped a silent 10-point error: "额外提高" means on top, while the
-     * default stack cap is 1 and two modifiers on one attribute then replace each other - so the file states
-     * {@code max_stacks: 2}.
-     */
-    @Test
-    public void theScholarAddsItsExtraSkillDamageOnTop() {
-        Character wearer = wearing(SCHOLAR);
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-
-        Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS, "param #1");
-        Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS, "param #1");
-
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, null, 0, 0));
-
-        Assertions.assertEquals(0.45, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
-                "0.20 + 0.25: 「额外提高」 (raised by an extra amount) adds, which is what max_stacks: 2 is for");
-    }
-
-    // ==================================================================
-    // 310 - when effect RES >= 30%, the whole party's CRIT DMG +10%
-    // ==================================================================
-
-    /**
-     * The threshold is 30%, it is a fraction, and it reaches the whole side.
-     */
-    @Test
-    public void theBrokenKeelAppliesAboveItsThreshold() {
-        Assertions.assertEquals(0.1,
-                brokenKeelCritDamageAt(0.35) - bareCritDamage(), EPS,
-                "param #2 is 0.3 -- the registered reason said 50%, which no parameter supports");
-        Assertions.assertEquals(0,
-                brokenKeelCritDamageAt(0.25) - bareCritDamage(), EPS,
-                "below it nothing is granted");
-    }
-
-    // ==================================================================
-    // 10, 120, 311, 12-- the second pass over the backlog
-    // ==================================================================
-
-    /**
-     * The Skill boost is permanent, and the fire boost is consumed by the next attack.
-     */
-    @Test
-    public void theFiresmithBoostsTheNextAttackAfterItsUltimate() {
-        Character wearer = wearing(FIRESMITH);
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        Assertions.assertEquals(0.12, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS, "param #1");
-
+        Character firesmith = wearing(FIRESMITH);
+        Battle firesmithBattle = new Battle(List.of(firesmith), List.of(dummy()), BattleFixture.seeded());
+        firesmithBattle.startBattle();
+        double firesmithSkill = boostOf(firesmith, AttributeType.SKILL_DAMAGE_BOOST);
         // Measured as a delta: the relic's random sub-stats can carry FIRE_DAMAGE_BOOST themselves, which is
         // how the first draft of this case came out at 0.444.
-        double before = boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST);
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, null, 0, 0));
-        Assertions.assertEquals(before + 0.12, boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST), EPS, "param #2");
+        double fireBefore = boostOf(firesmith, AttributeType.FIRE_DAMAGE_BOOST);
+        firesmithBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, firesmith, null, 0, 0));
+        double fireAfterUltimate = boostOf(firesmith, AttributeType.FIRE_DAMAGE_BOOST);
+        firesmithBattle.castImmediate(new DefaultSkill(WEARER, 1, 1), firesmith,
+                List.of(firesmithBattle.enemyUnits().getFirst()));
+        double fireAfterAttack = boostOf(firesmith, AttributeType.FIRE_DAMAGE_BOOST);
 
-        battle.castImmediate(new DefaultSkill(WEARER, 1, 1), wearer, List.of(battle.enemyUnits().getFirst()));
-        Assertions.assertEquals(before, boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST), EPS,
-                "「下一次攻击」 (the next attack): the attack has happened, so the boost is gone");
+        Assertions.assertAll("102 - the Basic ATK scope (+10%), not every cast",
+                () -> Assertions.assertEquals(0.1, boostOf(musketeer, AttributeType.BASIC_ATTACK_DAMAGE_BOOST), EPS,
+                        "[102 basic ATK] param #2 is 0.1 -- the registered reason's 12% came from the English sentence"),
+                () -> Assertions.assertEquals(0, boostOf(musketeer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
+                        "[102 not skills] 「普攻造成的伤害」 (DMG dealt by Basic ATKs) is one scope, not every cast"));
+
+        Assertions.assertAll("122 - Skill/Ultimate +20%, and the extra +25% adds on top",
+                () -> Assertions.assertEquals(0.2, scholarSkill, EPS, "[122 skill boost] param #1"),
+                () -> Assertions.assertEquals(0.2, scholarUltimate, EPS, "[122 ultimate boost] param #1"),
+                () -> Assertions.assertEquals(0.45, scholarSkillAfterUltimate, EPS,
+                        "[122 extra skill DMG] 0.20 + 0.25: 「额外提高」 (raised by an extra amount) adds, which is what max_stacks: 2 is for"));
+
+        Assertions.assertAll("107 - Skill +12%, then a fire boost for exactly one attack",
+                () -> Assertions.assertEquals(0.12, firesmithSkill, EPS, "[107 skill boost] param #1"),
+                () -> Assertions.assertEquals(fireBefore + 0.12, fireAfterUltimate, EPS,
+                        "[107 fire boost after ultimate] param #2"),
+                () -> Assertions.assertEquals(fireBefore, fireAfterAttack, EPS,
+                        "[107 one attack only] 「下一次攻击」 (the next attack): the attack has happened, so the boost is gone"));
     }
 
+    // ==================================================================
+    // 310 / 311 / 328 - the wearer alone: threshold-gated bonuses
+    // ==================================================================
+
     /**
-     * Only the wearer's own follow-up grants it, and the share is the parameter's 36%.
+     * One lone wearer with a single forcing attribute, three suits: 310's Effect RES threshold (a party CRIT DMG
+     * buff that lands on the wearer too), 311's nested SPD tiers and 328's Max-Energy curve with its cap.
+     *
+     * <p>Same fixture shape in all three (one character, one attribute set before the battle), so the threshold
+     * clauses are one scenario; each assertion still names its suit and its tier.
      */
     @Test
-    public void theValorousBoostsUltimateDamageAfterItsOwnFollowUp() {
-        Character wearer = wearing(VALOROUS);
-        Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
+    public void theWearerAloneGainsItsThresholdGatedBonuses() {
+        double keelAbove = brokenKeelCritDamageAt(0.35) - bareCritDamage();
+        double keelBelow = brokenKeelCritDamageAt(0.25) - bareCritDamage();
+        double glamothBelowFirst = damageBoostAtSpeed(130);
+        double glamothSecond = damageBoostAtSpeed(135);
+        double glamothTop = damageBoostAtSpeed(160);
+        double amphoreusFortyOver = grantedDamageBoost(240);
+        double amphoreusCapped = grantedDamageBoost(400);
+        double amphoreusBelow = grantedDamageBoost(150);
 
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, dummy(), 0, 0));
-        Assertions.assertEquals(0, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
-                "「装备者施放追加攻击时」 (when the wearer casts a follow-up attack): a teammate's follow-up is not hers");
+        Assertions.assertAll("310 - EFFECT RES >= 30%: the whole side's CRIT DMG +10%",
+                () -> Assertions.assertEquals(0.1, keelAbove, EPS,
+                        "[310 above threshold] param #2 is 0.3 -- the registered reason said 50%, which no parameter supports"),
+                () -> Assertions.assertEquals(0, keelBelow, EPS, "[310 below threshold] below it nothing is granted"));
 
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, dummy(), 0, 0));
-        Assertions.assertEquals(0.36, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
-                "param #2 is 0.36 -- the registered reason said 12%");
+        Assertions.assertAll("311 - the two SPD tiers are exclusive",
+                () -> Assertions.assertEquals(0, glamothBelowFirst, EPS,
+                        "[311 below first tier] below the first threshold"),
+                () -> Assertions.assertEquals(0.12, glamothSecond, EPS, "[311 second tier] param #4"),
+                () -> Assertions.assertEquals(0.18, glamothTop, EPS,
+                        "[311 top tier] param #5 alone -- without the lower tier''s upper bound this would be 0.30"));
+
+        Assertions.assertAll("328 - the Max-Energy curve and its 32% cap",
+                () -> Assertions.assertEquals(0.002 * (240 - 200), amphoreusFortyOver, 1e-6,
+                        "[328 forty over] 240 energy is 40 points over the threshold: 0.2% x 40 = 8%"),
+                () -> Assertions.assertEquals(0.32, amphoreusCapped, 1e-6,
+                        "[328 capped] 「最多提高#3[i]%」 (raises it by at most #3[i]%) -- past 360 the cap holds, and the lower tier is excluded by its own upper bound"),
+                () -> Assertions.assertEquals(0, amphoreusBelow, 1e-6,
+                        "[328 below threshold] below the threshold nothing is granted at all (and 0.002 x 150 - 0.4 would have been negative)"));
     }
 
+    // ==================================================================
+    // 316 - a weakness-gated buff
+    // ==================================================================
+
     /**
-     * The two nested thresholds must not both apply: 160 speed grants 18%, not 12% + 18%.
+     * 316 Talia: Kingdom of Banditry (盗贼公国塔利亚): hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
+     *
+     * <p>Note: Both sides in one case: the condition is the whole rule, and a rule that ignored the weakness would pass a
+     * test that only checked the fire-weak enemy.
      */
     @Test
-    public void theGlamothTiersAreExclusive() {
-        Assertions.assertEquals(0, damageBoostAtSpeed(130), EPS, "below the first threshold");
-        Assertions.assertEquals(0.12, damageBoostAtSpeed(135), EPS, "param #4");
-        Assertions.assertEquals(0.18, damageBoostAtSpeed(160), EPS,
-                "param #5 alone -- without the lower tier''s upper bound this would be 0.30");
+    public void theBanditryBreakEffectNeedsAFireWeakEnemy() {
+        // 2026-10-19: the text says 40% for 1 turn; the shipped file said 0.2 / 2 turns and is fixed.
+        double fireWeak = breakEffectAfterHit(true);
+        double notFireWeak = breakEffectAfterHit(false);
+
+        Assertions.assertAll("316 - the fire-weak gate",
+                () -> Assertions.assertEquals(0.4, fireWeak, 1e-6,
+                        "[316 fire-weak enemy] 「命中具有火属性弱点的敌方目标时」 (when hitting an enemy target with a Fire Weakness) -- +40% for 1 turn"),
+                () -> Assertions.assertEquals(0, notFireWeak, 1e-6,
+                        "[316 no fire weakness] the same hit on an enemy without that weakness grants nothing"));
     }
 
+    // ==================================================================
+    // 322 - a damage-CATEGORY boost (DoT only)
+    // ==================================================================
+
     /**
-     * Three effects on one trigger, and the summon condition is what keeps the third reachable.
+     * 322 逐火者的航迹 (Revelry by the Sea): the DoT-only boost appears once ATK passes 2400, again at 3600, and not
+     * below - and the <b>same</b> DoT tick hits harder once the wearer holds it.
+     *
+     * <p>Note: The two halves were separate cases and the pair is the point: an attribute nothing reads would look
+     * exactly like a working rule, so both the granted modifier and the damage instance are asserted here, over the
+     * same fixture (one lone wearer at a forced ATK) and the same clause.
+     */
+    @Test
+    public void theRevelryDotBoostIsGrantedAndReachesTheTick() {
+        double tierTwelve = dotBoostAtAttack(2500);
+        double tierTwentyFour = dotBoostAtAttack(4000);
+        double belowFirstTier = dotBoostAtAttack(2000);
+        double plain = firstDotDamage(2000);
+        double boosted = firstDotDamage(2500);
+
+        Assertions.assertAll("322 - the DoT-only tiers and the tick they must reach",
+                () -> Assertions.assertEquals(0.12, tierTwelve, 1e-6,
+                        "[322 >= 2400] \"when it is greater than or equal to 2400 ... raise it by 12%\" (「大于等于 2400 时…提高 12%」)"),
+                () -> Assertions.assertEquals(0.24, tierTwentyFour, 1e-6,
+                        "[322 >= 3600] 「大于等于 3600 时…提高 24%」 (at 3600 or above ... raises it by 24%) -- the lower tier is excluded by its own upper bound"),
+                () -> Assertions.assertEquals(0, belowFirstTier, 1e-6,
+                        "[322 below 2400] below 2400 nothing is granted"),
+                () -> Assertions.assertTrue(plain > 0,
+                        "[322 DoT precondition] precondition: the DoT tick dealt damage (" + plain + ")"),
+                () -> Assertions.assertTrue(boosted > plain,
+                        "[322 DoT reaches the tick] 「使装备者造成的持续伤害额外提高 12%」 (raises the DoT the wearer deals by an extra 12%) must reach the tick (" + boosted + " vs " + plain + ")"));
+    }
+
+    // ==================================================================
+    // 111 / 117 / 120 - the wearer with ONE teammate: only her own actions count
+    // ==================================================================
+
+    /**
+     * The wearer with one rule-less teammate, three suits: 111's break energy, 117's damage against a debuffed
+     * enemy and 120's Ultimate boost after a follow-up. In every clause the question is the same - does the rule
+     * answer to the wearer, or to whoever on the field happens to act - so the clauses share a scenario.
+     *
+     * <p>The teammate is {@link #ALLY}, the same rule-less character as the wearer, rather than 1210: Guinaifen's
+     * own trace boosts her damage against a burning target, which is exactly the state the 117 clause applies, so
+     * she would have measured her own rule instead of the set's.
+     */
+    @Test
+    public void theWearersRulesAnswerOnlyToHerOwnActions() {
+        Character thief = wearing(THIEF);
+        Character thiefAlly = CharacterFactory.create(ALLY, LEVEL);
+        Battle thiefBattle = new Battle(List.of(thief, thiefAlly), List.of(dummy()), BattleFixture.seeded());
+        thiefBattle.startBattle();
+        double energyBefore = thief.getCurrentEnergy();
+        thiefBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, thiefAlly, dummy(), 0, 0));
+        double energyAfterTeammateBreak = thief.getCurrentEnergy();
+        thiefBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, thief, dummy(), 0, 0));
+        double energyAfterOwnBreak = thief.getCurrentEnergy();
+
+        Character pioneer = wearing(PIONEER);
+        pioneer.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
+        Character pioneerAlly = CharacterFactory.create(ALLY, LEVEL);
+        pioneerAlly.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
+        Enemy debuffed = dummy();
+        Enemy clean = dummy();
+        Battle pioneerBattle = new Battle(List.of(pioneer, pioneerAlly), List.of(debuffed, clean),
+                BattleFixture.seeded());
+        pioneerBattle.startBattle();
+        debuffed.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(
+                pioneer, DamageElement.FIRE, 1, 2));      // any debuff: the count is what the text asks for
+
+        double onDebuffed = hit(pioneerBattle, pioneer, debuffed);
+        double onClean = hit(pioneerBattle, pioneer, clean);
+        // "装备者造成的伤害": the wearer's rule must not boost a teammate's hit on the same enemy.
+        double teammateOnDebuffed = hit(pioneerBattle, pioneerAlly, debuffed);
+        double teammateOnClean = hit(pioneerBattle, pioneerAlly, clean);
+
+        Character valorous = wearing(VALOROUS);
+        Character valorousAlly = CharacterFactory.create(ALLY, LEVEL);
+        Battle valorousBattle = new Battle(List.of(valorous, valorousAlly), List.of(dummy()), BattleFixture.seeded());
+        valorousBattle.startBattle();
+        valorousBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, valorousAlly, dummy(), 0, 0));
+        double ultimateAfterTeammateFollowUp = boostOf(valorous, AttributeType.ULTIMATE_DAMAGE_BOOST);
+        valorousBattle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, valorous, dummy(), 0, 0));
+        double ultimateAfterOwnFollowUp = boostOf(valorous, AttributeType.ULTIMATE_DAMAGE_BOOST);
+
+        Assertions.assertAll("111 - only the wearer's own break pays",
+                () -> Assertions.assertEquals(energyBefore, energyAfterTeammateBreak, EPS,
+                        "[111 teammate's break] 「装备者击破」 (a break by the wearer): a teammate's break is not hers"),
+                () -> Assertions.assertEquals(energyBefore + 3, energyAfterOwnBreak, EPS,
+                        "[111 own break] param #2 is 3 -- the registered reason's 8 has no parameter behind it"));
+
+        Assertions.assertAll("117 - +12% against a debuffed enemy, and only for the wearer",
+                () -> Assertions.assertTrue(onClean > 0, "[117 precondition] precondition: the clean hit landed"),
+                () -> Assertions.assertEquals(0.12, onDebuffed / onClean - 1, 1e-6,
+                        "[117 debuffed enemy] param #1 is 0.12 and it applies to the instance being settled"),
+                () -> Assertions.assertEquals(teammateOnClean, teammateOnDebuffed, EPS,
+                        "[117 not the teammate] a rule on the wearer's table is not a rule on everyone's damage"));
+
+        Assertions.assertAll("120 - only the wearer's own follow-up grants the Ultimate boost",
+                () -> Assertions.assertEquals(0, ultimateAfterTeammateFollowUp, EPS,
+                        "[120 teammate's follow-up] 「装备者施放追加攻击时」 (when the wearer casts a follow-up attack): a teammate's follow-up is not hers"),
+                () -> Assertions.assertEquals(0.36, ultimateAfterOwnFollowUp, EPS,
+                        "[120 own follow-up] param #2 is 0.36 -- the registered reason said 12%"));
+    }
+
+    // ==================================================================
+    // 127 - the memosprite condition, with a teammate on the field
+    // ==================================================================
+
+    /**
+     * 127 Three effects on one trigger, and the summon condition is what keeps the third reachable.
      *
      * <p>Without the memosprite the rule must do <b>nothing</b>, not throw: the effect that names
      * {@code target: "summon"} fails loudly when nothing is out, so "若装备者的忆灵在场" is load-bearing.
@@ -291,9 +351,11 @@ public class RelicAbilityBatchTest {
         double wearerHp = wearer.getMaxHp();
         double allyBoost = boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST);
 
-        Assertions.assertDoesNotThrow(() -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0)),
-                "no memosprite out: the condition keeps the summon-targeted effect from being reached");
-        Assertions.assertEquals(wearerHp, wearer.getMaxHp(), EPS, "…so nothing was granted");
+        Assertions.assertAll("127 - with no memosprite out the rule does nothing at all",
+                () -> Assertions.assertDoesNotThrow(() -> battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0)),
+                        "[127 no memosprite] no memosprite out: the condition keeps the summon-targeted effect from being reached"),
+                () -> Assertions.assertEquals(wearerHp, wearer.getMaxHp(), EPS,
+                        "[127 nothing granted] …so nothing was granted"));
 
         // A fixture memosprite rather than SummonFactory.memosprite(master): the wearer is deliberately the
         // rule-less character, and summoning 1413's or 1402's would drag their own rules into the measurement.
@@ -305,124 +367,109 @@ public class RelicAbilityBatchTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0));
 
         double bareHp = CharacterFactory.create(WEARER, LEVEL).getMaxHp();
-        Assertions.assertEquals(0.24 * bareHp, wearer.getMaxHp() - wearerHp, 0.5,
-                "「装备者…生命上限提高 24%」 (the wearer's ... Max HP is raised by 24%) -- asserted as the DELTA, because a percentage modifier on a base "
-                        + "attribute adds 24% of the character's base Max HP while the relic's own sub-stats "
-                        + "already carry their own HP%");
-        Assertions.assertTrue(evey.getBuffManager().countBuffs(StatModifierBuff.class) > 0,
-                "「及其忆灵」 (and its memosprite): the memosprite carries its own copy of the Max HP buff");
-        Assertions.assertEquals(allyBoost + 0.15, boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST), EPS,
-                "「我方全体造成的伤害提高 15%」 (all allies deal 15% more DMG) reaches a teammate too");
-
+        double hpDelta = wearer.getMaxHp() - wearerHp;
+        boolean memospriteHasHpBuff = evey.getBuffManager().countBuffs(StatModifierBuff.class) > 0;
+        double allyBoostAfter = boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST);
         // the file states the sentence's disjunction as ONE duration with two ends. Asserted on the shipped
         // 4-piece rather than on a hand-made rule, because the shape of the JSON is half of what this guarantees.
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(SHATTERED_WORLD).at(4)
                 .matching(TriggerEvent.SKILL_CAST,
                         new TriggerTable.TriggerContext(wearer, wearer, null, 0, 0, null, battle));
-        Assertions.assertEquals(1, rules.size());
-        for (EffectSpec effect : rules.getFirst().effects()) {
-            Assertions.assertEquals(List.of("next_attack", "next_skill"), effect.getUntil(),
-                    "「持续至装备者下次施放普攻或战技后」 (lasts until the wearer next casts a Basic ATK or Skill) -- a list, so a support Skill ends it too");
-        }
+
+        Assertions.assertAll("127 - with the memosprite out, every half lands",
+                () -> Assertions.assertEquals(0.24 * bareHp, hpDelta, 0.5,
+                        "[127 wearer max HP +24%] 「装备者…生命上限提高 24%」 (the wearer's ... Max HP is raised by 24%) -- asserted as the DELTA, because a percentage modifier on a base "
+                                + "attribute adds 24% of the character's base Max HP while the relic's own sub-stats "
+                                + "already carry their own HP%"),
+                () -> Assertions.assertTrue(memospriteHasHpBuff,
+                        "[127 memosprite max HP] 「及其忆灵」 (and its memosprite): the memosprite carries its own copy of the Max HP buff"),
+                () -> Assertions.assertEquals(allyBoost + 0.15, allyBoostAfter, EPS,
+                        "[127 whole party +15%] 「我方全体造成的伤害提高 15%」 (all allies deal 15% more DMG) reaches a teammate too"),
+                () -> Assertions.assertEquals(1, rules.size(),
+                        "[127 one rule, two ends] the shipped 4-piece states the sentence's disjunction as one rule"),
+                () -> {
+                    for (EffectSpec effect : rules.getFirst().effects()) {
+                        Assertions.assertEquals(List.of("next_attack", "next_skill"), effect.getUntil(),
+                                "[127 duration] 「持续至装备者下次施放普攻或战技后」 (lasts until the wearer next casts a Basic ATK or Skill) -- a list, so a support Skill ends it too");
+                    }
+                });
     }
 
     // ==================================================================
-    // 124 / 319 / 320 -- "装备者及其忆灵" reaches a LATE arrival
+    // 124 / 319 / 320 - "装备者及其忆灵" reaches a LATE arrival
     // ==================================================================
 
     /**
-     * The memosprite half of a pre-battle effect lands when the memosprite arrives.
+     * The memosprite half of a pre-battle effect lands when the memosprite arrives: 319 (HP >= 5000 -> CRIT DMG
+     * +28%, and nothing below it), 124 (SPD < 95 -> CRIT Rate) and 320 (SPD >= 180 -> OUTGOING_HEALING_BOOST).
      *
-     * <p>Why this is needed: `target: "summon"` cannot be filed at BATTLE_START (nothing may be
-     * out, and the selector fails loudly rather than silently missing), so each tier carries a second rule on
-     * SUMMONED. Both halves are asserted: the wearer gets hers at the start, the memosprite gets hers when it
-     * appears - including for a wearer whose kit summons it mid-fight, which is the case the single BATTLE_START
-     * rule could not serve at all.
+     * <p>Why this shape is one scenario: every clause has the same fixture - one lone wearer, one forced
+     * attribute, the engine's real summon path - and the same two observation points, the wearer at battle start
+     * and the memosprite on arrival.
+     *
+     * <p>Why the second rule per tier is needed at all: `target: "summon"` cannot be filed at BATTLE_START
+     * (nothing may be out, and the selector fails loudly rather than silently missing), so each tier carries a
+     * second rule on SUMMONED. Both halves are asserted: the wearer gets hers at the start, the memosprite gets
+     * hers when it appears - including for a wearer whose kit summons it mid-fight, which is the case the single
+     * BATTLE_START rule could not serve at all.
      */
     @Test
-    public void aPreBattleMemospriteEffectLandsOnArrival() {
-        Character wearer = wearing(SERENE_DEMESNE);               // 谧宁拾骨地 (Bone Collection's Serene Demesne): HP >= 5000 -> CRIT DMG +28%
-        wearer.setAttribute(AttributeType.HEALTH, new DoubleValue(6_000));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        double wearerBoost = boostOf(wearer, AttributeType.CRIT_ATTACK);
+    public void preBattleMemospriteEffectsLandOnArrivalAndRespectTheirThresholds() {
+        Character demesne = wearing(SERENE_DEMESNE);             // 谧宁拾骨地 (Bone Collection's Serene Demesne): HP >= 5000 -> CRIT DMG +28%
+        demesne.setAttribute(AttributeType.HEALTH, new DoubleValue(6_000));
+        Battle demesneBattle = new Battle(List.of(demesne), List.of(dummy()), BattleFixture.seeded());
+        demesneBattle.startBattle();
+        double demesneWearerBoost = boostOf(demesne, AttributeType.CRIT_ATTACK);
+        Summon demesneSprite = demesneBattle.summon(demesne, MONSTER, 1);
+        demesneBattle.processRequests();                         // where SUMMONED is fired, by design
+        double demesneSpriteBoost = boostOf(demesneSprite, AttributeType.CRIT_ATTACK);
 
-        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
-        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
-        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
-        Summon evey = battle.summon(wearer, MONSTER, 1);
-        battle.processRequests();                                // where SUMMONED is fired, by design
+        Character demesneBelow = wearing(SERENE_DEMESNE);
+        demesneBelow.setAttribute(AttributeType.HEALTH, new DoubleValue(4_000));
+        Battle demesneBelowBattle = new Battle(List.of(demesneBelow), List.of(dummy()), BattleFixture.seeded());
+        demesneBelowBattle.startBattle();
+        Summon demesneBelowSprite = demesneBelowBattle.summon(demesneBelow, MONSTER, 1);
+        demesneBelowBattle.processRequests();                    // where SUMMONED is fired, by design
+        double demesneBelowSpriteBoost = boostOf(demesneBelowSprite, AttributeType.CRIT_ATTACK);
 
-        Assertions.assertTrue(wearerBoost > bareCritDamage(), "the wearer was granted hers at the start");
-        Assertions.assertEquals(0.28, boostOf(evey, AttributeType.CRIT_ATTACK), EPS,
-                "and the memosprite gets the same 28% when it arrives -- not at battle start, when it was not "
-                        + "there yet. (Asserted as the raw value, not against the wearer's total: hers includes "
-                        + "the base 0.5 CRIT DMG every character has, and the memosprite's panel gives it none.)");
-    }
-
-    /**
-     * Below the threshold nothing is granted, to either unit.
-     */
-    @Test
-    public void aPreBattleMemospriteEffectRespectsItsThreshold() {
-        Character wearer = wearing(SERENE_DEMESNE);
-        wearer.setAttribute(AttributeType.HEALTH, new DoubleValue(4_000));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-
-        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
-        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
-        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
-        Summon evey = battle.summon(wearer, MONSTER, 1);
-        battle.processRequests();                                // where SUMMONED is fired, by design
-
-        Assertions.assertEquals(0, boostOf(evey, AttributeType.CRIT_ATTACK), EPS,
-                "4000 is below 「大于等于 5000 点」 (at least 5000 points) -- and HEALTH is a base attribute, so the literal is absolute");
-    }
-
-    /**
-     * The nested tiers hold on both halves: 90 speed grants 32%, not 20% + 32%.
-     */
-    @Test
-    public void thePoetsNestedTiersHoldOnBothHalves() {
-        Character wearer = wearing(POET);                        // 哀歌覆国的诗人 (Poet of Mourning Collapse): SPD < 110 / < 95
-        wearer.setAttribute(AttributeType.SPEED, new DoubleValue(90));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
-        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
-        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
-        Summon evey = battle.summon(wearer, MONSTER, 1);
-        battle.processRequests();                                // where SUMMONED is fired, by design
-
+        Character poet = wearing(POET);                          // 哀歌覆国的诗人 (Poet of Mourning Collapse): SPD < 110 / < 95
+        poet.setAttribute(AttributeType.SPEED, new DoubleValue(90));
+        Battle poetBattle = new Battle(List.of(poet), List.of(dummy()), BattleFixture.seeded());
+        poetBattle.startBattle();
+        Summon poetSprite = poetBattle.summon(poet, MONSTER, 1);
+        poetBattle.processRequests();                            // where SUMMONED is fired, by design
         // Measured on the memosprite: its panel states HEALTH and SPEED only, so its CRIT Rate IS the buff
         // (0.32). The wearer's own value is unusable as an absolute -- the relic's random sub-stats carry
         // CRIT Rate of their own, which is how the first draft read 0.69394.
-        Assertions.assertEquals(0.32, boostOf(evey, AttributeType.CRIT_CHANCE), 1e-6,
-                "「小于 95」 (below 95) alone: without the upper tier's exclusion this would be 0.52");
-        Assertions.assertTrue(boostOf(wearer, AttributeType.CRIT_CHANCE) > bareCritRate(),
-                "and the wearer was granted hers at the start");
-    }
+        double poetSpriteCritRate = boostOf(poetSprite, AttributeType.CRIT_CHANCE);
+        double poetWearerCritRate = boostOf(poet, AttributeType.CRIT_CHANCE);
 
-    /**
-     * The healing tiers reach the memosprite too, through OUTGOING_HEALING_BOOST.
-     */
-    @Test
-    public void theGiantTreesHealingTiersReachTheMemosprite() {
-        Character wearer = wearing(RAPT_BROODING);               // 渊思寂虑的巨树 (Giant Tree of Rapt Brooding): SPD >= 135 / >= 180
-        wearer.setAttribute(AttributeType.SPEED, new DoubleValue(190));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
-        // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
-        // would announce nothing -- which the first draft of this case demonstrated by measuring 0.0.
-        Summon evey = battle.summon(wearer, MONSTER, 1);
-        battle.processRequests();                                // where SUMMONED is fired, by design
+        Character tree = wearing(RAPT_BROODING);                 // 渊思寂虑的巨树 (Giant Tree of Rapt Brooding): SPD >= 135 / >= 180
+        tree.setAttribute(AttributeType.SPEED, new DoubleValue(190));
+        Battle treeBattle = new Battle(List.of(tree), List.of(dummy()), BattleFixture.seeded());
+        treeBattle.startBattle();
+        Summon treeSprite = treeBattle.summon(tree, MONSTER, 1);
+        treeBattle.processRequests();                            // where SUMMONED is fired, by design
+        double treeWearerHealing = boostOf(tree, AttributeType.OUTGOING_HEALING_BOOST);
+        double treeSpriteHealing = boostOf(treeSprite, AttributeType.OUTGOING_HEALING_BOOST);
 
-        Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.OUTGOING_HEALING_BOOST), 1e-6,
-                "the upper tier on the wearer, with no lower tier added on top");
-        Assertions.assertEquals(0.2, boostOf(evey, AttributeType.OUTGOING_HEALING_BOOST), 1e-6,
-                "and on the memosprite");
+        Assertions.assertAll("124 / 319 / 320 - 「装备者及其忆灵」 reaches a late arrival",
+                () -> Assertions.assertTrue(demesneWearerBoost > bareCritDamage(),
+                        "[319 wearer at start] the wearer was granted hers at the start"),
+                () -> Assertions.assertEquals(0.28, demesneSpriteBoost, EPS,
+                        "[319 memosprite on arrival] and the memosprite gets the same 28% when it arrives -- not at battle start, when it was not "
+                                + "there yet. (Asserted as the raw value, not against the wearer's total: hers includes "
+                                + "the base 0.5 CRIT DMG every character has, and the memosprite's panel gives it none.)"),
+                () -> Assertions.assertEquals(0, demesneBelowSpriteBoost, EPS,
+                        "[319 below 5000] 4000 is below 「大于等于 5000 点」 (at least 5000 points) -- and HEALTH is a base attribute, so the literal is absolute"),
+                () -> Assertions.assertEquals(0.32, poetSpriteCritRate, 1e-6,
+                        "[124 below 95] 「小于 95」 (below 95) alone: without the upper tier's exclusion this would be 0.52"),
+                () -> Assertions.assertTrue(poetWearerCritRate > bareCritRate(),
+                        "[124 wearer at start] and the wearer was granted hers at the start"),
+                () -> Assertions.assertEquals(0.2, treeWearerHealing, 1e-6,
+                        "[320 upper tier on the wearer] the upper tier on the wearer, with no lower tier added on top"),
+                () -> Assertions.assertEquals(0.2, treeSpriteHealing, 1e-6,
+                        "[320 on the memosprite] and on the memosprite"));
     }
 
     // ==================================================================
@@ -430,25 +477,26 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 114 Messenger Traversing Hackerspace (骇域漫游的信使): the wearer's Ultimate <b>on an ally</b> speeds the whole side up - and aimed at an enemy it
-     * does nothing at all.
+     * The `is_ally` family: one wearer, one 1210 teammate, one cast aimed at her.
      *
-     * <p>Note: Both halves in one case on purpose: the contrast is the whole reason the condition exists (`actor == self`
-     * alone would fire for a damaging ultimate too), and a test that only checked the ally half would pass for a rule
-     * that never looks at the target.
+     * <p>114 Messenger Traversing Hackerspace (骇域漫游的信使): the wearer's Ultimate <b>on an ally</b> speeds the
+     * whole side up - and aimed at an enemy it does nothing at all. Both halves are in this scenario on purpose:
+     * the contrast is the whole reason the condition exists (`actor == self` alone would fire for a damaging
+     * ultimate too), and a test that only checked the ally half would pass for a rule that never looks at the
+     * target. 118 Watchmaker, Master of Dream Machinations (梦游者钟表匠) is the same trigger with a ratio
+     * attribute (+30% Break Effect, 2 turns); 121 Sacerdos' Relived Ordeal (祭司的旧日祭礼) is the Skill half,
+     * which raises THAT ally's CRIT DMG and stacks to the cap it states.
      */
     @Test
-    public void theMessengerUltimateHastesThePartyOnlyWhenItTargetsAnAlly() {
-        Character wearer = wearing(MESSENGER);
-        Character ally = CharacterFactory.create(1210, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        double speedBefore = boostOf(ally, AttributeType.SPEED);
+    public void castsOnAnAllyReachTheAimedAllyAndTheParty() {
+        Character messenger = wearing(MESSENGER);
+        Character messengerAlly = CharacterFactory.create(1210, LEVEL);
+        Battle messengerBattle = new Battle(List.of(messenger, messengerAlly), List.of(dummy()), BattleFixture.seeded());
+        messengerBattle.startBattle();
+        double speedBefore = boostOf(messengerAlly, AttributeType.SPEED);
 
-        battle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), wearer, List.of(ally));
-
-        Assertions.assertEquals(speedBefore * 0.12, boostOf(ally, AttributeType.SPEED) - speedBefore, 1e-6,
-                "「我方全体速度提高#1[i]%」 (all allies' SPD is raised by #1[i]%) -- #1 = 0.12, a share of the target's base speed");
+        messengerBattle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), messenger, List.of(messengerAlly));
+        double speedAfterAllyUltimate = boostOf(messengerAlly, AttributeType.SPEED);
 
         Battle aimedAtEnemy = new Battle(List.of(wearing(MESSENGER), CharacterFactory.create(1210, LEVEL)),
                 List.of(dummy()), BattleFixture.seeded());
@@ -458,69 +506,67 @@ public class RelicAbilityBatchTest {
 
         aimedAtEnemy.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), aimedAtEnemy.characters().getFirst(),
                 List.of(aimedAtEnemy.enemyUnits().getFirst()));
+        double secondAfterEnemyAimedUltimate = boostOf(second, AttributeType.SPEED);
 
-        Assertions.assertEquals(secondBefore, boostOf(second, AttributeType.SPEED), 1e-6,
-                "aimed at an ENEMY: 「对己方角色」 (on one of our own characters) does not hold, so nothing is granted");
-    }
+        Character watchmaker = wearing(WATCHMAKER);
+        Character watchmakerAlly = CharacterFactory.create(1210, LEVEL);
+        Battle watchmakerBattle = new Battle(List.of(watchmaker, watchmakerAlly), List.of(dummy()),
+                BattleFixture.seeded());
+        watchmakerBattle.startBattle();
+        double breakEffectBefore = boostOf(watchmakerAlly, AttributeType.BREAKING_EFFECT);
 
-    /**
-     * 118 Watchmaker, Master of Dream Machinations (梦游者钟表匠): the same trigger, a ratio attribute (+30% Break Effect, 2 turns).
-     */
-    @Test
-    public void theWatchmakerUltimateRaisesThePartysBreakEffect() {
-        Character wearer = wearing(WATCHMAKER);
-        Character ally = CharacterFactory.create(1210, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        double before = boostOf(ally, AttributeType.BREAKING_EFFECT);
+        watchmakerBattle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), watchmaker, List.of(watchmakerAlly));
+        double breakEffectAfter = boostOf(watchmakerAlly, AttributeType.BREAKING_EFFECT);
 
-        battle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), wearer, List.of(ally));
+        Character sacerdos = wearing(SACERDOS);
+        Character sacerdosAlly = CharacterFactory.create(1210, LEVEL);
+        Battle sacerdosBattle = new Battle(List.of(sacerdos, sacerdosAlly), List.of(dummy()), BattleFixture.seeded());
+        sacerdosBattle.startBattle();
+        double critDamageBefore = boostOf(sacerdosAlly, AttributeType.CRIT_ATTACK);
 
-        Assertions.assertEquals(0.3, boostOf(ally, AttributeType.BREAKING_EFFECT) - before, 1e-6,
-                "「击破特攻提高#1[i]%」 (Break Effect is raised by #1[i]%) -- a ratio attribute, so 0.3 is an absolute +30%");
-    }
+        sacerdosBattle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), sacerdos, List.of(sacerdosAlly));
+        double critDamageAfterOneCast = boostOf(sacerdosAlly, AttributeType.CRIT_ATTACK);
+        sacerdosBattle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), sacerdos, List.of(sacerdosAlly));
+        double critDamageAfterTwoCasts = boostOf(sacerdosAlly, AttributeType.CRIT_ATTACK);
 
-    /**
-     * 121 Sacerdos' Relived Ordeal (祭司的旧日祭礼): the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states.
-     */
-    @Test
-    public void theSacerdosSkillBuffsTheAimedAllyAndStacksTwice() {
-        Character wearer = wearing(SACERDOS);
-        Character ally = CharacterFactory.create(1210, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
-        battle.startBattle();
-        double before = boostOf(ally, AttributeType.CRIT_ATTACK);
+        Assertions.assertAll("114 - the Ultimate hastes the party only when it targets an ally",
+                () -> Assertions.assertEquals(speedBefore * 0.12, speedAfterAllyUltimate - speedBefore, 1e-6,
+                        "[114 aimed at an ally] 「我方全体速度提高#1[i]%」 (all allies' SPD is raised by #1[i]%) -- #1 = 0.12, a share of the target's base speed"),
+                () -> Assertions.assertEquals(secondBefore, secondAfterEnemyAimedUltimate, 1e-6,
+                        "[114 aimed at an enemy] aimed at an ENEMY: 「对己方角色」 (on one of our own characters) does not hold, so nothing is granted"));
 
-        battle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), wearer, List.of(ally));
-        Assertions.assertEquals(0.18, boostOf(ally, AttributeType.CRIT_ATTACK) - before, 1e-6,
-                "「使该目标暴击伤害提高#1[i]%」 (raises that target's CRIT DMG by #1[i]%) -- #1 = 0.18, on the unit the cast was AIMED at");
+        Assertions.assertAll("118 - the same trigger, a ratio attribute",
+                () -> Assertions.assertEquals(0.3, breakEffectAfter - breakEffectBefore, 1e-6,
+                        "[118 break effect] 「击破特攻提高#1[i]%」 (Break Effect is raised by #1[i]%) -- a ratio attribute, so 0.3 is an absolute +30%"));
 
-        battle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), wearer, List.of(ally));
-        Assertions.assertEquals(0.36, boostOf(ally, AttributeType.CRIT_ATTACK) - before, 1e-6,
-                "「最多叠加#3[i]层」 -- two casts, two stacks (the engine's default would have REPLACED the first)");
+        Assertions.assertAll("121 - the Skill raises THAT ally's CRIT DMG, and stacks twice",
+                () -> Assertions.assertEquals(0.18, critDamageAfterOneCast - critDamageBefore, 1e-6,
+                        "[121 aimed ally] 「使该目标暴击伤害提高#1[i]%」 (raises that target's CRIT DMG by #1[i]%) -- #1 = 0.18, on the unit the cast was AIMED at"),
+                () -> Assertions.assertEquals(0.36, critDamageAfterTwoCasts - critDamageBefore, 1e-6,
+                        "[121 two stacks] 「最多叠加#3[i]层」 -- two casts, two stacks (the engine's default would have REPLACED the first)"));
     }
 
     // ==================================================================
-    // 328 - a derived value read off MAX ENERGY, with a cap
+    // 314 - the party-composition condition
     // ==================================================================
 
     /**
-     * 328 Amphoreus, the Eternal Land (生命的翁法罗斯): "Max Energy >= 200 points, and for every 1 point above it the damage dealt is increased by 0.2%, up to 32%".
+     * 314 Izumo Gensei and Takama Divine Realm (出云显世与高天神国): the CRIT Rate arrives only when a teammate walks the wearer's Path.
      *
-     * <p>Three points on the curve, which is what the sentence actually says: below the threshold <b>nothing</b>,
-     * 40 points over it <b>0.08</b>, and past 360 the <b>32% cap</b>. Note: The value is read off the modifier the rule
-     * grants rather than off the resolved attribute: the wearer is built <b>with</b> a relic suit, so its random
-     * sub-stats may already carry a damage boost of their own (the trap that made an earlier case read 0.444 instead
-     * of 0.12).
+     * <p>Note: The value is read off the <b>modifier the rule granted</b>, not off the resolved attribute: the wearer is
+     * built with a relic suit, whose random sub-stats may carry CRIT Rate of their own (relic sub-stats become
+     * attributes at build time, so a `StatModifierBuff` on that attribute can only have come from a rule).
      */
     @Test
-    public void theAmphoreusBoostGrowsWithMaxEnergyAndStopsAtItsCap() {
-        Assertions.assertEquals(0.002 * (240 - 200), grantedDamageBoost(240), 1e-6,
-                "240 energy is 40 points over the threshold: 0.2% x 40 = 8%");
-        Assertions.assertEquals(0.32, grantedDamageBoost(400), 1e-6,
-                "「最多提高#3[i]%」 (raises it by at most #3[i]%) -- past 360 the cap holds, and the lower tier is excluded by its own upper bound");
-        Assertions.assertEquals(0, grantedDamageBoost(150), 1e-6,
-                "below the threshold nothing is granted at all (and 0.002 x 150 - 0.4 would have been negative)");
+    public void theIzumoCritRateNeedsATeammateOnTheSamePath() {
+        double samePath = grantedCritRateWith(1013);
+        double otherPath = grantedCritRateWith(1210);
+
+        Assertions.assertAll("314 - the same-Path teammate condition",
+                () -> Assertions.assertEquals(0.12, samePath, 1e-6,
+                        "[314 same Path] Herta (黑塔) is Erudition (智识), like the wearer: \"if there is at least one ally on the same Path as the wearer\" (「若至少存在一名与装备者命途相同的队友」)"),
+                () -> Assertions.assertEquals(0, otherPath, 1e-6,
+                        "[314 other Path] Guinaifen (桂乃芬) is Nihility (虚无): the condition does not hold, so nothing is granted"));
     }
 
     /**
@@ -541,25 +587,6 @@ public class RelicAbilityBatchTest {
         return 0;
     }
 
-    // ==================================================================
-    // 314 - the party-composition condition
-    // ==================================================================
-
-    /**
-     * 314 Izumo Gensei and Takama Divine Realm (出云显世与高天神国): the CRIT Rate arrives only when a teammate walks the wearer's Path.
-     *
-     * <p>Note: The value is read off the <b>modifier the rule granted</b>, not off the resolved attribute: the wearer is
-     * built with a relic suit, whose random sub-stats may carry CRIT Rate of their own (relic sub-stats become
-     * attributes at build time, so a `StatModifierBuff` on that attribute can only have come from a rule).
-     */
-    @Test
-    public void theIzumoCritRateNeedsATeammateOnTheSamePath() {
-        Assertions.assertEquals(0.12, grantedCritRateWith(1013), 1e-6,
-                "Herta (黑塔) is Erudition (智识), like the wearer: \"if there is at least one ally on the same Path as the wearer\" (「若至少存在一名与装备者命途相同的队友」)");
-        Assertions.assertEquals(0, grantedCritRateWith(1210), 1e-6,
-                "Guinaifen (桂乃芬) is Nihility (虚无): the condition does not hold, so nothing is granted");
-    }
-
     /**
      * The CRIT Rate modifier the suit granted, or 0 when it granted none.
      */
@@ -576,25 +603,6 @@ public class RelicAbilityBatchTest {
             }
         }
         return 0;
-    }
-
-    // ==================================================================
-    // 316 - a weakness-gated buff
-    // ==================================================================
-
-    /**
-     * 316 Talia: Kingdom of Banditry (盗贼公国塔利亚): hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
-     *
-     * <p>Note: Both sides in one case: the condition is the whole rule, and a rule that ignored the weakness would pass a
-     * test that only checked the fire-weak enemy.
-     */
-    @Test
-    public void theBanditryBreakEffectNeedsAFireWeakEnemy() {
-        // 2026-10-19: the text says 40% for 1 turn; the shipped file said 0.2 / 2 turns and is fixed.
-        Assertions.assertEquals(0.4, breakEffectAfterHit(true), 1e-6,
-                "「命中具有火属性弱点的敌方目标时」 (when hitting an enemy target with a Fire Weakness) -- +40% for 1 turn");
-        Assertions.assertEquals(0, breakEffectAfterHit(false), 1e-6,
-                "the same hit on an enemy without that weakness grants nothing");
     }
 
     /**
@@ -615,46 +623,6 @@ public class RelicAbilityBatchTest {
         battle.castImmediate(new DefaultSkill(WEARER, 1, 1), wearer, List.of(target));
 
         return boostOf(wearer, AttributeType.BREAKING_EFFECT) - before;
-    }
-
-    // ==================================================================
-    // 322 - a damage-CATEGORY boost (DoT only)
-    // ==================================================================
-
-    /**
-     * 322 逐火者的航迹 (Revelry by the Sea): the DoT-only boost appears once ATK passes 2400, again at 3600, and not below.
-     *
-     * <p>Note: This case reads the granted <b>modifier</b>; that the attribute actually reaches a DoT instance's damage is
-     * the branch in {@code Battle}'s assembly, and it is pinned separately by
-     * {@link #theDotBoostReachesTheDamageInstance()} -- an attribute nothing reads would look exactly like a working
-     * rule, so both halves are checked.
-     */
-    @Test
-    public void theRevelryDotBoostAppearsAtItsThresholds() {
-        Assertions.assertEquals(0.12, dotBoostAtAttack(2500), 1e-6, "\"when it is greater than or equal to 2400 ... raise it by 12%\" (「大于等于 2400 时…提高 12%」)");
-        Assertions.assertEquals(0.24, dotBoostAtAttack(4000), 1e-6,
-                "「大于等于 3600 时…提高 24%」 (at 3600 or above ... raises it by 24%) -- the lower tier is excluded by its own upper bound");
-        Assertions.assertEquals(0, dotBoostAtAttack(2000), 1e-6, "below 2400 nothing is granted");
-    }
-
-    /**
-     * ...and the attribute really reaches the tick: the <b>same</b> DoT hits harder once the wearer holds the boost.
-     *
-     * <p>Note: This is the half that would silently not work. `DOT_DAMAGE_BOOST` is read by a branch in {@code Battle}'s
-     * boost assembly, and an attribute that nothing reads looks exactly like a working rule from the outside -- so the
-     * pair of cases is the point, not either one.
-     *
-     * <p>The two runs differ in <b>one</b> fact (the wearer's ATK, 2000 vs 2500, which is what gates the tier), and
-     * the DoT's own base is the buff's, not the wearer's, so the only thing that can move the number is the boost.
-     */
-    @Test
-    public void theDotBoostReachesTheDamageInstance() {
-        double plain = firstDotDamage(2000);
-        double boosted = firstDotDamage(2500);
-
-        Assertions.assertTrue(plain > 0, "precondition: the DoT tick dealt damage (" + plain + ")");
-        Assertions.assertTrue(boosted > plain,
-                "「使装备者造成的持续伤害额外提高 12%」 (raises the DoT the wearer deals by an extra 12%) must reach the tick (" + boosted + " vs " + plain + ")");
     }
 
     /**

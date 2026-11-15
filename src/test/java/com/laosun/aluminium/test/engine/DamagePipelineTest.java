@@ -24,6 +24,11 @@ import java.util.Random;
  * <p>Attackers are plain {@code Character.fromAttributes} combatants (Lv80, no light cone
  * or relic), so every boost / crit attribute starts at 0 and the defender's DEFENCE
  * isolates the zone under test.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the scenarios below, one
+ * {@code assertAll} per fixture so a failing clause still names itself. The reflection
+ * entry-point check keeps its own test: an {@code assertThrows} is not a positive clause
+ * and must not hide behind one.
  */
 public class DamagePipelineTest {
     private static final double EPS = 1e-6;
@@ -62,27 +67,44 @@ public class DamagePipelineTest {
     }
 
     @Test
-    public void boostZoneWiresElementAndGlobalBoost() {
+    public void boostZoneSettlesOnceAndAppliesHpOnce() {
         Character attacker = attacker();
         attacker.setAttribute(AttributeType.FIRE_DAMAGE_BOOST, new DoubleValue(0.3));
 
-        Assertions.assertEquals(1300, settle(attacker, defender(0)), EPS);
+        // same fixture as the "applied exactly once" clause: a fire-boosted attacker vs an undefended dummy
+        double fireBoostOnly = settle(attacker, defender(0));
+
+        Enemy victim = defender(0);
+        double hpBefore = victim.getCurrentHp();
+        Damage damage = new Damage(attacker, victim, DamageElement.FIRE, DamageType.NORMAL, BASE);
+        double settled = battle(attacker, victim, 0).applyDamage(victim, damage);
 
         // attack-type DMG boost and elemental DMG boost add up into the same zone: 1 + 0.3 + 0.2 = 1.5
         attacker.setAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST, new DoubleValue(0.2));
+        double withAllTypeBoost = settle(attacker, defender(0));
 
-        Assertions.assertEquals(1500, settle(attacker, defender(0)), EPS);
+        Assertions.assertAll("the boost zone settles and the damage lands once",
+                () -> Assertions.assertEquals(1300, fireBoostOnly, EPS,
+                        "boost zone: FIRE_DAMAGE_BOOST 0.3"),
+                () -> Assertions.assertEquals(1300, settled, EPS,
+                        "boost zone: the settlement value seen when the hit is applied"),
+                () -> Assertions.assertEquals(hpBefore - settled, victim.getCurrentHp(), EPS,
+                        "applied once: the defender HP drops by exactly the settled damage"),
+                () -> Assertions.assertEquals(1500, withAllTypeBoost, EPS,
+                        "boost zone: FIRE_DAMAGE_BOOST 0.3 + ALL_DAMAGE_TYPE_BOOST 0.2"));
     }
 
     @Test
     public void critFollowsTheInjectedRandom() {
         // the first value of Random(0) ~= 0.310 - it is used to pin down both the "crit / no crit" branches
         double firstRoll = new Random(0).nextDouble();
-        Assertions.assertTrue(firstRoll > 0.5 && firstRoll < 0.9,
-                "assertion premise: the first value of Random(0) should lie in 0.5 ~ 0.9, actual " + firstRoll);
-
-        Assertions.assertEquals(1000, critSettled(0.5, 1.0), EPS);   // roll > 0.5 to no crit
-        Assertions.assertEquals(2000, critSettled(0.9, 1.0), EPS);   // roll < 0.9 to crit
+        Assertions.assertAll("the crit zone reads the injected random",
+                () -> Assertions.assertTrue(firstRoll > 0.5 && firstRoll < 0.9,
+                        "assertion premise: the first value of Random(0) should lie in 0.5 ~ 0.9, actual " + firstRoll),
+                () -> Assertions.assertEquals(1000, critSettled(0.5, 1.0), EPS,
+                        "crit zone: roll > 0.5 to no crit"),
+                () -> Assertions.assertEquals(2000, critSettled(0.9, 1.0), EPS,
+                        "crit zone: roll < 0.9 to crit"));
     }
 
     @Test
@@ -97,32 +119,18 @@ public class DamagePipelineTest {
     }
 
     @Test
-    public void defenceZoneUsesAttackerLevelAndDefenderDefence() {
-        Assertions.assertEquals(BASE * LEVEL_TERM / (1150 + LEVEL_TERM),
-                settle(attacker(), defender(1150)), EPS);
-    }
-
-    @Test
-    public void defenceIgnoreShrinksEffectiveDefence() {
-        Character attacker = attacker();
-        attacker.setAttribute(AttributeType.DEFENCE_IGNORE, new DoubleValue(0.5));
-
-        Assertions.assertEquals(BASE * LEVEL_TERM / (575 + LEVEL_TERM),
-                settle(attacker, defender(1150)), EPS);
-    }
-
-    @Test
-    public void hpIsReducedExactlyOnce() {
-        Character attacker = attacker();
-        attacker.setAttribute(AttributeType.FIRE_DAMAGE_BOOST, new DoubleValue(0.3));
-        Enemy defender = defender(0);
-        double hpBefore = defender.getCurrentHp();
-
-        Damage damage = new Damage(attacker, defender, DamageElement.FIRE, DamageType.NORMAL, BASE);
-        double settled = battle(attacker, defender, 0).applyDamage(defender, damage);
-
-        Assertions.assertEquals(1300, settled, EPS);
-        Assertions.assertEquals(hpBefore - settled, defender.getCurrentHp(), EPS);
+    public void defenceZoneScenarios() {
+        Assertions.assertAll("the defence zone follows the attacker level and the defender defence",
+                () -> Assertions.assertEquals(BASE * LEVEL_TERM / (1150 + LEVEL_TERM),
+                        settle(attacker(), defender(1150)), EPS,
+                        "defence zone: level term 200 + 10 x 80 against 1150 DEF"),
+                () -> {
+                    Character ignoring = attacker();
+                    ignoring.setAttribute(AttributeType.DEFENCE_IGNORE, new DoubleValue(0.5));
+                    Assertions.assertEquals(BASE * LEVEL_TERM / (575 + LEVEL_TERM),
+                            settle(ignoring, defender(1150)), EPS,
+                            "defence zone: DEFENCE_IGNORE 0.5 halves the effective defence");
+                });
     }
 
     @Test
@@ -130,12 +138,16 @@ public class DamagePipelineTest {
         Character attacker = attacker();
         Enemy defender = defender(0);
         defender.takeDamage(defender.getCurrentHp());   // kill it outright
-        Assertions.assertTrue(defender.isDeath());
 
         Damage damage = new Damage(attacker, defender, DamageElement.FIRE, DamageType.NORMAL, BASE);
 
-        Assertions.assertEquals(0, battle(attacker, defender, 0).applyDamage(defender, damage), EPS);
-        Assertions.assertEquals(0, defender.getCurrentHp(), EPS);
+        Assertions.assertAll("a dead target no longer takes damage",
+                () -> Assertions.assertTrue(defender.isDeath(),
+                        "dead target: the fixture is actually dead"),
+                () -> Assertions.assertEquals(0, battle(attacker, defender, 0).applyDamage(defender, damage), EPS,
+                        "dead target: applyDamage settles to zero"),
+                () -> Assertions.assertEquals(0, defender.getCurrentHp(), EPS,
+                        "dead target: HP stays at zero"));
     }
 
     @Test

@@ -31,6 +31,12 @@ import java.util.Random;
  * <p>The generator is fixed in every case below, so the 35% is asserted rather than gambled: with a generator
  * that answers {@code 0.1} the roll passes, with {@code 0.9} it fails. That is the same injected-generator rule
  * the engine follows everywhere.
+ *
+ * <p><b>L3:</b> the clauses that share one fixture are grouped into the scenarios below, each assertion inside
+ * {@link Assertions#assertAll} keeping its message that names the clause. The {@code 0.9} board is read once - the
+ * failed roll leaves the burn, and the same hit still lets the counter talent fire - and the 守护 trace's value is read
+ * before and after two of her own turns on the one board. Nothing was dropped: every expected value, tolerance and
+ * message the separate cases carried is still asserted.
  */
 public class ClaraTraceTest {
     private static final int CLARA = 1107;
@@ -45,38 +51,35 @@ public class ClaraTraceTest {
 
         hit(battle, clara);
 
-        Assertions.assertFalse(clara.getBuffManager().hasBuff(DotBuff.class),
-                "the burn is a negative effect, so dispelling (解除) takes it");
-        Assertions.assertTrue(clara.getBuffManager().hasBuff(StateBuff.class),
-                "and the named state stays: it is not classified as negative");
-    }
-
-    @Test
-    public void aFailedRollLeavesTheDebuffInPlace() {
-        Battle battle = battleWith(fixed(0.9));
-        Character clara = battle.characters().getFirst();
-        clara.getBuffManager().addBuff(new DotBuff(clara, DamageElement.FIRE, 100, 3));
-
-        hit(battle, clara);
-
-        Assertions.assertTrue(clara.getBuffManager().hasBuff(DotBuff.class),
-                "0.9 is not below 0.35, so nothing is dispelled -- and the same hit still happened");
+        Assertions.assertAll("「受到攻击时有 35% 的固定概率解除自身 1 个负面效果」 - the roll passes",
+                () -> Assertions.assertFalse(clara.getBuffManager().hasBuff(DotBuff.class),
+                        "the burn is a negative effect, so dispelling (解除) takes it"),
+                () -> Assertions.assertTrue(clara.getBuffManager().hasBuff(StateBuff.class),
+                        "and the named state stays: it is not classified as negative"));
     }
 
     /**
-     * Her counter talent (already in the file) still works next to the new trace.
+     * The same hit with the roll failing (0.9): the trace takes nothing off, and her counter talent - a different rule
+     * in the same file - still answers the attack.
      */
     @Test
-    public void herCounterTalentStillFires() {
+    public void aFailedRollLeavesTheDebuffAndTheTalentStillCounters() {
         Battle battle = battleWith(fixed(0.9));
         Character clara = battle.characters().getFirst();
         Enemy enemy = battle.enemyUnits().getFirst();
+        clara.getBuffManager().addBuff(new DotBuff(clara, DamageElement.FIRE, 100, 3));
         double before = enemy.getCurrentHp();
 
         hit(battle, clara);
 
-        Assertions.assertTrue(enemy.getCurrentHp() < before,
-                "「受到攻击后反击」 (counterattacks after being attacked) is a different rule in the same file, and it must survive the addition");
+        boolean debuffKept = clara.getBuffManager().hasBuff(DotBuff.class);
+        boolean counterFired = enemy.getCurrentHp() < before;
+
+        Assertions.assertAll("a failed Family roll on a hit that still counters",
+                () -> Assertions.assertTrue(debuffKept,
+                        "0.9 is not below 0.35, so nothing is dispelled -- and the same hit still happened"),
+                () -> Assertions.assertTrue(counterFired,
+                        "「受到攻击后反击」 (counterattacks after being attacked) is a different rule in the same file, and it must survive the addition"));
     }
 
     /**
@@ -86,34 +89,34 @@ public class ClaraTraceTest {
      * 35% control resistance at BATTLE_START, and nothing else in the file changed. Asserting it here rather than
      * only in {@code DebuffResistTest} is what keeps the <b>content</b> honest - the engine op can be perfect and the
      * file still say the wrong percentage or the wrong class.
+     *
+     * <p>...and it is permanent, which is what a trace (行迹) is: two of her own turns do not spend it, and the same
+     * value is read again off the same board after them.
      */
     @Test
-    public void herGuardianTraceResistsTheControlClass() {
+    public void herGuardianTraceResistsControlAndIsNotSpentByTurns() {
         Battle battle = battleWith(fixed(0.9));
         Character clara = battle.characters().getFirst();
 
-        Assertions.assertEquals(0.35, clara.getBuffManager().debuffResistOf(DebuffClass.CONTROL), 1e-9,
-                "「抵抗控制类负面状态的概率提高35%」 (raises RES to Crowd Control debuffs by 35%)");
-        Assertions.assertEquals(1, clara.getBuffManager().countBuffs(ClassResistBuff.class), "one contribution");
-        Assertions.assertEquals(0, clara.getBuffManager().debuffResistOf(DebuffClass.DOT),
-                "Guardian (守护) says control class (控制类) and nothing about the DOT class (持续伤害类)");
-        Assertions.assertEquals(0, clara.getBuffManager().debuffCount(),
-                "being harder to control is good for her: a dispel-negative (解除负面) must not take it off");
-    }
-
-    /**
-     * ...and it is permanent, which is what a trace (行迹) is: two of her own turns do not spend it.
-     */
-    @Test
-    public void herGuardianTraceIsNotSpentByTurns() {
-        Battle battle = battleWith(fixed(0.9));
-        Character clara = battle.characters().getFirst();
+        double control = clara.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
+        int contributions = clara.getBuffManager().countBuffs(ClassResistBuff.class);
+        double dot = clara.getBuffManager().debuffResistOf(DebuffClass.DOT);
+        int debuffs = clara.getBuffManager().debuffCount();
 
         TestTurns.take(battle, clara);
         TestTurns.take(battle, clara);
+        double afterTurns = clara.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
 
-        Assertions.assertEquals(0.35, clara.getBuffManager().debuffResistOf(DebuffClass.CONTROL), 1e-9,
-                "a trace states no duration, so 'permanent': true — the buff is never ticked");
+        Assertions.assertAll("the 守护 trace: a permanent 35% control resistance",
+                () -> Assertions.assertEquals(0.35, control, 1e-9,
+                        "「抵抗控制类负面状态的概率提高35%」 (raises RES to Crowd Control debuffs by 35%)"),
+                () -> Assertions.assertEquals(1, contributions, "one contribution"),
+                () -> Assertions.assertEquals(0, dot,
+                        "Guardian (守护) says control class (控制类) and nothing about the DOT class (持续伤害类)"),
+                () -> Assertions.assertEquals(0, debuffs,
+                        "being harder to control is good for her: a dispel-negative (解除负面) must not take it off"),
+                () -> Assertions.assertEquals(0.35, afterTurns, 1e-9,
+                        "a trace states no duration, so 'permanent': true — the buff is never ticked"));
     }
 
     // ==================================================================

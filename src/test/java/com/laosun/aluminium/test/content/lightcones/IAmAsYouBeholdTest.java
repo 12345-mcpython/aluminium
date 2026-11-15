@@ -32,7 +32,7 @@ public class IAmAsYouBeholdTest {
     @Test
     public void everyTierStatesWhatTheTextStates() {
         // 2026-10-19: the attack and energy-regen shares are the cone's own properties now (the stat rule was a duplicate);
-        // the 30% 【王之娱乐】 window and the per-energy ultimate rider are pinned in ConeAuditBatchTwentyEightTest.
+        // the 30% 【王之娱乐】 window and the per-energy ultimate rider are pinned in LightConeAuditBatchTwentyEightTest.
         for (int rank = 1; rank <= 5; rank++) {
             double plainAttack = CharacterFactory.create(WEARER, LEVEL, true)
                     .getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();

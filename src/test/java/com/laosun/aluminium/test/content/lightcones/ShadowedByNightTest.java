@@ -33,7 +33,7 @@ public class ShadowedByNightTest {
         battle.startBattle();
         // 2026-10-19: the break share is the cone's own `breaking_effect` property (it is in the panel before the
         // battle starts), so no rule states it any more.
-        Assertions.assertTrue(true, "the break share is the property - pinned in ConeAuditBatchTwelveTest");
+        Assertions.assertTrue(true, "the break share is the property - pinned in LightConeAuditBatchTwelveTest");
         double base = unit.getAttribute(AttributeType.SPEED).baseValue();
         Assertions.assertTrue(unit.getAttribute(AttributeType.SPEED).get() - speedBefore > 0,
                 "speed at battle start: base=" + base);

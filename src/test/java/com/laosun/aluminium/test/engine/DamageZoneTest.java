@@ -19,6 +19,11 @@ import com.laosun.aluminium.DoubleValue;
  * <p>Pure algebra: {@code attacker}/{@code defender} take no part in zone settlement,
  * so they stay {@code null} here - that also keeps {@link com.laosun.aluminium.Constant}
  * from being initialised (no JSON is loaded for this test).
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the eight scenarios below, one
+ * {@code assertAll} per area so a failing clause still names itself. The two exception
+ * paths - the read-only container and the constructor's NPEs - stay separate tests: an
+ * {@code assertThrows} is not a positive clause and must not hide behind one.
  */
 public class DamageZoneTest {
     private static final double BASE = 1000.0;
@@ -29,124 +34,109 @@ public class DamageZoneTest {
     }
 
     @Test
-    public void noZoneLeavesBaseUntouched() {
-        Damage damage = damage();
+    public void containerInvariants() {
+        Damage empty = damage();
+        Damage onePerKind = damage().addBoost(0.1).addBoost(0.2);
+        double resistanceFirst = damage().resist(0.2, 0).addBoost(0.5).toValue();
+        double boostFirst = damage().addBoost(0.5).resist(0.2, 0).toValue();
 
-        Assertions.assertTrue(damage.getDamageArea().isEmpty());
-        Assertions.assertEquals(BASE, damage.toValue(), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(empty.getDamageArea().isEmpty(),
+                        "no zone leaves the container empty"),
+                () -> Assertions.assertEquals(BASE, empty.toValue(), EPS,
+                        "no zone leaves the base untouched"),
+                () -> Assertions.assertEquals(1, onePerKind.getDamageArea().size(),
+                        "one instance per kind"),
+                () -> Assertions.assertEquals(1.3, onePerKind.boostArea().getRate(), EPS,
+                        "the two boosts are one additive instance"),
+                () -> Assertions.assertEquals(1200, resistanceFirst, EPS,
+                        "resistance then boost"),
+                () -> Assertions.assertEquals(resistanceFirst, boostFirst, EPS,
+                        "zone order does not matter"));
     }
 
     @Test
-    public void boostIsAdditive() {
-        Damage damage = damage().addBoost(0.3).addBoost(0.2);
+    public void boostAndVulnerability() {
+        Damage boosted = damage().addBoost(0.3).addBoost(0.2);
+        Damage vulnerable = damage().addVulnerable(2.0).addVulnerable(2.0);
+        Damage negativeBoost = damage().addBoost(-1.5);
+        Damage negativeVulnerable = damage().addVulnerable(-1.5);
+        Damage.DefenceArea zeroDefence = new Damage.DefenceArea().set(80, 0, 0);
 
-        Assertions.assertEquals(1.5, damage.boostArea().getRate(), EPS);
-        Assertions.assertEquals(1500, damage.toValue(), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1.5, boosted.boostArea().getRate(), EPS,
+                        "damage boost is additive"),
+                () -> Assertions.assertEquals(1500, boosted.toValue(), EPS,
+                        "the additive boost settles"),
+                () -> Assertions.assertEquals(5.0, vulnerable.vulnerableArea().raw().get(), EPS,
+                        "the raw vulnerability stays unclamped at 5.0"),
+                () -> Assertions.assertEquals(3.5, vulnerable.vulnerableArea().getRate(), EPS,
+                        "the read rate is capped at 3.5"),
+                () -> Assertions.assertEquals(3500, vulnerable.toValue(), EPS,
+                        "the capped vulnerability settles"),
+                () -> Assertions.assertEquals(0.0, negativeBoost.boostArea().getRate(), EPS,
+                        "damage boost has a sanity floor at 0"),
+                () -> Assertions.assertEquals(0.0, negativeVulnerable.vulnerableArea().getRate(), EPS,
+                        "vulnerability has a sanity floor at 0"),
+                () -> Assertions.assertEquals(1.0, zeroDefence.getRate(), EPS,
+                        "at 0 defence the computed zone is exactly 1.0"));
     }
 
     @Test
-    public void vulnerableIsCapped() {
-        Damage damage = damage().addVulnerable(2.0).addVulnerable(2.0);
-
-        // The un-clamped raw value is still 5.0; it is only capped to 3.5 when the rate is read
-        Assertions.assertEquals(5.0, damage.vulnerableArea().raw().get(), EPS);
-        Assertions.assertEquals(3.5, damage.vulnerableArea().getRate(), EPS);
-        Assertions.assertEquals(3500, damage.toValue(), EPS);
+    public void reductionAndWeakness() {
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(10,
+                        damage().addReduction(0.9).addReduction(0.9).addReduction(0.9).toValue(), EPS,
+                        "reduction multiplies and floors: 0.1^3 -> 0.001 -> 0.01"),
+                () -> Assertions.assertEquals(10,
+                        damage().addReduction(1.5).addReduction(-0.5).toValue(), EPS,
+                        "reduction inputs clamp to [0,1]: 1.5 -> 1, -0.5 -> 0, then floor"),
+                () -> Assertions.assertEquals(200,
+                        damage().addWeakness(0.9).addWeakness(0.3).toValue(), EPS,
+                        "weakness floors at 0.2: 1 - 1.2 -> 0.2"));
     }
 
     @Test
-    public void reductionIsMultiplicativeFlooredAndInputClamped() {
-        // Multiplication + floor: 0.1³ = 0.001 to 0.01
-        Assertions.assertEquals(10,
-                damage().addReduction(0.9).addReduction(0.9).addReduction(0.9).toValue(), EPS);
+    public void defenceAndIgnore() {
+        Damage plain = damage().defence(80, 1150, 0);
+        Damage ignored = damage().defence(80, 1150, 0.5);
+        Damage overIgnored = damage().defence(80, 1150, 1.5);
+        Damage negativeIgnored = damage().defence(80, 1150, -0.5);
 
-        // The input is clamped to [0,1] first: 1.5 to 1 (factor 0), -0.5 to 0 (factor 1) to product 0 to floor 0.01
-        Assertions.assertEquals(10,
-                damage().addReduction(1.5).addReduction(-0.5).toValue(), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1000.0 / 2150.0, plain.defenceArea().getRate(), EPS,
+                        "defence zone rate for 1150 DEF at level 80"),
+                () -> Assertions.assertEquals(BASE * 1000.0 / 2150.0, plain.toValue(), EPS,
+                        "the defence zone settles"),
+                () -> Assertions.assertEquals(1000.0 / 1575.0, ignored.defenceArea().getRate(), EPS,
+                        "50% defence ignore shrinks the effective defence"),
+                () -> Assertions.assertEquals(BASE * 1000.0 / 1575.0, ignored.toValue(), EPS,
+                        "the ignored defence settles"),
+                () -> Assertions.assertEquals(1.0, overIgnored.defenceArea().getRate(), EPS,
+                        "a 1.5 ignore clamps to 1 and leaves no defence"),
+                () -> Assertions.assertEquals(1000.0 / 2150.0, negativeIgnored.defenceArea().getRate(), EPS,
+                        "a -0.5 ignore clamps to 0 and leaves the defence untouched"));
     }
 
     @Test
-    public void weaknessIsFloored() {
-        Damage damage = damage().addWeakness(0.9).addWeakness(0.3);
-
-        // 1 - 1.2 = -0.2 to floored to 0.2
-        Assertions.assertEquals(200, damage.toValue(), EPS);
+    public void resistanceAndClamps() {
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1200, damage().resist(0.2, 0.4).toValue(), EPS,
+                        "negative resistance applies at full effect"),
+                () -> Assertions.assertEquals(100, damage().resist(1.2, 0).toValue(), EPS,
+                        "resistance caps at 0.9"),
+                () -> Assertions.assertEquals(2000, damage().resist(-1.5, 0).toValue(), EPS,
+                        "resistance has a -100% lower clamp"),
+                () -> Assertions.assertEquals(2.0, damage().resist(-1.5, 0).resistArea().getRate(), EPS,
+                        "the lower clamp reads as a 2.0 zone"));
     }
 
     @Test
-    public void sanityFloorVersusOfficialFloors() {
-        // DMG boost / vulnerability: there is no negative DMG boost in the game; 0 is just PercentArea's
-        // sanity floor (guarding against a negative factor flipping the damage sign);
-        // the only official lower bounds are reduction 0.01 and weakness 0.2, already asserted by their
-        // own cases, so they are not repeated here
-        Assertions.assertEquals(0.0, damage().addBoost(-1.5).boostArea().getRate(), EPS);
-        Assertions.assertEquals(0.0, damage().addVulnerable(-1.5).vulnerableArea().getRate(), EPS);
-        // Computed zones have no lower bound: the defence formula is always positive itself, and at 0 defence it is exactly 1.0
-        Assertions.assertEquals(1.0, new Damage.DefenceArea().set(80, 0, 0).getRate(), EPS);
-    }
-
-    @Test
-    public void critIsBookkeepingOnly() {
-        Assertions.assertEquals(2000, damage().crit(true, 1.0).toValue(), EPS);
-        Assertions.assertEquals(1000, damage().crit(false, 1.0).toValue(), EPS);
-    }
-
-    @Test
-    public void defenceZone() {
-        Damage damage = damage().defence(80, 1150, 0);
-
-        Assertions.assertEquals(1000.0 / 2150.0, damage.defenceArea().getRate(), EPS);
-        Assertions.assertEquals(BASE * 1000.0 / 2150.0, damage.toValue(), EPS);
-    }
-
-    @Test
-    public void defenceIgnoreShrinksEffectiveDefence() {
-        Damage damage = damage().defence(80, 1150, 0.5);
-
-        Assertions.assertEquals(1000.0 / 1575.0, damage.defenceArea().getRate(), EPS);
-        Assertions.assertEquals(BASE * 1000.0 / 1575.0, damage.toValue(), EPS);
-    }
-
-    @Test
-    public void defenceIgnoreIsClampedToUnitRange() {
-        // 1.5 to clamped to 1 to effective defence 0 to defence zone rate 1.0
-        Assertions.assertEquals(1.0, damage().defence(80, 1150, 1.5).defenceArea().getRate(), EPS);
-        // -0.5 to clamped to 0 to equivalent to ignoring no defence at all
-        Assertions.assertEquals(1000.0 / 2150.0, damage().defence(80, 1150, -0.5).defenceArea().getRate(), EPS);
-    }
-
-    @Test
-    public void resistanceZone() {
-        // 0.2 - 0.4 = -0.2 to negative resistance (currently implemented at full effect)
-        Assertions.assertEquals(1200, damage().resist(0.2, 0.4).toValue(), EPS);
-    }
-
-    @Test
-    public void resistanceIsClampedToMax() {
-        // 1.2 to cap 0.9
-        Assertions.assertEquals(100, damage().resist(1.2, 0).toValue(), EPS);
-    }
-
-    @Test
-    public void resistanceIsClampedToMin() {
-        // HSR.md §2.5: resistance ranges over -100% ~ 90% so resistance zone 0.1 ~ 2.0 (negative resistance at full effect)
-        Assertions.assertEquals(2000, damage().resist(-1.5, 0).toValue(), EPS);
-        Assertions.assertEquals(2.0, damage().resist(-1.5, 0).resistArea().getRate(), EPS);
-    }
-
-    @Test
-    public void elationKeepsCritButSkipsBoost() {
-        Damage damage = new Damage(null, null, DamageElement.FIRE, DamageType.ELATION, BASE)
+    public void damageTypeExceptions() {
+        Damage elation = new Damage(null, null, DamageElement.FIRE, DamageType.ELATION, BASE)
                 .addBoost(0.5)
                 .crit(true, 1.0);
-
-        // Elation damage: takes the crit zone, but is unaffected by damage-increase effects (HSR.md §6.4 / §6.5)
-        Assertions.assertEquals(2000, damage.toValue(), EPS);
-    }
-
-    @Test
-    public void trueDamageSkipsEveryZone() {
-        Damage damage = damage()
+        Damage trueDamage = damage()
                 .addBoost(0.5)
                 .addVulnerable(0.5)
                 .addReduction(0.5)
@@ -155,66 +145,56 @@ public class DamageZoneTest {
                 .defence(80, 1150, 0)
                 .resist(0.2, 0)
                 .trueDamage();
-
-        Assertions.assertEquals(BASE, damage.toValue(), EPS);
-        Assertions.assertTrue(damage.isTrueDamage());
-        Assertions.assertTrue(damage.isCountsAsAttack());
-        Assertions.assertFalse(damage.notCountsAsAttack().isCountsAsAttack());
-    }
-
-    @Test
-    public void oneZoneInstancePerKind() {
-        Damage damage = damage().addBoost(0.1).addBoost(0.2);
-
-        Assertions.assertEquals(1, damage.getDamageArea().size());
-        Assertions.assertEquals(1.3, damage.boostArea().getRate(), EPS);
-    }
-
-    @Test
-    public void zoneContainerIsReadOnly() {
-        Damage damage = damage().addBoost(0.1);
-
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> damage.getDamageArea().clear());
-        Assertions.assertEquals(1, damage.getDamageArea().size());
-    }
-
-    @Test
-    public void zonesAreTestableWithoutDamage() {
-        // A zone can be unit-tested without a Damage too: one additive zone + one computed zone
-        // (the values of the other zones are already asserted by their own cases)
-        Assertions.assertEquals(3.5, new Damage.VulnerableArea().add(2.0).add(2.0).getRate(), EPS);
-        Assertions.assertEquals(1000.0 / 2150.0, new Damage.DefenceArea().set(80, 1150, 0).getRate(), EPS);
-    }
-
-    @Test
-    public void zoneOrderDoesNotMatter() {
-        double resistanceFirst = damage().resist(0.2, 0).addBoost(0.5).toValue();
-        double boostFirst = damage().addBoost(0.5).resist(0.2, 0).toValue();
-
-        Assertions.assertEquals(1200, resistanceFirst, EPS);
-        Assertions.assertEquals(resistanceFirst, boostFirst, EPS);
-    }
-
-    @Test
-    public void breakDamageSkipsBoostAndCritButKeepsDefence() {
-        Damage damage = new Damage(null, null, DamageElement.FIRE, DamageType.BREAK, BASE)
+        Damage breakDamage = new Damage(null, null, DamageElement.FIRE, DamageType.BREAK, BASE)
                 .addBoost(0.5)
                 .crit(true, 1.0)
                 .defence(80, 1150, 0);
-
-        // DMG boost / crit are blocked by applies(), the defence zone still takes effect as usual
-        Assertions.assertFalse(damage.boostArea().applies(DamageType.BREAK));
-        Assertions.assertFalse(damage.critArea().applies(DamageType.BREAK));
-        Assertions.assertEquals(BASE * 1000.0 / 2150.0, damage.toValue(), EPS);
-    }
-
-    @Test
-    public void dotKeepsBoostButSkipsCrit() {
-        Damage damage = new Damage(null, null, DamageElement.FIRE, DamageType.DOT, BASE)
+        Damage dot = new Damage(null, null, DamageElement.FIRE, DamageType.DOT, BASE)
                 .addBoost(0.5)
                 .crit(true, 1.0);
 
-        Assertions.assertEquals(1500, damage.toValue(), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2000, elation.toValue(), EPS,
+                        "elation keeps crit but skips damage boost"),
+                () -> Assertions.assertEquals(BASE, trueDamage.toValue(), EPS,
+                        "true damage skips every zone"),
+                () -> Assertions.assertTrue(trueDamage.isTrueDamage(), "the true-damage flag is set"),
+                () -> Assertions.assertTrue(trueDamage.isCountsAsAttack(),
+                        "true damage still counts as an attack"),
+                () -> Assertions.assertFalse(trueDamage.notCountsAsAttack().isCountsAsAttack(),
+                        "the not-counts-as-attack copy is off"),
+                () -> Assertions.assertFalse(breakDamage.boostArea().applies(DamageType.BREAK),
+                        "break damage skips the boost zone"),
+                () -> Assertions.assertFalse(breakDamage.critArea().applies(DamageType.BREAK),
+                        "break damage skips the crit zone"),
+                () -> Assertions.assertEquals(BASE * 1000.0 / 2150.0, breakDamage.toValue(), EPS,
+                        "break damage keeps the defence zone"),
+                () -> Assertions.assertEquals(1500, dot.toValue(), EPS,
+                        "dot keeps boost but skips crit"));
+    }
+
+    @Test
+    public void critAndBreakdown() {
+        Map<String, Double> breakdown = damage().addBoost(0.5).crit(false, 0).breakdown();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2000, damage().crit(true, 1.0).toValue(), EPS,
+                        "crit doubles a normal hit"),
+                () -> Assertions.assertEquals(1000, damage().crit(false, 1.0).toValue(), EPS,
+                        "a non-crit keeps the base"),
+                () -> Assertions.assertEquals(3.5, new Damage.VulnerableArea().add(2.0).add(2.0).getRate(), EPS,
+                        "a zone can be tested without a Damage"),
+                () -> Assertions.assertEquals(1000.0 / 2150.0,
+                        new Damage.DefenceArea().set(80, 1150, 0).getRate(), EPS,
+                        "the computed defence zone can be tested without a Damage"),
+                () -> Assertions.assertEquals(BASE, breakdown.get("base"), EPS,
+                        "the breakdown names the base"),
+                () -> Assertions.assertEquals(1.5, breakdown.get("BoostArea"), EPS,
+                        "the breakdown names the boost zone"),
+                () -> Assertions.assertEquals(1.0, breakdown.get("CritArea"), EPS,
+                        "the breakdown names the crit zone"),
+                () -> Assertions.assertEquals(1500, breakdown.get("final"), EPS,
+                        "the breakdown names the final value"));
     }
 
     @Test
@@ -224,40 +204,54 @@ public class DamageZoneTest {
                 .addBoost(0.2, ModifierSource.BUFF, 3)
                 .addBoost(0.3, ModifierSource.RELIC, 4);
 
-        // DMG boost 1+0.5, vulnerability 1+0.5 to 2250
-        Assertions.assertEquals(2250, damage.toValue(), EPS);
-        Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.BUFF).size());
-        Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.RELIC).size());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(2250, damage.toValue(), EPS,
+                        "boost 1+0.5 and vulnerability 1+0.5 settle to 2250"),
+                () -> Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.BUFF).size(),
+                        "one BUFF modifier is on the boost zone"),
+                () -> Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.RELIC).size(),
+                        "one RELIC modifier is on the boost zone"));
 
-        // Removal by source: a Buff expiring / being dispelled is exactly this opening
         damage.vulnerableArea().removeModifiersFrom(BUFF, 7);
         damage.boostArea().removeModifiersFrom(ModifierSource.BUFF, 3);
 
-        Assertions.assertEquals(1300, damage.toValue(), EPS);
-        Assertions.assertEquals(1.3, damage.boostArea().getRate(), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1300, damage.toValue(), EPS,
+                        "removing both BUFF modifiers leaves 1300"),
+                () -> Assertions.assertEquals(1.3, damage.boostArea().getRate(), EPS,
+                        "only the RELIC boost remains"));
     }
 
+    /**
+     * The read-only container is an exception path, so it stays its own test rather than
+     * hiding inside {@link #containerInvariants()}.
+     */
     @Test
-    public void breakdownListsEveryContributingZone() {
-        Map<String, Double> breakdown = damage().addBoost(0.5).crit(false, 0).breakdown();
+    public void zoneContainerIsReadOnly() {
+        Damage damage = damage().addBoost(0.1);
 
-        Assertions.assertEquals(BASE, breakdown.get("base"), EPS);
-        Assertions.assertEquals(1.5, breakdown.get("BoostArea"), EPS);
-        Assertions.assertEquals(1.0, breakdown.get("CritArea"), EPS);
-        Assertions.assertEquals(1500, breakdown.get("final"), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertThrows(UnsupportedOperationException.class,
+                        () -> damage.getDamageArea().clear()),
+                () -> Assertions.assertEquals(1, damage.getDamageArea().size()));
     }
 
+    /**
+     * The constructor's NPEs are an exception path too; the two positive constructor facts
+     * stay here because they are about the same object.
+     */
     @Test
     public void constructorContract() {
-        // 4-arg legacy constructor: damage type defaults to NORMAL
         Damage legacy = new Damage(null, null, DamageElement.FIRE, BASE);
-        Assertions.assertEquals(DamageType.NORMAL, legacy.getType());
-        Assertions.assertEquals(BASE, legacy.toValue(), EPS);
 
-        // neither element nor type is allowed to be null
-        Assertions.assertThrows(NullPointerException.class,
-                () -> new Damage(null, null, null, DamageType.BREAK, BASE));
-        Assertions.assertThrows(NullPointerException.class,
-                () -> new Damage(null, null, DamageElement.FIRE, null, BASE));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(DamageType.NORMAL, legacy.getType(),
+                        "the 4-arg constructor defaults to NORMAL"),
+                () -> Assertions.assertEquals(BASE, legacy.toValue(), EPS,
+                        "the 4-arg constructor keeps the base"),
+                () -> Assertions.assertThrows(NullPointerException.class,
+                        () -> new Damage(null, null, null, DamageType.BREAK, BASE)),
+                () -> Assertions.assertThrows(NullPointerException.class,
+                        () -> new Damage(null, null, DamageElement.FIRE, null, BASE)));
     }
 }

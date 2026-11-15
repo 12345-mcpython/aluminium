@@ -30,7 +30,7 @@ import java.util.Set;
  * not a new kind of thing in this engine - it is <b>an ordinary buff that carries a name</b> (the lesson the
  * DOT migration already taught), so it inherits duration, refresh, and {@code clearAll} removal for free.
  *
- * <p><b>What is pinned here, and why each case is worth its own test.</b>
+ * <p><b>What is pinned here, and why each case is worth pinning.</b>
  * <ul>
  *   <li>the op puts a state on a unit, and the condition reads it back;</li>
  *   <li>{@code target has_state X} reads the <b>event's subject</b>, not the owner - the classic
@@ -44,6 +44,9 @@ import java.util.Set;
  *   <li>every argument is validated at <b>load</b> time, and a missing party fails the condition rather than
  *       passing it.</li>
  * </ul>
+ *
+ * <p>Cases that exercise one clause against one observed object share a scenario method and are asserted together
+ * with {@link Assertions#assertAll}; rejection paths stay in their own validation scenarios.
  */
 public class TriggerStateTest {
     /**
@@ -60,17 +63,39 @@ public class TriggerStateTest {
     // 1. The op and the condition
     // ==================================================================
 
+    /**
+     * The op puts the named state on the owner, and applying the same name again refreshes it instead of stacking.
+     */
     @Test
     public void applyBuffPutsTheNamedStateOnTheOwner() {
         Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", 2, null));
         Character owner = battle.characters().getFirst();
 
-        Assertions.assertEquals(1, fire(battle, owner), "the rule applies the state");
-        Assertions.assertTrue(owner.getBuffManager().hasState("协奏"), "the owner is now in 【协奏】");
-        Assertions.assertEquals(1, owner.getBuffManager().countBuffs(StateBuff.class));
-        Assertions.assertFalse(owner.getBuffManager().hasState("转魄"), "a different name is a different state");
+        int applied = fire(battle, owner);
+        boolean inState = owner.getBuffManager().hasState("协奏");
+        int stateCount = owner.getBuffManager().countBuffs(StateBuff.class);
+        boolean otherName = owner.getBuffManager().hasState("转魄");
+
+        Assertions.assertAll("APPLY_BUFF applies and refreshes the named state",
+                () -> Assertions.assertEquals(1, applied, "the rule applies the state"),
+                () -> Assertions.assertTrue(inState, "the owner is now in 【协奏】"),
+                () -> Assertions.assertEquals(1, stateCount, "exactly one state buff is attached"),
+                () -> Assertions.assertFalse(otherName, "a different name is a different state"));
+
+        takeTurn(battle, owner);
+        Integer afterOneTurn = stateDuration(owner, "协奏");
+        fire(battle, owner);
+        int refreshedCount = owner.getBuffManager().countBuffs(StateBuff.class);
+        Integer refreshed = stateDuration(owner, "协奏");
+        Assertions.assertAll("the same state refreshes instead of stacking",
+                () -> Assertions.assertEquals(1, afterOneTurn, "one turn of the duration was burned"),
+                () -> Assertions.assertEquals(1, refreshedCount, "refreshed, not stacked"),
+                () -> Assertions.assertEquals(2, refreshed, "and the duration is back to the full 2"));
     }
 
+    /**
+     * {@code self has_state X} gates a rule on the owner's own state: silent before it is applied, firing after.
+     */
     @Test
     public void theConditionReadsTheOwnersState() {
         Battle battle = battleWith(
@@ -79,11 +104,16 @@ public class TriggerStateTest {
         Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0)),
-                "before the state is applied the conditioned rule must not fire");
-        Assertions.assertEquals(1, fire(battle, owner), "the state is applied");
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0)),
-                "now that the owner is in 【协奏】, the conditioned rule fires");
+        int conditionedBefore = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
+        int applied = fire(battle, owner);
+        int conditionedAfter = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
+
+        Assertions.assertAll("self has_state reads the owner's state",
+                () -> Assertions.assertEquals(0, conditionedBefore,
+                        "before the state is applied the conditioned rule must not fire"),
+                () -> Assertions.assertEquals(1, applied, "the state is applied"),
+                () -> Assertions.assertEquals(1, conditionedAfter,
+                        "now that the owner is in 【协奏】, the conditioned rule fires"));
     }
 
     /**
@@ -97,238 +127,142 @@ public class TriggerStateTest {
         ally.getBuffManager().addBuff(new StateBuff("dot:shock", 2));
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)),
-                "the subject of the event is in the shocked state");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
-                "the owner is NOT in the shocked state, so the rule must not fire -- reading the owner here would make "
-                        + "every 'the target is in state X' rule fire on the wrong unit");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
-                "an event with no subject fails the condition instead of accidentally passing it");
+        int onSubject = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0));
+        int onOwner = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0));
+        int onNothing = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
+
+        Assertions.assertAll("target has_state reads the event subject",
+                () -> Assertions.assertEquals(1, onSubject,
+                        "the subject of the event is in the shocked state"),
+                () -> Assertions.assertEquals(0, onOwner,
+                        "the owner is NOT in the shocked state, so the rule must not fire -- reading the owner here would make "
+                                + "every 'the target is in state X' rule fire on the wrong unit"),
+                () -> Assertions.assertEquals(0, onNothing,
+                        "an event with no subject fails the condition instead of accidentally passing it"));
     }
 
     // ==================================================================
-    // 2. State identity: names, not classes
+    // 2. State identity and duration: names, not classes
     // ==================================================================
 
+    /**
+     * A state is identified by its name, not by its class: two different names coexist on one unit, while a timed
+     * state expires after its turns and a {@code permanent} one never does.
+     */
     @Test
-    public void twoDifferentStatesCoexist() {
-        Battle battle = battleWith(
+    public void statesAreNamedAndTheirDurationIsHonoured() {
+        Battle coexisting = battleWith(
                 stateOp("ALLY_ATTACK", "协奏", 2, null),
                 stateOp("SKILL_CAST", "转魄", 2, null));
-        Character owner = battle.characters().getFirst();
+        Character coexistOwner = coexisting.characters().getFirst();
+        fire(coexisting, coexistOwner);
+        coexisting.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, coexistOwner, null, 0, 0));
+        boolean firstState = coexistOwner.getBuffManager().hasState("协奏");
+        boolean secondState = coexistOwner.getBuffManager().hasState("转魄");
+        int coexistCount = coexistOwner.getBuffManager().countBuffs(StateBuff.class);
 
-        fire(battle, owner);
-        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
+        Assertions.assertAll("two different states coexist",
+                () -> Assertions.assertTrue(firstState, "the first state is on"),
+                () -> Assertions.assertTrue(secondState,
+                        "applying a second state must not evict the first: StateBuff.isSameKind compares names, "
+                                + "not classes (matching by class would silently evict the first state)"),
+                () -> Assertions.assertEquals(2, coexistCount, "both state buffs are attached"));
 
-        Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
-        Assertions.assertTrue(owner.getBuffManager().hasState("转魄"),
-                "applying a second state must not evict the first: StateBuff.isSameKind compares names, "
-                        + "not classes (matching by class would silently evict the first state)");
-        Assertions.assertEquals(2, owner.getBuffManager().countBuffs(StateBuff.class));
-    }
+        Battle timed = battleWith(stateOp("ALLY_ATTACK", "协奏", 1, null));
+        Character timedOwner = timed.characters().getFirst();
+        fire(timed, timedOwner);
+        boolean applied = timedOwner.getBuffManager().hasState("协奏");
+        takeTurn(timed, timedOwner);
+        boolean expired = timedOwner.getBuffManager().hasState("协奏");
 
-    @Test
-    public void theSameStateRefreshesInsteadOfStacking() {
-        Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", 2, null));
-        Character owner = battle.characters().getFirst();
+        Assertions.assertAll("a state expires after its turns",
+                () -> Assertions.assertTrue(applied, "the state is on right after it is applied"),
+                () -> Assertions.assertFalse(expired, "「lasts 1 turn」 is over after that turn"));
 
-        fire(battle, owner);
-        takeTurn(battle, owner);
-        Assertions.assertEquals(1, stateDuration(owner, "协奏"), "one turn of the duration was burned");
-
-        fire(battle, owner);
-        Assertions.assertEquals(1, owner.getBuffManager().countBuffs(StateBuff.class), "refreshed, not stacked");
-        Assertions.assertEquals(2, stateDuration(owner, "协奏"), "and the duration is back to the full 2");
-    }
-
-    // ==================================================================
-    // 3. Duration
-    // ==================================================================
-
-    @Test
-    public void aStateExpiresAfterItsTurns() {
-        Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", 1, null));
-        Character owner = battle.characters().getFirst();
-
-        fire(battle, owner);
-        Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
-
-        takeTurn(battle, owner);
-        Assertions.assertFalse(owner.getBuffManager().hasState("协奏"), "「lasts 1 turn」 is over after that turn");
-    }
-
-    @Test
-    public void aPermanentStateNeverExpires() {
-        Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", null, true));
-        Character owner = battle.characters().getFirst();
-
-        fire(battle, owner);
+        Battle permanent = battleWith(stateOp("ALLY_ATTACK", "协奏", null, true));
+        Character permanentOwner = permanent.characters().getFirst();
+        fire(permanent, permanentOwner);
         for (int turn = 0; turn < 3; turn++) {
-            takeTurn(battle, owner);
+            takeTurn(permanent, permanentOwner);
         }
-        Assertions.assertTrue(owner.getBuffManager().hasState("协奏"),
-                "permanent means until the battle ends, and nothing counts it down");
+        boolean stillThere = permanentOwner.getBuffManager().hasState("协奏");
+
+        Assertions.assertAll("a permanent state never expires",
+                () -> Assertions.assertTrue(stillThere,
+                        "permanent means until the battle ends, and nothing counts it down"));
     }
 
     // ==================================================================
-    // 4. Fail fast: every argument is validated at load time
-    // ==================================================================
-
-    @Test
-    public void anApplyBuffWithoutAStateNameIsRejectedAtLoadTime() {
-        EffectSpec noName = new EffectSpec();
-        TriggerSpecs.set(noName, "op", "APPLY_BUFF");
-        TriggerSpecs.set(noName, "turns", 2);
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, noName))));
-        Assertions.assertTrue(e.getMessage().contains("buff"), e.getMessage());
-        Assertions.assertTrue(e.getMessage().contains(TriggerSpecs.TEST_SOURCE), e.getMessage());
-    }
-
-    @Test
-    public void anApplyBuffNeedsExactlyOneDuration() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", null, null))),
-                "no duration at all");
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", 2, true))),
-                "both durations at once");
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", 0, null))),
-                "0 turns would be a state that expires the moment it is applied");
-    }
-
-    @Test
-    public void anUnknownPartyInHasStateIsRejectedAtLoadTime() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER,
-                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("enemy has_state 协奏"), gain(1)))));
-        Assertions.assertTrue(e.getMessage().contains("enemy"), e.getMessage());
-        Assertions.assertTrue(e.getMessage().contains("self"), "the message must list the known parties");
-    }
-
-    @Test
-    public void hasStateWithoutANameIsRejectedAtLoadTime() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER,
-                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("self has_state"), gain(1)))));
-        Assertions.assertTrue(e.getMessage().contains("has_state"), e.getMessage());
-    }
-
-    // ==================================================================
-    // 3b. `REMOVE_STATE` - the other half of the state pair
+    // 3. `REMOVE_STATE` - the other half of the state pair
     // ==================================================================
 
     /**
-     * The state comes off, and the removal is the same vocabulary as the test: `APPLY_BUFF` writes the name,
-     * `has_state` reads it, `REMOVE_STATE` takes it away.
+     * The state comes off, and the removal is the same vocabulary as the test: {@code APPLY_BUFF} writes the name,
+     * {@code has_state} reads it, {@code REMOVE_STATE} takes it away. Only the named state goes - the DoT spelling
+     * is understood, other states are untouched, and removing one that is not there is quiet rather than a failure.
      */
     @Test
-    public void removeStateTakesTheNamedStateOff() {
+    public void removeStateOnlyTakesTheNamedStateOff() {
         // Two different events so the two halves can be observed separately; on one event the table would apply and
         // remove the state within the same fire, which would prove nothing about either.
-        Battle battle = battleWith(
+        Battle oneState = battleWith(
                 stateOp("ALLY_ATTACK", "蒙福者", 3, null),
                 removeStateOn("SKILL_CAST", "蒙福者"));
-        Character owner = battle.characters().getFirst();
+        Character oneStateOwner = oneState.characters().getFirst();
+        int applyCount = fire(oneState, oneStateOwner);
+        boolean onAfterApply = oneStateOwner.getBuffManager().hasState("蒙福者");
+        int removeCount = fire(oneState, oneStateOwner, TriggerEvent.SKILL_CAST);
+        boolean offAfterRemove = oneStateOwner.getBuffManager().hasState("蒙福者");
 
-        Assertions.assertEquals(1, fire(battle, owner), "the state was applied");
-        Assertions.assertTrue(owner.getBuffManager().hasState("蒙福者"), "precondition: it is on");
-        Assertions.assertEquals(1, fire(battle, owner, TriggerEvent.SKILL_CAST), "and then removed");
-        Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"), "「removes ... the state」");
-    }
+        Assertions.assertAll("REMOVE_STATE takes the named state off",
+                () -> Assertions.assertEquals(1, applyCount, "the state was applied"),
+                () -> Assertions.assertTrue(onAfterApply, "precondition: it is on"),
+                () -> Assertions.assertEquals(1, removeCount, "and then removed"),
+                () -> Assertions.assertFalse(offAfterRemove, "「removes ... the state」"));
 
-    /**
-     * Only the named state goes: other states on the same unit are untouched.
-     *
-     * <p>Pinned because the cheap implementation - "remove the first buff that is a StateBuff" - would pass the case
-     * above and take somebody else's state off, which is a wrong state with nothing to report (a defect this project
-     * refuses to carry).
-     */
-    @Test
-    public void removeStateLeavesOtherStatesAlone() {
-        Battle battle = battleWith(
+        Battle twoStates = battleWith(
                 stateOp("ALLY_ATTACK", "协奏", 3, null),
                 stateOp("ALLY_ATTACK", "转魄", 3, null),
                 removeStateOn("SKILL_CAST", "协奏"));
-        Character owner = battle.characters().getFirst();
+        Character twoStatesOwner = twoStates.characters().getFirst();
+        fire(twoStates, twoStatesOwner);
+        fire(twoStates, twoStatesOwner, TriggerEvent.SKILL_CAST);
+        boolean namedGone = twoStatesOwner.getBuffManager().hasState("协奏");
+        boolean otherStateStays = twoStatesOwner.getBuffManager().hasState("转魄");
 
-        fire(battle, owner);
-        fire(battle, owner, TriggerEvent.SKILL_CAST);
+        Assertions.assertAll("REMOVE_STATE leaves other states alone",
+                () -> Assertions.assertFalse(namedGone, "the named one is gone"),
+                () -> Assertions.assertTrue(otherStateStays, "the other one is not"));
 
-        Assertions.assertFalse(owner.getBuffManager().hasState("协奏"), "the named one is gone");
-        Assertions.assertTrue(owner.getBuffManager().hasState("转魄"), "the other one is not");
-    }
+        Battle dotBattle = battleWith(removeStateOn("ALLY_ATTACK", "dot:shock"));
+        Character dotOwner = dotBattle.characters().getFirst();
+        dotOwner.getBuffManager().addBuff(new DotBuff(dotOwner, DamageElement.THUNDER, 100, 2));
+        boolean dotOn = dotOwner.getBuffManager().hasState("dot:shock");
+        fire(dotBattle, dotOwner);
+        boolean dotOff = dotOwner.getBuffManager().hasState("dot:shock");
 
-    /**
-     * The four DoT spellings resolve the same way here as they do in {@code has_state}.
-     *
-     * <p>"shocked" is not a {@code StateBuff} - the engine has represented the four damage-over-time states as an
-     * ordinary {@code DotBuff(element)} from the start, and {@code BuffManager} is the one place that knows the two
-     * spellings are the same fact. Removing is the side where forgetting that would be invisible: the state would
-     * simply stay on, and the rule would look like it ran.
-     */
-    @Test
-    public void removeStateUnderstandsTheDotSpelling() {
-        Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "dot:shock"));
-        Character owner = battle.characters().getFirst();
-        owner.getBuffManager().addBuff(new DotBuff(owner, DamageElement.THUNDER, 100, 2));
-        Assertions.assertTrue(owner.getBuffManager().hasState("dot:shock"), "precondition: the thunder DoT is on");
+        Assertions.assertAll("REMOVE_STATE understands the DoT spelling",
+                () -> Assertions.assertTrue(dotOn, "precondition: the thunder DoT is on"),
+                () -> Assertions.assertFalse(dotOff,
+                        "「removes ... the state」 works on the DoT names too -- one name, one meaning"));
 
-        fire(battle, owner);
+        Battle quietBattle = battleWith(removeStateOn("ALLY_ATTACK", "蒙福者"));
+        Character quietOwner = quietBattle.characters().getFirst();
+        int quietCount = fire(quietBattle, quietOwner);
+        boolean neverThere = quietOwner.getBuffManager().hasState("蒙福者");
 
-        Assertions.assertFalse(owner.getBuffManager().hasState("dot:shock"),
-                "「removes ... the state」 works on the DoT names too -- one name, one meaning");
-    }
-
-    /**
-     * Removing a state that is not there is nothing to do, not a failure.
-     */
-    @Test
-    public void removingAStateThatIsNotThereIsQuiet() {
-        Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "蒙福者"));
-        Character owner = battle.characters().getFirst();
-
-        Assertions.assertEquals(1, fire(battle, owner), "the rule runs; there was simply nothing to take off");
-        Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"));
-    }
-
-    /**
-     * The op takes the state off entirely, so a count is refused rather than silently ignored.
-     */
-    @Test
-    public void removeStateRefusesAnAmount() {
-        EffectSpec effect = new EffectSpec();
-        TriggerSpecs.set(effect, "op", "REMOVE_STATE");
-        TriggerSpecs.set(effect, "buff", "蒙福者");
-        TriggerSpecs.set(effect, "amount", 1.0);
-
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
-
-        Assertions.assertTrue(refused.getMessage().contains("amount"), refused.getMessage());
-    }
-
-    /**
-     * …and the name is required, like every other op that names something.
-     */
-    @Test
-    public void removeStateRequiresTheStateName() {
-        EffectSpec effect = new EffectSpec();
-        TriggerSpecs.set(effect, "op", "REMOVE_STATE");
-
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
-
-        Assertions.assertTrue(refused.getMessage().contains("buff"), refused.getMessage());
+        Assertions.assertAll("removing a state that is not there is quiet",
+                () -> Assertions.assertEquals(1, quietCount, "the rule runs; there was simply nothing to take off"),
+                () -> Assertions.assertFalse(neverThere, "nothing was there to remove"));
     }
 
     // ==================================================================
-    // 3c. `is_ally` - which SIDE the unit the event names is on
+    // 4. `is_ally` - which SIDE the unit the event names is on
     // ==================================================================
 
     /**
-     * {@code target is_ally} is true for one of ours and false for an enemy.
+     * {@code target is_ally} is true for one of ours and false for an enemy; {@code !target is_ally} is the opposite
+     * and - like every negated party condition - fails with no target.
      *
      * <p>The condition exists for "when casting the ultimate on <b>one of our own characters</b>" (relic sets 114/118/121): a cast event carries the
      * unit it AIMED at, and a damaging cast aimed at an enemy carries one too - so without the side test the rule
@@ -341,48 +275,36 @@ public class TriggerStateTest {
         Character ally = battle.characters().get(1);
         Enemy enemy = dummy();
         drainSkillPoints(battle);
+        int onAlly = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0));
+        int onEnemy = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)),
-                "a teammate is on our side");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0)),
-                "…and an enemy target is not: the rule must not fire on a cast aimed at the other side");
-    }
+        Assertions.assertAll("target is_ally reads the unit's side",
+                () -> Assertions.assertEquals(1, onAlly, "a teammate is on our side"),
+                () -> Assertions.assertEquals(0, onEnemy,
+                        "…and an enemy target is not: the rule must not fire on a cast aimed at the other side"));
 
-    /**
-     * {@code !target is_ally} is the opposite, and - like every negated party condition - fails with no target.
-     */
-    @Test
-    public void isAllyNegatedIsTheOtherSide() {
-        Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("!target is_ally"), gain(1)));
-        Character owner = battle.characters().getFirst();
-        Character ally = battle.characters().get(1);
-        Enemy enemy = dummy();
-        drainSkillPoints(battle);
+        Battle negation = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("!target is_ally"), gain(1)));
+        Character negationOwner = negation.characters().getFirst();
+        Character negationAlly = negation.characters().get(1);
+        Enemy negationEnemy = dummy();
+        drainSkillPoints(negation);
+        int onEnemyNegated = negation.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negationOwner, negationEnemy, 1, 0));
+        int onAllyNegated = negation.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negationOwner, negationAlly, 1, 0));
+        int onNothingNegated = negation.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negationOwner, null, 1, 0));
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0)));
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0)));
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
-                "no target at all is not \"the other side\" either");
-    }
-
-    /**
-     * It takes no argument, so anything after the keyword is refused while the file is read.
-     */
-    @Test
-    public void isAllyTakesNoArgument() {
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER,
-                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target is_ally 我方"), gain(1)))));
-
-        Assertions.assertTrue(refused.getMessage().contains("is_ally"), refused.getMessage());
+        Assertions.assertAll("!target is_ally is the other side",
+                () -> Assertions.assertEquals(1, onEnemyNegated, "an enemy target is the other side"),
+                () -> Assertions.assertEquals(0, onAllyNegated, "a teammate is not the other side"),
+                () -> Assertions.assertEquals(0, onNothingNegated, "no target at all is not \"the other side\" either"));
     }
 
     // ==================================================================
-    // 3d. `has_same_path_ally` - a question about the PARTY
+    // 5. `has_same_path_ally` - a question about the PARTY
     // ==================================================================
 
     /**
-     * {@code self has_same_path_ally} is true when another <b>living</b> ally walks the wearer's Path.
+     * {@code self has_same_path_ally} is true when another <b>living</b> ally walks the wearer's Path;
+     * {@code !self has_same_path_ally} is the opposite (and still needs a party to look at).
      *
      * <p>Its first user is relic 314's "if there is at least one teammate on the same Path as the wearer" - the rule cannot name a Path, because
      * the relic can be worn by anybody, so it has to compare the wearer against the rest of the side. That makes it the
@@ -390,72 +312,57 @@ public class TriggerStateTest {
      */
     @Test
     public void hasSamePathAllyReadsTheParty() {
-        Battle same = withAllyOf(1013, pathRule(gain(1)));
-        drainSkillPoints(same);
-        Assertions.assertEquals(1, same.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, same.characters().getFirst(), null, 1, 0)),
-                "Herta (黑塔) is Erudition, like Himeko (姬子)");
+        Battle samePath = withAllyOf(1013, pathRule(gain(1)));
+        drainSkillPoints(samePath);
+        int withSamePath = samePath.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, samePath.characters().getFirst(), null, 1, 0));
 
-        Battle other = withAllyOf(1210, pathRule(gain(1)));
-        drainSkillPoints(other);
-        Assertions.assertEquals(0,
-                other.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, other.characters().getFirst(), null, 1, 0)),
-                "Guinaifen (桂乃芬) is Nihility: 「same Path」 does not hold");
+        Battle otherPath = withAllyOf(1210, pathRule(gain(1)));
+        drainSkillPoints(otherPath);
+        int withOtherPath = otherPath.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, otherPath.characters().getFirst(), null, 1, 0));
 
         Battle alone = battleWith(pathRule(gain(1)));
         drainSkillPoints(alone);
-        Assertions.assertEquals(0, alone.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, alone.characters().getFirst(), null, 1, 0)),
-                "nobody else on the field is not 「at least one teammate exists」");
-    }
+        int noParty = alone.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, alone.characters().getFirst(), null, 1, 0));
 
-    /**
-     * A <b>dead</b> teammate is not somebody on the field - the same reading `summonsOf` uses.
-     */
-    @Test
-    public void aDeadSamePathAllyDoesNotCount() {
-        Battle battle = withAllyOf(1013, pathRule(gain(1)));
-        Character owner = battle.characters().getFirst();
-        Character ally = battle.characters().get(1);
-        drainSkillPoints(battle);
-        ally.takeDamage(9_999_999);
-        battle.processRequests();
+        Assertions.assertAll("self has_same_path_ally reads the party",
+                () -> Assertions.assertEquals(1, withSamePath,
+                        "Herta (黑塔) is Erudition, like Himeko (姬子)"),
+                () -> Assertions.assertEquals(0, withOtherPath,
+                        "Guinaifen (桂乃芬) is Nihility: 「same Path」 does not hold"),
+                () -> Assertions.assertEquals(0, noParty,
+                        "nobody else on the field is not 「at least one teammate exists」"));
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
-                "a corpse is not 「a teammate on the same Path as the wearer」");
-    }
+        Battle deadAlly = withAllyOf(1013, pathRule(gain(1)));
+        Character deadAllyOwner = deadAlly.characters().getFirst();
+        Character dead = deadAlly.characters().get(1);
+        drainSkillPoints(deadAlly);
+        dead.takeDamage(9_999_999);
+        deadAlly.processRequests();
+        int withCorpse = deadAlly.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, deadAllyOwner, null, 1, 0));
 
-    /**
-     * {@code !self has_same_path_ally} is the opposite (and still needs a party to look at).
-     */
-    @Test
-    public void hasSamePathAllyCanBeNegated() {
-        Battle battle = withAllyOf(1210, pathRule(gain(1)));
-        Character owner = battle.characters().getFirst();
-        drainSkillPoints(battle);
+        Assertions.assertAll("a dead same-Path ally does not count",
+                () -> Assertions.assertEquals(0, withCorpse,
+                        "a corpse is not 「a teammate on the same Path as the wearer」"));
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
-                "precondition: no teammate shares the Path, so the positive spelling is silent");
+        Battle positivePrecondition = withAllyOf(1210, pathRule(gain(1)));
+        Character positiveOwner = positivePrecondition.characters().getFirst();
+        drainSkillPoints(positivePrecondition);
+        int positiveSilent = positivePrecondition.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, positiveOwner, null, 1, 0));
 
         Battle negated = withAllyOf(1210,
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!self has_same_path_ally"), gain(1)));
         drainSkillPoints(negated);
-        Assertions.assertEquals(1,
-                negated.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negated.characters().getFirst(), null, 1, 0)));
-    }
+        int negatedHolds = negated.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negated.characters().getFirst(), null, 1, 0));
 
-    /**
-     * The question is about MY side, so no other subject (and no argument) is accepted.
-     */
-    @Test
-    public void hasSamePathAllyTakesNoOtherSubject() {
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(
-                        TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_same_path_ally"), gain(1)))));
-
-        Assertions.assertTrue(refused.getMessage().contains("has_same_path_ally"), refused.getMessage());
+        Assertions.assertAll("!self has_same_path_ally is the opposite",
+                () -> Assertions.assertEquals(0, positiveSilent,
+                        "precondition: no teammate shares the Path, so the positive spelling is silent"),
+                () -> Assertions.assertEquals(1, negatedHolds,
+                        "the negated spelling holds when nobody shares the Path"));
     }
 
     // ==================================================================
-    // 3e. `has_weakness` - a property only an ENEMY has
+    // 6. `has_weakness` - a property only an ENEMY has
     // ==================================================================
 
     /**
@@ -473,33 +380,23 @@ public class TriggerStateTest {
         Enemy resistant = dummy();
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, weak, 1, 0)),
-                "a fire-weak enemy");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, resistant, 1, 0)),
-                "an enemy with no fire weakness");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
-                "a character has no weakness bar at all");
-    }
+        int onWeak = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, weak, 1, 0));
+        int onResistant = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, resistant, 1, 0));
+        int onCharacter = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0));
 
-    /**
-     * A misspelled element is refused while the file is read, and the message lists the vocabulary.
-     */
-    @Test
-    public void anUnknownWeaknessElementIsRefused() {
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER,
-                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_weakness Fyre"), gain(1)))));
-
-        Assertions.assertTrue(refused.getMessage().contains("Fyre"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("FIRE"), refused.getMessage());
+        Assertions.assertAll("target has_weakness reads the enemy's bar",
+                () -> Assertions.assertEquals(1, onWeak, "a fire-weak enemy"),
+                () -> Assertions.assertEquals(0, onResistant, "an enemy with no fire weakness"),
+                () -> Assertions.assertEquals(0, onCharacter, "a character has no weakness bar at all"));
     }
 
     // ==================================================================
-    // 3f. `has_skill` - "that party carries this slot at all" (8009/8010)
+    // 7. `has_skill` - "that party carries this slot at all" (8009/8010)
     // ==================================================================
 
     /**
-     * {@code target has_skill ELATION_SKILL} reads the <b>named party's kit</b>, not the owner's.
+     * {@code target has_skill ELATION_SKILL} reads the <b>named party's kit</b>, not the owner's;
+     * {@code !target has_skill ELATION_SKILL} is the document's second branch.
      *
      * <p>The discrimination is one slot asked about two units: 8010 carries the Elation skill (data slot 20) and
      * Himeko (姬子) does not, while <b>both</b> carry {@code COMMON}. So a wrong implementation that read the owner's kit, or
@@ -518,70 +415,54 @@ public class TriggerStateTest {
         Character elation = battle.characters().get(1);
         drainSkillPoints(battle);
 
-        Assertions.assertTrue(elation.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded(),
-                "precondition: 8010's slot 20 is a REAL row, which is what the condition asks about");
-        Assertions.assertFalse(owner.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded(),
-                "precondition: Himeko (姬子) CARRIES the key too (the builder fills every intrinsic slot) -- its row is the "
-                        + "loader's not-found placeholder, so 'the slot is there' and 'she has the skill' differ, "
-                        + "and only the second is the question");
-        Assertions.assertTrue(owner.getSkills().get(SkillType.COMMON).getData().isLoaded(),
-                "precondition: and her COMMON row is real, so the two units differ in exactly one slot");
-
-        Assertions.assertEquals(2, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0)),
-                "8010 has both slots, so both rules run");
-        Assertions.assertEquals(3, battle.getSkillPoints(), "and each granted its own amount (1 + 2)");
-
+        boolean elationLoaded = elation.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded();
+        boolean ownerElationLoaded = owner.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded();
+        boolean ownerCommonLoaded = owner.getSkills().get(SkillType.COMMON).getData().isLoaded();
+        int onElation = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0));
+        int pointsAfterElation = battle.getSkillPoints();
         drainSkillPoints(battle);
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
-                "Himeko (姬子) has COMMON but no Elation skill: only the second rule runs");
-        Assertions.assertEquals(2, battle.getSkillPoints(),
-                "and only ITS amount lands (2, measured from a drained bar so no cap can hide the difference)");
-    }
+        int onOwner = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0));
+        int pointsAfterOwner = battle.getSkillPoints();
 
-    /**
-     * The other polarity: {@code !target has_skill ELATION_SKILL} is the document's second branch.
-     *
-     * <p>Both directions in one case, because "it fires for the unit without the skill" and "it does not fire for the
-     * unit with it" are two claims, and a wrong implementation satisfies either alone. The {@code !} prefix is
-     * available because {@code HasSkill} reads a party - the same rule {@code has_path} follows.
-     */
-    @Test
-    public void hasSkillNegationIsTheOtherBranch() {
-        Battle battle = withAllyOf(8010,
+        Assertions.assertAll("target has_skill asks the named party's kit",
+                () -> Assertions.assertTrue(elationLoaded,
+                        "precondition: 8010's slot 20 is a REAL row, which is what the condition asks about"),
+                () -> Assertions.assertFalse(ownerElationLoaded,
+                        "precondition: Himeko (姬子) CARRIES the key too (the builder fills every intrinsic slot) -- its row is the "
+                                + "loader's not-found placeholder, so 'the slot is there' and 'she has the skill' differ, "
+                                + "and only the second is the question"),
+                () -> Assertions.assertTrue(ownerCommonLoaded,
+                        "precondition: and her COMMON row is real, so the two units differ in exactly one slot"),
+                () -> Assertions.assertEquals(2, onElation,
+                        "8010 has both slots, so both rules run"),
+                () -> Assertions.assertEquals(3, pointsAfterElation, "and each granted its own amount (1 + 2)"),
+                () -> Assertions.assertEquals(1, onOwner,
+                        "Himeko (姬子) has COMMON but no Elation skill: only the second rule runs"),
+                () -> Assertions.assertEquals(2, pointsAfterOwner,
+                        "and only ITS amount lands (2, measured from a drained bar so no cap can hide the difference)"));
+
+        Battle negation = withAllyOf(8010,
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_skill ELATION_SKILL"), gain(1)));
-        Character owner = battle.characters().getFirst();
-        Character elation = battle.characters().get(1);
-        drainSkillPoints(battle);
+        Character negationOwner = negation.characters().getFirst();
+        Character negationElation = negation.characters().get(1);
+        drainSkillPoints(negation);
+        int negatedOnOwner = negation.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negationOwner, negationOwner, 1, 0));
+        int negatedOnElation = negation.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negationOwner, negationElation, 1, 0));
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
-                "Himeko (姬子) has no Elation skill, so the negated condition holds");
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0)),
-                "8010 HAS one, so it must not");
-    }
-
-    /**
-     * Note: A slot that is not a {@link SkillType} is refused where the file is read.
-     *
-     * <p>The wrong spelling in this case is not hypothetical: {@code ELATION} is a {@code DamageType} constant, and
-     * writing it here reads perfectly - "elation" - while naming nothing the kit can carry. The message has to name
-     * both the bad spelling and the right one, or the author is left with "unknown skill".
-     */
-    @Test
-    public void anUnknownSkillSlotIsRefused() {
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER, List.of(
-                        TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_skill ELATION"), gain(1)))));
-
-        Assertions.assertTrue(refused.getMessage().contains("ELATION"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("ELATION_SKILL"), refused.getMessage());
+        Assertions.assertAll("!target has_skill is the other branch",
+                () -> Assertions.assertEquals(1, negatedOnOwner,
+                        "Himeko (姬子) has no Elation skill, so the negated condition holds"),
+                () -> Assertions.assertEquals(0, negatedOnElation,
+                        "8010 HAS one, so it must not"));
     }
 
     // ==================================================================
-    // 4. `has_path` and the `!` prefix
+    // 8. `has_path` and the `!` prefix
     // ==================================================================
 
     /**
      * {@code has_path} reads the Path off the named party - Himeko (姬子) is Erudition and Tingyun (停云) is Harmony.
+     * {@code !} inverts the condition, and a negated condition still <b>fails</b> when its party does not exist.
      *
      * <p>Same shape as {@code has_state}: the left side names a party, so "the target is on this Path" and
      * "I am on this Path" are the same mechanism. The Path itself is engine knowledge already
@@ -595,77 +476,175 @@ public class TriggerStateTest {
         Character owner = battle.characters().getFirst();
         Character harmony = battle.characters().get(1);
         drainSkillPoints(battle);
+        int matched = battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0));
+        int points = battle.getSkillPoints();
 
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0)),
-                "Tingyun (停云) is Harmony: only the first rule matches");
-        Assertions.assertEquals(1, battle.getSkillPoints(), "and it is the one that granted a point");
-    }
+        Assertions.assertAll("target has_path reads the named party's Path",
+                () -> Assertions.assertEquals(1, matched,
+                        "Tingyun (停云) is Harmony: only the first rule matches"),
+                () -> Assertions.assertEquals(1, points, "and it is the one that granted a point"));
 
-    /**
-     * A near miss is refused where the file is read, and the message lists the vocabulary.
-     */
-    @Test
-    public void anUnknownPathNameIsRefused() {
-        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER,
-                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 同谐谐"), gain(1)))));
-
-        Assertions.assertTrue(rejected.getMessage().contains("同谐谐"), rejected.getMessage());
-        Assertions.assertTrue(rejected.getMessage().contains("同谐"), rejected.getMessage());
-    }
-
-    /**
-     * {@code !} inverts the condition - the exception Sunday (星期日)'s Skill is written as.
-     *
-     * <p>Both directions in one case, because "it fires for the other Path" and "it does not fire for Harmony" are
-     * two different claims and a wrong implementation can satisfy either alone.
-     */
-    @Test
-    public void negationInvertsTheCondition() {
-        Battle battle = withAlly(
+        Battle negation = withAlly(
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
-        Character owner = battle.characters().getFirst();
-        Character harmony = battle.characters().get(1);
-        drainSkillPoints(battle);
+        Character negationOwner = negation.characters().getFirst();
+        Character negationHarmony = negation.characters().get(1);
+        drainSkillPoints(negation);
+        int negatedOnHarmony = negation.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negationOwner, negationHarmony, 1, 0));
+        int negatedOnOwner = negation.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, negationOwner, negationOwner, 1, 0));
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0)),
-                "the target IS Harmony, so the negated condition fails");
-        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0)),
-                "Himeko (姬子) is Erudition, so it holds");
-    }
+        Assertions.assertAll("!target has_path inverts the condition",
+                () -> Assertions.assertEquals(0, negatedOnHarmony,
+                        "the target IS Harmony, so the negated condition fails"),
+                () -> Assertions.assertEquals(1, negatedOnOwner,
+                        "Himeko (姬子) is Erudition, so it holds"));
 
-    /**
-     * Note: A negated condition still <b>fails</b> when its party does not exist.
-     *
-     * <p>This is the trap the prefix could have walked into: the positive spelling guarantees "a missing party is
-     * never the accidental reason a rule matched" (a missing party reads as {@code false}), and a naive
-     * {@code !inner.test(ctx)} would invert exactly that into {@code true}. {@code Negated} asks the inner
-     * condition for its party first, and this case is what pins it.
-     */
-    @Test
-    public void negatedConditionStillFailsWhenThePartyIsMissing() {
-        Battle battle = battleWith(
+        Battle missing = battleWith(
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
-        Character owner = battle.characters().getFirst();
-        drainSkillPoints(battle);
+        Character missingOwner = missing.characters().getFirst();
+        drainSkillPoints(missing);
+        int withoutTarget = missing.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, missingOwner, null, 1, 0));
 
-        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
-                "there is no target for this event: the negation must not turn that into a match");
+        Assertions.assertAll("a negated condition still fails when the party is missing",
+                () -> Assertions.assertEquals(0, withoutTarget,
+                        "there is no target for this event: the negation must not turn that into a match"));
     }
 
+    // ==================================================================
+    // 9. Fail fast: the effect arguments are validated at load time
+    // ==================================================================
+
     /**
-     * Note: Only a party-reading condition may be negated, and the message says what to write instead.
-     *
-     * <p>For a number, "cannot read it" and "is zero" are different facts ({@code NaN} comparisons are all false,
-     * so {@code !(NaN > 0)} is <b>true</b>), and the DSL already has the honest spelling for the second one.
+     * {@code APPLY_BUFF} needs one state name and exactly one duration; {@code REMOVE_STATE} needs a name and refuses
+     * an amount. All of it is rejected while the table is constructed, before a battle can run.
      */
     @Test
-    public void negatingANumberIsRefused() {
-        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(OWNER,
-                        List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("!self_summon_count >= 1"), gain(1)))));
+    public void effectArgumentsAreValidatedAtLoadTime() {
+        Assertions.assertAll("APPLY_BUFF and REMOVE_STATE validate their arguments at load time",
+                () -> {
+                    EffectSpec noName = new EffectSpec();
+                    TriggerSpecs.set(noName, "op", "APPLY_BUFF");
+                    TriggerSpecs.set(noName, "turns", 2);
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, noName))),
+                            "an APPLY_BUFF without a state name is rejected at load time");
+                    Assertions.assertTrue(e.getMessage().contains("buff"), e.getMessage());
+                    Assertions.assertTrue(e.getMessage().contains(TriggerSpecs.TEST_SOURCE), e.getMessage());
+                },
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", null, null))),
+                        "no duration at all"),
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", 2, true))),
+                        "both durations at once"),
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", 0, null))),
+                        "0 turns would be a state that expires the moment it is applied"),
+                () -> {
+                    EffectSpec withAmount = new EffectSpec();
+                    TriggerSpecs.set(withAmount, "op", "REMOVE_STATE");
+                    TriggerSpecs.set(withAmount, "buff", "蒙福者");
+                    TriggerSpecs.set(withAmount, "amount", 1.0);
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, withAmount))),
+                            "REMOVE_STATE refuses an amount");
+                    Assertions.assertTrue(refused.getMessage().contains("amount"), refused.getMessage());
+                },
+                () -> {
+                    EffectSpec noBuff = new EffectSpec();
+                    TriggerSpecs.set(noBuff, "op", "REMOVE_STATE");
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, noBuff))),
+                            "REMOVE_STATE requires the state name");
+                    Assertions.assertTrue(refused.getMessage().contains("buff"), refused.getMessage());
+                });
+    }
 
-        Assertions.assertTrue(rejected.getMessage().contains("self_summon_count == 0"), rejected.getMessage());
+    // ==================================================================
+    // 10. Fail fast: the `has_state` arguments are validated at load time
+    // ==================================================================
+
+    /**
+     * {@code has_state} validates its party and its name at load time: an unknown party is refused with the known
+     * parties listed, and a missing name is refused with the condition named.
+     */
+    @Test
+    public void hasStateArgumentsAreValidatedAtLoadTime() {
+        Assertions.assertAll("has_state validates its party and its name at load time",
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER,
+                                    List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("enemy has_state 协奏"), gain(1)))),
+                            "an unknown party in has_state is rejected at load time");
+                    Assertions.assertTrue(e.getMessage().contains("enemy"), e.getMessage());
+                    Assertions.assertTrue(e.getMessage().contains("self"), "the message must list the known parties");
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER,
+                                    List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("self has_state"), gain(1)))),
+                            "has_state without a name is rejected at load time");
+                    Assertions.assertTrue(e.getMessage().contains("has_state"), e.getMessage());
+                });
+    }
+
+    // ==================================================================
+    // 11. Fail fast: the remaining condition vocabulary is validated
+    // ==================================================================
+
+    /**
+     * Every other condition argument is validated where the file is read, and each message names the bad spelling and
+     * the right one: {@code is_ally} takes no argument, {@code has_same_path_ally} takes no other subject,
+     * {@code has_weakness} and {@code has_skill} and {@code has_path} list their vocabulary, and a number cannot be
+     * negated (the honest spelling is the comparison).
+     */
+    @Test
+    public void conditionVocabularyIsValidatedAtLoadTime() {
+        Assertions.assertAll("every condition argument is validated while the file is read",
+                () -> {
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER,
+                                    List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target is_ally 我方"), gain(1)))),
+                            "is_ally takes no argument");
+                    Assertions.assertTrue(refused.getMessage().contains("is_ally"), refused.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER, List.of(
+                                    TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_same_path_ally"), gain(1)))),
+                            "has_same_path_ally takes no other subject");
+                    Assertions.assertTrue(refused.getMessage().contains("has_same_path_ally"), refused.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER,
+                                    List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_weakness Fyre"), gain(1)))),
+                            "an unknown weakness element is refused");
+                    Assertions.assertTrue(refused.getMessage().contains("Fyre"), refused.getMessage());
+                    Assertions.assertTrue(refused.getMessage().contains("FIRE"), refused.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER, List.of(
+                                    TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_skill ELATION"), gain(1)))),
+                            "an unknown skill slot is refused");
+                    Assertions.assertTrue(refused.getMessage().contains("ELATION"), refused.getMessage());
+                    Assertions.assertTrue(refused.getMessage().contains("ELATION_SKILL"), refused.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER,
+                                    List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 同谐谐"), gain(1)))),
+                            "an unknown Path name is refused");
+                    Assertions.assertTrue(rejected.getMessage().contains("同谐谐"), rejected.getMessage());
+                    Assertions.assertTrue(rejected.getMessage().contains("同谐"), rejected.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> new TriggerTable(OWNER, List.of(
+                                    TriggerSpecs.rule("ALLY_ATTACK", List.of("!self_summon_count >= 1"), gain(1)))),
+                            "negating a number is refused");
+                    Assertions.assertTrue(rejected.getMessage().contains("self_summon_count == 0"), rejected.getMessage());
+                });
     }
 
     // ==================================================================

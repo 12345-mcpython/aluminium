@@ -22,21 +22,58 @@ import java.util.List;
  * physical reduces it);
  * Himeko 1003's basic attack Fire has toughness reduction {@code single=30}, her skill Blast Fire has
  * {@code single=60 / spread=30}.
+ *
+ * <p><b>L3:</b> the single-clause cases that share one fixture are grouped into the six scenarios below,
+ * one {@code assertAll} per scenario so a failing clause still names itself. The non-weakness hit, the
+ * blast, the AoE and the bounce each rest on their own fixture (a different attacker, or a different
+ * enemy layout), so each of those stays its own scenario; no rejection path is involved here.
  */
 public class ToughnessBattleTest {
     private static final double EPS = 1e-6;
     private static final int ICE_EDGE = 1002011;
 
+    /**
+     * One Himeko facing one Ice Edge: the first basic attack only halves the bar, the second empties it
+     * and breaks the enemy (paying the break energy exactly once), and a third attack on the already
+     * broken enemy does not touch the empty bar again.
+     */
     @Test
-    public void weaknessHitReducesToughnessBySkillStanceValue() {
+    public void weaknessHitsReduceToughnessAndEmptyingItBreaksTheEnemyOnce() {
         Character himeko = character("himeko");
+        himeko.setMaxEnergy(120);
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
         Battle battle = newBattle(himeko, iceEdge);
 
-        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // basic attack Fire, toughness reduction 30
+        // first hit: basic attack Fire, toughness reduction 30
+        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
+        double stanceAfterFirstHit = iceEdge.getStance();
+        boolean brokenAfterFirstHit = iceEdge.isBroken();
 
-        Assertions.assertEquals(30, iceEdge.getStance(), EPS);
-        Assertions.assertFalse(iceEdge.isBroken(), "only half is reduced, not broken yet");
+        // second hit empties the remaining 30 → weakness break
+        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
+        double stanceAfterBreak = iceEdge.getStance();
+        boolean brokenAfterBreak = iceEdge.isBroken();
+        DamageElement breakElement = iceEdge.getBrokenElement();
+        double energyAfterBreak = himeko.getCurrentEnergy();
+
+        // third hit lands on the already broken enemy
+        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
+
+        Assertions.assertAll("weakness hit → emptied bar → break, and only once",
+                () -> Assertions.assertEquals(30, stanceAfterFirstHit, EPS,
+                        "one weakness hit reduces toughness by the skill's stance_list single 30"),
+                () -> Assertions.assertFalse(brokenAfterFirstHit, "only half is reduced, not broken yet"),
+                () -> Assertions.assertTrue(brokenAfterBreak, "emptying the toughness breaks the enemy"),
+                () -> Assertions.assertEquals(DamageElement.FIRE, breakElement,
+                        "the break records the fire weakness element"),
+                () -> Assertions.assertEquals(0, stanceAfterBreak, EPS, "the toughness bar is left at zero"),
+                () -> Assertions.assertEquals(45, energyAfterBreak, EPS,
+                        "two basic attacks 20+20 + weakness break energy gain 5"),
+                () -> Assertions.assertTrue(iceEdge.isBroken(), "the broken state survives the following hit"),
+                () -> Assertions.assertEquals(0, iceEdge.getStance(), EPS,
+                        "a broken enemy takes no further toughness damage"),
+                () -> Assertions.assertEquals(65, himeko.getCurrentEnergy(), EPS,
+                        "weakness break energy gain is granted only once: 20×3 + 5"));
     }
 
     @Test
@@ -47,39 +84,9 @@ public class ToughnessBattleTest {
 
         battle.castImmediate(new DefaultSkill(1001, 1, 1), mar7th, List.of(iceEdge));   // basic attack Ice, Ice Edge is not weak to ice
 
-        Assertions.assertEquals(60, iceEdge.getStance(), EPS, "a non-weakness hit does not reduce toughness (HSR.md §3.2)");
-    }
-
-    @Test
-    public void emptyingToughnessBreaksTheEnemyAndGrantsBreakEnergy() {
-        Character himeko = character("himeko");
-        himeko.setMaxEnergy(120);
-        Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = newBattle(himeko, iceEdge);
-
-        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
-        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
-
-        Assertions.assertTrue(iceEdge.isBroken());
-        Assertions.assertEquals(DamageElement.FIRE, iceEdge.getBrokenElement());
-        Assertions.assertEquals(0, iceEdge.getStance(), EPS);
-        Assertions.assertEquals(45, himeko.getCurrentEnergy(), EPS, "two basic attacks 20+20 + weakness break energy gain 5");
-    }
-
-    @Test
-    public void brokenEnemyTakesNoFurtherToughnessDamage() {
-        Character himeko = character("himeko");
-        himeko.setMaxEnergy(120);
-        Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = newBattle(himeko, iceEdge);
-
-        for (int i = 0; i < 3; i++) {
-            battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
-        }
-
-        Assertions.assertTrue(iceEdge.isBroken());
-        Assertions.assertEquals(0, iceEdge.getStance(), EPS);
-        Assertions.assertEquals(65, himeko.getCurrentEnergy(), EPS, "weakness break energy gain is granted only once: 20×3 + 5");
+        Assertions.assertAll("only a weakness hit reduces toughness",
+                () -> Assertions.assertEquals(60, iceEdge.getStance(), EPS,
+                        "a non-weakness hit does not reduce toughness (HSR.md §3.2)"));
     }
 
     @Test
@@ -93,10 +100,11 @@ public class ToughnessBattleTest {
 
         battle.castImmediate(new DefaultSkill(1003, 2, 1), himeko, List.of(centre));   // Blast Fire 60/30
 
-        Assertions.assertEquals(0, centre.getStance(), EPS, "centre 60 - 60");
-        Assertions.assertTrue(centre.isBroken(), "the centre is emptied → weakness break");
-        Assertions.assertEquals(30, left.getStance(), EPS, "neighbour 60 - spread 30");
-        Assertions.assertEquals(30, right.getStance(), EPS);
+        Assertions.assertAll("blast: centre gets single, neighbours get spread",
+                () -> Assertions.assertEquals(0, centre.getStance(), EPS, "centre 60 - 60"),
+                () -> Assertions.assertTrue(centre.isBroken(), "the centre is emptied → weakness break"),
+                () -> Assertions.assertEquals(30, left.getStance(), EPS, "neighbour 60 - spread 30"),
+                () -> Assertions.assertEquals(30, right.getStance(), EPS, "neighbour 60 - spread 30"));
     }
 
     @Test
@@ -108,10 +116,11 @@ public class ToughnessBattleTest {
 
         battle.castImmediate(new DefaultSkill(1003, 3, 1), himeko, List.of(first));   // ultimate AoE Fire all=60
 
-        Assertions.assertEquals(0, first.getStance(), EPS);
-        Assertions.assertTrue(first.isBroken());
-        Assertions.assertEquals(0, second.getStance(), EPS);
-        Assertions.assertTrue(second.isBroken());
+        Assertions.assertAll("AoE: every enemy takes the full all value",
+                () -> Assertions.assertEquals(0, first.getStance(), EPS, "the main target 60 - all 60"),
+                () -> Assertions.assertTrue(first.isBroken(), "the main target is emptied → weakness break"),
+                () -> Assertions.assertEquals(0, second.getStance(), EPS, "the other enemy 60 - all 60"),
+                () -> Assertions.assertTrue(second.isBroken(), "the other enemy is emptied → weakness break"));
     }
 
     /**
@@ -130,8 +139,10 @@ public class ToughnessBattleTest {
 
         battle.castImmediate(new DefaultSkill(1321, 4, 1), hero, List.of(iceEdge));
 
-        Assertions.assertEquals(51, iceEdge.getStance(), EPS, "a total of 9 spread across 5 hits: 60 - 9 = 51");
-        Assertions.assertFalse(iceEdge.isBroken(), "only 9 points in total, nowhere near emptied");
+        Assertions.assertAll("bounce: single is the total across the hits",
+                () -> Assertions.assertEquals(51, iceEdge.getStance(), EPS,
+                        "a total of 9 spread across 5 hits: 60 - 9 = 51"),
+                () -> Assertions.assertFalse(iceEdge.isBroken(), "only 9 points in total, nowhere near emptied"));
     }
 
     /**
@@ -153,11 +164,12 @@ public class ToughnessBattleTest {
         Battle battle = newBattle(himeko, iceEdge);
 
         battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // basic attack reduces 30 to 30 left
-        Assertions.assertEquals(30, iceEdge.getStance(), EPS);
+        double stanceAfterBasicAttack = iceEdge.getStance();
 
         double hpBefore = iceEdge.getCurrentHp();
         battle.castImmediate(new DefaultSkill(1003, 2, 1), himeko, List.of(iceEdge));   // skill is nominally 60 but actually reduces only 30
-        Assertions.assertTrue(iceEdge.isBroken());
+        boolean brokenAfterSkill = iceEdge.isBroken();
+        double damageDealt = hpBefore - iceEdge.getCurrentHp();
 
         double atk = himeko.getAttribute(AttributeType.ATTACK).get();
         double defenceZone = 1000.0 / (iceEdge.getAttribute(AttributeType.DEFENCE).get() + 1000.0);
@@ -170,15 +182,20 @@ public class ToughnessBattleTest {
         double expected = (skillDamage + breakDamage) * defenceZone * resistZone
                 * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
 
-        Assertions.assertEquals(expected, hpBefore - iceEdge.getCurrentHp(), 1e-6,
-                "weakness break damage uses the 30 actually reduced, not the nominal 60");
-
         // Reverse assertion: if the nominal value 60 were used by mistake the settled value would be clearly
         // larger - ensuring this case really can fail
         double wrong = (skillDamage + breakDamage * 2) * defenceZone * resistZone
                 * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
-        Assertions.assertNotEquals(wrong, hpBefore - iceEdge.getCurrentHp(), 1e-6,
-                "the result of the nominal value 60 must differ from this implementation, otherwise this test has no discriminating power");
+
+        Assertions.assertAll("break damage uses the toughness actually consumed",
+                () -> Assertions.assertEquals(30, stanceAfterBasicAttack, EPS,
+                        "the basic attack leaves 30 toughness"),
+                () -> Assertions.assertTrue(brokenAfterSkill,
+                        "the skill (nominally 60) empties the remaining 30 → weakness break"),
+                () -> Assertions.assertEquals(expected, damageDealt, 1e-6,
+                        "weakness break damage uses the 30 actually reduced, not the nominal 60"),
+                () -> Assertions.assertNotEquals(wrong, damageDealt, 1e-6,
+                        "the result of the nominal value 60 must differ from this implementation, otherwise this test has no discriminating power"));
     }
 
     private static Character character(String name) {

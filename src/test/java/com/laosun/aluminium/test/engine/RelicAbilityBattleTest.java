@@ -36,8 +36,14 @@ import com.laosun.aluminium.DoubleValue;
  * {@code resources/game/relic_sets/<setId>.json} and are attached by {@code CharacterFactory}, so a test
  * that only read the JSON would prove nothing about whether the engine executes it.
  *
+ * <p><b>L3:</b> the single-clause cases are grouped into the ten scenarios below, one {@code assertAll}
+ * per scenario so a failing clause still names itself. A clause keeps its own battle whenever it needs a
+ * different fixture (a control team, a partial suit, a fresh, uncapped stack count), so no scenario mixes
+ * one fixture's numbers into another's, and no assertion of a different observed object is folded into
+ * another's group.
+ *
  * <h2>The F-2 case</h2>
- * {@link #openingSkillPointsIncludeThePasserbyFourPiece()} is the end-to-end claim registered as
+ * {@link #passerbyOpeningSkillPointsScenario()} is the end-to-end claim registered as
  * {@code F-2}: a team wearing the Passerby of Wandering Cloud 4-piece starts
  * with <b>4</b> skill points instead of 3. It also pins the <b>ordering</b> the claim depends on -
  * the opening value is assigned when the {@link Battle} is constructed, and {@code BATTLE_START} is
@@ -125,70 +131,67 @@ public class RelicAbilityBattleTest {
     private static final double TOLERANCE = 1e-9;
 
     // ==================================================================
-    // 1. F-2: the opening skill points
+    // 1. F-2: the opening skill points (set 101)
     // ==================================================================
 
     /**
-     * A team without the set starts at 3; with one 4-piece wearer it starts at 4; with two wearers, 5.
+     * Set 101's whole opening claim in one place: a team without the set starts at 3; with one 4-piece
+     * wearer it starts at 4; with two wearers, 5; and three pieces is one short, so it stays at 3.
      *
      * <p>Each case is measured against the same team without the set, so nothing but the set bonus can
      * explain the difference.
+     *
+     * <p>The test also states the <b>ordering</b> finding: the opening value exists <b>before</b>
+     * {@code BATTLE_START} fires, and the set rule is what raises it. {@code Battle}'s constructor
+     * installs the skill-point policy (start {@link Constant#SKILL_POINT_START}); {@code startBattle()}
+     * fires {@code BATTLE_START} later. So the direction of the bonus is "3, then +1", and the
+     * observable opening value is 4. Had the trigger fired before the opening assignment, the +1 would
+     * have been overwritten and the registered F-2 claim would be unimplementable - this scenario is what
+     * catches such a reordering.
      */
     @Test
-    public void openingSkillPointsIncludeThePasserbyFourPiece() {
-        Assertions.assertEquals(3, Constant.SKILL_POINT_START, "the engine's conventional opening value");
-
+    public void passerbyOpeningSkillPointsScenario() {
         Battle control = newBattle(List.of(plain(HIMEKO), plain(HIMEKO)), true);
-        Assertions.assertEquals(3, control.getSkillPoints(),
-                "without the set the team still opens at the conventional 3");
+        int controlPoints = control.getSkillPoints();
 
         Battle one = newBattle(List.of(wearing(HIMEKO, PASSERBY), plain(HIMEKO)), true);
-        Assertions.assertEquals(4, one.getSkillPoints(),
-                "F-2: a Passerby 4-piece wearer makes the team open at 4 (3 + 1 from Ability51011)");
+        int oneWearerPoints = one.getSkillPoints();
 
         Battle two = newBattle(List.of(wearing(HIMEKO, PASSERBY), wearing(HIMEKO, PASSERBY)), true);
-        Assertions.assertEquals(5, two.getSkillPoints(),
-                "two wearers each contribute 1, capped at the conventional maximum of "
-                        + Constant.SKILL_POINT_MAX);
-    }
+        int twoWearerPoints = two.getSkillPoints();
 
-    /**
-     * The ordering finding, stated as an assertion: the opening value exists <b>before</b>
-     * {@code BATTLE_START} fires, and the set rule is what raises it.
-     *
-     * <p>{@code Battle}'s constructor installs the skill-point policy (start
-     * {@link Constant#SKILL_POINT_START}); {@code startBattle()} fires {@code BATTLE_START} later. So
-     * the direction of the bonus is "3, then +1", and the observable opening value is 4. Had the
-     * trigger fired before the opening assignment, the +1 would have been overwritten and the
-     * registered F-2 claim would be unimplementable - this test is what catches such a reordering.
-     */
-    @Test
-    public void theOpeningValueIsAssignedBeforeBattleStartFires() {
-        Battle notStarted = newBattle(List.of(wearing(HIMEKO, PASSERBY)), false);
-        Assertions.assertEquals(3, notStarted.getSkillPoints(),
-                "the conventional start value is in place before startBattle()");
-
-        notStarted.startBattle();
-        Assertions.assertEquals(4, notStarted.getSkillPoints(),
-                "BATTLE_START is fired by startBattle() and adds the set's point on top of the opening 3");
-    }
-
-    /**
-     * Three pieces is one short of the 4-piece bonus, so the team opens at 3.
-     */
-    @Test
-    public void belowTheThresholdTheOpeningValueIsUnchanged() {
         Battle threePieces = newBattle(List.of(partial(HIMEKO, PASSERBY)), true);
-        Assertions.assertEquals(3, threePieces.getSkillPoints(),
-                "three pieces of set 101 must not grant the 4-piece ability");
+        int partialPoints = threePieces.getSkillPoints();
+
+        Battle notStarted = newBattle(List.of(wearing(HIMEKO, PASSERBY)), false);
+        int pointsBeforeStart = notStarted.getSkillPoints();
+        notStarted.startBattle();
+        int pointsAfterStart = notStarted.getSkillPoints();
+
+        Assertions.assertAll("F-2: the Passerby of Wandering Cloud 4-piece raises the opening skill points",
+                () -> Assertions.assertEquals(3, Constant.SKILL_POINT_START,
+                        "the engine's conventional opening value"),
+                () -> Assertions.assertEquals(3, controlPoints,
+                        "without the set the team still opens at the conventional 3"),
+                () -> Assertions.assertEquals(4, oneWearerPoints,
+                        "F-2: a Passerby 4-piece wearer makes the team open at 4 (3 + 1 from Ability51011)"),
+                () -> Assertions.assertEquals(5, twoWearerPoints,
+                        "two wearers each contribute 1, capped at the conventional maximum of "
+                                + Constant.SKILL_POINT_MAX),
+                () -> Assertions.assertEquals(3, partialPoints,
+                        "three pieces of set 101 must not grant the 4-piece ability"),
+                () -> Assertions.assertEquals(3, pointsBeforeStart,
+                        "the conventional start value is in place before startBattle()"),
+                () -> Assertions.assertEquals(4, pointsAfterStart,
+                        "BATTLE_START is fired by startBattle() and adds the set's point on top of the opening 3"));
     }
 
     // ==================================================================
-    // 2. The three in-battle abilities
+    // 2. The three in-battle abilities (sets 104, 109, 110)
     // ==================================================================
 
     /**
-     * Set 104: after the wearer's Ultimate, +25% CRIT DMG for 2 turns.
+     * Set 104: after the wearer's Ultimate, +25% CRIT DMG for 2 turns - and three pieces grant nothing.
      *
      * <p>{@code CRIT DMG} is a <b>ratio</b> attribute, so the rule's {@code percent} is an absolute
      * addition to it (0.5 to 0.5), not a factor. That is asserted through the modifier the rule
@@ -196,28 +199,30 @@ public class RelicAbilityBattleTest {
      * number" cannot pass by accident.
      */
     @Test
-    public void ultimateCriticalDamageBonusApplies() {
+    public void glacialForestUltimateCritDamageScenario() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, GLACIAL_FOREST)), true);
         Character hero = battle.characters().getFirst();
         double before = hero.getAttribute(AttributeType.CRIT_ATTACK).get();
-
-        Assertions.assertTrue(castUltimate(battle, hero));
-
+        boolean cast = castUltimate(battle, hero);
         List<DoubleValue.Modifier> buffs = buffsOn(hero, AttributeType.CRIT_ATTACK);
-        Assertions.assertEquals(1, buffs.size(),
-                "Ability51041 must install exactly one CRIT DMG buff; the 2-piece tier of this set is "
-                        + "Ice DMG, so nothing else touches this attribute");
-        Assertions.assertEquals(GLACIAL_CRIT_DMG, buffs.getFirst().getValue(), TOLERANCE,
-                "param #1 is 0.25, and for a ratio attribute that is 25 percentage points");
-        Assertions.assertEquals(before + GLACIAL_CRIT_DMG,
-                hero.getAttribute(AttributeType.CRIT_ATTACK).get(), TOLERANCE,
-                "Ability51041: +25% CRIT DMG after the wearer's Ultimate");
+        double after = hero.getAttribute(AttributeType.CRIT_ATTACK).get();
 
         Battle partialBattle = newBattle(List.of(partial(HIMEKO, GLACIAL_FOREST)), true);
         Character control = partialBattle.characters().getFirst();
-        Assertions.assertTrue(castUltimate(partialBattle, control));
-        Assertions.assertTrue(buffsOn(control, AttributeType.CRIT_ATTACK).isEmpty(),
-                "three pieces must not grant the 4-piece ability");
+        boolean controlCast = castUltimate(partialBattle, control);
+        boolean controlUntouched = buffsOn(control, AttributeType.CRIT_ATTACK).isEmpty();
+
+        Assertions.assertAll("set 104: +25% CRIT DMG after the wearer's Ultimate",
+                () -> Assertions.assertTrue(cast, "the wearer's Ultimate really was cast"),
+                () -> Assertions.assertEquals(1, buffs.size(),
+                        "Ability51041 must install exactly one CRIT DMG buff; the 2-piece tier of this set is "
+                                + "Ice DMG, so nothing else touches this attribute"),
+                () -> Assertions.assertEquals(GLACIAL_CRIT_DMG, buffs.getFirst().getValue(), TOLERANCE,
+                        "param #1 is 0.25, and for a ratio attribute that is 25 percentage points"),
+                () -> Assertions.assertEquals(before + GLACIAL_CRIT_DMG, after, TOLERANCE,
+                        "Ability51041: +25% CRIT DMG after the wearer's Ultimate"),
+                () -> Assertions.assertTrue(controlCast, "the three-piece control's Ultimate really was cast"),
+                () -> Assertions.assertTrue(controlUntouched, "three pieces must not grant the 4-piece ability"));
     }
 
     /**
@@ -233,7 +238,7 @@ public class RelicAbilityBattleTest {
      * rather than on a simple ratio of the final value.
      */
     @Test
-    public void skillAttackBonusAppliesOnSkillButNotOnTheUltimate() {
+    public void sizzlingThunderSkillAttackScenario() {
         Battle onSkill = newBattle(List.of(wearing(HIMEKO, SIZZLING_THUNDER)), true);
         Character skillUser = onSkill.characters().getFirst();
         double skillBefore = skillUser.getAttribute(AttributeType.ATTACK).get();
@@ -241,47 +246,60 @@ public class RelicAbilityBattleTest {
                 List.of(onSkill.enemyUnits().getFirst()));
 
         List<DoubleValue.Modifier> buffs = buffsOn(skillUser, AttributeType.ATTACK);
-        Assertions.assertEquals(1, buffs.size(),
-                "Ability51091 must install exactly one ATK buff when the wearer uses their Skill");
-        Assertions.assertEquals(SIZZLING_ATTACK, buffs.getFirst().getValue(), TOLERANCE,
-                "param #1 is 0.2");
-        Assertions.assertEquals(DoubleValue.Modifier.ModifierType.ADD_PERCENT,
-                buffs.getFirst().getModifierType(),
-                "ATK is a base attribute, so the buff is an additive percentage, not a flat value");
-        Assertions.assertTrue(skillUser.getAttribute(AttributeType.ATTACK).get() > skillBefore,
-                "the buff must actually raise the attribute");
+        double skillAfter = skillUser.getAttribute(AttributeType.ATTACK).get();
 
         Battle onUltimate = newBattle(List.of(wearing(HIMEKO, SIZZLING_THUNDER)), true);
         Character ultimateUser = onUltimate.characters().getFirst();
         double ultimateBefore = ultimateUser.getAttribute(AttributeType.ATTACK).get();
-        Assertions.assertTrue(castUltimate(onUltimate, ultimateUser));
-        Assertions.assertTrue(buffsOn(ultimateUser, AttributeType.ATTACK).isEmpty(),
-                "an Ultimate is not a Skill: ULT_CAST and SKILL_CAST are mutually exclusive, so the "
-                        + "20% ATK must not arrive here");
-        Assertions.assertEquals(ultimateBefore, ultimateUser.getAttribute(AttributeType.ATTACK).get(), TOLERANCE);
+        boolean ultimateCast = castUltimate(onUltimate, ultimateUser);
+        boolean ultimateUntouched = buffsOn(ultimateUser, AttributeType.ATTACK).isEmpty();
+        double ultimateAfter = ultimateUser.getAttribute(AttributeType.ATTACK).get();
+
+        Assertions.assertAll("set 109: +20% ATK on the Skill, and not on the Ultimate",
+                () -> Assertions.assertEquals(1, buffs.size(),
+                        "Ability51091 must install exactly one ATK buff when the wearer uses their Skill"),
+                () -> Assertions.assertEquals(SIZZLING_ATTACK, buffs.getFirst().getValue(), TOLERANCE,
+                        "param #1 is 0.2"),
+                () -> Assertions.assertEquals(DoubleValue.Modifier.ModifierType.ADD_PERCENT,
+                        buffs.getFirst().getModifierType(),
+                        "ATK is a base attribute, so the buff is an additive percentage, not a flat value"),
+                () -> Assertions.assertTrue(skillAfter > skillBefore,
+                        "the buff must actually raise the attribute"),
+                () -> Assertions.assertTrue(ultimateCast, "the control's Ultimate really was cast"),
+                () -> Assertions.assertTrue(ultimateUntouched,
+                        "an Ultimate is not a Skill: ULT_CAST and SKILL_CAST are mutually exclusive, so the "
+                                + "20% ATK must not arrive here"),
+                () -> Assertions.assertEquals(ultimateBefore, ultimateAfter, TOLERANCE,
+                        "so the Ultimate leaves ATK exactly where it was"));
     }
 
     /**
-     * Set 110: after the wearer's Ultimate, their action is advanced forward by 25%.
+     * Set 110: after the wearer's Ultimate, their action is advanced forward by 25% - and three pieces
+     * leave the action bar alone.
      */
     @Test
-    public void ultimateAdvancesTheWearersAction() {
+    public void twilightEagleUltimateAdvanceScenario() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, TWILIGHT_EAGLE)), true);
         Character hero = battle.characters().getFirst();
         double remainingBefore = timeRemaining(battle, hero);
-        Assertions.assertTrue(remainingBefore > 0, "precondition: the wearer has time left before acting");
-
-        Assertions.assertTrue(castUltimate(battle, hero));
-
-        Assertions.assertEquals(remainingBefore * (1 - EAGLE_ADVANCE), timeRemaining(battle, hero), 1e-6,
-                "Ability51101: the wearer skips 25% of their remaining time to act");
+        boolean cast = castUltimate(battle, hero);
+        double remainingAfter = timeRemaining(battle, hero);
 
         Battle partialBattle = newBattle(List.of(partial(HIMEKO, TWILIGHT_EAGLE)), true);
         Character control = partialBattle.characters().getFirst();
         double controlBefore = timeRemaining(partialBattle, control);
-        Assertions.assertTrue(castUltimate(partialBattle, control));
-        Assertions.assertEquals(controlBefore, timeRemaining(partialBattle, control), 1e-6,
-                "three pieces must not grant the 4-piece ability");
+        boolean controlCast = castUltimate(partialBattle, control);
+        double controlAfter = timeRemaining(partialBattle, control);
+
+        Assertions.assertAll("set 110: after the Ultimate the wearer advances forward 25%",
+                () -> Assertions.assertTrue(remainingBefore > 0,
+                        "precondition: the wearer has time left before acting"),
+                () -> Assertions.assertTrue(cast, "the wearer's Ultimate really was cast"),
+                () -> Assertions.assertEquals(remainingBefore * (1 - EAGLE_ADVANCE), remainingAfter, 1e-6,
+                        "Ability51101: the wearer skips 25% of their remaining time to act"),
+                () -> Assertions.assertTrue(controlCast, "the three-piece control's Ultimate really was cast"),
+                () -> Assertions.assertEquals(controlBefore, controlAfter, 1e-6,
+                        "three pieces must not grant the 4-piece ability"));
     }
 
     // ==================================================================
@@ -289,11 +307,12 @@ public class RelicAbilityBattleTest {
     // ==================================================================
 
     /**
-     * Ability51051, the "attacks or is hit" ability: each application adds one stack of +5% ATK, and the
-     * sixth application changes nothing.
+     * Ability51051, the "attacks or is hit" ability: each application adds one stack of +5% ATK, the
+     * sixth application changes nothing, a shielded hit still counts, the stacks are permanent, and
+     * three pieces grant none of it.
      *
      * <p>This is the end-to-end claim for the stacking primitive and for the {@code TAKING_HIT} event at
-     * once. Two things are asserted separately because they fail differently:
+     * once. Three things are asserted separately because they fail differently:
      * <ul>
      *   <li><b>The two halves of the disjunction share one cap.</b> Four attacks plus three hits is
      *       seven applications of a 5-stack ability, so the total must be exactly 5 - which is only true
@@ -303,7 +322,8 @@ public class RelicAbilityBattleTest {
      *   <li><b>The "is hit" half is {@code TAKING_HIT}, not {@code HP_LOST}.</b> The hits taken here are
      *       <b>fully absorbed by a shield</b>, so no HP is lost: had the rule been hung on
      *       {@code HP_LOST} instead, the stack count would stop at 4. That is the exact scenario the
-     *       distinction exists for.</li>
+     *       distinction exists for, and the second (single shielded hit) fixture states it without a cap
+     *       in the way.</li>
      *   <li><b>The stacks actually reach the attribute.</b> Each one is checked to be an
      *       {@code ADD_PERCENT} of 0.05 - the kind a <b>base</b> attribute needs, because ATK is
      *       {@code base  x  (1 + sum of percentages)}: the total is deliberately <em>not</em> asserted as a
@@ -312,7 +332,7 @@ public class RelicAbilityBattleTest {
      * </ul>
      */
     @Test
-    public void streetwiseBoxingStacksOnAttackAndOnBeingHitUpToItsCap() {
+    public void streetwiseBoxingStackingScenario() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
         Character hero = battle.characters().getFirst();
         int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
@@ -323,12 +343,9 @@ public class RelicAbilityBattleTest {
             battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
                     List.of(battle.enemyUnits().getFirst()));
         }
-        Assertions.assertEquals(baseBuffs + STREETWISE_MAX_STACKS,
-                buffsOn(hero, AttributeType.ATTACK).size(),
-                "six attacks stop at the 5-stack cap from Ability51051's own text");
-        assertEachStackIsStreetwise(hero);
-        Assertions.assertTrue(hero.getAttribute(AttributeType.ATTACK).get() > attackWithoutStacks,
-                "the stacks must reach the attribute");
+        int buffsAfterSixAttacks = buffsOn(hero, AttributeType.ATTACK).size();
+        List<DoubleValue.Modifier> stacksAfterSixAttacks = buffsOn(hero, AttributeType.ATTACK);
+        double attackAfterSixAttacks = hero.getAttribute(AttributeType.ATTACK).get();
 
         // Three hits taken, all of them swallowed by a shield: the cap is already reached, so these add
         // nothing - and they prove the "is hit" half is wired, because HP_LOST never fires here.
@@ -338,99 +355,89 @@ public class RelicAbilityBattleTest {
             battle.applyDamage(hero, new Damage(battle.enemyUnits().getFirst(), hero,
                     DamageElement.PHYSICAL, 1_000));
         }
-        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE,
-                "precondition: the shield absorbed every hit, so no HP was lost");
-        Assertions.assertEquals(baseBuffs + STREETWISE_MAX_STACKS,
-                buffsOn(hero, AttributeType.ATTACK).size(),
-                "TAKING_HIT must add stacks to the SAME counter as ALLY_ATTACK, and the shared cap is 5");
-        assertEachStackIsStreetwise(hero);
-    }
+        double hpAfterShieldedHits = hero.getCurrentHp();
+        int buffsAfterShieldedHits = buffsOn(hero, AttributeType.ATTACK).size();
+        List<DoubleValue.Modifier> stacksAfterShieldedHits = buffsOn(hero, AttributeType.ATTACK);
 
-    /**
-     * The "is hit" half on its own: a shielded hit is still a hit, so it adds a stack.
-     *
-     * <p>Split from the test above because that one is already at the cap when the hits land. Here the
-     * shield guarantees {@code HP_LOST} does not fire, so a rule hung on it would leave the count at zero
-     * - which is exactly the regression this pins.
-     */
-    @Test
-    public void streetwiseBoxingStacksOnAShieldedHitAsWell() {
-        Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
-        Character hero = battle.characters().getFirst();
-        int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
-
-        battle.grantShield(hero, 10_000_000);
-        double hpBefore = hero.getCurrentHp();
-        battle.applyDamage(hero, new Damage(battle.enemyUnits().getFirst(), hero,
+        // The "is hit" half on its own: a shielded hit is still a hit, so it adds a stack.
+        Battle hitOnly = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
+        Character hitHero = hitOnly.characters().getFirst();
+        int hitOnlyBaseBuffs = buffsOn(hitHero, AttributeType.ATTACK).size();
+        hitOnly.grantShield(hitHero, 10_000_000);
+        double hitOnlyHpBefore = hitHero.getCurrentHp();
+        hitOnly.applyDamage(hitHero, new Damage(hitOnly.enemyUnits().getFirst(), hitHero,
                 DamageElement.PHYSICAL, 1_000));
+        double hitOnlyHpAfter = hitHero.getCurrentHp();
+        int buffsAfterOneShieldedHit = buffsOn(hitHero, AttributeType.ATTACK).size();
 
-        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE,
-                "precondition: the shield ate the whole hit");
-        Assertions.assertEquals(baseBuffs + 1, buffsOn(hero, AttributeType.ATTACK).size(),
-                "a hit the shield absorbed is still 'being hit', so the set must gain a stack");
+        // "For the rest of the battle": the stacks survive every turn boundary.
+        Battle lasting = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
+        Character lastingHero = lasting.characters().getFirst();
+        int lastingBaseBuffs = buffsOn(lastingHero, AttributeType.ATTACK).size();
+        lasting.castImmediate(lastingHero.getSkills().get(SkillType.COMMON), lastingHero,
+                List.of(lasting.enemyUnits().getFirst()));
+        int buffsAfterOneAttack = buffsOn(lastingHero, AttributeType.ATTACK).size();
+        for (int turn = 0; turn < 10; turn++) {
+            lasting.stepForward();
+            if (lasting.currentMove() == null) {
+                break;
+            }
+            lasting.beforeMove();
+            lasting.afterMove();
+        }
+        int buffsAfterTenTurns = buffsOn(lastingHero, AttributeType.ATTACK).size();
+        List<DoubleValue.Modifier> stacksAfterTenTurns = buffsOn(lastingHero, AttributeType.ATTACK);
+
+        // The threshold: three pieces must not grant the 4-piece ability.
+        Battle partialBattle = newBattle(List.of(partial(HIMEKO, STREETWISE_BOXING)), true);
+        Character partialHero = partialBattle.characters().getFirst();
+        double partialBaseAttack = partialHero.getAttribute(AttributeType.ATTACK).get();
+        partialBattle.castImmediate(partialHero.getSkills().get(SkillType.COMMON), partialHero,
+                List.of(partialBattle.enemyUnits().getFirst()));
+        boolean partialUntouched = buffsOn(partialHero, AttributeType.ATTACK).isEmpty();
+        double partialAttackAfter = partialHero.getAttribute(AttributeType.ATTACK).get();
+
+        Assertions.assertAll("set 105: +5% ATK per attack given or taken, up to 5 stacks",
+                () -> Assertions.assertEquals(baseBuffs + STREETWISE_MAX_STACKS, buffsAfterSixAttacks,
+                        "six attacks stop at the 5-stack cap from Ability51051's own text"),
+                () -> assertEachStackIsStreetwise(stacksAfterSixAttacks),
+                () -> Assertions.assertTrue(attackAfterSixAttacks > attackWithoutStacks,
+                        "the stacks must reach the attribute"),
+                () -> Assertions.assertEquals(hpBefore, hpAfterShieldedHits, TOLERANCE,
+                        "precondition: the shield absorbed every hit, so no HP was lost"),
+                () -> Assertions.assertEquals(baseBuffs + STREETWISE_MAX_STACKS, buffsAfterShieldedHits,
+                        "TAKING_HIT must add stacks to the SAME counter as ALLY_ATTACK, and the shared cap is 5"),
+                () -> assertEachStackIsStreetwise(stacksAfterShieldedHits),
+                () -> Assertions.assertEquals(hitOnlyHpBefore, hitOnlyHpAfter, TOLERANCE,
+                        "precondition: the shield ate the whole hit"),
+                () -> Assertions.assertEquals(hitOnlyBaseBuffs + 1, buffsAfterOneShieldedHit,
+                        "a hit the shield absorbed is still 'being hit', so the set must gain a stack"),
+                () -> Assertions.assertEquals(lastingBaseBuffs + 1, buffsAfterOneAttack,
+                        "one basic attack adds one stack"),
+                () -> Assertions.assertEquals(lastingBaseBuffs + 1, buffsAfterTenTurns,
+                        "a 'permanent' modifier has no turn limit, so no number of turns may remove it"),
+                () -> assertEachStackIsStreetwise(stacksAfterTenTurns),
+                () -> Assertions.assertTrue(partialUntouched,
+                        "three pieces is one short of the 4-piece bonus"),
+                () -> Assertions.assertEquals(partialBaseAttack, partialAttackAfter, TOLERANCE,
+                        "so the three-piece wearer's ATK is left exactly where it started"));
     }
 
     /**
      * Every installed stack carries the modifier the ability states, of the kind a base attribute needs.
      */
-    private static void assertEachStackIsStreetwise(Character hero) {
-        for (DoubleValue.Modifier modifier : buffsOn(hero, AttributeType.ATTACK)) {
-            Assertions.assertEquals(STREETWISE_ATTACK_PER_STACK, modifier.getValue(), TOLERANCE);
+    private static void assertEachStackIsStreetwise(List<DoubleValue.Modifier> stacks) {
+        for (DoubleValue.Modifier modifier : stacks) {
+            Assertions.assertEquals(STREETWISE_ATTACK_PER_STACK, modifier.getValue(), TOLERANCE,
+                    "Ability51051: each stack is +5% ATK (param #1[i] = 0.05)");
             Assertions.assertEquals(DoubleValue.Modifier.ModifierType.ADD_PERCENT,
                     modifier.getModifierType(),
                     "ATK is a base attribute, so each stack is an additive percentage");
         }
     }
 
-    /**
-     * "For the rest of the battle": the stacks survive every turn boundary.
-     *
-     * <p>The observable is the stack count after several full turns - a turn-limited modifier would
-     * have expired (and the count dropped) long before the loop ends.
-     */
-    @Test
-    public void streetwiseBoxingStacksLastForTheRestOfTheBattle() {
-        Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
-        Character hero = battle.characters().getFirst();
-        int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
-
-        battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
-                List.of(battle.enemyUnits().getFirst()));
-        Assertions.assertEquals(baseBuffs + 1, buffsOn(hero, AttributeType.ATTACK).size());
-
-        for (int turn = 0; turn < 10; turn++) {
-            battle.stepForward();
-            if (battle.currentMove() == null) {
-                break;
-            }
-            battle.beforeMove();
-            battle.afterMove();
-        }
-
-        Assertions.assertEquals(baseBuffs + 1, buffsOn(hero, AttributeType.ATTACK).size(),
-                "a 'permanent' modifier has no turn limit, so no number of turns may remove it");
-        assertEachStackIsStreetwise(hero);
-    }
-
-    /**
-     * Three pieces must not grant the 4-piece ability.
-     */
-    @Test
-    public void streetwiseBoxingNeedsAllFourPieces() {
-        Battle battle = newBattle(List.of(partial(HIMEKO, STREETWISE_BOXING)), true);
-        Character hero = battle.characters().getFirst();
-        double baseAttack = hero.getAttribute(AttributeType.ATTACK).get();
-
-        battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
-                List.of(battle.enemyUnits().getFirst()));
-
-        Assertions.assertTrue(buffsOn(hero, AttributeType.ATTACK).isEmpty(),
-                "three pieces is one short of the 4-piece bonus");
-        Assertions.assertEquals(baseAttack, hero.getAttribute(AttributeType.ATTACK).get(), TOLERANCE);
-    }
-
     // ==================================================================
-    // 6. FOLLOW_UP: City of Converging Stars (326)
+    // 4. FOLLOW_UP: City of Converging Stars (326)
     // ==================================================================
 
     /**
@@ -440,16 +447,21 @@ public class RelicAbilityBattleTest {
     private static final double CONVERGING_CRIT_DMG = 0.12;
 
     /**
-     * The wearer's own follow-up attack raises their ATK by the authored amount.
+     * The wearer's own follow-up attack raises their ATK by the authored amount; a plain basic attack
+     * leaves it alone; and "this effect cannot stack", so a second follow-up only refreshes.
      *
      * <p>This is the end-to-end proof that {@code FOLLOW_UP} has a real emitter: the event is fired from
      * {@code Battle.applyAdditionalDamage}, the rule lives in {@code resources/game/relic_sets/326.json}, and
      * neither half is visible unless both work. Asserting on the resulting <b>attribute value</b> rather
      * than on "a modifier exists" is deliberate - a rule that fired but applied nothing would pass the
      * weaker check.
+     *
+     * <p>The basic-attack control is why {@code FOLLOW_UP} exists instead of reusing {@code ALLY_ATTACK}:
+     * a rule hung on the latter would fire there too, which the set's text does not allow. The second
+     * follow-up pins the non-stacking reading - a stackable one would give +48% ATK and two modifiers.
      */
     @Test
-    public void cityOfConvergingStarsBuffsAttackOnTheWearersFollowUp() {
+    public void convergingStarsFollowUpAttackScenario() {
         Character himeko = wearing(HIMEKO, CONVERGING_STARS);
         Battle battle = newBattle(List.of(himeko), true);
         double before = himeko.getAttribute(AttributeType.ATTACK).get();
@@ -457,63 +469,55 @@ public class RelicAbilityBattleTest {
         battle.applyAdditionalDamage(himeko, battle.enemyUnits().getFirst(), DamageElement.FIRE, 100);
 
         List<DoubleValue.Modifier> buffs = buffsOn(himeko, AttributeType.ATTACK);
-        Assertions.assertEquals(1, buffs.size(),
-                "Ability53261 must install exactly one ATK buff when the wearer uses a Follow-Up ATK");
-        Assertions.assertEquals(CONVERGING_ATTACK, buffs.getFirst().getValue(), TOLERANCE, "param #1 is 0.24");
-        Assertions.assertEquals(DoubleValue.Modifier.ModifierType.ADD_PERCENT,
-                buffs.getFirst().getModifierType(),
-                "ATK is a base attribute, so the buff is an additive percentage, not a flat value");
-        Assertions.assertTrue(himeko.getAttribute(AttributeType.ATTACK).get() > before,
-                "the buff must actually raise the attribute");
+        double after = himeko.getAttribute(AttributeType.ATTACK).get();
+
+        // A follow-up attack is not just "an attack": a plain basic attack must leave the bonus alone.
+        Character basicHero = wearing(HIMEKO, CONVERGING_STARS);
+        Battle basicBattle = newBattle(List.of(basicHero), true);
+        double basicBefore = basicHero.getAttribute(AttributeType.ATTACK).get();
+        basicBattle.castImmediate(basicHero.getSkills().get(SkillType.COMMON), basicHero,
+                List.of(basicBattle.enemyUnits().getFirst()));
+        double basicAfter = basicHero.getAttribute(AttributeType.ATTACK).get();
+
+        // "This effect cannot stack": a second follow-up refreshes rather than accumulating.
+        Character stackingHero = wearing(HIMEKO, CONVERGING_STARS);
+        Battle stackingBattle = newBattle(List.of(stackingHero), true);
+        double base = stackingHero.getAttribute(AttributeType.ATTACK).get();
+        stackingBattle.applyAdditionalDamage(stackingHero, stackingBattle.enemyUnits().getFirst(),
+                DamageElement.FIRE, 100);
+        double afterFirst = stackingHero.getAttribute(AttributeType.ATTACK).get();
+        stackingBattle.applyAdditionalDamage(stackingHero, stackingBattle.enemyUnits().getFirst(),
+                DamageElement.FIRE, 100);
+        List<DoubleValue.Modifier> stackBuffs = buffsOn(stackingHero, AttributeType.ATTACK);
+        double afterSecond = stackingHero.getAttribute(AttributeType.ATTACK).get();
+
+        Assertions.assertAll("set 326: +24% ATK on the wearer's Follow-Up ATK, once",
+                () -> Assertions.assertEquals(1, buffs.size(),
+                        "Ability53261 must install exactly one ATK buff when the wearer uses a Follow-Up ATK"),
+                () -> Assertions.assertEquals(CONVERGING_ATTACK, buffs.getFirst().getValue(), TOLERANCE,
+                        "param #1 is 0.24"),
+                () -> Assertions.assertEquals(DoubleValue.Modifier.ModifierType.ADD_PERCENT,
+                        buffs.getFirst().getModifierType(),
+                        "ATK is a base attribute, so the buff is an additive percentage, not a flat value"),
+                () -> Assertions.assertTrue(after > before, "the buff must actually raise the attribute"),
+                () -> Assertions.assertEquals(basicBefore, basicAfter, TOLERANCE,
+                        "only an additional-damage instance is a follow-up attack; a basic attack is not"),
+                () -> Assertions.assertEquals(1, stackBuffs.size(),
+                        "two follow-ups must leave one modifier, not two"),
+                () -> Assertions.assertEquals(CONVERGING_ATTACK, stackBuffs.getFirst().getValue(), TOLERANCE,
+                        "the second follow-up refreshes the same bonus instead of adding another"),
+                () -> Assertions.assertEquals(afterFirst, afterSecond, TOLERANCE,
+                        "so the value after the second follow-up is the same as after the first, not higher"),
+                () -> Assertions.assertTrue(afterFirst > base,
+                        "and it really did move off the base value"));
     }
 
     /**
-     * A follow-up attack is not just "an attack": a plain basic attack must leave the bonus alone.
-     *
-     * <p>This is why {@code FOLLOW_UP} exists instead of reusing {@code ALLY_ATTACK} - a rule hung on
-     * the latter would fire here too, which the set's text does not allow.
+     * "on a kill, +12% CRIT DMG for all allies": the kill fires from the follow-up's settlement, and the
+     * bonus reaches a team-mate, not just the wearer.
      */
     @Test
-    public void aBasicAttackDoesNotCountAsAFollowUp() {
-        Character himeko = wearing(HIMEKO, CONVERGING_STARS);
-        Battle battle = newBattle(List.of(himeko), true);
-        double before = himeko.getAttribute(AttributeType.ATTACK).get();
-
-        battle.castImmediate(himeko.getSkills().get(SkillType.COMMON), himeko,
-                List.of(battle.enemyUnits().getFirst()));
-
-        Assertions.assertEquals(before, himeko.getAttribute(AttributeType.ATTACK).get(), TOLERANCE,
-                "only an additional-damage instance is a follow-up attack; a basic attack is not");
-    }
-
-    /**
-     * "This effect cannot stack" is honoured: a second follow-up refreshes rather than accumulating.
-     *
-     * <p>Worth asserting because the stacking primitive added for set 105 could easily have been applied
-     * here by reflex. A stackable reading would give +48% ATK and two modifiers.
-     */
-    @Test
-    public void theFollowUpAttackBonusDoesNotStack() {
-        Character himeko = wearing(HIMEKO, CONVERGING_STARS);
-        Battle battle = newBattle(List.of(himeko), true);
-        double base = himeko.getAttribute(AttributeType.ATTACK).get();
-
-        battle.applyAdditionalDamage(himeko, battle.enemyUnits().getFirst(), DamageElement.FIRE, 100);
-        double afterFirst = himeko.getAttribute(AttributeType.ATTACK).get();
-        battle.applyAdditionalDamage(himeko, battle.enemyUnits().getFirst(), DamageElement.FIRE, 100);
-
-        List<DoubleValue.Modifier> buffs = buffsOn(himeko, AttributeType.ATTACK);
-        Assertions.assertEquals(1, buffs.size(),
-                "two follow-ups must leave one modifier, not two");
-        Assertions.assertEquals(CONVERGING_ATTACK, buffs.getFirst().getValue(), TOLERANCE,
-                "the second follow-up refreshes the same bonus instead of adding another");
-        Assertions.assertEquals(afterFirst, himeko.getAttribute(AttributeType.ATTACK).get(), TOLERANCE,
-                "so the value after the second follow-up is the same as after the first, not higher");
-        Assertions.assertTrue(afterFirst > base, "and it really did move off the base value");
-    }
-
-    @Test
-    public void cityOfConvergingStarsGivesTheWholeTeamCritDamageOnAKill() {
+    public void convergingStarsTeamCritDamageOnKillScenario() {
         Character himeko = wearing(HIMEKO, CONVERGING_STARS);
         Character mate = plain(HIMEKO);
         Battle battle = newBattle(List.of(himeko, mate), true);
@@ -523,18 +527,20 @@ public class RelicAbilityBattleTest {
 
         // One instance big enough to kill: the KILL event fires from applyDamage's settlement.
         battle.applyAdditionalDamage(himeko, enemy, DamageElement.FIRE, ENEMY_HP * 2);
-        Assertions.assertTrue(enemy.isDeath(), "the enemy really did die, so KILL fired");
+        boolean enemyDied = enemy.isDeath();
+        double wearerAfter = himeko.getAttribute(AttributeType.CRIT_ATTACK).get();
+        double mateAfter = mate.getAttribute(AttributeType.CRIT_ATTACK).get();
 
-        Assertions.assertEquals(wearerBefore + CONVERGING_CRIT_DMG,
-                himeko.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
-                "CRIT DMG is a ratio attribute, so the value is the bonus itself (12 percentage points)");
-        Assertions.assertEquals(mateBefore + CONVERGING_CRIT_DMG,
-                mate.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
-                "'for all allies' must reach a team-mate, not just the wearer");
+        Assertions.assertAll("set 326: on a kill, +12% CRIT DMG for all allies",
+                () -> Assertions.assertTrue(enemyDied, "the enemy really did die, so KILL fired"),
+                () -> Assertions.assertEquals(wearerBefore + CONVERGING_CRIT_DMG, wearerAfter, 1e-9,
+                        "CRIT DMG is a ratio attribute, so the value is the bonus itself (12 percentage points)"),
+                () -> Assertions.assertEquals(mateBefore + CONVERGING_CRIT_DMG, mateAfter, 1e-9,
+                        "'for all allies' must reach a team-mate, not just the wearer"));
     }
 
     // ==================================================================
-    // . The follow-up-only damage boost: The Ashblazing Grand Duke (115)
+    // 5. The follow-up-only damage boost: The Ashblazing Grand Duke (115)
     // ==================================================================
 
     /**
@@ -556,19 +562,15 @@ public class RelicAbilityBattleTest {
      * buffs above fell into.
      */
     @Test
-    public void ashblazingTwoPieceRaisesFollowUpDamageAndLeavesOtherAttacksAlone() {
+    public void ashblazingFollowUpDamageScenario() {
         Battle withBoost = newBattle(List.of(wearing(HIMEKO, ASHBLAZING)), true);
         Battle withoutBoost = newBattle(List.of(wearing(HIMEKO, ASHBLAZING)), true);
         withoutBoost.characters().getFirst().getBuffManager().clearAll();
 
         Character himeko = withBoost.characters().getFirst();
-        Assertions.assertEquals(ASHBLAZING_BOOST,
-                himeko.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), TOLERANCE,
-                "the 2-piece rule grants the follow-up-only boost at battle start");
-        Assertions.assertEquals(0,
-                withoutBoost.characters().getFirst()
-                        .getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), TOLERANCE,
-                "and clearing the buffs removes it, so the control battle really is the control");
+        double boostOnWearer = himeko.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
+        double boostInControl = withoutBoost.characters().getFirst()
+                .getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
 
         // A fixed crit state keeps both battles numerically comparable.
         for (Battle battle : List.of(withBoost, withoutBoost)) {
@@ -580,11 +582,16 @@ public class RelicAbilityBattleTest {
         double normalWith = hitFor(withBoost, false);
         double normalWithout = hitFor(withoutBoost, false);
 
-        Assertions.assertTrue(followUpWith > followUpWithout,
-                "a follow-up attack must hit harder with the boost: " + followUpWith
-                        + " vs " + followUpWithout);
-        Assertions.assertEquals(normalWith, normalWithout, TOLERANCE,
-                "a basic attack must be completely unaffected: " + normalWith + " vs " + normalWithout);
+        Assertions.assertAll("set 115: +20% DMG on Follow-Up ATK, and nothing else",
+                () -> Assertions.assertEquals(ASHBLAZING_BOOST, boostOnWearer, TOLERANCE,
+                        "the 2-piece rule grants the follow-up-only boost at battle start"),
+                () -> Assertions.assertEquals(0, boostInControl, TOLERANCE,
+                        "and clearing the buffs removes it, so the control battle really is the control"),
+                () -> Assertions.assertTrue(followUpWith > followUpWithout,
+                        "a follow-up attack must hit harder with the boost: " + followUpWith
+                                + " vs " + followUpWithout),
+                () -> Assertions.assertEquals(normalWith, normalWithout, TOLERANCE,
+                        "a basic attack must be completely unaffected: " + normalWith + " vs " + normalWithout));
     }
 
     /**
@@ -603,7 +610,7 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
-    // 131 "the Navigator who sees the stars as I do" (星如我见的领航员): the stack counter that also comes back down
+    // 6. 131 "the Navigator who sees the stars as I do" (星如我见的领航员): the stack counter that also comes back down
     // ==================================================================
 
     /**
@@ -617,7 +624,8 @@ public class RelicAbilityBattleTest {
 
     /**
      * The whole 4-piece ability, in one battle: enter to 1 stack; turn start to 1 off; Skill to 1 on, up to 3;
-     * turn start to 1 off again.
+     * turn start to 1 off again - and, on a second fixture, the Ultimate's removal clause and the
+     * three-piece threshold.
      *
      * <p><b>Why this is the interesting one.</b> Every other set ability the engine has is monotonic - a buff
      * that appears, or a counter that only grows. This one says "…stacking up to 3 time(s) … removes 1
@@ -625,70 +633,74 @@ public class RelicAbilityBattleTest {
      * could only have been modelled by dropping the second half of the text, which is why it sat in
      * {@code _unmodelled.json}. Both directions are asserted here, and through a real battle, so the claim
      * "the set works" is about the engine executing the file rather than about the file existing.
+     *
+     * <p>"or after casting the Ultimate, remove 1 layer" is the other half of the removal clause, so it
+     * needs a fresh battle (the first one has already had its turn-start removals); the three-piece guard
+     * is the same threshold check the other sets carry.
      */
     @Test
-    public void navigatorStacksGrowOnSkillAndShrinkAtTheWearersTurnStart() {
+    public void navigatorStackCounterScenario() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
         Character hero = battle.characters().getFirst();
 
-        Assertions.assertEquals(1, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
-                "entering combat grants one stack of the Skill DMG boost");
-        Assertions.assertEquals(1, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size(),
-                "and one of the Ultimate DMG boost -- the text names both scopes");
-        Assertions.assertEquals(NAVIGATOR_BOOST, hero.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get(),
-                TOLERANCE, "one stack is 18%");
+        int skillStacksOnEntry = buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size();
+        int ultimateStacksOnEntry = buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size();
+        double valueOnEntry = hero.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get();
 
         takeTurnOf(battle, hero);
-        Assertions.assertEquals(0, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
-                "the start of the wearer's turn removes one -- which is exactly the stack entering combat gave");
+        int skillStacksAfterFirstTurn = buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size();
 
         for (int cast = 0; cast < NAVIGATOR_MAX_STACKS + 1; cast++) {
             castSkill(battle, hero);
         }
-        Assertions.assertEquals(NAVIGATOR_MAX_STACKS, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
-                "each Skill grants one, up to the cap of 3 -- the fourth changes nothing");
-        Assertions.assertEquals(NAVIGATOR_MAX_STACKS * NAVIGATOR_BOOST,
-                hero.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get(), TOLERANCE,
-                "and the scoped boost adds up stack by stack (one attribute per stack, removed by id)");
+        int skillStacksAfterCasts = buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size();
+        double valueAfterCasts = hero.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get();
 
         takeTurnOf(battle, hero);
-        Assertions.assertEquals(NAVIGATOR_MAX_STACKS - 1, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
-                "one comes off per turn start, so the counter never just sits at the cap");
-    }
+        int skillStacksAfterSecondTurn = buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size();
 
-    /**
-     * "or after casting the Ultimate, remove 1 layer" - the other half of the removal clause.
-     */
-    @Test
-    public void navigatorLosesAStackAfterTheWearersUltimate() {
-        Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
-        Character hero = battle.characters().getFirst();
+        Battle ultimateBattle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
+        Character ultimateHero = ultimateBattle.characters().getFirst();
+        castSkill(ultimateBattle, ultimateHero);
+        int ultimateStacksBeforeUltimate = buffsOn(ultimateHero, AttributeType.ULTIMATE_DAMAGE_BOOST).size();
+        boolean ultimateCast = castUltimate(ultimateBattle, ultimateHero);
+        int ultimateStacksAfterUltimate = buffsOn(ultimateHero, AttributeType.ULTIMATE_DAMAGE_BOOST).size();
+        int skillStacksAfterUltimate = buffsOn(ultimateHero, AttributeType.SKILL_DAMAGE_BOOST).size();
 
-        castSkill(battle, hero);
-        Assertions.assertEquals(2, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size(),
-                "precondition: one stack from entering combat, one from the Skill");
+        Battle partialBattle = newBattle(List.of(partial(HIMEKO, NAVIGATOR)), true);
+        Character partialHero = partialBattle.characters().getFirst();
+        int partialSkillStacks = buffsOn(partialHero, AttributeType.SKILL_DAMAGE_BOOST).size();
+        int partialUltimateStacks = buffsOn(partialHero, AttributeType.ULTIMATE_DAMAGE_BOOST).size();
 
-        Assertions.assertTrue(castUltimate(battle, hero));
-        Assertions.assertEquals(1, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size(),
-                "after the wearer's Ultimate, one stack of each scope comes off");
-        Assertions.assertEquals(1, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
-                "the Skill scope loses one too -- the text does not distinguish them");
-    }
-
-    /**
-     * Three pieces must not grant the 4-piece ability (the same guard the other sets have).
-     */
-    @Test
-    public void navigatorNeedsAllFourPieces() {
-        Battle battle = newBattle(List.of(partial(HIMEKO, NAVIGATOR)), true);
-        Character hero = battle.characters().getFirst();
-
-        Assertions.assertEquals(0, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size());
-        Assertions.assertEquals(0, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size());
+        Assertions.assertAll("set 131: the Skill/Ultimate DMG stack counter that grows and shrinks",
+                () -> Assertions.assertEquals(1, skillStacksOnEntry,
+                        "entering combat grants one stack of the Skill DMG boost"),
+                () -> Assertions.assertEquals(1, ultimateStacksOnEntry,
+                        "and one of the Ultimate DMG boost -- the text names both scopes"),
+                () -> Assertions.assertEquals(NAVIGATOR_BOOST, valueOnEntry, TOLERANCE, "one stack is 18%"),
+                () -> Assertions.assertEquals(0, skillStacksAfterFirstTurn,
+                        "the start of the wearer's turn removes one -- which is exactly the stack entering combat gave"),
+                () -> Assertions.assertEquals(NAVIGATOR_MAX_STACKS, skillStacksAfterCasts,
+                        "each Skill grants one, up to the cap of 3 -- the fourth changes nothing"),
+                () -> Assertions.assertEquals(NAVIGATOR_MAX_STACKS * NAVIGATOR_BOOST, valueAfterCasts, TOLERANCE,
+                        "and the scoped boost adds up stack by stack (one attribute per stack, removed by id)"),
+                () -> Assertions.assertEquals(NAVIGATOR_MAX_STACKS - 1, skillStacksAfterSecondTurn,
+                        "one comes off per turn start, so the counter never just sits at the cap"),
+                () -> Assertions.assertEquals(2, ultimateStacksBeforeUltimate,
+                        "precondition: one stack from entering combat, one from the Skill"),
+                () -> Assertions.assertTrue(ultimateCast, "the wearer's Ultimate really was cast"),
+                () -> Assertions.assertEquals(1, ultimateStacksAfterUltimate,
+                        "after the wearer's Ultimate, one stack of each scope comes off"),
+                () -> Assertions.assertEquals(1, skillStacksAfterUltimate,
+                        "the Skill scope loses one too -- the text does not distinguish them"),
+                () -> Assertions.assertEquals(0, partialSkillStacks,
+                        "three pieces must not grant the 4-piece ability: no Skill scope stack"),
+                () -> Assertions.assertEquals(0, partialUltimateStacks,
+                        "and no Ultimate scope stack either"));
     }
 
     // ==================================================================
-    // 106 "the Iron Guard that wards the wind and snow" (戍卫风雪的铁卫): a damage-taken zone the data could not reach
+    // 7. 106 "the Iron Guard that wards the wind and snow" (戍卫风雪的铁卫): a damage-taken zone the data could not reach
     // ==================================================================
 
     /**
@@ -697,81 +709,77 @@ public class RelicAbilityBattleTest {
     private static final double SNOW_REDUCTION = 0.08;
 
     /**
-     * "reduces the damage taken by 8%" - and the measurement is deliberately taken twice <b>on the same wearer in the
-     * same battle</b>: once with the buff the rule installed and once after removing it.
+     * Set 106's whole ability: the 2-piece's 8% damage reduction (measured on the same wearer with the buff
+     * and without it), the 2-piece tier's reach (three pieces are enough, none is not), and the 4-piece's
+     * "at the start of the wearer's turn, below half health, heal 8% of Max HP and give 5 Energy" - plus
+     * the same turn start doing nothing above the threshold.
      *
-     * <p>Comparing "a character wearing the set" against "a character wearing nothing" would have been
-     * meaningless here, because the relics themselves carry main and sub stats (DEF, HP) - the damage would
-     * differ for reasons that have nothing to do with the 8%. Removing one buff leaves everything else
-     * identical, so the ratio is the set's rule and nothing else. `TOLERANCE` is the same 1e-9 the other
-     * cases use.
-     */
-    @Test
-    public void guardOfSnowReducesTheDamageTheWearerTakes() {
-        Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
-        Character hero = battle.characters().getFirst();
-        Assertions.assertTrue(hero.getBuffManager().hasBuff(ReductionBuff.class),
-                "the 2-piece is attached at battle start (BATTLE_START -> MODIFY_DAMAGE_TAKEN, negative)");
-
-        double withReduction = smallHitOn(battle, hero);
-        Assertions.assertTrue(hero.getBuffManager().removeOneBuff(ReductionBuff.class),
-                "precondition: the buff is there to take off");
-        double without = smallHitOn(battle, hero);
-
-        Assertions.assertEquals(without * (1 - SNOW_REDUCTION), withReduction, TOLERANCE,
-                "8% less, in the multiplicative reduction zone");
-    }
-
-    /**
-     * It is the <b>2-piece</b> tier, so three pieces are already enough - and none of them is not.
-     */
-    @Test
-    public void guardOfSnowIsATwoPieceAbility() {
-        Battle threePieces = newBattle(List.of(partial(HIMEKO, GUARD_OF_SNOW)), true);
-        Assertions.assertTrue(threePieces.characters().getFirst().getBuffManager().hasBuff(ReductionBuff.class));
-
-        Battle none = newBattle(List.of(plain(HIMEKO)), true);
-        Assertions.assertFalse(none.characters().getFirst().getBuffManager().hasBuff(ReductionBuff.class));
-    }
-
-    /**
-     * The 4-piece: at the start of the wearer's turn, below half health, heal 8% of Max HP and give 5 Energy.
+     * <p>"reduces the damage taken by 8%" is deliberately measured twice <b>on the same wearer in the
+     * same battle</b>: once with the buff the rule installed and once after removing it. Comparing "a
+     * character wearing the set" against "a character wearing nothing" would have been meaningless here,
+     * because the relics themselves carry main and sub stats (DEF, HP) - the damage would differ for
+     * reasons that have nothing to do with the 8%. Removing one buff leaves everything else identical, so
+     * the ratio is the set's rule and nothing else. `TOLERANCE` is the same 1e-9 the other cases use.
      *
      * <p>The heal is the interesting half in engine terms: 8% of Max HP is a different number for every
      * character and level, so it is written as {@code scale: target_max_hp} rather than as a number - which is
-     * why this ability was registered as unmodellable until that spelling existed.
+     * why this ability was registered as unmodellable until that spelling existed. The two 4-piece cases
+     * are the complement of one threshold, so they share the fixture and differ only in the damage taken
+     * before the turn starts.
      */
     @Test
-    public void guardOfSnowFourPieceHealsAndGrantsEnergyBelowHalfHealth() {
+    public void guardOfSnowDamageReductionAndHealScenario() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
         Character hero = battle.characters().getFirst();
-        double maxHp = hero.getMaxHp();
-        hero.takeDamage(maxHp * 0.6);                     // down to 40%: below the threshold
-        double hpBefore = hero.getCurrentHp();
-        double energyBefore = hero.getCurrentEnergy();
+        boolean reductionAttached = hero.getBuffManager().hasBuff(ReductionBuff.class);
 
-        takeTurnOf(battle, hero);
+        double withReduction = smallHitOn(battle, hero);
+        boolean removed = hero.getBuffManager().removeOneBuff(ReductionBuff.class);
+        double without = smallHitOn(battle, hero);
 
-        Assertions.assertEquals(hpBefore + maxHp * 0.08, hero.getCurrentHp(), TOLERANCE,
-                "8% of the wearer's own Max HP, not a number from the file");
-        Assertions.assertEquals(energyBefore + 5, hero.getCurrentEnergy(), TOLERANCE, "and the text's 5 Energy");
-    }
+        Battle threePieces = newBattle(List.of(partial(HIMEKO, GUARD_OF_SNOW)), true);
+        boolean partialHasReduction = threePieces.characters().getFirst()
+                .getBuffManager().hasBuff(ReductionBuff.class);
+        Battle none = newBattle(List.of(plain(HIMEKO)), true);
+        boolean plainHasReduction = none.characters().getFirst().getBuffManager().hasBuff(ReductionBuff.class);
 
-    /**
-     * Above the threshold the same turn start does nothing at all.
-     */
-    @Test
-    public void guardOfSnowFourPieceDoesNothingAboveHalfHealth() {
-        Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
-        Character hero = battle.characters().getFirst();
-        hero.takeDamage(hero.getMaxHp() * 0.2);           // 80%: above the threshold
-        double hpBefore = hero.getCurrentHp();
-        double energyBefore = hero.getCurrentEnergy();
+        Battle lowBattle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
+        Character lowHero = lowBattle.characters().getFirst();
+        double maxHp = lowHero.getMaxHp();
+        lowHero.takeDamage(maxHp * 0.6);                  // down to 40%: below the threshold
+        double hpBefore = lowHero.getCurrentHp();
+        double energyBefore = lowHero.getCurrentEnergy();
+        takeTurnOf(lowBattle, lowHero);
+        double hpAfter = lowHero.getCurrentHp();
+        double energyAfter = lowHero.getCurrentEnergy();
 
-        takeTurnOf(battle, hero);
+        Battle highBattle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
+        Character highHero = highBattle.characters().getFirst();
+        highHero.takeDamage(highHero.getMaxHp() * 0.2);   // 80%: above the threshold
+        double highHpBefore = highHero.getCurrentHp();
+        double highEnergyBefore = highHero.getCurrentEnergy();
+        takeTurnOf(highBattle, highHero);
+        double highHpAfter = highHero.getCurrentHp();
+        double highEnergyAfter = highHero.getCurrentEnergy();
 
-        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE, "「if the HP percentage <= 50%」");
-        Assertions.assertEquals(energyBefore, hero.getCurrentEnergy(), TOLERANCE);
+        Assertions.assertAll("set 106: 8% damage reduction (2-piece) and the 8%-Max-HP heal (4-piece)",
+                () -> Assertions.assertTrue(reductionAttached,
+                        "the 2-piece is attached at battle start (BATTLE_START -> MODIFY_DAMAGE_TAKEN, negative)"),
+                () -> Assertions.assertTrue(removed, "precondition: the buff is there to take off"),
+                () -> Assertions.assertEquals(without * (1 - SNOW_REDUCTION), withReduction, TOLERANCE,
+                        "8% less, in the multiplicative reduction zone"),
+                () -> Assertions.assertTrue(partialHasReduction,
+                        "the 2-piece tier is reached by three pieces, one short of the 4-piece tier"),
+                () -> Assertions.assertFalse(plainHasReduction,
+                        "and a character wearing no set carries no reduction buff"),
+                () -> Assertions.assertEquals(hpBefore + maxHp * 0.08, hpAfter, TOLERANCE,
+                        "8% of the wearer's own Max HP, not a number from the file"),
+                () -> Assertions.assertEquals(energyBefore + 5, energyAfter, TOLERANCE,
+                        "and the text's 5 Energy"),
+                () -> Assertions.assertEquals(highHpBefore, highHpAfter, TOLERANCE,
+                        "「if the HP percentage <= 50%」"),
+                () -> Assertions.assertEquals(highEnergyBefore, highEnergyAfter, TOLERANCE,
+                        "so no Energy above the threshold either"));
     }
 
     // ==================================================================
@@ -891,5 +899,6 @@ public class RelicAbilityBattleTest {
         throw new IllegalStateException(unit.getName() + " is not on the action bar");
     }
 
-    /** Genius of Brilliant Stars (繁星璀璨的天才), 4-piece: "ignores 10% of defence when dealing damage; if the target has a quantum weakness, additionally ignores 10%". */
+    // Genius of Brilliant Stars (繁星璀璨的天才), 4-piece: "ignores 10% of defence when dealing damage;
+    // if the target has a quantum weakness, additionally ignores 10%".
 }

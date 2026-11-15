@@ -50,6 +50,10 @@ import java.util.Random;
  * the game's, it is long, and it grows with the next character. It is also why Taunt is <b>not</b> covered (it is in
  * none of the twelve) and why the class protects against exactly what the engine can apply today (three of the
  * twelve; the rest are registered).
+ *
+ * <p><b>L3:</b> the clauses that share a fixture are grouped into the four scenarios below, one {@code assertAll}
+ * per scenario so a failing clause still names itself. The taunt's own effect-resistance roll and the two load-time
+ * rejection paths stay their own tests: an {@code assertThrows} is not a positive clause and must not hide behind one.
  */
 public class DebuffResistTest {
     private static final double EPS = 1e-9;
@@ -73,125 +77,131 @@ public class DebuffResistTest {
      */
     @Test
     public void theClassResistanceRemovesThatShareOfTheChance() {
-        Assertions.assertTrue(freezeLands(0.0, 0.7), "no resistance: 0.7 < 1.0, so it lands");
-        Assertions.assertFalse(freezeLands(0.35, 0.7), "35% resisted leaves 0.65, and 0.7 is above it");
-        Assertions.assertTrue(freezeLands(0.35, 0.6), "…while 0.6 is below 0.65 and therefore still lands");
-        Assertions.assertFalse(freezeLands(1.0, 0.0), "1.0 is immunity: nothing lands, not even on a 0 roll");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(freezeLands(0.0, 0.7), "no resistance: 0.7 < 1.0, so it lands"),
+                () -> Assertions.assertFalse(freezeLands(0.35, 0.7), "35% resisted leaves 0.65, and 0.7 is above it"),
+                () -> Assertions.assertTrue(freezeLands(0.35, 0.6), "…while 0.6 is below 0.65 and therefore still lands"),
+                () -> Assertions.assertFalse(freezeLands(1.0, 0.0), "1.0 is immunity: nothing lands, not even on a 0 roll"));
     }
 
     /**
-     * The two classes do not cross: being immune to control says nothing about Burn.
-     */
-    @Test
-    public void immunityToControlDoesNotStopTheBurn() {
-        Fixture f = new Fixture(0.0, resist(1.0), TriggerSpecs.dot("Fire", 500.0, null, null, 2, null));
-
-        f.fire();
-
-        Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "「immune to control-class debuffs」 is about control, and a burn is damage-over-time class");
-    }
-
-    /**
-     * And the immunity really stops a control the rule states <b>no</b> probability for.
-     */
-    @Test
-    public void immunityStopsAControlTheRuleStatesNoProbabilityFor() {
-        Fixture f = new Fixture(0.0, resist(1.0), TriggerSpecs.applyControl("ctrl:frozen", 1, null, "target"));
-
-        f.fire();
-
-        Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(ControlBuff.class));
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("ctrl:frozen"));
-        Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "and the victim keeps its turn");
-    }
-
-    /**
-     * Two appliers add: 35% + 35% is 0%, not two independent rolls (a different curve).
-     */
-    @Test
-    public void twoResistancesOfTheSameClassAddAndClampAtOne() {
-        Fixture f = new Fixture();
-
-        f.resist(DebuffClass.CONTROL, 0.35, f.owner);
-        f.resist(DebuffClass.CONTROL, 0.35, f.applier(2));
-        Assertions.assertEquals(0.7, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
-
-        f.resist(DebuffClass.CONTROL, 0.35, f.applier(3));
-        Assertions.assertEquals(1.0, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS,
-                "0.35 × 3 = 1.05, and a resistance beyond total is still total");
-        Assertions.assertEquals(0.0, f.enemy.getBuffManager().debuffResistOf(DebuffClass.DOT), EPS,
-                "the other class is untouched");
-    }
-
-    /**
-     * Note: Identity is (class, <b>applier</b>): a re-application from one applier refreshes <b>its own</b> contribution
-     * instead of adding a second one, while the other applier's stands.
+     * What a class immunity covers: exactly the control class, and nothing else.
      *
-     * <p>That is what keeps Clara (克拉拉)'s permanent 35% ward alive when a one-turn [防火墙] (Firewall)-style immunity lands on her and
-     * later expires: with class alone as the identity, the timed 100% would replace the trace and take it with
-     * it. The numbers below are chosen so a fourth buff would be visible (0.2 + 0.3 = 0.5, and 0.2 + 0.3 + 0.2 = 0.).
+     * <p>Three clauses on the one fixture (a rule granting a full {@code percent: 1.0} class resistance): a burn is
+     * damage-over-time, not control; a control the rule states <b>no</b> probability for is still rolled and stopped;
+     * and Taunt, which is in no class, is left alone. (The taunt's own roll is a separate case below.)
      */
     @Test
-    public void reapplyingFromTheSameApplierRefreshesItsOwnContribution() {
-        Fixture f = new Fixture();
+    public void aClassImmunityCoversExactlyTheControlClass() {
+        Fixture burn = new Fixture(0.0, resist(1.0), TriggerSpecs.dot("Fire", 500.0, null, null, 2, null));
+        burn.fire();
 
-        f.resist(DebuffClass.CONTROL, 0.2, f.owner);
-        f.resist(DebuffClass.CONTROL, 0.3, f.applier(2));
-        Assertions.assertEquals(0.5, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
+        Fixture unstatedControl = new Fixture(0.0, resist(1.0),
+                TriggerSpecs.applyControl("ctrl:frozen", 1, null, "target"));
+        unstatedControl.fire();
 
-        f.resist(DebuffClass.CONTROL, 0.2, f.owner);
-        Assertions.assertEquals(0.5, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS,
-                "the same applier again is a refresh, not a second contribution");
-        Assertions.assertEquals(2, f.enemy.getBuffManager().countBuffs(ClassResistBuff.class));
+        Fixture taunt = new Fixture(0.0, resist(1.0), TriggerSpecs.taunt(1));
+        taunt.fire();
 
-        f.resist(DebuffClass.CONTROL, 0.6, f.applier(2));
-        Assertions.assertEquals(0.8, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS,
-                "…and a stronger one from that applier replaces its own previous number");
-        Assertions.assertEquals(2, f.enemy.getBuffManager().countBuffs(ClassResistBuff.class));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, burn.enemy.getBuffManager().countBuffs(DotBuff.class),
+                        "「immune to control-class debuffs」 is about control, and a burn is damage-over-time class"),
+                () -> Assertions.assertEquals(0, unstatedControl.enemy.getBuffManager().countBuffs(ControlBuff.class),
+                        "a control the rule states no probability for is still stopped"),
+                () -> Assertions.assertFalse(unstatedControl.enemy.getBuffManager().hasState("ctrl:frozen"),
+                        "and the frozen state is not there"),
+                () -> Assertions.assertTrue(unstatedControl.enemy.getBuffManager().canAct(),
+                        "and the victim keeps its turn"),
+                () -> Assertions.assertEquals(1, taunt.enemy.getBuffManager().countBuffs(TauntBuff.class),
+                        "Taunt is in no class, so 「immune to the control class」 leaves it alone — the documents' 12-name list does not "
+                                + "include it"));
     }
 
     /**
-     * A timed resistance expires on its carrier's turns, like every other timed buff.
+     * How several contributions of one class relate: they <b>add</b> (35% + 35% = 70%, and 105% is still total),
+     * and each is identified by (class, <b>applier</b>) — a re-application from one applier refreshes <b>its own</b>
+     * contribution instead of adding a second one, while the other applier's stands.
+     *
+     * <p>That is what keeps Clara (克拉拉)'s permanent 35% ward alive when a one-turn [防火墙] (Firewall)-style
+     * immunity lands on her and later expires: with class alone as the identity, the timed 100% would replace the
+     * trace and take it with it. The numbers below are chosen so a fourth buff would be visible (0.2 + 0.3 = 0.5,
+     * and 0.2 + 0.3 + 0.2 = 0.).
      */
     @Test
-    public void aTimedResistanceExpires() {
-        Fixture f = new Fixture(0.0, resist(1.0, 1));
+    public void classResistanceContributionsAddAndRefreshPerApplier() {
+        // Two appliers add: 35% + 35% is 70%, not two independent rolls (a different curve); a third clamps at total.
+        Fixture adding = new Fixture();
+        adding.resist(DebuffClass.CONTROL, 0.35, adding.owner);
+        adding.resist(DebuffClass.CONTROL, 0.35, adding.applier(2));
+        double afterTwoAppliers = adding.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
+        adding.resist(DebuffClass.CONTROL, 0.35, adding.applier(3));
+        double afterThreeAppliers = adding.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
+        double otherClass = adding.enemy.getBuffManager().debuffResistOf(DebuffClass.DOT);
 
-        f.fire();
+        // Identity is the applier: the same one again refreshes its own number, a stronger one replaces it.
+        Fixture refreshing = new Fixture();
+        refreshing.resist(DebuffClass.CONTROL, 0.2, refreshing.owner);
+        refreshing.resist(DebuffClass.CONTROL, 0.3, refreshing.applier(2));
+        double afterTwoContributors = refreshing.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
+        refreshing.resist(DebuffClass.CONTROL, 0.2, refreshing.owner);
+        double afterSameApplier = refreshing.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
+        int buffsAfterSameApplier = refreshing.enemy.getBuffManager().countBuffs(ClassResistBuff.class);
+        refreshing.resist(DebuffClass.CONTROL, 0.6, refreshing.applier(2));
+        double afterStrongerApplier = refreshing.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
+        int buffsAfterStrongerApplier = refreshing.enemy.getBuffManager().countBuffs(ClassResistBuff.class);
 
-        Assertions.assertEquals(1.0, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
-        TestTurns.take(f.battle, f.enemy);
-        Assertions.assertEquals(0.0, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS,
-                "「while in the [防火墙] (Firewall) state ... immune」 lasts a turn — a buff covers both that and a permanent trace");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0.7, afterTwoAppliers, EPS, "35% + 35% adds to 70%"),
+                () -> Assertions.assertEquals(1.0, afterThreeAppliers, EPS,
+                        "0.35 × 3 = 1.05, and a resistance beyond total is still total"),
+                () -> Assertions.assertEquals(0.0, otherClass, EPS, "the other class is untouched"),
+                () -> Assertions.assertEquals(0.5, afterTwoContributors, EPS, "0.2 + 0.3 = 0.5"),
+                () -> Assertions.assertEquals(0.5, afterSameApplier, EPS,
+                        "the same applier again is a refresh, not a second contribution"),
+                () -> Assertions.assertEquals(2, buffsAfterSameApplier, "the refresh did not add a buff"),
+                () -> Assertions.assertEquals(0.8, afterStrongerApplier, EPS,
+                        "…and a stronger one from that applier replaces its own previous number"),
+                () -> Assertions.assertEquals(2, buffsAfterStrongerApplier,
+                        "still one contribution per applier"));
     }
 
     /**
-     * A permanent one is never ticked, so it holds for the whole fight.
+     * A class resistance is a <b>positive</b> buff with a duration: a timed one expires on its carrier's turns, a
+     * permanent one is never ticked and holds for the whole fight, and "removes N negative effects" must not take
+     * either off.
      */
     @Test
-    public void aPermanentResistanceHolds() {
-        Fixture f = new Fixture(0.0, resistPermanent(0.35));
+    public void aClassResistanceIsAPositiveBuffWithADuration() {
+        // A timed resistance expires on its carrier's turns, like every other timed buff.
+        Fixture timed = new Fixture(0.0, resist(1.0, 1));
+        timed.fire();
+        double whileTimed = timed.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
+        TestTurns.take(timed.battle, timed.enemy);
+        double afterTick = timed.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
 
-        f.fire();
-        TestTurns.take(f.battle, f.enemy);
-        TestTurns.take(f.battle, f.enemy);
+        // A permanent one is never ticked, so it holds for the whole fight.
+        Fixture permanent = new Fixture(0.0, resistPermanent(0.35));
+        permanent.fire();
+        TestTurns.take(permanent.battle, permanent.enemy);
+        TestTurns.take(permanent.battle, permanent.enemy);
+        double afterTwoTurns = permanent.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
 
-        Assertions.assertEquals(0.35, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
-    }
+        // It is a positive effect on its bearer, so a cleanse ignores it.
+        Fixture positive = new Fixture(0.0, resist(0.35));
+        positive.fire();
+        int debuffs = positive.enemy.getBuffManager().debuffCount();
+        int cleansed = positive.enemy.getBuffManager().removeDebuffs(1);
+        double stillCarried = positive.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL);
 
-    /**
-     * It is a <b>positive</b> effect on its bearer, so "removes N negative effects" must not take it off.
-     */
-    @Test
-    public void theResistanceIsNotADebuff() {
-        Fixture f = new Fixture(0.0, resist(0.35));
-
-        f.fire();
-
-        Assertions.assertEquals(0, f.enemy.getBuffManager().debuffCount(), "carrying it is good for you");
-        Assertions.assertEquals(0, f.enemy.getBuffManager().removeDebuffs(1), "so a cleanse ignores it");
-        Assertions.assertEquals(0.35, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1.0, whileTimed, EPS,
+                        "「while in the [防火墙] (Firewall) state ... immune」 is up when granted"),
+                () -> Assertions.assertEquals(0.0, afterTick, EPS,
+                        "「while in the [防火墙] (Firewall) state ... immune」 lasts a turn — a buff covers both that and a permanent trace"),
+                () -> Assertions.assertEquals(0.35, afterTwoTurns, EPS, "a permanent trace is never ticked"),
+                () -> Assertions.assertEquals(0, debuffs, "carrying it is good for you"),
+                () -> Assertions.assertEquals(0, cleansed, "so a cleanse ignores it"),
+                () -> Assertions.assertEquals(0.35, stillCarried, EPS, "and the resistance is still there"));
     }
 
     /**
@@ -210,28 +220,6 @@ public class DebuffResistTest {
 
         Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(TauntBuff.class),
                 "an unconditional marker would still be there -- the roll is what keeps it out");
-    }
-
-    /**
-     * A state that is in no class is not covered by any class resistance - and that is the documents' own answer
-     * here, not a placeholder.
-     *
-     * <p>Note: <b>Measured.</b> "control-class debuffs" is <b>defined by the corpus itself</b>, 28 times, always
-     * the same twelve names: "Frozen, Entanglement, Imprisonment, Domination, Enraged Noise, Strong Shock, Strange Dream, Binding, Fear, Action Lock, Blissful Puppet, Grudgefire Burning". Taunt is
-     * <b>not</b> one of them, so leaving {@code TauntBuff} outside the control class matches the game's own list
-     * rather than dodging a decision. Note: The other side of that measurement is a registered gap: of those twelve
-     * states the engine implements three (Frozen / Entanglement / Imprisonment, the break trio), so a "immune to the control class" clause protects
-     * against everything the engine can currently apply and nothing more - see the register of known gaps.
-     */
-    @Test
-    public void aClassImmunityDoesNotCoverAStateInNoClass() {
-        Fixture f = new Fixture(0.0, resist(1.0), TriggerSpecs.taunt(1));
-
-        f.fire();
-
-        Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(TauntBuff.class),
-                "Taunt is in no class, so 「immune to the control class」 leaves it alone — the documents' 12-name list does not "
-                        + "include it");
     }
 
     // ==================================================================

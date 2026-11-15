@@ -66,67 +66,69 @@ public class StatModifierStackingTest {
                 .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF).size();
     }
 
-    // ==================================================================
-    // 1. The primitive: a stackable stat buff
-    // ==================================================================
-
     /**
-     * Copies accumulate: five applications of +5% ATK are +25%, not +5%.
+     * The stack lifecycle on one character: applications accumulate, the cap is a hard ceiling, removal is
+     * per stack and exact, and clearing removes every stack.
      */
     @Test
-    public void stackableModifiersAccumulate() {
+    public void stackableModifiersAccumulateCapAndAreRemovedExactly() {
         Character c = hero();
         for (int i = 0; i < 5; i++) {
             c.getBuffManager().addBuff(stackableAttack(0.05, 5));
         }
 
-        Assertions.assertEquals(5, attackModifiersOf(c),
-                "each application must install its own modifier, or nothing accumulates");
-        Assertions.assertEquals(300 * 1.25, attackOf(c), 1e-9,
-                "five stacks of +5% ATK on a base of 300 is 375");
-        Assertions.assertEquals(5, c.getBuffManager().countBuffs(StatModifierBuff.class));
-    }
+        Assertions.assertAll("five applications of a 5-stack +5% ATK buff",
+                () -> Assertions.assertEquals(5, attackModifiersOf(c),
+                        "each application must install its own modifier, or nothing accumulates"),
+                () -> Assertions.assertEquals(300 * 1.25, attackOf(c), 1e-9,
+                        "five stacks of +5% ATK on a base of 300 is 375"),
+                () -> Assertions.assertEquals(5, c.getBuffManager().countBuffs(StatModifierBuff.class),
+                        "five applications must leave five buffs to remove or expire"));
 
-    /**
-     * The cap is enforced: a sixth application changes nothing, and nothing is evicted.
-     */
-    @Test
-    public void theStackCapIsEnforcedAndNothingIsEvicted() {
-        Character c = hero();
-        for (int i = 0; i < 8; i++) {
-            c.getBuffManager().addBuff(stackableAttack(0.05, 5));
-        }
-
-        Assertions.assertEquals(5, attackModifiersOf(c),
-                "a 5-stack buff must stop at five modifiers, not roll over");
-        Assertions.assertEquals(300 * 1.25, attackOf(c), 1e-9,
-                "the sixth, seventh and eighth applications are no-ops");
-    }
-
-    /**
-     * Removal is per stack and exact: two stacks off leaves three stacks' worth.
-     */
-    @Test
-    public void stacksAreRemovedOneAtATimeAndExactly() {
-        Character c = hero();
-        for (int i = 0; i < 5; i++) {
-            c.getBuffManager().addBuff(stackableAttack(0.05, 5));
-        }
-
-        Assertions.assertTrue(c.getBuffManager().removeOneBuff(StatModifierBuff.class));
-        Assertions.assertTrue(c.getBuffManager().removeOneBuff(StatModifierBuff.class));
-
-        Assertions.assertEquals(3, attackModifiersOf(c));
-        Assertions.assertEquals(300 * 1.15, attackOf(c), 1e-9,
-                "removal takes one modifier with it; it does not recompute the attribute");
-
+        // Three more applications reach eight in total, so the cap is exercised from a full stack.
         for (int i = 0; i < 3; i++) {
-            Assertions.assertTrue(c.getBuffManager().removeOneBuff(StatModifierBuff.class));
+            c.getBuffManager().addBuff(stackableAttack(0.05, 5));
         }
-        Assertions.assertEquals(300, attackOf(c), 1e-9,
-                "removing the last stack returns the attribute to base exactly");
-        Assertions.assertFalse(c.getBuffManager().removeOneBuff(StatModifierBuff.class),
-                "removing a stack that is not there reports false rather than throwing");
+
+        Assertions.assertAll("sixth, seventh and eighth applications at the cap",
+                () -> Assertions.assertEquals(5, attackModifiersOf(c),
+                        "a 5-stack buff must stop at five modifiers, not roll over"),
+                () -> Assertions.assertEquals(300 * 1.25, attackOf(c), 1e-9,
+                        "the sixth, seventh and eighth applications are no-ops"));
+
+        Assertions.assertAll("removing two of the five stacks",
+                () -> Assertions.assertTrue(c.getBuffManager().removeOneBuff(StatModifierBuff.class),
+                        "the first stack is removable"),
+                () -> Assertions.assertTrue(c.getBuffManager().removeOneBuff(StatModifierBuff.class),
+                        "the second stack is removable"),
+                () -> Assertions.assertEquals(3, attackModifiersOf(c),
+                        "two removals must leave three stack modifiers"),
+                () -> Assertions.assertEquals(300 * 1.15, attackOf(c), 1e-9,
+                        "removal takes one modifier with it; it does not recompute the attribute"));
+
+        Assertions.assertAll("removing the remaining three stacks",
+                () -> {
+                    for (int i = 0; i < 3; i++) {
+                        Assertions.assertTrue(c.getBuffManager().removeOneBuff(StatModifierBuff.class),
+                                "remaining stack " + (i + 1) + " is removable");
+                    }
+                },
+                () -> Assertions.assertEquals(300, attackOf(c), 1e-9,
+                        "removing the last stack returns the attribute to base exactly"),
+                () -> Assertions.assertFalse(c.getBuffManager().removeOneBuff(StatModifierBuff.class),
+                        "removing a stack that is not there reports false rather than throwing"));
+
+        Character cleared = hero();
+        for (int i = 0; i < 4; i++) {
+            cleared.getBuffManager().addBuff(stackableAttack(0.05, 5));
+        }
+        cleared.getBuffManager().clearAll();
+
+        Assertions.assertAll("clearAll on a character holding four stacks",
+                () -> Assertions.assertEquals(300, attackOf(cleared), 1e-9,
+                        "clearAll removes every stack, returning ATK to base"),
+                () -> Assertions.assertEquals(0, attackModifiersOf(cleared),
+                        "no stack modifier survives clearAll"));
     }
 
     /**
@@ -144,135 +146,119 @@ public class StatModifierStackingTest {
         c.getBuffManager().addBuff(permanent);
 
         for (int turn = 0; turn < 20; turn++) {
-            c.getBuffManager().beforeMove();
-            c.getBuffManager().afterMove();
+            turnBoundary(c);
         }
 
-        Assertions.assertEquals(1, attackModifiersOf(c),
-                "a permanent buff is never ticked, so it cannot expire at a turn boundary");
-        Assertions.assertEquals(300 * 1.05, attackOf(c), 1e-9);
-        Assertions.assertTrue(permanent.isPermanent());
+        Assertions.assertAll("a permanent +5% ATK stack after twenty turn boundaries",
+                () -> Assertions.assertEquals(1, attackModifiersOf(c),
+                        "a permanent buff is never ticked, so it cannot expire at a turn boundary"),
+                () -> Assertions.assertEquals(300 * 1.05, attackOf(c), 1e-9,
+                        "the same single stack is still worth +5% after twenty rounds"),
+                () -> Assertions.assertTrue(permanent.isPermanent(),
+                        "the buff records itself as permanent, not as a large turn count"));
     }
 
     /**
-     * A stackable buff is still removable as a whole (dispel / death / {@code clearAll}).
-     */
-    @Test
-    public void clearingRemovesEveryStack() {
-        Character c = hero();
-        for (int i = 0; i < 4; i++) {
-            c.getBuffManager().addBuff(stackableAttack(0.05, 5));
-        }
-
-        c.getBuffManager().clearAll();
-
-        Assertions.assertEquals(300, attackOf(c), 1e-9);
-        Assertions.assertEquals(0, attackModifiersOf(c));
-    }
-
-    // ==================================================================
-    // 2. The default is untouched: replace, do not stack
-    // ==================================================================
-
-    /**
-     * A modifier built <b>without</b> a cap replaces, exactly as before this change.
+     * The other half of the opt-in rule: a modifier built without a cap still replaces, and only a
+     * different stack group accumulates alongside.
      *
-     * <p>This is the other half of the opt-in rule, and the one that protects every existing
-     * character: {@code BuffRuleTest.theSameBuffAgainRefreshesInsteadOfStacking} pins it for the
+     * <p>{@code BuffRuleTest.theSameBuffAgainRefreshesInsteadOfStacking} pins the replacement for the
      * convenience factories, and this pins it for the data-driven one.
      */
     @Test
-    public void withoutACapTheModifierStillReplaces() {
-        Character c = hero();
-        c.getBuffManager().addBuff(plainAttack(0.5, 2));
-        c.getBuffManager().addBuff(plainAttack(0.2, 5));
+    public void kindIdentityDecidesReplaceVersusAccumulate() {
+        Character replaced = hero();
+        replaced.getBuffManager().addBuff(plainAttack(0.5, 2));
+        replaced.getBuffManager().addBuff(plainAttack(0.2, 5));
 
-        Assertions.assertEquals(1, attackModifiersOf(c), "same kind replaces, it does not stack");
-        Assertions.assertEquals(300 * 1.2, attackOf(c), 1e-9, "the newest value wins");
+        Assertions.assertAll("a plain modifier built without a cap, applied twice",
+                () -> Assertions.assertEquals(1, attackModifiersOf(replaced),
+                        "same kind replaces, it does not stack"),
+                () -> Assertions.assertEquals(300 * 1.2, attackOf(replaced), 1e-9, "the newest value wins"));
 
-        // And the same through the trigger table's plain MODIFY_ATTR, which is what content uses.
         Character triggered = hero();
-        TriggerTable table = table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                TriggerSpecs.modifyAttr("ATTACK", 0.5, 2)));
-        triggered.setTriggerTable(table);
+        triggered.setTriggerTable(table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                TriggerSpecs.modifyAttr("ATTACK", 0.5, 2))));
         Battle battle = battleWith(triggered);
 
         fire(battle, 3);
-        Assertions.assertEquals(1, attackModifiersOf(triggered),
-                "a plain MODIFY_ATTR must keep replacing no matter how often its rule fires");
-        Assertions.assertEquals(300 * 1.5, attackOf(triggered), 1e-9);
-    }
 
-    /**
-     * A stack of a different kind is a different stack group: +ATK% and +DEF% accumulate
-     * independently (the same distinction {@code isSameKind} makes).
-     */
-    @Test
-    public void stackGroupsDoNotMixAttributes() {
-        Character c = hero();
-        c.getBuffManager().addBuff(stackableAttack(0.05, 5));
-        c.getBuffManager().addBuff(StatModifierBuff.of(AttributeType.DEFENCE, "add_percent", 0.1,
+        Assertions.assertAll("a plain MODIFY_ATTR fired three times",
+                () -> Assertions.assertEquals(1, attackModifiersOf(triggered),
+                        "a plain MODIFY_ATTR must keep replacing no matter how often its rule fires"),
+                () -> Assertions.assertEquals(300 * 1.5, attackOf(triggered), 1e-9,
+                        "the newest +50% wins, not three copies of it"));
+
+        Character mixedGroups = hero();
+        mixedGroups.getBuffManager().addBuff(stackableAttack(0.05, 5));
+        mixedGroups.getBuffManager().addBuff(StatModifierBuff.of(AttributeType.DEFENCE, "add_percent", 0.1,
                 "buff", turnsPlaceholder(), false, true, 5));
 
-        Assertions.assertEquals(300 * 1.05, attackOf(c), 1e-9);
-        Assertions.assertEquals(200 * 1.1, c.getAttribute(AttributeType.DEFENCE).get(), 1e-9);
-        Assertions.assertEquals(2, c.getBuffManager().countBuffs(StatModifierBuff.class));
+        Assertions.assertAll("an ATK stack group and a DEF stack group on one character",
+                () -> Assertions.assertEquals(300 * 1.05, attackOf(mixedGroups), 1e-9,
+                        "the DEF stack does not touch ATK"),
+                () -> Assertions.assertEquals(200 * 1.1,
+                        mixedGroups.getAttribute(AttributeType.DEFENCE).get(), 1e-9,
+                        "the ATK stack does not touch DEF"),
+                () -> Assertions.assertEquals(2,
+                        mixedGroups.getBuffManager().countBuffs(StatModifierBuff.class),
+                        "different attributes are different stack groups, so both stacks live"));
     }
 
-    // ==================================================================
-    // 3. The trigger-table view: max_stacks / permanent
-    // ==================================================================
-
     /**
-     * {@code max_stacks} + {@code permanent} make one rule accumulate instead of refreshing.
+     * The trigger-table view of the cap: three firings of a 5-stack rule install three stacks, a 3-stack
+     * cap holds at any number of firings, and the {@code stacks} alias means the same as {@code max_stacks}.
+     *
+     * <p>{@code max_stacks} + {@code permanent} make one rule accumulate instead of refreshing, and both
+     * cap spellings fail loudly at load when they disagree.
      */
     @Test
-    public void theTriggerTableCanAskForAStackingPermanentModifier() {
-        Character c = hero();
-        c.setTriggerTable(table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+    public void theTriggerTableBoundsStackingThroughMaxStacksAndItsAlias() {
+        Character threeOfFive = hero();
+        threeOfFive.setTriggerTable(table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
                 TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, 5, null, null))));
-        Battle battle = battleWith(c);
+        Battle firstBattle = battleWith(threeOfFive);
 
-        fire(battle, 3);
+        fire(firstBattle, 3);
 
-        Assertions.assertEquals(3, attackModifiersOf(c), "three firings, three stacks");
-        Assertions.assertEquals(300 * 1.15, attackOf(c), 1e-9);
-        for (DoubleValue.Modifier modifier : c.getAttribute(AttributeType.ATTACK)
-                .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF)) {
-            Assertions.assertEquals(0.05, modifier.getValue(), 1e-9);
-        }
-    }
+        Assertions.assertAll("three firings of a 5-stack permanent rule",
+                () -> Assertions.assertEquals(3, attackModifiersOf(threeOfFive),
+                        "three firings, three stacks"),
+                () -> Assertions.assertEquals(300 * 1.15, attackOf(threeOfFive), 1e-9,
+                        "three stacks of +5% ATK on a base of 300 is 345"),
+                () -> {
+                    for (DoubleValue.Modifier modifier : threeOfFive.getAttribute(AttributeType.ATTACK)
+                            .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF)) {
+                        Assertions.assertEquals(0.05, modifier.getValue(), 1e-9,
+                                "each stack is +5%, not one merged value");
+                    }
+                });
 
-    /**
-     * The cap reaches through the table too: ten firings of a 3-stack rule stop at three.
-     */
-    @Test
-    public void theTriggerTableHonoursTheCap() {
-        Character c = hero();
-        c.setTriggerTable(table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+        Character cappedAtThree = hero();
+        cappedAtThree.setTriggerTable(table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
                 TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, 3, null, null))));
-        Battle battle = battleWith(c);
+        Battle secondBattle = battleWith(cappedAtThree);
 
-        fire(battle, 10);
+        fire(secondBattle, 10);
 
-        Assertions.assertEquals(3, attackModifiersOf(c));
-        Assertions.assertEquals(300 * 1.15, attackOf(c), 1e-9);
-    }
+        Assertions.assertAll("ten firings of a 3-stack permanent rule",
+                () -> Assertions.assertEquals(3, attackModifiersOf(cappedAtThree),
+                        "the cap stops the rule at three modifiers"),
+                () -> Assertions.assertEquals(300 * 1.15, attackOf(cappedAtThree), 1e-9,
+                        "the fourth through tenth firings are no-ops"));
 
-    /**
-     * The alias spelling {@code stacks} means the same thing as {@code max_stacks}.
-     */
-    @Test
-    public void theStacksAliasIsAccepted() {
-        Character c = hero();
-        c.setTriggerTable(table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+        Character aliased = hero();
+        aliased.setTriggerTable(table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
                 TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, null, 4, null))));
-        Battle battle = battleWith(c);
+        Battle aliasBattle = battleWith(aliased);
 
-        fire(battle, 6);
+        fire(aliasBattle, 6);
 
-        Assertions.assertEquals(4, attackModifiersOf(c));
-        Assertions.assertEquals(300 * 1.20, attackOf(c), 1e-9);
+        Assertions.assertAll("the stacks alias spelling of the cap",
+                () -> Assertions.assertEquals(4, attackModifiersOf(aliased),
+                        "stacks is accepted as an alias of max_stacks, so four stacks are installed"),
+                () -> Assertions.assertEquals(300 * 1.20, attackOf(aliased), 1e-9,
+                        "four stacks of +5% ATK on a base of 300 is 360"));
     }
 
     /**
@@ -294,124 +280,118 @@ public class StatModifierStackingTest {
         Battle battle = battleWith(c);
 
         fire(battle, 2);
-        Assertions.assertEquals(2, c.getBuffManager().countBuffs(StatModifierBuff.class));
-        Assertions.assertEquals(0.16, c.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9);
+
+        Assertions.assertAll("two timed CRIT_CHANCE stacks",
+                () -> Assertions.assertEquals(2, c.getBuffManager().countBuffs(StatModifierBuff.class),
+                        "two firings install two timed stacks"),
+                () -> Assertions.assertEquals(0.16, c.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
+                        "two stacks of +8% CRIT Rate make +16%"));
 
         turnBoundary(c);
-        Assertions.assertEquals(2, c.getBuffManager().countBuffs(StatModifierBuff.class),
-                "a 2-turn stack survives its first turn boundary");
-        Assertions.assertEquals(0.16, c.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9);
+
+        Assertions.assertAll("after the first turn boundary",
+                () -> Assertions.assertEquals(2, c.getBuffManager().countBuffs(StatModifierBuff.class),
+                        "a 2-turn stack survives its first turn boundary"),
+                () -> Assertions.assertEquals(0.16, c.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
+                        "the stacks are still worth +16% after one turn"));
 
         turnBoundary(c);
-        Assertions.assertEquals(0, c.getBuffManager().countBuffs(StatModifierBuff.class),
-                "both stacks were applied at the same moment, so both expire together");
-        Assertions.assertEquals(0, c.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
-                "the attribute returns to base exactly (0 for a ratio attribute)");
+
+        Assertions.assertAll("after the second turn boundary",
+                () -> Assertions.assertEquals(0, c.getBuffManager().countBuffs(StatModifierBuff.class),
+                        "both stacks were applied at the same moment, so both expire together"),
+                () -> Assertions.assertEquals(0, c.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
+                        "the attribute returns to base exactly (0 for a ratio attribute)"));
     }
 
     /**
-     * One turn of the owner's own action bar: the early tick, then the late one.
-     */
-    private static void turnBoundary(Character c) {
-        c.getBuffManager().beforeMove();
-        c.getBuffManager().afterMove();
-    }
-
-    // ==================================================================
-    // 4. Load-time validation, naming the phase
-    // ==================================================================
-
-    /**
-     * A cap that could never apply is rejected where the table is compiled, not mid-battle.
-     */
-    @Test
-    public void nonPositiveStackCapsAreRejectedAtLoad() {
-        IllegalArgumentException zero = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                        TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, 0, null, null))));
-        Assertions.assertTrue(zero.getMessage().contains("non-positive stack cap"), zero.getMessage());
-
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                        TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, -3, null, null))));
-    }
-
-    /**
-     * Above the engine's limit is rejected too, so a typo cannot grow the buff list without bound.
-     */
-    @Test
-    public void absurdStackCapsAreRejectedAtLoad() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                        TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true,
-                                Constant.MAX_STACKS_LIMIT + 1, null, null))));
-        Assertions.assertTrue(e.getMessage().contains(String.valueOf(Constant.MAX_STACKS_LIMIT)),
-                e.getMessage());
-    }
-
-    /**
-     * Stating both spellings is ambiguous and is rejected rather than silently picking one.
-     */
-    @Test
-    public void bothSpellingsOfTheCapAreRejectedAtLoad() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                        TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, 3, 3, null))));
-        Assertions.assertTrue(e.getMessage().contains("alias"), e.getMessage());
-    }
-
-    /**
-     * The duration is still mandatory, and {@code turns} vs {@code permanent} are mutually exclusive.
+     * Load-time validation of the new {@code MODIFY_ATTR} arguments: a non-positive cap and a cap above the
+     * engine limit are rejected, stating both cap spellings is rejected, and the duration must be stated
+     * exactly once with no non-positive turn count.
      *
-     * <p>Both directions are asserted because both are silent failures otherwise: a missing duration
-     * would have to default to something, and stating both would mean the engine picks one and the
-     * rule's text disagrees with it.
+     * <p>All of these throw where the table is compiled rather than mid-battle, so a typo cannot produce a
+     * rule that loads, fires, and does nothing visible.
      */
     @Test
-    public void theDurationMustBeStatedExactlyOnce() {
-        IllegalArgumentException missing = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                        TriggerSpecs.modifyAttr("ATTACK", 0.05, null, null, null, null, null))));
-        Assertions.assertTrue(missing.getMessage().contains("permanent"), missing.getMessage());
-
-        IllegalArgumentException both = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                        TriggerSpecs.modifyAttr("ATTACK", 0.05, 2, true, null, null, null))));
-        Assertions.assertTrue(both.getMessage().contains("both"), both.getMessage());
-    }
-
-    /**
-     * A non-positive turn count points the author at the argument that means "no turn limit".
-     */
-    @Test
-    public void aNonPositiveTurnCountStillPointsAtPermanent() {
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
-                        TriggerSpecs.modifyAttr("ATTACK", 0.05, 0, null, null, null, null))));
-        Assertions.assertTrue(e.getMessage().contains("permanent"),
-                "the message must name the argument that expresses 'for the rest of the battle': "
-                        + e.getMessage());
+    public void invalidCapAndDurationArgumentsAreRejectedAtLoad() {
+        Assertions.assertAll("MODIFY_ATTR stack and duration arguments",
+                () -> {
+                    IllegalArgumentException zero = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                                    TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, 0, null, null))),
+                            "a zero stack cap is rejected at load");
+                    Assertions.assertTrue(zero.getMessage().contains("non-positive stack cap"),
+                            zero.getMessage());
+                },
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                                TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, -3, null, null))),
+                        "a negative stack cap is rejected at load"),
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                                    TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true,
+                                            Constant.MAX_STACKS_LIMIT + 1, null, null))),
+                            "a cap above the engine limit is rejected at load");
+                    Assertions.assertTrue(e.getMessage().contains(String.valueOf(Constant.MAX_STACKS_LIMIT)),
+                            e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                                    TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, 3, 3, null))),
+                            "stating both max_stacks and stacks is rejected at load");
+                    Assertions.assertTrue(e.getMessage().contains("alias"), e.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException missing = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                                    TriggerSpecs.modifyAttr("ATTACK", 0.05, null, null, null, null, null))),
+                            "a rule with neither turns nor permanent is rejected at load");
+                    Assertions.assertTrue(missing.getMessage().contains("permanent"), missing.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException both = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                                    TriggerSpecs.modifyAttr("ATTACK", 0.05, 2, true, null, null, null))),
+                            "a rule stating both turns and permanent is rejected at load");
+                    Assertions.assertTrue(both.getMessage().contains("both"), both.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(),
+                                    TriggerSpecs.modifyAttr("ATTACK", 0.05, 0, null, null, null, null))),
+                            "a non-positive turn count is rejected at load");
+                    Assertions.assertTrue(e.getMessage().contains("permanent"),
+                            "the message must name the argument that expresses 'for the rest of the battle': "
+                                    + e.getMessage());
+                });
     }
 
     /**
      * The new arguments belong to {@code MODIFY_ATTR} only.
      *
-     * <p>Without this check a {@code max_stacks} written on, say, {@code GAIN_ENERGY} would be read by
-     * Gson, ignored by the interpreter, and the rule would load perfectly while doing the wrong thing -
-     * the same silent-typo class the closed op vocabulary exists to eliminate.
+     * <p>Without this check a {@code max_stacks} written on, say, {@code HEAL} would be read by Gson,
+     * ignored by the interpreter, and the rule would load perfectly while doing the wrong thing - the same
+     * silent-typo class the closed op vocabulary exists to eliminate.
      */
     @Test
     public void theNewArgumentsAreRejectedOnOtherOps() {
         EffectSpec heal = TriggerSpecs.heal(10, null);
         TriggerSpecs.set(heal, "maxStacks", 3);
-        IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(), heal)));
-        Assertions.assertTrue(e.getMessage().contains("MODIFY_ATTR"), e.getMessage());
-
         EffectSpec permanentHeal = TriggerSpecs.heal(10, null);
         TriggerSpecs.set(permanentHeal, "permanent", true);
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(), permanentHeal)));
+
+        Assertions.assertAll("stack and duration arguments on a HEAL effect",
+                () -> {
+                    IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(), heal)),
+                            "max_stacks on a heal rule is rejected at load");
+                    Assertions.assertTrue(e.getMessage().contains("MODIFY_ATTR"), e.getMessage());
+                },
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(), permanentHeal)),
+                        "permanent on a heal rule is rejected at load"));
     }
 
     /**
@@ -419,17 +399,19 @@ public class StatModifierStackingTest {
      */
     @Test
     public void theBuffFactoryRejectsNonsense() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> StatModifierBuff.of(AttributeType.ATTACK, "add_percent", 0.05, "buff", 1, false,
-                        true, 0));
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> StatModifierBuff.of(AttributeType.ATTACK, "add_percent", 0.05, "buff", 0, false,
-                        false, 3),
-                "a stack that expires immediately would be a silent no-op");
-        Assertions.assertDoesNotThrow(
-                () -> StatModifierBuff.of(AttributeType.ATTACK, "add_percent", 0.05, "buff", 0, false,
-                        true, 3),
-                "…but a permanent stack needs no turn count");
+        Assertions.assertAll("StatModifierBuff.of argument validation",
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> StatModifierBuff.of(AttributeType.ATTACK, "add_percent", 0.05, "buff", 1, false,
+                                true, 0),
+                        "a stackable buff with a zero cap is rejected"),
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> StatModifierBuff.of(AttributeType.ATTACK, "add_percent", 0.05, "buff", 0, false,
+                                false, 3),
+                        "a stack that expires immediately would be a silent no-op"),
+                () -> Assertions.assertDoesNotThrow(
+                        () -> StatModifierBuff.of(AttributeType.ATTACK, "add_percent", 0.05, "buff", 0, false,
+                                true, 3),
+                        "…but a permanent stack needs no turn count"));
     }
 
     /**
@@ -467,15 +449,16 @@ public class StatModifierStackingTest {
             }
         };
 
-        IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> c.getBuffManager().addBuff(broken));
-        Assertions.assertTrue(e.getMessage().contains("stack group key"), e.getMessage());
-        Assertions.assertEquals(0, c.getBuffManager().countBuffs(AbstractBuff.class));
+        Assertions.assertAll("a stackable buff with no stack group key",
+                () -> {
+                    IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
+                            () -> c.getBuffManager().addBuff(broken),
+                            "adding it is refused");
+                    Assertions.assertTrue(e.getMessage().contains("stack group key"), e.getMessage());
+                },
+                () -> Assertions.assertEquals(0, c.getBuffManager().countBuffs(AbstractBuff.class),
+                        "the refused buff is not installed"));
     }
-
-    // ==================================================================
-    // Helpers
-    // ==================================================================
 
     /**
      * The duration placeholder: never read for a permanent buff (see {@code TriggerInterpreter}).
@@ -521,5 +504,13 @@ public class StatModifierStackingTest {
         for (int i = 0; i < times; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
         }
+    }
+
+    /**
+     * One turn of the owner's own action bar: the early tick, then the late one.
+     */
+    private static void turnBoundary(Character c) {
+        c.getBuffManager().beforeMove();
+        c.getBuffManager().afterMove();
     }
 }

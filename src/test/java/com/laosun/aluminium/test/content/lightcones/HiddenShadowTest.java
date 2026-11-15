@@ -13,6 +13,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,12 @@ import java.util.List;
  * <p>Two halves, because the clause is two rules on two different events: the spec half pins the ARMING rule (the spending one
  * only exists while the marker is up, i.e. in a transient state), and the behavioural half casts a Skill for real, then compares
  * a plain damage instance with and without the cone.
+ *
+ * <p>Also covers 匿影 (20018) 「施放战技后，使装备者的<b>下一次普攻</b>造成的伤害提高，提高数值等同于装备者攻击力的 <b>60%</b>」 from the
+ * other side. Two things the old note got wrong, both measured here. 「战技后再接战技，总伤害也变大」 was a <b>within-instance
+ * comparison</b> dominated by a weakness BREAK: the second skill broke the target, and the break instance is 4843.99 next to a
+ * 557.38 normal hit -- the cone's own addend on that hit is 0. And the marker is NOT burned by the skill's own damage:
+ * `SKILL_CAST` arms it, and it is still there when the basic lands -- the addend on the basic is exactly 0.6 x ATK.
  */
 public class HiddenShadowTest {
     private static final int CONE = 20018;
@@ -33,6 +40,8 @@ public class HiddenShadowTest {
     private static final int LEVEL = 80;
     private static final double RANK_ONE = 0.6;
     private static final double RANK_TWO = 0.75;
+    // From the merged HiddenShadowConeTest: its wearer is a DIFFERENT character id (the old class's WEARER, renamed).
+    private static final int CONE_WEARER = 1204;
 
     private Character wearer;
     private Enemy enemy;
@@ -158,5 +167,50 @@ public class HiddenShadowTest {
         }
         System.out.println("[20018] without the cone, rules matching: " + pinned);
         Assertions.assertEquals(0, pinned, "no cone, no rule (false case)");
+    }
+
+    private static final class Run {
+        private final Character wearer;
+        private final Battle battle;
+        private final Enemy enemy;
+        private final List<Damage> settled = new ArrayList<>();
+
+        Run() {
+            wearer = CharacterFactory.create(CONE_WEARER, LEVEL, true, Weapon.build(20018, LEVEL, false, 1));
+            enemy = BattleFixture.monster();
+            battle = new Battle(new ArrayList<>(List.of(wearer)), new ArrayList<>(List.of(enemy)),
+                    BattleFixture.seeded());
+            battle.startBattle();
+            battle.addDamageObserver((Damage damage, double applied, double hpLoss, double shield, boolean died) ->
+                    settled.add(damage));
+        }
+
+        List<Damage> cast(SkillType slot) {
+            settled.clear();
+            battle.castImmediate(wearer.getSkills().get(slot), wearer, List.of(enemy));
+            battle.processRequests();
+            return List.copyOf(settled);
+        }
+
+        double flatOfNormal(List<Damage> instances) {
+            return instances.stream().filter(d -> d.getType() == DamageType.NORMAL)
+                    .mapToDouble(Damage::getFlatAddend).findFirst().orElse(0);
+        }
+    }
+
+    /**
+     * The skill's own hit carries nothing; the basic that follows carries 60% of her attack.
+     */
+    @Test
+    public void theBonusGoesToTheNextBasicAndNotToTheSkillItself() {
+        Run run = new Run();
+        List<Damage> skill = run.cast(SkillType.SKILL);
+        Assertions.assertEquals(0.0, run.flatOfNormal(skill), 1e-9,
+                "「下一次**普攻**」 - the skill's own hit is not a basic attack");
+
+        List<Damage> basic = run.cast(SkillType.COMMON);
+        double expected = 0.6 * run.wearer.getAttribute(AttributeType.ATTACK).get();
+        Assertions.assertEquals(expected, run.flatOfNormal(basic), 1e-6,
+                "the basic carries 「等同于装备者攻击力的 60%」 as an addend (" + expected + ")");
     }
 }

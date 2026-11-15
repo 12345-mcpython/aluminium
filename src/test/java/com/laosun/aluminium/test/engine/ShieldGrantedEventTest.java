@@ -47,16 +47,23 @@ public class ShieldGrantedEventTest {
     private static final double HEAL = 100;
 
     /**
-     * An ally's shield on her fires it (the raw grant path).
+     * An ally's shield on her fires it (the raw grant path) - and 「单个回合内不可重复触发」 is {@code per_turn: 1}
+     * (the engine counts the owner's turns).
      */
     @Test
-    public void anAlliesShieldFiresIt() {
+    public void anAlliesRawShieldFiresItOncePerTurn() {
         Fixture f = new Fixture();
         f.hurt();
 
         f.battle.grantShield(f.ally, f.dahlia, 500);
+        double afterOneShield = f.healed();
+        f.battle.grantShield(f.ally, f.dahlia, 500);
 
-        Assertions.assertEquals(HEAL, f.healed(), EPS, "\"when receiving ... a shield provided by an ally\" (「受到队友提供的…护盾时」)");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(HEAL, afterOneShield, EPS,
+                        "\"when receiving ... a shield provided by an ally\" (「受到队友提供的…护盾时」)"),
+                () -> Assertions.assertEquals(HEAL, f.healed(), EPS,
+                        "two shields in the same turn, one trigger -- without the limit this would read " + (2 * HEAL)));
     }
 
     /**
@@ -70,73 +77,54 @@ public class ShieldGrantedEventTest {
 
         f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.ally, f.dahlia, 0, 0));
 
-        Assertions.assertTrue(f.dahlia.getShield() > 0, "precondition: the timed shield is on her");
-        Assertions.assertEquals(HEAL, f.healed(), EPS,
-                "a shield with `turns` is installed by a ShieldBuff, which has no Battle handle -- the interpreter "
-                        + "announces it, and a rule that answered only the raw path would miss every timed shield");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(f.dahlia.getShield() > 0, "precondition: the timed shield is on her"),
+                () -> Assertions.assertEquals(HEAL, f.healed(), EPS,
+                        "a shield with `turns` is installed by a ShieldBuff, which has no Battle handle -- the interpreter "
+                                + "announces it, and a rule that answered only the raw path would miss every timed shield"));
     }
 
     /**
-     * Note: "队友提供的": a shield she gives herself is not one.
+     * Note: The three ways a shield is NOT 「队友提供的」: she gave it to herself ({@code actor != self} is what rules it
+     * out), nobody is credited with it (a raw grant naming no provider), and a grant of 0, which is how this API says
+     * "clear the shield" rather than "grant one". Each clause runs on a fresh copy of the same fixture.
      */
     @Test
-    public void aShieldSheGaveHerselfDoesNotFire() {
-        Fixture f = new Fixture();
-        f.hurt();
+    public void shieldsThatAreNotFromATeammateDoNotFire() {
+        Assertions.assertAll(
+                () -> {
+                    Fixture f = new Fixture();
+                    f.hurt();
 
-        f.battle.grantShield(f.dahlia, f.dahlia, 500);
+                    f.battle.grantShield(f.dahlia, f.dahlia, 500);
 
-        Assertions.assertEquals(0, f.healed(), EPS,
-                "`actor is_ally` alone would accept this (she IS on our side) -- `actor != self` is the other half");
-    }
+                    Assertions.assertEquals(0, f.healed(), EPS,
+                            "`actor is_ally` alone would accept this (she IS on our side) -- `actor != self` is the other half");
+                },
+                () -> {
+                    Fixture f = new Fixture();
+                    f.hurt();
 
-    /**
-     * Note: A raw grant names no provider, so a question about who provided it must answer no.
-     */
-    @Test
-    public void aShieldNobodyIsCreditedWithDoesNotFire() {
-        Fixture f = new Fixture();
-        f.hurt();
+                    f.battle.grantShield(f.dahlia, 500);
 
-        f.battle.grantShield(f.dahlia, 500);
+                    Assertions.assertEquals(0, f.healed(), EPS, "no provider stated = no one to be a teammate");
+                },
+                () -> {
+                    Fixture f = new Fixture();
+                    f.hurt();
 
-        Assertions.assertEquals(0, f.healed(), EPS, "no provider stated = no one to be a teammate");
-    }
+                    f.battle.grantShield(f.ally, f.dahlia, 0);
 
-    /**
-     * Note: A grant of 0 is how this API says "clear the shield": it is not a grant.
-     */
-    @Test
-    public void clearingAShieldIsNotGrantingOne() {
-        Fixture f = new Fixture();
-        f.hurt();
-
-        f.battle.grantShield(f.ally, f.dahlia, 0);
-
-        Assertions.assertEquals(0, f.healed(), EPS,
-                "the same convention as HEALED, which only fires when HP was really restored");
-    }
-
-    /**
-     * "单个回合内不可重复触发" is `per_turn: 1` (the engine counts the owner's turns).
-     */
-    @Test
-    public void itFiresOncePerTurn() {
-        Fixture f = new Fixture();
-        f.hurt();
-
-        f.battle.grantShield(f.ally, f.dahlia, 500);
-        f.battle.grantShield(f.ally, f.dahlia, 500);
-
-        Assertions.assertEquals(HEAL, f.healed(), EPS,
-                "two shields in the same turn, one trigger -- without the limit this would read " + (2 * HEAL));
+                    Assertions.assertEquals(0, f.healed(), EPS,
+                            "the same convention as HEALED, which only fires when HP was really restored");
+                });
     }
 
     /**
      * The healing half is the same rule shape: a teammate's heal (and NOT her own).
      */
     @Test
-    public void aTeammatesHealFiresTheHealingHalf() {
+    public void theHealingHalfAnswersATeammatesHealOnly() {
         Fixture f = new Fixture();
         f.hurt();
         double baseline = f.dahlia.getCurrentHp();
@@ -144,13 +132,17 @@ public class ShieldGrantedEventTest {
         // Note: The heal under test IS the heal the rule hangs on, so the direct amount lands in the same delta: a
         // self-heal of 100 moves her HP by 100 and must NOT add the rule's 100; a teammate's moves it by 200.
         f.battle.heal(f.dahlia, f.dahlia, 100);
-        Assertions.assertEquals(100, f.dahlia.getCurrentHp() - baseline, EPS,
-                "a heal she gave herself is not 「队友提供的」 (actor != self)");
+        double afterSelfHeal = f.dahlia.getCurrentHp() - baseline;
 
         baseline = f.dahlia.getCurrentHp();
         f.battle.heal(f.ally, f.dahlia, 100);
-        Assertions.assertEquals(200, f.dahlia.getCurrentHp() - baseline, EPS,
-                "…and a teammate's heal is: the 100 healed plus the rule's 100");
+        double afterAllyHeal = f.dahlia.getCurrentHp() - baseline;
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(100, afterSelfHeal, EPS,
+                        "a heal she gave herself is not 「队友提供的」 (actor != self)"),
+                () -> Assertions.assertEquals(200, afterAllyHeal, EPS,
+                        "…and a teammate's heal is: the 100 healed plus the rule's 100"));
     }
 
     /**

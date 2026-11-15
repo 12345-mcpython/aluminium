@@ -29,9 +29,9 @@ public class WarmthShortensColdNightsTest {
     @Test
     public void theConeRaisesMaxHpByTheRankShare() {
         // 2026-10-19: the share is the cone's own `health_percent` property (it is in the panel before the battle starts),
-        Assertions.assertTrue(true, "rank 1 share is the property - pinned in ConeAuditBatchNineTest");
+        Assertions.assertTrue(true, "rank 1 share is the property - pinned in LightConeAuditBatchNineTest");
         // 2026-10-19: likewise, the rank-5 share is the property (0.32 in the panel before the battle starts).
-        Assertions.assertTrue(true, "rank 5 share is the property too - pinned in ConeAuditBatchNineTest");
+        Assertions.assertTrue(true, "rank 5 share is the property too - pinned in LightConeAuditBatchNineTest");
     }
 
     @Test

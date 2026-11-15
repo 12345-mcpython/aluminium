@@ -44,6 +44,10 @@ import com.laosun.aluminium.equipment.Relic;
  *   <li>the spellings mean different events, including the Elation skill's own category;</li>
  *   <li>the shipped user of it - relic set 305 - grants its 60% CRIT Rate and loses it to the first attack.</li>
  * </ol>
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the four scenarios below, one {@code assertAll} per
+ * scenario so a failing clause still names itself. The four load-time rejection paths stay their own tests:
+ * an {@code assertThrows} is not a positive clause and must not hide behind one.
  */
 public class BuffLifetimeTest {
     private static final double EPS = 1e-6;
@@ -63,144 +67,117 @@ public class BuffLifetimeTest {
     // ==================================================================
 
     /**
-     * "for the next attack": the owner's attack consumes it.
-     */
-    @Test
-    public void theOwnersAttackConsumesIt() {
-        Battle battle = battleWithBuff("next_attack");
-        Character owner = battle.characters().getFirst();
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "precondition: the buff is up");
-
-        attack(battle, owner, 1);        // slot 1 = the basic attack
-
-        Assertions.assertEquals(0, critRateBonus(owner), EPS,
-                "「until after the wearer's first attack」 -- the attack ended it");
-    }
-
-    /**
-     * A teammate's attack does <b>not</b>.
+     * "for the next attack": the lifetime belongs to its owner and only a real attack ends it.
      *
-     * <p>The engine delivers "an attack happened" to every member of our side ({@code AttackEvent} is how
-     * Robin's and Tribbie's third-party kits hear about it), so this is the case that pins the owner test -
-     * without it, whoever attacks first would consume everybody's "for the next attack" buff.
+     * <p>One scenario for the one fixture ({@code next_attack} on the owner) and the one observable (the
+     * CRIT Rate bonus): the owner's attack consumes it, a teammate's attack does not, any number of turn
+     * boundaries leave it alone, and a swing that connects with nothing is not an attack.
      */
     @Test
-    public void aTeammatesAttackDoesNotConsumeIt() {
-        Battle battle = battleWithBuff("next_attack", 2);
-        Character owner = battle.characters().getFirst();
-        Character teammate = battle.characters().get(1);
+    public void nextAttackLifetimeBelongsToItsOwner() {
+        // The owner's own attack consumes it, and it is up beforehand.
+        Battle ownerBattle = battleWithBuff("next_attack");
+        Character owner = ownerBattle.characters().getFirst();
+        double beforeAnyAction = critRateBonus(owner);
+        attack(ownerBattle, owner, 1);        // slot 1 = the basic attack
+        double afterOwnerAttack = critRateBonus(owner);
 
-        attack(battle, teammate, 1);
+        // A teammate's attack does not: the buff belongs to its owner, not to whoever attacks first.
+        Battle teamBattle = battleWithBuff("next_attack", 2);
+        Character teamOwner = teamBattle.characters().getFirst();
+        Character teammate = teamBattle.characters().get(1);
+        attack(teamBattle, teammate, 1);
+        double afterTeammateAttack = critRateBonus(teamOwner);
 
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS,
-                "the buff belongs to its owner, not to whoever happens to attack");
-    }
-
-    /**
-     * A lifetime is not a turn count: turn boundaries leave it alone.
-     *
-     * <p>Pinned because the tempting implementation - give the buff a placeholder duration - would expire it
-     * on the first {@code afterMove}, i.e. a rule that looks like it works and lasts one turn instead of one
-     * attack.
-     */
-    @Test
-    public void turnBoundariesDoNotConsumeIt() {
-        Battle battle = battleWithBuff("next_attack");
-        Character owner = battle.characters().getFirst();
-
+        // A lifetime is not a turn count: turn boundaries leave it alone.
+        Battle turnBattle = battleWithBuff("next_attack");
+        Character turnOwner = turnBattle.characters().getFirst();
         for (int turn = 0; turn < 5; turn++) {
-            owner.getBuffManager().beforeMove();
-            owner.getBuffManager().afterMove();
+            turnOwner.getBuffManager().beforeMove();
+            turnOwner.getBuffManager().afterMove();
         }
+        double afterTurnBoundaries = critRateBonus(turnOwner);
 
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS,
-                "it ends when its owner attacks, and nothing has attacked");
+        // An attack that hits nothing is not an attack: the buff survives the whiff.
+        Battle whiffBattle = battleWithBuff("next_attack");
+        Character whiffOwner = whiffBattle.characters().getFirst();
+        whiffBattle.enemyUnits().getFirst().takeDamage(9_999_999);
+        whiffBattle.processRequests();
+        attack(whiffBattle, whiffOwner, 1, whiffBattle.enemyUnits().getFirst());
+        double afterWhiff = critRateBonus(whiffOwner);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0.5, beforeAnyAction, EPS, "precondition: the buff is up"),
+                () -> Assertions.assertEquals(0, afterOwnerAttack, EPS,
+                        "「until after the wearer's first attack」 -- the attack ended it"),
+                () -> Assertions.assertEquals(0.5, afterTeammateAttack, EPS,
+                        "the buff belongs to its owner, not to whoever happens to attack"),
+                () -> Assertions.assertEquals(0.5, afterTurnBoundaries, EPS,
+                        "it ends when its owner attacks, and nothing has attacked"),
+                () -> Assertions.assertEquals(0.5, afterWhiff, EPS,
+                        "not one hit landed, so nothing attacked"));
     }
 
     /**
-     * An attack that <b>connects with nothing</b> is not an attack: the buff survives it.
+     * The spellings name different events: {@code next_skill}, {@code next_ultimate},
+     * {@code next_elation_skill} and {@code next_skill:<slot>} are four clauses of one vocabulary, so they
+     * share the fixture and the observable and are checked as one scenario.
      *
-     * <p>"持续到施放首次攻击后结束" is about an attack that happened, and the engine says an attack happened only
-     * when at least one target was hit ({@code Battle.fireAfterAttack}'s first guard). Casting at a battlefield
-     * with nothing left alive is the reachable way to swing and hit nothing - and the tempting implementation,
-     * broadcasting "an attack happened" whenever a skill was cast, would burn the buff on the whiff.
+     * <p>The Elation cast is driven with skill 1513's own row ({@code DefaultSkill(1513, 20, 1)}) because the
+     * category the lifetime reads is a fact about the SKILL's data ({@code ElationDamage}), while the caster
+     * stays this class's own unit: nothing in the lifetime reads who cast it.
      */
     @Test
-    public void anAttackThatHitsNothingDoesNotConsumeIt() {
-        Battle battle = battleWithBuff("next_attack");
-        Character owner = battle.characters().getFirst();
-        battle.enemyUnits().getFirst().takeDamage(9_999_999);
-        battle.processRequests();
-
-        attack(battle, owner, 1, battle.enemyUnits().getFirst());   // slot 1 at the battlefield's dead enemy
-
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS,
-                "not one hit landed, so nothing attacked");
-    }
-
-    /**
-     * The three spellings are three different events.
-     */
-    @Test
-    public void theSpellingsNameDifferentEvents() {
+    public void lifetimeSpellingsNameDistinctEvents() {
         // next_skill: a basic attack does not consume it, a Skill does.
         Battle skillBattle = battleWithBuff("next_skill");
         Character skillOwner = skillBattle.characters().getFirst();
         attack(skillBattle, skillOwner, 1);
-        Assertions.assertEquals(0.5, critRateBonus(skillOwner), EPS,
-                "a basic attack is not a Skill");
+        double afterBasicForSkill = critRateBonus(skillOwner);
         attack(skillBattle, skillOwner, 2);
-        Assertions.assertEquals(0, critRateBonus(skillOwner), EPS, "a Skill is");
+        double afterSkill = critRateBonus(skillOwner);
 
         // next_ultimate: a Skill does not consume it, the Ultimate does.
         Battle ultBattle = battleWithBuff("next_ultimate");
         Character ultOwner = ultBattle.characters().getFirst();
         attack(ultBattle, ultOwner, 2);
-        Assertions.assertEquals(0.5, critRateBonus(ultOwner), EPS, "a Skill is not an Ultimate");
+        double afterSkillForUltimate = critRateBonus(ultOwner);
         attack(ultBattle, ultOwner, 3);
-        Assertions.assertEquals(0, critRateBonus(ultOwner), EPS, "the Ultimate is");
-    }
+        double afterUltimate = critRateBonus(ultOwner);
 
-    /**
-     * {@code next_elation_skill}: a Skill does not consume it, an <b>Elation</b> skill does.
-     *
-     * <p>Reader: 1513 (砂金•戏浪)'s talent - 「并在施放后使自身下一次在阿哈时刻中施放的欢愉技强化为【All in！敬炽烈一夏】」, a slot swap
-     * that has to survive until the next Elation cast and be consumed by it. {@code next_skill} cannot say it (it ends on
-     * a 战技) and {@code cast_end} is too early (it would end in the cast that granted it).
-     *
-     * <p>The category the lifetime reads is a fact about the SKILL's data ({@code ElationDamage}), so the cast is driven
-     * with that data ({@code DefaultSkill(1513, 20, 1)} - her Elation skill's row) while the caster stays this class's own
-     * unit: nothing in the lifetime reads who cast it.
-     */
-    @Test
-    public void anElationCastIsItsOwnLifetime() {
-        Battle battle = battleWithBuff("next_elation_skill");
-        Character owner = battle.characters().getFirst();
+        // next_elation_skill: a Skill does not consume it, an Elation skill does.
+        Battle elationBattle = battleWithBuff("next_elation_skill");
+        Character elationOwner = elationBattle.characters().getFirst();
+        attack(elationBattle, elationOwner, 2);
+        double afterSkillForElation = critRateBonus(elationOwner);
+        elationBattle.castImmediate(new DefaultSkill(1513, 20, 1), elationOwner, List.of(monster()));
+        double afterElationCast = critRateBonus(elationOwner);
 
-        attack(battle, owner, 2);                                 // a Skill
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "a Skill is not an Elation skill");
+        // next_skill:20: an ordinary basic and a Skill are not the row; the named row ends it.
+        Battle slotBattle = battleWithBuff("next_skill:20");
+        Character slotOwner = slotBattle.characters().getFirst();
+        attack(slotBattle, slotOwner, 1);
+        double afterBasicForSlot = critRateBonus(slotOwner);
+        attack(slotBattle, slotOwner, 2);
+        double afterSkillForSlot = critRateBonus(slotOwner);
+        slotBattle.castImmediate(new DefaultSkill(1513, 20, 1), slotOwner, List.of(monster()));
+        double afterNamedSlot = critRateBonus(slotOwner);
 
-        battle.castImmediate(new DefaultSkill(1513, 20, 1), owner, List.of(monster()));
-        Assertions.assertEquals(0, critRateBonus(owner), EPS, "the Elation cast is");
-    }
-    /**
-     * {@code next_skill:<slot>}: the lifetime that names ONE row - 「下一次强化普攻」 (1224 Eidolon 6).
-     *
-     * <p>Reader-side: a Skill (slot 2) must not consume it, and the named row must. The named row here is 1513 Elation
-     * skill (slot 20), the same row the neighbouring case casts - a slot whose data the engine has, so the cast is a
-     * real one.
-     */
-    @Test
-    public void aNamedSlotIsItsOwnLifetime() {
-        Battle battle = battleWithBuff("next_skill:20");
-        Character owner = battle.characters().getFirst();
-
-        attack(battle, owner, 1);
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "an ordinary basic is not the row");
-        attack(battle, owner, 2);
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "a Skill is not the row");
-        battle.castImmediate(new DefaultSkill(1513, 20, 1), owner, List.of(monster()));
-        Assertions.assertEquals(0, critRateBonus(owner), EPS, "the named slot ends it");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0.5, afterBasicForSkill, EPS,
+                        "a basic attack is not a Skill"),
+                () -> Assertions.assertEquals(0, afterSkill, EPS, "a Skill is"),
+                () -> Assertions.assertEquals(0.5, afterSkillForUltimate, EPS,
+                        "a Skill is not an Ultimate"),
+                () -> Assertions.assertEquals(0, afterUltimate, EPS, "the Ultimate is"),
+                () -> Assertions.assertEquals(0.5, afterSkillForElation, EPS,
+                        "a Skill is not an Elation skill"),
+                () -> Assertions.assertEquals(0, afterElationCast, EPS, "the Elation cast is"),
+                () -> Assertions.assertEquals(0.5, afterBasicForSlot, EPS,
+                        "an ordinary basic is not the row"),
+                () -> Assertions.assertEquals(0.5, afterSkillForSlot, EPS,
+                        "a Skill is not the row"),
+                () -> Assertions.assertEquals(0, afterNamedSlot, EPS, "the named slot ends it"));
     }
 
     // ==================================================================
@@ -208,49 +185,44 @@ public class BuffLifetimeTest {
     // ==================================================================
 
     /**
-     * "持续至装备者下次施放普攻<b>或</b>战技后" - a duration that names two events ends at the <b>first</b> of them.
+     * "持续至装备者下次施放普攻<b>或</b>战技后" - a duration that names two events ends at the <b>first</b> of
+     * them, and it takes a whiffed basic attack (neither event) to leave it alone.
      *
-     * <p>Relic set 12's sentence is a disjunction, and it is the case that tells a list of lifetimes apart from
-     * both wrong shapes: a single {@code next_attack} would ignore a Skill that attacks nothing (the case below,
-     * which the existing whiff rule pins from the other side), and one buff per event would make the two
-     * <b>replace</b> each other - same kind, same target - so only the later one would ever be up.
+     * <p>One scenario, because all three clauses use the same fixture (a list of lifetimes on the owner) and
+     * the same observable: a Skill cast that lands nothing still ends it, a basic attack ends it, and a basic
+     * attack that lands nothing does not.
      */
     @Test
-    public void aDisjunctionEndsAtTheFirstOfItsEvents() {
+    public void aDisjunctionEndsAtTheFirstNamedEvent() {
         // The half a lone `next_attack` cannot express: a cast that landed nothing still ends it.
         Battle bySkill = battleWithBuff(List.of("next_attack", "next_skill"));
         Character skilled = bySkill.characters().getFirst();
         bySkill.enemyUnits().getFirst().takeDamage(9_999_999);
         bySkill.processRequests();
-
         attack(bySkill, skilled, 2, bySkill.enemyUnits().getFirst());   // a Skill, aimed at the dead enemy
-        Assertions.assertEquals(0, critRateBonus(skilled), EPS,
-                "the cast is the event, whether or not it connected");
+        double afterWhiffedSkill = critRateBonus(skilled);
 
         // The other member, on its own: a basic attack ends it just as well.
         Battle byAttack = battleWithBuff(List.of("next_attack", "next_skill"));
         Character attacker = byAttack.characters().getFirst();
-
         attack(byAttack, attacker, 1);
-        Assertions.assertEquals(0, critRateBonus(attacker), EPS,
-                "「普攻或战技」 (a Basic ATK or a Skill): either one is enough");
-    }
+        double afterBasic = critRateBonus(attacker);
 
-    /**
-     * A second lifetime does not make the buff outlive its owner's death of a whiff: an attack that hits nothing
-     * is still not an attack ({@code next_attack}), and it is not a Skill cast either when it is a basic attack.
-     */
-    @Test
-    public void aWhiffedBasicAttackStillDoesNotConsumeTheDisjunction() {
-        Battle battle = battleWithBuff(List.of("next_attack", "next_skill"));
-        Character owner = battle.characters().getFirst();
-        battle.enemyUnits().getFirst().takeDamage(9_999_999);
-        battle.processRequests();
+        // A whiffed basic attack is neither named event, so the disjunction must survive it.
+        Battle whiff = battleWithBuff(List.of("next_attack", "next_skill"));
+        Character whiffOwner = whiff.characters().getFirst();
+        whiff.enemyUnits().getFirst().takeDamage(9_999_999);
+        whiff.processRequests();
+        attack(whiff, whiffOwner, 1, whiff.enemyUnits().getFirst());
+        double afterWhiffedBasic = critRateBonus(whiffOwner);
 
-        attack(battle, owner, 1, battle.enemyUnits().getFirst());
-
-        Assertions.assertEquals(0.5, critRateBonus(owner), EPS,
-                "no hit landed and no Skill was cast, so neither named event happened");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0, afterWhiffedSkill, EPS,
+                        "the cast is the event, whether or not it connected"),
+                () -> Assertions.assertEquals(0, afterBasic, EPS,
+                        "「普攻或战技」 (a Basic ATK or a Skill): either one is enough"),
+                () -> Assertions.assertEquals(0.5, afterWhiffedBasic, EPS,
+                        "no hit landed and no Skill was cast, so neither named event happened"));
     }
 
     // ==================================================================
@@ -323,62 +295,56 @@ public class BuffLifetimeTest {
     // ==================================================================
 
     /**
-     * The authored 2-piece grants +60% CRIT Rate above 120% CRIT DMG, and the first attack takes it away.
+     * The shipped 2-piece of relic set 305 (星体差分机): what the authored rule says, what it grants above the
+     * threshold, and what it refuses below it - one scenario of the one fixture ({@code wearer(double)}
+     * wearing set 305 in a seeded battle).
      *
      * <p>End-to-end through the relic loader, the real battle start and a real attack. Measured as a delta
      * against the same character bare, never as an absolute - her sheet has a CRIT Rate of its own.
      */
     @Test
-    public void theAuthoredRuleGrantsItsCritRateUntilTheFirstAttack() {
-        Character wearer = wearer(1.3);
-        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
-        double bare = CharacterFactory.create(OWNER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
-
-        battle.startBattle();
-        Assertions.assertEquals(bare + 0.6, critRateOf(wearer), EPS,
-                "the rule fired: param #3 is 0.6 (60%), read from the parameters");
-
-        attack(battle, wearer, 1);
-
-        Assertions.assertEquals(bare, critRateOf(wearer), EPS,
-                "「持续到施放首次攻击后结束」 (lasts until the first attack is cast, then ends) -- and the first attack has happened");
-    }
-
-    /**
-     * Below the threshold nothing is granted at all.
-     */
-    @Test
-    public void belowTheCritDamageThresholdNothingIsGranted() {
-        Character wearer = wearer(1.0);            // 100% CRIT DMG, below the text's 120%
-        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
-        double bare = CharacterFactory.create(OWNER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
-
-        battle.startBattle();
-
-        Assertions.assertEquals(bare, critRateOf(wearer), EPS,
-                "`self_attr:CRIT_ATTACK >= 1.2` is a fraction, and 1.0 is below it");
-    }
-
-    /**
-     * The rule is filed at the 2-piece tier and states the lifetime from the text.
-     */
-    @Test
-    public void theAuthoredRuleStatesItsOwnLifetime() {
-        Character wearer = wearer(1.3);
-        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
-        battle.startBattle();
-
+    public void relic305TwoPieceGrantsCritRateUntilTheFirstAttack() {
+        // What the authored rule is: filed at the 2-piece tier, it states a lifetime, not a turn count.
+        Character reader = wearer(1.3);
+        Battle readerBattle = new Battle(List.of(reader), List.of(monster()), BattleFixture.seeded());
+        readerBattle.startBattle();
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(STELLAR_DIFFERENTIATOR).at(2)
                 .matching(TriggerEvent.BATTLE_START,
-                        new TriggerTable.TriggerContext(wearer, wearer, null, 0, 0, null, battle));
+                        new TriggerTable.TriggerContext(reader, reader, null, 0, 0, null, readerBattle));
+        // Kept null-safe so a missing rule is still reported by the size assertion, not by a getFirst() throw.
+        EffectSpec effect = rules.isEmpty() ? null : rules.getFirst().effects().getFirst();
 
-        Assertions.assertEquals(1, rules.size());
-        EffectSpec effect = rules.getFirst().effects().getFirst();
-        Assertions.assertEquals("CRIT_CHANCE", effect.getAttribute());
-        Assertions.assertEquals(0.6, effect.getPercent(), EPS, "param #3 is 0.6");
-        Assertions.assertEquals(List.of("next_attack"), effect.getUntil(),
-                "a lifetime, not a turn count: turns would expire on the wrong boundary");
-        Assertions.assertNull(effect.getTurns(), "and the two are mutually exclusive");
+        // Above 120% CRIT DMG the 2-piece grants +60% CRIT Rate, and the first attack takes it away.
+        Character wearer = wearer(1.3);
+        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
+        double bare = CharacterFactory.create(OWNER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
+        battle.startBattle();
+        double granted = critRateOf(wearer);
+        attack(battle, wearer, 1);
+        double afterFirstAttack = critRateOf(wearer);
+
+        // Below the threshold nothing is granted at all.
+        Character belowWearer = wearer(1.0);            // 100% CRIT DMG, below the text's 120%
+        Battle belowBattle = new Battle(List.of(belowWearer), List.of(monster()), BattleFixture.seeded());
+        double bareBelow = CharacterFactory.create(OWNER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
+        belowBattle.startBattle();
+        double belowThreshold = critRateOf(belowWearer);
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, rules.size(),
+                        "the 2-piece tier compiles exactly one BATTLE_START rule"),
+                () -> Assertions.assertEquals("CRIT_CHANCE", effect.getAttribute(),
+                        "the rule modifies CRIT_CHANCE"),
+                () -> Assertions.assertEquals(0.6, effect.getPercent(), EPS, "param #3 is 0.6"),
+                () -> Assertions.assertEquals(List.of("next_attack"), effect.getUntil(),
+                        "a lifetime, not a turn count: turns would expire on the wrong boundary"),
+                () -> Assertions.assertNull(effect.getTurns(), "and the two are mutually exclusive"),
+                () -> Assertions.assertEquals(bare + 0.6, granted, EPS,
+                        "the rule fired: param #3 is 0.6 (60%), read from the parameters"),
+                () -> Assertions.assertEquals(bare, afterFirstAttack, EPS,
+                        "「持续到施放首次攻击后结束」 (lasts until the first attack is cast, then ends) -- and the first attack has happened"),
+                () -> Assertions.assertEquals(bareBelow, belowThreshold, EPS,
+                        "`self_attr:CRIT_ATTACK >= 1.2` is a fraction, and 1.0 is below it"));
     }
 
     // ==================================================================

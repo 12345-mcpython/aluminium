@@ -1,6 +1,9 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.damage.Damage;
+import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
@@ -14,11 +17,12 @@ import com.laosun.aluminium.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import com.laosun.aluminium.damage.Damage;
 
 /**
  * Special energy-provider characters use an independent {@link EnergyProvider}
@@ -61,56 +65,54 @@ public class SpecialEnergyProviderTest {
         Character any = CharacterFactory.create(1308, 80);      // Acheron
         Skill skill = realSkill(1308, SkillType.COMMON);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        var hit = new com.laosun.aluminium.damage.Damage(any, enemy,
-                com.laosun.aluminium.enums.DamageElement.THUNDER,
-                com.laosun.aluminium.enums.DamageType.NORMAL, 100);
+        Damage hit = new Damage(any, enemy, DamageElement.THUNDER, DamageType.NORMAL, 100);
 
-        Assertions.assertNull(none.onSkillCast(any, skill, Set.of()), "skill cast");
-        Assertions.assertNull(none.onUltCast(any, realSkill(1308, SkillType.ULTRA)), "ultimate");
-        Assertions.assertNull(none.onTakingHit(any, hit), "taking a hit");
-        Assertions.assertNull(none.onKill(any, any), "kill");
-        Assertions.assertNull(none.onBreak(any, any), "break");
+        Assertions.assertAll(
+                () -> Assertions.assertNull(none.onSkillCast(any, skill, Set.of()), "skill cast"),
+                () -> Assertions.assertNull(none.onUltCast(any, realSkill(1308, SkillType.ULTRA)), "ultimate"),
+                () -> Assertions.assertNull(none.onTakingHit(any, hit), "taking a hit"),
+                () -> Assertions.assertNull(none.onKill(any, any), "kill"),
+                () -> Assertions.assertNull(none.onBreak(any, any), "break"));
     }
 
     /**
-     * Control: the standard provider's same 5 hooks all grant something (hit 10 / kill 5 / break 5).
+     * Control: the standard provider's same 5 hooks all grant something (hit 10 / kill 5 / break 5),
+     * and the skill-cast amount is the skill's <b>own</b> {@code sp_base} rather than a constant.
+     *
+     * <p>⚠ <b>CORRECTED (2026-10-17)</b>: the off-tier row used to be asserted the other way round - 20 for a
+     * basic attack whose data says 30 - and its message recorded the constant as the deliberate choice,
+     * 「fidelity to the off-tier value is left to datafication」. That datafication is what happened: the provider
+     * now multiplies the row's own {@code sp_base} by the instance count, and the constants survive only as the
+     * fallback for a row that states nothing. A case that pinned the pre-datafication number would have gone green
+     * on the very regression this change is meant to remove.
      */
     @Test
     public void standardProviderGrantsFromEverySource() {
         Character regular = CharacterFactory.create(1204, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         // onTakingHit checks damage == null itself (that means "no damage event"), so give it a real damage instance here
-        var hit = new com.laosun.aluminium.damage.Damage(regular, enemy,
-                com.laosun.aluminium.enums.DamageElement.THUNDER,
-                com.laosun.aluminium.enums.DamageType.NORMAL, 100);
-
-        Assertions.assertEquals(20, standard.onSkillCast(regular,
-                realSkill(1204, SkillType.COMMON), Set.of()).amount(), EPS);
-        Assertions.assertEquals(30, standard.onSkillCast(regular,
-                realSkill(1204, SkillType.SKILL), Set.of()).amount(), EPS);
-        Assertions.assertEquals(5, standard.onUltCast(regular,
-                realSkill(1204, SkillType.ULTRA)).amount(), EPS);
-        Assertions.assertEquals(10, standard.onTakingHit(regular, hit).amount(), EPS);
-        Assertions.assertEquals(5, standard.onKill(regular, regular).amount(), EPS);
-        Assertions.assertEquals(5, standard.onBreak(regular, regular).amount(), EPS);
-    }
-
-    /**
-     * The standard provider reads the skill's <b>own</b> {@code sp_base}, so an off-tier row wins over the conventional
-     * number.
-     *
-     * <p>⚠ <b>CORRECTED (2026-10-17)</b>: this case used to assert the opposite - 20 for a basic attack whose data says
-     * 30 - and its message recorded the constant as the deliberate choice, 「fidelity to the off-tier value is left to
-     * datafication」. That datafication is what happened: the provider now multiplies the row's own {@code sp_base} by the
-     * instance count, and the constants survive only as the fallback for a row that states nothing. A case that pinned
-     * the pre-datafication number would have gone green on the very regression this change is meant to remove.
-     */
-    @Test
-    public void theProviderReadsTheSkillsOwnSpBase() {
+        Damage hit = new Damage(regular, enemy, DamageElement.THUNDER, DamageType.NORMAL, 100);
         Character yaoGuang = CharacterFactory.create(1502, 80);   // Yao Guang: the basic-attack data says 30 (off-tier)
-        Assertions.assertEquals(30, standard.onSkillCast(yaoGuang,
-                        realSkill(1502, SkillType.COMMON), Set.of()).amount(), EPS,
-                "the data's own sp_base (30) wins over the conventional 20");
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(20, standard.onSkillCast(regular,
+                        realSkill(1204, SkillType.COMMON), Set.of()).amount(), EPS,
+                        "basic attack uses the row's own sp_base (20 here)"),
+                () -> Assertions.assertEquals(30, standard.onSkillCast(regular,
+                        realSkill(1204, SkillType.SKILL), Set.of()).amount(), EPS,
+                        "skill uses the row's own sp_base (30)"),
+                () -> Assertions.assertEquals(5, standard.onUltCast(regular,
+                        realSkill(1204, SkillType.ULTRA)).amount(), EPS,
+                        "ultimate grants the flat 5"),
+                () -> Assertions.assertEquals(10, standard.onTakingHit(regular, hit).amount(), EPS,
+                        "taking a hit grants the flat 10"),
+                () -> Assertions.assertEquals(5, standard.onKill(regular, regular).amount(), EPS,
+                        "kill grants the flat 5"),
+                () -> Assertions.assertEquals(5, standard.onBreak(regular, regular).amount(), EPS,
+                        "break grants the flat 5"),
+                () -> Assertions.assertEquals(30, standard.onSkillCast(yaoGuang,
+                                realSkill(1502, SkillType.COMMON), Set.of()).amount(), EPS,
+                        "the data's own sp_base (30) wins over the conventional 20"));
     }
 
     // ==================================================================
@@ -118,29 +120,33 @@ public class SpecialEnergyProviderTest {
     // ==================================================================
 
     /**
-     * {@code CharacterFactory} swaps in the special provider for these 6 characters.
+     * The assembly point picks the provider from the character's resource: {@code CharacterFactory} swaps in the
+     * special provider for these 6 characters, while a regular character and a data-free placeholder entry point
+     * both keep the standard provider.
      */
     @Test
-    public void factoryInjectsTheSpecialProvider() {
+    public void characterCreationAttachesTheProviderMatchingTheResource() {
+        List<Executable> checks = new ArrayList<>();
         for (int cid : SPECIAL) {
             Character c = CharacterFactory.create(cid, 80);
-            Assertions.assertTrue(c.getEnergyProvider() instanceof NoConventionalEnergyProvider,
-                    "cid=" + cid + " should use the special provider, actual " + c.getEnergyProvider().getClass().getSimpleName());
-            Assertions.assertTrue(CharacterFactory.usesSpecialResource(cid));
+            checks.add(() -> Assertions.assertTrue(c.getEnergyProvider() instanceof NoConventionalEnergyProvider,
+                    "cid=" + cid + " should use the special provider, actual " + c.getEnergyProvider().getClass().getSimpleName()));
+            checks.add(() -> Assertions.assertTrue(CharacterFactory.usesSpecialResource(cid),
+                    "cid=" + cid + " should be classified as using a special resource"));
         }
-        Character jingYuan = CharacterFactory.create(1204, 80);
-        Assertions.assertTrue(jingYuan.getEnergyProvider() instanceof StandardEnergyProvider,
-                "a regular character still uses the standard provider");
-        Assertions.assertFalse(CharacterFactory.usesSpecialResource(1204));
-    }
 
-    /**
-     * Placeholder entry points are unaffected (it does not look up character data, so there is no cid to judge by).
-     */
-    @Test
-    public void placeholderCharactersKeepTheStandardProvider() {
+        Character jingYuan = CharacterFactory.create(1204, 80);
+        checks.add(() -> Assertions.assertTrue(jingYuan.getEnergyProvider() instanceof StandardEnergyProvider,
+                "a regular character still uses the standard provider"));
+        checks.add(() -> Assertions.assertFalse(CharacterFactory.usesSpecialResource(1204),
+                "1204 is not a special-resource character"));
+
+        // Placeholder entry points are unaffected: they do not look up character data, so there is no cid to judge by
         Character placeholder = Character.fromAttributes("hero", 10_000, 100, 100, 100);
-        Assertions.assertTrue(placeholder.getEnergyProvider() instanceof StandardEnergyProvider);
+        checks.add(() -> Assertions.assertTrue(placeholder.getEnergyProvider() instanceof StandardEnergyProvider,
+                "a placeholder keeps the standard provider"));
+
+        Assertions.assertAll(checks);
     }
 
     // ==================================================================
@@ -148,38 +154,28 @@ public class SpecialEnergyProviderTest {
     // ==================================================================
 
     /**
-     * The core: Acheron gains not a single point of energy from being hit.
+     * The core: no special-resource character gains a single point of energy in a real battle, Acheron included.
      *
      * <p>Her cap is only 9; before the fix one hit (+10) filled it and she could cast an ultimate
-     * straight away.
+     * straight away, so she is run first (seed 0) and then again inside the exhaustive sweep (seed 1).
      */
     @Test
-    public void acheronGainsNothingFromBeingHit() {
-        Character acheron = CharacterFactory.create(1308, 80);
-        Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(acheron), List.of(enemy), new Random(0));
-        battle.startBattle();
+    public void specialResourceCharactersNeverGainEnergyInBattle() {
+        List<Executable> checks = new ArrayList<>();
 
-        // Let the enemy hit her a few times: the enemy has 132 speed and acts first
-        for (int i = 0; i < 6 && !battle.isOver(); i++) {
-            battle.stepForward();
-            if (battle.currentMove() == null) {
-                break;
-            }
-            CanHit actor = battle.currentMove().getCanHit();
-            battle.beforeMove();
-            if (actor == enemy) {
-                battle.performAction(enemySkill(enemy), List.of(acheron));
-            } else {
-                battle.performAction(realSkill(1308, SkillType.COMMON), List.of(enemy));
-            }
-            battle.afterMove();
+        Character acheron = runBattle(1308, 0L);
+        checks.add(() -> Assertions.assertEquals(0, acheron.getCurrentEnergy(), EPS,
+                "Acheron's energy should always be 0 (neither hits nor skills are credited), actual " + acheron.getCurrentEnergy()));
+        checks.add(() -> Assertions.assertFalse(acheron.isEnergyFull(),
+                "she should never be at full energy — being full lets her cast an ultimate that should not exist"));
+
+        for (int cid : SPECIAL) {
+            Character c = runBattle(cid, 1L);
+            checks.add(() -> Assertions.assertEquals(0, c.getCurrentEnergy(), EPS,
+                    "cid=" + cid + " (" + c.getName() + ")'s energy should always be 0"));
         }
 
-        Assertions.assertEquals(0, acheron.getCurrentEnergy(), EPS,
-                "Acheron's energy should always be 0 (neither hits nor skills are credited), actual " + acheron.getCurrentEnergy());
-        Assertions.assertFalse(acheron.isEnergyFull(),
-                "she should never be at full energy — being full lets her cast an ultimate that should not exist");
+        Assertions.assertAll(checks);
     }
 
     /**
@@ -187,11 +183,25 @@ public class SpecialEnergyProviderTest {
      */
     @Test
     public void regularCharacterStillGainsFromBeingHit() {
-        Character jingYuan = CharacterFactory.create(1204, 80);
+        Character jingYuan = runBattle(1204, 0L);
+
+        Assertions.assertTrue(jingYuan.getCurrentEnergy() > 0,
+                "a regular character should have energy credited, actual " + jingYuan.getCurrentEnergy());
+    }
+
+    // ==================================================================
+
+    /**
+     * Runs the shared end-to-end fixture: one character against one enemy, six moves alternating the enemy's
+     * basic attack (aimed at the character) and the character's own basic attack (aimed at the enemy).
+     */
+    private static Character runBattle(int cid, long seed) {
+        Character character = CharacterFactory.create(cid, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(jingYuan), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(character), List.of(enemy), new Random(seed));
         battle.startBattle();
 
+        // The enemy has 132 speed and acts first
         for (int i = 0; i < 6 && !battle.isOver(); i++) {
             battle.stepForward();
             if (battle.currentMove() == null) {
@@ -200,49 +210,14 @@ public class SpecialEnergyProviderTest {
             CanHit actor = battle.currentMove().getCanHit();
             battle.beforeMove();
             if (actor == enemy) {
-                battle.performAction(enemySkill(enemy), List.of(jingYuan));
+                battle.performAction(enemySkill(enemy), List.of(character));
             } else {
-                battle.performAction(realSkill(1204, SkillType.COMMON), List.of(enemy));
+                battle.performAction(realSkill(cid, SkillType.COMMON), List.of(enemy));
             }
             battle.afterMove();
         }
-
-        Assertions.assertTrue(jingYuan.getCurrentEnergy() > 0,
-                "a regular character should have energy credited, actual " + jingYuan.getCurrentEnergy());
+        return character;
     }
-
-    /**
-     * The 6 special characters have energy constantly at 0 in a real battle (exhaustive, to avoid
-     * protecting only one of them).
-     */
-    @Test
-    public void everySpecialResourceCharacterStaysAtZeroEnergy() {
-        for (int cid : SPECIAL) {
-            Character c = CharacterFactory.create(cid, 80);
-            Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-            Battle battle = new Battle(List.of(c), List.of(enemy), new Random(1));
-            battle.startBattle();
-
-            for (int i = 0; i < 6 && !battle.isOver(); i++) {
-                battle.stepForward();
-                if (battle.currentMove() == null) {
-                    break;
-                }
-                CanHit actor = battle.currentMove().getCanHit();
-                battle.beforeMove();
-                if (actor == enemy) {
-                    battle.performAction(enemySkill(enemy), List.of(c));
-                } else {
-                    battle.performAction(realSkill(cid, SkillType.COMMON), List.of(enemy));
-                }
-                battle.afterMove();
-            }
-            Assertions.assertEquals(0, c.getCurrentEnergy(), EPS,
-                    "cid=" + cid + " (" + c.getName() + ")'s energy should always be 0");
-        }
-    }
-
-    // ==================================================================
 
     private static Skill realSkill(int cid, SkillType type) {
         int slot = switch (type) {

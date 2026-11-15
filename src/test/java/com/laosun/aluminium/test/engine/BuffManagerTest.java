@@ -1,6 +1,5 @@
 package com.laosun.aluminium.test.engine;
 
-
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
@@ -32,25 +31,89 @@ public class BuffManagerTest {
                 .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF);
     }
 
+    /**
+     * The boost buff's whole life on one unit: attach, query, remove, and a same-kind re-application that
+     * refreshes instead of stacking. Every clause uses the same fixture (one character, one BUFF-sourced
+     * modifier on {@code ALL_DAMAGE_TYPE_BOOST}) and observes the same effect.
+     */
     @Test
-    public void addBuffAppliesEffect() {
+    public void boostBuffLifecycleThroughEffectAndQuery() {
         Character c = character();
-        c.getBuffManager().addBuff(new BoostDamageBuff(2, .5));
+        BuffManager manager = c.getBuffManager();
 
-        Assertions.assertEquals(1, boostModifiers(c).size());
-        Assertions.assertEquals(.5, boostModifiers(c).getFirst().getValue(), 1e-9);
+        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "not attached yet → false");
+
+        BoostDamageBuff buff = new BoostDamageBuff(2, .5);
+        manager.addBuff(buff);
+
+        Assertions.assertAll("boost buff attaches one effect and becomes visible to hasBuff",
+                () -> Assertions.assertEquals(1, boostModifiers(c).size(), "attach: one BUFF-sourced boost modifier"),
+                () -> Assertions.assertEquals(.5, boostModifiers(c).getFirst().getValue(), 1e-9, "attach: boost value"),
+                () -> Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class), "attached → true"),
+                () -> Assertions.assertFalse(manager.hasBuff(StunBuff.class),
+                        "a category that is not attached → false"));
+
+        manager.removeBuff(buff);
+
+        Assertions.assertAll("removeBuff drops the effect and the query result",
+                () -> Assertions.assertTrue(boostModifiers(c).isEmpty(), "remove: boost modifier gone"),
+                () -> Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "removed → back to false"));
+
+        manager.addBuff(new BoostDamageBuff(2, .5));
+        manager.addBuff(new BoostDamageBuff(1, .7));
+
+        Assertions.assertAll("a same-kind buff refreshes instead of stacking",
+                () -> Assertions.assertEquals(1, boostModifiers(c).size(), "same-kind buff should replace, not stack"),
+                () -> Assertions.assertEquals(.7, boostModifiers(c).getFirst().getValue(), 1e-9,
+                        "refresh: replaced boost value"));
     }
 
+    /**
+     * A late (post-move) buff must survive {@code beforeMove} and expire on {@code afterMove}. The effect
+     * and the {@code hasBuff} query are two probes of the same fixture, so they share one scenario.
+     */
     @Test
-    public void lateBuffTicksOnlyOnAfterMove() {
+    public void postMoveBuffExpiresOnlyAfterTheMove() {
         Character c = character();
-        c.getBuffManager().addBuff(new BoostDamageBuff(1, .5));
+        BuffManager manager = c.getBuffManager();
+        manager.addBuff(new BoostDamageBuff(1, .5));      // post-move buff, duration 1
 
-        c.getBuffManager().beforeMove();
-        Assertions.assertEquals(1, boostModifiers(c).size(), "late buff must not tick on beforeMove");
+        manager.beforeMove();
 
-        c.getBuffManager().afterMove();
-        Assertions.assertTrue(boostModifiers(c).isEmpty(), "late buff should expire and remove effect");
+        Assertions.assertAll("beforeMove: a late buff has not ticked yet",
+                () -> Assertions.assertEquals(1, boostModifiers(c).size(), "late buff must not tick on beforeMove"),
+                () -> Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class),
+                        "a post-move buff must not expire on beforeMove"));
+
+        manager.afterMove();
+
+        Assertions.assertAll("afterMove: the late buff expires and disappears",
+                () -> Assertions.assertTrue(boostModifiers(c).isEmpty(), "late buff should expire and remove effect"),
+                () -> Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class),
+                        "after expiry it should no longer be found"),
+                () -> Assertions.assertFalse(manager.hasBuff(null), "null returns false without blowing up"));
+    }
+
+    /**
+     * A control buff and a boost buff share one manager: the control blocks acting while the boost's
+     * modifier is present, and {@code clearAll} removes both effects at once.
+     */
+    @Test
+    public void controlAndBoostBuffsCoexistUntilClearAll() {
+        Character c = character();
+        BuffManager manager = c.getBuffManager();
+        manager.addBuff(new StunBuff(2));
+        manager.addBuff(new BoostDamageBuff(3, .5));
+
+        Assertions.assertAll("different kinds of buff coexist",
+                () -> Assertions.assertFalse(manager.canAct(), "stun should block action"),
+                () -> Assertions.assertEquals(1, boostModifiers(c).size(), "coexist: one BUFF-sourced boost modifier"));
+
+        manager.clearAll();
+
+        Assertions.assertAll("clearAll removes every effect",
+                () -> Assertions.assertTrue(manager.canAct(), "clearAll: action is no longer blocked"),
+                () -> Assertions.assertTrue(boostModifiers(c).isEmpty(), "clearAll: boost modifier is gone"));
     }
 
     @Test
@@ -67,86 +130,8 @@ public class BuffManagerTest {
         Assertions.assertTrue(manager.canAct(), "stun should not block after full expiry");
     }
 
-    @Test
-    public void removeBuffRemovesEffect() {
-        Character c = character();
-        BoostDamageBuff buff = new BoostDamageBuff(2, .5);
-        c.getBuffManager().addBuff(buff);
-
-        c.getBuffManager().removeBuff(buff);
-
-        Assertions.assertTrue(boostModifiers(c).isEmpty());
-    }
-
-    @Test
-    public void sameKindBuffRefreshesInsteadOfStacking() {
-        Character c = character();
-        c.getBuffManager().addBuff(new BoostDamageBuff(2, .5));
-
-        c.getBuffManager().addBuff(new BoostDamageBuff(1, .7));
-
-        List<DoubleValue.Modifier> buffMods = boostModifiers(c);
-        Assertions.assertEquals(1, buffMods.size(), "same-kind buff should replace, not stack");
-        Assertions.assertEquals(.7, buffMods.getFirst().getValue(), 1e-9);
-    }
-
-    @Test
-    public void differentKindsCoexist() {
-        Character c = character();
-        c.getBuffManager().addBuff(new StunBuff(2));
-        c.getBuffManager().addBuff(new BoostDamageBuff(3, .5));
-
-        Assertions.assertFalse(c.getBuffManager().canAct(), "stun should block action");
-        Assertions.assertEquals(1, boostModifiers(c).size());
-    }
-
-    @Test
-    public void clearAllRemovesEverything() {
-        Character c = character();
-        c.getBuffManager().addBuff(new StunBuff(2));
-        c.getBuffManager().addBuff(new BoostDamageBuff(3, .5));
-
-        c.getBuffManager().clearAll();
-
-        Assertions.assertTrue(c.getBuffManager().canAct());
-        Assertions.assertTrue(boostModifiers(c).isEmpty());
-    }
-
     // ==================================================================
-    // the buff query point (the prerequisite for super break, triggers and the control state machine)
-    // ==================================================================
-
-    @Test
-    public void hasBuffFindsMountedBuffsAndSurvivesRemoval() {
-        Character c = character();
-        BuffManager manager = c.getBuffManager();
-        BoostDamageBuff buff = new BoostDamageBuff(2, .5);
-
-        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "not attached yet → false");
-        manager.addBuff(buff);
-        Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class), "attached → true");
-        Assertions.assertFalse(manager.hasBuff(StunBuff.class), "a category that is not attached → false");
-
-        manager.removeBuff(buff);
-        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "removed → back to false");
-    }
-
-    @Test
-    public void hasBuffTracksExpiryAndRejectsBadInput() {
-        Character c = character();
-        BuffManager manager = c.getBuffManager();
-        manager.addBuff(new BoostDamageBuff(1, .5));      // post-move buff, duration 1
-
-        manager.beforeMove();
-        Assertions.assertTrue(manager.hasBuff(BoostDamageBuff.class), "a post-move buff must not expire on beforeMove");
-
-        manager.afterMove();
-        Assertions.assertFalse(manager.hasBuff(BoostDamageBuff.class), "after expiry it should no longer be found");
-        Assertions.assertFalse(manager.hasBuff(null), "null returns false without blowing up");
-    }
-
-    // ==================================================================
-    // two stability holes in the manager itself
+    // a stability hole in the manager itself
     // ==================================================================
 
     /**
@@ -155,8 +140,8 @@ public class BuffManagerTest {
      * <p>{@code blocked} is set when a control buff expires on the turn it was blocking (see
      * {@code stunExpiryStillBlocksTheCurrentTurn}). If clearing every buff leaves that flag standing, the
      * unit stays unable to act even though nothing is on it any more - a stuck unit that no amount of
-     * dispelling can free. {@code clearAllRemovesEverything} did not catch it because its stun is never
-     * ticked, so {@code blocked} is never set.
+     * dispelling can free. {@code controlAndBoostBuffsCoexistUntilClearAll} did not catch it because its
+     * stun is never ticked, so {@code blocked} is never set.
      */
     @Test
     public void clearAllAlsoClearsTheBlockedFlag() {

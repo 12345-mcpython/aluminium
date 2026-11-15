@@ -26,7 +26,13 @@ import java.util.*;
  * <p>The set used for the value assertions is 102 "Musketeer of Wild Wheat", because both of its tiers are
  * plain stats in the data (2 pieces +12% ATK, 4 pieces +6% SPD). Most 4-piece bonuses are an ability the
  * engine cannot execute yet, so they could not carry an assertion about a panel value; that gap is pinned
- * separately by {@link #everyEffectIsEitherStatsOrANamedAbility()}.
+ * by the accounting block of {@link #theShippedRelicSetTableIsLoadedBoundAndFullyAccountedFor()}.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the four scenarios below, every clause inside an
+ * {@code assertAll} entry that names itself: the shipped table (loaded, bound, mapped and accounted for),
+ * the piece-count thresholds, the bonus on a real character sheet, and the deterministic reference build
+ * together with the team that wears it. The four rejection paths stay their own tests: an
+ * {@code assertThrows} is not a positive clause and must not hide behind one.
  */
 public class RelicSetTest {
 
@@ -70,66 +76,39 @@ public class RelicSetTest {
     private static final double TOLERANCE = 1e-9;
 
     // ==================================================================
-    // 1. The table is loaded and bound
+    // 1. The shipped table: loaded, bound, mapped and accounted for
     // ==================================================================
 
     /**
-     * {@code relic_sets.json} is loaded, and its rows really bind (a misspelled {@code @SerializedName}
-     * leaves a field at 0/false/empty - the silent-Gson failure this project keeps hitting).
+     * The shipped {@code relic_sets.json}, end to end.
+     *
+     * <p>It is loaded and cached, its rows really bind (a misspelled {@code @SerializedName} leaves a field
+     * at 0/false/empty - the silent-Gson failure this project keeps hitting), every property name in it
+     * resolves to an {@link AttributeType}, and every effect is either stats the engine applies or an
+     * ability it selects but cannot execute yet - nothing is both stat-less and ability-less, which would be
+     * a bonus that quietly does nothing.
+     *
+     * <p>The property-name mapping is the guard rail: an unmappable name throws with the offending string
+     * instead of being dropped, and that failure mode is worth naming because a dropped property does not
+     * break anything visibly - the character is simply a few percent weaker than the game, forever, with
+     * nothing in the log.
+     *
+     * <p><b>L3:</b> these were three single-clause cases about one fixture - the shipped
+     * {@link Constant#RELIC_SETS} table - and one subject: whether every row, name and effect in it is
+     * usable. They are one scenario, and every clause names itself in its {@code assertAll}.
      */
     @Test
-    public void relicSetsAreLoadedFromTheGeneratedTable() {
-        Assertions.assertFalse(Constant.RELIC_SETS.isEmpty(),
-                "relic_sets.json was not loaded — the engine cannot apply any set bonus without it");
+    public void theShippedRelicSetTableIsLoadedBoundAndFullyAccountedFor() {
         // Synthetic test-side sets (release_version == "test") never ship, so no census counts them.
         List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()
                 .filter(s -> !"test".equals(s.releaseVersion())).toList();
-        // ⚠ CORRECTED (2026-10-18, data migration): 60 -> 62 sets in the current version.
-        Assertions.assertEquals(62, shipped.size(),
-                "the shipped relic_sets.json holds 62 sets; a different number means "
-                        + "the file changed and this registry line needs re-checking");
         int effects = shipped.stream().mapToInt(set -> set.effects().size()).sum();
-        // ⚠ CORRECTED (2026-10-18, data migration): 92 -> 96 bonuses (two new sets, 2 + 2).
-        Assertions.assertEquals(96, effects, "the shipped file holds 96 set bonuses (2- and 4-piece)");
-        Assertions.assertTrue(RelicSets.loadCount() >= 1, "the file must have been read at least once");
-        Assertions.assertSame(Constant.RELIC_SETS, RelicSets.table(), "the table is read once and cached");
 
         RelicSet musketeer = Constant.RELIC_SETS.get(CAVERN_SET);
-        Assertions.assertNotNull(musketeer, "set " + CAVERN_SET + " must exist");
-        Assertions.assertEquals(CAVERN_SET, musketeer.setId(), "set_id must bind, not stay 0");
-        Assertions.assertEquals("Musketeer of Wild Wheat", musketeer.name().english(),
-                "set 102's name is 'Musketeer of Wild Wheat'");
-        Assertions.assertFalse(musketeer.isPlanar(), "set 102 is a cavern set");
-        Assertions.assertEquals(
-                List.of(RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT),
-                slotsOf(musketeer),
-                "a cavern set occupies the four cavern slots, in the order the data lists them");
-        Assertions.assertEquals(List.of(2, 4), requiresOf(musketeer),
-                "a cavern set has a 2-piece and a 4-piece bonus");
-        Assertions.assertEquals(5, musketeer.parts().getFirst().rarity(),
-                "the 5-star copy of each part is the one kept by the generator");
-
         RelicSet planar = Constant.RELIC_SETS.get(PLANAR_SET);
-        Assertions.assertNotNull(planar, "set " + PLANAR_SET + " must exist");
-        Assertions.assertTrue(planar.isPlanar(), "set 301 is a planar ornament set (is_planar must bind)");
-        Assertions.assertEquals(List.of(RelicType.BALL, RelicType.LINE), slotsOf(planar),
-                "NECK is the sphere slot and OBJECT is the rope slot");
-        Assertions.assertEquals(List.of(2), requiresOf(planar), "a planar set only has a 2-piece bonus");
-    }
 
-    // ==================================================================
-    // 2. The property-name mapping (the guard against a silent skip)
-    // ==================================================================
-
-    /**
-     * <b>The guard rail.</b> Every property in the shipped file must resolve to an
-     * {@link AttributeType}; an unmappable name throws with the offending string instead of being dropped.
-     *
-     * <p>This is the failure mode worth a test of its own: a dropped property does not break anything
-     * visibly - the character is simply a few percent weaker than the game, forever, with nothing in the log.
-     */
-    @Test
-    public void everyPropertyNameInTheShippedFileResolvesToAnAttributeType() {
+        // The guard rail, row by row: the call throws for an unmappable name, so a property can never be
+        // skipped silently while the loop below still counts it.
         Set<String> names = new LinkedHashSet<>();
         int properties = 0;
         for (RelicSet set : Constant.RELIC_SETS.values()) {
@@ -143,41 +122,298 @@ public class RelicSetTest {
                 }
             }
         }
-        Assertions.assertTrue(properties > 0, "the loop above must actually visit properties");
-        Assertions.assertEquals(19, names.size(),
-                "the shipped file uses 19 distinct property names; a new one must be mapped in "
-                        + "AttributeType.BY_GAME_PROPERTY before this test can pass: " + names);
+
+        // No effect is silently empty: stats, or an ability that is at least selected and named.
+        int withStats = 0;
+        int abilityOnly = 0;
+        for (RelicSet set : shipped) {
+            for (RelicSet.Effect effect : set.effects()) {
+                if (!effect.properties().isEmpty()) {
+                    withStats++;
+                    continue;
+                }
+                Assertions.assertTrue(effect.hasAbility(),
+                        "set " + set.setId() + "'s " + effect.require() + "-piece bonus has neither "
+                                + "properties nor an ability: nothing would ever apply it");
+                abilityOnly++;
+            }
+        }
+        final int propertyCount = properties;
+        final int statBonuses = withStats;
+        final int abilityBonuses = abilityOnly;
+
+        Assertions.assertAll("the shipped relic_sets.json is loaded and its rows bind",
+                () -> Assertions.assertFalse(Constant.RELIC_SETS.isEmpty(),
+                        "relic_sets.json was not loaded — the engine cannot apply any set bonus without it"),
+                // ⚠ CORRECTED (2026-10-18, data migration): 60 -> 62 sets in the current version.
+                () -> Assertions.assertEquals(62, shipped.size(),
+                        "the shipped relic_sets.json holds 62 sets; a different number means "
+                                + "the file changed and this registry line needs re-checking"),
+                // ⚠ CORRECTED (2026-10-18, data migration): 92 -> 96 bonuses (two new sets, 2 + 2).
+                () -> Assertions.assertEquals(96, effects,
+                        "the shipped file holds 96 set bonuses (2- and 4-piece)"),
+                () -> Assertions.assertTrue(RelicSets.loadCount() >= 1,
+                        "the file must have been read at least once"),
+                () -> Assertions.assertSame(Constant.RELIC_SETS, RelicSets.table(),
+                        "the table is read once and cached"),
+                () -> Assertions.assertNotNull(musketeer, "set " + CAVERN_SET + " must exist"),
+                () -> Assertions.assertEquals(CAVERN_SET, musketeer.setId(), "set_id must bind, not stay 0"),
+                () -> Assertions.assertEquals("Musketeer of Wild Wheat", musketeer.name().english(),
+                        "set 102's name is 'Musketeer of Wild Wheat'"),
+                () -> Assertions.assertFalse(musketeer.isPlanar(), "set 102 is a cavern set"),
+                () -> Assertions.assertEquals(
+                        List.of(RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT),
+                        slotsOf(musketeer),
+                        "a cavern set occupies the four cavern slots, in the order the data lists them"),
+                () -> Assertions.assertEquals(List.of(2, 4), requiresOf(musketeer),
+                        "a cavern set has a 2-piece and a 4-piece bonus"),
+                () -> Assertions.assertEquals(5, musketeer.parts().getFirst().rarity(),
+                        "the 5-star copy of each part is the one kept by the generator"),
+                () -> Assertions.assertNotNull(planar, "set " + PLANAR_SET + " must exist"),
+                () -> Assertions.assertTrue(planar.isPlanar(),
+                        "set 301 is a planar ornament set (is_planar must bind)"),
+                () -> Assertions.assertEquals(List.of(RelicType.BALL, RelicType.LINE), slotsOf(planar),
+                        "NECK is the sphere slot and OBJECT is the rope slot"),
+                () -> Assertions.assertEquals(List.of(2), requiresOf(planar),
+                        "a planar set only has a 2-piece bonus"));
 
         // The mapping is the generator's own inner_outer_mapping - the same dictionary that turns the
         // affix tables into attack_percent / crit_chance - so these pairings are the semantics, not
         // spelling: "AddedRatio" means a percentage, "Base" means the ratio attribute itself.
-        Assertions.assertEquals(AttributeType.ATTACK_PERCENT,
-                AttributeType.fromGameProperty("AttackAddedRatio"), "AttackAddedRatio is attack percent");
-        Assertions.assertEquals(AttributeType.HEALTH_PERCENT,
-                AttributeType.fromGameProperty("HPAddedRatio"), "HPAddedRatio is health percent");
-        Assertions.assertEquals(AttributeType.DEFENCE_PERCENT,
-                AttributeType.fromGameProperty("DefenceAddedRatio"), "DefenceAddedRatio is defence percent");
-        Assertions.assertEquals(AttributeType.SPEED_PERCENT,
-                AttributeType.fromGameProperty("SpeedAddedRatio"), "SpeedAddedRatio is speed percent");
-        Assertions.assertEquals(AttributeType.CRIT_CHANCE,
-                AttributeType.fromGameProperty("CriticalChanceBase"), "CriticalChanceBase is crit rate");
-        Assertions.assertEquals(AttributeType.CRIT_ATTACK,
-                AttributeType.fromGameProperty("CriticalDamageBase"), "CriticalDamageBase is crit damage");
-        Assertions.assertEquals(AttributeType.BREAKING_EFFECT,
-                AttributeType.fromGameProperty("BreakDamageAddedRatioBase"), "break effect");
-        Assertions.assertEquals(AttributeType.ENERGY_REGENERATION_RATE,
-                AttributeType.fromGameProperty("SPRatioBase"), "SPRatioBase is energy regeneration rate");
-        Assertions.assertEquals(AttributeType.OUTGOING_HEALING_BOOST,
-                AttributeType.fromGameProperty("HealRatioBase"), "HealRatioBase is outgoing healing");
-        Assertions.assertEquals(AttributeType.EFFECT_HIT_RATE,
-                AttributeType.fromGameProperty("StatusProbabilityBase"), "StatusProbabilityBase is effect hit");
-        Assertions.assertEquals(AttributeType.EFFECT_RESISTANCE,
-                AttributeType.fromGameProperty("StatusResistanceBase"), "StatusResistanceBase is effect res");
-        Assertions.assertEquals(AttributeType.PHYSICAL_DAMAGE_BOOST,
-                AttributeType.fromGameProperty("PhysicalAddedRatio"), "PhysicalAddedRatio is the physical boost");
-        Assertions.assertEquals(AttributeType.ELATION_DAMAGE_BOOST,
-                AttributeType.fromGameProperty("ElationDamageAddedRatioBase"), "ElationDamageAddedRatioBase");
+        Assertions.assertAll("the shipped property vocabulary",
+                () -> Assertions.assertTrue(propertyCount > 0, "the loop above must actually visit properties"),
+                () -> Assertions.assertEquals(19, names.size(),
+                        "the shipped file uses 19 distinct property names; a new one must be mapped in "
+                                + "AttributeType.BY_GAME_PROPERTY before this test can pass: " + names),
+                () -> Assertions.assertEquals(AttributeType.ATTACK_PERCENT,
+                        AttributeType.fromGameProperty("AttackAddedRatio"), "AttackAddedRatio is attack percent"),
+                () -> Assertions.assertEquals(AttributeType.HEALTH_PERCENT,
+                        AttributeType.fromGameProperty("HPAddedRatio"), "HPAddedRatio is health percent"),
+                () -> Assertions.assertEquals(AttributeType.DEFENCE_PERCENT,
+                        AttributeType.fromGameProperty("DefenceAddedRatio"), "DefenceAddedRatio is defence percent"),
+                () -> Assertions.assertEquals(AttributeType.SPEED_PERCENT,
+                        AttributeType.fromGameProperty("SpeedAddedRatio"), "SpeedAddedRatio is speed percent"),
+                () -> Assertions.assertEquals(AttributeType.CRIT_CHANCE,
+                        AttributeType.fromGameProperty("CriticalChanceBase"), "CriticalChanceBase is crit rate"),
+                () -> Assertions.assertEquals(AttributeType.CRIT_ATTACK,
+                        AttributeType.fromGameProperty("CriticalDamageBase"), "CriticalDamageBase is crit damage"),
+                () -> Assertions.assertEquals(AttributeType.BREAKING_EFFECT,
+                        AttributeType.fromGameProperty("BreakDamageAddedRatioBase"), "break effect"),
+                () -> Assertions.assertEquals(AttributeType.ENERGY_REGENERATION_RATE,
+                        AttributeType.fromGameProperty("SPRatioBase"), "SPRatioBase is energy regeneration rate"),
+                () -> Assertions.assertEquals(AttributeType.OUTGOING_HEALING_BOOST,
+                        AttributeType.fromGameProperty("HealRatioBase"), "HealRatioBase is outgoing healing"),
+                () -> Assertions.assertEquals(AttributeType.EFFECT_HIT_RATE,
+                        AttributeType.fromGameProperty("StatusProbabilityBase"), "StatusProbabilityBase is effect hit"),
+                () -> Assertions.assertEquals(AttributeType.EFFECT_RESISTANCE,
+                        AttributeType.fromGameProperty("StatusResistanceBase"), "StatusResistanceBase is effect res"),
+                () -> Assertions.assertEquals(AttributeType.PHYSICAL_DAMAGE_BOOST,
+                        AttributeType.fromGameProperty("PhysicalAddedRatio"), "PhysicalAddedRatio is the physical boost"),
+                () -> Assertions.assertEquals(AttributeType.ELATION_DAMAGE_BOOST,
+                        AttributeType.fromGameProperty("ElationDamageAddedRatioBase"), "ElationDamageAddedRatioBase"));
+
+        // The counts are pinned because they are the registered gap: stat bonuses are applied, ability-only
+        // bonuses (most 4-piece effects) are selected but not executed, and if regeneration changes either
+        // number, this line is where somebody finds out.
+        Assertions.assertAll("the registered gap: stats or a named ability",
+                // ⚠ CORRECTED (2026-10-18, data migration): 57 -> 59 stat bonuses (the two new sets ship one each).
+                () -> Assertions.assertEquals(59, statBonuses, "the shipped file's stat bonuses"),
+                // ⚠ CORRECTED (2026-10-18, data migration): 35 -> 37 ability-only bonuses.
+                () -> Assertions.assertEquals(37, abilityBonuses,
+                        "the shipped file's ability-only bonuses: selected by RelicSuit.activeEffects(), not executed "
+                                + "— the engine has no ability interpreter"),
+                () -> Assertions.assertEquals(shipped.stream().mapToInt(s -> s.effects().size()).sum(),
+                        statBonuses + abilityBonuses, "every effect is accounted for"));
     }
+
+    // ==================================================================
+    // 2. 2-piece / 4-piece, on the computed value
+    // ==================================================================
+
+    /**
+     * The piece-count thresholds of set 102, on the computed value.
+     *
+     * <p>Exactly two pieces apply the 2-piece bonus and nothing else: {@code ATTACK = 1000 x 1.12 = 1120}.
+     * Four pieces additionally apply the 4-piece bonus - {@code ATTACK = 1000 x 1.12 + flat},
+     * {@code SPEED = 100 x 1.06 + flat} - and both tiers are attributable. Taking pieces off takes the
+     * bonuses with them: 4 to 3 loses the 4-piece bonus (the 2-piece stays), 2 pieces keep only the
+     * 2-piece bonus, and 1 piece gets nothing at all, as does an empty suit.
+     *
+     * <p>Every control wears the <b>same pieces with their set id cleared</b>, so the only difference
+     * between the two computed values is the set bonus itself - not the affixes, which are identical. Ten
+     * flat points of attack (the hand piece) and the boots' flat speed are deliberately in the four-piece
+     * expectation: a percentage multiplies only the base, so a test that ignored the flat parts would be
+     * asserting something the engine does not do.
+     *
+     * <p><b>L3:</b> the three single-clause cases use the same fixture ({@code musketeer(...)} and its
+     * set-id-cleared control) and the same observable (the computed {@code ATTACK} / {@code SPEED} of that
+     * suit), so they are one scenario and each threshold names itself in its {@code assertAll}.
+     */
+    @Test
+    public void theMusketeerSetAppliesItsBonusesExactlyAtTheThresholds() {
+        RelicSuit two = musketeer(RelicType.HEAD, RelicType.BODY);
+        RelicSuit twoControl = musketeerWithoutSetBonuses(RelicType.HEAD, RelicType.BODY);
+        RelicSuit four = musketeer(RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT);
+        RelicSuit fourControl = musketeerWithoutSetBonuses(RelicType.HEAD, RelicType.HAND, RelicType.BODY,
+                RelicType.BOOT);
+        double flatAttack = four.hand.getMainAttribute().value();
+        double flatSpeed = four.boot.getMainAttribute().value();
+        RelicSuit empty = new RelicSuit();
+
+        Assertions.assertAll("two pieces of set 102",
+                () -> Assertions.assertEquals(BASE_ATTACK * (1 + MUSKETEER_2PC_ATTACK_PERCENT),
+                        attribute(two, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
+                        "2 pieces of set 102 must give +12% ATK on top of the untouched base"),
+                () -> Assertions.assertEquals(BASE_ATTACK,
+                        attribute(twoControl, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
+                        "the control (same pieces, no set id) must be exactly the base"),
+                () -> Assertions.assertEquals(BASE_SPEED, attribute(two, AttributeType.SPEED, BASE_SPEED),
+                        TOLERANCE, "the 4-piece bonus must NOT apply at two pieces"),
+                () -> Assertions.assertEquals(List.of(2), requiresOf(two),
+                        "only the 2-piece bonus is live at two pieces"));
+
+        Assertions.assertAll("four pieces of set 102",
+                () -> Assertions.assertEquals(BASE_ATTACK * (1 + MUSKETEER_2PC_ATTACK_PERCENT) + flatAttack,
+                        attribute(four, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
+                        "the 4-piece bonus keeps the 2-piece +12% ATK and adds the hand piece's flat attack"),
+                () -> Assertions.assertEquals(BASE_SPEED * (1 + MUSKETEER_4PC_SPEED_PERCENT) + flatSpeed,
+                        attribute(four, AttributeType.SPEED, BASE_SPEED), TOLERANCE,
+                        "four pieces add +6% SPD on top of the boots' flat speed"),
+                // "Additionally" spelled out: each tier's contribution on its own, measured against the control.
+                () -> Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT,
+                        attribute(four, AttributeType.ATTACK, BASE_ATTACK)
+                                - attribute(fourControl, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
+                        "the 2-piece attack bonus is worth 12% of the base"),
+                () -> Assertions.assertEquals(BASE_SPEED * MUSKETEER_4PC_SPEED_PERCENT,
+                        attribute(four, AttributeType.SPEED, BASE_SPEED)
+                                - attribute(fourControl, AttributeType.SPEED, BASE_SPEED), TOLERANCE,
+                        "the 4-piece speed bonus is worth 6% of the base"),
+                () -> Assertions.assertEquals(List.of(2, 4), requiresOf(four),
+                        "both tiers are live at four pieces"));
+
+        Assertions.assertAll("taking pieces off takes the bonuses with them",
+                () -> Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT, attackBonus(4),
+                        TOLERANCE, "four pieces: the 2-piece attack bonus is live"),
+                () -> Assertions.assertEquals(BASE_SPEED * MUSKETEER_4PC_SPEED_PERCENT, speedBonus(4),
+                        TOLERANCE, "four pieces: the 4-piece speed bonus is live"),
+                () -> Assertions.assertEquals(0.0, speedBonus(3), TOLERANCE,
+                        "three pieces: the 4-piece bonus is gone"),
+                () -> Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT, attackBonus(3),
+                        TOLERANCE, "three pieces: the 2-piece bonus is still there"),
+                () -> Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT, attackBonus(2),
+                        TOLERANCE, "two pieces: exactly at the 2-piece threshold"),
+                () -> Assertions.assertEquals(0.0, speedBonus(2), TOLERANCE,
+                        "two pieces: still below the 4-piece threshold"),
+                () -> Assertions.assertEquals(0.0, attackBonus(1), TOLERANCE,
+                        "one piece: below both thresholds"),
+                () -> Assertions.assertEquals(0.0, speedBonus(1), TOLERANCE,
+                        "one piece: below both thresholds"),
+                () -> Assertions.assertTrue(empty.activeEffects().isEmpty(), "an empty suit satisfies no set"),
+                () -> Assertions.assertEquals(BASE_ATTACK, attribute(empty, AttributeType.ATTACK, BASE_ATTACK),
+                        TOLERANCE, "an empty suit contributes nothing"));
+    }
+
+    // ==================================================================
+    // 3. The bonus reaches a real character sheet
+    // ==================================================================
+
+    /**
+     * The bonus is not merely a modifier on a scratch builder: it moves a real character's computed panel.
+     *
+     * <p>Same character, same pieces, the only difference being whether the pieces carry their set id, so
+     * everything else - traces, level scaling, base stats - cancels out of the difference.
+     */
+    @Test
+    public void setBonusReachesTheCharacterSheet() {
+        Character withSet = CharacterFactory.create(JING_YUAN, CHARACTER_LEVEL, true, null,
+                RelicFactory.suit(CAVERN_SET, STAR, LEVEL));
+        Character withoutSet = CharacterFactory.create(JING_YUAN, CHARACTER_LEVEL, true, null,
+                musketeerWithoutSetBonuses(RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT));
+
+        double baseAttack = Constant.CHARACTERS.get(JING_YUAN).attack()
+                * LevelPromotionCalc.calcCharacterRate(CHARACTER_LEVEL, true);
+        double baseSpeed = Constant.CHARACTERS.get(JING_YUAN).speed();
+
+        Assertions.assertAll("Jing Yuan's computed sheet",
+                () -> Assertions.assertEquals(baseAttack * MUSKETEER_2PC_ATTACK_PERCENT,
+                        withSet.getAttribute(AttributeType.ATTACK).get()
+                                - withoutSet.getAttribute(AttributeType.ATTACK).get(),
+                        TOLERANCE,
+                        "Jing Yuan's sheet must gain 12% of his base attack from the 2-piece bonus"),
+                () -> Assertions.assertEquals(baseSpeed * MUSKETEER_4PC_SPEED_PERCENT,
+                        withSet.getAttribute(AttributeType.SPEED).get()
+                                - withoutSet.getAttribute(AttributeType.SPEED).get(),
+                        TOLERANCE, "…and 6% of his base speed from the 4-piece bonus"));
+    }
+
+    // ==================================================================
+    // 4. The deterministic factory and the reference team
+    // ==================================================================
+
+    /**
+     * The reference build, and the team that wears it.
+     *
+     * <p>The build is 4 pieces of one set plus 2 of another, both bonuses are live, and building it twice
+     * gives the same numbers (no {@code ThreadLocalRandom}, no rolling). The real team really wears that
+     * build - the wiring, not just the factory.
+     *
+     * <p><b>L3:</b> the two single-clause cases share this one fixture ({@code StageFactory}'s reference
+     * relics) and this one observable (the pieces of the build and its computed panel), so they are one
+     * scenario and each clause names itself in its {@code assertAll}.
+     */
+    @Test
+    public void theReferenceRelicBuildIsDeterministicAndTheRealTeamWearsIt() {
+        RelicSuit first = StageFactory.referenceRelics();
+        RelicSuit second = StageFactory.referenceRelics();
+        List<Relic> pieces = piecesOf(first);
+        RelicSuit control = combinedWithoutSetBonuses();
+
+        Assertions.assertAll("the reference relic build",
+                () -> Assertions.assertNotSame(first, second, "every call must build fresh relics, not share them"),
+                () -> Assertions.assertEquals(6, pieces.size(), "a full suit is six pieces"),
+                () -> Assertions.assertEquals(4,
+                        pieces.stream().filter(piece -> piece.setId == CAVERN_SET).count(),
+                        "four pieces of cavern set " + CAVERN_SET),
+                () -> Assertions.assertEquals(2,
+                        pieces.stream().filter(piece -> piece.setId == PLANAR_SET).count(),
+                        "two pieces of planar set " + PLANAR_SET),
+                () -> Assertions.assertEquals(6,
+                        pieces.stream().filter(piece -> piece.getSubAttributes().isEmpty()).count(),
+                        "the factory rolls no sub-stats, so the build is exactly reproducible"),
+                () -> Assertions.assertEquals(
+                        BASE_ATTACK * (MUSKETEER_2PC_ATTACK_PERCENT + SPACE_SEALING_2PC_ATTACK_PERCENT),
+                        attribute(first, AttributeType.ATTACK, BASE_ATTACK)
+                                - attribute(control, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
+                        "the 4-piece cavern set's +12% ATK and the planar set's +12% ATK both apply"),
+                () -> Assertions.assertEquals(BASE_SPEED * MUSKETEER_4PC_SPEED_PERCENT,
+                        attribute(first, AttributeType.SPEED, BASE_SPEED)
+                                - attribute(control, AttributeType.SPEED, BASE_SPEED), TOLERANCE,
+                        "the 4-piece cavern speed bonus applies too"),
+                () -> Assertions.assertEquals(attribute(first, AttributeType.ATTACK, BASE_ATTACK),
+                        attribute(second, AttributeType.ATTACK, BASE_ATTACK),
+                        TOLERANCE, "a second build must produce the same panel, or the build is not reproducible"),
+                () -> Assertions.assertEquals(attribute(first, AttributeType.SPEED, BASE_SPEED),
+                        attribute(second, AttributeType.SPEED, BASE_SPEED),
+                        TOLERANCE, "a second build must produce the same panel, or the build is not reproducible"));
+
+        for (Character character : StageFactory.realTeam()) {
+            RelicSuit suit = character.getRelicSuit();
+            Assertions.assertNotNull(suit, character.getName() + " must carry a relic suit");
+            List<Relic> worn = piecesOf(suit);
+            Assertions.assertAll(character.getName() + " wears the reference build",
+                    () -> Assertions.assertEquals(6, worn.size(), character.getName() + " must wear six relics"),
+                    () -> Assertions.assertEquals(4,
+                            worn.stream().filter(piece -> piece.setId == CAVERN_SET).count(),
+                            character.getName() + " must wear the 4-piece cavern set"),
+                    () -> Assertions.assertEquals(2,
+                            worn.stream().filter(piece -> piece.setId == PLANAR_SET).count(),
+                            character.getName() + " must wear the 2-piece planar set"));
+        }
+    }
+
+    // ==================================================================
+    // 5. Rejected input: one test per error path
+    // ==================================================================
 
     /**
      * An unknown property name is an error, not a skip - that is what makes the guard above worth having.
@@ -221,231 +457,6 @@ public class RelicSetTest {
                 "the keys of the file are set ids; anything else is a broken file");
         Assertions.assertTrue(badKey.getMessage().contains("not a number"),
                 "a non-numeric key must be reported as such, not silently coerced: " + badKey.getMessage());
-    }
-
-    // ==================================================================
-    // 3. 2-piece / 4-piece, on the computed value
-    // ==================================================================
-
-    /**
-     * Exactly two pieces of the same set apply the 2-piece bonus, and nothing else:
-     * {@code ATTACK = 1000  x  1.12 = 1120}.
-     *
-     * <p>The control suit wears the <b>same two pieces with their set id cleared</b>, so the only difference
-     * between the two computed values is the set bonus itself - not the affixes, which are identical.
-     */
-    @Test
-    public void twoPieceBonusAppliesAtTwoPieces() {
-        RelicSuit two = musketeer(RelicType.HEAD, RelicType.BODY);
-        RelicSuit control = musketeerWithoutSetBonuses(RelicType.HEAD, RelicType.BODY);
-
-        Assertions.assertEquals(BASE_ATTACK * (1 + MUSKETEER_2PC_ATTACK_PERCENT),
-                attribute(two, AttributeType.ATTACK, BASE_ATTACK),
-                TOLERANCE, "2 pieces of set 102 must give +12% ATK on top of the untouched base");
-        Assertions.assertEquals(BASE_ATTACK, attribute(control, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
-                "the control (same pieces, no set id) must be exactly the base");
-        Assertions.assertEquals(BASE_SPEED, attribute(two, AttributeType.SPEED, BASE_SPEED), TOLERANCE,
-                "the 4-piece bonus must NOT apply at two pieces");
-
-        Assertions.assertEquals(List.of(2), requiresOf(two),
-                "only the 2-piece bonus is live at two pieces");
-    }
-
-    /**
-     * Four pieces additionally apply the 4-piece bonus: {@code ATTACK = 1000  x  1.12 + flat},
-     * {@code SPEED = 100  x  1.06 + flat}, and both tiers are attributable.
-     *
-     * <p>Ten flat points of attack (the hand piece) and the boots' flat speed are deliberately in the
-     * expectation: a percentage multiplies only the base, so a test that ignored the flat parts would be
-     * asserting something the engine does not do.
-     */
-    @Test
-    public void fourPieceBonusAppliesAdditionallyAtFourPieces() {
-        RelicSuit four = musketeer(RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT);
-        RelicSuit control = musketeerWithoutSetBonuses(RelicType.HEAD, RelicType.HAND, RelicType.BODY,
-                RelicType.BOOT);
-
-        double flatAttack = four.hand.getMainAttribute().value();
-        double flatSpeed = four.boot.getMainAttribute().value();
-
-        Assertions.assertEquals(BASE_ATTACK * (1 + MUSKETEER_2PC_ATTACK_PERCENT) + flatAttack,
-                attribute(four, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
-                "the 4-piece bonus keeps the 2-piece +12% ATK and adds the hand piece's flat attack");
-        Assertions.assertEquals(BASE_SPEED * (1 + MUSKETEER_4PC_SPEED_PERCENT) + flatSpeed,
-                attribute(four, AttributeType.SPEED, BASE_SPEED), TOLERANCE,
-                "four pieces add +6% SPD on top of the boots' flat speed");
-
-        // "Additionally" spelled out: each tier's contribution on its own, measured against the control.
-        Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT,
-                attribute(four, AttributeType.ATTACK, BASE_ATTACK)
-                        - attribute(control, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
-                "the 2-piece attack bonus is worth 12% of the base");
-        Assertions.assertEquals(BASE_SPEED * MUSKETEER_4PC_SPEED_PERCENT,
-                attribute(four, AttributeType.SPEED, BASE_SPEED)
-                        - attribute(control, AttributeType.SPEED, BASE_SPEED), TOLERANCE,
-                "the 4-piece speed bonus is worth 6% of the base");
-        Assertions.assertEquals(List.of(2, 4), requiresOf(four),
-                "both tiers are live at four pieces");
-    }
-
-    /**
-     * Taking pieces off takes the bonuses with them: 4 to 3 loses the 4-piece bonus (the 2-piece stays),
-     * 2 pieces keep only the 2-piece bonus, and 1 piece gets nothing at all.
-     */
-    @Test
-    public void removingPiecesRemovesTheBonus() {
-        Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT, attackBonus(4), TOLERANCE,
-                "four pieces: the 2-piece attack bonus is live");
-        Assertions.assertEquals(BASE_SPEED * MUSKETEER_4PC_SPEED_PERCENT, speedBonus(4), TOLERANCE,
-                "four pieces: the 4-piece speed bonus is live");
-
-        Assertions.assertEquals(0.0, speedBonus(3), TOLERANCE,
-                "three pieces: the 4-piece bonus is gone");
-        Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT, attackBonus(3), TOLERANCE,
-                "three pieces: the 2-piece bonus is still there");
-
-        Assertions.assertEquals(BASE_ATTACK * MUSKETEER_2PC_ATTACK_PERCENT, attackBonus(2), TOLERANCE,
-                "two pieces: exactly at the 2-piece threshold");
-        Assertions.assertEquals(0.0, speedBonus(2), TOLERANCE,
-                "two pieces: still below the 4-piece threshold");
-
-        Assertions.assertEquals(0.0, attackBonus(1), TOLERANCE, "one piece: below both thresholds");
-        Assertions.assertEquals(0.0, speedBonus(1), TOLERANCE, "one piece: below both thresholds");
-
-        RelicSuit empty = new RelicSuit();
-        Assertions.assertTrue(empty.activeEffects().isEmpty(), "an empty suit satisfies no set");
-        Assertions.assertEquals(BASE_ATTACK, attribute(empty, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
-                "an empty suit contributes nothing");
-    }
-
-    // ==================================================================
-    // 4. The bonus reaches a real character sheet
-    // ==================================================================
-
-    /**
-     * The bonus is not merely a modifier on a scratch builder: it moves a real character's computed panel.
-     *
-     * <p>Same character, same pieces, the only difference being whether the pieces carry their set id, so
-     * everything else - traces, level scaling, base stats - cancels out of the difference.
-     */
-    @Test
-    public void setBonusReachesTheCharacterSheet() {
-        Character withSet = CharacterFactory.create(JING_YUAN, CHARACTER_LEVEL, true, null,
-                RelicFactory.suit(CAVERN_SET, STAR, LEVEL));
-        Character withoutSet = CharacterFactory.create(JING_YUAN, CHARACTER_LEVEL, true, null,
-                musketeerWithoutSetBonuses(RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT));
-
-        double baseAttack = Constant.CHARACTERS.get(JING_YUAN).attack()
-                * LevelPromotionCalc.calcCharacterRate(CHARACTER_LEVEL, true);
-        double baseSpeed = Constant.CHARACTERS.get(JING_YUAN).speed();
-
-        Assertions.assertEquals(baseAttack * MUSKETEER_2PC_ATTACK_PERCENT,
-                withSet.getAttribute(AttributeType.ATTACK).get()
-                        - withoutSet.getAttribute(AttributeType.ATTACK).get(),
-                TOLERANCE, "Jing Yuan's sheet must gain 12% of his base attack from the 2-piece bonus");
-        Assertions.assertEquals(baseSpeed * MUSKETEER_4PC_SPEED_PERCENT,
-                withSet.getAttribute(AttributeType.SPEED).get()
-                        - withoutSet.getAttribute(AttributeType.SPEED).get(),
-                TOLERANCE, "…and 6% of his base speed from the 4-piece bonus");
-    }
-
-    // ==================================================================
-    // 5. The deterministic factory and the reference team
-    // ==================================================================
-
-    /**
-     * The reference build is 4 pieces of one set plus 2 of another, both bonuses are live, and building it
-     * twice gives the same numbers (no {@code ThreadLocalRandom}, no rolling).
-     */
-    @Test
-    public void theReferenceRelicBuildIsDeterministicAndWearsBothSetSizes() {
-        RelicSuit first = StageFactory.referenceRelics();
-        RelicSuit second = StageFactory.referenceRelics();
-        Assertions.assertNotSame(first, second, "every call must build fresh relics, not share them");
-
-        List<Relic> pieces = piecesOf(first);
-        Assertions.assertEquals(6, pieces.size(), "a full suit is six pieces");
-        Assertions.assertEquals(4, pieces.stream().filter(piece -> piece.setId == CAVERN_SET).count(),
-                "four pieces of cavern set " + CAVERN_SET);
-        Assertions.assertEquals(2, pieces.stream().filter(piece -> piece.setId == PLANAR_SET).count(),
-                "two pieces of planar set " + PLANAR_SET);
-        Assertions.assertEquals(6, pieces.stream().filter(piece -> piece.getSubAttributes().isEmpty()).count(),
-                "the factory rolls no sub-stats, so the build is exactly reproducible");
-
-        RelicSuit control = combinedWithoutSetBonuses();
-        Assertions.assertEquals(BASE_ATTACK * (MUSKETEER_2PC_ATTACK_PERCENT + SPACE_SEALING_2PC_ATTACK_PERCENT),
-                attribute(first, AttributeType.ATTACK, BASE_ATTACK)
-                        - attribute(control, AttributeType.ATTACK, BASE_ATTACK), TOLERANCE,
-                "the 4-piece cavern set's +12% ATK and the planar set's +12% ATK both apply");
-        Assertions.assertEquals(BASE_SPEED * MUSKETEER_4PC_SPEED_PERCENT,
-                attribute(first, AttributeType.SPEED, BASE_SPEED)
-                        - attribute(control, AttributeType.SPEED, BASE_SPEED), TOLERANCE,
-                "the 4-piece cavern speed bonus applies too");
-
-        Assertions.assertEquals(attribute(first, AttributeType.ATTACK, BASE_ATTACK),
-                attribute(second, AttributeType.ATTACK, BASE_ATTACK),
-                TOLERANCE, "a second build must produce the same panel, or the build is not reproducible");
-        Assertions.assertEquals(attribute(first, AttributeType.SPEED, BASE_SPEED),
-                attribute(second, AttributeType.SPEED, BASE_SPEED),
-                TOLERANCE, "a second build must produce the same panel, or the build is not reproducible");
-    }
-
-    /**
-     * The real team really wears the reference build (the wiring, not just the factory).
-     */
-    @Test
-    public void theRealTeamActuallyWearsRelics() {
-        for (Character character : StageFactory.realTeam()) {
-            RelicSuit suit = character.getRelicSuit();
-            Assertions.assertNotNull(suit, character.getName() + " must carry a relic suit");
-            List<Relic> pieces = piecesOf(suit);
-            Assertions.assertEquals(6, pieces.size(), character.getName() + " must wear six relics");
-            Assertions.assertEquals(4, pieces.stream().filter(piece -> piece.setId == CAVERN_SET).count(),
-                    character.getName() + " must wear the 4-piece cavern set");
-            Assertions.assertEquals(2, pieces.stream().filter(piece -> piece.setId == PLANAR_SET).count(),
-                    character.getName() + " must wear the 2-piece planar set");
-        }
-    }
-
-    // ==================================================================
-    // 6. Registered gaps and error paths
-    // ==================================================================
-
-    /**
-     * <b>No effect is silently empty.</b> Every bonus in the file either carries stats the engine applies or
-     * names an ability it cannot execute yet - nothing is both stat-less and ability-less, which would be a
-     * bonus that quietly does nothing.
-     *
-     * <p>The counts are pinned because they <em>are</em> the registered gap: 5stat bonuses are applied,
-     * 35 ability-only bonuses (most 4-piece effects) are selected but not executed, and if regeneration
-     * changes either number, this line is where somebody finds out.
-     */
-    @Test
-    public void everyEffectIsEitherStatsOrANamedAbility() {
-        int withStats = 0;
-        int abilityOnly = 0;
-        List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()
-                .filter(s -> !"test".equals(s.releaseVersion())).toList();
-        for (RelicSet set : shipped) {
-            for (RelicSet.Effect effect : set.effects()) {
-                if (!effect.properties().isEmpty()) {
-                    withStats++;
-                    continue;
-                }
-                Assertions.assertTrue(effect.hasAbility(),
-                        "set " + set.setId() + "'s " + effect.require() + "-piece bonus has neither "
-                                + "properties nor an ability: nothing would ever apply it");
-                abilityOnly++;
-            }
-        }
-        // ⚠ CORRECTED (2026-10-18, data migration): 57 -> 59 stat bonuses (the two new sets ship one each).
-        Assertions.assertEquals(59, withStats, "the shipped file's stat bonuses");
-        // ⚠ CORRECTED (2026-10-18, data migration): 35 -> 37 ability-only bonuses.
-        Assertions.assertEquals(37, abilityOnly,
-                "the shipped file's ability-only bonuses: selected by RelicSuit.activeEffects(), not executed "
-                        + "— the engine has no ability interpreter");
-        Assertions.assertEquals(shipped.stream().mapToInt(s -> s.effects().size()).sum(),
-                withStats + abilityOnly, "every effect is accounted for");
     }
 
     /**

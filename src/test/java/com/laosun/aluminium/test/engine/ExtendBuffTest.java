@@ -29,8 +29,12 @@ import java.util.List;
  * <p><b>The two filters, and why neither is optional.</b> Every sentence identifies the buff by its <b>origin</b>
  * ("provided by the Skill") and then by <b>what it is</b>: a state's name (Burn / Invigoration / Frozen / shield), or - when the text names an
  * effect rather than a state ("damage increase effect") - the <b>attribute</b> the modifier sits on. "Everything I have on that
- * unit" is deliberately not a spelling, and {@link #itDoesNotLengthenTheOwnersOtherBuffs} is the case that shows why:
+ * unit" is deliberately not a spelling, and {@link #onlyTheOwnersOwnBuffTheFilterNamesIsLengthened} is the case that shows why:
  * Bronya's DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the scenarios below, one {@code assertAll} per scenario so a
+ * failing clause still names itself; the two load-time rejection paths stay their own tests, because an
+ * {@code assertThrows} is not a positive clause and must not hide behind one.
  */
 public class ExtendBuffTest {
     private static final double EPS = 1e-6;
@@ -40,85 +44,73 @@ public class ExtendBuffTest {
     private static final int LEVEL = 80;
 
     /**
-     * The "加护" (Reinforce) shape: the same rule applies the shield and then lengthens it.
+     * What a filter names: a state's own name, a DOT's name (its element's), or the attribute a modifier sits on.
+     *
+     * <p>Three positive spellings, one clause - "the buff the rule names" is the thing that grows. The "加护"
+     * (Reinforce) shape comes first because it is the whole reason the op exists: the same rule applies the shield
+     * and then lengthens it, and the two numbers stay in two rules.
      */
     @Test
-    public void itLengthensTheBuffTheSameRuleJustApplied() {
-        Fixture f = new Fixture(
+    public void theFilterNamesTheBuffItLengthens() {
+        Fixture reinforced = new Fixture(
                 TriggerSpecs.shield(500, 2, "target"),
                 TriggerSpecs.extendBuff(BuffManager.SHIELD_STATE, null, 1));
+        reinforced.fire();
 
-        f.fire();
-
-        Assertions.assertEquals(3, f.buff(ShieldBuff.class).duration(),
-                "2 turns from the shield + 1 from the trace -- and the two numbers stay in two rules");
-    }
-
-    /**
-     * A state's name is the filter for a named state and for a DOT (whose name comes from its element).
-     */
-    @Test
-    public void aStateNameNamesTheBuff() {
         Fixture state = new Fixture(
                 TriggerSpecs.applyBuff("协奏", 1, null),
                 TriggerSpecs.extendBuff("协奏", null, 2));
         state.fire();
-        Assertions.assertEquals(3, state.buff(StateBuff.class).duration(), "1 + 2");
 
         Fixture dot = new Fixture(
                 TriggerSpecs.dot("Fire", 500.0, null, null, 2, null),
                 TriggerSpecs.extendBuff("dot:burn", null, 1));
         dot.fire();
-        Assertions.assertEquals(3, dot.buff(DotBuff.class).duration(),
-                "the DOT's name is its element's (Fire -> Burning), translated in one place");
-    }
 
-    /**
-     * When the sentence names an <i>effect</i> rather than a state, the attribute a modifier sits on names it.
-     */
-    @Test
-    public void anAttributeNamesAModifier() {
-        Fixture f = new Fixture(
+        Fixture modifier = new Fixture(
                 TriggerSpecs.modifyAttr("ATTACK", 0.2, 1, null, null, null, "target"),
                 TriggerSpecs.extendBuff(null, "ATTACK", 1));
+        modifier.fire();
 
-        f.fire();
-
-        Assertions.assertEquals(2, f.buff(StatModifierBuff.class).duration(), "1 + 1");
+        Assertions.assertAll("the filter names the buff it lengthens",
+                () -> Assertions.assertEquals(3, reinforced.buff(ShieldBuff.class).duration(),
+                        "shield state 「加护」: 2 turns from the shield + 1 from the trace -- and the two numbers stay in two rules"),
+                () -> Assertions.assertEquals(3, state.buff(StateBuff.class).duration(),
+                        "state name: 1 + 2"),
+                () -> Assertions.assertEquals(3, dot.buff(DotBuff.class).duration(),
+                        "DOT name: the DOT's name is its element's (Fire -> Burning), translated in one place"),
+                () -> Assertions.assertEquals(2, modifier.buff(StatModifierBuff.class).duration(),
+                        "attribute name: 1 + 1"));
     }
 
     /**
-     * Note: Only the owner's own buffs: "provided by the Skill" / "inflicted on the enemy target by the talent" are all about who applied it.
-     */
-    @Test
-    public void itDoesNotLengthenAnotherUnitsBuff() {
-        Fixture f = new Fixture(TriggerSpecs.extendBuff(BuffManager.SHIELD_STATE, null, 1));
-        Character someoneElse = CharacterFactory.create(ALLY, LEVEL);
-        f.target.getBuffManager().addBuff(new ShieldBuff(someoneElse, 500, 2));
-
-        f.fire();
-
-        Assertions.assertEquals(2, f.buff(ShieldBuff.class).duration(),
-                "a shield somebody else applied is not 「the shield provided by the Skill」");
-    }
-
-    /**
-     * And only the buff the rule <b>names</b> - the case that ruled out a "everything of mine" spelling.
+     * And only that buff: neither filter is optional - not another unit's buff, and not the owner's other buffs.
      *
-     * <p>Both buffs below belong to the owner. A filter that lengthened every one of them would look right in every
-     * single-buff test and silently add a turn to the other one in a real fight.
+     * <p>The two negatives are the two halves of the filter. "Provided by the Skill" is about <b>who</b> applied the
+     * buff, so a shield somebody else applied keeps its 2 turns. And "the shield" is about <b>what</b> the buff is, so
+     * out of two buffs that are both the owner's, only the named one grows; a filter that lengthened every one of them
+     * would look right in every single-buff test and silently add a turn to the burn in a real fight.
      */
     @Test
-    public void itDoesNotLengthenTheOwnersOtherBuffs() {
-        Fixture f = new Fixture(
+    public void onlyTheOwnersOwnBuffTheFilterNamesIsLengthened() {
+        Fixture anotherUnitsShield = new Fixture(TriggerSpecs.extendBuff(BuffManager.SHIELD_STATE, null, 1));
+        Character someoneElse = CharacterFactory.create(ALLY, LEVEL);
+        anotherUnitsShield.target.getBuffManager().addBuff(new ShieldBuff(someoneElse, 500, 2));
+        anotherUnitsShield.fire();
+
+        Fixture ownersOtherBuffs = new Fixture(
                 TriggerSpecs.dot("Fire", 500.0, null, null, 2, null),
                 TriggerSpecs.shield(500, 2, "target"),
                 TriggerSpecs.extendBuff(BuffManager.SHIELD_STATE, null, 1));
+        ownersOtherBuffs.fire();
 
-        f.fire();
-
-        Assertions.assertEquals(3, f.buff(ShieldBuff.class).duration(), "the named buff got its turn");
-        Assertions.assertEquals(2, f.buff(DotBuff.class).duration(), "and the owner's burn did not");
+        Assertions.assertAll("only the owner's buff that the filter names is lengthened",
+                () -> Assertions.assertEquals(2, anotherUnitsShield.buff(ShieldBuff.class).duration(),
+                        "another unit's buff: a shield somebody else applied is not 「the shield provided by the Skill」"),
+                () -> Assertions.assertEquals(3, ownersOtherBuffs.buff(ShieldBuff.class).duration(),
+                        "the owner's named buff: the named buff got its turn"),
+                () -> Assertions.assertEquals(2, ownersOtherBuffs.buff(DotBuff.class).duration(),
+                        "the owner's other buff: and the owner's burn did not"));
     }
 
     /**
@@ -135,13 +127,14 @@ public class ExtendBuffTest {
                 TriggerSpecs.rule("BASIC_ATTACK", null, TriggerSpecs.extendBuff("协奏", null, 5)));
         f.fire();
         StateBuff state = f.buff(StateBuff.class);
-        Assertions.assertTrue(state.isPermanent(), "precondition: the state is 「the whole battle」");
         int duration = state.duration();
 
-        Assertions.assertDoesNotThrow(() -> f.fire(TriggerEvent.BASIC_ATTACK));
-
-        Assertions.assertEquals(duration, state.duration(),
-                "permanent means \"never ticked\": the +5 is a number nobody would ever read");
+        Assertions.assertAll("a permanent buff has no countdown to lengthen",
+                () -> Assertions.assertTrue(state.isPermanent(), "precondition: the state is 「the whole battle」"),
+                () -> Assertions.assertDoesNotThrow(() -> f.fire(TriggerEvent.BASIC_ATTACK),
+                        "the +5 is not an error: a permanent buff is never ticked"),
+                () -> Assertions.assertEquals(duration, state.duration(),
+                        "permanent means \"never ticked\": the +5 is a number nobody would ever read"));
     }
 
     /**
@@ -166,12 +159,14 @@ public class ExtendBuffTest {
                 new Case(TriggerSpecs.applyControl("ctrl:frozen", 1, null, "target"), ControlBuff.class),
                 new Case(TriggerSpecs.dot("Ice", 500.0, null, null, 2, null), DotBuff.class));
 
-        for (Case one : cases) {
-            Fixture f = new Fixture(one.effect());
-            f.fire();
-            Assertions.assertSame(f.owner, f.buff(one.kind()).getSource(),
-                    one.kind().getSimpleName() + " must remember who applied it -- EXTEND_BUFF filters by origin");
-        }
+        Assertions.assertAll("every buff a rule creates records its source", () -> {
+            for (Case one : cases) {
+                Fixture f = new Fixture(one.effect());
+                f.fire();
+                Assertions.assertSame(f.owner, f.buff(one.kind()).getSource(),
+                        one.kind().getSimpleName() + " must remember who applied it -- EXTEND_BUFF filters by origin");
+            }
+        });
     }
 
     // ==================================================================

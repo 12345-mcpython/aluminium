@@ -26,31 +26,88 @@ import java.util.Random;
  *   <li>Wave 1 is already in play and queued into the action bar (spawning is queued entry, so
  *   {@code processRequests()} is easy to miss);</li>
  *   <li>The status is already {@code RUNNING} (not {@code NOT_STARTED}), so full turns can be run;</li>
+ *   <li>Assembly is reproducible from a fixed seed;</li>
+ *   <li>The reference team is usable, and a caller-supplied team is honoured;</li>
  *   <li>The error paths: unknown stage / empty team.</li>
  * </ol>
+ *
+ * <p>Scenario tests group only the clauses that share a fixture: every stage-103201 clause is one
+ * scenario (one assembled battle family), while the multi-wave stage, the team-building cases and the
+ * rejection paths keep their own fixtures.
  *
  * <p>Note: Cases that depend on {@code stage.json} (generator output, not committed) fall back to assume.
  */
 public class StageFactoryTest {
 
     /**
-     * The acceptance in the plan: {@code load(103201)} can be fought, has 3 monsters, and its status
-     * is no longer NOT_STARTED.
+     * Scenario: loading stage 103201 with the reference team gives a battle that is already under way,
+     * whose monsters are the ones the stage data declares, that is reproducible from a fixed seed and
+     * that can be advanced through full turns.
+     *
+     * <p>Merged from the four single-clause cases that share the stage-103201 fixture and observe the
+     * same assembled battle: the runnable-battle acceptance case, the stage-data case, the fixed-seed
+     * case and the run-full-turns case. Each clause is checked in {@code assertAll} with its own
+     * message.
      */
     @Test
-    public void loadBuildsARunnableBattle() {
+    public void loadedBattleIsReadyReproducibleAndPlayable() {
         assumeStageData();
+
+        // Clause 1: the acceptance in the plan - load(103201) can be fought, has 3 monsters, and its
+        // status is no longer NOT_STARTED.
         Battle battle = StageFactory.load(103201);
-
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
-                "the battle produced by load should already be underway");
-        Assertions.assertEquals(3, battle.enemies().size(), "103201 wave 1 has 3 monsters");
-        Assertions.assertEquals(0, battle.getWaveManager().getWaveIndex(), "wave 1 has been entered");
-
         // Summons stand on our side and take a queue entry too, so the count is per COMBATANT, not per character.
         int expectedQueueSize = battle.allies().size() + battle.enemies().size();
-        Assertions.assertEquals(expectedQueueSize, battle.queue().size(),
-                "our side + wave 1's monsters should all be in the action bar (missing processRequests loses people)");
+
+        // Clause 2: the monsters in the stage really are the ids / count / level written in the stage data.
+        StageBean stage = StageFactory.requireStage(103201);
+        Battle stageBattle = StageFactory.load(103201, StageFactory.realTeam(), new Random(1));
+
+        Assertions.assertAll("load(103201): the battle is already under way and its content comes from the stage",
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
+                        "the battle produced by load should already be underway"),
+                () -> Assertions.assertEquals(3, battle.enemies().size(), "103201 wave 1 has 3 monsters"),
+                () -> Assertions.assertEquals(0, battle.getWaveManager().getWaveIndex(), "wave 1 has been entered"),
+                () -> Assertions.assertEquals(expectedQueueSize, battle.queue().size(),
+                        "our side + wave 1's monsters should all be in the action bar (missing processRequests loses people)"),
+                () -> Assertions.assertEquals(stage.monsterIds(0).size(), stageBattle.enemies().size(),
+                        "wave 1 should hold exactly the monster count the stage data declares"),
+                () -> {
+                    for (Enemy enemy : stageBattle.enemyUnits()) {
+                        Assertions.assertAll(enemy.getName(),
+                                () -> Assertions.assertFalse(enemy.isDeath(),
+                                        "a monster should be alive when the battle starts"),
+                                () -> Assertions.assertTrue(enemy.getMaxHp() > 0,
+                                        "a monster should have positive max HP"),
+                                () -> Assertions.assertEquals(stage.level(), enemy.getLevel(),
+                                        "the monster's level should come from the stage"));
+                    }
+                });
+
+        // Clause 3: a fixed seed to the whole battle is reproducible (the same stage + the same seed
+        // gives the same result from two assemblies).
+        Battle first = StageFactory.load(103201, StageFactory.realTeam(), new Random(42));
+        Battle second = StageFactory.load(103201, StageFactory.realTeam(), new Random(42));
+
+        Assertions.assertAll("load(103201): a fixed seed makes the battle reproducible",
+                () -> Assertions.assertEquals(describe(first), describe(second),
+                        "two assemblies with the same seed should be identical"));
+
+        // Clause 4: runs several full turns without blowing up, with the status staying RUNNING / terminal.
+        Battle played = StageFactory.load(103201, StageFactory.realTeam(), new Random(7));
+        for (int i = 0; i < 5 && !played.isOver(); i++) {
+            played.stepForward();
+            if (played.currentMove() == null) {
+                break;
+            }
+            played.beforeMove();
+            played.afterMove();
+        }
+
+        Assertions.assertAll("load(103201): the battle can run turns",
+                () -> Assertions.assertTrue(played.queue().getElapsed() > 0, "the clock should have advanced"),
+                () -> Assertions.assertNotEquals(Battle.Status.NOT_STARTED, played.getStatus(),
+                        "the status should stay RUNNING (or become terminal) once turns have run"));
     }
 
     /**
@@ -67,67 +124,15 @@ public class StageFactoryTest {
         StageBean low = StageFactory.requireStage(103201);
         StageBean high = StageFactory.requireStage(103203);
 
-        Assertions.assertTrue(high.level() > low.level(), "the two chosen stages should have different levels");
-
         Enemy lowEnemy = battle(103201).enemyUnits().getFirst();
         Enemy highEnemy = battle(103203).enemyUnits().getFirst();
 
-        Assertions.assertTrue(highEnemy.getMaxHp() > lowEnemy.getMaxHp(),
-                "a monster in a higher-level stage should have more HP (low: " + lowEnemy.getMaxHp()
-                        + ", high: " + highEnemy.getMaxHp() + ")");
-    }
-
-    /**
-     * The monsters in the stage really are the ids / count written in the stage data.
-     */
-    @Test
-    public void enemiesMatchTheStageData() {
-        assumeStageData();
-        StageBean stage = StageFactory.requireStage(103201);
-        Battle battle = StageFactory.load(103201, StageFactory.realTeam(), new Random(1));
-
-        Assertions.assertEquals(stage.monsterIds(0).size(), battle.enemies().size());
-        for (Enemy enemy : battle.enemyUnits()) {
-            Assertions.assertFalse(enemy.isDeath());
-            Assertions.assertTrue(enemy.getMaxHp() > 0);
-            Assertions.assertEquals(stage.level(), enemy.getLevel(),
-                    "the monster's level should come from the stage");
-        }
-    }
-
-    /**
-     * A fixed seed to the whole battle is reproducible (the same stage + the same seed gives the same
-     * result from two assemblies).
-     */
-    @Test
-    public void fixedSeedMakesTheBattleReproducible() {
-        assumeStageData();
-        Battle first = StageFactory.load(103201, StageFactory.realTeam(), new Random(42));
-        Battle second = StageFactory.load(103201, StageFactory.realTeam(), new Random(42));
-
-        Assertions.assertEquals(describe(first), describe(second),
-                "two assemblies with the same seed should be identical");
-    }
-
-    /**
-     * Runs several full turns without blowing up, with the status staying RUNNING / terminal.
-     */
-    @Test
-    public void theBattleCanRunTurns() {
-        assumeStageData();
-        Battle battle = StageFactory.load(103201, StageFactory.realTeam(), new Random(7));
-
-        for (int i = 0; i < 5 && !battle.isOver(); i++) {
-            battle.stepForward();
-            if (battle.currentMove() == null) {
-                break;
-            }
-            battle.beforeMove();
-            battle.afterMove();
-        }
-
-        Assertions.assertTrue(battle.queue().getElapsed() > 0, "the clock should have advanced");
-        Assertions.assertNotEquals(Battle.Status.NOT_STARTED, battle.getStatus());
+        Assertions.assertAll("difficulty is decided by the stage data",
+                () -> Assertions.assertTrue(high.level() > low.level(),
+                        "the two chosen stages should have different levels"),
+                () -> Assertions.assertTrue(highEnemy.getMaxHp() > lowEnemy.getMaxHp(),
+                        "a monster in a higher-level stage should have more HP (low: " + lowEnemy.getMaxHp()
+                                + ", high: " + highEnemy.getMaxHp() + ")"));
     }
 
     /**
@@ -141,22 +146,33 @@ public class StageFactoryTest {
 
         Battle battle = StageFactory.load(310030, StageFactory.realTeam(), new Random(3));
         WaveManager waves = battle.getWaveManager();
-        Assertions.assertEquals(0, waves.getWaveIndex());
+        int initialWaveIndex = waves.getWaveIndex();
 
         for (Enemy enemy : battle.enemyUnits()) {
             enemy.takeDamage(999_999_999);
         }
         battle.processRequests();
 
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(), "a next wave remains → no win judged");
+        Battle.Status statusBeforeNextWave = battle.getStatus();
+        int enemiesBeforeNextWave = battle.enemies().size();
 
-        int before = battle.enemies().size();
-        Assertions.assertTrue(waves.nextWave());
+        Assertions.assertAll("310030: wave 1 is cleared and no win is judged",
+                () -> Assertions.assertEquals(0, initialWaveIndex, "the battle starts in wave 1"),
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, statusBeforeNextWave,
+                        "a next wave remains → no win judged"));
+
+        boolean advanced = waves.nextWave();
         battle.processRequests();
+        int enemiesAfterNextWave = battle.enemies().size();
+        int waveIndexAfterNextWave = waves.getWaveIndex();
+        Battle.Status statusAfterNextWave = battle.getStatus();
 
-        Assertions.assertTrue(battle.enemies().size() > before, "wave 2 is appended");
-        Assertions.assertEquals(1, waves.getWaveIndex());
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus());
+        Assertions.assertAll("310030: wave 2 is entered",
+                () -> Assertions.assertTrue(advanced, "nextWave() should enter wave 2"),
+                () -> Assertions.assertTrue(enemiesAfterNextWave > enemiesBeforeNextWave, "wave 2 is appended"),
+                () -> Assertions.assertEquals(1, waveIndexAfterNextWave, "the wave index should advance to wave 2"),
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, statusAfterNextWave,
+                        "the battle keeps running in wave 2"));
     }
 
     /**
@@ -165,29 +181,39 @@ public class StageFactoryTest {
      *
      * <p>Replaces the old assertion, which checked 3 placeholders with deliberately distinct
      * speeds. The real roster happens to have distinct speeds too, so the action bar stays meaningful.
+     *
+     * <p>Kept out of the stage scenario on purpose: it needs no {@code stage.json}, so it must never
+     * become a skipped test.
      */
     @Test
-    public void realTeamIsUsable() {
+    public void referenceTeamIsUsable() {
         List<Character> team = StageFactory.realTeam();
 
-        Assertions.assertEquals(4, team.size(), "the reference team is 4 characters");
-        Assertions.assertEquals(4, team.stream()
-                        .map(c -> c.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get())
-                        .distinct().count(),
-                "the speeds should all differ, so the action bar is meaningful");
-        for (Character c : team) {
-            Assertions.assertTrue(c.getMaxHp() > 0);
-            Assertions.assertNotNull(c.getElement(), c.getName() + " must have a real element");
-            Assertions.assertNotNull(c.getPath(), c.getName() + " must have a real path");
-            Assertions.assertTrue(c.hasEnergyBar(),
-                    c.getName() + " should have an energy bar (otherwise no ultimate can be cast)");
-            Assertions.assertFalse(c.isDeath());
-            Assertions.assertNotNull(c.getWeapon(), c.getName() + " should carry a light cone");
-        }
+        Assertions.assertAll("the reference team is usable",
+                () -> Assertions.assertEquals(4, team.size(), "the reference team is 4 characters"),
+                () -> Assertions.assertEquals(4, team.stream()
+                                .map(c -> c.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get())
+                                .distinct().count(),
+                        "the speeds should all differ, so the action bar is meaningful"),
+                () -> {
+                    for (Character c : team) {
+                        Assertions.assertAll(c.getName(),
+                                () -> Assertions.assertTrue(c.getMaxHp() > 0, "max HP should be positive"),
+                                () -> Assertions.assertNotNull(c.getElement(), c.getName() + " must have a real element"),
+                                () -> Assertions.assertNotNull(c.getPath(), c.getName() + " must have a real path"),
+                                () -> Assertions.assertTrue(c.hasEnergyBar(),
+                                        c.getName() + " should have an energy bar (otherwise no ultimate can be cast)"),
+                                () -> Assertions.assertFalse(c.isDeath(), "a fresh character should not be dead"),
+                                () -> Assertions.assertNotNull(c.getWeapon(), c.getName() + " should carry a light cone"));
+                    }
+                });
     }
 
     /**
      * The caller can supply their own team (this is how the real team is swapped in).
+     *
+     * <p>Its own fixture: a one-character placeholder team, not the reference roster, so it stays out
+     * of both the stage scenario and the reference-team case.
      */
     @Test
     public void callersCanSupplyTheirOwnTeam() {
@@ -197,28 +223,34 @@ public class StageFactoryTest {
 
         Battle battle = StageFactory.load(103201, team, new Random(0));
 
-        Assertions.assertEquals(1, battle.characters().size());
-        Assertions.assertEquals("solo", battle.characters().getFirst().getName());
-        Assertions.assertEquals(1 + battle.enemies().size(), battle.queue().size());
+        Assertions.assertAll("load(103201, caller team): the caller-supplied team is honoured",
+                () -> Assertions.assertEquals(1, battle.characters().size(),
+                        "only the caller's single character is fielded"),
+                () -> Assertions.assertEquals("solo", battle.characters().getFirst().getName(),
+                        "the caller's character is the one fighting"),
+                () -> Assertions.assertEquals(1 + battle.enemies().size(), battle.queue().size(),
+                        "the caller's character + wave 1's monsters should all be in the action bar"));
     }
 
     /**
      * The error paths: an unknown stage gives a self-explanatory message; an empty team is also rejected.
+     *
+     * <p>Rejection paths stay in their own test, never mixed into the positive scenarios above.
      */
     @Test
     public void invalidInputsAreRejected() {
         assumeStageData();
 
         IllegalArgumentException unknown = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> StageFactory.load(-1));
-        Assertions.assertTrue(unknown.getMessage().contains("-1"), unknown.getMessage());
-
+                () -> StageFactory.load(-1), "an unknown stage id should be rejected");
         IllegalArgumentException emptyTeam = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> StageFactory.load(103201, List.of(), new Random(0)));
-        Assertions.assertTrue(emptyTeam.getMessage().contains("team"), emptyTeam.getMessage());
+                () -> StageFactory.load(103201, List.of(), new Random(0)), "an empty team should be rejected");
 
-        Assertions.assertFalse(StageFactory.hasStage(-1));
-        Assertions.assertTrue(StageFactory.hasStage(103201));
+        Assertions.assertAll("invalid inputs are rejected",
+                () -> Assertions.assertTrue(unknown.getMessage().contains("-1"), unknown.getMessage()),
+                () -> Assertions.assertTrue(emptyTeam.getMessage().contains("team"), emptyTeam.getMessage()),
+                () -> Assertions.assertFalse(StageFactory.hasStage(-1), "hasStage(-1) should be false"),
+                () -> Assertions.assertTrue(StageFactory.hasStage(103201), "hasStage(103201) should be true"));
     }
 
     // ==================================================================

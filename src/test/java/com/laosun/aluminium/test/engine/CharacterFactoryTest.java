@@ -31,23 +31,84 @@ import java.util.Set;
 public class CharacterFactoryTest {
 
     // ==================================================================
-    // Main acceptance: Jing Yuan
+    // Main acceptance: a created character and its panel
     // ==================================================================
 
+    /**
+     * Main acceptance: {@code CharacterFactory.create(1204, 80)} builds a real character, and the five
+     * target-team characters keep the identity fields recorded in {@code character_data.json}.
+     *
+     * <p>Panel scaling check: {@code final panel = data base value x calcCharacterRate(80, true)},
+     * then plus the trace bonuses from {@code skill_traces.json} (the latter applied unconditionally in
+     * {@code build()}).
+     *
+     * <pre>
+     *   Jing Yuan's traces: attack 4+4+6+6+8 = 28%, defence 5+.5 = 12.5%, no HP trace
+     *   attack 95.04 x .35 x 1.28 = 894.13632
+     *   defence 66 x .35 x 1.125 = 545.35
+     *   HP 158.4 x .35 = 1164.24
+     * </pre>
+     *
+     * <p>Note: My first version asserted attack / defence directly as {@code data x multiplier} and
+     * missed the traces; the failure values 894.136 / 545.35 looked like "attribute array
+     * index misalignment", which sent me down a wrong diagnosis for one round.
+     * Here it was changed to explicitly include the traces via {@code SkillTrace.sumAttributes} -
+     * the test explains that 28% / 12.5% by itself.
+     *
+     * <p>The element, path, aggro and energy of these 5 are deliberately made pairwise different,
+     * so one test covers several tiers.
+     */
     @Test
-    public void createBuildsARealCharacter() {
+    public void createBuildsARealCharacterWithIdentityAndScaledPanel() {
         Character jingYuan = CharacterFactory.create(1204, 80);
+        CharacterData data = CharacterFactory.data(1204);
+        double rate = LevelPromotionCalc.calcCharacterRate(80, true);
+        Map<AttributeType, Double> traces = SkillTrace.sumAttributes(SkillTrace.init(1204));
 
-        Assertions.assertEquals("Jing Yuan", jingYuan.getName());
-        Assertions.assertEquals(80, jingYuan.getLevel());
-        Assertions.assertEquals(DamageElement.THUNDER, jingYuan.getElement());
-        Assertions.assertEquals(Path.ERUDITION, jingYuan.getPath());
-        Assertions.assertEquals(130, jingYuan.getMaxEnergy(), 1e-9);
-        Assertions.assertEquals(75, jingYuan.getAggro());
+        double traceAttack = traces.getOrDefault(AttributeType.ATTACK_PERCENT, 0.0);
+        double traceDefence = traces.getOrDefault(AttributeType.DEFENCE_PERCENT, 0.0);
+
+        Assertions.assertAll("Jing Yuan identity",
+                () -> Assertions.assertEquals("Jing Yuan", jingYuan.getName(), "name"),
+                () -> Assertions.assertEquals(80, jingYuan.getLevel(), "level"),
+                () -> Assertions.assertEquals(DamageElement.THUNDER, jingYuan.getElement(), "element"),
+                () -> Assertions.assertEquals(Path.ERUDITION, jingYuan.getPath(), "path"),
+                () -> Assertions.assertEquals(130, jingYuan.getMaxEnergy(), 1e-9, "energy cap"),
+                () -> Assertions.assertEquals(75, jingYuan.getAggro(), "aggro"));
+
+        Assertions.assertAll("Jing Yuan panel",
+                () -> Assertions.assertEquals(0.28, traceAttack, 1e-9, "attack traces total 28%"),
+                () -> Assertions.assertEquals(0.125, traceDefence, 1e-9, "defence traces total 12.5%"),
+                () -> Assertions.assertEquals(data.health() * rate,
+                        jingYuan.getAttribute(AttributeType.HEALTH).get(), 1e-3,
+                        "HP is data x rate (he has no HP trace)"),
+                () -> Assertions.assertEquals(data.attack() * rate * (1 + traceAttack),
+                        jingYuan.getAttribute(AttributeType.ATTACK).get(), 1e-3,
+                        "attack includes the 28% trace"),
+                () -> Assertions.assertEquals(data.defence() * rate * (1 + traceDefence),
+                        jingYuan.getAttribute(AttributeType.DEFENCE).get(), 1e-3,
+                        "defence includes the 12.5% trace"),
+                () -> Assertions.assertEquals(data.speed(),
+                        jingYuan.getAttribute(AttributeType.SPEED).get(), 1e-9,
+                        "speed takes no level scaling and has no trace"),
+                () -> Assertions.assertEquals(1164.24, jingYuan.getAttribute(AttributeType.HEALTH).get(), 1e-3,
+                        "Lv80 fully ascended HP (in-game value)"));
+
+        Assertions.assertAll("target team identity",
+                () -> assertIdentity(1204, "Jing Yuan", DamageElement.THUNDER, Path.ERUDITION, 130, 75),
+                () -> assertIdentity(1102, "Seele", DamageElement.QUANTUM, Path.HUNT, 120, 75),
+                () -> assertIdentity(1107, "Clara", DamageElement.PHYSICAL, Path.DESTRUCTION, 110, 125),
+                () -> assertIdentity(1105, "Natasha", DamageElement.PHYSICAL, Path.ABUNDANCE, 90, 100),
+                () -> assertIdentity(1001, "March 7th", DamageElement.ICE, Path.PRESERVATION, 120, 150));
     }
 
+    // ==================================================================
+    // Field coverage of the generated data
+    // ==================================================================
+
     /**
-     * Every character's star rating can be read, and the only values are 4 / 5 (a prerequisite of skill assembly).
+     * Every character in the generated data exposes a complete identity: a readable star rating
+     * (the only values are 4 / 5), and the four collaboration characters are present and buildable.
      *
      * <p>{@code rarity} is obtained by the generator from the last digit of
      * {@code AvatarConfig.Rarity} (of the form {@code CombatPowerAvatarRarityType5}).
@@ -60,193 +121,45 @@ public class CharacterFactoryTest {
      * new character that quietly landed with no rarity, or with the wrong one, moves these numbers and
      * says so. The four collaboration characters (1014 Saber, 1015 Archer, 1508, 1509) took 5★ from 71
      * to 75; 4★ stayed at 23.
-     */
-    @Test
-    public void everyCharacterHasAStarRating() {
-        Map<Integer, Long> distribution = com.laosun.aluminium.Constant.CHARACTERS.values().stream()
-                .collect(java.util.stream.Collectors.groupingBy(
-                        CharacterData::rarity, java.util.stream.Collectors.counting()));
-
-        Assertions.assertEquals(Set.of(4, 5), distribution.keySet(),
-                "the star rating should only be 4 and 5, actually " + distribution);
-        Assertions.assertEquals(23L, distribution.get(4), "number of 4★");
-        Assertions.assertEquals(75L, distribution.get(5), "number of 5★");
-
-        Assertions.assertEquals(5, CharacterFactory.data(1204).rarity(), "Jing Yuan is 5★");
-        Assertions.assertEquals(4, CharacterFactory.data(1001).rarity(), "March 7th is 4★");
-    }
-
-    /**
-     * The four collaboration characters are present, and buildable.
      *
      * <p>⚠ They live only in the game's {@code *LD} tables, which the generator merges - so a data
      * snapshot taken before that merge, or a regeneration that stopped merging, drops exactly this set and
      * nothing else. The star-rating count above cannot name them; this can.
      */
     @Test
-    public void theCollaborationCharactersAreBuildable() {
-        for (String[] expected : new String[][]{
-                {"1014", "wind", "Saber"},
-                {"1015", "quantum", "Archer"},
-                {"1508", "quantum", "Rin Tohsaka"},
-                {"1509", "thunder", "Gilgamesh"}}) {
-            int cid = Integer.parseInt(expected[0]);
-            CharacterData data = CharacterFactory.data(cid);
-            Assertions.assertNotNull(data, expected[0] + " must be in the generated data");
-            Assertions.assertEquals(expected[1], data.attribute(),
-                    expected[0] + "'s element must match AvatarConfigLD");
-            Assertions.assertEquals(5, data.rarity(), expected[0] + " is a 5★");
-            Assertions.assertEquals(expected[2], data.name().english(),
-                    expected[0] + "'s name must resolve, not fall back to a missing text id");
-            Assertions.assertNotNull(CharacterFactory.create(cid, 80),
-                    expected[0] + " must build from the generated data alone");
-        }
-    }
+    public void generatedDataDescribesEveryCharacter() {
+        Map<Integer, Long> distribution = com.laosun.aluminium.Constant.CHARACTERS.values().stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                        CharacterData::rarity, java.util.stream.Collectors.counting()));
 
-    /**
-     * Panel scaling check: {@code final panel = data base value  x  calcCharacterRate(80, true)},
-     * then plus the trace bonuses from {@code skill_traces.json} (the latter applied unconditionally in
-     * {@code build()}).
-     *
-     * <pre>
-     *   Jing Yuan's traces: attack 4+4+6+6+8 = 28%, defence 5+.5 = 12.5%, no HP trace
-     *   attack 95.04 x .35 x 1.28 = 894.13632
-     *   defence 66 x .35 x 1.125 = 545.35
-     *   HP 158.4 x .35 = 1164.24
-     * </pre>
-     *
-     * <p>Note: My first version asserted attack / defence directly as {@code data  x  multiplier} and
-     * missed the traces; the failure values 894.136 / 545.35 looked like "attribute array
-     * index misalignment", which sent me down a wrong diagnosis for one round.
-     * Here it was changed to explicitly include the traces via {@code SkillTrace.sumAttributes} -
-     * the test explains that 28% / 12.5% by itself.
-     */
-    @Test
-    public void panelIsScaledFromTheData() {
-        CharacterData data = CharacterFactory.data(1204);
-        Character jingYuan = CharacterFactory.create(1204, 80);
-        double rate = LevelPromotionCalc.calcCharacterRate(80, true);
-        Map<AttributeType, Double> traces = SkillTrace.sumAttributes(SkillTrace.init(1204));
+        Assertions.assertAll("star rating distribution",
+                () -> Assertions.assertEquals(Set.of(4, 5), distribution.keySet(),
+                        "the star rating should only be 4 and 5, actually " + distribution),
+                () -> Assertions.assertEquals(23L, distribution.get(4), "number of 4★"),
+                () -> Assertions.assertEquals(75L, distribution.get(5), "number of 5★"));
 
-        double traceAttack = traces.getOrDefault(AttributeType.ATTACK_PERCENT, 0.0);
-        double traceDefence = traces.getOrDefault(AttributeType.DEFENCE_PERCENT, 0.0);
-        Assertions.assertEquals(0.28, traceAttack, 1e-9, "Jing Yuan's attack traces total 28%");
-        Assertions.assertEquals(0.125, traceDefence, 1e-9, "Jing Yuan's defence traces total 12.5%");
+        Assertions.assertAll("named star ratings",
+                () -> Assertions.assertEquals(5, CharacterFactory.data(1204).rarity(), "Jing Yuan is 5★"),
+                () -> Assertions.assertEquals(4, CharacterFactory.data(1001).rarity(), "March 7th is 4★"));
 
-        Assertions.assertEquals(data.health() * rate,
-                jingYuan.getAttribute(AttributeType.HEALTH).get(), 1e-3,
-                "he has no HP trace");
-        Assertions.assertEquals(data.attack() * rate * (1 + traceAttack),
-                jingYuan.getAttribute(AttributeType.ATTACK).get(), 1e-3);
-        Assertions.assertEquals(data.defence() * rate * (1 + traceDefence),
-                jingYuan.getAttribute(AttributeType.DEFENCE).get(), 1e-3);
-        // speed does not take level scaling, and there is no speed trace
-        Assertions.assertEquals(data.speed(),
-                jingYuan.getAttribute(AttributeType.SPEED).get(), 1e-9);
-        Assertions.assertEquals(1164.24, jingYuan.getAttribute(AttributeType.HEALTH).get(), 1e-3,
-                "Jing Yuan Lv80 fully ascended HP (in-game value)");
-    }
-
-    /**
-     * The ascension multiplier only guarantees the two anchors Lv1 and Lv80; the intermediate
-     * tiers are a linear approximation, not game values.
-     *
-     * <p>Measured {@code calcCharacterRate}: Lv20 to 2.35, Lv40 to 4.15, Lv0 to 6.85;
-     * whereas in the docs' "panel growth" table, ascension 2/40 is
-     * {@code 285.12 / 158.4 = 1.80} and ascension 5/0 is {@code 45.2 / 158.4 = 3.00}
-     * (that is, 1 + level tier  x  0.4).
-     * So do not use the intermediate tiers to cross-check against the game panel - the formula
-     * only lines up at the two ends (this is consistent with the "simulator multiplier formula"
-     * recorded in the design notes: it was an approximation to begin with).
-     *
-     * <p>This one writes "which anchors are trustworthy" into the test, so that next time nobody
-     * (including me) asserts 45.2 at Lv0 again.
-     */
-    @Test
-    public void onlyTheLevel1AndLevel80AnchorsMatchTheGameTable() {
-        // Trustworthy anchor 1: Lv1 unascended = base value
-        Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, false), 1e-9);
-        Assertions.assertEquals(158.4,
-                158.4 * LevelPromotionCalc.calcCharacterRate(1, false), 1e-9);
-
-        // Trustworthy anchor 2: Lv80 ascended = x .35 (Jing Yuan max level 1164.24 / March th 1058.4)
-        Assertions.assertEquals(7.35, LevelPromotionCalc.calcCharacterRate(80, true), 1e-9);
-        Assertions.assertEquals(1164.24,
-                158.4 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3);
-        Assertions.assertEquals(1058.4,
-                144.0 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3);
-
-        // Intermediate tiers: record the current formula value, and explicitly record its difference from the game table
-        Assertions.assertEquals(6.85, LevelPromotionCalc.calcCharacterRate(70, true), 1e-9);
-        Assertions.assertNotEquals(475.2 / 158.4,
-                LevelPromotionCalc.calcCharacterRate(70, true), 1e-6,
-                "Lv70 is a deviating tier of the linear approximation, not a game value (the game table is 3.00×)");
-    }
-
-    /**
-     * A latent bug fixed early on: a low level combined with "ascended" once produced a
-     * negative ascension.
-     *
-     * <p>Originally Lv1 + {@code promotion=true} gave {@code promoteCount = 1/10 - 1 = -1}, a
-     * multiplier of 0.6 - so "ascended" actually pushed the level-1 panel down to 60% (Jing Yuan's
-     * HP 158.4 to 95.04).
-     * And 95.04 happens to be his attack value, so this bug looked like "attribute array index
-     * misalignment" and was extremely easy to misdiagnose (I misdiagnosed it at first myself).
-     *
-     * <p>A level-1 character cannot have a negative ascension, so the lower bound is 0, and the Lv1
-     * multiplier must be exactly 1.0.
-     */
-    @Test
-    public void lowLevelsNeverGetNegativePromotion() {
-        Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, true), 1e-9);
-        Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, false), 1e-9);
-        for (int level = 1; level <= 80; level++) {
-            Assertions.assertTrue(LevelPromotionCalc.calcCharacterRate(level, true) >= 1.0,
-                    "Lv" + level + " ascended multiplier should not be less than 1");
-            Assertions.assertTrue(LevelPromotionCalc.calcCharacterRate(level, true)
-                            >= LevelPromotionCalc.calcCharacterRate(level, false),
-                    "Lv" + level + ": the ascended panel should not be lower than the unascended one");
-        }
-    }
-
-    /**
-     * The unascended panel is never higher than the ascended one (at Lv0 it really is lower -
-     * at Lv80 the two are the same, see the test above).
-     */
-    @Test
-    public void unpromotedPanelIsNeverHigher() {
-        Character promoted = CharacterFactory.create(1204, 70, true);
-        Character unpromoted = CharacterFactory.create(1204, 70, false);
-        double promotedRate = LevelPromotionCalc.calcCharacterRate(70, true);
-        double unpromotedRate = LevelPromotionCalc.calcCharacterRate(70, false);
-
-        Assertions.assertTrue(promoted.getAttribute(AttributeType.HEALTH).get()
-                        > unpromoted.getAttribute(AttributeType.HEALTH).get(),
-                "the Lv70 ascended panel should be higher");
-        Assertions.assertEquals(CharacterFactory.data(1204).health() * promotedRate,
-                promoted.getAttribute(AttributeType.HEALTH).get(), 1e-3);
-        Assertions.assertEquals(CharacterFactory.data(1204).health() * unpromotedRate,
-                unpromoted.getAttribute(AttributeType.HEALTH).get(), 1e-3);
-    }
-
-    // ==================================================================
-    // Field coverage: element / path / aggro / energy
-    // ==================================================================
-
-    /**
-     * Full-table check of the identity fields of 5 real characters (values taken directly from
-     * {@code character_data.json}).
-     *
-     * <p>The element, path, aggro and energy of these 5 are deliberately made pairwise different,
-     * so one test covers several tiers.
-     */
-    @Test
-    public void identityFieldsMatchTheDataForTheTargetTeam() {
-        assertIdentity(1204, "Jing Yuan", DamageElement.THUNDER, Path.ERUDITION, 130, 75);
-        assertIdentity(1102, "Seele", DamageElement.QUANTUM, Path.HUNT, 120, 75);
-        assertIdentity(1107, "Clara", DamageElement.PHYSICAL, Path.DESTRUCTION, 110, 125);
-        assertIdentity(1105, "Natasha", DamageElement.PHYSICAL, Path.ABUNDANCE, 90, 100);
-        assertIdentity(1001, "March 7th", DamageElement.ICE, Path.PRESERVATION, 120, 150);
+        Assertions.assertAll("collaboration characters are buildable", () -> {
+            for (String[] expected : new String[][]{
+                    {"1014", "wind", "Saber"},
+                    {"1015", "quantum", "Archer"},
+                    {"1508", "quantum", "Rin Tohsaka"},
+                    {"1509", "thunder", "Gilgamesh"}}) {
+                int cid = Integer.parseInt(expected[0]);
+                CharacterData data = CharacterFactory.data(cid);
+                Assertions.assertNotNull(data, expected[0] + " must be in the generated data");
+                Assertions.assertEquals(expected[1], data.attribute(),
+                        expected[0] + "'s element must match AvatarConfigLD");
+                Assertions.assertEquals(5, data.rarity(), expected[0] + " is a 5★");
+                Assertions.assertEquals(expected[2], data.name().english(),
+                        expected[0] + "'s name must resolve, not fall back to a missing text id");
+                Assertions.assertNotNull(CharacterFactory.create(cid, 80),
+                        expected[0] + " must build from the generated data alone");
+            }
+        });
     }
 
     /**
@@ -256,32 +169,134 @@ public class CharacterFactoryTest {
      *
      * <p>Before the fix {@code fromString} was an exact match, so all-lowercase input
      * silently returned null - the element field became null instead of raising an error.
+     *
+     * <p>The same parser is then run over the whole table: all characters' attributes should
+     * parse to an element (only elements exist in the data, all present).
      */
     @Test
     public void elementParsingIsCaseInsensitive() {
-        Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("Thunder"));
-        Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("thunder"));
-        Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("THUNDER"));
-        Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("  thunder  "),
-                "leading and trailing whitespace should be ignored");
-        Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("Quantum"));
-        Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("quantum"));
+        Assertions.assertAll("fromString spellings",
+                () -> Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("Thunder"),
+                        "capitalized thunder"),
+                () -> Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("thunder"),
+                        "lowercase thunder"),
+                () -> Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("THUNDER"),
+                        "uppercase thunder"),
+                () -> Assertions.assertEquals(DamageElement.THUNDER, DamageElement.fromString("  thunder  "),
+                        "leading and trailing whitespace should be ignored"),
+                () -> Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("Quantum"),
+                        "capitalized quantum"),
+                () -> Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("quantum"),
+                        "lowercase quantum"));
 
         // Non-damaging skills are written "Unknown" in the data to must still be null, not become some element
-        Assertions.assertNull(DamageElement.fromString("Unknown"));
-        Assertions.assertNull(DamageElement.fromString("unknown"));
-        Assertions.assertNull(DamageElement.fromString(""));
-        Assertions.assertNull(DamageElement.fromString(null));
+        Assertions.assertAll("non-damaging spellings stay null",
+                () -> Assertions.assertNull(DamageElement.fromString("Unknown"), "Unknown is not an element"),
+                () -> Assertions.assertNull(DamageElement.fromString("unknown"), "unknown is not an element"),
+                () -> Assertions.assertNull(DamageElement.fromString(""), "empty string is not an element"),
+                () -> Assertions.assertNull(DamageElement.fromString(null), "null is not an element"));
+
+        Assertions.assertAll("every character's attribute parses to an element", () ->
+                com.laosun.aluminium.Constant.CHARACTERS.forEach((cid, data) -> {
+                    DamageElement element = DamageElement.fromString(data.attribute());
+                    Assertions.assertNotNull(element,
+                            "character " + cid + "'s attribute=" + data.attribute() + " does not parse to an element");
+                }));
     }
 
+    // ==================================================================
+    // Level promotion scaling and the panels it produces
+    // ==================================================================
+
+    /**
+     * Level promotion scaling: the ascension multiplier only guarantees the two anchors Lv1 and Lv80;
+     * the intermediate tiers are a linear approximation, not game values. The panel of a factory
+     * character follows that multiplier, and a low level never gets a negative ascension.
+     *
+     * <p>Measured {@code calcCharacterRate}: Lv20 to 2.35, Lv40 to 4.15, Lv0 to 6.85;
+     * whereas in the docs' "panel growth" table, ascension 2/40 is
+     * {@code 285.12 / 158.4 = 1.80} and ascension 5/0 is {@code 45.2 / 158.4 = 3.00}
+     * (that is, 1 + level tier x 0.4).
+     * So do not use the intermediate tiers to cross-check against the game panel - the formula
+     * only lines up at the two ends (this is consistent with the "simulator multiplier formula"
+     * recorded in the design notes: it was an approximation to begin with).
+     *
+     * <p>This one writes "which anchors are trustworthy" into the test, so that next time nobody
+     * (including me) asserts 45.2 at Lv0 again.
+     *
+     * <p>A latent bug fixed early on: a low level combined with "ascended" once produced a
+     * negative ascension. Originally Lv1 + {@code promotion=true} gave
+     * {@code promoteCount = 1/10 - 1 = -1}, a multiplier of 0.6 - so "ascended" actually pushed the
+     * level-1 panel down to 60% (Jing Yuan's HP 158.4 to 95.04). And 95.04 happens to be his attack
+     * value, so this bug looked like "attribute array index misalignment" and was extremely easy to
+     * misdiagnose (I misdiagnosed it at first myself). A level-1 character cannot have a negative
+     * ascension, so the lower bound is 0, and the Lv1 multiplier must be exactly 1.0.
+     *
+     * <p>The unascended panel is never higher than the ascended one (at Lv0 it really is lower -
+     * at Lv80 the two are the same, see the Lv80 anchor above), and a different level gives a
+     * different panel (level 1 and level 80).
+     */
     @Test
-    public void identityFieldsAreCaseInsensitivelyParsedForEveryCharacter() {
-        // All 93 characters' attribute should parse to an element (only elements exist in the data, all present)
-        com.laosun.aluminium.Constant.CHARACTERS.forEach((cid, data) -> {
-            DamageElement element = DamageElement.fromString(data.attribute());
-            Assertions.assertNotNull(element,
-                    "character " + cid + "'s attribute=" + data.attribute() + " does not parse to an element");
-        });
+    public void levelPromotionScalingKeepsItsAnchors() {
+        Assertions.assertAll("Lv1 and Lv80 anchors",
+                () -> Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, false), 1e-9,
+                        "Lv1 unascended multiplier is 1.0"),
+                () -> Assertions.assertEquals(158.4,
+                        158.4 * LevelPromotionCalc.calcCharacterRate(1, false), 1e-9,
+                        "Lv1 panel is the base value"),
+                () -> Assertions.assertEquals(7.35, LevelPromotionCalc.calcCharacterRate(80, true), 1e-9,
+                        "Lv80 ascended multiplier is 7.35"),
+                () -> Assertions.assertEquals(1164.24,
+                        158.4 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3,
+                        "Jing Yuan Lv80 ascended HP"),
+                () -> Assertions.assertEquals(1058.4,
+                        144.0 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3,
+                        "March 7th Lv80 ascended HP"),
+                () -> Assertions.assertEquals(6.85, LevelPromotionCalc.calcCharacterRate(70, true), 1e-9,
+                        "recorded intermediate tier at Lv70"),
+                () -> Assertions.assertNotEquals(475.2 / 158.4,
+                        LevelPromotionCalc.calcCharacterRate(70, true), 1e-6,
+                        "Lv70 is a deviating tier of the linear approximation, not a game value (the game table is 3.00×)"));
+
+        Assertions.assertAll("low levels never get negative promotion",
+                () -> Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, true), 1e-9,
+                        "Lv1 ascended multiplier is 1.0"),
+                () -> Assertions.assertEquals(1.0, LevelPromotionCalc.calcCharacterRate(1, false), 1e-9,
+                        "Lv1 unascended multiplier is 1.0"),
+                () -> {
+                    for (int level = 1; level <= 80; level++) {
+                        Assertions.assertTrue(LevelPromotionCalc.calcCharacterRate(level, true) >= 1.0,
+                                "Lv" + level + " ascended multiplier should not be less than 1");
+                        Assertions.assertTrue(LevelPromotionCalc.calcCharacterRate(level, true)
+                                        >= LevelPromotionCalc.calcCharacterRate(level, false),
+                                "Lv" + level + ": the ascended panel should not be lower than the unascended one");
+                    }
+                });
+
+        Character promoted = CharacterFactory.create(1204, 70, true);
+        Character unpromoted = CharacterFactory.create(1204, 70, false);
+        double promotedRate = LevelPromotionCalc.calcCharacterRate(70, true);
+        double unpromotedRate = LevelPromotionCalc.calcCharacterRate(70, false);
+        Character low = CharacterFactory.create(1204, 1);
+        Character high = CharacterFactory.create(1204, 80);
+
+        Assertions.assertAll("panels follow level and promotion",
+                () -> Assertions.assertTrue(promoted.getAttribute(AttributeType.HEALTH).get()
+                                > unpromoted.getAttribute(AttributeType.HEALTH).get(),
+                        "the Lv70 ascended panel should be higher"),
+                () -> Assertions.assertEquals(CharacterFactory.data(1204).health() * promotedRate,
+                        promoted.getAttribute(AttributeType.HEALTH).get(), 1e-3,
+                        "Lv70 ascended HP is data x rate"),
+                () -> Assertions.assertEquals(CharacterFactory.data(1204).health() * unpromotedRate,
+                        unpromoted.getAttribute(AttributeType.HEALTH).get(), 1e-3,
+                        "Lv70 unascended HP is data x rate"),
+                () -> Assertions.assertEquals(1, low.getLevel(), "Lv1 reports level 1"),
+                () -> Assertions.assertTrue(high.getAttribute(AttributeType.HEALTH).get()
+                                > low.getAttribute(AttributeType.HEALTH).get(),
+                        "the Lv80 panel should be higher than Lv1"),
+                () -> Assertions.assertEquals(CharacterFactory.data(1204).health(),
+                        low.getAttribute(AttributeType.HEALTH).get(), 1e-3,
+                        "Lv1 is just the data base value (multiplier 1.0)"));
     }
 
     // ==================================================================
@@ -289,57 +304,44 @@ public class CharacterFactoryTest {
     // ==================================================================
 
     /**
-     * The three data boundaries of the energy cap:
+     * Energy cap boundaries and the energy bar that goes with them.
+     *
      * <ul>
      *   <li>140 Castorice (遐蝶) - the only {@code null} in the whole data set. Must stay 0 (no energy bar);
      *       falling back to 100 would conjure an energy bar for her out of nothing;</li>
      *   <li>1220 Feixiao - 12 (the ultimate only costs 6);</li>
      *   <li>1308 Acheron - 9 (actually uses "stacks in place of an energy bar", see the note on stack resources).</li>
      * </ul>
+     *
+     * <p>Characters that have an energy bar report {@code hasEnergyBar()} = true, start at 0 energy
+     * and are not yet full.
      */
     @Test
-    public void energyEdgeCasesAreKeptFaithfully() {
-        Assertions.assertNull(CharacterFactory.data(1407).maxEnergy(), "Castorice's energy really is null");
-        Assertions.assertEquals(0, CharacterFactory.create(1407, 80).getMaxEnergy(), 1e-9,
-                "null must land as 0 = no energy bar; it must not fall back to 100");
-        Assertions.assertFalse(CharacterFactory.create(1407, 80).hasEnergyBar(),
-                "Castorice has no energy bar");
-
-        Assertions.assertEquals(12, CharacterFactory.create(1220, 80).getMaxEnergy(), 1e-9);
-        Assertions.assertEquals(9, CharacterFactory.create(1308, 80).getMaxEnergy(), 1e-9);
-    }
-
-    /**
-     * Characters that have an energy bar: {@code hasEnergyBar()} is true and the starting energy is 0.
-     */
-    @Test
-    public void charactersWithEnergyHaveAnEnergyBar() {
+    public void energyBarSemanticsAtTheDataBoundaries() {
+        Character castorice = CharacterFactory.create(1407, 80);
         Character jingYuan = CharacterFactory.create(1204, 80);
 
-        Assertions.assertTrue(jingYuan.hasEnergyBar());
-        Assertions.assertEquals(0, jingYuan.getCurrentEnergy(), 1e-9);
-        Assertions.assertFalse(jingYuan.isEnergyFull(), "should not start at full energy");
+        Assertions.assertAll("energy cap boundaries",
+                () -> Assertions.assertNull(CharacterFactory.data(1407).maxEnergy(),
+                        "Castorice's energy really is null"),
+                () -> Assertions.assertEquals(0, castorice.getMaxEnergy(), 1e-9,
+                        "null must land as 0 = no energy bar; it must not fall back to 100"),
+                () -> Assertions.assertFalse(castorice.hasEnergyBar(), "Castorice has no energy bar"),
+                () -> Assertions.assertEquals(12, CharacterFactory.create(1220, 80).getMaxEnergy(), 1e-9,
+                        "Feixiao's energy cap is 12"),
+                () -> Assertions.assertEquals(9, CharacterFactory.create(1308, 80).getMaxEnergy(), 1e-9,
+                        "Acheron's energy cap is 9"));
+
+        Assertions.assertAll("characters with energy have an energy bar",
+                () -> Assertions.assertTrue(jingYuan.hasEnergyBar(), "Jing Yuan has an energy bar"),
+                () -> Assertions.assertEquals(0, jingYuan.getCurrentEnergy(), 1e-9,
+                        "starting energy is 0"),
+                () -> Assertions.assertFalse(jingYuan.isEnergyFull(), "should not start at full energy"));
     }
 
     // ==================================================================
-    // Mid-battle entry / legacy entry point
+    // Legacy entry point / rejection / battle entry
     // ==================================================================
-
-    /**
-     * Different level to different panel (level 1 and level 80).
-     */
-    @Test
-    public void levelChangesThePanel() {
-        Character low = CharacterFactory.create(1204, 1);
-        Character high = CharacterFactory.create(1204, 80);
-
-        Assertions.assertEquals(1, low.getLevel());
-        Assertions.assertTrue(high.getAttribute(AttributeType.HEALTH).get()
-                > low.getAttribute(AttributeType.HEALTH).get());
-        Assertions.assertEquals(CharacterFactory.data(1204).health(),
-                low.getAttribute(AttributeType.HEALTH).get(), 1e-3,
-                "Lv1 is just the data base value (multiplier 1.0)");
-    }
 
     /**
      * The legacy placeholder entry point still works, but has no element (faithfully reflecting
@@ -351,10 +353,11 @@ public class CharacterFactoryTest {
     public void placeholderEntryStillWorksButHasNoIdentity() {
         Character placeholder = Character.fromAttributes("hero", 10_000, 100, 100, 100);
 
-        Assertions.assertEquals("hero", placeholder.getName());
-        Assertions.assertNull(placeholder.getElement(), "the placeholder character has no element");
-        Assertions.assertEquals(Path.OTHER, placeholder.getPath(), "the placeholder character's path is the fallback value");
-        Assertions.assertEquals(0, placeholder.getMaxEnergy(), 1e-9, "the placeholder character has no energy bar");
+        Assertions.assertAll("placeholder identity",
+                () -> Assertions.assertEquals("hero", placeholder.getName(), "the name is kept"),
+                () -> Assertions.assertNull(placeholder.getElement(), "the placeholder character has no element"),
+                () -> Assertions.assertEquals(Path.OTHER, placeholder.getPath(), "the placeholder character's path is the fallback value"),
+                () -> Assertions.assertEquals(0, placeholder.getMaxEnergy(), 1e-9, "the placeholder character has no energy bar"));
     }
 
     /**
@@ -362,11 +365,15 @@ public class CharacterFactoryTest {
      */
     @Test
     public void unknownCharacterIsRejected() {
-        Assertions.assertThrows(CharacterException.class, () -> CharacterFactory.create(99999, 80));
-        Assertions.assertThrows(CharacterException.class, () -> CharacterFactory.data(99999));
+        Assertions.assertAll("unknown cid is rejected",
+                () -> Assertions.assertThrows(CharacterException.class,
+                        () -> CharacterFactory.create(99999, 80), "create must reject an unknown cid"),
+                () -> Assertions.assertThrows(CharacterException.class,
+                        () -> CharacterFactory.data(99999), "data must reject an unknown cid"));
 
-        Assertions.assertTrue(CharacterFactory.exists(1204));
-        Assertions.assertFalse(CharacterFactory.exists(99999));
+        Assertions.assertAll("exists answers in advance",
+                () -> Assertions.assertTrue(CharacterFactory.exists(1204), "1204 exists"),
+                () -> Assertions.assertFalse(CharacterFactory.exists(99999), "99999 does not exist"));
     }
 
     /**
@@ -386,12 +393,13 @@ public class CharacterFactoryTest {
         // Note: `characters().size() + enemies().size()` was the old fixed 3, which stops being true the moment a
         // character brings a STANDING summon (景元's 神君). The action bar holds one entry per combatant on either side, so the
         // assertion counts the allies (summons included) instead of naming a number.
-        Assertions.assertEquals(battle.allies().size() + battle.enemies().size(), battle.queue().size(),
-                "one queue entry per combatant on either side (summons included)");
-        Assertions.assertEquals(com.laosun.aluminium.Battle.Status.RUNNING, battle.getStatus());
-        // aggro comes from the data (Jing Yuan 5 / Seele 5), so the chance of being hit is even
-        Assertions.assertEquals(75, battle.aggroOf(jingYuan));
-        Assertions.assertEquals(75, battle.aggroOf(seele));
+        Assertions.assertAll("battle entry",
+                () -> Assertions.assertEquals(battle.allies().size() + battle.enemies().size(), battle.queue().size(),
+                        "one queue entry per combatant on either side (summons included)"),
+                () -> Assertions.assertEquals(com.laosun.aluminium.Battle.Status.RUNNING, battle.getStatus(),
+                        "the battle is running"),
+                () -> Assertions.assertEquals(75, battle.aggroOf(jingYuan), "Jing Yuan's aggro comes from the data"),
+                () -> Assertions.assertEquals(75, battle.aggroOf(seele), "Seele's aggro comes from the data"));
     }
 
     // ==================================================================
@@ -400,10 +408,11 @@ public class CharacterFactoryTest {
                                        Path path, double energy, int aggro) {
         Character character = CharacterFactory.create(cid, 80);
 
-        Assertions.assertEquals(name, character.getName(), "cid " + cid);
-        Assertions.assertEquals(element, character.getElement(), "cid " + cid);
-        Assertions.assertEquals(path, character.getPath(), "cid " + cid);
-        Assertions.assertEquals(energy, character.getMaxEnergy(), 1e-9, "cid " + cid);
-        Assertions.assertEquals(aggro, character.getAggro(), "cid " + cid);
+        Assertions.assertAll("cid " + cid,
+                () -> Assertions.assertEquals(name, character.getName(), "cid " + cid + " name"),
+                () -> Assertions.assertEquals(element, character.getElement(), "cid " + cid + " element"),
+                () -> Assertions.assertEquals(path, character.getPath(), "cid " + cid + " path"),
+                () -> Assertions.assertEquals(energy, character.getMaxEnergy(), 1e-9, "cid " + cid + " energy cap"),
+                () -> Assertions.assertEquals(aggro, character.getAggro(), "cid " + cid + " aggro"));
     }
 }

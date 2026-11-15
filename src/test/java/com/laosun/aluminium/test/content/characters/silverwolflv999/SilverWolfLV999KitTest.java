@@ -1,12 +1,15 @@
 package com.laosun.aluminium.test.content.characters.silverwolflv999;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.trigger.TriggerTable;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,71 +40,103 @@ import java.util.List;
  * <p><b>Eidolon 1's 「保留 20% 的【隐藏分】」 WAS open and is now closed</b>, and the reason is worth keeping: the clear and
  * the retention had been written as TWO rules, and `previousCredited` - what the retention's share reads - is per-RULE and
  * starts at 0, so the share was 20% of nothing. They are one rule now, and it reads a fifth of what she actually held.
+ *
+ * <h2>Her ZONE (结界)</h2>
+ *
+ * Character 1506 (Silver Wolf LV.999): her ZONE (结界) - both halves, which the registration had called impossible.
+ *
+ * <p>The Zone is a NAMED STATE marker in this project, not a container: 1203 opens its own with {@code APPLY_BUFF buff: 结界}
+ * and reads it with {@code target has_state 结界}, and 1410/1513 do the same. And {@code SKILL_POINT_SPENT} is a real event.
+ * So 「【无敌玩家】状态下展开结界」 and 「结界内我方目标每消耗 1 个战技点…触发 1 次【头号补给盲盒】：造成 90% 的虚数属性欢愉伤害」
+ * are both writable, and this case pins them.
+ *
+ * <p>⚠ Moved: these cases used to live in their own class ({@code SilverWolfLV999ZoneTest}); one file now carries her
+ * kit, the state it grants and the zone it deploys. No assertion changed in the move.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the scenarios below, one {@code assertAll} per fixture so a
+ * failing clause still names itself: her two slots' resources, the Ultimate's entry (state, allowance, trace pay AND both
+ * enhanced slots), the Zone with the spent point it enables, and the shipped declarations with the overflow they promise.
+ * The exit, the E1 retention, the control ban, the E2 extension and the no-zone control keep their own tests - they are
+ * different fixtures or a refusal, and an {@code assertAll} is not where either belongs.
+ *
  */
 public class SilverWolfLV999KitTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
+    private static final int LEVEL = 80;
     private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
     private static final String CHARGES = "强化普攻次数";
     private static final String GOD = "无敌玩家";
+    private static final String FREEZE = "ctrl:frozen";
+    private static final String ZONE = "结界";
     /**
-     * 【好活当赏】 - a RESOURCE, because that is what her rider's gate asks about ({@code self_resource:好活当赏 >= 1}).
+     * 【好活当赏】 - a RESOURCE, because that is what her gates ask about ({@code self_resource:好活当赏 >= 1}): her two
+     * riders' and the 【头号补给盲盒】's (「「银狼LV.999」持有【好活当赏】时」).
      *
-     * <p>⚠ This constant used to be a {@code StateBuff}: the file's gate said {@code self has_state 好活当赏}, so the fixture
-     * synthesized the state. Nothing in the whole corpus grants it to her (1513 applies it to itself), so the rules could
-     * never fire and the case could not tell. The audit moved the gate to the resource spelling the corpus already uses
-     * (1503's note, 1505's identical clause) and the fixture now states that premise instead.
+     * <p>⚠ This constant used to be a {@code StateBuff}: the file's gate said {@code self has_state 好活当赏}, so the
+     * fixture synthesized the state. Nothing in the whole corpus grants it to her (1513 applies it to itself; the Aha
+     * Moment is what grants it, and this engine has no Aha stage), so the rules could never fire and the case could not
+     * tell. The audit moved the gate to the resource spelling the corpus already uses (1503's note, 1505's identical
+     * clause) and the fixtures now state that premise instead.
      */
     private static final String GIFT = "好活当赏";
 
     /**
-     * Her Skill gains the 5 笑点 her page states.
+     * Her Skill gains the 5 笑点 her page states, and her Elation skill gains 15 隐藏分: the two resource clauses her two
+     * damage slots pay, read on ONE battle - which is the order the second of them already drove them in.
      */
     @Test
-    public void theSkillGainsFiveLaughs() {
+    public void herSkillAndHerElationSkillPayTheirResources() {
         Battle battle = newBattle();
         Character wolf = battle.characters().getFirst();
-        int before = battle.partyResourceValue(LAUGH);
+        int laughsBefore = battle.partyResourceValue(LAUGH);
         cast(battle, wolf, SkillType.SKILL, battle.enemyUnits().getFirst());
-        int gained = battle.partyResourceValue(LAUGH) - before;
-        System.out.println("[1506] the Skill gained " + gained + " 笑点");
-        Assertions.assertEquals(5, gained, "战技: 「获得 5 个笑点」");
-    }
-
-    /**
-     * Her Elation skill gains 15 隐藏分.
-     */
-    @Test
-    public void theElationSkillGainsFifteenHidden() {
-        Battle battle = newBattle();
-        Character wolf = battle.characters().getFirst();
-        cast(battle, wolf, SkillType.SKILL, battle.enemyUnits().getFirst());
+        int laughsGained = battle.partyResourceValue(LAUGH) - laughsBefore;
         int afterSkill = wolf.getResources().value(HIDDEN);
         fireElationSkill(battle, wolf);
         int afterElation = wolf.getResources().value(HIDDEN);
-        System.out.println("[1506] 隐藏分 after the Skill " + afterSkill + " ; after the Elation skill " + afterElation);
-        Assertions.assertEquals(15, afterElation - afterSkill,
-                "欢愉技 殿堂级操作回放: 「获得 15 点【隐藏分】」");
+        int hiddenGained = afterElation - afterSkill;
+        System.out.println("[1506] the Skill gained " + laughsGained + " 笑点 ; 隐藏分 after the Skill " + afterSkill
+                + " ; after the Elation skill " + afterElation);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(5, laughsGained, "战技: 「获得 5 个笑点」"),
+                () -> Assertions.assertEquals(15, hiddenGained,
+                        "欢愉技 殿堂级操作回放: 「获得 15 点【隐藏分】」"));
     }
 
     /**
-     * Her Ultimate enters 【无敌玩家】, fills the enhanced-basic allowance, and pays the trace's 20.
+     * Her Ultimate enters 【无敌玩家】, fills the enhanced-basic allowance, pays the trace's 20 - and installs the enhanced
+     * Elation skill (slot 21) as well as the enhanced basic.
+     *
+     * <p>All of it hangs on the same cast, so it is one scenario: the Elation slot is read before and after the same
+     * Ultimate whose state, allowance and trace payment it shares the fixture with.
      */
     @Test
-    public void theUltimateEntersGodmodeAndPaysTheTrace() {
+    public void theUltimateEntersGodmodeAndInstallsTheEnhancedSlots() {
         Battle battle = newBattle();
         Character wolf = battle.characters().getFirst();
+        int elationSlotBefore = wolf.getSkills().get(SkillType.ELATION_SKILL).getSkillSlot();
         int before = wolf.getResources().value(HIDDEN);
         castUltimate(battle, wolf);
-        System.out.println("[1506] after the Ultimate: state=" + wolf.getBuffManager().hasState(GOD)
-                + " charges=" + wolf.getResources().value(CHARGES)
-                + " 隐藏分 " + before + " -> " + wolf.getResources().value(HIDDEN));
-        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "终结技: 「进入【无敌玩家】状态」");
-        Assertions.assertEquals(3, wolf.getResources().value(CHARGES),
-                "天赋: 「完整施放 3 次强化普攻后退出」 - so the allowance starts full");
-        Assertions.assertEquals(20, wolf.getResources().value(HIDDEN) - before,
-                "行迹 隐藏关卡全成就: 「进入【无敌玩家】状态后，获得 20 点【隐藏分】」");
+        boolean inGodmode = wolf.getBuffManager().hasState(GOD);
+        int charges = wolf.getResources().value(CHARGES);
+        int hiddenAfter = wolf.getResources().value(HIDDEN);
+        int elationSlotAfter = wolf.getSkills().get(SkillType.ELATION_SKILL).getSkillSlot();
+        System.out.println("[1506] after the Ultimate: state=" + inGodmode
+                + " charges=" + charges
+                + " 隐藏分 " + before + " -> " + hiddenAfter
+                + " ; her Elation skill's slot " + elationSlotBefore + " -> " + elationSlotAfter);
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(inGodmode, "终结技: 「进入【无敌玩家】状态」"),
+                () -> Assertions.assertEquals(3, charges,
+                        "天赋: 「完整施放 3 次强化普攻后退出」 - so the allowance starts full"),
+                () -> Assertions.assertEquals(20, hiddenAfter - before,
+                        "行迹 隐藏关卡全成就: 「进入【无敌玩家】状态后，获得 20 点【隐藏分】」"),
+                () -> Assertions.assertEquals(20, elationSlotBefore,
+                        "premise: her Elation skill is slot 20 before the Ultimate"),
+                () -> Assertions.assertEquals(21, elationSlotAfter,
+                        "【无敌玩家】状态下拥有强化欢愉技 - 崩坏级伤害演示 is slot 21"));
     }
 
     /**
@@ -185,6 +220,87 @@ public class SilverWolfLV999KitTest {
     public void theBangerRidersPayOnBothSlots() {
         assertRider(SkillType.COMMON, "普攻");
         assertRider(SkillType.SKILL, "战技");
+    }
+
+    /**
+     * 「【无敌玩家】状态下，「银狼LV.999」免疫控制类负面状态」 - and the immunity leaves with the state.
+     *
+     * <p>⚠ The three phases are one battle on purpose: a fixture that only showed "the control does not land" would pass just
+     * as well if the control could never land at all (the fixture monster is immune to freeze, which is why the injector is a
+     * party member with a hand-built table). Phase 1 states the premise - a 100% base chance control lands on her while no
+     * state protects her - phase 2 is the clause, and phase 3 is its lifetime.
+     */
+    @Test
+    public void godmodeIsImmuneToControlAndTheImmunityLeavesWithIt() {
+        Character wolf = CharacterFactory.create(WOLF, 80);
+        Character injector = Character.fromAttributes("injector", 10_000, 100, 100, 100);
+        injector.setTriggerTable(new TriggerTable(9999, List.of(TriggerSpecs.rule(
+                TriggerEvent.TURN_START.name(), List.of(), control()))));
+        Battle battle = new Battle(List.of(wolf, injector), List.of(BattleFixture.monster()),
+                BattleFixture.alwaysRoll(0.0));
+        battle.startBattle();
+        battle.processRequests();
+
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
+        Assertions.assertTrue(wolf.getBuffManager().hasState(FREEZE),
+                "premise: a 100% base chance control lands on her when nothing protects her");
+        wolf.getBuffManager().removeState(FREEZE);
+
+        castUltimate(battle, wolf);
+        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "premise: the Ultimate puts her in 【无敌玩家】");
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
+        System.out.println("[1506] in 【无敌玩家】, after the same control: ctrl:frozen="
+                + wolf.getBuffManager().hasState(FREEZE));
+        Assertions.assertFalse(wolf.getBuffManager().hasState(FREEZE),
+                "「【无敌玩家】状态下，「银狼LV.999」免疫控制类负面状态」");
+
+        for (int use = 1; use <= 3; use++) {
+            cast(battle, wolf, SkillType.COMMON, battle.enemyUnits().getFirst());
+        }
+        Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "premise: three enhanced basics end the state");
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
+        System.out.println("[1506] after leaving 【无敌玩家】, the same control: ctrl:frozen="
+                + wolf.getBuffManager().hasState(FREEZE));
+        Assertions.assertTrue(wolf.getBuffManager().hasState(FREEZE),
+                "「【无敌玩家】状态下…免疫」 is scoped by the state, so the control lands again once it is gone");
+    }
+
+    /**
+     * 「结界中的敌方目标受到的伤害提高 20%」 (星魂 1) - read as a RATIO between two fixtures that differ only in the rank.
+     */
+    @Test
+    public void eidolonOneRaisesTheDamageEnemiesTakeInsideTheZone() {
+        double atZero = damageInsideTheZone(0);
+        double atOne = damageInsideTheZone(1);
+        System.out.println("[1506] damage the same attack deals inside the zone: E0 " + atZero + " -> E1 " + atOne
+                + " (x" + (atOne / atZero) + ")");
+        Assertions.assertTrue(atZero > 0, "premise: the attack really settles damage");
+        Assertions.assertEquals(1.2, atOne / atZero, 1e-9,
+                "「结界中的敌方目标受到的伤害提高 20%」 - and only once, though two rules apply it");
+    }
+
+    /**
+     * 「【无敌玩家】状态下…无法施放终结技」 - asserted both ways, because "the cast failed" alone would pass just as
+     * well if the bar had been empty.
+     */
+    @Test
+    public void godmodeBansTheUltimateAndTheBanLeavesWithIt() {
+        Battle battle = newBattle();
+        Character wolf = battle.characters().getFirst();
+        Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "precondition: not in 【无敌玩家】 yet");
+
+        castUltimate(battle, wolf);
+        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "precondition: the Ultimate put her in 【无敌玩家】");
+
+        wolf.setCurrentEnergy(wolf.getMaxEnergy());
+        Assertions.assertFalse(battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst())),
+                "「无法施放终结技」 - the bar is full and the gate still refuses");
+        battle.processRequests();
+
+        wolf.getBuffManager().removeState(GOD);
+        wolf.setCurrentEnergy(wolf.getMaxEnergy());
+        Assertions.assertTrue(battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst())),
+                "control: with the state removed the same cast is allowed");
     }
 
     /**
@@ -340,6 +456,47 @@ public class SilverWolfLV999KitTest {
         Assertions.assertEquals(2, rule.minEidolon(), "「星魂 2」 gates the clause itself, not the base kit");
     }
 
+    /**
+     * A 100% base chance control aimed at the event's target - the fixture monster is immune to freeze.
+     */
+    private static EffectSpec control() {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "APPLY_CONTROL");
+        TriggerSpecs.set(effect, "control", FREEZE);
+        TriggerSpecs.set(effect, "turns", 1);
+        TriggerSpecs.set(effect, "baseChance", 1.0);
+        TriggerSpecs.set(effect, "target", "target");
+        return effect;
+    }
+
+    /**
+     * One ordinary attack's damage on the enemy, in a battle whose Zone is already up at the given Eidolon rank.
+     */
+    private static double damageInsideTheZone(int eidolonRank) {
+        Battle battle = newBattleNoCrit(eidolonRank);
+        Character wolf = battle.characters().getFirst();
+        castUltimate(battle, wolf);
+        Assertions.assertTrue(wolf.getBuffManager().hasState(ZONE), "premise: the Ultimate deployed the Zone");
+        Enemy victim = battle.enemyUnits().getFirst();
+        double hp = victim.getCurrentHp();
+        double before = hp;
+        cast(battle, wolf, SkillType.SKILL, victim);
+        double dealt = before - victim.getCurrentHp();
+        Assertions.assertTrue(dealt < hp, "premise: the attack must not kill it, or the HP cap hides the ratio (dealt "
+                + dealt + " of " + hp + ")");
+        return dealt;
+    }
+
+    private static Battle newBattleNoCrit(int eidolonRank) {
+        Battle battle = new Battle(
+                List.of(CharacterFactory.create(WOLF, 80, false, null, null, eidolonRank),
+                        CharacterFactory.create(ALLY, 80)),
+                List.of(BattleFixture.monster()), BattleFixture.alwaysRoll(0.9999));
+        battle.startBattle();
+        battle.processRequests();
+        return battle;
+    }
+
     private static Battle newBattle() {
         return newBattle(0);
     }
@@ -348,6 +505,134 @@ public class SilverWolfLV999KitTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ALLY, 80)),
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
+        battle.startBattle();
+        battle.processRequests();
+        return battle;
+    }
+
+    // ==================================================================
+    // Zone (结界) - the cases that were SilverWolfLV999ZoneTest
+    // ==================================================================
+
+    /**
+     * Her Ultimate deploys the Zone on HERSELF, and a Skill Point spent inside it fires 【头号补给盲盒】 at the enemies.
+     *
+     * <p>Both halves are the same battle and the same cast - the Zone the Ultimate deploys, then the spent point that
+     * needs it - so they are one scenario, read on the enemy side's HP.
+     */
+    @Test
+    public void theUltimateDeploysTheZoneAndASpentPointFiresTheBox() {
+        Battle battle = newPromotedBattle();
+        Character wolf = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
+        boolean zoneBefore = wolf.getBuffManager().hasState(ZONE);
+
+        castUltimateHoldingGift(battle, wolf);
+        boolean zoneOnHer = wolf.getBuffManager().hasState(ZONE);
+        boolean zoneOnAlly = ally.getBuffManager().hasState(ZONE);
+        System.out.println("[1506] after the Ultimate: 结界=" + zoneOnHer
+                + " 无敌玩家=" + wolf.getBuffManager().hasState(GOD)
+                + " ; the ally holds 结界=" + zoneOnAlly);
+
+        double before = totalEnemyHp(battle);
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.processRequests();
+        double after = totalEnemyHp(battle);
+        System.out.println("[1506] enemy HP before/after one spent Skill Point: " + before + " -> " + after
+                + " (dealt " + (before - after) + ")");
+        Assertions.assertAll(
+                () -> Assertions.assertFalse(zoneBefore, "precondition: no Zone before the Ultimate"),
+                () -> Assertions.assertTrue(zoneOnHer, "终结技: 「展开结界」"),
+                () -> Assertions.assertFalse(zoneOnAlly, "and it is HERS - the marker is on the caster"),
+                () -> Assertions.assertTrue(before - after > 0,
+                        "结界内每消耗 1 个战技点触发一次盲盒，造成 90% 虚数欢愉伤害"));
+    }
+
+    /**
+     * Without the state there is no Zone, so a spent Skill Point is just a spent Skill Point.
+     */
+    @Test
+    public void withoutTheZoneASpentPointDoesNothing() {
+        Battle battle = newPromotedBattle();
+        Character wolf = battle.characters().getFirst();
+        double before = totalEnemyHp(battle);
+        battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
+        battle.processRequests();
+        double after = totalEnemyHp(battle);
+        System.out.println("[1506] with no Ultimate: enemy HP " + before + " -> " + after);
+        Assertions.assertEquals(before, after, 1e-9,
+                "the Zone and 【无敌玩家】 are both required, so nothing fires without them");
+    }
+
+    /**
+     * 「达到 60 点后可激活终结技，达到上限后还可溢出 240 点」: the shipped declarations carry those numbers, a plain gain
+     * may sit above the normal cap, a clamped gain stops at it, and her Ultimate's advance is one 100% rule.
+     *
+     * <p>One fixture (her compiled character in a started battle) and one subject (what the compiled table declares), so
+     * the declarations and the behaviour they promise are one scenario. The resource is moved only AFTER the declarations
+     * are read, which is why the same battle can serve both halves.
+     */
+    @Test
+    public void theShippedDeclarationsCarryTheirNumbers() {
+        Character wolf = CharacterFactory.create(WOLF, LEVEL);
+        Battle battle = new Battle(List.of(wolf, CharacterFactory.create(ALLY, LEVEL)),
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
+        battle.startBattle();
+        var spec = wolf.getTriggerTable().resources().stream()
+                .filter(resource -> resource.id().equals(HIDDEN)).findFirst().orElseThrow();
+        var rules = wolf.getTriggerTable().rulesFor(TriggerEvent.CAST_SETUP).stream()
+                .filter(rule -> rule.id().equals("p1506_ult_advance")).toList();
+        Assertions.assertEquals(1, rules.size(), "her Ultimate's advance is one rule, named p1506_ult_advance");
+        var effect = rules.getFirst().effects().getFirst();
+        int overflowGain = wolf.getResources().gain(HIDDEN, 100);
+        int afterOverflow = wolf.getResources().value(HIDDEN);
+        int clampedGain = wolf.getResources().get(HIDDEN).gainClamped(100);
+        int afterClamped = wolf.getResources().value(HIDDEN);
+        System.out.println("[1506] declared " + HIDDEN + ": max=" + spec.max() + " overflow=" + spec.overflow()
+                + " ; a plain gain of 100 took the resource to " + afterOverflow + " (it added " + overflowGain
+                + ") ; a clamped gain of 100 added " + clampedGain + " and left it at " + afterClamped
+                + " ; the panel reads " + wolf.getResources().get(HIDDEN));
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(60, spec.max(), "the activation threshold is the normal cap"),
+                () -> Assertions.assertEquals(240, spec.overflow(), "and the text allows 240 more"),
+                () -> Assertions.assertEquals(100, afterOverflow, "the normal cap of 60 does not stop a plain gain"),
+                () -> Assertions.assertEquals(60, afterClamped, "but a clamped gain stops exactly at it"),
+                () -> Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "action advance 100% (行动提前 100%)"));
+    }
+
+    // ==================================================================
+    // Zone helpers
+    // ==================================================================
+
+    private static double totalEnemyHp(Battle battle) {
+        return battle.enemyUnits().stream().mapToDouble(e -> e.getCurrentHp()).sum();
+    }
+
+    /**
+     * Casts her Ultimate with 【好活当赏】 granted first - the box's own gate, which the zone cases have to satisfy before
+     * a spent Skill Point can trigger it.
+     *
+     * <p>⚠ Deliberately NOT the kit's {@code castUltimate}: that one leaves the resource alone, because its rider cases
+     * measure the gate's effect on her two slots and must not also arm the box. The two helpers were one name in the two
+     * original classes, which is why they are distinguished here.
+     */
+    private static void castUltimateHoldingGift(Battle battle, Character wolf) {
+        wolf.getResources().gain(GIFT, 1);
+        wolf.setCurrentEnergy(wolf.getMaxEnergy());
+        battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));
+        battle.processRequests();
+    }
+
+    /**
+     * A battle for the zone cases, built with {@code CharacterFactory.create(cid, level)} for both units.
+     *
+     * <p>⚠ Deliberately NOT the kit's {@code newBattle()}: {@code create(cid, level)} promotes the character, while the
+     * kit's fixture passes {@code promoted = false}. That is a different stat sheet, so the two fixtures are not unified.
+     */
+    private static Battle newPromotedBattle() {
+        Battle battle = new Battle(
+                List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();

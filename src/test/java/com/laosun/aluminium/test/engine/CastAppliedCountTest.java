@@ -40,6 +40,12 @@ import java.util.Random;
  *       not one this engine rolls for - both are silent-zero mistakes otherwise;</li>
  *   <li>March 7th (三月七)'s own file pays 6 per landed freeze and nothing at Eidolon (星魂) 0.</li>
  * </ol>
+ *
+ * <p><b>L3:</b> the single-clause cases that share a fixture are grouped into the scenarios below, one
+ * {@code assertAll} per scenario so a failing clause still names itself. The two load-time refusals share one
+ * scenario (one rule compiled into a table, one refusal and the field its message names); they stay apart from every
+ * positive scenario, because an {@code assertThrows} is not a positive clause. The DOT spelling and the two
+ * shipped-content observations keep their own tests: each has a fixture, or an observable, of its own.
  */
 public class CastAppliedCountTest {
     private static final double EPS = 1e-6;
@@ -56,113 +62,100 @@ public class CastAppliedCountTest {
     private static final int MONSTER = 1003010;
 
     /**
-     * Three enemies, all frozen, pay three times.
+     * The count is the <b>landed</b> one: every landed application pays once (three frozen is 18, two is 12), and the
+     * case that separates this from {@code per_target: true} - three targets aimed at and none frozen - pays exactly
+     * nothing.
      *
-     * <p>Stated as the <b>difference</b> between two identical casts that differ only in whether the freeze lands:
-     * casting an ultimate also grants the skill's own energy, so an absolute number here would be measuring that
-     * plus the counter. The contrast cancels everything except the counter.
+     * <p>All three clauses share one fixture (a {@code ULT_CAST} that freezes all enemies, plus the counter rule) and
+     * one observable (the energy the ultimate granted), so they are one scenario and every clause names itself in the
+     * {@code assertAll}.
      */
     @Test
-    public void everyLandedApplicationPaysOnce() {
+    public void theLandedCountPaysOncePerLandedApplication() {
         double allFrozen = energyFromAnUltimate(3, 0);
         double noneFrozen = energyFromAnUltimate(3, 3);
-
-        Assertions.assertEquals(18, allFrozen - noneFrozen, EPS,
-                "6 energy × the 3 targets the freeze really landed on");
-    }
-
-    /**
-     * ...and a partial result pays partially: two of three frozen is 12, not 18 and not 0.
-     */
-    @Test
-    public void aPartialResultPaysPartially() {
-        Assertions.assertEquals(12, energyFromAnUltimate(3, 1) - energyFromAnUltimate(3, 3), EPS);
-    }
-
-    /**
-     * Note: The case that separates this from {@code per_target: true}.
-     *
-     * <p>Three targets are aimed at and none can be frozen - the aim count is 3 and the landed count is 0. So the
-     * counter's own contribution must be <b>exactly nothing</b> here: the comparison is against the same cast with
-     * no counter rule at all, which cancels the skill's own energy and leaves only what the counter added. An
-     * implementation that read the aim count would add 3  x  6 = 18 and go red.
-     */
-    @Test
-    public void theAimedCountIsNotTheLandedCount() {
-        double withCounter = energyFromAnUltimate(3, 3);
+        double partial = energyFromAnUltimate(3, 1);
         double withoutCounter = energyFromAnUltimate(freezeOnlyHero(), 3, 3);
 
-        Assertions.assertEquals(withoutCounter, withCounter, EPS,
-                "a fully resisted ultimate pays nothing, however many enemies it hit");
+        Assertions.assertAll("the landed count pays, the aimed count does not",
+                () -> Assertions.assertEquals(18, allFrozen - noneFrozen, EPS,
+                        "every landed application pays once: 6 energy × the 3 targets the freeze really landed on"),
+                () -> Assertions.assertEquals(12, partial - noneFrozen, EPS,
+                        "a partial result pays partially: two of three frozen is 12, not 18 and not 0"),
+                () -> Assertions.assertEquals(withoutCounter, noneFrozen, EPS,
+                        "the aimed count is not the landed count: a fully resisted ultimate pays nothing, however many "
+                                + "enemies it hit"));
     }
 
     /**
-     * Note: A state applied <b>outside</b> a cast must not be paid for by the next one.
+     * The count belongs to <b>one cast</b>: the next cast starts from zero, and nothing outside the cast - neither an
+     * application made before it nor the record itself after its events are delivered - may be paid for or read.
      *
-     * <p>The counter can be written by an op that is not part of a cast at all - a {@code TAKING_HIT} rule that
-     * freezes whoever hit her is the live example - so "one cast" has to be enforced at the <b>start</b> of a cast as
-     * well as at the end of one. This is the case that pins the start: the same ultimate is cast twice, once in a
-     * battle where an out-of-cast freeze already happened and once in a battle where it did not, and the counter's
-     * contribution must be identical (nothing landed in either ultimate).
+     * <p>Both halves matter: a second cast must not add to the first (that would make "每冻结1个目标" pay for
+     * freezes from earlier turns), and a rule firing outside the window must not read a stale number at all. An
+     * application made <b>outside</b> a cast must not be paid for by the next one either: the counter can be written
+     * by an op that is not part of a cast at all - a {@code TAKING_HIT} rule that freezes whoever hit her is the live
+     * example - so "one cast" has to be enforced at the <b>start</b> of a cast as well as at the end of one.
+     *
+     * <p>All four clauses share one fixture shape (the counting hero's ultimate on a three-enemy battle) and one
+     * observable (the energy the cast granted, plus the record it leaves behind). The out-of-cast freeze rule is the
+     * clause's own input, not a different fixture.
      */
     @Test
-    public void anOutOfCastApplicationDoesNotPayTheNextCast() {
+    public void theCountBelongsToOneCastOnly() {
+        Battle battle = ultimateBattle(3, 1);
+        double first = castUltimate(battle);
+
         // Freezable enemies, so the out-of-cast freeze really lands (a1) and the ultimate then lands its own (3).
         Battle contaminated = ultimateBattle(heroWithAnOutOfCastFreeze(), 3, 0);
         // The freeze happens on a hit she takes, long before the ultimate: `attacker` is the one who gets frozen.
         contaminated.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, contaminated.enemyUnits().getFirst(),
                 contaminated.characters().getFirst(), 1, 0));
-
         double withStale = castUltimate(contaminated);
         double clean = energyFromAnUltimate(3, 0);
 
-        Assertions.assertEquals(clean, withStale, EPS,
-                "the ultimate froze 3 targets, so it pays 18 -- the earlier freeze belongs to no cast and must not "
-                        + "make it 24");
+        Assertions.assertAll("the count is per cast: it starts at zero, ends with the cast, and is not inherited",
+                () -> Assertions.assertEquals(12, first, EPS, "two of three frozen on the first cast"),
+                () -> Assertions.assertEquals(0, battle.castAppliedCount("ctrl:frozen"),
+                        "once the cast's events are delivered, its record is cleared"),
+                () -> {
+                    double second = castUltimate(battle);
+                    Assertions.assertEquals(12, second, EPS,
+                            "the second cast starts from zero instead of adding to the first");
+                },
+                () -> Assertions.assertEquals(clean, withStale, EPS,
+                        "an out-of-cast application: the ultimate froze 3 targets, so it pays 18 -- the earlier freeze "
+                                + "belongs to no cast and must not make it 24"));
     }
 
     /**
-     * The count belongs to <b>one cast</b>, and the record is gone once that cast's events have been delivered.
+     * Load time, not a forever zero: the loader refuses the spelling where the count cannot exist - a rule that reads
+     * it on a non-cast event - and where the state name is not one this engine rolls for, because a typo would make
+     * the counter answer 0 forever. Both are silent-zero mistakes otherwise.
      *
-     * <p>Both halves matter: a second cast must not add to the first (that would make "每冻结1个目标" pay for
-     * freezes from earlier turns), and a rule firing outside the window must not read a stale number at all.
+     * <p>One fixture (one rule compiled into a table, which is where load-time validation runs) and one observable
+     * (the refusal and the field its message names); it stays apart from every positive scenario above, because an
+     * {@code assertThrows} is not a positive clause.
      */
     @Test
-    public void theCountIsPerCastAndIsForgottenAfterwards() {
-        Battle battle = ultimateBattle(3, 1);
-
-        double first = castUltimate(battle);
-        Assertions.assertEquals(12, first, EPS, "two of three frozen on the first cast");
-        Assertions.assertEquals(0, battle.castAppliedCount("ctrl:frozen"),
-                "once the cast's events are delivered, its record is cleared");
-
-        double second = castUltimate(battle);
-        Assertions.assertEquals(12, second, EPS, "the second cast starts from zero instead of adding to the first");
-    }
-
-    /**
-     * Note: A rule that reads the count on an event outside a cast is refused at load, not answered with 0.
-     */
-    @Test
-    public void readingTheCountOutsideACastIsRefusedAtLoad() {
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.rule("TAKING_HIT", null, countedEnergy("ctrl:frozen", 6))));
-
-        Assertions.assertTrue(refused.getMessage().contains("TAKING_HIT"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("cast_applied:ctrl:frozen"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("ULT_CAST"), "the message lists the cast events");
-    }
-
-    /**
-     * Note: A state name this engine does not roll for is refused: a typo would make the counter answer 0 forever.
-     */
-    @Test
-    public void anUnknownStateNameIsRefusedAtLoad() {
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.rule("ULT_CAST", null, countedEnergy("冰冻", 6))));
-
-        Assertions.assertTrue(refused.getMessage().contains("冰冻"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("ctrl:frozen"), "the message lists the states it knows");
+    public void impossibleCountSpellingsAreRefusedAtLoad() {
+        Assertions.assertAll("the cast_applied spelling is refused at load time where it could only read zero",
+                () -> {
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> tableOf(TriggerSpecs.rule("TAKING_HIT", null, countedEnergy("ctrl:frozen", 6))),
+                            "a rule that reads the count on a non-cast event is refused");
+                    Assertions.assertTrue(refused.getMessage().contains("TAKING_HIT"), refused.getMessage());
+                    Assertions.assertTrue(refused.getMessage().contains("cast_applied:ctrl:frozen"), refused.getMessage());
+                    Assertions.assertTrue(refused.getMessage().contains("ULT_CAST"), "the message lists the cast events");
+                },
+                () -> {
+                    IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> tableOf(TriggerSpecs.rule("ULT_CAST", null, countedEnergy("冰冻", 6))),
+                            "a state name this engine does not roll for is refused");
+                    Assertions.assertTrue(refused.getMessage().contains("冰冻"), refused.getMessage());
+                    Assertions.assertTrue(refused.getMessage().contains("ctrl:frozen"),
+                            "the message lists the states it knows");
+                });
     }
 
     /**
@@ -218,10 +211,13 @@ public class CastAppliedCountTest {
                 .orElseThrow(() -> new AssertionError("Eidolon (星魂) 1's rule is gone from characters/1001.json"))
                 .effects().getFirst();
 
-        Assertions.assertEquals("GAIN_ENERGY", effect.getOp());
-        Assertions.assertEquals("cast_applied:ctrl:frozen", effect.getScale());
-        Assertions.assertEquals(6, effect.getPercent(), EPS);
-        Assertions.assertNull(effect.getPerTarget(), "per_target would count the enemies it aimed at, not the ones it froze");
+        Assertions.assertAll("the shipped Eidolon 1 rule reads the landed count",
+                () -> Assertions.assertEquals("GAIN_ENERGY", effect.getOp(), "the op is an energy grant"),
+                () -> Assertions.assertEquals("cast_applied:ctrl:frozen", effect.getScale(),
+                        "the magnitude is the landed count of ctrl:frozen"),
+                () -> Assertions.assertEquals(6, effect.getPercent(), EPS, "6 energy per landed freeze"),
+                () -> Assertions.assertNull(effect.getPerTarget(),
+                        "per_target would count the enemies it aimed at, not the ones it froze"));
     }
 
     // ==================================================================

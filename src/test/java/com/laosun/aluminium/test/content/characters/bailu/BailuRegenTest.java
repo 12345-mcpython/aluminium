@@ -21,6 +21,12 @@ import java.util.Random;
  * <p><b>What is registered</b> (the file's notes): the Skill's random double heal with its decaying multiplier, the
  * talent's "this effect can trigger 2 times" (registered whole, because shipping the heal without the count would heal on every hit)
  * and its death prevention, trace Vidyadhara Ichor Lines (持明龙脉), and the eidolons.
+ *
+ * <p><b>L3:</b> the fresh branch of the Ultimate's sentence and the trace that rides on it share one board and one cast,
+ * so they are one scenario test ({@code theTraceReducesDamageTakenForTheBearers} - the name {@code 1211.json}'s ultimate
+ * note cites for the ordering trap) with an {@code Assertions.assertAll}, each assertion keeping the message that names
+ * its clause. The "extend" branch and the 持明龙脉 allowance keep their own boards, because each reads a state the
+ * merged board does not have.
  */
 public class BailuRegenTest {
     private static final int BAILU = 1211;
@@ -28,16 +34,29 @@ public class BailuRegenTest {
     private static final int LEVEL = 80;
 
     /**
-     * The fresh branch: allies without [生息] get it.
+     * The fresh branch: allies without [生息] get it — and the trace 鳞渊福泽 rides on the state, so the bearer takes 10%
+     * less while it lasts.
+     *
+     * <p>One board, one cast: the readings are the same {@code castUltimate()}, one of the state and one of the reduction
+     * zone that arrives with it. The name is the one {@code 1211.json} cites for the effect-ordering trap (the reduction
+     * must be applied before {@code APPLY_BUFF 生息} in the same rule), so it survives the merge.
      */
     @Test
-    public void theUltimateGivesRegenerationToThoseWithoutIt() {
+    public void theTraceReducesDamageTakenForTheBearers() {
         Fixture f = new Fixture();
+        // Note: Counted rather than "is it non-empty": the reduction zone is also used elsewhere, so an emptiness assertion
+        // would have been a claim about the whole battle rather than about this cast.
+        int reductionsBefore = f.ally.getBuffManager().allBuffsOf(
+                com.laosun.aluminium.buff.ReductionBuff.class).size();
 
         f.castUltimate();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("生息"), "「for our targets that do not have [生息] (Invigoration) ... apply [生息] (Invigoration)」");
-        Assertions.assertTrue(f.bailu.getBuffManager().hasState("生息"), "...and 「all of our side」 includes her");
+        Assertions.assertAll("the Ultimate's [生息] and the trace that rides on it",
+                () -> Assertions.assertTrue(f.ally.getBuffManager().hasState("生息"), "「for our targets that do not have [生息] (Invigoration) ... apply [生息] (Invigoration)」"),
+                () -> Assertions.assertTrue(f.bailu.getBuffManager().hasState("生息"), "...and 「all of our side」 includes her"),
+                () -> Assertions.assertTrue(f.ally.getBuffManager().allBuffsOf(
+                                com.laosun.aluminium.buff.ReductionBuff.class).size() > reductionsBefore,
+                        "「characters that have [生息] (Invigoration) take 10% less damage」 -- the reduction goes up with the state"));
     }
 
     /**
@@ -57,22 +76,6 @@ public class BailuRegenTest {
         Assertions.assertEquals(statesBefore,
                 f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StateBuff.class).size(),
                 "「this effect cannot stack」: the second branch EXTENDS the state instead of applying another one");
-    }
-
-    /** trace Aquatic Benediction (鳞渊福泽) rides on the state: the bearer takes 10% less while it lasts. */
-    @Test
-    public void theTraceReducesDamageTakenForTheBearers() {
-        Fixture f = new Fixture();
-        // Note: Counted rather than "is it non-empty": the reduction zone is also used elsewhere, so an emptiness assertion
-        // would have been a claim about the whole battle rather than about this cast.
-        int before = f.ally.getBuffManager().allBuffsOf(
-                com.laosun.aluminium.buff.ReductionBuff.class).size();
-
-        f.castUltimate();
-
-        Assertions.assertTrue(f.ally.getBuffManager().allBuffsOf(
-                        com.laosun.aluminium.buff.ReductionBuff.class).size() > before,
-                "「characters that have [生息] (Invigoration) take 10% less damage」 -- the reduction goes up with the state");
     }
 
     /**

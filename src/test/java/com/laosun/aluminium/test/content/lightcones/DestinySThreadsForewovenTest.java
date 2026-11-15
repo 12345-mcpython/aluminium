@@ -47,7 +47,7 @@ public class DestinySThreadsForewovenTest {
         double gain = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - before;
         System.out.println("[21039] effectResistance=" + gain);
         // 2026-10-19: the resistance is the cone's own `effect_resistance` property (in the panel before the battle starts).
-        Assertions.assertTrue(true, "rank 5's resistance share is the property - pinned in ConeAuditBatchElevenTest");
+        Assertions.assertTrue(true, "rank 5's resistance share is the property - pinned in LightConeAuditBatchElevenTest");
     }
 
     private static double[] boost(double extraDefence) {

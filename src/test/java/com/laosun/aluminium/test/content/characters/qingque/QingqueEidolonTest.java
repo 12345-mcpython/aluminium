@@ -25,18 +25,31 @@ public class QingqueEidolonTest {
     private static final int QINGQUE = 1201;
     private static final int LEVEL = 80;
 
+    /**
+     * Both Eidolons run on the same fixture — 青雀 at an Eidolon level beside ally 1001 against one monster with a fixed
+     * roll — so one combat casts her Ultimate to read the boost ZONE and another lets her own draw pay the Energy.
+     */
     @Test
-    public void eidolonOneBoostsTheUltimateOnly() {
+    public void eidolonsLiftTheUltimateZoneAndPayEnergyOnHerDraw() {
         double without = ultBoostZone(0);
         double with = ultBoostZone(1);
         System.out.println("[1201] boost zone " + without + " -> " + with);
+        double energy = energyAfterHerOwnDraw();
+        System.out.println("[1201] energy after her draw = " + energy);
+
         // The clause is a share of the boost ZONE, so the ratio of settled damage is smaller whenever another boost is
         // already there; the zone itself moves by exactly 0.1.
-        Assertions.assertEquals(0.1, with - without, 1e-6, "「施放终结技造成的伤害提高 10%」");
+        Assertions.assertAll("星魂 1 / 星魂 2: the Ultimate's boost ZONE and the Energy her draw pays",
+                () -> Assertions.assertEquals(0.1, with - without, 1e-6,
+                        "Eidolon 1: 「施放终结技造成的伤害提高 10%」"),
+                () -> Assertions.assertEquals(1, energy, 1e-9,
+                        "Eidolon 2: 「每次触发抽牌时，立即恢复 1 点能量」"));
     }
 
-    @Test
-    public void eidolonTwoPaysAEnergyOnHerDraw() {
+    /**
+     * Eidolon 2's fixture: her own turn start is the draw that has to pay one point of Energy.
+     */
+    private static double energyAfterHerOwnDraw() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL, true, null, null, 2);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(new ArrayList<>(List.of(qingque, CharacterFactory.create(1001, LEVEL))),
@@ -44,10 +57,12 @@ public class QingqueEidolonTest {
         battle.startBattle();
         qingque.setCurrentEnergy(0);
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, qingque, qingque, 0, 0));
-        System.out.println("[1201] energy after her draw = " + qingque.getCurrentEnergy());
-        Assertions.assertEquals(1, qingque.getCurrentEnergy(), 1e-9, "「每次触发抽牌时，立即恢复 1 点能量」");
+        return qingque.getCurrentEnergy();
     }
 
+    /**
+     * Eidolon 1's fixture: the same combat, read at Eidolon 0 and Eidolon 1 to isolate the Ultimate's boost ZONE.
+     */
     private static double ultBoostZone(int eidolon) {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL, true, null, null, eidolon);
         Enemy enemy = BattleFixture.monster();

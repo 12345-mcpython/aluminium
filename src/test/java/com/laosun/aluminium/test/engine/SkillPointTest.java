@@ -30,6 +30,10 @@ import java.util.function.Supplier;
  * the queue and by design does not touch skill points); everything goes through the real chain
  * {@code stepForward to beforeMove to performAction to afterMove}, otherwise what is tested is "a world without skill
  * points".
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the scenarios below, one {@code assertAll} per
+ * fixture/observable, so a failing clause still names itself. The 0-point refusal stays its own test: a
+ * rejection path is not a positive clause.
  */
 public class SkillPointTest {
     private static final double EPS = 1e-9;
@@ -39,54 +43,75 @@ public class SkillPointTest {
     // ==================================================================
 
     /**
-     * Starts at 3 points, caps at 5.
+     * {@code gainSkillPoint}: starts at 3, one gain is +1, the pool caps at 5, and a non-positive amount is
+     * ignored rather than turned into a spend.
+     *
+     * <p>All clauses are on the same fixture (a bare battle) and the same observable (the pool count), so they
+     * share one scenario. The non-positive probes run first, while the pool is still at its start value.
      */
     @Test
-    public void startsAtThreeAndCapsAtFive() {
+    public void gainSkillPointRules() {
         Battle battle = newBattle();
 
-        Assertions.assertEquals(3, battle.getSkillPoints(), "skill points at the start");
-        Assertions.assertEquals(Constant.SKILL_POINT_START, battle.getSkillPoints());
-        Assertions.assertEquals(5, Constant.SKILL_POINT_MAX);
-
-        battle.gainSkillPoint(1);
-        Assertions.assertEquals(4, battle.getSkillPoints());
-        battle.gainSkillPoint(1);
-        Assertions.assertEquals(5, battle.getSkillPoints(), "reaches 5");
-        battle.gainSkillPoint(1);
-        Assertions.assertEquals(5, battle.getSkillPoints(), "capped, no overflow");
-        battle.gainSkillPoint(100);
-        Assertions.assertEquals(5, battle.getSkillPoints(), "adding 100 at once still only reaches 5");
+        Assertions.assertAll("gainSkillPoint: start, cap and non-positive amounts",
+                () -> Assertions.assertEquals(3, battle.getSkillPoints(), "skill points at the start"),
+                () -> Assertions.assertEquals(Constant.SKILL_POINT_START, battle.getSkillPoints(),
+                        "the start value is the rule's constant"),
+                () -> Assertions.assertEquals(5, Constant.SKILL_POINT_MAX, "the cap is the rule's constant"),
+                () -> {
+                    battle.gainSkillPoint(0);
+                    Assertions.assertEquals(3, battle.getSkillPoints(), "adding 0 changes nothing");
+                },
+                () -> {
+                    battle.gainSkillPoint(-5);
+                    Assertions.assertEquals(3, battle.getSkillPoints(),
+                            "adding a negative must not turn into a spend");
+                },
+                () -> {
+                    battle.gainSkillPoint(1);
+                    Assertions.assertEquals(4, battle.getSkillPoints(), "one gain is +1");
+                },
+                () -> {
+                    battle.gainSkillPoint(1);
+                    Assertions.assertEquals(5, battle.getSkillPoints(), "reaches 5");
+                },
+                () -> {
+                    battle.gainSkillPoint(1);
+                    Assertions.assertEquals(5, battle.getSkillPoints(), "capped, no overflow");
+                },
+                () -> {
+                    battle.gainSkillPoint(100);
+                    Assertions.assertEquals(5, battle.getSkillPoints(),
+                            "adding 100 at once still only reaches 5");
+                });
     }
 
     /**
-     * After spending down to 0, any further spend must return false (rather than going negative).
+     * Spending at 0 points is refused by both entry points ({@code spendSkillPoint} and
+     * {@code applySkillPointCost}), and a failed deduction must not take the pool negative - it is atomic.
      */
     @Test
-    public void spendingStopsAtZero() {
+    public void spendingStopsAtZeroAndTheCostIsAtomic() {
         Battle battle = newBattle();
+        Character hero = battle.characters().getFirst();
+        Skill skill = hero.getSkills().get(SkillType.SKILL);
 
-        for (int i = 0; i < 3; i++) {
-            Assertions.assertTrue(battle.spendSkillPoint(), "spend #" + (i + 1) + " should succeed");
-        }
-        Assertions.assertEquals(0, battle.getSkillPoints());
-        Assertions.assertFalse(battle.hasSkillPoint());
-
-        Assertions.assertFalse(battle.spendSkillPoint(), "at 0 points it should fail");
-        Assertions.assertEquals(0, battle.getSkillPoints(), "a failure must not go negative");
-    }
-
-    /**
-     * Gaining a non-positive amount is a caller bug: ignore it silently, do not treat it as "spending a point".
-     */
-    @Test
-    public void gainingNonPositiveAmountIsIgnored() {
-        Battle battle = newBattle();
-
-        battle.gainSkillPoint(0);
-        Assertions.assertEquals(3, battle.getSkillPoints(), "adding 0 changes nothing");
-        battle.gainSkillPoint(-5);
-        Assertions.assertEquals(3, battle.getSkillPoints(), "adding a negative must not turn into a spend");
+        Assertions.assertAll("spending never goes below zero",
+                () -> {
+                    for (int i = 0; i < 3; i++) {
+                        Assertions.assertTrue(battle.spendSkillPoint(),
+                                "spend #" + (i + 1) + " should succeed");
+                    }
+                    Assertions.assertEquals(0, battle.getSkillPoints(), "the pool is empty after three spends");
+                },
+                () -> Assertions.assertFalse(battle.hasSkillPoint(),
+                        "with 0 points hasSkillPoint is false"),
+                () -> Assertions.assertFalse(battle.spendSkillPoint(), "at 0 points it should fail"),
+                () -> Assertions.assertEquals(0, battle.getSkillPoints(), "a failure must not go negative"),
+                () -> Assertions.assertFalse(battle.applySkillPointCost(skill, hero),
+                        "not enough points → failure"),
+                () -> Assertions.assertEquals(0, battle.getSkillPoints(),
+                        "the failed attempt must not deduct to -1"));
     }
 
     // ==================================================================
@@ -94,48 +119,45 @@ public class SkillPointTest {
     // ==================================================================
 
     /**
-     * One basic attack through the real chain to +1.
+     * The real turn chain ({@code stepForward to beforeMove to performAction to afterMove}) is what moves the
+     * pool: a basic attack gains +1 (and repeated basic attacks cap at 5), a skill spends -1.
+     *
+     * <p>The three clauses are on the same fixture and the same observable; each sub-scenario starts from its
+     * own battle so no clause borrows another clause's pool state (the skill clause needs the start value of 3
+     * to assert the 3 to 2 drop).
      */
     @Test
-    public void basicAttackInRealActionFlowGainsOnePoint() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
+    public void realActionChainAppliesTheSkillPointRules() {
+        Assertions.assertAll("the real action chain changes the pool",
+                () -> {
+                    Battle battle = newBattle();
+                    Character hero = battle.characters().getFirst();
 
-        Assertions.assertEquals(3, battle.getSkillPoints());
-        Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.COMMON),
-                () -> List.of(firstEnemy(battle))));
-        Assertions.assertEquals(4, battle.getSkillPoints(), "basic attack +1");
-    }
+                    Assertions.assertEquals(3, battle.getSkillPoints(), "starting pool before the basic attack");
+                    Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.COMMON),
+                            () -> List.of(firstEnemy(battle))), "the basic attack itself should succeed");
+                    Assertions.assertEquals(4, battle.getSkillPoints(), "basic attack +1");
+                },
+                () -> {
+                    Battle battle = newBattle();
+                    Character hero = battle.characters().getFirst();
 
-    /**
-     * One skill cast through the real chain to -1.
-     */
-    @Test
-    public void skillInRealActionFlowSpendsOnePoint() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
+                    for (int i = 0; i < 4; i++) {
+                        Assertions.assertTrue(
+                                actWithRealTurn(battle, hero, () -> skill(hero, Slot.COMMON),
+                                        () -> List.of(firstEnemy(battle))),
+                                "basic attack #" + (i + 1) + "");
+                    }
+                    Assertions.assertEquals(5, battle.getSkillPoints(), "basic attacks in a row cap at 5");
+                },
+                () -> {
+                    Battle battle = newBattle();
+                    Character hero = battle.characters().getFirst();
 
-        Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.SKILL),
-                () -> List.of(firstEnemy(battle))));
-        Assertions.assertEquals(2, battle.getSkillPoints(), "skill -1");
-    }
-
-    /**
-     * Basic attacks in a row up to the cap: 3 to 4 to 5 to 5.
-     */
-    @Test
-    public void repeatedBasicAttacksCapAtFive() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-
-        for (int i = 0; i < 4; i++) {
-            Assertions.assertTrue(
-                    actWithRealTurn(battle, hero, () -> skill(hero, Slot.COMMON),
-                            () -> List.of(firstEnemy(battle))),
-                    "basic attack #" + (i + 1) + "");
-        }
-
-        Assertions.assertEquals(5, battle.getSkillPoints(), "basic attacks in a row cap at 5");
+                    Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.SKILL),
+                            () -> List.of(firstEnemy(battle))), "the skill itself should succeed");
+                    Assertions.assertEquals(2, battle.getSkillPoints(), "skill -1");
+                });
     }
 
     // ==================================================================
@@ -149,6 +171,8 @@ public class SkillPointTest {
      * <p>The "no damage" part must be asserted together: {@code performAction} only queues, the actual
      * settlement happens in {@code afterMove to processRequests}. If the cost had failed but the request was
      * already queued, we would get "it was never paid for yet the hit came out".
+     *
+     * <p>This is a refusal path, so it stays out of the positive scenarios above.
      */
     @Test
     public void skillWithNoPointsFailsAndDealsNoDamage() {
@@ -159,13 +183,16 @@ public class SkillPointTest {
         while (battle.spendSkillPoint()) {
             // drain the pool to zero
         }
-        Assertions.assertEquals(0, battle.getSkillPoints());
-
         double hpBefore = target.getCurrentHp();
-        Assertions.assertFalse(actWithoutAfterMove(battle, hero, () -> skill(hero, Slot.SKILL), List.of(target)),
-                "0 skill points → the action does not happen");
-        Assertions.assertEquals(0, battle.getSkillPoints(), "a failed action must not deduct below zero");
-        Assertions.assertEquals(hpBefore, target.getCurrentHp(), EPS, "a failed action must not deal damage");
+        boolean acted = actWithoutAfterMove(battle, hero, () -> skill(hero, Slot.SKILL), List.of(target));
+
+        Assertions.assertAll("at 0 points the skill is refused and deals no damage",
+                () -> Assertions.assertEquals(0, battle.getSkillPoints(), "the pool is empty before the attempt"),
+                () -> Assertions.assertFalse(acted, "0 skill points → the action does not happen"),
+                () -> Assertions.assertEquals(0, battle.getSkillPoints(),
+                        "a failed action must not deduct below zero"),
+                () -> Assertions.assertEquals(hpBefore, target.getCurrentHp(), EPS,
+                        "a failed action must not deal damage"));
     }
 
     // ==================================================================
@@ -182,42 +209,41 @@ public class SkillPointTest {
 
         int before = battle.getSkillPoints();
         jingYuan.setCurrentEnergy(200);
-        Assertions.assertTrue(battle.castUltra(jingYuan, List.of(firstEnemy(battle))));
 
-        Assertions.assertEquals(before, battle.getSkillPoints(), "the ultimate does not touch skill points");
+        Assertions.assertAll("the ultimate is skill-point neutral",
+                () -> Assertions.assertTrue(battle.castUltra(jingYuan, List.of(firstEnemy(battle))),
+                        "precondition: the ultimate is cast"),
+                () -> Assertions.assertEquals(before, battle.getSkillPoints(),
+                        "the ultimate does not touch skill points"));
     }
 
     /**
      * Follow-up attacks / talents: their {@code attack_type} is {@code null} in the data, so they must take the
-     * neutral branch.
+     * neutral branch; the map basic attack (slot 6, {@code MazeNormal}) is neutral too and does not count as
+     * "basic attack restores a point".
      *
      * <p>Note: This one guards against writing the {@code switch} as "if it is not a basic attack then it is a skill"
      * ({@code default -> spend}): that way talents and follow-up attacks would quietly eat skill points, and the
      * moment follow-up attacks are added it would be hit immediately.
      */
     @Test
-    public void nullAttackTypeIsNeutral() {
+    public void neutralAttackTypesDoNotChangeThePool() {
         Battle battle = newBattle();
+        Character hero = battle.characters().getFirst();
         Skill talentLike = skill(CharacterFactory.create(1003, 80), Slot.TALENT);
-        Assertions.assertNull(talentLike.getData().getSkillType(), "precondition: the talent's attack_type is null");
-
-        int before = battle.getSkillPoints();
-        Assertions.assertTrue(battle.applySkillPointCost(talentLike, battle.characters().getFirst()),
-                "a neutral skill does not block the action");
-        Assertions.assertEquals(before, battle.getSkillPoints(), "neither rises nor falls");
-    }
-
-    /**
-     * The map basic attack (slot 6, {@code MazeNormal}) is treated as neutral too, it does not count as "basic attack restores a point".
-     */
-    @Test
-    public void mazeAttackTypeIsNeutral() {
-        Battle battle = newBattle();
         Skill maze = skill(CharacterFactory.create(1003, 80), Slot.MAZE);
 
         int before = battle.getSkillPoints();
-        Assertions.assertTrue(battle.applySkillPointCost(maze, battle.characters().getFirst()));
-        Assertions.assertEquals(before, battle.getSkillPoints(), "MazeNormal is neutral");
+
+        Assertions.assertAll("neutral attack types do not change the pool",
+                () -> Assertions.assertNull(talentLike.getData().getSkillType(),
+                        "precondition: the talent's attack_type is null"),
+                () -> Assertions.assertTrue(battle.applySkillPointCost(talentLike, hero),
+                        "a neutral skill does not block the action"),
+                () -> Assertions.assertEquals(before, battle.getSkillPoints(), "neither rises nor falls"),
+                () -> Assertions.assertTrue(battle.applySkillPointCost(maze, hero),
+                        "MazeNormal does not block the action"),
+                () -> Assertions.assertEquals(before, battle.getSkillPoints(), "MazeNormal is neutral"));
     }
 
     // ==================================================================
@@ -244,37 +270,20 @@ public class SkillPointTest {
         Character hero = battle.characters().getFirst();
 
         // precondition self-check: the default enemy skill's getData() is null, so it cannot test the camp check
-        Assertions.assertNull(enemySkill(enemy).getData(),
-                "precondition: EnemySkill has no character multiplier data, testing it directly is a no-op");
+        Skill defaultEnemySkill = enemySkill(enemy);
 
         // swap in "a real character's basic attack" (Normal) - the data is non-null, so it really reaches the skill point branch
         enemy.setSkill(SkillType.COMMON, new DefaultSkill(1003, 1, 1));
         int before = battle.getSkillPoints();
-        Assertions.assertTrue(actWithRealTurn(battle, enemy, () -> enemy.getSkills().get(SkillType.COMMON),
-                () -> List.of(hero)), "the enemy's basic attack itself should succeed");
+        boolean acted = actWithRealTurn(battle, enemy, () -> enemy.getSkills().get(SkillType.COMMON),
+                () -> List.of(hero));
 
-        Assertions.assertEquals(before, battle.getSkillPoints(),
-                "an enemy action must not change our skill points (this fails once the camp check is removed)");
-    }
-
-    // ==================================================================
-    // 6. applySkillPointCost is atomic
-    // ==================================================================
-
-    /**
-     * Trying to cast the skill at 0 points: returns false and the count is unchanged (it must not deduct to -1 and then check).
-     */
-    @Test
-    public void skillPointCostIsAtomicAtZero() {
-        Battle battle = newBattle();
-        Skill skill = battle.characters().getFirst().getSkills().get(SkillType.SKILL);
-
-        while (battle.spendSkillPoint()) {
-            // zero it out
-        }
-        Assertions.assertFalse(battle.applySkillPointCost(skill, battle.characters().getFirst()),
-                "not enough points → failure");
-        Assertions.assertEquals(0, battle.getSkillPoints(), "the failed attempt must not deduct to -1");
+        Assertions.assertAll("an enemy action must not feed our pool",
+                () -> Assertions.assertNull(defaultEnemySkill.getData(),
+                        "precondition: EnemySkill has no character multiplier data, testing it directly is a no-op"),
+                () -> Assertions.assertTrue(acted, "the enemy's basic attack itself should succeed"),
+                () -> Assertions.assertEquals(before, battle.getSkillPoints(),
+                        "an enemy action must not change our skill points (this fails once the camp check is removed)"));
     }
 
     // ==================================================================

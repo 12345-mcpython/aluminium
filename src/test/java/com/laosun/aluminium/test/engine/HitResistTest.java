@@ -30,31 +30,28 @@ import java.util.Random;
 public class HitResistTest {
     private static final double EPS = 1e-9;
 
+    /**
+     * One scenario for the plain formula on a hand-made caster/enemy pair: the factors multiply, the result is
+     * clamped to 1.0, and a base chance below 1.0 still multiplies both factors.
+     */
     @Test
     public void chanceIsBaseTimesHitTimesResist() {
-        Character caster = caster(0, 0);                 // hit 0
-        Enemy target = enemyWithResist(0.3, null);       // resist 0.3
+        Character plain = caster(0, 0);                  // hit 0
+        Character boosted = caster(0.5, 0);              // hit 0.5
+        Character quarter = caster(0.25, 0);             // hit 0.25
+        Enemy resist30 = enemyWithResist(0.3, null);     // resist 0.3
+        Enemy resist20 = enemyWithResist(0.2, null);     // resist 0.2
 
-        Assertions.assertEquals(0.7, newBattle(caster, target).hitChance(caster, target, 1.0, null), EPS,
-                "1.0 × (1+0) × (1-0.3) = 0.7");
-    }
-
-    @Test
-    public void chanceIsClampedToOne() {
-        Character caster = caster(0.5, 0);
-        Enemy target = enemyWithResist(0.3, null);
-
-        Assertions.assertEquals(1.0, newBattle(caster, target).hitChance(caster, target, 1.0, null), EPS,
-                "1.0 × 1.5 × 0.7 = 1.05 → clamped to 1.0");
-    }
-
-    @Test
-    public void baseBelowOneMultipliesBothFactors() {
-        Character caster = caster(0.25, 0);
-        Enemy target = enemyWithResist(0.2, null);
-
-        Assertions.assertEquals(0.8, newBattle(caster, target).hitChance(caster, target, 0.8, null), EPS,
-                "0.8 × 1.25 × 0.8 = 0.8");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0.7,
+                        newBattle(plain, resist30).hitChance(plain, resist30, 1.0, null), EPS,
+                        "1.0 × (1+0) × (1-0.3) = 0.7"),
+                () -> Assertions.assertEquals(1.0,
+                        newBattle(boosted, resist30).hitChance(boosted, resist30, 1.0, null), EPS,
+                        "1.0 × 1.5 × 0.7 = 1.05 → clamped to 1.0"),
+                () -> Assertions.assertEquals(0.8,
+                        newBattle(quarter, resist20).hitChance(quarter, resist20, 0.8, null), EPS,
+                        "0.8 × 1.25 × 0.8 = 0.8"));
     }
 
     /**
@@ -66,20 +63,20 @@ public class HitResistTest {
         Character caster = caster(0, 0);
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
 
-        Assertions.assertEquals(1.0, iceEdge.getDebuffResist().get("STAT_CTRL_Frozen"), EPS,
-                "in Ice Edge's data it is 100% resistance to freeze");
-        Assertions.assertEquals(0.0,
-                newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_CTRL_Frozen"), EPS,
-                "specific resistance 1.0 → the key factor (1-1) = 0 → fully immune");
-
         // note that Ice Edge itself also has 30% effect resistance (template 0.2 + level group 0.1), so "unaffected by
         // the specific resistance" != a chance of 1.0, it is 1.0 x (1 - 0.3) = 0.
-        Assertions.assertEquals(0.7,
-                newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_DOT_Burn"), EPS,
-                "a key that was not configured counts as 0 → only the generic 30% effect resistance is left");
-        Assertions.assertEquals(0.7,
-                newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, null), EPS,
-                "without a key the specific resistance is not looked up → same as above");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1.0, iceEdge.getDebuffResist().get("STAT_CTRL_Frozen"), EPS,
+                        "in Ice Edge's data it is 100% resistance to freeze"),
+                () -> Assertions.assertEquals(0.0,
+                        newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_CTRL_Frozen"), EPS,
+                        "specific resistance 1.0 → the key factor (1-1) = 0 → fully immune"),
+                () -> Assertions.assertEquals(0.7,
+                        newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_DOT_Burn"), EPS,
+                        "a key that was not configured counts as 0 → only the generic 30% effect resistance is left"),
+                () -> Assertions.assertEquals(0.7,
+                        newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, null), EPS,
+                        "without a key the specific resistance is not looked up → same as above"));
     }
 
     /**
@@ -105,16 +102,20 @@ public class HitResistTest {
     @Test
     public void enemyEffectHitRateReachesThePanel() {
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
-
-        Assertions.assertEquals(0.32, iceEdge.getAttribute(AttributeType.EFFECT_HIT_RATE).get(), 1e-9,
-                "group 1·Lv90 effect hit rate = 0.32");
-        Assertions.assertEquals(0.3, iceEdge.getAttribute(AttributeType.EFFECT_RESISTANCE).get(), 1e-9,
-                "effect resistance is additive: template 0.2 + level group 0.1");
-        // when the enemy is the caster, the 0.32 hit rate really does raise the chance
         Character victim = Character.fromAttributes("victim", 10_000, 100, 100, 100);
-        Assertions.assertEquals(1.0, newBattle(iceEdge, victim).hitChance(iceEdge, victim, 1.0, null), EPS);
-        Assertions.assertEquals(0.66, newBattle(iceEdge, victim).hitChance(iceEdge, victim, 0.5, null), 1e-9,
-                "0.5 × 1.32 = 0.66");
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0.32, iceEdge.getAttribute(AttributeType.EFFECT_HIT_RATE).get(), 1e-9,
+                        "group 1·Lv90 effect hit rate = 0.32"),
+                () -> Assertions.assertEquals(0.3, iceEdge.getAttribute(AttributeType.EFFECT_RESISTANCE).get(), 1e-9,
+                        "effect resistance is additive: template 0.2 + level group 0.1"),
+                // when the enemy is the caster, the 0.32 hit rate really does raise the chance
+                () -> Assertions.assertEquals(1.0,
+                        newBattle(iceEdge, victim).hitChance(iceEdge, victim, 1.0, null), EPS,
+                        "1.0 × (1+0.32) = 1.32 → clamped to 1.0"),
+                () -> Assertions.assertEquals(0.66,
+                        newBattle(iceEdge, victim).hitChance(iceEdge, victim, 0.5, null), 1e-9,
+                        "0.5 × 1.32 = 0.66"));
     }
 
     /**
@@ -128,16 +129,20 @@ public class HitResistTest {
         Enemy target = enemyWithResist(0, null);
         Battle battle = newBattle(caster, target);
 
-        Assertions.assertTrue(battle.tryApplyDebuff(caster, target, new StunBuff(2), 1.0, null),
-                "chance 1.0 → always attached");
-        Assertions.assertTrue(target.getBuffManager().hasBuff(StunBuff.class));
-
         // guaranteed to fail: Ice Edge is immune to freeze to chance 0.0
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Battle battle2 = newBattle(caster, iceEdge);
-        Assertions.assertFalse(battle2.tryApplyDebuff(caster, iceEdge, new StunBuff(2), 1.0, "STAT_CTRL_Frozen"),
-                "chance 0.0 → cannot be attached");
-        Assertions.assertFalse(iceEdge.getBuffManager().hasBuff(StunBuff.class));
+
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(battle.tryApplyDebuff(caster, target, new StunBuff(2), 1.0, null),
+                        "chance 1.0 → always attached"),
+                () -> Assertions.assertTrue(target.getBuffManager().hasBuff(StunBuff.class),
+                        "chance 1.0 → the stun buff is on the target"),
+                () -> Assertions.assertFalse(
+                        battle2.tryApplyDebuff(caster, iceEdge, new StunBuff(2), 1.0, "STAT_CTRL_Frozen"),
+                        "chance 0.0 → cannot be attached"),
+                () -> Assertions.assertFalse(iceEdge.getBuffManager().hasBuff(StunBuff.class),
+                        "chance 0.0 → no stun buff on the immune enemy"));
     }
 
     @Test
@@ -154,9 +159,11 @@ public class HitResistTest {
             a.append(first.rollDebuff(caster, target, 0.5, null) ? '1' : '0');
             b.append(second.rollDebuff(caster, target, 0.5, null) ? '1' : '0');
         }
-        Assertions.assertEquals(a.toString(), b.toString(), "injecting a Random with the same seed → reproducible");
-        Assertions.assertTrue(a.toString().contains("1") && a.toString().contains("0"),
-                "at a 0.5 chance both outcomes should appear within 32 rolls");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(a.toString(), b.toString(),
+                        "injecting a Random with the same seed → reproducible"),
+                () -> Assertions.assertTrue(a.toString().contains("1") && a.toString().contains("0"),
+                        "at a 0.5 chance both outcomes should appear within 32 rolls"));
     }
 
     // ==================================================================

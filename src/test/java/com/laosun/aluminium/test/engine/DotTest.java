@@ -37,12 +37,29 @@ import com.laosun.aluminium.damage.Damage;
  * the turn off. Tests that assert expiry therefore drive both, in the order
  * {@code Battle.beforeMove()} drives them - the split is the point of the design, so it is visible in
  * the tests rather than hidden behind a helper that would hide a wrong order too.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the seven positive scenarios and the one
+ * load-time validation scenario below, one {@code assertAll} per scenario so a failing clause still
+ * names itself. The exception paths stay out of the positive scenarios: an {@code assertThrows} is
+ * not a positive clause and must not hide behind one.
  */
 public class DotTest {
     private static final double EPS = 1e-6;
 
+    // ==================================================================
+    // 1. Manual DOTs on a dummy: settlement, order, stacking, boost
+    // ==================================================================
+
+    /**
+     * One fixture recipe - a source at a given DMG boost against the 100000-HP / 100-DEF dummy - for
+     * the whole manual-DOT contract: it settles at the turn start and only the manager's tick burns
+     * a turn off, it is removed once the last settlement is done, a second copy of the same element
+     * is a second instance that settles too, and the settlement takes the DMG boost while never
+     * critting.
+     */
     @Test
-    public void dotTicksAtTurnStartAndExpiresAfterItsTurns() {
+    public void manualDotsSettleStackExpireAndNeverCrit() {
+        // One DOT of 2 turns: settlement first, the countdown second - exactly as Battle.beforeMove does it.
         Character source = character("source", 0.0);
         Enemy dummy = dummy(100_000, 100, 100);
         Battle battle = new Battle(List.of(source), List.of(dummy), BattleFixture.seeded());
@@ -50,23 +67,61 @@ public class DotTest {
 
         double expected = 500 * 1000.0 / (100 + 1000.0);
         double first = battle.tickDots(dummy);
-        Assertions.assertEquals(expected, first, 1e-6);
-        Assertions.assertEquals(1, dummy.getBuffManager().countBuffs(DotBuff.class),
-                "settling alone does not consume a turn -- the manager's tick does that");
+        int afterFirstSettlement = dummy.getBuffManager().countBuffs(DotBuff.class);
 
         dummy.getBuffManager().beforeMove();                    // the other half, exactly as Battle.beforeMove does it
-        Assertions.assertEquals(1, dummy.getBuffManager().countBuffs(DotBuff.class), "1 settlement left");
+        int afterFirstCountdown = dummy.getBuffManager().countBuffs(DotBuff.class);
 
         double second = battle.tickDots(dummy);
-        Assertions.assertEquals(expected, second, 1e-6);
         dummy.getBuffManager().beforeMove();
-        Assertions.assertTrue(dummy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(),
-                "it is removed once the last settlement is done");
+        boolean expired = dummy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty();
+        double afterExpiry = battle.tickDots(dummy);
+        double hpAfterTwoSettlements = dummy.getCurrentHp();
 
-        Assertions.assertEquals(0, battle.tickDots(dummy), EPS, "no DOTs left → 0");
-        Assertions.assertEquals(dummy.getMaxHp() - 2 * expected, dummy.getCurrentHp(), 1e-6);
+        // A second burn of the same element is a second instance, and both settle.
+        Character stackingSource = character("source", 0.0);
+        Enemy stackingDummy = dummy(100_000, 100, 100);
+        Battle stackingBattle = new Battle(List.of(stackingSource), List.of(stackingDummy), BattleFixture.seeded());
+        stackingDummy.getBuffManager().addBuff(new DotBuff(stackingSource, DamageElement.FIRE, 500, 3));
+        stackingDummy.getBuffManager().addBuff(new DotBuff(stackingSource, DamageElement.FIRE, 500, 3));
+        int stackedInstances = stackingDummy.getBuffManager().countBuffs(DotBuff.class);
+        double stackedSettlement = stackingBattle.tickDots(stackingDummy);
+
+        // A boosted source: the DOT takes the boost, and a DOT is never a crit.
+        Character boostedSource = character("source", 1.0);      // DMG boost +100%
+        Enemy boostedDummy = dummy(100_000, 100, 100);
+        Battle boostedBattle = new Battle(List.of(boostedSource), List.of(boostedDummy), BattleFixture.seeded());
+        boostedDummy.getBuffManager().addBuff(new DotBuff(boostedSource, DamageElement.FIRE, 500, 1));
+        double settled = boostedBattle.tickDots(boostedDummy);
+
+        Assertions.assertAll("the manual DOT contract on a 100-DEF dummy",
+                () -> Assertions.assertEquals(expected, first, 1e-6,
+                        "500 x 1000/1100: the first settlement"),
+                () -> Assertions.assertEquals(1, afterFirstSettlement,
+                        "settling alone does not consume a turn -- the manager's tick does that"),
+                () -> Assertions.assertEquals(1, afterFirstCountdown, "1 settlement left"),
+                () -> Assertions.assertEquals(expected, second, 1e-6,
+                        "the second settlement is the same 500 x 1000/1100"),
+                () -> Assertions.assertTrue(expired,
+                        "it is removed once the last settlement is done"),
+                () -> Assertions.assertEquals(0, afterExpiry, EPS, "no DOTs left → 0"),
+                () -> Assertions.assertEquals(dummy.getMaxHp() - 2 * expected, hpAfterTwoSettlements, 1e-6,
+                        "exactly two settlements came off the 100000 HP"),
+                () -> Assertions.assertEquals(2, stackedInstances,
+                        "a second burn is a second instance, not a refresh of the first"),
+                () -> Assertions.assertEquals(2 * expected, stackedSettlement, 1e-6,
+                        "both settle, and neither was silently dropped in favour of the other"),
+                () -> Assertions.assertEquals(500 * 2 * 1000.0 / (100 + 1000.0), settled, 1e-6,
+                        "DOT takes DMG boost"),
+                () -> Assertions.assertFalse(DamageType.DOT.isCrittable(), "a DOT never crits"),
+                () -> Assertions.assertTrue(DamageType.DOT.isBoostable(), "but it is boostable"));
     }
 
+    /**
+     * "first applied, first settled" - its own scenario because the observable is not the dummy's HP
+     * but the order in which the elements arrive at {@code onDamage}, which needs the recording enemy
+     * below.
+     */
     @Test
     public void dotsSettleInApplicationOrder() {
         Character source = character("source", 0.0);
@@ -81,36 +136,14 @@ public class DotTest {
         Assertions.assertEquals(List.of(DamageElement.THUNDER, DamageElement.FIRE), seen, "first applied, first settled");
     }
 
-    @Test
-    public void theSameElementStacksInsteadOfRefreshing() {
-        Character source = character("source", 0.0);
-        Enemy dummy = dummy(100_000, 100, 100);
-        Battle battle = new Battle(List.of(source), List.of(dummy), BattleFixture.seeded());
-        dummy.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));
-        dummy.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));
+    // ==================================================================
+    // 2. Attachment: a weakness break
+    // ==================================================================
 
-        Assertions.assertEquals(2, dummy.getBuffManager().countBuffs(DotBuff.class),
-                "a second burn is a second instance, not a refresh of the first");
-
-        // Both settle, and neither was silently dropped in favour of the other.
-        double expected = 2 * 500 * 1000.0 / (100 + 1000.0);
-        Assertions.assertEquals(expected, battle.tickDots(dummy), 1e-6);
-    }
-
-    @Test
-    public void dotIsBoostedButNeverCrits() {
-        Character source = character("source", 1.0);          // DMG boost +100%
-        Enemy dummy = dummy(100_000, 100, 100);
-        Battle battle = new Battle(List.of(source), List.of(dummy), BattleFixture.seeded());
-        dummy.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 1));
-
-        double settled = battle.tickDots(dummy);
-
-        Assertions.assertEquals(500 * 2 * 1000.0 / (100 + 1000.0), settled, 1e-6, "DOT takes DMG boost");
-        Assertions.assertFalse(DamageType.DOT.isCrittable());
-        Assertions.assertTrue(DamageType.DOT.isBoostable());
-    }
-
+    /**
+     * Breaking with Fire attaches a real burn: 1 DOT instance of the breaking element, owned by the
+     * breaker, for {@code Constant.DOT_TURNS} turns, at the break's own base damage.
+     */
     @Test
     public void breakingWithFireAttachesABurn() {
         Character himeko = character("himeko", 0.0);
@@ -129,6 +162,10 @@ public class DotTest {
         Assertions.assertEquals(376.75535 * Constant.DOT_RATIO, dot.getBaseDamage(), 1e-6);
     }
 
+    /**
+     * Ice breaks to freeze, not to a DOT: the break happens, the broken element is Ice, and no
+     * {@link DotBuff} is attached at all.
+     */
     @Test
     public void breakingWithAFrozenElementAttachesNoDot() {
         Character mar7th = character("mar7th", 0.0);
@@ -145,44 +182,53 @@ public class DotTest {
         Assertions.assertTrue(iceEdge.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "Ice = freeze, not a DOT");
     }
 
+    // ==================================================================
+    // 3. Settlement driven by the real battle driver
+    // ==================================================================
+
+    /**
+     * Through {@code Battle.beforeMove()}: the DOT settles automatically at the start of its
+     * carrier's turn.
+     *
+     * <p>One scenario because both clauses are the same fixture (a hero at speed 100 against the
+     * speed-200 dummy) and the same observable (the dummy's HP at the moment its turn starts).
+     *
+     * <p>The 1-turn half is also the test that pins the <b>order</b> of the two lines in
+     * {@code Battle.beforeMove()}: settlement runs first, the buff countdown second. Swap them and a
+     * 1-turn DOT is counted down to zero and removed <i>before</i> it ever deals damage: it silently
+     * burns for nothing. No other test can see that, because for a DOT with 2+ turns one settlement
+     * survives either way - only the boundary case distinguishes the two orders.
+     */
     @Test
-    public void dotTicksThroughBattleWhenTheEnemyTurnStarts() {
+    public void dotsSettleAutomaticallyWhenTheirCarrierTurnStarts() {
         Character hero = character("hero", 0.0);                        // speed 100 to period 100
         Enemy fast = dummy(100_000, 100, 200);                          // speed 200 to period 50, acts first
         Battle battle = new Battle(List.of(hero), List.of(fast), BattleFixture.seeded());
         fast.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 500, 2));
 
         battle.stepForward();
-        Assertions.assertSame(fast, battle.queue().getCurrentActor().getCanHit());
+        var acting = battle.queue().getCurrentActor().getCanHit();
         battle.beforeMove();
+        double hpAfterTwoTurnDot = fast.getCurrentHp();
 
-        Assertions.assertEquals(100_000 - 500 * 1000.0 / 1100.0, fast.getCurrentHp(), 1e-6,
-                "the DOT settles automatically at the start of the enemy's turn");
-    }
+        // The boundary case: a 1-turn DOT still settles once, before it is counted down and removed.
+        Character boundaryHero = character("hero", 0.0);
+        Enemy boundaryFast = dummy(100_000, 100, 200);                  // speed 200 to acts first
+        Battle boundaryBattle = new Battle(List.of(boundaryHero), List.of(boundaryFast), BattleFixture.seeded());
+        boundaryFast.getBuffManager().addBuff(new DotBuff(boundaryHero, DamageElement.FIRE, 500, 1));
 
-    /**
-     * A one-turn DOT must still <b>settle once</b> - and this is the test that pins the <b>order</b> of
-     * the two lines in {@code Battle.beforeMove()}.
-     *
-     * <p>Settlement runs first, the buff countdown second. Swap them and a 1-turn DOT is counted down
-     * to zero and removed <i>before</i> it ever deals damage: it silently burns for nothing. No other
-     * test can see that, because for a DOT with 2+ turns one settlement survives either way - only the
-     * boundary case distinguishes the two orders.
-     */
-    @Test
-    public void aOneTurnDotStillSettlesBeforeItExpires() {
-        Character hero = character("hero", 0.0);
-        Enemy fast = dummy(100_000, 100, 200);                 // speed 200 to acts first
-        Battle battle = new Battle(List.of(hero), List.of(fast), BattleFixture.seeded());
-        fast.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 500, 1));
+        boundaryBattle.stepForward();
+        boundaryBattle.beforeMove();
+        double hpAfterOneTurnDot = boundaryFast.getCurrentHp();
+        boolean boundaryExpired = boundaryFast.getBuffManager().allBuffsOf(DotBuff.class).isEmpty();
 
-        battle.stepForward();
-        battle.beforeMove();
-
-        Assertions.assertEquals(100_000 - 500 * 1000.0 / 1100.0, fast.getCurrentHp(), 1e-6,
-                "the last settlement must happen before the DOT expires");
-        Assertions.assertTrue(fast.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(),
-                "and then it is gone");
+        Assertions.assertAll("the driver settles the DOT at the start of the carrier's turn",
+                () -> Assertions.assertSame(fast, acting, "the speed-200 enemy acts first"),
+                () -> Assertions.assertEquals(100_000 - 500 * 1000.0 / 1100.0, hpAfterTwoTurnDot, 1e-6,
+                        "the DOT settles automatically at the start of the enemy's turn"),
+                () -> Assertions.assertEquals(100_000 - 500 * 1000.0 / 1100.0, hpAfterOneTurnDot, 1e-6,
+                        "the last settlement must happen before the DOT expires"),
+                () -> Assertions.assertTrue(boundaryExpired, "and then it is gone"));
     }
 
     /**
@@ -212,124 +258,120 @@ public class DotTest {
     }
 
     // ==================================================================
-    // A DOT attached by a RULE: op APPLY_DOT
+    // 4. A DOT attached by a RULE: op APPLY_DOT
     // ==================================================================
 
     /**
-     * "使目标陷入dot:burn状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the {@code has_state}
-     * name follows from the element (Fire to burn (dot:burn)) with no second field.
+     * A rule-attached DOT, in one fixture (an {@code EffectSpec} compiled onto the applier): the
+     * element, the magnitude and the chance the spec states, and the {@code has_state} name that
+     * follows from the element.
      *
-     * <p>Before this op only a weakness break could attach a DOT ({@code attachBreakDot}), so the whole
-     * "使目标陷入dot:burn/dot:shock/dot:bleed/dot:wind_shear状态" family - 11 of the 9documents - had no spelling.
-     */
-    @Test
-    public void aRuleCanAttachABurn() {
-        Fixture f = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, null));
-
-        Assertions.assertEquals(1, f.fire(), "the rule fires");
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("dot:burn"),
-                "Fire + DotBuff IS Burn (dot:burn): the engine's one translation is BuffManager.DOT_STATES");
-        Assertions.assertEquals(500, f.dot().getBaseDamage(), EPS, "the flat amount the rule stated");
-
-        double expected = 500 * 1000.0 / (100 + 1000.0);
-        Assertions.assertEquals(expected, f.battle.tickDots(f.enemy), 1e-6, "and it settles like any DOT");
-    }
-
-    /**
-     * "每回合造成等同于三月七60%攻击力的冰属性伤害": the magnitude is a share of the <b>rule owner's</b>
-     * attribute, read once when the DOT lands and frozen into it.
+     * <p>"使目标陷入dot:burn状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the
+     * {@code has_state} name follows from the element (Fire to burn (dot:burn)) with no second field.
+     * Before this op only a weakness break could attach a DOT ({@code attachBreakDot}), so the whole
+     * "使目标陷入dot:burn/dot:shock/dot:bleed/dot:wind_shear状态" family - 11 of the 9documents - had
+     * no spelling.
      *
-     * <p>Note: Frozen, not live: raising her attack afterwards must not change damage that is already burning. That is
-     * the same snapshot rule the other derived values follow, and it is asserted here because the alternative
-     * (holding a reference to her panel) would look identical in a one-turn test.
+     * <p>"每回合造成等同于三月七60%攻击力的冰属性伤害": the magnitude is a share of the <b>rule
+     * owner's</b> attribute, read once when the DOT lands and frozen into it - raising her attack
+     * afterwards must not change damage that is already burning. A flat constant may sit on top of the
+     * share ("等同于 60% 攻击力 + 50"), and a stated <b>base chance</b> is the same per-target pipeline
+     * a control uses: when the roll fails nothing is attached (not a DOT with 0 turns, which would
+     * still settle nothing but would show up in "有几个负面效果").
      */
     @Test
-    public void theDotMagnitudeCanBeDerivedFromTheAppliersAttribute() {
-        Fixture f = new Fixture(TriggerSpecs.dot("Ice", null, "self_attr:ATTACK", 0.6, 2, null));
-        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+    public void aRuleAttachesTheDotItsEffectSpecStates() {
+        // A flat amount.
+        Fixture flat = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, null));
+        int flatFired = flat.fire();
+        boolean flatBurned = flat.enemy.getBuffManager().hasState("dot:burn");
+        double flatBase = flat.dot().getBaseDamage();
+        double flatSettlement = flat.battle.tickDots(flat.enemy);
 
-        f.fire();
+        // The magnitude derived from the applier's ATTACK, read once when the DOT lands and frozen.
+        Fixture derived = new Fixture(TriggerSpecs.dot("Ice", null, "self_attr:ATTACK", 0.6, 2, null));
+        derived.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+        derived.fire();
+        double derivedBase = derived.dot().getBaseDamage();
+        derived.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(4000));
+        double derivedBaseAfterRaise = derived.dot().getBaseDamage();
 
-        Assertions.assertEquals(1200, f.dot().getBaseDamage(), EPS,
-                "60% of the applier's 2000 ATTACK, computed when it landed");
+        // A flat constant on top of the derived share.
+        Fixture withConstant = new Fixture(TriggerSpecs.dot("Ice", 50.0, "self_attr:ATTACK", 0.6, 2, null));
+        withConstant.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+        withConstant.fire();
+        double baseWithConstant = withConstant.dot().getBaseDamage();
 
-        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(4000));
-        Assertions.assertEquals(1200, f.dot().getBaseDamage(), EPS,
-                "and frozen: a later change to her panel cannot change a DOT that is already burning");
-    }
-
-    /**
-     * A flat constant may sit on top of the derived share - "等同于 60% 攻击力 + 50".
-     */
-    @Test
-    public void aDerivedMagnitudeMayCarryAConstant() {
-        Fixture f = new Fixture(TriggerSpecs.dot("Ice", 50.0, "self_attr:ATTACK", 0.6, 2, null));
-        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
-
-        f.fire();
-
-        Assertions.assertEquals(1250, f.dot().getBaseDamage(), EPS, "0.6 × 2000 + 50");
-    }
-
-    /**
-     * A DOT may state a <b>base chance</b>, and it is the same per-target pipeline a control uses.
-     *
-     * <p>"有一定基础概率使目标陷入dot:burn状态" is common in the documents, so the field is read here too -
-     * and when the roll fails, nothing is attached (not a DOT with 0 turns, which would still settle nothing but
-     * would show up in "有几个负面效果").
-     */
-    @Test
-    public void aDotWithABaseChanceIsRolledThroughTheEffectHitPipeline() {
+        // The base chance, through the effect-hit pipeline: resisted, and landing.
         Fixture resisted = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, 1.0));
         resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
         resisted.fire();
-        Assertions.assertEquals(0, resisted.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "100% effect resistance: 「陷入dot:burn状态」 (falls into the Burn state) did not happen, so there is no DOT at all");
+        int resistedInstances = resisted.enemy.getBuffManager().countBuffs(DotBuff.class);
 
         Fixture lands = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, 1.0));
         lands.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
         lands.fire();
-        Assertions.assertEquals(1, lands.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "and with no resistance, a base chance of 1 always lands");
+        int landedInstances = lands.enemy.getBuffManager().countBuffs(DotBuff.class);
+
+        Assertions.assertAll("a rule attaches the DOT its effect spec describes",
+                () -> Assertions.assertEquals(1, flatFired, "the rule fires"),
+                () -> Assertions.assertTrue(flatBurned,
+                        "Fire + DotBuff IS Burn (dot:burn): the engine's one translation is BuffManager.DOT_STATES"),
+                () -> Assertions.assertEquals(500, flatBase, EPS, "the flat amount the rule stated"),
+                () -> Assertions.assertEquals(500 * 1000.0 / (100 + 1000.0), flatSettlement, 1e-6,
+                        "and it settles like any DOT"),
+                () -> Assertions.assertEquals(1200, derivedBase, EPS,
+                        "60% of the applier's 2000 ATTACK, computed when it landed"),
+                () -> Assertions.assertEquals(1200, derivedBaseAfterRaise, EPS,
+                        "and frozen: a later change to her panel cannot change a DOT that is already burning"),
+                () -> Assertions.assertEquals(1250, baseWithConstant, EPS, "0.6 × 2000 + 50"),
+                () -> Assertions.assertEquals(0, resistedInstances,
+                        "100% effect resistance: 「陷入dot:burn状态」 (falls into the Burn state) did not happen, so there is no DOT at all"),
+                () -> Assertions.assertEquals(1, landedInstances,
+                        "and with no resistance, a base chance of 1 always lands"));
     }
 
     // ==================================================================
-    // Fail fast: what a DOT rule may not say
+    // 5. Fail fast: what a DOT rule may not say
     // ==================================================================
 
-    @Test
-    public void aDotWithoutAnElementOrATurnsCountIsRejected() {
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.dot(null, 500.0, null, null, 2, null)), "no element");
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.dot("Fire", 500.0, null, null, null, null)), "no turns");
-    }
-
     /**
-     * An unknown element would attach nothing at all, so it is refused where the file is read.
+     * What a DOT rule may not say, refused where the file is read: no element, no turns, an unknown
+     * element (it would attach nothing at all), and no magnitude (neither an amount nor a
+     * scale+percent means 0 damage forever).
+     *
+     * <p>One validation scenario for the one fixture (an effect spec compiled into a
+     * {@code TriggerTable}, which is where validation runs) and the one observable (the load-time
+     * refusal and the field its message names) - and it stays apart from every positive scenario
+     * above, because an {@code assertThrows} is not a positive clause.
      */
     @Test
-    public void anUnknownElementIsRejectedAtLoadTime() {
-        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.dot("Burning", 500.0, null, null, 2, null)));
-
-        Assertions.assertTrue(rejected.getMessage().contains("Burning"), rejected.getMessage());
+    public void aDotRuleThatCannotWorkIsRejectedAtLoadTime() {
+        Assertions.assertAll("a DOT rule that cannot state a settlement is rejected at load time",
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> tableOf(TriggerSpecs.dot(null, 500.0, null, null, 2, null)), "no element"),
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> tableOf(TriggerSpecs.dot("Fire", 500.0, null, null, null, null)), "no turns"),
+                () -> {
+                    IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> tableOf(TriggerSpecs.dot("Burning", 500.0, null, null, 2, null)),
+                            "an unknown element would attach nothing at all");
+                    Assertions.assertTrue(rejected.getMessage().contains("Burning"), rejected.getMessage());
+                },
+                () -> {
+                    IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
+                            () -> tableOf(TriggerSpecs.dot("Fire", null, null, null, 2, null)),
+                            "neither an amount nor a scale+percent is 0 damage forever");
+                    Assertions.assertTrue(rejected.getMessage().contains("magnitude"), rejected.getMessage());
+                },
+                () -> Assertions.assertThrows(IllegalArgumentException.class,
+                        () -> tableOf(TriggerSpecs.dot("Fire", null, null, 0.6, 2, null)),
+                        "a percent with no scale is a share of nothing"));
     }
 
-    /**
-     * A DOT has to know how much each turn takes: neither an amount nor a scale+percent means 0 damage forever.
-     */
-    @Test
-    public void aDotWithoutAMagnitudeIsRejected() {
-        IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.dot("Fire", null, null, null, 2, null)));
-
-        Assertions.assertTrue(rejected.getMessage().contains("magnitude"), rejected.getMessage());
-
-        Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(TriggerSpecs.dot("Fire", null, null, 0.6, 2, null)),
-                "a percent with no scale is a share of nothing");
-    }
+    // ==================================================================
+    // Fixture
+    // ==================================================================
 
     /**
      * One battle with a rule under test, one enemy, and a way to read the DOT it attached.

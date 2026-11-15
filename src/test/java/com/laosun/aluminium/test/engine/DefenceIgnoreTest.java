@@ -1,6 +1,5 @@
 package com.laosun.aluminium.test.engine;
 
-
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -65,57 +64,53 @@ public class DefenceIgnoreTest {
     // ==================================================================
 
     /**
-     * A rule granting {@code DEFENCE_IGNORE} really raises the damage a later hit settles.
+     * The whole damage-path scenario: a rule-granted {@code DEFENCE_IGNORE} really raises a later hit, two
+     * plain grants <b>replace</b> each other unless the rule asks for stacks, and the defence zone clamps at
+     * "ignore everything".
      *
-     * <p>Same character, same target, same base damage - the only difference is whether the rule fired. If
-     * {@code assemble} stopped reading the attribute, or {@code MODIFY_ATTR} silently failed to land on a
-     * ratio attribute, this is where it shows.
-     */
-    @Test
-    public void aRuleGrantedDefenceIgnoreRaisesTheDamageOfLaterHits() {
-        double without = damageWithGrant(null);
-        double with = damageWithGrant(0.2);
-
-        Assertions.assertTrue(with > without,
-                "ignoring 20% of the target's DEF must raise the settled hit: " + with + " vs " + without);
-        // The defence zone is (200 + 10L) / (def + 200 + 10L), so ignoring part of def raises damage by a
-        // fraction of it -- more than nothing, well under the full 20%. A tighter bound would just restate
-        // the formula, which DamageZoneTest already pins.
-        Assertions.assertTrue(with < without * 1.2,
-                "and it is a defence-zone effect, not a flat +20% damage: " + with + " vs " + without);
-    }
-
-    /**
-     * Two grants of the same attribute <b>replace</b> each other unless the rule asks for stacks, and the
-     * defence zone clamps at "ignore everything".
-     *
-     * <p>Note: <b>The replacement half surprised me and is worth pinning</b>: authoring Boothill (波提欧)'s 16% and
-     * Ruan Mei (阮-梅)'s 20% as two plain rules gives <b>20%</b>, not 36% - {@code MODIFY_ATTR} defaults to
-     * {@code max_stacks: 1}, i.e. "re-application replaces" (the engine's long-standing convention, stated in
+     * <p>Same character, same target, same base damage throughout - the only differences are the percentages
+     * and the {@code max_stacks} the rules ask for. If {@code assemble} stopped reading the attribute, or
+     * {@code MODIFY_ATTR} silently failed to land on a ratio attribute, this is where it shows. The
+     * replacement half is worth pinning: authoring Boothill (波提欧)'s 16% and Ruan Mei (阮-梅)'s 20% as two
+     * plain rules gives <b>20%</b>, not 36%, because {@code MODIFY_ATTR} defaults to
+     * {@code max_stacks: 1} - "re-application replaces", the engine's long-standing convention, stated in
      * {@code TriggerInterpreter}'s op table and pinned for other attributes by
-     * {@code StatModifierStackingTest}). A content author who wants sources to add says so with
-     * {@code max_stacks}, which the second half here measures - otherwise the symptom is a character who is
-     * quietly weaker than the game with nothing to see.
+     * {@code StatModifierStackingTest}. A content author who wants sources to add says so with
+     * {@code max_stacks}, which the stacked clause here measures; otherwise the symptom is a character who
+     * is quietly weaker than the game with nothing to see.
      */
     @Test
-    public void sameKindGrantsReplaceByDefaultAndStackOnlyWhenAsked() {
-        Assertions.assertEquals(damageWithGrant(0.3), damageWithGrants(1, 0.3, 0.3), EPS,
-                "two plain 0.3 grants land on one 0.3, because the second replaces the first");
-        Assertions.assertEquals(damageWithGrant(0.6), damageWithGrants(2, 0.3, 0.3), EPS,
-                "with max_stacks: 2 the same two grants add up to 0.6");
-        Assertions.assertTrue(damageWithGrant(0.6) > damageWithGrant(0.3),
-                "…so more ignore really is more damage, and the replacement above is not hiding a no-op");
-    }
+    public void aRuleGrantedDefenceIgnoreShapesTheSettledHit() {
+        double without = damageWithGrant(null);
+        double withTwentyPercent = damageWithGrant(0.2);
+        double onePlain = damageWithGrant(0.3);
+        double twoPlain = damageWithGrants(1, 0.3, 0.3);
+        double twoStacked = damageWithGrants(2, 0.3, 0.3);
+        double sixtyPercent = damageWithGrant(0.6);
+        double fullIgnore = damageWithGrant(1.0);
+        double overFullIgnore = damageWithGrant(1.5);
+        double ninetyPercent = damageWithGrant(0.9);
 
-    /**
-     * Everything past "ignore it all" is the same hit: the zone clamps the ratio to 100%.
-     */
-    @Test
-    public void fullIgnoreIsTheCeiling() {
-        Assertions.assertEquals(damageWithGrant(1.0), damageWithGrant(1.5), EPS,
-                "1.5 (or any larger number) clamps to 1.0 in the defence zone");
-        Assertions.assertTrue(damageWithGrant(1.0) > damageWithGrant(0.9),
-                "and full ignore is still more than 90%, so the clamp is not swallowing real values");
+        Assertions.assertAll("defence ignore raised from a rule",
+                () -> Assertions.assertTrue(withTwentyPercent > without,
+                        "raise: ignoring 20% of the target's DEF must raise the settled hit: "
+                                + withTwentyPercent + " vs " + without),
+                // The defence zone is (200 + 10L) / (def + 200 + 10L), so ignoring part of def raises damage by a
+                // fraction of it -- more than nothing, well under the full 20%. A tighter bound would just restate
+                // the formula, which DamageZoneTest already pins.
+                () -> Assertions.assertTrue(withTwentyPercent < without * 1.2,
+                        "bounded raise: and it is a defence-zone effect, not a flat +20% damage: "
+                                + withTwentyPercent + " vs " + without),
+                () -> Assertions.assertEquals(onePlain, twoPlain, EPS,
+                        "replace: two plain 0.3 grants land on one 0.3, because the second replaces the first"),
+                () -> Assertions.assertEquals(sixtyPercent, twoStacked, EPS,
+                        "stack: with max_stacks: 2 the same two grants add up to 0.6"),
+                () -> Assertions.assertTrue(sixtyPercent > onePlain,
+                        "more ignore: …so more ignore really is more damage, and the replacement above is not hiding a no-op"),
+                () -> Assertions.assertEquals(fullIgnore, overFullIgnore, EPS,
+                        "clamp: 1.5 (or any larger number) clamps to 1.0 in the defence zone"),
+                () -> Assertions.assertTrue(fullIgnore > ninetyPercent,
+                        "clamp not swallowing: and full ignore is still more than 90%, so the clamp is not swallowing real values"));
     }
 
     /**
@@ -132,18 +127,21 @@ public class DefenceIgnoreTest {
         Battle battle = new Battle(List.of(attacker), List.of(target), BattleFixture.seeded());
         battle.startBattle();
         double whileBuffed = hit(battle, attacker);
-
-        Assertions.assertEquals(0.5, attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
-                "precondition: the 3-turn grant is on");
+        double granted = attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get();
         for (int turn = 0; turn < 3; turn++) {
             attacker.getBuffManager().beforeMove();
             attacker.getBuffManager().afterMove();
         }
+        double afterExpiry = attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get();
+        double afterExpiryHit = hit(battle, attacker);
 
-        Assertions.assertEquals(0, attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
-                "after three of its owner's turns the grant is gone");
-        Assertions.assertTrue(hit(battle, attacker) < whileBuffed,
-                "so the same hit is smaller again");
+        Assertions.assertAll("timed defence-ignore grant",
+                () -> Assertions.assertEquals(0.5, granted, EPS,
+                        "grant on: precondition: the 3-turn grant is on"),
+                () -> Assertions.assertEquals(0, afterExpiry, EPS,
+                        "grant gone: after three of its owner's turns the grant is gone"),
+                () -> Assertions.assertTrue(afterExpiryHit < whileBuffed,
+                        "hit shrinks: so the same hit is smaller again"));
     }
 
     // ==================================================================
@@ -151,28 +149,40 @@ public class DefenceIgnoreTest {
     // ==================================================================
 
     /**
-     * Jade's eidolon 4 is really authored, gated on the rank, and states the numbers from her text.
+     * Jade's (翡翠) eidolon 4 is really shipped content: authored with the numbers from her text, gated on
+     * the rank, and found by the ordinary per-character loader (it is data, not a test fixture).
      *
-     * <p>Read back through the loader with a context that satisfies every gate, so a wrong attribute, a wrong
+     * <p>The rule is read back through a context that satisfies every gate, so a wrong attribute, a wrong
      * percentage or a lost {@code min_eidolon} fails here instead of in a battle nobody measures.
      */
     @Test
-    public void herEidolonFourIsAuthoredWithItsOwnNumbers() {
+    public void herEidolonFourIsAuthoredAndReadByTheLoader() {
         Character jade = jadeAt(4);
         List<TriggerTable.CompiledRule> rules = jade.getTriggerTable()
                 .matching(TriggerEvent.ULT_CAST, new TriggerTable.TriggerContext(jade, jade, null, 0, 0));
+        TriggerTable shipped = TriggerTables.of(JADE);
 
-        Assertions.assertEquals(1, rules.size(), "her table has exactly the one rule");
-        Assertions.assertEquals(4, rules.getFirst().minEidolon(),
-                "it IS an Eidolon 4 ability, so the gate sits next to the mechanic");
-
-        EffectSpec effect = rules.getFirst().effects().getFirst();
-        Assertions.assertEquals("MODIFY_ATTR", effect.getOp());
-        Assertions.assertEquals("DEFENCE_IGNORE", effect.getAttribute());
-        Assertions.assertEquals(0.12, effect.getPercent(), EPS, "param #1 is 0.12");
-        Assertions.assertEquals(3, effect.getTurns(), "param #2 is 3 turns");
-        Assertions.assertNull(effect.getTarget(),
-                "the effect is about the damage SHE deals, so it is a buff on herself (absent means self)");
+        Assertions.assertAll("Jade's shipped eidolon 4 rule",
+                () -> Assertions.assertEquals(1, rules.size(),
+                        "one rule: her table has exactly the one rule"),
+                () -> Assertions.assertEquals(4, rules.getFirst().minEidolon(),
+                        "rank gate: it IS an Eidolon 4 ability, so the gate sits next to the mechanic"),
+                () -> Assertions.assertEquals("MODIFY_ATTR",
+                        rules.getFirst().effects().getFirst().getOp(),
+                        "op: the shipped rule modifies an attribute"),
+                () -> Assertions.assertEquals("DEFENCE_IGNORE",
+                        rules.getFirst().effects().getFirst().getAttribute(),
+                        "attribute: the shipped rule names DEFENCE_IGNORE"),
+                () -> Assertions.assertEquals(0.12, rules.getFirst().effects().getFirst().getPercent(), EPS,
+                        "percent: param #1 is 0.12"),
+                () -> Assertions.assertEquals(3, rules.getFirst().effects().getFirst().getTurns(),
+                        "turns: param #2 is 3 turns"),
+                () -> Assertions.assertNull(rules.getFirst().effects().getFirst().getTarget(),
+                        "self target: the effect is about the damage SHE deals, so it is a buff on herself (absent means self)"),
+                () -> Assertions.assertFalse(shipped.isEmpty(),
+                        "classpath file: 1314.json must be on the classpath"),
+                () -> Assertions.assertEquals(1, shipped.ruleCount(TriggerEvent.ULT_CAST),
+                        "loader count: the shipped file carries exactly one ULT_CAST rule"));
     }
 
     /**
@@ -186,7 +196,8 @@ public class DefenceIgnoreTest {
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
 
-        Assertions.assertEquals(0.12, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS);
+        Assertions.assertEquals(0.12, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
+                "event grant: the Ultimate lands Jade's authored 0.12 on the attribute");
     }
 
     /**
@@ -201,7 +212,7 @@ public class DefenceIgnoreTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
 
         Assertions.assertEquals(0, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
-                "at Eidolon 3 the ability does not exist yet");
+                "rank gate: at Eidolon 3 the ability does not exist yet");
     }
 
     /**
@@ -217,17 +228,7 @@ public class DefenceIgnoreTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, null, 0, 0));
 
         Assertions.assertEquals(0, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
-                "the text says when casting the ultimate -- HER ultimate, so `actor == self` is doing its job");
-    }
-
-    /**
-     * Her file is found by the ordinary per-character loader (it is data, not a test fixture).
-     */
-    @Test
-    public void herFileIsTheOneTheLoaderReads() {
-        Assertions.assertFalse(TriggerTables.of(JADE).isEmpty(),
-                "1314.json must be on the classpath");
-        Assertions.assertEquals(1, TriggerTables.of(JADE).ruleCount(TriggerEvent.ULT_CAST));
+                "actor gate: the text says when casting the ultimate -- HER ultimate, so `actor == self` is doing its job");
     }
 
     // ==================================================================

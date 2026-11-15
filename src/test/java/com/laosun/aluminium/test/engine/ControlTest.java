@@ -73,302 +73,320 @@ import java.util.Set;
  * element), the <b>one call site</b> that reads it by freeze below (exact), and the <b>mechanism</b> - a push
  * surviving a speed change - by {@code QueueActionManipulationTest.aDelaySurvivesASpeedChange}, which is
  * where it can be observed alone.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the five scenarios below, one {@code assertAll}
+ * per scenario so a failing clause still names itself: the three control breaks, the two sides of the break
+ * boundary, the skill-applied state together with its landing roll, and the payload the state owns. The four
+ * load-time rejection paths stay their own tests: an {@code assertThrows} is not a positive clause and must
+ * not hide behind one.
  */
 public class ControlTest {
     private static final double EPS = 1e-6;
 
-    @Test
-    public void anIceBreakFreezesTheVictimAndPushesItBack() {
-        Fixture f = fixture(DamageElement.ICE);
-        double speedBefore = f.speed();
-        double delayBefore = timeRemaining(f.battle, f.enemy);
-
-        f.breakWith(DamageElement.ICE);
-
-        Assertions.assertTrue(f.enemy.getBuffManager().hasBuff(ControlBuff.class),
-                "the freeze state must attach an act lock");
-        Assertions.assertEquals("ctrl:frozen", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
-                "and the state carries the NAME the documents use, which is what the freeze state is asked with");
-        Assertions.assertFalse(f.enemy.getBuffManager().canAct(),
-                "the freeze state = cannot act; this is the same predicate performAction refuses on");
-        Assertions.assertEquals(speedBefore, f.speed(), EPS, "the freeze state does not slow -- imprisonment/entanglement do");
-        Assertions.assertEquals(f.period() * (Constant.BREAK_DELAY_RATIO + Constant.FREEZE_EXTRA_DELAY),
-                timeRemaining(f.battle, f.enemy) - delayBefore, EPS,
-                "the delay is the fixed 25% plus the element's own extra");
-    }
-
-    @Test
-    public void aQuantumBreakSlowsAndDelaysButStillLetsTheVictimAct() {
-        Fixture f = fixture(DamageElement.QUANTUM);
-        double speedBefore = f.speed();
-
-        f.breakWith(DamageElement.QUANTUM);
-
-        Assertions.assertTrue(f.enemy.getBuffManager().canAct(),
-                "entanglement acts, just later and slower -- it must NOT be an act lock");
-        Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("ENTANGLED").slowPercent()),
-                f.speed(), EPS, "entanglement = speed reduction");
-        // Note: The push is NOT asserted here, deliberately -- see the class javadoc's measured table. A 20%
-        // slow reschedules the action by more than the push, so with or without the element's extra delay
-        // the movement clears every threshold this test could name: an assertion that cannot fail. The push
-        // being read out of the table is pinned by the freeze state's exact figure, and the mechanism by
-        // QueueActionManipulationTest.aDelaySurvivesASpeedChange.
-    }
-
-    @Test
-    public void anImaginaryBreakSlowsAndDelaysButStillLetsTheVictimAct() {
-        Fixture f = fixture(DamageElement.IMAGINARY);
-        double speedBefore = f.speed();
-
-        f.breakWith(DamageElement.IMAGINARY);
-
-        Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "imprisonment is not an act lock");
-        Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("IMPRISONED").slowPercent()),
-                f.speed(), EPS, "imprisonment = speed reduction");
-        // Same as entanglement above: no push assertion, and for the same measured reason -- at a 10% slow the
-        // reschedule alone already moves the bar 33.6 against a plain break's 18.94. (A truncated reschedule
-        // would move it 12.63 instead, *below* the baseline, so this case would be assertable for the wrong
-        // reason.)
-    }
-
-    /**
-     * Regression, and the guard on the whole task: a damaging break must be <b>untouched</b>.
-     *
-     * <p>It burns, it does not touch speed, it does not lock the action, and its delay is exactly the
-     * fixed 25% with no element-specific extra. If the control path were wired to every element instead of
-     * only the three that have a state, this is what would go red.
-     */
-    @Test
-    public void aPhysicalBreakStillOnlyBurns() {
-        Fixture f = fixture(DamageElement.PHYSICAL);
-        double speedBefore = f.speed();
-        double delayBefore = timeRemaining(f.battle, f.enemy);
-
-        f.breakWith(DamageElement.PHYSICAL);
-
-        Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(DotBuff.class), "still burns");
-        Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "a burn does not control");
-        Assertions.assertFalse(f.enemy.getBuffManager().hasBuff(ControlBuff.class));
-        Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(StatModifierBuff.class),
-                "a burn must not slow: the slow belongs to the control states only");
-        Assertions.assertEquals(speedBefore, f.speed(), EPS);
-        Assertions.assertEquals(f.period() * Constant.BREAK_DELAY_RATIO,
-                timeRemaining(f.battle, f.enemy) - delayBefore, EPS,
-                "the four damaging elements add no extra delay");
-    }
-
-    /**
-     * A break cannot be resisted away.
-     *
-     * <p>{@code ControlEffect.resistKey} exists so that the <i>skill</i>-applied path can be resisted through
-     * {@code hitChance}; a <b>break</b> happens because the toughness bar emptied, so a monster that is fully
-     * immune to freeze ({@code STAT_CTRL_Frozen} = 1) must <b>still</b> be frozen by an Ice break. Wiring the
-     * break path through the resistance check would make a weakness break silently do nothing, which is the
-     * kind of failure that reads as "no bug" from the outside.
-     */
-    @Test
-    public void anIceBreakFreezesEvenAMonsterThatIsImmuneToFreezeSkills() {
-        Fixture f = fixture(DamageElement.ICE);
-        f.enemy.setDebuffResist(java.util.Map.of("STAT_CTRL_Frozen", 1.0));
-
-        f.breakWith(DamageElement.ICE);
-
-        Assertions.assertFalse(f.enemy.getBuffManager().canAct(),
-                "a break is not a resisted debuff: 100% skill resistance must not cancel it");
-    }
-
     // ==================================================================
-    // A control applied by a SKILL: op APPLY_CONTROL
+    // 1. The break path: the element decides what state is left
     // ==================================================================
 
     /**
-     * "有 50% 基础概率使敌方目标陷入冻结状态，持续1回合": the state lands, the victim cannot act, and the name is
-     * readable - which is what makes the freeze state askable at all.
+     * The three non-damaging elements leave a control state behind, and the state is what the data says:
+     * freeze (冻结) locks the action and pushes the bar, entangle (纠缠) and imprison (禁锢) only slow the
+     * victim and still let it act.
+     *
+     * <p>One scenario because the three clauses use the same fixture ({@code fixture(element)}: Ice Edge in a
+     * seeded battle, made weak to exactly the element under test) and the same observables - the enemy's buff
+     * manager, its speed and the action-value bar. The element is the clause, not the fixture, so each break
+     * is driven on its own instance and every clause names itself in the {@code assertAll}.
      */
     @Test
-    public void aSkillAppliedFreezeStopsTheVictimActingAndCarriesItsName() {
-        Applied f = new Applied(control(1.0));
-        f.fire();
+    public void theThreeControlBreaksLeaveTheirOwnState() {
+        // Ice -> frozen (冻结): cannot act, no slow, and the fixed 25% plus the element's own extra push.
+        Fixture frozen = fixture(DamageElement.ICE);
+        double frozenSpeedBefore = frozen.speed();
+        double frozenDelayBefore = timeRemaining(frozen.battle, frozen.enemy);
+        frozen.breakWith(DamageElement.ICE);
+        boolean freezeAttachedAControlBuff = frozen.enemy.getBuffManager().hasBuff(ControlBuff.class);
+        boolean frozenCanAct = frozen.enemy.getBuffManager().canAct();
+        double frozenSpeed = frozen.speed();
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"),
-                "the applied state answers has_state under the name the documents use");
-        Assertions.assertFalse(f.enemy.getBuffManager().canAct(), "Frozen (ctrl:frozen) = cannot act (不能行动)");
-        Assertions.assertEquals("ctrl:frozen", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName());
+        // Quantum -> entangled (纠缠): acts, just later and slower.
+        Fixture entangled = fixture(DamageElement.QUANTUM);
+        double entangledSpeedBefore = entangled.speed();
+        entangled.breakWith(DamageElement.QUANTUM);
+        boolean entangledCanAct = entangled.enemy.getBuffManager().canAct();
+        double entangledSpeed = entangled.speed();
+
+        // Imaginary -> imprisoned (禁锢): acts, just later and slower.
+        Fixture imprisoned = fixture(DamageElement.IMAGINARY);
+        double imprisonedSpeedBefore = imprisoned.speed();
+        imprisoned.breakWith(DamageElement.IMAGINARY);
+        boolean imprisonedCanAct = imprisoned.enemy.getBuffManager().canAct();
+        double imprisonedSpeed = imprisoned.speed();
+        // The push is NOT asserted for either of these, deliberately -- see the class javadoc's measured
+        // table. A 20%/10% slow reschedules the action by more than the push, so with or without the
+        // element's extra delay the movement clears every threshold this test could name: an assertion
+        // that cannot fail. The push being read out of the table is pinned by the freeze state's exact
+        // figure, and the mechanism by QueueActionManipulationTest.aDelaySurvivesASpeedChange.
+
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(freezeAttachedAControlBuff,
+                        "the freeze state must attach an act lock"),
+                () -> Assertions.assertEquals("ctrl:frozen",
+                        frozen.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
+                        "and the state carries the NAME the documents use, which is what the freeze state is asked with"),
+                () -> Assertions.assertFalse(frozenCanAct,
+                        "the freeze state = cannot act; this is the same predicate performAction refuses on"),
+                () -> Assertions.assertEquals(frozenSpeedBefore, frozenSpeed, EPS,
+                        "the freeze state does not slow -- imprisonment/entanglement do"),
+                () -> Assertions.assertEquals(
+                        frozen.period() * (Constant.BREAK_DELAY_RATIO + Constant.FREEZE_EXTRA_DELAY),
+                        timeRemaining(frozen.battle, frozen.enemy) - frozenDelayBefore, EPS,
+                        "the delay is the fixed 25% plus the element's own extra"),
+                () -> Assertions.assertTrue(entangledCanAct,
+                        "entanglement acts, just later and slower -- it must NOT be an act lock"),
+                () -> Assertions.assertEquals(
+                        entangledSpeedBefore * (1 - Constant.CONTROL_EFFECTS.get("ENTANGLED").slowPercent()),
+                        entangledSpeed, EPS, "entanglement = speed reduction"),
+                () -> Assertions.assertTrue(imprisonedCanAct, "imprisonment is not an act lock"),
+                () -> Assertions.assertEquals(
+                        imprisonedSpeedBefore * (1 - Constant.CONTROL_EFFECTS.get("IMPRISONED").slowPercent()),
+                        imprisonedSpeed, EPS, "imprisonment = speed reduction"));
     }
 
     /**
-     * A base chance is a <b>base</b> chance: it goes through effect hit and effect resistance, per target.
+     * The break path is decided by the element alone: a damaging break is untouched, and a monster that is
+     * immune to the <i>skill's</i> freeze is still frozen by an Ice break.
      *
-     * <p>Driven from the two ends of the pipeline rather than from a lucky seed: with the applier's effect hit at
-     * +100% a 50% base chance becomes certain, and with the victim's effect resistance at 100% it becomes impossible. A
-     * rule-level {@code chance} could do neither (it is one fixed roll for the whole rule), which is why the
-     * vocabulary needed this field rather than reusing that one.
+     * <p>Both clauses drive the same fixture ({@code fixture(element)} plus one break) and read the same
+     * observable, what the enemy's buff manager allows. They are the two sides of one boundary: control is
+     * wired to the three elements that have a state and to nothing else - a physical break that suddenly
+     * carried a control buff, or slowed, or added an extra delay, is what would go red if the control path
+     * were wired to every element - and a break is not a resisted skill debuff, because it happens when the
+     * toughness bar emptied, not because a hit landed.
      */
     @Test
-    public void theBaseChanceRunsThroughTheEffectHitAndResistPipeline() {
-        Applied lands = new Applied(control(1.0));
-        lands.hero.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
-        lands.fire();
-        Assertions.assertTrue(lands.enemy.getBuffManager().hasState("ctrl:frozen"),
-                "50% base × (1 + 100% effect hit) = 100%, so it always lands");
+    public void aBreakIsDecidedByTheElementAlone() {
+        // Regression, and the guard on the whole task: a damaging break must be untouched.
+        Fixture physical = fixture(DamageElement.PHYSICAL);
+        double physicalSpeedBefore = physical.speed();
+        double physicalDelayBefore = timeRemaining(physical.battle, physical.enemy);
+        physical.breakWith(DamageElement.PHYSICAL);
+        int burns = physical.enemy.getBuffManager().countBuffs(DotBuff.class);
+        boolean physicalCanAct = physical.enemy.getBuffManager().canAct();
+        boolean physicalHasAControlBuff = physical.enemy.getBuffManager().hasBuff(ControlBuff.class);
+        int physicalSlows = physical.enemy.getBuffManager().countBuffs(StatModifierBuff.class);
+        double physicalSpeed = physical.speed();
 
-        Applied resisted = new Applied(control(1.0));
-        resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
-        resisted.fire();
-        Assertions.assertFalse(resisted.enemy.getBuffManager().hasState("ctrl:frozen"),
-                "and 100% effect resistance takes it to 0, whatever the base chance was");
+        // A break cannot be resisted away: STAT_CTRL_Frozen = 1 cannot cancel the break's state.
+        Fixture immune = fixture(DamageElement.ICE);
+        immune.enemy.setDebuffResist(java.util.Map.of("STAT_CTRL_Frozen", 1.0));
+        immune.breakWith(DamageElement.ICE);
+        boolean immuneCanAct = immune.enemy.getBuffManager().canAct();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(1, burns, "still burns"),
+                () -> Assertions.assertTrue(physicalCanAct, "a burn does not control"),
+                () -> Assertions.assertFalse(physicalHasAControlBuff,
+                        "a damaging break attaches no control state"),
+                () -> Assertions.assertEquals(0, physicalSlows,
+                        "a burn must not slow: the slow belongs to the control states only"),
+                () -> Assertions.assertEquals(physicalSpeedBefore, physicalSpeed, EPS,
+                        "the burn leaves the speed alone"),
+                () -> Assertions.assertEquals(physical.period() * Constant.BREAK_DELAY_RATIO,
+                        timeRemaining(physical.battle, physical.enemy) - physicalDelayBefore, EPS,
+                        "the four damaging elements add no extra delay"),
+                () -> Assertions.assertFalse(immuneCanAct,
+                        "a break is not a resisted debuff: 100% skill resistance must not cancel it"));
     }
 
-    /**
-     * A monster's own resistance to <b>this</b> state ({@code STAT_CTRL_Frozen}) is part of the same roll.
-     *
-     * <p>Note: The fixture for this case is Ice Edge (1002011), whose data really does carry
-     * {@code STAT_CTRL_Frozen = 1.0} - it cannot be frozen by a skill at all. That is why every other case above
-     * uses 1003010 (no specific resistances): a "the state lands" assertion on a monster that is immune to it would
-     * have been a test of the data, not of the pipeline.
-     */
-    @Test
-    public void aMonstersSpecificFreezeResistanceIsObeyedOnTheSkillPath() {
-        Applied f = new Applied(EnemyFactory.create(1002011, 90, 1), control(1.0));
-        f.hero.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));   // otherwise certain
-
-        f.fire();
-
-        Assertions.assertEquals(java.util.Map.of("STAT_CTRL_Frozen", 1.0), f.enemy.getDebuffResist(),
-                "precondition: this monster's data is what makes it unfreezable");
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("ctrl:frozen"),
-                "STAT_CTRL_Frozen = 1 means this monster cannot be frozen by a skill -- which is exactly what "
-                        + "ControlEffect.resistKey is for (and what a BREAK deliberately ignores)");
-    }
+    // ==================================================================
+    // 2. A control applied by a SKILL: op APPLY_CONTROL
+    // ==================================================================
 
     /**
-     * Note: <b>A break-frozen unit and a skill-frozen unit are the same state.</b>
+     * A control applied by a skill is one named state: it lands, it answers by name, it is the same state a
+     * break produces, a rule can gate on it, and it is a debuff that can be dispelled.
      *
-     * <p>This is the property that made the migration worth doing: before {@code ControlBuff}, a break produced an
-     * unnamed {@code StunBuff}, so a question about the freeze state answered <b>false</b> for a unit that was, to the game and to the
-     * player, frozen - a condition that would have silently missed half the cases it exists for.
-     */
-    @Test
-    public void aBreakFreezeAndASkillFreezeAreTheSameState() {
-        Fixture broken = fixture(DamageElement.ICE);
-        broken.breakWith(DamageElement.ICE);
-
-        Applied applied = new Applied(control(1.0));
-        applied.fire();
-
-        Assertions.assertTrue(broken.enemy.getBuffManager().hasState("ctrl:frozen"), "the break's state has the name");
-        Assertions.assertTrue(applied.enemy.getBuffManager().hasState("ctrl:frozen"), "and so does the skill's");
-        Assertions.assertEquals(broken.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
-                applied.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
-                "one state, one name, whichever path applied it");
-    }
-
-    /**
-     * A gated rule can therefore ask the question: {@code target has_state 冻结}.
+     * <p>One fixture family ({@code new Applied(control(1.0))}: the placeholder caster and enemy 1003010 in
+     * a seeded battle) and one observable, the named state in the buff manager. The freeze states the same
+     * name whichever path applied it - the property that made the migration worth doing: before
+     * {@code ControlBuff}, a break produced an unnamed {@code StunBuff}, so a question about the freeze state
+     * answered <b>false</b> for a unit that was, to the game and to the player, frozen.
      *
-     * <p>Note: The gate is on a <b>later event</b>, and that is not a stylistic choice: {@code TriggerInterpreter.fire}
+     * <p>The gate is on a <b>later event</b>, and that is not a stylistic choice: {@code TriggerInterpreter.fire}
      * matches <b>every</b> rule of one event against the context <i>before</i> any of them runs ({@code matching}
      * is a pure predicate), so a rule cannot see a state an earlier rule of the same event applied. Content that
      * wants both writes two rules on two events - which is what the game's sentences do too (the freeze is on the
      * cast, the bonus is on the damage).
      */
     @Test
-    public void aRuleCanGateOnTheFrozenState() {
-        Applied f = new Applied(control(1.0),
+    public void aSkillAppliedControlIsOneNamedState() {
+        // "有 50% 基础概率使敌方目标陷入冻结状态，持续1回合": the state lands, stops the turn, and has a name.
+        Applied freeze = new Applied(control(1.0));
+        freeze.fire();
+        boolean freezeHasTheName = freeze.enemy.getBuffManager().hasState("ctrl:frozen");
+        boolean freezeCanAct = freeze.enemy.getBuffManager().canAct();
+        ControlBuff freezeBuff = freeze.enemy.getBuffManager().findBuff(ControlBuff.class);
+        String freezeBuffName = freezeBuff == null ? null : freezeBuff.getName();
+        int freezeDebuffs = freeze.enemy.getBuffManager().debuffCount();
+        freeze.enemy.getBuffManager().removeDebuffs(1);
+        boolean canActAfterDispel = freeze.enemy.getBuffManager().canAct();
+
+        // A break-frozen unit and a skill-frozen unit are the same state.
+        Fixture broken = fixture(DamageElement.ICE);
+        broken.breakWith(DamageElement.ICE);
+        Applied applied = new Applied(control(1.0));
+        applied.fire();
+        boolean breakHasTheName = broken.enemy.getBuffManager().hasState("ctrl:frozen");
+        boolean skillHasTheName = applied.enemy.getBuffManager().hasState("ctrl:frozen");
+
+        // A gated rule can ask the question: "target has_state 冻结" / ctrl:frozen.
+        Applied gated = new Applied(control(1.0),
                 TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state ctrl:frozen"),
                         TriggerSpecs.gainEnergy(1)));
+        int controlLands = gated.fire();
+        int laterEventSeesTheFreeze = gated.fire(com.laosun.aluminium.enums.TriggerEvent.BASIC_ATTACK);
 
-        Assertions.assertEquals(1, f.fire(), "the freeze lands");
-        Assertions.assertEquals(1, f.fire(com.laosun.aluminium.enums.TriggerEvent.BASIC_ATTACK),
-                "and a later event's rule sees the freeze state on the victim");
-
-        Applied resisted = new Applied(control(1.0),
+        // The same gate on a victim whose effect resistance is 100%: nothing landed, so nothing is seen.
+        Applied gatedResisted = new Applied(control(1.0),
                 TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state ctrl:frozen"),
                         TriggerSpecs.gainEnergy(1)));
-        resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
+        gatedResisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
+        int resistedControlLands = gatedResisted.fire();
+        int resistedLaterEvent = gatedResisted.fire(com.laosun.aluminium.enums.TriggerEvent.BASIC_ATTACK);
 
-        Assertions.assertEquals(1, resisted.fire(), "here the control rule runs but lands nothing");
-        Assertions.assertEquals(0, resisted.fire(com.laosun.aluminium.enums.TriggerEvent.BASIC_ATTACK),
-                "so the gated rule is refused -- the gate is the only thing that changed");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(freezeHasTheName,
+                        "the applied state answers has_state under the name the documents use"),
+                () -> Assertions.assertFalse(freezeCanAct, "Frozen (ctrl:frozen) = cannot act (不能行动)"),
+                () -> Assertions.assertEquals("ctrl:frozen", freezeBuffName,
+                        "and it is a ControlBuff, so the state's name is readable"),
+                () -> Assertions.assertEquals(1, freezeDebuffs, "the control counts as a debuff"),
+                () -> Assertions.assertTrue(canActAfterDispel, "dispelling it gives the turn back"),
+                () -> Assertions.assertTrue(breakHasTheName, "the break's state has the name"),
+                () -> Assertions.assertTrue(skillHasTheName, "and so does the skill's"),
+                () -> Assertions.assertEquals(
+                        broken.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
+                        applied.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
+                        "one state, one name, whichever path applied it"),
+                () -> Assertions.assertEquals(1, controlLands, "the freeze lands"),
+                () -> Assertions.assertEquals(1, laterEventSeesTheFreeze,
+                        "and a later event's rule sees the freeze state on the victim"),
+                () -> Assertions.assertEquals(1, resistedControlLands,
+                        "here the control rule runs but lands nothing"),
+                () -> Assertions.assertEquals(0, resistedLaterEvent,
+                        "so the gated rule is refused -- the gate is the only thing that changed"));
     }
 
     /**
-     * The parts of a state come off together: entanglement's slow goes when the state is removed by name.
+     * A base chance is a <b>base</b> chance: it goes through effect hit, effect resistance and the monster's
+     * own resist data, per target.
+     *
+     * <p>Driven from the ends of the pipeline rather than from a lucky seed: with the applier's effect hit at
+     * +100% a 50% base chance becomes certain, with the victim's effect resistance at 100% it becomes
+     * impossible, and Ice Edge's {@code STAT_CTRL_Frozen = 1} makes it impossible for that monster whatever the
+     * roll. A rule-level {@code chance} could do none of this (it is one fixed roll for the whole rule), which
+     * is why the vocabulary needed this field rather than reusing that one.
+     *
+     * <p>The 1002011 enemy is a clause, not a second fixture: the roll reads the target's own resist data, and
+     * every other case uses 1003010 (no specific resistances) precisely so that "the state lands" is a
+     * statement about the pipeline and not about the data.
      */
     @Test
-    public void removingTheNamedStateTakesItsSlowWithIt() {
-        Applied f = new Applied(control("ctrl:entangled", null));
-        double before = f.enemy.getAttribute(AttributeType.SPEED).get();
+    public void theLandingRollRunsThroughHitResistAndMonsterData() {
+        Applied certain = new Applied(control(1.0));
+        certain.hero.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
+        certain.fire();
+        boolean landedThroughEffectHit = certain.enemy.getBuffManager().hasState("ctrl:frozen");
 
-        f.fire();
-        Assertions.assertTrue(f.enemy.getAttribute(AttributeType.SPEED).get() < before, "entanglement slows");
+        Applied resistedByEffectResistance = new Applied(control(1.0));
+        resistedByEffectResistance.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
+        resistedByEffectResistance.fire();
+        boolean landedThroughEffectResistance =
+                resistedByEffectResistance.enemy.getBuffManager().hasState("ctrl:frozen");
 
-        Assertions.assertEquals(1, f.enemy.getBuffManager().removeState("ctrl:entangled"), "the state is taken off by name");
-        Assertions.assertEquals(before, f.enemy.getAttribute(AttributeType.SPEED).get(), EPS,
-                "and the slow it attached goes with it -- one buff, so the parts cannot come apart");
-    }
+        Applied resistedByMonsterData = new Applied(EnemyFactory.create(1002011, 90, 1), control(1.0));
+        resistedByMonsterData.hero.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
+        resistedByMonsterData.fire();
+        boolean landedThroughMonsterData =
+                resistedByMonsterData.enemy.getBuffManager().hasState("ctrl:frozen");
 
-    /**
-     * A control is a negative effect, so a rule that dispels N negative effects reaches it.
-     */
-    @Test
-    public void aControlIsADebuffAndCanBeDispelled() {
-        Applied f = new Applied(control(1.0));
-        f.fire();
-        Assertions.assertEquals(1, f.enemy.getBuffManager().debuffCount(), "the control counts as a debuff");
-
-        f.enemy.getBuffManager().removeDebuffs(1);
-
-        Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "dispelling it gives the turn back");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(landedThroughEffectHit,
+                        "50% base × (1 + 100% effect hit) = 100%, so it always lands"),
+                () -> Assertions.assertFalse(landedThroughEffectResistance,
+                        "and 100% effect resistance takes it to 0, whatever the base chance was"),
+                () -> Assertions.assertEquals(java.util.Map.of("STAT_CTRL_Frozen", 1.0),
+                        resistedByMonsterData.enemy.getDebuffResist(),
+                        "precondition: this monster's data is what makes it unfreezable"),
+                () -> Assertions.assertFalse(landedThroughMonsterData,
+                        "STAT_CTRL_Frozen = 1 means this monster cannot be frozen by a skill -- which is exactly what "
+                                + "ControlEffect.resistKey is for (and what a BREAK deliberately ignores)"));
     }
 
     // ==================================================================
-    // The state's own per-turn damage rides with the state
+    // 3. The state's own payload rides with the state
     // ==================================================================
 
     /**
-     * "冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加伤害": the payload is attached with the
-     * state, and it is <b>frozen with it</b> - a resisted freeze deals no ice damage either, which is why this is
-     * one effect and not two.
+     * The state carries its payload, and removal takes the payload with it: entanglement's slow and the
+     * freeze's per-turn ice damage both belong to the one buff, so neither can be left behind - otherwise
+     * the ice would keep burning after "解除冻结".
+     *
+     * <p>One scenario because the fixture is the same applied-control battle and the observable is the same
+     * question asked of two payload kinds (a {@code StatModifierBuff} for speed, a {@code DotBuff} for the ice
+     * damage). A resisted freeze attaches no payload at all, which is what "one effect, not two" means.
      */
     @Test
-    public void theStateCarriesItsOwnPerTurnDamage() {
-        Applied f = new Applied(controlWithDamage(1.0));
-        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+    public void theStateCarriesItsPayloadAndRemovalTakesIt() {
+        // Entanglement's slow goes when the state is removed by name.
+        Applied entangled = new Applied(control("ctrl:entangled", null));
+        double speedBeforeEntangle = entangled.enemy.getAttribute(AttributeType.SPEED).get();
+        entangled.fire();
+        double speedWhileEntangled = entangled.enemy.getAttribute(AttributeType.SPEED).get();
+        int removedStates = entangled.enemy.getBuffManager().removeState("ctrl:entangled");
+        double speedAfterEntangleRemoved = entangled.enemy.getAttribute(AttributeType.SPEED).get();
 
-        f.fire();
+        // "冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加伤害": the payload lands with the state.
+        Applied frozen = new Applied(controlWithDamage(1.0));
+        frozen.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+        frozen.fire();
+        boolean freezeHasTheName = frozen.enemy.getBuffManager().hasState("ctrl:frozen");
+        DotBuff dot = frozen.enemy.getBuffManager().findBuff(DotBuff.class);
 
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"), "the state landed");
-        DotBuff dot = f.enemy.getBuffManager().findBuff(DotBuff.class);
-        Assertions.assertNotNull(dot, "and so did its per-turn damage");
-        Assertions.assertEquals(DamageElement.ICE, dot.getElement());
-        Assertions.assertEquals(1200, dot.getBaseDamage(), EPS, "60% of her 2000 ATTACK, read when it landed");
-
+        // A resisted freeze deals no ice damage either: the payload is part of the state, not a second effect.
         Applied resisted = new Applied(controlWithDamage(1.0));
         resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
         resisted.fire();
-        Assertions.assertEquals(0, resisted.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "a resisted freeze attaches no damage: the payload is part of the state, not a second effect");
-    }
+        int dotsOnResisted = resisted.enemy.getBuffManager().countBuffs(DotBuff.class);
 
-    /**
-     * Taking the state off takes its damage with it - otherwise the ice would keep burning after "解除冻结".
-     */
-    @Test
-    public void theStatesDamageComesOffWithIt() {
-        Applied f = new Applied(controlWithDamage(1.0));
-        f.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
-        f.fire();
-        Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(DotBuff.class), "precondition");
+        // Taking the state off takes its damage with it.
+        Applied removed = new Applied(controlWithDamage(1.0));
+        removed.hero.setAttribute(AttributeType.ATTACK, new DoubleValue(2000));
+        removed.fire();
+        int dotsWhileFrozen = removed.enemy.getBuffManager().countBuffs(DotBuff.class);
+        removed.enemy.getBuffManager().removeState("ctrl:frozen");
+        int dotsAfterRemoval = removed.enemy.getBuffManager().countBuffs(DotBuff.class);
 
-        f.enemy.getBuffManager().removeState("ctrl:frozen");
-
-        Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "one buff owns the state and its payload, so 「解除」 (remove) cannot leave half of it behind");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(speedWhileEntangled < speedBeforeEntangle, "entanglement slows"),
+                () -> Assertions.assertEquals(1, removedStates, "the state is taken off by name"),
+                () -> Assertions.assertEquals(speedBeforeEntangle, speedAfterEntangleRemoved, EPS,
+                        "and the slow it attached goes with it -- one buff, so the parts cannot come apart"),
+                () -> Assertions.assertTrue(freezeHasTheName, "the state landed"),
+                () -> Assertions.assertNotNull(dot, "and so did its per-turn damage"),
+                () -> Assertions.assertEquals(DamageElement.ICE, dot.getElement(),
+                        "the payload is ice damage, as the text says"),
+                () -> Assertions.assertEquals(1200, dot.getBaseDamage(), EPS,
+                        "60% of her 2000 ATTACK, read when it landed"),
+                () -> Assertions.assertEquals(0, dotsOnResisted,
+                        "a resisted freeze attaches no damage: the payload is part of the state, not a second effect"),
+                () -> Assertions.assertEquals(1, dotsWhileFrozen, "precondition"),
+                () -> Assertions.assertEquals(0, dotsAfterRemoval,
+                        "one buff owns the state and its payload, so 「解除」 (remove) cannot leave half of it behind"));
     }
 
     // ==================================================================
-    // Fail fast: what a control rule may not say
+    // 4. Fail fast: what a control rule may not say
     // ==================================================================
 
     /**
@@ -387,6 +405,9 @@ public class ControlTest {
         Assertions.assertTrue(rejected.getMessage().contains("ctrl:frozen"), "the message lists the known states");
     }
 
+    /**
+     * A control without a turn count is refused: a state that never ends is not the sentence's "持续1回合".
+     */
     @Test
     public void aControlWithoutATurnCountIsRejected() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -395,6 +416,10 @@ public class ControlTest {
         Assertions.assertTrue(rejected.getMessage().contains("turns"), rejected.getMessage());
     }
 
+    /**
+     * A base chance is a fraction greater than 0 and at most 1: 1.5 is not a probability, and 0 would read
+     * like 「never」, which is spelled by not writing the rule.
+     */
     @Test
     public void aBaseChanceOutsideZeroToOneIsRejected() {
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -485,7 +510,7 @@ public class ControlTest {
      * March 7th's shape: the freeze plus its own per-turn ice damage (60% of the applier's ATTACK).
      *
      * <p>Note: The payload is stated on the <b>same</b> effect, which is what makes it land only when the freeze does
-     * (see {@link #theStateCarriesItsOwnPerTurnDamage}).
+     * (see {@link #theStateCarriesItsPayloadAndRemovalTakesIt}).
      */
     private static com.laosun.aluminium.beans.TriggerSpec controlWithDamage(Double baseChance) {
         com.laosun.aluminium.beans.EffectSpec effect =

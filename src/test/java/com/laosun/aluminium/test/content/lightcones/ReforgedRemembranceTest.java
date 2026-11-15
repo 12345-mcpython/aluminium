@@ -1,8 +1,10 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
+import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.equipment.Weapon;
@@ -12,20 +14,24 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
-import com.laosun.aluminium.damage.Damage;
 
 /**
  * Light cone 23022: every damage-over-time TYPE the wearer strikes marks one layer of [先知], once per type per battle, up to four.
  *
  * <p>The DoTs are planted by NAME through {@code DotBuff}'s named constructor. The probe measured that a DotBuff planted with a
  * name answers {@code has_state} and {@code stacksOf} for exactly that name -- all four game names included.
+ *
+ * <p><b>The 「每种类型仅 1 次」 that was called missing.</b> The rule-level {@code once_per_battle} already means exactly that, and
+ * each of the four states has its own rule - so the sentence needed no new concept, only one flag per rule.
  */
 public class ReforgedRemembranceTest {
     private static final int CONE = 23022;
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
+    private static final int RUN_WEARER = 1204;
     private static final String SEER = "先知";
     private static final String WIND_NAME = "dot:wind_shear";
     private static final String FIRE_NAME = "dot:burn";
@@ -144,5 +150,57 @@ public class ReforgedRemembranceTest {
                 + " DOT defenceIgnore=" + dot.getDefenceIgnore());
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SEER), "no DoT type, no layer");
         Assertions.assertEquals(0.0, dot.getDefenceIgnore(), 1e-9, "and therefore no ignore on the instance");
+    }
+
+    private static final class Run {
+        private final Character wearer;
+        private final Enemy enemy;
+        private final Battle battle;
+
+        Run() {
+            wearer = CharacterFactory.create(RUN_WEARER, LEVEL, true, Weapon.build(23022, LEVEL, false, 1));
+            enemy = BattleFixture.monster();
+            battle = new Battle(new ArrayList<>(List.of(wearer)), new ArrayList<>(List.of(enemy)),
+                    BattleFixture.seeded());
+            battle.startBattle();
+        }
+
+        /**
+         * One hit landing on a target that carries the named DoT state.
+         */
+        void hitWhileCarrying(String state) {
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff(state, 3));
+            battle.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.PHYSICAL, DamageType.NORMAL, 100));
+            battle.processRequests();
+        }
+
+        int seer() {
+            return wearer.getBuffManager().stacksOf("先知");
+        }
+
+        double attack() {
+            return wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
+        }
+    }
+
+    /**
+     * Each state type pays once, however many hits land; different types each pay.
+     */
+    @Test
+    public void eachTypePaysOncePerBattle() {
+        Run run = new Run();
+        double base = run.attack();
+
+        run.hitWhileCarrying("dot:wind_shear");
+        Assertions.assertEquals(1, run.seer(), "the first wind-shear hit grants a stack");
+        run.hitWhileCarrying("dot:wind_shear");
+        Assertions.assertEquals(1, run.seer(), "「每种状态类型仅可叠加 1 次」 - a second hit on the same type does not");
+
+        run.hitWhileCarrying("dot:burn");
+        Assertions.assertEquals(2, run.seer(), "a different type pays again");
+        // 「每层使攻击力提高 5%」 - the DIRECTION holds, the arithmetic does not. Measured: two layers read x1.078125 with
+        // `per_stack` and x1.03906 with `per_stack_live`; the sentence wants x1.10. Both numbers are in the status row - this
+        // pins only what is true today, so the gap cannot be mistaken for a pass.
+        Assertions.assertTrue(run.attack() > base, "「每层使攻击力提高 5%」 - the attack is raised");
     }
 }

@@ -23,27 +23,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Event completion: verifies that the new events are emitted at the right time, the
- * right number of times, under the right filter conditions.
+ * Event completion: verifies that the events are emitted at the right time, the right number
+ * of times, under the right filter conditions.
  *
  * <p>This class tests the events' contract, not battle outcomes - so the assertions
  * concentrate on "who received it, how many times, carrying what number".
  *
- * <p>Four boundaries deliberately pinned down (all of them places where it is easy to write
- * the wrong thing after adding an event):
+ * <p><b>L3:</b> the single-clause cases are grouped into the scenario methods below, one
+ * {@code assertAll} per scenario so a failing clause still names itself. The boundaries
+ * deliberately pinned down (all of them places where it is easy to write the wrong thing
+ * after adding an event):
  * <ol>
- *   <li>{@link #nonDamagingSkillStillFiresSkillCast()} - heal / shield skills have no hit
- *       set; if the implementation says "no hit landed, so do not emit", those effects'
- *       trigger sources would never receive anything;</li>
- *   <li>{@link #fullyShieldedHitFiresNoHpLoss()} - absorbed by a shield does not count as
- *       HP loss. HP loss and "taking damage" are two different conventions, and characters
- *       that convert lost HP into resources (Castorice / Mydei / Blade) rely on that
- *       distinction;</li>
- *   <li>{@link #failedSkillSpendFiresNoSkillPointSpent()} - not spent, not consumed. Otherwise
- *       counters of the Misha / Sparkle kind ("per 1 point consumed") would book a consumption
- *       that never happened;</li>
- *   <li>{@link #zeroEnergyCharacterFiresNoEnergyEvent()} - characters with no energy bar
- *       have no energy event. The 6 stack-resource characters fall into this class.</li>
+ *   <li>{@link #luochaSkillCastAndHealScenario()} - heal / shield skills have no hit set; if
+ *       the implementation said "no hit landed, so do not emit", those effects' trigger
+ *       sources would never receive anything;</li>
+ *   <li>{@link #fullyShieldedHitScenario()} - absorbed by a shield does not count as HP loss
+ *       (nor as a kill). HP loss and "taking damage" are two different conventions, and
+ *       characters that convert lost HP into resources (Castorice / Mydei / Blade) rely on
+ *       that distinction;</li>
+ *   <li>{@link #failedSkillSpendScenario()} - not spent, not consumed. Otherwise counters of
+ *       the Misha / Sparkle kind ("per 1 point consumed") would book a consumption that never
+ *       happened;</li>
+ *   <li>{@link #zeroEnergyCharacterScenario()} - characters with no energy bar have no energy
+ *       event. The stack-resource characters fall into this class.</li>
  * </ol>
  */
 public class EventBusTest {
@@ -61,379 +63,366 @@ public class EventBusTest {
     private static final String SP_GAINED = "SP_GAINED";
     private static final String SP_SPENT = "SP_SPENT";
 
-    // ==================================================================
-    // 1. Skill cast: both damaging and non-damaging skills must emit
-    // ==================================================================
-
     /**
-     * Damaging skill: `SkillCastEvent` carries the actual hit set.
+     * Scenario: a damaging skill cast emits {@code SkillCastEvent} exactly once and carries the
+     * actual hit set - one event per cast, not one event per hit.
      */
     @Test
-    public void damagingSkillFiresSkillCastWithHitTargets() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Enemy enemy = firstEnemy(battle);
-        Probe probe = attachProbe(hero);
+    public void skillCastScenario() {
+        Battle basicBattle = newBattle();
+        Character basicHero = basicBattle.characters().getFirst();
+        Enemy basicEnemy = firstEnemy(basicBattle);
+        Probe basicProbe = attachProbe(basicHero);
+        castNow(basicBattle, basicHero, basicHero.getSkills().get(SkillType.COMMON), List.of(basicEnemy));
+        Event basicCast = basicProbe.last(SKILL_CAST);
 
-        castNow(battle, hero, hero.getSkills().get(SkillType.COMMON), List.of(enemy));
+        Battle aoeBattle = newBattle();
+        Character aoeHero = aoeBattle.characters().getFirst();
+        Probe aoeProbe = attachProbe(aoeHero);
+        Skill aoe = new DefaultSkill(1003, 3, 1);   // Himeko's ultimate: AoE
+        castNow(aoeBattle, aoeHero, aoe, List.of(firstEnemy(aoeBattle)));
 
-        Event last = probe.last(SKILL_CAST);
-        Assertions.assertNotNull(last, "a damaging skill MUST emit SkillCastEvent");
-        Assertions.assertEquals(hero, last.user());
-        Assertions.assertEquals(List.of(enemy), last.hits(), "actual hit set = that enemy");
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(basicCast, "a damaging skill MUST emit SkillCastEvent"),
+                () -> Assertions.assertEquals(basicHero, basicCast.user(), "the caster is the event user"),
+                () -> Assertions.assertEquals(List.of(basicEnemy), basicCast.hits(),
+                        "actual hit set = that enemy"),
+                () -> Assertions.assertEquals(1, aoeProbe.count(SKILL_CAST),
+                        "an AoE hitting 3 targets still emits only 1 cast event"));
     }
 
     /**
-     * Note: Core boundary: non-damaging skills must emit SkillCastEvent too.
+     * Scenario: a Luocha heal skill - a non-damaging cast still emits {@code SkillCastEvent}
+     * (with an empty hit set and the caller's chosen targets), while {@code HealEvent} fires
+     * only for HP really restored.
      *
-     * <p>The heal skill (Luocha 1203 slot 2, `RESTORE`) deals no damage at all, so its
-     * `hitTargets` is empty. Effects such as Bronya's "50% chance to restore 1 skill point
-     * when casting a skill" and Sushang's "restore 1 skill point after casting a skill on a
-     * broken target" have "the cast itself" as their trigger source; if the implementation is
-     * written as "no hit landed, so do not emit", they would never receive anything.
+     * <p>Core boundary: heal / shield skills have no hit set. Effects such as Bronya's "50%
+     * chance to restore 1 skill point when casting a skill" and Sushang's "restore 1 skill
+     * point after casting a skill on a broken target" have "the cast itself" as their trigger
+     * source; if the implementation is written as "no hit landed, so do not emit", they would
+     * never receive anything.
      */
     @Test
-    public void nonDamagingSkillStillFiresSkillCast() {
+    public void luochaSkillCastAndHealScenario() {
         Character luocha = CharacterFactory.create(1203, 80);
         Battle battle = newBattle(luocha);
         Probe probe = attachProbe(luocha);
-
         Skill healSkill = luocha.getSkills().get(SkillType.SKILL);
-        Assertions.assertNotNull(healSkill, "precondition: Luocha has a skill slot");
-        Assertions.assertFalse(healSkill.getData().getEffect().isDamaging(), "precondition: this is a heal skill");
+        double maxHp = luocha.getMaxHp();
+        double hpBeforeAnyHeal = luocha.getCurrentHp();
+
+        battle.heal(luocha, luocha, 300);               // full HP: the actual restore is 0
+        int healCountAtFullHp = probe.count(HEAL);
 
         castNow(battle, luocha, healSkill, List.of(luocha));
+        Event castEvent = probe.last(SKILL_CAST);
 
-        Event last = probe.last(SKILL_CAST);
-        Assertions.assertNotNull(last, "a non-damaging skill (heal) MUST emit SkillCastEvent too");
-        Assertions.assertTrue(last.hits().isEmpty(), "a heal skill has no hit set");
-        Assertions.assertEquals(List.of(luocha), last.chosen(), "but the targets the caller chose must be carried out verbatim");
+        luocha.takeDamage(500);                         // lose some HP first, otherwise a heal at full HP is 0
+        double hpBeforeRealHeal = luocha.getCurrentHp();
+        battle.heal(luocha, luocha, 300);
+        Event healEvent = probe.last(HEAL);
+
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(healSkill, "precondition: Luocha has a skill slot"),
+                () -> Assertions.assertFalse(healSkill.getData().getEffect().isDamaging(),
+                        "precondition: this is a heal skill"),
+                () -> Assertions.assertEquals(maxHp, hpBeforeAnyHeal, EPS, "precondition: at full HP"),
+                () -> Assertions.assertEquals(0, healCountAtFullHp,
+                        "healing at full HP restores 0 → no event emitted"),
+                () -> Assertions.assertNotNull(castEvent,
+                        "a non-damaging skill (heal) MUST emit SkillCastEvent too"),
+                () -> Assertions.assertTrue(castEvent.hits().isEmpty(), "a heal skill has no hit set"),
+                () -> Assertions.assertEquals(List.of(luocha), castEvent.chosen(),
+                        "but the targets the caller chose must be carried out verbatim"),
+                () -> Assertions.assertNotNull(healEvent, "a heal must emit HealEvent"),
+                () -> Assertions.assertEquals(luocha, healEvent.target(),
+                        "the healed target is the event target"),
+                () -> Assertions.assertEquals(luocha.getCurrentHp() - hpBeforeRealHeal, healEvent.amount(), EPS,
+                        "the event carries the HP really restored"),
+                () -> Assertions.assertTrue(healEvent.amount() > 0, "a real heal restores a positive amount"));
     }
 
     /**
-     * One cast emits SkillCastEvent exactly once (not once per hit).
+     * Scenario: {@code EnergyEvent} is emitted only on an actual credit - a basic attack credits
+     * the conventional 20, while an already-full bar credits 0 and therefore emits nothing
+     * ("clipped by the cap" is not an energy gain).
      */
     @Test
-    public void skillCastFiresOncePerCastNotPerHit() {
+    public void energyCreditScenario() {
         Battle battle = newBattle();
         Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
-
-        Skill aoe = new DefaultSkill(1003, 3, 1);   // Himeko's ultimate: AoE
-        castNow(battle, hero, aoe, List.of(firstEnemy(battle)));
-
-        Assertions.assertEquals(1, probe.count(SKILL_CAST), "an AoE hitting 3 targets still emits only 1 cast event");
-    }
-
-    // ==================================================================
-    // 2. Energy: emitted only on an actual credit; characters with no energy bar do not emit
-    // ==================================================================
-
-    /**
-     * Basic attack lands to energy gain to `EnergyEvent`, carrying the actually credited value (20).
-     */
-    @Test
-    public void energyEventCarriesTheActuallyCreditedAmount() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Probe probe = attachProbe(hero);
-
         castNow(battle, hero, hero.getSkills().get(SkillType.COMMON), List.of(firstEnemy(battle)));
+        Event credited = probe.last(ENERGY);
 
-        Event last = probe.last(ENERGY);
-        Assertions.assertNotNull(last, "an energy gain must emit EnergyEvent");
-        Assertions.assertEquals(hero, last.target());
-        Assertions.assertEquals(20, last.amount(), EPS, "basic attack conventional energy gain is 20");
+        Battle cappedBattle = newBattle();
+        Character cappedHero = cappedBattle.characters().getFirst();
+        cappedHero.setCurrentEnergy(cappedHero.getMaxEnergy());
+        Probe cappedProbe = attachProbe(cappedHero);
+        castNow(cappedBattle, cappedHero, cappedHero.getSkills().get(SkillType.COMMON),
+                List.of(firstEnemy(cappedBattle)));
+
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(credited, "an energy gain must emit EnergyEvent"),
+                () -> Assertions.assertEquals(hero, credited.target(),
+                        "the credited character is the event target"),
+                () -> Assertions.assertEquals(20, credited.amount(), EPS,
+                        "basic attack conventional energy gain is 20"),
+                () -> Assertions.assertEquals(0, cappedProbe.count(ENERGY),
+                        "already full → actual credit 0 → no event emitted"));
     }
 
     /**
-     * When energy is already full the actual credit is 0 to no emission ("clipped by the cap" is not an energy gain).
-     */
-    @Test
-    public void cappedEnergyFiresNoEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        hero.setCurrentEnergy(hero.getMaxEnergy());
-        Probe probe = attachProbe(hero);
-
-        castNow(battle, hero, hero.getSkills().get(SkillType.COMMON), List.of(firstEnemy(battle)));
-
-        Assertions.assertEquals(0, probe.count(ENERGY), "already full → actual credit 0 → no event emitted");
-    }
-
-    /**
-     * Note: Characters with no energy bar (the 6 stack-resource ones) have no energy event.
+     * Scenario: characters with no energy bar have no energy event at all.
      *
-     * <p>Castorice 140's `max_energy` is null in the data and `sp_base` is null everywhere,
-     * and her provider is {@code NoConventionalEnergyProvider} (all 5 hooks return null), so
-     * the code never even reaches the energy-gain entry point.
+     * <p>Castorice (1407) has no energy bar in her data (max energy 0), so the energy-gain
+     * entry point never credits anything and no {@code EnergyEvent} reaches a subscriber.
      */
     @Test
-    public void zeroEnergyCharacterFiresNoEnergyEvent() {
+    public void zeroEnergyCharacterScenario() {
         Character castorice = CharacterFactory.create(1407, 80);
         Battle battle = newBattle(castorice);
         Probe probe = attachProbe(castorice);
 
-        Assertions.assertEquals(0, castorice.getMaxEnergy(), EPS, "precondition: she has no energy bar");
-
         castNow(battle, castorice, castorice.getSkills().get(SkillType.COMMON), List.of(firstEnemy(battle)));
 
-        Assertions.assertEquals(0, probe.count(ENERGY), "no energy bar → there must be no energy event");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0, castorice.getMaxEnergy(), EPS,
+                        "precondition: she has no energy bar"),
+                () -> Assertions.assertEquals(0, probe.count(ENERGY),
+                        "no energy bar → there must be no energy event"));
     }
 
-    // ==================================================================
-    // 3. HP loss vs taking damage
-    // ==================================================================
-
     /**
-     * Taking a normal hit to the HP-loss event carries before/after and the real amount lost.
+     * Scenario: {@code HpLossEvent} reports the HP really lost (before / after / amount), and
+     * within one lethal settlement the loss is reported before the kill.
+     *
+     * <p>The two cases live on independent battlefields: one is a plain hit on a full-HP
+     * enemy, the other needs a 1-HP enemy so the same basic attack really does kill.
      */
     @Test
-    public void hpLossReportsBeforeAndAfter() {
+    public void hpLossScenario() {
         Battle battle = newBattle();
         Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
-
-        double before = enemy.getCurrentHp();
+        double hpBeforeHit = enemy.getCurrentHp();
         battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero, List.of(enemy));
+        Event hpLoss = probe.last(HP_LOSS);
 
-        Event last = probe.last(HP_LOSS);
-        Assertions.assertNotNull(last, "taking a hit must emit HpLossEvent");
-        Assertions.assertEquals(enemy, last.target());
-        Assertions.assertEquals(before, last.before(), EPS);
-        Assertions.assertEquals(enemy.getCurrentHp(), last.after(), EPS);
-        Assertions.assertEquals(before - enemy.getCurrentHp(), last.amount(), EPS, "amount = before - after");
+        Battle lethalBattle = newBattle();
+        Character lethalHero = lethalBattle.characters().getFirst();
+        Enemy lethalEnemy = firstEnemy(lethalBattle);
+        Probe lethalProbe = attachProbe(lethalEnemy);
+        lethalEnemy.takeDamage(lethalEnemy.getCurrentHp() - 1);   // leave 1 HP
+        double hpBeforeLethalHit = lethalEnemy.getCurrentHp();
+        // This basic attack is guaranteed to kill, so both events are produced in the same settlement.
+        actWithRealTurn(lethalBattle, lethalHero, () -> lethalHero.getSkills().get(SkillType.COMMON),
+                () -> List.of(firstEnemy(lethalBattle)));
+        int lossIndex = lethalProbe.indexOf(HP_LOSS);
+        int killIndex = lethalProbe.indexOf(KILL);
+
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(hpLoss, "taking a hit must emit HpLossEvent"),
+                () -> Assertions.assertEquals(enemy, hpLoss.target(),
+                        "the defender is the event target"),
+                () -> Assertions.assertEquals(hpBeforeHit, hpLoss.before(), EPS,
+                        "before = the pre-hit HP"),
+                () -> Assertions.assertEquals(enemy.getCurrentHp(), hpLoss.after(), EPS,
+                        "after = the post-hit HP"),
+                () -> Assertions.assertEquals(hpBeforeHit - enemy.getCurrentHp(), hpLoss.amount(), EPS,
+                        "amount = before - after"),
+                () -> Assertions.assertEquals(1, hpBeforeLethalHit, EPS, "precondition: only 1 HP left"),
+                () -> Assertions.assertTrue(lossIndex != Integer.MAX_VALUE,
+                        "the defender should receive HpLossEvent"),
+                () -> Assertions.assertTrue(killIndex != Integer.MAX_VALUE,
+                        "the defender should receive KillEvent"),
+                () -> Assertions.assertTrue(lossIndex < killIndex,
+                        "within one settlement: HP loss first, then the kill"));
     }
 
     /**
-     * Note: Core boundary: a shield absorbs it all to not one drop of HP lost to do not emit
-     * HpLossEvent.
+     * Scenario: a hit fully absorbed by a shield loses no HP and is not a kill, so neither
+     * {@code HpLossEvent} nor {@code KillEvent} is emitted.
      *
      * <p>"HP loss" and "taking damage" are two different conventions. Characters that convert
-     * lost HP into resources (Castorice's [新蕊], Mydei's [血仇], Blade's [充能]) want the
-     * amount of HP really lost - if an event were emitted here and the amount absorbed by
-     * the shield counted too, they would accumulate stacks out of thin air.
+     * lost HP into resources (Castorice / Mydei / Blade) want the amount of HP really lost - if
+     * the amount absorbed by the shield counted too, they would accumulate stacks out of thin
+     * air. The same shield also guards against "does not die before the shield breaks" being
+     * bypassed by a kill event.
      */
     @Test
-    public void fullyShieldedHitFiresNoHpLoss() {
+    public void fullyShieldedHitScenario() {
         Battle battle = newBattle();
         Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
         battle.grantShield(enemy, 10_000_000);          // shield thick enough that it cannot be broken through
-        double hpBefore = enemy.getCurrentHp();
-
+        double hpBeforeShieldedHit = enemy.getCurrentHp();
         battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero, List.of(enemy));
+        boolean deadAfterShieldedHit = enemy.isDeath();
 
-        Assertions.assertEquals(hpBefore, enemy.getCurrentHp(), EPS, "precondition: indeed not one drop of HP lost");
-        Assertions.assertEquals(0, probe.count(HP_LOSS), "fully shielded → no HP-loss event");
-    }
-
-    // ==================================================================
-    // 4. Healing: emitted only when HP is really restored
-    // ==================================================================
-
-    /**
-     * Heal skill to HP really restored to emit `HealEvent`.
-     */
-    @Test
-    public void healEventCarriesActuallyHealed() {
-        Character luocha = CharacterFactory.create(1203, 80);
-        Battle battle = newBattle(luocha);
-        Probe probe = attachProbe(luocha);
-
-        luocha.takeDamage(500);                          // lose some HP first, otherwise a heal at full HP is 0
-        double before = luocha.getCurrentHp();
-
-        battle.heal(luocha, luocha, 300);
-
-        Event last = probe.last(HEAL);
-        Assertions.assertNotNull(last, "a heal must emit HealEvent");
-        Assertions.assertEquals(luocha, last.target());
-        Assertions.assertEquals(luocha.getCurrentHp() - before, last.amount(), EPS);
-        Assertions.assertTrue(last.amount() > 0);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(hpBeforeShieldedHit, enemy.getCurrentHp(), EPS,
+                        "precondition: indeed not one drop of HP lost"),
+                () -> Assertions.assertEquals(0, probe.count(HP_LOSS),
+                        "fully shielded → no HP-loss event"),
+                () -> Assertions.assertFalse(deadAfterShieldedHit,
+                        "precondition: the shield held, it is not dead"),
+                () -> Assertions.assertEquals(0, probe.count(KILL),
+                        "fully shielded → no kill event"));
     }
 
     /**
-     * Healing a full-HP target to actual restore 0 to no emission.
-     */
-    @Test
-    public void healingAFullHpTargetFiresNoEvent() {
-        Character luocha = CharacterFactory.create(1203, 80);
-        Battle battle = newBattle(luocha);
-        Probe probe = attachProbe(luocha);
-
-        Assertions.assertEquals(luocha.getMaxHp(), luocha.getCurrentHp(), EPS, "precondition: at full HP");
-        battle.heal(luocha, luocha, 300);
-
-        Assertions.assertEquals(0, probe.count(HEAL), "healing at full HP restores 0 → no event emitted");
-    }
-
-    // ==================================================================
-    // 5. Kill / break
-    // ==================================================================
-
-    /**
-     * Kill an enemy to `KillEvent`, and the killer is the one who cast the skill.
-     */
-    @Test
-    public void killEventNamesTheAttacker() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Enemy enemy = firstEnemy(battle);
-        Probe probe = attachProbe(enemy);
-        probe.attachOn(hero);
-
-        enemy.takeDamage(enemy.getCurrentHp() - 1);      // leave 1 HP
-        battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero, List.of(enemy));
-
-        Event last = probe.last(KILL);
-        Assertions.assertNotNull(last, "a kill must emit KillEvent");
-        Assertions.assertEquals(enemy, last.victim());
-        Assertions.assertEquals(hero, last.attacker());
-    }
-
-    /**
-     * Additional damage finishing a target off still emits KillEvent (same convention as
-     * kill energy gain: it does not look at `countsAsAttack`).
+     * Scenario: {@code KillEvent} fires on every real death and names the killer - by a cast, by
+     * additional damage, by true damage, and by a DOT.
      *
-     * <p>This also guards against a reverse mistake: if the implementation hung KillEvent
-     * behind the "counts as an attack" gate, then additional damage / true damage / break
-     * finishing a kill would all emit no event - and that is exactly the case Himeko's
-     * "ultimate +5 energy per kill" kind of effect most needs to receive.
-     */
-    @Test
-    public void additionalDamageKillStillFiresEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Enemy enemy = firstEnemy(battle);
-        Probe probe = attachProbe(enemy);
-
-        enemy.takeDamage(enemy.getCurrentHp() - 1);      // leave 1 HP
-
-        // Additional damage: notCountsAsAttack, but attributed to the attacker to the kill is a fact
-        battle.applyAdditionalDamage(hero, enemy, DamageElement.PHYSICAL, 1000);
-
-        Assertions.assertEquals(0, enemy.getCurrentHp(), EPS, "precondition: the additional damage really finished it off");
-        Assertions.assertNotNull(probe.last(KILL), "a kill by additional damage must emit KillEvent too");
-    }
-
-    /**
-     * Note: An acceptance criterion that was planned wrong: the original plan required "DOT
-     * does not emit `KillEvent`".
+     * <p>The original plan required "DOT does not emit {@code KillEvent}". Measurement showed
+     * the opposite: {@code tickDots} goes through {@code Battle.applyDamage(..., KILL_ONLY)},
+     * the same settlement path as a basic attack, so a DOT kill does emit the event - and that
+     * is correct, because effects of the "ultimate +5 energy per enemy defeated" kind need to
+     * know that a DOT finishing the job also counts as a defeat. {@code KILL_ONLY} only affects
+     * the energy-gain category, not the fact of death.
      *
-     * <p>Measurement showed the opposite: `tickDots` goes through
-     * `Battle.applyDamage(..., KILL_ONLY)`, the same settlement path as a basic attack, so DOT
-     * killing someone does emit `KillEvent` - and that is correct: effects of Himeko's
-     * "ultimate +5 energy per 1 enemy defeated" kind need to know that "a DOT finishing the
-     * job also counts as a defeat", consistent with the kill-energy convention (`KILL_ONLY`
-     * only affects the energy-gain category, not the fact of "death").
+     * <p>Each case is arranged on its own battlefield (a 1-HP enemy, a different damage source):
+     * they are the same clause but different inputs.
+     */
+    @Test
+    public void killScenario() {
+        Battle castBattle = newBattle();
+        Character castHero = castBattle.characters().getFirst();
+        Enemy castEnemy = firstEnemy(castBattle);
+        Probe castProbe = attachProbe(castEnemy);
+        castProbe.attachOn(castHero);
+        castEnemy.takeDamage(castEnemy.getCurrentHp() - 1);      // leave 1 HP
+        castBattle.castImmediate(castHero.getSkills().get(SkillType.COMMON), castHero, List.of(castEnemy));
+        Event castKill = castProbe.last(KILL);
+
+        Battle additionalBattle = newBattle();
+        Character additionalHero = additionalBattle.characters().getFirst();
+        Enemy additionalEnemy = firstEnemy(additionalBattle);
+        Probe additionalProbe = attachProbe(additionalEnemy);
+        additionalEnemy.takeDamage(additionalEnemy.getCurrentHp() - 1);      // leave 1 HP
+        // Additional damage: notCountsAsAttack, but attributed to the attacker the kill is a fact.
+        additionalBattle.applyAdditionalDamage(additionalHero, additionalEnemy, DamageElement.PHYSICAL, 1000);
+        double hpAfterAdditional = additionalEnemy.getCurrentHp();
+        Event additionalKill = additionalProbe.last(KILL);
+
+        Battle dotBattle = newBattle();
+        Character dotHero = dotBattle.characters().getFirst();
+        Enemy dotEnemy = firstEnemy(dotBattle);
+        Probe dotProbe = attachProbe(dotEnemy);
+        dotEnemy.takeDamage(dotEnemy.getCurrentHp() - 1);      // leave 1 HP
+        dotEnemy.getBuffManager().addBuff(new DotBuff(dotHero, DamageElement.FIRE, 9999, 3));
+        dotBattle.tickDots(dotEnemy);
+        boolean dotDead = dotEnemy.isDeath();
+        Event dotKill = dotProbe.last(KILL);
+
+        Battle trueBattle = newBattle();
+        Character trueHero = trueBattle.characters().getFirst();
+        Enemy trueEnemy = firstEnemy(trueBattle);
+        Probe trueProbe = attachProbe(trueEnemy);
+        trueEnemy.takeDamage(trueEnemy.getCurrentHp() - 1);      // leave 1 HP
+        trueBattle.applyTrueDamage(trueHero, trueEnemy, DamageElement.PHYSICAL, 1000);
+        double hpAfterTrue = trueEnemy.getCurrentHp();
+        Event trueKill = trueProbe.last(KILL);
+
+        Assertions.assertAll(
+                () -> Assertions.assertNotNull(castKill, "a kill must emit KillEvent"),
+                () -> Assertions.assertEquals(castEnemy, castKill.victim(),
+                        "the victim is the killed enemy"),
+                () -> Assertions.assertEquals(castHero, castKill.attacker(),
+                        "the attacker is the one who cast the skill"),
+                () -> Assertions.assertEquals(0, hpAfterAdditional, EPS,
+                        "precondition: the additional damage really finished it off"),
+                () -> Assertions.assertNotNull(additionalKill,
+                        "a kill by additional damage must emit KillEvent too"),
+                () -> Assertions.assertTrue(dotDead, "precondition: the DOT really did kill it"),
+                () -> Assertions.assertNotNull(dotKill,
+                        "a DOT kill emits KillEvent too (same convention as kill energy gain; the original plan's 'does not emit' was wrong)"),
+                () -> Assertions.assertEquals(0, hpAfterTrue, EPS,
+                        "precondition: the true damage really finished it off"),
+                () -> Assertions.assertNotNull(trueKill, "a kill by true damage must emit KillEvent too"));
+    }
+
+    /**
+     * Scenario: one real turn emits the whole event family - the skill-point credit, the cast
+     * before its energy gain, and the turn boundaries still expressed by {@code MoveEvent}.
      *
-     * <p>So here we assert the measured behaviour, and this correction is guarded by
-     * this class.
-     */
-    @Test
-    public void dotKillAlsoFiresKillEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Enemy enemy = firstEnemy(battle);
-        Probe probe = attachProbe(enemy);
-
-        enemy.takeDamage(enemy.getCurrentHp() - 1);      // leave 1 HP
-        enemy.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 9999, 3));
-
-        battle.tickDots(enemy);
-
-        Assertions.assertTrue(enemy.isDeath(), "precondition: the DOT really did kill it");
-        Assertions.assertNotNull(probe.last(KILL),
-                "a DOT kill emits KillEvent too (same convention as kill energy gain; the original plan's 'does not emit' was wrong)");
-    }
-
-    /**
-     * True damage finishing a target off is the same: damage attributed to the attacker kills the target to emit `KillEvent`.
-     */
-    @Test
-    public void trueDamageKillFiresEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Enemy enemy = firstEnemy(battle);
-        Probe probe = attachProbe(enemy);
-
-        enemy.takeDamage(enemy.getCurrentHp() - 1);      // leave 1 HP
-        battle.applyTrueDamage(hero, enemy, DamageElement.PHYSICAL, 1000);
-
-        Assertions.assertEquals(0, enemy.getCurrentHp(), EPS, "precondition: the true damage really finished it off");
-        Assertions.assertNotNull(probe.last(KILL), "a kill by true damage must emit KillEvent too");
-    }
-
-    /**
-     * Give the enemy a huge shield to no HP lost to hence no kill (guards against "does not die before the shield breaks" being bypassed by events).
-     */
-    @Test
-    public void shieldedTargetIsNotReportedAsKilled() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Enemy enemy = firstEnemy(battle);
-        Probe probe = attachProbe(enemy);
-
-        battle.grantShield(enemy, 10_000_000);
-        battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero, List.of(enemy));
-
-        Assertions.assertFalse(enemy.isDeath(), "precondition: the shield held, it is not dead");
-        Assertions.assertEquals(0, probe.count(KILL));
-    }
-
-    // ==================================================================
-    // 6. Skill points: emitted only when really spent/gained
-    // ==================================================================
-
-    /**
-     * Basic attack to skill point +1 to emit `SkillPointEvent.onSkillPointGained`.
-     */
-    @Test
-    public void skillPointGainFiresEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Probe probe = attachProbe(hero);
-
-        Assertions.assertEquals(3, battle.getSkillPoints(), "precondition: 3 points at the start");
-        actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.COMMON),
-                () -> List.of(firstEnemy(battle)));
-
-        Event last = probe.last(SP_GAINED);
-        Assertions.assertNotNull(last, "a basic attack gaining a point must emit the event");
-        Assertions.assertEquals(1, last.amount(), EPS);
-    }
-
-    /**
-     * Skill to skill point -1 to emit `SkillPointEvent.onSkillPointSpent`.
-     */
-    @Test
-    public void skillPointSpendFiresEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Probe probe = attachProbe(hero);
-
-        actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.SKILL),
-                () -> List.of(firstEnemy(battle)));
-
-        Event last = probe.last(SP_SPENT);
-        Assertions.assertNotNull(last, "spending a skill point must emit the event");
-        Assertions.assertEquals(1, last.amount(), EPS);
-    }
-
-    /**
-     * Note: Core boundary: not enough skill points, the action does not go through to do not emit
-     * the spend event.
+     * <p>Ordering note: a single probe cannot compare HP loss with the kill - those go to the
+     * defender, whereas {@code SkillCastEvent}/{@code EnergyEvent} are broadcast to our side.
+     * Forcing both onto one probe yields a vacuously true comparison, so the loss-before-kill
+     * order is asserted in {@link #hpLossScenario()} on the defender's probe instead.
      *
-     * <p>Otherwise Misha's "for every 1 skill point our whole team consumes to next ultimate +1
-     * hit" and Sparkle's "restore 1 extra energy when a skill point is consumed" would book a
-     * consumption that never happened at all.
+     * <p>The turn boundaries are pinned here so that nobody later adds a {@code TurnStartEvent}:
+     * that would be a duplicated abstraction.
      */
     @Test
-    public void failedSkillSpendFiresNoSkillPointSpent() {
+    public void realTurnScenario() {
+        Battle basicBattle = newBattle();
+        Character basicHero = basicBattle.characters().getFirst();
+        Probe basicProbe = attachProbe(basicHero);
+        int[] beforeMoveCount = {0};
+        int[] afterMoveCount = {0};
+        basicHero.beforeMove = () -> beforeMoveCount[0]++;
+        basicHero.afterMove = () -> afterMoveCount[0]++;
+        int skillPointsAtStart = basicBattle.getSkillPoints();
+        actWithRealTurn(basicBattle, basicHero, () -> basicHero.getSkills().get(SkillType.COMMON),
+                () -> List.of(firstEnemy(basicBattle)));
+        Event gained = basicProbe.last(SP_GAINED);
+        int castIndex = basicProbe.indexOf(SKILL_CAST);
+        int energyIndex = basicProbe.indexOf(ENERGY);
+        basicBattle.afterMove();
+        int beforeMoves = beforeMoveCount[0];
+        int afterMoves = afterMoveCount[0];
+
+        Battle spendBattle = newBattle();
+        Character spendHero = spendBattle.characters().getFirst();
+        Probe spendProbe = attachProbe(spendHero);
+        actWithRealTurn(spendBattle, spendHero, () -> spendHero.getSkills().get(SkillType.SKILL),
+                () -> List.of(firstEnemy(spendBattle)));
+        Event spent = spendProbe.last(SP_SPENT);
+
+        Battle cappedBattle = newBattle();
+        Character cappedHero = cappedBattle.characters().getFirst();
+        Probe cappedProbe = attachProbe(cappedHero);
+        cappedBattle.gainSkillPoint(100);                // push it to the cap of 5
+        int pointsAtCap = cappedBattle.getSkillPoints();
+        actWithRealTurn(cappedBattle, cappedHero, () -> cappedHero.getSkills().get(SkillType.COMMON),
+                () -> List.of(firstEnemy(cappedBattle)));
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(3, skillPointsAtStart, "precondition: 3 points at the start"),
+                () -> Assertions.assertNotNull(gained, "a basic attack gaining a point must emit the event"),
+                () -> Assertions.assertEquals(1, gained.amount(), EPS,
+                        "the gain event carries the actual credit of 1"),
+                () -> Assertions.assertTrue(castIndex != Integer.MAX_VALUE,
+                        "this character should receive SkillCastEvent"),
+                () -> Assertions.assertTrue(energyIndex != Integer.MAX_VALUE,
+                        "this character should receive EnergyEvent"),
+                () -> Assertions.assertTrue(castIndex < energyIndex,
+                        "the cast event comes before the energy gain"),
+                () -> Assertions.assertTrue(beforeMoves >= 1, "MoveEvent.beforeMove covers turn start"),
+                () -> Assertions.assertTrue(afterMoves >= 1, "MoveEvent.afterMove covers turn end"),
+                () -> Assertions.assertNotNull(spent, "spending a skill point must emit the event"),
+                () -> Assertions.assertEquals(1, spent.amount(), EPS,
+                        "the spend event carries the actual credit of 1"),
+                () -> Assertions.assertEquals(5, pointsAtCap, "precondition: already full"),
+                () -> Assertions.assertEquals(0, cappedProbe.count(SP_GAINED),
+                        "already full → actual credit 0 → no event emitted"));
+    }
+
+    /**
+     * Scenario: not enough skill points - the action does not go through, so the spend event is
+     * not emitted and the point count does not change.
+     *
+     * <p>Otherwise Misha's "for every 1 skill point our whole team consumes, the next ultimate
+     * gains 1 hit" and Sparkle's "restore 1 extra energy when a skill point is consumed" would
+     * book a consumption that never happened at all.
+     */
+    @Test
+    public void failedSkillSpendScenario() {
         Battle battle = newBattle();
         Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
@@ -441,116 +430,18 @@ public class EventBusTest {
         while (battle.spendSkillPoint()) {
             // drain to zero
         }
-        Assertions.assertEquals(0, battle.getSkillPoints(), "precondition: 0 points");
+        int pointsBefore = battle.getSkillPoints();
 
         boolean acted = actWithoutAfterMove(battle, hero, () -> hero.getSkills().get(SkillType.SKILL),
                 List.of(firstEnemy(battle)));
 
-        Assertions.assertFalse(acted, "precondition: the action does not go through");
-        Assertions.assertEquals(0, probe.count(SP_SPENT), "not spent → do not emit the spend event");
-        Assertions.assertEquals(0, battle.getSkillPoints(), "the point count did not change either");
-    }
-
-    /**
-     * Basic attack while skill points are already full to actual credit 0 to do not emit the gain event.
-     */
-    @Test
-    public void cappedSkillPointsFireNoGainEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Probe probe = attachProbe(hero);
-
-        battle.gainSkillPoint(100);                       // push it to the cap of 5
-        Assertions.assertEquals(5, battle.getSkillPoints(), "precondition: already full");
-
-        actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.COMMON),
-                () -> List.of(firstEnemy(battle)));
-
-        Assertions.assertEquals(0, probe.count(SP_GAINED), "already full → actual credit 0 → no event emitted");
-    }
-
-    // ==================================================================
-    // . Event ordering: which events should a plain "basic attack kills an enemy" emit, and in what order
-    // ==================================================================
-
-    /**
-     * The actual order within one damage instance: the cast comes before the energy gain
-     * (comparable on the same probe, because both are broadcast to that character).
-     *
-     * <p>Note: Lesson: at first I also wanted to assert here that "HP loss comes before the kill",
-     * but a single probe cannot see both - {@code SkillCastEvent}/{@code EnergyEvent} are
-     * broadcast to our side (only received if the probe is attached to the character),
-     * whereas {@code HpLossEvent}/{@code KillEvent} go to the defender (the probe must be
-     * attached to the enemy). Forcing a comparison on one probe yields an assertion that is
-     * always vacuously true (both are {@code MAX_VALUE}, and {@code MAX < MAX} is false to the
-     * test goes red, but red for a reason that is not an engine bug). So it was split into two,
-     * each testing its own thing.
-     */
-    @Test
-    public void skillCastIsBroadcastBeforeEnergyGain() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Probe probe = attachProbe(hero);
-
-        actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.COMMON),
-                () -> List.of(firstEnemy(battle)));
-
-        int cast = probe.indexOf(SKILL_CAST);
-        int energy = probe.indexOf(ENERGY);
-        Assertions.assertTrue(cast != Integer.MAX_VALUE, "this character should receive SkillCastEvent");
-        Assertions.assertTrue(energy != Integer.MAX_VALUE, "this character should receive EnergyEvent");
-        Assertions.assertTrue(cast < energy, "the cast event comes before the energy gain");
-    }
-
-    /**
-     * The defender's point of view: HP loss first, then the kill.
-     *
-     * <p>Both are broadcast to the defender + the killer, so attaching to the enemy lets us
-     * see both at once. Use a low-HP enemy so this basic attack really does kill it.
-     */
-    @Test
-    public void hpLossIsReportedBeforeKill() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        Enemy enemy = firstEnemy(battle);
-        Probe probe = attachProbe(enemy);
-
-        // Push HP down to 1: this basic attack is guaranteed to kill, so both events are produced in the same settlement
-        enemy.takeDamage(enemy.getCurrentHp() - 1);
-        Assertions.assertEquals(1, enemy.getCurrentHp(), EPS, "precondition: only 1 HP left");
-
-        actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.COMMON),
-                () -> List.of(firstEnemy(battle)));
-
-        int loss = probe.indexOf(HP_LOSS);
-        int kill = probe.indexOf(KILL);
-        Assertions.assertTrue(loss != Integer.MAX_VALUE, "the defender should receive HpLossEvent");
-        Assertions.assertTrue(kill != Integer.MAX_VALUE, "the defender should receive KillEvent");
-        Assertions.assertTrue(loss < kill, "within one settlement: HP loss first, then the kill");
-    }
-
-    /**
-     * Turn events are still expressed by the existing {@code MoveEvent} - do not create a
-     * new event for "turn start".
-     *
-     * <p>This is pinned so that nobody later adds a `TurnStartEvent`: that would be a
-     * duplicated abstraction.
-     */
-    @Test
-    public void turnBoundariesAreStillMoveEvent() {
-        Battle battle = newBattle();
-        Character hero = battle.characters().getFirst();
-        int[] beforeMoveCount = {0};
-        int[] afterMoveCount = {0};
-        hero.beforeMove = () -> beforeMoveCount[0]++;
-        hero.afterMove = () -> afterMoveCount[0]++;
-
-        actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.COMMON),
-                () -> List.of(firstEnemy(battle)));
-        battle.afterMove();
-
-        Assertions.assertTrue(beforeMoveCount[0] >= 1, "MoveEvent.beforeMove covers turn start");
-        Assertions.assertTrue(afterMoveCount[0] >= 1, "MoveEvent.afterMove covers turn end");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(0, pointsBefore, "precondition: 0 points"),
+                () -> Assertions.assertFalse(acted, "precondition: the action does not go through"),
+                () -> Assertions.assertEquals(0, probe.count(SP_SPENT),
+                        "not spent → do not emit the spend event"),
+                () -> Assertions.assertEquals(0, battle.getSkillPoints(),
+                        "the point count did not change either"));
     }
 
     // ==================================================================

@@ -27,116 +27,161 @@ import java.util.List;
 public class BattleResultTest {
     private static final double EPS = 1e-9;
 
+    /**
+     * One scenario for the status at the start of a battle: a fresh battle is {@code NOT_STARTED} and not
+     * over, {@code startBattle()} moves it to {@code RUNNING}, and an ordinary move leaves it {@code RUNNING}.
+     *
+     * <p>One scenario because all three clauses read the same object of this class's one fixture - its
+     * status and {@code isOver()} - at successive points of the same lifecycle; nothing but the status moves
+     * between them.
+     */
     @Test
-    public void statusStartsAsNotStarted() {
+    public void statusMovesFromNotStartedToRunningAndStaysRunning() {
         Battle battle = newBattle();
-
-        Assertions.assertEquals(Battle.Status.NOT_STARTED, battle.getStatus());
-        Assertions.assertFalse(battle.isOver(), "it is not over before the battle has started");
-    }
-
-    @Test
-    public void startBattleMovesToRunning() {
-        Battle battle = newBattle();
+        Battle.Status beforeStart = battle.getStatus();
+        boolean overBeforeStart = battle.isOver();
 
         battle.startBattle();
+        Battle.Status afterStart = battle.getStatus();
+        boolean overAfterStart = battle.isOver();
 
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus());
-        Assertions.assertFalse(battle.isOver());
+        battle.stepForward();
+        battle.afterMove();
+        Battle.Status midBattle = battle.getStatus();
+        boolean overMidBattle = battle.isOver();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(Battle.Status.NOT_STARTED, beforeStart,
+                        "before startBattle() the status is NOT_STARTED"),
+                () -> Assertions.assertFalse(overBeforeStart, "it is not over before the battle has started"),
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, afterStart,
+                        "startBattle() moves it to RUNNING"),
+                () -> Assertions.assertFalse(overAfterStart, "a battle that has just started is not over"),
+                () -> Assertions.assertEquals(Battle.Status.RUNNING, midBattle,
+                        "it stays RUNNING until the outcome is decided"),
+                () -> Assertions.assertFalse(overMidBattle,
+                        "one ordinary move does not decide the outcome"));
     }
 
     /**
-     * All enemies wiped out to WIN, and after the terminal state the action bar no longer advances.
+     * One scenario for the winning judgement: all enemies wiped out is a {@code WIN}, a terminal state after
+     * which the action bar no longer advances - and killing our side afterwards does not re-judge it.
+     *
+     * <p>One scenario because both clauses stand on this class's one fixture and on the same premise (enemies
+     * wiped out, one {@code processRequests()} judgement); the second clause only adds the party wipe to prove
+     * the already-decided result is not re-judged.
      */
     @Test
-    public void wipingOutTheEnemiesWinsAndStopsTheClock() {
+    public void wipingOutTheEnemiesWinsAndTheWinIsTerminal() {
         Battle battle = newBattle();
         battle.startBattle();
 
         battle.enemies().getFirst().takeDamage(999_999);
         battle.processRequests();                     // public entry point: triggers death cleanup + judgment
-
-        Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
-        Assertions.assertTrue(battle.isOver());
+        Battle.Status afterWipe = battle.getStatus();
+        boolean overAfterWipe = battle.isOver();
 
         double elapsedBefore = battle.queue().getElapsed();
         battle.stepForward();
         battle.stepForward();
-
-        Assertions.assertEquals(elapsedBefore, battle.queue().getElapsed(), EPS,
-                "after a terminal state stepForward() no longer advances the clock");
-        Assertions.assertNull(battle.currentMove(), "and nobody is at their action point");
-    }
-
-    /**
-     * Our side wiped out to LOSE.
-     */
-    @Test
-    public void wipingOutThePartyLoses() {
-        Battle battle = newBattle();
-        battle.startBattle();
+        double elapsedAfter = battle.queue().getElapsed();
+        var moveAfterTerminal = battle.currentMove();
+        Battle.Status beforePartyWipe = battle.getStatus();
 
         for (Character c : battle.characters()) {
             c.takeDamage(999_999);
         }
         battle.processRequests();
+        Battle.Status afterPartyWipe = battle.getStatus();
 
-        Assertions.assertEquals(Battle.Status.LOSE, battle.getStatus());
-        Assertions.assertTrue(battle.isOver());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(Battle.Status.WIN, afterWipe,
+                        "all enemies wiped out means WIN"),
+                () -> Assertions.assertTrue(overAfterWipe, "a WIN is a terminal state, so it is over"),
+                () -> Assertions.assertEquals(Battle.Status.WIN, beforePartyWipe,
+                        "the WIN already stands when our side falls"),
+                () -> Assertions.assertEquals(elapsedBefore, elapsedAfter, EPS,
+                        "after a terminal state stepForward() no longer advances the clock"),
+                () -> Assertions.assertNull(moveAfterTerminal, "and nobody is at their action point"),
+                () -> Assertions.assertEquals(Battle.Status.WIN, afterPartyWipe,
+                        "the result is decided, it is not re-judged"));
     }
 
     /**
-     * Both sides wiped out at the same time to LOSE (loss is judged before win).
+     * One scenario for the losing judgement: our side wiped out is a {@code LOSE}, and both sides wiped out at
+     * the same instant is a {@code LOSE} too - loss is judged before win.
      *
-     * <p>This rule was set because "at the same time" must have a definite outcome and must not
-     * waver with the order of judgment.
+     * <p>One scenario because both clauses use this class's one fixture and read the same object, the status
+     * after {@code processRequests()}; the second clause only adds the enemy wipe to the same premise, and the
+     * rule exists because "at the same time" must have a definite outcome that does not waver with the order
+     * of judgement.
      */
     @Test
-    public void mutualDestructionIsALoss() {
-        Battle battle = newBattle();
-        battle.startBattle();
-
-        for (Character c : battle.characters()) {
+    public void wipingOutThePartyLosesEvenWhenTheEnemiesFallToo() {
+        Battle partyWiped = newBattle();
+        partyWiped.startBattle();
+        for (Character c : partyWiped.characters()) {
             c.takeDamage(999_999);
         }
-        battle.enemies().getFirst().takeDamage(999_999);
-        battle.processRequests();
+        partyWiped.processRequests();
+        Battle.Status partyWipedStatus = partyWiped.getStatus();
+        boolean partyWipedOver = partyWiped.isOver();
 
-        Assertions.assertEquals(Battle.Status.LOSE, battle.getStatus());
+        Battle bothWiped = newBattle();
+        bothWiped.startBattle();
+        for (Character c : bothWiped.characters()) {
+            c.takeDamage(999_999);
+        }
+        bothWiped.enemies().getFirst().takeDamage(999_999);
+        bothWiped.processRequests();
+        Battle.Status bothWipedStatus = bothWiped.getStatus();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(Battle.Status.LOSE, partyWipedStatus,
+                        "our side wiped out means LOSE"),
+                () -> Assertions.assertTrue(partyWipedOver, "a LOSE is a terminal state, so it is over"),
+                () -> Assertions.assertEquals(Battle.Status.LOSE, bothWipedStatus,
+                        "both sides wiped out at the same time is a LOSE: loss is judged before win"));
     }
 
     /**
-     * Before the battle starts ({@code NOT_STARTED}), not even a full wipe is judged a loss - the
-     * battle has not begun.
+     * Before the battle starts ({@code NOT_STARTED}), not even a full wipe is judged a loss - the battle has
+     * not begun, so there is no outcome to speak of.
      */
     @Test
     public void nothingIsJudgedBeforeTheBattleStarts() {
         Battle battle = newBattle();
         battle.enemies().getFirst().takeDamage(999_999);
+        Battle.Status judged = battle.checkResult();
+        Battle.Status status = battle.getStatus();
 
-        Assertions.assertEquals(Battle.Status.NOT_STARTED, battle.checkResult());
-        Assertions.assertEquals(Battle.Status.NOT_STARTED, battle.getStatus());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(Battle.Status.NOT_STARTED, judged,
+                        "checkResult() judges nothing while the battle is NOT_STARTED"),
+                () -> Assertions.assertEquals(Battle.Status.NOT_STARTED, status,
+                        "and the status is left at NOT_STARTED"));
     }
 
     /**
-     * No reverting from a terminal state: killing someone after a win has already been judged does
-     * not turn it into a LOSE.
+     * The status is per battle instance, not static: a battle that has been won does not leak its terminal
+     * state into the next one.
      */
     @Test
-    public void theResultIsFinal() {
-        Battle battle = newBattle();
-        battle.startBattle();
+    public void statusIsPerBattleInstance() {
+        Battle first = newBattle();
+        first.startBattle();
+        first.enemies().getFirst().takeDamage(999_999);
+        first.processRequests();
+        Battle.Status firstStatus = first.getStatus();
 
-        battle.enemies().getFirst().takeDamage(999_999);
-        battle.processRequests();
-        Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
+        Battle second = newBattle();
+        Battle.Status secondStatus = second.getStatus();
 
-        for (Character c : battle.characters()) {
-            c.takeDamage(999_999);
-        }
-        battle.processRequests();
-
-        Assertions.assertEquals(Battle.Status.WIN, battle.getStatus(), "the result is decided, it is not re-judged");
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(Battle.Status.WIN, firstStatus,
+                        "the first battle is won"),
+                () -> Assertions.assertEquals(Battle.Status.NOT_STARTED, secondStatus,
+                        "the new battle's status is unaffected by the previous one"));
     }
 
     /**
@@ -148,42 +193,10 @@ public class BattleResultTest {
         Battle battle = new Battle(List.of(hero), List.of(), BattleFixture.seeded());
 
         battle.startBattle();
+        Battle.Status status = battle.getStatus();
 
-        Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
-    }
-
-    /**
-     * After one battle finishes the status is terminal, and starting another is independent of it
-     * (the status is not static).
-     */
-    @Test
-    public void statusIsPerBattleInstance() {
-        Battle first = newBattle();
-        first.startBattle();
-        first.enemies().getFirst().takeDamage(999_999);
-        first.processRequests();
-        Assertions.assertEquals(Battle.Status.WIN, first.getStatus());
-
-        Battle second = newBattle();
-
-        Assertions.assertEquals(Battle.Status.NOT_STARTED, second.getStatus(),
-                "the new battle's status is unaffected by the previous one");
-    }
-
-    /**
-     * Fighting a normal battle: the status is RUNNING in the middle and WIN at the end.
-     */
-    @Test
-    public void statusIsRunningWhileTheBattleGoesOn() {
-        Battle battle = newBattle();
-        battle.startBattle();
-
-        battle.stepForward();
-        battle.afterMove();
-
-        Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
-                "it stays RUNNING until the outcome is decided");
-        Assertions.assertFalse(battle.isOver());
+        Assertions.assertEquals(Battle.Status.WIN, status,
+                "an empty enemy side counts as wiped out, so the battle is won at the start");
     }
 
     // ==================================================================

@@ -27,124 +27,42 @@ import java.util.Random;
  *
  * <p>Determinism matters for the same reason: the same seed must reach the same decision, or a
  * failure here would not be reproducible.
+ *
+ * <p><b>L3:</b> the single-clause cases are grouped into the six scenarios below, one
+ * {@code assertAll} per scenario so a failing clause still names itself. The turn-limit cases whose
+ * fixtures differ - an idle hero, a refusing policy - stay their own scenarios instead of sharing an
+ * {@code assertAll}.
  */
 public class BattleDriverTest {
 
     /**
-     * A battle that can actually be won: a real character with a real kit against a killable enemy.
-     */
-    @Test
-    void aBattleAgainstAKillableEnemyIsDecided() {
-        Character hero = CharacterFactory.create(1109, 80, false, null, null, 0);
-        Enemy foe = Enemy.fromAttributes("训练假人", 800, 0, 100, 100);
-
-        BattleDriver.Result result = BattleDriver.of(List.of(hero), List.of(foe), 20260919L).run();
-
-        Assertions.assertTrue(result.isDecided(),
-                "the battle should reach a terminal state, got " + result.outcome()
-                        + " after " + result.turns() + " turns");
-        Assertions.assertEquals(Battle.Status.WIN, result.status(),
-                "a lone hero against one weak enemy should win");
-        Assertions.assertTrue(result.turns() > 0, "at least one turn must have been taken");
-    }
-
-    /**
-     * The driver must not spin forever when neither side can finish the other.
+     * A seeded battle against a killable enemy is decided; the same seed decides it the same way, and a
+     * listener may watch it without changing the outcome.
      *
-     * <p>This is the case a bare "while (!isOver())" loop cannot survive, and the reason the turn
-     * ceiling exists: a unit that cannot die is not a win, it is a hang. The result has to say so
-     * rather than pretend the battle ended.
+     * <p>One scenario because every clause stands on this class's seeded fixture (a real character
+     * against one killable dummy) and reads the same object, the {@code BattleDriver.Result} that run
+     * produces: the decision itself, its reproduction from the same seed, and the fact that observing
+     * the run - the event order, the start/end pairing, and the silent-versus-watched outcome - leaves
+     * it untouched.
      */
     @Test
-    void anUnwinnableBattleStopsAtTheTurnLimitInsteadOfHanging() {
-        // A hero with no skills at all cannot damage anything; the enemy is alive but the hero is the
-        // only unit that will ever act as far as this policy is concerned.
-        Character hero = Character.fromAttributes("无技者", 100000, 0, 100, 100);
-        Enemy foe = Enemy.fromAttributes("不还手的墙", 100000, 0, 100, 100);
+    void aSeededBattleIsDecidedReproduciblyAndListenersDoNotChangeIt() {
+        BattleDriver.Result first = seededBattle().run();
+        BattleDriver.Result second = seededBattle().run();
 
-        BattleDriver driver = new BattleDriver(BattleFixture.battle(List.of(hero), List.of(foe)),
-                new AutoPolicy(), 12);
-        BattleDriver.Result result = driver.run();
+        BattleDriver.Result silent = seededBattle().run();
+        BattleDriver.Result watched = seededBattle()
+                .withListener(new BattleListener() {
+                    @Override
+                    public void onTurnStart(CanHit actor, int turn) {
+                        // a listener that reads state must not perturb the random stream
+                        actor.getName();
+                    }
+                })
+                .run();
 
-        Assertions.assertEquals(BattleDriver.Outcome.TURN_LIMIT, result.outcome(),
-                "an undecidable battle must be reported as a turn limit, not as finished");
-        Assertions.assertFalse(result.isDecided(), "a turn limit is not a decision");
-        Assertions.assertEquals(12, result.turns(), "the ceiling should be honoured exactly");
-    }
-
-    /**
-     * The same seed reaches the same conclusion, so a failure can be reproduced.
-     */
-    @Test
-    void theSameSeedDecidesTheSameWayTwice() {
-        BattleDriver.Result first = BattleDriver.of(
-                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L).run();
-        BattleDriver.Result second = BattleDriver.of(
-                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L).run();
-
-        Assertions.assertEquals(first.status(), second.status(), "status must be reproducible");
-        Assertions.assertEquals(first.turns(), second.turns(), "turn count must be reproducible");
-    }
-
-    /**
-     * A single step plays exactly one turn and leaves the battle usable.
-     *
-     * <p>Stepping is what an interactive client needs, and it must not be a different code path from
-     * running: a step that left the action bar inconsistent would corrupt every later turn.
-     */
-    @Test
-    void oneStepPlaysExactlyOneTurnAndLeavesTheBattleConsistent() {
-        Battle battle = BattleFixture.battle(
-                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                List.of(Enemy.fromAttributes("训练假人", 4000, 0, 100, 100)));
-        BattleDriver driver = new BattleDriver(battle, new AutoPolicy());
-
-        battle.startBattle();
-
-        Assertions.assertTrue(driver.step(), "the first step should find an actor");
-        Assertions.assertFalse(battle.isOver(),
-                "one turn against a healthy enemy must not decide the battle");
-        Assertions.assertTrue(driver.step(), "the second step should also find an actor");
-        Assertions.assertFalse(battle.isOver(), "still undecided after two turns");
-    }
-
-    /**
-     * When the policy declines, the turn still ends -- the action bar must not stall on a refusal.
-     *
-     * <p>A policy that returns {@code null} is saying "I have nothing to do", not "freeze the battle".
-     * Skipping {@code afterMove} would leave the queue unadvanced and the next step would hand the same
-     * unit the same turn forever.
-     */
-    @Test
-    void aPolicyThatAlwaysDeclinesDoesNotStallTheActionBar() {
-        Battle battle = BattleFixture.battle(
-                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                List.of(Enemy.fromAttributes("训练假人", 5000, 0, 100, 100)));
-        SkillPolicy nothing = (b, actor) -> null;
-        BattleDriver driver = new BattleDriver(battle, nothing, 8);
-
-        BattleDriver.Result result = driver.run();
-
-        Assertions.assertEquals(BattleDriver.Outcome.TURN_LIMIT, result.outcome());
-        Assertions.assertEquals(8, result.turns(),
-                "every step must have advanced the bar even though no action was taken");
-    }
-
-    /**
-     * A listener sees every turn, in order, and each start is matched by an end.
-     *
-     * <p>The pairing is the part worth pinning: a front end that reports "X acts" on a start and never
-     * hears the end would leave its own state half-updated, and the driver taking over the loop is
-     * exactly what makes such an omission possible.
-     */
-    @Test
-    void aListenerSeesEveryTurnStartPairedWithAnEnd() {
         List<String> events = new ArrayList<>();
-        BattleDriver driver = BattleDriver.of(
-                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L)
+        BattleDriver.Result observed = seededBattle()
                 .withListener(new BattleListener() {
                     @Override
                     public void onBattleStart(BattleDriver d) {
@@ -170,13 +88,8 @@ public class BattleDriverTest {
                     public void onBattleEnd(BattleDriver.Result result) {
                         events.add("over:" + result.outcome());
                     }
-                });
-
-        BattleDriver.Result result = driver.run();
-
-        Assertions.assertEquals("start", events.getFirst(), "the battle start comes first");
-        Assertions.assertTrue(events.getLast().startsWith("over:"),
-                "the battle end comes last, got " + events.getLast());
+                })
+                .run();
 
         int starts = 0;
         int ends = 0;
@@ -188,35 +101,106 @@ public class BattleDriverTest {
                 ends++;
             }
         }
-        Assertions.assertEquals(result.turns(), starts, "one start per turn taken");
-        Assertions.assertEquals(starts, ends, "every start must be paired with an end");
+        final int startsSeen = starts;
+        final int endsSeen = ends;
+
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(first.isDecided(),
+                        "the battle should reach a terminal state, got " + first.outcome()
+                                + " after " + first.turns() + " turns"),
+                () -> Assertions.assertEquals(Battle.Status.WIN, first.status(),
+                        "a lone hero against one weak enemy should win"),
+                () -> Assertions.assertTrue(first.turns() > 0,
+                        "at least one turn must have been taken"),
+                () -> Assertions.assertEquals(first.status(), second.status(),
+                        "status must be reproducible"),
+                () -> Assertions.assertEquals(first.turns(), second.turns(),
+                        "turn count must be reproducible"),
+                () -> Assertions.assertEquals("start", events.getFirst(),
+                        "the battle start comes first"),
+                () -> Assertions.assertTrue(events.getLast().startsWith("over:"),
+                        "the battle end comes last, got " + events.getLast()),
+                () -> Assertions.assertEquals(observed.turns(), startsSeen,
+                        "one start per turn taken"),
+                () -> Assertions.assertEquals(startsSeen, endsSeen,
+                        "every start must be paired with an end"),
+                () -> Assertions.assertEquals(silent.status(), watched.status(),
+                        "a listener that only reads must not change the status"),
+                () -> Assertions.assertEquals(silent.turns(), watched.turns(),
+                        "narration must not consume the battle's randomness"));
     }
 
     /**
-     * A battle driven with a listener decides exactly as one driven without, so observing cannot
-     * change the outcome.
+     * The driver must not spin forever when neither side can finish the other.
+     *
+     * <p>This is the case a bare "while (!isOver())" loop cannot survive, and the reason the turn
+     * ceiling exists: a unit that cannot die is not a win, it is a hang. The result has to say so
+     * rather than pretend the battle ended.
      */
     @Test
-    void attachingAListenerDoesNotChangeTheOutcome() {
-        BattleDriver.Result silent = BattleDriver.of(
+    void anUnwinnableBattleStopsAtTheTurnLimitInsteadOfHanging() {
+        // A hero with no skills at all cannot damage anything; the enemy is alive but the hero is the
+        // only unit that will ever act as far as this policy is concerned.
+        Character hero = Character.fromAttributes("无技者", 100000, 0, 100, 100);
+        Enemy foe = Enemy.fromAttributes("不还手的墙", 100000, 0, 100, 100);
+
+        BattleDriver driver = new BattleDriver(BattleFixture.battle(List.of(hero), List.of(foe)),
+                new AutoPolicy(), 12);
+        BattleDriver.Result result = driver.run();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(BattleDriver.Outcome.TURN_LIMIT, result.outcome(),
+                        "an undecidable battle must be reported as a turn limit, not as finished"),
+                () -> Assertions.assertFalse(result.isDecided(), "a turn limit is not a decision"),
+                () -> Assertions.assertEquals(12, result.turns(),
+                        "the ceiling should be honoured exactly"));
+    }
+
+    /**
+     * A single step plays exactly one turn and leaves the battle usable.
+     *
+     * <p>Stepping is what an interactive client needs, and it must not be a different code path from
+     * running: a step that left the action bar inconsistent would corrupt every later turn.
+     */
+    @Test
+    void oneStepPlaysExactlyOneTurnAndLeavesTheBattleConsistent() {
+        Battle battle = BattleFixture.battle(
                 List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L).run();
+                List.of(Enemy.fromAttributes("训练假人", 4000, 0, 100, 100)));
+        BattleDriver driver = new BattleDriver(battle, new AutoPolicy());
 
-        BattleDriver.Result watched = BattleDriver.of(
-                        List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                        List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L)
-                .withListener(new BattleListener() {
-                    @Override
-                    public void onTurnStart(CanHit actor, int turn) {
-                        // a listener that reads state must not perturb the random stream
-                        actor.getName();
-                    }
-                })
-                .run();
+        battle.startBattle();
 
-        Assertions.assertEquals(silent.status(), watched.status());
-        Assertions.assertEquals(silent.turns(), watched.turns(),
-                "narration must not consume the battle's randomness");
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(driver.step(), "the first step should find an actor"),
+                () -> Assertions.assertFalse(battle.isOver(),
+                        "one turn against a healthy enemy must not decide the battle"),
+                () -> Assertions.assertTrue(driver.step(), "the second step should also find an actor"),
+                () -> Assertions.assertFalse(battle.isOver(), "still undecided after two turns"));
+    }
+
+    /**
+     * When the policy declines, the turn still ends -- the action bar must not stall on a refusal.
+     *
+     * <p>A policy that returns {@code null} is saying "I have nothing to do", not "freeze the battle".
+     * Skipping {@code afterMove} would leave the queue unadvanced and the next step would hand the same
+     * unit the same turn forever.
+     */
+    @Test
+    void aPolicyThatAlwaysDeclinesDoesNotStallTheActionBar() {
+        Battle battle = BattleFixture.battle(
+                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                List.of(Enemy.fromAttributes("训练假人", 5000, 0, 100, 100)));
+        SkillPolicy nothing = (b, actor) -> null;
+        BattleDriver driver = new BattleDriver(battle, nothing, 8);
+
+        BattleDriver.Result result = driver.run();
+
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(BattleDriver.Outcome.TURN_LIMIT, result.outcome(),
+                        "a refusal-only policy must still be reported as a turn limit"),
+                () -> Assertions.assertEquals(8, result.turns(),
+                        "every step must have advanced the bar even though no action was taken"));
     }
 
     /**
@@ -239,18 +223,12 @@ public class BattleDriverTest {
 
         // A roll drawn for the weighted selector would come from the same stream, so compare like for like.
         BattleDriver driver = new BattleDriver(stepped, new AutoPolicy(0, AutoPolicy.Targeting.FIRST_ALIVE));
-        Assertions.assertTrue(driver.step(), "the turn should be played");
 
-        Assertions.assertEquals(untouched.getRng().nextLong(), stepped.getRng().nextLong(),
-                "deterministic targeting must leave the random stream where the twin left it");
-    }
-
-    private static Battle twinBattle() {
-        return new Battle(
-                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
-                List.of(Enemy.fromAttributes("一号", 3000, 0, 100, 100),
-                        Enemy.fromAttributes("二号", 3000, 0, 100, 100)),
-                new Random(20260919L));
+        Assertions.assertAll(
+                () -> Assertions.assertTrue(driver.step(), "the turn should be played"),
+                () -> Assertions.assertEquals(untouched.getRng().nextLong(),
+                        stepped.getRng().nextLong(),
+                        "deterministic targeting must leave the random stream where the twin left it"));
     }
 
     /**
@@ -261,8 +239,25 @@ public class BattleDriverTest {
         BattleDriver.Result first = deterministicRun();
         BattleDriver.Result second = deterministicRun();
 
-        Assertions.assertEquals(first.status(), second.status());
-        Assertions.assertEquals(first.turns(), second.turns());
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(first.status(), second.status(),
+                        "the status must be reproducible under deterministic targeting"),
+                () -> Assertions.assertEquals(first.turns(), second.turns(),
+                        "the turn count must be reproducible under deterministic targeting"));
+    }
+
+    private static BattleDriver seededBattle() {
+        return BattleDriver.of(
+                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L);
+    }
+
+    private static Battle twinBattle() {
+        return new Battle(
+                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                List.of(Enemy.fromAttributes("一号", 3000, 0, 100, 100),
+                        Enemy.fromAttributes("二号", 3000, 0, 100, 100)),
+                new Random(20260919L));
     }
 
     private static BattleDriver.Result deterministicRun() {
