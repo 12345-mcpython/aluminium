@@ -29,7 +29,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     private static final int GRANT = 20;
     private static final int CYCLE = 3;
     private static final String LAUGH = "笑点";
-    private static final String FLAG = "笑点已触发";
+    private static final String FLAG = "internal:23057/punchline_triggered";
     private static final String COUNT = "internal:23057/basic_count";
 
     private Character wearer;

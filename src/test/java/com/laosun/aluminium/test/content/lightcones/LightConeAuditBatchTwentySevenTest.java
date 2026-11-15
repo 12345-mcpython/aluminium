@@ -35,7 +35,7 @@ public class LightConeAuditBatchTwentySevenTest {
                 - bare.wearer.getAttribute(AttributeType.CRIT_CHANCE).get();
         System.out.println("[23056] 暴击率增量 " + crit + " ; 规则数 " + rules(23056));
         Assertions.assertEquals(0.18, crit, 1e-9, "「暴击率提高 18%」—— 属性给一次");
-        Assertions.assertEquals(3, rules(23056), "开战【影噬】、累计计数、每 4 次付清");
+        Assertions.assertEquals(3, rules(23056), "开战【char:23056/shadow_devour】、累计计数、每 4 次付清");
 
         JsonObject counter = effect(23056, "cone23056_shadow_every4_count", 0);
         System.out.println("[23056] 计数上限 " + counter.get("max_stacks"));
@@ -87,7 +87,7 @@ public class LightConeAuditBatchTwentySevenTest {
         double health = f.wearer.getAttribute(AttributeType.HEALTH).get() - bare.wearer.getAttribute(AttributeType.HEALTH).get();
         System.out.println("[23059] 生命上限增量 " + health + " ; 规则数 " + rules(23059));
         Assertions.assertTrue(health > 0, "「生命上限提高 30%」");
-        Assertions.assertEquals(5, rules(23059), "回合回能、波次重置、【炼狱】、两条暴伤份额");
+        Assertions.assertEquals(5, rules(23059), "回合回能、波次重置、【char:23059/purgatory】、两条暴伤份额");
 
         f.wearer.setCurrentEnergy(0);
         f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
@@ -96,7 +96,7 @@ public class LightConeAuditBatchTwentySevenTest {
         Assertions.assertEquals(20.0, f.wearer.getCurrentEnergy(), 1e-9, "「每个波次可触发 1 次」");
 
         JsonObject purgatory = effect(23059, "cone23059_purgatory", 0);
-        Assertions.assertEquals(2, purgatory.get("turns").getAsInt(), "【炼狱】持续 2 回合");
+        Assertions.assertEquals(2, purgatory.get("turns").getAsInt(), "【char:23059/purgatory】持续 2 回合");
     }
 
     /**

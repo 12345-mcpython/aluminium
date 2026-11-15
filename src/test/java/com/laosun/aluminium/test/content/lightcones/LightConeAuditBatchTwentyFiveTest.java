@@ -105,7 +105,7 @@ public class LightConeAuditBatchTwentyFiveTest {
                 - bare.wearer.getAttribute(AttributeType.EFFECT_HIT_RATE).get(), 1e-9, "「效果命中提高 40%」—— 属性给一次");
 
         JsonObject mark = effect(23047, "cone23047_ensnare", 0);
-        System.out.println("[23047] 魂迷: chance=" + mark.get("base_chance") + " turns=" + mark.get("turns"));
+        System.out.println("[23047] char:23047/soul_bewitched: chance=" + mark.get("base_chance") + " turns=" + mark.get("turns"));
         Assertions.assertEquals(0.8, mark.get("base_chance").getAsDouble(), 1e-12, "「80% 基础概率」");
         Assertions.assertEquals(3, mark.get("turns").getAsInt(), "「持续 3 回合」");
     }

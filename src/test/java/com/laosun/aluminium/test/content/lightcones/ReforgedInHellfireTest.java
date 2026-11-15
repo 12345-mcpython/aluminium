@@ -38,8 +38,8 @@ public class ReforgedInHellfireTest {
     private static final int WEARER = 1210;
     private static final int LEVEL = 80;
     private static final double[] HP = {0.30, 0.375, 0.45, 0.525, 0.60};
-    private static final String MARKER = "23059_wave_energy";
-    private static final String STATE = "炼狱";
+    private static final String MARKER = "internal:23059/wave_energy";
+    private static final String STATE = "char:23059/purgatory";
     // From the merged ReforgedInHellfireConeTest: its own wearer id plus the ally that stands in for "an attacker who is not
     // the wearer". CONE (23059) and LEVEL (80) are shared with the clauses above, so they are not redeclared.
     private static final int CONE_WEARER = 1002;
@@ -105,7 +105,7 @@ public class ReforgedInHellfireTest {
 
         Fixture bare = new Fixture(1, false);
         Assertions.assertEquals(0.0, bare.extraCritDamage(bare.wearer), 1e-9,
-                "no 【炼狱】: nothing");
+                "no 【char:23059/purgatory】: nothing");
     }
 
     /**
@@ -116,7 +116,7 @@ public class ReforgedInHellfireTest {
         Fixture nonCrit = new Fixture(1, true);
         nonCrit.hit(nonCrit.wearer, true);
         Assertions.assertEquals(2.1, nonCrit.critRate, 1e-9,
-                "a crit multiplies by 1 + (0.5 base crit damage + 0.6) - the【炼狱】shares are inside the crit");
+                "a crit multiplies by 1 + (0.5 base crit damage + 0.6) - the【char:23059/purgatory】shares are inside the crit");
 
         Fixture flat = new Fixture(1, true);
         flat.hit(flat.wearer, false);
@@ -155,7 +155,7 @@ public class ReforgedInHellfireTest {
                     new ArrayList<>(List.of(enemy)), BattleFixture.seeded());
             battle.startBattle();
             if (purgatory) {
-                enemy.getBuffManager().addBuff(new StateBuff("炼狱", 2));
+                enemy.getBuffManager().addBuff(new StateBuff("char:23059/purgatory", 2));
             }
         }
 

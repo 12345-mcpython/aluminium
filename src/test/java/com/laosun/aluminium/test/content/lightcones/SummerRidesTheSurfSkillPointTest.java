@@ -26,7 +26,7 @@ public class SummerRidesTheSurfSkillPointTest {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
     private static final int CYCLE = 3;
-    private static final String COUNT = "欢愉技计数";
+    private static final String COUNT = "internal:23064/elation_skill_count";
 
     private Character wearer;
     private Enemy enemy;

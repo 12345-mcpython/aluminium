@@ -31,7 +31,7 @@ public class FlickeringStarsSkillDamageTest {
     private static final int CONE = 23061;
     private static final int LEVEL = 80;
     private static final double BOOST = 0.72;
-    private static final String CROWN = "闪耀王冠";
+    private static final String CROWN = "char:23061/shining_crown";
 
     @Test
     public void theConePinsTheScopeAndTheShare() {

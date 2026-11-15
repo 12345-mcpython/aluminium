@@ -27,8 +27,8 @@ public class DazzledByAFloweryWorldPushTest {
     private static final int LEVEL = 80;
     private static final int THRESHOLD = 4;
     private static final double BURST = 0.2;
-    private static final String SPENT = "本回合消耗";
-    private static final String PUSH = "推流";
+    private static final String SPENT = "internal:23053/spent_this_turn";
+    private static final String PUSH = "char:23053/push_stream";
 
     private Character wearer;
     private Character ally;
@@ -68,7 +68,7 @@ public class DazzledByAFloweryWorldPushTest {
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[23053push] after four spends in one turn: push=" + wearer.getBuffManager().hasState(PUSH)
                 + " party elation +" + allyDelta + " counter=" + wearer.getBuffManager().stacksOf(SPENT));
-        Assertions.assertTrue(wearer.getBuffManager().hasState(PUSH), "four spends in one turn grant 【推流】 (Stream Promo)");
+        Assertions.assertTrue(wearer.getBuffManager().hasState(PUSH), "four spends in one turn grant 【char:23053/push_stream】 (Stream Promo)");
         Assertions.assertEquals(BURST, allyDelta, 1e-9, "and the whole party gains 20% elation damage");
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SPENT), "the counter is cleared by the payout");
     }

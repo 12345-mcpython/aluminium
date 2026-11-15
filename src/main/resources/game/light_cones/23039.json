@@ -12,12 +12,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -43,12 +43,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -69,7 +69,7 @@
       "id": "cone23039_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -86,7 +86,7 @@
       "id": "cone23039_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -108,7 +108,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -123,7 +123,7 @@
       "id": "cone23039_extra_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -140,7 +140,7 @@
       "id": "cone23039_extra_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -164,12 +164,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -195,12 +195,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -221,7 +221,7 @@
       "id": "cone23039_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -238,7 +238,7 @@
       "id": "cone23039_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -260,7 +260,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -275,7 +275,7 @@
       "id": "cone23039_extra_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -292,7 +292,7 @@
       "id": "cone23039_extra_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -316,12 +316,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -347,12 +347,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -373,7 +373,7 @@
       "id": "cone23039_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -390,7 +390,7 @@
       "id": "cone23039_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -412,7 +412,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -427,7 +427,7 @@
       "id": "cone23039_extra_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -444,7 +444,7 @@
       "id": "cone23039_extra_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -468,12 +468,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -499,12 +499,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -525,7 +525,7 @@
       "id": "cone23039_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -542,7 +542,7 @@
       "id": "cone23039_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -564,7 +564,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -579,7 +579,7 @@
       "id": "cone23039_extra_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -596,7 +596,7 @@
       "id": "cone23039_extra_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -620,12 +620,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -651,12 +651,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "血火",
+          "buff": "char:23039/blood_fire",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -677,7 +677,7 @@
       "id": "cone23039_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -694,7 +694,7 @@
       "id": "cone23039_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火 >= 1",
+        "self_stacks:char:23039/blood_fire >= 1",
         "from_category ULTRA"
       ],
       "do": [
@@ -716,7 +716,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "血火超额",
+          "buff": "internal:23039/blood_fire_excess",
           "amount": 1,
           "max_stacks": 1,
           "turns": 1,
@@ -731,7 +731,7 @@
       "id": "cone23039_extra_boost_skill",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category BPSKILL"
       ],
       "do": [
@@ -748,7 +748,7 @@
       "id": "cone23039_extra_boost_ult",
       "when": [
         "actor == self",
-        "self_stacks:血火超额 >= 1",
+        "self_stacks:internal:23039/blood_fire_excess >= 1",
         "from_category ULTRA"
       ],
       "do": [

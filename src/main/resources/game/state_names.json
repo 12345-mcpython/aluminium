@@ -51,14 +51,6 @@
       ]
     },
     {
-      "name": "23059_wave_energy",
-      "owner": "23059",
-      "kind": "char",
-      "used_by": [
-        "23059"
-      ]
-    },
-    {
       "name": "325_30",
       "owner": "325",
       "kind": "char",
@@ -607,6 +599,16 @@
       "key": "char:23038/revelation"
     },
     {
+      "name": "char:23039/blood_fire",
+      "owner": "23039",
+      "kind": "char",
+      "used_by": [
+        "23039"
+      ],
+      "zh": "血火",
+      "key": "char:23039/blood_fire"
+    },
+    {
       "name": "char:23040/farewell_flower",
       "owner": "23040",
       "kind": "char",
@@ -627,6 +629,26 @@
       "key": "char:23044/blazing_sun"
     },
     {
+      "name": "char:23047/soul_bewitched",
+      "owner": "23047",
+      "kind": "char",
+      "used_by": [
+        "23047"
+      ],
+      "zh": "魂迷",
+      "key": "char:23047/soul_bewitched"
+    },
+    {
+      "name": "char:23047/soul_debt",
+      "owner": "23047",
+      "kind": "char",
+      "used_by": [
+        "23047"
+      ],
+      "zh": "魂迷之债",
+      "key": "char:23047/soul_debt"
+    },
+    {
       "name": "char:23049/nightfall",
       "owner": "23049",
       "kind": "char",
@@ -637,6 +659,36 @@
       "key": "char:23049/nightfall"
     },
     {
+      "name": "char:23052/blank",
+      "owner": "23052",
+      "kind": "char",
+      "used_by": [
+        "23052"
+      ],
+      "zh": "空白",
+      "key": "char:23052/blank"
+    },
+    {
+      "name": "char:23052/verse",
+      "owner": "23052",
+      "kind": "char",
+      "used_by": [
+        "23052"
+      ],
+      "zh": "诗行",
+      "key": "char:23052/verse"
+    },
+    {
+      "name": "char:23053/push_stream",
+      "owner": "23053",
+      "kind": "char",
+      "used_by": [
+        "23053"
+      ],
+      "zh": "推流",
+      "key": "char:23053/push_stream"
+    },
+    {
       "name": "char:23054/best_fortune",
       "owner": "23054",
       "kind": "char",
@@ -645,6 +697,36 @@
       ],
       "zh": "上上签",
       "key": "char:23054/best_fortune"
+    },
+    {
+      "name": "char:23056/shadow_devour",
+      "owner": "23056",
+      "kind": "char",
+      "used_by": [
+        "23056"
+      ],
+      "zh": "影噬",
+      "key": "char:23056/shadow_devour"
+    },
+    {
+      "name": "char:23059/purgatory",
+      "owner": "23059",
+      "kind": "char",
+      "used_by": [
+        "23059"
+      ],
+      "zh": "炼狱",
+      "key": "char:23059/purgatory"
+    },
+    {
+      "name": "char:23061/shining_crown",
+      "owner": "23061",
+      "kind": "char",
+      "used_by": [
+        "23061"
+      ],
+      "zh": "闪耀王冠",
+      "key": "char:23061/shining_crown"
     },
     {
       "name": "char:23062/regal_entertainment",
@@ -665,6 +747,26 @@
       ],
       "zh": "新声",
       "key": "char:23063/new_voice"
+    },
+    {
+      "name": "char:23064/outlet",
+      "owner": "23064",
+      "kind": "char",
+      "used_by": [
+        "23064"
+      ],
+      "zh": "风口",
+      "key": "char:23064/outlet"
+    },
+    {
+      "name": "char:23064/trend",
+      "owner": "23064",
+      "kind": "char",
+      "used_by": [
+        "23064"
+      ],
+      "zh": "潮流",
+      "key": "char:23064/trend"
     },
     {
       "name": "char:24004/calculation",
@@ -883,6 +985,16 @@
       "key": "internal:23034/cast_count"
     },
     {
+      "name": "internal:23039/blood_fire_excess",
+      "owner": "23039",
+      "kind": "internal",
+      "used_by": [
+        "23039"
+      ],
+      "zh": "血火超额",
+      "key": "internal:23039/blood_fire_excess"
+    },
+    {
       "name": "internal:23042/iridescence_spent",
       "owner": "23042",
       "kind": "internal",
@@ -903,6 +1015,36 @@
       "key": "internal:23046/skill_layers"
     },
     {
+      "name": "internal:23053/spent_layers",
+      "owner": "23053",
+      "kind": "internal",
+      "used_by": [
+        "23053"
+      ],
+      "zh": "消耗层数",
+      "key": "internal:23053/spent_layers"
+    },
+    {
+      "name": "internal:23053/spent_this_turn",
+      "owner": "23053",
+      "kind": "internal",
+      "used_by": [
+        "23053"
+      ],
+      "zh": "本回合消耗",
+      "key": "internal:23053/spent_this_turn"
+    },
+    {
+      "name": "internal:23056/followups_total",
+      "owner": "23056",
+      "kind": "internal",
+      "used_by": [
+        "23056"
+      ],
+      "zh": "累计追击",
+      "key": "internal:23056/followups_total"
+    },
+    {
       "name": "internal:23057/basic_count",
       "owner": "23057",
       "kind": "internal",
@@ -911,6 +1053,46 @@
       ],
       "zh": "普攻计数",
       "key": "internal:23057/basic_count"
+    },
+    {
+      "name": "internal:23057/punchline_triggered",
+      "owner": "23057",
+      "kind": "internal",
+      "used_by": [
+        "23057"
+      ],
+      "zh": "笑点已触发",
+      "key": "internal:23057/punchline_triggered"
+    },
+    {
+      "name": "internal:23059/wave_energy",
+      "owner": "23059",
+      "kind": "internal",
+      "used_by": [
+        "23059"
+      ],
+      "zh": "23059_wave_energy",
+      "key": "internal:23059/wave_energy"
+    },
+    {
+      "name": "internal:23061/spent_this_turn",
+      "owner": "23061",
+      "kind": "internal",
+      "used_by": [
+        "23061"
+      ],
+      "zh": "本回合消耗",
+      "key": "internal:23061/spent_this_turn"
+    },
+    {
+      "name": "internal:23064/elation_skill_count",
+      "owner": "23064",
+      "kind": "internal",
+      "used_by": [
+        "23064"
+      ],
+      "zh": "欢愉技计数",
+      "key": "internal:23064/elation_skill_count"
     },
     {
       "name": "internal:24000/aeon_layers",
@@ -1502,14 +1684,6 @@
       ]
     },
     {
-      "name": "影噬",
-      "owner": "23056",
-      "kind": "char",
-      "used_by": [
-        "23056"
-      ]
-    },
-    {
       "name": "往昔的涟漪",
       "owner": "1415",
       "kind": "char",
@@ -1603,14 +1777,6 @@
       "kind": "char",
       "used_by": [
         "1215"
-      ]
-    },
-    {
-      "name": "推流",
-      "owner": "23053",
-      "kind": "char",
-      "used_by": [
-        "23053"
       ]
     },
     {
@@ -1792,22 +1958,6 @@
     },
     {
       "name": "本回合消耗",
-      "owner": "23053",
-      "kind": "char",
-      "used_by": [
-        "23053"
-      ]
-    },
-    {
-      "name": "本回合消耗",
-      "owner": "23061",
-      "kind": "char",
-      "used_by": [
-        "23061"
-      ]
-    },
-    {
-      "name": "本回合消耗",
       "owner": "324",
       "kind": "char",
       "used_by": [
@@ -1820,14 +1970,6 @@
       "kind": "battle",
       "key": "elation:elation_degree",
       "en": "Elation"
-    },
-    {
-      "name": "欢愉技计数",
-      "owner": "23064",
-      "kind": "internal",
-      "used_by": [
-        "23064"
-      ]
     },
     {
       "name": "残梦",
@@ -1867,14 +2009,6 @@
       "kind": "char",
       "used_by": [
         "1402"
-      ]
-    },
-    {
-      "name": "消耗层数",
-      "owner": "23053",
-      "kind": "internal",
-      "used_by": [
-        "23053"
       ]
     },
     {
@@ -1918,14 +2052,6 @@
       ]
     },
     {
-      "name": "潮流",
-      "owner": "23064",
-      "kind": "char",
-      "used_by": [
-        "23064"
-      ]
-    },
-    {
       "name": "火种",
       "owner": "1408",
       "kind": "char",
@@ -1956,14 +2082,6 @@
       "kind": "char",
       "used_by": [
         "1014"
-      ]
-    },
-    {
-      "name": "炼狱",
-      "owner": "23059",
-      "kind": "char",
-      "used_by": [
-        "23059"
       ]
     },
     {
@@ -2208,27 +2326,11 @@
       ]
     },
     {
-      "name": "空白",
-      "owner": "23052",
-      "kind": "char",
-      "used_by": [
-        "23052"
-      ]
-    },
-    {
       "name": "笑点",
       "owner": "battle",
       "kind": "battle",
       "key": "elation:punchline",
       "en": "Punchline"
-    },
-    {
-      "name": "笑点已触发",
-      "owner": "23057",
-      "kind": "internal",
-      "used_by": [
-        "23057"
-      ]
     },
     {
       "name": "累计损失",
@@ -2252,14 +2354,6 @@
       "kind": "char",
       "used_by": [
         "1505"
-      ]
-    },
-    {
-      "name": "累计追击",
-      "owner": "23056",
-      "kind": "char",
-      "used_by": [
-        "23056"
       ]
     },
     {
@@ -2477,22 +2571,6 @@
       ]
     },
     {
-      "name": "血火",
-      "owner": "23039",
-      "kind": "char",
-      "used_by": [
-        "23039"
-      ]
-    },
-    {
-      "name": "血火超额",
-      "owner": "23039",
-      "kind": "char",
-      "used_by": [
-        "23039"
-      ]
-    },
-    {
       "name": "行动次数",
       "owner": "1222",
       "kind": "internal",
@@ -2530,14 +2608,6 @@
       "kind": "internal",
       "used_by": [
         "1406"
-      ]
-    },
-    {
-      "name": "诗行",
-      "owner": "23052",
-      "kind": "char",
-      "used_by": [
-        "23052"
       ]
     },
     {
@@ -2669,14 +2739,6 @@
       ]
     },
     {
-      "name": "闪耀王冠",
-      "owner": "23061",
-      "kind": "char",
-      "used_by": [
-        "23061"
-      ]
-    },
-    {
       "name": "间隙织线",
       "owner": "1402",
       "kind": "char",
@@ -2740,14 +2802,6 @@
       ]
     },
     {
-      "name": "风口",
-      "owner": "23064",
-      "kind": "char",
-      "used_by": [
-        "23064"
-      ]
-    },
-    {
       "name": "飞黄",
       "owner": "1220",
       "kind": "char",
@@ -2785,22 +2839,6 @@
       "kind": "internal",
       "used_by": [
         "1014"
-      ]
-    },
-    {
-      "name": "魂迷",
-      "owner": "23047",
-      "kind": "char",
-      "used_by": [
-        "23047"
-      ]
-    },
-    {
-      "name": "魂迷之债",
-      "owner": "23047",
-      "kind": "char",
-      "used_by": [
-        "23047"
       ]
     },
     {

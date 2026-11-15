@@ -6,7 +6,7 @@
       "on": "BATTLE_START",
       "id": "cone23056_shadow",
       "do": [
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.4, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.2, "turns": 3, "target": "all_enemies" }
       ],
@@ -16,9 +16,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4_count",
-      "when": ["self_stacks:累计追击 < 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total < 4.0"],
       "do": [
-        { "op": "ADD_STACK", "buff": "累计追击", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23056/followups_total", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23056 吞没: 使装备者的暴击率提高#1[i]%。战斗开始时或装备者每累计施放#2[i]次追加攻击，使装备者获得【影噬】，持续#3[i]回合。当装备者持有【影噬】时，攻击力提高#4[i]%，并使敌方全体受到的伤害提高#5[i]%，同类效果无法叠加。",
       "_note": "「战斗开始时或每累计 **4 次**追加攻击，获得【影噬】3 回合」—— `BATTLE_START` ＋ `APPLY_BUFF` 与 `FOLLOW_UP` ＋ `ADD_STACK{max_stacks: 4}` → `REMOVE_STACK(4)` ＋ 重新施加 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23056_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（18/21/24/27/30% ✓）⇒ 再写一条会读成两倍 ✗。"
@@ -26,10 +26,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4",
-      "when": ["self_stacks:累计追击 >= 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total >= 4.0"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "累计追击", "amount": 4.0, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "internal:23056/followups_total", "amount": 4.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.4, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.2, "turns": 3, "target": "all_enemies" }
       ],
@@ -42,7 +42,7 @@
       "on": "BATTLE_START",
       "id": "cone23056_shadow",
       "do": [
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.5, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.225, "turns": 3, "target": "all_enemies" }
       ],
@@ -52,9 +52,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4_count",
-      "when": ["self_stacks:累计追击 < 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total < 4.0"],
       "do": [
-        { "op": "ADD_STACK", "buff": "累计追击", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23056/followups_total", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23056 吞没: 使装备者的暴击率提高#1[i]%。战斗开始时或装备者每累计施放#2[i]次追加攻击，使装备者获得【影噬】，持续#3[i]回合。当装备者持有【影噬】时，攻击力提高#4[i]%，并使敌方全体受到的伤害提高#5[i]%，同类效果无法叠加。",
       "_note": "「战斗开始时或每累计 **4 次**追加攻击，获得【影噬】3 回合」—— `BATTLE_START` ＋ `APPLY_BUFF` 与 `FOLLOW_UP` ＋ `ADD_STACK{max_stacks: 4}` → `REMOVE_STACK(4)` ＋ 重新施加 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23056_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（18/21/24/27/30% ✓）⇒ 再写一条会读成两倍 ✗。"
@@ -62,10 +62,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4",
-      "when": ["self_stacks:累计追击 >= 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total >= 4.0"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "累计追击", "amount": 4.0, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "internal:23056/followups_total", "amount": 4.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.5, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.225, "turns": 3, "target": "all_enemies" }
       ],
@@ -78,7 +78,7 @@
       "on": "BATTLE_START",
       "id": "cone23056_shadow",
       "do": [
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.6, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.25, "turns": 3, "target": "all_enemies" }
       ],
@@ -88,9 +88,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4_count",
-      "when": ["self_stacks:累计追击 < 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total < 4.0"],
       "do": [
-        { "op": "ADD_STACK", "buff": "累计追击", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23056/followups_total", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23056 吞没: 使装备者的暴击率提高#1[i]%。战斗开始时或装备者每累计施放#2[i]次追加攻击，使装备者获得【影噬】，持续#3[i]回合。当装备者持有【影噬】时，攻击力提高#4[i]%，并使敌方全体受到的伤害提高#5[i]%，同类效果无法叠加。",
       "_note": "「战斗开始时或每累计 **4 次**追加攻击，获得【影噬】3 回合」—— `BATTLE_START` ＋ `APPLY_BUFF` 与 `FOLLOW_UP` ＋ `ADD_STACK{max_stacks: 4}` → `REMOVE_STACK(4)` ＋ 重新施加 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23056_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（18/21/24/27/30% ✓）⇒ 再写一条会读成两倍 ✗。"
@@ -98,10 +98,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4",
-      "when": ["self_stacks:累计追击 >= 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total >= 4.0"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "累计追击", "amount": 4.0, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "internal:23056/followups_total", "amount": 4.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.6, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.25, "turns": 3, "target": "all_enemies" }
       ],
@@ -114,7 +114,7 @@
       "on": "BATTLE_START",
       "id": "cone23056_shadow",
       "do": [
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.7, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.275, "turns": 3, "target": "all_enemies" }
       ],
@@ -124,9 +124,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4_count",
-      "when": ["self_stacks:累计追击 < 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total < 4.0"],
       "do": [
-        { "op": "ADD_STACK", "buff": "累计追击", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23056/followups_total", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23056 吞没: 使装备者的暴击率提高#1[i]%。战斗开始时或装备者每累计施放#2[i]次追加攻击，使装备者获得【影噬】，持续#3[i]回合。当装备者持有【影噬】时，攻击力提高#4[i]%，并使敌方全体受到的伤害提高#5[i]%，同类效果无法叠加。",
       "_note": "「战斗开始时或每累计 **4 次**追加攻击，获得【影噬】3 回合」—— `BATTLE_START` ＋ `APPLY_BUFF` 与 `FOLLOW_UP` ＋ `ADD_STACK{max_stacks: 4}` → `REMOVE_STACK(4)` ＋ 重新施加 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23056_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（18/21/24/27/30% ✓）⇒ 再写一条会读成两倍 ✗。"
@@ -134,10 +134,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4",
-      "when": ["self_stacks:累计追击 >= 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total >= 4.0"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "累计追击", "amount": 4.0, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "internal:23056/followups_total", "amount": 4.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.7, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.275, "turns": 3, "target": "all_enemies" }
       ],
@@ -150,7 +150,7 @@
       "on": "BATTLE_START",
       "id": "cone23056_shadow",
       "do": [
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.8, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.3, "turns": 3, "target": "all_enemies" }
       ],
@@ -160,9 +160,9 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4_count",
-      "when": ["self_stacks:累计追击 < 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total < 4.0"],
       "do": [
-        { "op": "ADD_STACK", "buff": "累计追击", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23056/followups_total", "amount": 1.0, "max_stacks": 4, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23056 吞没: 使装备者的暴击率提高#1[i]%。战斗开始时或装备者每累计施放#2[i]次追加攻击，使装备者获得【影噬】，持续#3[i]回合。当装备者持有【影噬】时，攻击力提高#4[i]%，并使敌方全体受到的伤害提高#5[i]%，同类效果无法叠加。",
       "_note": "「战斗开始时或每累计 **4 次**追加攻击，获得【影噬】3 回合」—— `BATTLE_START` ＋ `APPLY_BUFF` 与 `FOLLOW_UP` ＋ `ADD_STACK{max_stacks: 4}` → `REMOVE_STACK(4)` ＋ 重新施加 ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone23056_crit`** ✗ —— 「暴击率提高 #1%」**就是光锥自己的** `crit_chance` 属性（18/21/24/27/30% ✓）⇒ 再写一条会读成两倍 ✗。"
@@ -170,10 +170,10 @@
     {
       "on": "FOLLOW_UP",
       "id": "cone23056_shadow_every4",
-      "when": ["self_stacks:累计追击 >= 4.0"],
+      "when": ["self_stacks:internal:23056/followups_total >= 4.0"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "累计追击", "amount": 4.0, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "影噬", "turns": 3, "target": "self" },
+        { "op": "REMOVE_STACK", "buff": "internal:23056/followups_total", "amount": 4.0, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23056/shadow_devour", "turns": 3, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.8, "turns": 3, "target": "self" },
         { "op": "MODIFY_DAMAGE_TAKEN", "percent": 0.3, "turns": 3, "target": "all_enemies" }
       ],

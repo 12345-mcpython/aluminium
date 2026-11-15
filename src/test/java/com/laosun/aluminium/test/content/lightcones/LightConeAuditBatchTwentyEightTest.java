@@ -82,7 +82,7 @@ public class LightConeAuditBatchTwentyEightTest {
                 - bare.wearer.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9, "「暴击率提高 18%」—— 属性给一次");
 
         JsonObject wind = effect(23064, "cone23064_wind_gust", 1);
-        System.out.println("[23064] 风口: speed=" + wind.get("percent"));
+        System.out.println("[23064] char:23064/outlet: speed=" + wind.get("percent"));
         Assertions.assertEquals(0.24, wind.get("percent").getAsDouble(), 1e-12, "「速度提高 24%」");
 
         JsonObject pay = effect(23064, "cone23064_skill_point_per_three_casts", 0);

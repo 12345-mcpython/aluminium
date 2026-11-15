@@ -26,8 +26,8 @@ public class TheFinaleOfALieTest {
     private static final double[] CRIT = {0.18, 0.21, 0.24, 0.27, 0.30};
     private static final double[] ATK = {0.40, 0.50, 0.60, 0.70, 0.80};
     private static final double[] VULN = {0.20, 0.225, 0.25, 0.275, 0.30};
-    private static final String SHADOW = "影噬";
-    private static final String COUNTER = "累计追击";
+    private static final String SHADOW = "char:23056/shadow_devour";
+    private static final String COUNTER = "internal:23056/followups_total";
 
     private Character wearer(int rank) {
         return CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));

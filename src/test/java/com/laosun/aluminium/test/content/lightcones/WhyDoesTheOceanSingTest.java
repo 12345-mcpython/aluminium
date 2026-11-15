@@ -55,14 +55,14 @@ public class WhyDoesTheOceanSingTest {
                     "rank " + rank + ": the effect-hit share reaches the panel");
             var ensnare = table.rulesFor(TriggerEvent.DEBUFF_APPLIED).stream()
                     .filter(r -> r.id().equals("cone23047_ensnare")).toList();
-            Assertions.assertEquals(1, ensnare.size(), "rank " + rank + ": the Enthrallment (魂迷) rule");
-            Assertions.assertEquals(List.of("actor == self", "!target has_state 魂迷"),
+            Assertions.assertEquals(1, ensnare.size(), "rank " + rank + ": the Enthrallment (char:23047/soul_bewitched) rule");
+            Assertions.assertEquals(List.of("actor == self", "!target has_state char:23047/soul_bewitched"),
                     ensnare.getFirst().conditions().stream().map(c -> c.source()).toList(),
                     "rank " + rank + ": only a debuff the WEARER applied, and only while the target is not charmed yet - "
                             + "「同类效果无法叠加」 is also the guard against this rule meeting its own application");
             var m = ensnare.getFirst().effects().getFirst();
             Assertions.assertEquals("APPLY_BUFF", m.getOp());
-            Assertions.assertEquals("魂迷", m.getBuff(), "rank " + rank + ": the state's name");
+            Assertions.assertEquals("char:23047/soul_bewitched", m.getBuff(), "rank " + rank + ": the state's name");
             Assertions.assertEquals(3, m.getTurns(), "rank " + rank + ": three turns");
             Assertions.assertEquals("target", m.getTarget());
             Assertions.assertEquals(0.8, m.getBaseChance(), 1e-9, "rank " + rank + ": an 80% base chance");
@@ -89,13 +89,13 @@ public class WhyDoesTheOceanSingTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.DEBUFF_APPLIED, ally, enemy, 0, 0));
         battle.processRequests();
-        Assertions.assertFalse(enemy.getBuffManager().hasState("魂迷"),
+        Assertions.assertFalse(enemy.getBuffManager().hasState("char:23047/soul_bewitched"),
                 "「装备者施加的负面效果」- a TEAMMATE's debuff does not charm");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.DEBUFF_APPLIED, wearer, enemy, 0, 0));
         battle.processRequests();
-        Assertions.assertTrue(enemy.getBuffManager().hasState("魂迷"),
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:23047/soul_bewitched"),
                 "her own debuff has an 80% base chance, and the generator rolled low");
     }
 
@@ -115,14 +115,14 @@ public class WhyDoesTheOceanSingTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.DEBUFF_APPLIED, wearer, enemy, 0, 0));
         battle.processRequests();
-        Assertions.assertTrue(enemy.getBuffManager().hasState("魂迷"), "precondition: the target is charmed");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:23047/soul_bewitched"), "precondition: the target is charmed");
 
         wearer.takeDamage(wearer.getMaxHp() * 2);
         // Any cast sweeps the dead; the ally's basic is the lever the public API offers.
         battle.castImmediate(ally.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON), ally, List.of(enemy));
         battle.processRequests();
-        Assertions.assertFalse(enemy.getBuffManager().hasState("魂迷"),
-                "「装备者陷入无法战斗状态时，移除所有【魂迷】」");
+        Assertions.assertFalse(enemy.getBuffManager().hasState("char:23047/soul_bewitched"),
+                "「装备者陷入无法战斗状态时，移除所有【char:23047/soul_bewitched】」");
     }
 
     /**
@@ -142,9 +142,9 @@ public class WhyDoesTheOceanSingTest {
                 TriggerEvent.TAKING_HIT, ally, enemy, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(before, ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
-                "no 魂迷 on the target, no speed");
+                "no char:23047/soul_bewitched on the target, no speed");
 
-        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("魂迷", 3));
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:23047/soul_bewitched", 3));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.TAKING_HIT, ally, enemy, 0, 0));
         battle.processRequests();
@@ -183,7 +183,7 @@ public class WhyDoesTheOceanSingTest {
             battle = new Battle(new ArrayList<>(List.of(wearer)), new ArrayList<>(List.of(enemy)),
                     BattleFixture.seeded());
             battle.startBattle();
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("魂迷", 3));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:23047/soul_bewitched", 3));
         }
 
         void applyMyDebuffs(int count) {

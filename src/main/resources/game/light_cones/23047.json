@@ -7,12 +7,12 @@
       "id": "cone23047_ensnare",
       "when": [
         "actor == self",
-        "!target has_state 魂迷"
+        "!target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "魂迷",
+          "buff": "char:23047/soul_bewitched",
           "turns": 3,
           "base_chance": 0.8,
           "target": "target",
@@ -26,12 +26,12 @@
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_dot_taken_per_my_debuff",
       "when": [
-        "target has_state 魂迷"
+        "target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "target": "target"
         },
         {
@@ -40,7 +40,7 @@
           "damage_type": "DOT",
           "per_steps": "target_debuffs_from_self:1",
           "per_steps_cap": 6,
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "permanent": true,
           "target": "target"
         }
@@ -52,7 +52,7 @@
       "on": "TAKING_HIT",
       "id": "cone23047_speed_for_the_attacker",
       "when": [
-        "target has_state 魂迷",
+        "target has_state char:23047/soul_bewitched",
         "actor is_ally"
       ],
       "do": [
@@ -74,12 +74,12 @@
       "id": "cone23047_ensnare",
       "when": [
         "actor == self",
-        "!target has_state 魂迷"
+        "!target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "魂迷",
+          "buff": "char:23047/soul_bewitched",
           "turns": 3,
           "base_chance": 0.8,
           "target": "target",
@@ -93,12 +93,12 @@
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_dot_taken_per_my_debuff",
       "when": [
-        "target has_state 魂迷"
+        "target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "target": "target"
         },
         {
@@ -107,7 +107,7 @@
           "damage_type": "DOT",
           "per_steps": "target_debuffs_from_self:1",
           "per_steps_cap": 6,
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "permanent": true,
           "target": "target"
         }
@@ -119,7 +119,7 @@
       "on": "TAKING_HIT",
       "id": "cone23047_speed_for_the_attacker",
       "when": [
-        "target has_state 魂迷",
+        "target has_state char:23047/soul_bewitched",
         "actor is_ally"
       ],
       "do": [
@@ -141,12 +141,12 @@
       "id": "cone23047_ensnare",
       "when": [
         "actor == self",
-        "!target has_state 魂迷"
+        "!target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "魂迷",
+          "buff": "char:23047/soul_bewitched",
           "turns": 3,
           "base_chance": 0.8,
           "target": "target",
@@ -160,12 +160,12 @@
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_dot_taken_per_my_debuff",
       "when": [
-        "target has_state 魂迷"
+        "target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "target": "target"
         },
         {
@@ -174,7 +174,7 @@
           "damage_type": "DOT",
           "per_steps": "target_debuffs_from_self:1",
           "per_steps_cap": 6,
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "permanent": true,
           "target": "target"
         }
@@ -186,7 +186,7 @@
       "on": "TAKING_HIT",
       "id": "cone23047_speed_for_the_attacker",
       "when": [
-        "target has_state 魂迷",
+        "target has_state char:23047/soul_bewitched",
         "actor is_ally"
       ],
       "do": [
@@ -208,12 +208,12 @@
       "id": "cone23047_ensnare",
       "when": [
         "actor == self",
-        "!target has_state 魂迷"
+        "!target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "魂迷",
+          "buff": "char:23047/soul_bewitched",
           "turns": 3,
           "base_chance": 0.8,
           "target": "target",
@@ -227,12 +227,12 @@
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_dot_taken_per_my_debuff",
       "when": [
-        "target has_state 魂迷"
+        "target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "target": "target"
         },
         {
@@ -241,7 +241,7 @@
           "damage_type": "DOT",
           "per_steps": "target_debuffs_from_self:1",
           "per_steps_cap": 6,
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "permanent": true,
           "target": "target"
         }
@@ -253,7 +253,7 @@
       "on": "TAKING_HIT",
       "id": "cone23047_speed_for_the_attacker",
       "when": [
-        "target has_state 魂迷",
+        "target has_state char:23047/soul_bewitched",
         "actor is_ally"
       ],
       "do": [
@@ -275,12 +275,12 @@
       "id": "cone23047_ensnare",
       "when": [
         "actor == self",
-        "!target has_state 魂迷"
+        "!target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "魂迷",
+          "buff": "char:23047/soul_bewitched",
           "turns": 3,
           "base_chance": 0.8,
           "target": "target",
@@ -294,12 +294,12 @@
       "on": "DEBUFF_APPLIED",
       "id": "cone23047_dot_taken_per_my_debuff",
       "when": [
-        "target has_state 魂迷"
+        "target has_state char:23047/soul_bewitched"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "target": "target"
         },
         {
@@ -308,7 +308,7 @@
           "damage_type": "DOT",
           "per_steps": "target_debuffs_from_self:1",
           "per_steps_cap": 6,
-          "buff": "魂迷之债",
+          "buff": "char:23047/soul_debt",
           "permanent": true,
           "target": "target"
         }
@@ -320,7 +320,7 @@
       "on": "TAKING_HIT",
       "id": "cone23047_speed_for_the_attacker",
       "when": [
-        "target has_state 魂迷",
+        "target has_state char:23047/soul_bewitched",
         "actor is_ally"
       ],
       "do": [

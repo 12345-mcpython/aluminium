@@ -22,10 +22,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23057_laughter_on_self_ult",
-      "when": ["actor == self", "target == self", "self_stacks:笑点已触发 < 1"],
+      "when": ["actor == self", "target == self", "self_stacks:internal:23057/punchline_triggered < 1"],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "笑点", "amount": 20, "target": "self" },
-        { "op": "ADD_STACK", "buff": "笑点已触发", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23057: 「当装备者对自身单体施放终结技时，获得#3[i]点【笑点】。该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。"
@@ -46,7 +46,7 @@
       "when": ["actor == self", "from_category Normal", "self_stacks:internal:23057/basic_count >= 3"],
       "do": [
         { "op": "REMOVE_STACK", "buff": "internal:23057/basic_count", "amount": 3, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "笑点已触发", "amount": 1, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23057: 「该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。⭐与“计数”同事件 ✓：两者合起来的周期是 **#4 次普攻** ✓（第 #4 次先计到满 ✓，随即被本条清零 ✓）。"
@@ -73,10 +73,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23057_laughter_on_self_ult",
-      "when": ["actor == self", "target == self", "self_stacks:笑点已触发 < 1"],
+      "when": ["actor == self", "target == self", "self_stacks:internal:23057/punchline_triggered < 1"],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "笑点", "amount": 25, "target": "self" },
-        { "op": "ADD_STACK", "buff": "笑点已触发", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23057: 「当装备者对自身单体施放终结技时，获得#3[i]点【笑点】。该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。"
@@ -97,7 +97,7 @@
       "when": ["actor == self", "from_category Normal", "self_stacks:internal:23057/basic_count >= 3"],
       "do": [
         { "op": "REMOVE_STACK", "buff": "internal:23057/basic_count", "amount": 3, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "笑点已触发", "amount": 1, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23057: 「该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。⭐与“计数”同事件 ✓：两者合起来的周期是 **#4 次普攻** ✓（第 #4 次先计到满 ✓，随即被本条清零 ✓）。"
@@ -124,10 +124,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23057_laughter_on_self_ult",
-      "when": ["actor == self", "target == self", "self_stacks:笑点已触发 < 1"],
+      "when": ["actor == self", "target == self", "self_stacks:internal:23057/punchline_triggered < 1"],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "笑点", "amount": 30, "target": "self" },
-        { "op": "ADD_STACK", "buff": "笑点已触发", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23057: 「当装备者对自身单体施放终结技时，获得#3[i]点【笑点】。该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。"
@@ -148,7 +148,7 @@
       "when": ["actor == self", "from_category Normal", "self_stacks:internal:23057/basic_count >= 3"],
       "do": [
         { "op": "REMOVE_STACK", "buff": "internal:23057/basic_count", "amount": 3, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "笑点已触发", "amount": 1, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23057: 「该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。⭐与“计数”同事件 ✓：两者合起来的周期是 **#4 次普攻** ✓（第 #4 次先计到满 ✓，随即被本条清零 ✓）。"
@@ -175,10 +175,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23057_laughter_on_self_ult",
-      "when": ["actor == self", "target == self", "self_stacks:笑点已触发 < 1"],
+      "when": ["actor == self", "target == self", "self_stacks:internal:23057/punchline_triggered < 1"],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "笑点", "amount": 35, "target": "self" },
-        { "op": "ADD_STACK", "buff": "笑点已触发", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23057: 「当装备者对自身单体施放终结技时，获得#3[i]点【笑点】。该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。"
@@ -199,7 +199,7 @@
       "when": ["actor == self", "from_category Normal", "self_stacks:internal:23057/basic_count >= 3"],
       "do": [
         { "op": "REMOVE_STACK", "buff": "internal:23057/basic_count", "amount": 3, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "笑点已触发", "amount": 1, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23057: 「该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。⭐与“计数”同事件 ✓：两者合起来的周期是 **#4 次普攻** ✓（第 #4 次先计到满 ✓，随即被本条清零 ✓）。"
@@ -226,10 +226,10 @@
     {
       "on": "ULT_CAST",
       "id": "cone23057_laughter_on_self_ult",
-      "when": ["actor == self", "target == self", "self_stacks:笑点已触发 < 1"],
+      "when": ["actor == self", "target == self", "self_stacks:internal:23057/punchline_triggered < 1"],
       "do": [
         { "op": "GAIN_RESOURCE", "resource": "笑点", "amount": 40, "target": "self" },
-        { "op": "ADD_STACK", "buff": "笑点已触发", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "max_stacks": 1, "permanent": true, "target": "self" }
       ],
       "source": "光锥 23057: 「当装备者对自身单体施放终结技时，获得#3[i]点【笑点】。该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。"
@@ -250,7 +250,7 @@
       "when": ["actor == self", "from_category Normal", "self_stacks:internal:23057/basic_count >= 3"],
       "do": [
         { "op": "REMOVE_STACK", "buff": "internal:23057/basic_count", "amount": 3, "target": "self" },
-        { "op": "REMOVE_STACK", "buff": "笑点已触发", "amount": 1, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "internal:23057/punchline_triggered", "amount": 1, "target": "self" }
       ],
       "source": "光锥 23057: 「该效果最多触发1次，施放#4[i]次普攻后重置可触发次数。」",
       "_note": "⭐ 本句今天就能完整表达 ✓：语料里已有 **`self_stacks:<NAME>`** ✓（引擎自带的参数化变量 ✓，第 1249-1257 行 ✓）⇒ **不需要新能力** ✓。写法：三条规则 ✓：① `ULT_CAST` + `target == self` + `self_stacks:笑点已触发 < 1` ⇒ **授予** ✓；② `ALLY_ATTACK` + `from_category Normal` + `self_stacks:普攻计数 < #4-1` ⇒ **计数** ✓；③ 同事件 + `self_stacks:普攻计数 >= #4-1` ⇒ **重置**（清零计数并重新开放触发 ✓）。⭐ 为什么可以这么写 ✓：两条正好互斥 ✓（`< #4-1` 与 `>= #4-1` ✓）⇒ 第 3 次普攻只走重置那条 ✓，不会出现\"先清后加\"的顺序问题 ✓。⚠ 一处口径 ✗：「**单体**」的**形状**层仍无谓词 ✗（一个包含自身的**群体**终结技也会算 ✗）—— 已在注记里写明 ✓。⚠ 「20 点」的**声明**由本光锥自己给出 ✓（第 24 轮做的能力 ✓）。⭐与“计数”同事件 ✓：两者合起来的周期是 **#4 次普攻** ✓（第 #4 次先计到满 ✓，随即被本条清零 ✓）。"

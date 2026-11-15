@@ -63,8 +63,8 @@ public class SummerRidesTheSurfTest {
         double base = wearer.getAttribute(AttributeType.SPEED).get();
         cast(battle, SkillCategory.ELATION_DAMAGE);
         double delta = wearer.getAttribute(AttributeType.SPEED).get() - base;
-        boolean state = wearer.getBuffManager().hasState("风口");
-        System.out.println("[23064] after an elation cast: speed +" + delta + " (base " + base + ") has Updraft (风口)=" + state);
+        boolean state = wearer.getBuffManager().hasState("char:23064/outlet");
+        System.out.println("[23064] after an elation cast: speed +" + delta + " (base " + base + ") has Updraft (char:23064/outlet)=" + state);
         Assertions.assertTrue(state, "the state itself is granted");
         Assertions.assertEquals(base * 0.24, delta, 1e-6, "and it is +24% SPEED (a share of the base)");
     }
@@ -76,7 +76,7 @@ public class SummerRidesTheSurfTest {
         cast(battle, SkillCategory.ULTRA);
         System.out.println("[23064] after an ULTRA cast: speed delta="
                 + (wearer.getAttribute(AttributeType.SPEED).get() - base));
-        Assertions.assertFalse(wearer.getBuffManager().hasState("风口"), "the clause names an ELATION skill");
+        Assertions.assertFalse(wearer.getBuffManager().hasState("char:23064/outlet"), "the clause names an ELATION skill");
         Assertions.assertEquals(base, wearer.getAttribute(AttributeType.SPEED).get(), 1e-9, "false case");
     }
 
@@ -93,7 +93,7 @@ public class SummerRidesTheSurfTest {
                     states++;
                     System.out.println("[23064] spec state=" + effect.getBuff() + " turns=" + effect.getTurns()
                             + " permanent=" + effect.getPermanent());
-                    Assertions.assertEquals("风口", effect.getBuff(), "the document's name for the state");
+                    Assertions.assertEquals("char:23064/outlet", effect.getBuff(), "the document's name for the state");
                     Assertions.assertEquals(Boolean.TRUE, effect.getPermanent(), "no duration upstream");
                 } else if ("MODIFY_ATTR".equals(effect.getOp())) {
                     modifiers++;
@@ -121,7 +121,7 @@ public class SummerRidesTheSurfTest {
     public void anElationCastGrantsTideAndItsElationShare() {
         Fixture f = new Fixture(1);
         f.cast(SkillType.ELATION_SKILL);
-        Assertions.assertTrue(f.wearer.getBuffManager().hasState("潮流"), "「额外获得【潮流】」");
+        Assertions.assertTrue(f.wearer.getBuffManager().hasState("char:23064/trend"), "「额外获得【char:23064/trend】」");
         double withoutCone = bareElation();
         Assertions.assertEquals(0.4, f.elation() - withoutCone, 1e-9, "S1 #3 = 40% on top of the kit basis");
         f.cast(SkillType.ELATION_SKILL);

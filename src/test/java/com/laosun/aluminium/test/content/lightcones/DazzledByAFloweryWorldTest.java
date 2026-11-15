@@ -86,7 +86,7 @@ public class DazzledByAFloweryWorldTest {
         spend(battle, 2);
         double capped = hit(battle, DamageType.ELATION);
         System.out.println("[23053] none=" + none + " one=" + one + " four=" + four + " after six=" + capped
-                + " layers=" + wearer.getBuffManager().stacksOf("消耗层数"));
+                + " layers=" + wearer.getBuffManager().stacksOf("internal:23053/spent_layers"));
         Assertions.assertTrue(one > none, "one spent point must raise the settled elation damage");
         // The VALUE, not just the direction (discipline 189): the settled damage is `base / (effDef + 200 + 10L)`, and
         // the ignore multiplies effDef. Everything here comes from the engine's own numbers, so a wrong `percent` has to
@@ -104,7 +104,7 @@ public class DazzledByAFloweryWorldTest {
         }
         Assertions.assertTrue(four > one, "and four must raise it further (" + PER_POINT + " per layer)");
         Assertions.assertEquals(four, capped, 1e-9, "but the clause caps at " + CAP + " layers");
-        Assertions.assertEquals(CAP, wearer.getBuffManager().stacksOf("消耗层数"), "counter at the cap");
+        Assertions.assertEquals(CAP, wearer.getBuffManager().stacksOf("internal:23053/spent_layers"), "counter at the cap");
     }
 
     @Test

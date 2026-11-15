@@ -24,7 +24,7 @@ import java.util.List;
 public class OneTurnCounterProbeTest {
     private static final int UNIT = 1205;
     private static final int LEVEL = 80;
-    private static final String COUNT = "本回合消耗";
+    private static final String COUNT = "internal:23061/spent_this_turn";
 
     private static EffectSpec oneTurnCounter() {
         EffectSpec stack = new EffectSpec();

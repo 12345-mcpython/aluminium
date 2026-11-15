@@ -25,8 +25,8 @@ public class FlickeringStarsTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int THRESHOLD = 4;
-    private static final String SPENT = "本回合消耗";
-    private static final String CROWN = "闪耀王冠";
+    private static final String SPENT = "internal:23061/spent_this_turn";
+    private static final String CROWN = "char:23061/shining_crown";
 
     private Character wearer;
     private Character ally;

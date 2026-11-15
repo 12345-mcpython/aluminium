@@ -99,8 +99,8 @@ public class LightConeAuditBatchTwentySixTest {
     public void coneTwoThreeFiveTwoBlankAndPoem() {
         JsonObject blank = effect(23052, "cone23052_blank_on_ally", 1);
         JsonObject poem = effect(23052, "cone23052_poem_on_enemy", 1);
-        System.out.println("[23052] 空白: damage_taken=" + blank.get("percent") + " target=" + blank.get("target")
-                + " ; 诗行: crit_damage=" + poem.get("percent") + " target=" + poem.get("target"));
+        System.out.println("[23052] char:23052/blank: damage_taken=" + blank.get("percent") + " target=" + blank.get("target")
+                + " ; char:23052/verse: crit_damage=" + poem.get("percent") + " target=" + poem.get("target"));
         Assertions.assertEquals(0.1, blank.get("percent").getAsDouble(), 1e-12, "「敌方全体受到的伤害提高 10%」");
         Assertions.assertEquals("all_enemies", blank.get("target").getAsString(), "「**敌方全体**」");
         Assertions.assertEquals(0.16, poem.get("percent").getAsDouble(), 1e-12, "「我方全体暴击伤害提高 16%」");
@@ -116,10 +116,10 @@ public class LightConeAuditBatchTwentySixTest {
         JsonObject ignore = effect(23053, "cone23053_def_ignore_per_stack", 0);
         System.out.println("[23053] 无视防御: per_stack=" + ignore.get("per_stack") + " damage_type=" + ignore.get("damage_type")
                 + " percent=" + ignore.get("percent"));
-        Assertions.assertEquals("self_stacks:消耗层数", ignore.get("per_stack").getAsString(), "「**每消耗 1 个**战技点」");
+        Assertions.assertEquals("self_stacks:internal:23053/spent_layers", ignore.get("per_stack").getAsString(), "「**每消耗 1 个**战技点」");
         Assertions.assertEquals("ELATION", ignore.get("damage_type").getAsString(), "只对**欢愉伤害**");
         JsonObject pay = effect(23053, "cone23053_turn_spend_pays_out", 2);
-        System.out.println("[23053] 推流: elation boost=" + pay.get("percent") + " target=" + pay.get("target"));
+        System.out.println("[23053] char:23053/push_stream: elation boost=" + pay.get("percent") + " target=" + pay.get("target"));
         Assertions.assertEquals(0.2, pay.get("percent").getAsDouble(), 1e-12, "「我方全体欢愉度提高 20%」");
         Assertions.assertEquals("all_allies", pay.get("target").getAsString(), "「我方全体」");
     }
