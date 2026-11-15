@@ -47,10 +47,10 @@ public class PearlKitTest {
     private static final int ALLY = 1204;
     private static final int LEVEL = 80;
     private static final String COUNTER = "好活当赏";
-    private static final String CHARGE = "充能";
-    private static final String DEEP = "深度学习";
-    private static final String MARK = "美学底本";
-    private static final String ARCHETYPE = "美学底本";
+    private static final String CHARGE = "char:1503/charge";
+    private static final String DEEP = "char:1503/deep_learning";
+    private static final String MARK = "char:1503/aesthetic_original";
+    private static final String ARCHETYPE = "char:1503/aesthetic_original";
     private static final String PUNCHLINE = "笑点";
     private static final double INSIGHT_ELATION = 0.32;
     private static final double PER_POINT_OVER = 0.0003;
@@ -80,11 +80,11 @@ public class PearlKitTest {
         System.out.println("[pearl_formA] slot-8 damage with the archetype's Attack at 3000 = " + strong
                 + " ; at 1000 = " + weak);
 
-        Assertions.assertAll("「使用【美学底本】的属性值计算」",
+        Assertions.assertAll("「使用【char:1503/aesthetic_original】的属性值计算」",
                 () -> Assertions.assertTrue(without > 0,
                         "[the instance] the slot-8 enhanced basic deals damage at all"),
                 () -> Assertions.assertTrue(withBoost > without,
-                        "[the 欢愉度] the extra instance reads the ARCHETYPE's 欢愉度 (「使用【美学底本】的属性值计算」): "
+                        "[the 欢愉度] the extra instance reads the ARCHETYPE's 欢愉度 (「使用【char:1503/aesthetic_original】的属性值计算」): "
                                 + withBoost + " vs " + without),
                 () -> Assertions.assertEquals(weak, strong, 1e-6,
                         "[the Attack] 欢愉伤害 has no attack-power term, so the archetype's Attack cannot move this"
@@ -101,7 +101,7 @@ public class PearlKitTest {
         System.out.println("[pearl_formA] slot-9 (non-Elation archetype): 欢愉度+100%/Attack 3000 = " + boosted
                 + " ; +0%/Attack 1000 = " + plain);
         Assertions.assertEquals(plain, boosted, 1e-6,
-                "「若【美学底本】为「欢愉」命途」: the other form's sentence has no extra damage, so neither the "
+                "「若【char:1503/aesthetic_original】为「欢愉」命途」: the other form's sentence has no extra damage, so neither the "
                         + "archetype's 欢愉度 nor its Attack can move the number");
     }
 
@@ -291,7 +291,7 @@ public class PearlKitTest {
         attack(lifetime, pearl);
         int charges = pearl.getResources().value(CHARGE);
         boolean afterThree = pearl.getBuffManager().hasState(DEEP);
-        System.out.println("[pearl_charge] 深度学习 after 1 / 2 / 3 enhanced basics: " + afterOne + " / " + afterTwo
+        System.out.println("[pearl_charge] char:1503/deep_learning after 1 / 2 / 3 enhanced basics: " + afterOne + " / " + afterTwo
                 + " / " + afterThree + " (charges " + charges + ")");
 
         Battle reEntry = counterBattle(HUNTER);
@@ -307,12 +307,12 @@ public class PearlKitTest {
         System.out.println("[pearl_charge] after spending two: " + spentTwoLeft + " (state up: " + stillDeep
                 + ") ; after re-entering the state: " + afterReEntry);
 
-        Assertions.assertAll("「行动结束后若充能不足则【深度学习】结束」",
+        Assertions.assertAll("「行动结束后若充能不足则【char:1503/deep_learning】结束」",
                 () -> Assertions.assertTrue(afterOne, "[the lifetime] two charges left, so it lasts"),
                 () -> Assertions.assertTrue(afterTwo, "[the lifetime] one left, so it still lasts"),
                 () -> Assertions.assertEquals(0, charges, "[the lifetime] and the third spends the last one"),
                 () -> Assertions.assertFalse(afterThree,
-                        "[the lifetime] 「行动结束后若充能不足则【深度学习】结束」"),
+                        "[the lifetime] 「行动结束后若充能不足则【char:1503/deep_learning】结束」"),
                 () -> Assertions.assertEquals(1, spentTwoLeft, "[the re-entry] precondition: two charges were spent"),
                 () -> Assertions.assertTrue(stillDeep,
                         "[the re-entry] precondition: the state is still up, so its counter is not empty"),
@@ -450,13 +450,13 @@ public class PearlKitTest {
                 + " ; her counter " + pearl.getResources().value(COUNTER));
 
         Assertions.assertTrue(archetype.getBuffManager().hasState(MARK),
-                "「使用秘技后获得【美学底本】」: the mark is on the unit the caller named");
+                "「使用秘技后获得【char:1503/aesthetic_original】」: the mark is on the unit the caller named");
         Assertions.assertTrue(archetype.getBuffManager().hasState(DEEP),
-                "「并【深度学习】持有【美学底本】的角色」: 深度学习 lands on the HOLDER");
+                "「并【char:1503/deep_learning】持有【char:1503/aesthetic_original】的角色」: char:1503/deep_learning lands on the HOLDER");
         Assertions.assertFalse(other.getBuffManager().hasState(DEEP),
                 "and not on the rest of the party - the clause names one unit");
         Assertions.assertFalse(pearl.getBuffManager().hasState(DEEP),
-                "「真珠只能【深度学习】除自身以外的角色」");
+                "「真珠只能【char:1503/deep_learning】除自身以外的角色」");
         Assertions.assertEquals(20, pearl.getResources().value(COUNTER), "and she gets her 20 points");
     }
 
@@ -482,13 +482,13 @@ public class PearlKitTest {
 
         Assertions.assertAll("the 秘技 gate",
                 () -> Assertions.assertFalse(deep,
-                        "[the gate] 「并【深度学习】持有【美学底本】的角色」 is gated on the 秘技 marker, which is not"
+                        "[the gate] 「并【char:1503/deep_learning】持有【char:1503/aesthetic_original】的角色」 is gated on the 秘技 marker, which is not"
                                 + " there"),
                 () -> Assertions.assertEquals(0, counter, "[the counter] and no counter either"),
                 () -> Assertions.assertTrue(marked,
-                        "[the mark] the unit the caller named holds 【美学底本】 - that IS the map's answer"),
+                        "[the mark] the unit the caller named holds 【char:1503/aesthetic_original】 - that IS the map's answer"),
                 () -> Assertions.assertFalse(deep,
-                        "[the mark] while 深度学习 still needs the technique rule, whose gate is the 秘技 marker"));
+                        "[the mark] while char:1503/deep_learning still needs the technique rule, whose gate is the 秘技 marker"));
     }
 
     /**
@@ -539,7 +539,7 @@ public class PearlKitTest {
 
         Assertions.assertNotNull(atFour, "four Elation allies owe the archetype an extra turn");
         Assertions.assertEquals(HUNTER, atFour.getCid(),
-                "and that extra turn belongs to 【美学底本】 - the ally the Ultimate aimed at, not to Pearl");
+                "and that extra turn belongs to 【char:1503/aesthetic_original】 - the ally the Ultimate aimed at, not to Pearl");
         Assertions.assertNull(atThree, "three Elation allies are one short of the extra turn");
     }
 
@@ -606,7 +606,7 @@ public class PearlKitTest {
                 () -> Assertions.assertEquals(0, left, "[the removal] the granted 30 is removed"),
                 () -> Assertions.assertEquals(60, partyLost, "[the removal] and so is the granted 60"),
                 () -> Assertions.assertEquals(0, unmarkedGain,
-                        "[the gate] only 【美学底本】's extra turn pays: the clause gates on the mark"));
+                        "[the gate] only 【char:1503/aesthetic_original】's extra turn pays: the clause gates on the mark"));
     }
 
     /**
@@ -806,7 +806,7 @@ public class PearlKitTest {
             battle.processRequests();
             if (keepHerKit) {
                 Assertions.assertTrue(her.getBuffManager().hasState(DEEP), "precondition: she is deep-studying");
-                Assertions.assertFalse(her.getBuffManager().hasState("美学底本"),
+                Assertions.assertFalse(her.getBuffManager().hasState("char:1503/aesthetic_original"),
                         "precondition: the archetype mark went to the AIM, not to her - otherwise this judge cannot"
                                 + " tell the two gates apart");
             }

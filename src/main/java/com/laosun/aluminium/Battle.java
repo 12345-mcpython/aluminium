@@ -3737,7 +3737,7 @@ public class Battle {
         CanHit archetype = preBattle.archetypeHolder();
         if (archetype != null && !archetype.isDeath()) {
             archetype.getBuffManager()
-                    .addBuff(new com.laosun.aluminium.buff.StateBuff("美学底本", 1, true));
+                    .addBuff(new com.laosun.aluminium.buff.StateBuff("char:1503/aesthetic_original", 1, true));
         }
     }
 

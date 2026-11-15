@@ -4,7 +4,7 @@
   "_status": "implemented",
   "resources": [
     {
-      "id": "气氛值",
+      "id": "char:1512/atmosphere",
       "max": 50,
       "source": "1512 知更鸟•晴歌 天赋 巡游在无界的天空 (151204): 「…知更鸟•晴歌获得1点气氛值，上限50点。」",
       "note": "上限 **50** 是**文档原话** ✓。⚠ 本文件只声明**容量** ✓ 与三处**固定**获取（秘技 +6 ✓、战技 +6 ✓、终结技的 +2 ✗ 未写 ✓）；天赋那条\"每有攻击/首次治疗护盾 +1\"✗ 未写（见 `skill_summon_and_vibes` 的注释 ✓）⇒ 运行时气氛值**只增不减且少于文档** ✓，这一点写在注释里而不是藏起来 ✓。 ⭐ **2026-10-18**：作用域改为 **`PARTY`** ✓ —— 天赋的【Fever】结界要按**当前气氛值**给**全队**算\"无视防御\"（`scale: party_resource:气氛值` ✓ 只读全队计数器 ✓），而这只计数器只有她自己在加 ✓，所以改成队级既符合文档语义、又让 `party_resource:` 读得到 ✓。 ⭐ 2026-10-18：作用域改为 **`PARTY`**（Fever 结界要按当前气氛值给**全队**算无视防御，`party_resource:` 只读队级计数器 ✓）。\n\n⚠⚠ **登记（不是实现）**：天赋 151204 的【Fever】结界 ——「结界内我方目标造成伤害时无视敌方目标（#8% + 气氛值…#9%）的防御力」，`param = [0.7, 1.8, 0, 0, 50, 6, 12, **0.15**, **0.005**]` ⇒ 无视防御 = **15% + 0.5% × 气氛值**、气氛值上限 50 ⇒ 封顶 **40%** ✓。⭐ 这条**已被整场捕获实测证实**：捕获里反解出的有效 DEF 恰好是 `1150 × {0.775, 0.77, 0.76, 0.725, 0.71, 0.705, 0.685, 0.6}`，即无视防御 22.5% / 23% / 24% / 27.5% / 29% / 29.5% / 31.5% / 40% —— 正是这条公式在气氛值 15 / 16 / 18 / 25 / 28 / 29 / 33 / 50 时的值 ✓✓。✗ **为什么还没写成规则**：`MODIFY_ATTR` 一旦带 `scale`，引擎就把数值当**绝对值**（`absolute = scaled`），而 `DEFENCE_IGNORE` 是**份额**型属性 ⇒ 实测 `amount 0.15 + percent 0.005 × 气氛值` 落在 0.15 **点**（= 0.15%）而不是 15% ✗，偏了 100 倍 ✓（判据 `FeverDefenceIgnoreTest` 量出来的比值 1.0026 对 1.1336 ✓）。⇒ **引擎缺口**：需要让**份额型属性**也能用 `scale` 表达（\"基准份额 + 每单位资源\"），补上之后这条规则原样就能写 ✓。另：文档的门槛是「**当「晴空乐手」全员登台后**…进入【Fever】状态」✗ —— 引擎目前只能召唤一只忆灵 ✗。",
@@ -13,7 +13,7 @@
 
     ,
     {
-      "id": "记录",
+      "id": "internal:1512/record",
       "max": 2147483647,
       "initial": 0,
       "source": "1512 知更鸟•晴歌 星魂 1 夏日离群飞鸟: 「「晴空乐手」会记录我方目标造成的非真实伤害的100%…」",
@@ -66,7 +66,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 6
         },
         {
@@ -105,7 +105,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 6
         }
       ],
@@ -128,7 +128,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "Fever"
+            "state": "char:1512/fever"
           }
         }
       ],
@@ -138,7 +138,7 @@
           "attribute": "DEFENCE_IGNORE",
           "percent": 0.005,
           "cap_amount": 0.4,
-          "scale": "party_resource:气氛值",
+          "scale": "party_resource:char:1512/atmosphere",
           "instance": true,
           "turns": 1,
           "target": "actor",
@@ -164,7 +164,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "Fever"
+            "state": "char:1512/fever"
           }
         }
       ],
@@ -174,7 +174,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.028,
           "amount": 0.84,
-          "scale": "party_resource:气氛值",
+          "scale": "party_resource:char:1512/atmosphere",
           "turns": 1,
           "target": "actor",
           "instance": true
@@ -199,7 +199,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "Fever"
+            "state": "char:1512/fever"
           }
         }
       ],
@@ -209,7 +209,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.028,
           "amount": 0.84,
-          "scale": "party_resource:气氛值",
+          "scale": "party_resource:char:1512/atmosphere",
           "instance": true,
           "turns": 1,
           "target": "actor"
@@ -329,7 +329,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "特邀嘉宾",
+          "buff": "char:1512/special_guest",
           "turns": 2,
           "target": "target",
           "blocks": "advance_to_others"
@@ -357,14 +357,14 @@
           "type": "entity",
           "entity": "actor",
           "json": {
-            "state": "特邀嘉宾"
+            "state": "char:1512/special_guest"
           }
         }
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 2
         }
       ],
@@ -388,14 +388,14 @@
           "entity": "actor",
           "json": {
             "is_summon": true,
-            "master_state": "特邀嘉宾"
+            "master_state": "char:1512/special_guest"
           }
         }
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 2
         }
       ],
@@ -409,7 +409,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 1
         }
       ],
@@ -423,7 +423,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 1,
           "once_per_turn": "heal_or_shield"
         }
@@ -438,7 +438,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 1,
           "once_per_turn": "heal_or_shield"
         }
@@ -456,7 +456,7 @@
           "entity": "self",
           "json": {
             "resource": {
-              "name": "气氛值",
+              "name": "char:1512/atmosphere",
               "min": 6
             }
           }
@@ -491,7 +491,7 @@
           "entity": "self",
           "json": {
             "resource": {
-              "name": "气氛值",
+              "name": "char:1512/atmosphere",
               "min": 12
             }
           }
@@ -534,7 +534,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "Fever",
+          "buff": "char:1512/fever",
           "permanent": true,
           "target": "self"
         }
@@ -608,7 +608,7 @@
         },
         {
           "op": "RAISE_RESOURCE_CAP",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 20
         }
       ],
@@ -634,7 +634,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 12
         }
       ],
@@ -657,7 +657,7 @@
             }
           }
         },
-        "self_stacks:首次狂热已触发 <= 0"
+        "self_stacks:internal:1512/fever_once <= 0"
       ],
       "do": [
         {
@@ -667,7 +667,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "首次狂热已触发",
+          "buff": "internal:1512/fever_once",
           "amount": 1,
           "max_stacks": 1,
           "permanent": true,
@@ -685,17 +685,17 @@
       "_status": "implemented",
       "when": [
         "actor is_ally",
-        "self_stacks:本回合已加成 <= 0"
+        "self_stacks:internal:1512/bonus_applied_this_turn <= 0"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "气氛值",
+          "resource": "char:1512/atmosphere",
           "amount": 2
         },
         {
           "op": "ADD_STACK",
-          "buff": "本回合已加成",
+          "buff": "internal:1512/bonus_applied_this_turn",
           "amount": 1,
           "max_stacks": 1,
           "permanent": true,
@@ -740,7 +740,7 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "self has_state Fever"
+        "self has_state char:1512/fever"
       ],
       "do": [
         {
@@ -757,12 +757,12 @@
       "id": "turn_start_clears_the_skill_bonus",
       "_status": "implemented",
       "when": [
-        "self_stacks:本回合已加成 >= 1"
+        "self_stacks:internal:1512/bonus_applied_this_turn >= 1"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "本回合已加成",
+          "buff": "internal:1512/bonus_applied_this_turn",
           "amount": 1,
           "target": "self"
         }
@@ -782,7 +782,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "记录",
+          "resource": "internal:1512/record",
           "amountFromEvent": true
         }
       ],
@@ -808,7 +808,7 @@
             "inputs": [
               {
                 "type": "resource",
-                "resource": "记录"
+                "resource": "internal:1512/record"
               },
               {
                 "type": "add",
@@ -822,7 +822,7 @@
                     "inputs": [
                       {
                         "type": "party_resource",
-                        "resource": "气氛值"
+                        "resource": "char:1512/atmosphere"
                       },
                       {
                         "type": "const",
@@ -837,8 +837,8 @@
         },
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "记录",
-          "scale": "self_resource:记录",
+          "resource": "internal:1512/record",
+          "scale": "self_resource:internal:1512/record",
           "percent": 0.5,
           "target": "self"
         }
@@ -881,7 +881,7 @@
                 "inputs": [
                   {
                     "type": "party_resource",
-                    "resource": "气氛值"
+                    "resource": "char:1512/atmosphere"
                   },
                   {
                     "type": "const",

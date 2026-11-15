@@ -24,7 +24,7 @@
       "note": "⭐ 笑点 是**队伍级**计数（1502 也声明了同一个名字，两者共用）；数据里没有上限，所以 `max` 用 `Integer.MAX_VALUE`。⭐ 它在本文件里只有**一处获取**（终结技的额外回合）✓。"
     },
     {
-      "id": "充能",
+      "id": "char:1503/charge",
       "max": 3,
       "initial": 0
     }
@@ -315,11 +315,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "艺术壁垒",
+          "buff": "char:1503/art_barrier",
           "until": "next_ultimate",
           "target": "target",
           "target_when": [
-            "!target has_state 艺术壁垒"
+            "!target has_state char:1503/art_barrier"
           ]
         }
       ],
@@ -331,7 +331,7 @@
       "id": "art_barrier_pays_pearl_on_the_holders_ultimate",
       "when": [
         "from_category ULTRA",
-        "actor has_state 艺术壁垒"
+        "actor has_state char:1503/art_barrier"
       ],
       "do": [
         {
@@ -355,10 +355,10 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": -0.3,
           "permanent": true,
-          "buff": "吞纳沙砾",
+          "buff": "char:1503/sand_absorb",
           "target": "target",
           "target_when": [
-            "!target has_state 吞纳沙砾"
+            "!target has_state char:1503/sand_absorb"
           ]
         }
       ],
@@ -375,7 +375,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "吞纳沙砾",
+          "buff": "char:1503/sand_absorb",
           "target": "target"
         }
       ],
@@ -396,20 +396,20 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "美学底本",
+          "buff": "char:1503/aesthetic_original",
           "permanent": true,
           "target": "target",
           "target_when": [
-            "!target has_state 美学底本"
+            "!target has_state char:1503/aesthetic_original"
           ]
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "深度学习",
+          "buff": "char:1503/deep_learning",
           "permanent": true,
           "target": "self",
           "target_when": [
-            "!self has_state 深度学习"
+            "!self has_state char:1503/deep_learning"
           ]
         }
       ],
@@ -580,11 +580,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢愉",
+          "buff": "char:1503/rendering_reason",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢愉"
+            "!target has_state char:1503/rendering_reason"
           ]
         }
       ],
@@ -602,11 +602,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢愉",
+          "buff": "char:1503/rendering_reason",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢愉"
+            "!target has_state char:1503/rendering_reason"
           ]
         }
       ],
@@ -624,11 +624,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢愉",
+          "buff": "char:1503/rendering_reason",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢愉"
+            "!target has_state char:1503/rendering_reason"
           ]
         }
       ],
@@ -646,11 +646,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢愉",
+          "buff": "char:1503/rendering_reason",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢愉"
+            "!target has_state char:1503/rendering_reason"
           ]
         }
       ],
@@ -677,7 +677,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_1_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 1"
       ],
       "do": [
@@ -695,7 +695,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_2_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 2"
       ],
       "do": [
@@ -713,7 +713,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_3_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 3"
       ],
       "do": [
@@ -731,7 +731,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_4_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 4"
       ],
       "do": [
@@ -802,7 +802,7 @@
           "permanent": true,
           "target": "all_allies",
           "target_when": [
-            "self has_state 深度学习"
+            "self has_state char:1503/deep_learning"
           ]
         }
       ],
@@ -830,7 +830,7 @@
       "id": "enhanced_basic_form_a_extra_elation_damage",
       "when": [
         "actor == self",
-        "actor has_state 深度学习",
+        "actor has_state char:1503/deep_learning",
         "from_skill_id == 8"
       ],
       "do": [
@@ -840,7 +840,7 @@
           "element": "Ice",
           "damage_type": "ELATION",
           "target": "target",
-          "elation_from": "美学底本",
+          "elation_from": "char:1503/aesthetic_original",
           "percent_from_skill_param": "ULTRA:1"
         }
       ],
@@ -853,7 +853,7 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "actor has_state 深度学习",
+        "actor has_state char:1503/deep_learning",
         "from_skill_id == 8"
       ],
       "do": [
@@ -864,7 +864,7 @@
           "element": "Ice",
           "damage_type": "ELATION",
           "target": "target",
-          "elation_from": "美学底本"
+          "elation_from": "char:1503/aesthetic_original"
         }
       ],
       "source": "1503 真珠 星魂 6 用一副躯壳，演算生命（rank 150306，Param = [0.2, 2.4]）: 「【深度学习】时…真珠的强化普攻额外造成 240% 的冰属性欢愉伤害，该次欢愉伤害使用【美学底本】的属性值计算」。⭐ 2.4 = 240% ✓（同行的 0.2 是已出货的全属性抗性穿透 ✓）。",
@@ -890,7 +890,7 @@
       "on": "EXTRA_TURN_STARTED",
       "id": "extra_turn_pays_the_archetype",
       "when": [
-        "actor has_state 美学底本"
+        "actor has_state char:1503/aesthetic_original"
       ],
       "do": [
         {
@@ -911,7 +911,7 @@
       "on": "EXTRA_TURN_ENDED",
       "id": "extra_turn_takes_the_reward_back",
       "when": [
-        "actor has_state 美学底本"
+        "actor has_state char:1503/aesthetic_original"
       ],
       "do": [
         {
@@ -954,7 +954,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 1"
       ],
       "do": [
@@ -974,7 +974,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 2"
       ],
       "do": [
@@ -994,7 +994,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 3"
       ],
       "do": [
@@ -1014,7 +1014,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢愉",
+        "actor has_state char:1503/rendering_reason",
         "allies_with_path:欢愉 >= 4"
       ],
       "do": [
@@ -1034,7 +1034,7 @@
       "min_eidolon": 2,
       "when": [
         "eidolon >= 2",
-        "actor has_state 美学底本"
+        "actor has_state char:1503/aesthetic_original"
       ],
       "do": [
         {
@@ -1114,9 +1114,9 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "深度学习",
+          "buff": "char:1503/deep_learning",
           "turns": 2,
-          "target": "holder_of:美学底本"
+          "target": "holder_of:char:1503/aesthetic_original"
         }
       ],
       "source": "1503 真珠 秘技 凝润珠光，复刻真迹 (150307): 「使用秘技后获得【美学底本】，切换行动角色时【美学底本】转移至当前行动角色。下一次战斗开始时，真珠获得 #2[i] 点【好活当赏】，并【深度学习】持有【美学底本】的角色，该【深度学习】具有 #1[i] 点充能」—— #2 = 20、#1 = 2。",
@@ -1131,7 +1131,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1503/charge",
           "amount": 3,
           "to_max": true
         }
@@ -1149,7 +1149,7 @@
       "do": [
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1503/charge",
           "amount": 1,
           "target": "self"
         }
@@ -1167,7 +1167,7 @@
       "do": [
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "充能",
+          "resource": "char:1503/charge",
           "amount": 1,
           "target": "self"
         }
@@ -1180,14 +1180,14 @@
       "id": "deep_study_ends_when_the_charges_run_out",
       "when": [
         "actor == self",
-        "self_resource:充能 <= 0",
-        "self has_state 深度学习"
+        "self_resource:char:1503/charge <= 0",
+        "self has_state char:1503/deep_learning"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
           "target": "self",
-          "buff": "深度学习"
+          "buff": "char:1503/deep_learning"
         }
       ],
       "source": "1503 真珠 终结技 映照万千颜色 (150303): 「行动结束后若充能不足则【深度学习】结束」。",

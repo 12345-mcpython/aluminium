@@ -75,14 +75,6 @@
       ]
     },
     {
-      "name": "Fever",
-      "owner": "1512",
-      "kind": "char",
-      "used_by": [
-        "1512"
-      ]
-    },
-    {
       "name": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
       "owner": "1402",
       "kind": "char",
@@ -207,6 +199,96 @@
       ],
       "zh": "恶报",
       "key": "char:1214/retribution"
+    },
+    {
+      "name": "char:1503/aesthetic_original",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ],
+      "zh": "美学底本",
+      "key": "char:1503/aesthetic_original"
+    },
+    {
+      "name": "char:1503/art_barrier",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ],
+      "zh": "艺术壁垒",
+      "key": "char:1503/art_barrier"
+    },
+    {
+      "name": "char:1503/charge",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ],
+      "zh": "充能",
+      "key": "char:1503/charge"
+    },
+    {
+      "name": "char:1503/deep_learning",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ],
+      "zh": "深度学习",
+      "key": "char:1503/deep_learning"
+    },
+    {
+      "name": "char:1503/rendering_reason",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ],
+      "zh": "渲染理性，解构欢愉",
+      "key": "char:1503/rendering_reason"
+    },
+    {
+      "name": "char:1503/sand_absorb",
+      "owner": "1503",
+      "kind": "char",
+      "used_by": [
+        "1503"
+      ],
+      "zh": "吞纳沙砾",
+      "key": "char:1503/sand_absorb"
+    },
+    {
+      "name": "char:1512/atmosphere",
+      "owner": "1512",
+      "kind": "char",
+      "used_by": [
+        "1512"
+      ],
+      "zh": "气氛值",
+      "key": "char:1512/atmosphere"
+    },
+    {
+      "name": "char:1512/fever",
+      "owner": "1512",
+      "kind": "char",
+      "used_by": [
+        "1512"
+      ],
+      "zh": "Fever",
+      "key": "char:1512/fever"
+    },
+    {
+      "name": "char:1512/special_guest",
+      "owner": "1512",
+      "kind": "char",
+      "used_by": [
+        "1512"
+      ],
+      "zh": "特邀嘉宾",
+      "key": "char:1512/special_guest"
     },
     {
       "name": "char:20022/remembrance",
@@ -885,6 +967,36 @@
       "key": "internal:1214/retribution_overflow"
     },
     {
+      "name": "internal:1512/bonus_applied_this_turn",
+      "owner": "1512",
+      "kind": "internal",
+      "used_by": [
+        "1512"
+      ],
+      "zh": "本回合已加成",
+      "key": "internal:1512/bonus_applied_this_turn"
+    },
+    {
+      "name": "internal:1512/fever_once",
+      "owner": "1512",
+      "kind": "internal",
+      "used_by": [
+        "1512"
+      ],
+      "zh": "首次狂热已触发",
+      "key": "internal:1512/fever_once"
+    },
+    {
+      "name": "internal:1512/record",
+      "owner": "1512",
+      "kind": "internal",
+      "used_by": [
+        "1512"
+      ],
+      "zh": "记录",
+      "key": "internal:1512/record"
+    },
+    {
       "name": "internal:20018/next_basic_pending",
       "owner": "20018",
       "kind": "internal",
@@ -1244,14 +1356,6 @@
     },
     {
       "name": "充能",
-      "owner": "1503",
-      "kind": "char",
-      "used_by": [
-        "1503"
-      ]
-    },
-    {
-      "name": "充能",
       "owner": "1504",
       "kind": "char",
       "used_by": [
@@ -1425,14 +1529,6 @@
       "kind": "char",
       "used_by": [
         "1414"
-      ]
-    },
-    {
-      "name": "吞纳沙砾",
-      "owner": "1503",
-      "kind": "char",
-      "used_by": [
-        "1503"
       ]
     },
     {
@@ -1941,14 +2037,6 @@
       ]
     },
     {
-      "name": "本回合已加成",
-      "owner": "1512",
-      "kind": "char",
-      "used_by": [
-        "1512"
-      ]
-    },
-    {
       "name": "本回合施放战技",
       "owner": "1207",
       "kind": "char",
@@ -1988,14 +2076,6 @@
       ]
     },
     {
-      "name": "气氛值",
-      "owner": "1512",
-      "kind": "char",
-      "used_by": [
-        "1512"
-      ]
-    },
-    {
       "name": "永续的燃烧",
       "owner": "1408",
       "kind": "char",
@@ -2025,22 +2105,6 @@
       "kind": "internal",
       "used_by": [
         "1112"
-      ]
-    },
-    {
-      "name": "深度学习",
-      "owner": "1503",
-      "kind": "char",
-      "used_by": [
-        "1503"
-      ]
-    },
-    {
-      "name": "渲染理性，解构欢愉",
-      "owner": "1503",
-      "kind": "char",
-      "used_by": [
-        "1503"
       ]
     },
     {
@@ -2114,14 +2178,6 @@
       "kind": "char",
       "used_by": [
         "1412"
-      ]
-    },
-    {
-      "name": "特邀嘉宾",
-      "owner": "1512",
-      "kind": "char",
-      "used_by": [
-        "1512"
       ]
     },
     {
@@ -2476,14 +2532,6 @@
       ]
     },
     {
-      "name": "美学底本",
-      "owner": "1503",
-      "kind": "char",
-      "used_by": [
-        "1503"
-      ]
-    },
-    {
       "name": "老主顾",
       "owner": "1406",
       "kind": "char",
@@ -2513,14 +2561,6 @@
       "kind": "char",
       "used_by": [
         "1402"
-      ]
-    },
-    {
-      "name": "艺术壁垒",
-      "owner": "1503",
-      "kind": "char",
-      "used_by": [
-        "1503"
       ]
     },
     {
@@ -2592,14 +2632,6 @@
       "kind": "char",
       "used_by": [
         "1401"
-      ]
-    },
-    {
-      "name": "记录",
-      "owner": "1512",
-      "kind": "internal",
-      "used_by": [
-        "1512"
       ]
     },
     {
@@ -2823,14 +2855,6 @@
       "kind": "char",
       "used_by": [
         "1504"
-      ]
-    },
-    {
-      "name": "首次狂热已触发",
-      "owner": "1512",
-      "kind": "internal",
-      "used_by": [
-        "1512"
       ]
     },
     {

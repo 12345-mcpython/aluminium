@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class ResourceChangeHolderTest {
     private static final String COUNTER = "测试计数";
-    private static final String RECORDED = "测试记录";
+    private static final String RECORDED = "测试internal:1512/record";
     private static final String FROM_SELF = "测试主体是自己";
     private static final String FROM_OTHER = "测试主体是他人";
 

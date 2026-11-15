@@ -46,11 +46,11 @@ public class PearlCombatTest {
     private static final int HUNTER_SLOT = 1;   // the ordinary basic, which must heal nobody
     private static final int ELATION_ARCHETYPE = 1505;      // 「欢愉」命途: the barrier applies
     private static final int OTHER_ALLY = 1002;        // not that path: it must not
-    private static final String BARRIER = "艺术壁垒";
-    private static final String GRIT = "吞纳沙砾";
+    private static final String BARRIER = "char:1503/art_barrier";
+    private static final String GRIT = "char:1503/sand_absorb";
     private static final int ENERGY = 90;
     private static final String COUNTER = "好活当赏";
-    private static final String CARRIER = "渲染理性，解构欢愉";
+    private static final String CARRIER = "char:1503/rendering_reason";
     private static final double INSTANCE = 100;
     private static final int ELATION_ALLY = 1502;
     private static final int FIXTURE_LEVEL = 80;

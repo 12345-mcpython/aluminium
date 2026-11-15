@@ -161,7 +161,7 @@ public class PearlEidolonsTest {
         System.out.println("[pearl_e2_advance] at E2 an Elation ally keeps " + e2.elationA
                 + " (expected 0.9 x 0.85 x 0.70 = 0.5355)");
 
-        Assertions.assertAll("「除…【美学底本】外」",
+        Assertions.assertAll("「除…【char:1503/aesthetic_original】外」",
                 () -> Assertions.assertEquals(1.0, e0.elationA, 1e-6,
                         "[the advance] at E0 the tiers advance the archetype only: an Elation ally beside Pearl is"
                                 + " untouched"),
@@ -173,7 +173,7 @@ public class PearlEidolonsTest {
                 () -> Assertions.assertTrue(e2.elationB < 0.9, "[the widening] both of them (" + e2.elationB + ")"),
                 () -> Assertions.assertEquals(1.0, e2.archetype, 1e-6,
                         "[the exclusion] and the archetype, which is NOT on the Elation path, is excluded by"
-                                + " 「除…【美学底本】外」"),
+                                + " 「除…【char:1503/aesthetic_original】外」"),
                 () -> Assertions.assertEquals(0.9 * 0.85 * 0.70, e2.elationA, 1e-6,
                         "[the percentages] the tiers are unchanged: 10%, 15% then 30% on the same ally"));
     }
@@ -278,7 +278,7 @@ public class PearlEidolonsTest {
             }
             Assertions.assertTrue(when.contains("eidolon >= 4"),
                     id + " names the rank in its content: " + when);
-            Assertions.assertTrue(when.stream().anyMatch(c -> c.contains("渲染理性")),
+            Assertions.assertTrue(when.stream().anyMatch(c -> c.contains("char:1503/rendering_reason")),
                     id + " repeats its sibling's armed-attacker condition: " + when);
             Assertions.assertTrue(when.stream().anyMatch(c -> c.startsWith("allies_with_path")),
                     id + " repeats its sibling's tier condition: " + when);
@@ -539,7 +539,7 @@ public class PearlEidolonsTest {
         battle.startBattle();
         battle.processRequests();
         battle.characters().get(1).getBuffManager()
-                .addBuff(new com.laosun.aluminium.buff.StateBuff("美学底本", 3, false));
+                .addBuff(new com.laosun.aluminium.buff.StateBuff("char:1503/aesthetic_original", 3, false));
         return battle;
     }
 

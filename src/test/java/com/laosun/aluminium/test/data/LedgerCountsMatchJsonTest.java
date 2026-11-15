@@ -40,7 +40,7 @@ public class LedgerCountsMatchJsonTest {
 
     private static final Pattern RULE_ROW = Pattern.compile("^\\|\\s*(\\d{4})\\s*\\|");
     private static final Pattern RULES = Pattern.compile("(\\d+) 条规则");
-    private static final Pattern RECORDS = Pattern.compile("(\\d+) 条记录");
+    private static final Pattern RECORDS = Pattern.compile("(\\d+) 条internal:1512/record");
     private static final Pattern BLOCKERS = Pattern.compile("(\\d+) 条阻塞");
     private static final Pattern NO_GAP = Pattern.compile("0 缺口");
     private static final Pattern DONE = Pattern.compile("\\*\\*完全实现\\*\\*");

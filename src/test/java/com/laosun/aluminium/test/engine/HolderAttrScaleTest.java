@@ -38,7 +38,7 @@ public class HolderAttrScaleTest {
     private static final int OWNER = 1503;      // Pearl (真珠) herself: the rule owner, who must NOT be read
     private static final int HOLDER = 1002;     // the ally the sentence is about
     private static final int BYSTANDER = 1202;  // the other ally: also not to be read
-    private static final String MARK = "美学底本";
+    private static final String MARK = "char:1503/aesthetic_original";
     private static final double SHARE = 0.6;
 
     /**
@@ -151,7 +151,7 @@ public class HolderAttrScaleTest {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new TriggerTable(OWNER, List.of(
                         TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"),
-                                scale("holder_attr:" + MARK, "MODIFY_ATTR", "DEFENCE")))));
+                                scale("holder_attr:" + "无名状态", "MODIFY_ATTR", "DEFENCE")))));
 
         Assertions.assertTrue(refused.getMessage().contains("STATE>:<ATTRIBUTE>"), refused.getMessage());
         Assertions.assertTrue(refused.getMessage().contains(TriggerSpecs.TEST_SOURCE), refused.getMessage());

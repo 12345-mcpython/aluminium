@@ -95,9 +95,9 @@ public class RobinSummerettoTest {
     private static final int EIDOLON_ALLY = 1002;
     private static final int CYRENE = 1415;
     private static final int LEVEL = 80;
-    private static final String VIBES = "气氛值";
-    private static final String FEVER = "Fever";
-    private static final String GUEST = "特邀嘉宾";
+    private static final String VIBES = "char:1512/atmosphere";
+    private static final String FEVER = "char:1512/fever";
+    private static final String GUEST = "char:1512/special_guest";
     private static final double AURA_ONE = 0.112;
     private static final double CONE = 0.36;
 
@@ -142,7 +142,7 @@ public class RobinSummerettoTest {
     public void theFilesDeclareTheResourceAndThePanel() {
         JsonObject character = read("/game/characters/1512.json");
         JsonArray resources = character.getAsJsonArray("resources");
-        Assertions.assertNotNull(resources, "the character file must declare the atmosphere resource (气氛值)");
+        Assertions.assertNotNull(resources, "the character file must declare the atmosphere resource (char:1512/atmosphere)");
         Assertions.assertEquals(50, resources.get(0).getAsJsonObject().get("max").getAsInt(), "\"the ceiling is 50 points\" (「上限50点」)");
 
         JsonObject memo = read("/game/memosprites/1512.json");
@@ -216,13 +216,13 @@ public class RobinSummerettoTest {
         castSkill(scene);
         int afterThirdCast = scene.battle.summonCountOf(scene.robin);
 
-        Assertions.assertAll("「全员登台」: the gauge brings the band on, and the whole band opens 【Fever】",
+        Assertions.assertAll("「全员登台」: the gauge brings the band on, and the whole band opens 【char:1512/fever】",
                 () -> Assertions.assertEquals(2, afterFirstCast,
                         "the skill summons the first, and its own +6 gauge crosses the 6 threshold for the second"),
                 () -> Assertions.assertFalse(feverAtTwo, "two of three is not 全员登台"),
                 () -> Assertions.assertEquals(3, afterSecondCast,
                         "the second cast's gauge reaches 12 and brings the third"),
-                () -> Assertions.assertTrue(feverAtThree, "all three on stage ⇒ 【Fever】"),
+                () -> Assertions.assertTrue(feverAtThree, "all three on stage ⇒ 【char:1512/fever】"),
                 () -> Assertions.assertEquals(3, afterThirdCast,
                         "and neither threshold fires twice: the band is three"));
     }
@@ -305,7 +305,7 @@ public class RobinSummerettoTest {
 
         Assertions.assertAll("the talent's 第一次 clause and its attack half",
                 () -> Assertions.assertEquals(1.0, afterFirstHeal, 1e-9,
-                        "「在任意目标回合第一次提供治疗…时，获得 1 点气氛值」"),
+                        "「在任意目标回合第一次提供治疗…时，获得 1 点char:1512/atmosphere」"),
                 () -> Assertions.assertEquals(afterFirstHeal, afterSecondHeal, 1e-9,
                         "the second heal in the same turn is not a 第一次 and pays nothing"),
                 () -> Assertions.assertEquals(1.0, afterHealAndShield, 1e-9,
@@ -313,7 +313,7 @@ public class RobinSummerettoTest {
                 () -> Assertions.assertEquals(2.0, afterTheNewTurn, 1e-9,
                         "「任意目标回合」: a turn boundary starts the window over"),
                 () -> Assertions.assertEquals(1.0, afterFirstAttack, 1e-9,
-                        "「我方目标施放攻击时…获得 1 点气氛值」"),
+                        "「我方目标施放攻击时…获得 1 点char:1512/atmosphere」"),
                 () -> Assertions.assertEquals(2.0, afterSecondAttack, 1e-9,
                         "every attack pays - this half is not a once-per-turn clause"));
     }
@@ -338,7 +338,7 @@ public class RobinSummerettoTest {
         double at50 = boostAfterWarmUp(50);
         double withoutFever = boostAfterWarmUp(0, false);
         double withFever = boostAfterWarmUp(0);
-        Assertions.assertAll("【Fever】's damage boost on her own hit: 0.84 + 气氛值 x 0.028",
+        Assertions.assertAll("【char:1512/fever】's damage boost on her own hit: 0.84 + char:1512/atmosphere x 0.028",
                 () -> Assertions.assertEquals(1.4, at50 - at0, 1e-6,
                         "50 points x 0.028 = 1.4 more boost with a full gauge; got " + (at50 - at0)),
                 () -> Assertions.assertEquals(0.84, withFever - withoutFever, 1e-6,
@@ -359,7 +359,7 @@ public class RobinSummerettoTest {
         double without = memoBoost(0, false);
         double with = memoBoost(0, true);
         Assertions.assertEquals(0.84, with - without, 1e-6,
-                "with Fever the memosprite's own hit carries +84%; without it, nothing (" + without + " vs " + with + ")");
+                "with char:1512/fever the memosprite's own hit carries +84%; without it, nothing (" + without + " vs " + with + ")");
     }
 
     /** The memosprite's own cast, measured as the boost bucket of the settled damage. */
@@ -451,8 +451,8 @@ public class RobinSummerettoTest {
         double ignore15 = ignoreAt(15);
         double ignore50 = ignoreAt(50);
         Assertions.assertEquals(0.15, ignore0, 1e-6, "no gauge: the base 15% still applies");
-        Assertions.assertEquals(0.225, ignore15, 1e-6, "气氛值 15 -> 15% + 15 x 0.5% = 22.5%");
-        Assertions.assertEquals(0.40, ignore50, 1e-6, "气氛值 50 -> 15% + 25% = 40% (the document's cap)");
+        Assertions.assertEquals(0.225, ignore15, 1e-6, "char:1512/atmosphere 15 -> 15% + 15 x 0.5% = 22.5%");
+        Assertions.assertEquals(0.40, ignore50, 1e-6, "char:1512/atmosphere 50 -> 15% + 25% = 40% (the document's cap)");
     }
 
     /**
@@ -461,7 +461,7 @@ public class RobinSummerettoTest {
     @Test
     public void withoutFeverTheGaugeChangesNothing() {
         Assertions.assertEquals(0.0, ignoreAt(50, false), 1e-9,
-                "the aura is gated on the 【Fever】 state (the document's gate is \"all three memosprites on stage\")");
+                "the aura is gated on the 【char:1512/fever】 state (the document's gate is \"all three memosprites on stage\")");
     }
 
     private static double ignoreAt(int vibes) {
@@ -584,18 +584,18 @@ public class RobinSummerettoTest {
     public void eidolon2GivesTheWholeSidePenetrationAndRaisesTheVibeCap() {
         Fixture e2 = new Fixture(2);
         double penetration = e2.ally.getAttribute(AttributeType.DAMAGE_PENETRATION).get();
-        int e2Cap = e2.battle.partyResource("气氛值").getMax() + e2.battle.partyResource("气氛值").getMaxOverflow();
-        int e2Value = e2.battle.partyResource("气氛值").value();
+        int e2Cap = e2.battle.partyResource("char:1512/atmosphere").getMax() + e2.battle.partyResource("char:1512/atmosphere").getMaxOverflow();
+        int e2Value = e2.battle.partyResource("char:1512/atmosphere").value();
 
         Fixture e0 = new Fixture(0);
         double control = e0.ally.getAttribute(AttributeType.DAMAGE_PENETRATION).get();
-        int baseCap = e0.battle.partyResource("气氛值").getMax() + e0.battle.partyResource("气氛值").getMaxOverflow();
+        int baseCap = e0.battle.partyResource("char:1512/atmosphere").getMax() + e0.battle.partyResource("char:1512/atmosphere").getMaxOverflow();
 
         Assertions.assertAll("Eidolon 2: the side's penetration, and the bar's capacity",
                 () -> Assertions.assertEquals(0.18, penetration, 1e-9,
                         "「我方目标的全属性抗性穿透提高 18%」 — a teammate carries it too"),
                 () -> Assertions.assertEquals(0.0, control, 1e-9, "control: nothing at E0"),
-                () -> Assertions.assertEquals(baseCap + 20, e2Cap, "「气氛值上限提高 20 点」"),
+                () -> Assertions.assertEquals(baseCap + 20, e2Cap, "「char:1512/atmosphere上限提高 20 点」"),
                 () -> Assertions.assertEquals(0, e2Value,
                         "and her bar is still empty — capacity, not a gift"));
     }
@@ -667,7 +667,7 @@ public class RobinSummerettoTest {
         // the 「非真实伤害」 filter is the registered approximation - so this asserts the shape (roughly half, never all or none).
         int kept = f.record();
         Assertions.assertTrue(kept > recorded / 4 && kept < recorded * 3 / 4,
-                "「清空记录值的 50%」 — about half stays (" + recorded + " -> " + kept + ")");
+                "「清空internal:1512/record值的 50%」 — about half stays (" + recorded + " -> " + kept + ")");
     }
 
     /**
@@ -733,7 +733,7 @@ public class RobinSummerettoTest {
         }
 
         private int vibes() {
-            return battle.partyResource("气氛值").value();
+            return battle.partyResource("char:1512/atmosphere").value();
         }
 
         private void castSkill() {
@@ -757,7 +757,7 @@ public class RobinSummerettoTest {
         }
 
         private int record() {
-            return robin.getResources().value("记录");
+            return robin.getResources().value("internal:1512/record");
         }
 
         /** One settled instance on our side, which is what the recording rule listens to. */
@@ -776,11 +776,11 @@ public class RobinSummerettoTest {
         }
 
         private int cap() {
-            return robin.getResources().get("气氛值").getMax();
+            return robin.getResources().get("char:1512/atmosphere").getMax();
         }
 
         private int value() {
-            return robin.getResources().value("气氛值");
+            return robin.getResources().value("char:1512/atmosphere");
         }
     }
 
@@ -799,7 +799,7 @@ public class RobinSummerettoTest {
     @Test
     public void theEidolonStoresOneBarAndCastingTheUltimatePoursItBack() {
         StorageFixture e6 = new StorageFixture(6);
-        Assertions.assertTrue(e6.robin.getBuffManager().hasState(FEVER), "precondition: the band opened 【Fever】");
+        Assertions.assertTrue(e6.robin.getBuffManager().hasState(FEVER), "precondition: the band opened 【char:1512/fever】");
         double bankCap = e6.robin.getEnergyBankCap();
 
         double before = e6.robin.getCurrentEnergy();
@@ -916,7 +916,7 @@ public class RobinSummerettoTest {
         Scene scene = scene();
         scene.battle.castImmediate(scene.ultimate, scene.robin, List.of(scene.ally));
 
-        Assertions.assertTrue(scene.ally.getBuffManager().hasState(GUEST), "the ally holds 【特邀嘉宾】");
+        Assertions.assertTrue(scene.ally.getBuffManager().hasState(GUEST), "the ally holds 【char:1512/special_guest】");
         Assertions.assertFalse(scene.robin.getBuffManager().hasState(GUEST), "the caster does not");
     }
 
@@ -951,9 +951,9 @@ public class RobinSummerettoTest {
 
         // 2 from the guest clause + 1 from her talent's 「我方目标施放攻击时」 - 额外 means the guest's 2 are ON TOP of the
         // talent's 1, so the attack is worth 3 in total.
-        Assertions.assertAll("【特邀嘉宾】: the guest attack pays 2, and so does its summon's",
+        Assertions.assertAll("【char:1512/special_guest】: the guest attack pays 2, and so does its summon's",
                 () -> Assertions.assertEquals(beforeGuest + 3, afterGuest, 1e-9,
-                        "guest 2 + talent 1: 「…额外使知更鸟•晴歌获得 2 点气氛值」"),
+                        "guest 2 + talent 1: 「…额外使知更鸟•晴歌获得 2 点char:1512/atmosphere」"),
                 () -> Assertions.assertEquals(beforeSummon + 2, afterSummon, 1e-9,
                         "「…及其召唤物攻击时」 grants the same 2 points"));
     }
