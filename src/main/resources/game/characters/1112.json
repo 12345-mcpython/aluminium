@@ -63,12 +63,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "负债证明",
+          "buff": "char:1112/debt_proof",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "负债证明",
+          "buff": "char:1112/debt_proof",
           "turns": 2,
           "target": "target"
         },
@@ -85,7 +85,7 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "damage_type": "ADDITIONAL",
           "turns": 2,
-          "buff": "负债证明",
+          "buff": "char:1112/debt_proof",
           "target": "target",
           "percent_from_skill_param": "SKILL:1"
         }
@@ -138,7 +138,7 @@
       "id": "eidolon1_executed_on_debt_target",
       "min_eidolon": 1,
       "when": [
-        "target has_state 负债证明"
+        "target has_state char:1112/debt_proof"
       ],
       "do": [
         {
@@ -182,7 +182,7 @@
           "element": "Fire",
           "attacker": "actor",
           "stance": 60,
-          "require_state": "负债证明",
+          "require_state": "char:1112/debt_proof",
           "target": "random_enemy_with_state"
         }
       ],
@@ -194,7 +194,7 @@
       "id": "talent_ally_followup_advances_numby",
       "when": [
         "actor is_ally",
-        "target has_state 负债证明",
+        "target has_state char:1112/debt_proof",
         "!actor is_summon"
       ],
       "do": [
@@ -213,7 +213,7 @@
       "min_eidolon": 2,
       "when": [
         "actor is_summon",
-        "enemy_state_count:负债证明 >= 1"
+        "enemy_state_count:char:1112/debt_proof >= 1"
       ],
       "do": [
         {
@@ -251,7 +251,7 @@
       "when": [
         "actor is_summon",
         "self has_state sys:technique",
-        "enemy_state_count:负债证明 >= 1"
+        "enemy_state_count:char:1112/debt_proof >= 1"
       ],
       "do": [
         {
@@ -274,13 +274,13 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "涨幅惊人",
+          "buff": "char:1112/staggering_rise",
           "permanent": true,
           "target": "summon"
         },
         {
           "op": "ADD_STACK",
-          "buff": "涨幅次数",
+          "buff": "internal:1112/rise_count",
           "value": {
             "type": "skill_param",
             "skill": "ULTRA",
@@ -299,7 +299,7 @@
             "index": 0
           },
           "permanent": true,
-          "while_holder_state": "涨幅惊人",
+          "while_holder_state": "char:1112/staggering_rise",
           "target": "summon"
         },
         {
@@ -311,7 +311,7 @@
             "index": 1
           },
           "permanent": true,
-          "while_holder_state": "涨幅惊人",
+          "while_holder_state": "char:1112/staggering_rise",
           "target": "summon"
         }
       ],
@@ -330,7 +330,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "涨幅次数",
+          "buff": "internal:1112/rise_count",
           "amount": 1,
           "max_stacks": 5,
           "permanent": true,
@@ -355,7 +355,7 @@
           "attribute": "RESISTANCE_REDUCTION",
           "percent": 0.1,
           "permanent": true,
-          "while_holder_state": "涨幅惊人",
+          "while_holder_state": "char:1112/staggering_rise",
           "target": "summon"
         }
       ],
@@ -368,12 +368,12 @@
       "id": "windfall_advances_numby_on_a_basic_attack",
       "when": [
         "from_skill COMMON",
-        "target has_state 负债证明",
+        "target has_state char:1112/debt_proof",
         {
           "type": "entity",
           "entity": "summon",
           "json": {
-            "state": "涨幅惊人"
+            "state": "char:1112/staggering_rise"
           }
         }
       ],
@@ -393,12 +393,12 @@
       "id": "windfall_advances_numby_on_a_skill_attack",
       "when": [
         "from_skill SKILL",
-        "target has_state 负债证明",
+        "target has_state char:1112/debt_proof",
         {
           "type": "entity",
           "entity": "summon",
           "json": {
-            "state": "涨幅惊人"
+            "state": "char:1112/staggering_rise"
           }
         }
       ],
@@ -418,12 +418,12 @@
       "id": "windfall_advances_numby_on_an_ultimate_attack",
       "when": [
         "from_skill ULTRA",
-        "target has_state 负债证明",
+        "target has_state char:1112/debt_proof",
         {
           "type": "entity",
           "entity": "summon",
           "json": {
-            "state": "涨幅惊人"
+            "state": "char:1112/staggering_rise"
           }
         }
       ],
@@ -447,7 +447,7 @@
           "type": "entity",
           "entity": "summon",
           "json": {
-            "state": "涨幅惊人"
+            "state": "char:1112/staggering_rise"
           }
         }
       ],
@@ -471,7 +471,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "涨幅次数",
+          "buff": "internal:1112/rise_count",
           "amount": 1,
           "target": "actor"
         }
@@ -485,12 +485,12 @@
       "id": "windfall_ends_when_spent",
       "when": [
         "actor is_summon",
-        "actor_stacks:涨幅次数 <= 0"
+        "actor_stacks:internal:1112/rise_count <= 0"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "涨幅惊人",
+          "buff": "char:1112/staggering_rise",
           "target": "actor"
         }
       ],
@@ -522,12 +522,12 @@
         "actor is_ally",
         "!actor is_summon",
         "enemy_count >= 1",
-        "enemy_state_count:负债证明 == 0"
+        "enemy_state_count:char:1112/debt_proof == 0"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "负债证明",
+          "buff": "char:1112/debt_proof",
           "turns": 2,
           "target": "random_enemy"
         }

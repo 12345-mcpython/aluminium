@@ -48,12 +48,12 @@ public class TopazNumbyTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
         battle.processRequests();
         Assertions.assertEquals(before, enemy.getCurrentHp(), 1e-9,
-                "nobody holds 【负债证明】, so there is no target the sentence allows");
+                "nobody holds 【char:1112/debt_proof】, so there is no target the sentence allows");
 
         battle.castImmediate(topaz.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), topaz,
                 List.of(enemy));
         battle.processRequests();
-        Assertions.assertTrue(enemy.getBuffManager().hasState("负债证明"), "precondition: the Skill marks the target");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:1112/debt_proof"), "precondition: the Skill marks the target");
         before = enemy.getCurrentHp();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, numby, numby, 1, 0));
         battle.processRequests();
@@ -86,7 +86,7 @@ public class TopazNumbyTest {
         Summon numby = battle.summonsOf(topaz).getFirst();
         battle.castImmediate(topaz.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), topaz, List.of(marked));
         battle.processRequests();
-        Assertions.assertTrue(marked.getBuffManager().hasState("负债证明"), "precondition: the Skill marks the target");
+        Assertions.assertTrue(marked.getBuffManager().hasState("char:1112/debt_proof"), "precondition: the Skill marks the target");
 
         double before = remaining(battle, numby);
         Assertions.assertTrue(before > 0, "precondition: it has time left to skip (" + before + ")");
@@ -100,7 +100,7 @@ public class TopazNumbyTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, topaz, plain, 1, 0));
         battle.processRequests();
         Assertions.assertEquals(armed, remaining(battle, numby), 1e-9,
-                "「陷入【负债证明】状态下的敌方目标」 - a target without the mark does not advance it");
+                "「陷入【char:1112/debt_proof】状态下的敌方目标」 - a target without the mark does not advance it");
 
         // Control 2: the summon's own follow-up - 「在账账自身回合内，无法触发行动提前效果」.
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, numby, marked, 1, 0));
@@ -130,7 +130,7 @@ public class TopazNumbyTest {
         Assertions.assertEquals(5.0, energyAfterOneAction(2) - energyAfterOneAction(1), 1e-9,
                 "「账账自身行动并发动攻击后，托帕恢复 5 点能量」");
         Assertions.assertEquals(0.0, energyAfterOneAction(2, false) - energyAfterOneAction(1, false), 1e-9,
-                "no 【负债证明】 on the field ⇒ no attack ⇒ no energy");
+                "no 【char:1112/debt_proof】 on the field ⇒ no attack ⇒ no energy");
     }
 
     /**

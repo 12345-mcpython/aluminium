@@ -43,7 +43,7 @@ public class BondmateHolderTest {
     private static final int ALLY = 1002;
     private static final int OTHER_ALLY = 1202;
     private static final int LEVEL = 80;
-    private static final String BONDMATE = "同袍";
+    private static final String BONDMATE = "char:1414/comrade";
     private static final double EPS = 1e-6;
 
     // ==================================================================
@@ -127,7 +127,7 @@ public class BondmateHolderTest {
         battle.startBattle();
 
         Assertions.assertTrue(him.getBuffManager().hasState(BONDMATE),
-                "「使用秘技后获得【同袍】」 (gains Bondmate after using the Technique): the technique's own marker (秘技) is what the rule is gated on");
+                "「使用秘技后获得【char:1414/comrade】」 (gains Bondmate after using the Technique): the technique's own marker (秘技) is what the rule is gated on");
     }
 
     /**

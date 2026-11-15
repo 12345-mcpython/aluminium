@@ -43,7 +43,7 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getShield() > 0, "「为我方全体提供…护盾」 (a shield for all of our side) -- the designated ally");
         Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
                 "「抵消等同于丹恒•腾荒20.00%攻击力+400伤害的护盾」 (a shield that absorbs damage equal to 20.00% of Dan Heng - Permansor Terrae's ATK + 400): expected " + expected + ", shield " + ally.getShield());
-        Assertions.assertTrue(ally.getBuffManager().hasState("同袍"), "\"makes a designated single ally the Bondmate (【同袍】)\" (「使指定我方单体角色成为【同袍】」)");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1414/comrade"), "\"makes a designated single ally the Bondmate (【char:1414/comrade】)\" (「使指定我方单体角色成为【char:1414/comrade】」)");
     }
 
     /**

@@ -32,7 +32,7 @@ public class TopazTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
-        boolean marked = enemy.getBuffManager().hasState("负债证明");
+        boolean marked = enemy.getBuffManager().hasState("char:1112/debt_proof");
         double settled = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         System.out.println("[1112] marked=" + marked + " settled=" + settled);
         Assertions.assertTrue(marked, "the skill applies the debt state");

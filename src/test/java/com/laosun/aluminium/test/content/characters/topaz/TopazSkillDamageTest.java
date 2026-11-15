@@ -69,7 +69,7 @@ public class TopazSkillDamageTest {
         System.out.println("[1112] skill=" + skill + " strike=" + strike + " 1.5atk=" + 1.5 * attack);
         System.out.println("[1112] skill: plain=" + skill + " windfall=" + with
                 + " ratio=" + (with / skill) + " expected=" + expected);
-        Assertions.assertAll("战技: one instance of the 150%, and 【涨幅惊人！】's reach into it",
+        Assertions.assertAll("战技: one instance of the 150%, and 【char:1112/staggering_rise！】's reach into it",
                 () -> Assertions.assertTrue(skill > 0, "precondition: the Skill dealt damage"),
                 () -> Assertions.assertEquals(1.5, ratio, 0.01,
                         "one instance, and the 50% the Skill applies on top: " + ratio),
@@ -119,7 +119,7 @@ public class TopazSkillDamageTest {
 
         /** One Numby strike on the (now marked) target, for comparison with the Skill's instance. */
         private double strikeDamage() {
-            Assertions.assertTrue(enemy.getBuffManager().hasState("负债证明"),
+            Assertions.assertTrue(enemy.getBuffManager().hasState("char:1112/debt_proof"),
                     "precondition: the Skill marked the target, so Numby has something to hit");
             double before = enemy.getCurrentHp();
             battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, summon(), summon(), 1, 0));

@@ -21,6 +21,10 @@ import java.util.Random;
  * self-shield at 30% DEF + 384, which only exists when the technique was declared.
  */
 public class PreservationTrailblazerTest {
+    /** The stack counter of the given avatar (8003 and 8004 are the same kit under two ids). */
+    private static String magmaWill(int cid) {
+        return "char:" + cid + "/burning_will";
+    }
     private static final int TB3 = 8003;
     private static final int TB4 = 8004;
     private static final int ALLY = 1002;
@@ -39,11 +43,11 @@ public class PreservationTrailblazerTest {
         for (int i = 0; i < 8; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0));
         }
-        Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"),
+        Assertions.assertEquals(8, tb.getBuffManager().stacksOf(magmaWill(TB3)),
                 "「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」 (every time it is attacked once, gains 1 stack of Magma Will (【灼热意志】), up to 8 stacks)");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0));
-        Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"), "the ninth hit must not pass the cap");
+        Assertions.assertEquals(8, tb.getBuffManager().stacksOf(magmaWill(TB3)), "the ninth hit must not pass the cap");
     }
 
     /**
@@ -180,7 +184,7 @@ public class PreservationTrailblazerTest {
         Scene scene = new Scene(cid, eidolon);
         if (enhanced) {
             // The swap to slot 8 happens on the events around the stacks; one hit is enough when 星魂 4 already gave four.
-            int hits = Math.max(1, 4 - scene.unit.getBuffManager().stacksOf("灼热意志"));
+            int hits = Math.max(1, 4 - scene.unit.getBuffManager().stacksOf(magmaWill(cid)));
             for (int i = 0; i < hits; i++) {
                 scene.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                         TriggerEvent.TAKING_HIT, scene.enemy, scene.unit, 0, 0));
@@ -282,13 +286,13 @@ public class PreservationTrailblazerTest {
         // stacks (eidolon 4) still needs ONE event for the swap rule to run. Measured: skipping it left the basic un-enhanced.
         // ⚠ Computed ONCE: re-reading the count per iteration would shrink the bound as the stacks grow (measured: 4 intended
         // hits landed as 2, and the basic was never enhanced).
-        int hits = Math.max(1, 4 - scene.unit.getBuffManager().stacksOf("灼热意志"));
+        int hits = Math.max(1, 4 - scene.unit.getBuffManager().stacksOf(magmaWill(cid)));
         for (int i = 0; i < hits; i++) {
             scene.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                     TriggerEvent.TAKING_HIT, scene.enemy, scene.unit, 0, 0));
         }
         scene.battle.processRequests();
-        Assertions.assertTrue(scene.unit.getBuffManager().stacksOf("灼热意志") >= 4,
+        Assertions.assertTrue(scene.unit.getBuffManager().stacksOf(magmaWill(cid)) >= 4,
                 "precondition: four stacks so the basic is the enhanced one");
         scene.battle.castImmediate(scene.unit.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON),
                 scene.unit, List.of(scene.enemy));

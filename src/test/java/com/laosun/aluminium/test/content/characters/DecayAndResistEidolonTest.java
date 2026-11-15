@@ -72,12 +72,12 @@ public class DecayAndResistEidolonTest {
                 new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         for (int i = 0; i < 6; i++) {
-            asta.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("蓄能", 1, true, 99));
+            asta.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("char:1009/charge", 1, true, 99));
         }
         for (int i = 0; i < 2; i++) {
             battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, asta, asta, 0, 0));
         }
-        return asta.getBuffManager().stacksOf("蓄能");
+        return asta.getBuffManager().stacksOf("char:1009/charge");
     }
 
     /** @return how the enemy's effect resistance moved across a wave start */

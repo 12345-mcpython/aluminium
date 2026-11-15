@@ -22,6 +22,10 @@ import java.util.List;
  * spends four - after which the slot is the plain row again. Written 2026-11-06 for both files (they share one document).
  */
 public class TrailblazerMagmaWillSwapTest {
+    /** The stack counter of the given avatar (8003 and 8004 are the same kit under two ids). */
+    private static String magmaWill(int cid) {
+        return "char:" + cid + "/burning_will";
+    }
     private static final int[] BOTH = {8003, 8004};
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
@@ -44,14 +48,14 @@ public class TrailblazerMagmaWillSwapTest {
                         DamageType.NORMAL, 1));
                 battle.processRequests();
             }
-            Assertions.assertEquals(4, trailblazer.getBuffManager().stacksOf("灼热意志"),
+            Assertions.assertEquals(4, trailblazer.getBuffManager().stacksOf(magmaWill(cid)),
                     "cid " + cid + ": four hits, four stacks");
             Assertions.assertEquals(8, trailblazer.getSkills().get(SkillType.COMMON).getSkillSlot(),
                     "cid " + cid + ": 「层数不低于 4 时，普攻将获得强化」 — the slot holds data row 8");
 
             battle.castImmediate(trailblazer.getSkills().get(SkillType.COMMON), trailblazer, List.of(enemy));
             battle.processRequests();
-            Assertions.assertEquals(0, trailblazer.getBuffManager().stacksOf("灼热意志"),
+            Assertions.assertEquals(0, trailblazer.getBuffManager().stacksOf(magmaWill(cid)),
                     "cid " + cid + ": 「消耗 4 层【灼热意志】」");
             Assertions.assertEquals(1, trailblazer.getSkills().get(SkillType.COMMON).getSkillSlot(),
                     "cid " + cid + ": and below four stacks the plain basic is back");

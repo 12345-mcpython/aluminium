@@ -21,13 +21,13 @@ public class TrickeryOdeDefenceTest {
     private static final int CYRENE = 1415;
     private static final int CIPHER = 1406;
     private static final int ODE_SLOT = 20;
-    private static final String PATRON = "老主顾";
+    private static final String PATRON = "char:1406/regular_customer";
 
     @Test
     public void theMarkLosesMoreThanTheRest() {
         double[] r = run();
         System.out.println("[trick_def] the marked one's defence fell " + r[0] + " ; the unmarked one's " + r[1]);
-        Assertions.assertEquals(0.10, r[0], 1e-6, "【老主顾】 (Patron) takes #2");
+        Assertions.assertEquals(0.10, r[0], 1e-6, "【char:1406/regular_customer】 (Patron) takes #2");
         Assertions.assertEquals(0.06, r[1], 1e-6, "everyone else takes #3");
     }
 

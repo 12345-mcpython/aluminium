@@ -12,7 +12,7 @@
   ],
   "resources": [
     {
-      "id": "记录值",
+      "id": "char:1406/recorded_value",
       "max": 2147483647,
       "source": "1406 赛飞儿 天赋 热情好客的多洛斯人: 「赛飞儿会记录我方目标对【老主顾】造成的非真实伤害的12%，不记录溢出伤害，施放终结技后清空记录值。」",
       "note": "**记账**不是面板：`DEALING_DAMAGE` 打中【老主顾】时按事件量的 12% 累加。⚠ 「不记录**溢出**伤害」与「施放终结技后**清空**」未写（登记在该角色的 `_gaps`）。"
@@ -24,12 +24,12 @@
       "id": "talent_records_a_share_of_damage_to_the_patron",
       "when": [
         "actor is_ally",
-        "target has_state 老主顾"
+        "target has_state char:1406/regular_customer"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "记录值",
+          "resource": "char:1406/recorded_value",
           "amountFromEvent": true,
           "amountPercent": 0.12
         }
@@ -100,12 +100,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "老主顾",
+          "buff": "char:1406/regular_customer",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "老主顾",
+          "buff": "char:1406/regular_customer",
           "permanent": true,
           "target": "target"
         }
@@ -122,7 +122,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "老主顾",
+          "buff": "char:1406/regular_customer",
           "permanent": true,
           "target": "target"
         }
@@ -135,7 +135,7 @@
       "id": "talent_reaction_followup",
       "when": [
         "actor is_other_ally",
-        "target has_state 老主顾"
+        "target has_state char:1406/regular_customer"
       ],
       "per_turn": 1,
       "do": [
@@ -259,7 +259,7 @@
           "permanent": true,
           "target": "all_enemies",
           "target_when": [
-            "target has_state 老主顾"
+            "target has_state char:1406/regular_customer"
           ]
         }
       ],
@@ -282,7 +282,7 @@
           "permanent": true,
           "target": "all_enemies",
           "target_when": [
-            "!target has_state 老主顾"
+            "!target has_state char:1406/regular_customer"
           ]
         }
       ],

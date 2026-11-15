@@ -65,14 +65,14 @@ public class SeeleClauseCoverageTest {
      */
     @Test
     public void eidolon6MarksTheTargetAndTheMarkAddsARider() {
-        Assertions.assertTrue(markedByTheUltimate(), "「施放终结技攻击后…陷入【乱蝶】」");
+        Assertions.assertTrue(markedByTheUltimate(), "「施放终结技攻击后…陷入【char:1102/chaos_butterfly】」");
         Assertions.assertTrue(riderFiresOnANormalAttack(), "「受到攻击后，额外受到 1 次…量子附加伤害」");
     }
 
     private static boolean markedByTheUltimate() {
         Fixture f = new Fixture(6);
         f.castUltimate();
-        return f.enemy.getBuffManager().hasState("乱蝶");
+        return f.enemy.getBuffManager().hasState("char:1102/chaos_butterfly");
     }
 
     private static boolean riderFiresOnANormalAttack() {

@@ -21,6 +21,14 @@ import java.util.List;
  * being ABSENT, and the marker is spent by its own rule. So one enhanced basic costs nothing, and the next one costs four.
  */
 public class TrailblazerFreeEnhancedBasicTest {
+    /** The twin avatars' counters: each id owns its own. */
+    private static String magmaWill(int cid) {
+        return "char:" + cid + "/burning_will";
+    }
+
+    private static String freeEmpower(int cid) {
+        return "char:" + cid + "/free_empower";
+    }
     private static final int[] BOTH = {8003, 8004};
     private static final int LEVEL = 80;
 
@@ -39,18 +47,18 @@ public class TrailblazerFreeEnhancedBasicTest {
                         DamageType.NORMAL, 1));
                 battle.processRequests();
             }
-            Assertions.assertEquals(4, trailblazer.getBuffManager().stacksOf("灼热意志"), "cid " + cid + ": precondition");
+            Assertions.assertEquals(4, trailblazer.getBuffManager().stacksOf(magmaWill(cid)), "cid " + cid + ": precondition");
 
             trailblazer.setCurrentEnergy(trailblazer.getMaxEnergy());
             battle.castImmediate(trailblazer.getSkills().get(SkillType.ULTRA), trailblazer, List.of(enemy));
             battle.processRequests();
-            Assertions.assertTrue(trailblazer.getBuffManager().hasState("免费强化"), "cid " + cid + ": the marker is on");
+            Assertions.assertTrue(trailblazer.getBuffManager().hasState(freeEmpower(cid)), "cid " + cid + ": the marker is on");
 
             battle.castImmediate(trailblazer.getSkills().get(SkillType.COMMON), trailblazer, List.of(enemy));
             battle.processRequests();
-            Assertions.assertEquals(4, trailblazer.getBuffManager().stacksOf("灼热意志"),
+            Assertions.assertEquals(4, trailblazer.getBuffManager().stacksOf(magmaWill(cid)),
                     "cid " + cid + ": 「…且不消耗【灼热意志】」 — four before, four after");
-            Assertions.assertFalse(trailblazer.getBuffManager().hasState("免费强化"),
+            Assertions.assertFalse(trailblazer.getBuffManager().hasState(freeEmpower(cid)),
                     "cid " + cid + ": the marker was spent by that attack");
         }
     }

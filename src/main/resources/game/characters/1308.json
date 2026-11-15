@@ -11,7 +11,7 @@
   ],
   "resources": [
     {
-      "id": "残梦",
+      "id": "char:1308/residual_dream",
       "max": 9,
       "source": "1308 黄泉 天赋 红叶时雨，万倾一空 (130804, Enhance): 「【残梦】达到9点时可激活终结技。终结技期间可无视弱点属性削减敌方韧性，并使敌方全体全属性抗性降低20%，持续至终结技结束。任意单位施放技能期间使敌方目标陷入负面效果，黄泉获得1点【残梦】并为目标附上1层【集真赤】，若使多个目标陷入负面效果，则为其中【集真赤】最多的敌方目标附上1层【集真赤】。该效果每次施放技能最多触发1次。黄泉在场时，敌方目标离场或被任意单位消灭后，其持有的【集真赤】会转移至全场【集真赤】最多的敌方目标。」",
       "note": "上限 **9** 是**文档原话** ✓（「【残梦】**达到 9 点**时可激活终结技」✓），并且**有写入者** ✓（战技 +1 ✓）⇒ 按第 219 轮的判据 ✓（\"**上限单独不够，还得有东西能把它填上**\" ✓）**可以声明** ✓。⚠ 文档**没说初始值** ✗ ⇒ 保持默认 **0** ✓。\n⚠ **登记**：「【残梦】**达到 9 点时**可**激活终结技**」✗ —— ⭐ 阈值形式**是有的** ✓（`self_resource:残梦 >= 9` ✓），但它是**解锁终结技** ✗（一个\"**能不能放**\"的门 ✗），而不是一种效果 ✗ ⇒ 写不出来 ✓。"
@@ -49,7 +49,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "残梦",
+          "resource": "char:1308/residual_dream",
           "amount": 1
         }
       ],
@@ -82,12 +82,12 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "残梦",
+          "resource": "char:1308/residual_dream",
           "amount": 1
         },
         {
           "op": "ADD_STACK",
-          "buff": "集真赤",
+          "buff": "char:1308/true_red",
           "amount": 1,
           "permanent": true,
           "target": "target"
@@ -147,12 +147,12 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "残梦",
+          "resource": "char:1308/residual_dream",
           "amount": 1
         },
         {
           "op": "ADD_STACK",
-          "buff": "集真赤",
+          "buff": "char:1308/true_red",
           "amount": 1,
           "permanent": true,
           "target": "random_enemy"
@@ -172,15 +172,15 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "残梦",
+          "resource": "char:1308/residual_dream",
           "amount": 1
         },
         {
           "op": "ADD_STACK",
-          "buff": "集真赤",
+          "buff": "char:1308/true_red",
           "amount": 1,
           "permanent": true,
-          "target": "highest_stacks_enemy:集真赤"
+          "target": "highest_stacks_enemy:char:1308/true_red"
         }
       ],
       "source": "1308 黄泉 星魂 2 霆鼓俱寂，瑟风亦止: 「…自身回合开始时获得1点【残梦】，同时为【集真赤】最多的敌方附上1层【集真赤】。」",

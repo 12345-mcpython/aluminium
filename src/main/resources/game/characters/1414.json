@@ -39,12 +39,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "同袍",
+          "buff": "char:1414/comrade",
           "target": "all_allies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "同袍",
+          "buff": "char:1414/comrade",
           "turns": 3,
           "target": "target"
         },
@@ -85,7 +85,7 @@
           "scale": "self_attr:ATTACK",
           "percent": 0.15,
           "turns": 3,
-          "target": "holder_of:同袍"
+          "target": "holder_of:char:1414/comrade"
         }
       ],
       "source": "1414 丹恒•腾荒 行迹 神秀 (1414101, skill_traces.json param [0.15]): 「施放战技时，使成为【同袍】的目标攻击力提高，提高数值等同于丹恒•腾荒15%攻击力。」",
@@ -127,7 +127,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "同袍",
+          "buff": "char:1414/comrade",
           "permanent": true,
           "target": "self"
         }
@@ -152,7 +152,7 @@
       "on": "ALLY_ATTACK",
       "id": "trace_sylvanity_energy_when_the_bondmate_attacks",
       "when": [
-        "actor has_state 同袍"
+        "actor has_state char:1414/comrade"
       ],
       "do": [
         {
@@ -175,7 +175,7 @@
           "op": "CAST_SKILL",
           "skill": "SKILL",
           "target": "self",
-          "cast_target": "holder_of:同袍"
+          "cast_target": "holder_of:char:1414/comrade"
         }
       ],
       "source": "1414 丹恒•腾荒 秘技 地坼 (141407, Maze) 后半: 「…下一次战斗开始时自动对持有【同袍】的角色施放1次战技，此次战技不消耗战技点。」",
@@ -192,7 +192,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "献予「大地」之诗",
+          "buff": "char:1414/ode_to_earth",
           "permanent": true,
           "target": "self"
         }
@@ -214,7 +214,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.0012,
           "permanent": true,
-          "target": "holder_of:同袍",
+          "target": "holder_of:char:1414/comrade",
           "coexist": true,
           "max_stacks": 1
         }

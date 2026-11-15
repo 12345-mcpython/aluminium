@@ -88,7 +88,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "暖流",
+          "buff": "char:1410/warm_current",
           "permanent": true,
           "target": "self"
         }
@@ -100,7 +100,7 @@
       "id": "memosprite_ode_of_ocean_spends_itself_for_energy",
       "on": "ALLY_ATTACK",
       "when": [
-        "self has_state 暖流"
+        "self has_state char:1410/warm_current"
       ],
       "do": [
         {
@@ -110,7 +110,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "暖流"
+          "buff": "char:1410/warm_current"
         }
       ],
       "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22）：「**海瑟音施放攻击后消耗【暖流】为自身恢复 #4 点能量**。」",
@@ -149,14 +149,14 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "奥词普攻溢出",
+          "resource": "internal:1410/arcane_basic_overflow",
           "scale": "cast_skill_param:1",
           "percent": 10000,
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "奥词战技溢出",
+          "resource": "internal:1410/arcane_skill_overflow",
           "scale": "cast_skill_param:2",
           "percent": 10000,
           "target": "self"
@@ -178,7 +178,7 @@
           "element": "Physical",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词普攻溢出",
+            "resource": "internal:1410/arcane_basic_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -200,7 +200,7 @@
           "element": "Fire",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词普攻溢出",
+            "resource": "internal:1410/arcane_basic_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -222,7 +222,7 @@
           "element": "Ice",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词普攻溢出",
+            "resource": "internal:1410/arcane_basic_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -244,7 +244,7 @@
           "element": "Wind",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词普攻溢出",
+            "resource": "internal:1410/arcane_basic_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -266,7 +266,7 @@
           "element": "Thunder",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词普攻溢出",
+            "resource": "internal:1410/arcane_basic_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -288,7 +288,7 @@
           "element": "Quantum",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词普攻溢出",
+            "resource": "internal:1410/arcane_basic_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -310,7 +310,7 @@
           "element": "Imaginary",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词普攻溢出",
+            "resource": "internal:1410/arcane_basic_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -332,7 +332,7 @@
           "element": "Physical",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词战技溢出",
+            "resource": "internal:1410/arcane_skill_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -354,7 +354,7 @@
           "element": "Fire",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词战技溢出",
+            "resource": "internal:1410/arcane_skill_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -376,7 +376,7 @@
           "element": "Ice",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词战技溢出",
+            "resource": "internal:1410/arcane_skill_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -398,7 +398,7 @@
           "element": "Wind",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词战技溢出",
+            "resource": "internal:1410/arcane_skill_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -420,7 +420,7 @@
           "element": "Thunder",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词战技溢出",
+            "resource": "internal:1410/arcane_skill_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -442,7 +442,7 @@
           "element": "Quantum",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词战技溢出",
+            "resource": "internal:1410/arcane_skill_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -464,7 +464,7 @@
           "element": "Imaginary",
           "percent_from": {
             "type": "resource",
-            "resource": "奥词战技溢出",
+            "resource": "internal:1410/arcane_skill_overflow",
             "basis_points": true
           },
           "target": "target"
@@ -555,12 +555,12 @@
   ],
   "resources": [
     {
-      "id": "奥词普攻溢出",
+      "id": "internal:1410/arcane_basic_overflow",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 数据行 22 的「普攻」那半（#2）在施放那一刻被捕获后存放的地方（基点）。"
     },
     {
-      "id": "奥词战技溢出",
+      "id": "internal:1410/arcane_skill_overflow",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 数据行 22 的「战技」那半（#3）在施放那一刻被捕获后存放的地方（基点）。"
     }

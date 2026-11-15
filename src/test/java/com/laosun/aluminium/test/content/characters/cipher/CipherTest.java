@@ -41,7 +41,7 @@ public class CipherTest {
         double reference = reactionLoss(false, true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "「after 【老主顾】 (Patron) is attacked by another of our targets」 -- without the mark, nothing");
+                "「after 【char:1406/regular_customer】 (Patron) is attacked by another of our targets」 -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the follow-up lands");
         Assertions.assertEquals(0.5, marked / reference, 0.05,
                 "150% against a hand-built 300% reference: " + marked + " vs " + reference);
@@ -126,7 +126,7 @@ public class CipherTest {
             TriggerSpecs.set(effect, "target", "target");
             EffectSpec markEffect = new EffectSpec();
             TriggerSpecs.set(markEffect, "op", "APPLY_BUFF");
-            TriggerSpecs.set(markEffect, "buff", "老主顾");
+            TriggerSpecs.set(markEffect, "buff", "char:1406/regular_customer");
             TriggerSpecs.set(markEffect, "permanent", true);
             TriggerSpecs.set(markEffect, "target", "target");
             // Note: The reference must carry her presence aura too. Round 1040 shipped "while Cipher is on the field, the damage taken by all enemies is increased by
@@ -141,7 +141,7 @@ public class CipherTest {
                     TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), markEffect),
                     TriggerSpecs.rule(TriggerEvent.BATTLE_START.name(), List.of(), aura),
                     TriggerSpecs.rule(TriggerEvent.ALLY_ATTACK.name(),
-                            List.of("actor is_other_ally", "target has_state 老主顾"), effect))));
+                            List.of("actor is_other_ally", "target has_state char:1406/regular_customer"), effect))));
         }
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(cipher, ally), List.of(enemy), fixed());
@@ -149,7 +149,7 @@ public class CipherTest {
         if (mark) {
             // Applied directly in BOTH paths: casting the Skill would also raise her ATTACK by 30% (its own rule), and the reference cannot
             // reproduce that without reproducing the whole rule. One difference between the paths is the point.
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("老主顾", 1, true));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1406/regular_customer", 1, true));
         }
         double before = enemy.getCurrentHp();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));

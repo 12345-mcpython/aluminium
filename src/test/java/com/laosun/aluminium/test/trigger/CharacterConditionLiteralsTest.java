@@ -372,7 +372,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1406, "SKILL_CAST", "skill_weakness_and_attack", List.of("actor == self"));
         assertRule(1406, "SKILL_CAST", "talent_patron_on_skill", List.of("actor == self"));
         assertRule(1406, "ULT_CAST", "talent_patron_on_ult", List.of("actor == self"));
-        assertRule(1406, "ALLY_ATTACK", "talent_reaction_followup", List.of("actor is_other_ally", "target has_state 老主顾"));
+        assertRule(1406, "ALLY_ATTACK", "talent_reaction_followup", List.of("actor is_other_ally", "target has_state char:1406/regular_customer"));
         assertRule(1406, "BATTLE_START", "technique_opening_aoe", List.of("self has_state sys:technique"));
         assertRule(1406, "DEALING_DAMAGE", "eidolon2_damage_taken", List.of("actor == self"));
         assertRule(1406, "BATTLE_START", "level_convention", List.of());
@@ -410,7 +410,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1501, "BATTLE_START", "technique_opening_aoe_and_skill_points", List.of("self has_state sys:technique"));
         assertRule(1501, "BATTLE_START", "level_convention", List.of());
         assertRule(1502, "CAST_SETUP", "p1502_ult_penetration", List.of("actor == self", "from_category ULTRA"));
-        assertRule(1504, "ALLY_ATTACK", "talent_reaction_to_bait", List.of("actor is_other_ally", "target has_state 饲饵"));
+        assertRule(1504, "ALLY_ATTACK", "talent_reaction_to_bait", List.of("actor is_other_ally", "target has_state char:1504/bait"));
         assertRule(1504, "BATTLE_START", "technique_opening_aoe", List.of("self has_state sys:technique"));
         assertRule(1504, "SKILL_CAST", "skill_marks_the_bait", List.of("actor == self"));
         assertRule(1504, "BATTLE_START", "eidolon1_enemies_take_more", List.of());

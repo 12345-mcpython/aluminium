@@ -37,13 +37,13 @@ public class AcheronTest {
 
         Assertions.assertEquals(0, dreamOf(acheron), "the document states no initial value, so it starts at 0");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0));
-        Assertions.assertEquals(1, dreamOf(acheron), "「获得1点【残梦】」 (gains 1 point of [残梦])");
+        Assertions.assertEquals(1, dreamOf(acheron), "「获得1点【char:1308/residual_dream】」 (gains 1 point of [char:1308/residual_dream])");
 
         for (int i = 0; i < 11; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0));
         }
         Assertions.assertEquals(9, dreamOf(acheron),
-                "「【残梦】达到9点时可激活终结技」 (at 9 points of [残梦] the Ultimate can be activated) -- twelve casts must still read nine");
+                "「【char:1308/residual_dream】达到9点时可激活终结技」 (at 9 points of [char:1308/residual_dream] the Ultimate can be activated) -- twelve casts must still read nine");
     }
 
     /**
@@ -88,7 +88,7 @@ public class AcheronTest {
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int dreamOf(Character unit) {
-        return unit.getResources().get("残梦").getValue();
+        return unit.getResources().get("char:1308/residual_dream").getValue();
     }
 
     private static Random fixed() {

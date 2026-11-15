@@ -35,9 +35,9 @@ import java.util.List;
 public class TopazUltimateTest {
     private static final int TOPAZ = 1112;
     private static final int LEVEL = 80;
-    private static final String STATE = "涨幅惊人";
-    private static final String CHARGES = "涨幅次数";
-    private static final String MARK = "负债证明";
+    private static final String STATE = "char:1112/staggering_rise";
+    private static final String CHARGES = "internal:1112/rise_count";
+    private static final String MARK = "char:1112/debt_proof";
     private static final double EPS = 1e-9;
 
     /**
@@ -69,9 +69,9 @@ public class TopazUltimateTest {
         double expected = (1 + fireBoost + 1.5) / (1 + fireBoost) * (1 + critAfter) / (1 + critBefore);
         System.out.println("[1112] numby strike: plain=" + without + " windfall=" + with
                 + " ratio=" + (with / without) + " expected=" + expected);
-        Assertions.assertAll("终结技 「使账账进入【涨幅惊人！】状态」: the state, its budget and its two modifiers",
+        Assertions.assertAll("终结技 「使账账进入【char:1112/staggering_rise！】状态」: the state, its budget and its two modifiers",
                 () -> Assertions.assertFalse(inStateBefore, "control: not in the state before the Ultimate"),
-                () -> Assertions.assertTrue(inStateAfter, "「使账账进入【涨幅惊人！】状态」"),
+                () -> Assertions.assertTrue(inStateAfter, "「使账账进入【char:1112/staggering_rise！】状态」"),
                 () -> Assertions.assertEquals(2, budget, "「账账施放 2 次攻击后退出」"),
                 () -> Assertions.assertEquals(0.25, critAfter - baseCrit, EPS,
                         "「暴击伤害提高 25%」 - on 账账, not on 托帕"),
@@ -117,12 +117,12 @@ public class TopazUltimateTest {
         }
         boolean aliveAfterThree = six.numby().getBuffManager().hasState(STATE);
 
-        Assertions.assertAll("「账账施放 2 次攻击后退出【涨幅惊人！】状态」 and 星魂 6's third attack + 10% RES pierce",
+        Assertions.assertAll("「账账施放 2 次攻击后退出【char:1112/staggering_rise！】状态」 and 星魂 6's third attack + 10% RES pierce",
                 () -> Assertions.assertTrue(aliveAfterOne, "one attack is not enough"),
                 () -> Assertions.assertFalse(aliveAfterTwo, "「施放 2 次攻击后退出」"),
                 () -> Assertions.assertEquals(0, spentBudget, "the budget is spent"),
                 () -> Assertions.assertEquals(0.0, boostAfterExit, EPS,
-                        "「伤害倍率提高 150%」 left with 【涨幅惊人！】"),
+                        "「伤害倍率提高 150%」 left with 【char:1112/staggering_rise！】"),
                 () -> Assertions.assertEquals(0.5, critAfterExit, EPS,
                         "…and so did 「暴击伤害提高 25%」"),
                 () -> Assertions.assertEquals(0.0, pierceWithoutEidolon, EPS,
@@ -132,7 +132,7 @@ public class TopazUltimateTest {
                 () -> Assertions.assertEquals(0.1, pierceInState, EPS,
                         "「攻击时火属性抗性穿透提高 10%」"),
                 () -> Assertions.assertEquals(3, sixBudget,
-                        "「账账处于【涨幅惊人！】状态的攻击次数增加 1 次」"),
+                        "「账账处于【char:1112/staggering_rise！】状态的攻击次数增加 1 次」"),
                 () -> Assertions.assertFalse(aliveAfterThree, "three attacks, then out"));
     }
 
@@ -153,7 +153,7 @@ public class TopazUltimateTest {
         double armed = noState.remaining();
         noState.basicAttack();
         Assertions.assertEquals(armed, noState.remaining(), 1e-9,
-                "control: without 【涨幅惊人！】 the sentence does not apply");
+                "control: without 【char:1112/staggering_rise！】 the sentence does not apply");
 
         Scene unmarked = new Scene(0, true);
         unmarked.ultimate();
@@ -161,7 +161,7 @@ public class TopazUltimateTest {
         double untouched = unmarked.remaining();
         unmarked.basicAttack();
         Assertions.assertEquals(untouched, unmarked.remaining(), 1e-9,
-                "control: no 【负债证明】 on the target, no advance");
+                "control: no 【char:1112/debt_proof】 on the target, no advance");
     }
 
     /** 行迹 技术性调整:「当账账处于【涨幅惊人！】状态施放攻击后，额外使托帕恢复 10 点能量」 - judged as the difference from the SAME action without the state, so the attack own energy cancels. */
@@ -201,7 +201,7 @@ public class TopazUltimateTest {
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, topaz, topaz, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(1, (holdsMark(first) ? 1 : 0) + (holdsMark(second) ? 1 : 0),
-                "「若场上不存在…使随机敌方目标陷入【负债证明】」 - exactly one enemy is marked");
+                "「若场上不存在…使随机敌方目标陷入【char:1112/debt_proof】」 - exactly one enemy is marked");
 
         boolean firstWasMarked = holdsMark(first);
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, topaz, topaz, 0, 0));

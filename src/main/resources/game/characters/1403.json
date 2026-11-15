@@ -84,7 +84,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "神启",
+          "buff": "char:1403/revelation",
           "turns": 3,
           "ticks_on": "self",
           "target": "self"
@@ -94,7 +94,7 @@
           "attribute": "DAMAGE_PENETRATION",
           "turns": 3,
           "ticks_on": "self",
-          "buff": "神启",
+          "buff": "char:1403/revelation",
           "target": "all_allies",
           "percent_from_skill_param": "SKILL:0"
         }
@@ -111,7 +111,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "神启",
+          "buff": "char:1403/revelation",
           "turns": 3,
           "ticks_on": "self",
           "target": "self"
@@ -121,7 +121,7 @@
           "attribute": "DAMAGE_PENETRATION",
           "turns": 3,
           "ticks_on": "self",
-          "buff": "神启",
+          "buff": "char:1403/revelation",
           "target": "all_allies",
           "percent_from_skill_param": "SKILL:0"
         }
@@ -198,7 +198,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "献予「门径」之诗",
+          "buff": "char:1403/ode_to_gateway",
           "permanent": true,
           "target": "self"
         },
@@ -302,7 +302,7 @@
       "when": [
         "actor == self",
         "self has_state char:1403/barrier",
-        "self has_state 献予「门径」之诗",
+        "self has_state char:1403/ode_to_gateway",
         "damage_is_additional",
         "damage_has_no_cast"
       ],
@@ -373,7 +373,7 @@
           "attribute": "DEFENCE_IGNORE",
           "turns": 3,
           "ticks_on": "self",
-          "buff": "神启",
+          "buff": "char:1403/revelation",
           "target": "all_allies",
           "percent_from_skill_param": "TALENT:0"
         }
@@ -394,7 +394,7 @@
           "attribute": "DEFENCE_IGNORE",
           "turns": 3,
           "ticks_on": "self",
-          "buff": "神启",
+          "buff": "char:1403/revelation",
           "target": "all_allies",
           "percent_from_skill_param": "TALENT:0"
         }

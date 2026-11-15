@@ -91,7 +91,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "自身回合数",
+          "buff": "internal:1009/own_turns",
           "amount": 1,
           "max_stacks": 99,
           "permanent": true,
@@ -106,13 +106,13 @@
       "id": "talent_charge_decays_from_second_turn",
       "when": [
         "actor == self",
-        "self_stacks:自身回合数 >= 2",
-        "!self has_state 蓄能不减"
+        "self_stacks:internal:1009/own_turns >= 2",
+        "!self has_state char:1009/charge_no_decay"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "蓄能",
+          "buff": "char:1009/charge",
           "amount": 3,
           "target": "self"
         }
@@ -127,7 +127,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "per_stack": "self_stacks:蓄能",
+          "per_stack": "self_stacks:char:1009/charge",
           "per_stack_cap": 5,
           "per_stack_live": true,
           "permanent": true,
@@ -148,7 +148,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "蓄能",
+          "buff": "char:1009/charge",
           "amount": 1,
           "max_stacks": 99,
           "permanent": true,
@@ -167,7 +167,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "蓄能",
+          "buff": "char:1009/charge",
           "amount": 1,
           "max_stacks": 99,
           "permanent": true,
@@ -261,7 +261,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "蓄能不减",
+          "buff": "char:1009/charge_no_decay",
           "turns": 1,
           "ticks_on": "self",
           "target": "self"
@@ -281,7 +281,7 @@
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.15,
           "permanent": true,
-          "while_stacks": "蓄能",
+          "while_stacks": "char:1009/charge",
           "while_stacks_min": 2,
           "target": "self"
         }

@@ -39,7 +39,7 @@ public class AstaTest {
     private static final int ASTA = 1009;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String CHARGE = "蓄能";
+    private static final String CHARGE = "char:1009/charge";
 
     /**
      * Note: "使我方全体速度提高50点，持续2回合" -- fifty points, for the party.
@@ -114,7 +114,7 @@ public class AstaTest {
         battle.startBattle();
         battle.processRequests();
         for (int i = 0; i < charges; i++) {
-            asta.getBuffManager().addBuff(new StackBuff("蓄能", 99, true, 99));
+            asta.getBuffManager().addBuff(new StackBuff("char:1009/charge", 99, true, 99));
         }
         // The gate is swept at a TURN BOUNDARY (BuffManager.processBuffTick), not by a TURN_START event - so the fixture gives her
         // a real turn: the move signal is taken from the queue the way ArgentiStacksTest does it.

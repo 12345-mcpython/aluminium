@@ -77,6 +77,26 @@
       "key": "char:1008/last_stand"
     },
     {
+      "name": "char:1009/charge",
+      "owner": "1009",
+      "kind": "char",
+      "used_by": [
+        "1009"
+      ],
+      "zh": "蓄能",
+      "key": "char:1009/charge"
+    },
+    {
+      "name": "char:1009/charge_no_decay",
+      "owner": "1009",
+      "kind": "char",
+      "used_by": [
+        "1009"
+      ],
+      "zh": "蓄能不减",
+      "key": "char:1009/charge_no_decay"
+    },
+    {
       "name": "char:1014/core_resonance",
       "owner": "1014",
       "kind": "char",
@@ -127,6 +147,36 @@
       "key": "char:1015/loop_link"
     },
     {
+      "name": "char:1102/amplify",
+      "owner": "1102",
+      "kind": "char",
+      "used_by": [
+        "1102"
+      ],
+      "zh": "增幅",
+      "key": "char:1102/amplify"
+    },
+    {
+      "name": "char:1102/chaos_butterfly",
+      "owner": "1102",
+      "kind": "char",
+      "used_by": [
+        "1102"
+      ],
+      "zh": "乱蝶",
+      "key": "char:1102/chaos_butterfly"
+    },
+    {
+      "name": "char:1102/nightwalk",
+      "owner": "1102",
+      "kind": "char",
+      "used_by": [
+        "1102"
+      ],
+      "zh": "夜行",
+      "key": "char:1102/nightwalk"
+    },
+    {
       "name": "char:1106/general_solution",
       "owner": "1106",
       "kind": "char",
@@ -155,6 +205,26 @@
       ],
       "zh": "斗志",
       "key": "char:1111/fighting_spirit"
+    },
+    {
+      "name": "char:1112/debt_proof",
+      "owner": "1112",
+      "kind": "char",
+      "used_by": [
+        "1112"
+      ],
+      "zh": "负债证明",
+      "key": "char:1112/debt_proof"
+    },
+    {
+      "name": "char:1112/staggering_rise",
+      "owner": "1112",
+      "kind": "char",
+      "used_by": [
+        "1112"
+      ],
+      "zh": "涨幅惊人",
+      "key": "char:1112/staggering_rise"
     },
     {
       "name": "char:1202/blessing",
@@ -497,6 +567,26 @@
       "key": "char:1307/epiphany"
     },
     {
+      "name": "char:1308/residual_dream",
+      "owner": "1308",
+      "kind": "char",
+      "used_by": [
+        "1308"
+      ],
+      "zh": "残梦",
+      "key": "char:1308/residual_dream"
+    },
+    {
+      "name": "char:1308/true_red",
+      "owner": "1308",
+      "kind": "char",
+      "used_by": [
+        "1308"
+      ],
+      "zh": "集真赤",
+      "key": "char:1308/true_red"
+    },
+    {
       "name": "char:1313/blessed_one",
       "owner": "1313",
       "kind": "char",
@@ -687,6 +777,26 @@
       "key": "char:1403/barrier"
     },
     {
+      "name": "char:1403/ode_to_gateway",
+      "owner": "1403",
+      "kind": "char",
+      "used_by": [
+        "1403"
+      ],
+      "zh": "献予「门径」之诗",
+      "key": "char:1403/ode_to_gateway"
+    },
+    {
+      "name": "char:1403/revelation",
+      "owner": "1403",
+      "kind": "char",
+      "used_by": [
+        "1403"
+      ],
+      "zh": "神启",
+      "key": "char:1403/revelation"
+    },
+    {
       "name": "char:1404/blood_feud",
       "owner": "1404",
       "kind": "char",
@@ -735,6 +845,26 @@
       ],
       "zh": "真知的战技增伤",
       "key": "char:1405/true_knowledge_skill_boost"
+    },
+    {
+      "name": "char:1406/recorded_value",
+      "owner": "1406",
+      "kind": "char",
+      "used_by": [
+        "1406"
+      ],
+      "zh": "记录值",
+      "key": "char:1406/recorded_value"
+    },
+    {
+      "name": "char:1406/regular_customer",
+      "owner": "1406",
+      "kind": "char",
+      "used_by": [
+        "1406"
+      ],
+      "zh": "老主顾",
+      "key": "char:1406/regular_customer"
     },
     {
       "name": "char:1407/moon_cocoon",
@@ -826,6 +956,16 @@
       ],
       "zh": "天空应我的祈愿",
       "key": "char:1409/sky_answer"
+    },
+    {
+      "name": "char:1410/warm_current",
+      "owner": "1410",
+      "kind": "char",
+      "used_by": [
+        "1410"
+      ],
+      "zh": "暖流",
+      "key": "char:1410/warm_current"
     },
     {
       "name": "char:1412/action_lock",
@@ -1019,6 +1159,26 @@
       "key": "char:1413/myriad_essence"
     },
     {
+      "name": "char:1414/comrade",
+      "owner": "1414",
+      "kind": "char",
+      "used_by": [
+        "1414"
+      ],
+      "zh": "同袍",
+      "key": "char:1414/comrade"
+    },
+    {
+      "name": "char:1414/ode_to_earth",
+      "owner": "1414",
+      "kind": "char",
+      "used_by": [
+        "1414"
+      ],
+      "zh": "献予「大地」之诗",
+      "key": "char:1414/ode_to_earth"
+    },
+    {
       "name": "char:1415/barrier",
       "owner": "1415",
       "kind": "char",
@@ -1179,6 +1339,16 @@
       "key": "char:1503/sand_absorb"
     },
     {
+      "name": "char:1504/bait",
+      "owner": "1504",
+      "kind": "char",
+      "used_by": [
+        "1504"
+      ],
+      "zh": "饲饵",
+      "key": "char:1504/bait"
+    },
+    {
       "name": "char:1504/charge",
       "owner": "1504",
       "kind": "char",
@@ -1187,6 +1357,16 @@
       ],
       "zh": "充能",
       "key": "char:1504/charge"
+    },
+    {
+      "name": "char:1504/gluttony",
+      "owner": "1504",
+      "kind": "char",
+      "used_by": [
+        "1504"
+      ],
+      "zh": "婪酣",
+      "key": "char:1504/gluttony"
     },
     {
       "name": "char:1506/barrier",
@@ -1859,6 +2039,66 @@
       "key": "char:24004/calculation"
     },
     {
+      "name": "char:8003/burning_will",
+      "owner": "8003",
+      "kind": "char",
+      "used_by": [
+        "8003"
+      ],
+      "zh": "灼热意志",
+      "key": "char:8003/burning_will"
+    },
+    {
+      "name": "char:8003/free_empower",
+      "owner": "8003",
+      "kind": "char",
+      "used_by": [
+        "8003"
+      ],
+      "zh": "免费强化",
+      "key": "char:8003/free_empower"
+    },
+    {
+      "name": "char:8003/rampart",
+      "owner": "8003",
+      "kind": "char",
+      "used_by": [
+        "8003"
+      ],
+      "zh": "城垣",
+      "key": "char:8003/rampart"
+    },
+    {
+      "name": "char:8004/burning_will",
+      "owner": "8004",
+      "kind": "char",
+      "key": "char:8004/burning_will",
+      "zh": "灼热意志",
+      "used_by": [
+        "8004"
+      ]
+    },
+    {
+      "name": "char:8004/free_empower",
+      "owner": "8004",
+      "kind": "char",
+      "key": "char:8004/free_empower",
+      "zh": "免费强化",
+      "used_by": [
+        "8004"
+      ]
+    },
+    {
+      "name": "char:8004/rampart",
+      "owner": "8004",
+      "kind": "char",
+      "key": "char:8004/rampart",
+      "zh": "城垣",
+      "used_by": [
+        "8004"
+      ]
+    },
+    {
       "name": "char:8007/charge",
       "owner": "8007",
       "kind": "char",
@@ -1935,6 +2175,16 @@
       "zh": "风化"
     },
     {
+      "name": "internal:1009/own_turns",
+      "owner": "1009",
+      "kind": "internal",
+      "used_by": [
+        "1009"
+      ],
+      "zh": "自身回合数",
+      "key": "internal:1009/own_turns"
+    },
+    {
       "name": "internal:1014/first_ultimate_done",
       "owner": "1014",
       "kind": "internal",
@@ -1983,6 +2233,16 @@
       ],
       "zh": "本回合战技次数",
       "key": "internal:1015/skill_casts_this_turn"
+    },
+    {
+      "name": "internal:1112/rise_count",
+      "owner": "1112",
+      "kind": "internal",
+      "used_by": [
+        "1112"
+      ],
+      "zh": "涨幅次数",
+      "key": "internal:1112/rise_count"
     },
     {
       "name": "internal:1204/attack_segments",
@@ -2183,6 +2443,26 @@
       ],
       "zh": "天空之诗的治疗份额",
       "key": "internal:1409/ode_sky_heal_share"
+    },
+    {
+      "name": "internal:1410/arcane_basic_overflow",
+      "owner": "1410",
+      "kind": "internal",
+      "used_by": [
+        "1410"
+      ],
+      "zh": "奥词普攻溢出",
+      "key": "internal:1410/arcane_basic_overflow"
+    },
+    {
+      "name": "internal:1410/arcane_skill_overflow",
+      "owner": "1410",
+      "kind": "internal",
+      "used_by": [
+        "1410"
+      ],
+      "zh": "奥词战技溢出",
+      "key": "internal:1410/arcane_skill_overflow"
     },
     {
       "name": "internal:1413/ode_years_essence_points",
@@ -2537,29 +2817,12 @@
       ]
     },
     {
-      "name": "乱蝶",
-      "owner": "1102",
-      "kind": "char",
-      "used_by": [
-        "1102"
-      ]
-    },
-    {
       "name": "伴舞",
       "owner": "8005",
       "kind": "char",
       "used_by": [
         "8005",
         "8006"
-      ]
-    },
-    {
-      "name": "免费强化",
-      "owner": "8003",
-      "kind": "char",
-      "used_by": [
-        "8003",
-        "8004"
       ]
     },
     {
@@ -2619,14 +2882,6 @@
       ]
     },
     {
-      "name": "同袍",
-      "owner": "1414",
-      "kind": "char",
-      "used_by": [
-        "1414"
-      ]
-    },
-    {
       "name": "地狱变",
       "owner": "1205",
       "kind": "char",
@@ -2635,60 +2890,11 @@
       ]
     },
     {
-      "name": "城垣",
-      "owner": "8003",
-      "kind": "char",
-      "used_by": [
-        "8003",
-        "8004"
-      ]
-    },
-    {
-      "name": "增幅",
-      "owner": "1102",
-      "kind": "char",
-      "used_by": [
-        "1102"
-      ]
-    },
-    {
-      "name": "夜行",
-      "owner": "1102",
-      "kind": "char",
-      "used_by": [
-        "1102"
-      ]
-    },
-    {
-      "name": "奥词战技溢出",
-      "owner": "1410",
-      "kind": "internal",
-      "used_by": [
-        "1410"
-      ]
-    },
-    {
-      "name": "奥词普攻溢出",
-      "owner": "1410",
-      "kind": "internal",
-      "used_by": [
-        "1410"
-      ]
-    },
-    {
       "name": "好活当赏",
       "owner": "battle",
       "kind": "battle",
       "key": "elation:certified_banger",
       "en": "Certified Banger"
-    },
-    {
-      "name": "婪酣",
-      "owner": "1504",
-      "kind": "char",
-      "used_by": [
-        "1504"
-      ]
     },
     {
       "name": "完全燃烧",
@@ -2796,14 +3002,6 @@
       ]
     },
     {
-      "name": "暖流",
-      "owner": "1410",
-      "kind": "char",
-      "used_by": [
-        "1410"
-      ]
-    },
-    {
       "name": "本回合消耗",
       "owner": "324",
       "kind": "char",
@@ -2819,44 +3017,11 @@
       "en": "Elation"
     },
     {
-      "name": "残梦",
-      "owner": "1308",
-      "kind": "char",
-      "used_by": [
-        "1308"
-      ]
-    },
-    {
-      "name": "涨幅惊人",
-      "owner": "1112",
-      "kind": "char",
-      "used_by": [
-        "1112"
-      ]
-    },
-    {
-      "name": "涨幅次数",
-      "owner": "1112",
-      "kind": "internal",
-      "used_by": [
-        "1112"
-      ]
-    },
-    {
       "name": "灵感",
       "owner": "1401",
       "kind": "char",
       "used_by": [
         "1401"
-      ]
-    },
-    {
-      "name": "灼热意志",
-      "owner": "8003",
-      "kind": "char",
-      "used_by": [
-        "8003",
-        "8004"
       ]
     },
     {
@@ -2900,22 +3065,6 @@
       ]
     },
     {
-      "name": "献予「大地」之诗",
-      "owner": "1414",
-      "kind": "char",
-      "used_by": [
-        "1414"
-      ]
-    },
-    {
-      "name": "献予「门径」之诗",
-      "owner": "1403",
-      "kind": "char",
-      "used_by": [
-        "1403"
-      ]
-    },
-    {
       "name": "琼玉牌",
       "owner": "1201",
       "kind": "char",
@@ -2937,14 +3086,6 @@
       "kind": "char",
       "used_by": [
         "1304"
-      ]
-    },
-    {
-      "name": "神启",
-      "owner": "1403",
-      "kind": "char",
-      "used_by": [
-        "1403"
       ]
     },
     {
@@ -3002,38 +3143,6 @@
       ]
     },
     {
-      "name": "老主顾",
-      "owner": "1406",
-      "kind": "char",
-      "used_by": [
-        "1406"
-      ]
-    },
-    {
-      "name": "自身回合数",
-      "owner": "1009",
-      "kind": "char",
-      "used_by": [
-        "1009"
-      ]
-    },
-    {
-      "name": "蓄能",
-      "owner": "1009",
-      "kind": "char",
-      "used_by": [
-        "1009"
-      ]
-    },
-    {
-      "name": "蓄能不减",
-      "owner": "1009",
-      "kind": "char",
-      "used_by": [
-        "1009"
-      ]
-    },
-    {
       "name": "虚弱",
       "owner": "battle",
       "kind": "battle",
@@ -3054,22 +3163,6 @@
       "kind": "char",
       "used_by": [
         "1401"
-      ]
-    },
-    {
-      "name": "记录值",
-      "owner": "1406",
-      "kind": "internal",
-      "used_by": [
-        "1406"
-      ]
-    },
-    {
-      "name": "负债证明",
-      "owner": "1112",
-      "kind": "char",
-      "used_by": [
-        "1112"
       ]
     },
     {
@@ -3120,14 +3213,6 @@
       "en": "Aha Instant"
     },
     {
-      "name": "集真赤",
-      "owner": "1308",
-      "kind": "char",
-      "used_by": [
-        "1308"
-      ]
-    },
-    {
       "name": "领航旗语",
       "owner": "1510",
       "kind": "char",
@@ -3149,14 +3234,6 @@
       "kind": "internal",
       "used_by": [
         "1220"
-      ]
-    },
-    {
-      "name": "饲饵",
-      "owner": "1504",
-      "kind": "char",
-      "used_by": [
-        "1504"
       ]
     }
   ]

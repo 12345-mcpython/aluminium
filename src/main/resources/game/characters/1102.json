@@ -58,7 +58,7 @@
           "attribute": "AGGRO_ADDED_RATIO",
           "percent": -0.5,
           "permanent": true,
-          "buff": "夜行",
+          "buff": "char:1102/nightwalk",
           "target": "self"
         }
       ],
@@ -75,7 +75,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "夜行",
+          "buff": "char:1102/nightwalk",
           "target": "self"
         }
       ],
@@ -98,7 +98,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "增幅",
+          "buff": "char:1102/amplify",
           "turns": 1,
           "target": "self"
         }
@@ -231,7 +231,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "乱蝶",
+          "buff": "char:1102/chaos_butterfly",
           "turns": 1,
           "target": "target"
         }
@@ -245,7 +245,7 @@
       "min_eidolon": 6,
       "_status": "implemented",
       "when": [
-        "target has_state 乱蝶",
+        "target has_state char:1102/chaos_butterfly",
         "damage_is_attack"
       ],
       "do": [
@@ -321,7 +321,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "乱蝶",
+          "buff": "char:1102/chaos_butterfly",
           "target": "all_enemies"
         }
       ],

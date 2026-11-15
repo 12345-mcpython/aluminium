@@ -30,8 +30,8 @@ public class EarthOdeRaisesTheBondmatesDamageTest {
         com.laosun.aluminium.skill.SkillExecutor.execute(battle, him.getSkills().get(SkillType.SKILL), him,
                 List.of(battle.characters().get(2)));
         battle.processRequests();
-        Assertions.assertTrue(battle.characters().get(2).getBuffManager().hasState("同袍"),
-                "precondition: the ally holds 【同袍】 (Bondmate)");
+        Assertions.assertTrue(battle.characters().get(2).getBuffManager().hasState("char:1414/comrade"),
+                "precondition: the ally holds 【char:1414/comrade】 (Bondmate)");
         double before = battle.characters().get(2).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         // the ode, cast at him
         var sprite = battle.summonServant(battle.characters().get(0));
@@ -43,6 +43,6 @@ public class EarthOdeRaisesTheBondmatesDamageTest {
         battle.processRequests();
         double after = battle.characters().get(2).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[earth_boost] the bondmate's damage boost reads " + before + " -> " + after);
-        Assertions.assertEquals(0.0012, after - before, 1e-9, "0.12% lands on the 【同袍】 (Bondmate) holder");
+        Assertions.assertEquals(0.0012, after - before, 1e-9, "0.12% lands on the 【char:1414/comrade】 (Bondmate) holder");
     }
 }

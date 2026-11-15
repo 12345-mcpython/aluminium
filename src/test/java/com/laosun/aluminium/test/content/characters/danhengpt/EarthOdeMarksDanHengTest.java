@@ -21,11 +21,11 @@ public class EarthOdeMarksDanHengTest {
     private static final int DAN_HENG = 1414;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 25;
-    private static final String STATE = "献予「大地」之诗";
+    private static final String STATE = "char:1414/ode_to_earth";
 
     @Test
     public void theEarthOdeMarksTheOneItIsCastAt() {
-        Assertions.assertEquals(1.0, state(true), 1e-9, "cast at him, he gains the poem offered to Earth (献予「大地」之诗)");
+        Assertions.assertEquals(1.0, state(true), 1e-9, "cast at him, he gains the poem offered to Earth (char:1414/ode_to_earth)");
         Assertions.assertEquals(0.0, state(false), 1e-9, "cast at someone else, he does not");
     }
 

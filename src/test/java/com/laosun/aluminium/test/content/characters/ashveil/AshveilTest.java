@@ -62,7 +62,7 @@ public class AshveilTest {
     private static final int ASHVEIL = 1504;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String LAYERS = "婪酣";
+    private static final String LAYERS = "char:1504/gluttony";
 
     // ------------------------------------------------------------------ talent: the Bait reaction
 
@@ -100,7 +100,7 @@ public class AshveilTest {
         // Her declaration gives 2 charges. One firing is TWO layers: the talent says 「获得 2 层【婪酣】」 and `amount` IS the count.
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
-        Assertions.assertEquals(5, ashveil.getBuffManager().stacksOf("婪酣"),
+        Assertions.assertEquals(5, ashveil.getBuffManager().stacksOf("char:1504/gluttony"),
                 "two firings of two layers, plus the layer the Skill cast grants through 罪途");
 
         Assertions.assertThrows(IllegalStateException.class,
@@ -131,9 +131,9 @@ public class AshveilTest {
         }
         int eidolonTwo = e2.layers();
 
-        Assertions.assertAll("「随后获得 2 层【婪酣】，最多叠加 12 层」, and Eidolon 2's 18",
+        Assertions.assertAll("「随后获得 2 层【char:1504/gluttony】，最多叠加 12 层」, and Eidolon 2's 18",
                 () -> Assertions.assertEquals(0, before, "precondition: no layers yet"),
-                () -> Assertions.assertEquals(2, afterOne, "「随后获得 2 层【婪酣】」 — two, not one"),
+                () -> Assertions.assertEquals(2, afterOne, "「随后获得 2 层【char:1504/gluttony】」 — two, not one"),
                 () -> Assertions.assertEquals(12, capped, "the base cap is 12"),
                 () -> Assertions.assertEquals(18, eidolonTwo, "「叠加上限提高至 18 层」"));
     }
@@ -172,7 +172,7 @@ public class AshveilTest {
         f.castUltimate();
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < hpBefore, "precondition: the Ultimate and its follow-up landed");
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("饲饵"), "「使指定敌方单体成为【饲饵】」");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("char:1504/bait"), "「使指定敌方单体成为【char:1504/bait】」");
         Assertions.assertEquals(3, f.ashveil.getResources().get("char:1504/charge").value(), 1e-9,
                 "「且不死途获得 3 点充能」 (clamped at the declared maximum of 3)");
     }
@@ -418,8 +418,8 @@ public class AshveilTest {
         private void triggerTalent() {
             // the talent spends one charge per trigger; top it up so the fixture can fire it repeatedly
             ashveil.getResources().get("char:1504/charge").setValue(3);
-            if (!enemy.getBuffManager().hasState("饲饵")) {
-                enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("饲饵", 99, true));
+            if (!enemy.getBuffManager().hasState("char:1504/bait")) {
+                enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1504/bait", 99, true));
             }
             battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
             battle.processRequests();

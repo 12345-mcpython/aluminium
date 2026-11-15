@@ -24,7 +24,7 @@ public class PassageOdeExtraZoneHitTest {
     private static final int TRIBBIE = 1403;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 15;
-    private static final String GATE = "献予「门径」之诗";
+    private static final String GATE = "char:1403/ode_to_gateway";
 
     @Test
     public void theExtraHitOnlyLandsWhileTheOdeIsOnHer() {

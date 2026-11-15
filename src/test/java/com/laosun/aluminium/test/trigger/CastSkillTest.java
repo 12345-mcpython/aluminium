@@ -299,9 +299,9 @@ public class CastSkillTest {
         double pointsBefore = battle.getSkillPoints();
         battle.startBattle();
 
-        Assertions.assertTrue(him.getBuffManager().hasState("同袍"),
-                "precondition: the technique put 【同袍】 (Bondmate) on him (the aim's true side)");
-        Assertions.assertFalse(ally.getBuffManager().hasState("同袍"),
+        Assertions.assertTrue(him.getBuffManager().hasState("char:1414/comrade"),
+                "precondition: the technique put 【char:1414/comrade】 (Bondmate) on him (the aim's true side)");
+        Assertions.assertFalse(ally.getBuffManager().hasState("char:1414/comrade"),
                 "and the commanded cast must NOT have moved it onto the first ally");
 
         double expected = 0.2 * attackBefore + 400;   // the Lv10 row the document quotes (20% ATK + 400)

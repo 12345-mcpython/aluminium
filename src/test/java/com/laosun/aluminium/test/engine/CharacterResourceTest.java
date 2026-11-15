@@ -337,7 +337,7 @@ public class CharacterResourceTest {
         TriggerTable one = new TriggerTable(HIMEKO, List.of(chargeThresholdRule()),
                 List.of(new ResourceSpec(CHARGE, 3)));
         TriggerTable two = new TriggerTable(HIMEKO, List.of(chargeThresholdRule()),
-                List.of(new ResourceSpec("残梦", 9)));
+                List.of(new ResourceSpec("char:1308/residual_dream", 9)));
 
         TriggerTable both = one.plus(two);
         IllegalArgumentException clash = Assertions.assertThrows(IllegalArgumentException.class,

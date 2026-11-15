@@ -57,8 +57,8 @@ public class TribbieTest {
 
         battle.startBattle();
 
-        Assertions.assertTrue(tribbie.getBuffManager().hasState("神启"),
-                "「使用秘技后，进入战斗时获得【神启】」 (after using the Technique, gains Numinosity (【神启】) on entering battle)");
+        Assertions.assertTrue(tribbie.getBuffManager().hasState("char:1403/revelation"),
+                "「使用秘技后，进入战斗时获得【char:1403/revelation】」 (after using the Technique, gains Numinosity (【char:1403/revelation】) on entering battle)");
     }
 
 

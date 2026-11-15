@@ -46,7 +46,7 @@
       "max_eidolon": 1,
       "when": [
         "actor is_other_ally",
-        "target has_state 饲饵"
+        "target has_state char:1504/bait"
       ],
       "do": [
         {
@@ -67,7 +67,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "婪酣",
+          "buff": "char:1504/gluttony",
           "amount": 2,
           "max_stacks": 12,
           "permanent": true,
@@ -83,7 +83,7 @@
       "min_eidolon": 2,
       "when": [
         "actor is_other_ally",
-        "target has_state 饲饵"
+        "target has_state char:1504/bait"
       ],
       "do": [
         {
@@ -104,7 +104,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "婪酣",
+          "buff": "char:1504/gluttony",
           "amount": 2,
           "max_stacks": 18,
           "permanent": true,
@@ -156,7 +156,7 @@
       "_note": "「**若该目标为【饲饵】**，则额外造成 **100%** 攻击力雷伤，并恢复 **1** 点战技点」—— 条件 `target has_state 饲饵` ✓，但**必须在施加之前求值**（同一次施放的`skill_marks_the_bait` 会把状态摘掉再挂上）⇒ **本条排在 `skill_marks_the_bait` 之前**（文件顺序 = 执行顺序，1214/1301 的同一课）✓。⚠ 100% 是**字面值**：`skills.json` 150402 那一行与文档的列映射没核清（见 `_gaps`），所以不读行、直接写文档给的倍数 —— 这是**有意的取舍**，不是忘了读行。",
       "when": [
         "actor == self",
-        "target has_state 饲饵"
+        "target has_state char:1504/bait"
       ],
       "id": "skill_strikes_the_existing_bait_twice"
     },
@@ -169,19 +169,19 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "饲饵",
+          "buff": "char:1504/bait",
           "target": "all_enemies"
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.4,
           "permanent": true,
-          "buff": "饲饵",
+          "buff": "char:1504/bait",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "饲饵",
+          "buff": "char:1504/bait",
           "permanent": true,
           "target": "target"
         }
@@ -270,12 +270,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "饲饵",
+          "buff": "char:1504/bait",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "饲饵",
+          "buff": "char:1504/bait",
           "permanent": true,
           "target": "target"
         },
@@ -368,7 +368,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.04,
-          "per_stack": "self_stacks:婪酣",
+          "per_stack": "self_stacks:char:1504/gluttony",
           "per_stack_cap": 30,
           "per_stack_live": true,
           "permanent": true,
@@ -379,7 +379,7 @@
       "_note": "「敌方全体**全属性抗性降低 20%**」= `MODIFY_ATTR RESISTANCE_REDUCTION { percent: 0.2 }` ✓；「每获得过 1 层【婪酣】，造成的伤害提高 **4%**，最多 **30** 层」= `per_stack: 「self_stacks:婪酣」` + `per_stack_cap: 30` + `per_stack_live: true` ✓（每层 4%，实时读层数，层名与天赋的 `ADD_STACK 婪酣` 一致）。数值来自星魂参数 ⇒ 字面值 ✓。✅ 「**当场上存在【饲饵】时**」= `any_enemy has_state 「饲饵」`（引擎**有条件**，原登记的「没有『场上存在某状态』的条件」已作废）✓。 ⚠ 事件从 `BATTLE_START` 改成 **`SKILL_CAST`**：`any_enemy has_state 「饲饵」` 在开战时恒假（那时还没有【饲饵】），而这条效果的文案是「**当场上存在**【饲饵】时」的**持续**条件 ⇒ 挂在她施加【饲饵】的那次施放上，之后每次施放重算（修饰是常驻/实时，重复应用同值）。",
       "when": [
         "actor == self",
-        "any_enemy has_state 饲饵"
+        "any_enemy has_state char:1504/bait"
       ]
     },
     {
@@ -419,7 +419,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "婪酣",
+          "buff": "char:1504/gluttony",
           "amount": 1,
           "max_stacks": 12,
           "permanent": true,
@@ -438,7 +438,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "婪酣",
+          "buff": "char:1504/gluttony",
           "amount": 2,
           "max_stacks": 12,
           "permanent": true,
@@ -471,7 +471,7 @@
                   {
                     "type": "stacks",
                     "whose": "owner",
-                    "buff": "婪酣"
+                    "buff": "char:1504/gluttony"
                   },
                   {
                     "type": "const",
@@ -490,7 +490,7 @@
       "do": [
         {
           "percent": 2.0,
-          "times_from": "steps:self_stacks:婪酣/4",
+          "times_from": "steps:self_stacks:char:1504/gluttony/4",
           "target": "target",
           "element": "Thunder",
           "op": "DAMAGE",
@@ -499,7 +499,7 @@
       ],
       "when": [
         "actor == self",
-        "self_stacks:婪酣 >= 4"
+        "self_stacks:char:1504/gluttony >= 4"
       ],
       "source": "1504 不死途 终结技 飨宴，自始无终:「…拥有【婪酣】时，每消耗4层【婪酣】可额外造成1次等同于不死途200%攻击力的雷属性伤害…直至【婪酣】小于4层。」",
       "_note": "「拥有【婪酣】时，**每消耗 4 层**可额外造成 1 次 **200%** 雷伤，直至不足 4 层」—— 这一轮给 **`times_from`** 加了 **`steps:<counter>/<N>`** 拼法（复用 `steps`/`per_steps`/`SPEND_STEPS` 共用的解析器，`floor(层数 / 4)`），于是「几组就打几下」可以直接写 ✓。⚠ 条件 `self_stacks:婪酣 >= 4` 与 `times_from` 的取整是两件事：前者是「至少够一组」，后者是「够几组打几下」。⛔ 同句「**消耗**那 4 层」这半仍未写（`REMOVE_STACK` 需要一个「4 × 组数」的量，见 `_gaps`）。",
