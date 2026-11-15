@@ -393,6 +393,7 @@ public final class DoubleValue implements Cloneable {
         /*
          * Creates an add-percent modifier from an integer percentage (e.g. 18 means 18%).
          */
+
         /**
          * A modifier whose ADD_PERCENT share is asked for on every computation.
          *
@@ -432,34 +433,32 @@ public final class DoubleValue implements Cloneable {
             return live != null ? live.getAsDouble() : value;
         }
 
-        public static Modifier addPercentNumber(double percentValue) {
-            return new Modifier(ModifierType.ADD_PERCENT, percentValue / 100.0, ModifierSource.UNKNOWN, 0);
-        }
-
         /**
          * Creates a multiply-percent modifier from an integer percentage.
          */
-        public static Modifier multiplyPercentNumber(double percentValue) {
-            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue / 100.0, ModifierSource.UNKNOWN, 0);
+        public static Modifier addPercentNumber(double percentValue) {
+            return new Modifier(ModifierType.ADD_PERCENT, percentValue / 100.0, ModifierSource.UNKNOWN, 0);
         }
 
         public static Modifier addPercentNumber(double percentValue, ModifierSource source) {
             return new Modifier(ModifierType.ADD_PERCENT, percentValue / 100.0, source, 0);
         }
 
-        public static Modifier multiplyPercentNumber(double percentValue, ModifierSource source) {
-            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue / 100.0, source, 0);
-        }
-
         public static Modifier addPercentNumber(double percentValue, ModifierSource source, int sourceRoleId) {
             return new Modifier(ModifierType.ADD_PERCENT, percentValue / 100.0, source, sourceRoleId);
+        }
+
+        public static Modifier multiplyPercentNumber(double percentValue) {
+            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue / 100.0, ModifierSource.UNKNOWN, 0);
+        }
+
+        public static Modifier multiplyPercentNumber(double percentValue, ModifierSource source) {
+            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue / 100.0, source, 0);
         }
 
         public static Modifier multiplyPercentNumber(double percentValue, ModifierSource source, int sourceRoleId) {
             return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue / 100.0, source, sourceRoleId);
         }
-
-        // these need to call with number for example 0.18 represent to 18% boost
 
         /**
          * Creates an add-percent modifier from a decimal value (e.g. 0.18 means 18%).
@@ -468,11 +467,24 @@ public final class DoubleValue implements Cloneable {
             return new Modifier(ModifierType.ADD_PERCENT, percentValue, ModifierSource.UNKNOWN, 0);
         }
 
-        /**
-         * Creates a multiply-percent modifier from a decimal value.
-         */
+        public static Modifier addPercent(double percentValue, ModifierSource source) {
+            return new Modifier(ModifierType.ADD_PERCENT, percentValue, source, 0);
+        }
+
+        public static Modifier addPercent(double percentValue, ModifierSource source, int sourceRoleId) {
+            return new Modifier(ModifierType.ADD_PERCENT, percentValue, source, sourceRoleId);
+        }
+
         public static Modifier multiplyPercent(double percentValue) {
             return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue, ModifierSource.UNKNOWN, 0);
+        }
+
+        public static Modifier multiplyPercent(double percentValue, ModifierSource source) {
+            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue, source, 0);
+        }
+
+        public static Modifier multiplyPercent(double percentValue, ModifierSource source, int sourceRoleId) {
+            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue, source, sourceRoleId);
         }
 
         /**
@@ -482,26 +494,8 @@ public final class DoubleValue implements Cloneable {
             return new Modifier(ModifierType.PURE_VALUE, value, ModifierSource.UNKNOWN, 0);
         }
 
-
-        public static Modifier addPercent(double percentValue, ModifierSource source) {
-            return new Modifier(ModifierType.ADD_PERCENT, percentValue, source, 0);
-        }
-
-        public static Modifier multiplyPercent(double percentValue, ModifierSource source) {
-            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue, source, 0);
-        }
-
         public static Modifier pure(double value, ModifierSource source) {
             return new Modifier(ModifierType.PURE_VALUE, value, source, 0);
-        }
-
-
-        public static Modifier addPercent(double percentValue, ModifierSource source, int sourceRoleId) {
-            return new Modifier(ModifierType.ADD_PERCENT, percentValue, source, sourceRoleId);
-        }
-
-        public static Modifier multiplyPercent(double percentValue, ModifierSource source, int sourceRoleId) {
-            return new Modifier(ModifierType.MULTIPLY_PERCENT, percentValue, source, sourceRoleId);
         }
 
         public static Modifier pure(double value, ModifierSource source, int sourceRoleId) {
