@@ -126,7 +126,7 @@ public class EternalCalculusTest {
         }
 
         private int stacks() {
-            return wearer.getBuffManager().stacksOf("演算");
+            return wearer.getBuffManager().stacksOf("char:24004/calculation");
         }
 
         private double attack() {

@@ -106,7 +106,7 @@ public class OnTheFallOfAnAeonTest {
         System.out.println("[24000] stack=\"" + stack.getBuff() + "\" cap=" + stack.stackCap()
                 + " ; share per_stack=\"" + share.getPerStack() + "\" percent=" + share.getPercent());
         Assertions.assertEquals(4, stack.stackCap(), "four layers at most");
-        Assertions.assertEquals("星神层数", share.getPerStack(), "per layer");
+        Assertions.assertEquals("internal:24000/aeon_layers", share.getPerStack(), "per layer");
         Assertions.assertEquals(0.08, share.getPercent(), 1e-9, "8% per layer at rank 1");
     }
 }

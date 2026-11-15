@@ -41,12 +41,12 @@ public class FlowingNightglowTest {
             var s = song.getFirst().effects();
             Assertions.assertEquals(2, s.size(), "rank " + rank + ": a stack and its bonus");
             Assertions.assertEquals("ADD_STACK", s.get(0).getOp());
-            Assertions.assertEquals("歌咏", s.get(0).getBuff(), "rank " + rank + ": the counter");
+            Assertions.assertEquals("char:23026/singing", s.get(0).getBuff(), "rank " + rank + ": the counter");
             Assertions.assertEquals(5, s.get(0).getMaxStacks(), "rank " + rank + ": capped at five");
             Assertions.assertEquals("MODIFY_ATTR", s.get(1).getOp());
             Assertions.assertEquals("ENERGY_REGENERATION_RATE", s.get(1).getAttribute());
             Assertions.assertEquals(REGEN[rank - 1], s.get(1).getPercent(), 1e-9, "rank " + rank + ": per layer");
-            Assertions.assertEquals("歌咏", s.get(1).getPerStack(),
+            Assertions.assertEquals("char:23026/singing", s.get(1).getPerStack(),
                     "rank " + rank + ": scaled by the counter (so no max_stacks here)");
             Assertions.assertEquals("self", s.get(1).getTarget());
 
@@ -56,9 +56,9 @@ public class FlowingNightglowTest {
             var u = ult.getFirst().effects();
             Assertions.assertEquals(4, u.size(), "rank " + rank + ": remove, state, ATK, side damage");
             Assertions.assertEquals("REMOVE_STATE", u.get(0).getOp());
-            Assertions.assertEquals("歌咏", u.get(0).getBuff(), "rank " + rank + ": consumed");
+            Assertions.assertEquals("char:23026/singing", u.get(0).getBuff(), "rank " + rank + ": consumed");
             Assertions.assertEquals("APPLY_BUFF", u.get(1).getOp());
-            Assertions.assertEquals("华彩", u.get(1).getBuff());
+            Assertions.assertEquals("char:23026/splendour", u.get(1).getBuff());
             Assertions.assertEquals(1, u.get(1).getTurns(), "rank " + rank + ": one turn");
             Assertions.assertEquals("ATTACK", u.get(2).getAttribute());
             Assertions.assertEquals(SELF[rank - 1], u.get(2).getPercent(), 1e-9, "rank " + rank + ": the ATK");

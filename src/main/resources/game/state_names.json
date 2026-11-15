@@ -277,6 +277,26 @@
       "key": "char:21041/trick"
     },
     {
+      "name": "char:23006/erode",
+      "owner": "23006",
+      "kind": "char",
+      "used_by": [
+        "23006"
+      ],
+      "zh": "游丝",
+      "key": "char:23006/erode"
+    },
+    {
+      "name": "char:23006/erode_haste",
+      "owner": "23006",
+      "kind": "char",
+      "used_by": [
+        "23006"
+      ],
+      "zh": "游丝加速",
+      "key": "char:23006/erode_haste"
+    },
+    {
       "name": "char:23007/aether_code",
       "owner": "23007",
       "kind": "char",
@@ -347,6 +367,26 @@
       "key": "char:23020/argument"
     },
     {
+      "name": "char:23021/color_flame",
+      "owner": "23021",
+      "kind": "char",
+      "used_by": [
+        "23021"
+      ],
+      "zh": "彩焰",
+      "key": "char:23021/color_flame"
+    },
+    {
+      "name": "char:23021/masquerade",
+      "owner": "23021",
+      "kind": "char",
+      "used_by": [
+        "23021"
+      ],
+      "zh": "假面",
+      "key": "char:23021/masquerade"
+    },
+    {
       "name": "char:23022/oracle",
       "owner": "23022",
       "kind": "char",
@@ -375,6 +415,26 @@
       ],
       "zh": "崩溃",
       "key": "char:23025/collapse"
+    },
+    {
+      "name": "char:23026/singing",
+      "owner": "23026",
+      "kind": "char",
+      "used_by": [
+        "23026"
+      ],
+      "zh": "歌咏",
+      "key": "char:23026/singing"
+    },
+    {
+      "name": "char:23026/splendour",
+      "owner": "23026",
+      "kind": "char",
+      "used_by": [
+        "23026"
+      ],
+      "zh": "华彩",
+      "key": "char:23026/splendour"
     },
     {
       "name": "char:23028/hope_priceless",
@@ -465,6 +525,56 @@
       ],
       "zh": "烈阳",
       "key": "char:23044/blazing_sun"
+    },
+    {
+      "name": "char:23049/nightfall",
+      "owner": "23049",
+      "kind": "char",
+      "used_by": [
+        "23049"
+      ],
+      "zh": "夜色",
+      "key": "char:23049/nightfall"
+    },
+    {
+      "name": "char:23054/best_fortune",
+      "owner": "23054",
+      "kind": "char",
+      "used_by": [
+        "23054"
+      ],
+      "zh": "上上签",
+      "key": "char:23054/best_fortune"
+    },
+    {
+      "name": "char:23062/regal_entertainment",
+      "owner": "23062",
+      "kind": "char",
+      "used_by": [
+        "23062"
+      ],
+      "zh": "王之娱乐",
+      "key": "char:23062/regal_entertainment"
+    },
+    {
+      "name": "char:23063/new_voice",
+      "owner": "23063",
+      "kind": "char",
+      "used_by": [
+        "23063"
+      ],
+      "zh": "新声",
+      "key": "char:23063/new_voice"
+    },
+    {
+      "name": "char:24004/calculation",
+      "owner": "24004",
+      "kind": "char",
+      "used_by": [
+        "24004"
+      ],
+      "zh": "演算",
+      "key": "char:24004/calculation"
     },
     {
       "name": "ctrl:frozen",
@@ -673,6 +783,16 @@
       "key": "internal:23046/skill_layers"
     },
     {
+      "name": "internal:24000/aeon_layers",
+      "owner": "24000",
+      "kind": "internal",
+      "used_by": [
+        "24000"
+      ],
+      "zh": "星神层数",
+      "key": "internal:24000/aeon_layers"
+    },
+    {
       "name": "relic130_elation_used",
       "owner": "130",
       "kind": "char",
@@ -687,14 +807,6 @@
       "key": "sys:technique",
       "en": "Technique",
       "zh": "秘技"
-    },
-    {
-      "name": "上上签",
-      "owner": "23054",
-      "kind": "char",
-      "used_by": [
-        "23054"
-      ]
     },
     {
       "name": "下个战技返还战技点",
@@ -751,14 +863,6 @@
       "used_by": [
         "8005",
         "8006"
-      ]
-    },
-    {
-      "name": "假面",
-      "owner": "23021",
-      "kind": "char",
-      "used_by": [
-        "23021"
       ]
     },
     {
@@ -972,14 +1076,6 @@
       ]
     },
     {
-      "name": "华彩",
-      "owner": "23026",
-      "kind": "char",
-      "used_by": [
-        "23026"
-      ]
-    },
-    {
       "name": "协奏",
       "owner": "1309",
       "kind": "char",
@@ -1066,14 +1162,6 @@
       "kind": "char",
       "used_by": [
         "1102"
-      ]
-    },
-    {
-      "name": "夜色",
-      "owner": "23049",
-      "kind": "char",
-      "used_by": [
-        "23049"
       ]
     },
     {
@@ -1300,14 +1388,6 @@
       ]
     },
     {
-      "name": "彩焰",
-      "owner": "23021",
-      "kind": "char",
-      "used_by": [
-        "23021"
-      ]
-    },
-    {
       "name": "影噬",
       "owner": "23056",
       "kind": "char",
@@ -1477,14 +1557,6 @@
       ]
     },
     {
-      "name": "新声",
-      "owner": "23063",
-      "kind": "char",
-      "used_by": [
-        "23063"
-      ]
-    },
-    {
       "name": "新蕊",
       "owner": "1407",
       "kind": "char",
@@ -1514,14 +1586,6 @@
       "kind": "char",
       "used_by": [
         "1506"
-      ]
-    },
-    {
-      "name": "星神层数",
-      "owner": "24000",
-      "kind": "internal",
-      "used_by": [
-        "24000"
       ]
     },
     {
@@ -1676,14 +1740,6 @@
       ]
     },
     {
-      "name": "歌咏",
-      "owner": "23026",
-      "kind": "char",
-      "used_by": [
-        "23026"
-      ]
-    },
-    {
       "name": "残梦",
       "owner": "1308",
       "kind": "char",
@@ -1761,30 +1817,6 @@
       "kind": "char",
       "used_by": [
         "1503"
-      ]
-    },
-    {
-      "name": "游丝",
-      "owner": "23006",
-      "kind": "char",
-      "used_by": [
-        "23006"
-      ]
-    },
-    {
-      "name": "游丝加速",
-      "owner": "23006",
-      "kind": "char",
-      "used_by": [
-        "23006"
-      ]
-    },
-    {
-      "name": "演算",
-      "owner": "24004",
-      "kind": "char",
-      "used_by": [
-        "24004"
       ]
     },
     {
@@ -1955,14 +1987,6 @@
       "kind": "char",
       "used_by": [
         "1403"
-      ]
-    },
-    {
-      "name": "王之娱乐",
-      "owner": "23062",
-      "kind": "char",
-      "used_by": [
-        "23062"
       ]
     },
     {

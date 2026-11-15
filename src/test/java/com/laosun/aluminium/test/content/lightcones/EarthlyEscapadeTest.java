@@ -26,8 +26,8 @@ public class EarthlyEscapadeTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int CAP = 4;
-    private static final String FLAME = "彩焰";
-    private static final String MASK = "假面";
+    private static final String FLAME = "char:23021/color_flame";
+    private static final String MASK = "char:23021/masquerade";
 
     private Character wearer;
     private Character ally;

@@ -23,7 +23,7 @@ public class IAmAsYouBeholdTest {
     private static final double[] ATK = {0.18, 0.21, 0.24, 0.27, 0.30};
     private static final double[] REGEN = {0.10, 0.125, 0.15, 0.175, 0.20};
     private static final double[] CRITDMG = {0.24, 0.30, 0.36, 0.42, 0.48};
-    private static final String KING = "王之娱乐";
+    private static final String KING = "char:23062/regal_entertainment";
 
     private Character wearer(int rank) {
         return CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));

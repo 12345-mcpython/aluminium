@@ -7,12 +7,12 @@
       "id": "cone24000_attack_per_attack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "星神层数", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:24000/aeon_layers", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "per_stack": "星神层数",
+          "per_stack": "internal:24000/aeon_layers",
           "permanent": true,
           "target": "self"
         }
@@ -37,12 +37,12 @@
       "id": "cone24000_attack_per_attack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "星神层数", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:24000/aeon_layers", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.09,
-          "per_stack": "星神层数",
+          "per_stack": "internal:24000/aeon_layers",
           "permanent": true,
           "target": "self"
         }
@@ -67,8 +67,8 @@
       "id": "cone24000_attack_per_attack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "星神层数", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
-        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.1, "per_stack": "星神层数", "permanent": true, "target": "self" }
+        { "op": "ADD_STACK", "buff": "internal:24000/aeon_layers", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.1, "per_stack": "internal:24000/aeon_layers", "permanent": true, "target": "self" }
       ],
       "source": "光锥 24000: 「当装备者施放攻击时，使装备者本场战斗中的攻击力提高#1[i]%，该效果最多叠加#2[i]层。」",
       "_note": "「装备者**施放攻击**时，攻击力提高 #1%，**最多叠加 4 层**（本场战斗）」—— `ALLY_ATTACK` ＋ `actor == self` ＋ ⭐ `ADD_STACK{max_stacks: 4}` ＋ `MODIFY_ATTR ATTACK{per_stack: 星神层数}` ✓（8/9/10/11/12% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 4` ✗（没有层缓冲、同属性修饰互相替换 ⇒ 永远只 +8% ✗）。"
@@ -90,12 +90,12 @@
       "id": "cone24000_attack_per_attack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "星神层数", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:24000/aeon_layers", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.11,
-          "per_stack": "星神层数",
+          "per_stack": "internal:24000/aeon_layers",
           "permanent": true,
           "target": "self"
         }
@@ -120,12 +120,12 @@
       "id": "cone24000_attack_per_attack",
       "when": ["actor == self"],
       "do": [
-        { "op": "ADD_STACK", "buff": "星神层数", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "internal:24000/aeon_layers", "amount": 1, "max_stacks": 4, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.12,
-          "per_stack": "星神层数",
+          "per_stack": "internal:24000/aeon_layers",
           "permanent": true,
           "target": "self"
         }

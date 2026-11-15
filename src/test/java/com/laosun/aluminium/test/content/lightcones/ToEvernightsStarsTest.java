@@ -42,7 +42,7 @@ public class ToEvernightsStarsTest {
     public void herMemospriteCastingGrantsNightfall() {
         Fixture f = new Fixture();
         f.spriteCasts();
-        Assertions.assertTrue(f.wearer.getBuffManager().hasState("夜色"), "「忆灵施放技能时，装备者获得【夜色】」");
+        Assertions.assertTrue(f.wearer.getBuffManager().hasState("char:23049/nightfall"), "「忆灵施放技能时，装备者获得【char:23049/nightfall】」");
     }
 
     /**
@@ -53,7 +53,7 @@ public class ToEvernightsStarsTest {
         Assertions.assertEquals(0.2, defenceIgnoreFromMemosprite(true), 1e-9,
                 "S1 #2 = 20%, on the instance");
         Assertions.assertEquals(0.0, defenceIgnoreFromMemosprite(false), 1e-9,
-                "without [夜色] the clause does not fire");
+                "without [char:23049/nightfall] the clause does not fire");
     }
 
     /**

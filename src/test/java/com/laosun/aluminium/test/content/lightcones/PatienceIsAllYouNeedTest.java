@@ -54,9 +54,9 @@ public class PatienceIsAllYouNeedTest {
     public void theConeInflictsThreadAndThreadCountsAsShock() {
         Battle battle = battle(true);
         attack(battle);
-        boolean thread = enemy.getBuffManager().hasState("游丝");
+        boolean thread = enemy.getBuffManager().hasState("char:23006/erode");
         boolean shock = enemy.getBuffManager().hasState("dot:shock");
-        System.out.println("[23006] after one hit: has Erode (游丝)=" + thread + " has Shock (dot:shock)=" + shock);
+        System.out.println("[23006] after one hit: has Erode (char:23006/erode)=" + thread + " has Shock (dot:shock)=" + shock);
         Assertions.assertTrue(thread, "the named DOT answers to its own name");
         Assertions.assertTrue(shock, "and to Shock (dot:shock) through the element table -- the alias costs nothing");
     }
@@ -69,19 +69,19 @@ public class PatienceIsAllYouNeedTest {
         // before today. (An event-driven fixture needs an event that carries a target, and BATTLE_START does not -- measured.)
         enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.DotBuff(
                 wearer, DamageElement.THUNDER, 20, 2));
-        boolean thread = enemy.getBuffManager().hasState("游丝");
+        boolean thread = enemy.getBuffManager().hasState("char:23006/erode");
         boolean shock = enemy.getBuffManager().hasState("dot:shock");
-        System.out.println("[23006] unnamed thunder DOT: has Erode (游丝)=" + thread + " has Shock (dot:shock)=" + shock);
+        System.out.println("[23006] unnamed thunder DOT: has Erode (char:23006/erode)=" + thread + " has Shock (dot:shock)=" + shock);
         Assertions.assertTrue(shock, "an unnamed thunder DOT is still Shock (dot:shock) -- the element path is untouched");
-        Assertions.assertFalse(thread, "but it is NOT Erode (游丝): the name is what distinguishes them");
+        Assertions.assertFalse(thread, "but it is NOT Erode (char:23006/erode): the name is what distinguishes them");
     }
 
     @Test
     public void withoutTheConeTheEnemyIsNotInflicted() {
         Battle battle = battle(false);
         attack(battle);
-        System.out.println("[23006] without the cone: has Erode (游丝)=" + enemy.getBuffManager().hasState("游丝"));
-        Assertions.assertFalse(enemy.getBuffManager().hasState("游丝"), "no cone, no state (false case)");
+        System.out.println("[23006] without the cone: has Erode (char:23006/erode)=" + enemy.getBuffManager().hasState("char:23006/erode"));
+        Assertions.assertFalse(enemy.getBuffManager().hasState("char:23006/erode"), "no cone, no state (false case)");
     }
 
     @Test
@@ -97,7 +97,7 @@ public class PatienceIsAllYouNeedTest {
                     System.out.println("[23006] spec element=" + effect.getElement() + " name=" + effect.getBuff()
                             + " percent=" + effect.getPercent() + " turns=" + effect.getTurns());
                     Assertions.assertEquals("Thunder", effect.getElement(), "thunder is what makes Shock (dot:shock) true");
-                    Assertions.assertEquals("游丝", effect.getBuff(), "the document's name for the state");
+                    Assertions.assertEquals("char:23006/erode", effect.getBuff(), "the document's name for the state");
                     Assertions.assertEquals(1, effect.getTurns(), "one turn at rank 1");
                 }
             }

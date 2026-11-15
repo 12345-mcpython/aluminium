@@ -44,7 +44,7 @@ public class RiseAndSingTest {
         var state = effects.stream().filter(e -> "APPLY_BUFF".equals(e.getOp()))
                 .findFirst().orElseThrow();
         System.out.println("[23063] the state is " + state.getBuff());
-        Assertions.assertEquals("新声", state.getBuff(), "the state name");
+        Assertions.assertEquals("char:23063/new_voice", state.getBuff(), "the state name");
         var speed = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp()))
                 .findFirst().orElseThrow();
         System.out.println("[23063] speed percent=" + speed.getPercent() + " target=" + speed.getTarget());

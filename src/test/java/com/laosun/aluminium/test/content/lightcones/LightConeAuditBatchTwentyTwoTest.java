@@ -47,7 +47,7 @@ public class LightConeAuditBatchTwentyTwoTest {
         System.out.println("[23026] 终结技后: 队友增伤 " + (f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - partyBefore)
                 + " ; 她的攻击增量 " + (f.attribute(AttributeType.ATTACK) - attackBefore));
         Assertions.assertEquals(0.24, f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - partyBefore, 1e-9,
-                "【华彩】「使我方全体造成的伤害提高 24%」");
+                "【char:23026/splendour】「使我方全体造成的伤害提高 24%」");
     }
 
     /**

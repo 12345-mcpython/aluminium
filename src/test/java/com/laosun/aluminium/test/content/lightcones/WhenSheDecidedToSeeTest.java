@@ -25,7 +25,7 @@ public class WhenSheDecidedToSeeTest {
     private static final double[] CRIT = {0.10, 0.11, 0.12, 0.13, 0.14};
     private static final double[] CDMG = {0.30, 0.375, 0.45, 0.525, 0.60};
     private static final double[] REGEN = {0.12, 0.14, 0.16, 0.18, 0.20};
-    private static final String CHARM = "上上签";
+    private static final String CHARM = "char:23054/best_fortune";
 
     private Character wearer(int rank) {
         return CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));

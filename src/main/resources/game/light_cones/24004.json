@@ -20,7 +20,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.04,
-          "per_stack": "self_stacks:演算",
+          "per_stack": "self_stacks:char:24004/calculation",
           "per_stack_live": true,
           "permanent": true,
           "target": "self"
@@ -34,8 +34,8 @@
       "id": "cone24004_attack_per_hit_stacks",
       "when": ["actor == self"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
-        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "char:24004/calculation", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:24004/calculation", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv1 #2 = 0.04",
       "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
@@ -60,7 +60,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.05,
-          "per_stack": "self_stacks:演算",
+          "per_stack": "self_stacks:char:24004/calculation",
           "per_stack_live": true,
           "permanent": true,
           "target": "self"
@@ -74,8 +74,8 @@
       "id": "cone24004_attack_per_hit_stacks",
       "when": ["actor == self"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
-        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "char:24004/calculation", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:24004/calculation", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv2 #2 = 0.05",
       "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
@@ -100,7 +100,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.06,
-          "per_stack": "self_stacks:演算",
+          "per_stack": "self_stacks:char:24004/calculation",
           "per_stack_live": true,
           "permanent": true,
           "target": "self"
@@ -114,8 +114,8 @@
       "id": "cone24004_attack_per_hit_stacks",
       "when": ["actor == self"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
-        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "char:24004/calculation", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:24004/calculation", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv3 #2 = 0.06",
       "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
@@ -140,7 +140,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.07,
-          "per_stack": "self_stacks:演算",
+          "per_stack": "self_stacks:char:24004/calculation",
           "per_stack_live": true,
           "permanent": true,
           "target": "self"
@@ -154,8 +154,8 @@
       "id": "cone24004_attack_per_hit_stacks",
       "when": ["actor == self"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
-        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "char:24004/calculation", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:24004/calculation", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv4 #2 = 0.07",
       "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"
@@ -180,7 +180,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "per_stack": "self_stacks:演算",
+          "per_stack": "self_stacks:char:24004/calculation",
           "per_stack_live": true,
           "permanent": true,
           "target": "self"
@@ -194,8 +194,8 @@
       "id": "cone24004_attack_per_hit_stacks",
       "when": ["actor == self"],
       "do": [
-        { "op": "REMOVE_STACK", "buff": "演算", "amount": 5, "target": "self" },
-        { "op": "ADD_STACK", "buff": "演算", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
+        { "op": "REMOVE_STACK", "buff": "char:24004/calculation", "amount": 5, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:24004/calculation", "amount": 1, "max_stacks": 5, "times_from": "hit_count", "permanent": true, "target": "self" }
       ],
       "source": "光锥 24004: 「施放攻击后，每击中一名敌方目标，使攻击力额外提高#2[i]%，该效果最多叠加5次，持续至下次攻击后」 param Lv5 #2 = 0.08",
       "_note": "「持续至**下次攻击后**」的写法：ATTACK_FINISHED 在**这一发的伤害结算之后**发出 ✓ ⇒ 同一个事件里**先清掉上一发的层、再按本发命中数叠新的** ✓ —— 于是「下一发攻击**期间**」旧层仍然生效（它们是在上一发的结束时留下的）✓，而「攻击后」被替换 ✓。⚠ 不能把清除放在 ATTACK_STARTED/DEALING_DAMAGE：那会让旧层在**这一发结算前**消失 ✗。"

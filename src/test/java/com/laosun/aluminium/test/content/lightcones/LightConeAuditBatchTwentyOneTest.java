@@ -43,7 +43,7 @@ public class LightConeAuditBatchTwentyOneTest {
         double allyDamage = f.ally.getAttribute(AttributeType.CRIT_ATTACK).get()
                 - bare.ally.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23021] 队友的暴击率/暴伤增量 " + allyCrit + " / " + allyDamage);
-        Assertions.assertEquals(0.1, allyCrit, 1e-9, "「队友暴击率提高 10%」（开战即有【假面】）");
+        Assertions.assertEquals(0.1, allyCrit, 1e-9, "「队友暴击率提高 10%」（开战即有【char:23021/masquerade】）");
         Assertions.assertEquals(0.28, allyDamage, 1e-9, "「队友暴击伤害提高 28%」");
     }
 

@@ -17,7 +17,7 @@
       "id": "cone23063_battle_advance",
       "do": [
         { "op": "ADVANCE", "percent": 0.3, "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "新声", "turns": 2, "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23063/new_voice", "turns": 2, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.3, "turns": 2, "target": "all_allies" }
       ],
       "source": "光锥 23063：「进入战斗时，使装备者的行动提前#2[i]%，并使装备者获得【新声】，持续#4[i]回合。」",

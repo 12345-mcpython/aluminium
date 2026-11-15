@@ -39,7 +39,7 @@ public class LightConeAuditBatchTwentyEightTest {
                 > bare.wearer.getAttribute(AttributeType.ATTACK).get(), "「攻击力提高 18%」—— 属性给一次");
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get()
                 > bare.wearer.getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get(), "「能量恢复效率提高 10%」");
-        Assertions.assertEquals(3, rules(23062), "【王之娱乐】两条 + 能量缩放一条");
+        Assertions.assertEquals(3, rules(23062), "【char:23062/regal_entertainment】两条 + 能量缩放一条");
 
         JsonObject rider = effect(23062, "cone23062_energy_scale", 0);
         System.out.println("[23062] 能量缩放: scale=" + rider.get("scale") + " percent=" + rider.get("percent")
@@ -99,7 +99,7 @@ public class LightConeAuditBatchTwentyEightTest {
         JsonObject share = effect(24000, "cone24000_attack_per_attack", 1);
         System.out.println("[24000] 叠层: max=" + stack.get("max_stacks") + " per_stack=" + share.get("per_stack"));
         Assertions.assertEquals(4, stack.get("max_stacks").getAsInt(), "「最多叠加 4 层」");
-        Assertions.assertEquals("星神层数", share.get("per_stack").getAsString(), "「攻击力提高 8%」按层");
+        Assertions.assertEquals("internal:24000/aeon_layers", share.get("per_stack").getAsString(), "「攻击力提高 8%」按层");
 
         JsonObject onBreak = effect(24000, "cone24000_damage_after_break", 0);
         System.out.println("[24000] 击破后: percent=" + onBreak.get("percent") + " turns=" + onBreak.get("turns"));

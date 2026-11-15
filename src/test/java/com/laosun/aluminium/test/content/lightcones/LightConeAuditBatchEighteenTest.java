@@ -44,7 +44,7 @@ public class LightConeAuditBatchEighteenTest {
         Assertions.assertEquals(3 * 0.048 * (start / 1.0) / 1.0, gain, gain * 0.05, "「每次施放攻击后速度 +4.8%，最多 3 层」");
 
         JsonObject dot = rule(23006, "cone23006_thread_dot").getAsJsonArray("do").get(0).getAsJsonObject();
-        System.out.println("[23006] 游丝: element=" + dot.get("element") + " scale=" + dot.get("scale")
+        System.out.println("[23006] char:23006/erode: element=" + dot.get("element") + " scale=" + dot.get("scale")
                 + " percent=" + dot.get("percent") + " chance=" + dot.get("base_chance") + " turns=" + dot.get("turns"));
         Assertions.assertEquals("Thunder", dot.get("element").getAsString(), "「雷属性持续伤害」");
         Assertions.assertEquals("self_attr:ATTACK", dot.get("scale").getAsString(), "「等同于装备者攻击力」");

@@ -38,7 +38,7 @@ public class LightConeAuditBatchTwentySixTest {
         Assertions.assertTrue(f.wearer.getAttribute(AttributeType.HEALTH).get()
                 > bare.wearer.getAttribute(AttributeType.HEALTH).get(), "「生命上限提高 30%」");
         Assertions.assertEquals(5, rules(23049),
-                "the [夜色] grant, the memosprite defence ignore, the two damage boosts and the departure energy");
+                "the [char:23049/nightfall] grant, the memosprite defence ignore, the two damage boosts and the departure energy");
     }
 
     /**
@@ -135,7 +135,7 @@ public class LightConeAuditBatchTwentySixTest {
         double expected = bare.wearer.getAttribute(AttributeType.SPEED).get() * 0.18;
         System.out.println("[23054] 速度增量 " + speed + " ; 期望 " + expected + " ; 规则数 " + rules(23054));
         Assertions.assertTrue(speed > 0, "「速度提高 18%」");
-        Assertions.assertEquals(2, rules(23054), "剩下两条：【上上签】与波次回能");
+        Assertions.assertEquals(2, rules(23054), "剩下两条：【char:23054/best_fortune】与波次回能");
 
         double allyCrit = f.ally.getAttribute(AttributeType.CRIT_CHANCE).get()
                 - bare.ally.getAttribute(AttributeType.CRIT_CHANCE).get();

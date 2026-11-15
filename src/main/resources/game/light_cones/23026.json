@@ -6,12 +6,12 @@
       "on": "ALLY_ATTACK",
       "id": "cone23026_song",
       "do": [
-        { "op": "ADD_STACK", "buff": "歌咏", "max_stacks": 5, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23026/singing", "max_stacks": 5, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.03,
-          "per_stack": "歌咏",
+          "per_stack": "char:23026/singing",
           "permanent": true,
           "target": "self"
         }
@@ -23,8 +23,8 @@
       "on": "ULT_CAST",
       "id": "cone23026_flourish",
       "do": [
-        { "op": "REMOVE_STATE", "buff": "歌咏", "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "华彩", "turns": 1, "target": "self" },
+        { "op": "REMOVE_STATE", "buff": "char:23026/singing", "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23026/splendour", "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.48, "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.24, "turns": 1, "target": "all_allies" }
       ],
@@ -37,12 +37,12 @@
       "on": "ALLY_ATTACK",
       "id": "cone23026_song",
       "do": [
-        { "op": "ADD_STACK", "buff": "歌咏", "max_stacks": 5, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23026/singing", "max_stacks": 5, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.035,
-          "per_stack": "歌咏",
+          "per_stack": "char:23026/singing",
           "permanent": true,
           "target": "self"
         }
@@ -54,8 +54,8 @@
       "on": "ULT_CAST",
       "id": "cone23026_flourish",
       "do": [
-        { "op": "REMOVE_STATE", "buff": "歌咏", "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "华彩", "turns": 1, "target": "self" },
+        { "op": "REMOVE_STATE", "buff": "char:23026/singing", "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23026/splendour", "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.6, "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.28, "turns": 1, "target": "all_allies" }
       ],
@@ -68,12 +68,12 @@
       "on": "ALLY_ATTACK",
       "id": "cone23026_song",
       "do": [
-        { "op": "ADD_STACK", "buff": "歌咏", "max_stacks": 5, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23026/singing", "max_stacks": 5, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.04,
-          "per_stack": "歌咏",
+          "per_stack": "char:23026/singing",
           "permanent": true,
           "target": "self"
         }
@@ -85,8 +85,8 @@
       "on": "ULT_CAST",
       "id": "cone23026_flourish",
       "do": [
-        { "op": "REMOVE_STATE", "buff": "歌咏", "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "华彩", "turns": 1, "target": "self" },
+        { "op": "REMOVE_STATE", "buff": "char:23026/singing", "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23026/splendour", "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.72, "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.32, "turns": 1, "target": "all_allies" }
       ],
@@ -99,12 +99,12 @@
       "on": "ALLY_ATTACK",
       "id": "cone23026_song",
       "do": [
-        { "op": "ADD_STACK", "buff": "歌咏", "max_stacks": 5, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23026/singing", "max_stacks": 5, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.045,
-          "per_stack": "歌咏",
+          "per_stack": "char:23026/singing",
           "permanent": true,
           "target": "self"
         }
@@ -116,8 +116,8 @@
       "on": "ULT_CAST",
       "id": "cone23026_flourish",
       "do": [
-        { "op": "REMOVE_STATE", "buff": "歌咏", "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "华彩", "turns": 1, "target": "self" },
+        { "op": "REMOVE_STATE", "buff": "char:23026/singing", "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23026/splendour", "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.84, "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.36, "turns": 1, "target": "all_allies" }
       ],
@@ -130,12 +130,12 @@
       "on": "ALLY_ATTACK",
       "id": "cone23026_song",
       "do": [
-        { "op": "ADD_STACK", "buff": "歌咏", "max_stacks": 5, "permanent": true, "target": "self" },
+        { "op": "ADD_STACK", "buff": "char:23026/singing", "max_stacks": 5, "permanent": true, "target": "self" },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.05,
-          "per_stack": "歌咏",
+          "per_stack": "char:23026/singing",
           "permanent": true,
           "target": "self"
         }
@@ -147,8 +147,8 @@
       "on": "ULT_CAST",
       "id": "cone23026_flourish",
       "do": [
-        { "op": "REMOVE_STATE", "buff": "歌咏", "target": "self" },
-        { "op": "APPLY_BUFF", "buff": "华彩", "turns": 1, "target": "self" },
+        { "op": "REMOVE_STATE", "buff": "char:23026/singing", "target": "self" },
+        { "op": "APPLY_BUFF", "buff": "char:23026/splendour", "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.96, "turns": 1, "target": "self" },
         { "op": "MODIFY_ATTR", "attribute": "ALL_DAMAGE_TYPE_BOOST", "percent": 0.4, "turns": 1, "target": "all_allies" }
       ],

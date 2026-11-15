@@ -7,7 +7,7 @@
       "id": "cone23049_nightfall_on_sprite_skill",
       "when": ["actor == summon"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+        { "op": "APPLY_BUFF", "buff": "char:23049/nightfall", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
       "_note": "「装备者**的**忆灵施放技能时」—— `CAST_SETUP` 是**每一次施放**都会发的事件 ✓（`SkillExecutor` 在结算前发，包括忆灵的 BUFF 类技能：它们不发 SKILL_CAST/ULT_CAST ✓，但 CAST_SETUP 发 ✓），条件 **`actor == summon`** 把它限定在**装备者自己的忆灵**上 ✓（`is_summon` 会连敌方召唤物一起收进来 ✗）。【夜色】没有期限句 ⇒ `permanent: true` ✓，「同类效果无法叠加」⇒ 重复施放是替换 ✓。"
@@ -15,7 +15,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprites_ignore_defence",
-      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "when": ["self has_state char:23049/nightfall", "actor is_summon", "actor is_ally"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -31,7 +31,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_wearer_damage_boost",
-      "when": ["self has_state 夜色", "actor == self"],
+      "when": ["self has_state char:23049/nightfall", "actor == self"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.3 }
       ],
@@ -41,7 +41,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprite_damage_boost",
-      "when": ["self has_state 夜色", "actor == summon"],
+      "when": ["self has_state char:23049/nightfall", "actor == summon"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.3 }
       ],
@@ -65,7 +65,7 @@
       "id": "cone23049_nightfall_on_sprite_skill",
       "when": ["actor == summon"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+        { "op": "APPLY_BUFF", "buff": "char:23049/nightfall", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
       "_note": "同第 1 档。"
@@ -73,7 +73,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprites_ignore_defence",
-      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "when": ["self has_state char:23049/nightfall", "actor is_summon", "actor is_ally"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -89,7 +89,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_wearer_damage_boost",
-      "when": ["self has_state 夜色", "actor == self"],
+      "when": ["self has_state char:23049/nightfall", "actor == self"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.375 }
       ],
@@ -99,7 +99,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprite_damage_boost",
-      "when": ["self has_state 夜色", "actor == summon"],
+      "when": ["self has_state char:23049/nightfall", "actor == summon"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.375 }
       ],
@@ -123,7 +123,7 @@
       "id": "cone23049_nightfall_on_sprite_skill",
       "when": ["actor == summon"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+        { "op": "APPLY_BUFF", "buff": "char:23049/nightfall", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
       "_note": "同第 1 档。"
@@ -131,7 +131,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprites_ignore_defence",
-      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "when": ["self has_state char:23049/nightfall", "actor is_summon", "actor is_ally"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -147,7 +147,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_wearer_damage_boost",
-      "when": ["self has_state 夜色", "actor == self"],
+      "when": ["self has_state char:23049/nightfall", "actor == self"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.45 }
       ],
@@ -157,7 +157,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprite_damage_boost",
-      "when": ["self has_state 夜色", "actor == summon"],
+      "when": ["self has_state char:23049/nightfall", "actor == summon"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.45 }
       ],
@@ -181,7 +181,7 @@
       "id": "cone23049_nightfall_on_sprite_skill",
       "when": ["actor == summon"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+        { "op": "APPLY_BUFF", "buff": "char:23049/nightfall", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
       "_note": "同第 1 档。"
@@ -189,7 +189,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprites_ignore_defence",
-      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "when": ["self has_state char:23049/nightfall", "actor is_summon", "actor is_ally"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -205,7 +205,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_wearer_damage_boost",
-      "when": ["self has_state 夜色", "actor == self"],
+      "when": ["self has_state char:23049/nightfall", "actor == self"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.525 }
       ],
@@ -215,7 +215,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprite_damage_boost",
-      "when": ["self has_state 夜色", "actor == summon"],
+      "when": ["self has_state char:23049/nightfall", "actor == summon"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.525 }
       ],
@@ -239,7 +239,7 @@
       "id": "cone23049_nightfall_on_sprite_skill",
       "when": ["actor == summon"],
       "do": [
-        { "op": "APPLY_BUFF", "buff": "夜色", "permanent": true, "target": "self" }
+        { "op": "APPLY_BUFF", "buff": "char:23049/nightfall", "permanent": true, "target": "self" }
       ],
       "source": "光锥 23049: 「装备者的忆灵施放技能时，使装备者获得【夜色】。」",
       "_note": "同第 1 档。"
@@ -247,7 +247,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprites_ignore_defence",
-      "when": ["self has_state 夜色", "actor is_summon", "actor is_ally"],
+      "when": ["self has_state char:23049/nightfall", "actor is_summon", "actor is_ally"],
       "do": [
         {
           "op": "MODIFY_ATTR",
@@ -263,7 +263,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_wearer_damage_boost",
-      "when": ["self has_state 夜色", "actor == self"],
+      "when": ["self has_state char:23049/nightfall", "actor == self"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.6 }
       ],
@@ -273,7 +273,7 @@
     {
       "on": "DEALING_DAMAGE",
       "id": "cone23049_sprite_damage_boost",
-      "when": ["self has_state 夜色", "actor == summon"],
+      "when": ["self has_state char:23049/nightfall", "actor == summon"],
       "do": [
         { "op": "BOOST_DAMAGE", "percent": 0.6 }
       ],
