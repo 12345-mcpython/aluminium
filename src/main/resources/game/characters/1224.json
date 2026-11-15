@@ -152,7 +152,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "强化",
+          "buff": "char:1224/empower",
           "blocks": "skill",
           "permanent": true,
           "target": "self"
@@ -162,7 +162,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.8,
           "permanent": true,
-          "while_state": "强化",
+          "while_state": "char:1224/empower",
           "while_resource": "充能",
           "while_resource_min": 7,
           "target": "self"
@@ -194,7 +194,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "强化",
+          "buff": "char:1224/empower",
           "target": "self"
         },
         {

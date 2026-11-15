@@ -45,6 +45,16 @@
       "key": "char:1002/hidden_dragon"
     },
     {
+      "name": "char:1004/empower",
+      "owner": "1004",
+      "kind": "char",
+      "used_by": [
+        "1004"
+      ],
+      "zh": "强化",
+      "key": "char:1004/empower"
+    },
+    {
       "name": "char:1006/defect",
       "owner": "1006",
       "kind": "char",
@@ -223,6 +233,16 @@
       ],
       "zh": "猎物",
       "key": "char:1223/prey"
+    },
+    {
+      "name": "char:1224/empower",
+      "owner": "1224",
+      "kind": "char",
+      "used_by": [
+        "1224"
+      ],
+      "zh": "强化",
+      "key": "char:1224/empower"
     },
     {
       "name": "char:1305/deduction",
@@ -2302,22 +2322,6 @@
       "kind": "char",
       "used_by": [
         "1303"
-      ]
-    },
-    {
-      "name": "强化",
-      "owner": "1004",
-      "kind": "char",
-      "used_by": [
-        "1004"
-      ]
-    },
-    {
-      "name": "强化",
-      "owner": "1224",
-      "kind": "char",
-      "used_by": [
-        "1224"
       ]
     },
     {

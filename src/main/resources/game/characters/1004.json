@@ -178,14 +178,14 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "强化",
+          "buff": "char:1004/empower",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "强化",
+          "buff": "char:1004/empower",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -200,7 +200,7 @@
       "min_eidolon": 1,
       "when": [
         "actor == self",
-        "self_stacks:强化 >= 1"
+        "self_stacks:char:1004/empower >= 1"
       ],
       "do": [
         {
@@ -230,7 +230,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "强化",
+          "buff": "char:1004/empower",
           "amount": 1,
           "target": "self"
         }
@@ -244,7 +244,7 @@
       "min_eidolon": 1,
       "when": [
         "actor == self",
-        "self_stacks:强化 >= 1"
+        "self_stacks:char:1004/empower >= 1"
       ],
       "do": [
         {
@@ -274,7 +274,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "强化",
+          "buff": "char:1004/empower",
           "amount": 1,
           "target": "self"
         }
