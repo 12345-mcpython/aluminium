@@ -33,7 +33,7 @@ public class WorldOdeAddedFireHitsTest {
         // (measured: the five hits read 1123.6 where 5 x 5% x ATK x mitigation says 103.95). Registered rather than approximated; the `times` mutation still moves the reading
         // (1599.9 -> 1394.25), which is why a count-aware isolation is the next step.
         Assertions.assertTrue(with > without + 1e-6,
-                "the five added hits must land while he holds 【永续的燃烧】 (Eternal Ignition)");
+                "the five added hits must land while he holds 【char:1408/everlasting_burn】 (Eternal Ignition)");
     }
 
     /**
@@ -64,7 +64,7 @@ public class WorldOdeAddedFireHitsTest {
             SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
             battle.processRequests();
             him = battle.characters().getFirst();
-            Assertions.assertTrue(him.getBuffManager().stacksOf("永续的燃烧") > 0,
+            Assertions.assertTrue(him.getBuffManager().stacksOf("char:1408/everlasting_burn") > 0,
                     "precondition: the transformation granted the state");
         }
         attack = battle.characters().getFirst().getAttribute(

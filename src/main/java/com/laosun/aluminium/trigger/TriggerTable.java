@@ -568,7 +568,13 @@ public class TriggerTable {
             // here exactly like a condition that reads it - otherwise the step silently counts nothing.
             if (effect.getWeightSteps() != null) {
                 for (String step : effect.getWeightSteps()) {
-                    String named = step == null ? "" : step.trim().split(":", 2)[0].trim();
+                    // The watched name is everything before the LAST TWO colons (threshold and delta are numbers), so a
+                    // counter whose own name carries colons - `char:1506/hidden_score:60:-9` - is read whole here, the
+                    // same convention `TriggerInterpreter.weightOf` executes.
+                    String spelled = step == null ? "" : step.trim();
+                    int lastColon = spelled.lastIndexOf(':');
+                    int previousColon = lastColon <= 0 ? -1 : spelled.lastIndexOf(':', lastColon - 1);
+                    String named = previousColon < 0 ? "" : spelled.substring(0, previousColon).trim();
                     if (!named.isEmpty()) {
                         referencedResources.add(named);
                     }

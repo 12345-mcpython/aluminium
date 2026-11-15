@@ -27,7 +27,7 @@ import java.util.List;
 public class ControlImmunityTest {
     private static final int OWNER = 1408;
     private static final int APPLIER = 1002;
-    private static final String STATE = "变身";
+    private static final String STATE = "char:1408/transformation";
     private static final String FREEZE = "ctrl:frozen";
 
     /**
@@ -43,7 +43,7 @@ public class ControlImmunityTest {
      */
     @Test
     public void withoutTheTransformationTheControlLands() {
-        Assertions.assertTrue(controlledAfter(false), "「变身期间」 (during the transformation)-- outside it she is controlable");
+        Assertions.assertTrue(controlledAfter(false), "「char:1408/transformation期间」 (during the transformation)-- outside it she is controlable");
     }
 
     // ==================================================================

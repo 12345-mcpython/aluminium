@@ -90,11 +90,11 @@ import java.util.Random;
 public class SilverWolfLV999EidolonLevelsTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final String HIDDEN = "隐藏分";
+    private static final String HIDDEN = "char:1506/hidden_score";
     private static final String RAMP_RULE = "p1506_enhanced_basic_hidden_ramp";
     private static final String LAUGH = "笑点";
-    private static final String CHARGES = "强化普攻次数";
-    private static final String QUOTA = "里程碑配额";
+    private static final String CHARGES = "internal:1506/enhanced_basic_count";
+    private static final String QUOTA = "internal:1506/milestone_quota";
     private static final String RULE = "p1506_e2_milestones_while_in_godmode";
     private static final int STEP = 120;
     private static final String WAVE_RULE = "p1506_technique_box_each_wave";
@@ -190,7 +190,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         double after = wolf.getAttribute(AttributeType.ELATION_DAMAGE_AMP).get();
         System.out.println("[1506] E6 增笑 " + before + " -> " + after);
         Assertions.assertEquals(0.5, after - before, 1e-9,
-                "星魂 6: 「强化普攻期间造成的欢愉伤害增笑 50%」 - and 强化普攻期间 is the 【无敌玩家】 the Ultimate grants");
+                "星魂 6: 「强化普攻期间造成的欢愉伤害增笑 50%」 - and 强化普攻期间 is the 【char:1506/invincible_player】 the Ultimate grants");
     }
 
     /**
@@ -463,7 +463,7 @@ public class SilverWolfLV999EidolonLevelsTest {
     public void nothingIsCountedWhileSheIsNotInGodmode() {
         build(2, 280);
         feederLaughs();
-        System.out.println("[milestone] the same gain with no 【无敌玩家】: hidden " + hidden() + ", ledger " + quota()
+        System.out.println("[milestone] the same gain with no 【char:1506/invincible_player】: hidden " + hidden() + ", ledger " + quota()
                 + ", charges " + charges());
         Assertions.assertEquals(280, hidden(), "the hidden score still moves");
         Assertions.assertEquals(0, quota(), "but the ledger only exists inside the state");
@@ -478,7 +478,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         build(2, 0);
         enterGodmode();
         Assertions.assertEquals(20, quota(), "precondition: the ledger was seeded on entry");
-        battle.fireStateEnded(wolf, "无敌玩家");
+        battle.fireStateEnded(wolf, "char:1506/invincible_player");
         battle.processRequests();
         System.out.println("[milestone] after the state ended: hidden " + hidden() + ", ledger " + quota());
         Assertions.assertEquals(0, quota(), "the next state starts from its own initial hidden score");
@@ -500,11 +500,11 @@ public class SilverWolfLV999EidolonLevelsTest {
         List<String> ids = rules.stream().map(rule -> rule.id()).toList();
         System.out.println("[milestone] her RESOURCE_CHANGED rules, in order: " + ids);
         Assertions.assertEquals(RULE, ids.getLast(),
-                "it overwrites lastChangedResource, so anything after it on 隐藏分 would never fire");
+                "it overwrites lastChangedResource, so anything after it on char:1506/hidden_score would never fire");
         var rule = rules.getLast();
         var effects = rule.effects();
         Assertions.assertEquals(2, rule.minEidolon(), "the clause is her Eidolon 2");
-        Assertions.assertEquals(List.of("self has_state 无敌玩家", "resource_changed:隐藏分"),
+        Assertions.assertEquals(List.of("self has_state char:1506/invincible_player", "resource_changed:char:1506/hidden_score"),
                 rule.conditions().stream().map(condition -> condition.source()).toList(),
                 "the state is the scope, and the hidden score is what moved");
         Assertions.assertEquals(4, effects.size(), "accumulate, extra turn, restore, spend - in that order");
@@ -542,8 +542,8 @@ public class SilverWolfLV999EidolonLevelsTest {
         double excessAtCap = full.crit() - 1.0;
         System.out.println("[1506-talent] CRIT_CHANCE " + plain.crit() + " -> " + atHundred.crit()
                 + " ; CRIT_ATTACK " + plain.critDamage() + " -> " + atHundred.critDamage()
-                + " ; 隐藏分 " + atHundred.hidden());
-        System.out.println("[1506-talent] base CRIT_CHANCE " + plain.crit() + " ; at " + below.hidden() + " 隐藏分 crit = "
+                + " ; char:1506/hidden_score " + atHundred.hidden());
+        System.out.println("[1506-talent] base CRIT_CHANCE " + plain.crit() + " ; at " + below.hidden() + " char:1506/hidden_score crit = "
                 + below.crit() + " (crit dmg " + below.critDamage() + ") ; at " + above.hidden() + " crit = "
                 + above.crit() + " (crit dmg " + above.critDamage() + ", excess " + excess + ")");
         System.out.println("[1506-talent] at the 300-point ceiling: CRIT_CHANCE " + full.crit() + ", CRIT_ATTACK "
@@ -551,9 +551,9 @@ public class SilverWolfLV999EidolonLevelsTest {
                 + " ; marginal per point past the switch = " + ((full.critDamage() - lower.critDamage()) / 50));
         Assertions.assertAll(
                 () -> Assertions.assertEquals(100, atHundred.hidden(),
-                        "precondition: 100 counted laughs became 100 隐藏分"),
+                        "precondition: 100 counted laughs became 100 char:1506/hidden_score"),
                 () -> Assertions.assertEquals(plain.crit() + 100 * 0.004, atHundred.crit(), 1e-9,
-                        "「每点【隐藏分】使暴击率提高 0.4%」"),
+                        "「每点【char:1506/hidden_score】使暴击率提高 0.4%」"),
                 () -> Assertions.assertEquals(plain.critDamage(), atHundred.critDamage(), 1e-9,
                         "and while she is below full, NOTHING switches to crit damage yet"),
                 () -> Assertions.assertTrue(below.crit() < 1.0, "precondition: the lower reading is still under full"),
@@ -581,7 +581,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         Reading twice = read(new int[]{100, 100});
         Reading threeTimes = read(new int[]{60, 80, 60});
         System.out.println("[1506-talent] 200 at once = " + oneGain.crit() + " ; 100 then 100 = " + twice.crit()
-                + " ; 60+80+60 = " + threeTimes.crit() + " ; 隐藏分 " + threeTimes.hidden());
+                + " ; 60+80+60 = " + threeTimes.crit() + " ; char:1506/hidden_score " + threeTimes.hidden());
         Assertions.assertEquals(200, twice.hidden(), "precondition: two gains of 100 are 200 points");
         Assertions.assertEquals(oneGain.crit(), twice.crit(), 1e-9,
                 "each point counts once: base + 200 x 0.004, not base + 100 x 0.004 twice over");

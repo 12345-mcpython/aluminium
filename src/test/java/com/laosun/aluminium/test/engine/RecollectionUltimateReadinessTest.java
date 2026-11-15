@@ -15,7 +15,7 @@ import java.util.List;
  * "[追忆]达到 24 点时可激活终结技" and "处于[往昔的涟漪]时 12 点".
  */
 public class RecollectionUltimateReadinessTest {
-    private static final String MEMORY = "追忆";
+    private static final String MEMORY = "char:1415/remembrance";
 
     @Test
     public void theCounterIsWhatMakesHerUltimateCastable() {
@@ -45,7 +45,7 @@ public class RecollectionUltimateReadinessTest {
                     her, List.of(battle.enemies().getFirst()));
             battle.processRequests();
             her = battle.characters().getFirst();
-            Assertions.assertTrue(her.getBuffManager().hasState("往昔的涟漪"),
+            Assertions.assertTrue(her.getBuffManager().hasState("char:1415/ripples_of_the_past"),
                     "precondition: the ripple came up with her ultimate");
         }
         her.getResources().gain(MEMORY, seeded);

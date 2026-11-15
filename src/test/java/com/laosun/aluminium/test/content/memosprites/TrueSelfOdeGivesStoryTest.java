@@ -23,13 +23,13 @@ public class TrueSelfOdeGivesStoryTest {
     private static final int CYRENE = 1415;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 26;
-    private static final String STORY = "故事";
+    private static final String STORY = "char:1415/story";
 
     @Test
     public void aRuleCanPutAResourceOnTheMemosprite() {
         double with = story(true);
         double without = story(false);
-        System.out.println("[true_self] the memosprite's 【故事】 (Story) reads " + with + " with the ode and " + without
+        System.out.println("[true_self] the memosprite's 【char:1415/story】 (Story) reads " + with + " with the ode and " + without
                 + " without it");
         Assertions.assertEquals(1.0, with, 1e-9, "her ultimate gives the memosprite one point");
         Assertions.assertEquals(0.0, without, 1e-9, "and without the ode there is no counter at all");

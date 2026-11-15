@@ -43,7 +43,7 @@ public class EvanesciaLaughLinksTest {
     private static final int FIXED = 20;
     private static final int LEVEL = 80;
     private static final String LAUGH = "笑点";
-    private static final String HIDDEN = "隐藏分";
+    private static final String HIDDEN = "char:1506/hidden_score";
 
     private Character source;
     private Character other;

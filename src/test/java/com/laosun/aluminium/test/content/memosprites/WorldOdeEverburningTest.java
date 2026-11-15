@@ -19,7 +19,7 @@ import java.util.List;
 public class WorldOdeEverburningTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
-    private static final String STATE = "永续的燃烧";
+    private static final String STATE = "char:1408/everlasting_burn";
 
     @Test
     public void theTransformationGrantsTheStateAndItsCritRate() {

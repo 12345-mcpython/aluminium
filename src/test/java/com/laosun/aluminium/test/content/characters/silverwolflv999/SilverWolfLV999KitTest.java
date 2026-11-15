@@ -65,9 +65,9 @@ public class SilverWolfLV999KitTest {
     private static final int ALLY = 1204;
     private static final int LEVEL = 80;
     private static final String LAUGH = "笑点";
-    private static final String HIDDEN = "隐藏分";
-    private static final String CHARGES = "强化普攻次数";
-    private static final String GOD = "无敌玩家";
+    private static final String HIDDEN = "char:1506/hidden_score";
+    private static final String CHARGES = "internal:1506/enhanced_basic_count";
+    private static final String GOD = "char:1506/invincible_player";
     private static final String FREEZE = "ctrl:frozen";
     private static final String ZONE = "结界";
     /**
@@ -97,12 +97,12 @@ public class SilverWolfLV999KitTest {
         fireElationSkill(battle, wolf);
         int afterElation = wolf.getResources().value(HIDDEN);
         int hiddenGained = afterElation - afterSkill;
-        System.out.println("[1506] the Skill gained " + laughsGained + " 笑点 ; 隐藏分 after the Skill " + afterSkill
+        System.out.println("[1506] the Skill gained " + laughsGained + " 笑点 ; char:1506/hidden_score after the Skill " + afterSkill
                 + " ; after the Elation skill " + afterElation);
         Assertions.assertAll(
                 () -> Assertions.assertEquals(5, laughsGained, "战技: 「获得 5 个笑点」"),
                 () -> Assertions.assertEquals(15, hiddenGained,
-                        "欢愉技 殿堂级操作回放: 「获得 15 点【隐藏分】」"));
+                        "欢愉技 殿堂级操作回放: 「获得 15 点【char:1506/hidden_score】」"));
     }
 
     /**
@@ -125,18 +125,18 @@ public class SilverWolfLV999KitTest {
         int elationSlotAfter = wolf.getSkills().get(SkillType.ELATION_SKILL).getSkillSlot();
         System.out.println("[1506] after the Ultimate: state=" + inGodmode
                 + " charges=" + charges
-                + " 隐藏分 " + before + " -> " + hiddenAfter
+                + " char:1506/hidden_score " + before + " -> " + hiddenAfter
                 + " ; her Elation skill's slot " + elationSlotBefore + " -> " + elationSlotAfter);
         Assertions.assertAll(
-                () -> Assertions.assertTrue(inGodmode, "终结技: 「进入【无敌玩家】状态」"),
+                () -> Assertions.assertTrue(inGodmode, "终结技: 「进入【char:1506/invincible_player】状态」"),
                 () -> Assertions.assertEquals(3, charges,
                         "天赋: 「完整施放 3 次强化普攻后退出」 - so the allowance starts full"),
                 () -> Assertions.assertEquals(20, hiddenAfter - before,
-                        "行迹 隐藏关卡全成就: 「进入【无敌玩家】状态后，获得 20 点【隐藏分】」"),
+                        "行迹 隐藏关卡全成就: 「进入【char:1506/invincible_player】状态后，获得 20 点【char:1506/hidden_score】」"),
                 () -> Assertions.assertEquals(20, elationSlotBefore,
                         "premise: her Elation skill is slot 20 before the Ultimate"),
                 () -> Assertions.assertEquals(21, elationSlotAfter,
-                        "【无敌玩家】状态下拥有强化欢愉技 - 崩坏级伤害演示 is slot 21"));
+                        "【char:1506/invincible_player】状态下拥有强化欢愉技 - 崩坏级伤害演示 is slot 21"));
     }
 
     /**
@@ -157,11 +157,11 @@ public class SilverWolfLV999KitTest {
                     + " charges=" + wolf.getResources().value(CHARGES)
                     + " state=" + wolf.getBuffManager().hasState(GOD));
         }
-        System.out.println("[1506] 隐藏分 " + beforeExit + " -> " + wolf.getResources().value(HIDDEN));
+        System.out.println("[1506] char:1506/hidden_score " + beforeExit + " -> " + wolf.getResources().value(HIDDEN));
         Assertions.assertFalse(wolf.getBuffManager().hasState(GOD),
-                "天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」");
+                "天赋: 「完整施放 3 次强化普攻后退出【char:1506/invincible_player】状态」");
         Assertions.assertEquals(0, wolf.getResources().value(HIDDEN),
-                "天赋: 「退出【无敌玩家】状态时【隐藏分】会被清空」");
+                "天赋: 「退出【char:1506/invincible_player】状态时【char:1506/hidden_score】会被清空」");
     }
 
     /**
@@ -175,12 +175,12 @@ public class SilverWolfLV999KitTest {
     public void eidolonOneKeepsAFifthOfTheHidden() {
         int kept = hiddenAfterLeavingGodmode(1);
         int lost = hiddenAfterLeavingGodmode(0);
-        System.out.println("[1506] 隐藏分 after leaving 【无敌玩家】: E1 keeps " + kept + " ; E0 keeps " + lost
+        System.out.println("[1506] char:1506/hidden_score after leaving 【char:1506/invincible_player】: E1 keeps " + kept + " ; E0 keeps " + lost
                 + " (a fifth of the 80 she held is 16)");
         // Note: She holds 80 at the exit, not 60 - the Ultimate and its trace pay 20 before the fixture's own 60 - and the
         // rule keeps a fifth of THAT. The first version of this case expected a fifth of 60 and read the rule as wrong.
         Assertions.assertEquals(16, kept, 1e-9,
-                "星魂 1: 「改为保留 20% 的【隐藏分】」 - a fifth of the 80 she held at the exit");
+                "星魂 1: 「改为保留 20% 的【char:1506/hidden_score】」 - a fifth of the 80 she held at the exit");
         Assertions.assertEquals(0, lost, 1e-9, "and at E0 the base clause clears it as the document says");
     }
 
@@ -193,7 +193,7 @@ public class SilverWolfLV999KitTest {
         int at20 = hiddenFromElationCastAt(20);
         int at39 = hiddenFromElationCastAt(39);
         int at40 = hiddenFromElationCastAt(40);
-        System.out.println("[1506] 隐藏分 from one Elation cast at 19/20/39/40 counted laughs: "
+        System.out.println("[1506] char:1506/hidden_score from one Elation cast at 19/20/39/40 counted laughs: "
                 + below + " / " + at20 + " / " + at39 + " / " + at40);
         Assertions.assertEquals(15, below, "under 20 counted laughs the trace pays nothing");
         Assertions.assertEquals(35, at20, "「大于等于 20 个，额外获得 20 点」 -> 15 + 20");
@@ -247,22 +247,22 @@ public class SilverWolfLV999KitTest {
         wolf.getBuffManager().removeState(FREEZE);
 
         castUltimate(battle, wolf);
-        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "premise: the Ultimate puts her in 【无敌玩家】");
+        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "premise: the Ultimate puts her in 【char:1506/invincible_player】");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
-        System.out.println("[1506] in 【无敌玩家】, after the same control: ctrl:frozen="
+        System.out.println("[1506] in 【char:1506/invincible_player】, after the same control: ctrl:frozen="
                 + wolf.getBuffManager().hasState(FREEZE));
         Assertions.assertFalse(wolf.getBuffManager().hasState(FREEZE),
-                "「【无敌玩家】状态下，「银狼LV.999」免疫控制类负面状态」");
+                "「【char:1506/invincible_player】状态下，「银狼LV.999」免疫控制类负面状态」");
 
         for (int use = 1; use <= 3; use++) {
             cast(battle, wolf, SkillType.COMMON, battle.enemyUnits().getFirst());
         }
         Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "premise: three enhanced basics end the state");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, wolf, 0, 0));
-        System.out.println("[1506] after leaving 【无敌玩家】, the same control: ctrl:frozen="
+        System.out.println("[1506] after leaving 【char:1506/invincible_player】, the same control: ctrl:frozen="
                 + wolf.getBuffManager().hasState(FREEZE));
         Assertions.assertTrue(wolf.getBuffManager().hasState(FREEZE),
-                "「【无敌玩家】状态下…免疫」 is scoped by the state, so the control lands again once it is gone");
+                "「【char:1506/invincible_player】状态下…免疫」 is scoped by the state, so the control lands again once it is gone");
     }
 
     /**
@@ -287,10 +287,10 @@ public class SilverWolfLV999KitTest {
     public void godmodeBansTheUltimateAndTheBanLeavesWithIt() {
         Battle battle = newBattle();
         Character wolf = battle.characters().getFirst();
-        Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "precondition: not in 【无敌玩家】 yet");
+        Assertions.assertFalse(wolf.getBuffManager().hasState(GOD), "precondition: not in 【char:1506/invincible_player】 yet");
 
         castUltimate(battle, wolf);
-        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "precondition: the Ultimate put her in 【无敌玩家】");
+        Assertions.assertTrue(wolf.getBuffManager().hasState(GOD), "precondition: the Ultimate put her in 【char:1506/invincible_player】");
 
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         Assertions.assertFalse(battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst())),
@@ -377,7 +377,7 @@ public class SilverWolfLV999KitTest {
         for (int use = 1; use <= 3; use++) {
             cast(battle, wolf, SkillType.COMMON, battle.enemyUnits().getFirst());
         }
-        System.out.println("[1506] E" + eidolonRank + ": 隐藏分 " + atExit + " -> "
+        System.out.println("[1506] E" + eidolonRank + ": char:1506/hidden_score " + atExit + " -> "
                 + wolf.getResources().value(HIDDEN));
         return wolf.getResources().value(HIDDEN);
     }
@@ -450,7 +450,7 @@ public class SilverWolfLV999KitTest {
         Assertions.assertEquals(1, effect.getTurns(), "延长 1 回合");
         Assertions.assertEquals("self", effect.getTarget(), "自身");
         Assertions.assertTrue(conditions.contains("from_category ULTRA") && conditions.contains("actor == self"),
-                "and it hangs on the same entry as 【无敌玩家】 itself, which is the order 「进入…后」 needs");
+                "and it hangs on the same entry as 【char:1506/invincible_player】 itself, which is the order 「进入…后」 needs");
         // ⚠ The Eidolon gate is a FIELD on the compiled rule, not a loading filter: the same table serves every rank and the
         // interpreter decides at firing time (measured - the first version looked the rule up at E0 and still found it).
         Assertions.assertEquals(2, rule.minEidolon(), "「星魂 2」 gates the clause itself, not the base kit");
@@ -532,7 +532,7 @@ public class SilverWolfLV999KitTest {
         boolean zoneOnHer = wolf.getBuffManager().hasState(ZONE);
         boolean zoneOnAlly = ally.getBuffManager().hasState(ZONE);
         System.out.println("[1506] after the Ultimate: 结界=" + zoneOnHer
-                + " 无敌玩家=" + wolf.getBuffManager().hasState(GOD)
+                + " char:1506/invincible_player=" + wolf.getBuffManager().hasState(GOD)
                 + " ; the ally holds 结界=" + zoneOnAlly);
 
         double before = totalEnemyHp(battle);
@@ -562,7 +562,7 @@ public class SilverWolfLV999KitTest {
         double after = totalEnemyHp(battle);
         System.out.println("[1506] with no Ultimate: enemy HP " + before + " -> " + after);
         Assertions.assertEquals(before, after, 1e-9,
-                "the Zone and 【无敌玩家】 are both required, so nothing fires without them");
+                "the Zone and 【char:1506/invincible_player】 are both required, so nothing fires without them");
     }
 
     /**

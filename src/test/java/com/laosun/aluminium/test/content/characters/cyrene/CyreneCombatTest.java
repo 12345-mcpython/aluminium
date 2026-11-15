@@ -360,13 +360,13 @@ public class CyreneCombatTest {
         Assertions.assertTrue(hyacine.getBuffManager().hasState("献予「天空」之诗")
                         || hyacine.getBuffManager().stacksOf("献予「天空」之诗") > 0,
                 "风堇 holds 「献予「天空」之诗」 (two stacks per grant)");
-        Assertions.assertTrue(evernight.getBuffManager().hasState("献予「岁月」之诗"),
-                "长夜月 holds 「献予「岁月」之诗」");
-        Assertions.assertTrue(cyrene.getBuffManager().hasState("献予「真我」之诗"),
-                "昔涟 holds 「献予「真我」之诗」");
+        Assertions.assertTrue(evernight.getBuffManager().hasState("char:1415/ode_to_years"),
+                "长夜月 holds 「char:1415/ode_to_years」");
+        Assertions.assertTrue(cyrene.getBuffManager().hasState("char:1415/ode_to_true_self"),
+                "昔涟 holds 「char:1415/ode_to_true_self」");
         Assertions.assertFalse(robin.getBuffManager().hasState("献予「天空」之诗")
-                        || robin.getBuffManager().hasState("献予「岁月」之诗")
-                        || robin.getBuffManager().hasState("献予「真我」之诗"),
+                        || robin.getBuffManager().hasState("char:1415/ode_to_years")
+                        || robin.getBuffManager().hasState("char:1415/ode_to_true_self"),
                 "知更鸟•晴歌 has NO ode of its own, so the count her Eidolon reads is three, not four");
     }
 

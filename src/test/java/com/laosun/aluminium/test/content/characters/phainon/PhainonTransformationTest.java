@@ -32,9 +32,9 @@ public class PhainonTransformationTest {
     private static final int OWNER = 1408;
     private static final int ALLY = 1002;
     private static final int APPLIER = 1002;
-    private static final String STATE = "变身";
+    private static final String STATE = "char:1408/transformation";
     private static final String COUNTDOWN = "卡厄斯兰那的额外回合";
-    private static final String SEEDS = "火种";
+    private static final String SEEDS = "char:1408/ember";
     private static final String DOT = "dot:shock";
     private static final int TURNS = 8;
     private static final double EPS = 1e-9;
@@ -122,9 +122,9 @@ public class PhainonTransformationTest {
     public void theEighthCountdownTurnEndsIt() {
         boolean afterEight = transformedAfterCountdownTurns(TURNS);
         boolean afterSeven = transformedAfterCountdownTurns(TURNS - 1);
-        Assertions.assertAll("「最后 1 个倒计时回合…结束变身」",
+        Assertions.assertAll("「最后 1 个倒计时回合…结束char:1408/transformation」",
                 () -> Assertions.assertFalse(afterEight,
-                        "\"the last countdown turn ... ends the transformation\" (「最后 1 个倒计时回合…结束变身」)"),
+                        "\"the last countdown turn ... ends the transformation\" (「最后 1 个倒计时回合…结束char:1408/transformation」)"),
                 () -> Assertions.assertTrue(afterSeven,
                         "「最后 1 个」-- the seventh turn is not the last one"));
     }
@@ -193,7 +193,7 @@ public class PhainonTransformationTest {
         SkillExecutor.execute(battle, ult, owner, List.of(owner));
         battle.processRequests();
         boolean transformed = owner.getBuffManager().hasState(STATE);
-        // Note: Updated: `atk0` already carries the trace's +50% ("进入战斗或变身结束时攻击力提高 50%"), so the
+        // Note: Updated: `atk0` already carries the trace's +50% ("进入战斗或char:1408/transformation结束时攻击力提高 50%"), so the
         // block is measured against the BASE: 1 + 0.5 (trace) + 0.8 (transformation) = 2.3.
         double base = atk0 / 1.5;
         double atkAfter = owner.getAttribute(AttributeType.ATTACK).get();
@@ -216,13 +216,13 @@ public class PhainonTransformationTest {
         double secondHpAfter = second.getAttribute(AttributeType.HEALTH).get();
         double penAfter = second.getAttribute(AttributeType.DAMAGE_PENETRATION).get();
 
-        Assertions.assertAll("「变身期间攻击力提高 80%，生命上限提高 270%」",
+        Assertions.assertAll("「char:1408/transformation期间攻击力提高 80%，生命上限提高 270%」",
                 () -> Assertions.assertFalse(transformedBefore, "no transformation yet"),
                 () -> Assertions.assertTrue(panelReads, "precondition: the panel reads"),
                 () -> Assertions.assertTrue(panelReads, "the plain panel is what it is, and the test asserts nothing else"),
                 () -> Assertions.assertTrue(transformed, "precondition: the transformation is on"),
                 () -> Assertions.assertEquals(base * 2.3, atkAfter, atk0 * 0.001,
-                        "「变身期间攻击力提高 80%」 (during the transformation, ATK is raised by 80%) beside the trace's 50% (before=" + atk0 + ")"),
+                        "「char:1408/transformation期间攻击力提高 80%」 (during the transformation, ATK is raised by 80%) beside the trace's 50% (before=" + atk0 + ")"),
                 () -> Assertions.assertEquals(hp0 * 3.7, hpAfter, hp0 * 0.001,
                         "「生命上限提高 270%」 (Max HP raised by 270%) (before=" + hp0 + ")"),
                 () -> Assertions.assertTrue(secondTransformed, "precondition: the transformation is on"),
@@ -272,11 +272,11 @@ public class PhainonTransformationTest {
         owner.getBuffManager().removeState(STATE);
         battle.processRequests();
         Assertions.assertFalse(owner.getBuffManager().hasState(STATE), "the transformation is off");
-        // Note: Updated: the trace fires AGAIN when the transformation ends ("或变身结束时"), so what is left
+        // Note: Updated: the trace fires AGAIN when the transformation ends ("或char:1408/transformation结束时"), so what is left
         // is the battle-start 50% plus the end 50%. What this reading is about is unchanged: the TRANSFORMATION's own
         // block is gone.
         Assertions.assertEquals(atk0 * (2.0 / 1.5), owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,
-                "「变身期间」 (during the transformation)-- the transformation's block must be gone with the state");
+                "「char:1408/transformation期间」 (during the transformation)-- the transformation's block must be gone with the state");
         Assertions.assertEquals(pen0, owner.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), EPS,
                 "and the RES PEN too");
     }
@@ -322,7 +322,7 @@ public class PhainonTransformationTest {
                 + " ; ally " + allyBefore + " -> " + allyAfter + " (base " + allyBase + ")");
 
         Assertions.assertEquals(ownerBase * 0.15, ownerAfter - ownerBefore, ownerBase * 1e-6,
-                "「变身结束时…速度提高 15%」 (when the transformation ends ... SPD is raised by 15%)-- on her");
+                "「char:1408/transformation结束时…速度提高 15%」 (when the transformation ends ... SPD is raised by 15%)-- on her");
         Assertions.assertEquals(allyBase * 0.15, allyAfter - allyBefore, allyBase * 1e-6,
                 "all allies (「我方全体」) -- and on the ally, which is what \"all\" (全体) means");
     }
@@ -339,8 +339,8 @@ public class PhainonTransformationTest {
         battle.processRequests();
 
         int before = owner.getResources().value(SEEDS);
-        // "战斗开始时，获得 1 点[火种]" -- the other half of the same trace line (1408101).
-        Assertions.assertEquals(1, before, "\"at the start of battle, gains 1 point of Kindling (【火种】)\" (「战斗开始时，获得 1 点【火种】」)");
+        // "战斗开始时，获得 1 点[char:1408/ember]" -- the other half of the same trace line (1408101).
+        Assertions.assertEquals(1, before, "\"at the start of battle, gains 1 point of Kindling (【char:1408/ember】)\" (「战斗开始时，获得 1 点【char:1408/ember】」)");
         Skill ult = owner.getSkills().get(SkillType.ULTRA);
         SkillExecutor.execute(battle, ult, owner, List.of(owner));
         battle.processRequests();
@@ -353,7 +353,7 @@ public class PhainonTransformationTest {
         System.out.println("[end-clauses] seeds " + before + " -> " + duringTransformation + " -> " + after);
 
         Assertions.assertEquals(duringTransformation + 3, after,
-                "\"when the transformation ends, gains 3 points of Kindling (【火种】)\" (「变身结束时，获得 3 点【火种】」)");
+                "\"when the transformation ends, gains 3 points of Kindling (【char:1408/ember】)\" (「char:1408/transformation结束时，获得 3 点【char:1408/ember】」)");
     }
 
     /**
@@ -409,11 +409,11 @@ public class PhainonTransformationTest {
     public void anAttackHealsTheTransformedHer() {
         double healed = healFromOneAttack(true);
         double untouched = healFromOneAttack(false);
-        Assertions.assertAll("「变身期间...施放攻击后回复等同于自身生命上限 20% 的生命值」",
+        Assertions.assertAll("「char:1408/transformation期间...施放攻击后回复等同于自身生命上限 20% 的生命值」",
                 () -> Assertions.assertEquals(0.20, healed, 1e-6,
                         "「回复等同于自身生命上限 20% 的生命值」 (share of Max HP)"),
                 () -> Assertions.assertEquals(0.0, untouched, 1e-9,
-                        "「变身期间」 (while transformed)-- no transformation, no heal"));
+                        "「char:1408/transformation期间」 (while transformed)-- no transformation, no heal"));
     }
 
     // ==================================================================

@@ -27,7 +27,7 @@ public class OdeOfRomanceStanceTest2 {
     private static final int CYRENE = 1415;
     private static final int AGLAEA = 1402;
     private static final int ODE_OF_ROMANCE = 14;
-    private static final String STANCE = "至高之姿";
+    private static final String STANCE = "char:1402/supreme_posture";
 
     @Test
     public void bothBoostsLandAndBothLeaveWithTheStance() {

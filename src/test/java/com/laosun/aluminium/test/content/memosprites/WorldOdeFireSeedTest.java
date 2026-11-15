@@ -20,13 +20,13 @@ public class WorldOdeFireSeedTest {
     private static final int CYRENE = 1415;
     private static final int PHAINON = 1408;
     private static final int ODE_SLOT = 21;
-    private static final String FIRE_SEED = "火种";
+    private static final String FIRE_SEED = "char:1408/ember";
 
     @Test
     public void theOdeGivesHimSixFireSeed() {
         int with = seedAfterOde(true);
         int without = seedAfterOde(false);
-        System.out.println("[fire_seed] after the ode 【火种】 (Kindling) is " + with + " with the ode ; " + without + " without it");
+        System.out.println("[fire_seed] after the ode 【char:1408/ember】 (Kindling) is " + with + " with the ode ; " + without + " without it");
         Assertions.assertEquals(6, with, "the data row's #8 is 6, granted when the ode is cast at him");
         Assertions.assertEquals(0, without, "without the ode nothing is granted");
     }

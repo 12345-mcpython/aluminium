@@ -19,7 +19,7 @@ import java.util.List;
 public class WorldOdeFireSeedCritTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
-    private static final String FIRE_SEED = "火种";
+    private static final String FIRE_SEED = "char:1408/ember";
 
     @Test
     public void theTransformationTurnsExcessSeedsIntoCritDamage() {

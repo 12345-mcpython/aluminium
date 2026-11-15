@@ -35,7 +35,7 @@ public class PhainonKitTest {
     private static final int SUPPORT = 1414;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
-    private static final String COREFLAME = "火种";
+    private static final String COREFLAME = "char:1408/ember";
 
     // ==================================================================
     // Former class: PhainonTest
@@ -55,19 +55,19 @@ public class PhainonKitTest {
         Battle battle = new Battle(List.of(phainon, ally), List.of(enemy), fixed());
         battle.startBattle();
 
-        // Note: Updated: the document DOES state one -- her trace 1408101 "战斗开始时，获得 1 点[火种]", which is
+        // Note: Updated: the document DOES state one -- her trace 1408101 "战斗开始时，获得 1 点[char:1408/ember]", which is
         // now written, so the pool opens at one. The reading is unchanged in kind: it starts where the sentences say.
         Assertions.assertEquals(1, coreflameOf(phainon),
-                "「战斗开始时，获得 1 点【火种】」 (at the start of battle, gains 1 point of Kindling (【火种】))");
+                "「战斗开始时，获得 1 点【char:1408/ember】」 (at the start of battle, gains 1 point of Kindling (【char:1408/ember】))");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0));
         Assertions.assertEquals(3, coreflameOf(phainon),
-                "「获得2点【火种】」 (gains 2 points of Kindling) -- one from the battle start, two from the cast");
+                "「获得2点【char:1408/ember】」 (gains 2 points of Kindling) -- one from the battle start, two from the cast");
 
         for (int i = 0; i < 9; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0));
         }
         // Note: 12 -> 15. This expectation was written while the file declared only `max: 12`, and the
-        // document's sentence does not stop there: "[火种]达到 12 点时可激活终结技，达到上限后还可最多溢出 3 点".
+        // document's sentence does not stop there: "[char:1408/ember]达到 12 点时可激活终结技，达到上限后还可最多溢出 3 点".
         // The test's INTENT is untouched -- the pool is capped, and ten casts cannot run past the ceiling -- but the ceiling now
         // quotes the whole sentence. The allowance itself is pinned from both sides by `CoreflameOverflowTest`.
         Assertions.assertEquals(15, coreflameOf(phainon),
@@ -105,7 +105,7 @@ public class PhainonKitTest {
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int coreflameOf(Character unit) {
-        return unit.getResources().get("火种").getValue();
+        return unit.getResources().get("char:1408/ember").getValue();
     }
 
     private static Random fixed() {
@@ -275,7 +275,7 @@ public class PhainonKitTest {
         battle.applyEnergyGain(phainon, EnergyGain.normal(10));
         battle.processRequests();
         int after = phainon.getResources().value(COREFLAME);
-        System.out.println("[1408] 收到 10 点回能后的火种: " + before + " -> " + after + " (登记：这一句还没写)");
+        System.out.println("[1408] 收到 10 点回能后的char:1408/ember: " + before + " -> " + after + " (登记：这一句还没写)");
         Assertions.assertEquals(before, after,
                 "登记中的缺口：ENERGY_GAINED 不带「谁给的」，所以「队友提供的回能」今天判不了");
     }
@@ -329,7 +329,7 @@ public class PhainonKitTest {
         double[] aimedAtHer = scene(true);
         double[] aimedAway = scene(false);
         Assertions.assertAll("「when Phainon becomes the skill target of any other target」",
-                () -> Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "「gains 1 point of [火种] (Kindling)」"),
+                () -> Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "「gains 1 point of [char:1408/ember] (Kindling)」"),
                 () -> Assertions.assertEquals(0.30, aimedAtHer[1], EPS, "「crit damage increased by 30%」"),
                 () -> Assertions.assertEquals(0.0, aimedAway[0], EPS, "「when becoming ... a skill target」 -- she was not the target"),
                 () -> Assertions.assertEquals(0.0, aimedAway[1], EPS, "…so there is no crit damage either"));

@@ -347,7 +347,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1401, "BATTLE_START", "eidolon6_ice_penetration", List.of());
         assertRule(1401, "SKILL_CAST", "the_enhanced_skill_applies_one_insight",
                 List.of("actor == self", "from_skill_id == 9.0"));
-        assertRule(1402, "DEALING_DAMAGE", "talent_fissure_thread_bonus", List.of("actor == self", "self_summon_count >= 1.0", "target has_state 间隙织线"));
+        assertRule(1402, "DEALING_DAMAGE", "talent_fissure_thread_bonus", List.of("actor == self", "self_summon_count >= 1.0", "target has_state char:1402/gap_thread"));
         assertRule(1402, "DEALING_DAMAGE", "talent_fissure_thread_applies_state", List.of("actor == self", "self_summon_count >= 1.0"));
         assertRule(1403, "BATTLE_START", "trace_30_energy", List.of());
         assertRule(1403, "ALLY_ATTACK", "trace_energy_per_target", List.of("actor != self", "hit_count > 0.0"));
@@ -403,7 +403,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1414, "SKILL_CAST", "skill_bondmate_and_shield", List.of("actor == self"));
         assertRule(1414, "ULT_CAST", "ult_party_shield", List.of("actor == self"));
         assertRule(1414, "BATTLE_START", "level_convention", List.of());
-        assertRule(1415, "BASIC_ATTACK", "basic_recollection", List.of("actor == self", "!self has_state 往昔的涟漪"));
+        assertRule(1415, "BASIC_ATTACK", "basic_recollection", List.of("actor == self", "!self has_state char:1415/ripples_of_the_past"));
         assertRule(1415, "SKILL_CAST", "skill_recollection", List.of("actor == self"));
         assertRule(1415, "BATTLE_START", "talent_party_damage", List.of());
         assertRule(1415, "BATTLE_START", "level_convention", List.of());

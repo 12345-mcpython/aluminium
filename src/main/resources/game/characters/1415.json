@@ -4,7 +4,7 @@
   "_status": "partial",
   "resources": [
     {
-      "id": "追忆",
+      "id": "char:1415/remembrance",
       "max": 24,
       "source": "1415 昔涟 天赋 众愿啊，汇流如歌 (141504, Enhance): 「战斗开始时或昔涟行动后，我方任意状态的其他角色及其忆灵获得【未来】，持有【未来】的我方目标行动时消耗【未来】使昔涟获得1点【追忆】。昔涟在【追忆】达到24点时可激活终结技并解除自身所有负面效果，处于【往昔的涟漪】状态时在【追忆】达到12点时可激活终结技，达到上限后还可最多溢出至27点。昔涟在场时，我方全体目标造成的伤害提高20.00%。」  ⭐ 「达到上限后还可最多溢出至 27 点」⇒ `max: 24` 加 `overflow: 3`。",
       "note": "上限 **24** 是**文档原话** ✓（「【追忆】**达到 24 点**时可激活终结技」✓），并且**有写入者** ✓（普攻 +1 ✓、战技 +3 ✓）⇒ 按第 219 轮的判据 ✓ **可以声明** ✓。⚠ 文档**没说初始值** ✗ ⇒ 保持默认 **0** ✓。⚠ **登记**：「达到上限后还可**最多溢出至 27 点**」✗ —— 声明的资源**会被引擎钳位** ✓ ⇒ **溢出被丢弃** ✗ （与第 222 轮白厄的【火种】同一条 ✓，那里也登记了 3 点溢出 ✓）。",
@@ -16,12 +16,12 @@
       "source": "1412 刻律德菈 战技：「使指定我方单体角色获得【军功】并使刻律德菈获得 1 点充能。充能上限 8 点。」（本文件声明它，是因为**规则在本文件**而资源属于 1412 ✓；上限与 1412 文件一致 ✓）"
     },
     {
-      "id": "故事",
+      "id": "char:1415/story",
       "max": 2147483647,
       "source": "⚠ 这里是为了满足**加载器的规则**（“规则用到的资源必须在角色自己的文件里声明”）；而**计数真正落在忆灵自己的声明处**（`memosprites/1415.json` 的 `resources`）。"
     },
     {
-      "id": "忆灵技的额外一击",
+      "id": "char:1415/memosprite_extra_hit",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 槽位 26「献予「真我」之诗」的**额外付交击数**：「昔涟每从 1 个除德谬歌以外**不同的队友**处获得【追忆】后，德谬歌施放【花与箭的舞曲】时**额外**造成 1 次…冰属性伤害」—— 本计数器就是“**有多少位不同队友**给过”，即额外的击数。"
     }
@@ -68,7 +68,7 @@
           "type": "entity",
           "entity": "actor",
           "json": {
-            "state": "未来"
+            "state": "char:1415/future"
           }
         },
         {
@@ -77,7 +77,7 @@
             "type": "entity",
             "entity": "actor",
             "json": {
-              "state": "从这位队友处得到过【追忆】"
+              "state": "char:1415/remembrance_received"
             }
           }
         }
@@ -85,7 +85,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "忆灵技的额外一击",
+          "resource": "char:1415/memosprite_extra_hit",
           "amount": 1,
           "target": "summon"
         }
@@ -102,14 +102,14 @@
           "type": "entity",
           "entity": "actor",
           "json": {
-            "state": "未来"
+            "state": "char:1415/future"
           }
         }
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "从这位队友处得到过【追忆】",
+          "buff": "char:1415/remembrance_received",
           "permanent": true,
           "target": "attacker"
         }
@@ -135,7 +135,7 @@
             "type": "entity",
             "entity": "self",
             "json": {
-              "state": "往昔的涟漪"
+              "state": "char:1415/ripples_of_the_past"
             }
           }
         }
@@ -143,7 +143,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "追忆",
+          "resource": "char:1415/remembrance",
           "amount": 1
         }
       ],
@@ -166,7 +166,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "追忆",
+          "resource": "char:1415/remembrance",
           "amount": 3
         },
         {
@@ -217,8 +217,8 @@
           "ally_state_cap": 4,
           "ally_states": [
             "献予「天空」之诗",
-            "献予「岁月」之诗",
-            "献予「真我」之诗"
+            "char:1415/ode_to_years",
+            "char:1415/ode_to_true_self"
           ],
           "percent": 0.24
         }
@@ -265,7 +265,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "追忆",
+          "resource": "char:1415/remembrance",
           "amount_from": {
             "type": "cast_param",
             "index": 1
@@ -457,7 +457,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "献予「真我」之诗",
+          "buff": "char:1415/ode_to_true_self",
           "permanent": true,
           "target": "self"
         }
@@ -481,14 +481,14 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "献予「真我」之诗"
+            "state": "char:1415/ode_to_true_self"
           }
         }
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "故事",
+          "resource": "char:1415/story",
           "amount": 1,
           "target": "summon"
         }
@@ -512,14 +512,14 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "献予「真我」之诗"
+            "state": "char:1415/ode_to_true_self"
           }
         }
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "故事",
+          "resource": "char:1415/story",
           "amount": 1,
           "target": "summon"
         }
@@ -537,7 +537,7 @@
           "entity": "summon",
           "json": {
             "resource": {
-              "name": "故事",
+              "name": "char:1415/story",
               "min": 3
             }
           }
@@ -546,14 +546,14 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "献予「真我」之诗"
+            "state": "char:1415/ode_to_true_self"
           }
         }
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "故事",
+          "resource": "char:1415/story",
           "spendAll": true,
           "target": "summon"
         },
@@ -579,7 +579,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "未来",
+          "buff": "char:1415/future",
           "permanent": true,
           "target": "other_allies"
         }
@@ -603,7 +603,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "未来",
+          "buff": "char:1415/future",
           "permanent": true,
           "target": "other_allies"
         }
@@ -620,19 +620,19 @@
           "type": "entity",
           "entity": "actor",
           "json": {
-            "state": "未来"
+            "state": "char:1415/future"
           }
         }
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "未来",
+          "buff": "char:1415/future",
           "target": "attacker"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "追忆",
+          "resource": "char:1415/remembrance",
           "amount": 1
         }
       ],
@@ -649,7 +649,7 @@
           "entity": "self",
           "json": {
             "resource": {
-              "name": "追忆",
+              "name": "char:1415/remembrance",
               "min": 24
             }
           }
@@ -695,7 +695,7 @@
           "scale": "actor_max_hp",
           "percent": 0.003,
           "element": "Ice",
-          "times_from": "resource:忆灵技的额外一击",
+          "times_from": "resource:char:1415/memosprite_extra_hit",
           "target": "random_enemy"
         }
       ],
@@ -718,7 +718,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "往昔的涟漪",
+          "buff": "char:1415/ripples_of_the_past",
           "permanent": true,
           "target": "self"
         },
@@ -779,7 +779,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "往昔的涟漪"
+            "state": "char:1415/ripples_of_the_past"
           }
         },
         {
@@ -787,7 +787,7 @@
           "entity": "self",
           "json": {
             "resource": {
-              "name": "追忆",
+              "name": "char:1415/remembrance",
               "min": 12
             }
           }
@@ -818,7 +818,7 @@
           "entity": "self",
           "json": {
             "resource": {
-              "name": "追忆",
+              "name": "char:1415/remembrance",
               "min": 24
             }
           }
@@ -844,7 +844,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "往昔的涟漪"
+            "state": "char:1415/ripples_of_the_past"
           }
         },
         {
@@ -852,7 +852,7 @@
           "entity": "self",
           "json": {
             "resource": {
-              "name": "追忆",
+              "name": "char:1415/remembrance",
               "min": 12
             }
           }
@@ -899,13 +899,13 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "献予「岁月」之诗",
+          "buff": "char:1415/ode_to_years",
           "permanent": true,
           "target": "ally_cid:1413"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "献予「真我」之诗",
+          "buff": "char:1415/ode_to_true_self",
           "permanent": true,
           "target": "self"
         }

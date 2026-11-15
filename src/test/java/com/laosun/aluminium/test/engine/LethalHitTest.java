@@ -22,7 +22,7 @@ import java.util.List;
 public class LethalHitTest {
     private static final int PHAINON = 1408;
     private static final int JINGLIU = 1104;
-    private static final String STATE = "变身";
+    private static final String STATE = "char:1408/transformation";
 
     /**
      * 1408: transformed, a lethal blow leaves her standing at a QUARTER of her (raised) Max HP.
@@ -47,7 +47,7 @@ public class LethalHitTest {
     @Test
     public void withoutTheTransformationTheBlowKills() {
         Assertions.assertTrue(survivor(PHAINON, false).isDeath(),
-                "「变身期间」 (during the transformation)-- outside it the clause does not apply");
+                "「char:1408/transformation期间」 (during the transformation)-- outside it the clause does not apply");
     }
 
     /**

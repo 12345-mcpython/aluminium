@@ -36,8 +36,8 @@ public class CyreneRecollectionAndRippleTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     // The resource and the state it is re-tiered by; the absorbed files called the state STATE and the resource MEMORY.
-    private static final String RECOLLECTION = "追忆";
-    private static final String RIPPLE = "往昔的涟漪";
+    private static final String RECOLLECTION = "char:1415/remembrance";
+    private static final String RIPPLE = "char:1415/ripples_of_the_past";
 
     // ---------------------------------------------------------------------------------------------------------------
     // Former CyreneRecollectionTest: the enhanced basic's 3 points, and the ordinary basic's 1 outside the ripple.
@@ -81,12 +81,12 @@ public class CyreneRecollectionAndRippleTest {
         battle.processRequests();
         double after = cyrene.getResources().get(RECOLLECTION).exactValue();
 
-        Assertions.assertAll("the basic attack's 「获得 #2 点【追忆】」, outside and inside 【往昔的涟漪】",
+        Assertions.assertAll("the basic attack's 「获得 #2 点【char:1415/remembrance】」, outside and inside 【char:1415/ripples_of_the_past】",
                 () -> Assertions.assertEquals(beforeOrdinary + 1.0, afterOrdinary, 1e-9,
-                        "the ordinary basic's own 「获得 #2 点」 (1) still fires when 【往昔的涟漪】 is not up"),
+                        "the ordinary basic's own 「获得 #2 点」 (1) still fires when 【char:1415/ripples_of_the_past】 is not up"),
                 () -> Assertions.assertTrue(installed, "precondition: the ultimate installed the enhanced basic"),
                 () -> Assertions.assertEquals(3.0, after - before, 1e-9,
-                        "「获得 #2 点【追忆】」 = 3; the ordinary basic's +1 must not also fire inside the ripple"));
+                        "「获得 #2 点【char:1415/remembrance】」 = 3; the ordinary basic's +1 must not also fire inside the ripple"));
     }
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -121,11 +121,11 @@ public class CyreneRecollectionAndRippleTest {
         battle.processRequests();
         int left = battle.characters().getFirst().getBuffManager().debuffCount();
         System.out.println("[recollection] after reaching 24, her debuffs read " + left);
-        Assertions.assertAll("【追忆】's stated cap with its overflow, and the cleanse a full pool performs",
+        Assertions.assertAll("【char:1415/remembrance】's stated cap with its overflow, and the cleanse a full pool performs",
                 () -> Assertions.assertEquals(24, cap, "the stated cap"),
                 () -> Assertions.assertEquals(3, overflow, "and it may overflow to 27"),
                 () -> Assertions.assertTrue(debuffsBefore > 0, "precondition: she carries a debuff"),
-                () -> Assertions.assertEquals(0, left, "a full [追忆] (Recollection) cleanses her"));
+                () -> Assertions.assertEquals(0, left, "a full [char:1415/remembrance] (Recollection) cleanses her"));
     }
 
     // ---------------------------------------------------------------------------------------------------------------

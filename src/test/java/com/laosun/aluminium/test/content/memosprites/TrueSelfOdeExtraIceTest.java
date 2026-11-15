@@ -15,7 +15,7 @@ import java.util.List;
  * The extra Ice hits of slot 26's second clause.
  */
 public class TrueSelfOdeExtraIceTest {
-    private static final String COUNTER = "忆灵技的额外一击";
+    private static final String COUNTER = "char:1415/memosprite_extra_hit";
 
     @Test
     public void eachCounterPointAddsAHit() {

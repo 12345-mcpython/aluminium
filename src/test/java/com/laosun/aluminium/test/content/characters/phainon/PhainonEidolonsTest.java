@@ -30,8 +30,8 @@ import java.util.List;
 public class PhainonEidolonsTest {
     private static final int PHAINON = 1408;
     private static final int ALLY = 1204;
-    private static final String TRANSFORMED = "变身";
-    private static final String COREFLAME = "火种";
+    private static final String TRANSFORMED = "char:1408/transformation";
+    private static final String COREFLAME = "char:1408/ember";
     /**
      * 【支柱•死星天裁】's data slot in {@code skills.json} (140811). It has no {@code SkillType}: the data's slot 11 is
      * not one of the mapped slots, so the case builds the skill by {@code (cid, slot, level)}.
@@ -180,7 +180,7 @@ public class PhainonEidolonsTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.LETHAL_DAMAGE, phainon, phainon, 0, 0));
         battle.processRequests();
         double healed = phainon.getCurrentHp() - before;
-        System.out.println("[1408] a killing blow during 【变身】 heals " + healed + " of " + maxHp
+        System.out.println("[1408] a killing blow during 【char:1408/transformation】 heals " + healed + " of " + maxHp
                 + " (" + (healed / maxHp) + ")");
         Assertions.assertEquals(0.25, healed / maxHp, 1e-9,
                 "文档 `:189`：回复等同于自身生命上限 25% 的生命值（数据同一行的 #2 = 0.25）");
@@ -286,11 +286,11 @@ public class PhainonEidolonsTest {
         int startAtSix = coreflameAtBattleStart(6);
         int overflowAtZero = coreflameAfterGaining(0, 100);
         int overflowAtSix = coreflameAfterGaining(6, 100);
-        System.out.println("[1408] 火种 at battle start: E0 " + startAtZero + " ; E6 " + startAtSix
+        System.out.println("[1408] char:1408/ember at battle start: E0 " + startAtZero + " ; E6 " + startAtSix
                 + " (行迹【行向世界终点】给 1 点，星魂 6 再加 6 点)");
-        System.out.println("[1408] 火种 after gaining 100: E0 " + overflowAtZero + " (cap 12 + overflow 3) ; E6 " + overflowAtSix);
-        Assertions.assertAll("星魂 6 的两条【火种】句",
-                () -> Assertions.assertEquals(1, startAtZero, "行迹：战斗开始时获得 1 点【火种】"),
+        System.out.println("[1408] char:1408/ember after gaining 100: E0 " + overflowAtZero + " (cap 12 + overflow 3) ; E6 " + overflowAtSix);
+        Assertions.assertAll("星魂 6 的两条【char:1408/ember】句",
+                () -> Assertions.assertEquals(1, startAtZero, "行迹：战斗开始时获得 1 点【char:1408/ember】"),
                 () -> Assertions.assertEquals(7, startAtSix, "星魂 6：战斗开始时获得 6 点，与行迹那 1 点相加"),
                 () -> Assertions.assertEquals(15, overflowAtZero, "E0：溢出额度是声明里的 3 ⇒ 12 + 3 = 15 就停"),
                 () -> Assertions.assertEquals(107, overflowAtSix,
@@ -428,7 +428,7 @@ public class PhainonEidolonsTest {
 
         double[] atZero = appliedBlock(0);
         double[] atFive = appliedBlock(5);
-        System.out.println("[1408] 变身块落下的增量: E0 ATK +" + atZero[0] + " / HEALTH +" + atZero[1]
+        System.out.println("[1408] char:1408/transformation块落下的增量: E0 ATK +" + atZero[0] + " / HEALTH +" + atZero[1]
                 + " ; E5 ATK +" + atFive[0] + " / HEALTH +" + atFive[1]
                 + " (第 12 行说 0.88 / 2.97，字面量是 0.8 / 2.7)");
         Assertions.assertAll("槽 5 的行漂移见证",
@@ -465,7 +465,7 @@ public class PhainonEidolonsTest {
         phainon.setCurrentEnergy(phainon.getMaxEnergy());
         battle.castUltra(phainon, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(phainon.getBuffManager().hasState("变身"), "precondition: the transformation is on");
+        Assertions.assertTrue(phainon.getBuffManager().hasState("char:1408/transformation"), "precondition: the transformation is on");
         return new double[]{
                 phainon.getAttribute(AttributeType.ATTACK).get() - atkBefore,
                 phainon.getAttribute(AttributeType.HEALTH).get() - hpBefore};

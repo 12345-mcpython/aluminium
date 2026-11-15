@@ -147,10 +147,10 @@ public class AglaeaMemospritesTest {
 
         fireSummonAttack(battle, garmentmaker, enemy);
         Assertions.assertEquals(base, garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
-                "「攻击处于【间隙织线】状态的敌人后」 — an unthreaded target adds no stack");
+                "「攻击处于【char:1402/gap_thread】状态的敌人后」 — an unthreaded target adds no stack");
 
         for (int hit = 0; hit < 6; hit++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1402/gap_thread", 5));
             fireSummonAttack(battle, garmentmaker, enemy);
         }
         double capped = garmentmaker.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
@@ -186,10 +186,10 @@ public class AglaeaMemospritesTest {
         Summon garmentmaker = battle.summonOf(aglaea);
         Assertions.assertNotNull(garmentmaker, "precondition: the stance brought the memosprite out");
         Assertions.assertEquals(base, aglaea.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-9,
-                "no 【匠躯】 layers yet, so no speed");
+                "no 【char:1402/artisan_body】 layers yet, so no speed");
 
         for (int layer = 1; layer <= 3; layer++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1402/gap_thread", 5));
             fireSummonAttack(battle, garmentmaker, enemy);
             Assertions.assertEquals(base * (1 + 0.15 * layer),
                     aglaea.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get(), 1e-6,
@@ -218,12 +218,12 @@ public class AglaeaMemospritesTest {
         Summon garmentmaker = battle.summonMemosprite(aglaea);
         battle.processRequests();
         for (int hit = 0; hit < 9; hit++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1402/gap_thread", 5));
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                     com.laosun.aluminium.enums.TriggerEvent.ATTACK_FINISHED, aglaea, enemy, 1, 0));
             battle.processRequests();
         }
-        return garmentmaker.getBuffManager().stacksOf("匠躯");
+        return garmentmaker.getBuffManager().stacksOf("char:1402/artisan_body");
     }
 
     /**
@@ -241,21 +241,21 @@ public class AglaeaMemospritesTest {
         Summon first = battle.summonMemosprite(aglaea);
         battle.processRequests();
         for (int layer = 0; layer < 2; layer++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("间隙织线", 5));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1402/gap_thread", 5));
             fireSummonAttack(battle, first, enemy);
         }
-        Assertions.assertEquals(2, first.getBuffManager().stacksOf("匠躯"), "precondition: two layers before it leaves");
+        Assertions.assertEquals(2, first.getBuffManager().stacksOf("char:1402/artisan_body"), "precondition: two layers before it leaves");
 
         // It leaves: the trace files "one layer kept" on her.
         battle.applyDamage(first, new Damage(enemy, first, DamageElement.THUNDER, DamageType.NORMAL, 1_000_000));
         battle.processRequests();
         Assertions.assertTrue(first.isDeath(), "precondition: the memosprite is gone");
-        Assertions.assertEquals(1, aglaea.getBuffManager().stacksOf("织运之竭-保留"),
+        Assertions.assertEquals(1, aglaea.getBuffManager().stacksOf("internal:1402/weave_depletion_kept"),
                 "「最多保留 1 层」 — two layers leave, one is kept");
 
         Summon second = battle.summonMemosprite(aglaea);
         battle.processRequests();
-        Assertions.assertEquals(1, second.getBuffManager().stacksOf("匠躯"),
+        Assertions.assertEquals(1, second.getBuffManager().stacksOf("char:1402/artisan_body"),
                 "「衣匠再次被召唤时获得对应层数」 — the replacement starts with the kept layer, not with two");
     }
 
@@ -276,7 +276,7 @@ public class AglaeaMemospritesTest {
         battle.processRequests();
         Summon garmentmaker = battle.summonOf(aglaea);
         Assertions.assertNotNull(garmentmaker, "precondition: the Ultimate brought it out");
-        Assertions.assertTrue(aglaea.getBuffManager().hasState("至高之姿"), "precondition: the stance is on");
+        Assertions.assertTrue(aglaea.getBuffManager().hasState("char:1402/supreme_posture"), "precondition: the stance is on");
         Assertions.assertEquals(1, battle.countdownsOf(aglaea).size(),
                 "「行动序列上出现倒计时」 — placed by her");
         var countdown = battle.countdownsOf(aglaea).getFirst();
@@ -288,8 +288,8 @@ public class AglaeaMemospritesTest {
                 com.laosun.aluminium.enums.TriggerEvent.COUNTDOWN_TURN, countdown, null, 0, 0));
         battle.processRequests();
         Assertions.assertTrue(garmentmaker.isDeath(), "「回合开始时使衣匠自毁」 — the countdown's turn dismissed it");
-        Assertions.assertFalse(aglaea.getBuffManager().hasState("至高之姿"),
-                "「衣匠消失时阿格莱雅解除【至高之姿】状态」 — the state went with it");    }
+        Assertions.assertFalse(aglaea.getBuffManager().hasState("char:1402/supreme_posture"),
+                "「衣匠消失时阿格莱雅解除【char:1402/supreme_posture】状态」 — the state went with it");    }
     @Test
     public void theGarmentmakerShrugsOffControl() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);

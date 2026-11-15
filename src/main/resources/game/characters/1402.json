@@ -83,10 +83,10 @@
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
           "percent_from_skill_param": "ULTRA:0",
-          "per_stack": "summon_stacks:匠躯",
+          "per_stack": "summon_stacks:char:1402/artisan_body",
           "per_stack_live": true,
           "permanent": true,
-          "while_state": "至高之姿",
+          "while_state": "char:1402/supreme_posture",
           "buff": "至高之姿-速度",
           "target": "self"
         }
@@ -111,7 +111,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "至高之姿",
+          "buff": "char:1402/supreme_posture",
           "blocks": "skill",
           "permanent": true,
           "ticks_on": "summon",
@@ -172,12 +172,12 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "间隙织线",
+          "buff": "char:1402/gap_thread",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "间隙织线",
+          "buff": "char:1402/gap_thread",
           "permanent": true,
           "target": "pick"
         }
@@ -208,7 +208,7 @@
       "id": "p1402_memosprite_speed_stack_on_threaded_hit",
       "when": [
         "actor is_summon",
-        "target has_state 间隙织线"
+        "target has_state char:1402/gap_thread"
       ],
       "do": [
         {
@@ -218,7 +218,7 @@
           "stackable": true,
           "max_stacks": 6,
           "permanent": true,
-          "buff": "匠躯",
+          "buff": "char:1402/artisan_body",
           "target": "summon"
         }
       ],
@@ -231,7 +231,7 @@
       "min_eidolon": 4,
       "when": [
         "actor == self",
-        "target has_state 间隙织线"
+        "target has_state char:1402/gap_thread"
       ],
       "do": [
         {
@@ -241,7 +241,7 @@
           "stackable": true,
           "max_stacks": 7,
           "permanent": true,
-          "buff": "匠躯",
+          "buff": "char:1402/artisan_body",
           "target": "summon"
         }
       ],
@@ -254,7 +254,7 @@
       "min_eidolon": 4,
       "when": [
         "actor is_summon",
-        "target has_state 间隙织线"
+        "target has_state char:1402/gap_thread"
       ],
       "do": [
         {
@@ -264,7 +264,7 @@
           "stackable": true,
           "max_stacks": 7,
           "permanent": true,
-          "buff": "匠躯",
+          "buff": "char:1402/artisan_body",
           "target": "summon"
         }
       ],
@@ -335,12 +335,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "短视之惩-她-自身速度",
+          "buff": "char:1402/myopia_her_speed",
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "短视之惩-她-忆灵速度",
+          "buff": "char:1402/myopia_her_memosprite_speed",
           "target": "self"
         },
         {
@@ -348,10 +348,10 @@
           "attribute": "ATTACK",
           "scale": "self_attr:SPEED",
           "percent": 7.2,
-          "while_state": "至高之姿",
+          "while_state": "char:1402/supreme_posture",
           "permanent": true,
           "coexist": true,
-          "buff": "短视之惩-她-自身速度",
+          "buff": "char:1402/myopia_her_speed",
           "target": "self"
         },
         {
@@ -359,10 +359,10 @@
           "attribute": "ATTACK",
           "scale": "summon_attr:SPEED",
           "percent": 3.6,
-          "while_state": "至高之姿",
+          "while_state": "char:1402/supreme_posture",
           "permanent": true,
           "coexist": true,
-          "buff": "短视之惩-她-忆灵速度",
+          "buff": "char:1402/myopia_her_memosprite_speed",
           "target": "self"
         }
       ],
@@ -381,7 +381,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DAMAGE_PENETRATION_THUNDER",
           "percent": 0.2,
-          "while_state": "至高之姿",
+          "while_state": "char:1402/supreme_posture",
           "permanent": true,
           "buff": "星魂6-雷穿透",
           "target": "self"
@@ -390,7 +390,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DAMAGE_PENETRATION_THUNDER",
           "percent": 0.2,
-          "while_state": "至高之姿",
+          "while_state": "char:1402/supreme_posture",
           "permanent": true,
           "buff": "星魂6-雷穿透-衣匠",
           "target": "summon"
@@ -408,12 +408,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "短视之惩-衣匠-自身速度",
+          "buff": "char:1402/myopia_seamstress_speed",
           "target": "summon"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "短视之惩-衣匠-忆灵速度",
+          "buff": "char:1402/myopia_seamstress_memosprite_speed",
           "target": "summon"
         },
         {
@@ -421,10 +421,10 @@
           "attribute": "ATTACK",
           "scale": "self_attr:SPEED",
           "percent": 7.2,
-          "while_state": "至高之姿",
+          "while_state": "char:1402/supreme_posture",
           "permanent": true,
           "coexist": true,
-          "buff": "短视之惩-衣匠-自身速度",
+          "buff": "char:1402/myopia_seamstress_speed",
           "target": "summon"
         },
         {
@@ -432,10 +432,10 @@
           "attribute": "ATTACK",
           "scale": "summon_attr:SPEED",
           "percent": 3.6,
-          "while_state": "至高之姿",
+          "while_state": "char:1402/supreme_posture",
           "permanent": true,
           "coexist": true,
-          "buff": "短视之惩-衣匠-忆灵速度",
+          "buff": "char:1402/myopia_seamstress_memosprite_speed",
           "target": "summon"
         }
       ],
@@ -460,12 +460,12 @@
       "id": "p1402_eidolon_trace_keeps_one_layer_when_it_leaves",
       "when": [
         "actor == summon",
-        "actor_stacks:匠躯 >= 1"
+        "actor_stacks:char:1402/artisan_body >= 1"
       ],
       "do": [
         {
           "op": "SET_STACKS",
-          "buff": "织运之竭-保留",
+          "buff": "internal:1402/weave_depletion_kept",
           "scale": "const:1",
           "percent": 1,
           "target": "self"
@@ -479,12 +479,12 @@
       "id": "p1402_eidolon_trace_clears_the_kept_layer",
       "when": [
         "actor == summon",
-        "actor_stacks:匠躯 < 1"
+        "actor_stacks:char:1402/artisan_body < 1"
       ],
       "do": [
         {
           "op": "SET_STACKS",
-          "buff": "织运之竭-保留",
+          "buff": "internal:1402/weave_depletion_kept",
           "scale": "const:1",
           "percent": 0,
           "target": "self"
@@ -498,7 +498,7 @@
       "id": "p1402_eidolon_trace_gives_the_layer_back",
       "when": [
         "actor == summon",
-        "self_stacks:织运之竭-保留 >= 1"
+        "self_stacks:internal:1402/weave_depletion_kept >= 1"
       ],
       "do": [
         {
@@ -508,7 +508,7 @@
           "stackable": true,
           "max_stacks": 6,
           "permanent": true,
-          "buff": "匠躯",
+          "buff": "char:1402/artisan_body",
           "target": "summon"
         }
       ],
@@ -571,7 +571,7 @@
       "when": [
         "actor == self",
         "self_summon_count >= 1",
-        "target has_state 间隙织线"
+        "target has_state char:1402/gap_thread"
       ],
       "do": [
         {
@@ -594,12 +594,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "间隙织线",
+          "buff": "char:1402/gap_thread",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "间隙织线",
+          "buff": "char:1402/gap_thread",
           "turns": 3,
           "target": "target"
         }
@@ -618,15 +618,15 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "间隙织线易伤",
+          "buff": "char:1402/gap_thread_vulnerability",
           "target": "all_enemies"
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.15,
           "permanent": true,
-          "buff": "间隙织线易伤",
-          "while_holder_state": "间隙织线",
+          "buff": "char:1402/gap_thread_vulnerability",
+          "while_holder_state": "char:1402/gap_thread",
           "target": "target"
         }
       ],
@@ -639,7 +639,7 @@
       "min_eidolon": 1,
       "when": [
         "actor == self",
-        "target has_state 间隙织线"
+        "target has_state char:1402/gap_thread"
       ],
       "do": [
         {
@@ -657,7 +657,7 @@
       "min_eidolon": 1,
       "when": [
         "actor is_summon",
-        "target has_state 间隙织线"
+        "target has_state char:1402/gap_thread"
       ],
       "do": [
         {
@@ -684,7 +684,7 @@
           "permanent": true,
           "stackable": true,
           "max_stacks": 3,
-          "buff": "星魂二穿防",
+          "buff": "char:1402/eidolon2_pen",
           "target": "self"
         }
       ],
@@ -706,7 +706,7 @@
           "permanent": true,
           "stackable": true,
           "max_stacks": 3,
-          "buff": "星魂二穿防",
+          "buff": "char:1402/eidolon2_pen",
           "target": "summon"
         }
       ],
@@ -723,7 +723,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "星魂二穿防",
+          "buff": "char:1402/eidolon2_pen",
           "target": "all_allies"
         }
       ],
@@ -741,7 +741,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "浪漫",
+          "buff": "char:1402/romance",
           "permanent": true,
           "target": "self"
         }
@@ -753,7 +753,7 @@
       "id": "memosprite_ode_of_romance_spends_itself_for_energy",
       "on": "ALLY_ATTACK",
       "when": [
-        "self has_state 浪漫"
+        "self has_state char:1402/romance"
       ],
       "do": [
         {
@@ -763,7 +763,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "浪漫",
+          "buff": "char:1402/romance",
           "target": "self"
         }
       ],
@@ -787,7 +787,7 @@
             "index": 1
           },
           "permanent": true,
-          "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+          "buff": "char:1402/amazing_buff",
           "target": "self"
         },
         {
@@ -798,7 +798,7 @@
             "index": 2
           },
           "permanent": true,
-          "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+          "buff": "char:1402/amazing_buff",
           "target": "self"
         }
       ],
@@ -823,7 +823,7 @@
             "index": 1
           },
           "permanent": true,
-          "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+          "buff": "char:1402/amazing_buff",
           "target": "summon"
         },
         {
@@ -834,7 +834,7 @@
             "index": 2
           },
           "permanent": true,
-          "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+          "buff": "char:1402/amazing_buff",
           "target": "summon"
         }
       ],
@@ -845,12 +845,12 @@
       "id": "memosprite_ode_of_romance_ends_with_her_stance",
       "on": "STATE_ENDED",
       "when": [
-        "self state_ended 至高之姿"
+        "self state_ended char:1402/supreme_posture"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+          "buff": "char:1402/amazing_buff",
           "kind": "own",
           "target": "self"
         }
@@ -862,13 +862,13 @@
       "id": "memosprite_ode_of_romance_stance_end_also_clears_the_garmentmaker",
       "on": "STATE_ENDED",
       "when": [
-        "self state_ended 至高之姿",
+        "self state_ended char:1402/supreme_posture",
         "self_summon_count >= 1"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+          "buff": "char:1402/amazing_buff",
           "kind": "own",
           "target": "summon"
         }

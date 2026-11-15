@@ -31,7 +31,7 @@ public class ChanceDecayTest {
     /**
      * A resource 1506's own file declares, so the fixture does not have to invent one.
      */
-    private static final String COUNTER = "隐藏分";
+    private static final String COUNTER = "char:1506/hidden_score";
     private static final String BOX = "test_decaying_rule";
 
     /**

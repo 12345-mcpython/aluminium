@@ -1033,7 +1033,13 @@ final class TriggerMagnitudes {
             // Trailblazer documents (每累计恢复 10 点能量), GLOSSARY_EXTRA (每累计损失 30% 生命值), RELICS (每累计获得 5 点笑点,
             // which is Elation damage again) and two WEAPONS entries. ⚠ The quantity is a FLOOR, not a "did it cross" flag:
             // a single +400 against N = 120 is THREE steps, which is exactly what a per-event `>= N` check would under-count.
-            String[] parts = effect.getScale().trim().substring(TriggerInterpreter.STEPS_PREFIX.length()).split(":", 2);
+            String spelled = effect.getScale().trim().substring(TriggerInterpreter.STEPS_PREFIX.length());
+            // Split at the LAST colon: the counter may carry colons in its own name (`char:1506/hidden_score`), while the
+            // step after it is a number. The same convention `holder_attr:` / `self_attr_above:` / `weight_steps` use.
+            int lastColon = spelled.lastIndexOf(':');
+            String[] parts = lastColon < 0
+                    ? new String[]{spelled}
+                    : new String[]{spelled.substring(0, lastColon), spelled.substring(lastColon + 1)};
             if (parts.length != 2) {
                 throw new IllegalStateException("the scale \"" + effect.getScale()
                         + "\" must state <COUNTER>:<N>, e.g. steps:隐藏分:120");
@@ -1072,7 +1078,14 @@ final class TriggerMagnitudes {
             // "when SPD is greater than or equal to 120 ... for each 1 point of SPD above that ...": the EXCESS over a
             // stated threshold, as a magnitude. Note: `self_max_energy` below is the same shape with the threshold
             // hard-wired to MAX ENERGY; this is that, parameterised.
-            String[] parts = effect.getScale().trim().substring(TriggerInterpreter.ABOVE_PREFIX.length()).split(":", 2);
+            // The split is on the LAST colon, for the same reason `holder_attr:` does it: the quantity may be a COUNTER
+            // whose name carries colons (`char:1506/hidden_score`), while the threshold after it is always a number.
+            // Splitting on the first colon would read the threshold out of the middle of the name.
+            String spelled = effect.getScale().trim().substring(TriggerInterpreter.ABOVE_PREFIX.length());
+            int lastColon = spelled.lastIndexOf(':');
+            String[] parts = lastColon < 0
+                    ? new String[]{spelled}
+                    : new String[]{spelled.substring(0, lastColon), spelled.substring(lastColon + 1)};
             if (parts.length != 2) {
                 throw new IllegalStateException("the scale \"" + effect.getScale()
                         + "\" must state <ATTRIBUTE>:<threshold>, e.g. self_attr_above:SPEED:120");

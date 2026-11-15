@@ -12,20 +12,20 @@
   ],
   "resources": [
     {
-      "id": "火种",
+      "id": "char:1408/ember",
       "max": 12,
       "source": "1408 白厄 天赋 此身为炬 (140804, Enhance): 「白厄的天赋。【火种】达到12点时可激活终结技，达到上限后还可最多溢出3点，变身结束时会基于溢出点数获得【火种】。当白厄成为其他任意目标的技能目标时，获得1点【火种】。若施放者为白厄的队友，还会使白厄的暴击伤害提高30%，持续3回合。」\n⭐ 2026-10-02（文档，白厄的天赋）：「【火种】达到 12 点时可激活终结技，**达到上限后还可最多溢出 3 点**」✓",
       "note": "上限 **12** 是**文档原话** ✓（「【火种】**达到 12 点**时可激活终结技」✓），并且**有写入者** ✓（战技 +2 ✓）⇒ 按第 219 轮那条判据 ✓（\"**上限单独不够，还得有东西能把它填上**\" ✓）**可以声明** ✓。⚠ 文档**没说初始值** ✗ ⇒ 保持默认 **0** ✓。⚠⚠ **一处必须写明的差异** ✗：文档说「达到上限后**还可最多溢出 3 点**」✓，而**声明的资源会被引擎钳位** ✓ ⇒ **溢出会被丢弃** ✗，不会像文档那样**存下来**（并\"变身结束时基于溢出点数获得【火种】\" ✗）⇒ 按\"**未实现**\"登记 ✓，不装作等价 ✗。\n⭐ 2026-10-02：**溢出上限 3** ✓（`\"overflow\": 3` ✓ —— 本字段已有出货读者：1506 的【隐藏分】 ✓）⇒ 火种可达 **15** ✓。⚠ 仍登记：“**变身结束时会基于溢出点数获得【火种】**” ✗—— 它需要**一个量等于某资源当前值的效果** ✗，而 `EffectSpec` 的数值来源只有三路 ✗。",
       "overflow": 3
     },
     {
-      "id": "额外回合计数",
+      "id": "internal:1408/extra_turn_count",
       "max": 8,
       "source": "1408 白厄（文档）：「卡厄斯兰那拥有 **8** 个卡厄斯兰那的额外回合」",
       "note": "⭐ 2026-10-02：这是**计数器**（不是游戏里的资源 ✓）—— 因为引擎里**没有倒计时剩余回合计数器** ✗，而「最后 1 个倒计时回合」需要数到 8 ✓。"
     },
     {
-      "id": "毁伤",
+      "id": "char:1408/ravage",
       "max": 2147483647,
       "source": "【毁伤】（TextMap 哈希 13175321313076641604 = 毁伤）。⚠ **数据没给上限**（只读到名字与 #9 = 4）⇒ `max` 用 **`Integer.MAX_VALUE`** 表示**不设上限**，不臆造游戏数值。"
     }
@@ -62,7 +62,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "火种",
+          "resource": "char:1408/ember",
           "amount": 2
         }
       ],
@@ -136,7 +136,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "变身",
+          "buff": "char:1408/transformation",
           "permanent": true,
           "target": "self"
         },
@@ -150,7 +150,7 @@
           "attribute": "ATTACK",
           "percent": 0.8,
           "permanent": true,
-          "buff": "变身",
+          "buff": "char:1408/transformation",
           "target": "self"
         },
         {
@@ -158,7 +158,7 @@
           "attribute": "HEALTH",
           "percent": 2.7,
           "permanent": true,
-          "buff": "变身",
+          "buff": "char:1408/transformation",
           "target": "self"
         },
         {
@@ -166,7 +166,7 @@
           "attribute": "DAMAGE_PENETRATION",
           "percent": 0.2,
           "permanent": true,
-          "buff": "变身",
+          "buff": "char:1408/transformation",
           "min_eidolon": 2,
           "target": "self"
         },
@@ -182,7 +182,7 @@
           "op": "RESIST_DEBUFF",
           "kind": "control",
           "percent": 1,
-          "buff": "变身",
+          "buff": "char:1408/transformation",
           "permanent": true,
           "target": "self"
         }
@@ -195,7 +195,7 @@
       "id": "transformation_heals_on_attack",
       "when": [
         "actor == self",
-        "self has_state 变身"
+        "self has_state char:1408/transformation"
       ],
       "do": [
         {
@@ -217,7 +217,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "火种",
+          "resource": "char:1408/ember",
           "amount": 1
         }
       ],
@@ -256,7 +256,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "额外回合计数",
+          "resource": "internal:1408/extra_turn_count",
           "amount": 1
         }
       ],
@@ -268,13 +268,13 @@
       "id": "last_countdown_turn_ends_the_transformation",
       "when": [
         "actor == countdown",
-        "self_resource:额外回合计数 >= 8",
-        "!self has_state 永续的燃烧"
+        "self_resource:internal:1408/extra_turn_count >= 8",
+        "!self has_state char:1408/everlasting_burn"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "变身",
+          "buff": "char:1408/transformation",
           "target": "self"
         }
       ],
@@ -286,7 +286,7 @@
       "id": "transformation_dispels_own_debuffs",
       "when": [
         "actor == self",
-        "self has_state 变身"
+        "self has_state char:1408/transformation"
       ],
       "do": [
         {
@@ -303,7 +303,7 @@
       "id": "transformation_survives_a_lethal_hit",
       "when": [
         "target == self",
-        "self has_state 变身"
+        "self has_state char:1408/transformation"
       ],
       "do": [
         {
@@ -320,7 +320,7 @@
       "on": "STATE_ENDED",
       "id": "transformation_end_speeds_the_party",
       "when": [
-        "self state_ended 变身"
+        "self state_ended char:1408/transformation"
       ],
       "do": [
         {
@@ -338,12 +338,12 @@
       "on": "STATE_ENDED",
       "id": "trace_worlds_end_three_seeds",
       "when": [
-        "self state_ended 变身"
+        "self state_ended char:1408/transformation"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "火种",
+          "resource": "char:1408/ember",
           "amount": 3,
           "target": "self"
         }
@@ -372,7 +372,7 @@
       "on": "STATE_ENDED",
       "id": "trace_hero_true_colors_on_transformation_end",
       "when": [
-        "self state_ended 变身"
+        "self state_ended char:1408/transformation"
       ],
       "do": [
         {
@@ -394,7 +394,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "火种",
+          "resource": "char:1408/ember",
           "amount": 1,
           "target": "self"
         }
@@ -409,7 +409,7 @@
       "do": [
         {
           "op": "RAISE_RESOURCE_CAP",
-          "resource": "火种",
+          "resource": "char:1408/ember",
           "unbounded": true,
           "target": "self"
         }
@@ -424,7 +424,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "火种",
+          "resource": "char:1408/ember",
           "amount": 6,
           "target": "self"
         }
@@ -486,7 +486,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "火种",
+          "resource": "char:1408/ember",
           "amount": 6,
           "target": "self"
         }
@@ -499,7 +499,7 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self_resource:火种 >= 13"
+        "self_resource:char:1408/ember >= 13"
       ],
       "do": [
         {
@@ -520,7 +520,7 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self_resource:火种 >= 14"
+        "self_resource:char:1408/ember >= 14"
       ],
       "do": [
         {
@@ -541,7 +541,7 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self_resource:火种 >= 15"
+        "self_resource:char:1408/ember >= 15"
       ],
       "do": [
         {
@@ -562,7 +562,7 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self_resource:火种 >= 16"
+        "self_resource:char:1408/ember >= 16"
       ],
       "do": [
         {
@@ -583,7 +583,7 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self_resource:火种 >= 17"
+        "self_resource:char:1408/ember >= 17"
       ],
       "do": [
         {
@@ -604,7 +604,7 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self_resource:火种 >= 18"
+        "self_resource:char:1408/ember >= 18"
       ],
       "do": [
         {
@@ -625,7 +625,7 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self has_state 永续的燃烧"
+        "self has_state char:1408/everlasting_burn"
       ],
       "do": [
         {
@@ -645,7 +645,7 @@
       "when": [
         "actor == self",
         "damage_is_attack",
-        "self has_state 永续的燃烧"
+        "self has_state char:1408/everlasting_burn"
       ],
       "do": [
         {
@@ -665,19 +665,19 @@
       "on": "COUNTDOWN_TURN",
       "when": [
         "actor == countdown",
-        "self has_state 永续的燃烧",
-        "self_resource:额外回合计数 >= 8"
+        "self has_state char:1408/everlasting_burn",
+        "self_resource:internal:1408/extra_turn_count >= 8"
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "额外回合计数",
+          "resource": "internal:1408/extra_turn_count",
           "spendAll": true,
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "毁伤",
+          "resource": "char:1408/ravage",
           "amount": 4,
           "target": "self"
         }
@@ -695,7 +695,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "永续的燃烧",
+          "buff": "char:1408/everlasting_burn",
           "amount": 1,
           "max_stacks": 1,
           "permanent": true,
@@ -710,7 +710,7 @@
       "on": "COUNTDOWN_TURN",
       "when": [
         "actor == countdown",
-        "self has_state 永续的燃烧"
+        "self has_state char:1408/everlasting_burn"
       ],
       "do": [
         {

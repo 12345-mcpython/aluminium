@@ -56,7 +56,7 @@ import java.util.Set;
 public class AglaeaBaseKitTest {
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
-    private static final String THREAD = "间隙织线";
+    private static final String THREAD = "char:1402/gap_thread";
     private static final int ENHANCED_BASIC_SLOT = 8;
 
     private static final Path FILE = Path.of("src", "main", "resources", "game", "characters", "1402.json");
@@ -91,7 +91,7 @@ public class AglaeaBaseKitTest {
         SECTION.put("强化战技：高举吧，ctrl:sublimated的名讳", List.of(RULE + "skill_effect"));
         SECTION.put("忆灵：衣匠（面板）", List.of(DATA + " MemospriteSpec 11402"));
         SECTION.put("忆灵技能 1：刺纹之陷", List.of(DATA + " memosprites/1402.json states its attack block (Blast, 1.54 / 0.924, stance 30 / 15)"));
-        SECTION.put("忆灵技能 2：泪水锻造的匠躯", List.of(RULE + "p1402_memosprite_speed_stack_on_threaded_hit",
+        SECTION.put("忆灵技能 2：泪水锻造的char:1402/artisan_body", List.of(RULE + "p1402_memosprite_speed_stack_on_threaded_hit",
                 GAP + "行动时自动施放"));
         SECTION.put("忆灵技能 3：飞驰之夏", List.of(RULE + "memosprite_speeding_summer_advances_itself"));
         SECTION.put("忆灵技能 4：枯草之盈", List.of(RULE + "memosprite_bloom_of_drying_grass_pays_energy"));
@@ -148,7 +148,7 @@ public class AglaeaBaseKitTest {
         double plain = skillDamage(false);
         Assertions.assertTrue(plain > 0, "precondition: the skill lands: " + plain);
         Assertions.assertTrue(threaded > plain,
-                "the additional damage must land on a 【间隙织线】 (Seam Stitch) target: " + plain + " -> " + threaded);
+                "the additional damage must land on a 【char:1402/gap_thread】 (Seam Stitch) target: " + plain + " -> " + threaded);
         double extra = threaded - plain;
         double attack = attackOf();
         // Note: The arithmetic of a flat addend is pinned by `AddDamageOpTest` (it lands in the BASE layer, so defence and the
@@ -176,7 +176,7 @@ public class AglaeaBaseKitTest {
         Assertions.assertEquals(30.0, with.energy - without.energy, 1e-9, "「恢复 30 点能量」");
 
         Assertions.assertEquals(1, with.threaded, "「使敌方随机目标陷入」 — exactly one enemy is threaded");
-        Assertions.assertEquals(0, without.threaded, "control: no technique, no 【间隙织线】");
+        Assertions.assertEquals(0, without.threaded, "control: no technique, no 【char:1402/gap_thread】");
     }
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -194,7 +194,7 @@ public class AglaeaBaseKitTest {
 
         battle.castImmediate(aglaea.getSkills().get(SkillType.ULTRA), aglaea, List.of(enemy));
         battle.processRequests();
-        Assertions.assertTrue(aglaea.getBuffManager().hasState("至高之姿"), "precondition: the stance is on");
+        Assertions.assertTrue(aglaea.getBuffManager().hasState("char:1402/supreme_posture"), "precondition: the stance is on");
         Assertions.assertEquals(ENHANCED_BASIC_SLOT, aglaea.getSkills().get(SkillType.COMMON).getSkillSlot(),
                 "「普通攻击强化为【孤锋千吻】」 — the slot now holds data row 8");
 
@@ -226,7 +226,7 @@ public class AglaeaBaseKitTest {
 
         battle.castImmediate(aglaea.getSkills().get(SkillType.ULTRA), aglaea, List.of(enemy));
         battle.processRequests();
-        Assertions.assertTrue(aglaea.getBuffManager().hasState("至高之姿"), "precondition: the stance is on");
+        Assertions.assertTrue(aglaea.getBuffManager().hasState("char:1402/supreme_posture"), "precondition: the stance is on");
         Assertions.assertFalse(com.laosun.aluminium.trigger.SkillCastability.allows(skill, aglaea, battle),
                 "「…且无法施放战技」");
 
@@ -239,7 +239,7 @@ public class AglaeaBaseKitTest {
                         com.laosun.aluminium.enums.DamageElement.THUNDER,
                         com.laosun.aluminium.enums.DamageType.NORMAL, 1_000_000));
         battle.processRequests();
-        Assertions.assertFalse(aglaea.getBuffManager().hasState("至高之姿"), "precondition: the stance ended with it");
+        Assertions.assertFalse(aglaea.getBuffManager().hasState("char:1402/supreme_posture"), "precondition: the stance ended with it");
         Assertions.assertTrue(com.laosun.aluminium.trigger.SkillCastability.allows(skill, aglaea, battle),
                 "the ban is the stance's, so it leaves with it");
     }

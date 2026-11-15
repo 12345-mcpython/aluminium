@@ -16,7 +16,7 @@ import com.laosun.aluminium.entity.Summon;
  * "每从 1 个除德谬歌以外不同的队友处获得[追忆]后".
  */
 public class TrueSelfOdeDistinctAlliesTest {
-    private static final String COUNTER = "忆灵技的额外一击";
+    private static final String COUNTER = "char:1415/memosprite_extra_hit";
 
     @Test
     public void onlyTheFirstTimeEachAllyCounts() {

@@ -69,7 +69,7 @@ public class DerivedCastsTest {
         assertRow(casts.get(18), 11413, 7, "长夜's 「迷梦，流失，如露」");
         assertRow(casts.get(51), 11415, 1, "德谬歌's 忆灵技1");
         assertRow(casts.get(52), 11512, 1, "晴空乐手's 忆灵技1");
-        assertRow(casts.get(59), 1415, 8, "昔涟's 强化普攻 - only castable inside 【往昔的涟漪】");
+        assertRow(casts.get(59), 1415, 8, "昔涟's 强化普攻 - only castable inside 【char:1415/ripples_of_the_past】");
         assertRow(casts.get(76), 1415, 8, "the same row, a second time");
     }
 

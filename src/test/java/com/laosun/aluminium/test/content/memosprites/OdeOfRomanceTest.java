@@ -29,7 +29,7 @@ public class OdeOfRomanceTest {
     private static final int CYRENE = 1415;
     private static final int AGLAEA = 1402;
     private static final int ODE_OF_ROMANCE = 14;
-    private static final String STATE = "浪漫";
+    private static final String STATE = "char:1402/romance";
 
     /**
      * The ode is deliverable, and reaching Aglaea leaves [浪漫] on her.

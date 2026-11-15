@@ -7,7 +7,7 @@
   ],
   "resources": [
     {
-      "id": "隐藏分",
+      "id": "char:1506/hidden_score",
       "max": 60,
       "initial": 0,
       "overflow": 240,
@@ -27,13 +27,13 @@
       "source": "1506 银狼LV.999 天赋: 「持有【好活当赏】时，施放普攻、战技对受到攻击的敌方目标造成 40% 的虚数属性欢愉伤害」；终结技的盲盒从句也以它为门。⚠ 文档**没有给她的【好活当赏】上限** ✗ —— 数据里只有名字 / 图标（与 1505／8009 同一判断 ✓）⇒ `max` 用 `Integer.MAX_VALUE` 表示「游戏从未说过会满」✓。⚠ 它是**计数**不是状态 ✓：本项目的口径见下方两条骑手规则的 note 与 1503 的注记 ✓。"
     },
     {
-      "id": "强化普攻次数",
+      "id": "internal:1506/enhanced_basic_count",
       "max": 3,
       "initial": 0,
       "source": "1506 银狼LV.999 天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」—— 计数即时长。"
     },
     {
-      "id": "里程碑配额",
+      "id": "internal:1506/milestone_quota",
       "max": 300,
       "initial": 0,
       "source": "1506 银狼LV.999 星魂 2 用这副躯壳，抵达真理的尽头: 「本次【无敌玩家】状态下每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数」—— 这个计数器是【隐藏分】在本状态内的影子：进入时记入当时的【隐藏分】（含初始），此后每次提高按增量累加，每满 120 点由 SPEND_STEPS 花掉、余数留给下一次。上限 300 = 【隐藏分】自己的上限（60 + 溢出 240），所以它不会先于【隐藏分】封顶。"
@@ -104,7 +104,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "amountFromEvent": true
         }
       ],
@@ -138,7 +138,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "amount": 15
         }
       ],
@@ -174,37 +174,37 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "无敌玩家",
+          "buff": "char:1506/invincible_player",
           "permanent": true,
           "blocks": "ultimate",
           "target": "self"
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "里程碑配额",
+          "resource": "internal:1506/milestone_quota",
           "spendAll": true,
           "min_eidolon": 2,
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "里程碑配额",
+          "resource": "internal:1506/milestone_quota",
           "amount_from": {
             "type": "resource",
-            "resource": "隐藏分"
+            "resource": "char:1506/hidden_score"
           },
           "min_eidolon": 2,
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "强化普攻次数",
+          "resource": "internal:1506/enhanced_basic_count",
           "amount": 3,
           "to_max": true
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "amount": 20
         }
       ],
@@ -223,7 +223,7 @@
           "kind": "control",
           "percent": 1,
           "permanent": true,
-          "buff": "无敌玩家-免疫控制",
+          "buff": "char:1506/invincible_control_immunity",
           "target": "self"
         }
       ],
@@ -234,24 +234,24 @@
       "on": "STATE_ENDED",
       "id": "p1506_leaving_godmode_clears_hidden",
       "when": [
-        "actor state_ended 无敌玩家"
+        "actor state_ended char:1506/invincible_player"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "amount": 0,
           "target": "self"
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "spendAll": true,
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "amountFromPrevious": true,
           "amountPercent": 0.2,
           "min_eidolon": 1,
@@ -259,14 +259,14 @@
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "里程碑配额",
+          "resource": "internal:1506/milestone_quota",
           "spendAll": true,
           "min_eidolon": 2,
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "无敌玩家-免疫控制",
+          "buff": "char:1506/invincible_control_immunity",
           "target": "self"
         }
       ],
@@ -283,7 +283,7 @@
       "do": [
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "强化普攻次数",
+          "resource": "internal:1506/enhanced_basic_count",
           "amount": 1,
           "target": "self"
         }
@@ -296,13 +296,13 @@
       "id": "p1506_three_enhanced_basics_end_godmode",
       "when": [
         "actor == self",
-        "self_resource:强化普攻次数 <= 0",
-        "self has_state 无敌玩家"
+        "self_resource:internal:1506/enhanced_basic_count <= 0",
+        "self has_state char:1506/invincible_player"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "无敌玩家",
+          "buff": "char:1506/invincible_player",
           "target": "self"
         }
       ],
@@ -368,7 +368,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "amount": 20
         }
       ],
@@ -386,7 +386,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "隐藏分",
+          "resource": "char:1506/hidden_score",
           "amount": 20
         }
       ],
@@ -555,26 +555,26 @@
       "on": "RESOURCE_CHANGED",
       "id": "p1506_talent_hidden_becomes_crit",
       "when": [
-        "resource_changed:隐藏分"
+        "resource_changed:char:1506/hidden_score"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "1506天赋-暴击率",
+          "buff": "char:1506/talent_crit_chance",
           "kind": "own",
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "1506天赋-暴击伤害",
+          "buff": "char:1506/talent_crit_damage",
           "kind": "own",
           "target": "self"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "buff": "1506天赋-暴击率",
-          "scale": "self_attr_above:隐藏分:0",
+          "buff": "char:1506/talent_crit_chance",
+          "scale": "self_attr_above:char:1506/hidden_score:0",
           "permanent": true,
           "coexist": true,
           "target": "self",
@@ -583,7 +583,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "buff": "1506天赋-暴击伤害",
+          "buff": "char:1506/talent_crit_damage",
           "scale": "self_attr_above:CRIT_CHANCE:1.0",
           "percent": 2,
           "permanent": true,
@@ -604,33 +604,33 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "1506行迹-强化普攻隐藏分1",
+          "buff": "internal:1506/trace_hidden_1",
           "kind": "own",
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "1506行迹-强化普攻隐藏分2",
+          "buff": "internal:1506/trace_hidden_2",
           "kind": "own",
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "1506行迹-强化普攻隐藏分3",
+          "buff": "internal:1506/trace_hidden_3",
           "kind": "own",
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "1506行迹-强化普攻隐藏分4",
+          "buff": "internal:1506/trace_hidden_4",
           "kind": "own",
           "target": "self"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "buff": "1506行迹-强化普攻隐藏分1",
-          "scale": "self_attr_above:隐藏分:60",
+          "buff": "internal:1506/trace_hidden_1",
+          "scale": "self_attr_above:char:1506/hidden_score:60",
           "percent": 0.15,
           "permanent": true,
           "coexist": true,
@@ -639,8 +639,8 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "buff": "1506行迹-强化普攻隐藏分2",
-          "scale": "self_attr_above:隐藏分:120",
+          "buff": "internal:1506/trace_hidden_2",
+          "scale": "self_attr_above:char:1506/hidden_score:120",
           "percent": -0.075,
           "permanent": true,
           "coexist": true,
@@ -649,8 +649,8 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "buff": "1506行迹-强化普攻隐藏分3",
-          "scale": "self_attr_above:隐藏分:120",
+          "buff": "internal:1506/trace_hidden_3",
+          "scale": "self_attr_above:char:1506/hidden_score:120",
           "percent": 0.075,
           "permanent": true,
           "coexist": true,
@@ -659,8 +659,8 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "buff": "1506行迹-强化普攻隐藏分4",
-          "scale": "self_attr_above:隐藏分:180",
+          "buff": "internal:1506/trace_hidden_4",
+          "scale": "self_attr_above:char:1506/hidden_score:180",
           "percent": 0.15,
           "permanent": true,
           "coexist": true,
@@ -775,9 +775,9 @@
           "target": "self",
           "weight": 10,
           "weight_steps": [
-            "隐藏分:60:-9",
-            "隐藏分:120:-0.9",
-            "隐藏分:300:-0.099"
+            "char:1506/hidden_score:60:-9",
+            "char:1506/hidden_score:120:-0.9",
+            "char:1506/hidden_score:300:-0.099"
           ]
         }
       ],
@@ -790,7 +790,7 @@
       "when": [
         "self_resource:好活当赏 >= 1",
         "self has_state 结界",
-        "self has_state 无敌玩家"
+        "self has_state char:1506/invincible_player"
       ],
       "one_of": true,
       "chance": 1,
@@ -838,9 +838,9 @@
           "target": "self",
           "weight": 10,
           "weight_steps": [
-            "隐藏分:60:-9",
-            "隐藏分:120:-0.9",
-            "隐藏分:300:-0.099"
+            "char:1506/hidden_score:60:-9",
+            "char:1506/hidden_score:120:-0.9",
+            "char:1506/hidden_score:300:-0.099"
           ]
         }
       ],
@@ -868,31 +868,31 @@
       "id": "p1506_e2_milestones_while_in_godmode",
       "min_eidolon": 2,
       "when": [
-        "self has_state 无敌玩家",
-        "resource_changed:隐藏分"
+        "self has_state char:1506/invincible_player",
+        "resource_changed:char:1506/hidden_score"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "里程碑配额",
+          "resource": "internal:1506/milestone_quota",
           "amountFromEvent": true,
           "target": "self"
         },
         {
           "op": "EXTRA_TURN",
-          "per_steps": "里程碑配额:120",
+          "per_steps": "internal:1506/milestone_quota:120",
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "强化普攻次数",
-          "per_steps": "里程碑配额:120",
+          "resource": "internal:1506/enhanced_basic_count",
+          "per_steps": "internal:1506/milestone_quota:120",
           "amount": 1,
           "target": "self"
         },
         {
           "op": "SPEND_STEPS",
-          "steps": "里程碑配额:120",
+          "steps": "internal:1506/milestone_quota:120",
           "target": "self"
         }
       ],

@@ -71,7 +71,7 @@ public class SilverWolfLootBoxTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
     private static final String LAUGH = "笑点";
-    private static final String HIDDEN = "隐藏分";
+    private static final String HIDDEN = "char:1506/hidden_score";
     /**
      * 【好活当赏】 - the box's own gate since the audit (「「银狼LV.999」持有【好活当赏】时」): a RESOURCE, because that is what
      * the clause reads ({@code self_resource:好活当赏 >= 1}). Nothing in her file grants it - the Aha Moment does, and this

@@ -48,8 +48,8 @@ import java.util.Random;
 public class AglaeaEidolonsTest {
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
-    private static final String THREAD = "间隙织线";
-    private static final String BUFF = "星魂二穿防";
+    private static final String THREAD = "char:1402/gap_thread";
+    private static final String BUFF = "char:1402/eidolon2_pen";
     private static final double EPS = 1e-9;
 
     // ---------------------------------------------------------------------------------------------------------------

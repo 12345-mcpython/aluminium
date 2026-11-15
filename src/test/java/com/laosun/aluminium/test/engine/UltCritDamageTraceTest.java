@@ -61,7 +61,7 @@ public class UltCritDamageTraceTest {
         battle.processRequests();
 
         double before = owner.getAttribute(AttributeType.CRIT_ATTACK).get();
-        Assertions.assertFalse(owner.getBuffManager().hasState("变身"), "no ultimate yet");
+        Assertions.assertFalse(owner.getBuffManager().hasState("char:1408/transformation"), "no ultimate yet");
         Assertions.assertEquals(before, owner.getAttribute(AttributeType.CRIT_ATTACK).get(), EPS,
                 "nothing has been cast, so nothing has changed");
     }

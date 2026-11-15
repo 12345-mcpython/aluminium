@@ -46,8 +46,8 @@ public class CyreneBaseKitTest {
     private static final int ALLY = 1002;
     private static final int ANAXA = 1405;
     private static final int MONSTER = 1002011;
-    private static final String FUTURE = "未来";
-    private static final String MEMORY = "追忆";
+    private static final String FUTURE = "char:1415/future";
+    private static final String MEMORY = "char:1415/remembrance";
 
     // ---------------------------------------------------------------------------------------------------------------
     // Former CyreneTest: 1415 Cyrene, from her own file -- the [追忆] resource and the party boost that needs no condition.
@@ -65,15 +65,15 @@ public class CyreneBaseKitTest {
 
         Assertions.assertEquals(0, recollectionOf(cyrene), "the document states no initial value, so it starts at 0");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, cyrene, enemy, 0, 0));
-        Assertions.assertEquals(1, recollectionOf(cyrene), "「获得1点【追忆】」 (gains 1 point of Recollection (【追忆】))");
+        Assertions.assertEquals(1, recollectionOf(cyrene), "「获得1点【char:1415/remembrance】」 (gains 1 point of Recollection (【char:1415/remembrance】))");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
-        Assertions.assertEquals(4, recollectionOf(cyrene), "「获得3点【追忆】」 (gains 3 points of Recollection) -- the other writer");
+        Assertions.assertEquals(4, recollectionOf(cyrene), "「获得3点【char:1415/remembrance】」 (gains 3 points of Recollection) -- the other writer");
 
         for (int i = 0; i < 8; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
         }
         Assertions.assertEquals(27, recollectionOf(cyrene),
-                "「【追忆】达到24点时可激活终结技」 (at 24 points of Recollection the Ultimate can be activated) -- thirty-two casts must still read twenty-four");
+                "「【char:1415/remembrance】达到24点时可激活终结技」 (at 24 points of Recollection the Ultimate can be activated) -- thirty-two casts must still read twenty-four");
     }
 
     /**
@@ -100,7 +100,7 @@ public class CyreneBaseKitTest {
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int recollectionOf(Character unit) {
-        return unit.getResources().get("追忆").getValue();
+        return unit.getResources().get("char:1415/remembrance").getValue();
     }
 
     private static Random fixed() {
@@ -225,7 +225,7 @@ public class CyreneBaseKitTest {
         Assertions.assertAll("battle start on the 1415 + 1405 board",
                 () -> Assertions.assertEquals(0.2, boost, 1e-9,
                         "exactly the talent's stated 20.00% -- measured, NOT two layers, so `max_stacks: 2` merely permits more"),
-                () -> Assertions.assertTrue(allyHasFuture, "another ally gains 【未来】 (the Future)"),
+                () -> Assertions.assertTrue(allyHasFuture, "another ally gains 【char:1415/future】 (the Future)"),
                 () -> Assertions.assertFalse(herHasFuture,
                         "and Cyrene (昔涟) does not, because the text says other allies (其他)"));
 
@@ -239,9 +239,9 @@ public class CyreneBaseKitTest {
         boolean still = battle.characters().get(1).getBuffManager().hasState(FUTURE);
         double after = battle.characters().get(0).getResources().has(MEMORY)
                 ? battle.characters().get(0).getResources().value(MEMORY) : 0;
-        System.out.println("[future_spend] after the ally acts: 【未来】 (the Future) still on it = " + still
-                + " ; Cyrene (昔涟)'s Recollection (【追忆】) " + before + " -> " + after);
-        Assertions.assertAll("the ally's first action spends 【未来】",
+        System.out.println("[future_spend] after the ally acts: 【char:1415/future】 (the Future) still on it = " + still
+                + " ; Cyrene (昔涟)'s Recollection (【char:1415/remembrance】) " + before + " -> " + after);
+        Assertions.assertAll("the ally's first action spends 【char:1415/future】",
                 () -> Assertions.assertTrue(heldIt, "precondition: the ally holds it"),
                 () -> Assertions.assertFalse(still, "acting consumes it"),
                 () -> Assertions.assertEquals(before + 1, after, 1e-9, "and she is credited one point"));

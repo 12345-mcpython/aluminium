@@ -25,7 +25,7 @@ public class OdeOfRomanceEnergyTest {
     private static final int AGLAEA = 1402;
     private static final int ODE_OF_ROMANCE = 14;
     private static final double ENERGY = 70.0;
-    private static final String STATE = "浪漫";
+    private static final String STATE = "char:1402/romance";
 
     @Test
     public void anAttackSpendsTheStateAndPaysSeventy() {

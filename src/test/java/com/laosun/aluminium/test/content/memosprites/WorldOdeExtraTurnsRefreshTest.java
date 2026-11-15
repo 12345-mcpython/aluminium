@@ -21,19 +21,19 @@ import java.util.List;
 public class WorldOdeExtraTurnsRefreshTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
-    private static final String STATE = "永续的燃烧";
-    private static final String COUNTER = "额外回合计数";
-    private static final String MARK = "毁伤";
+    private static final String STATE = "char:1408/everlasting_burn";
+    private static final String COUNTER = "internal:1408/extra_turn_count";
+    private static final String MARK = "char:1408/ravage";
 
     @Test
     public void theLastExtraTurnRefreshesWhileEverBurning() {
         double[] with = run(true);
         double[] without = run(false);
-        System.out.println("[refresh] with the state: transformation (变身) " + with[0] + ", counter " + with[1] + ", Scourge (【毁伤】) " + with[2]
-                + " ; without it: transformation (变身) " + without[0] + ", counter " + without[1] + ", Scourge (【毁伤】) " + without[2]);
+        System.out.println("[refresh] with the state: transformation (char:1408/transformation) " + with[0] + ", counter " + with[1] + ", Scourge (【char:1408/ravage】) " + with[2]
+                + " ; without it: transformation (char:1408/transformation) " + without[0] + ", counter " + without[1] + ", Scourge (【char:1408/ravage】) " + without[2]);
         Assertions.assertTrue(with[0] > 0, "the transformation survives the exhausted turn while ever-burning");
         Assertions.assertEquals(0.0, with[1], 1e-9, "and every extra turn is refreshed, so the counter is empty again");
-        Assertions.assertEquals(4.0, with[2], 1e-9, "and 【毁伤】 (Scourge) gains #9 = 4");
+        Assertions.assertEquals(4.0, with[2], 1e-9, "and 【char:1408/ravage】 (Scourge) gains #9 = 4");
         Assertions.assertEquals(0.0, without[0], 1e-9, "while without the state the same turn ends the transformation");
         Assertions.assertEquals(0.0, without[2], 1e-9, "and nothing is gained");
     }
@@ -60,7 +60,7 @@ public class WorldOdeExtraTurnsRefreshTest {
         SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         him = battle.characters().getFirst();
-        Assertions.assertTrue(him.getBuffManager().stacksOf("变身") > 0, "precondition: he transformed");
+        Assertions.assertTrue(him.getBuffManager().stacksOf("char:1408/transformation") > 0, "precondition: he transformed");
         if (!everBurning) {
             him.getBuffManager().removeState(STATE);
         }
@@ -79,7 +79,7 @@ public class WorldOdeExtraTurnsRefreshTest {
         battle.beforeMove();
         battle.processRequests();
         him = battle.characters().getFirst();
-        return new double[]{him.getBuffManager().stacksOf("变身"),
+        return new double[]{him.getBuffManager().stacksOf("char:1408/transformation"),
                 him.getResources().value(COUNTER), him.getResources().value(MARK)};
     }
 }

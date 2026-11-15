@@ -3,54 +3,6 @@
   "_note": "状态 / 层数 / 资源名的**身份表**（唯一声明点，守卫是 `StateNameRegistryTest`）。⚠ 身份是 **(owner, name)**，不是 name：实测「充能」被 **8 个互不相同的机制**用着（上限 3/3/4/8/8/10/10/100/无上限），「结界」是 7 个角色各自的领域 —— 只按名字建表会把它们合成一个，而这正是本地化层最受不了的混淆。\n\n`owner` 三选一：`battle`（战斗模型自己的词汇：控制类、持续伤害、击破、秘技、欢愉子系统 —— 谁上场都用，所以没有归属）、一个 4 位 cid（该角色的术语，**专名与复用词都算**）、`internal`（本项目自造的记账计数器，没有显示语义）。`kind` 跟随 owner（battle / char / internal）。`used_by` 列出真正用到这条身份的文件（跨文件借用，如 1415 用 1412 的「充能」）。`key` 是将来取代中文名的 ASCII 身份：`battle` 现在就必须有，其余等该族迁移时再补；**键一旦等于名字，必须保留 `zh`**。\n\n守卫逐文件**结构化**扫描（只读 `when` 与 `do` 的字段，不读 `_note` / `source` / `_gaps` 散文），每个 (文件, 名字) 必须**恰好**对应一条身份。",
   "entries": [
     {
-      "name": "1506天赋-暴击伤害",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "1506天赋-暴击率",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "1506行迹-强化普攻隐藏分1",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "1506行迹-强化普攻隐藏分2",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "1506行迹-强化普攻隐藏分3",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "1506行迹-强化普攻隐藏分4",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
       "name": "325_30",
       "owner": "325",
       "kind": "char",
@@ -72,14 +24,6 @@
       "kind": "internal",
       "used_by": [
         "1315"
-      ]
-    },
-    {
-      "name": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
       ]
     },
     {
@@ -199,6 +143,156 @@
       ],
       "zh": "恶报",
       "key": "char:1214/retribution"
+    },
+    {
+      "name": "char:1402/amazing_buff",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "MServant_CyreneServant_00_AmazingBuff_Aglaea",
+      "key": "char:1402/amazing_buff"
+    },
+    {
+      "name": "char:1402/artisan_body",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "匠躯",
+      "key": "char:1402/artisan_body"
+    },
+    {
+      "name": "char:1402/eidolon2_pen",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "星魂二穿防",
+      "key": "char:1402/eidolon2_pen"
+    },
+    {
+      "name": "char:1402/gap_thread",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "间隙织线",
+      "key": "char:1402/gap_thread"
+    },
+    {
+      "name": "char:1402/gap_thread_vulnerability",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "间隙织线易伤",
+      "key": "char:1402/gap_thread_vulnerability"
+    },
+    {
+      "name": "char:1402/myopia_her_memosprite_speed",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "短视之惩-她-忆灵速度",
+      "key": "char:1402/myopia_her_memosprite_speed"
+    },
+    {
+      "name": "char:1402/myopia_her_speed",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "短视之惩-她-自身速度",
+      "key": "char:1402/myopia_her_speed"
+    },
+    {
+      "name": "char:1402/myopia_seamstress_memosprite_speed",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "短视之惩-衣匠-忆灵速度",
+      "key": "char:1402/myopia_seamstress_memosprite_speed"
+    },
+    {
+      "name": "char:1402/myopia_seamstress_speed",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "短视之惩-衣匠-自身速度",
+      "key": "char:1402/myopia_seamstress_speed"
+    },
+    {
+      "name": "char:1402/romance",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "浪漫",
+      "key": "char:1402/romance"
+    },
+    {
+      "name": "char:1402/supreme_posture",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "至高之姿",
+      "key": "char:1402/supreme_posture"
+    },
+    {
+      "name": "char:1408/ember",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ],
+      "zh": "火种",
+      "key": "char:1408/ember"
+    },
+    {
+      "name": "char:1408/everlasting_burn",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ],
+      "zh": "永续的燃烧",
+      "key": "char:1408/everlasting_burn"
+    },
+    {
+      "name": "char:1408/ravage",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ],
+      "zh": "毁伤",
+      "key": "char:1408/ravage"
+    },
+    {
+      "name": "char:1408/transformation",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [
+        "1408"
+      ],
+      "zh": "变身",
+      "key": "char:1408/transformation"
     },
     {
       "name": "char:1412/action_lock",
@@ -362,6 +456,86 @@
       "key": "char:1412/strong_shock"
     },
     {
+      "name": "char:1415/future",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "未来",
+      "key": "char:1415/future"
+    },
+    {
+      "name": "char:1415/memosprite_extra_hit",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "忆灵技的额外一击",
+      "key": "char:1415/memosprite_extra_hit"
+    },
+    {
+      "name": "char:1415/ode_to_true_self",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "献予「真我」之诗",
+      "key": "char:1415/ode_to_true_self"
+    },
+    {
+      "name": "char:1415/ode_to_years",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "献予「岁月」之诗",
+      "key": "char:1415/ode_to_years"
+    },
+    {
+      "name": "char:1415/remembrance",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "追忆",
+      "key": "char:1415/remembrance"
+    },
+    {
+      "name": "char:1415/remembrance_received",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "从这位队友处得到过【追忆】",
+      "key": "char:1415/remembrance_received"
+    },
+    {
+      "name": "char:1415/ripples_of_the_past",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "往昔的涟漪",
+      "key": "char:1415/ripples_of_the_past"
+    },
+    {
+      "name": "char:1415/story",
+      "owner": "1415",
+      "kind": "char",
+      "used_by": [
+        "1415"
+      ],
+      "zh": "故事",
+      "key": "char:1415/story"
+    },
+    {
       "name": "char:1503/aesthetic_original",
       "owner": "1503",
       "kind": "char",
@@ -420,6 +594,56 @@
       ],
       "zh": "吞纳沙砾",
       "key": "char:1503/sand_absorb"
+    },
+    {
+      "name": "char:1506/hidden_score",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "隐藏分",
+      "key": "char:1506/hidden_score"
+    },
+    {
+      "name": "char:1506/invincible_control_immunity",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "无敌玩家-免疫控制",
+      "key": "char:1506/invincible_control_immunity"
+    },
+    {
+      "name": "char:1506/invincible_player",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "无敌玩家",
+      "key": "char:1506/invincible_player"
+    },
+    {
+      "name": "char:1506/talent_crit_chance",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "1506天赋-暴击率",
+      "key": "char:1506/talent_crit_chance"
+    },
+    {
+      "name": "char:1506/talent_crit_damage",
+      "owner": "1506",
+      "kind": "char",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "1506天赋-暴击伤害",
+      "key": "char:1506/talent_crit_damage"
     },
     {
       "name": "char:1512/atmosphere",
@@ -1128,6 +1352,86 @@
       "key": "internal:1214/retribution_overflow"
     },
     {
+      "name": "internal:1402/weave_depletion_kept",
+      "owner": "1402",
+      "kind": "internal",
+      "used_by": [
+        "1402"
+      ],
+      "zh": "织运之竭-保留",
+      "key": "internal:1402/weave_depletion_kept"
+    },
+    {
+      "name": "internal:1408/extra_turn_count",
+      "owner": "1408",
+      "kind": "internal",
+      "used_by": [
+        "1408"
+      ],
+      "zh": "额外回合计数",
+      "key": "internal:1408/extra_turn_count"
+    },
+    {
+      "name": "internal:1506/enhanced_basic_count",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "强化普攻次数",
+      "key": "internal:1506/enhanced_basic_count"
+    },
+    {
+      "name": "internal:1506/milestone_quota",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "里程碑配额",
+      "key": "internal:1506/milestone_quota"
+    },
+    {
+      "name": "internal:1506/trace_hidden_1",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "1506行迹-强化普攻隐藏分1",
+      "key": "internal:1506/trace_hidden_1"
+    },
+    {
+      "name": "internal:1506/trace_hidden_2",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "1506行迹-强化普攻隐藏分2",
+      "key": "internal:1506/trace_hidden_2"
+    },
+    {
+      "name": "internal:1506/trace_hidden_3",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "1506行迹-强化普攻隐藏分3",
+      "key": "internal:1506/trace_hidden_3"
+    },
+    {
+      "name": "internal:1506/trace_hidden_4",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [
+        "1506"
+      ],
+      "zh": "1506行迹-强化普攻隐藏分4",
+      "key": "internal:1506/trace_hidden_4"
+    },
+    {
       "name": "internal:1512/bonus_applied_this_turn",
       "owner": "1512",
       "kind": "internal",
@@ -1426,14 +1730,6 @@
       ]
     },
     {
-      "name": "从这位队友处得到过【追忆】",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
       "name": "优势口袋",
       "owner": "1315",
       "kind": "char",
@@ -1588,14 +1884,6 @@
       ]
     },
     {
-      "name": "匠躯",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
       "name": "千锻魂",
       "owner": "1507",
       "kind": "char",
@@ -1625,14 +1913,6 @@
       "kind": "internal",
       "used_by": [
         "1107"
-      ]
-    },
-    {
-      "name": "变身",
-      "owner": "1408",
-      "kind": "char",
-      "used_by": [
-        "1408"
       ]
     },
     {
@@ -1844,14 +2124,6 @@
       ]
     },
     {
-      "name": "强化普攻次数",
-      "owner": "1506",
-      "kind": "internal",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
       "name": "归纳",
       "owner": "1305",
       "kind": "char",
@@ -1876,27 +2148,11 @@
       ]
     },
     {
-      "name": "往昔的涟漪",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
       "name": "御剑真诀",
       "owner": "1209",
       "kind": "char",
       "used_by": [
         "1209"
-      ]
-    },
-    {
-      "name": "忆灵技的额外一击",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
       ]
     },
     {
@@ -1972,14 +2228,6 @@
       ]
     },
     {
-      "name": "故事",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
       "name": "救主计数",
       "owner": "1217",
       "kind": "char",
@@ -2005,22 +2253,6 @@
       ]
     },
     {
-      "name": "无敌玩家",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "无敌玩家-免疫控制",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
       "name": "星魂4穿透",
       "owner": "1014",
       "kind": "char",
@@ -2034,14 +2266,6 @@
       "kind": "char",
       "used_by": [
         "1313"
-      ]
-    },
-    {
-      "name": "星魂二穿防",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
       ]
     },
     {
@@ -2093,14 +2317,6 @@
       ]
     },
     {
-      "name": "未来",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
       "name": "本回合施放战技",
       "owner": "1207",
       "kind": "char",
@@ -2132,30 +2348,6 @@
       ]
     },
     {
-      "name": "毁伤",
-      "owner": "1408",
-      "kind": "char",
-      "used_by": [
-        "1408"
-      ]
-    },
-    {
-      "name": "永续的燃烧",
-      "owner": "1408",
-      "kind": "char",
-      "used_by": [
-        "1408"
-      ]
-    },
-    {
-      "name": "浪漫",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
       "name": "涨幅惊人",
       "owner": "1112",
       "kind": "char",
@@ -2177,14 +2369,6 @@
       "kind": "char",
       "used_by": [
         "1305"
-      ]
-    },
-    {
-      "name": "火种",
-      "owner": "1408",
-      "kind": "char",
-      "used_by": [
-        "1408"
       ]
     },
     {
@@ -2278,22 +2462,6 @@
       ]
     },
     {
-      "name": "献予「岁月」之诗",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
-      "name": "献予「真我」之诗",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
       "name": "献予「纷争」之诗",
       "owner": "1404",
       "kind": "char",
@@ -2374,38 +2542,6 @@
       ]
     },
     {
-      "name": "短视之惩-她-忆灵速度",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
-      "name": "短视之惩-她-自身速度",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
-      "name": "短视之惩-衣匠-忆灵速度",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
-      "name": "短视之惩-衣匠-自身速度",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
       "name": "神启",
       "owner": "1403",
       "kind": "char",
@@ -2466,14 +2602,6 @@
       "kind": "char",
       "used_by": [
         "1505"
-      ]
-    },
-    {
-      "name": "织运之竭-保留",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
       ]
     },
     {
@@ -2593,14 +2721,6 @@
       "kind": "char",
       "used_by": [
         "1413"
-      ]
-    },
-    {
-      "name": "至高之姿",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
       ]
     },
     {
@@ -2747,14 +2867,6 @@
       ]
     },
     {
-      "name": "追忆",
-      "owner": "1415",
-      "kind": "char",
-      "used_by": [
-        "1415"
-      ]
-    },
-    {
       "name": "避厄",
       "owner": "1208",
       "kind": "char",
@@ -2779,14 +2891,6 @@
       ]
     },
     {
-      "name": "里程碑配额",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
       "name": "鉴知",
       "owner": "1208",
       "kind": "char",
@@ -2803,35 +2907,11 @@
       ]
     },
     {
-      "name": "间隙织线",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
-      "name": "间隙织线易伤",
-      "owner": "1402",
-      "kind": "char",
-      "used_by": [
-        "1402"
-      ]
-    },
-    {
       "name": "阿哈时刻",
       "owner": "battle",
       "kind": "battle",
       "key": "elation:aha_instant",
       "en": "Aha Instant"
-    },
-    {
-      "name": "隐藏分",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
     },
     {
       "name": "集真赤",
@@ -2855,14 +2935,6 @@
       "kind": "char",
       "used_by": [
         "1510"
-      ]
-    },
-    {
-      "name": "额外回合计数",
-      "owner": "1408",
-      "kind": "internal",
-      "used_by": [
-        "1408"
       ]
     },
     {

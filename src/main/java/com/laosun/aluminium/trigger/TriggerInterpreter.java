@@ -136,17 +136,22 @@ public final class TriggerInterpreter {
             return weight;
         }
         for (String raw : effect.getWeightSteps()) {
-            String[] parts = raw == null ? new String[0] : raw.trim().split(":", 3);
-            if (parts.length != 3) {
+            // Split from the RIGHT: the watched quantity may be a counter whose name carries colons
+            // (`char:1506/hidden_score:60:-9`), and the two parts after it are numbers. The same convention
+            // `holder_attr:` and `self_attr_above:` use, so one spelling means one thing everywhere.
+            String spelled = raw == null ? "" : raw.trim();
+            int lastColon = spelled.lastIndexOf(':');
+            int previousColon = lastColon <= 0 ? -1 : spelled.lastIndexOf(':', lastColon - 1);
+            if (previousColon < 0) {
                 throw new IllegalStateException("a weight step is written \"<resource>:<threshold>:<delta>\", e.g. "
                         + "\"战技点:4:-0.9\", and this one is \"" + raw + "\"");
             }
-            String name = parts[0].trim();
+            String name = spelled.substring(0, previousColon).trim();
             double threshold;
             double delta;
             try {
-                threshold = Double.parseDouble(parts[1].trim());
-                delta = Double.parseDouble(parts[2].trim());
+                threshold = Double.parseDouble(spelled.substring(previousColon + 1, lastColon).trim());
+                delta = Double.parseDouble(spelled.substring(lastColon + 1).trim());
             } catch (NumberFormatException notANumber) {
                 throw new IllegalStateException("a weight step's threshold and delta must be numbers, and \"" + raw
                         + "\" is not");
