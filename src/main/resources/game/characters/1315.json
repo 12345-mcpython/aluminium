@@ -20,7 +20,7 @@
         {
           "op": "BOOST_TOUGHNESS",
           "percent": 0.5,
-          "per_stack": "优势口袋",
+          "per_stack": "char:1315/edge_pocket",
           "per_stack_cap": 3,
           "turns": 1,
           "target": "self"
@@ -61,7 +61,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "绝命对峙",
+          "buff": "char:1315/deadly_standoff",
           "turns": 2,
           "target": "target"
         },
@@ -72,7 +72,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "绝命对峙",
+          "buff": "char:1315/deadly_standoff",
           "turns": 2,
           "blocks": "skill, energy_gain",
           "target": "self"
@@ -95,7 +95,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "优势口袋",
+          "buff": "char:1315/edge_pocket",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -103,7 +103,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "绝命对峙",
+          "buff": "char:1315/deadly_standoff",
           "target": "all_allies"
         }
       ],
@@ -116,7 +116,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "优势口袋",
+          "buff": "char:1315/edge_pocket",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -124,7 +124,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "绝命对峙",
+          "buff": "char:1315/deadly_standoff",
           "target": "all_allies"
         }
       ],
@@ -217,7 +217,7 @@
       "id": "eidolon4_target_takes_more_from_him",
       "when": [
         "actor == self",
-        "target has_state 绝命对峙"
+        "target has_state char:1315/deadly_standoff"
       ],
       "do": [
         {
@@ -236,7 +236,7 @@
       "id": "eidolon4_he_takes_less_from_that_target",
       "when": [
         "target == self",
-        "actor has_state 绝命对峙"
+        "actor has_state char:1315/deadly_standoff"
       ],
       "do": [
         {
@@ -255,7 +255,7 @@
       "id": "standoff_target_takes_more_from_him",
       "when": [
         "actor == self",
-        "target has_state 绝命对峙"
+        "target has_state char:1315/deadly_standoff"
       ],
       "do": [
         {
@@ -273,7 +273,7 @@
       "id": "standoff_he_takes_more_from_that_target",
       "when": [
         "target == self",
-        "actor has_state 绝命对峙"
+        "actor has_state char:1315/deadly_standoff"
       ],
       "do": [
         {
@@ -290,13 +290,13 @@
       "on": "KILL",
       "id": "eidolon2_pocket_reward_on_kill",
       "when": [
-        "self has_state 绝命对峙",
-        "!self has_state E2本回合已触发"
+        "self has_state char:1315/deadly_standoff",
+        "!self has_state internal:1315/e2_triggered_this_turn"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "E2本回合已触发",
+          "buff": "internal:1315/e2_triggered_this_turn",
           "until": "turn_end",
           "target": "self"
         },
@@ -320,13 +320,13 @@
       "on": "BREAK",
       "id": "eidolon2_pocket_reward_on_break",
       "when": [
-        "self has_state 绝命对峙",
-        "!self has_state E2本回合已触发"
+        "self has_state char:1315/deadly_standoff",
+        "!self has_state internal:1315/e2_triggered_this_turn"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "E2本回合已触发",
+          "buff": "internal:1315/e2_triggered_this_turn",
           "until": "turn_end",
           "target": "self"
         },

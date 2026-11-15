@@ -59,8 +59,8 @@ public class SparkleTest {
     private static final int ALLY_WITHOUT_RULES = 1210;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
-    private static final String COUNTER = "叙述性诡计";
-    private static final String PHANTASM = "谜诡";
+    private static final String COUNTER = "char:1306/narrative_trick";
+    private static final String PHANTASM = "char:1306/riddle";
 
     /**
      * Note: "等同于花火24.00%暴击伤害+45.00%" -- a derived share PLUS a flat amount, both read from the engine.
@@ -123,8 +123,8 @@ public class SparkleTest {
 
         Assertions.assertEquals(Math.min(before + 4, battle.getSkillPointMax()), battle.getSkillPoints(),
                 "「为我方恢复 4 个战技点」 (clamped by the pool's ceiling)");
-        Assertions.assertTrue(ally.getBuffManager().hasState("谜诡"),
-                "「并使我方全体获得【谜诡】」 (and grants all allies Cipher (【谜诡】))");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1306/riddle"),
+                "「并使我方全体获得【char:1306/riddle】」 (and grants all allies Cipher (【char:1306/riddle】))");
     }
 
     /**
@@ -161,7 +161,7 @@ public class SparkleTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, unit, enemy, 1, 0));
-        int layers = unit.getBuffManager().stacksOf("幻相");
+        int layers = unit.getBuffManager().stacksOf("char:1306/illusion");
         System.out.println("[1306] layersAfterOneSpend=" + layers);
         var rules = unit.getTriggerTable().matching(TriggerEvent.SKILL_POINT_SPENT,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 1, 0));
@@ -180,7 +180,7 @@ public class SparkleTest {
             }
         }
         Assertions.assertEquals(1, layers, "the spend stacked one layer");
-        Assertions.assertEquals("self_stacks:幻相", scale, "the layers live on the wearer");
+        Assertions.assertEquals("self_stacks:char:1306/illusion", scale, "the layers live on the wearer");
         Assertions.assertEquals(0.04, percent, 1e-9, "each layer adds 4%");
         Assertions.assertEquals(0.12, cap, 1e-9, "three layers cap it at 12%");
     }
@@ -247,7 +247,7 @@ public class SparkleTest {
         double raised = e1.boostAfterThreeSpends();
         System.out.println("[1306] ally all-damage boost after three spends: E0=" + plain + " ; E1=" + raised);
         Assertions.assertEquals(0.06 * 3 + 0.1 * 3, plain, 1e-6,
-                "6% per spent point (3 layers) plus 10% per layer of that same boost, for the 谜诡 holder");
+                "6% per spent point (3 layers) plus 10% per layer of that same boost, for the char:1306/riddle holder");
         Assertions.assertEquals(plain, raised, 1e-6, "the rider is base kit, not an Eidolon");
     }
 
@@ -332,7 +332,7 @@ public class SparkleTest {
                 .filter(r -> "talent_phantasm_stack".equals(r.id())).toList();
         Assertions.assertEquals(1, rules.size(), "the stack rule must exist");
         TriggerInterpreter.apply(b, rules.getFirst(), ctx);
-        return c.getBuffManager().stacksOf("幻相");
+        return c.getBuffManager().stacksOf("char:1306/illusion");
     }
 
     private static double ignoreAfter(int rank, int layers) {

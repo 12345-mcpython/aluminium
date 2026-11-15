@@ -44,28 +44,28 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": -0.1,
           "turns": 2,
-          "buff": "生息",
+          "buff": "char:1211/lifespan",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 生息"
+            "!target has_state char:1211/lifespan"
           ]
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "生息",
+          "buff": "char:1211/lifespan",
           "turns": 2,
           "target": "all_allies",
           "target_when": [
-            "!target has_state 生息"
+            "!target has_state char:1211/lifespan"
           ]
         },
         {
           "op": "EXTEND_BUFF",
-          "buff": "生息",
+          "buff": "char:1211/lifespan",
           "turns": 1,
           "target": "all_allies",
           "target_when": [
-            "target has_state 生息"
+            "target has_state char:1211/lifespan"
           ]
         }
       ],
@@ -83,12 +83,12 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": -0.1,
           "turns": 2,
-          "buff": "生息",
+          "buff": "char:1211/lifespan",
           "target": "all_allies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "生息",
+          "buff": "char:1211/lifespan",
           "turns": 2,
           "target": "all_allies"
         }
@@ -101,7 +101,7 @@
       "id": "eidolon1_energy_when_invigoration_ends_at_full_hp",
       "min_eidolon": 1,
       "when": [
-        "target state_ended 生息",
+        "target state_ended char:1211/lifespan",
         "target_hp_percent >= 1"
       ],
       "do": [
@@ -120,7 +120,7 @@
       "when": [
         "actor is_ally",
         "actor != self",
-        "self_stacks:天赋治疗额度 >= 1"
+        "self_stacks:internal:1211/talent_heal_allowance >= 1"
       ],
       "do": [
         {
@@ -132,7 +132,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "天赋治疗额度",
+          "buff": "internal:1211/talent_heal_allowance",
           "amount": 1,
           "target": "self"
         }
@@ -226,7 +226,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "天赋治疗额度",
+          "buff": "internal:1211/talent_heal_allowance",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -243,7 +243,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "天赋治疗额度",
+          "buff": "internal:1211/talent_heal_allowance",
           "amount": 2,
           "max_stacks": 2,
           "permanent": true,
@@ -259,7 +259,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "生息治疗额度",
+          "buff": "internal:1211/lifespan_heal_allowance",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -275,7 +275,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "生息治疗额度",
+          "buff": "internal:1211/lifespan_heal_allowance",
           "value": {
             "type": "skill_param",
             "skill": "TALENT",
@@ -293,8 +293,8 @@
       "on": "TAKING_HIT",
       "id": "talent_invigoration_heals_the_hit_ally",
       "when": [
-        "target has_state 生息",
-        "self_stacks:生息治疗额度 >= 1"
+        "target has_state char:1211/lifespan",
+        "self_stacks:internal:1211/lifespan_heal_allowance >= 1"
       ],
       "do": [
         {
@@ -306,7 +306,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "生息治疗额度",
+          "buff": "internal:1211/lifespan_heal_allowance",
           "amount": 1,
           "target": "self"
         }

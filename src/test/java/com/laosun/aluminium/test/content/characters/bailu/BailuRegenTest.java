@@ -51,12 +51,12 @@ public class BailuRegenTest {
 
         f.castUltimate();
 
-        Assertions.assertAll("the Ultimate's [生息] and the trace that rides on it",
-                () -> Assertions.assertTrue(f.ally.getBuffManager().hasState("生息"), "「for our targets that do not have [生息] (Invigoration) ... apply [生息] (Invigoration)」"),
-                () -> Assertions.assertTrue(f.bailu.getBuffManager().hasState("生息"), "...and 「all of our side」 includes her"),
+        Assertions.assertAll("the Ultimate's [char:1211/lifespan] and the trace that rides on it",
+                () -> Assertions.assertTrue(f.ally.getBuffManager().hasState("char:1211/lifespan"), "「for our targets that do not have [char:1211/lifespan] (Invigoration) ... apply [char:1211/lifespan] (Invigoration)」"),
+                () -> Assertions.assertTrue(f.bailu.getBuffManager().hasState("char:1211/lifespan"), "...and 「all of our side」 includes her"),
                 () -> Assertions.assertTrue(f.ally.getBuffManager().allBuffsOf(
                                 com.laosun.aluminium.buff.ReductionBuff.class).size() > reductionsBefore,
-                        "「characters that have [生息] (Invigoration) take 10% less damage」 -- the reduction goes up with the state"));
+                        "「characters that have [char:1211/lifespan] (Invigoration) take 10% less damage」 -- the reduction goes up with the state"));
     }
 
     /**
@@ -67,12 +67,12 @@ public class BailuRegenTest {
         Fixture f = new Fixture();
         // Note: A hand-built StateBuff carries no `buffName` (only `APPLY_BUFF` sets one), so the precondition counts STATE
         // buffs rather than named ones -- `stacksOf` is about names and would read 0 here.
-        f.ally.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("生息", 1));
+        f.ally.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1211/lifespan", 1));
         int statesBefore = f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StateBuff.class).size();
 
         f.castUltimate();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("生息"), "still there (extended, not reset)");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("char:1211/lifespan"), "still there (extended, not reset)");
         Assertions.assertEquals(statesBefore,
                 f.ally.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.StateBuff.class).size(),
                 "「this effect cannot stack」: the second branch EXTENDS the state instead of applying another one");
@@ -87,7 +87,7 @@ public class BailuRegenTest {
     @Test
     public void theDragonVeinAddsOneInvigorationTrigger() {
         Fixture f = new Fixture();
-        Assertions.assertEquals(3, f.bailu.getBuffManager().stacksOf("生息治疗额度"),
+        Assertions.assertEquals(3, f.bailu.getBuffManager().stacksOf("internal:1211/lifespan_heal_allowance"),
                 "天赋 2 次（TALENT:4）+ 行迹 1 次 = 3");
     }
 

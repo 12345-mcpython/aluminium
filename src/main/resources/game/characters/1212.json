@@ -41,7 +41,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "朔望",
+          "buff": "char:1212/syzygy",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -60,7 +60,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "朔望",
+          "buff": "char:1212/syzygy",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -75,7 +75,7 @@
       "id": "talent_transmigration_at_two_stacks",
       "when": [
         "actor == self",
-        "self_stacks:朔望 >= 2"
+        "self_stacks:char:1212/syzygy >= 2"
       ],
       "do": [
         {
@@ -85,14 +85,14 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "转魄",
+          "buff": "char:1212/soul_shift",
           "turns": 3,
           "ticks_on": "self",
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "朔望",
+          "buff": "char:1212/syzygy",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -106,12 +106,12 @@
       "on": "HP_CONSUMED",
       "id": "talent_moon_on_hp_consumed",
       "when": [
-        "self has_state 转魄"
+        "self has_state char:1212/soul_shift"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "月色",
+          "buff": "char:1212/moonlight",
           "amount": 1,
           "max_stacks": 5,
           "turns": 2,
@@ -125,12 +125,12 @@
       "on": "TAKING_HIT",
       "id": "talent_moon_on_damage",
       "when": [
-        "self has_state 转魄"
+        "self has_state char:1212/soul_shift"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "月色",
+          "buff": "char:1212/moonlight",
           "amount": 1,
           "max_stacks": 5,
           "turns": 2,

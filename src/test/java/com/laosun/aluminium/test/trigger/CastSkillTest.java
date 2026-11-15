@@ -225,10 +225,10 @@ public class CastSkillTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(him), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        // Note: "[血仇]状态期间…自身回合开始时自动施放[弑王成王]": the gate is part of the sentence, so the scene
+        // Note: "[char:1404/blood_feud]状态期间…自身回合开始时自动施放[弑王成王]": the gate is part of the sentence, so the scene
         // enters the state. The rule used to fire unconditionally, which is the defect that gate corrects.
         him.getBuffManager().addBuff(
-                new com.laosun.aluminium.buff.StateBuff("血仇", 9, true));
+                new com.laosun.aluminium.buff.StateBuff("char:1404/blood_feud", 9, true));
         battle.processRequests();
 
         double before = enemy.getCurrentHp();

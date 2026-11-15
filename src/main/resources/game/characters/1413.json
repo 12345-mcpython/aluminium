@@ -85,7 +85,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "亿质",
+          "resource": "char:1413/myriad_essence",
           "amount": 2
         }
       ],
@@ -241,7 +241,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "至暗之谜",
+          "buff": "char:1413/darkest_riddle",
           "turns": 3,
           "target": "self"
         },
@@ -431,7 +431,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "长夜的迷梦增伤",
+          "resource": "char:1413/long_night_dream_boost",
           "scale": "cast_skill_param:0",
           "percent": 10000,
           "target": "self"
@@ -465,7 +465,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent_from": {
             "type": "resource",
-            "resource": "长夜的迷梦增伤",
+            "resource": "char:1413/long_night_dream_boost",
             "basis_points": true
           },
           "permanent": true,
@@ -497,7 +497,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "岁月之诗的亿质点数",
+          "resource": "internal:1413/ode_years_essence_points",
           "scale": "cast_skill_param:1",
           "target": "self"
         }
@@ -527,10 +527,10 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "亿质",
+          "resource": "char:1413/myriad_essence",
           "amount_from": {
             "type": "resource",
-            "resource": "岁月之诗的亿质点数"
+            "resource": "internal:1413/ode_years_essence_points"
           },
           "target": "self"
         }
@@ -560,10 +560,10 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "亿质",
+          "resource": "char:1413/myriad_essence",
           "amount_from": {
             "type": "resource",
-            "resource": "岁月之诗的亿质点数"
+            "resource": "internal:1413/ode_years_essence_points"
           },
           "target": "self"
         }
@@ -654,7 +654,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "亿质",
+          "resource": "char:1413/myriad_essence",
           "amount_from": {
             "type": "cast_param",
             "index": 3
@@ -687,7 +687,7 @@
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "亿质",
+          "resource": "char:1413/myriad_essence",
           "spendAll": true,
           "target": "self"
         },
@@ -772,7 +772,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "亿质",
+          "resource": "char:1413/myriad_essence",
           "amount": 1
         }
       ],
@@ -790,17 +790,17 @@
   ],
   "resources": [
     {
-      "id": "长夜的迷梦增伤",
+      "id": "char:1413/long_night_dream_boost",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 它是「献予「岁月」之诗」（数据行 24）的 `#1` 在**施放那一刻被捕获**后存放的地方（基点）。"
     },
     {
-      "id": "亿质",
+      "id": "char:1413/myriad_essence",
       "source": "【亿质】本身（TextMap 哈希 14616362604670218887 = 亿质；引擎里是 `ByAvatarBaseType = \"Memory\"`）。⚠ **数据没给上限**：长夜月的能力文件都不引用那个哈希，所以 `max` 用 **`Integer.MAX_VALUE`**（表示**不设上限**），而不是臆造一个游戏数值。",
       "max": 2147483647
     },
     {
-      "id": "岁月之诗的亿质点数",
+      "id": "internal:1413/ode_years_essence_points",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 数据行 24 的 `#2`（ParamList 下标 1）在施放那一刻被捕获后存放的地方（基点）。"
     }

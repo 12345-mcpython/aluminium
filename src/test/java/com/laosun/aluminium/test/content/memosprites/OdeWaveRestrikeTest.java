@@ -36,7 +36,7 @@ public class OdeWaveRestrikeTest {
     private static final int ODE_TO_STRIFE = 16;
     private static final int GODSLAYER = 11;
     private static final int MULTI_WAVE_STAGE = 310030;
-    private static final String MARK = "献予「纷争」之诗";
+    private static final String MARK = "char:1404/ode_to_strife";
 
     /**
      * The ode marks him; a wave monster entering then makes him strike again.

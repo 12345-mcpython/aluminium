@@ -34,7 +34,7 @@ public class OdeToStrifeCritTest {
     private static final int CYRENE = 1415;
     private static final int MYDEI = 1404;
     private static final int ODE_TO_STRIFE = 16;
-    private static final String BLOODFEUD = "血仇";
+    private static final String BLOODFEUD = "char:1404/blood_feud";
 
     /**
      * The strike the ode commands, with every roll a crit, carries the crit-damage clause.

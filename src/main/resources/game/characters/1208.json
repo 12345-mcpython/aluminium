@@ -5,7 +5,7 @@
   "_gaps": [],
   "resources": [
     {
-      "id": "累计损失",
+      "id": "internal:1208/accumulated_loss",
       "max": 2147483647,
       "initial": 0,
       "source": "1208 符玄 星魂 6 种陵: 「【穷观阵】开启时，会累计我方全体本场战斗中的已损失生命值…本场战斗中累计已损失生命值最高不超过符玄生命上限的120%」",
@@ -41,7 +41,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "避厄",
+          "buff": "char:1208/ward",
           "permanent": true,
           "target": "all_allies"
         },
@@ -64,7 +64,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "鉴知",
+          "buff": "char:1208/insight",
           "turns": 3,
           "ticks_on": "self",
           "target": "all_allies"
@@ -116,7 +116,7 @@
       "once_per_battle": true,
       "when": [
         "actor is_ally",
-        "self has_state 鉴知"
+        "self has_state char:1208/insight"
       ],
       "do": [
         {
@@ -135,7 +135,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "避厄治疗次",
+          "buff": "internal:1208/ward_heals",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -151,7 +151,7 @@
       "when": [
         "target == self",
         "hp_percent <= 0.5",
-        "self_stacks:避厄治疗次 >= 1"
+        "self_stacks:internal:1208/ward_heals >= 1"
       ],
       "do": [
         {
@@ -162,7 +162,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "避厄治疗次",
+          "buff": "internal:1208/ward_heals",
           "amount": 1,
           "target": "self"
         }
@@ -179,7 +179,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "避厄治疗次",
+          "buff": "internal:1208/ward_heals",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -198,7 +198,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "鉴知",
+          "buff": "char:1208/insight",
           "turns": 2,
           "ticks_on": "self",
           "target": "all_allies"
@@ -228,7 +228,7 @@
       "on": "DEALING_DAMAGE",
       "id": "skill_zone_shares_65_percent",
       "when": [
-        "target has_state 鉴知",
+        "target has_state char:1208/insight",
         "target != self"
       ],
       "do": [
@@ -287,7 +287,7 @@
       "id": "eidolon4_energy_when_an_ally_in_the_zone_is_hit",
       "min_eidolon": 4,
       "when": [
-        "target has_state 鉴知",
+        "target has_state char:1208/insight",
         "target != self"
       ],
       "do": [
@@ -308,7 +308,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "累计损失",
+          "resource": "internal:1208/accumulated_loss",
           "amountFromEvent": true
         }
       ],
@@ -337,7 +337,7 @@
                 "inputs": [
                   {
                     "type": "resource",
-                    "resource": "累计损失"
+                    "resource": "internal:1208/accumulated_loss"
                   },
                   {
                     "type": "mul",
@@ -375,7 +375,7 @@
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "累计损失",
+          "resource": "internal:1208/accumulated_loss",
           "spendAll": true,
           "target": "self"
         }

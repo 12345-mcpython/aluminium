@@ -25,7 +25,7 @@ public class TrueKnowledgeSkillDamageTest {
     private static final int CYRENE = 1415;
     private static final int ANAXA = 1405;
     private static final int ODE_SLOT = 18;
-    private static final String CAPTURED = "真知的战技增伤";
+    private static final String CAPTURED = "char:1405/true_knowledge_skill_boost";
 
     @Test
     public void theStateRaisesHisSkillDamageAndNothingElse() {
@@ -33,14 +33,14 @@ public class TrueKnowledgeSkillDamageTest {
         double[] skillElsewhere = hit(false, SkillType.SKILL);
         double[] basicAtHim = hit(true, SkillType.COMMON);
         double[] basicElsewhere = hit(false, SkillType.COMMON);
-        System.out.println("[true_knowledge_dmg] SKILL: " + skillAtHim[0] + " with [真知] (True Knowledge) on him, "
+        System.out.println("[true_knowledge_dmg] SKILL: " + skillAtHim[0] + " with [char:1405/true_knowledge] (True Knowledge) on him, "
                 + skillElsewhere[0] + " without it (captured " + skillAtHim[1] + " bp)");
         System.out.println("[true_knowledge_dmg] COMMON: " + basicAtHim[0] + " with it, " + basicElsewhere[0]
                 + " without it");
         double skillRatio = skillAtHim[0] / skillElsewhere[0];
         double basicRatio = basicAtHim[0] / basicElsewhere[0];
         double attackRatio = basicAtHim[2] / basicElsewhere[2];
-        Assertions.assertTrue(skillRatio > 1.05, "his SKILL hits much harder with [真知] (True Knowledge) up: " + skillRatio);
+        Assertions.assertTrue(skillRatio > 1.05, "his SKILL hits much harder with [char:1405/true_knowledge] (True Knowledge) up: " + skillRatio);
         // The BASIC's move is the OTHER clause of the same sentence (「所有智识命途角色攻击力提高 #3」), NOT a gate leak: so
         // it must move by exactly what the ATTACK raise did and no more.
         //

@@ -35,7 +35,7 @@ public class OdeToStrifeBloodfeudTest {
     private static final int MYDEI = 1404;
     private static final int ODE_TO_STRIFE = 16;
     private static final int GODSLAYER = 11;
-    private static final String BLOODFEUD = "血仇";
+    private static final String BLOODFEUD = "char:1404/blood_feud";
 
     /**
      * In [血仇] the command lands: his SKILL slot becomes [弑神登神].
@@ -70,7 +70,7 @@ public class OdeToStrifeBloodfeudTest {
 
         int slot = mydei.getSkills().get(SkillType.SKILL).getSkillSlot();
         System.out.println("[ode] outside bloodfeud his SKILL slot " + before + " -> " + slot + " (want it unchanged)");
-        Assertions.assertEquals(before, slot, "「若万敌处于【血仇】」 (if Mydei is in the Vendetta state)-- this branch needs it");
+        Assertions.assertEquals(before, slot, "「若万敌处于【char:1404/blood_feud】」 (if Mydei is in the Vendetta state)-- this branch needs it");
     }
 
     // ==================================================================

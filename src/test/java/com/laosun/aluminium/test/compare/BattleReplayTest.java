@@ -131,7 +131,7 @@ public class BattleReplayTest {
         Assertions.assertTrue(out.lines().noneMatch(line -> line.contains("DIFFERS")),
                 "no cast may still differ; a factor coming back means either the Max-HP rule or the fold regressed; "
                         + "output was:\n" + out);
-        Assertions.assertTrue(out.contains("seeded: {亿质=10.0}"),
+        Assertions.assertTrue(out.contains("seeded: {char:1413/myriad_essence=10.0}"),
                 "cast 4's prefix is declared and printed as such - a reader must be able to tell it from a number the "
                         + "engine reproduced; output was:\n" + out);
         // 1409's tally-delivered hits state no SHARE (damage_percentage is 0), but they do state the base the rule built

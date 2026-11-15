@@ -89,7 +89,7 @@ public class CastoriceTest {
 
         Summon small = SummonFactory.memosprite(master, spec, name -> 1000);
         Assertions.assertEquals(1000, small.getAttribute(AttributeType.HEALTH).get(), 1e-6,
-                "100% of a 1000-point 【新蕊】 (Newbud)");
+                "100% of a 1000-point 【char:1407/rosebud】 (Newbud)");
 
         Summon large = SummonFactory.memosprite(master, spec, name -> 34000);
         Assertions.assertEquals(34000, large.getAttribute(AttributeType.HEALTH).get(), 1e-6,

@@ -127,7 +127,7 @@
           "attribute": "AGGRO_ADDED_RATIO",
           "percent": -0.5,
           "permanent": true,
-          "buff": "赤子",
+          "buff": "char:1206/newborn",
           "target": "self"
         }
       ],
@@ -144,7 +144,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "赤子",
+          "buff": "char:1206/newborn",
           "target": "self"
         }
       ],
@@ -199,7 +199,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "剑势",
+          "buff": "char:1206/sword_stance",
           "amount": 1,
           "max_stacks": 10,
           "permanent": true,
@@ -220,7 +220,7 @@
         {
           "op": "BOOST_DAMAGE",
           "damage_type": "ADDITIONAL",
-          "scale": "self_stacks:剑势",
+          "scale": "self_stacks:char:1206/sword_stance",
           "percent": 0.025
         }
       ],
@@ -389,7 +389,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "剑势额外判定",
+          "buff": "internal:1206/sword_stance_extra_roll",
           "amount": 1,
           "turns": 2,
           "target": "self"
@@ -404,7 +404,7 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self_stacks:剑势额外判定 >= 1",
+        "self_stacks:internal:1206/sword_stance_extra_roll >= 1",
         "!target has_state break:weakness"
       ],
       "chance": 0.33,
@@ -432,7 +432,7 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self_stacks:剑势额外判定 >= 1",
+        "self_stacks:internal:1206/sword_stance_extra_roll >= 1",
         "target has_state break:weakness"
       ],
       "chance": 1,

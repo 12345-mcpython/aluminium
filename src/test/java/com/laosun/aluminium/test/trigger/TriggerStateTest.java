@@ -74,7 +74,7 @@ public class TriggerStateTest {
         int applied = fire(battle, owner);
         boolean inState = owner.getBuffManager().hasState("协奏");
         int stateCount = owner.getBuffManager().countBuffs(StateBuff.class);
-        boolean otherName = owner.getBuffManager().hasState("转魄");
+        boolean otherName = owner.getBuffManager().hasState("char:1212/soul_shift");
 
         Assertions.assertAll("APPLY_BUFF applies and refreshes the named state",
                 () -> Assertions.assertEquals(1, applied, "the rule applies the state"),
@@ -153,12 +153,12 @@ public class TriggerStateTest {
     public void statesAreNamedAndTheirDurationIsHonoured() {
         Battle coexisting = battleWith(
                 stateOp("ALLY_ATTACK", "协奏", 2, null),
-                stateOp("SKILL_CAST", "转魄", 2, null));
+                stateOp("SKILL_CAST", "char:1212/soul_shift", 2, null));
         Character coexistOwner = coexisting.characters().getFirst();
         fire(coexisting, coexistOwner);
         coexisting.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, coexistOwner, null, 0, 0));
         boolean firstState = coexistOwner.getBuffManager().hasState("协奏");
-        boolean secondState = coexistOwner.getBuffManager().hasState("转魄");
+        boolean secondState = coexistOwner.getBuffManager().hasState("char:1212/soul_shift");
         int coexistCount = coexistOwner.getBuffManager().countBuffs(StateBuff.class);
 
         Assertions.assertAll("two different states coexist",
@@ -206,13 +206,13 @@ public class TriggerStateTest {
         // Two different events so the two halves can be observed separately; on one event the table would apply and
         // remove the state within the same fire, which would prove nothing about either.
         Battle oneState = battleWith(
-                stateOp("ALLY_ATTACK", "蒙福者", 3, null),
-                removeStateOn("SKILL_CAST", "蒙福者"));
+                stateOp("ALLY_ATTACK", "char:1313/blessed_one", 3, null),
+                removeStateOn("SKILL_CAST", "char:1313/blessed_one"));
         Character oneStateOwner = oneState.characters().getFirst();
         int applyCount = fire(oneState, oneStateOwner);
-        boolean onAfterApply = oneStateOwner.getBuffManager().hasState("蒙福者");
+        boolean onAfterApply = oneStateOwner.getBuffManager().hasState("char:1313/blessed_one");
         int removeCount = fire(oneState, oneStateOwner, TriggerEvent.SKILL_CAST);
-        boolean offAfterRemove = oneStateOwner.getBuffManager().hasState("蒙福者");
+        boolean offAfterRemove = oneStateOwner.getBuffManager().hasState("char:1313/blessed_one");
 
         Assertions.assertAll("REMOVE_STATE takes the named state off",
                 () -> Assertions.assertEquals(1, applyCount, "the state was applied"),
@@ -222,13 +222,13 @@ public class TriggerStateTest {
 
         Battle twoStates = battleWith(
                 stateOp("ALLY_ATTACK", "协奏", 3, null),
-                stateOp("ALLY_ATTACK", "转魄", 3, null),
+                stateOp("ALLY_ATTACK", "char:1212/soul_shift", 3, null),
                 removeStateOn("SKILL_CAST", "协奏"));
         Character twoStatesOwner = twoStates.characters().getFirst();
         fire(twoStates, twoStatesOwner);
         fire(twoStates, twoStatesOwner, TriggerEvent.SKILL_CAST);
         boolean namedGone = twoStatesOwner.getBuffManager().hasState("协奏");
-        boolean otherStateStays = twoStatesOwner.getBuffManager().hasState("转魄");
+        boolean otherStateStays = twoStatesOwner.getBuffManager().hasState("char:1212/soul_shift");
 
         Assertions.assertAll("REMOVE_STATE leaves other states alone",
                 () -> Assertions.assertFalse(namedGone, "the named one is gone"),
@@ -246,10 +246,10 @@ public class TriggerStateTest {
                 () -> Assertions.assertFalse(dotOff,
                         "「removes ... the state」 works on the DoT names too -- one name, one meaning"));
 
-        Battle quietBattle = battleWith(removeStateOn("ALLY_ATTACK", "蒙福者"));
+        Battle quietBattle = battleWith(removeStateOn("ALLY_ATTACK", "char:1313/blessed_one"));
         Character quietOwner = quietBattle.characters().getFirst();
         int quietCount = fire(quietBattle, quietOwner);
-        boolean neverThere = quietOwner.getBuffManager().hasState("蒙福者");
+        boolean neverThere = quietOwner.getBuffManager().hasState("char:1313/blessed_one");
 
         Assertions.assertAll("removing a state that is not there is quiet",
                 () -> Assertions.assertEquals(1, quietCount, "the rule runs; there was simply nothing to take off"),
@@ -542,7 +542,7 @@ public class TriggerStateTest {
                 () -> {
                     EffectSpec withAmount = new EffectSpec();
                     TriggerSpecs.set(withAmount, "op", "REMOVE_STATE");
-                    TriggerSpecs.set(withAmount, "buff", "蒙福者");
+                    TriggerSpecs.set(withAmount, "buff", "char:1313/blessed_one");
                     TriggerSpecs.set(withAmount, "amount", 1.0);
                     IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
                             () -> new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, withAmount))),

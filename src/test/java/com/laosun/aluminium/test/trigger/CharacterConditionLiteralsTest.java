@@ -181,10 +181,10 @@ public class CharacterConditionLiteralsTest {
         assertRule(1211, "ULT_CAST", "ult_rebirth", List.of("actor == self"));
         assertRule(1212, "SKILL_CAST", "skill_syzygy_stack", List.of("actor == self"));
         assertRule(1212, "ULT_CAST", "ult_syzygy_stack", List.of("actor == self"));
-        assertRule(1212, "SKILL_CAST", "talent_transmigration_at_two_stacks", List.of("actor == self", "self_stacks:朔望 >= 2.0"));
+        assertRule(1212, "SKILL_CAST", "talent_transmigration_at_two_stacks", List.of("actor == self", "self_stacks:char:1212/syzygy >= 2.0"));
         assertRule(1212, "BATTLE_START", "level_convention", List.of());
-        assertRule(1212, "HP_CONSUMED", "talent_moon_on_hp_consumed", List.of("self has_state 转魄"));
-        assertRule(1212, "TAKING_HIT", "talent_moon_on_damage", List.of("self has_state 转魄"));
+        assertRule(1212, "HP_CONSUMED", "talent_moon_on_hp_consumed", List.of("self has_state char:1212/soul_shift"));
+        assertRule(1212, "TAKING_HIT", "talent_moon_on_damage", List.of("self has_state char:1212/soul_shift"));
         assertRule(1213, "DEALING_DAMAGE", "talent_righteous_heart", List.of("actor == self"));
         assertRule(1213, "BATTLE_START", "level_convention", List.of());
         assertRule(1214, "BATTLE_START", "technique_opening_aoe", List.of("self has_state sys:technique"));
@@ -361,9 +361,9 @@ public class CharacterConditionLiteralsTest {
         assertRule(1404, "ULT_CAST", "ult_heal_charge_and_taunt", List.of("actor == self"));
         assertRule(1404, "BATTLE_START", "level_convention", List.of());
         assertRule(1404, "DEALING_DAMAGE", "eidolon2_the_bloodfeud_pierces_fifteen_percent",
-                List.of("actor == self", "self has_state 血仇"));
+                List.of("actor == self", "self has_state char:1404/blood_feud"));
         assertRule(1404, "DEALING_DAMAGE", "eidolon4_the_bloodfeud_crits_harder",
-                List.of("actor == self", "self has_state 血仇"));
+                List.of("actor == self", "self has_state char:1404/blood_feud"));
         assertRule(1404, "TAKING_HIT", "eidolon4_a_hit_heals_ten_percent", List.of("target == self"));
         assertRule(1404, "BATTLE_START", "eidolon6_enters_bloodfeud_at_once", List.of());
         assertRule(1405, "ALLY_ATTACK", "eidolon1_defence_down_on_skill", List.of("actor == self", "from_skill SKILL"));

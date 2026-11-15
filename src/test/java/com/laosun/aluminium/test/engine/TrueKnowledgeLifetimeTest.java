@@ -23,7 +23,7 @@ public class TrueKnowledgeLifetimeTest {
     private static final int ANAXA = 1405;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 18;
-    private static final String KNOWLEDGE = "真知";
+    private static final String KNOWLEDGE = "char:1405/true_knowledge";
 
     @Test
     public void theKnowledgeOutlivesTheCastThatGrantedIt() {
@@ -46,8 +46,8 @@ public class TrueKnowledgeLifetimeTest {
                 List.of(battle.enemies().getFirst()));
         battle.processRequests();
         boolean still = battle.characters().get(1).getBuffManager().hasState(KNOWLEDGE);
-        System.out.println("[knowledge_lifetime] after the cast that grants it, 【真知】 (True Knowledge) is "
+        System.out.println("[knowledge_lifetime] after the cast that grants it, 【char:1405/true_knowledge】 (True Knowledge) is "
                 + (still ? "still on him" : "gone"));
-        Assertions.assertTrue(still, "the cast that grants 【真知】 (True Knowledge) must not also consume it");
+        Assertions.assertTrue(still, "the cast that grants 【char:1405/true_knowledge】 (True Knowledge) must not also consume it");
     }
 }

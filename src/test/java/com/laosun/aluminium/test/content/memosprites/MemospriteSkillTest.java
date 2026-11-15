@@ -49,7 +49,7 @@ public class MemospriteSkillTest {
                 "「ServantID 11415」-- a memosprite's skill is keyed by the SERVANT's id, which is what SkillEffects looks up");
         Assertions.assertEquals(ODE_TO_STRIFE, skill.getSkillSlot(), "and by the DATA slot the table states (16, not the checklist's 8)");
         Assertions.assertTrue(deliverable,
-                "\"the poem offered to Strife\" (「献予「纷争」之诗」) is a support skill whose work is on the rule side, so the Rules entry is what makes it deliverable");
+                "\"the poem offered to Strife\" (「char:1404/ode_to_strife」) is a support skill whose work is on the rule side, so the Rules entry is what makes it deliverable");
     }
 
     /**

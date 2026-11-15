@@ -231,7 +231,7 @@ public class SushangTest {
         int reduced = reductions(withEidolon.sushang);
 
         Assertions.assertTrue(reduced > plain,
-                "「触发【剑势】后…受到的伤害降低20%」 must land a reduction: rank 0 = " + plain
+                "「触发【char:1206/sword_stance】后…受到的伤害降低20%」 must land a reduction: rank 0 = " + plain
                         + ", rank 2 = " + reduced);
     }
 
@@ -357,7 +357,7 @@ public class SushangTest {
         battle.processRequests();
         Character sushang = battle.characters().getFirst();
 
-        // "施放战技时额外增加 2 次【剑势】的发动判定": the ultimate installs it for 2 turns.
+        // "施放战技时额外增加 2 次【char:1206/sword_stance】的发动判定": the ultimate installs it for 2 turns.
         sushang.setCurrentEnergy(sushang.getMaxEnergy());
         battle.castUltra(sushang, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();
@@ -391,11 +391,11 @@ public class SushangTest {
     public void theSwordStanceShareFollowsTheSkillRowAtBothEnds() {
         double atZero = oneSkillCastAgainstOneEnemy(0);
         double atFive = oneSkillCastAgainstOneEnemy(5);
-        System.out.println("[1206] one Skill cast (skill row #1 + one 剑势 row #2) deals " + atZero + " at E0 and "
+        System.out.println("[1206] one Skill cast (skill row #1 + one char:1206/sword_stance row #2) deals " + atZero + " at E0 and "
                 + atFive + " at E5 (x" + (atFive / atZero) + "; with the Lv10 literal it would be "
                 + ((2.31 + 1.0) / (2.1 + 1.0)) + ")");
         Assertions.assertEquals(1.1, atFive / atZero, 1e-9,
-                "战技行的 #2 随等级走（E0 1.0、E5 1.1），所以这一发「本体 + 剑势」的比正好是 1.1");
+                "战技行的 #2 随等级走（E0 1.0、E5 1.1），所以这一发「本体 + char:1206/sword_stance」的比正好是 1.1");
     }
 
     /**
@@ -567,7 +567,7 @@ public class SushangTest {
     @Test
     public void theTraceCountsSwordStanceLayersUpToTen() {
         UltimateFixture f = new UltimateFixture();
-        Assertions.assertEquals(0, f.sushang.getBuffManager().stacksOf("剑势"),
+        Assertions.assertEquals(0, f.sushang.getBuffManager().stacksOf("char:1206/sword_stance"),
                 "precondition: nothing counted yet");
 
         // One cast: the Sword Stance lands (the dice are pinned so it always does) and must be counted once.
@@ -576,13 +576,13 @@ public class SushangTest {
         double before = f.enemy.getCurrentHp();
         f.castSkill();
         Assertions.assertTrue(f.enemy.getCurrentHp() < before, "precondition: the Skill hit");
-        Assertions.assertEquals(1, f.sushang.getBuffManager().stacksOf("剑势"),
-                "「每发动1次【剑势】」 counts one layer per Sword Stance that lands");
+        Assertions.assertEquals(1, f.sushang.getBuffManager().stacksOf("char:1206/sword_stance"),
+                "「每发动1次【char:1206/sword_stance】」 counts one layer per Sword Stance that lands");
 
         for (int i = 0; i < 15; i++) {
             f.castSkill();
         }
-        Assertions.assertEquals(10, f.sushang.getBuffManager().stacksOf("剑势"),
+        Assertions.assertEquals(10, f.sushang.getBuffManager().stacksOf("char:1206/sword_stance"),
                 "「最多叠加10层」 must hold: the cap is declared on ADD_STACK and must be enforced there");
     }
 

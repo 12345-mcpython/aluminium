@@ -23,7 +23,7 @@ import java.util.List;
 public class FuxuanEidolonTwoTest {
     private static final int FUXUAN = 1208;
     private static final int ALLY = 1002;
-    private static final String ZONE = "鉴知";
+    private static final String ZONE = "char:1208/insight";
 
     /**
      * The first blow is answered; the second kills, because the sentence allows one.

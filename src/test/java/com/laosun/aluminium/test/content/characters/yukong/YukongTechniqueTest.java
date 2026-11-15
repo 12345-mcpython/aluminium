@@ -16,7 +16,7 @@ public class YukongTechniqueTest {
 
     @Test
     public void theTechniqueGrantsTwoStacksOnEntry() {
-        Assertions.assertEquals(2, stacks(true), "「获得 2 层【鸣弦号令】」");
+        Assertions.assertEquals(2, stacks(true), "「获得 2 层【char:1207/string_command】」");
         Assertions.assertEquals(0, stacks(false), "the control: without the technique there are none");
     }
 
@@ -28,7 +28,7 @@ public class YukongTechniqueTest {
         Battle battle = new Battle(new ArrayList<>(List.of(her)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        System.out.println("[1207] technique=" + technique + " stacks=" + her.getBuffManager().stacksOf("鸣弦号令"));
-        return her.getBuffManager().stacksOf("鸣弦号令");
+        System.out.println("[1207] technique=" + technique + " stacks=" + her.getBuffManager().stacksOf("char:1207/string_command"));
+        return her.getBuffManager().stacksOf("char:1207/string_command");
     }
 }

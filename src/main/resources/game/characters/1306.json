@@ -76,7 +76,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "谜诡",
+          "buff": "char:1306/riddle",
           "turns": 2,
           "target": "all_allies"
         },
@@ -84,10 +84,10 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.1,
-          "per_stack": "叙述性诡计",
+          "per_stack": "char:1306/narrative_trick",
           "per_stack_cap": 3,
           "per_stack_live": true,
-          "while_holder_state": "谜诡",
+          "while_holder_state": "char:1306/riddle",
           "turns": 2,
           "target": "all_allies"
         }
@@ -106,7 +106,7 @@
           "turns": 2,
           "max_stacks": 3,
           "target": "all_allies",
-          "buff": "叙述性诡计",
+          "buff": "char:1306/narrative_trick",
           "percent_from_skill_param": "TALENT:1"
         }
       ],
@@ -136,7 +136,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE_IGNORE",
-          "scale": "self_stacks:叙述性诡计",
+          "scale": "self_stacks:char:1306/narrative_trick",
           "percent": 0.08,
           "permanent": true,
           "target": "all_allies"
@@ -152,7 +152,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "幻相",
+          "buff": "char:1306/illusion",
           "max_stacks": 3,
           "turns": 2,
           "target": "self",
@@ -170,7 +170,7 @@
       "do": [
         {
           "op": "MODIFY_DAMAGE_TAKEN",
-          "scale": "self_stacks:幻相",
+          "scale": "self_stacks:char:1306/illusion",
           "percent": 0.04,
           "cap_amount": 0.12,
           "turns": 2,
@@ -259,7 +259,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.4,
-          "while_holder_state": "谜诡",
+          "while_holder_state": "char:1306/riddle",
           "turns": 2,
           "target": "all_allies"
         }

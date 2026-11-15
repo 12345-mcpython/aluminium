@@ -11,7 +11,7 @@
   ],
   "resources": [
     {
-      "id": "天赋充能",
+      "id": "internal:1404/talent_charge",
       "max": 200,
       "source": "1404 万敌 天赋 以血还血 (140404, Enhance): 「每损失1%生命值积攒1点充能，最多积攒200点。充能达到100时消耗100点充能进入【血仇】状态…」",
       "note": "上限 **200** 是**文档原话** ✓（「最多积攒 200 点」✓），不是从数据推的 ✓。⚠ 本文件只声明**容量** ✓ 与两处**固定**获取（秘技 +50 ✓、终结技 +20 ✓）；「每损失 1% 生命值积攒 1 点」这个**按比例**的获取 ✗ 与「达到 100/150 点时的阈值行为」✗ 都登记在 `level_convention` 里 ✓。"
@@ -61,7 +61,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "天赋充能",
+          "resource": "internal:1404/talent_charge",
           "amount": 50
         }
       ],
@@ -83,7 +83,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "天赋充能",
+          "resource": "internal:1404/talent_charge",
           "amount": 20
         },
         {
@@ -100,7 +100,7 @@
       "id": "turn_start_autocasts_skill",
       "when": [
         "actor == self",
-        "self has_state 血仇"
+        "self has_state char:1404/blood_feud"
       ],
       "do": [
         {
@@ -129,19 +129,19 @@
       "on": "RESOURCE_CHANGED",
       "id": "talent_enters_bloodfeud_at_a_hundred",
       "when": [
-        "resource_changed:天赋充能",
-        "self_resource:天赋充能 >= 100",
-        "!self has_state 血仇"
+        "resource_changed:internal:1404/talent_charge",
+        "self_resource:internal:1404/talent_charge >= 100",
+        "!self has_state char:1404/blood_feud"
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "天赋充能",
+          "resource": "internal:1404/talent_charge",
           "amount": 100
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "血仇",
+          "buff": "char:1404/blood_feud",
           "permanent": true,
           "target": "self"
         },
@@ -162,7 +162,7 @@
           "scale": "self_attr:HEALTH",
           "percent": 0.5,
           "permanent": true,
-          "buff": "血仇",
+          "buff": "char:1404/blood_feud",
           "target": "self"
         }
       ],
@@ -174,17 +174,17 @@
       "id": "bloodfeud_survives_a_lethal_blow_and_ends",
       "when": [
         "actor == self",
-        "self has_state 血仇"
+        "self has_state char:1404/blood_feud"
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "天赋充能",
+          "resource": "internal:1404/talent_charge",
           "spendAll": true
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "血仇",
+          "buff": "char:1404/blood_feud",
           "target": "self"
         },
         {
@@ -201,14 +201,14 @@
       "on": "RESOURCE_CHANGED",
       "id": "bloodfeud_godslayer_at_a_hundred_and_fifty",
       "when": [
-        "resource_changed:天赋充能",
-        "self has_state 血仇",
-        "self_resource:天赋充能 >= 150"
+        "resource_changed:internal:1404/talent_charge",
+        "self has_state char:1404/blood_feud",
+        "self_resource:internal:1404/talent_charge >= 150"
       ],
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "天赋充能",
+          "resource": "internal:1404/talent_charge",
           "amount": 150
         },
         {
@@ -255,7 +255,7 @@
       "id": "memosprite_ode_commands_the_godslayer_in_bloodfeud",
       "on": "CAST_SETUP",
       "when": [
-        "self has_state 血仇",
+        "self has_state char:1404/blood_feud",
         "target == self",
         "actor is_summon",
         "from_skill_id == 16"
@@ -284,7 +284,7 @@
         "target == self",
         "actor is_summon",
         "from_skill_id == 16",
-        "!self has_state 血仇"
+        "!self has_state char:1404/blood_feud"
       ],
       "do": [
         {
@@ -325,7 +325,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "献予「纷争」之诗",
+          "buff": "char:1404/ode_to_strife",
           "permanent": true,
           "target": "self"
         }
@@ -337,7 +337,7 @@
       "id": "memosprite_ode_restrikes_when_a_wave_monster_enters",
       "on": "WAVE_START",
       "when": [
-        "self has_state 献予「纷争」之诗"
+        "self has_state char:1404/ode_to_strife"
       ],
       "do": [
         {
@@ -407,7 +407,7 @@
       "min_eidolon": 2,
       "when": [
         "actor == self",
-        "self has_state 血仇"
+        "self has_state char:1404/blood_feud"
       ],
       "do": [
         {
@@ -429,7 +429,7 @@
       "min_eidolon": 4,
       "when": [
         "actor == self",
-        "self has_state 血仇"
+        "self has_state char:1404/blood_feud"
       ],
       "do": [
         {
@@ -471,7 +471,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "血仇",
+          "buff": "char:1404/blood_feud",
           "permanent": true,
           "target": "self"
         },
@@ -481,7 +481,7 @@
           "scale": "self_attr:HEALTH",
           "percent": 0.5,
           "permanent": true,
-          "buff": "血仇",
+          "buff": "char:1404/blood_feud",
           "target": "self"
         }
       ],

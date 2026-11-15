@@ -79,7 +79,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "荣光之秘-待发",
+          "buff": "char:1313/glory_secret_pending",
           "permanent": true,
           "target": "self"
         }
@@ -92,7 +92,7 @@
       "id": "technique_first_ally_ability_grants_the_share",
       "when": [
         "actor == self",
-        "self has_state 荣光之秘-待发"
+        "self has_state char:1313/glory_secret_pending"
       ],
       "do": [
         {
@@ -105,7 +105,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "荣光之秘-待发",
+          "buff": "char:1313/glory_secret_pending",
           "target": "self"
         }
       ],
@@ -193,7 +193,7 @@
       "on": "SKILL_CAST",
       "when": [
         "actor == self",
-        "target has_state 蒙福者"
+        "target has_state char:1313/blessed_one"
       ],
       "do": [
         {
@@ -220,12 +220,12 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "蒙福者",
+          "buff": "char:1313/blessed_one",
           "target": "all_allies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "蒙福者",
+          "buff": "char:1313/blessed_one",
           "turns": 3,
           "ticks_on": "self",
           "target": "target_and_summon"
@@ -325,7 +325,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "星魂二-待发",
+          "buff": "char:1313/eidolon2_pending",
           "permanent": true,
           "target": "self"
         }
@@ -339,7 +339,7 @@
       "min_eidolon": 2,
       "when": [
         "actor == self",
-        "self has_state 星魂二-待发"
+        "self has_state char:1313/eidolon2_pending"
       ],
       "do": [
         {
@@ -348,7 +348,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "星魂二-待发",
+          "buff": "char:1313/eidolon2_pending",
           "target": "self"
         }
       ],
@@ -367,7 +367,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.3,
-          "while_holder_state": "蒙福者",
+          "while_holder_state": "char:1313/blessed_one",
           "permanent": true,
           "buff": "星魂二-蒙福者增伤",
           "target": "target_and_summon"

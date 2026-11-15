@@ -38,7 +38,7 @@ public class NumberProviderCountersTest {
     /** 1413 长夜月 declares 亿质, so it is the resource the rules below pay into. */
     private static final int OWNER = 1413;
     private static final int LEVEL = 80;
-    private static final String RESOURCE = "亿质";
+    private static final String RESOURCE = "char:1413/myriad_essence";
 
     /**
      * {@code energy} reads the current bar, and {@code relation: "max"} the cap.

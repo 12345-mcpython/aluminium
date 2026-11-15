@@ -87,7 +87,7 @@ public class EvernightDreamDumpTest {
         // answers 「每次生命降低时…获得 2 点【忆质】」, so 2 comes straight back. The assertion is still sharp: without
         // `spendAll` the number would be 50 (what she started with), so this distinguishes "emptied, then refunded by
         // her kit" from "never emptied".
-        Assertions.assertEquals(2, scene.evernight().getResources().get("亿质").value(), 1e-9,
+        Assertions.assertEquals(2, scene.evernight().getResources().get("char:1413/myriad_essence").value(), 1e-9,
                 "「消耗全部【忆质】」 emptied the pool; the 2 left is her talent's grant for the HP this same clause "
                         + "consumed (50 would mean the spend never happened)");
         Assertions.assertEquals(1, scene.evernight().getCurrentHp(), 1e-6,
@@ -117,12 +117,12 @@ public class EvernightDreamDumpTest {
         Summon evey = battle.memospriteOf(evernight);
         Assertions.assertNotNull(evey, "precondition: her talent summons 「长夜」 at battle start");
 
-        Resource resource = evernight.getResources().get("亿质");
+        Resource resource = evernight.getResources().get("char:1413/myriad_essence");
         if (resource == null) {
-            resource = evernight.getResources().register("亿质", 100, 0);
+            resource = evernight.getResources().register("char:1413/myriad_essence", 100, 0);
         }
         resource.setValue(points);
-        Assertions.assertNull(evey.getResources().get("亿质"),
+        Assertions.assertNull(evey.getResources().get("char:1413/myriad_essence"),
                 "precondition: the counter is the summoner's - the sentence says 「长夜月当前每持有…」");
 
         Skill skill = new DefaultSkill(SERVANT, SKILL_SLOT, LEVEL);

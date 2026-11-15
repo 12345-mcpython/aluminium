@@ -35,14 +35,14 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "鸣弦号令",
+          "buff": "char:1207/string_command",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "鸣弦号令",
+          "buff": "char:1207/string_command",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -50,7 +50,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "buff": "鸣弦号令增益",
+          "buff": "char:1207/string_command_boost",
           "permanent": true,
           "target": "all_allies",
           "percent_from_skill_param": "SKILL:1"
@@ -68,7 +68,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "本回合施放战技",
+          "buff": "internal:1207/skill_cast_this_turn",
           "max_stacks": 1,
           "permanent": true,
           "target": "self"
@@ -81,7 +81,7 @@
       "on": "TURN_END",
       "when": [
         "actor is_ally",
-        "self_stacks:鸣弦号令 >= 1"
+        "self_stacks:char:1207/string_command >= 1"
       ],
       "do": [
         {
@@ -102,7 +102,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "鸣弦号令",
+          "buff": "char:1207/string_command",
           "amount": 1,
           "target": "self"
         }
@@ -116,12 +116,12 @@
       "id": "her_own_turn_removes_a_layer_after_the_casting_turn",
       "when": [
         "actor == self",
-        "self_stacks:本回合施放战技 <= 0"
+        "self_stacks:internal:1207/skill_cast_this_turn <= 0"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "鸣弦号令",
+          "buff": "char:1207/string_command",
           "amount": 1,
           "target": "self"
         }
@@ -134,12 +134,12 @@
       "id": "her_own_turn_keeps_the_layer_on_the_casting_turn",
       "when": [
         "actor == self",
-        "self_stacks:本回合施放战技 >= 1"
+        "self_stacks:internal:1207/skill_cast_this_turn >= 1"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "本回合施放战技",
+          "buff": "internal:1207/skill_cast_this_turn",
           "amount": 1,
           "target": "self"
         }
@@ -150,12 +150,12 @@
       "on": "TURN_END",
       "when": [
         "actor is_ally",
-        "self_stacks:鸣弦号令 <= 0"
+        "self_stacks:char:1207/string_command <= 0"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "鸣弦号令增益",
+          "buff": "char:1207/string_command_boost",
           "target": "all_allies"
         }
       ],
@@ -171,7 +171,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "鸣弦号令",
+          "buff": "char:1207/string_command",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -186,13 +186,13 @@
       "on": "ULT_CAST",
       "when": [
         "actor == self",
-        "self_stacks:鸣弦号令 >= 1"
+        "self_stacks:char:1207/string_command >= 1"
       ],
       "do": [
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "buff": "鸣弦号令增益",
+          "buff": "char:1207/string_command_boost",
           "permanent": true,
           "target": "all_allies",
           "percent_from_skill_param": "ULTRA:1"
@@ -200,7 +200,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "buff": "鸣弦号令增益",
+          "buff": "char:1207/string_command_boost",
           "permanent": true,
           "target": "all_allies",
           "percent_from_skill_param": "ULTRA:2"
@@ -239,7 +239,7 @@
       "on": "DEALING_DAMAGE",
       "when": [
         "actor == self",
-        "self_stacks:鸣弦号令 >= 1"
+        "self_stacks:char:1207/string_command >= 1"
       ],
       "do": [
         {
@@ -382,14 +382,14 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "鸣弦号令",
+          "buff": "char:1207/string_command",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
         },
         {
           "op": "ADD_STACK",
-          "buff": "鸣弦号令",
+          "buff": "char:1207/string_command",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"

@@ -29,8 +29,8 @@ public class BoothillTest {
     private static final int BOOTHILL = 1315;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
-    private static final String STANDOFF = "绝命对峙";
-    private static final String POCKET = "优势口袋";
+    private static final String STANDOFF = "char:1315/deadly_standoff";
+    private static final String POCKET = "char:1315/edge_pocket";
 
     /**
      * Note: The state lands on the enemy AND on him, and both stack rules read their own event.
@@ -44,14 +44,14 @@ public class BoothillTest {
 
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, boothill, enemy, 0, 0));
         Assertions.assertTrue(enemy.getBuffManager().hasState(STANDOFF),
-                "「使指定敌方单体及自身进入【绝命对峙】状态」 (puts a designated single enemy and herself into the Standoff state) -- the ENEMY");
+                "「使指定敌方单体及自身进入【char:1315/deadly_standoff】状态」 (puts a designated single enemy and herself into the Standoff state) -- the ENEMY");
         Assertions.assertTrue(boothill.getBuffManager().hasState(STANDOFF),
                 "and HIMSELF");
 
         Assertions.assertEquals(0, boothill.getBuffManager().stacksOf(POCKET), "nothing before either end condition");
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.BREAK, boothill, enemy, 0, 0));
         Assertions.assertEquals(1, boothill.getBuffManager().stacksOf(POCKET),
-                "「弱点被击破后…获得1层【优势口袋】」 (after the Weakness is Broken ... gains 1 stack of Pocket Trickshot (【优势口袋】))");
+                "「弱点被击破后…获得1层【char:1315/edge_pocket】」 (after the Weakness is Broken ... gains 1 stack of Pocket Trickshot (【char:1315/edge_pocket】))");
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.KILL, boothill, enemy, 0, 0));
         Assertions.assertEquals(2, boothill.getBuffManager().stacksOf(POCKET),
                 "「该目标被消灭…后…获得1层」 (after that target is killed ... gains 1 stack) -- the OTHER event feeds it too");
@@ -162,7 +162,7 @@ public class BoothillTest {
             battle.processRequests();
         }
         Assertions.assertEquals(stacks, boothill.getBuffManager().stacksOf(POCKET),
-                "precondition: " + stacks + " stacks of 【优势口袋】");
+                "precondition: " + stacks + " stacks of 【char:1315/edge_pocket】");
 
         double before = enemy.getStance();
         // The enhanced Basic is a data row of its own (slot 8); casting it directly keeps the criterion about the talent.

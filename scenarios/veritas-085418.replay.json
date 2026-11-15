@@ -135,7 +135,7 @@
       "level": 8,
       "target": 1,
       "resources": {
-        "亿质": 10
+        "char:1413/myriad_essence": 10
       },
       "note": "Same slot as cast 1. The capture's per-instance base is 0.09 x 生命上限 = 0.9 for the whole cast, i.e. 0.6 + the 「每有 #3 点【忆质】额外造成 #2%」 the game folds into the same six instances (AGENT.md §3.7h; the fold is now implemented - skill_effects.json's resource_share). The ten points are DERIVED, not guessed: (0.09 - 0.06) x 4 / 0.12 = 10 at the Lv8 row. They are declared here because a replay that starts from zero only earns the one point cast 1 granted - the window's prefix is state the payload never carries."
     },
@@ -155,7 +155,7 @@
       "level": 1,
       "target": 1,
       "resources": {
-        "亿质": 50
+        "char:1413/myriad_essence": 50
       },
       "note": "「迷梦，流失，如露」(1141307, SkillTriggerKey Skill11 - the servant's slots are SkillID % 100, so this is data slot 7; the old 'slot_guess 8' was the guess and no slot 8 exists upstream). The text (TextMap 7843681538325136114) prices the hit PER POINT of 忆质 - main target #1, every other enemy #2 - and then 「施放后，消耗全部【忆质】和生命值，并使「长夜」消失」. The capture's 3.0000000028 (main) and 1.5000000014 (other) are 0.06 x 50 and 0.03 x 50: fifty points at the Lv1 row (Lv10 would need 17.857 points, which is not a whole number). The fifty are the window's prefix and are declared here for the same reason cast 4's ten are - a replay that starts empty has only what the window earned."
     },

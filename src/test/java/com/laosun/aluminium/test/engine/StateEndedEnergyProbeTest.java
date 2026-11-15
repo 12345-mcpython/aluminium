@@ -23,7 +23,7 @@ import com.laosun.aluminium.damage.Damage;
  */
 public class StateEndedEnergyProbeTest {
     private static final int OWNER = 1211;
-    private static final String STATE = "生息";
+    private static final String STATE = "char:1211/lifespan";
 
     /**
      * At full HP the clause pays.

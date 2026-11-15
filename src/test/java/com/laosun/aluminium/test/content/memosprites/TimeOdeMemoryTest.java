@@ -21,7 +21,7 @@ public class TimeOdeMemoryTest {
     private static final int LONGNIGHT = 1413;
     private static final int CYRENE = 1415;
     private static final int ODE_SLOT = 24;
-    private static final String MEM = "亿质";
+    private static final String MEM = "char:1413/myriad_essence";
 
     @Test
     public void herSkillGrantsTheCapturedMemory() {

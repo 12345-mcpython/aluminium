@@ -35,7 +35,7 @@ public class OdeToStrifeAdvanceTest {
     private static final int MYDEI = 1404;
     private static final int ODE_TO_STRIFE = 16;
     private static final double EPS = 1e-6;
-    private static final String BLOODFEUD = "血仇";
+    private static final String BLOODFEUD = "char:1404/blood_feud";
 
     /**
      * Outside [血仇] (Bloodfeud) he is advanced: his remaining action value collapses.
@@ -71,7 +71,7 @@ public class OdeToStrifeAdvanceTest {
         System.out.println("[advance] in bloodfeud: " + before + " -> " + after
                 + " (his SKILL slot = " + mydei.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL).getSkillSlot() + ")");
         Assertions.assertEquals(before, after, EPS,
-                "「if Mydei is in [血仇] (Vendetta)」-- that branch commands him instead of advancing him");
+                "「if Mydei is in [char:1404/blood_feud] (Vendetta)」-- that branch commands him instead of advancing him");
     }
 
     // ==================================================================

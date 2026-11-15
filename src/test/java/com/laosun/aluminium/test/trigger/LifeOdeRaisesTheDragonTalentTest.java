@@ -23,7 +23,7 @@ public class LifeOdeRaisesTheDragonTalentTest {
     private static final int CASTORICE = 1407;
     private static final int CYRENE = 1415;
     private static final int ODE_SLOT = 17;
-    private static final String BUD = "新蕊";
+    private static final String BUD = "char:1407/rosebud";
     private static final int CAP = 34000;
     private static final int OVERFLOW = 680;
     private static final double PER_POINT = 0.0012;

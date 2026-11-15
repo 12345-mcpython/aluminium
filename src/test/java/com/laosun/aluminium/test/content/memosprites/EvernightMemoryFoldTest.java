@@ -92,13 +92,13 @@ public class EvernightMemoryFoldTest {
         Summon evey = battle.memospriteOf(evernight);
         Assertions.assertNotNull(evey, "precondition: her talent summons 「长夜」 at battle start");
 
-        Resource resource = evernight.getResources().get("亿质");
+        Resource resource = evernight.getResources().get("char:1413/myriad_essence");
         if (resource == null) {
             // Her own rules register it in a real fight; the judge states the number it needs rather than replaying a kit.
-            resource = evernight.getResources().register("亿质", 100, 0);
+            resource = evernight.getResources().register("char:1413/myriad_essence", 100, 0);
         }
         resource.setValue(points);
-        Assertions.assertNull(evey.getResources().get("亿质"),
+        Assertions.assertNull(evey.getResources().get("char:1413/myriad_essence"),
                 "precondition: the servant has no 忆质 of its own - the sentence names the summoner's");
 
         Skill skill = new DefaultSkill(SERVANT, SKILL_SLOT, level);

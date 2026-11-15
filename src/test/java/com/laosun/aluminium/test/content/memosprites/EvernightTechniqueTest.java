@@ -36,6 +36,6 @@ public class EvernightTechniqueTest {
         Battle battle = new Battle(new ArrayList<>(List.of(her)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        return her.getResources().value("亿质");
+        return her.getResources().value("char:1413/myriad_essence");
     }
 }

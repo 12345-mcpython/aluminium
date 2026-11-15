@@ -113,12 +113,12 @@ public class SundayEidolonTest {
         battle.processRequests();
         int afterSecond = battle.getSkillPoints();
 
-        Assertions.assertAll("星魂 2: 首次终结技的 2 点，与【蒙福者】的 30%",
+        Assertions.assertAll("星魂 2: 首次终结技的 2 点，与【char:1313/blessed_one】的 30%",
                 () -> Assertions.assertEquals(pool + 2, afterFirst,
                         "[the points] 「首次施放终结技后恢复 2 个战技点」"),
                 () -> Assertions.assertEquals(afterFirst, afterSecond,
                         "[once] …and the second Ultimate pays nothing: the marker was spent"),
-                () -> Assertions.assertEquals(0.3, atTwo, EPS, "[the share] 「【蒙福者】造成的伤害提高 30%」"),
+                () -> Assertions.assertEquals(0.3, atTwo, EPS, "[the share] 「【char:1313/blessed_one】造成的伤害提高 30%」"),
                 () -> Assertions.assertEquals(0.3, atThree, EPS,
                         "[no stack] …and it does not stack with itself when the Eidolon is higher"),
                 () -> Assertions.assertEquals(0.0, atOne, "[before 星魂 2] before 星魂 2 there is no such share"));

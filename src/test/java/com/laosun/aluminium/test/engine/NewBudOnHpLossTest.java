@@ -26,7 +26,7 @@ import com.laosun.aluminium.damage.Damage;
 public class NewBudOnHpLossTest {
     private static final int OWNER = 1407;
     private static final int ALLY = 1002;
-    private static final String RES = "新蕊";
+    private static final String RES = "char:1407/rosebud";
 
     /**
      * One bud per point of HP she loses.
@@ -49,6 +49,6 @@ public class NewBudOnHpLossTest {
         Assertions.assertEquals(50.0, dealt, "precondition: the battle really took 50 HP off her");
 
         Assertions.assertEquals(before + 50, battle.partyResource(RES).value(),
-                "「每损失 1 点生命值遐蝶获得 1 点【新蕊】」 (for every 1 point of HP lost, Castorice gains 1 point of Newbud) (before=" + before + ")");
+                "「每损失 1 点生命值遐蝶获得 1 点【char:1407/rosebud】」 (for every 1 point of HP lost, Castorice gains 1 point of Newbud) (before=" + before + ")");
     }
 }

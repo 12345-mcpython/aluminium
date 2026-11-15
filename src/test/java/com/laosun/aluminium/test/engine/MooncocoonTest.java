@@ -25,7 +25,7 @@ public class MooncocoonTest {
     private static final int OWNER = 1407;
     private static final int HEALER = 1211;
     private static final int VICTIM = 1002;
-    private static final String STATE = "月茧";
+    private static final String STATE = "char:1407/moon_cocoon";
 
     /**
      * "暂时延后陷入无法战斗状态": the blow is HELD -- the victim is alive, at zero HP, carrying the trace.
@@ -36,7 +36,7 @@ public class MooncocoonTest {
         strike(scene);
         Assertions.assertFalse(scene.victim.isDeath(), "\"does not fall into the unable-to-fight state\" (「不会陷入无法战斗状态」)");
         Assertions.assertEquals(0.0, scene.victim.getCurrentHp(), 1e-9, "it really stops at 0 HP —— that is the \"delay\" (「延后」)");
-        Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "\"gains the Mooncocoon (【月茧】) state\" (「获得【月茧】状态」)");
+        Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "\"gains the Mooncocoon (【char:1407/moon_cocoon】) state\" (「获得【char:1407/moon_cocoon】状态」)");
     }
 
     /**
@@ -65,9 +65,9 @@ public class MooncocoonTest {
         strike(scene);
         Assertions.assertTrue(scene.victim.getCurrentHp() > 0, "precondition: the teammate's heal really restored HP");
         Assertions.assertFalse(scene.victim.getBuffManager().hasState(STATE),
-                "HP raised ⇒ the Mooncocoon (【月茧】) is removed");
+                "HP raised ⇒ the Mooncocoon (【char:1407/moon_cocoon】) is removed");
         takeItsTurn(scene);
-        Assertions.assertFalse(scene.victim.isDeath(), "the Mooncocoon (【月茧】) is removed ⇒ it no longer falls");
+        Assertions.assertFalse(scene.victim.isDeath(), "the Mooncocoon (【char:1407/moon_cocoon】) is removed ⇒ it no longer falls");
     }
 
     // ==================================================================

@@ -210,7 +210,7 @@ public class SundayTest {
         Character sunday = battle.characters().getFirst();
         Character first = battle.characters().get(1);
 
-        Assertions.assertTrue(first.getBuffManager().hasState("蒙福者"), "「使目标及其召唤物成为【蒙福者】」 (makes the target and its summons The Beatified (【蒙福者】))");
+        Assertions.assertTrue(first.getBuffManager().hasState("char:1313/blessed_one"), "「使目标及其召唤物成为【char:1313/blessed_one】」 (makes the target and its summons The Beatified (【char:1313/blessed_one】))");
         Assertions.assertEquals(0.12 * critDamageOf(sunday) + 0.08, critDamageOf(first) - HARMONY_BARE_CRIT_DMG, EPS,
                 "「提高数值等同于星期日#2%暴击伤害+#4%」 (raises by an amount equal to #2% of Sunday's CRIT DMG + #4%) -- his own number, not the target's");
 
@@ -221,13 +221,13 @@ public class SundayTest {
         next.stepForward();
         next.beforeMove();
         next.afterMove();                                  // Sunday's turn comes first (96 speed vs 112)
-        Assertions.assertTrue(first.getBuffManager().hasState("蒙福者"), "precondition: still on the first ally");
+        Assertions.assertTrue(first.getBuffManager().hasState("char:1313/blessed_one"), "precondition: still on the first ally");
 
         castUltimate(next, sunday, second);
 
-        Assertions.assertFalse(first.getBuffManager().hasState("蒙福者"),
+        Assertions.assertFalse(first.getBuffManager().hasState("char:1313/blessed_one"),
                 "「仅对…最新的施放目标生效」 (applies only to ... the most recent cast target) -- the removal is what says that, there is no holder flag");
-        Assertions.assertTrue(second.getBuffManager().hasState("蒙福者"));
+        Assertions.assertTrue(second.getBuffManager().hasState("char:1313/blessed_one"));
     }
 
     /**
@@ -262,13 +262,13 @@ public class SundayTest {
         Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
         Character sunday = battle.characters().getFirst();
         Character ally = battle.characters().get(1);
-        Assertions.assertTrue(ally.getBuffManager().hasState("蒙福者"), "precondition");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1313/blessed_one"), "precondition");
 
         sunday.takeDamage(9_999_999);
         battle.processRequests();
 
         Assertions.assertTrue(sunday.isDeath(), "precondition: he is down");
-        Assertions.assertFalse(ally.getBuffManager().hasState("蒙福者"),
+        Assertions.assertFalse(ally.getBuffManager().hasState("char:1313/blessed_one"),
                 "the state's clock was HIS turns -- once he is gone there is no clock, so it goes with him");
     }
 
@@ -291,16 +291,16 @@ public class SundayTest {
         takeTurn(battle, sunday);
         int afterHisTurn = blessingDuration(ally);
 
-        Assertions.assertTrue(ally.getBuffManager().hasState("蒙福者"), "precondition: he is the blessed one");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1313/blessed_one"), "precondition: he is the blessed one");
         drainSkillPoints(battle);
 
         cast(battle, sunday, ally);
 
-        Assertions.assertAll("「[蒙福者]」: his turns spend it, and the Skill on the holder pays its point back",
+        Assertions.assertAll("「[char:1313/blessed_one]」: his turns spend it, and the Skill on the holder pays its point back",
                 () -> Assertions.assertEquals(3, afterHerTurn, "[her turn] her turn does not spend it"),
                 () -> Assertions.assertEquals(2, afterHisTurn, "[his turn] his does"),
                 () -> Assertions.assertEquals(1, battle.getSkillPoints(),
-                        "[the refund] 「对【蒙福者】施放战技后恢复1个战技点」 (restores 1 Skill Point after casting the Skill on The Beatified) -- the point the skill cost came back"));
+                        "[the refund] 「对【char:1313/blessed_one】施放战技后恢复1个战技点」 (restores 1 Skill Point after casting the Skill on The Beatified) -- the point the skill cost came back"));
     }
 
     // ==================================================================
@@ -326,7 +326,7 @@ public class SundayTest {
                         + " + the talent's crit rate + the trace's dispel + the technique's first-ability share"
                         + " + 星魂 1's defence ignore + 星魂 6's talent variant");
         Assertions.assertEquals(4, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
-                "the 【蒙福者】 clause + the 40-point energy floor + 星魂 2 two rules");
+                "the 【char:1313/blessed_one】 clause + the 40-point energy floor + 星魂 2 two rules");
     }
 
     // ==================================================================

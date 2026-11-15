@@ -25,7 +25,7 @@ public class TimeOdeBoostTest {
     private static final int CYRENE = 1415;
     private static final int ODE_SLOT = 24;
     private static final int DREAM_SLOT = 7;
-    private static final String SHARE = "长夜的迷梦增伤";
+    private static final String SHARE = "char:1413/long_night_dream_boost";
 
     @Test
     public void theOdeCapturesAndThenBoostsTheDreamSkill() {

@@ -74,8 +74,8 @@ public class Mydei1404Test {
     private static final int LEVEL = 80;
     // 【血仇】 (Vendetta): one id for both forcing the state on and reading it back -- the old files spelled this single
     // string as STATE ("bloodfeud" tests) and BLOODFEUD ("skills" tests); merged into one constant.
-    private static final String STATE = "血仇";
-    private static final String CHARGE = "天赋充能";
+    private static final String STATE = "char:1404/blood_feud";
+    private static final String CHARGE = "internal:1404/talent_charge";
 
     // ==================================================================
     // The technique: 80% of his Max HP, gated on the technique state.
@@ -108,7 +108,7 @@ public class Mydei1404Test {
             JsonObject root = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
             JsonArray resources = root.getAsJsonArray("resources");
             Assertions.assertNotNull(resources, "the file must declare its resource");
-            Assertions.assertEquals("天赋充能", resources.get(0).getAsJsonObject().get("id").getAsString());
+            Assertions.assertEquals("internal:1404/talent_charge", resources.get(0).getAsJsonObject().get("id").getAsString());
             Assertions.assertEquals(200, resources.get(0).getAsJsonObject().get("max").getAsInt(),
                     "\"accumulates at most 200 points\" (「最多积攒200点」)");
         } catch (java.io.IOException failure) {
@@ -132,7 +132,7 @@ public class Mydei1404Test {
 
         chargeToAHundred(battle, him);
         Assertions.assertTrue(him.getBuffManager().hasState(STATE),
-                "\"when charge reaches 100, consume 100 points of charge to enter the [血仇] (Vendetta) state\"");
+                "\"when charge reaches 100, consume 100 points of charge to enter the [char:1404/blood_feud] (Vendetta) state\"");
 
         battle.applyTrueDamage(battle.enemies().getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
@@ -140,7 +140,7 @@ public class Mydei1404Test {
         Assertions.assertFalse(him.isDeath(), "\"will not enter the unable-to-fight state\"");
         Assertions.assertEquals(him.getMaxHp() * 0.50, him.getCurrentHp(), him.getMaxHp() * 0.01,
                 "\"restore HP equal to 50% of one's own Max HP\"");
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "\"leave the [血仇] (Vendetta) state\"");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "\"leave the [char:1404/blood_feud] (Vendetta) state\"");
         Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "\"clear the charge\"");
     }
 
@@ -154,11 +154,11 @@ public class Mydei1404Test {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [血仇] (Vendetta) yet");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [char:1404/blood_feud] (Vendetta) yet");
 
         battle.applyTrueDamage(battle.enemies().getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
-        Assertions.assertTrue(him.isDeath(), "only while in the [血仇] (Vendetta) state does this clause exist");
+        Assertions.assertTrue(him.isDeath(), "only while in the [char:1404/blood_feud] (Vendetta) state does this clause exist");
     }
 
     // ==================================================================
@@ -187,16 +187,16 @@ public class Mydei1404Test {
         double base = him.getMaxHp();
         SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(him.getBuffManager().hasState(STATE), "precondition: 【血仇】 (Vendetta) is on");
+        Assertions.assertTrue(him.getBuffManager().hasState(STATE), "precondition: 【char:1404/blood_feud】 (Vendetta) is on");
         Assertions.assertEquals(base * 1.5, him.getMaxHp(), base * 0.01,
-                "「【血仇】状态下生命上限提高，数值等同于当前生命上限的 50%」 (while in the Vendetta (【血仇】) state, Max HP is raised by an amount equal to 50% of the current Max HP)");
+                "「【char:1404/blood_feud】状态下生命上限提高，数值等同于当前生命上限的 50%」 (while in the Vendetta (【char:1404/blood_feud】) state, Max HP is raised by an amount equal to 50% of the current Max HP)");
 
         // The paragraph's ONLY exit: the lethal blow. The raise must go with the state.
         battle.applyTrueDamage(battle.enemies().getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: the lethal blow ended it");
         Assertions.assertEquals(base, him.getMaxHp(), base * 0.01,
-                "「退出【血仇】状态」 (leaves the Vendetta state)-- the extra Max HP leaves with it");
+                "「退出【char:1404/blood_feud】状态」 (leaves the Vendetta state)-- the extra Max HP leaves with it");
     }
 
     // ==================================================================
@@ -312,9 +312,9 @@ public class Mydei1404Test {
         ChargeRead atHundred = fireResourceChange(100);
         ChargeRead atHundredFifty = fireResourceChange(150);
 
-        Assertions.assertAll("the charge gates while in 【血仇】",
+        Assertions.assertAll("the charge gates while in 【char:1404/blood_feud】",
                 () -> Assertions.assertEquals(100, atHundred.charge(),
-                        "「充能达到 100 时消耗 100 点充能进入【血仇】状态」 (when Charge reaches 100, consumes 100 points of Charge to enter the Vendetta state)-- already in it, so nothing is drained again; "
+                        "「充能达到 100 时消耗 100 点充能进入【char:1404/blood_feud】状态」 (when Charge reaches 100, consumes 100 points of Charge to enter the Vendetta state)-- already in it, so nothing is drained again; "
                                 + "without this the charge can never reach 150 and the next sentence is unreachable"),
                 () -> Assertions.assertEquals(0, atHundredFifty.charge(), "\"consumes 150 points of Charge\" (「消耗 150 点充能」)"),
                 () -> Assertions.assertTrue(atHundredFifty.enemyLoss() > 0, "【弑神登神】 (Godslayer Be God) was cast"),
@@ -335,10 +335,10 @@ public class Mydei1404Test {
         double e2 = damageInBloodfeud(2);
         double e3 = damageInBloodfeud(3);
         double e4 = damageInBloodfeud(4);
-        System.out.println("[1404-E2] damage in 血仇: E1=" + e1 + " ; E2=" + e2);
-        System.out.println("[1404-E4] critical damage in 血仇: E3=" + e3 + " ; E4=" + e4);
+        System.out.println("[1404-E2] damage in char:1404/blood_feud: E1=" + e1 + " ; E2=" + e2);
+        System.out.println("[1404-E4] critical damage in char:1404/blood_feud: E3=" + e3 + " ; E4=" + e4);
 
-        Assertions.assertAll("Eidolon damage bonuses while in 【血仇】",
+        Assertions.assertAll("Eidolon damage bonuses while in 【char:1404/blood_feud】",
                 () -> Assertions.assertTrue(e2 > e1,
                         "「无视 15% 的防御力」 must land as more damage: E1=" + e1 + " E2=" + e2),
                 () -> Assertions.assertTrue(e4 > e3,
@@ -371,7 +371,7 @@ public class Mydei1404Test {
         Run e5 = new Run(5);
         Run e6 = new Run(6);
         Assertions.assertFalse(e5.him.getBuffManager().hasState(STATE), "E5 enters it the normal way: at 100 charge");
-        Assertions.assertTrue(e6.him.getBuffManager().hasState(STATE), "「进入战斗时立刻进入【血仇】状态」");
+        Assertions.assertTrue(e6.him.getBuffManager().hasState(STATE), "「进入战斗时立刻进入【char:1404/blood_feud】状态」");
         Assertions.assertEquals(1.5 * e5.him.getAttribute(AttributeType.HEALTH).get(),
                 e6.him.getAttribute(AttributeType.HEALTH).get(), 1e-6,
                 "the state carries its own 「生命上限 +50%」, so entering it at battle start includes it");
@@ -426,7 +426,7 @@ public class Mydei1404Test {
         int charge = him.getResources().value(CHARGE);
         double enemyAfter = battle.enemies().getFirst().getCurrentHp();
         int slot = him.getSkills().get(SkillType.SKILL).getSkillSlot();
-        System.out.println("[mydei-skills] " + amount + " charge while in 【血仇】: charge " + charge
+        System.out.println("[mydei-skills] " + amount + " charge while in 【char:1404/blood_feud】: charge " + charge
                 + " ; enemy " + enemyBefore + " -> " + enemyAfter + " ; SKILL slot now=" + slot);
         return new ChargeRead(charge, enemyBefore - enemyAfter, slot);
     }

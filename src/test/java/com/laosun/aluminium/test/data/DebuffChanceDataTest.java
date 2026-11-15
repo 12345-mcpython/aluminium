@@ -92,7 +92,7 @@ public class DebuffChanceDataTest {
     @Test
     public void aSkillWhoseTextStatesNoChanceReportsNoChance() {
         Assertions.assertNull(SkillData.init(1315, 2).debuffChance(1),
-                "Boothill Standoff (绝命对峙): the description states no probability, so there is nothing to read");
+                "Boothill Standoff (char:1315/deadly_standoff): the description states no probability, so there is nothing to read");
     }
 
     /**

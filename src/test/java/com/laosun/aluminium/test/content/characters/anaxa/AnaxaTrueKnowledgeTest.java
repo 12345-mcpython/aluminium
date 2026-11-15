@@ -26,7 +26,7 @@ public class AnaxaTrueKnowledgeTest {
 
     private static final int ANAXA = 1405;
     private static final int LEVEL = 80;
-    private static final String STATE = "质性揭露";
+    private static final String STATE = "char:1405/qualitative_epiphany";
     private static final DamageElement[] EXTRA = {DamageElement.ICE, DamageElement.THUNDER, DamageElement.WIND,
             DamageElement.QUANTUM, DamageElement.IMAGINARY, DamageElement.PHYSICAL};
 

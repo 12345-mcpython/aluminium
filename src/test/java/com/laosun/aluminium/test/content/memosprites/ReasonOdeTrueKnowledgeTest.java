@@ -21,7 +21,7 @@ public class ReasonOdeTrueKnowledgeTest {
     private static final int ANAXA = 1405;
     private static final int OTHER = 1002;
     private static final int ODE_SLOT = 18;
-    private static final String TRUE_KNOWLEDGE = "真知";
+    private static final String TRUE_KNOWLEDGE = "char:1405/true_knowledge";
 
     @Test
     public void theReasonOdeGrantsTrueKnowledgeToTheOneItNames() {

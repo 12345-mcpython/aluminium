@@ -45,8 +45,8 @@ public class FuXuanTest {
     private static final int ALLY_1001 = 1001;
     private static final double BASE = 1000.0;
     // 【鉴知】 under one name for every judge that reads it, and the talent's charge counter.
-    private static final String ZONE = "鉴知";
-    private static final String CHARGE = "避厄治疗次";
+    private static final String ZONE = "char:1208/insight";
+    private static final String CHARGE = "internal:1208/ward_heals";
 
     // ==================================================================
     // Base kit: the team-wide -18% of [避厄] and the two numbers [鉴知] hands out.
@@ -84,8 +84,8 @@ public class FuXuanTest {
 
         battle.castImmediate(fuxuan.getSkills().get(SkillType.SKILL), fuxuan, List.of(ally));
 
-        Assertions.assertTrue(ally.getBuffManager().hasState("鉴知"),
-                "「处于【穷观阵】的我方全体获得【鉴知】」 (all allies inside the Matrix of Prescience (【穷观阵】) gain Knowledge (【鉴知】))");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1208/insight"),
+                "「处于【穷观阵】的我方全体获得【char:1208/insight】」 (all allies inside the Matrix of Prescience (【穷观阵】) gain Knowledge (【char:1208/insight】))");
         Assertions.assertEquals(expected, ally.getAttribute(AttributeType.HEALTH).get() - hpBefore, expected * 0.02,
                 "6% of HER max HP: expected " + expected);
         Assertions.assertEquals(0.12, ally.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-6,
@@ -192,7 +192,7 @@ public class FuXuanTest {
     public void withoutTheZoneNobodyShares() {
         ShareFixture bare = new ShareFixture(false);
         bare.hitAlly();
-        Assertions.assertEquals(0.0, bare.herSettled, 1e-9, "no 【鉴知】, no share");
+        Assertions.assertEquals(0.0, bare.herSettled, 1e-9, "no 【char:1208/insight】, no share");
     }
 
     // ==================================================================
@@ -286,7 +286,7 @@ public class FuXuanTest {
         ClauseFixture f = new ClauseFixture(6);
         f.accumulate(4000);
         f.castUltimate();
-        Assertions.assertEquals(0, f.fuXuan.getResources().value("累计损失"), 1e-9,
+        Assertions.assertEquals(0, f.fuXuan.getResources().value("internal:1208/accumulated_loss"), 1e-9,
                 "「施放终结技后会清空并进行重新累计」");
     }
 
@@ -442,7 +442,7 @@ public class FuXuanTest {
         TechniqueFixture with = new TechniqueFixture(true);
         TechniqueFixture without = new TechniqueFixture(false);
 
-        Assertions.assertTrue(with.fuxuan.getBuffManager().hasState(ZONE), "「自动开启【穷观阵】」 - 【鉴知】 is up");
+        Assertions.assertTrue(with.fuxuan.getBuffManager().hasState(ZONE), "「自动开启【穷观阵】」 - 【char:1208/insight】 is up");
         Assertions.assertTrue(with.ally.getBuffManager().hasState(ZONE), "on every ally");
 
         // The share is an ABSOLUTE amount: 6% of HER Max HP, added to each ally (not 6% of the ally own HP).

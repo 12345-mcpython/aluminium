@@ -12,14 +12,14 @@
   ],
   "resources": [
     {
-      "id": "新蕊",
+      "id": "char:1407/rosebud",
       "max": 34000,
       "scope": "PARTY",
       "source": "1407 逍蝶 天赋 掌心溡过的荒芜 (140704) 与「机制备注」：依据 tbgd `Avatar_Castorice_00_Ability.json` 的 `Castorice_Passive_MaxCount` 表达式 `5.3125 × 队伍最高等级²`（结果 ≤ 2000 时钳为 2000）",
       "note": "⭐ `\"scope\": \"PARTY\"` **是必需的** ✓：`Battle.registerPartyResources`（`:701`）会**跳过**所有 `scope` 不是 `PARTY` 的声明 ✓（`:707`）⇒ 没有它就进不了战斗的资源表 ✗，`partyResource(名)` 会返回 **null** ✗ —— 这一行解释了前面全部的 +0 ✓。⚠ 上限 **34,000** = 文档公式在**满级 Lv80** 的值 ✓（文档表：均衡 0 ⇒ 2,125 … 满级 ⇒ 34,000 ✓）；⚠ 资源只能声明**一个** `max` ✗ 而真实上限随等级变 ✗⇒ 取满级值并在此说明 ✓。"
     },
     {
-      "id": "生死之诗的溢出消耗",
+      "id": "internal:1407/ode_life_death_overflow",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 「召唤死龙时消耗的溢出量」的存放处（基点，`amount_percent: 12`）。"
     }
@@ -73,7 +73,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "新蕊",
+          "resource": "char:1407/rosebud",
           "amountFromEvent": true
         }
       ],
@@ -89,7 +89,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "月茧",
+          "buff": "char:1407/moon_cocoon",
           "defers_death": true,
           "permanent": true,
           "target": "target"
@@ -102,12 +102,12 @@
       "on": "HEALED",
       "id": "mooncocoon_a_heal_ends_it",
       "when": [
-        "target has_state 月茧"
+        "target has_state char:1407/moon_cocoon"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "月茧",
+          "buff": "char:1407/moon_cocoon",
           "target": "target"
         }
       ],
@@ -118,12 +118,12 @@
       "on": "SHIELD_GRANTED",
       "id": "mooncocoon_a_shield_ends_it",
       "when": [
-        "target has_state 月茧"
+        "target has_state char:1407/moon_cocoon"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "月茧",
+          "buff": "char:1407/moon_cocoon",
           "target": "target"
         }
       ],
@@ -140,7 +140,7 @@
       "do": [
         {
           "op": "RAISE_RESOURCE_CAP",
-          "resource": "新蕊",
+          "resource": "char:1407/rosebud",
           "amount": 680,
           "target": "self"
         }
@@ -174,13 +174,13 @@
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "新蕊",
+          "resource": "char:1407/rosebud",
           "overflow_only": true,
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "生死之诗的溢出消耗",
+          "resource": "internal:1407/ode_life_death_overflow",
           "amountFromPrevious": true,
           "amountPercent": 12,
           "target": "self"
@@ -188,7 +188,7 @@
         {
           "op": "MODIFY_RULE",
           "rule": "dragon_hollow_wing_damage",
-          "effect_percent_from_resource": "生死之诗的溢出消耗"
+          "effect_percent_from_resource": "internal:1407/ode_life_death_overflow"
         }
       ],
       "source": "1415 昔涟 忆灵技能 17：「召唤死龙时会消耗所有溢出【新蕊】，**每消耗 1% 溢出值**，使本次召唤的死龙触发天赋【灼掠幽墟的晦翼】的技能效果时，造成的伤害倍率提高 #2%」（#2 = 0.0012）。",

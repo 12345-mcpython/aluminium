@@ -19,14 +19,6 @@
       ]
     },
     {
-      "name": "E2本回合已触发",
-      "owner": "1315",
-      "kind": "internal",
-      "used_by": [
-        "1315"
-      ]
-    },
-    {
       "name": "break:weakness",
       "owner": "battle",
       "kind": "battle",
@@ -195,6 +187,66 @@
       "key": "char:1205/charge"
     },
     {
+      "name": "char:1206/newborn",
+      "owner": "1206",
+      "kind": "char",
+      "used_by": [
+        "1206"
+      ],
+      "zh": "赤子",
+      "key": "char:1206/newborn"
+    },
+    {
+      "name": "char:1206/sword_stance",
+      "owner": "1206",
+      "kind": "char",
+      "used_by": [
+        "1206"
+      ],
+      "zh": "剑势",
+      "key": "char:1206/sword_stance"
+    },
+    {
+      "name": "char:1207/string_command",
+      "owner": "1207",
+      "kind": "char",
+      "used_by": [
+        "1207"
+      ],
+      "zh": "鸣弦号令",
+      "key": "char:1207/string_command"
+    },
+    {
+      "name": "char:1207/string_command_boost",
+      "owner": "1207",
+      "kind": "char",
+      "used_by": [
+        "1207"
+      ],
+      "zh": "鸣弦号令增益",
+      "key": "char:1207/string_command_boost"
+    },
+    {
+      "name": "char:1208/insight",
+      "owner": "1208",
+      "kind": "char",
+      "used_by": [
+        "1208"
+      ],
+      "zh": "鉴知",
+      "key": "char:1208/insight"
+    },
+    {
+      "name": "char:1208/ward",
+      "owner": "1208",
+      "kind": "char",
+      "used_by": [
+        "1208"
+      ],
+      "zh": "避厄",
+      "key": "char:1208/ward"
+    },
+    {
       "name": "char:1210/fire_swallow",
       "owner": "1210",
       "kind": "char",
@@ -203,6 +255,46 @@
       ],
       "zh": "吞火",
       "key": "char:1210/fire_swallow"
+    },
+    {
+      "name": "char:1211/lifespan",
+      "owner": "1211",
+      "kind": "char",
+      "used_by": [
+        "1211"
+      ],
+      "zh": "生息",
+      "key": "char:1211/lifespan"
+    },
+    {
+      "name": "char:1212/moonlight",
+      "owner": "1212",
+      "kind": "char",
+      "used_by": [
+        "1212"
+      ],
+      "zh": "月色",
+      "key": "char:1212/moonlight"
+    },
+    {
+      "name": "char:1212/soul_shift",
+      "owner": "1212",
+      "kind": "char",
+      "used_by": [
+        "1212"
+      ],
+      "zh": "转魄",
+      "key": "char:1212/soul_shift"
+    },
+    {
+      "name": "char:1212/syzygy",
+      "owner": "1212",
+      "kind": "char",
+      "used_by": [
+        "1212"
+      ],
+      "zh": "朔望",
+      "key": "char:1212/syzygy"
     },
     {
       "name": "char:1213/reverse_scale",
@@ -355,6 +447,36 @@
       "key": "char:1305/technique_slow"
     },
     {
+      "name": "char:1306/illusion",
+      "owner": "1306",
+      "kind": "char",
+      "used_by": [
+        "1306"
+      ],
+      "zh": "幻相",
+      "key": "char:1306/illusion"
+    },
+    {
+      "name": "char:1306/narrative_trick",
+      "owner": "1306",
+      "kind": "char",
+      "used_by": [
+        "1306"
+      ],
+      "zh": "叙述性诡计",
+      "key": "char:1306/narrative_trick"
+    },
+    {
+      "name": "char:1306/riddle",
+      "owner": "1306",
+      "kind": "char",
+      "used_by": [
+        "1306"
+      ],
+      "zh": "谜诡",
+      "key": "char:1306/riddle"
+    },
+    {
       "name": "char:1307/arcana",
       "owner": "1307",
       "kind": "char",
@@ -375,6 +497,36 @@
       "key": "char:1307/epiphany"
     },
     {
+      "name": "char:1313/blessed_one",
+      "owner": "1313",
+      "kind": "char",
+      "used_by": [
+        "1313"
+      ],
+      "zh": "蒙福者",
+      "key": "char:1313/blessed_one"
+    },
+    {
+      "name": "char:1313/eidolon2_pending",
+      "owner": "1313",
+      "kind": "char",
+      "used_by": [
+        "1313"
+      ],
+      "zh": "星魂二-待发",
+      "key": "char:1313/eidolon2_pending"
+    },
+    {
+      "name": "char:1313/glory_secret_pending",
+      "owner": "1313",
+      "kind": "char",
+      "used_by": [
+        "1313"
+      ],
+      "zh": "荣光之秘-待发",
+      "key": "char:1313/glory_secret_pending"
+    },
+    {
       "name": "char:1314/charge",
       "owner": "1314",
       "kind": "char",
@@ -383,6 +535,26 @@
       ],
       "zh": "充能",
       "key": "char:1314/charge"
+    },
+    {
+      "name": "char:1315/deadly_standoff",
+      "owner": "1315",
+      "kind": "char",
+      "used_by": [
+        "1315"
+      ],
+      "zh": "绝命对峙",
+      "key": "char:1315/deadly_standoff"
+    },
+    {
+      "name": "char:1315/edge_pocket",
+      "owner": "1315",
+      "kind": "char",
+      "used_by": [
+        "1315"
+      ],
+      "zh": "优势口袋",
+      "key": "char:1315/edge_pocket"
     },
     {
       "name": "char:1317/charge",
@@ -513,6 +685,76 @@
       ],
       "zh": "结界",
       "key": "char:1403/barrier"
+    },
+    {
+      "name": "char:1404/blood_feud",
+      "owner": "1404",
+      "kind": "char",
+      "used_by": [
+        "1404"
+      ],
+      "zh": "血仇",
+      "key": "char:1404/blood_feud"
+    },
+    {
+      "name": "char:1404/ode_to_strife",
+      "owner": "1404",
+      "kind": "char",
+      "used_by": [
+        "1404"
+      ],
+      "zh": "献予「纷争」之诗",
+      "key": "char:1404/ode_to_strife"
+    },
+    {
+      "name": "char:1405/qualitative_epiphany",
+      "owner": "1405",
+      "kind": "char",
+      "used_by": [
+        "1405"
+      ],
+      "zh": "质性揭露",
+      "key": "char:1405/qualitative_epiphany"
+    },
+    {
+      "name": "char:1405/true_knowledge",
+      "owner": "1405",
+      "kind": "char",
+      "used_by": [
+        "1405"
+      ],
+      "zh": "真知",
+      "key": "char:1405/true_knowledge"
+    },
+    {
+      "name": "char:1405/true_knowledge_skill_boost",
+      "owner": "1405",
+      "kind": "char",
+      "used_by": [
+        "1405"
+      ],
+      "zh": "真知的战技增伤",
+      "key": "char:1405/true_knowledge_skill_boost"
+    },
+    {
+      "name": "char:1407/moon_cocoon",
+      "owner": "1407",
+      "kind": "char",
+      "used_by": [
+        "1407"
+      ],
+      "zh": "月茧",
+      "key": "char:1407/moon_cocoon"
+    },
+    {
+      "name": "char:1407/rosebud",
+      "owner": "1407",
+      "kind": "char",
+      "used_by": [
+        "1407"
+      ],
+      "zh": "新蕊",
+      "key": "char:1407/rosebud"
     },
     {
       "name": "char:1408/ember",
@@ -745,6 +987,36 @@
       ],
       "zh": "强烈震荡",
       "key": "char:1412/strong_shock"
+    },
+    {
+      "name": "char:1413/darkest_riddle",
+      "owner": "1413",
+      "kind": "char",
+      "used_by": [
+        "1413"
+      ],
+      "zh": "至暗之谜",
+      "key": "char:1413/darkest_riddle"
+    },
+    {
+      "name": "char:1413/long_night_dream_boost",
+      "owner": "1413",
+      "kind": "char",
+      "used_by": [
+        "1413"
+      ],
+      "zh": "长夜的迷梦增伤",
+      "key": "char:1413/long_night_dream_boost"
+    },
+    {
+      "name": "char:1413/myriad_essence",
+      "owner": "1413",
+      "kind": "char",
+      "used_by": [
+        "1413"
+      ],
+      "zh": "亿质",
+      "key": "char:1413/myriad_essence"
     },
     {
       "name": "char:1415/barrier",
@@ -1723,6 +1995,66 @@
       "key": "internal:1204/attack_segments"
     },
     {
+      "name": "internal:1206/sword_stance_extra_roll",
+      "owner": "1206",
+      "kind": "internal",
+      "used_by": [
+        "1206"
+      ],
+      "zh": "剑势额外判定",
+      "key": "internal:1206/sword_stance_extra_roll"
+    },
+    {
+      "name": "internal:1207/skill_cast_this_turn",
+      "owner": "1207",
+      "kind": "internal",
+      "used_by": [
+        "1207"
+      ],
+      "zh": "本回合施放战技",
+      "key": "internal:1207/skill_cast_this_turn"
+    },
+    {
+      "name": "internal:1208/accumulated_loss",
+      "owner": "1208",
+      "kind": "internal",
+      "used_by": [
+        "1208"
+      ],
+      "zh": "累计损失",
+      "key": "internal:1208/accumulated_loss"
+    },
+    {
+      "name": "internal:1208/ward_heals",
+      "owner": "1208",
+      "kind": "internal",
+      "used_by": [
+        "1208"
+      ],
+      "zh": "避厄治疗次",
+      "key": "internal:1208/ward_heals"
+    },
+    {
+      "name": "internal:1211/lifespan_heal_allowance",
+      "owner": "1211",
+      "kind": "internal",
+      "used_by": [
+        "1211"
+      ],
+      "zh": "生息治疗额度",
+      "key": "internal:1211/lifespan_heal_allowance"
+    },
+    {
+      "name": "internal:1211/talent_heal_allowance",
+      "owner": "1211",
+      "kind": "internal",
+      "used_by": [
+        "1211"
+      ],
+      "zh": "天赋治疗额度",
+      "key": "internal:1211/talent_heal_allowance"
+    },
+    {
       "name": "internal:1214/retribution_overflow",
       "owner": "1214",
       "kind": "internal",
@@ -1783,6 +2115,16 @@
       "key": "internal:1307/epiphany_energy_allowance"
     },
     {
+      "name": "internal:1315/e2_triggered_this_turn",
+      "owner": "1315",
+      "kind": "internal",
+      "used_by": [
+        "1315"
+      ],
+      "zh": "E2本回合已触发",
+      "key": "internal:1315/e2_triggered_this_turn"
+    },
+    {
       "name": "internal:1402/weave_depletion_kept",
       "owner": "1402",
       "kind": "internal",
@@ -1791,6 +2133,26 @@
       ],
       "zh": "织运之竭-保留",
       "key": "internal:1402/weave_depletion_kept"
+    },
+    {
+      "name": "internal:1404/talent_charge",
+      "owner": "1404",
+      "kind": "internal",
+      "used_by": [
+        "1404"
+      ],
+      "zh": "天赋充能",
+      "key": "internal:1404/talent_charge"
+    },
+    {
+      "name": "internal:1407/ode_life_death_overflow",
+      "owner": "1407",
+      "kind": "internal",
+      "used_by": [
+        "1407"
+      ],
+      "zh": "生死之诗的溢出消耗",
+      "key": "internal:1407/ode_life_death_overflow"
     },
     {
       "name": "internal:1408/extra_turn_count",
@@ -1821,6 +2183,16 @@
       ],
       "zh": "天空之诗的治疗份额",
       "key": "internal:1409/ode_sky_heal_share"
+    },
+    {
+      "name": "internal:1413/ode_years_essence_points",
+      "owner": "1413",
+      "kind": "internal",
+      "used_by": [
+        "1413"
+      ],
+      "zh": "岁月之诗的亿质点数",
+      "key": "internal:1413/ode_years_essence_points"
     },
     {
       "name": "internal:1506/enhanced_basic_count",
@@ -2173,22 +2545,6 @@
       ]
     },
     {
-      "name": "亿质",
-      "owner": "1413",
-      "kind": "char",
-      "used_by": [
-        "1413"
-      ]
-    },
-    {
-      "name": "优势口袋",
-      "owner": "1315",
-      "kind": "char",
-      "used_by": [
-        "1315"
-      ]
-    },
-    {
       "name": "伴舞",
       "owner": "8005",
       "kind": "char",
@@ -2204,22 +2560,6 @@
       "used_by": [
         "8003",
         "8004"
-      ]
-    },
-    {
-      "name": "剑势",
-      "owner": "1206",
-      "kind": "char",
-      "used_by": [
-        "1206"
-      ]
-    },
-    {
-      "name": "剑势额外判定",
-      "owner": "1206",
-      "kind": "char",
-      "used_by": [
-        "1206"
       ]
     },
     {
@@ -2279,14 +2619,6 @@
       ]
     },
     {
-      "name": "叙述性诡计",
-      "owner": "1306",
-      "kind": "char",
-      "used_by": [
-        "1306"
-      ]
-    },
-    {
       "name": "同袍",
       "owner": "1414",
       "kind": "char",
@@ -2325,22 +2657,6 @@
       "kind": "char",
       "used_by": [
         "1102"
-      ]
-    },
-    {
-      "name": "天赋充能",
-      "owner": "1404",
-      "kind": "char",
-      "used_by": [
-        "1404"
-      ]
-    },
-    {
-      "name": "天赋治疗额度",
-      "owner": "1211",
-      "kind": "char",
-      "used_by": [
-        "1211"
       ]
     },
     {
@@ -2383,27 +2699,11 @@
       ]
     },
     {
-      "name": "岁月之诗的亿质点数",
-      "owner": "1413",
-      "kind": "char",
-      "used_by": [
-        "1413"
-      ]
-    },
-    {
       "name": "师父",
       "owner": "1224",
       "kind": "char",
       "used_by": [
         "1224"
-      ]
-    },
-    {
-      "name": "幻相",
-      "owner": "1306",
-      "kind": "char",
-      "used_by": [
-        "1306"
       ]
     },
     {
@@ -2488,22 +2788,6 @@
       ]
     },
     {
-      "name": "新蕊",
-      "owner": "1407",
-      "kind": "char",
-      "used_by": [
-        "1407"
-      ]
-    },
-    {
-      "name": "星魂二-待发",
-      "owner": "1313",
-      "kind": "char",
-      "used_by": [
-        "1313"
-      ]
-    },
-    {
       "name": "智剑连心",
       "owner": "1209",
       "kind": "char",
@@ -2517,38 +2801,6 @@
       "kind": "char",
       "used_by": [
         "1410"
-      ]
-    },
-    {
-      "name": "月色",
-      "owner": "1212",
-      "kind": "char",
-      "used_by": [
-        "1212"
-      ]
-    },
-    {
-      "name": "月茧",
-      "owner": "1407",
-      "kind": "char",
-      "used_by": [
-        "1407"
-      ]
-    },
-    {
-      "name": "朔望",
-      "owner": "1212",
-      "kind": "char",
-      "used_by": [
-        "1212"
-      ]
-    },
-    {
-      "name": "本回合施放战技",
-      "owner": "1207",
-      "kind": "char",
-      "used_by": [
-        "1207"
       ]
     },
     {
@@ -2656,14 +2908,6 @@
       ]
     },
     {
-      "name": "献予「纷争」之诗",
-      "owner": "1404",
-      "kind": "char",
-      "used_by": [
-        "1404"
-      ]
-    },
-    {
       "name": "献予「门径」之诗",
       "owner": "1403",
       "kind": "char",
@@ -2680,30 +2924,6 @@
       ]
     },
     {
-      "name": "生息",
-      "owner": "1211",
-      "kind": "char",
-      "used_by": [
-        "1211"
-      ]
-    },
-    {
-      "name": "生息治疗额度",
-      "owner": "1211",
-      "kind": "char",
-      "used_by": [
-        "1211"
-      ]
-    },
-    {
-      "name": "生死之诗的溢出消耗",
-      "owner": "1407",
-      "kind": "internal",
-      "used_by": [
-        "1407"
-      ]
-    },
-    {
       "name": "白花之刻",
       "owner": "1203",
       "kind": "char",
@@ -2717,22 +2937,6 @@
       "kind": "char",
       "used_by": [
         "1304"
-      ]
-    },
-    {
-      "name": "真知",
-      "owner": "1405",
-      "kind": "char",
-      "used_by": [
-        "1405"
-      ]
-    },
-    {
-      "name": "真知的战技增伤",
-      "owner": "1405",
-      "kind": "char",
-      "used_by": [
-        "1405"
       ]
     },
     {
@@ -2757,14 +2961,6 @@
       "kind": "battle",
       "key": "elation:punchline",
       "en": "Punchline"
-    },
-    {
-      "name": "累计损失",
-      "owner": "1208",
-      "kind": "char",
-      "used_by": [
-        "1208"
-      ]
     },
     {
       "name": "累计损失生命",
@@ -2806,14 +3002,6 @@
       ]
     },
     {
-      "name": "绝命对峙",
-      "owner": "1315",
-      "kind": "char",
-      "used_by": [
-        "1315"
-      ]
-    },
-    {
       "name": "老主顾",
       "owner": "1406",
       "kind": "char",
@@ -2827,30 +3015,6 @@
       "kind": "char",
       "used_by": [
         "1009"
-      ]
-    },
-    {
-      "name": "至暗之谜",
-      "owner": "1413",
-      "kind": "char",
-      "used_by": [
-        "1413"
-      ]
-    },
-    {
-      "name": "荣光之秘-待发",
-      "owner": "1313",
-      "kind": "char",
-      "used_by": [
-        "1313"
-      ]
-    },
-    {
-      "name": "蒙福者",
-      "owner": "1313",
-      "kind": "char",
-      "used_by": [
-        "1313"
       ]
     },
     {
@@ -2877,14 +3041,6 @@
       "en": "Weakened"
     },
     {
-      "name": "血仇",
-      "owner": "1404",
-      "kind": "char",
-      "used_by": [
-        "1404"
-      ]
-    },
-    {
       "name": "行动次数",
       "owner": "1222",
       "kind": "internal",
@@ -2906,14 +3062,6 @@
       "kind": "internal",
       "used_by": [
         "1406"
-      ]
-    },
-    {
-      "name": "谜诡",
-      "owner": "1306",
-      "kind": "char",
-      "used_by": [
-        "1306"
       ]
     },
     {
@@ -2941,30 +3089,6 @@
       ]
     },
     {
-      "name": "质性揭露",
-      "owner": "1405",
-      "kind": "char",
-      "used_by": [
-        "1405"
-      ]
-    },
-    {
-      "name": "赤子",
-      "owner": "1206",
-      "kind": "char",
-      "used_by": [
-        "1206"
-      ]
-    },
-    {
-      "name": "转魄",
-      "owner": "1212",
-      "kind": "char",
-      "used_by": [
-        "1212"
-      ]
-    },
-    {
       "name": "迷迷的声援",
       "owner": "8007",
       "kind": "char",
@@ -2981,43 +3105,11 @@
       ]
     },
     {
-      "name": "避厄",
-      "owner": "1208",
-      "kind": "char",
-      "used_by": [
-        "1208"
-      ]
-    },
-    {
-      "name": "避厄治疗次",
-      "owner": "1208",
-      "kind": "char",
-      "used_by": [
-        "1208"
-      ]
-    },
-    {
       "name": "酩酊",
       "owner": "1301",
       "kind": "char",
       "used_by": [
         "1301"
-      ]
-    },
-    {
-      "name": "鉴知",
-      "owner": "1208",
-      "kind": "char",
-      "used_by": [
-        "1208"
-      ]
-    },
-    {
-      "name": "长夜的迷梦增伤",
-      "owner": "1413",
-      "kind": "char",
-      "used_by": [
-        "1413"
       ]
     },
     {
@@ -3065,22 +3157,6 @@
       "kind": "char",
       "used_by": [
         "1504"
-      ]
-    },
-    {
-      "name": "鸣弦号令",
-      "owner": "1207",
-      "kind": "char",
-      "used_by": [
-        "1207"
-      ]
-    },
-    {
-      "name": "鸣弦号令增益",
-      "owner": "1207",
-      "kind": "char",
-      "used_by": [
-        "1207"
       ]
     }
   ]

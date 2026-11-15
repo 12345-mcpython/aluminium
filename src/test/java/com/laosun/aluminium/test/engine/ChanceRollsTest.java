@@ -45,7 +45,7 @@ public class ChanceRollsTest {
         f.castSkill();
 
         Assertions.assertEquals(1, f.additionalInstances(),
-                "the base 【剑势】 only: " + f.additionalInstances() + " additional instance(s)");
+                "the base 【char:1206/sword_stance】 only: " + f.additionalInstances() + " additional instance(s)");
     }
 
     /**
@@ -63,7 +63,7 @@ public class ChanceRollsTest {
         f.castSkill();
 
         Assertions.assertEquals(3, f.additionalInstances(),
-                "the base 【剑势】 plus the two extra judgements: " + f.additionalInstances()
+                "the base 【char:1206/sword_stance】 plus the two extra judgements: " + f.additionalInstances()
                         + " additional instance(s)");
     }
 
@@ -128,7 +128,7 @@ public class ChanceRollsTest {
         }
 
         private int extraStacks() {
-            return sushang.getBuffManager().stacksOf("剑势额外判定");
+            return sushang.getBuffManager().stacksOf("internal:1206/sword_stance_extra_roll");
         }
 
         private int additionalInstances() {

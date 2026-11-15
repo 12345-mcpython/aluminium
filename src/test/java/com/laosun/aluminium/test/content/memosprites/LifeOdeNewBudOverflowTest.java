@@ -21,7 +21,7 @@ public class LifeOdeNewBudOverflowTest {
     private static final int CASTORICE = 1407;
     private static final int CYRENE = 1415;
     private static final int ODE_SLOT = 17;
-    private static final String BUD = "新蕊";
+    private static final String BUD = "char:1407/rosebud";
     private static final int MAX = 34000;
     private static final int OVERFLOW = 680;
 
@@ -30,7 +30,7 @@ public class LifeOdeNewBudOverflowTest {
         int with = filled(true);
         int without = filled(false);
         System.out.println("[newbud] filled past the cap: with the ode " + with + " ; without it " + without);
-        Assertions.assertEquals(MAX + OVERFLOW, with, "the ode lets 【新蕊】 (Newbud) overflow to max + 2% of max");
+        Assertions.assertEquals(MAX + OVERFLOW, with, "the ode lets 【char:1407/rosebud】 (Newbud) overflow to max + 2% of max");
         Assertions.assertEquals(MAX, without, "and without it there is no overflow to use");
     }
 

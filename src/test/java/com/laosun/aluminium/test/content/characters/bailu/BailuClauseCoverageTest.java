@@ -72,11 +72,11 @@ public class BailuClauseCoverageTest {
         double bailuBefore = full.bailu.getCurrentEnergy();
         double allyBefore = full.ally.getCurrentEnergy();
 
-        full.battle.fireStateEnded(full.ally, "生息");
+        full.battle.fireStateEnded(full.ally, "char:1211/lifespan");
 
-        Assertions.assertAll("「【生息】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标8点能量」",
+        Assertions.assertAll("「【char:1211/lifespan】结束时若我方目标当前生命值等于其生命上限，则额外恢复目标8点能量」",
                 () -> Assertions.assertEquals(8.0, full.ally.getCurrentEnergy() - allyBefore, 1e-9,
-                        "「额外恢复目标 8 点能量」 — the target is the one whose [生息] ended"),
+                        "「额外恢复目标 8 点能量」 — the target is the one whose [char:1211/lifespan] ended"),
                 () -> Assertions.assertEquals(0.0, full.bailu.getCurrentEnergy() - bailuBefore, 1e-9,
                         "and it is NOT the rule's owner (the old reading paid Bailu)"));
 
@@ -85,7 +85,7 @@ public class BailuClauseCoverageTest {
         double hurtBailuBefore = hurt.bailu.getCurrentEnergy();
         double hurtAllyBefore = hurt.ally.getCurrentEnergy();
 
-        hurt.battle.fireStateEnded(hurt.ally, "生息");
+        hurt.battle.fireStateEnded(hurt.ally, "char:1211/lifespan");
 
         Assertions.assertAll("「若…生命值等于其生命上限」 — an ally below full HP pays nothing",
                 () -> Assertions.assertEquals(0.0, hurt.ally.getCurrentEnergy() - hurtAllyBefore, 1e-9,
@@ -102,7 +102,7 @@ public class BailuClauseCoverageTest {
         Fixture f = new Fixture(0, false, true);
         double allyBefore = f.ally.getCurrentEnergy();
 
-        f.battle.fireStateEnded(f.ally, "生息");
+        f.battle.fireStateEnded(f.ally, "char:1211/lifespan");
 
         Assertions.assertEquals(0.0, f.ally.getCurrentEnergy() - allyBefore, 1e-9,
                 "「星魂 1」 gates the clause itself");
@@ -114,14 +114,14 @@ public class BailuClauseCoverageTest {
     @Test
     public void theTechniqueInvigoratesTheWholePartyAtBattleStart() {
         Fixture with = new Fixture(0, true, false);
-        Assertions.assertTrue(with.bailu.getBuffManager().hasState("生息"), "「我方全体」 includes Bailu");
-        Assertions.assertTrue(with.ally.getBuffManager().hasState("生息"), "...and the ally");
+        Assertions.assertTrue(with.bailu.getBuffManager().hasState("char:1211/lifespan"), "「我方全体」 includes Bailu");
+        Assertions.assertTrue(with.ally.getBuffManager().hasState("char:1211/lifespan"), "...and the ally");
         Assertions.assertEquals(1, reductionsOn(with.ally),
-                "「拥有【生息】的角色受到的伤害降低 10%」 — the technique's grant carries the trace too");
+                "「拥有【char:1211/lifespan】的角色受到的伤害降低 10%」 — the technique's grant carries the trace too");
 
         Fixture without = new Fixture(0, false, false);
-        Assertions.assertFalse(without.ally.getBuffManager().hasState("生息"),
-                "control: no technique, no ultimate ⇒ no [生息] (so the reading above is about the technique)");
+        Assertions.assertFalse(without.ally.getBuffManager().hasState("char:1211/lifespan"),
+                "control: no technique, no ultimate ⇒ no [char:1211/lifespan] (so the reading above is about the technique)");
         Assertions.assertEquals(0, reductionsOn(without.ally), "control: no reduction either");
     }
 
@@ -199,7 +199,7 @@ public class BailuClauseCoverageTest {
         battle.processRequests();
         battle.castImmediate(bailu.getSkills().get(SkillType.ULTRA), bailu, List.of(ally, bailu));
         battle.processRequests();
-        Assertions.assertTrue(ally.getBuffManager().hasState("生息"), "precondition: the Ultimate grants 生息");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1211/lifespan"), "precondition: the Ultimate grants char:1211/lifespan");
 
         double first = ally.getCurrentHp();
         hit(battle, ally);
@@ -213,7 +213,7 @@ public class BailuClauseCoverageTest {
         Assertions.assertTrue(afterSecond > afterFirst - 1e-6, "the second hit is answered too");
         Assertions.assertEquals(afterSecond, afterThird, 1e-9,
                 "「该效果可以触发 2 次」 — the third hit is not healed");
-        Assertions.assertEquals(0, bailu.getBuffManager().stacksOf("生息治疗额度"), "the allowance is spent");
+        Assertions.assertEquals(0, bailu.getBuffManager().stacksOf("internal:1211/lifespan_heal_allowance"), "the allowance is spent");
     }
 
     private static void hit(Battle battle, Character ally) {

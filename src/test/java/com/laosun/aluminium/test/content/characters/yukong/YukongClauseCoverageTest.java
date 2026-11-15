@@ -23,7 +23,7 @@ public class YukongClauseCoverageTest {
 
     private static final int YUKONG = 1207;
     private static final int ALLY = 1002;
-    private static final String STACKS = "鸣弦号令";
+    private static final String STACKS = "char:1207/string_command";
 
     /**
      * 「驭空施放战技获得【鸣弦号令】的回合，不会移除【鸣弦号令】」 — and every later turn end <b>does</b> take a layer.
@@ -36,7 +36,7 @@ public class YukongClauseCoverageTest {
     public void theCastingTurnKeepsItsLayersAndEveryLaterTurnEndDoesNot() {
         Fixture f = new Fixture();
         f.castSkill();
-        Assertions.assertEquals(2, f.stacks(), "「获得 2 层【鸣弦号令】」");
+        Assertions.assertEquals(2, f.stacks(), "「获得 2 层【char:1207/string_command】」");
 
         f.endTurn(f.yukong);
         Assertions.assertEquals(2, f.stacks(), "the casting turn keeps them");
@@ -46,7 +46,7 @@ public class YukongClauseCoverageTest {
 
         f.endTurn(f.yukong);
         Assertions.assertEquals(0, f.stacks(), "and so does her own, once it is no longer the casting turn");
-        Assertions.assertFalse(f.ally.getBuffManager().hasState("鸣弦号令增益"),
+        Assertions.assertFalse(f.ally.getBuffManager().hasState("char:1207/string_command_boost"),
                 "the last layer takes the party's attack boost with it");
     }
 

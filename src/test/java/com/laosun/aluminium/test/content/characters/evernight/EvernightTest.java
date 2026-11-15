@@ -36,7 +36,7 @@ public class EvernightTest {
     private static final int VICTIM = 1002011;
     private static final int BYSTANDER = 1002012;
     private static final int ALLY = 1001;
-    private static final String MEMORY = "亿质";
+    private static final String MEMORY = "char:1413/myriad_essence";
     private static final int RAINCLOUDS = 1;
     private static final double VULNERABILITY = 0.3;
 
@@ -97,7 +97,7 @@ public class EvernightTest {
         Assertions.assertEquals(0, f.memory(), "precondition: nothing has been cast yet");
 
         f.castRainclouds();
-        Assertions.assertEquals(1, f.memory(), "「施放后获得 #4 点【亿质】」 -- #4 is 1 in the row");
+        Assertions.assertEquals(1, f.memory(), "「施放后获得 #4 点【char:1413/myriad_essence】」 -- #4 is 1 in the row");
 
         f.castRainclouds();
         Assertions.assertEquals(2, f.memory(), "and it accumulates, one per cast");
@@ -116,7 +116,7 @@ public class EvernightTest {
         f.battle.processRequests();
 
         Assertions.assertEquals(0, f.memory(),
-                "小伊卡 casting its own slot 1 must not feed 长夜月's 【亿质】 -- 「长夜施放后」 is HER memosprite");
+                "小伊卡 casting its own slot 1 must not feed 长夜月's 【char:1413/myriad_essence】 -- 「长夜施放后」 is HER memosprite");
     }
 
     /**
@@ -225,7 +225,7 @@ public class EvernightTest {
 
         Assertions.assertTrue(before > 0 && after > 0, "precondition: both ally hits land");
         Assertions.assertEquals(1.0 + VULNERABILITY, after / before, (1.0 + VULNERABILITY) * 1e-6,
-                "【至暗之谜】 raises the damage the enemies take by 30% (before=" + before + ", after=" + after + ")");
+                "【char:1413/darkest_riddle】 raises the damage the enemies take by 30% (before=" + before + ", after=" + after + ")");
     }
 
     /**
