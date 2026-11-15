@@ -62,7 +62,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "灵感",
+          "buff": "char:1401/inspiration",
           "amount": 1,
           "target": "self"
         }
@@ -77,7 +77,7 @@
       "when": [
         "actor == self",
         "from_skill_id == 9",
-        "self_stacks:灵感 <= 0"
+        "self_stacks:char:1401/inspiration <= 0"
       ],
       "do": [
         {
@@ -101,7 +101,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "解读",
+          "buff": "char:1401/interpretation",
           "amount": 1,
           "max_stacks": 42,
           "permanent": true,
@@ -152,7 +152,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "灵感",
+          "buff": "char:1401/inspiration",
           "amount": 1,
           "max_stacks": 4,
           "permanent": true,
@@ -168,7 +168,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "解读",
+          "buff": "char:1401/interpretation",
           "amount": 1,
           "max_stacks": 42,
           "permanent": true,
@@ -225,7 +225,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "灵感",
+          "buff": "char:1401/inspiration",
           "amount": 1,
           "max_stacks": 4,
           "permanent": true,
@@ -246,7 +246,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "灵感",
+          "buff": "char:1401/inspiration",
           "amount": 1,
           "max_stacks": 4,
           "permanent": true,
@@ -320,7 +320,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "解读",
+          "buff": "char:1401/interpretation",
           "amount": 1,
           "max_stacks": 42,
           "permanent": true,

@@ -37,12 +37,12 @@ public class FugueTest {
 
         battle.castImmediate(fugue.getSkills().get(SkillType.SKILL), fugue, List.of(ally));
 
-        Assertions.assertTrue(ally.getBuffManager().hasState("狐祈"),
-                "「使指定我方单体获得【狐祈】」 (grants a designated single ally [狐祈])");
-        Assertions.assertTrue(fugue.getBuffManager().hasState("炽灼"),
-                "「并使自身进入【炽灼】状态」 (and puts herself into the Torrid Scorch state) -- on HERSELF");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1225/fox_prayer"),
+                "「使指定我方单体获得【char:1225/fox_prayer】」 (grants a designated single ally [char:1225/fox_prayer])");
+        Assertions.assertTrue(fugue.getBuffManager().hasState("char:1225/scorching"),
+                "「并使自身进入【char:1225/scorching】状态」 (and puts herself into the Torrid Scorch state) -- on HERSELF");
         Assertions.assertEquals(0.3, ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-6,
-                "「持有【狐祈】的我方目标，击破特攻提高30%」 (an ally holding [狐祈] gets 30% more Break Effect)");
+                "「持有【char:1225/fox_prayer】的我方目标，击破特攻提高30%」 (an ally holding [char:1225/fox_prayer] gets 30% more Break Effect)");
     }
 
     /**
@@ -54,7 +54,7 @@ public class FugueTest {
         double marked = defenceLoss(true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "「持有【狐祈】的我方目标每次施放攻击时」 (every time an ally holding [狐祈] casts an attack) -- unmarked, nothing");
+                "「持有【char:1225/fox_prayer】的我方目标每次施放攻击时」 (every time an ally holding [char:1225/fox_prayer] casts an attack) -- unmarked, nothing");
         Assertions.assertEquals(0.18, marked, 1e-6,
                 "「使受到攻击的敌方目标防御力降低18%」 (lowers the attacked enemy target's DEF by 18%) of the enemy's own defence");
     }

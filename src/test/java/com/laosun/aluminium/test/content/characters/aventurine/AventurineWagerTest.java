@@ -54,13 +54,13 @@ public class AventurineWagerTest {
         Character aventurine = battle.characters().getFirst();
         Character ally = battle.characters().get(1);
         Enemy enemy = (Enemy) battle.enemies().getFirst();
-        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("盲注"), "precondition: no blind bet yet");
+        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("char:1304/blind_bet"), "precondition: no blind bet yet");
 
         battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 1));
         battle.processRequests();
 
-        Assertions.assertEquals(1, aventurine.getBuffManager().stacksOf("盲注"),
-                "「…在受到攻击后，使砂金获得 1 点【盲注】」");
+        Assertions.assertEquals(1, aventurine.getBuffManager().stacksOf("char:1304/blind_bet"),
+                "「…在受到攻击后，使砂金获得 1 点【char:1304/blind_bet】」");
     }
 
     /** 天赋「…并在受到攻击后额外获得 1 点【盲注】」: the SAME clause, but the one being hit is Aventurine himself. */
@@ -69,15 +69,15 @@ public class AventurineWagerTest {
         Battle battle = scene(0);
         Character aventurine = battle.characters().getFirst();
         Enemy enemy = (Enemy) battle.enemies().getFirst();
-        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("盲注"), "precondition");
+        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("char:1304/blind_bet"), "precondition");
 
         battle.applyDamage(aventurine, new Damage(enemy, aventurine, DamageElement.FIRE, DamageType.NORMAL, 1));
         battle.processRequests();
 
         // TWO, not one: the trace 热手 shields the whole party at battle start, so Aventurine is BOTH a shielded ally being
         // hit (+1) AND the one the extra clause speaks about (+1). The sentence says 「**额外**获得」, i.e. in addition.
-        Assertions.assertEquals(2, aventurine.getBuffManager().stacksOf("盲注"),
-                "「…并在受到攻击后额外获得 1 点【盲注】」 — one for the wager he holds, one extra");
+        Assertions.assertEquals(2, aventurine.getBuffManager().stacksOf("char:1304/blind_bet"),
+                "「…并在受到攻击后额外获得 1 点【char:1304/blind_bet】」 — one for the wager he holds, one extra");
     }
 
     /** 天赋「【盲注】达到 7 点后…发动 7 段追加攻击，每段 25% 防御力」: seven instances, and the points are spent. */
@@ -92,7 +92,7 @@ public class AventurineWagerTest {
             battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 1));
             battle.processRequests();
         }
-        Assertions.assertEquals(6, aventurine.getBuffManager().stacksOf("盲注"),
+        Assertions.assertEquals(6, aventurine.getBuffManager().stacksOf("char:1304/blind_bet"),
                 "precondition: six hits on the SHIELDED ALLY, six points, no follow-up yet");
         double hpBefore = enemy.getCurrentHp();
 
@@ -101,10 +101,10 @@ public class AventurineWagerTest {
         battle.processRequests();
 
         Assertions.assertTrue(enemy.getCurrentHp() < hpBefore,
-                "「【盲注】达到 7 点后…发动 7 段追加攻击」 — the enemy lost HP to the barrage");
+                "「【char:1304/blind_bet】达到 7 点后…发动 7 段追加攻击」 — the enemy lost HP to the barrage");
         // The hit pays its own point FIRST (that rule sits earlier in the file), so the seventh point arrives and is spent in
         // the same firing: nothing is left over.
-        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("盲注"),
+        Assertions.assertEquals(0, aventurine.getBuffManager().stacksOf("char:1304/blind_bet"),
                 "「消耗 7 点」 — the seventh hit reached seven and all seven were spent");
     }
 

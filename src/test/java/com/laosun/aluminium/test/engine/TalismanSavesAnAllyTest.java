@@ -23,7 +23,7 @@ import java.util.List;
 public class TalismanSavesAnAllyTest {
     private static final int HUOHUO = 1217;
     private static final int ALLY = 1002;
-    private static final String STATE = "禳命";
+    private static final String STATE = "char:1217/avert_fate";
 
     /**
      * At E2 the ally survives, at HALF OF ITS OWN Max HP.
@@ -80,7 +80,7 @@ public class TalismanSavesAnAllyTest {
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         SkillExecutor.execute(battle, skill, her, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: [禳命] (\"Divine Provision\") is on her");
+        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: [char:1217/avert_fate] (\"Divine Provision\") is on her");
 
         for (int blow = 0; blow < blows; blow++) {
             if (ally.isDeath()) {

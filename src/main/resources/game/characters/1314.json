@@ -56,7 +56,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "当品",
+          "buff": "char:1314/pawn",
           "amount": 1,
           "max_stacks": 50,
           "permanent": true,
@@ -65,7 +65,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "scale": "self_stacks:当品",
+          "scale": "self_stacks:char:1314/pawn",
           "permanent": true,
           "target": "self",
           "per_stack_live": true,
@@ -75,7 +75,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.005,
-          "per_stack": "当品",
+          "per_stack": "char:1314/pawn",
           "permanent": true,
           "target": "self",
           "per_stack_live": true
@@ -100,7 +100,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "当品",
+          "buff": "char:1314/pawn",
           "amount": 15,
           "max_stacks": 50,
           "permanent": true,
@@ -109,7 +109,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "scale": "self_stacks:当品",
+          "scale": "self_stacks:char:1314/pawn",
           "permanent": true,
           "target": "self",
           "per_stack_live": true,
@@ -119,7 +119,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.005,
-          "per_stack": "当品",
+          "per_stack": "char:1314/pawn",
           "permanent": true,
           "target": "self",
           "per_stack_live": true
@@ -133,7 +133,7 @@
       "id": "eidolon2_crit_chance_at_fifteen_goods",
       "min_eidolon": 2,
       "when": [
-        "self_stacks:当品 >= 15"
+        "self_stacks:char:1314/pawn >= 15"
       ],
       "do": [
         {
@@ -155,7 +155,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.005,
-          "per_stack": "当品",
+          "per_stack": "char:1314/pawn",
           "per_stack_live": true,
           "permanent": true,
           "target": "self"
@@ -170,7 +170,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "当品",
+          "buff": "char:1314/pawn",
           "amount": 1,
           "max_stacks": 50,
           "permanent": true,
@@ -189,7 +189,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "收债人",
+          "buff": "char:1314/debt_collector",
           "turns": 3,
           "ticks_on": "self",
           "target": "target"
@@ -212,7 +212,7 @@
       "on": "ALLY_ATTACK",
       "id": "collector_attack_deals_extra",
       "when": [
-        "actor has_state 收债人"
+        "actor has_state char:1314/debt_collector"
       ],
       "do": [
         {
@@ -230,7 +230,7 @@
       "on": "ALLY_ATTACK",
       "id": "collector_attack_costs_hp",
       "when": [
-        "actor has_state 收债人",
+        "actor has_state char:1314/debt_collector",
         "actor != self"
       ],
       "do": [
@@ -306,7 +306,7 @@
       "on": "ALLY_ATTACK",
       "id": "talent_charge_for_the_collectors_hits",
       "when": [
-        "actor has_state 收债人",
+        "actor has_state char:1314/debt_collector",
         "actor != self"
       ],
       "do": [
@@ -343,7 +343,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "当品",
+          "buff": "char:1314/pawn",
           "amount_from_skill_param": "TALENT:3",
           "max_stacks": 50,
           "permanent": true,
@@ -359,7 +359,7 @@
       "id": "eidolon1_two_targets_pay_one_more",
       "min_eidolon": 1,
       "when": [
-        "actor has_state 收债人",
+        "actor has_state char:1314/debt_collector",
         "hit_count == 2"
       ],
       "do": [
@@ -378,7 +378,7 @@
       "id": "eidolon1_one_target_pays_two_more",
       "min_eidolon": 1,
       "when": [
-        "actor has_state 收债人",
+        "actor has_state char:1314/debt_collector",
         "hit_count == 1"
       ],
       "do": [
@@ -414,7 +414,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "收债人",
+          "buff": "char:1314/debt_collector",
           "permanent": true,
           "target": "self"
         },

@@ -257,6 +257,16 @@
       "key": "char:1205/charge"
     },
     {
+      "name": "char:1205/hellscape",
+      "owner": "1205",
+      "kind": "char",
+      "used_by": [
+        "1205"
+      ],
+      "zh": "地狱变",
+      "key": "char:1205/hellscape"
+    },
+    {
       "name": "char:1206/newborn",
       "owner": "1206",
       "kind": "char",
@@ -407,6 +417,16 @@
       "key": "char:1215/edict"
     },
     {
+      "name": "char:1217/avert_fate",
+      "owner": "1217",
+      "kind": "char",
+      "used_by": [
+        "1217"
+      ],
+      "zh": "禳命",
+      "key": "char:1217/avert_fate"
+    },
+    {
       "name": "char:1218/barrier",
       "owner": "1218",
       "kind": "char",
@@ -415,6 +435,26 @@
       ],
       "zh": "结界",
       "key": "char:1218/barrier"
+    },
+    {
+      "name": "char:1218/simmer",
+      "owner": "1218",
+      "kind": "char",
+      "used_by": [
+        "1218"
+      ],
+      "zh": "烬煨",
+      "key": "char:1218/simmer"
+    },
+    {
+      "name": "char:1220/feihuang",
+      "owner": "1220",
+      "kind": "char",
+      "used_by": [
+        "1220"
+      ],
+      "zh": "飞黄",
+      "key": "char:1220/feihuang"
     },
     {
       "name": "char:1223/charge",
@@ -475,6 +515,46 @@
       ],
       "zh": "强化",
       "key": "char:1224/empower"
+    },
+    {
+      "name": "char:1225/fox_prayer",
+      "owner": "1225",
+      "kind": "char",
+      "used_by": [
+        "1225"
+      ],
+      "zh": "狐祈",
+      "key": "char:1225/fox_prayer"
+    },
+    {
+      "name": "char:1225/scorching",
+      "owner": "1225",
+      "kind": "char",
+      "used_by": [
+        "1225"
+      ],
+      "zh": "炽灼",
+      "key": "char:1225/scorching"
+    },
+    {
+      "name": "char:1304/blind_bet",
+      "owner": "1304",
+      "kind": "char",
+      "used_by": [
+        "1304"
+      ],
+      "zh": "盲注",
+      "key": "char:1304/blind_bet"
+    },
+    {
+      "name": "char:1304/panic",
+      "owner": "1304",
+      "kind": "char",
+      "used_by": [
+        "1304"
+      ],
+      "zh": "惊惶",
+      "key": "char:1304/panic"
     },
     {
       "name": "char:1305/deduction",
@@ -627,6 +707,26 @@
       "key": "char:1314/charge"
     },
     {
+      "name": "char:1314/debt_collector",
+      "owner": "1314",
+      "kind": "char",
+      "used_by": [
+        "1314"
+      ],
+      "zh": "收债人",
+      "key": "char:1314/debt_collector"
+    },
+    {
+      "name": "char:1314/pawn",
+      "owner": "1314",
+      "kind": "char",
+      "used_by": [
+        "1314"
+      ],
+      "zh": "当品",
+      "key": "char:1314/pawn"
+    },
+    {
       "name": "char:1315/deadly_standoff",
       "owner": "1315",
       "kind": "char",
@@ -655,6 +755,46 @@
       ],
       "zh": "充能",
       "key": "char:1317/charge"
+    },
+    {
+      "name": "char:1317/color_ink",
+      "owner": "1317",
+      "kind": "char",
+      "used_by": [
+        "1317"
+      ],
+      "zh": "彩墨",
+      "key": "char:1317/color_ink"
+    },
+    {
+      "name": "char:1317/hand_seal",
+      "owner": "1317",
+      "kind": "char",
+      "used_by": [
+        "1317"
+      ],
+      "zh": "结印",
+      "key": "char:1317/hand_seal"
+    },
+    {
+      "name": "char:1401/inspiration",
+      "owner": "1401",
+      "kind": "char",
+      "used_by": [
+        "1401"
+      ],
+      "zh": "灵感",
+      "key": "char:1401/inspiration"
+    },
+    {
+      "name": "char:1401/interpretation",
+      "owner": "1401",
+      "kind": "char",
+      "used_by": [
+        "1401"
+      ],
+      "zh": "解读",
+      "key": "char:1401/interpretation"
     },
     {
       "name": "char:1402/amazing_buff",
@@ -2109,6 +2249,26 @@
       "key": "char:8007/charge"
     },
     {
+      "name": "char:8007/mimi_support",
+      "owner": "8007",
+      "kind": "char",
+      "used_by": [
+        "8007"
+      ],
+      "zh": "迷迷的声援",
+      "key": "char:8007/mimi_support"
+    },
+    {
+      "name": "char:8007/ode_to_creation",
+      "owner": "8007",
+      "kind": "char",
+      "used_by": [
+        "8007"
+      ],
+      "zh": "献予「创世」之诗",
+      "key": "char:8007/ode_to_creation"
+    },
+    {
       "name": "char:8008/charge",
       "owner": "8008",
       "kind": "char",
@@ -2255,6 +2415,16 @@
       "key": "internal:1204/attack_segments"
     },
     {
+      "name": "internal:1205/hp_lost_this_battle",
+      "owner": "1205",
+      "kind": "internal",
+      "used_by": [
+        "1205"
+      ],
+      "zh": "累计损失生命",
+      "key": "internal:1205/hp_lost_this_battle"
+    },
+    {
       "name": "internal:1206/sword_stance_extra_roll",
       "owner": "1206",
       "kind": "internal",
@@ -2343,6 +2513,37 @@
       ],
       "zh": "承负返还",
       "key": "internal:1215/burden_refund"
+    },
+    {
+      "name": "internal:1217/saviour_count",
+      "owner": "1217",
+      "kind": "internal",
+      "used_by": [
+        "1217",
+        "1503"
+      ],
+      "zh": "救主计数",
+      "key": "internal:1217/saviour_count"
+    },
+    {
+      "name": "internal:1218/barrier_count",
+      "owner": "1218",
+      "kind": "internal",
+      "used_by": [
+        "1218"
+      ],
+      "zh": "结界计数",
+      "key": "internal:1218/barrier_count"
+    },
+    {
+      "name": "internal:1220/feihuang_count",
+      "owner": "1220",
+      "kind": "internal",
+      "used_by": [
+        "1220"
+      ],
+      "zh": "飞黄计数",
+      "key": "internal:1220/feihuang_count"
     },
     {
       "name": "internal:1223/charge_count",
@@ -2882,14 +3083,6 @@
       ]
     },
     {
-      "name": "地狱变",
-      "owner": "1205",
-      "kind": "char",
-      "used_by": [
-        "1205"
-      ]
-    },
-    {
       "name": "好活当赏",
       "owner": "battle",
       "kind": "battle",
@@ -2929,35 +3122,11 @@
       ]
     },
     {
-      "name": "当品",
-      "owner": "1314",
-      "kind": "char",
-      "used_by": [
-        "1314"
-      ]
-    },
-    {
-      "name": "彩墨",
-      "owner": "1317",
-      "kind": "char",
-      "used_by": [
-        "1317"
-      ]
-    },
-    {
       "name": "御剑真诀",
       "owner": "1209",
       "kind": "char",
       "used_by": [
         "1209"
-      ]
-    },
-    {
-      "name": "惊惶",
-      "owner": "1304",
-      "kind": "char",
-      "used_by": [
-        "1304"
       ]
     },
     {
@@ -2974,23 +3143,6 @@
       "kind": "char",
       "used_by": [
         "1506"
-      ]
-    },
-    {
-      "name": "收债人",
-      "owner": "1314",
-      "kind": "char",
-      "used_by": [
-        "1314"
-      ]
-    },
-    {
-      "name": "救主计数",
-      "owner": "1217",
-      "kind": "char",
-      "used_by": [
-        "1217",
-        "1503"
       ]
     },
     {
@@ -3017,51 +3169,11 @@
       "en": "Elation"
     },
     {
-      "name": "灵感",
-      "owner": "1401",
-      "kind": "char",
-      "used_by": [
-        "1401"
-      ]
-    },
-    {
-      "name": "炽灼",
-      "owner": "1225",
-      "kind": "char",
-      "used_by": [
-        "1225"
-      ]
-    },
-    {
-      "name": "烬煨",
-      "owner": "1218",
-      "kind": "char",
-      "used_by": [
-        "1218"
-      ]
-    },
-    {
       "name": "热意",
       "owner": "1513",
       "kind": "char",
       "used_by": [
         "1513"
-      ]
-    },
-    {
-      "name": "狐祈",
-      "owner": "1225",
-      "kind": "char",
-      "used_by": [
-        "1225"
-      ]
-    },
-    {
-      "name": "献予「创世」之诗",
-      "owner": "8007",
-      "kind": "char",
-      "used_by": [
-        "8007"
       ]
     },
     {
@@ -3081,35 +3193,11 @@
       ]
     },
     {
-      "name": "盲注",
-      "owner": "1304",
-      "kind": "char",
-      "used_by": [
-        "1304"
-      ]
-    },
-    {
-      "name": "禳命",
-      "owner": "1217",
-      "kind": "char",
-      "used_by": [
-        "1217"
-      ]
-    },
-    {
       "name": "笑点",
       "owner": "battle",
       "kind": "battle",
       "key": "elation:punchline",
       "en": "Punchline"
-    },
-    {
-      "name": "累计损失生命",
-      "owner": "1205",
-      "kind": "char",
-      "used_by": [
-        "1205"
-      ]
     },
     {
       "name": "累计能量",
@@ -3127,22 +3215,6 @@
       "en": "Ultimate Activated"
     },
     {
-      "name": "结印",
-      "owner": "1317",
-      "kind": "char",
-      "used_by": [
-        "1317"
-      ]
-    },
-    {
-      "name": "结界计数",
-      "owner": "1218",
-      "kind": "internal",
-      "used_by": [
-        "1218"
-      ]
-    },
-    {
       "name": "虚弱",
       "owner": "battle",
       "kind": "battle",
@@ -3155,14 +3227,6 @@
       "kind": "internal",
       "used_by": [
         "1222"
-      ]
-    },
-    {
-      "name": "解读",
-      "owner": "1401",
-      "kind": "char",
-      "used_by": [
-        "1401"
       ]
     },
     {
@@ -3179,14 +3243,6 @@
       "kind": "char",
       "used_by": [
         "1321"
-      ]
-    },
-    {
-      "name": "迷迷的声援",
-      "owner": "8007",
-      "kind": "char",
-      "used_by": [
-        "8007"
       ]
     },
     {
@@ -3218,22 +3274,6 @@
       "kind": "char",
       "used_by": [
         "1510"
-      ]
-    },
-    {
-      "name": "飞黄",
-      "owner": "1220",
-      "kind": "char",
-      "used_by": [
-        "1220"
-      ]
-    },
-    {
-      "name": "飞黄计数",
-      "owner": "1220",
-      "kind": "internal",
-      "used_by": [
-        "1220"
       ]
     }
   ]

@@ -67,7 +67,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "迷迷的声援",
+          "buff": "char:8007/mimi_support",
           "turns": 3,
           "target": "target"
         }
@@ -125,7 +125,7 @@
       "on": "DAMAGE_SETTLED",
       "id": "cheer_true_damage_rider",
       "when": [
-        "actor has_state 迷迷的声援",
+        "actor has_state char:8007/mimi_support",
         "actor is_ally",
         "damage_is_attack"
       ],
@@ -175,7 +175,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "献予「创世」之诗",
+          "buff": "char:8007/ode_to_creation",
           "permanent": true,
           "target": "self"
         }
@@ -223,7 +223,7 @@
       "id": "memosprite_ode_of_genesis_gives_it_an_extra_turn_after_the_reinforced_basic_attack",
       "on": "CAST_SETUP",
       "when": [
-        "self has_state 献予「创世」之诗",
+        "self has_state char:8007/ode_to_creation",
         "actor == self",
         "from_skill_id == 4"
       ],

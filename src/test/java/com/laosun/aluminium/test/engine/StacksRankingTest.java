@@ -32,7 +32,7 @@ import java.util.List;
  */
 public class StacksRankingTest {
     private static final int OWNER = 1218;
-    private static final String MARK = "烬煨";
+    private static final String MARK = "char:1218/simmer";
 
     @Test
     public void theLowestStackedEnemyIsSelected() {

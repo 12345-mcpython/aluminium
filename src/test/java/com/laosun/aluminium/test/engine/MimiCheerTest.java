@@ -20,7 +20,7 @@ import java.util.List;
 public class MimiCheerTest {
     private static final int OWNER = 8007;
     private static final int ALLY = 1002;
-    private static final String CHEER = "迷迷的声援";
+    private static final String CHEER = "char:8007/mimi_support";
 
     /**
      * The skill lays the cheer on its target.
@@ -41,6 +41,6 @@ public class MimiCheerTest {
         battle.processRequests();
 
         Assertions.assertTrue(ally.getBuffManager().hasState(CHEER),
-                "\"applies Mem's Support (【迷迷的声援】)\" (「附上【迷迷的声援】」)");
+                "\"applies Mem's Support (【char:8007/mimi_support】)\" (「附上【char:8007/mimi_support】」)");
     }
 }

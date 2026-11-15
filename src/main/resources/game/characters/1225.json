@@ -42,12 +42,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "狐祈",
+          "buff": "char:1225/fox_prayer",
           "target": "all_allies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "狐祈",
+          "buff": "char:1225/fox_prayer",
           "permanent": true,
           "target": "target"
         }
@@ -64,7 +64,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "炽灼",
+          "buff": "char:1225/scorching",
           "turns": 3,
           "target": "self"
         },
@@ -101,7 +101,7 @@
       "on": "ALLY_ATTACK",
       "id": "skill_defence_down_on_marked_attack",
       "when": [
-        "actor has_state 狐祈"
+        "actor has_state char:1225/fox_prayer"
       ],
       "do": [
         {

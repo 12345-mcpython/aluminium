@@ -30,7 +30,7 @@ public class AventurineUnnervedCritTest {
     private static final int LEVEL = 80;
     private static final int AVENTURINE = 1304;
     private static final int ALLY = 1002;
-    private static final String UNNERVED = "惊惶";
+    private static final String UNNERVED = "char:1304/panic";
 
     /**
      * Our hit on a 【惊惶】 target collects the ultimate row's #3; without the state it collects nothing.
@@ -44,7 +44,7 @@ public class AventurineUnnervedCritTest {
                 "「我方目标」 - an ally's hit too");
 
         Fixture bare = new Fixture(false);
-        Assertions.assertEquals(0.0, bare.extraCritDamage(bare.wearer), 1e-9, "no 【惊惶】, no share");
+        Assertions.assertEquals(0.0, bare.extraCritDamage(bare.wearer), 1e-9, "no 【char:1304/panic】, no share");
     }
 
     /**

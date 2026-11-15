@@ -82,8 +82,8 @@ import java.util.Random;
 public class BladeTest {
     private static final int BLADE = 1205;
     private static final int LEVEL = 80;
-    private static final String STATE = "地狱变";
-    private static final String TALLY = "累计损失生命";
+    private static final String STATE = "char:1205/hellscape";
+    private static final String TALLY = "internal:1205/hp_lost_this_battle";
     private static final String CHARGE = "char:1205/charge";
 
     // ==================================================================
@@ -102,7 +102,7 @@ public class BladeTest {
         f.enterHellscape();
 
         Assertions.assertFalse(SkillCastability.allows(f.skill(), f.blade, f.battle),
-                "「处于【地狱变】状态时无法施放战技」");
+                "「处于【char:1205/hellscape】状态时无法施放战技」");
         Assertions.assertTrue(SkillCastability.allows(f.blade.getSkills().get(SkillType.COMMON), f.blade, f.battle),
                 "only the Skill is banned - the Basic still works");
     }
@@ -209,8 +209,8 @@ public class BladeTest {
 
         battle.castImmediate(blade.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), blade, List.of(enemy));
 
-        Assertions.assertTrue(blade.getBuffManager().hasState("地狱变"),
-                "「进入【地狱变】状态」 (enters the Hellscape (【地狱变】) state)");
+        Assertions.assertTrue(blade.getBuffManager().hasState("char:1205/hellscape"),
+                "「进入【char:1205/hellscape】状态」 (enters the Hellscape (【char:1205/hellscape】) state)");
     }
 
     /**

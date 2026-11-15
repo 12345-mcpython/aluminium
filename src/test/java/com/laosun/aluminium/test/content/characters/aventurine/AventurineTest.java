@@ -53,12 +53,12 @@ public class AventurineTest {
         Enemy enemy = Enemy.fromAttributes("Dummy", 40000, 500, 100, 90);
         Battle battle = new Battle(List.of(aventurine), List.of(enemy), fixed());
         battle.startBattle();
-        Assertions.assertFalse(enemy.getBuffManager().hasState("惊惶"), "precondition: not unnerved yet");
+        Assertions.assertFalse(enemy.getBuffManager().hasState("char:1304/panic"), "precondition: not unnerved yet");
 
         battle.castImmediate(aventurine.getSkills().get(SkillType.ULTRA), aventurine, List.of(enemy));
 
-        Assertions.assertTrue(enemy.getBuffManager().hasState("惊惶"),
-                "「使指定敌方单体陷入【惊惶】状态，持续3回合」 (puts a designated single enemy into the Unnerved (【惊惶】) state for 3 turns)");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:1304/panic"),
+                "「使指定敌方单体陷入【char:1304/panic】状态，持续3回合」 (puts a designated single enemy into the Unnerved (【char:1304/panic】) state for 3 turns)");
     }
 
 

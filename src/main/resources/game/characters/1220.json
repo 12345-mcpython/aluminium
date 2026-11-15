@@ -11,7 +11,7 @@
   ],
   "resources": [
     {
-      "id": "飞黄",
+      "id": "char:1220/feihuang",
       "max": 12,
       "source": "1220 飞霄 天赋 雷狩: 「【飞黄】达到6点时可激活终结技，最多累计12点。我方目标每施放2次攻击，飞霄获得1点【飞黄】…」",
       "note": "上限 **12** 是文档原话（「最多累计12点」）⇒ 可以声明。⚠ 「达到 6 点可激活终结技」这一半**不是资源的事**：引擎没有「按某个池子解锁终结技」的闸门（终结技只认能量），已登记在该角色的 `_gaps`。"
@@ -27,7 +27,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "飞黄计数",
+          "buff": "internal:1220/feihuang_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -48,7 +48,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "飞黄计数",
+          "buff": "internal:1220/feihuang_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
@@ -63,17 +63,17 @@
       "on": "ALLY_ATTACK",
       "id": "talent_flying_aureus_pays_a_point_every_two_attacks",
       "when": [
-        "self_stacks:飞黄计数 >= 2"
+        "self_stacks:internal:1220/feihuang_count >= 2"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "飞黄",
+          "resource": "char:1220/feihuang",
           "amount": 1
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "飞黄计数",
+          "buff": "internal:1220/feihuang_count",
           "amount": 2,
           "target": "self"
         }

@@ -27,7 +27,7 @@ public class StackScaledMagnitudeTest {
     private static final int ATTACKER = 1210;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
-    private static final String COUNTER = "烬煨";
+    private static final String COUNTER = "char:1218/simmer";
 
     @Test
     public void theResistanceReductionIsThreePercentPerStack() {

@@ -72,7 +72,7 @@ public class FeixiaoTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int VICTIM = 1002011;
-    private static final String AUREUS = "飞黄";
+    private static final String AUREUS = "char:1220/feihuang";
 
     // ==================================================================
     // 追击: the teammate-triggered follow-up, its per-turn cap and the boost it carries
@@ -305,10 +305,10 @@ public class FeixiaoTest {
         teammate.teammateAttacks(SkillCategory.ULTRA, 2);
         int afterTeammateUltimates = teammate.aureus();
 
-        Assertions.assertAll("「我方目标每施放 2 次攻击，飞霄获得 1 点【飞黄】；飞霄的终结技攻击不计入次数」",
+        Assertions.assertAll("「我方目标每施放 2 次攻击，飞霄获得 1 点【char:1220/feihuang】；飞霄的终结技攻击不计入次数」",
                 () -> Assertions.assertEquals(0, startsEmpty, "it starts empty"),
                 () -> Assertions.assertEquals(0, afterOneAttack, "one attack is not yet two"),
-                () -> Assertions.assertEquals(1, afterTwoAttacks, "「每施放 2 次攻击，飞霄获得 1 点【飞黄】」"),
+                () -> Assertions.assertEquals(1, afterTwoAttacks, "「每施放 2 次攻击，飞霄获得 1 点【char:1220/feihuang】」"),
                 () -> Assertions.assertEquals(2, afterFourAttacks, "and it keeps counting from zero, not from two"),
                 () -> Assertions.assertEquals(0, afterHerUltimates,
                         "「飞霄的终结技攻击不计入次数」: a single Ultimate attack is not two, and must not count either"),

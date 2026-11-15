@@ -146,7 +146,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1205, "BATTLE_START", "technique_opening_aoe", List.of("self has_state sys:technique"));
         assertRule(1205, "TAKING_HIT", "talent_charge_on_hit", List.of("target == self"));
         assertRule(1205, "BATTLE_START", "level_convention", List.of());
-        assertRule(1205, "TURN_START", "eidolon2_crit_while_hellscape", List.of("self has_state 地狱变"));
+        assertRule(1205, "TURN_START", "eidolon2_crit_while_hellscape", List.of("self has_state char:1205/hellscape"));
         assertRule(1205, "DEALING_DAMAGE", "eidolon1_the_ultimates_designated_target_takes_the_tally",
                 List.of("from_category ULTRA", "damage_is_main_target"));
         assertRule(1205, "TAKING_HIT", "talent_charge_on_hit_eidolon6", List.of("target == self"));
@@ -205,7 +205,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1218, "ALLY_ATTACK", "talent_res_down_per_ashen_roast", List.of("actor == self"));
         assertRule(1218, "ALLY_ATTACK", "talent_vulnerability_per_ashen_roast", List.of("actor == self"));
         assertRule(1218, "ULT_CAST", "ult_domain_ult_damage_taken", List.of("actor == self"));
-        assertRule(1218, "DEALING_DAMAGE", "talent_ember_tiered_taken", List.of("actor == self", "target_stacks:烬煨 >= 1.0"));
+        assertRule(1218, "DEALING_DAMAGE", "talent_ember_tiered_taken", List.of("actor == self", "target_stacks:char:1218/simmer >= 1.0"));
         assertRule(1220, "ALLY_ATTACK", "talent_followup_on_teammate_attack", List.of("actor is_other_ally"));
         assertRule(1220, "ALLY_ATTACK", "talent_damage_up_on_this_attack", List.of("actor is_other_ally"));
         assertRule(1220, "SKILL_CAST", "skill_repeats_the_talent_followup", List.of("actor == self"));
@@ -239,7 +239,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1225, "SKILL_CAST", "skill_marks_foxian_prayer", List.of("actor == self"));
         assertRule(1225, "SKILL_CAST", "skill_torrid_scorch_on_self", List.of("actor == self"));
         assertRule(1225, "SKILL_CAST", "skill_break_effect_for_marked_ally", List.of("actor == self"));
-        assertRule(1225, "ALLY_ATTACK", "skill_defence_down_on_marked_attack", List.of("actor has_state 狐祈"));
+        assertRule(1225, "ALLY_ATTACK", "skill_defence_down_on_marked_attack", List.of("actor has_state char:1225/fox_prayer"));
         assertRule(1225, "BATTLE_START", "technique_advance_and_defence_down", List.of("self has_state sys:technique"));
         assertRule(1225, "BATTLE_START", "level_convention", List.of());
         assertRule(1301, "ULT_CAST", "ult_tipsy", List.of("actor == self"));
@@ -304,16 +304,16 @@ public class CharacterConditionLiteralsTest {
                 List.of("actor == self", "from_skill ULTRA", "hit_index == 0.0"));
         assertRule(1314, "BATTLE_START", "trace_reverse_repo_one_goods", List.of());
         assertRule(1314, "BATTLE_START", "technique_fifteen_goods", List.of("self has_state sys:technique"));
-        assertRule(1314, "BATTLE_START", "eidolon2_crit_chance_at_fifteen_goods", List.of("self_stacks:当品 >= 15.0"));
+        assertRule(1314, "BATTLE_START", "eidolon2_crit_chance_at_fifteen_goods", List.of("self_stacks:char:1314/pawn >= 15.0"));
         assertRule(1314, "ALLY_ATTACK", "talent_charge_for_her_own_hits", List.of("actor == self"));
         assertRule(1314, "ALLY_ATTACK", "talent_charge_for_the_collectors_hits",
-                List.of("actor has_state 收债人", "actor != self"));
+                List.of("actor has_state char:1314/debt_collector", "actor != self"));
         assertRule(1314, "RESOURCE_CHANGED", "talent_follow_up_at_eight_charge",
                 List.of("resource_changed:char:1314/charge", "self_resource:char:1314/charge >= 8.0"));
         assertRule(1314, "ALLY_ATTACK", "eidolon1_two_targets_pay_one_more",
-                List.of("actor has_state 收债人", "hit_count == 2.0"));
+                List.of("actor has_state char:1314/debt_collector", "hit_count == 2.0"));
         assertRule(1314, "ALLY_ATTACK", "eidolon1_one_target_pays_two_more",
-                List.of("actor has_state 收债人", "hit_count == 1.0"));
+                List.of("actor has_state char:1314/debt_collector", "hit_count == 1.0"));
         assertRule(1314, "BATTLE_START", "eidolon1_the_talent_follow_up_hits_harder", List.of());
         assertRule(1314, "BATTLE_START", "eidolon6_she_becomes_a_collector", List.of());
         assertRule(1315, "SKILL_CAST", "skill_standoff_on_both", List.of("actor == self"));

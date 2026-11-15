@@ -45,8 +45,8 @@ public class Herta1401Test {
     private static final int LEVEL = 80;
     private static final int PLAIN_SKILL_SLOT = 2;
     private static final int ENHANCED_SKILL_SLOT = 9;
-    private static final String INSPIRATION = "灵感";
-    private static final String INSIGHT = "解读";
+    private static final String INSPIRATION = "char:1401/inspiration";
+    private static final String INSIGHT = "char:1401/interpretation";
 
     // ==================================================================
     // The Skill form: the plain Skill's 【解读】, the Ultimate's 【灵感】 replacement, and the Talent's entry layer.
@@ -65,20 +65,20 @@ public class Herta1401Test {
                 () -> Assertions.assertEquals(PLAIN_SKILL_SLOT, scene.skillSlot(), "the plain Skill before the Ultimate"));
 
         scene.castSkill();
-        Assertions.assertAll("「战技…并施加 1 层【解读】」",
+        Assertions.assertAll("「战技…并施加 1 层【char:1401/interpretation】」",
                 () -> Assertions.assertEquals(1, scene.enemy.getBuffManager().stacksOf(INSIGHT),
-                        "「施加 1 层【解读】」"));
+                        "「施加 1 层【char:1401/interpretation】」"));
 
         scene.castUltimate();
-        Assertions.assertAll("「持有【灵感】时，战技强化为【我有一个大胆的想法】」",
-                () -> Assertions.assertEquals(1, scene.herta.getBuffManager().stacksOf(INSPIRATION), "「获得 1 层【灵感】」"),
+        Assertions.assertAll("「持有【char:1401/inspiration】时，战技强化为【我有一个大胆的想法】」",
+                () -> Assertions.assertEquals(1, scene.herta.getBuffManager().stacksOf(INSPIRATION), "「获得 1 层【char:1401/inspiration】」"),
                 () -> Assertions.assertEquals(ENHANCED_SKILL_SLOT, scene.skillSlot(),
-                        "「持有【灵感】时，战技强化为【我有一个大胆的想法】」"));
+                        "「持有【char:1401/inspiration】时，战技强化为【我有一个大胆的想法】」"));
 
         scene.castSkill();
         Assertions.assertAll("the enhanced cast and the return to the plain Skill",
                 () -> Assertions.assertEquals(0, scene.herta.getBuffManager().stacksOf(INSPIRATION),
-                        "「消耗 1 层【灵感】」"),
+                        "「消耗 1 层【char:1401/inspiration】」"),
                 () -> Assertions.assertEquals(PLAIN_SKILL_SLOT, scene.skillSlot(),
                         "「持有」的相反面 - no stack left, so the plain Skill comes back"));
     }
@@ -101,7 +101,7 @@ public class Herta1401Test {
 
         Enemy late = BattleFixture.monster();
         battle.addEnemy(late);
-        Assertions.assertEquals(1, late.getBuffManager().stacksOf(INSIGHT), "「对其施加 1 层【解读】」");
+        Assertions.assertEquals(1, late.getBuffManager().stacksOf(INSIGHT), "「对其施加 1 层【char:1401/interpretation】」");
 
         Enemy another = BattleFixture.monster();
         battle.addEnemy(another);
@@ -152,7 +152,7 @@ public class Herta1401Test {
     public void theSecondEidolonPaysMoreInspirationAndAdvancesTheEnhancedSkill() {
         Assertions.assertAll("Eidolon 2, entry",
                 () -> Assertions.assertEquals(0, stacks(newRun(1)), "E1: nothing at battle start"),
-                () -> Assertions.assertEquals(1, stacks(newRun(2)), "「进入战斗…额外获得 1 层【灵感】」"));
+                () -> Assertions.assertEquals(1, stacks(newRun(2)), "「进入战斗…额外获得 1 层【char:1401/inspiration】」"));
 
         Assertions.assertAll("Eidolon 2, Ultimate",
                 () -> Assertions.assertEquals(1, stacksAfterUlt(newRun(1)), "the Ultimate itself pays one"),
@@ -316,15 +316,15 @@ public class Herta1401Test {
         Assertions.assertTrue(herta.getAttribute(AttributeType.ATTACK).get() > before,
                 "「使大黑塔攻击力提高80%，持续3回合」 (raises The Herta's ATK by 80% for 3 turns)");
         // ADD_STACK makes a stack, not a named state: it is read with stacksOf, the same API 8003's Magma Will uses.
-        Assertions.assertEquals(1, herta.getBuffManager().stacksOf("灵感"),
-                "「获得1层【灵感】」 (gains 1 stack of [灵感])");
+        Assertions.assertEquals(1, herta.getBuffManager().stacksOf("char:1401/inspiration"),
+                "「获得1层【char:1401/inspiration】」 (gains 1 stack of [char:1401/inspiration])");
 
         // Note: The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
         for (int i = 0; i < 5; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, herta, herta, 0, 0));
         }
-        Assertions.assertEquals(4, herta.getBuffManager().stacksOf("灵感"),
-                "「【灵感】最多持有4层」 ([灵感] can be held up to 4 stacks)");
+        Assertions.assertEquals(4, herta.getBuffManager().stacksOf("char:1401/inspiration"),
+                "「【char:1401/inspiration】最多持有4层」 ([char:1401/inspiration] can be held up to 4 stacks)");
     }
 
     /**

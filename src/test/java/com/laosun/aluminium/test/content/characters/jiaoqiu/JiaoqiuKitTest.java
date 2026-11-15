@@ -51,7 +51,7 @@ public class JiaoqiuKitTest {
     private static final int JIAOQIU = 1218;
     private static final int ATTACKER = 1001;
     private static final int LEVEL = 80;
-    private static final String ASHEN = "烬煨";
+    private static final String ASHEN = "char:1218/simmer";
 
     /**
      * 1218 Jiaoqiu, from his own file: [烬煨]'s capped stacks and the Burn equivalence, both of whose numbers the document
@@ -73,8 +73,8 @@ public class JiaoqiuKitTest {
             battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, jiaoqiu, enemy, 0, 0));
         }
 
-        Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("烬煨") : enemy.getBuffManager().stacksOf("烬煨"),
-                "「【烬煨】最多叠加5层」 (Ashen Roast stacks at most 5 times) -- seven applications must still read five");
+        Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("char:1218/simmer") : enemy.getBuffManager().stacksOf("char:1218/simmer"),
+                "「【char:1218/simmer】最多叠加5层」 (Ashen Roast stacks at most 5 times) -- seven applications must still read five");
         Assertions.assertTrue(enemy.getBuffManager().hasState("dot:burn"),
                 "\"is also considered to be in the Burn state at the same time\" (「也会被视为同时陷入了灼烧状态」) -- a Fire DotBuff IS Burn (dot:burn) by the engine's own translation");
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
@@ -95,7 +95,7 @@ public class JiaoqiuKitTest {
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
                 "「对敌方全体造成等同于椒丘100%攻击力的火属性伤害」 (Fire damage to all enemies equal to 100% of Jiaoqiu (椒丘)'s ATK)");
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("烬煨"), "and applies 1 stack of Ashen Roast (【烬煨】)");
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("char:1218/simmer"), "and applies 1 stack of Ashen Roast (【char:1218/simmer】)");
 
         Character plain = CharacterFactory.create(JIAOQIU, LEVEL);
         Enemy enemy2 = BattleFixture.monster();
@@ -121,7 +121,7 @@ public class JiaoqiuKitTest {
 
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, jiaoqiu, enemy, 0, 0));
         int layers = enemy.getBuffManager().stacksOf(ASHEN);
-        Assertions.assertTrue(layers >= 1, "precondition: 「施加 1 层【烬煨】」");
+        Assertions.assertTrue(layers >= 1, "precondition: 「施加 1 层【char:1218/simmer】」");
         double withOne = enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
         System.out.println("[1218] layers=" + layers + " res " + bare + " -> " + withOne);
         Assertions.assertEquals(0.03 * layers, withOne - bare, 1e-9, "「每层 3%」");
@@ -150,7 +150,7 @@ public class JiaoqiuKitTest {
         double e0 = settled(0);
         double e1 = settled(1);
         System.out.println("[1218] e0=" + e0 + " e1=" + e1 + " ratio=" + (e1 / e0));
-        Assertions.assertEquals(1.4, e1 / e0, 1e-6, "「对处于【烬煨】状态的敌方目标造成的伤害提高 40%」");
+        Assertions.assertEquals(1.4, e1 / e0, 1e-6, "「对处于【char:1218/simmer】状态的敌方目标造成的伤害提高 40%」");
     }
 
     /**

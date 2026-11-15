@@ -11,7 +11,7 @@
   ],
   "resources": [
     {
-      "id": "累计损失生命",
+      "id": "internal:1205/hp_lost_this_battle",
       "max": 2147483647,
       "source": "1205 刃 终结技 大辟万死: 「…同时对其相邻目标造成等同于刃#3%攻击力+#4%生命上限+#6%本场战斗中累计已损失生命值的风属性伤害…本场战斗中累计已损失生命值最高不超过刃生命上限的#7%」",
       "note": "这是**记账**不是面板：每次自己掉血就累加 `HP_LOST` 的事件量（`amount_from_event`）。⚠ 文档有一处**封顶**「不超过生命上限的 #7% = 90%」，引擎的 `GAIN_RESOURCE` 没有「按属性比例封顶」的写法 ⇒ **未封顶**，已登记在该角色的 `_gaps`；终结技后清空也未写。"
@@ -27,7 +27,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "累计损失生命",
+          "resource": "internal:1205/hp_lost_this_battle",
           "amountFromEvent": true
         }
       ],
@@ -71,7 +71,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "地狱变",
+          "buff": "char:1205/hellscape",
           "turns": 3,
           "ticks_on": "self",
           "blocks": "skill",
@@ -82,7 +82,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent_from_skill_param": "SKILL:3",
           "turns": 3,
-          "while_state": "地狱变",
+          "while_state": "char:1205/hellscape",
           "target": "self"
         },
         {
@@ -277,7 +277,7 @@
       "do": [
         {
           "op": "ADD_DAMAGE",
-          "scale": "self_resource:累计损失生命",
+          "scale": "self_resource:internal:1205/hp_lost_this_battle",
           "percent": 1.5,
           "after_zones": true
         }
@@ -294,7 +294,7 @@
       "id": "eidolon2_crit_while_hellscape",
       "min_eidolon": 2,
       "when": [
-        "self has_state 地狱变"
+        "self has_state char:1205/hellscape"
       ],
       "do": [
         {

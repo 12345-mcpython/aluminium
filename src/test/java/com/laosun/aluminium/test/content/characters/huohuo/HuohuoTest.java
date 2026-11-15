@@ -73,7 +73,7 @@ public class HuohuoTest {
     private static final int ALLY = 1002;
     private static final int EIDOLON_ALLY = 1001;
     private static final int LEVEL = 80;
-    private static final String TALISMAN = "禳命";
+    private static final String TALISMAN = "char:1217/avert_fate";
 
     // ==================================================================
     // From HuohuoTest: the Skill's state, the ultimate's shares, the talent's gate
@@ -86,13 +86,13 @@ public class HuohuoTest {
     public void herSkillGrantsTheStateToHerself() {
         KitFixture f = new KitFixture();
         // The 行迹 grants 【禳命】 at battle start (1217101), so the "nothing yet" state is produced by removing it.
-        f.huohuo.getBuffManager().removeState("禳命");
-        Assertions.assertFalse(f.huohuo.getBuffManager().hasState("禳命"), "nothing before the cast");
+        f.huohuo.getBuffManager().removeState("char:1217/avert_fate");
+        Assertions.assertFalse(f.huohuo.getBuffManager().hasState("char:1217/avert_fate"), "nothing before the cast");
 
         f.skill();
 
-        Assertions.assertTrue(f.huohuo.getBuffManager().hasState("禳命"), "「施放战技后藿藿获得【禳命】」 (after casting the Skill, Huohuo gains Divine Provision (【禳命】))");
-        Assertions.assertFalse(f.ally.getBuffManager().hasState("禳命"), "…and it is hers (「藿藿获得」), not the party's");
+        Assertions.assertTrue(f.huohuo.getBuffManager().hasState("char:1217/avert_fate"), "「施放战技后藿藿获得【char:1217/avert_fate】」 (after casting the Skill, Huohuo gains Divine Provision (【char:1217/avert_fate】))");
+        Assertions.assertFalse(f.ally.getBuffManager().hasState("char:1217/avert_fate"), "…and it is hers (「藿藿获得」), not the party's");
     }
 
     /**
@@ -126,13 +126,13 @@ public class HuohuoTest {
         KitFixture f = new KitFixture();
         TriggerTable table = TriggerTables.of(HUOHUO);
 
-        f.huohuo.getBuffManager().removeState("禳命");
+        f.huohuo.getBuffManager().removeState("char:1217/avert_fate");
         Assertions.assertTrue(table.matching(TriggerEvent.TURN_START, ctx(f, false)).isEmpty(),
-                "no 【禳命】 (Divine Provision) on her, no trigger");
+                "no 【char:1217/avert_fate】 (Divine Provision) on her, no trigger");
 
         f.skill();
         Assertions.assertFalse(table.matching(TriggerEvent.TURN_START, ctx(f, true)).isEmpty(),
-                "with 【禳命】 (Divine Provision) up, a turn start matches");
+                "with 【char:1217/avert_fate】 (Divine Provision) up, a turn start matches");
     }
 
     private static TriggerTable.TriggerContext ctx(KitFixture f, boolean ignored) {
@@ -171,8 +171,8 @@ public class HuohuoTest {
      */
     @Test
     public void eidolonOneLengthensTheTalisman() {
-        Assertions.assertEquals(talismanTurns(0, false) + 1, talismanTurns(1, false), "the Skill's 禳命 is one turn longer");
-        Assertions.assertEquals(talismanTurns(0, true) + 1, talismanTurns(1, true), "the trace's 禳命 too");
+        Assertions.assertEquals(talismanTurns(0, false) + 1, talismanTurns(1, false), "the Skill's char:1217/avert_fate is one turn longer");
+        Assertions.assertEquals(talismanTurns(0, true) + 1, talismanTurns(1, true), "the trace's char:1217/avert_fate too");
     }
 
     private static int talismanTurns(int eidolon, boolean viaTrace) {
@@ -182,7 +182,7 @@ public class HuohuoTest {
         }
         return f.huohuo.getBuffManager().activeBuffs().stream()
                 .filter(buff -> buff instanceof com.laosun.aluminium.buff.StateBuff state
-                        && "禳命".equals(state.getState()))
+                        && "char:1217/avert_fate".equals(state.getState()))
                 .mapToInt(com.laosun.aluminium.buff.AbstractBuff::remainingTurns)
                 .max().orElseThrow();
     }
@@ -355,7 +355,7 @@ public class HuohuoTest {
 
         SkillExecutor.execute(battle, her.getSkills().get(SkillType.SKILL), her, List.of(her));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(TALISMAN), "precondition: her skill grants 【禳命】 (Divine Provision)");
+        Assertions.assertTrue(her.getBuffManager().hasState(TALISMAN), "precondition: her skill grants 【char:1217/avert_fate】 (Divine Provision)");
 
         spendTurnOf(battle, ally);
         boolean afterAllyTurn = her.getBuffManager().hasState(TALISMAN);
@@ -406,7 +406,7 @@ public class HuohuoTest {
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         SkillExecutor.execute(battle, skill, her, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(TALISMAN), "precondition: 【禳命】 (Divine Provision) is on her");
+        Assertions.assertTrue(her.getBuffManager().hasState(TALISMAN), "precondition: 【char:1217/avert_fate】 (Divine Provision) is on her");
         int before = her.getBuffManager().findBuff(StateBuff.class).duration();
 
         battle.applyTrueDamage(battle.enemies().getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
@@ -418,7 +418,7 @@ public class HuohuoTest {
 
         // Eidolon 1 lengthens the Talisman by one turn, so the invariant is "the save spends ONE turn", not "it ends at 1".
         Assertions.assertEquals(before - 1, after,
-                "「使【禳命】的持续回合数减 1」 - one turn, whatever she started with");
+                "「使【char:1217/avert_fate】的持续回合数减 1」 - one turn, whatever she started with");
         Assertions.assertTrue(!ally.isDeath(),
                 "「不会陷入无法战斗状态」 (does not fall into the unable-to-fight state)-- answering the lethal event is what cancels the death");
     }
@@ -434,7 +434,7 @@ public class HuohuoTest {
     public void theBattleOpensWithTheTalisman() {
         TraceFixture f = new TraceFixture();
         Assertions.assertTrue(f.huohuo.getBuffManager().hasState(TALISMAN),
-                "「战斗开始时，藿藿获得【禳命】」");
+                "「战斗开始时，藿藿获得【char:1217/avert_fate】」");
     }
 
     /**

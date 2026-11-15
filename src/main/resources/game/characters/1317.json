@@ -17,7 +17,7 @@
       "note": "上限 **10** 是**文档原话** ✓（「**最多拥有 10 点充能**」✓）。⚠ 文档**没说初始值** ✗ ⇒ 保持默认 **0** ✓（与 1224/1412 同一判断 ✓）。⚠ 本文件声明容量 ✓ 与**一处固定获取**（弱点被击破时 +1 ✓）；「发动第 3 段攻击时**消耗所有充能**并按每点提高倍率」✗ 已登记。"
     },
     {
-      "id": "彩墨",
+      "id": "char:1317/color_ink",
       "max": 3,
       "source": "1317 乱破 终结技 忍道•极•爱死天流: 「进入【结印】状态，立即获得1个额外回合并获得3点【彩墨】…【结印】状态下普攻获得强化且无法施放战技和终结技，施放强化普攻后会消耗1点【彩墨】，耗尽时退出【结印】状态。」",
       "note": "上限 **3** 是**文档原话** ✓（「获得 **3** 点【彩墨】」+ 强化普攻「消耗 1 点」⇒ 三次用完 ✓）。⚠ 初始值文档没写 ⇒ 默认 **0** ✓。"
@@ -253,22 +253,22 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "结印",
+          "buff": "char:1317/hand_seal",
           "blocks": "skill,ultimate",
-          "while_resource": "彩墨",
+          "while_resource": "char:1317/color_ink",
           "permanent": true,
           "target": "self"
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "彩墨",
+          "resource": "char:1317/color_ink",
           "amount": 3
         },
         {
           "op": "REPLACE_SKILL",
           "skill": "COMMON",
           "skill_id": 8,
-          "while_resource": "彩墨",
+          "while_resource": "char:1317/color_ink",
           "permanent": true,
           "target": "self"
         },
@@ -276,7 +276,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "WEAKNESS_BREAK_EFFICIENCY",
           "percent_from_skill_param": "ULTRA:0",
-          "while_resource": "彩墨",
+          "while_resource": "char:1317/color_ink",
           "permanent": true,
           "target": "self"
         },
@@ -284,7 +284,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "BREAKING_EFFECT",
           "percent_from_skill_param": "ULTRA:1",
-          "while_resource": "彩墨",
+          "while_resource": "char:1317/color_ink",
           "permanent": true,
           "target": "self"
         }
@@ -303,7 +303,7 @@
       "do": [
         {
           "op": "SPEND_RESOURCE",
-          "resource": "彩墨",
+          "resource": "char:1317/color_ink",
           "amount": 1
         }
       ],

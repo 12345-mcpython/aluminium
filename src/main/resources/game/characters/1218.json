@@ -35,7 +35,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "烬煨",
+          "buff": "char:1218/simmer",
           "amount": 1,
           "max_stacks": 5,
           "turns": 2,
@@ -63,7 +63,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "烬煨",
+          "buff": "char:1218/simmer",
           "amount": 1,
           "max_stacks": 9,
           "turns": 2,
@@ -97,7 +97,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "烬煨",
+          "buff": "char:1218/simmer",
           "amount": 1,
           "max_stacks": 5,
           "turns": 2,
@@ -118,7 +118,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "RESISTANCE_REDUCTION",
           "percent": 0.03,
-          "per_stack": "烬煨",
+          "per_stack": "char:1218/simmer",
           "per_stack_live": true,
           "permanent": true,
           "target": "target"
@@ -136,7 +136,7 @@
       "do": [
         {
           "op": "MODIFY_DAMAGE_TAKEN",
-          "scale": "target_stacks:烬煨",
+          "scale": "target_stacks:char:1218/simmer",
           "amount": 0.1,
           "turns": 2,
           "target": "target",
@@ -170,13 +170,13 @@
       "id": "talent_ember_tiered_taken",
       "when": [
         "actor == self",
-        "target_stacks:烬煨 >= 1"
+        "target_stacks:char:1218/simmer >= 1"
       ],
       "do": [
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "amount": 0.1,
-          "scale": "target_stacks:烬煨",
+          "scale": "target_stacks:char:1218/simmer",
           "cap_amount": 0.35,
           "turns": 2,
           "target": "target",
@@ -254,7 +254,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "结界计数",
+          "buff": "internal:1218/barrier_count",
           "target": "self"
         }
       ],
@@ -267,7 +267,7 @@
       "when": [
         "actor is_enemy",
         "self has_state char:1218/barrier",
-        "self_stacks:结界计数 < 6"
+        "self_stacks:internal:1218/barrier_count < 6"
       ],
       "chance": 0.6,
       "per_subject": "actor",
@@ -275,7 +275,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "烬煨",
+          "buff": "char:1218/simmer",
           "amount": 1,
           "max_stacks": 5,
           "turns": 2,
@@ -283,7 +283,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "结界计数",
+          "buff": "internal:1218/barrier_count",
           "amount": 1,
           "max_stacks": 6,
           "permanent": true,
@@ -297,7 +297,7 @@
       "on": "DEALING_DAMAGE",
       "id": "eidolon1_more_damage_to_roasted",
       "when": [
-        "target has_state 烬煨"
+        "target has_state char:1218/simmer"
       ],
       "min_eidolon": 1,
       "do": [
@@ -318,8 +318,8 @@
       "do": [
         {
           "op": "SET_STACKS",
-          "buff": "烬煨",
-          "scale": "max_enemy_stacks:烬煨",
+          "buff": "char:1218/simmer",
+          "scale": "max_enemy_stacks:char:1218/simmer",
           "percent": 1,
           "target": "all_enemies"
         }
@@ -408,15 +408,15 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "烬煨",
+          "buff": "char:1218/simmer",
           "value": {
             "type": "stacks",
             "whose": "target",
-            "buff": "烬煨"
+            "buff": "char:1218/simmer"
           },
           "max_stacks": 9,
           "turns": 2,
-          "target": "lowest_stacks_enemy:烬煨"
+          "target": "lowest_stacks_enemy:char:1218/simmer"
         }
       ],
       "source": "1218 椒丘 星魂 6 九沸九变，火为之纪 (AvatarRankDesc_121806): 「敌方目标被消灭时，其持有的【烬煨】会叠加给场上存活的【烬煨】层数最低的敌人。」",
@@ -431,11 +431,11 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "烬煨",
+          "buff": "char:1218/simmer",
           "value": {
             "type": "stacks",
             "whose": "highest_enemy",
-            "buff": "烬煨"
+            "buff": "char:1218/simmer"
           },
           "max_stacks": 9,
           "turns": 2,

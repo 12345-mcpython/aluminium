@@ -40,7 +40,7 @@ public class JiaoqiuDomainTest {
 
     private static final int JIAOQIU = 1218;
     private static final int LEVEL = 80;
-    private static final String ASHEN = "烬煨";
+    private static final String ASHEN = "char:1218/simmer";
     private static final String DOMAIN = "char:1218/barrier";
 
     /**
@@ -202,7 +202,7 @@ public class JiaoqiuDomainTest {
         // Note: `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule
         // (on ALLY_ATTACK) is what creates it -- a hand-made state does not register (round 219/240).
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, unit, enemy, 0, 0));
-        System.out.println("[1218] layers=" + enemy.getBuffManager().stacksOf("烬煨"));
+        System.out.println("[1218] layers=" + enemy.getBuffManager().stacksOf("char:1218/simmer"));
         var rules = unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));
         double amount = -1;
@@ -221,7 +221,7 @@ public class JiaoqiuDomainTest {
                 }
             }
         }
-        Assertions.assertEquals("target_stacks:烬煨", scale, "the layers live on the event target");
+        Assertions.assertEquals("target_stacks:char:1218/simmer", scale, "the layers live on the event target");
         Assertions.assertEquals(0.10, amount, 1e-9, "the base is 10% so that ONE layer reads 15%");
         Assertions.assertEquals(0.05, percent, 1e-9, "each further layer adds 5%");
         Assertions.assertEquals(0.35, cap, 1e-9, "five layers cap it at 35%");
@@ -271,7 +271,7 @@ public class JiaoqiuDomainTest {
         }
 
         private int count() {
-            return jiaoqiu.getBuffManager().stacksOf("结界计数");
+            return jiaoqiu.getBuffManager().stacksOf("internal:1218/barrier_count");
         }
     }
 }

@@ -23,7 +23,7 @@ public class CheerTrueDamageRiderTest {
     private static final double EPS = 1e-6;
     private static final int OWNER = 8007;
     private static final int ALLY = 1002;
-    private static final String CHEER = "迷迷的声援";
+    private static final String CHEER = "char:8007/mimi_support";
 
     /**
      * The holder's damage is raised by exactly the 28% the sentence states.

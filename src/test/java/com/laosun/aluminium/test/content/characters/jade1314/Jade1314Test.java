@@ -43,8 +43,8 @@ public class Jade1314Test {
     private static final int TALENT_ALLY = 1002;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
-    private static final String COLLECTOR = "收债人";
-    private static final String GOODS = "当品";
+    private static final String COLLECTOR = "char:1314/debt_collector";
+    private static final String GOODS = "char:1314/pawn";
     private static final String CHARGE = "char:1314/charge";
 
     // ==================================================================
@@ -67,7 +67,7 @@ public class Jade1314Test {
         f.skill(f.ally);
 
         Assertions.assertAll("the ally becomes the collector, is 30 points faster, and the state starts with 3 turns",
-                () -> Assertions.assertTrue(f.ally.getBuffManager().hasState(COLLECTOR), "「指定我方单体成为【收债人】」"),
+                () -> Assertions.assertTrue(f.ally.getBuffManager().hasState(COLLECTOR), "「指定我方单体成为【char:1314/debt_collector】」"),
                 () -> Assertions.assertEquals(before + 30, f.ally.getAttribute(AttributeType.SPEED).get(), 1e-6,
                         "「速度提高 30 点」 - points, not 30%"),
                 () -> Assertions.assertEquals(3,
@@ -81,7 +81,7 @@ public class Jade1314Test {
         }
         Assertions.assertAll("the duration is spent on HER turn boundaries, not the ally's",
                 () -> Assertions.assertFalse(f.ally.getBuffManager().hasState(COLLECTOR),
-                        "「翡翠每回合开始时【收债人】状态持续回合数减 1」 - 3 turns spent on HER boundaries"));
+                        "「翡翠每回合开始时【char:1314/debt_collector】状态持续回合数减 1」 - 3 turns spent on HER boundaries"));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class Jade1314Test {
 
         Assertions.assertTrue(f.jade.getBuffManager().hasState(COLLECTOR), "the state is applied to her too");
         Assertions.assertEquals(before, f.jade.getAttribute(AttributeType.SPEED).get(), 1e-6,
-                "「若翡翠成为【收债人】时，无法获得速度提高效果」");
+                "「若翡翠成为【char:1314/debt_collector】时，无法获得速度提高效果」");
     }
 
     // ==================================================================
@@ -118,7 +118,7 @@ public class Jade1314Test {
         double cost = allyHpBefore - f.ally.getCurrentHp();
         System.out.println("[1314] cost=" + cost + " expected=" + (0.02 * f.ally.getMaxHp()));
         Assertions.assertEquals(0.02 * f.ally.getMaxHp(), cost, 1e-6,
-                "「消耗【收债人】生命上限 2% 的生命值」");
+                "「消耗【char:1314/debt_collector】生命上限 2% 的生命值」");
 
         double loss = enemyBefore - f.enemy.getCurrentHp();
         double plainLoss = new CollectorFixture().attackLoss();
@@ -135,7 +135,7 @@ public class Jade1314Test {
         double before = f.jade.getCurrentHp();
         f.attack(f.jade);
         Assertions.assertEquals(before, f.jade.getCurrentHp(), 1e-9,
-                "「若翡翠成为【收债人】时…攻击后不消耗生命值」");
+                "「若翡翠成为【char:1314/debt_collector】时…攻击后不消耗生命值」");
     }
 
     // ==================================================================
@@ -163,7 +163,7 @@ public class Jade1314Test {
         double delta = sixteen.jade.getAttribute(AttributeType.ATTACK).get()
                 - one.jade.getAttribute(AttributeType.ATTACK).get();
 
-        Assertions.assertAll("the 当品 counter, its layers and their per-layer shares",
+        Assertions.assertAll("the char:1314/pawn counter, its layers and their per-layer shares",
                 () -> Assertions.assertEquals(1, layers(false), "trace (行迹): one layer when a battle starts"),
                 () -> Assertions.assertEquals(16, layers(true), "technique (秘技): fifteen more, so sixteen in total"),
                 () -> Assertions.assertEquals(0.524, criticalDamage(false), EPS, "one layer on top of the inherent 0.5"),
@@ -194,7 +194,7 @@ public class Jade1314Test {
         battle.addEnemy(BattleFixture.monster());
         int afterEntry = jade.getBuffManager().stacksOf(GOODS);
         System.out.println("[1314] goods " + atStart + " -> " + afterEntry);
-        Assertions.assertEquals(atStart + 1, afterEntry, "「在敌方目标进入战斗时，翡翠获得 1 层【当品】」");
+        Assertions.assertEquals(atStart + 1, afterEntry, "「在敌方目标进入战斗时，翡翠获得 1 层【char:1314/pawn】」");
 
         battle.addEnemy(BattleFixture.monster());
         Assertions.assertEquals(afterEntry + 1, jade.getBuffManager().stacksOf(GOODS),
@@ -225,7 +225,7 @@ public class Jade1314Test {
         addGoods(jade, 10);
         double ten = jade.getAttribute(AttributeType.ATTACK).get();
         System.out.println("[1314] base=" + base + " before=" + before + " 10 layers=" + ten);
-        Assertions.assertEquals(0.005 * 10 * base, ten - before, 1e-6, "「每层【当品】额外使攻击力提高 0.50%」");
+        Assertions.assertEquals(0.005 * 10 * base, ten - before, 1e-6, "「每层【char:1314/pawn】额外使攻击力提高 0.50%」");
 
         addGoods(jade, 10);
         double twenty = jade.getAttribute(AttributeType.ATTACK).get();
@@ -294,7 +294,7 @@ public class Jade1314Test {
         // Note: A difference, not an absolute: the unit carries the game's inherent +0.05 crit chance, so `get() - baseValue()`
         // mixes the two (measured: 0.23 where the clause owns 0.18).
         Assertions.assertEquals(0.18, withTechnique - without, EPS,
-                "at 15 stacks of Pawned Asset (【当品】), CRIT Rate is raised by 18%");
+                "at 15 stacks of Pawned Asset (【char:1314/pawn】), CRIT Rate is raised by 18%");
         // The absence of the clause still reads the game's inherent 5% crit chance, so the control is 0.05.
         Assertions.assertEquals(0.05, without, EPS, "one layer is below the threshold, so only the inherent remains");
     }
@@ -349,7 +349,7 @@ public class Jade1314Test {
         Assertions.assertAll("the eighth point spends the charge and buys the follow-up",
                 () -> Assertions.assertEquals(0, run.charge(), "「消耗 8 点充能」"),
                 () -> Assertions.assertTrue(before - run.enemy.getCurrentHp() > 0, "the follow-up deals damage"),
-                () -> Assertions.assertEquals(6, run.stacks(GOODS), "「发动…追加攻击时立即获得 5 层【当品】」"),
+                () -> Assertions.assertEquals(6, run.stacks(GOODS), "「发动…追加攻击时立即获得 5 层【char:1314/pawn】」"),
                 // The crit-damage case pinned the same six: 5 from the follow-up plus the 1 her trace (逆回购) grants at
                 // battle start.
                 () -> Assertions.assertEquals(6, run.stacks(GOODS),
@@ -404,7 +404,7 @@ public class Jade1314Test {
         Run e5 = new Run(5);
         Run e6 = new Run(6);
         Assertions.assertFalse(e5.jade.getBuffManager().hasState(COLLECTOR), "E5 is not one");
-        Assertions.assertTrue(e6.jade.getBuffManager().hasState(COLLECTOR), "「同时翡翠获得【收债人】状态」");
+        Assertions.assertTrue(e6.jade.getBuffManager().hasState(COLLECTOR), "「同时翡翠获得【char:1314/debt_collector】状态」");
         Assertions.assertEquals(0.2, e6.jade.getAttribute(AttributeType.DAMAGE_PENETRATION_QUANTUM).get()
                 - e5.jade.getAttribute(AttributeType.DAMAGE_PENETRATION_QUANTUM).get(), 1e-9,
                 "「量子属性抗性穿透提高 20%」");
@@ -430,7 +430,7 @@ public class Jade1314Test {
         Assertions.assertTrue(plain.enemy.getCurrentHp() - withTechnique.enemy.getCurrentHp() > 0,
                 "「对敌方全体造成等同于翡翠 50% 攻击力的量子属性伤害」");
         // 15 from the technique plus the 1 her trace grants at battle start.
-        Assertions.assertEquals(16, withTechnique.jade.getBuffManager().stacksOf(GOODS), "「立即获得 15 层【当品】」");
+        Assertions.assertEquals(16, withTechnique.jade.getBuffManager().stacksOf(GOODS), "「立即获得 15 层【char:1314/pawn】」");
     }
 
     // ==================================================================
@@ -483,7 +483,7 @@ public class Jade1314Test {
 
     private static void addGoods(Character jade, int layers) {
         for (int i = 0; i < layers; i++) {
-            jade.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("当品", 1, true, 50));
+            jade.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("char:1314/pawn", 1, true, 50));
         }
     }
 

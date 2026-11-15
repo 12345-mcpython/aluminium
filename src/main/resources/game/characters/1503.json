@@ -125,7 +125,7 @@
       "min_eidolon": 1,
       "when": [
         "actor is_ally",
-        "self_stacks:救主计数 < 2"
+        "self_stacks:internal:1217/saviour_count < 2"
       ],
       "do": [
         {
@@ -136,7 +136,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "救主计数",
+          "buff": "internal:1217/saviour_count",
           "amount": 1,
           "max_stacks": 2,
           "permanent": true,
