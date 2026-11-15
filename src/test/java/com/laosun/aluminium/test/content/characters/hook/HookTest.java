@@ -52,7 +52,7 @@ public class HookTest {
         f.battle.castImmediate(f.hook.getSkills().get(SkillType.SKILL), f.hook, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("dot:burn"),
-                "「有100%的基础概率使其陷入dot:burn状态」 (100% base chance to put it in the burning state)");
+                "「有100%的基础概率使其陷入灼烧状态」 (100% base chance to put it in the burning state)");
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…as a damage-over-time state");
 
         double energyBefore = f.hook.getCurrentEnergy();
@@ -174,7 +174,7 @@ public class HookTest {
      *   <li><b>Eidolon 1</b> — 「战技强化后造成的伤害提高 20%」. The gate is the enhanced form itself: {@code damage_skill_key == 9}
      *       (the loader's slot that {@code REPLACE_SKILL} installs). ⚠ {@code from_skill_id} does <b>not</b> work on
      *       {@code DEALING_DAMAGE}: its payload carries no cast facts — measured, the reading was identical at E0 and E1.</li>
-     *   <li><b>Eidolon 4</b> — 「使指定敌方目标的相邻目标也陷入等同于战技的dot:burn状态」. Needed a new selector,
+     *   <li><b>Eidolon 4</b> — 「使指定敌方目标的相邻目标也陷入等同于战技的灼烧状态」. Needed a new selector,
      *       {@code adjacent_enemies}: {@code random_adjacent_enemy} answers only one of the two neighbours.</li>
      * </ul>
      */
@@ -198,7 +198,7 @@ public class HookTest {
     }
 
     /**
-     * Eidolon 4: 「使指定敌方目标的相邻目标也陷入等同于战技的dot:burn状态」.
+     * Eidolon 4: 「使指定敌方目标的相邻目标也陷入等同于战技的灼烧状态」.
      *
      * <p>Measured with three enemies: after the Skill burns the middle one and a basic attack triggers the talent, both
      * neighbours are burning at E4 and neither is at E0.
@@ -208,7 +208,7 @@ public class HookTest {
         Assertions.assertArrayEquals(new boolean[]{false, false},
                 neighboursBurning(0), "control: at E0 the neighbours are untouched");
         Assertions.assertArrayEquals(new boolean[]{true, true},
-                neighboursBurning(4), "「相邻目标也陷入…dot:burn状态」 — both of them");
+                neighboursBurning(4), "「相邻目标也陷入…灼烧状态」 — both of them");
     }
 
     /**
@@ -268,8 +268,8 @@ public class HookTest {
     /*
      * 1109 虎克's Eidolon 2 and 6, the two clauses its file already states.
      *
-     * <p>E2 「战技使敌方目标陷入的dot:burn状态持续时间增加 1 回合」 is a {@code MODIFY_RULE} on the burn rule, so the check is the
-     * burn's own duration (2 → 3). E6 「对dot:burn状态下的敌方目标造成的伤害提高 20%」 is a {@code BOOST_DAMAGE} on the settling
+     * <p>E2 「战技使敌方目标陷入的灼烧状态持续时间增加 1 回合」 is a {@code MODIFY_RULE} on the burn rule, so the check is the
+     * burn's own duration (2 → 3). E6 「对灼烧状态下的敌方目标造成的伤害提高 20%」 is a {@code BOOST_DAMAGE} on the settling
      * instance, so the check is the damage ratio against a burning and a healthy enemy with otherwise identical stats.
      */
 
@@ -284,13 +284,13 @@ public class HookTest {
 
     /**
      * Eidolon 6: the same hit is 20% stronger against a burning target - compared across EIDOLON RANKS, not across
-     * enemies. A burning enemy also draws the talent's extra instance (「对dot:burn目标追加 100% 攻击力」), so the two enemies'
+     * enemies. A burning enemy also draws the talent's extra instance (「对灼烧目标追加 100% 攻击力」), so the two enemies'
      * totals differ by 1.71 for a reason that has nothing to do with E6; the rank-to-rank ratio cancels it.
      */
     @Test
     public void eidolonSixBoostsDamageAgainstBurningTargets() {
         Assertions.assertEquals(1.0, rankRatio(false), 1e-6, "a healthy target: rank 6 changes nothing");
-        Assertions.assertEquals(1.2, rankRatio(true), 1e-6, "「对dot:burn状态下的敌方目标造成的伤害提高 20%」");
+        Assertions.assertEquals(1.2, rankRatio(true), 1e-6, "「对灼烧状态下的敌方目标造成的伤害提高 20%」");
     }
 
     private static double rankRatio(boolean burning) {
@@ -389,7 +389,7 @@ public class HookTest {
     // ---------------------------------------------------------------------------------------------------------------
     /*
      * 1109 虎克's technique: 「进入战斗后对敌方随机单体造成 50% 攻击力的火属性伤害，同时有 100% 基础概率使敌方每个单体目标陷入
-     * dot:burn状态，持续 3 回合（每回合 50% 攻击力火伤）」.
+     * 灼烧状态，持续 3 回合（每回合 50% 攻击力火伤）」.
      *
      * <p>Two halves, two different targets: the <b>damage</b> is one random enemy ({@code random_enemy}), the <b>burn</b> is
      * every enemy ({@code all_enemies}). The technique gate is the engine's own {@code 秘技} state, laid down before any
@@ -406,7 +406,7 @@ public class HookTest {
         Assertions.assertEquals(1, hit.size(), "「对敌方随机单体造成…火属性伤害」 - exactly one enemy is hit");
         for (Enemy enemy : f.enemies) {
             Assertions.assertEquals(1, enemy.getBuffManager().countBuffs(DotBuff.class),
-                    enemy.getName() + ": 「使敌方每个单体目标陷入dot:burn状态」");
+                    enemy.getName() + ": 「使敌方每个单体目标陷入灼烧状态」");
         }
 
         TechniqueFixture bare = new TechniqueFixture(false);

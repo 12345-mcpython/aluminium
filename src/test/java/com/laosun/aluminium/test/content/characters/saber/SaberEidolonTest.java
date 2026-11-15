@@ -29,7 +29,7 @@ public class SaberEidolonTest {
 
     private static final int SABER = 1014;
     private static final int LEVEL = 80;
-    private static final String RESONANCE = "炉心共鸣";
+    private static final String RESONANCE = "char:1014/core_resonance";
 
     /**
      * 1014 Saber's Eidolon 2:「本场战斗中每获得 1 点【炉心共鸣】，使 Saber 造成的伤害无视目标 1.00% 的防御力，最多叠加 15 层」.

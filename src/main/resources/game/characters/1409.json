@@ -133,7 +133,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "雨过天晴",
+          "buff": "char:1409/after_the_rain",
           "turns": 3,
           "target": "self"
         },
@@ -175,7 +175,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "雨过天晴",
+          "buff": "char:1409/after_the_rain",
           "turns": 3,
           "target": "self"
         },
@@ -239,7 +239,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "雨过天晴"
+            "state": "char:1409/after_the_rain"
           }
         },
         {
@@ -335,7 +335,7 @@
           "attribute": "DAMAGE_PENETRATION",
           "percent": 0.2,
           "permanent": true,
-          "buff": "天空应我的祈愿",
+          "buff": "char:1409/sky_answer",
           "target": "all_allies"
         }
       ],
@@ -363,7 +363,7 @@
           "attribute": "DAMAGE_PENETRATION",
           "percent": 0.2,
           "permanent": true,
-          "buff": "天空应我的祈愿",
+          "buff": "char:1409/sky_answer",
           "target": "all_allies"
         }
       ],
@@ -481,7 +481,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "小伊卡累计治疗",
+          "resource": "internal:1409/ika_healing_total",
           "amountFromEvent": true,
           "target": "self"
         }
@@ -505,7 +505,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "小伊卡累计治疗",
+          "resource": "internal:1409/ika_healing_total",
           "amountFromEvent": true,
           "target": "self"
         }
@@ -535,7 +535,7 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "self_resource:小伊卡累计治疗",
+          "scale": "self_resource:internal:1409/ika_healing_total",
           "percent_from": {
             "type": "cast_param",
             "index": 0
@@ -571,8 +571,8 @@
       "do": [
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "小伊卡累计治疗",
-          "scale": "self_resource:小伊卡累计治疗",
+          "resource": "internal:1409/ika_healing_total",
+          "scale": "self_resource:internal:1409/ika_healing_total",
           "percent": 0.5,
           "target": "self"
         }
@@ -603,8 +603,8 @@
       "do": [
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "小伊卡累计治疗",
-          "scale": "self_resource:小伊卡累计治疗",
+          "resource": "internal:1409/ika_healing_total",
+          "scale": "self_resource:internal:1409/ika_healing_total",
           "percent": 0.12,
           "target": "self"
         }
@@ -886,7 +886,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "天空应我的祈愿",
+          "buff": "char:1409/sky_answer",
           "target": "all_allies"
         }
       ],
@@ -949,7 +949,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "雨过天晴"
+            "state": "char:1409/after_the_rain"
           }
         },
         {
@@ -1150,7 +1150,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "献予「天空」之诗"
+            "state": "char:1409/ode_to_sky"
           }
         },
         {
@@ -1163,7 +1163,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "献予「天空」之诗",
+          "buff": "char:1409/ode_to_sky",
           "amount": 1,
           "target": "self"
         }
@@ -1180,7 +1180,7 @@
           "type": "entity",
           "entity": "self",
           "json": {
-            "state": "献予「天空」之诗"
+            "state": "char:1409/ode_to_sky"
           }
         },
         {
@@ -1193,7 +1193,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "献予「天空」之诗",
+          "buff": "char:1409/ode_to_sky",
           "amount": 1,
           "target": "self"
         }
@@ -1223,7 +1223,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "天空之诗的治疗份额",
+          "resource": "internal:1409/ode_sky_heal_share",
           "scale": "cast_skill_param:0",
           "percent": 10000,
           "target": "self"
@@ -1241,15 +1241,15 @@
           "type": "entity",
           "entity": "actor",
           "json": {
-            "state": "献予「天空」之诗"
+            "state": "char:1409/ode_to_sky"
           }
         }
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "小伊卡累计治疗",
-          "amount_percent_from_resource": "天空之诗的治疗份额",
+          "resource": "internal:1409/ika_healing_total",
+          "amount_percent_from_resource": "internal:1409/ode_sky_heal_share",
           "target": "self",
           "amountFromEvent": true
         }
@@ -1260,12 +1260,12 @@
   ],
   "resources": [
     {
-      "id": "天空之诗的治疗份额",
+      "id": "internal:1409/ode_sky_heal_share",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 「本次治疗数值的 #1%」的那个 #1（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。"
     },
     {
-      "id": "小伊卡累计治疗",
+      "id": "internal:1409/ika_healing_total",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— “计入小伊卡忆灵技的治疗数值”（数据行 19 ）在施放那一刻被捕获 ⁄ 入账的地方。"
     }

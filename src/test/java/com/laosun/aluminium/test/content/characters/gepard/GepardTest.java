@@ -164,7 +164,7 @@ public class GepardTest {
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.SKILL), f.gepard, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:frozen"),
-                "\"a 65% base chance to put the attacked enemy target into the Frozen state\" (「有65%的基础概率使受到攻击的敌方目标陷入ctrl:frozen状态」) + the +35% from Eidolon (星魂) 1 ⇒ 100% base chance");
+                "\"a 65% base chance to put the attacked enemy target into the Frozen state\" (「有65%的基础概率使受到攻击的敌方目标陷入冻结状态」) + the +35% from Eidolon (星魂) 1 ⇒ 100% base chance");
     }
 
     /**
@@ -180,7 +180,7 @@ public class GepardTest {
         f.battle.tickDots(f.enemy);
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "「ctrl:frozen状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」 (while Frozen, the enemy target cannot act and takes additional Ice DMG equal to 60% of Gepard (杰帕德)'s ATK at the start of every turn)");
+                "「冻结状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」 (while Frozen, the enemy target cannot act and takes additional Ice DMG equal to 60% of Gepard (杰帕德)'s ATK at the start of every turn)");
     }
 
     /**
@@ -227,7 +227,7 @@ public class GepardTest {
         Assertions.assertEquals(0.0, none, 1e-9,
                 "at E0 nothing is filed for that rule");
         Assertions.assertEquals(0.35, raised, 1e-9,
-                "「施放战技时，使受到攻击的敌方目标陷入ctrl:frozen状态的基础概率提高35%」 (when casting the Skill, raises the base chance of putting the attacked enemy target into the Frozen state by 35%) — filed as a BASE CHANCE amendment, "
+                "「施放战技时，使受到攻击的敌方目标陷入冻结状态的基础概率提高35%」 (when casting the Skill, raises the base chance of putting the attacked enemy target into the Frozen state by 35%) — filed as a BASE CHANCE amendment, "
                         + "which is what a plain `percent` on MODIFY_RULE means");
     }
 

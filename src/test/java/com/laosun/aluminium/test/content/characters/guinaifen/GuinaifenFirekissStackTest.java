@@ -45,7 +45,7 @@ public class GuinaifenFirekissStackTest {
         }
     }
 
-    /** 星魂 2「她施加的dot:burn伤害倍率提升 40%」: the same burn ticks 40% harder at E2. */
+    /** 星魂 2「她施加的灼烧伤害倍率提升 40%」: the same burn ticks 40% harder at E2. */
     @Test
     public void theSecondEidolonMakesHerBurnHotter() {
         double without = burnTickDamage(1);
@@ -88,7 +88,7 @@ public class GuinaifenFirekissStackTest {
         Assertions.assertTrue(enemy.getBuffManager().stacksOf("char:1210/fire_swallow") >= 1, "the counter still fills");
     }
 
-    /** 星魂 4「她施加的dot:burn每触发一次伤害，使自身恢复 2 点能量」. */
+    /** 星魂 4「她施加的灼烧每触发一次伤害，使自身恢复 2 点能量」. */
     @Test
     public void everyBurnTickPaysTwoEnergy() {
         Battle battle = scene(4);

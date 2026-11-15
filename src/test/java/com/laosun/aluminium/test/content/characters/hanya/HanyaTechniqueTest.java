@@ -21,7 +21,7 @@ public class HanyaTechniqueTest {
 
     private static final int LEVEL = 80;
     private static final int HANYA = 1215;
-    private static final String BURDEN = "承负";
+    private static final String BURDEN = "char:1215/burden";
 
     /**
      * With the technique exactly one random enemy is marked; without it, none.
@@ -30,7 +30,7 @@ public class HanyaTechniqueTest {
     public void theTechniqueMarksOneRandomEnemy() {
         Fixture f = new Fixture(true);
         long marked = f.enemies.stream().filter(e -> e.getBuffManager().hasState(BURDEN)).count();
-        Assertions.assertEquals(1, marked, "「对敌方随机单体附上…【承负】」 - exactly one enemy");
+        Assertions.assertEquals(1, marked, "「对敌方随机单体附上…【char:1215/burden】」 - exactly one enemy");
         Assertions.assertTrue(f.enemies.stream().anyMatch(e -> e.getBuffManager().hasState(BURDEN)),
                 "and the marker is a state, so `has_state` answers it");
 

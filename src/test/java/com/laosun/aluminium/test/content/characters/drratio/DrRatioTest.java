@@ -37,7 +37,7 @@ public class DrRatioTest {
         double afterMark = reactionLoss(true);
 
         Assertions.assertEquals(0.0, beforeMark, 1e-9,
-                "「持有【智者的短见】的目标」 (a target holding [智者的短见]) -- no mark, no reaction");
+                "「持有【char:1305/sage_shortcoming】的目标」 (a target holding [char:1305/sage_shortcoming]) -- no mark, no reaction");
         Assertions.assertTrue(afterMark > 0,
                 "「理真医生对该目标发动1次天赋的追加攻击」 (Dr. Ratio launches 1 follow-up attack from his Talent at that target): " + afterMark);
     }

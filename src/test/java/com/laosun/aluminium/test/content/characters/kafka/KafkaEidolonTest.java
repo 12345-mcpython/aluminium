@@ -16,7 +16,7 @@ import java.util.List;
  * 1005 卡芙卡's Eidolons 2, 3, 4 and 5: the party-wide DoT boost (which leaves with her), the two level bumps, and the energy
  * a Shock tick refunds.
  *
- * <p>E4: 「当敌方目标承受的由卡芙卡造成的dot:shock状态产生伤害时，额外为卡芙卡恢复 2 点能量」. The load-bearing part is the guard:
+ * <p>E4: 「当敌方目标承受的由卡芙卡造成的触电状态产生伤害时，额外为卡芙卡恢复 2 点能量」. The load-bearing part is the guard:
  * {@code DAMAGE_SETTLED} fires for every settled instance, so without {@code damage_is_dot} her ordinary attacks would pay
  * the same 2 energy - which is what the second assertion checks.
  *

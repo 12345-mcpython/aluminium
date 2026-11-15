@@ -46,15 +46,15 @@ public class StackCounterTest {
         battle.startBattle();
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("承负"),
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("char:1215/burden"),
                 "one mark is not two: \"after every 2 times ...\" has not been reached");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
-        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("承负"),
+        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("char:1215/burden"),
                 "the second mark reached the threshold, and the rule that answered it cleared the counter");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("承负"),
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("char:1215/burden"),
                 "…and counting starts again (the cap stops a stray event from pushing it past the threshold)");
     }
 
@@ -71,12 +71,12 @@ public class StackCounterTest {
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
-        Assertions.assertEquals(2, enemy.getBuffManager().stacksOf("承负"), "two marks");
+        Assertions.assertEquals(2, enemy.getBuffManager().stacksOf("char:1215/burden"), "two marks");
 
-        Assertions.assertEquals(2, enemy.getBuffManager().removeState("承负"),
+        Assertions.assertEquals(2, enemy.getBuffManager().removeState("char:1215/burden"),
                 "REMOVE_STATE by name clears the WHOLE counter (every buff carrying the name), which is what "
                         + "\"automatically removed after triggering 2 times\" needs");
-        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("承负"));
+        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("char:1215/burden"));
     }
 
     /**
@@ -108,7 +108,7 @@ public class StackCounterTest {
     private static TriggerSpec countMark() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADD_STACK");
-        TriggerSpecs.set(effect, "buff", "承负");
+        TriggerSpecs.set(effect, "buff", "char:1215/burden");
         TriggerSpecs.set(effect, "maxStacks", 2);
         TriggerSpecs.set(effect, "permanent", true);
         TriggerSpecs.set(effect, "target", "target");
@@ -124,9 +124,9 @@ public class StackCounterTest {
         TriggerSpecs.set(pay, "amount", 1.0);
         EffectSpec reset = new EffectSpec();
         TriggerSpecs.set(reset, "op", "REMOVE_STATE");
-        TriggerSpecs.set(reset, "buff", "承负");
+        TriggerSpecs.set(reset, "buff", "char:1215/burden");
         TriggerSpecs.set(reset, "target", "target");
-        return TriggerSpecs.rule("ALLY_ATTACK", List.of("target_stacks:承负 >= 2"), pay, reset);
+        return TriggerSpecs.rule("ALLY_ATTACK", List.of("target_stacks:char:1215/burden >= 2"), pay, reset);
     }
 
     private static Enemy enemy() {

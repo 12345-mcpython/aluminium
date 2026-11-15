@@ -26,7 +26,7 @@ public class SkyOdeSpendTest {
     private static final int LEVEL = 80;
     private static final int HYACINE = 1409;
     private static final int ALLY = 1002;
-    private static final String MARK = "献予「天空」之诗";
+    private static final String MARK = "char:1409/ode_to_sky";
 
     @Test
     public void aSkillAndAnUltimateSpendOneLayerEachAndABasicSpendsNone() {

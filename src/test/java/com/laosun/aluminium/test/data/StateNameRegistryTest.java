@@ -58,8 +58,25 @@ public class StateNameRegistryTest {
             Pattern.compile("\\bstack_added\\s+([^\\s]+)"),
             Pattern.compile("\\benemy_state_count:([^\\s<>=]+)"),
             Pattern.compile("\\bcast_applied:([^\\s<>=]+)"),
+            Pattern.compile("\\bresource_changed:([^\\s<>=]+)"),
             Pattern.compile("\\b(?:self|actor|target|summon)_stacks:([^\\s<>=]+)"),
             Pattern.compile("\\b(?:self|summon|party|max_party)_resource(?:_before)?:([^\\s<>=]+)"));
+
+    /**
+     * Spells a counter name followed by <b>numbers</b>: {@code self_attr_above:<name>:60},
+     * {@code weight_steps: ["<name>:60:-9"]} and {@code steps}/{@code per_steps: "<name>:120"}.
+     *
+     * <p>The name is everything before the trailing numbers, so the split is from the RIGHT - a name may carry colons of
+     * its own ({@code char:1506/hidden_score}), and the engine's readers were changed to split the same way
+     * ({@code TriggerInterpreter.weightOf} / {@code TriggerTable.referencedResources} / {@code TriggerMagnitudes}).
+     */
+    private static final List<String> STEP_FIELDS = List.of("steps", "per_steps");
+
+    /** {@code <name>:<threshold>:<delta>} - the {@code weight_steps} entry shape. */
+    private static final Pattern WEIGHT_STEP = Pattern.compile("^(.*):-?\\d+(?:\\.\\d+)?:-?\\d+(?:\\.\\d+)?$");
+
+    /** Fields holding a <b>list</b> of state names. */
+    private static final List<String> STATE_LIST_FIELDS = List.of("ally_states");
 
     /** Fields whose value IS a name, on any op. */
     private static final List<String> NAME_FIELDS = List.of(
@@ -242,6 +259,13 @@ public class StateNameRegistryTest {
             } else {
                 rules.addAll(rulesOf(document.getAsJsonObject()));
             }
+            if (GLOBAL_FILES.contains(name)) {
+                // The hand-maintained data table is keyed by cid and then by slot, and its rows carry `castable_when`
+                // lists that quote conditions ("self has_state 往昔的涟漪"). Walk it as a tree: any object holding one of
+                // the condition keys is a decision point, wherever it sits.
+                scanDeep(document, users, name);
+                continue;
+            }
             for (JsonObject rule : rules) {
                 for (JsonElement when : conditionsOf(rule)) {
                     if (when.isJsonObject()) {
@@ -295,6 +319,26 @@ public class StateNameRegistryTest {
                             while (matcher.find()) {
                                 note(users, withoutStepsDivisor(matcher.group(1)), name);
                             }
+                        }
+                        // `self_attr_above:<name>:<n>` and `steps:<counter>:<n>` name an attribute OR a counter behind
+                        // trailing numbers. Only the COUNTER case is a state identity: an attribute name (SPEED,
+                        // DEFENCE, CRIT_CHANCE) is an {@code AttributeType} and has its own closed set.
+                        noteCounterSpelling(users, spelled, name);
+                    }
+                    for (String stepField : STEP_FIELDS) {
+                        for (String spelled : stringsAt(op, stepField)) {
+                            noteCounterSpelling(users, "steps:" + spelled.trim(), name);
+                        }
+                    }
+                    for (String spelled : stringsAt(op, "weight_steps")) {
+                        Matcher matcher = WEIGHT_STEP.matcher(spelled.trim());
+                        if (matcher.matches()) {
+                            note(users, matcher.group(1).trim(), name);
+                        }
+                    }
+                    for (String stateListField : STATE_LIST_FIELDS) {
+                        for (String spelled : stringsAt(op, stateListField)) {
+                            note(users, spelled.trim(), name);
                         }
                     }
                 }
@@ -396,6 +440,127 @@ public class StateNameRegistryTest {
     }
 
     /**
+     * Notes the counter a `self_attr_above:` / `steps:` spelling reads, when that name is <b>not</b> an attribute.
+     *
+     * <p>The engine tries {@code AttributeType} first, so `self_attr_above:SPEED:120` is an attribute read and has no
+     * state identity behind it. Only the fall-back branch - a counter the unit owns - is a name this table knows.
+     *
+     * @param users   the name → files map being built
+     * @param spelled the scale's value
+     * @param file    the file being walked
+     */
+    private static void noteCounterSpelling(Map<String, Set<String>> users, String spelled, String file) {
+        String trimmed = spelled.trim();
+        String rest;
+        if (trimmed.startsWith("self_attr_above:")) {
+            rest = trimmed.substring("self_attr_above:".length());
+        } else if (trimmed.startsWith("steps:")) {
+            rest = trimmed.substring("steps:".length());
+        } else {
+            return;
+        }
+        // A stack spelling carries its own prefix and maybe a `/N` divisor: `actor_stacks:<name>/1`.
+        for (String prefix : List.of("self_stacks:", "actor_stacks:", "target_stacks:", "summon_stacks:")) {
+            if (rest.startsWith(prefix)) {
+                String name = withoutStepsDivisor(rest.substring(prefix.length()).trim());
+                if (!name.isEmpty()) {
+                    note(users, name, file);
+                }
+                return;
+            }
+        }
+        if (rest.matches(".*/\\d+$")) {
+            rest = withoutStepsDivisor(rest);
+        }
+        // An attribute spelling may subtract a number (`CRIT_ATTACK-1.2`): the attribute is what precedes it.
+        Matcher attributeMinus = Pattern.compile("^(.+?)-\\d+(?:\\.\\d+)?$").matcher(rest);
+        String candidate = attributeMinus.matches() ? attributeMinus.group(1).trim() : rest;
+        if (COUNT_VARIABLES.contains(candidate)) {
+            return;      // an engine counter, not a content state
+        }
+        // Drop the trailing step (`:0.2`), then a subtracted threshold (`-1.2`): what is left is the name the step reads.
+        int lastColon = candidate.lastIndexOf(':');
+        if (lastColon >= 0) {
+            candidate = candidate.substring(0, lastColon).trim();
+        }
+        Matcher minusSomething = Pattern.compile("^(.+?)-\\d+(?:\\.\\d+)?$").matcher(candidate);
+        if (minusSomething.matches()) {
+            candidate = minusSomething.group(1).trim();
+        }
+        if (candidate.isEmpty() || COUNT_VARIABLES.contains(candidate)) {
+            return;      // blank, or an engine counter such as max_energy / target_debuffs_from_self
+        }
+        try {
+            com.laosun.aluminium.enums.AttributeType.fromString(candidate);
+            return;      // an attribute: the engine reads it as one, so it is not a state identity
+        } catch (IllegalArgumentException notAnAttribute) {
+            note(users, candidate, file);
+        }
+    }
+
+    /** Files that hold names but belong to no single content id, so any declared identity may serve them. */
+    private static final Set<String> GLOBAL_FILES = Set.of("skill_effects");
+
+    /**
+     * Walks a data table as a tree and notes every condition it finds: an object carrying {@code when} /
+     * {@code target_when} / {@code castable_when} is a decision point, wherever it sits in the nesting.
+     *
+     * @param node  the current node
+     * @param users the name → files map being built
+     * @param file  the file being walked
+     */
+    private static void scanDeep(JsonElement node, Map<String, Set<String>> users, String file) {
+        if (node.isJsonArray()) {
+            for (JsonElement child : node.getAsJsonArray()) {
+                scanDeep(child, users, file);
+            }
+            return;
+        }
+        if (!node.isJsonObject()) {
+            return;
+        }
+        JsonObject object = node.getAsJsonObject();
+        for (JsonElement when : conditionsOf(object)) {
+            if (when.isJsonPrimitive()) {
+                for (Pattern pattern : CONDITIONS) {
+                    Matcher matcher = pattern.matcher(when.getAsString());
+                    while (matcher.find()) {
+                        note(users, matcher.group(1), file);
+                    }
+                }
+            }
+        }
+        for (String key : object.keySet()) {
+            scanDeep(object.get(key), users, file);
+        }
+    }
+
+    /** The string values of a field that may be a single string or an array of them ({@code weight_steps}, {@code steps},
+     * {@code ally_states}).
+     *
+     * @param op    the effect spec
+     * @param field the JSON key
+     * @return every string it holds
+     */
+    private static List<String> stringsAt(JsonObject op, String field) {
+        List<String> values = new ArrayList<>();
+        if (!op.has(field)) {
+            return values;
+        }
+        JsonElement element = op.get(field);
+        if (element.isJsonPrimitive()) {
+            values.add(element.getAsString());
+        } else if (element.isJsonArray()) {
+            for (JsonElement one : element.getAsJsonArray()) {
+                if (one.isJsonPrimitive()) {
+                    values.add(one.getAsString());
+                }
+            }
+        }
+        return values;
+    }
+
+    /**
      * A {@code steps:} expression ends with a numeric divisor ({@code actor_stacks:X/1}), while an identity's own key
      * carries a slug after its slash ({@code char:1202/blessing}). Both arrive as one captured run, so the divisor is
      * dropped and the slug kept.
@@ -414,7 +579,7 @@ public class StateNameRegistryTest {
     /** Every condition list on a rule: `when` and the target-scoped `target_when`. */
     private static List<JsonElement> conditionsOf(JsonObject rule) {
         List<JsonElement> conditions = new ArrayList<>();
-        for (String key : List.of("when", "target_when")) {
+        for (String key : List.of("when", "target_when", "castable_when")) {
             for (JsonElement element : arrayOf(rule, key)) {
                 conditions.add(element);
             }
@@ -426,7 +591,19 @@ public class StateNameRegistryTest {
         return object.has(key) && object.get(key).isJsonArray() ? object.getAsJsonArray(key) : new JsonArray();
     }
 
+    /**
+     * Engine vocabulary a step spelling may name that is <b>not</b> a content state: the battle skill points, the
+     * owner's max energy, and the debuffs it applied. Filtered here rather than in each matcher, so no path can
+     * reintroduce them as identities.
+     */
+    private static final Set<String> ENGINE_NAMES =
+            Set.of("max_energy", "target_debuffs_from_self", "skill_points", "enemy_count", "shielded_count",
+                    "target_debuff_count", "target_dot_count", "target_weakness_count");
+
     private static void note(Map<String, Set<String>> users, String name, String file) {
+        if (ENGINE_NAMES.contains(name)) {
+            return;
+        }
         users.computeIfAbsent(name, ignored -> new LinkedHashSet<>()).add(file);
     }
 

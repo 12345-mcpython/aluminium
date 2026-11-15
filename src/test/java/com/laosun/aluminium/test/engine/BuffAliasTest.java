@@ -25,13 +25,13 @@ public class BuffAliasTest {
     @Test
     public void aBuffAnswersToTheOtherNamesItAliases() {
         Enemy enemy = enemyInBattle();
-        StackBuff arcana = new StackBuff("奥迹", 99, true, 50);
+        StackBuff arcana = new StackBuff("char:1307/arcana", 99, true, 50);
         arcana.setCountsAs(List.of("dot:wind_shear"), null);
         enemy.getBuffManager().addBuff(arcana);
 
-        Assertions.assertTrue(enemy.getBuffManager().hasState("奥迹"), "precondition: the buff is on the unit");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:1307/arcana"), "precondition: the buff is on the unit");
         Assertions.assertTrue(enemy.getBuffManager().hasState("dot:wind_shear"),
-                "「处于【奥迹】状态时，也会被视为陷入了dot:wind_shear状态」 - the alias answers");
+                "「处于【char:1307/arcana】状态时，也会被视为陷入了风化状态」 - the alias answers");
         Assertions.assertFalse(enemy.getBuffManager().hasState("dot:bleed"),
                 "an alias answers for the names it lists and no others");
 
@@ -39,7 +39,7 @@ public class BuffAliasTest {
         Assertions.assertEquals(0, enemy.getBuffManager().allBuffsOf(DotBuff.class).size(),
                 "「被视为」 must not apply a DOT - four DOTs would deal four DOTs' damage, which the sentence does not say");
 
-        enemy.getBuffManager().removeState("奥迹");
+        enemy.getBuffManager().removeState("char:1307/arcana");
         Assertions.assertFalse(enemy.getBuffManager().hasState("dot:wind_shear"),
                 "the alias lives exactly as long as the buff that carries it");
     }
@@ -47,18 +47,18 @@ public class BuffAliasTest {
     @Test
     public void anAliasAnswersOnlyWhileItsPrerequisiteIsAlsoThere() {
         Enemy enemy = enemyInBattle();
-        StateBuff epiphany = new StateBuff("揭露", 2);
-        epiphany.setCountsAs(List.of("dot:bleed", "dot:burn", "dot:shock"), "奥迹");
+        StateBuff epiphany = new StateBuff("char:1307/epiphany", 2);
+        epiphany.setCountsAs(List.of("dot:bleed", "dot:burn", "dot:shock"), "char:1307/arcana");
         enemy.getBuffManager().addBuff(epiphany);
 
         Assertions.assertFalse(enemy.getBuffManager().hasState("dot:bleed"),
-                "「当敌方目标处于【奥迹】状态时」 - without the prerequisite the alias is not granted");
+                "「当敌方目标处于【char:1307/arcana】状态时」 - without the prerequisite the alias is not granted");
 
-        enemy.getBuffManager().addBuff(new StateBuff("奥迹", 2));
-        Assertions.assertTrue(enemy.getBuffManager().hasState("dot:bleed"), "with 奥迹 on the same unit it is");
+        enemy.getBuffManager().addBuff(new StateBuff("char:1307/arcana", 2));
+        Assertions.assertTrue(enemy.getBuffManager().hasState("dot:bleed"), "with char:1307/arcana on the same unit it is");
         Assertions.assertTrue(enemy.getBuffManager().hasState("dot:shock"), "every name in the list, not just the first");
 
-        enemy.getBuffManager().removeState("奥迹");
+        enemy.getBuffManager().removeState("char:1307/arcana");
         Assertions.assertFalse(enemy.getBuffManager().hasState("dot:bleed"), "and it goes when the prerequisite goes");
     }
 

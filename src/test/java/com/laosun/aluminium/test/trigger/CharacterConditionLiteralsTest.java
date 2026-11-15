@@ -191,9 +191,9 @@ public class CharacterConditionLiteralsTest {
         assertRule(1214, "BATTLE_START", "level_convention", List.of());
         assertRule(1214, "ULT_CAST", "eidolon4_breaking_effect", List.of("actor == self"));
         assertRule(1215, "ULT_CAST", "ult_blessing", List.of("actor == self", "target != self"));
-        assertRule(1215, "DEALING_DAMAGE", "talent_common", List.of("target has_state 承负", "actor is_ally", "from_skill COMMON"));
-        assertRule(1215, "DEALING_DAMAGE", "talent_skill", List.of("target has_state 承负", "actor is_ally", "from_skill SKILL"));
-        assertRule(1215, "DEALING_DAMAGE", "talent_ultra", List.of("target has_state 承负", "actor is_ally", "from_skill ULTRA"));
+        assertRule(1215, "DEALING_DAMAGE", "talent_common", List.of("target has_state char:1215/burden", "actor is_ally", "from_skill COMMON"));
+        assertRule(1215, "DEALING_DAMAGE", "talent_skill", List.of("target has_state char:1215/burden", "actor is_ally", "from_skill SKILL"));
+        assertRule(1215, "DEALING_DAMAGE", "talent_ultra", List.of("target has_state char:1215/burden", "actor is_ally", "from_skill ULTRA"));
         assertRule(1215, "BATTLE_START", "eidolon4_duration", List.of());
         assertRule(1215, "BATTLE_START", "eidolon6_talent", List.of());
         assertRule(1217, "SKILL_CAST", "skill_talisman", List.of("actor == self"));
@@ -222,11 +222,11 @@ public class CharacterConditionLiteralsTest {
         assertRule(1222, "ULT_CAST", "ult_party_heal", List.of("actor == self"));
         assertRule(1222, "ULT_CAST", "eidolon2_party_break_effect", List.of("actor == self"));
         assertRule(1223, "SKILL_CAST", "skill_marks_prey", List.of("actor == self"));
-        assertRule(1223, "ALLY_ATTACK", "talent_additional_damage_on_prey", List.of("target has_state 猎物"));
+        assertRule(1223, "ALLY_ATTACK", "talent_additional_damage_on_prey", List.of("target has_state char:1223/prey"));
         assertRule(1223, "ULT_CAST", "ult_triggers_talent_followup", List.of("actor == self"));
         assertRule(1223, "BATTLE_START", "technique_damage_up", List.of("self has_state sys:technique"));
         assertRule(1223, "BATTLE_START", "eidolon1_energy_on_entry", List.of());
-        assertRule(1223, "ALLY_ATTACK", "eidolon1_energy_per_additional_damage", List.of("target has_state 猎物"));
+        assertRule(1223, "ALLY_ATTACK", "eidolon1_energy_per_additional_damage", List.of("target has_state char:1223/prey"));
         assertRule(1223, "BATTLE_START", "level_convention", List.of());
         assertRule(1223, "SKILL_CAST", "trace_prey_followup_taken", List.of("actor == self"));
         assertRule(1223, "FOLLOW_UP", "trace_skill_point_after_followup", List.of("actor == self"));
@@ -259,7 +259,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1304, "BATTLE_START", "level_convention", List.of());
         assertRule(1305, "ALLY_ATTACK", "talent_chance_followup", List.of("actor == self", "from_skill SKILL"));
         assertRule(1305, "ULT_CAST", "ult_marks_wisemans_folly", List.of("actor == self"));
-        assertRule(1305, "ALLY_ATTACK", "ult_reaction_followup", List.of("actor is_other_ally", "target has_state 智者的短见"));
+        assertRule(1305, "ALLY_ATTACK", "ult_reaction_followup", List.of("actor is_other_ally", "target has_state char:1305/sage_shortcoming"));
         assertRule(1305, "BATTLE_START", "technique_speed_down", List.of("self has_state sys:technique"));
         assertRule(1305, "BATTLE_START", "level_convention", List.of());
         assertRule(1306, "SKILL_CAST", "skill_crit_damage_share_and_advance", List.of("actor == self"));

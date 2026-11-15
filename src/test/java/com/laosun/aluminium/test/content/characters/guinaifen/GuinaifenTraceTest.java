@@ -106,7 +106,7 @@ public class GuinaifenTraceTest {
 
         Assertions.assertTrue(withoutTrace > 0, "precondition: she has a wait to shorten");
         Assertions.assertEquals(0.75 * withoutTrace, withTrace, 1e-6,
-                "the same 25%-of-remaining-wait arithmetic as Robin's Coloratura Cadenza (char:23026/splendour花腔)");
+                "the same 25%-of-remaining-wait arithmetic as Robin's Coloratura Cadenza (华彩花腔)");
     }
 
     // ==================================================================

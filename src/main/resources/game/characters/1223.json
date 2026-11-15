@@ -48,7 +48,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "猎物",
+          "buff": "char:1223/prey",
           "permanent": true,
           "target": "target"
         },
@@ -59,7 +59,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "离场",
+          "buff": "char:1223/off_field",
           "permanent": true,
           "target": "self"
         },
@@ -75,7 +75,7 @@
       "on": "ALLY_ATTACK",
       "id": "talent_additional_damage_on_prey",
       "when": [
-        "target has_state 猎物"
+        "target has_state char:1223/prey"
       ],
       "do": [
         {
@@ -93,7 +93,7 @@
       "on": "ALLY_ATTACK",
       "id": "talent_spends_a_charge_on_every_hit",
       "when": [
-        "target has_state 猎物"
+        "target has_state char:1223/prey"
       ],
       "do": [
         {
@@ -103,7 +103,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "充能计数",
+          "buff": "internal:1223/charge_count",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -118,8 +118,8 @@
       "on": "ALLY_ATTACK",
       "id": "talent_followup_every_third_charge",
       "when": [
-        "target has_state 猎物",
-        "self_stacks:充能计数 >= 3"
+        "target has_state char:1223/prey",
+        "self_stacks:internal:1223/charge_count >= 3"
       ],
       "do": [
         {
@@ -131,7 +131,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "充能计数",
+          "buff": "internal:1223/charge_count",
           "amount": 3,
           "target": "self"
         }
@@ -144,24 +144,24 @@
       "on": "ALLY_ATTACK",
       "id": "talent_prey_leaves_at_zero_charge",
       "when": [
-        "target has_state 猎物",
+        "target has_state char:1223/prey",
         "self_resource:充能 <= 0"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "猎物",
+          "buff": "char:1223/prey",
           "target": "target"
         },
         {
           "op": "REMOVE_BUFF",
-          "buff": "充能计数",
+          "buff": "internal:1223/charge_count",
           "amount": 99,
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "离场",
+          "buff": "char:1223/off_field",
           "target": "self"
         },
         {
@@ -226,7 +226,7 @@
       "on": "ALLY_ATTACK",
       "id": "eidolon1_energy_per_additional_damage",
       "when": [
-        "target has_state 猎物"
+        "target has_state char:1223/prey"
       ],
       "min_eidolon": 1,
       "do": [
@@ -250,7 +250,7 @@
           "percent": 0.25,
           "damage_type": "ADDITIONAL",
           "permanent": true,
-          "buff": "猎物",
+          "buff": "char:1223/prey",
           "target": "target"
         }
       ],
@@ -283,19 +283,19 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "孤立",
+          "buff": "char:1223/isolated",
           "blocks": "skill",
           "permanent": true,
           "target": "self"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "猎物",
+          "buff": "char:1223/prey",
           "target": "all_enemies"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "离场",
+          "buff": "char:1223/off_field",
           "target": "self"
         },
         {
@@ -353,7 +353,7 @@
       "id": "eidolon2_crit_damage_against_the_prey",
       "min_eidolon": 2,
       "when": [
-        "target has_state 猎物"
+        "target has_state char:1223/prey"
       ],
       "do": [
         {

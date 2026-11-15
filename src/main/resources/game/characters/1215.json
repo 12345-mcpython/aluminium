@@ -36,7 +36,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
           "scale": "self_attr:SPEED",
-          "buff": "敕令",
+          "buff": "char:1215/edict",
           "turns": 2,
           "target": "target",
           "percent": 0.2
@@ -44,14 +44,14 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "buff": "敕令",
+          "buff": "char:1215/edict",
           "turns": 2,
           "target": "target",
           "percent": 0.6
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "敕令",
+          "buff": "char:1215/edict",
           "turns": 2,
           "target": "target"
         }
@@ -63,7 +63,7 @@
     {
       "on": "KILL",
       "when": [
-        "actor has_state 敕令"
+        "actor has_state char:1215/edict"
       ],
       "do": [
         {
@@ -146,22 +146,22 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "承负",
+          "buff": "char:1215/burden",
           "target": "all_enemies"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "承负次数",
+          "buff": "internal:1215/burden_count",
           "target": "all_enemies"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "承负返还",
+          "buff": "internal:1215/burden_refund",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "承负",
+          "buff": "char:1215/burden",
           "permanent": true,
           "target": "target"
         }
@@ -173,14 +173,14 @@
     {
       "on": "ALLY_ATTACK",
       "when": [
-        "target has_state 承负",
+        "target has_state char:1215/burden",
         "actor is_other_ally",
         "from_skill COMMON"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "承负次数",
+          "buff": "internal:1215/burden_count",
           "max_stacks": 2,
           "permanent": true,
           "target": "target"
@@ -193,14 +193,14 @@
     {
       "on": "ALLY_ATTACK",
       "when": [
-        "target has_state 承负",
+        "target has_state char:1215/burden",
         "actor is_other_ally",
         "from_skill SKILL"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "承负次数",
+          "buff": "internal:1215/burden_count",
           "max_stacks": 2,
           "permanent": true,
           "target": "target"
@@ -213,14 +213,14 @@
     {
       "on": "ALLY_ATTACK",
       "when": [
-        "target has_state 承负",
+        "target has_state char:1215/burden",
         "actor is_other_ally",
         "from_skill ULTRA"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "承负次数",
+          "buff": "internal:1215/burden_count",
           "max_stacks": 2,
           "permanent": true,
           "target": "target"
@@ -233,7 +233,7 @@
     {
       "on": "ALLY_ATTACK",
       "when": [
-        "target_stacks:承负次数 >= 2"
+        "target_stacks:internal:1215/burden_count >= 2"
       ],
       "do": [
         {
@@ -242,7 +242,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "承负返还",
+          "buff": "internal:1215/burden_refund",
           "max_stacks": 2,
           "permanent": true,
           "target": "target"
@@ -260,12 +260,12 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "承负次数",
+          "buff": "internal:1215/burden_count",
           "target": "target"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "承负",
+          "buff": "char:1215/burden",
           "target": "target"
         }
       ],
@@ -276,7 +276,7 @@
     {
       "on": "DEALING_DAMAGE",
       "when": [
-        "target has_state 承负",
+        "target has_state char:1215/burden",
         "actor is_ally",
         "from_skill COMMON"
       ],
@@ -296,7 +296,7 @@
     {
       "on": "DEALING_DAMAGE",
       "when": [
-        "target has_state 承负",
+        "target has_state char:1215/burden",
         "actor is_ally",
         "from_skill SKILL"
       ],
@@ -316,7 +316,7 @@
     {
       "on": "DEALING_DAMAGE",
       "when": [
-        "target has_state 承负",
+        "target has_state char:1215/burden",
         "actor is_ally",
         "from_skill ULTRA"
       ],
@@ -336,8 +336,8 @@
     {
       "on": "KILL",
       "when": [
-        "target has_state 承负",
-        "target_stacks:承负返还 <= 1"
+        "target has_state char:1215/burden",
+        "target_stacks:internal:1215/burden_refund <= 1"
       ],
       "do": [
         {
@@ -397,22 +397,22 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "承负",
+          "buff": "char:1215/burden",
           "target": "all_enemies"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "承负次数",
+          "buff": "internal:1215/burden_count",
           "target": "all_enemies"
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "承负返还",
+          "buff": "internal:1215/burden_refund",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "承负",
+          "buff": "char:1215/burden",
           "permanent": true,
           "target": "pick"
         }

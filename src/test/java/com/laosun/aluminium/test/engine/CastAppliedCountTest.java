@@ -192,7 +192,7 @@ public class CastAppliedCountTest {
         double withoutEidolon = shippedUltimateEnergy(0);
 
         Assertions.assertEquals(18, withEidolon - withoutEidolon, EPS,
-                "「终结技每ctrl:frozen1个目标，为三月七恢复6点能量」 (for every target the Ultimate freezes, March 7th restores 6 Energy) × the 3 enemies her ultimate froze");
+                "「终结技每冻结1个目标，为三月七恢复6点能量」 (for every target the Ultimate freezes, March 7th restores 6 Energy) × the 3 enemies her ultimate froze");
     }
 
     /**

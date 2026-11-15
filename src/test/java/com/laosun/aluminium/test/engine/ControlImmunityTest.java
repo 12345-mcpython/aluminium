@@ -43,7 +43,7 @@ public class ControlImmunityTest {
      */
     @Test
     public void withoutTheTransformationTheControlLands() {
-        Assertions.assertTrue(controlledAfter(false), "「char:1408/transformation期间」 (during the transformation)-- outside it she is controlable");
+        Assertions.assertTrue(controlledAfter(false), "「变身期间」 (during the transformation)-- outside it she is controlable");
     }
 
     // ==================================================================

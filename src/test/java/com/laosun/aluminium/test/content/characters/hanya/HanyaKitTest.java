@@ -49,7 +49,7 @@ public class HanyaKitTest {
         Assertions.assertEquals(allySpeedBefore + 0.2 * herSpeed, f.ally.getAttribute(AttributeType.SPEED).get(), 1.0,
                 "「提高数值等同于寒鸦速度的20%」 (raises by an amount equal to 20% of Hanya's SPD): a derived share of HER panel, not a percentage of the ally's speed");
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.ATTACK).get() > allyAttackBefore, "…plus a flat 60% ATK");
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("敕令"),
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("char:1215/edict"),
                 "and the effect is also a STATE, which is the only way Eidolon 1's 「持有终结技效果的我方目标」 (an ally holding the Ultimate's effect) is readable");
         Assertions.assertEquals(herAttackBefore, f.hanya.getAttribute(AttributeType.ATTACK).get(), EPS,
                 "「指定我方单体」 (a designated single ally): a self-cast is not a target (target != self)");
@@ -91,7 +91,7 @@ public class HanyaKitTest {
         f.allyKills();
 
         Assertions.assertEquals(before, remainingWait(f, f.hanya), 1.0,
-                "the ally never received the decree state (敕令), so 「持有终结技效果的我方目标消灭敌方目标时」 (when an ally holding the Ultimate's effect kills an enemy target) does not apply");
+                "the ally never received the decree state (char:1215/edict), so 「持有终结技效果的我方目标消灭敌方目标时」 (when an ally holding the Ultimate's effect kills an enemy target) does not apply");
     }
 
     /**

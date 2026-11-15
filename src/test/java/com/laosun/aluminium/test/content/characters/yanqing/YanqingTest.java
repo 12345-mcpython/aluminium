@@ -372,8 +372,8 @@ public class YanqingTest {
         battle.processRequests();
 
         Assertions.assertTrue(enemy.getBuffManager().hasState("ctrl:frozen"),
-                "「有 65% 的基础概率使其陷入ctrl:frozen状态」 — a zero roll on an unresisting target lands it");
-        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「ctrl:frozen状态下，敌方目标不能行动」");
+                "「有 65% 的基础概率使其陷入冻结状态」 — a zero roll on an unresisting target lands it");
+        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」");
 
         double before = enemy.getCurrentHp();
         battle.tickDots(enemy);

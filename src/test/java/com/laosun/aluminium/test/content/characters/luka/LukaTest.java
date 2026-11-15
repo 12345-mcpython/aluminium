@@ -119,7 +119,7 @@ public class LukaTest {
         f.skillCast();
 
         var dots = f.enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.DotBuff.class);
-        Assertions.assertEquals(1, dots.size(), "「使目标陷入dot:bleed状态」 (puts the target into the Bleed (dot:bleed) state)");
+        Assertions.assertEquals(1, dots.size(), "「使目标陷入裂伤状态」 (puts the target into the Bleed (dot:bleed) state)");
         Assertions.assertEquals(attack * 3.38, dots.get(0).getBaseDamage(), 1e-3,
                 "⚠ the shipped `cap_scale`/`cap_percent` mapped: the per-turn damage is the owner's attack × 3.38. An "
                         + "unmapped key would leave the DOT uncapped and read 24% of the victim's Max HP instead — a hole no "
@@ -281,7 +281,7 @@ public class LukaTest {
     }
 
     /**
-     * 卢卡's technique: 「进入战斗后对敌方随机单体造成 50% 攻击力物理伤害，并有 100% 基础概率使该目标陷入与战技相同的dot:bleed状态。
+     * 卢卡's technique: 「进入战斗后对敌方随机单体造成 50% 攻击力物理伤害，并有 100% 基础概率使该目标陷入与战技相同的裂伤状态。
      * 随后卢卡额外获得 1 层【斗志】」.
      *
      * <p>The two halves must land on <b>the same</b> randomly chosen enemy - that is what the rule-level pick is for (a

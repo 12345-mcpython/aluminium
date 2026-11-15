@@ -29,9 +29,9 @@ public class HolderStateGateTest {
         battle.startBattle();
 
         VulnerabilityBuff bonus = new VulnerabilityBuff(2, 0.25, true, null, null, null);
-        bonus.gateHolder("揭露");
+        bonus.gateHolder("char:1307/epiphany");
         enemy.getBuffManager().addBuff(bonus);
-        enemy.getBuffManager().addBuff(new StateBuff("揭露", 2));
+        enemy.getBuffManager().addBuff(new StateBuff("char:1307/epiphany", 2));
         Assertions.assertEquals(1, enemy.getBuffManager().allBuffsOf(VulnerabilityBuff.class).size(),
                 "precondition: the modifier is on the victim");
 
@@ -40,7 +40,7 @@ public class HolderStateGateTest {
         Assertions.assertEquals(1, enemy.getBuffManager().allBuffsOf(VulnerabilityBuff.class).size(),
                 "the state is still held, so the modifier stays");
 
-        enemy.getBuffManager().removeState("揭露");
+        enemy.getBuffManager().removeState("char:1307/epiphany");
         enemy.getBuffManager().beforeMove();
 
         Assertions.assertEquals(0, enemy.getBuffManager().allBuffsOf(VulnerabilityBuff.class).size(),

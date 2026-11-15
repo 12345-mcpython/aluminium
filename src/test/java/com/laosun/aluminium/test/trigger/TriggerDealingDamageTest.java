@@ -24,7 +24,7 @@ import java.util.List;
 
 /**
  * Damage-instance conditions: the {@code DEALING_DAMAGE} event, the {@code BOOST_DAMAGE} op, and the DoT
- * state names that make them useful together - i.e. "对处于dot:burn状态的目标造成的伤害提高 20%".
+ * state names that make them useful together - i.e. "对处于灼烧状态的目标造成的伤害提高 20%".
  *
  * <p><b>Why a new event was needed.</b> {@code ALLY_ATTACK} fires <i>after</i> an attack is fully settled, so
  * at that point the number is already final. A bonus that depends on the <b>target's state at the moment of
@@ -224,7 +224,7 @@ public class TriggerDealingDamageTest {
     }
 
     /**
-     * Puts a Fire DoT on {@code target} - what "陷入dot:burn状态" leaves behind.
+     * Puts a Fire DoT on {@code target} - what "陷入灼烧状态" leaves behind.
      */
     private static void burn(Enemy target, Character source) {
         target.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));

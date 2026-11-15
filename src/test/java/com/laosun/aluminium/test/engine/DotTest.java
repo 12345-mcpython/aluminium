@@ -266,10 +266,10 @@ public class DotTest {
      * element, the magnitude and the chance the spec states, and the {@code has_state} name that
      * follows from the element.
      *
-     * <p>"使目标陷入dot:burn状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the
+     * <p>"使目标陷入灼烧状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the
      * {@code has_state} name follows from the element (Fire to burn (dot:burn)) with no second field.
      * Before this op only a weakness break could attach a DOT ({@code attachBreakDot}), so the whole
-     * "使目标陷入dot:burn/dot:shock/dot:bleed/dot:wind_shear状态" family - 11 of the 9documents - had
+     * "使目标陷入灼烧/dot:shock/dot:bleed/风化状态" family - 11 of the 9documents - had
      * no spelling.
      *
      * <p>"每回合造成等同于三月七60%攻击力的冰属性伤害": the magnitude is a share of the <b>rule
@@ -326,7 +326,7 @@ public class DotTest {
                         "and frozen: a later change to her panel cannot change a DOT that is already burning"),
                 () -> Assertions.assertEquals(1250, baseWithConstant, EPS, "0.6 × 2000 + 50"),
                 () -> Assertions.assertEquals(0, resistedInstances,
-                        "100% effect resistance: 「陷入dot:burn状态」 (falls into the Burn state) did not happen, so there is no DOT at all"),
+                        "100% effect resistance: 「陷入灼烧状态」 (falls into the Burn state) did not happen, so there is no DOT at all"),
                 () -> Assertions.assertEquals(1, landedInstances,
                         "and with no resistance, a base chance of 1 always lands"));
     }

@@ -19,7 +19,7 @@ import java.util.List;
  * The rule-level {@code pick}: one selector resolved <b>once per firing</b>, so several effects can name the same
  * randomly chosen unit.
  *
- * <p>Reader: 1111 Luka's technique (「对敌方**随机单体**造成伤害，并有…使**该目标**陷入与战技相同的dot:bleed」 - damage and bleed must
+ * <p>Reader: 1111 Luka's technique (「对敌方**随机单体**造成伤害，并有…使**该目标**陷入与战技相同的裂伤」 - damage and bleed must
  * land on one enemy). Without it, {@code random_enemy} is resolved per effect and the two halves would roll separately.
  */
 public class SharedRandomPickTest {

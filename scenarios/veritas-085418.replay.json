@@ -1,7 +1,7 @@
 {
   "name": "veritas-085418 — the captured fight, cast by cast",
   "capture": "src/test/resources/captures/veritas-085418.json",
-  "note": "⚠ The capture is a WINDOW of a fight already in progress, not a fight from its start: 1409's 「雨过天晴」 is up before event 0 (1415's 生命上限 10320.4433 already carries it, per AGENT.md §3.7k), and 1413's own 生命面板 moves inside the window (2960.0287 → 4526.4984 → 4309.8792). Those prefix states are NOT reproducible by driving this window, so they are declared missing in AGENT.md rather than invented here. What this plan states is what the payload itself states: each enemy's 生命上限 / 防御 / 抗性, and which skill slot each captured cast used. ⚠ The party's panels are NOT written here any more: each member states its `cid` + the light cone it wears, and the panel is COMPUTED by the engine (base row + level + cone + the account dump's relics + traces) - that derivation is itself part of what the replay proves (judge `PanelFromDumpTest`: the computed ATTACK/DEFENCE equal the capture's own panel to 1e-6 relative). The capture's per-cast panel is still installed at each cast, because it moves inside the window (1413's life 2960 → 4526 → 4309) and no replay can earn that. The 星魂 ranks are the account's own (1409 E6 / 1413 E1 / 1415 E2 / 1512 E0, from the 2026-10-18 archive), not the payload's - the payload carries none. The cast → slot table is the manual part ( §4 of the handover ): attack_type 12 is a 忆灵's skill, and a 忆灵's skills live by DATA SLOT, so each entry names the slot and the memosprite it belongs to.",
+  "note": "⚠ The capture is a WINDOW of a fight already in progress, not a fight from its start: 1409's 「char:1409/after_the_rain」 is up before event 0 (1415's 生命上限 10320.4433 already carries it, per AGENT.md §3.7k), and 1413's own 生命面板 moves inside the window (2960.0287 → 4526.4984 → 4309.8792). Those prefix states are NOT reproducible by driving this window, so they are declared missing in AGENT.md rather than invented here. What this plan states is what the payload itself states: each enemy's 生命上限 / 防御 / 抗性, and which skill slot each captured cast used. ⚠ The party's panels are NOT written here any more: each member states its `cid` + the light cone it wears, and the panel is COMPUTED by the engine (base row + level + cone + the account dump's relics + traces) - that derivation is itself part of what the replay proves (judge `PanelFromDumpTest`: the computed ATTACK/DEFENCE equal the capture's own panel to 1e-6 relative). The capture's per-cast panel is still installed at each cast, because it moves inside the window (1413's life 2960 → 4526 → 4309) and no replay can earn that. The 星魂 ranks are the account's own (1409 E6 / 1413 E1 / 1415 E2 / 1512 E0, from the 2026-10-18 archive), not the payload's - the payload carries none. The cast → slot table is the manual part ( §4 of the handover ): attack_type 12 is a 忆灵's skill, and a 忆灵's skills live by DATA SLOT, so each entry names the slot and the memosprite it belongs to.",
   "party": [
     {
       "owner": 1409,
@@ -114,7 +114,7 @@
       "slot": 1,
       "level": 8,
       "target": 1,
-      "note": "长夜's 忆灵技1「追忆，蹁跹，如雨」: six instances on one target (skill_segments.json servants.11413 Skill01 = 6, main=6), ice, base 0.06 x 生命上限 each = the game's 5 x 0.1 + 1 x 0.5 split of one 0.6 row."
+      "note": "长夜's 忆灵技1「char:1415/remembrance，蹁跹，如雨」: six instances on one target (skill_segments.json servants.11413 Skill01 = 6, main=6), ice, base 0.06 x 生命上限 each = the game's 5 x 0.1 + 1 x 0.5 split of one 0.6 row."
     },
     {
       "cast": 2,
@@ -124,7 +124,7 @@
       "target": 2,
       "note": "小伊卡's 忆灵技1「乌云乌云快走开！」: the damage is DELIVERED BY RULES (11409/1 is effect Rules -> 1409's own rule reads the 累计治疗 tally), which expands to every living enemy - the capture shows two targets because the rule/attack reaches all of them. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：10334.0262 ÷ #1（技能 Lv10 行 0.28）= 36907.2364 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
       "resources": {
-        "小伊卡累计治疗": 36907.2364
+        "internal:1409/ika_healing_total": 36907.2364
       }
     },
     {
@@ -176,7 +176,7 @@
       "target": 2,
       "note": "小伊卡 again, after more healing raised the tally. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：17299.796 ÷ #1（技能 Lv10 行 0.28）= 61784.9857 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
       "resources": {
-        "小伊卡累计治疗": 61784.9857
+        "internal:1409/ika_healing_total": 61784.9857
       }
     },
     {
@@ -187,7 +187,7 @@
       "target": 2,
       "note": "小伊卡 again. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：24000.0592 ÷ #1（技能 Lv10 行 0.28）= 85714.4971 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
       "resources": {
-        "小伊卡累计治疗": 85714.4971
+        "internal:1409/ika_healing_total": 85714.4971
       }
     },
     {
@@ -206,7 +206,7 @@
       "target": 1,
       "note": "小伊卡, one living target. ⚠ SEEDED（2026-10-30）：窗口开始时「本场战斗累计治疗数值」已经存在，而 payload 不携带它 ⇒ 小伊卡的伤害会掉到 1 点地板。种子由**捕获自己的每发基值**反解：29927.8128 ÷ #1（技能 Lv10 行 0.28）= 106885.0457 ✓（本行由 `AmountLoadout` 的 `setExactValue` 精确写入 ✓）。",
       "resources": {
-        "小伊卡累计治疗": 106885.0457
+        "internal:1409/ika_healing_total": 106885.0457
       }
     },
     {

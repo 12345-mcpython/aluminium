@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 21026: "攻击力提高#1%,对处于dot:burn或dot:bleed状态的敌方目标造成的伤害提高#2%" (ATK raised by #1%, damage to a burning or wounded enemy raised by #2%) at rank 5.
+ * Light cone 21026: "攻击力提高#1%,对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2%" (ATK raised by #1%, damage to a burning or wounded enemy raised by #2%) at rank 5.
  *
  * <p>ATTACK is flat, so its share scales the post-start base; the disjunction is two rules, the second excluding the first state.
  */

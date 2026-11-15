@@ -306,8 +306,8 @@ public class March7thKitTest {
                 List.of(enemy));
 
         Assertions.assertTrue(enemy.getBuffManager().hasState("ctrl:frozen"),
-                "「有50%基础概率陷入ctrl:frozen状态」 (a 50% base chance to fall into the Frozen state) -- with effect hit +100% and no resistance, this is the certain case");
-        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「ctrl:frozen状态下，敌方目标不能行动」 (while Frozen, the enemy target cannot act)");
+                "「有50%基础概率陷入冻结状态」 (a 50% base chance to fall into the Frozen state) -- with effect hit +100% and no resistance, this is the certain case");
+        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」 (while Frozen, the enemy target cannot act)");
         Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(),
                 "and the first sentence of the ultimate is the engine's own AoE path, not a rule");
 
@@ -447,7 +447,7 @@ public class March7thKitTest {
         Assertions.assertEquals(7, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
                 "Eidolon 2's battle-start shield; the two amendments (Eidolon 4 raising the talent's per-turn cap, the Traces (行迹) \"Ice Spell\" (「冰咒」) "
                         + "raising the ultimate's base chance); Eidolon 3's and Eidolon 5's skill levels plus the talent's "
-                        + "base level (three rules); and the technique's freeze (「进入战斗后…使随机敌方单体陷入ctrl:frozen状态」), "
+                        + "base level (three rules); and the technique's freeze (「进入战斗后…使随机敌方单体陷入冻结状态」), "
                         + "which was the last clause of hers left unwritten -- see the technique cases below");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");

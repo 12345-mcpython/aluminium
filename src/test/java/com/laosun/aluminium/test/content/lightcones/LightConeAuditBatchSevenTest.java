@@ -96,11 +96,11 @@ public class LightConeAuditBatchSevenTest {
         f.battle.applyDamage(f.wearer, new Damage(enemy, f.wearer, DamageElement.PHYSICAL, DamageType.NORMAL, 10));
         f.battle.processRequests();
         double burn = enemy.getCurrentHp() - before + 0;   // the burn ticks on the enemy's turn; read what landed now
-        System.out.println("[21016] 她的防御 " + defence + " ; dot:burn那一发在敌人身上落了 " + burn
-                + " ; 敌人身上有dot:burn = " + (enemy.getBuffManager().hasBuff(com.laosun.aluminium.buff.DotBuff.class)));
+        System.out.println("[21016] 她的防御 " + defence + " ; 灼烧那一发在敌人身上落了 " + burn
+                + " ; 敌人身上有灼烧 = " + (enemy.getBuffManager().hasBuff(com.laosun.aluminium.buff.DotBuff.class)));
         // The burn is a state on the enemy whose per-tick value is 40% of her DEFENCE; the state existing is the reading.
         Assertions.assertTrue(enemy.getBuffManager().hasBuff(com.laosun.aluminium.buff.DotBuff.class),
-                "「受到攻击后有基础概率使敌方目标陷入dot:burn状态」—— 状态要挂在敌人身上");
+                "「受到攻击后有基础概率使敌方目标陷入灼烧状态」—— 状态要挂在敌人身上");
     }
 
     /**

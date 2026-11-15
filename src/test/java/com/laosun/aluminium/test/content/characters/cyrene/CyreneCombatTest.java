@@ -357,14 +357,14 @@ public class CyreneCombatTest {
         SkillExecutor.execute(battle, demiurge.skillAt(1), demiurge, List.of(battle.enemyUnits().get(0)));
         battle.processRequests();
 
-        Assertions.assertTrue(hyacine.getBuffManager().hasState("献予「天空」之诗")
-                        || hyacine.getBuffManager().stacksOf("献予「天空」之诗") > 0,
-                "风堇 holds 「献予「天空」之诗」 (two stacks per grant)");
+        Assertions.assertTrue(hyacine.getBuffManager().hasState("char:1409/ode_to_sky")
+                        || hyacine.getBuffManager().stacksOf("char:1409/ode_to_sky") > 0,
+                "风堇 holds 「char:1409/ode_to_sky」 (two stacks per grant)");
         Assertions.assertTrue(evernight.getBuffManager().hasState("char:1415/ode_to_years"),
                 "长夜月 holds 「char:1415/ode_to_years」");
         Assertions.assertTrue(cyrene.getBuffManager().hasState("char:1415/ode_to_true_self"),
                 "昔涟 holds 「char:1415/ode_to_true_self」");
-        Assertions.assertFalse(robin.getBuffManager().hasState("献予「天空」之诗")
+        Assertions.assertFalse(robin.getBuffManager().hasState("char:1409/ode_to_sky")
                         || robin.getBuffManager().hasState("char:1415/ode_to_years")
                         || robin.getBuffManager().hasState("char:1415/ode_to_true_self"),
                 "知更鸟•晴歌 has NO ode of its own, so the count her Eidolon reads is three, not four");
@@ -449,10 +449,10 @@ public class CyreneCombatTest {
         for (int marked = 0; marked <= 4; marked++) {
             if (marked > 0) {
                 allies.get(marked - 1).getBuffManager()
-                        .addBuff(new com.laosun.aluminium.buff.StateBuff("献予「天空」之诗", 99));
+                        .addBuff(new com.laosun.aluminium.buff.StateBuff("char:1409/ode_to_sky", 99));
             }
             Assertions.assertTrue(allies.get(Math.max(0, marked - 1)).getBuffManager()
-                            .hasState("献予「天空」之诗") == (marked > 0),
+                            .hasState("char:1409/ode_to_sky") == (marked > 0),
                     "the mark is visible to hasState at marked=" + marked);
             List<Damage> settled = new ArrayList<>();
             battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));

@@ -92,12 +92,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "智者的短见",
+          "buff": "char:1305/sage_shortcoming",
           "target": "all_enemies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "智者的短见",
+          "buff": "char:1305/sage_shortcoming",
           "permanent": true,
           "target": "target"
         }
@@ -110,7 +110,7 @@
       "id": "ult_reaction_followup",
       "when": [
         "actor is_other_ally",
-        "target has_state 智者的短见"
+        "target has_state char:1305/sage_shortcoming"
       ],
       "do": [
         {
@@ -134,7 +134,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "秘技减速",
+          "buff": "char:1305/technique_slow",
           "base_chance": 1,
           "turns": 2,
           "target": "all_enemies"
@@ -144,9 +144,9 @@
           "attribute": "SPEED",
           "percent": -0.15,
           "turns": 2,
-          "buff": "秘技减速",
+          "buff": "char:1305/technique_slow",
           "target": "all_enemies",
-          "while_state": "秘技减速"
+          "while_state": "char:1305/technique_slow"
         }
       ],
       "source": "1305 真理医生 秘技 偶像塑造 (130507, Maze/Impair): 「…与处于特殊领域内的敌人进入战斗后，有100%基础概率使敌方每个单体目标速度降低15%，持续2回合。我方制造的领域效果最多存在1个。」",
@@ -219,7 +219,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "归纳",
+          "buff": "char:1305/induction",
           "value": {
             "type": "debuffs",
             "whose": "target"
@@ -239,7 +239,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
-          "per_stack": "self_stacks:归纳",
+          "per_stack": "self_stacks:char:1305/induction",
           "per_stack_cap": 6,
           "per_stack_live": true,
           "percent": 0.025,
@@ -249,7 +249,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
-          "per_stack": "self_stacks:归纳",
+          "per_stack": "self_stacks:char:1305/induction",
           "per_stack_cap": 6,
           "per_stack_live": true,
           "percent": 0.05,
@@ -269,7 +269,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "演绎",
+          "buff": "char:1305/deduction",
           "base_chance": 1,
           "turns": 2,
           "target": "target"
@@ -279,10 +279,10 @@
           "attribute": "EFFECT_RESISTANCE",
           "percent": -0.1,
           "turns": 2,
-          "buff": "演绎",
+          "buff": "char:1305/deduction",
           "target": "target",
           "target_when": [
-            "target has_state 演绎"
+            "target has_state char:1305/deduction"
           ]
         }
       ],
@@ -315,7 +315,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "归纳",
+          "buff": "char:1305/induction",
           "amount": 4,
           "max_stacks": 10,
           "permanent": true,

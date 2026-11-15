@@ -31,19 +31,19 @@ public class BlackSwanTest {
         battle.startBattle();
         double defenceBefore = enemy.getAttribute(AttributeType.DEFENCE).get();
         Assertions.assertTrue(defenceBefore > 0, "the fixture must have defence to shred: " + defenceBefore);
-        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("奥迹"), "nothing before the Skill");
+        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("char:1307/arcana"), "nothing before the Skill");
 
         battle.fire(skillCast(blackSwan, enemy));
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("奥迹"),
-                "「使目标…陷入1层【奥迹】」 (puts the target ... into 1 stack of [奥迹])");
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("char:1307/arcana"),
+                "「使目标…陷入1层【char:1307/arcana】」 (puts the target ... into 1 stack of [char:1307/arcana])");
         Assertions.assertEquals(0.208, (defenceBefore - enemy.getAttribute(AttributeType.DEFENCE).get()) / defenceBefore, 1e-6,
                 "「防御力降低20.80%」 (lowers DEF by 20.80%) of its own defence");
 
         for (int i = 0; i < 60; i++) {
             battle.fire(skillCast(blackSwan, enemy));
         }
-        Assertions.assertEquals(50, enemy.getBuffManager().stacksOf("奥迹"),
-                "「【奥迹】最多叠加50层」 ([奥迹] stacks at most 50 times) -- sixty-one casts must still read fifty");
+        Assertions.assertEquals(50, enemy.getBuffManager().stacksOf("char:1307/arcana"),
+                "「【char:1307/arcana】最多叠加50层」 ([char:1307/arcana] stacks at most 50 times) -- sixty-one casts must still read fifty");
     }
 
     /**
@@ -65,9 +65,9 @@ public class BlackSwanTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Cast.of(TriggerEvent.SKILL_CAST, blackSwan, aimed, 0, 0,
                 com.laosun.aluminium.enums.SkillCategory.BPSKILL, 130702, 0, List.of()));
 
-        Assertions.assertEquals(1, aimed.getBuffManager().stacksOf("奥迹"), "the aimed enemy");
-        Assertions.assertEquals(1, left.getBuffManager().stacksOf("奥迹"), "「与相邻目标」 — the neighbour too");
-        Assertions.assertEquals(1, right.getBuffManager().stacksOf("奥迹"), "both neighbours");
+        Assertions.assertEquals(1, aimed.getBuffManager().stacksOf("char:1307/arcana"), "the aimed enemy");
+        Assertions.assertEquals(1, left.getBuffManager().stacksOf("char:1307/arcana"), "「与相邻目标」 — the neighbour too");
+        Assertions.assertEquals(1, right.getBuffManager().stacksOf("char:1307/arcana"), "both neighbours");
         Assertions.assertEquals(0.208, (leftDefence - left.getAttribute(AttributeType.DEFENCE).get()) / leftDefence, 1e-6,
                 "the neighbour's defence is lowered by the same 20.80%");
         Assertions.assertTrue(aimedDefence > 0, "the fixture must have defence to shred");
@@ -110,7 +110,7 @@ public class BlackSwanTest {
         Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
         battle.startBattle();
         for (int i = 0; i < layers; i++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("char:1307/arcana", 99, true, 50));
         }
         double[] settled = {0};
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled[0] += applied);
@@ -144,7 +144,7 @@ public class BlackSwanTest {
         Battle battle = new Battle(List.of(blackSwan), List.of(left, enemy, right), BattleFixture.alwaysRoll(0.99));
         battle.startBattle();
         for (int i = 0; i < layers; i++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("char:1307/arcana", 99, true, 50));
         }
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.TURN_START, enemy, enemy, 0, 0));
@@ -171,8 +171,8 @@ public class BlackSwanTest {
                 blackSwan, List.of(left, right));
         battle.processRequests();
 
-        Assertions.assertTrue(left.getBuffManager().hasState("揭露"), "「使敌方全体陷入【揭露】」");
-        Assertions.assertTrue(right.getBuffManager().hasState("揭露"), "both of them");
+        Assertions.assertTrue(left.getBuffManager().hasState("char:1307/epiphany"), "「使敌方全体陷入【char:1307/epiphany】」");
+        Assertions.assertTrue(right.getBuffManager().hasState("char:1307/epiphany"), "both of them");
         Assertions.assertTrue(hitFor(blackSwan, left) > before,
                 "「受到的伤害提高 25%」 (" + before + " -> " + hitFor(blackSwan, left) + ")");
     }
@@ -212,7 +212,7 @@ public class BlackSwanTest {
 
         Assertions.assertTrue(afterFirstTurn > afterUlt, "the first turn start pays (from " + start + ")");
         Assertions.assertEquals(afterFirstTurn, blackSwan.getCurrentEnergy(), 1e-9,
-                "「最多触发 1 次」 — the second turn start pays nothing until 揭露 is applied again");
+                "「最多触发 1 次」 — the second turn start pays nothing until char:1307/epiphany is applied again");
     }
 
     /**
@@ -239,7 +239,7 @@ public class BlackSwanTest {
         battle.processRequests();
 
         Assertions.assertEquals(afterTurn, blackSwan.getCurrentEnergy(), 1e-9,
-                "「在【揭露】持续时间内最多触发 1 次」 — the turn start already spent the window's allowance");
+                "「在【char:1307/epiphany】持续时间内最多触发 1 次」 — the turn start already spent the window's allowance");
     }
 
     /**
@@ -256,9 +256,9 @@ public class BlackSwanTest {
         Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
         battle.startBattle();
         for (int i = 0; i < 12; i++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("char:1307/arcana", 99, true, 50));
         }
-        Assertions.assertEquals(12, enemy.getBuffManager().stacksOf("奥迹"), "precondition");
+        Assertions.assertEquals(12, enemy.getBuffManager().stacksOf("char:1307/arcana"), "precondition");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.TURN_START, enemy, enemy, 0, 0));
@@ -269,9 +269,9 @@ public class BlackSwanTest {
         // defect - `SET_STACKS` went through `removeState`, which takes the WHOLE counter off, so twelve layers became
         // ZERO (measured 2026-11-04). "1 layer left" and "no layer left" are different games: with zero, the dot does
         // not come back on the next turn and nothing carries the 「视为风化」 alias.
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("奥迹"),
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("char:1307/arcana"),
                 "「随后重置为 1 层」 — twelve layers are spent down to one, got "
-                        + enemy.getBuffManager().stacksOf("奥迹"));
+                        + enemy.getBuffManager().stacksOf("char:1307/arcana"));
     }
 
     /**
@@ -298,7 +298,7 @@ public class BlackSwanTest {
         battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
                 blackSwan, List.of(enemy));
         battle.processRequests();
-        return blackSwan.getBuffManager().stacksOf("奥迹不重置额度");
+        return blackSwan.getBuffManager().stacksOf("internal:1307/arcana_keep_allowance");
     }
 
     /**
@@ -314,7 +314,7 @@ public class BlackSwanTest {
         Assertions.assertEquals(1, layersAfterTurnStarts(true, 2),
                 "「最多触发 1 次」 — the next turn start resets to exactly one");
         Assertions.assertEquals(1, layersAfterTurnStarts(false, 1),
-                "control: without 揭露 the reset happens on the first turn start");
+                "control: without char:1307/epiphany the reset happens on the first turn start");
     }
 
     /** Layers left after firing {@code turnStarts} turn starts, with or without an Ultimate first. */
@@ -333,14 +333,14 @@ public class BlackSwanTest {
             battle.processRequests();
         }
         for (int i = 0; i < 12; i++) {
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("奥迹", 99, true, 50));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StackBuff("char:1307/arcana", 99, true, 50));
         }
         for (int i = 0; i < turnStarts; i++) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                     TriggerEvent.TURN_START, enemy, enemy, 0, 0));
             battle.processRequests();
         }
-        return Math.max(0, enemy.getBuffManager().stacksOf("奥迹"));
+        return Math.max(0, enemy.getBuffManager().stacksOf("char:1307/arcana"));
     }
 
     /**
@@ -364,7 +364,7 @@ public class BlackSwanTest {
         battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON),
                 blackSwan, List.of(enemy));
         battle.processRequests();
-        return enemy.getBuffManager().stacksOf("奥迹");
+        return enemy.getBuffManager().stacksOf("char:1307/arcana");
     }
 
     /**
@@ -390,7 +390,7 @@ public class BlackSwanTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.ALLY_ATTACK, byTeammate ? ally : blackSwan, enemy, 1, 0));
         battle.processRequests();
-        return enemy.getBuffManager().stacksOf("奥迹");
+        return enemy.getBuffManager().stacksOf("char:1307/arcana");
     }
 
     /**
@@ -417,7 +417,7 @@ public class BlackSwanTest {
     }
 
     /**
-     * 星魂 1: 「处于dot:wind_shear、dot:bleed、dot:burn、dot:shock状态下的敌方目标对应的风、物理、火、雷属性抗性分别降低 25%」.
+     * 星魂 1: 「处于风化、dot:bleed、dot:burn、触电状态下的敌方目标对应的风、物理、火、雷属性抗性分别降低 25%」.
      *
      * <p>Measured per element: the SAME hit lands harder in its own element and unchanged in the others, which is the difference
      * between a per-element resistance reduction and an all-type one.
@@ -462,11 +462,11 @@ public class BlackSwanTest {
         battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
                 blackSwan, List.of(enemy));
         battle.processRequests();
-        Assertions.assertTrue(enemy.getBuffManager().hasState("揭露"), "precondition: the state is on the victim");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:1307/epiphany"), "precondition: the state is on the victim");
         Assertions.assertEquals(1, enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.VulnerabilityBuff.class).size(),
                 "precondition: the +25% sits on the victim");
 
-        enemy.getBuffManager().removeState("揭露");
+        enemy.getBuffManager().removeState("char:1307/epiphany");
         enemy.getBuffManager().beforeMove();
 
         Assertions.assertEquals(0, enemy.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.VulnerabilityBuff.class).size(),
@@ -489,7 +489,7 @@ public class BlackSwanTest {
                 TriggerEvent.TURN_START, enemy, enemy, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(0.0, enemy.getAttribute(wind).get(), 1e-9,
-                "「处于dot:wind_shear…的敌方目标」 — no state, no reduction");
+                "「处于风化…的敌方目标」 — no state, no reduction");
 
         enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("dot:wind_shear", 2));
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
@@ -503,7 +503,7 @@ public class BlackSwanTest {
     }
 
     /**
-     * 「处于【奥迹】状态时，也会被视为陷入了dot:wind_shear状态」 (the 【奥迹】 keyword block): the alias is what makes a rule asking about
+     * 「处于【奥迹】状态时，也会被视为陷入了风化状态」 (the 【奥迹】 keyword block): the alias is what makes a rule asking about
      * dot:wind_shear see an enemy that only has Arcana.
      *
      * <p>Measured through 星魂 1, whose four reductions are gated on the victim's own state - the only place in this kit
@@ -513,9 +513,9 @@ public class BlackSwanTest {
     @Test
     public void arcanaCountsAsWindShear() {
         Assertions.assertEquals(0.0, windReductionAfterTurnStart(false), 1e-9,
-                "control: no Arcana, so nothing is 视为dot:wind_shear and no reduction lands");
+                "control: no Arcana, so nothing is 视为风化 and no reduction lands");
         Assertions.assertEquals(-0.25, windReductionAfterTurnStart(true), 1e-9,
-                "「被视为陷入了dot:wind_shear状态」 - the Arcana layers alone answer for dot:wind_shear (the reduction is stored negative)");
+                "「被视为陷入了风化状态」 - the Arcana layers alone answer for dot:wind_shear (the reduction is stored negative)");
     }
 
     /** The wind reduction on a victim after one of its turn starts, with or without Arcana from the Skill. */
@@ -530,7 +530,7 @@ public class BlackSwanTest {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                     TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
             battle.processRequests();
-            Assertions.assertTrue(enemy.getBuffManager().stacksOf("奥迹") >= 1, "precondition: the Skill applies Arcana");
+            Assertions.assertTrue(enemy.getBuffManager().stacksOf("char:1307/arcana") >= 1, "precondition: the Skill applies Arcana");
         }
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.TURN_START, enemy, enemy, 0, 0));
@@ -539,7 +539,7 @@ public class BlackSwanTest {
     }
 
     /**
-     * 终结技: 「当敌方目标处于【奥迹】状态时，也会被视为同时陷入了dot:wind_shear、dot:bleed、dot:burn、dot:shock状态」.
+     * 终结技: 「当敌方目标处于【奥迹】状态时，也会被视为同时陷入了风化、dot:bleed、dot:burn、触电状态」.
      *
      * <p>Two numbers per side, and the control is the one that matters: 揭露 on its own must <b>not</b> grant the three
      * extra names (the sentence requires Arcana), so the same fixture without the Skill keeps all four at zero.
@@ -548,12 +548,12 @@ public class BlackSwanTest {
     public void epiphanyMakesOnlyTheArcanaTargetsCount() {
         double[] epiphanyOnly = resistancesAfterEpiphany(false);
         Assertions.assertArrayEquals(new double[]{0, 0, 0, 0}, epiphanyOnly, 1e-9,
-                "control: 揭露 without 奥迹 is not 「处于【奥迹】状态」, so none of the four names applies");
+                "control: char:1307/epiphany without char:1307/arcana is not 「处于【char:1307/arcana】状态」, so none of the four names applies");
 
         double[] both = resistancesAfterEpiphany(true);
         for (int i = 0; i < both.length; i++) {
             Assertions.assertEquals(-0.25, both[i], 1e-9,
-                    "「会被视为同时陷入了dot:wind_shear、dot:bleed、dot:burn、dot:shock」 - every one of the four, index " + i);
+                    "「会被视为同时陷入了风化、dot:bleed、dot:burn、dot:shock」 - every one of the four, index " + i);
         }
     }
 
@@ -566,12 +566,12 @@ public class BlackSwanTest {
         battle.castImmediate(blackSwan.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA),
                 blackSwan, List.of(enemy));
         battle.processRequests();
-        Assertions.assertTrue(enemy.getBuffManager().hasState("揭露"), "precondition: the Ultimate marks the enemy");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("char:1307/epiphany"), "precondition: the Ultimate marks the enemy");
         if (withArcana) {
             battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                     TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
             battle.processRequests();
-            Assertions.assertTrue(enemy.getBuffManager().stacksOf("奥迹") >= 1, "precondition: the Skill applies Arcana");
+            Assertions.assertTrue(enemy.getBuffManager().stacksOf("char:1307/arcana") >= 1, "precondition: the Skill applies Arcana");
         }
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(
                 TriggerEvent.TURN_START, enemy, enemy, 0, 0));

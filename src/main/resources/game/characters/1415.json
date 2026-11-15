@@ -216,7 +216,7 @@
           "percent_per_ally_state": 0.06,
           "ally_state_cap": 4,
           "ally_states": [
-            "献予「天空」之诗",
+            "char:1409/ode_to_sky",
             "char:1415/ode_to_years",
             "char:1415/ode_to_true_self"
           ],
@@ -418,7 +418,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "献予「天空」之诗",
+          "buff": "char:1409/ode_to_sky",
           "amount": 2,
           "max_stacks": 99999,
           "permanent": true,
@@ -891,7 +891,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "献予「天空」之诗",
+          "buff": "char:1409/ode_to_sky",
           "amount": 2,
           "max_stacks": 99999,
           "permanent": true,

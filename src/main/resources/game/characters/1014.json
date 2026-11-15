@@ -73,7 +73,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "星魂4穿透",
+          "buff": "char:1014/eidolon4_pen",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -93,7 +93,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "RESISTANCE_REDUCTION",
           "percent": 0.04,
-          "per_stack": "星魂4穿透",
+          "per_stack": "char:1014/eidolon4_pen",
           "per_stack_cap": 3,
           "per_stack_live": true,
           "permanent": true,
@@ -126,7 +126,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "amount": 1,
           "max_stacks": 60,
           "permanent": true,
@@ -150,7 +150,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "amount": 3,
           "max_stacks": 60,
           "permanent": true,
@@ -187,7 +187,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "amount": 1,
           "max_stacks": 60,
           "permanent": true,
@@ -207,7 +207,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "amount": 1,
           "max_stacks": 60,
           "permanent": true,
@@ -233,7 +233,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "amount": 2,
           "max_stacks": 60,
           "permanent": true,
@@ -319,7 +319,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "amount": 2,
           "max_stacks": 60,
           "permanent": true,
@@ -334,12 +334,12 @@
       "id": "skill_gains_three_when_it_cannot_fill",
       "when": [
         "actor == self",
-        "self_energy + self_stacks:炉心共鸣 * 8 < self_max_energy"
+        "self_energy + self_stacks:char:1014/core_resonance * 8 < self_max_energy"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "amount": 3,
           "max_stacks": 60,
           "permanent": true,
@@ -355,12 +355,12 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "self has_state 首次终结技已触发"
+        "self has_state internal:1014/first_ultimate_done"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "终结技计数",
+          "buff": "internal:1014/ultimate_count",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -385,7 +385,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "首次终结技已触发",
+          "buff": "internal:1014/first_ultimate_done",
           "turns": 99,
           "target": "self"
         }
@@ -399,7 +399,7 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "self_stacks:终结技计数 >= 3"
+        "self_stacks:internal:1014/ultimate_count >= 3"
       ],
       "do": [
         {
@@ -408,7 +408,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "终结技计数",
+          "buff": "internal:1014/ultimate_count",
           "target": "self"
         }
       ],
@@ -448,7 +448,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "魔力放出",
+          "buff": "char:1014/mana_release",
           "turns": 99,
           "target": "self"
         }
@@ -465,7 +465,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "魔力放出",
+          "buff": "char:1014/mana_release",
           "turns": 99,
           "target": "self"
         }
@@ -497,14 +497,14 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self has_state 魔力放出",
-        "self_stacks:炉心共鸣 >= 1",
-        "self_energy + self_stacks:炉心共鸣 * 8 >= self_max_energy"
+        "self has_state char:1014/mana_release",
+        "self_stacks:char:1014/core_resonance >= 1",
+        "self_energy + self_stacks:char:1014/core_resonance * 8 >= self_max_energy"
       ],
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "魔力放出",
+          "buff": "char:1014/mana_release",
           "target": "self"
         },
         {
@@ -525,8 +525,8 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self_stacks:炉心共鸣 >= 1",
-        "self_energy + self_stacks:炉心共鸣 * 8 >= self_max_energy"
+        "self_stacks:char:1014/core_resonance >= 1",
+        "self_energy + self_stacks:char:1014/core_resonance * 8 >= self_max_energy"
       ],
       "do": [
         {
@@ -536,7 +536,7 @@
             "inputs": [
               {
                 "type": "stacks",
-                "buff": "炉心共鸣"
+                "buff": "char:1014/core_resonance"
               },
               {
                 "type": "const",
@@ -553,7 +553,7 @@
             "inputs": [
               {
                 "type": "stacks",
-                "buff": "炉心共鸣"
+                "buff": "char:1014/core_resonance"
               },
               {
                 "type": "const",
@@ -564,7 +564,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "target": "self"
         }
       ],
@@ -578,8 +578,8 @@
       "when": [
         "actor == self",
         "from_skill SKILL",
-        "self_stacks:炉心共鸣 >= 1",
-        "self_energy + self_stacks:炉心共鸣 * 8 >= self_max_energy"
+        "self_stacks:char:1014/core_resonance >= 1",
+        "self_energy + self_stacks:char:1014/core_resonance * 8 >= self_max_energy"
       ],
       "do": [
         {
@@ -589,7 +589,7 @@
             "inputs": [
               {
                 "type": "stacks",
-                "buff": "炉心共鸣"
+                "buff": "char:1014/core_resonance"
               },
               {
                 "type": "const",
@@ -606,7 +606,7 @@
             "inputs": [
               {
                 "type": "stacks",
-                "buff": "炉心共鸣"
+                "buff": "char:1014/core_resonance"
               },
               {
                 "type": "const",
@@ -617,7 +617,7 @@
         },
         {
           "op": "REMOVE_STATE",
-          "buff": "炉心共鸣",
+          "buff": "char:1014/core_resonance",
           "target": "self"
         }
       ],
@@ -634,7 +634,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE_IGNORE",
           "percent": 0.01,
-          "per_stack": "self_stacks:炉心共鸣",
+          "per_stack": "self_stacks:char:1014/core_resonance",
           "per_stack_cap": 15,
           "per_stack_live": true,
           "permanent": true,

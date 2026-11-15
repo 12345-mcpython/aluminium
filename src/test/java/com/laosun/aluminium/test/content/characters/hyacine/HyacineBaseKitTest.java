@@ -42,7 +42,7 @@ public class HyacineBaseKitTest {
     private static final double FLAT_AT_LV10 = 160;
     /** 1409's raw HEALTH base at Lv80 (the traces' +10% sits on top). */
     private static final double BASE_HP = 1086.624;
-    private static final String TALLY = "小伊卡累计治疗";
+    private static final String TALLY = "internal:1409/ika_healing_total";
 
     /**
      * Note: "风堇进入[雨过天晴]状态" and "我方全体目标生命上限提高30.00%".
@@ -59,8 +59,8 @@ public class HyacineBaseKitTest {
 
         battle.castImmediate(hyacine.getSkills().get(SkillType.ULTRA), hyacine, List.of(ally));
 
-        Assertions.assertTrue(hyacine.getBuffManager().hasState("雨过天晴"),
-                "「风堇进入【雨过天晴】状态」 (Hyacine enters the After Rain (【雨过天晴】) state)");
+        Assertions.assertTrue(hyacine.getBuffManager().hasState("char:1409/after_the_rain"),
+                "「风堇进入【char:1409/after_the_rain】状态」 (Hyacine enters the After Rain (【char:1409/after_the_rain】) state)");
         Assertions.assertTrue(ally.getMaxHp() > allyMaxBefore, "「我方全体目标生命上限提高30.00%」 (all allies' Max HP is raised by 30.00%) -- ally");
         Assertions.assertTrue(hyacine.getMaxHp() > herMaxBefore, "「我方全体」 (all allies) includes Hyacine herself");
     }

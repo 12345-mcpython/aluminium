@@ -44,7 +44,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "counts_as": [
             "dot:wind_shear"
           ],
@@ -142,7 +142,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "counts_as": [
             "dot:wind_shear"
           ],
@@ -184,7 +184,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "counts_as": [
             "dot:wind_shear"
           ],
@@ -203,7 +203,7 @@
       "id": "talent_arcana_dot_at_the_targets_turn_start",
       "when": [
         "actor != self",
-        "actor has_state 奥迹"
+        "actor has_state char:1307/arcana"
       ],
       "do": [
         {
@@ -228,7 +228,7 @@
                       {
                         "type": "stacks",
                         "whose": "target",
-                        "buff": "奥迹"
+                        "buff": "char:1307/arcana"
                       },
                       {
                         "type": "const",
@@ -255,8 +255,8 @@
       "id": "talent_arcana_three_layers_hit_the_neighbours",
       "when": [
         "actor != self",
-        "actor has_state 奥迹",
-        "target_stacks:奥迹 >= 3"
+        "actor has_state char:1307/arcana",
+        "target_stacks:char:1307/arcana >= 3"
       ],
       "do": [
         {
@@ -269,7 +269,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "counts_as": [
             "dot:wind_shear"
           ],
@@ -288,8 +288,8 @@
       "id": "talent_arcana_seven_layers_ignore_defence",
       "when": [
         "actor != self",
-        "actor has_state 奥迹",
-        "target_stacks:奥迹 >= 7"
+        "actor has_state char:1307/arcana",
+        "target_stacks:char:1307/arcana >= 7"
       ],
       "do": [
         {
@@ -307,13 +307,13 @@
       "on": "DEALING_DAMAGE",
       "id": "talent_each_dot_tick_may_add_a_layer",
       "when": [
-        "target has_state 奥迹",
+        "target has_state char:1307/arcana",
         "damage_is_dot"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "counts_as": [
             "dot:wind_shear"
           ],
@@ -336,14 +336,14 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "揭露",
+          "buff": "char:1307/epiphany",
           "turns": 2,
           "counts_as": [
             "dot:bleed",
             "dot:burn",
             "dot:shock"
           ],
-          "counts_as_requires": "奥迹",
+          "counts_as_requires": "char:1307/arcana",
           "target": "all_enemies"
         }
       ],
@@ -361,7 +361,7 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.25,
           "permanent": true,
-          "while_holder_state": "揭露",
+          "while_holder_state": "char:1307/epiphany",
           "target": "all_enemies"
         }
       ],
@@ -378,7 +378,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "counts_as": [
             "dot:wind_shear"
           ],
@@ -397,12 +397,12 @@
       "id": "eidolon2_kill_spreads_six_layers",
       "min_eidolon": 2,
       "when": [
-        "target has_state 奥迹"
+        "target has_state char:1307/arcana"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "counts_as": [
             "dot:wind_shear"
           ],
@@ -426,7 +426,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "揭露能量额度",
+          "buff": "internal:1307/epiphany_energy_allowance",
           "amount": 1,
           "max_stacks": 1,
           "permanent": true,
@@ -460,8 +460,8 @@
       "id": "eidolon4_energy_at_the_epiphany_turn",
       "min_eidolon": 4,
       "when": [
-        "actor has_state 揭露",
-        "self_stacks:揭露能量额度 >= 1"
+        "actor has_state char:1307/epiphany",
+        "self_stacks:internal:1307/epiphany_energy_allowance >= 1"
       ],
       "do": [
         {
@@ -470,7 +470,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "揭露能量额度",
+          "buff": "internal:1307/epiphany_energy_allowance",
           "amount": 1,
           "target": "self"
         }
@@ -483,8 +483,8 @@
       "id": "eidolon4_energy_when_an_epiphany_target_dies",
       "min_eidolon": 4,
       "when": [
-        "target has_state 揭露",
-        "self_stacks:揭露能量额度 >= 1"
+        "target has_state char:1307/epiphany",
+        "self_stacks:internal:1307/epiphany_energy_allowance >= 1"
       ],
       "do": [
         {
@@ -493,7 +493,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "揭露能量额度",
+          "buff": "internal:1307/epiphany_energy_allowance",
           "amount": 1,
           "target": "self"
         }
@@ -510,7 +510,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "奥迹不重置额度",
+          "buff": "internal:1307/arcana_keep_allowance",
           "amount": 1,
           "max_stacks": 1,
           "permanent": true,
@@ -525,13 +525,13 @@
       "id": "talent_arcana_resets_to_one_unless_the_epiphany_holds_it",
       "when": [
         "actor != self",
-        "actor has_state 奥迹",
-        "self_stacks:奥迹不重置额度 <= 0"
+        "actor has_state char:1307/arcana",
+        "self_stacks:internal:1307/arcana_keep_allowance <= 0"
       ],
       "do": [
         {
           "op": "SET_STACKS",
-          "buff": "奥迹",
+          "buff": "char:1307/arcana",
           "scale": "const:1",
           "percent": 1,
           "target": "actor"
@@ -545,13 +545,13 @@
       "id": "ult_the_allowance_is_spent_by_one_turn",
       "when": [
         "actor != self",
-        "actor has_state 奥迹",
-        "self_stacks:奥迹不重置额度 >= 1"
+        "actor has_state char:1307/arcana",
+        "self_stacks:internal:1307/arcana_keep_allowance >= 1"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "奥迹不重置额度",
+          "buff": "internal:1307/arcana_keep_allowance",
           "amount": 1,
           "target": "self"
         }

@@ -47,7 +47,7 @@ public class LethalHitTest {
     @Test
     public void withoutTheTransformationTheBlowKills() {
         Assertions.assertTrue(survivor(PHAINON, false).isDeath(),
-                "「char:1408/transformation期间」 (during the transformation)-- outside it the clause does not apply");
+                "「变身期间」 (during the transformation)-- outside it the clause does not apply");
     }
 
     /**

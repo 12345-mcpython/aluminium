@@ -108,7 +108,7 @@ public class LightConeAuditBatchTwentyOneTest {
         Fixture f = new Fixture(23024);
         double damage = rule(23024, "cone23024_bubble_damage").getAsJsonArray("do").get(0).getAsJsonObject()
                 .get("percent").getAsDouble();
-        System.out.println("[23024] 对char:23024/bubble目标的加伤 " + damage);
+        System.out.println("[23024] 对泡影目标的加伤 " + damage);
         Assertions.assertEquals(0.24, damage, 1e-12, "24%（叠影 1）");
         Assertions.assertTrue(f.wearer.getCurrentHp() > 0, "夹具可用");
     }

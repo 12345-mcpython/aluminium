@@ -65,6 +65,36 @@
       "key": "char:1008/last_stand"
     },
     {
+      "name": "char:1014/core_resonance",
+      "owner": "1014",
+      "kind": "char",
+      "used_by": [
+        "1014"
+      ],
+      "zh": "炉心共鸣",
+      "key": "char:1014/core_resonance"
+    },
+    {
+      "name": "char:1014/eidolon4_pen",
+      "owner": "1014",
+      "kind": "char",
+      "used_by": [
+        "1014"
+      ],
+      "zh": "星魂4穿透",
+      "key": "char:1014/eidolon4_pen"
+    },
+    {
+      "name": "char:1014/mana_release",
+      "owner": "1014",
+      "kind": "char",
+      "used_by": [
+        "1014"
+      ],
+      "zh": "魔力放出",
+      "key": "char:1014/mana_release"
+    },
+    {
       "name": "char:1015/loop_link",
       "owner": "1015",
       "kind": "char",
@@ -143,6 +173,116 @@
       ],
       "zh": "恶报",
       "key": "char:1214/retribution"
+    },
+    {
+      "name": "char:1215/burden",
+      "owner": "1215",
+      "kind": "char",
+      "used_by": [
+        "1215"
+      ],
+      "zh": "承负",
+      "key": "char:1215/burden"
+    },
+    {
+      "name": "char:1215/edict",
+      "owner": "1215",
+      "kind": "char",
+      "used_by": [
+        "1215"
+      ],
+      "zh": "敕令",
+      "key": "char:1215/edict"
+    },
+    {
+      "name": "char:1223/isolated",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ],
+      "zh": "孤立",
+      "key": "char:1223/isolated"
+    },
+    {
+      "name": "char:1223/off_field",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ],
+      "zh": "离场",
+      "key": "char:1223/off_field"
+    },
+    {
+      "name": "char:1223/prey",
+      "owner": "1223",
+      "kind": "char",
+      "used_by": [
+        "1223"
+      ],
+      "zh": "猎物",
+      "key": "char:1223/prey"
+    },
+    {
+      "name": "char:1305/deduction",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
+      ],
+      "zh": "演绎",
+      "key": "char:1305/deduction"
+    },
+    {
+      "name": "char:1305/induction",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
+      ],
+      "zh": "归纳",
+      "key": "char:1305/induction"
+    },
+    {
+      "name": "char:1305/sage_shortcoming",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
+      ],
+      "zh": "智者的短见",
+      "key": "char:1305/sage_shortcoming"
+    },
+    {
+      "name": "char:1305/technique_slow",
+      "owner": "1305",
+      "kind": "char",
+      "used_by": [
+        "1305"
+      ],
+      "zh": "秘技减速",
+      "key": "char:1305/technique_slow"
+    },
+    {
+      "name": "char:1307/arcana",
+      "owner": "1307",
+      "kind": "char",
+      "used_by": [
+        "1307"
+      ],
+      "zh": "奥迹",
+      "key": "char:1307/arcana"
+    },
+    {
+      "name": "char:1307/epiphany",
+      "owner": "1307",
+      "kind": "char",
+      "used_by": [
+        "1307"
+      ],
+      "zh": "揭露",
+      "key": "char:1307/epiphany"
     },
     {
       "name": "char:1402/amazing_buff",
@@ -293,6 +433,37 @@
       ],
       "zh": "变身",
       "key": "char:1408/transformation"
+    },
+    {
+      "name": "char:1409/after_the_rain",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
+        "1409"
+      ],
+      "zh": "雨过天晴",
+      "key": "char:1409/after_the_rain"
+    },
+    {
+      "name": "char:1409/ode_to_sky",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
+        "1409",
+        "1415"
+      ],
+      "zh": "献予「天空」之诗",
+      "key": "char:1409/ode_to_sky"
+    },
+    {
+      "name": "char:1409/sky_answer",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [
+        "1409"
+      ],
+      "zh": "天空应我的祈愿",
+      "key": "char:1409/sky_answer"
     },
     {
       "name": "char:1412/action_lock",
@@ -1302,6 +1473,26 @@
       "zh": "风化"
     },
     {
+      "name": "internal:1014/first_ultimate_done",
+      "owner": "1014",
+      "kind": "internal",
+      "used_by": [
+        "1014"
+      ],
+      "zh": "首次终结技已触发",
+      "key": "internal:1014/first_ultimate_done"
+    },
+    {
+      "name": "internal:1014/ultimate_count",
+      "owner": "1014",
+      "kind": "internal",
+      "used_by": [
+        "1014"
+      ],
+      "zh": "终结技计数",
+      "key": "internal:1014/ultimate_count"
+    },
+    {
       "name": "internal:1015/loop_count",
       "owner": "1015",
       "kind": "internal",
@@ -1352,6 +1543,56 @@
       "key": "internal:1214/retribution_overflow"
     },
     {
+      "name": "internal:1215/burden_count",
+      "owner": "1215",
+      "kind": "internal",
+      "used_by": [
+        "1215"
+      ],
+      "zh": "承负次数",
+      "key": "internal:1215/burden_count"
+    },
+    {
+      "name": "internal:1215/burden_refund",
+      "owner": "1215",
+      "kind": "internal",
+      "used_by": [
+        "1215"
+      ],
+      "zh": "承负返还",
+      "key": "internal:1215/burden_refund"
+    },
+    {
+      "name": "internal:1223/charge_count",
+      "owner": "1223",
+      "kind": "internal",
+      "used_by": [
+        "1223"
+      ],
+      "zh": "充能计数",
+      "key": "internal:1223/charge_count"
+    },
+    {
+      "name": "internal:1307/arcana_keep_allowance",
+      "owner": "1307",
+      "kind": "internal",
+      "used_by": [
+        "1307"
+      ],
+      "zh": "奥迹不重置额度",
+      "key": "internal:1307/arcana_keep_allowance"
+    },
+    {
+      "name": "internal:1307/epiphany_energy_allowance",
+      "owner": "1307",
+      "kind": "internal",
+      "used_by": [
+        "1307"
+      ],
+      "zh": "揭露能量额度",
+      "key": "internal:1307/epiphany_energy_allowance"
+    },
+    {
       "name": "internal:1402/weave_depletion_kept",
       "owner": "1402",
       "kind": "internal",
@@ -1370,6 +1611,26 @@
       ],
       "zh": "额外回合计数",
       "key": "internal:1408/extra_turn_count"
+    },
+    {
+      "name": "internal:1409/ika_healing_total",
+      "owner": "1409",
+      "kind": "internal",
+      "used_by": [
+        "1409"
+      ],
+      "zh": "小伊卡累计治疗",
+      "key": "internal:1409/ika_healing_total"
+    },
+    {
+      "name": "internal:1409/ode_sky_heal_share",
+      "owner": "1409",
+      "kind": "internal",
+      "used_by": [
+        "1409"
+      ],
+      "zh": "天空之诗的治疗份额",
+      "key": "internal:1409/ode_sky_heal_share"
     },
     {
       "name": "internal:1506/enhanced_basic_count",
@@ -1827,14 +2088,6 @@
       ]
     },
     {
-      "name": "充能计数",
-      "owner": "1223",
-      "kind": "internal",
-      "used_by": [
-        "1223"
-      ]
-    },
-    {
       "name": "免费强化",
       "owner": "8003",
       "kind": "char",
@@ -1965,22 +2218,6 @@
       ]
     },
     {
-      "name": "天空之诗的治疗份额",
-      "owner": "1409",
-      "kind": "char",
-      "used_by": [
-        "1409"
-      ]
-    },
-    {
-      "name": "天空应我的祈愿",
-      "owner": "1409",
-      "kind": "char",
-      "used_by": [
-        "1409"
-      ]
-    },
-    {
       "name": "天赋充能",
       "owner": "1404",
       "kind": "char",
@@ -2013,22 +2250,6 @@
       ]
     },
     {
-      "name": "奥迹",
-      "owner": "1307",
-      "kind": "char",
-      "used_by": [
-        "1307"
-      ]
-    },
-    {
-      "name": "奥迹不重置额度",
-      "owner": "1307",
-      "kind": "internal",
-      "used_by": [
-        "1307"
-      ]
-    },
-    {
       "name": "好活当赏",
       "owner": "battle",
       "kind": "battle",
@@ -2044,27 +2265,11 @@
       ]
     },
     {
-      "name": "孤立",
-      "owner": "1223",
-      "kind": "char",
-      "used_by": [
-        "1223"
-      ]
-    },
-    {
       "name": "完全燃烧",
       "owner": "1310",
       "kind": "char",
       "used_by": [
         "1310"
-      ]
-    },
-    {
-      "name": "小伊卡累计治疗",
-      "owner": "1409",
-      "kind": "char",
-      "used_by": [
-        "1409"
       ]
     },
     {
@@ -2124,14 +2329,6 @@
       ]
     },
     {
-      "name": "归纳",
-      "owner": "1305",
-      "kind": "char",
-      "used_by": [
-        "1305"
-      ]
-    },
-    {
       "name": "当品",
       "owner": "1314",
       "kind": "char",
@@ -2180,46 +2377,6 @@
       ]
     },
     {
-      "name": "承负",
-      "owner": "1215",
-      "kind": "char",
-      "used_by": [
-        "1215"
-      ]
-    },
-    {
-      "name": "承负次数",
-      "owner": "1215",
-      "kind": "internal",
-      "used_by": [
-        "1215"
-      ]
-    },
-    {
-      "name": "承负返还",
-      "owner": "1215",
-      "kind": "char",
-      "used_by": [
-        "1215"
-      ]
-    },
-    {
-      "name": "揭露",
-      "owner": "1307",
-      "kind": "char",
-      "used_by": [
-        "1307"
-      ]
-    },
-    {
-      "name": "揭露能量额度",
-      "owner": "1307",
-      "kind": "char",
-      "used_by": [
-        "1307"
-      ]
-    },
-    {
       "name": "收债人",
       "owner": "1314",
       "kind": "char",
@@ -2237,27 +2394,11 @@
       ]
     },
     {
-      "name": "敕令",
-      "owner": "1215",
-      "kind": "char",
-      "used_by": [
-        "1215"
-      ]
-    },
-    {
       "name": "新蕊",
       "owner": "1407",
       "kind": "char",
       "used_by": [
         "1407"
-      ]
-    },
-    {
-      "name": "星魂4穿透",
-      "owner": "1014",
-      "kind": "char",
-      "used_by": [
-        "1014"
       ]
     },
     {
@@ -2274,14 +2415,6 @@
       "kind": "char",
       "used_by": [
         "1209"
-      ]
-    },
-    {
-      "name": "智者的短见",
-      "owner": "1305",
-      "kind": "char",
-      "used_by": [
-        "1305"
       ]
     },
     {
@@ -2364,14 +2497,6 @@
       ]
     },
     {
-      "name": "演绎",
-      "owner": "1305",
-      "kind": "char",
-      "used_by": [
-        "1305"
-      ]
-    },
-    {
       "name": "灵感",
       "owner": "1401",
       "kind": "char",
@@ -2386,14 +2511,6 @@
       "used_by": [
         "8003",
         "8004"
-      ]
-    },
-    {
-      "name": "炉心共鸣",
-      "owner": "1014",
-      "kind": "char",
-      "used_by": [
-        "1014"
       ]
     },
     {
@@ -2429,14 +2546,6 @@
       ]
     },
     {
-      "name": "猎物",
-      "owner": "1223",
-      "kind": "char",
-      "used_by": [
-        "1223"
-      ]
-    },
-    {
       "name": "献予「创世」之诗",
       "owner": "8007",
       "kind": "char",
@@ -2450,15 +2559,6 @@
       "kind": "char",
       "used_by": [
         "1414"
-      ]
-    },
-    {
-      "name": "献予「天空」之诗",
-      "owner": "1409",
-      "kind": "char",
-      "used_by": [
-        "1409",
-        "1415"
       ]
     },
     {
@@ -2558,22 +2658,6 @@
       ]
     },
     {
-      "name": "离场",
-      "owner": "1223",
-      "kind": "char",
-      "used_by": [
-        "1223"
-      ]
-    },
-    {
-      "name": "秘技减速",
-      "owner": "1305",
-      "kind": "char",
-      "used_by": [
-        "1305"
-      ]
-    },
-    {
       "name": "笑点",
       "owner": "battle",
       "kind": "battle",
@@ -2610,14 +2694,6 @@
       "kind": "battle",
       "key": "sys:ultimate_activated",
       "en": "Ultimate Activated"
-    },
-    {
-      "name": "终结技计数",
-      "owner": "1014",
-      "kind": "internal",
-      "used_by": [
-        "1014"
-      ]
     },
     {
       "name": "结印",
@@ -2922,14 +2998,6 @@
       ]
     },
     {
-      "name": "雨过天晴",
-      "owner": "1409",
-      "kind": "char",
-      "used_by": [
-        "1409"
-      ]
-    },
-    {
       "name": "领航旗语",
       "owner": "1510",
       "kind": "char",
@@ -2959,22 +3027,6 @@
       "kind": "char",
       "used_by": [
         "1504"
-      ]
-    },
-    {
-      "name": "首次终结技已触发",
-      "owner": "1014",
-      "kind": "internal",
-      "used_by": [
-        "1014"
-      ]
-    },
-    {
-      "name": "魔力放出",
-      "owner": "1014",
-      "kind": "char",
-      "used_by": [
-        "1014"
       ]
     },
     {

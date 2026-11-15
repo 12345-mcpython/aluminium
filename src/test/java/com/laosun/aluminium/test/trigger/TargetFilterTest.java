@@ -46,7 +46,7 @@ public class TargetFilterTest {
         f.fire();
 
         Assertions.assertFalse(f.first.getBuffManager().hasState("印记"),
-                "the unmarked enemy was not reached: 「对所有dot:shock状态下的敌方目标」 (all enemy targets in the Shock state)");
+                "the unmarked enemy was not reached: 「对所有触电状态下的敌方目标」 (all enemy targets in the Shock state)");
         Assertions.assertTrue(f.second.getBuffManager().hasState("印记"), "…and the marked one was");
     }
 

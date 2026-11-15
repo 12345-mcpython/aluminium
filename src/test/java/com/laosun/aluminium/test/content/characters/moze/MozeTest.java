@@ -60,7 +60,7 @@ public class MozeTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final String CHARGE = "充能";
-    private static final String PREY = "猎物";
+    private static final String PREY = "char:1223/prey";
 
     // ==================================================================
     // Charge and the prey mark: nine charges, one per hit, a follow-up on every third
@@ -76,7 +76,7 @@ public class MozeTest {
         Assertions.assertEquals(8, f.charge(),
                 "「并获得 9 点充能」 minus the one the Skill's own hit spends");
         f.allyHits();
-        Assertions.assertEquals(7, f.charge(), "「我方目标攻击【猎物】后…并消耗 1 点充能」");
+        Assertions.assertEquals(7, f.charge(), "「我方目标攻击【char:1223/prey】后…并消耗 1 点充能」");
         f.allyHits();
         Assertions.assertEquals(6, f.charge(), "one per hit, not one per turn");
     }
@@ -114,7 +114,7 @@ public class MozeTest {
         f.allyHits();
         Assertions.assertEquals(0, f.charge(), "the eighth hit spends the last charge");
         Assertions.assertFalse(f.enemy.getBuffManager().hasState(PREY),
-                "「当充能为 0 时，解除目标【猎物】状态」");
+                "「当充能为 0 时，解除目标【char:1223/prey】状态」");
     }
 
     /**
@@ -226,7 +226,7 @@ public class MozeTest {
         double reference = additionalLoss(false, true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "「我方目标攻击【猎物】后」 (after one of our targets attacks [猎物]) -- without the mark, nothing");
+                "「我方目标攻击【char:1223/prey】后」 (after one of our targets attacks [char:1223/prey]) -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the additional damage lands");
         Assertions.assertEquals(0.5, marked / reference, 0.05,
                 "30% against a hand-built 60% reference: " + marked + " vs " + reference);
@@ -264,14 +264,14 @@ public class MozeTest {
             TriggerSpecs.set(effect, "element", "Thunder");
             TriggerSpecs.set(effect, "target", "target");
             moze.setTriggerTable(new TriggerTable(MOZE, List.of(TriggerSpecs.rule(
-                    TriggerEvent.ALLY_ATTACK.name(), List.of("target has_state 猎物"), effect))));
+                    TriggerEvent.ALLY_ATTACK.name(), List.of("target has_state char:1223/prey"), effect))));
         }
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(moze, ally), List.of(enemy), fixed());
         battle.startBattle();
         if (mark) {
             // Applied directly in BOTH paths, so the only difference between them is the percentage (round 20's lesson).
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("猎物", 1, true));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1223/prey", 1, true));
         }
         double before = enemy.getCurrentHp();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
@@ -389,7 +389,7 @@ public class MozeTest {
         EidolonFixture e2 = new EidolonFixture(2);
         e2.markPrey();
         Assertions.assertEquals(0.4, e2.extraCritDamageOnTheAllysHit(), 1e-9,
-                "「我方全体目标对成为【猎物】的…造成伤害时，暴击伤害提高 40%」 — the bonus rides the ATTACKER's instance");
+                "「我方全体目标对成为【char:1223/prey】的…造成伤害时，暴击伤害提高 40%」 — the bonus rides the ATTACKER's instance");
 
         EidolonFixture e1 = new EidolonFixture(1);
         e1.markPrey();

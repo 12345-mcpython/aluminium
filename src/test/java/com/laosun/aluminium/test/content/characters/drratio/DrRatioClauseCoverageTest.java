@@ -90,7 +90,7 @@ public class DrRatioClauseCoverageTest {
     @Test
     public void eidolon1StartsWithFourLayers() {
         Fixture e1 = new Fixture(1);
-        Assertions.assertEquals(4, e1.layers(), "「战斗开始时，立即获得 4 层【归纳】」");
+        Assertions.assertEquals(4, e1.layers(), "「战斗开始时，立即获得 4 层【char:1305/induction】」");
 
         Fixture e0 = new Fixture(0);
         Assertions.assertEquals(0, e0.layers(), "control: nothing at E0");
@@ -103,9 +103,9 @@ public class DrRatioClauseCoverageTest {
     public void eidolon2DealsOneExtraHitPerDebuffUpToFour() {
         // The Skill lands 演绎 on the target itself, and that IS a negative effect, so the counts are one higher than the
         // fixture's own debuffs: 2 -> 3, 6 -> capped at 4, and a bare cast -> 1.
-        Assertions.assertEquals(3, extraHitsAgainst(2), "two fixture debuffs plus the Skill's own 演绎");
+        Assertions.assertEquals(3, extraHitsAgainst(2), "two fixture debuffs plus the Skill's own char:1305/deduction");
         Assertions.assertEquals(4, extraHitsAgainst(6), "「最多触发 4 次」 — six debuffs still give four");
-        Assertions.assertEquals(1, extraHitsAgainst(0), "only the Skill's own 演绎 is on the target");
+        Assertions.assertEquals(1, extraHitsAgainst(0), "only the Skill's own char:1305/deduction is on the target");
     }
 
     /**
@@ -276,7 +276,7 @@ public class DrRatioClauseCoverageTest {
          * condition counts debuffs, so a state-based fixture would read zero and "prove" the rule wrong.
          */
         private void putThreeDebuffsOnTheEnemy() {
-            for (String name : List.of("dot:burn甲", "dot:burn乙", "dot:burn丙")) {
+            for (String name : List.of("灼烧甲", "灼烧乙", "灼烧丙")) {
                 enemy.getBuffManager().addBuff(new DotBuff(ratio, DamageElement.QUANTUM, 10, 3, 1, name));
             }
         }
@@ -297,7 +297,7 @@ public class DrRatioClauseCoverageTest {
         }
 
         private int layers() {
-            return ratio.getBuffManager().stacksOf("归纳");
+            return ratio.getBuffManager().stacksOf("char:1305/induction");
         }
     }
 }

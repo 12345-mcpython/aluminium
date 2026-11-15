@@ -114,7 +114,7 @@ public class AventurineWagerTest {
         double without = barrageDamage(3);
         double withE4 = barrageDamage(4);
         Assertions.assertTrue(withE4 > without,
-                "「额外增加 3 段internal:1204/attack_segments」 — the barrage hits harder with the Eidolon (" + without + " -> " + withE4 + ")");
+                "「额外增加 3 段攻击段数」 — the barrage hits harder with the Eidolon (" + without + " -> " + withE4 + ")");
         // ⚠ NOT 10/7: the same sentence also raises his DEFENCE by 40% BEFORE the barrage, so every hit is bigger as well as more
         // numerous - measured 1.85 (between 10/7 = 1.43 and 10/7 x 1.4 = 2.0). Pinned as a band, with the reason.
         Assertions.assertTrue(withE4 / without > 10.0 / 7.0,

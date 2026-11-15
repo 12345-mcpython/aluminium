@@ -75,7 +75,7 @@ public class AglaeaBaseKitTest {
 
     static {
         SECTION.put("普攻：刺纹之蜜", List.of(DATA + " the skill row 140201 deals it; no rule needed"));
-        SECTION.put("战技：高举吧，ctrl:sublimated的名讳", List.of(RULE + "skill_effect", RULE + "skill_effect_2"));
+        SECTION.put("战技：高举吧，升华的名讳", List.of(RULE + "skill_effect", RULE + "skill_effect_2"));
         SECTION.put("终结技：共舞吧，命定的衣匠", List.of(RULE + "ult_effect",
                 RULE + "p1402_stance_speed_follows_the_layers",
                 RULE + "memosprite_immune_to_control",
@@ -88,10 +88,10 @@ public class AglaeaBaseKitTest {
                 RULE + "p1402_memosprite_leaving_restores_her_basic",
                 RULE + "p1402_garmentmaker_hits_the_same_target",
                 RULE + "p1402_garmentmaker_hits_the_neighbours"));
-        SECTION.put("强化战技：高举吧，ctrl:sublimated的名讳", List.of(RULE + "skill_effect"));
+        SECTION.put("强化战技：高举吧，升华的名讳", List.of(RULE + "skill_effect"));
         SECTION.put("忆灵：衣匠（面板）", List.of(DATA + " MemospriteSpec 11402"));
         SECTION.put("忆灵技能 1：刺纹之陷", List.of(DATA + " memosprites/1402.json states its attack block (Blast, 1.54 / 0.924, stance 30 / 15)"));
-        SECTION.put("忆灵技能 2：泪水锻造的char:1402/artisan_body", List.of(RULE + "p1402_memosprite_speed_stack_on_threaded_hit",
+        SECTION.put("忆灵技能 2：泪水锻造的匠躯", List.of(RULE + "p1402_memosprite_speed_stack_on_threaded_hit",
                 GAP + "行动时自动施放"));
         SECTION.put("忆灵技能 3：飞驰之夏", List.of(RULE + "memosprite_speeding_summer_advances_itself"));
         SECTION.put("忆灵技能 4：枯草之盈", List.of(RULE + "memosprite_bloom_of_drying_grass_pays_energy"));

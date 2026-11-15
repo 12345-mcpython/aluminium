@@ -24,11 +24,11 @@ import java.util.Random;
  * Serval (1103), from her own file: the shock, the extension, the traces and Eidolon 6.
  *
  * <p><b>What it needed.</b> {@code APPLY_DOT} for the shock (base chance and per-turn damage out of her Skill's own row),
- * {@code EXTEND_BUFF} for "使dot:shock状态下的敌方目标延长 2 回合" - which needs no condition, because the extension only
+ * {@code EXTEND_BUFF} for "使触电状态下的敌方目标延长 2 回合" - which needs no condition, because the extension only
  * matches buffs carrying that state's name - and the engine's DOT-by-name resolution, which is what makes both shock (dot:shock) and
- * Eidolon 6's "对dot:shock状态下的敌方目标" reachable.
+ * Eidolon 6's "对触电状态下的敌方目标" reachable.
  *
- * <p><b>What is registered</b> (the file's notes): the talent's "对所有dot:shock状态下的敌方目标", the blast's neighbour
+ * <p><b>What is registered</b> (the file's notes): the talent's "对所有触电状态下的敌方目标", the blast's neighbour
  * rolls, Eidolon 1 and Eidolon 4 - three of the four are the same missing piece (an effect reaches what a *selector*
  * names, so a per-target condition cannot filter the set).
  */
@@ -59,7 +59,7 @@ public class ServalTest {
     public void herTraceFilesTheChanceAmendment() {
         Fixture f = new Fixture(0.0);
         Assertions.assertEquals(0.2, f.serval.ruleBaseChanceBonus("skill_shock"), 1e-9,
-                "「施放战技时…陷入dot:shock状态的基础概率提高20%」 (when casting the Skill, the base chance of falling into the Shock state is raised by 20%) is an amendment to the named rule, not a second rule "
+                "「施放战技时…陷入触电状态的基础概率提高20%」 (when casting the Skill, the base chance of falling into the Shock state is raised by 20%) is an amendment to the named rule, not a second rule "
                         + "(two rules would roll twice: 96%, not 100%)");
     }
 
@@ -76,15 +76,15 @@ public class ServalTest {
         f.enemyTurn();
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "「dot:shock状态下，敌方目标每回合开始时受到等同于希露瓦104%攻击力的雷属性持续伤害」 (while Shocked, the enemy target takes Lightning DoT equal to 104% of Serval (希露瓦)'s ATK at the start of every turn)");
+                "「触电状态下，敌方目标每回合开始时受到等同于希露瓦104%攻击力的雷属性持续伤害」 (while Shocked, the enemy target takes Lightning DoT equal to 104% of Serval (希露瓦)'s ATK at the start of every turn)");
     }
 
     /**
      * The ultimate extends the shock by two turns: 2 settlements become 4, and then it stops.
      *
-     * <p>Note: Counted rather than read off a duration getter, and on <b>one</b> enemy: "使dot:shock状态下的敌方目标延长 2 回合"
+     * <p>Note: Counted rather than read off a duration getter, and on <b>one</b> enemy: "使触电状态下的敌方目标延长 2 回合"
      * is about the enemies that are shocked, and the extension's own filter (`BuffManager.isNamed`, which answers a DOT
-     * by its element's state name) is what makes "dot:shock状态下的" true without a condition - there is nothing to assert
+     * by its element's state name) is what makes "触电状态下的" true without a condition - there is nothing to assert
      * about an enemy that never had it beyond that the same call does not create one, which the census covers.
      */
     @Test
@@ -92,12 +92,12 @@ public class ServalTest {
         int without = settlements(false);
         int with = settlements(true);
         Assertions.assertEquals(2, with - without,
-                "「延长2回合的dot:shock状态」 (extends the Shock state by 2 turns): the extension adds exactly two settlements (" + without + " -> " + with + ")");
+                "「延长2回合的触电状态」 (extends the Shock state by 2 turns): the extension adds exactly two settlements (" + without + " -> " + with + ")");
         Assertions.assertTrue(without >= 2, "precondition: the Skill's own shock settles at least twice");
     }
 
     /**
-     * 1103 希露瓦's technique:「进入战斗后对敌方随机单体造成 50% 攻击力的雷属性伤害，同时有 100% 的基础概率使敌方每个单体目标陷入dot:shock状态，持续 3 回合」.
+     * 1103 希露瓦's technique:「进入战斗后对敌方随机单体造成 50% 攻击力的雷属性伤害，同时有 100% 的基础概率使敌方每个单体目标陷入触电状态，持续 3 回合」.
      */
     @Test
     public void theTechniqueShocksEveryoneAndDamagesOne() {
@@ -116,7 +116,7 @@ public class ServalTest {
             lost += enemy.getMaxHp() - enemy.getCurrentHp();
         }
         System.out.println("[1103] shocked=" + shocked + " totalLost=" + lost);
-        Assertions.assertEquals(2, shocked, "「使敌方每个单体目标陷入dot:shock状态」");
+        Assertions.assertEquals(2, shocked, "「使敌方每个单体目标陷入触电状态」");
         Assertions.assertTrue(lost > 0, "「对敌方随机单体造成…雷属性伤害」");
     }
 

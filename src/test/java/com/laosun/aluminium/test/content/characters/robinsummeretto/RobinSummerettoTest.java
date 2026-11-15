@@ -305,7 +305,7 @@ public class RobinSummerettoTest {
 
         Assertions.assertAll("the talent's 第一次 clause and its attack half",
                 () -> Assertions.assertEquals(1.0, afterFirstHeal, 1e-9,
-                        "「在任意目标回合第一次提供治疗…时，获得 1 点char:1512/atmosphere」"),
+                        "「在任意目标回合第一次提供治疗…时，获得 1 点气氛值」"),
                 () -> Assertions.assertEquals(afterFirstHeal, afterSecondHeal, 1e-9,
                         "the second heal in the same turn is not a 第一次 and pays nothing"),
                 () -> Assertions.assertEquals(1.0, afterHealAndShield, 1e-9,
@@ -313,7 +313,7 @@ public class RobinSummerettoTest {
                 () -> Assertions.assertEquals(2.0, afterTheNewTurn, 1e-9,
                         "「任意目标回合」: a turn boundary starts the window over"),
                 () -> Assertions.assertEquals(1.0, afterFirstAttack, 1e-9,
-                        "「我方目标施放攻击时…获得 1 点char:1512/atmosphere」"),
+                        "「我方目标施放攻击时…获得 1 点气氛值」"),
                 () -> Assertions.assertEquals(2.0, afterSecondAttack, 1e-9,
                         "every attack pays - this half is not a once-per-turn clause"));
     }
@@ -595,7 +595,7 @@ public class RobinSummerettoTest {
                 () -> Assertions.assertEquals(0.18, penetration, 1e-9,
                         "「我方目标的全属性抗性穿透提高 18%」 — a teammate carries it too"),
                 () -> Assertions.assertEquals(0.0, control, 1e-9, "control: nothing at E0"),
-                () -> Assertions.assertEquals(baseCap + 20, e2Cap, "「char:1512/atmosphere上限提高 20 点」"),
+                () -> Assertions.assertEquals(baseCap + 20, e2Cap, "「气氛值上限提高 20 点」"),
                 () -> Assertions.assertEquals(0, e2Value,
                         "and her bar is still empty — capacity, not a gift"));
     }
@@ -667,7 +667,7 @@ public class RobinSummerettoTest {
         // the 「非真实伤害」 filter is the registered approximation - so this asserts the shape (roughly half, never all or none).
         int kept = f.record();
         Assertions.assertTrue(kept > recorded / 4 && kept < recorded * 3 / 4,
-                "「清空internal:1512/record值的 50%」 — about half stays (" + recorded + " -> " + kept + ")");
+                "「清空记录值的 50%」 — about half stays (" + recorded + " -> " + kept + ")");
     }
 
     /**
@@ -953,7 +953,7 @@ public class RobinSummerettoTest {
         // talent's 1, so the attack is worth 3 in total.
         Assertions.assertAll("【char:1512/special_guest】: the guest attack pays 2, and so does its summon's",
                 () -> Assertions.assertEquals(beforeGuest + 3, afterGuest, 1e-9,
-                        "guest 2 + talent 1: 「…额外使知更鸟•晴歌获得 2 点char:1512/atmosphere」"),
+                        "guest 2 + talent 1: 「…额外使知更鸟•晴歌获得 2 点气氛值」"),
                 () -> Assertions.assertEquals(beforeSummon + 2, afterSummon, 1e-9,
                         "「…及其召唤物攻击时」 grants the same 2 points"));
     }

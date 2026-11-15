@@ -28,7 +28,7 @@ import java.util.List;
 public class FractionalResourceTest {
 
     private static final int OWNER = 1409;
-    private static final String TALLY = "小伊卡累计治疗";
+    private static final String TALLY = "internal:1409/ika_healing_total";
 
     /**
      * The stored value keeps its fraction, while the counter view still answers a whole number.

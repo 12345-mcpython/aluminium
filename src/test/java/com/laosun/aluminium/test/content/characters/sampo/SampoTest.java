@@ -24,13 +24,13 @@ import java.util.List;
  * engine reads that count from the sentence), so the Eidolon is one more instance on the same slot - measured as the number
  * of settled instances, not as a ratio, because the main hit is part of the same count.
  *
- * <p><b>Eidolon 2.</b> 「dot:wind_shear状态下的敌方目标被消灭时，使敌方全体有 100% 的基础概率叠加 1 层等同于天赋的
- * dot:wind_shear状态」. The dead unit still carries its buffs at {@code KILL}, the windshear lands on every LIVING opponent,
+ * <p><b>Eidolon 2.</b> 「风化状态下的敌方目标被消灭时，使敌方全体有 100% 的基础概率叠加 1 层等同于天赋的
+ * 风化状态」. The dead unit still carries its buffs at {@code KILL}, the windshear lands on every LIVING opponent,
  * and a clean corpse pays nothing.
  *
  * <p><b>Eidolons 3 and 5.</b> The two level clauses the data spells as {@code skill_add_level}.
  *
- * <p><b>Eidolon 4.</b> 「战技击中dot:wind_shear状态大于等于 5 层的敌方目标时，使其当前承受的dot:wind_shear状态立即产生
+ * <p><b>Eidolon 4.</b> 「战技击中风化状态大于等于 5 层的敌方目标时，使其当前承受的风化状态立即产生
  * 相当于原伤害 8% 的伤害」. The threshold reads the DOT's own layers ({@code target_stacks:dot:wind_shear}). The expected
  * extra is derived from a measured full tick rather than from the DOT's raw base: the settled tick passes the target's DEF
  * and resistance like any damage.
@@ -120,12 +120,12 @@ public class SampoTest {
 
         System.out.println("[1108] corpse dead=" + spread.corpse.isDeath() + " other=" + otherAfter
                 + " ; e0=" + afterE0 + " ; clean=" + otherClean);
-        Assertions.assertAll("星魂 2: 「dot:wind_shear状态下的敌方目标被消灭时…叠加 1 层」",
+        Assertions.assertAll("星魂 2: 「风化状态下的敌方目标被消灭时…叠加 1 层」",
                 () -> Assertions.assertEquals(otherLayers + 1, otherAfter,
                         "「使敌方全体…叠加 1 层」 - the living enemy gains one layer"),
                 () -> Assertions.assertEquals(before, afterE0, "E0: no spread"),
                 () -> Assertions.assertEquals(otherBefore, otherClean,
-                        "「dot:wind_shear状态下的」 - a clean corpse spreads nothing"));
+                        "「风化状态下的」 - a clean corpse spreads nothing"));
     }
 
     private static final class EidolonTwoFixture {
@@ -219,7 +219,7 @@ public class SampoTest {
         double extra = skillLoss(4, 5) - skillLoss(4, 4);
         double withoutEidolon = skillLoss(0, 5) - skillLoss(0, 4);
         System.out.println("[1108] fullTick=" + fullTick + " extra=" + extra);
-        Assertions.assertAll("星魂 4: 「dot:wind_shear状态大于等于 5 层…立即产生相当于原伤害 8% 的伤害」",
+        Assertions.assertAll("星魂 4: 「风化状态大于等于 5 层…立即产生相当于原伤害 8% 的伤害」",
                 () -> Assertions.assertEquals(0.08 * fullTick, extra, 1e-6,
                         "「相当于原伤害 8%」 - one extra tick at 8% of the whole windshear stack"),
                 () -> Assertions.assertEquals(0.0, withoutEidolon, 1e-6,
@@ -323,7 +323,7 @@ public class SampoTest {
                 + " ; 加料 windsheared=" + fromWindsheared + " clean=" + fromClean);
         Assertions.assertAll("行迹 圈套 / 后手 / 加料",
                 () -> Assertions.assertEquals(3 + 1, turns,
-                        "「天赋使敌方陷入dot:wind_shear状态的持续时间延长 1 回合」"),
+                        "「天赋使敌方陷入风化状态的持续时间延长 1 回合」"),
                 () -> Assertions.assertEquals(10.0, gained, 1e-9, "「施放终结技时，额外恢复 10 点能量」"),
                 () -> Assertions.assertEquals(0.85, fromWindsheared / fromClean, 1e-6, "「造成的伤害降低 15%」"));
     }

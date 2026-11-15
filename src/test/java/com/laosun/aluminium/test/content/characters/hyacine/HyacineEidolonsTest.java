@@ -78,7 +78,7 @@ public class HyacineEidolonsTest {
         battle.processRequests();
 
         double healed = ally.getCurrentHp() - wounded;
-        Assertions.assertTrue(healed > 0, "an attack heals the attacker while 雨过天晴 is up");
+        Assertions.assertTrue(healed > 0, "an attack heals the attacker while char:1409/after_the_rain is up");
         // 0.088, not 0.08: this fixture builds her at Eidolon 6, and her Eidolon 3 already raised the Skill by two, so the
         // row the rule reads is Lv12 (0.08 at Lv10, 0.088 at Lv12). The rule reads the row precisely so this follows.
         Assertions.assertEquals(Math.min(hyacineMax * 0.088, ally.getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get() - wounded),

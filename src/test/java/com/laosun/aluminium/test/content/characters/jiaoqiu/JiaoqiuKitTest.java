@@ -76,7 +76,7 @@ public class JiaoqiuKitTest {
         Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("烬煨") : enemy.getBuffManager().stacksOf("烬煨"),
                 "「【烬煨】最多叠加5层」 (Ashen Roast stacks at most 5 times) -- seven applications must still read five");
         Assertions.assertTrue(enemy.getBuffManager().hasState("dot:burn"),
-                "\"is also considered to be in the Burn state at the same time\" (「也会被视为同时陷入了dot:burn状态」) -- a Fire DotBuff IS Burn (dot:burn) by the engine's own translation");
+                "\"is also considered to be in the Burn state at the same time\" (「也会被视为同时陷入了灼烧状态」) -- a Fire DotBuff IS Burn (dot:burn) by the engine's own translation");
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
     }
 
@@ -165,7 +165,7 @@ public class JiaoqiuKitTest {
     }
 
     /**
-     * 1218 椒丘's Eidolon 2: 「【烬煨】状态下的敌方目标受到的dot:burn伤害倍率提高 300%」 - the talent's Burn scales x4.
+     * 1218 椒丘's Eidolon 2: 「【烬煨】状态下的敌方目标受到的灼烧伤害倍率提高 300%」 - the talent's Burn scales x4.
      *
      * <p>Note: the fixture is the narrow one the stack-cap case above uses (`alwaysRoll(0.0)`, the base constructor): an
      * earlier probe with a wider fixture and a 0.99 roll saw no Burn at all, which misread as an engine path problem rather

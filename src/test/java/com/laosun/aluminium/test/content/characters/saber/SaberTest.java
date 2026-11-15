@@ -44,8 +44,8 @@ public class SaberTest {
     private static final int ALLY = 1001;
     private static final int OTHER = 1002;
     private static final int LEVEL = 80;
-    private static final String RESONANCE = "炉心共鸣";
-    private static final String MANA = "魔力放出";
+    private static final String RESONANCE = "char:1014/core_resonance";
+    private static final String MANA = "char:1014/mana_release";
     private static final Path SABER_FILE = Path.of("src", "main", "resources", "game", "characters", "1014.json");
 
     // ------------------------------------------------------------------ talent
@@ -64,19 +64,19 @@ public class SaberTest {
         Battle battle = new Battle(new ArrayList<>(List.of(saber, ally)),
                 new ArrayList<>(List.of(BattleFixture.monster())), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        boolean resonanceAtStart = saber.getBuffManager().hasState("炉心共鸣");
-        int atStart = saber.getBuffManager().stacksOf("炉心共鸣");
+        boolean resonanceAtStart = saber.getBuffManager().hasState("char:1014/core_resonance");
+        int atStart = saber.getBuffManager().stacksOf("char:1014/core_resonance");
         int before = atStart;
         double boostBefore = saber.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, ally, 0, 0));
-        int after = saber.getBuffManager().stacksOf("炉心共鸣");
+        int after = saber.getBuffManager().stacksOf("char:1014/core_resonance");
         double boostAfter = saber.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[1014] resonance at start: " + atStart + " (state " + resonanceAtStart + ") ; after the ultimate "
                 + before + " -> " + after + " ; boost " + boostBefore + " -> " + boostAfter);
         Assertions.assertAll("天赋 龙之炉心: 进入战斗 1 点，我方终结技再付 3 点并提高伤害",
-                () -> Assertions.assertTrue(resonanceAtStart, "「进入战斗时，获得 1 点【炉心共鸣】」"),
-                () -> Assertions.assertEquals(1, atStart, "「进入战斗时，获得 1 点【炉心共鸣】」 — the stack count it hands her"),
-                () -> Assertions.assertEquals(before + 3, after, "「并获得 3 点【炉心共鸣】」"),
+                () -> Assertions.assertTrue(resonanceAtStart, "「进入战斗时，获得 1 点【char:1014/core_resonance】」"),
+                () -> Assertions.assertEquals(1, atStart, "「进入战斗时，获得 1 点【char:1014/core_resonance】」 — the stack count it hands her"),
+                () -> Assertions.assertEquals(before + 3, after, "「并获得 3 点【char:1014/core_resonance】」"),
                 () -> Assertions.assertTrue(boostAfter > boostBefore, "「Saber 造成的伤害提高 60%，持续 2 回合」"));
     }
 
@@ -127,7 +127,7 @@ public class SaberTest {
         System.out.println("[1014] technique: attack " + plainAttack + " -> " + techniqueAttack
                 + " ; resonance " + resonance(false) + " -> " + resonance(true));
         Assertions.assertTrue(techniqueAttack > plainAttack, "「攻击力提高 35%」");
-        Assertions.assertEquals(resonance(false) + 2, resonance(true), "「并获得 2 点【炉心共鸣】」");
+        Assertions.assertEquals(resonance(false) + 2, resonance(true), "「并获得 2 点【char:1014/core_resonance】」");
     }
 
     private static Character saber(boolean technique) {
@@ -146,7 +146,7 @@ public class SaberTest {
     }
 
     private static int resonance(boolean technique) {
-        return saber(technique).getBuffManager().stacksOf("炉心共鸣");
+        return saber(technique).getBuffManager().stacksOf("char:1014/core_resonance");
     }
 
     // ------------------------------------------------------------------ traces
@@ -163,7 +163,7 @@ public class SaberTest {
         Character saber = CharacterFactory.create(SABER, LEVEL);
         battle(saber);
         double critChance = saber.getAttribute(AttributeType.CRIT_CHANCE).get();
-        boolean mana = saber.getBuffManager().hasState("魔力放出");
+        boolean mana = saber.getBuffManager().hasState("char:1014/mana_release");
 
         Character casting = CharacterFactory.create(SABER, LEVEL);
         Battle castingBattle = battle(casting);
@@ -177,7 +177,7 @@ public class SaberTest {
         double controlBefore = control.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle(control);
         for (int i = 0; i < 3; i++) {
-            control.getBuffManager().addBuff(new StackBuff("炉心共鸣", 1, true, 60));
+            control.getBuffManager().addBuff(new StackBuff("char:1014/core_resonance", 1, true, 60));
         }
         double controlDelta = control.getAttribute(AttributeType.CRIT_ATTACK).get() - controlBefore;
 
@@ -185,7 +185,7 @@ public class SaberTest {
                 + " ; the same points without a cast +" + controlDelta);
         Assertions.assertAll("行迹 龙之骑士 / 星之冠冕",
                 () -> Assertions.assertTrue(critChance >= 0.2, "「暴击率提高 20%」"),
-                () -> Assertions.assertTrue(mana, "「进入战斗…获得【魔力放出】」"),
+                () -> Assertions.assertTrue(mana, "「进入战斗…获得【char:1014/mana_release】」"),
                 () -> Assertions.assertEquals(0.5, castDelta - controlDelta, 1e-9,
                         "「暴击伤害提高 50%」, over and above the points"));
     }
@@ -376,7 +376,7 @@ public class SaberTest {
         battle.processRequests();
         System.out.println("[1014] resonance " + before + " -> " + saber.getBuffManager().stacksOf(RESONANCE));
         Assertions.assertEquals(before + 3, saber.getBuffManager().stacksOf(RESONANCE),
-                "「否则立即获得 3 点【炉心共鸣】」");
+                "「否则立即获得 3 点【char:1014/core_resonance】」");
     }
 
     /**
@@ -425,15 +425,15 @@ public class SaberTest {
                 + " ; skill points " + pointsBefore + " -> " + skillPointsAfter
                 + " ; extra turn " + (extraTurnActor != null));
         // The refund is capped by the bar: 46 points x 8 = 368 on a 360-energy Ultimate fills it, it does not overflow.
-        Assertions.assertAll("战技的消耗分支 + 行迹 龙之骑士: 回能、清空点数、消耗【魔力放出】换 1 战技点与立即行动",
+        Assertions.assertAll("战技的消耗分支 + 行迹 龙之骑士: 回能、清空点数、消耗【char:1014/mana_release】换 1 战技点与立即行动",
                 () -> Assertions.assertTrue(canFill,
                         "precondition: the points can fill the bar (" + points + " x 8 vs " + maxEnergy + ")"),
                 () -> Assertions.assertEquals(Math.min(8.0 * points, maxEnergy), energyGain, 1e-9,
-                        "「每消耗 1 点【炉心共鸣】固定恢复 8 点能量」, capped by the bar"),
-                () -> Assertions.assertEquals(0, pointsAfter, "「消耗所有【炉心共鸣】」"),
-                () -> Assertions.assertTrue(manaBefore, "precondition: 【魔力放出】 from entering battle"),
+                        "「每消耗 1 点【char:1014/core_resonance】固定恢复 8 点能量」, capped by the bar"),
+                () -> Assertions.assertEquals(0, pointsAfter, "「消耗所有【char:1014/core_resonance】」"),
+                () -> Assertions.assertTrue(manaBefore, "precondition: 【char:1014/mana_release】 from entering battle"),
                 () -> Assertions.assertNull(scheduledBefore, "precondition: nothing scheduled"),
-                () -> Assertions.assertFalse(manaAfter, "「消耗【魔力放出】」"),
+                () -> Assertions.assertFalse(manaAfter, "「消耗【char:1014/mana_release】」"),
                 () -> Assertions.assertEquals(pointsBefore + 1, skillPointsAfter, "「为我方恢复 1 个战技点」"),
                 () -> Assertions.assertSame(saber, extraTurnActor, "「使 Saber 立即行动」"));
     }
@@ -477,16 +477,16 @@ public class SaberTest {
         battle.startBattle();
         saber.setCurrentEnergy(0);
         for (int i = 0; i < 45; i++) {
-            saber.getBuffManager().addBuff(new StackBuff("炉心共鸣", 1, true, 60));
+            saber.getBuffManager().addBuff(new StackBuff("char:1014/core_resonance", 1, true, 60));
         }
         battle.castImmediate(saber.getSkills().get(SkillType.SKILL), saber, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();
-        System.out.println("[probe] mana=" + saber.getBuffManager().hasState("魔力放出")
+        System.out.println("[probe] mana=" + saber.getBuffManager().hasState("char:1014/mana_release")
                 + " s1=" + saber.getBuffManager().hasState("probe_s1")
                 + " s2=" + saber.getBuffManager().hasState("probe_s2")
                 + " s3=" + saber.getBuffManager().hasState("probe_s3")
                 + " s4=" + saber.getBuffManager().hasState("probe_s4")
-                + " stacks=" + saber.getBuffManager().stacksOf("炉心共鸣")
+                + " stacks=" + saber.getBuffManager().stacksOf("char:1014/core_resonance")
                 + " energy=" + saber.getCurrentEnergy());
     }
 

@@ -39,7 +39,7 @@ public class WeltTest {
         f.battle.castImmediate(f.welt.getSkills().get(SkillType.ULTRA), f.welt, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("ctrl:imprisoned"),
-                "「有100%的基础概率使受到攻击的敌方目标陷入ctrl:imprisoned状态，持续1回合」 (a 100% base chance to put the attacked enemy target into the Imprisonment (ctrl:imprisoned) state for 1 turn)");
+                "「有100%的基础概率使受到攻击的敌方目标陷入禁锢状态，持续1回合」 (a 100% base chance to put the attacked enemy target into the Imprisonment (ctrl:imprisoned) state for 1 turn)");
     }
 
 

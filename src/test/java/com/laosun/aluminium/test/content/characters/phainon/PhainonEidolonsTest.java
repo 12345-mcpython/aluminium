@@ -428,7 +428,7 @@ public class PhainonEidolonsTest {
 
         double[] atZero = appliedBlock(0);
         double[] atFive = appliedBlock(5);
-        System.out.println("[1408] char:1408/transformation块落下的增量: E0 ATK +" + atZero[0] + " / HEALTH +" + atZero[1]
+        System.out.println("[1408] 变身块落下的增量: E0 ATK +" + atZero[0] + " / HEALTH +" + atZero[1]
                 + " ; E5 ATK +" + atFive[0] + " / HEALTH +" + atFive[1]
                 + " (第 12 行说 0.88 / 2.97，字面量是 0.8 / 2.7)");
         Assertions.assertAll("槽 5 的行漂移见证",

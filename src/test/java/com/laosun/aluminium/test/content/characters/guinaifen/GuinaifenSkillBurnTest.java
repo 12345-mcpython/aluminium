@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 1210 桂乃芬's Skill clause: 「有 100% 的基础概率使目标与相邻目标陷入dot:burn状态…持续 2 回合」.
+ * 1210 桂乃芬's Skill clause: 「有 100% 的基础概率使目标与相邻目标陷入灼烧状态…持续 2 回合」.
  */
 public class GuinaifenSkillBurnTest {
 
@@ -31,6 +31,6 @@ public class GuinaifenSkillBurnTest {
 
         battle.castImmediate(unit.getSkills().get(SkillType.SKILL), unit, List.of(enemy));
         System.out.println("[1210] burning=" + enemy.getBuffManager().hasState("dot:burn"));
-        Assertions.assertTrue(enemy.getBuffManager().hasState("dot:burn"), "「陷入dot:burn状态」");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("dot:burn"), "「陷入灼烧状态」");
     }
 }

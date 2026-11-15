@@ -34,7 +34,7 @@ import java.util.Random;
  * because a 100% BASE chance still rolls (round 131).
  *
  * <p><b>Talent follow-up.</b> 「当卡芙卡的队友对敌方目标施放普攻后，卡芙卡立即发动追加攻击…并有 100% 的基础概率使受到攻击的敌方目标
- * 陷入与终结技相同的dot:shock状态，持续 2 回合，该效果每回合只能触发 1 次」. The rule shipped, but nothing judged it (the status
+ * 陷入与终结技相同的触电状态，持续 2 回合，该效果每回合只能触发 1 次」. The rule shipped, but nothing judged it (the status
  * row still lists it as unwritten). This test is the missing judge, and it pins the three words the rule is built on -
  * <b>teammate</b> (not herself), <b>basic attack</b> (not a skill), and <b>once per turn</b>. Kafka's follow-ups are counted
  * with a one-line marker rule on {@code FOLLOW_UP}, because a follow-up is not visible in any attribute.
@@ -85,7 +85,7 @@ public class KafkaTest {
         f.battle.castImmediate(f.kafka.getSkills().get(SkillType.ULTRA), f.kafka, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("dot:shock"),
-                "「有100%的基础概率使受到攻击的敌方目标陷入dot:shock状态」 (a 100% base chance to put the attacked enemy target into the Shock (dot:shock) state)");
+                "「有100%的基础概率使受到攻击的敌方目标陷入触电状态」 (a 100% base chance to put the attacked enemy target into the Shock (dot:shock) state)");
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…as a damage-over-time state");
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
                 "the ultimate's own damage plus the extra instance 「立即产生相当于原伤害 100% 的伤害」 (immediately deals damage equal to 100% of the original damage)");
@@ -114,7 +114,7 @@ public class KafkaTest {
         Assertions.assertTrue(afterAlly < before,
                 "the ally's basic attack lands and Kafka's follow-up adds to it: " + before + " -> " + afterAlly);
         Assertions.assertTrue(enemy.getBuffManager().hasState("dot:shock"),
-                "「并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的dot:shock状态」 (and a 100% base chance to put the attacked enemy target into the same Shock state as the Ultimate) — the follow-up really fired");
+                "「并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的触电状态」 (and a 100% base chance to put the attacked enemy target into the same Shock state as the Ultimate) — the follow-up really fired");
     }
 
     /**
@@ -150,7 +150,7 @@ public class KafkaTest {
 
         Assertions.assertAll("「该效果每回合只能触发 1 次」, and the turn that re-arms it is hers",
                 () -> Assertions.assertEquals(1, afterFirstBasic, "one follow-up"),
-                () -> Assertions.assertTrue(shocked, "「陷入与终结技相同的dot:shock状态」"),
+                () -> Assertions.assertTrue(shocked, "「陷入与终结技相同的触电状态」"),
                 () -> Assertions.assertEquals(1, afterSecondBasic, "「该效果每回合只能触发 1 次」"),
                 () -> Assertions.assertEquals(1, afterFirstBasic, "still one before her own turn"),
                 () -> Assertions.assertEquals(2, afterHerTurn, "a new turn: the follow-up is available again"));
@@ -230,7 +230,7 @@ public class KafkaTest {
         battle.startBattle();
         DamageElement[] elements = {DamageElement.FIRE, DamageElement.ICE};
         for (int i = 0; i < dots; i++) {
-            enemy.getBuffManager().addBuff(new DotBuff(ally, elements[i], 20_000, 3, 0, i == 0 ? "dot:burn" : "ctrl:frozen伤"));
+            enemy.getBuffManager().addBuff(new DotBuff(ally, elements[i], 20_000, 3, 0, i == 0 ? "dot:burn" : "冻结伤"));
         }
         Assertions.assertFalse(enemy.isDeath(), "precondition: the target survives");
         double before = enemy.getCurrentHp();
@@ -253,7 +253,7 @@ public class KafkaTest {
                 new ArrayList<>(List.of(neighbour, main)), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         neighbour.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 20_000, 3, 0, "dot:burn"));
-        main.getBuffManager().addBuff(new DotBuff(ally, DamageElement.ICE, 20_000, 3, 0, "ctrl:frozen伤"));
+        main.getBuffManager().addBuff(new DotBuff(ally, DamageElement.ICE, 20_000, 3, 0, "冻结伤"));
         double mainBefore = main.getCurrentHp();
         double neighbourBefore = neighbour.getCurrentHp();
         battle.castImmediate(kafka.getSkills().get(SkillType.SKILL), kafka, List.of(main));

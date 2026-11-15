@@ -275,7 +275,7 @@ public class PhainonKitTest {
         battle.applyEnergyGain(phainon, EnergyGain.normal(10));
         battle.processRequests();
         int after = phainon.getResources().value(COREFLAME);
-        System.out.println("[1408] 收到 10 点回能后的char:1408/ember: " + before + " -> " + after + " (登记：这一句还没写)");
+        System.out.println("[1408] 收到 10 点回能后的火种: " + before + " -> " + after + " (登记：这一句还没写)");
         Assertions.assertEquals(before, after,
                 "登记中的缺口：ENERGY_GAINED 不带「谁给的」，所以「队友提供的回能」今天判不了");
     }

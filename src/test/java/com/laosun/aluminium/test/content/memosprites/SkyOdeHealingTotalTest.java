@@ -25,8 +25,8 @@ public class SkyOdeHealingTotalTest {
     private static final int HYACINE = 1409;
     private static final int CYRENE = 1415;
     private static final int HEALER = 1002;
-    private static final String MARK = "献予「天空」之诗";
-    private static final String TOTAL = "小伊卡累计治疗";
+    private static final String MARK = "char:1409/ode_to_sky";
+    private static final String TOTAL = "internal:1409/ika_healing_total";
     private static final double HEAL = 1000;
     /**
      * Her HP at this level, and the HP she is left at before the heal -- the heal is capped by the missing amount.
@@ -93,7 +93,7 @@ public class SkyOdeHealingTotalTest {
         hyacine.takeDamage(hyacine.getMaxHp() * 0.5);
         battle.processRequests();
         System.out.println("[sky_heal]   diag: her captured share = "
-                + battle.characters().get(1).getResources().value("天空之诗的治疗份额")
+                + battle.characters().get(1).getResources().value("internal:1409/ode_sky_heal_share")
                 + " ; the healer's mark = " + battle.characters().get(2).getBuffManager().stacksOf(MARK)
                 + " ; her HP " + battle.characters().get(1).getCurrentHp() + "/" + battle.characters().get(1).getMaxHp());
         double before = battle.characters().get(1).getResources().value(TOTAL);

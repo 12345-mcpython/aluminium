@@ -52,7 +52,7 @@ public class HyacineMemospritesTest {
     private static final int HEALTHY = 1002;
     /** 1413 长夜's owner - the "someone else's memosprite" the gates are asked about. */
     private static final int EVERNIGHT = 1413;
-    private static final String TALLY = "小伊卡累计治疗";
+    private static final String TALLY = "internal:1409/ika_healing_total";
     private static final double EPS = 1e-9;
     /** The charity case measures a difference between two battles, so it keeps its own looser delta. */
     private static final double CHARITY_EPS = 1e-6;

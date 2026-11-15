@@ -75,12 +75,12 @@ public class LukaEidolonTest {
     }
 
     /**
-     * 1111 卢卡's Eidolon 1: 「当卢卡行动时，若指定的敌方目标处于dot:bleed状态，卢卡造成的伤害提高 15%，持续 2 回合」.
+     * 1111 卢卡's Eidolon 1: 「当卢卡行动时，若指定的敌方目标处于裂伤状态，卢卡造成的伤害提高 15%，持续 2 回合」.
      */
     @Test
     public void actingAgainstABleedingEnemyRaisesHisDamage() {
         Assertions.assertEquals(0.0, boostAfterTurn(1, false), 1e-9, "control: nothing while no enemy is bleeding");
-        Assertions.assertEquals(0.15, boostAfterTurn(1, true), 1e-9, "「若指定的敌方目标处于dot:bleed…造成的伤害提高 15%」");
+        Assertions.assertEquals(0.15, boostAfterTurn(1, true), 1e-9, "「若指定的敌方目标处于裂伤…造成的伤害提高 15%」");
         Assertions.assertEquals(0.0, boostAfterTurn(0, true), 1e-9, "control: the Eidolon is what pays it");
     }
 
@@ -96,7 +96,7 @@ public class LukaEidolonTest {
     }
 
     /**
-     * 1111 卢卡's Eidolon 6: 「本次强化普攻使用的【直冲拳】每施放过 1 段攻击，则额外使其当前承受的dot:bleed状态立即产生 1 次相当于原伤害
+     * 1111 卢卡's Eidolon 6: 「本次强化普攻使用的【直冲拳】每施放过 1 段攻击，则额外使其当前承受的裂伤状态立即产生 1 次相当于原伤害
      * 8% 的伤害」.
      */
     @Test

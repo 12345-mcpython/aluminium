@@ -34,13 +34,13 @@ public class HanyaBurdenTest {
     public void theSkillMovesBurdenToTheLatestTarget() {
         Fixture f = new Fixture();
         f.castSkillOn(f.first);
-        Assertions.assertTrue(f.first.getBuffManager().hasState("承负"), "precondition: the first enemy carries it");
+        Assertions.assertTrue(f.first.getBuffManager().hasState("char:1215/burden"), "precondition: the first enemy carries it");
 
         f.castSkillOn(f.second);
 
-        Assertions.assertFalse(f.first.getBuffManager().hasState("承负"),
+        Assertions.assertFalse(f.first.getBuffManager().hasState("char:1215/burden"),
                 "「仅对最新被施加的目标生效」 (applies only to the latest applied target) -- the removal IS that clause (there is no single-holder flag)");
-        Assertions.assertTrue(f.second.getBuffManager().hasState("承负"));
+        Assertions.assertTrue(f.second.getBuffManager().hasState("char:1215/burden"));
     }
 
     /**
@@ -52,12 +52,12 @@ public class HanyaBurdenTest {
         f.castSkillOn(f.first);
 
         f.allyAttacks(f.first, com.laosun.aluminium.enums.SkillCategory.NORMAL);
-        Assertions.assertTrue(f.first.getBuffManager().hasState("承负"),
+        Assertions.assertTrue(f.first.getBuffManager().hasState("char:1215/burden"),
                 "one attack is not two: 「每 2 次…后」 (after every 2 times) has not been reached");
 
         f.allyAttacks(f.first, com.laosun.aluminium.enums.SkillCategory.BPSKILL);
-        Assertions.assertFalse(f.first.getBuffManager().hasState("承负"),
-                "the second qualifying cast reached the threshold, the party got a skill point and 【承负】 (Burden) came off");
+        Assertions.assertFalse(f.first.getBuffManager().hasState("char:1215/burden"),
+                "the second qualifying cast reached the threshold, the party got a skill point and 【char:1215/burden】 (Burden) came off");
     }
 
     /**
@@ -69,7 +69,7 @@ public class HanyaBurdenTest {
         f.castSkillOn(f.first);
 
         f.allyAttacks(f.first, com.laosun.aluminium.enums.SkillCategory.NORMAL, 3);
-        Assertions.assertTrue(f.first.getBuffManager().hasState("承负"),
+        Assertions.assertTrue(f.first.getBuffManager().hasState("char:1215/burden"),
                 "three hits of ONE basic attack are still one 「次」 (one occurrence) -- the counter is on the attack event, not on the "
                         + "damage instances");
     }
@@ -84,9 +84,9 @@ public class HanyaBurdenTest {
         Assertions.assertEquals(3, TriggerTables.of(HANYA).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "the talent's boost, one rule per slot");
         Assertions.assertEquals(2, TriggerTables.of(HANYA).ruleCount(TriggerEvent.KILL),
-                "Eidolon 1 (the carrier\'s kill advances her) and the Traces (行迹) Netherworld (幽府) trace (a kill on a Burden (【承负】) target refunds one more)");
+                "Eidolon 1 (the carrier\'s kill advances her) and the Traces (行迹) Netherworld (幽府) trace (a kill on a Burden (【char:1215/burden】) target refunds one more)");
         Assertions.assertEquals(2, TriggerTables.of(HANYA).ruleCount(TriggerEvent.SKILL_CAST),
-                "the Burden (承负) application and Eidolon 2's speed boost");
+                "the Burden (char:1215/burden) application and Eidolon 2's speed boost");
     }
 
     // ==================================================================
