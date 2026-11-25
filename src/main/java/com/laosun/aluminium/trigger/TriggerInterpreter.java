@@ -760,32 +760,6 @@ public final class TriggerInterpreter {
         }
     }
 
-    /**
-     * {@code SHARE_DAMAGE}: "the ally takes 35% and I take 65%". The instance being settled keeps its own share (the
-     * percent is taken out of its reduction zone, so every other zone still applies to what is left) and the SAME share,
-     * element and type is queued for the named unit - settled right after the current instance, through its own zones.
-     *
-     * <p>Queued rather than settled here: this runs inside the current instance's zone arithmetic, and a nested
-     * settlement would interleave two hits' events.
-     */
-    static void shareDamage(EffectSpec effect, TriggerContext ctx) {
-        BattlePort battle = ctx.battle();
-        var damage = ctx.damage();
-        if (battle == null || damage == null) {
-            throw new IllegalStateException(
-                    "SHARE_DAMAGE runs on DEALING_DAMAGE, the event that carries the instance being settled; there is none "
-                            + "here (rule: " + ctx.ruleId() + ")");
-        }
-        double share = TriggerMagnitudes.shareOf(effect, ctx);
-        double base = damage.getSkillBaseValue() * share;
-        damage.addReduction(share);
-        for (CanHit receiver : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-            if (receiver == null || receiver.isDeath()) {
-                continue;
-            }
-            battle.deferSharedDamage(damage.getAttacker(), receiver, base, damage.getElement());
-        }
-    }
 
     static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
         BattlePort battle = ctx.battle();
@@ -1955,27 +1929,6 @@ public final class TriggerInterpreter {
         return effect.stackCap() == null ? 0 : effect.stackCap();
     }
 
-
-    /**
-     * {@code RAISE_SKILL_HITS}: adds damage segments to a data slot of the target (reader: 1405's ode of reason).
-     *
-     * <p>A negative amount takes them back, which is how "lasting 1 turn" is stated without a new lifetime.
-     */
-    static void raiseSkillHits(EffectSpec effect, TriggerContext ctx) {
-        CanHit owner = ctx.owner();
-        if (owner == null) {
-            throw new IllegalStateException(
-                    "RAISE_SKILL_HITS ran without a rule owner, so there is no combatant whose hits to raise; this is "
-                            + "an engine fault");
-        }
-        int slot = effect.getSkillId();
-        int amount = effect.getValue() != null
-                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
-                : effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
-        for (CanHit target : TriggerTargets.resolveTargets(ctx.battle(), effect, ctx)) {
-            target.raiseSkillHits(slot, amount);
-        }
-    }
 
     /**
      * {@code RAISE_SKILL_LEVEL}: "Skill Lv. +1""Ultimate Lv. +1" - this battle reads one skill slot one level higher.
