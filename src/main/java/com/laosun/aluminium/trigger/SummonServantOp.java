@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 
 /**
  * {@code SUMMON_SERVANT}: bring a servant (a second, non-memosprite kind of summon) onto the field.
@@ -19,6 +20,12 @@ final class SummonServantOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        // This op has no arm of its own in TriggerValidator, so this was the default check it used to get there.
+        TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override

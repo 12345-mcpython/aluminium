@@ -570,118 +570,7 @@ final class TriggerValidator {
             // APPLY_BUFF, REMOVE_STACK, MODIFY_DAMAGE_TAKEN, ABSORB_DAMAGE, SUPER_BREAK, CONSUME_HP,
             // BOOST_TOUGHNESS, BOOST_DAMAGE, TICK_DOT, REPLACE_SKILL and REMOVE_BUFF validate themselves now.
             // Each rule that was in this switch is a method on the handler named after the op.
-            case DISPEL -> {
-                // Either an amount, or a CLASS -- and with a class the amount is optional, because "all control-class negative states"
-                // counts nothing. Both together is allowed too: "the newest two of that class".
-                if (effect.getKind() != null && !effect.getKind().isBlank()) {
-                    requireDebuffClass(effect, op, spec);
-                } else {
-                    requirePositiveAmount(effect, op, spec);
-                }
-                requireNoDuration(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-            }
-            case TAUNT -> {
-                // "make the target enter the taunt state for N turns": the engine's TauntBuff is a pure marker with a hard
-                // target-selection constraint, so all this op needs is the duration. No `permanent` / `until`: a
-                // marker with no turn count would never come off, and no document writes it that way.
-                Integer turns = effect.getTurns();
-                if (turns == null || turns <= 0) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " requires a positive \"turns\" (how long the taunt lasts); the documents "
-                                    + "write \"make the target enter the taunt state, lasting 1 turn\" (source: " + spec.getSource() + ")");
-                }
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " takes a turn count and nothing else; \"permanent\" / \"until\" would be "
-                                    + "a taunt that never ends (source: " + spec.getSource() + ")");
-                }
-                requireNoStackArguments(effect, op, spec);
-            }
-            case REMOVE_STATE -> {
-                // `buff` is the state's name - the same spelling `has_state` reads and `APPLY_BUFF` writes, so the
-                // three are one vocabulary. Note: No count: "remove ... state" takes the state off, it does not take N of
-                // them, and an `amount` here would be silently ignored (which is what this op exists to avoid).
-                // `buff` (a name) OR `attribute` (what a modifier modifies), and optionally `"kind": "own"` for
-                // "only what THIS rule's owner applied" -- the origin filter `EXTEND_BUFF` has always had.
-                if (effect.getAttribute() != null && !effect.getAttribute().isBlank()) {
-                    requireAttribute(effect, op, spec);
-                } else {
-                    requireBuff(effect, op, spec);
-                }
-                if (effect.getKind() != null && !effect.getKind().isBlank()
-                        && !"own".equalsIgnoreCase(effect.getKind().trim())) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " has \"kind\": \"" + effect.getKind()
-                                    + "\"; the only kind it knows is \"own\" (only what this rule's owner applied)"
-                                    + " (source: " + spec.getSource() + ")");
-                }
-                requireNoDuration(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-                if (effect.getAmount() != null) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " takes the named state off entirely and has no \"amount\" (it states "
-                                    + effect.getAmount() + "); write one effect per state to remove "
-                                    + "(source: " + spec.getSource() + ")");
-                }
-            }
-            case APPLY_CONTROL -> {
-                // "with a 50% base chance, make the enemy target enter the frozen state for 1 turn": a named control state, a duration, and
-                // (optionally) a base chance that goes through Effect Hit Rate / Effect RES. The effect may also carry the
-                // state's OWN per-turn damage (`element` + a magnitude), which lands with the state.
-                requireControl(effect, op, spec);
-                requirePositiveTurns(effect, op, spec);
-                requireBaseChance(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
-                                    + "would be a control that never ends (source: " + spec.getSource() + ")");
-                }
-                requireStateDamage(effect, op, spec);
-            }
-            case APPLY_DOT -> {
-                // "make the target enter the burn state, dealing damage equal to ... each turn": a damage-over-time attached by a rule. The
-                // element is the engine's own spelling (Fire to burn), the magnitude is either flat or derived
-                // from the RULE OWNER's attribute, and it is frozen into the buff when it lands.
-                requireElement(effect, op, spec, false);
-                requireDotMagnitude(effect, op, spec);
-                // "at most no more than 338% of Luka (卢卡)'s ATK": a derived ceiling -- the magnitude is the SMALLER of the two values.
-                if (effect.getCapScale() != null || effect.getCapPercent() != null) {
-                    if (effect.getCapScale() == null || effect.getCapPercent() == null) {
-                        throw new IllegalArgumentException(
-                                "Op " + op + " states a derived ceiling, which needs BOTH \"cap_scale\" (whose attribute) and "
-                                        + "\"cap_percent\" (that attribute's share) (source: " + spec.getSource() + ")");
-                    }
-                }
-
-                requirePositiveTurns(effect, op, spec);
-                requireBaseChance(effect, op, spec);
-                // Note: `max_stacks` IS allowed here ("at most N stacks",): the general stack-family refusal would
-                // reject it, so the ceiling is validated on its own -- a positive count, nothing else from that family.
-                requireDotStackCap(effect, op, spec);
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
-                                    + "would be a damage-over-time that never ends (source: " + spec.getSource()
-                                    + ")");
-                }
-                requireNoMalformedArguments(effect, op, spec);
-            }
-            case EXTEND_BUFF -> {
-                // "...'s duration is increased by 1 turn": lengthen the buffs THIS owner already applied to the target, named by
-                // their state ("the shield provided by the Skill"/"the wind shear state the talent makes the enemy target enter") or by the attribute a modifier
-                // sits on ("damage boost effect"). Nothing else is stated.
-                requireSignedTurns(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " adds turns to a buff that already exists; \"permanent\" / \"until\" "
-                                    + "describe how a NEW buff ends and are not read here "
-                                    + "(source: " + spec.getSource() + ")");
-                }
-                requireExtendFilter(effect, op, spec);
-            }
+            // DISPEL, TAUNT, REMOVE_STATE, APPLY_CONTROL, APPLY_DOT and EXTEND_BUFF validate themselves now.
             case RESIST_DEBUFF -> {
                 // 「抵抗 1 次负面效果，2 回合后可再次触发」 (1207's 襄尺): a charge shield has no
                 // percentage and no duration of its own - the cooldown is its clock.
@@ -1065,7 +954,15 @@ final class TriggerValidator {
                 requireNoTarget(effect, op, spec);
                 requireEvent(spec, op, TriggerEvent.CAST_SETUP);
             }
-            default -> requireNoStackArguments(effect, op, spec);
+            default -> {
+                // The catch-all check for an op that has NO arm of its own. Once an op has a handler its checks are
+                // its own methods, and applying this one as well would refuse what the handler allows: APPLY_DOT
+                // states `max_stacks` ("at most N layers"), which this generic stack-family refusal rejects - measured
+                // by 1108 Sampo failing to load when the default stopped distinguishing the two.
+                if (OpRegistry.find(operator) == null) {
+                    requireNoStackArguments(effect, op, spec);
+                }
+            }
         }
     }
 

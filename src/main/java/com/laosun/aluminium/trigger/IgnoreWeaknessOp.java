@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.entity.CanHit;
 
 /**
@@ -20,6 +21,12 @@ final class IgnoreWeaknessOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        // This op has no arm of its own in TriggerValidator, so this was the default check it used to get there.
+        TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
