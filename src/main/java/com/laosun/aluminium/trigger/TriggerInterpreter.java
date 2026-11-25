@@ -1992,31 +1992,30 @@ public final class TriggerInterpreter {
      * <p>Note: <b>{@code BATTLE_START} only</b>, like {@code MODIFY_RULE}: a level raise is a passive fact of the loadout,
      * and a raise applied mid-battle would have to be taken back at a point nobody states.
      */
-    static void raiseSkillLevel(EffectSpec effect, TriggerContext ctx) {
+    static void raiseSkillLevel(RaiseSkillLevelArgs args, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {
             throw new IllegalStateException(
                     "RAISE_SKILL_LEVEL ran without a rule owner, so there is no combatant whose skill to raise; this "
                             + "is an engine fault (the op is validated onto BATTLE_START, which always has one)");
         }
-        int delta = (int) Math.round(effect.getAmount());
-        if (Boolean.TRUE.equals(effect.getMemosprite())) {
+        if (args.memosprite()) {
             // 「忆灵技等级+1」: the raise is filed on the OWNER (the summoner's kit), not on the memosprite, because
             // the memosprite does not exist yet at BATTLE_START - it is summoned later, possibly more than once. The
             // slot is its DATA SLOT (`skill_id`), which no SkillType names. `CanHit.skillLevel` reads the owner's map
             // when it resolves a memosprite's skill, so every summon of this character inherits the raise.
-            owner.raiseMemospriteSkillLevel(effect.getSkillId(), delta);
+            owner.raiseMemospriteSkillLevel(args.skillId(), (int) Math.round(args.delta()));
             return;
         }
-        if (effect.getSkills() != null) {
+        if (args.skills() != null) {
             // One fact, one amount: ["COMMON", "SKILL", "ULTRA", "TALENT"] is the file's level convention, and the
             // validator has already refused a blank, unknown or repeated slot.
-            for (String slot : effect.getSkills()) {
-                owner.raiseSkillLevel(SkillType.valueOf(slot.trim().toUpperCase(Locale.ROOT)), delta);
+            for (String slot : args.skills()) {
+                owner.raiseSkillLevel(SkillType.valueOf(slot.trim().toUpperCase(Locale.ROOT)), (int) Math.round(args.delta()));
             }
             return;
         }
-        owner.raiseSkillLevel(SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT)), delta);
+        owner.raiseSkillLevel(SkillType.valueOf(args.skill().trim().toUpperCase(Locale.ROOT)), (int) Math.round(args.delta()));
     }
 
 

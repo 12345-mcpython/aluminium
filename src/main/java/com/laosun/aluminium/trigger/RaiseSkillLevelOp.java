@@ -11,7 +11,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
  * copy of the rule at another level. Three ways to name the slot ({@code skill}, {@code skills}, and a memosprite's
  * {@code skill_id}) are mutually exclusive, because each names a different thing.
  */
-final class RaiseSkillLevelOp implements OpHandler<OpArgs> {
+final class RaiseSkillLevelOp implements OpHandler<RaiseSkillLevelArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,12 +19,17 @@ final class RaiseSkillLevelOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public RaiseSkillLevelArgs parse(EffectSpec effect) {
+        double delta = effect.getAmount() == null ? 0 : effect.getAmount();
+        return new RaiseSkillLevelArgs(delta,
+                Boolean.TRUE.equals(effect.getMemosprite()),
+                effect.getSkillId(),
+                effect.getSkills() == null ? null : java.util.List.copyOf(effect.getSkills()),
+                effect.getSkill());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(RaiseSkillLevelArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireEvent(rule, op, TriggerEvent.BATTLE_START);
         if (Boolean.TRUE.equals(effect.getMemosprite())) {
@@ -82,7 +87,7 @@ final class RaiseSkillLevelOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.raiseSkillLevel(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, RaiseSkillLevelArgs args) {
+        TriggerInterpreter.raiseSkillLevel(args, ctx.firing());
     }
 }
