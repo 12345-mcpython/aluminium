@@ -9,9 +9,10 @@ import com.laosun.aluminium.entity.CanHit;
  *
  * <p>It names the rule for the same reason {@code MODIFY_RULE} does - "reset the probability" without saying whose has
  * no subject. Whether the named rule really <b>decays</b> is checked in {@code TriggerTable.validateAmendments}, the
- * only place that can see the whole file.
+ * only place that can see the whole file. The id is parsed once ({@link ResetRuleChanceArgs}); the run-time half no
+ * longer reads the bean.
  */
-final class ResetRuleChanceOp implements OpHandler<OpArgs> {
+final class ResetRuleChanceOp implements OpHandler<ResetRuleChanceArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,12 +20,12 @@ final class ResetRuleChanceOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ResetRuleChanceArgs parse(EffectSpec effect) {
+        return new ResetRuleChanceArgs(effect.getRule() == null ? "" : effect.getRule().trim());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ResetRuleChanceArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireRuleReference(effect, op, rule);
         TriggerValidator.requireNoDuration(effect, op, rule);
@@ -32,10 +33,10 @@ final class ResetRuleChanceOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
+    public void apply(OpContext ctx, ResetRuleChanceArgs args) {
         CanHit owner = ctx.firing().owner();
         if (owner != null) {
-            owner.resetRuleChance(ctx.effect().getRule().trim());
+            owner.resetRuleChance(args.rule());
         }
     }
 }

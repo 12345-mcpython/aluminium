@@ -1957,24 +1957,6 @@ public final class TriggerInterpreter {
 
 
     /**
-     * {@code START_COUNTDOWN}: "a [协奏] countdown appears on the action order ... the countdown has a fixed 90 SPD".
-     *
-     * <p>Its turn is announced as {@link TriggerEvent#COUNTDOWN_TURN}, and the content answers with vocabulary it
-     * already has (`REMOVE_STATE` + `EXTRA_TURN self` for "leave the [协奏] state and act immediately") - so this op does one thing only,
-     * which is what keeps the countdown reusable for every other countdown sentence in the corpus.
-     *
-     * <p>Note: The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
-     * reads it back, so it needs no id).
-     */
-    static void startCountdown(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        String name = effect.getBuff() == null || effect.getBuff().isBlank()
-                ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
-                : effect.getBuff().trim();
-        battle.startCountdown(ctx.owner(), name, effect.getSpeed());
-    }
-
-
-    /**
      * {@code RAISE_SKILL_HITS}: adds damage segments to a data slot of the target (reader: 1405's ode of reason).
      *
      * <p>A negative amount takes them back, which is how "lasting 1 turn" is stated without a new lifetime.
