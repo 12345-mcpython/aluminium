@@ -1867,66 +1867,6 @@ public final class TriggerInterpreter {
     }
 
 
-    /**
-     * {@code MODIFY_RULE}: "raise the number of times the talent's counter effect can trigger per turn by 1" / "raise the base chance to freeze the enemy target by 15%" - a passive that
-     * <b>raises a number on another rule of the same file</b>.
-     *
-     * <p><b>Why it is not a second rule.</b> Both sentences modify something that already exists, and the honest
-     * spellings are impossible without saying so: a second {@code per_turn: 3} rule <i>adds</i> firings (the engine
-     * would fire 2 + 3 = 5 times a turn rather than raising the cap to 3), and a second {@code base_chance: 0.65}
-     * rule would roll <b>twice</b> (1 − 0.5  x  0.35 = 82.5% instead of 65%). Both are numbers that look right from the
-     * outside and are wrong in play - the failure mode this project refuses.
-     *
-     * <p><b>Where the raised number lives.</b> On the <b>combatant</b>, not on the rule: a table is compiled once per
-     * cid and a relic's rules are shared by every wearer, so an amendment written onto the rule would leak into every
-     * battle in the JVM (the same reasoning as the firing limits in {@code CanHit}). The two consumers are
-     * {@link #fire} (per-turn cap) and {@link TriggerEffects#applyControl} (base chance) - both read the amendment
-     * only when the rule they are running carries the id it was filed under.
-     *
-     * <p>Note: Which number moves is decided by <b>which field is stated</b>: {@code amount} raises a count, {@code
-     * percent} raises a probability, {@code cooldown_delta} moves a cooldown. The load-time validator refuses
-     * both-at-once, neither, an out-of-range value, a non-integer count, any other field, a non-{@code BATTLE_START}
-     * event, an unknown rule id, and a named rule that does not state the number being raised.
-     */
-    static void modifyRule(EffectSpec effect, TriggerContext ctx) {
-        CanHit owner = ctx.owner();
-        if (owner == null) {
-            throw new IllegalStateException(
-                    "MODIFY_RULE ran without a rule owner, so there is no combatant to file the amendment under; this "
-                            + "is an engine fault (the op is validated onto BATTLE_START, which always has one)");
-        }
-        String target = effect.getRule().trim();
-        if (effect.getAmount() != null) {
-            owner.addRulePerTurnBonus(target, (int) Math.round(effect.getAmount()));
-        } else if (effect.getEffectTurns() != null) {
-            // "the Ultimate's duration is additionally increased by 1 turn": the rule's own effect durations, raised where they are read
-            // (see amendedEffect). Note: Not an extra rule with a longer `turns`: the two modifiers of one skill are the
-            // same kind, so a second one would REPLACE the first rather than stack.
-            owner.amendRuleEffectTurns(target, effect.getEffectTurns());
-        } else if (effect.getEffectMaxStacks() != null) {
-            // "raise the talent's effect max stack count by 2": a CAP, not a value -- and it must be in place before any stack is
-            // attached, which it is: an amendment is filed at battle start and the stacks come from later firings.
-            owner.amendRuleEffectMaxStacks(target, effect.getEffectMaxStacks());
-        } else if (effect.getEffectPercent() != null) {
-            // "additionally raise the talent's damage boost effect by 10%": 30% -> 40%, the same rule, raised in place.
-            owner.amendRuleEffectPercent(target, effect.getEffectPercent());
-        } else if (effect.getEffectPercentScale() != null) {
-            owner.amendRuleEffectPercentScale(target, effect.getEffectPercentScale());
-        } else if (effect.getEffectAmount() != null) {
-            // "本次叠加的层数额外 +1 层": the LAYER COUNT an application grants.
-            owner.amendRuleEffectAmount(target, effect.getEffectAmount());
-        } else if (effect.getEffectPercentFromResource() != null) {
-            // The SAME amendment, sized by a resource in basis points (reader: 114151"for each 1% of overflow spent...").
-            int basisPoints = resourceAmount(ctx.battle(), owner, effect.getEffectPercentFromResource().trim());
-            owner.amendRuleEffectPercent(target, basisPoints / 10000.0);
-        } else if (effect.getCooldownDelta() != null) {
-            // "天赋的冷却时间减少 1 回合" (1002's Eidolon 2): a delta on the number the named rule states. Read where the
-            // cooldown is recorded, so the rule keeps saying "2" and the Eidolon is the correction.
-            owner.addRuleCooldownDelta(target, effect.getCooldownDelta());
-        } else {
-            owner.addRuleBaseChanceBonus(target, effect.getPercent());
-        }
-    }
 
     /**
      * 「并使「长夜」消失」: takes a summon off the field <b>without a death</b>.

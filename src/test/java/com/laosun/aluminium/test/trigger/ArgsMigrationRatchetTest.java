@@ -68,7 +68,8 @@ public class ArgsMigrationRatchetTest {
             "ABSORB_DAMAGE",
             "RAISE_RESOURCE_CAP",
             "RAISE_RESOURCE_MAX",
-            "RAISE_ENERGY_BANK");
+            "RAISE_ENERGY_BANK",
+            "MODIFY_RULE");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {
