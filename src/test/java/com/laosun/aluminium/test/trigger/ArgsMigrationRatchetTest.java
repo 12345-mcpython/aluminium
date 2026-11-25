@@ -7,134 +7,76 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * How many ops read their arguments once, at load time, instead of re-reading the bean on every hit.
+ * Every op parses its arguments once, at load time, instead of re-reading the bean on every hit.
  *
- * <p><b>Why a ratchet and not a rule.</b> "Parse the arguments" is the second half of the op migration, and it lands
- * one op at a time: each conversion changes a handler's {@code OpHandler<OpArgs>} into {@code OpHandler<XxxArgs>}. This
- * case names the ops that have moved, so the number can only grow - and so a conversion cannot be quietly undone by a
- * later edit that reverts the type parameter.
+ * <p><b>Why this is the terminal form of the migration.</b> It started as a ratchet - a growing list of converted ops -
+ * because the conversion landed one op at a time. That list is gone: what is left is the <b>closure</b>, "no handler
+ * takes the untyped {@code OpArgs} unless it is on the list below", plus that list's own reason for existing.
  *
- * <p><b>What it does not check.</b> Whether the parse is <i>complete</i> - an args record with one field where three
- * were read is still a conversion. The compiler enforces that the run-time half uses the record; this case only counts
- * who has made the move.
+ * <p><b>Why some ops genuinely take nothing.</b> An op whose whole effect is "do this to the target" has no arguments
+ * to parse: its sentence states a target and nothing else. Forcing an args record onto those would declare fields that
+ * no line reads - the {@code as_attack} defect (validated, dumped, never consulted) wearing a new hat. So they keep
+ * {@code OpArgs.NONE}, and this case names them so a <b>new</b> op cannot join them by accident.
  */
 public class ArgsMigrationRatchetTest {
 
     private static final Path HANDLERS = Path.of("src", "main", "java", "com", "laosun", "aluminium", "trigger");
 
     /**
-     * Ops whose arguments are parsed. Add one line when an op moves; never remove a line to make this pass.
+     * The ops that state no arguments at all, with the sentence each one is.
      *
-     * <ul>
-     *   <li>{@code IGNORE_WEAKNESS} - the cast count, and the "unstated means one" decision, are read once;</li>
-     *   <li>{@code RESET_RULE_CHANCE} - the rule id it names;</li>
-     *   <li>{@code START_COUNTDOWN} - the stated name (or none) and the Speed;</li>
-     *   <li>{@code SUMMON} - which of the three shapes, and the memosprite's name and Speed;</li>
-     *   <li>{@code RAISE_SKILL_LEVEL} - which of the three slot spellings, and how many levels;</li>
-     *   <li>{@code ADVANCE} / {@code DELAY} / {@code GAIN_SKILL_POINT} - the one magnitude each states, held as a
-     *       {@code Magnitude} so the run-time half never names the bean;</li>
-     *   <li>{@code HEAL} / {@code CONSUME_HP} - the same, resolved through the grant path.</li>
-     * </ul>
-     *
-     * <p><b>What is NOT on this list on purpose.</b> {@code BOOST_DAMAGE} reads its magnitude <i>and</i> its
-     * {@code per_stack} multiplier, and stacking is a different cluster with its own reader; carrying only half of it
-     * would move the type without moving the knowledge. It waits for {@code per_stack} to be parsed too.
+     * <p>Adding a line here means "this op's JSON can only say WHERE, never WHAT". Every line is a claim about the
+     * vocabulary, so each carries its own reason.
      */
-    private static final Set<String> PARSED = Set.of(
-            "IGNORE_WEAKNESS",
-            "RESET_RULE_CHANCE",
-            "START_COUNTDOWN",
-            "SUMMON",
-            "RAISE_SKILL_LEVEL",
-            "ADVANCE",
-            "DELAY",
-            "GAIN_SKILL_POINT",
-            "HEAL",
-            "CONSUME_HP",
-            "SHIELD",
-            "RAISE_ENERGY_TO",
-            "RAISE_SKILL_HITS",
-            "SHARE_DAMAGE",
-            "REGISTER_HEAL_BONUS",
-            "ADD_ELEMENTAL_WEAKNESS",
-            "ABSORB_DAMAGE",
-            "RAISE_RESOURCE_CAP",
-            "RAISE_RESOURCE_MAX",
-            "RAISE_ENERGY_BANK",
-            "MODIFY_RULE",
-            "RESIST_DEBUFF",
-            "TICK_DOT",
-            "SUPER_BREAK",
-            "REMOVE_BUFF",
-            "TAUNT",
-            "DISPEL",
-            "BOOST_TOUGHNESS",
-            "APPLY_REGEN",
-            "REMOVE_STATE",
-            "SET_STACKS",
-            "BOOST_DOT",
-            "EXTEND_BUFF",
-            "REMOVE_STACK",
-            "SPEND_STEPS",
-            "RAISE_SKILL_MULTIPLIER",
-            "RAISE_SKILL_POINT_CAP",
-            "RESET_TRIGGER_LIMIT",
-            "APPLY_DOT",
-            "APPLY_CONTROL",
-            "DELEGATE_DAMAGE",
-            "GAIN_RESOURCE",
-            "SPEND_RESOURCE",
-            "REMOVE_RESOURCE",
-            "GAIN_ENERGY",
-            "SUMMON_SERVANT",
-            "ADD_DAMAGE",
-            "REPLACE_SKILL",
-            "COMMAND_SUMMON",
-            "APPLY_BUFF",
-            "ADD_STACK",
-            "BOOST_DAMAGE",
-            "MODIFY_DAMAGE_TAKEN",
-            "CAST_SKILL",
-            "DAMAGE",
-            "MODIFY_ATTR");
+    private static final Map<String, String> NO_ARGUMENTS = Map.of(
+            "EXTRA_TURN", "the sentence is \"grant one more turn\" - the target is the whole effect",
+            "INSERT_ACTION", "the sentence is \"insert an action\" - order comes from the queue, not from the effect",
+            "DEPART", "the sentence is \"leave the field\" - nothing to measure or scope",
+            "RETURN", "the sentence is \"come back\" - the inverse of DEPART, equally bare",
+            "DRAW_ENERGY_BANK", "the whole store is drawn; no amount is stated because none could be",
+            "RESET_RESOURCE_CAP", "the cap goes back to its declared value - the declaration is the argument",
+            "DISMISS_SUMMON", "the sentence is \"the memosprite leaves\" - the target IS the summon");
 
     @Test
-    public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {
-        Set<String> parsedNow = parsedOps();
-        Set<String> lost = new TreeSet<>(PARSED);
-        lost.removeAll(parsedNow);
-        Assertions.assertTrue(lost.isEmpty(),
-                "these ops used to parse their arguments and now read the bean again: " + lost
-                        + " - the args record is the point of the conversion, not an optional extra");
+    public void everyOpParsesItsArgumentsUnlessItsSentenceStatesNone() throws IOException {
+        Set<String> untyped = untypedOps();
+        Set<String> unexplained = new TreeSet<>(untyped);
+        unexplained.removeAll(NO_ARGUMENTS.keySet());
+        Assertions.assertTrue(unexplained.isEmpty(),
+                "these ops take the untyped OpArgs but state no reason to: " + unexplained
+                        + " - either parse their arguments into a record, or add a line to NO_ARGUMENTS saying why"
+                        + " the sentence has none");
     }
 
     @Test
-    public void noOpRevertsToTheUntypedShapeWithoutFailing() throws IOException {
-        // The count is the progress bar. It is asserted as "at least", so a new conversion does not have to update
-        // this file - only a reversion does.
-        Assertions.assertTrue(parsedOps().size() >= PARSED.size(),
-                "parsed ops went from " + PARSED.size() + " to " + parsedOps().size());
+    public void theNoArgumentsListDoesNotRot() throws IOException {
+        Set<String> untyped = untypedOps();
+        Set<String> stale = new TreeSet<>(NO_ARGUMENTS.keySet());
+        stale.removeAll(untyped);
+        Assertions.assertTrue(stale.isEmpty(),
+                "these ops are on NO_ARGUMENTS but no longer take the untyped OpArgs (renamed, deleted, or converted): "
+                        + stale + " - a list nobody prunes stops being a statement about the vocabulary");
     }
 
     /**
-     * Reads every {@code *Op.java} in the trigger package and answers which handlers take a typed args record.
+     * Reads every {@code *Op.java} in the trigger package and answers which handlers still take the untyped record.
      *
-     * @return the op names whose {@code OpHandler<...>} is not the untyped {@code OpArgs}
+     * @return the op names whose {@code OpHandler<...>} is exactly {@code OpArgs}
      * @throws IOException when the sources cannot be read
      */
-    private static Set<String> parsedOps() throws IOException {
+    private static Set<String> untypedOps() throws IOException {
         Pattern handler = Pattern.compile("implements OpHandler<([A-Za-z0-9_]+)>");
         Pattern opName = Pattern.compile("return TriggerOperator\\.([A-Z_0-9]+);");
-        Set<String> parsed = new TreeSet<>();
-        TreeMap<String, String> untyped = new TreeMap<>();
+        Set<String> untyped = new TreeSet<>();
+        int handlers = 0;
         try (Stream<Path> files = Files.walk(HANDLERS)) {
             for (Path file : files.filter(each -> each.getFileName().toString().endsWith("Op.java")).toList()) {
                 String source = Files.readString(file, StandardCharsets.UTF_8);
@@ -142,17 +84,18 @@ public class ArgsMigrationRatchetTest {
                 if (!matcher.find()) {
                     continue;
                 }
-                Matcher op = opName.matcher(source);
-                String name = op.find() ? op.group(1) : file.getFileName().toString();
-                if ("OpArgs".equals(matcher.group(1))) {
-                    untyped.put(name, file.getFileName().toString());
-                } else {
-                    parsed.add(name);
+                handlers++;
+                if (!"OpArgs".equals(matcher.group(1))) {
+                    continue;
                 }
+                Matcher op = opName.matcher(source);
+                untyped.add(op.find() ? op.group(1) : file.getFileName().toString());
             }
         }
-        // Reported through the assertion of the other case; kept here so an unreadable file is loud rather than silent.
-        Assertions.assertFalse(untyped.isEmpty() && parsed.isEmpty(), "no handler was found at all");
-        return parsed;
+        // A scan that matched nothing would make both cases above vacuously green.
+        Assertions.assertTrue(handlers > 0, "no *Op.java handler was found to inspect");
+        return untyped;
     }
+
+
 }
