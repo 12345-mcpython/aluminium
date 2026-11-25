@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * refused together, because the document either gives one or it does not. {@code SET_STACKS} is the "make it exactly
  * N" twin.
  */
-final class AddStackOp implements OpHandler<OpArgs> {
+final class AddStackOp implements OpHandler<AddStackArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,23 @@ final class AddStackOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public AddStackArgs parse(EffectSpec effect) {
+        boolean permanent = TriggerLifetimes.unticked(effect);
+        return new AddStackArgs(
+                effect.getBuff(),
+                Boolean.TRUE.equals(effect.getUnboundedStacks()),
+                effect.getMaxStacks(),
+                permanent ? Integer.valueOf(TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER) : effect.getTurns(),
+                permanent,
+                effect.getOverflowTo(),
+                effect.getOverflowMax(),
+                effect.getCountsAs() == null ? null : java.util.List.copyOf(effect.getCountsAs()),
+                effect.getCountsAsRequires(),
+                effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(AddStackArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         if (Boolean.TRUE.equals(effect.getUnboundedStacks()) && effect.getMaxStacks() != null) {
             throw new IllegalArgumentException(
@@ -35,7 +46,7 @@ final class AddStackOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.addStack(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, AddStackArgs args) {
+        TriggerEffects.addStack(ctx, args);
     }
 }

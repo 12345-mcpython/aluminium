@@ -764,71 +764,64 @@ final class TriggerEffects {
      * with {@code target_stacks:<name> >= 2}, and without a cap a stray extra event would push the count past it and
      * the rule that resets it would fire twice in a row.
      */
-    static void addStack(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
+    static void addStack(OpContext ctx, AddStackArgs args) {
         // "the sentence states no ceiling" is not "one layer": `unbounded_stacks` asks for the largest cap the engine can
         // hold, so the counter keeps every layer the rules give it.
-        int cap = effect.stackCap() != null ? effect.stackCap()
-                : Boolean.TRUE.equals(effect.getUnboundedStacks()) ? Integer.MAX_VALUE : 1;
-        String name = effect.getBuff().trim();
-        // Note: How many marks this application carries: "immediately gain 15 stacks of [当品]" (1314 Jade (翡翠)'s technique) grants
-        // FIFTEEN at once, and `amount` alone would grant one. The readers are the "gain N stacks" family --
-        // 1314 alone states 5 (its talent's follow-up), 15 (its technique), 1 and 3 (its traces). One application still
-        // means one mark unless it says otherwise, so no existing file changes.
-        int wanted = effect.getValue() != null
-                ? Math.max(1, (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx)))
-                // 「立即获得 #4 层」 read out of a skill row: `amount_from_skill_param` is a magnitude like any other, and it
-                // used to be SILENTLY IGNORED here (one mark instead of the row count). Readers: every "gain N stacks"
-                // clause, including 1314 Jade talent 【当品】 at the follow-up.
-                : effect.getAmountFromSkillParam() != null
-                        ? Math.max(1, (int) Math.round(TriggerMagnitudes.constantTerm(effect, ctx)))
-                        : effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
-        // "for each 1 skill point restored, gain 1 stack of [彩焰]" (cone 23021): the marks follow the EVENT's own amount, not the
-        // number of times the event fired -- `Battle.gainSkillPoint(2)` raises one event carrying 2, and "each 1" means two
-        // marks. `scale: event_amount` + `percent: 1` is the same "share of a live quantity" shape HEAL/SHIELD already use.
-        if ("event_amount".equals(String.valueOf(effect.getScale()).trim())) {
-            double share = effect.getPercent() == null ? 1 : effect.getPercent();
-            wanted = Math.max(1, (int) Math.round(share * ctx.amount()));
+        int cap = args.maxStacks() != null ? args.maxStacks()
+                : args.unbounded() ? Integer.MAX_VALUE : 1;
+        String name = args.name().trim();
+        // Note: How many marks this application carries: "immediately gain 15 stacks of [当品]" grants FIFTEEN at once,
+        // and `amount` alone would grant one. The readers are the "gain N stacks" family.
+        Magnitude magnitude = args.magnitude();
+        int wanted = magnitude.getValue() != null
+                ? Math.max(1, (int) Math.round(TriggerMagnitudes.valueOf(magnitude, ctx.firing())))
+                // 「立即获得 #4 层」 read out of a skill row: `amount_from_skill_param` is a magnitude like any other, and
+                // it used to be SILENTLY IGNORED here (one mark instead of the row count).
+                : magnitude.getAmountFromSkillParam() != null
+                        ? Math.max(1, (int) Math.round(TriggerMagnitudes.constantTerm(magnitude, ctx.firing())))
+                        : magnitude.getAmount() == null ? 1 : Math.max(1, magnitude.getAmount().intValue());
+        // "for each 1 skill point restored, gain 1 stack of [彩焰]": the marks follow the EVENT's own amount, not the
+        // number of times the event fired -- `Battle.gainSkillPoint(2)` raises one event carrying 2, and "each 1" means
+        // two marks.
+        if ("event_amount".equals(String.valueOf(magnitude.getScale()).trim())) {
+            double share = magnitude.getPercent() == null ? 1 : magnitude.getPercent();
+            wanted = Math.max(1, (int) Math.round(share * ctx.firing().amount()));
         }
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        for (CanHit target : ctx.targets()) {
             for (int i = 0; i < wanted; i++) {
-                // 「累计**溢出**的层数」 (1214 雪衣 行迹 伺观中枢): layers the counter cannot take go to a BANK counter
-                // instead of being dropped. No sentence elsewhere states one, so the field is opt-in and absent = old behaviour.
+                // 「累计**溢出**的层数」: layers the counter cannot take go to a BANK counter instead of being dropped. No
+                // sentence elsewhere states one, so the field is opt-in and absent = old behaviour.
                 String credited = name;
                 int creditedCap = cap;
-                if (effect.getOverflowTo() != null && !effect.getOverflowTo().isBlank()
+                if (args.overflowTo() != null && !args.overflowTo().isBlank()
                         && target.getBuffManager().stacksOf(credited) >= creditedCap) {
-                    credited = effect.getOverflowTo().trim();
-                    creditedCap = effect.getOverflowMax() == null ? Integer.MAX_VALUE : effect.getOverflowMax();
+                    credited = args.overflowTo().trim();
+                    creditedCap = args.overflowMax() == null ? Integer.MAX_VALUE : args.overflowMax();
                 }
                 if (target.getBuffManager().stacksOf(credited) >= creditedCap) {
                     break;                      // "2 times" is a threshold, not an invitation to keep counting
                 }
-
-
-                boolean permanent = TriggerLifetimes.unticked(effect);
+                boolean permanent = args.permanent();
                 AbstractBuff stack = TriggerInterpreter.withSource(
                         TriggerLifetimes.withTickOwner(
                                 TriggerLifetimes.withLifetime(
                                         new com.laosun.aluminium.buff.StackBuff(
-                                                credited, permanent ? 1 : effect.getTurns(), permanent, creditedCap),
-                                        effect),
-                                effect, ctx),
-                        ctx);
-                stampCountsAs(effect.getCountsAs(), effect.getCountsAsRequires(), stack);
-                // Note: A counter may also be ROLLED - 「有 65% 的基础概率使目标陷入 1 层【奥迹】」 (1307) and cone 23035's
-                // 「100% 的基础概率」. Until 2026-11-04 this line was a plain `addBuff`, so `base_chance` on ADD_STACK was
-                // accepted by the loader and then ignored: the layer landed every time. Measured: 5 cone files and 1307
-                // state one, and no test could see it because the cone's is 100% - the difference there is that a 100%
-                // BASE chance is still resistible (the same reading APPLY_DOT and APPLY_BUFF already follow).
-                if (!TriggerInterpreter.attachRolled(battle, target, stack, effect, ctx)) {
+                                                credited, permanent ? 1 : args.turns(), permanent, creditedCap),
+                                        ctx.effect()),
+                                ctx.effect(), ctx.firing()),
+                        ctx.firing());
+                stampCountsAs(args.countsAs(), args.countsAsRequires(), stack);
+                // Note: A counter may also be ROLLED - 「有 65% 的基础概率使目标陷入 1 层【奥迹】」. Until 2026-11-04 this
+                // was a plain `addBuff`, so `base_chance` on ADD_STACK was accepted by the loader and then ignored: the
+                // layer landed every time. A 100% BASE chance is still resistible, the same reading APPLY_DOT and
+                // APPLY_BUFF already follow.
+                if (!TriggerInterpreter.attachRolled(ctx.battle(), target, stack, magnitude, ctx.firing())) {
                     continue;                   // the roll failed: no layer, and no STACK_GAINED to announce
                 }
-                // 「每获得 1 层【X】」 (1111 Luka's trace 循环制动): one firing PER LAYER, so a rule that pays "3 energy each"
-                // needs no arithmetic. The name rides on the payload and the condition reads it as `<who> stack_added <name>`.
-                // ⚠ A rule that adds a counter itself must not listen to its own event without a guard — the same warning
-                // the DEALING_DAMAGE family carries.
-                if (battle != null) {
-                    battle.fireStackGained(target, credited);
+                // 「每获得 1 层【X】」: one firing PER LAYER, so a rule that pays "3 energy each" needs no arithmetic.
+                // ⚠ A rule that adds a counter itself must not listen to its own event without a guard.
+                if (ctx.battle() != null) {
+                    ctx.battle().fireStackGained(target, credited);
                 }
             }
         }
