@@ -101,7 +101,8 @@ public class ArgsMigrationRatchetTest {
             "APPLY_BUFF",
             "ADD_STACK",
             "BOOST_DAMAGE",
-            "MODIFY_DAMAGE_TAKEN");
+            "MODIFY_DAMAGE_TAKEN",
+            "CAST_SKILL");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {

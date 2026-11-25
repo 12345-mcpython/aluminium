@@ -13,7 +13,7 @@ import java.util.Locale;
  * misses all apply. It names the skill either as a {@code SkillType} slot or as a memosprite data slot, and refuses the
  * row fields - the named skill is executed by the engine's own path, so there is no column to name.
  */
-final class CastSkillOp implements OpHandler<OpArgs> {
+final class CastSkillOp implements OpHandler<CastSkillArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -21,12 +21,16 @@ final class CastSkillOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public CastSkillArgs parse(EffectSpec effect) {
+        return new CastSkillArgs(
+                effect.getSkill(),
+                effect.getSkillId(),
+                effect.getCastTarget(),
+                effect.getCastCountedLaughs());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(CastSkillArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         if (effect.getSkillId() == null && (effect.getSkill() == null || effect.getSkill().isBlank())) {
             throw new IllegalArgumentException("Op " + op + " requires skill (a SkillType slot name) or skill_id "
@@ -46,7 +50,7 @@ final class CastSkillOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.castSkill(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, CastSkillArgs args) {
+        TriggerEffects.castSkill(ctx, args);
     }
 }

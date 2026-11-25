@@ -365,22 +365,22 @@ final class TriggerEffects {
      * <p>Note: <b>toughness must be carried by itself</b> -  - the precedent's own words: *when a cast is DELEGATED the executor expands no damage of its
      * own, so the stance would otherwise be dropped on the floor*. Note: Do not drop {@code stanceFor(true)}.
      */
-    static void castSkill(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        CanHit actor = TriggerTargets.require(TriggerTargets.resolveTarget(effect, ctx), "target", ctx);
-        SkillType slot = effect.getSkill() == null || effect.getSkill().isBlank()
+    static void castSkill(OpContext opCtx, CastSkillArgs args) {
+        CanHit actor = TriggerTargets.require(TriggerTargets.resolveTarget(opCtx.effect(), opCtx.firing()), "target", opCtx.firing());
+        SkillType slot = args.skill() == null || args.skill().isBlank()
                 ? null
-                : SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+                : SkillType.valueOf(args.skill().trim().toUpperCase(Locale.ROOT));
         Skill skill = slot == null ? null : actor.getSkills().get(slot);
         // A MEMOSPRITE keeps its skills by DATA SLOT, not by SkillType: its table is `Summon.skillsByDataSlot`, and
         // "automatically cast [花与箭的舞曲]" is its slot 1. Commanding that cast fails with "has no SKILL skill" because only
         // the character table was consulted. The slot is named with `skill_id`, the same field `REPLACE_SKILL` uses for a data row.
-        if (skill == null && effect.getSkillId() != null && actor instanceof Summon from) {
-            skill = from.skillAt(effect.getSkillId());
+        if (skill == null && args.skillId() != null && actor instanceof Summon from) {
+            skill = from.skillAt(args.skillId());
         }
         if (skill == null || skill.getData() == null || !skill.getData().isLoaded()) {
             throw new IllegalStateException(
                     actor.getName() + " has no " + slot + " skill"
-                            + (effect.getSkillId() == null ? "" : " and no own skill at data slot " + effect.getSkillId())
+                            + (args.skillId() == null ? "" : " and no own skill at data slot " + args.skillId())
                             + ", so a CAST_SKILL effect has nothing to read: the rule names the skill whose numbers the "
                             + "commanded cast uses");
         }
@@ -413,7 +413,7 @@ final class TriggerEffects {
         // Note: Which side the cast reaches is the SKILL's business, not the rule's: a swing lands on the caster's
         // opponents, a shield or a heal on the caster's own camp. (Until this, every commanded cast was treated as a
         // swing -- a shield would have been granted to the ENEMY.)
-        for (CanHit unit : damaging ? battle.getOpponents(actor) : battle.getSideOf(actor)) {
+        for (CanHit unit : damaging ? opCtx.battle().getOpponents(actor) : opCtx.battle().getSideOf(actor)) {
             if (unit != null && !unit.isDeath()) {
                 victims.add(unit);
             }
@@ -431,9 +431,9 @@ final class TriggerEffects {
         // is the unit `SkillExecutor` reads (`targets.getFirst()`) -- it decides which unit a single-target or blast
         // skill lands on, and which ally a skill's own cast events name as the unit it was aimed at (1414's skill
         // designates THAT ally as [同袍]).
-        if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank()) {
-            CanHit aimed = TriggerTargets.resolveSelector(effect.getCastTarget().trim().toLowerCase(Locale.ROOT), effect, ctx);
-            victims.remove(aimed);
+        if (args.castTarget() != null && !args.castTarget().isBlank()) {
+            CanHit aimed = TriggerTargets.resolveSelector(args.castTarget().trim().toLowerCase(Locale.ROOT),
+                    opCtx.effect(), opCtx.firing());
             victims.addFirst(aimed);
         }
         // THE ENGINE'S OWN CAST PATH, and the whole point of this op is that there is only one
@@ -461,24 +461,24 @@ final class TriggerEffects {
         // restores it, so "the open cast is itself a commanded one" is exactly `currentCast().outer() != null`.
         // Note: Skipped, not thrown: this is a rule requirement of the sentence (like `castUltra` refusing inside an extra
         // turn), not an authoring mistake.
-        if (battle.currentCast() != null && battle.currentCast().outer() != null) {
+        if (opCtx.battle().currentCast() != null && opCtx.battle().currentCast().outer() != null) {
             return;
         }
-        if (effect.getCastCountedLaughs() != null) {
+        if (args.countedLaughs() != null) {
             // ⚠ Loud when the cast cannot fold it: a fixed laugh count only reaches ELATION damage, and on any other
             // cast it would be a number nobody reads - the silence this interpreter refuses everywhere else. The damage
             // type is a fact about the skill's own row, so this can only be asked HERE (and it is the same reader the
             // settlement uses, `SkillExecutor.damageTypeOf`).
             if (SkillExecutor.damageTypeOf(skill.getData()) != com.laosun.aluminium.enums.DamageType.ELATION) {
                 throw new IllegalStateException("CAST_SKILL states cast_counted_laughs="
-                        + effect.getCastCountedLaughs() + ", but the commanded " + slot + " settles as "
+                        + args.countedLaughs() + ", but the commanded " + slot + " settles as "
                         + SkillExecutor.damageTypeOf(skill.getData())
                         + " damage: a laugh count is folded into Elation damage and nowhere else, so this number would "
                         + "be read by nobody");
             }
-            battle.markNextCastCountedLaughs(effect.getCastCountedLaughs());
+            opCtx.battle().markNextCastCountedLaughs(args.countedLaughs());
         }
-        skill.execute(battle.engine(), actor, victims);
+        skill.execute(opCtx.battle().engine(), actor, victims);
         // The moment "after the surprise attack ends" names: the commanded cast has finished, the original continues afterwards. A
         // commanded cast announces the same CAST_SETUP / SKILL_CAST a real one does, so this is the only event that
         // tells it apart -- see `TriggerEvent.INSERTED_CAST_END`.
@@ -486,7 +486,7 @@ final class TriggerEffects {
         // "after the surprise attack ends, grant Cerydra (刻律德菈) 1 point of charge"). The actor is still the actor; the target slot now answers "who was it cast on",
         // which is what that sentence needs -- and 1412's own subscriber states no target, so nothing shipped moves.
         CanHit aimed = victims.isEmpty() ? actor : victims.getFirst();
-        battle.fire(TriggerPayload.Simple.of(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0));
+        opCtx.battle().fire(TriggerPayload.Simple.of(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0));
     }
 
     /**
