@@ -51,11 +51,19 @@ interface OpHandler<A extends OpArgs> {
     /**
      * Refuses an effect that could never work, naming the rule that wrote it.
      *
+     * <p><b>Why this has a default.</b> An op that performs a whole sentence through one {@code TriggerEffects} helper
+     * usually has no check of its own, and the checks it does have still live in {@code TriggerValidator.validateOne}'s
+     * switch. Those arms are deleted <b>when their checks move here</b>, one op at a time, so that no op ever has its
+     * rules stated in two places: while the arm exists this method is not overridden, and when the arm goes the override
+     * arrives in the same commit. An override that is empty on purpose therefore never exists.
+     *
      * @param args   the parsed shape
      * @param effect the effect as it was written (for fields the shape deliberately does not copy)
      * @param rule   the rule it belongs to (for {@code source})
      */
-    void validate(A args, EffectSpec effect, TriggerSpec rule);
+    default void validate(A args, EffectSpec effect, TriggerSpec rule) {
+        // The rule's own checks still live in TriggerValidator's switch for this op; see the note above.
+    }
 
     /**
      * Performs the op.

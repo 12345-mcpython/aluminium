@@ -42,7 +42,29 @@ public final class OpRegistry {
             new AdvanceOp(),
             new DelayOp(),
             new DepartOp(),
-            new ReturnOp());
+            new ReturnOp(),
+            new ModifyAttrOp(),
+            new ApplyBuffOp(),
+            new RemoveStackOp(),
+            new DispelOp(),
+            new RemoveBuffOp(),
+            new TickDotOp(),
+            new SetStacksOp(),
+            new RemoveStateOp(),
+            new ApplyControlOp(),
+            new ApplyDotOp(),
+            new AddStackOp(),
+            new TauntOp(),
+            new ExtendBuffOp(),
+            new ReplaceSkillOp(),
+            new DismissSummonOp(),
+            new BoostDotOp(),
+            new ResistDebuffOp(),
+            new ModifyRuleOp(),
+            new RaiseSkillLevelOp(),
+            new RaiseSkillHitsOp(),
+            new StartCountdownOp(),
+            new SpendStepsOp());
 
     /** {@link #HANDLERS} indexed by op, built once. */
     private static final Map<TriggerOperator, OpHandler<?>> BY_OP = index();

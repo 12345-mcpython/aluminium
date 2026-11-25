@@ -967,28 +967,12 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case MODIFY_ATTR -> TriggerEffects.modifyAttr(battle, effect, ctx);
-            case APPLY_BUFF -> TriggerEffects.applyState(battle, effect, ctx);
-            case REMOVE_STACK -> TriggerEffects.removeStacks(battle, effect, ctx);
+            // A migrated op has no arm here at all: the registry dispatches it before this switch is reached, and
+            // TriggerDispatchCoverageTest fails if an op ever has both.
             case MODIFY_DAMAGE_TAKEN -> modifyDamageTaken(battle, effect, ctx);
             case BOOST_DAMAGE -> boostDamage(effect, ctx);
             case ADD_DAMAGE -> TriggerEffects.addDamageFlat(effect, ctx);
-            case DISPEL -> TriggerEffects.dispel(battle, effect, ctx);
-            case DISMISS_SUMMON -> dismissSummon(battle, effect, ctx);
-            case REMOVE_BUFF -> TriggerEffects.removeBuffs(battle, effect, ctx);
-            case REPLACE_SKILL -> TriggerEffects.replaceSkill(battle, effect, ctx);
-            case TICK_DOT -> TriggerEffects.tickDot(battle, effect, ctx);
             case SHARE_DAMAGE -> shareDamage(effect, ctx);
-            case SET_STACKS -> TriggerEffects.setStacks(battle, effect, ctx);
-            case REMOVE_STATE -> TriggerEffects.removeState(effect, ctx);
-            case TAUNT -> TriggerEffects.taunt(battle, effect, ctx);
-            case APPLY_CONTROL -> TriggerEffects.applyControl(battle, effect, ctx);
-            case APPLY_DOT -> TriggerEffects.applyDot(battle, effect, ctx);
-            case EXTEND_BUFF -> TriggerEffects.extendBuff(battle, effect, ctx);
-            case BOOST_DOT -> boostDot(battle, effect, ctx);
-            case RESIST_DEBUFF -> resistDebuff(battle, effect, ctx);
-            case MODIFY_RULE -> modifyRule(effect, ctx);
-            case RAISE_SKILL_LEVEL -> raiseSkillLevel(effect, ctx);
             case RAISE_SKILL_MULTIPLIER -> {
                 // 「终结技的伤害倍率提高 240%」: the ROW share of one slot is multiplied (x3.4). No zone, no MODIFY_ATTR and
                 // no MODIFY_RULE can say it - the row number is read at settlement, not by a rule. The optional
@@ -998,10 +982,6 @@ public final class TriggerInterpreter {
                         TriggerMagnitudes.shareOf(effect, ctx),
                         effect.getMinEnemies(), effect.getMaxEnemies());
             }
-            case RAISE_SKILL_HITS -> raiseSkillHits(effect, ctx);
-            case START_COUNTDOWN -> startCountdown(battle, effect, ctx);
-            case ADD_STACK -> TriggerEffects.addStack(battle, effect, ctx);
-            case SPEND_STEPS -> spendSteps(effect, ctx);
             case CONSUME_HP -> {
                 // Note: The share vocabulary is the HEAL/SHIELD one, not the modifier one: "consume HP equal to 30% of Blade (刃)'s Max HP"
                 // is `owner_max_hp`, which derivedMagnitude refuses (it names an ATTRIBUTE).
@@ -1652,7 +1632,7 @@ public final class TriggerInterpreter {
      * spend from, and saying so beats silently keeping the milestones and paying them again on the next change. Nothing
      * to spend (fewer than one whole step) is a no-op, because this rule fires on every change of the counter.
      */
-    private static void spendSteps(EffectSpec effect, TriggerContext ctx) {
+    static void spendSteps(EffectSpec effect, TriggerContext ctx) {
         String written = effect.getSteps() == null ? "" : effect.getSteps().trim();
         CounterSteps counter = parseCounterSteps(written, "SPEND_STEPS steps");
         int milestones = counter.wholeSteps(ctx);
@@ -2326,7 +2306,7 @@ public final class TriggerInterpreter {
      * <p>Note: The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
      * reads it back, so it needs no id).
      */
-    private static void startCountdown(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void startCountdown(Battle battle, EffectSpec effect, TriggerContext ctx) {
         String name = effect.getBuff() == null || effect.getBuff().isBlank()
                 ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
                 : effect.getBuff().trim();
@@ -2339,7 +2319,7 @@ public final class TriggerInterpreter {
      *
      * <p>A negative amount takes them back, which is how "lasting 1 turn" is stated without a new lifetime.
      */
-    private static void raiseSkillHits(EffectSpec effect, TriggerContext ctx) {
+    static void raiseSkillHits(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {
             throw new IllegalStateException(
@@ -2370,7 +2350,7 @@ public final class TriggerInterpreter {
      * <p>Note: <b>{@code BATTLE_START} only</b>, like {@code MODIFY_RULE}: a level raise is a passive fact of the loadout,
      * and a raise applied mid-battle would have to be taken back at a point nobody states.
      */
-    private static void raiseSkillLevel(EffectSpec effect, TriggerContext ctx) {
+    static void raiseSkillLevel(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {
             throw new IllegalStateException(
@@ -2419,7 +2399,7 @@ public final class TriggerInterpreter {
      * both-at-once, neither, an out-of-range value, a non-integer count, any other field, a non-{@code BATTLE_START}
      * event, an unknown rule id, and a named rule that does not state the number being raised.
      */
-    private static void modifyRule(EffectSpec effect, TriggerContext ctx) {
+    static void modifyRule(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {
             throw new IllegalStateException(
@@ -2470,7 +2450,7 @@ public final class TriggerInterpreter {
      * <p>⚠ A resolved target that is <b>not</b> a summon is a data error, not a silent no-op: "dismiss" applied to a
      * character would read as working (nothing happens) while the sentence is about something else entirely.
      */
-    private static void dismissSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void dismissSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (!(target instanceof com.laosun.aluminium.entity.Summon summon)) {
                 throw new IllegalStateException("DISMISS_SUMMON resolved "
@@ -2487,7 +2467,7 @@ public final class TriggerInterpreter {
      * for. Only the owner's own applications are touched - the sentence is about the burn SHE applied - and only the element the
      * rule names.
      */
-    private static void boostDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void boostDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
         double factor = 1 + TriggerMagnitudes.shareOf(effect, ctx);
         com.laosun.aluminium.enums.DamageElement onlyElement =
                 effect.getElement() == null || effect.getElement().isBlank()
@@ -2523,7 +2503,7 @@ public final class TriggerInterpreter {
      * is what the closed vocabularies exist to avoid.
      */
 
-    private static void resistDebuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void resistDebuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
         DebuffClass kind = DebuffClass.fromString(effect.getKind());
         // kind may be absent: RESIST_DEBUFF without a class means ANY negative state (1409s immunity clause).
         boolean permanent = TriggerLifetimes.unticked(effect);
