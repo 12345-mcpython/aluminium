@@ -124,6 +124,12 @@ public interface Magnitude {
     /** @return whether the number is a FIXED report that the energy-regeneration rate does not touch */
     Boolean getFixed();
 
+    /** @return the counter whose layers MULTIPLY this number, or {@code null} */
+    String getPerStack();
+
+    /** @return the ceiling on those layers, or {@code null} */
+    Integer getPerStackCap();
+
     /** @return a share of the event's own amount, used beside {@code amount_from_event} */
     Double getAmountPercent();
 

@@ -1249,7 +1249,7 @@ public final class TriggerInterpreter {
         CanHit summon = ctx.battle().summonOf(owner);
         return summon == null || summon.getBuffManager() == null ? 0 : summon.getBuffManager().stacksOf(name.trim());
     }
-    static double perStackFactor(EffectSpec effect, CanHit target, TriggerContext ctx) {
+    static double perStackFactor(Magnitude effect, CanHit target, TriggerContext ctx) {
         return capPerStack(effect, perStackCount(effect, target, ctx));
     }
 
@@ -1257,7 +1257,7 @@ public final class TriggerInterpreter {
      * Applies {@code per_stack_cap}: "每层 X%，最多 5 层" stops at five layers even when the counter holds more, and a rule
      * that states no cap counts every layer.
      */
-    static double capPerStack(EffectSpec effect, double count) {
+    static double capPerStack(Magnitude effect, double count) {
         Integer cap = effect.getPerStackCap();
         return cap == null ? count : Math.min(count, cap);
     }
@@ -1265,7 +1265,7 @@ public final class TriggerInterpreter {
     /**
      * The count {@code per_stack} names, uncapped: {@code self_stacks:<NAME>} reads the rule owner, a bare name the target.
      */
-    private static double perStackCount(EffectSpec effect, CanHit target, TriggerContext ctx) {
+    private static double perStackCount(Magnitude effect, CanHit target, TriggerContext ctx) {
         // A SELF counter (reader: cone 23053's "for each skill point the wearer consumes ... at most 4 stacks").
         // The bare name below is resolved on the TARGET, which is right for "each [当品] stack" (a counter on the victim) but
         // cannot say "MY counter" when the effect lands on somebody else -- so the condition vocabulary's own prefix is
@@ -1440,40 +1440,38 @@ public final class TriggerInterpreter {
     }
 
 
-    static void boostDamage(EffectSpec effect, TriggerContext ctx) {
-        Damage damage = ctx.damage();
+    static void boostDamage(OpContext opCtx, MagnitudeArgs args) {
+        Damage damage = opCtx.firing().damage();
         if (damage == null) {
             // Unreachable through a validated table (requireEvent pins the event), but `apply` is public and a
             // hand-built context can still lack an instance: better a loud error than a silent no-op.
             throw new IllegalStateException(
                     "Op BOOST_DAMAGE needs the damage instance being settled, but this context carries none");
         }
+        Magnitude effect = args.magnitude();
         // Note: A `damage_type` here must actually SCOPE the boost: the loader accepted it while this method
-        // ignored it, so "follow-up attacks only" silently raised every hit -- measured: an ordinary hit against a low-HP
-        // target came out 1.24x instead of 1.0x). Same semantics as MODIFY_ATTR's instance route.
+        // ignored it, so "follow-up attacks only" silently raised every hit -- measured: an ordinary hit against a
+        // low-HP target came out 1.24x instead of 1.0x. Same semantics as MODIFY_ATTR's instance route.
         com.laosun.aluminium.enums.DamageType only = parseDamageType(effect.getDamageType(), "BOOST_DAMAGE");
         if (only != null && damage.getType() != only) {
             return;
         }
-        // Both a stated `scale` and a stated ceiling must be read (reader: light cone 23062).
-        // Note: This method ignores `damage_type` the same way -- see the comment above.
-        // Through `shareOf`, like every other op that reads a share (; measured: `percent_from_resource` passed validation -- `TriggerValidator.requirePercent` has admitted it since round
-        // 83 -- and then died here with "getPercent() is null", so the op validated against a vocabulary it did not apply).
-        // "敌方目标每有 1 个负面效果...对其造成的伤害提高 1%" (1006 Eidolons 4 and 6): a share built out of a COUNT.
-        // The share family here reads percent / percent_from; a provider states the number itself, so it goes first.
+        // Through `shareOf`, like every other op that reads a share: measured, `percent_from_resource` passed validation
+        // and then died here with "getPercent() is null", so the op validated against a vocabulary it did not apply.
+        // "敌方目标每有 1 个负面效果...对其造成的伤害提高 1%": a share built out of a COUNT. A provider states the number
+        // itself, so it goes first.
         double magnitude = effect.getValue() != null
-                ? TriggerMagnitudes.valueOf(effect, ctx)
+                ? TriggerMagnitudes.valueOf(effect, opCtx.firing())
                 : effect.getScale() == null || effect.getScale().isBlank()
-                        ? TriggerMagnitudes.shareOf(effect, ctx)
-                        : TriggerMagnitudes.derivedMagnitude(effect, ctx);
-        // `per_stack` on a BOOST_DAMAGE is a LIVE count on the event's target (cone 21001: "for each
-        // debuff the enemy has, the wearer's damage +12%"). This method used to drop it, so the
-        // per-stack branch silently behaved as one stack while the at-cap rule produced the only
-        // increasing number.
-        if (effect.getPerStack() != null && !effect.getPerStack().isBlank() && ctx.target() != null) {
-            magnitude *= perStackFactor(effect, ctx.target(), ctx);
+                        ? TriggerMagnitudes.shareOf(effect, opCtx.firing())
+                        : TriggerMagnitudes.derivedMagnitude(effect, opCtx.firing());
+        // `per_stack` on a BOOST_DAMAGE is a LIVE count on the event's target (cone 21001: "for each debuff the enemy
+        // has, the wearer's damage +12%"). This method used to drop it, so the per-stack branch silently behaved as one
+        // stack while the at-cap rule produced the only increasing number.
+        if (effect.getPerStack() != null && !effect.getPerStack().isBlank() && opCtx.firing().target() != null) {
+            magnitude *= perStackFactor(effect, opCtx.firing().target(), opCtx.firing());
         }
-        damage.addBoost(TriggerMagnitudes.applyDerivedCeiling(effect, ctx, magnitude));
+        damage.addBoost(TriggerMagnitudes.applyDerivedCeiling(effect, opCtx.firing(), magnitude));
     }
 
     /**

@@ -10,7 +10,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
  * <p>No duration, no target and no buff: the instance is the state, so nothing persists and nothing can leak into the
  * next hit. Being tied to the instance is why the event is checked at load time.
  */
-final class BoostDamageOp implements OpHandler<OpArgs> {
+final class BoostDamageOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class BoostDamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requirePercent(effect, op, rule);
         TriggerValidator.requireNonZeroPercent(effect, op, rule);
@@ -33,7 +33,7 @@ final class BoostDamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.boostDamage(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, MagnitudeArgs args) {
+        TriggerInterpreter.boostDamage(ctx, args);
     }
 }
