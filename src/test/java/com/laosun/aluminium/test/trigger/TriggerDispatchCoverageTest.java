@@ -14,18 +14,19 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Every WIRED op is performed exactly once - by its handler or, while the migration lasts, by the legacy switch.
+ * Every WIRED op is performed exactly once, by its handler.
  *
- * <p>Why this cannot be left to the compiler: the enum switch does catch a misspelled {@code case} (that was the point
- * of moving off strings), but it cannot catch an op that was <b>never written at all</b> - that one falls into the
- * {@code default} arm and only fails when somebody's rule happens to use it. An op with a handler <b>and</b> a switch
- * arm is the mirror-image fault and a worse one: both would run, or one of them silently never would, and which is
- * which depends on a line in the dispatcher rather than on the op.
+ * <p><b>Why this cannot be left to the compiler.</b> The enum switch did catch a misspelled {@code case}, but it could
+ * not catch an op that was <b>never written at all</b> - that one fell into the {@code default} arm and only failed when
+ * somebody's rule happened to use it. An op with a handler <b>and</b> a switch arm was the mirror-image fault and a
+ * worse one: both would run, or one of them silently never would, and which was which depended on a line in the
+ * dispatcher rather than on the op.
  *
- * <p><b>What changes when the migration finishes.</b> The switch will have no arms left, {@link #arms()} will answer
- * empty, and this case will assert exactly "the registry covers {@code wiredNames()}" - the same claim, one source.
- * The transitional shape is deliberate: it lets the registry grow one op at a time without a window in which an op is
- * performed by nothing.
+ * <p><b>The migration is over.</b> {@code validateOne} / {@code applyOne} carry no op switch any more, so
+ * {@link #arms()} should answer empty - it still reads the source, because that is what makes the claim checkable
+ * rather than assumed: if an arm is ever reintroduced beside a handler, the first case fails. The two-source shape was
+ * deliberate while the registry grew one op at a time; what it asserts now is "the registry covers
+ * {@code wiredNames()}", one source, with the second only ever allowed to be empty.
  */
 public class TriggerDispatchCoverageTest {
 
@@ -34,6 +35,8 @@ public class TriggerDispatchCoverageTest {
 
     @Test
     public void everyWiredOpIsDispatchedExactlyOnce() throws IOException {
+        Assertions.assertTrue(arms().isEmpty(),
+                "the dispatcher still has op switch arms: " + arms() + " - one op has one path, and it is the registry");
         Set<String> arms = arms();
         Set<String> handled = OpRegistry.handledNames();
 
