@@ -717,22 +717,23 @@ public final class TriggerInterpreter {
      */
 
 
-    static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
-        BattlePort battle = ctx.battle();
+    static void delegateDamage(OpContext opCtx, DelegateDamageArgs args) {
+        BattlePort battle = opCtx.firing().battle();
         var cast = battle == null ? null : battle.currentCast();
         if (cast == null) {
             throw new IllegalStateException(
                     "DELEGATE_DAMAGE ran with no cast in progress; CAST_SETUP is fired by SkillExecutor.execute "
                             + "with a cast token, so this is an engine fault rather than a content error");
         }
-        com.laosun.aluminium.entity.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+        com.laosun.aluminium.entity.Character owner =
+                TriggerMagnitudes.requireCharacterOwner(opCtx.effect(), opCtx.firing());
         if (cast.caster() != owner) {
             throw new IllegalStateException(
                     "DELEGATE_DAMAGE names the rule owner's own cast, but the cast in progress belongs to "
                             + cast.caster().getName() + ": CAST_SETUP reaches every character's table, so the rule "
                             + "needs `actor == self` (rule owner: " + owner.getName() + ")");
         }
-        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+        SkillType slot = SkillType.valueOf(args.skill().toUpperCase(Locale.ROOT));
         Integer slotNumber = Constant.SKILL_SLOT.get(slot);
         if (slotNumber == null) {
             throw new IllegalStateException(
@@ -1815,12 +1816,6 @@ public final class TriggerInterpreter {
         battle.fire(TriggerPayload.ResourceChanged.of(TriggerEvent.RESOURCE_CHANGED, holder, resource, delta));
     }
 
-    /**
-     * The authored DOT layer ceiling, or {@code 0} when the rule states none.
-     */
-    static int dotStackCap(EffectSpec effect) {
-        return effect.stackCap() == null ? 0 : effect.stackCap();
-    }
 
 
     /**

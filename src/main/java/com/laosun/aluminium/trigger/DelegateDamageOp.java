@@ -11,7 +11,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
  * belongs to the rule that <b>does</b> deliver it; this op only says "not by me". Hence the {@code CAST_SETUP} event and
  * the absence of a target, a duration and stack arguments.
  */
-final class DelegateDamageOp implements OpHandler<OpArgs> {
+final class DelegateDamageOp implements OpHandler<DelegateDamageArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,12 +19,12 @@ final class DelegateDamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public DelegateDamageArgs parse(EffectSpec effect) {
+        return new DelegateDamageArgs(effect.getSkill() == null ? "" : effect.getSkill().trim());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(DelegateDamageArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireSkill(effect, op, rule);
         TriggerValidator.requireNoDuration(effect, op, rule);
@@ -34,7 +34,7 @@ final class DelegateDamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.delegateDamage(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, DelegateDamageArgs args) {
+        TriggerInterpreter.delegateDamage(ctx, args);
     }
 }

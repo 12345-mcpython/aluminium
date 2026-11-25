@@ -88,7 +88,8 @@ public class ArgsMigrationRatchetTest {
             "RAISE_SKILL_POINT_CAP",
             "RESET_TRIGGER_LIMIT",
             "APPLY_DOT",
-            "APPLY_CONTROL");
+            "APPLY_CONTROL",
+            "DELEGATE_DAMAGE");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {
