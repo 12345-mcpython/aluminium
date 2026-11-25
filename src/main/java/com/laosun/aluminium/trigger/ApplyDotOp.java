@@ -10,8 +10,11 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * OWNER's attribute, and it is frozen into the buff when it lands - which is why {@code BOOST_DOT} exists separately.
  * A derived ceiling needs <b>both</b> halves, and {@code max_stacks} is allowed here where the general stack-family
  * refusal would reject it.
+ *
+ * <p>Everything the run-time half needs is in {@link ApplyDotArgs}: the element, the frozen magnitude, the lifetime,
+ * the optional name and the layer ceiling.
  */
-final class ApplyDotOp implements OpHandler<OpArgs> {
+final class ApplyDotOp implements OpHandler<ApplyDotArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,12 +22,17 @@ final class ApplyDotOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ApplyDotArgs parse(EffectSpec effect) {
+        return new ApplyDotArgs(
+                effect.getElement() == null ? "" : effect.getElement().trim(),
+                effect,
+                effect.getTurns(),
+                effect.getBuff(),
+                effect.getMaxStacks());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ApplyDotArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireElement(effect, op, rule, false);
         TriggerValidator.requireDotMagnitude(effect, op, rule);
@@ -47,7 +55,7 @@ final class ApplyDotOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.applyDot(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, ApplyDotArgs args) {
+        TriggerEffects.applyDot(ctx, args);
     }
 }

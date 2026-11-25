@@ -9,8 +9,11 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * <p>A named control, a duration, and optionally a {@code base_chance} that goes through Effect Hit Rate / Effect RES.
  * The effect may also carry the state's OWN per-turn damage ({@code element} + a magnitude), which lands with it.
  * {@code permanent} / {@code until} are refused: a control with no clock would never end.
+ *
+ * <p>Everything the run-time half needs is in {@link ApplyControlArgs}; the base chance and the per-turn damage are
+ * still resolved at fire time, because both depend on the battle.
  */
-final class ApplyControlOp implements OpHandler<OpArgs> {
+final class ApplyControlOp implements OpHandler<ApplyControlArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +21,16 @@ final class ApplyControlOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ApplyControlArgs parse(EffectSpec effect) {
+        return new ApplyControlArgs(
+                effect.getControl() == null ? "" : effect.getControl().trim(),
+                effect.getElement(),
+                effect,
+                effect.getTurns());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ApplyControlArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireControl(effect, op, rule);
         TriggerValidator.requirePositiveTurns(effect, op, rule);
@@ -38,7 +45,7 @@ final class ApplyControlOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.applyControl(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, ApplyControlArgs args) {
+        TriggerEffects.applyControl(ctx, args);
     }
 }

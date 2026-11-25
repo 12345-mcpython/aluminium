@@ -510,46 +510,47 @@ final class TriggerEffects {
      * is registered rather than folded in here as a field nobody else can use. What this op attaches is the state
      * itself, so "cannot act" is complete.
      */
-    static void applyControl(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        Constant.ControlEffect control = Constant.CONTROL_STATES.get(effect.getControl().trim());
+    static void applyControl(OpContext ctx, ApplyControlArgs args) {
+        Constant.ControlEffect control = Constant.CONTROL_STATES.get(args.control().trim());
         if (control == null) {
             // Load-time validation already refused this; reaching here means the table changed under a compiled
             // rule, which is an engine fault rather than a content one.
             throw new IllegalStateException(
-                    "APPLY_CONTROL ran with the unknown state '" + effect.getControl() + "'; the loader validates "
+                    "APPLY_CONTROL ran with the unknown state '" + args.control() + "'; the loader validates "
                             + "against Constant.CONTROL_STATES, so this is an engine fault");
         }
         // Note: ALWAYS through the resist pipeline, even with no `base_chance` stated: "make the target enter the frozen state" with no
         // probability in the text is a 100% BASE chance, which the game still runs through Effect Hit Rate / Effect RES / the
         // state's own resistance. Attaching it directly would have made every "immune to control-class negative states" clause silently
         // ineffective against exactly the controls the documents write without a number.
-        Double statedChance = TriggerMagnitudes.baseChanceOf(effect, ctx);
+        Double statedChance = TriggerMagnitudes.baseChanceOf(args.magnitude(), ctx.firing());
         double baseChance = statedChance == null ? 1.0 : statedChance;
-        // ...plus whatever a trace / Eidolon raised it by ("raise the base chance to freeze the enemy target by 15%"), filed on this combatant under
-        // THIS rule's id. Read here rather than written into the effect: rules are compiled once and cached per cid,
-        // so the stated 0.5 stays the file's number and the amendment is a fact about this battle.
-        if (ctx.owner() != null) {
-            baseChance += ctx.owner().ruleBaseChanceBonus(ctx.ruleId());
+        // ...plus whatever a trace / Eidolon raised it by ("raise the base chance to freeze the enemy target by 15%"),
+        // filed on this combatant under THIS rule's id. Read here rather than written into the effect: rules are
+        // compiled once and cached per cid, so the stated 0.5 stays the file's number.
+        if (ctx.firing().owner() != null) {
+            baseChance += ctx.firing().owner().ruleBaseChanceBonus(ctx.firing().ruleId());
         }
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        for (CanHit target : ctx.targets()) {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            // The state's own per-turn damage ("in the frozen state ... at the start of each turn take ... Ice additional damage") rides WITH the
-            // state: attached in ControlBuff.applyEffect, taken off in its removeBuff, and only ever created on
-            // the units the roll let through. Note: The magnitude is read here, once, and frozen into the DOT.
-            ControlBuff applied = effect.getElement() == null || effect.getElement().isBlank()
-                    ? new ControlBuff(control, effect.getTurns())
-                    : new ControlBuff(control, effect.getTurns(), DamageElement.fromString(effect.getElement()),
-                    TriggerMagnitudes.dotMagnitude(effect, ctx));
-            applied.setSource(ctx.owner());
-            // Note: The roll's RESULT is recorded as well as used: "for each 1 target frozen" counts the targets this cast really
-            // froze, so a resisted application must not be counted (see Battle.recordCastApplied).
-            if (battle.tryApplyDebuff(ctx.owner(), target, applied, baseChance, control.resistKey())) {
-                battle.recordCastApplied(control.name());
-                // ⚠ Announced on the SUCCESS branch. The attempt is not the event: the state was rolled through the resist
-                // pipeline, and reporting a resisted application would claim a freeze that never happened.
-                battle.announceControl(ctx.owner(), target, control.display());
+            // The state's own per-turn damage rides WITH the state: attached in ControlBuff.applyEffect, taken off in
+            // its removeBuff, and only ever created on the units the roll let through. The magnitude is read here, once,
+            // and frozen into the DOT.
+            ControlBuff applied = args.element() == null || args.element().isBlank()
+                    ? new ControlBuff(control, args.turns())
+                    : new ControlBuff(control, args.turns(), DamageElement.fromString(args.element()),
+                    TriggerMagnitudes.dotMagnitude(args.magnitude(), ctx.firing()));
+            applied.setSource(ctx.firing().owner());
+            // Note: The roll's RESULT is recorded as well as used: "for each 1 target frozen" counts the targets this
+            // cast really froze, so a resisted application must not be counted (see Battle.recordCastApplied).
+            if (ctx.battle().tryApplyDebuff(ctx.firing().owner(), target, applied, baseChance,
+                    control.resistKey())) {
+                ctx.battle().recordCastApplied(control.name());
+                // ⚠ Announced on the SUCCESS branch. The attempt is not the event: the state was rolled through the
+                // resist pipeline, and reporting a resisted application would claim a freeze that never happened.
+                ctx.battle().announceControl(ctx.firing().owner(), target, control.display());
             }
         }
     }
@@ -690,32 +691,33 @@ final class TriggerEffects {
      * state is its element - which the four-element family has no key for. (That is a fact about the data, not a
      * shortcut: adding one later is passing a key here.)
      */
-    static void applyDot(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
+    static void applyDot(OpContext ctx, ApplyDotArgs args) {
         // No element named = EVERY DoT on the target ("所有持续伤害"), one instance each.
-        DamageElement element = effect.getElement() == null || effect.getElement().isBlank()
+        DamageElement element = args.element() == null || args.element().isBlank()
                 ? null
-                : DamageElement.fromString(effect.getElement());
+                : DamageElement.fromString(args.element());
         if (element == null) {
             throw new IllegalStateException(
-                    "APPLY_DOT ran with element '" + effect.getElement() + "'; the loader validates it against "
+                    "APPLY_DOT ran with element '" + args.element() + "'; the loader validates it against "
                             + "DamageElement, so this is an engine fault");
         }
-        double damage = TriggerMagnitudes.dotMagnitude(effect, ctx);
+        double damage = TriggerMagnitudes.dotMagnitude(args.magnitude(), ctx.firing());
         // Note: The same "always roll" rule as a control: an unstated chance is 100% BASE chance, not "bypasses Effect RES".
-        Double statedChance = TriggerMagnitudes.baseChanceOf(effect, ctx);
+        Double statedChance = TriggerMagnitudes.baseChanceOf(args.magnitude(), ctx.firing());
         double baseChance = statedChance == null ? 1.0 : statedChance;
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        for (CanHit target : ctx.targets()) {
             if (target == null || target.isDeath()) {
                 continue;
             }
             // A name, when the rule states one: it is what `has_state <name>` asks about (see DotBuff's named constructor).
             // Without it the DOT keeps answering only to its element's state name, which is all the corpus asks for.
-            String dotName = effect.getBuff() == null ? null : effect.getBuff().trim();
-            DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns(), TriggerInterpreter.dotStackCap(effect), dotName);
-            if (battle.tryApplyDebuff(ctx.owner(), target, dot, baseChance, null)) {
+            String dotName = args.buffName() == null ? null : args.buffName().trim();
+            DotBuff dot = new DotBuff(ctx.firing().owner(), element, damage, args.turns(),
+                    args.maxStacks() == null ? 0 : args.maxStacks(), dotName);
+            if (ctx.battle().tryApplyDebuff(ctx.firing().owner(), target, dot, baseChance, null)) {
                 // The DOT's state name is the document's name for the element (burn), from the one table that maps
                 // them - the same spelling "for each 1 target made to enter burn" would count with.
-                battle.recordCastApplied(BuffManager.dotStateName(element));
+                ctx.battle().recordCastApplied(BuffManager.dotStateName(element));
             }
         }
     }
