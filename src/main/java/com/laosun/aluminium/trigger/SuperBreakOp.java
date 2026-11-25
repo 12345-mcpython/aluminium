@@ -9,7 +9,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * <p>Only legal on {@code DEALING_DAMAGE}: it converts that instance's toughness reduction, so there is no other moment
  * it could be attached to.
  */
-final class SuperBreakOp implements OpHandler<OpArgs> {
+final class SuperBreakOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -17,12 +17,12 @@ final class SuperBreakOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requirePercent(effect, op, rule);
         TriggerValidator.requireNonZeroPercent(effect, op, rule);
@@ -30,7 +30,7 @@ final class SuperBreakOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.superBreak(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, MagnitudeArgs args) {
+        TriggerEffects.superBreak(ctx, args);
     }
 }

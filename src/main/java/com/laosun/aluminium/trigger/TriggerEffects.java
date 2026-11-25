@@ -1010,11 +1010,11 @@ final class TriggerEffects {
      * "negative effects on the carrier", and the two sentences mean opposite things about the same word ("remove"). Keeping
      * them apart is also what lets each one be validated and tested on its own.
      */
-    static void removeBuffs(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        int amount = effect.getValue() != null
-                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
-                : (int) Math.round(effect.getAmount());
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+    static void removeBuffs(OpContext ctx, MagnitudeArgs args) {
+        int amount = args.magnitude().getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(args.magnitude(), ctx.firing()))
+                : (int) Math.round(args.magnitude().getAmount());
+        for (CanHit target : ctx.targets()) {
             if (target != null) {
                 target.getBuffManager().removeBuffs(amount);
             }
@@ -1084,14 +1084,14 @@ final class TriggerEffects {
     /**
      * {@code TICK_DOT}: "immediately produce 1 instance of ... damage" - one extra instance of the named state, at the stated share.
      */
-    static void tickDot(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        DamageElement element = DamageElement.fromString(effect.getElement());
+    static void tickDot(OpContext ctx, TickDotArgs args) {
+        DamageElement element = DamageElement.fromString(args.element());
         // Note: The share comes from `shareOf`, not from `percent` directly: a rule may state it as `percent_from_resource`, and unboxing `percent` here
         // NPEs. `shareOf` is the engine's own resolver for every share spelling.
-        double percent = TriggerMagnitudes.shareOf(effect, ctx);
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        double percent = TriggerMagnitudes.shareOf(args.magnitude(), ctx.firing());
+        for (CanHit target : ctx.targets()) {
             if (target != null && !target.isDeath()) {
-                battle.tickDotStateNow(target, element, percent);
+                ctx.battle().tickDotStateNow(target, element, percent);
             }
         }
     }
@@ -1143,17 +1143,17 @@ final class TriggerEffects {
      * settled as one {@link DamageType#SUPER_BREAK} instance, taking the zones and resistance of the element the
      * triggering attack used.
      */
-    static void superBreak(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        Damage source = ctx.damage();
+    static void superBreak(OpContext ctx, MagnitudeArgs args) {
+        Damage source = ctx.firing().damage();
         if (source == null || source.getStance() <= 0) {
             return;                                   // nothing to convert: an instance that reduces no toughness
         }
-        double converted = source.getStance() * TriggerMagnitudes.shareOf(effect, ctx);
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        double converted = source.getStance() * TriggerMagnitudes.shareOf(args.magnitude(), ctx.firing());
+        for (CanHit target : ctx.targets()) {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            battle.applyAdditionalDamage(ctx.owner(), target, source.getElement(), converted);
+            ctx.battle().applyAdditionalDamage(ctx.firing().owner(), target, source.getElement(), converted);
         }
     }
 

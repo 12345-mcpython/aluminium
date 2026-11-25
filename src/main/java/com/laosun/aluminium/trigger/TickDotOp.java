@@ -9,7 +9,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * <p>The engine's own turn boundary already ticks DoTs; this op exists for the sentences that tick one <b>out of
  * turn</b> ("detonate", "one more time"), so it needs the element (which state) and the share.
  */
-final class TickDotOp implements OpHandler<OpArgs> {
+final class TickDotOp implements OpHandler<TickDotArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -17,12 +17,12 @@ final class TickDotOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public TickDotArgs parse(EffectSpec effect) {
+        return new TickDotArgs(effect.getElement() == null ? "" : effect.getElement().trim(), effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(TickDotArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireElement(effect, op, rule, false);
         TriggerValidator.requirePercent(effect, op, rule);
@@ -31,7 +31,7 @@ final class TickDotOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.tickDot(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, TickDotArgs args) {
+        TriggerEffects.tickDot(ctx, args);
     }
 }
