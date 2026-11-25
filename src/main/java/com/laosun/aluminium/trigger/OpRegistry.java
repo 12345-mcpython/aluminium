@@ -72,7 +72,20 @@ public final class OpRegistry {
             new ResetRuleChanceOp(),
             new ApplyRegenOp(),
             new SuperBreakOp(),
-            new BoostToughnessOp());
+            new BoostToughnessOp(),
+            new RaiseResourceCapOp(),
+            new RaiseResourceMaxOp(),
+            new RaiseEnergyBankOp(),
+            new DrawEnergyBankOp(),
+            new ModifyDamageTakenOp(),
+            new BoostDamageOp(),
+            new ShareDamageOp(),
+            new DelegateDamageOp(),
+            new RegisterHealBonusOp(),
+            new AddDamageOp(),
+            new CommandSummonOp(),
+            new CastSkillOp(),
+            new SummonServantOp());
 
     /** {@link #HANDLERS} indexed by op, built once. */
     private static final Map<TriggerOperator, OpHandler<?>> BY_OP = index();

@@ -856,15 +856,6 @@ public final class TriggerInterpreter {
                             effect), ctx));
                 }
             }
-            case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
-            // 「可积攒最多 120 点溢出能量」: the bar's overflow allowance. Reader: 1014 Saber's trace 湖之祝福 and its
-            // Eidolon 6 (「提高到 200 点」 = the same op with the difference).
-            case RAISE_ENERGY_BANK -> energyBankCap(effect, ctx);
-            // 「施放终结技后清空并恢复相应的能量值」: hand the banked overflow back to the bar.
-            case DRAW_ENERGY_BANK -> energyBankDraw(effect, ctx);
-            // The DECLARED cap, not the overflow tier above it. Reader: 1513 Aventurine · Waveflair Eidolon 2
-            // (「【热意】上限提高至 50 点」) -- the base declaration states 30 and an Eidolon raises it for the battle.
-            case RAISE_RESOURCE_MAX -> raiseResourceMax(effect, ctx);
             case GAIN_RESOURCE -> {
                 // ⚠ The store that MOVED, not the rule owner's: an effect may grant to somebody else ("give that ally 2
                 // points"), and `resourceAmount(owner)` measured on a unit that does not carry the counter reads 0 on
@@ -923,12 +914,6 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            // A migrated op has no arm here at all: the registry dispatches it before this switch is reached, and
-            // TriggerDispatchCoverageTest fails if an op ever has both.
-            case MODIFY_DAMAGE_TAKEN -> modifyDamageTaken(battle, effect, ctx);
-            case BOOST_DAMAGE -> boostDamage(effect, ctx);
-            case ADD_DAMAGE -> TriggerEffects.addDamageFlat(effect, ctx);
-            case SHARE_DAMAGE -> shareDamage(effect, ctx);
             case RAISE_SKILL_MULTIPLIER -> {
                 // 「终结技的伤害倍率提高 240%」: the ROW share of one slot is multiplied (x3.4). No zone, no MODIFY_ATTR and
                 // no MODIFY_RULE can say it - the row number is read at settlement, not by a rule. The optional
@@ -956,7 +941,6 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case REGISTER_HEAL_BONUS -> registerHealBonus(effect, ctx);
             case SUMMON -> {
                 // 「若任意「晴空乐手」已在场…」 (1512): a kit may own SEVERAL memosprites, and "which one" is data. Without
                 // the name the op keeps its old meaning (the character's first / its only one).
@@ -982,10 +966,6 @@ public final class TriggerInterpreter {
                     battle.summonMemosprite(owner, effect.getMemospriteName().trim());
                 }
             }
-            case COMMAND_SUMMON -> TriggerEffects.commandSummon(battle, effect, ctx);
-            case CAST_SKILL -> TriggerEffects.castSkill(battle, effect, ctx);
-            case SUMMON_SERVANT -> battle.summonServant(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
-            case DELEGATE_DAMAGE -> delegateDamage(effect, ctx);
             default -> throw new IllegalStateException(
                     "Op '" + op + "' reached the dispatcher without an arm");
         }
@@ -1029,7 +1009,7 @@ public final class TriggerInterpreter {
      * @param effect the effect carrying the op (its {@code percent} is the bonus)
      * @param ctx    the firing context; {@code owner} is the healer, {@code targetFilter} its condition
      */
-    private static void registerHealBonus(EffectSpec effect, TriggerContext ctx) {
+    static void registerHealBonus(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
         if (owner == null) {
             return;
@@ -1061,7 +1041,7 @@ public final class TriggerInterpreter {
      * <p>Queued rather than settled here: this runs inside the current instance's zone arithmetic, and a nested
      * settlement would interleave two hits' events.
      */
-    private static void shareDamage(EffectSpec effect, TriggerContext ctx) {
+    static void shareDamage(EffectSpec effect, TriggerContext ctx) {
         Battle battle = ctx.battle();
         var damage = ctx.damage();
         if (battle == null || damage == null) {
@@ -1080,7 +1060,7 @@ public final class TriggerInterpreter {
         }
     }
 
-    private static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
+    static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
         Battle battle = ctx.battle();
         Battle.PendingCast cast = battle == null ? null : battle.currentCast();
         if (cast == null) {
@@ -1239,7 +1219,7 @@ public final class TriggerInterpreter {
      * @param effect the effect ({@code resource} + {@code amount}, or a {@code value} provider)
      * @param ctx    the firing context
      */
-    private static void raiseResourceMax(EffectSpec effect, TriggerContext ctx) {
+    static void raiseResourceMax(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
         com.laosun.aluminium.state.Resource resource = holder.getResources().get(effect.getResource());
         if (resource == null) {
@@ -1263,7 +1243,7 @@ public final class TriggerInterpreter {
      * @param effect the effect ({@code amount} = how many points of overflow may be kept in total)
      * @param ctx    the firing context
      */
-    private static void energyBankCap(EffectSpec effect, TriggerContext ctx) {
+    static void energyBankCap(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
         holder.setEnergyBankCap(effect.getValue() != null
                 ? TriggerMagnitudes.valueOf(effect, ctx)
@@ -1279,7 +1259,7 @@ public final class TriggerInterpreter {
      * @param effect the effect (optionally a {@code target}; the owner by default)
      * @param ctx    the firing context
      */
-    private static void energyBankDraw(EffectSpec effect, TriggerContext ctx) {
+    static void energyBankDraw(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
         holder.drawEnergyBank();
     }
@@ -1294,7 +1274,7 @@ public final class TriggerInterpreter {
      * 拥有上限</u>」. {@code Resource.absoluteMax()} saturates on the sum, so the invariant still holds. The two spellings
      * are exclusive: "by this many more" and "by no limit" are different claims (the validator refuses the pair).
      */
-    private static void raiseResourceCap(EffectSpec effect, TriggerContext ctx) {
+    static void raiseResourceCap(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
         // A PARTY-scoped resource has no home on the unit (the same fact `gainResource` records) -- [新蕊] is declared `scope: PARTY` -- so the fallback is the
         // battle-level counter, which is the SAME `Resource` object and therefore carries the settable overflow.
@@ -1784,7 +1764,7 @@ public final class TriggerInterpreter {
      *               {@code target})
      * @param ctx    the context
      */
-    private static void modifyDamageTaken(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void modifyDamageTaken(Battle battle, EffectSpec effect, TriggerContext ctx) {
         // Note: A DERIVED magnitude, not `percent`: "at 1 stack raise the damage the enemy takes by 15.00%, and thereafter each additional 1 stack raises it by
         // 5.00%" (1218 椒丘) is `amount + percent x layers`, so a zone reads its own value the same way a MODIFY_ATTR
         // does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently IGNORED -- worse than refusing
@@ -1901,7 +1881,7 @@ public final class TriggerInterpreter {
     }
 
 
-    private static void boostDamage(EffectSpec effect, TriggerContext ctx) {
+    static void boostDamage(EffectSpec effect, TriggerContext ctx) {
         Damage damage = ctx.damage();
         if (damage == null) {
             // Unreachable through a validated table (requireEvent pins the event), but `apply` is public and a
