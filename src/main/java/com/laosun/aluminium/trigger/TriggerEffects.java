@@ -84,8 +84,8 @@ final class TriggerEffects {
      *               {@code permanent}, optional {@code max_stacks}, {@code target})
      * @param ctx    the context
      */
-    static void modifyAttr(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        AttributeType attribute = AttributeType.fromString(effect.getAttribute());
+    static void modifyAttr(ModifyAttrArgs args, Magnitude spec, BattlePort battle, TriggerContext ctx, EffectSpec lifetime) {
+        AttributeType attribute = AttributeType.fromString(args.attribute());
         // A derived magnitude - "the raise is equal to X% + Y% of <somebody's attribute>". It is computed once,
         // when the rule fires, and it is an ABSOLUTE number in the target attribute's units: the documents that
         // need this state a value ("equal to 12% of Sunday's CRIT DMG plus 8%"), not a share of the target's base.
@@ -96,35 +96,35 @@ final class TriggerEffects {
         // ignore X% of their DEF" (relic 108/4) is a property of the instance, not of the wearer -- and `Battle` fires
         // DEALING_DAMAGE (2539) before it settles the defence zone (2551), so a rule really can still change it.
         // Opt-in (`instance: true`) because seven shipped rules already use MODIFY_ATTR on that event.
-        if (Boolean.TRUE.equals(effect.getInstance()) && ctx.damage() != null) {
+        if (Boolean.TRUE.equals(args.instance()) && ctx.damage() != null) {
             // An optional damage-type scope: "<b>break damage</b> dealt to the target ignores X% of their DEF" (relic 119/4)
             // and "<b>follow-up attacks</b> ignore X% of their DEF". The instance already knows its own type, so this is a comparison, not a new dimension.
-            com.laosun.aluminium.enums.DamageType instanceScope = TriggerInterpreter.parseDamageType(effect.getDamageType(), "MODIFY_ATTR");
+            com.laosun.aluminium.enums.DamageType instanceScope = TriggerInterpreter.parseDamageType(args.damageType(), "MODIFY_ATTR");
             if (instanceScope != null && ctx.damage().getType() != instanceScope) {
                 return;   // the instance belongs to another damage type: this rule does not speak about it
             }
             if (attribute == AttributeType.DEFENCE_IGNORE) {
-                // Note: this read `effect.getPercent()` alone, which silently dropped a stated `amount` and `scale`.
+                // Note: this read `spec.getPercent()` alone, which silently dropped a stated `amount` and `scale`.
                 // Measured on 1512's Fever aura ("15% + 0.5% per 气氛值"): only the 0.5% arrived, at every gauge value.
-                double instanceMagnitude = TriggerMagnitudes.magnitudeOf(effect, ctx);
-                if (effect.getAmountCap() != null) {
-                    instanceMagnitude = Math.min(instanceMagnitude, effect.getAmountCap());
+                double instanceMagnitude = TriggerMagnitudes.magnitudeOf(spec, ctx);
+                if (spec.getAmountCap() != null) {
+                    instanceMagnitude = Math.min(instanceMagnitude, spec.getAmountCap());
                 }
-                instanceMagnitude *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(effect, ctx.target(), ctx);
+                instanceMagnitude *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(spec, ctx.target(), ctx);
                 ctx.damage().addDefenceIgnore(instanceMagnitude);
                 return;
             }
             if (attribute == AttributeType.CRIT_CHANCE) {
                 // Same fix as DEFENCE_IGNORE: `percent` alone dropped a stated `amount`/`scale`.
-                ctx.damage().addCritChance(TriggerMagnitudes.magnitudeOf(effect, ctx));
+                ctx.damage().addCritChance(TriggerMagnitudes.magnitudeOf(spec, ctx));
                 return;
             }
             if (attribute == AttributeType.CRIT_ATTACK) {
                 // per_stack belongs here too (reader: cone 23016's "each stack of [温驯] raises CRIT DMG"):
                 // the two branches beside this one already scaled by the factor, and this one did not -- measured, a rule at
                 // one layer and at two layers produced the SAME number. Same shape as DEFENCE_IGNORE / the boost channel.
-                double critDamage = TriggerMagnitudes.magnitudeOf(effect, ctx);
-                critDamage *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(effect, ctx.target(), ctx);
+                double critDamage = TriggerMagnitudes.magnitudeOf(spec, ctx);
+                critDamage *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(spec, ctx.target(), ctx);
                 ctx.damage().addCritDamage(critDamage);
                 return;
             }
@@ -135,11 +135,11 @@ final class TriggerEffects {
             // Note: Before this, such a rule had to be a written modifier, i.e. a snapshot taken at cast time.
             if (attribute == AttributeType.ALL_DAMAGE_TYPE_BOOST) {
                 // Same fix as DEFENCE_IGNORE: `percent` alone dropped a stated `amount`/`scale`.
-                double instanceBoost = TriggerMagnitudes.magnitudeOf(effect, ctx);
-                if (effect.getAmountCap() != null) {
-                    instanceBoost = Math.min(instanceBoost, effect.getAmountCap());
+                double instanceBoost = TriggerMagnitudes.magnitudeOf(spec, ctx);
+                if (spec.getAmountCap() != null) {
+                    instanceBoost = Math.min(instanceBoost, spec.getAmountCap());
                 }
-                instanceBoost *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(effect, ctx.target(), ctx);
+                instanceBoost *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(spec, ctx.target(), ctx);
                 ctx.damage().addBoost(instanceBoost);
                 return;
             }
@@ -155,16 +155,16 @@ final class TriggerEffects {
         // no-scale share as well. Measured consequence: 1002 Dan Heng (丹恒)'s technique 「攻击力提高 40%」, stated as
         // `percent_from_skill_param: "TECHNIQUE:0"`, produced a modifier of `ATTACK PURE_VALUE 0.4` - i.e. +0.4 attack
         // instead of +40% - while the literal `percent: 0.4` it replaced produced `add_percent` and the right thing.
-        boolean scaled = effect.getScale() != null && !effect.getScale().isBlank();
-        boolean unified = effect.getValue() != null;
-        boolean ratio = effect.getRatio() != null;
-        boolean derived = scaled || (effect.getPercent() == null && !ratio && !unified);
+        boolean scaled = spec.getScale() != null && !spec.getScale().isBlank();
+        boolean unified = spec.getValue() != null;
+        boolean ratio = args.ratio() != null;
+        boolean derived = scaled || (spec.getPercent() == null && !ratio && !unified);
         // Whether the magnitude is already ABSOLUTE in the attribute's units: a flat `amount` ("raise SPEED by 50
         // points", 艾丝妲's ultimate) or a scaled product ("equal to X% of DEF"). A bare share - a literal `percent` or
         // one of its spellings with no scale - is a fraction of the target's base instead. A `value` expression is
         // already absolute by construction (the provider states the number in the attribute's own units), and `ratio`
         // is a ratio attribute's absolute fraction (5 = +500%).
-        boolean absolute = unified || ratio || !TriggerMagnitudes.statesShare(effect) || scaled;
+        boolean absolute = unified || ratio || !TriggerMagnitudes.statesShare(spec) || scaled;
         // ? A plain modifier is a share OR a flat value: `amount` alone means "raise the attribute by this many points", which the
         // validator enforces as exactly one of the two.
         // Note: The share may come from the skill parameter now, so "is a share stated" is NOT `percent != null`:
@@ -177,26 +177,26 @@ final class TriggerEffects {
         // list of spellings `shareOf` actually reads - a copy here is the thing that kept falling one spelling behind
         // (cast_param, then skill_param, then summon_param).
         if (unified) {
-            magnitude = TriggerMagnitudes.valueOf(effect, ctx);
+            magnitude = TriggerMagnitudes.valueOf(spec, ctx);
         } else if (ratio) {
-            magnitude = effect.getRatio();
-        } else if (TriggerMagnitudes.statesShare(effect)) {
+            magnitude = args.ratio();
+        } else if (TriggerMagnitudes.statesShare(spec)) {
             // Note: `scaled`, not `derived` - a no-scale share is the magnitude ITSELF; its constant term (if any) is a
             // separate absolute modifier, added below (`1409`'s 「30% + 600」). Folding the constant in here turned
             // "30% + 600" into "600.3 x base" (measured: 652,900 instead of 926).
-            magnitude = scaled ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : TriggerMagnitudes.shareOf(effect, ctx);
-        } else if (effect.getAmount() == null && effect.getAmountFromSkillParam() != null) {
+            magnitude = scaled ? TriggerMagnitudes.derivedMagnitude(spec, ctx) : TriggerMagnitudes.shareOf(spec, ctx);
+        } else if (spec.getAmount() == null && spec.getAmountFromSkillParam() != null) {
             // "使我方全体速度提高50点" (Asta Ultimate): the FLAT half read out of the skill own row, because that column
             // moves with the level; without this branch the flat arm unboxed a null amount.
-            magnitude = TriggerMagnitudes.ownerSkillParamValue(effect, ctx,
-                    String.valueOf(effect.getAmountFromSkillParam()));
+            magnitude = TriggerMagnitudes.ownerSkillParamValue(spec, ctx,
+                    String.valueOf(spec.getAmountFromSkillParam()));
         } else {
-            magnitude = effect.getAmount();
+            magnitude = spec.getAmount();
         }
-        boolean permanent = TriggerLifetimes.unticked(effect);
-        int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
-        int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        boolean permanent = args.permanent();
+        int turns = args.turns();
+        int maxStacks = spec.stackCap() == null ? 1 : spec.stackCap();
+        for (CanHit target : TriggerTargets.resolveTargets(battle, lifetime, ctx)) {
             // ? A stated ceiling, in the target's own unit. The two forms differ:
             //   * a DERIVED magnitude is already absolute, so the ceiling is compared directly;
             //   * a SHARE scales off the target's BASE value, so the ceiling is divided by that base first
@@ -205,7 +205,7 @@ final class TriggerEffects {
             // "each [当品] stack additionally raises Jade (翡翠)'s ATK by 0.50%": a SHARE times a count. A plain modifier's magnitude is
             // a share of the target's BASE, while the derived path yields ABSOLUTE units -- so "each stack ... raises X%" on a flat
             // attribute had no spelling. Read PER TARGET, because the count differs from one victim to the next.
-            if (effect.getPerStack() != null && !effect.getPerStack().isBlank()) {
+            if (spec.getPerStack() != null && !spec.getPerStack().isBlank()) {
                 // `per_stack` may name the target's DEBUFF COUNT, not only a counter: "for each 1 negative effect the enemy target suffers,
                 // the wearer's <attribute> dealt to it is additionally raised by X%, up to N stacks" is cone 21001 / 23020, and 116/4 counts a target's DoTs. A named
                 // counter keeps its old meaning, so nothing existing moves.
@@ -216,44 +216,44 @@ final class TriggerEffects {
                 // beforehand: 86 shipped uses live on this path (81 bare counters, 5 x target_debuff_count),
                 // and every one of them resolves identically through perStackFactor, so merging changes no
                 // shipped behaviour -- it removes the trap.
-                applied *= TriggerInterpreter.perStackFactor(effect, target, ctx);
+                applied *= TriggerInterpreter.perStackFactor(spec, target, ctx);
             }
             if (absolute) {
-                applied = TriggerMagnitudes.applyDerivedCeiling(effect, ctx, applied);
-            } else if (effect.getCapScale() != null || effect.getCapPercent() != null) {
-                double ceiling = TriggerMagnitudes.resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx);
+                applied = TriggerMagnitudes.applyDerivedCeiling(spec, ctx, applied);
+            } else if (spec.getCapScale() != null || spec.getCapPercent() != null) {
+                double ceiling = TriggerMagnitudes.resolveScale(spec.getCapScale(), spec.getCapPercent(), ctx);
                 double base = target.getAttribute(attribute).baseValue();
                 if (base > 0) {
                     applied = Math.min(applied, ceiling / base);
                 }
             }
             AbstractBuff buff = TriggerInterpreter.withSource(TriggerLifetimes.withTickOwner(
-                    TriggerLifetimes.withLifetime(TriggerInterpreter.statModifier(attribute, applied, turns, permanent, maxStacks, absolute), effect),
-                    effect, ctx), ctx);
+                    TriggerLifetimes.withLifetime(TriggerInterpreter.statModifier(attribute, applied, turns, permanent, maxStacks, absolute), lifetime),
+                    lifetime, ctx), ctx);
             // "while in the [协奏] state, raise the ATK of all of us ...": the boost lasts as long as the STATE, and the state ends
             // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets
             // `REMOVE_STATE <the same name>` take it off; Note: without a name the modifier is skipped by that loop, i.e.
             // unnamed boosts keep exactly the lifetime they always had.
             // The ask travels onto the buff, so `BuffManager` can honour it without knowing about effects.
-            if (Boolean.TRUE.equals(effect.getCoexist())) {
+            if (Boolean.TRUE.equals(args.coexist())) {
                 buff.setKeepsSiblings(true);
             }
-            if (Boolean.TRUE.equals(effect.getPerStackLive())) {
+            if (Boolean.TRUE.equals(spec.getPerStackLive())) {
                 // "raise X% for each 1 stack held ..." as a SUSTAINED aura (reader family: fourteen documents). The share is
                 // asked for on every read, so the aura follows the count -- a snapshot would only be right at the instant it
                 // was taken, and re-attaching on every change would stack the buff itself.
-                boolean derivedCounter = effect.getScale() != null
-                        && effect.getScale().trim().startsWith("self_stacks:");
+                boolean derivedCounter = spec.getScale() != null
+                        && spec.getScale().trim().startsWith("self_stacks:");
                 // 「获得衣匠忆灵天赋的速度提高层数，每层使自身速度提高 15%」 (1402's stance): the counted unit is the
                 // MEMOSPRITE, so the reader needs the battle - but it still has no event dependency, so it is as live as
                 // the two counter forms beside it.
-                boolean summonCounter = effect.getPerStack() != null
-                        && effect.getPerStack().trim().startsWith(TriggerInterpreter.SUMMON_STACKS_PREFIX);
-                if (!derivedCounter && !summonCounter && !TriggerInterpreter.ctxFreeCounter(effect)) {
+                boolean summonCounter = spec.getPerStack() != null
+                        && spec.getPerStack().trim().startsWith(TriggerInterpreter.SUMMON_STACKS_PREFIX);
+                if (!derivedCounter && !summonCounter && !TriggerInterpreter.ctxFreeCounter(spec)) {
                     throw new IllegalStateException(
                             "per_stack_live only exists for the counter forms (self_stacks:<NAME>, summon_stacks:<NAME> or "
                                     + "a bare name), but this "
-                                    + "rule states per_stack='" + effect.getPerStack() + "' and scale='" + effect.getScale()
+                                    + "rule states per_stack='" + spec.getPerStack() + "' and scale='" + spec.getScale()
                                     + "'; the per-hit count forms are read from an event context and (source: "
                                     + ctx.ruleId() + ")");
                 }
@@ -261,91 +261,91 @@ final class TriggerEffects {
                     if (derivedCounter) {
                         // The derived form is ABSOLUTE: percent x layers (+ amount), read on every computation. Building it from
                         // `magnitude` would square the count, because magnitude already contains it.
-                        String own = effect.getScale().trim().substring("self_stacks:".length()).trim();
-                        double extra = effect.getAmount() == null ? 0 : effect.getAmount();
-                        double pct = effect.getPercent() == null ? 0 : effect.getPercent();
+                        String own = spec.getScale().trim().substring("self_stacks:".length()).trim();
+                        double extra = spec.getAmount() == null ? 0 : spec.getAmount();
+                        double pct = spec.getPercent() == null ? 0 : spec.getPercent();
                         liveBuff.makeLive(() -> pct
-                                * TriggerInterpreter.capPerStack(effect, target.getBuffManager().stacksOf(own)) + extra);
+                                * TriggerInterpreter.capPerStack(spec, target.getBuffManager().stacksOf(own)) + extra);
                     } else if (summonCounter) {
                         // Same arithmetic as the derived form (a SHARE per layer: 0.15 x layers), but the counter lives on
                         // the rule owner's memosprite — 0 when it is not on the field, which is also when the aura is gone.
-                        String own = effect.getPerStack().trim()
+                        String own = spec.getPerStack().trim()
                                 .substring(TriggerInterpreter.SUMMON_STACKS_PREFIX.length()).trim();
-                        double extra = effect.getAmount() == null ? 0 : effect.getAmount();
+                        double extra = spec.getAmount() == null ? 0 : spec.getAmount();
                         // `shareOf`, not the raw field: 「每层使自身速度提高 15%」 reads that 15% out of the ultimate row
                         // (ULTRA:0), and a share stated by SPELLING is invisible to `getPercent()`.
-                        double pct = TriggerMagnitudes.shareOf(effect, ctx);
+                        double pct = TriggerMagnitudes.shareOf(spec, ctx);
                         liveBuff.makeLive(() -> pct
-                                * TriggerInterpreter.capPerStack(effect,
+                                * TriggerInterpreter.capPerStack(spec,
                                 TriggerInterpreter.summonStacks(ctx, own)) + extra);
                     } else {
-                        String counter = TriggerInterpreter.counterName(effect);
+                        String counter = TriggerInterpreter.counterName(spec);
                         // Note: read through `perStackFactor`, not `stacksOf(counter)`: a `self_stacks:` spelling names the RULE
                         // OWNER's counter while the modifier sits on every ally, so a raw stacksOf() read the wrong unit and the
                         // aura paid 0 to everyone but the owner (measured on 1009's per-charge ATK).
-                        liveBuff.makeLive(() -> magnitude * TriggerInterpreter.perStackFactor(effect, target, ctx));
+                        liveBuff.makeLive(() -> magnitude * TriggerInterpreter.perStackFactor(spec, target, ctx));
                     }
                 }
             }
-            if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
-                buff.setBuffName(effect.getBuff().trim());
+            if (args.buffName() != null && !args.buffName().isBlank()) {
+                buff.setBuffName(args.buffName().trim());
             }
             // "while the owner holds X": the modifier lives exactly as long as that state (AbstractBuff.gateBroken is asked
             // at every turn boundary). Reader: 1217 Eidolon 1 speed aura.
-            if (effect.getWhileState() != null && !effect.getWhileState().isBlank()) {
-                buff.gate(effect.getWhileState().trim(), ctx.owner());
+            if (args.whileState() != null && !args.whileState().isBlank()) {
+                buff.gate(args.whileState().trim(), ctx.owner());
             }
             // "while the owner's counter is at least N": a THRESHOLD on layers, which `per_stack` cannot express (that one scales
             // continuously). Reader: 1009 Eidolon 4, 「蓄能层数 ≥2 时能量恢复效率提高 15%」.
-            if (effect.getWhileStacks() != null && !effect.getWhileStacks().isBlank()) {
-                buff.gateStacks(effect.getWhileStacks().trim(),
-                        effect.getWhileStacksMin() == null ? 1 : effect.getWhileStacksMin(), ctx.owner());
+            if (args.whileStacks() != null && !args.whileStacks().isBlank()) {
+                buff.gateStacks(args.whileStacks().trim(),
+                        args.whileStacksMin() == null ? 1 : args.whileStacksMin(), ctx.owner());
             }
             // "while the owner's RESOURCE is at least N": the same threshold, for a tally that lives on the ResourceManager.
             // Reader: 1224 March 7th (三月七)'s talent, 「充能大于等于 7 点时，造成伤害提高 80%」.
-            if (effect.getWhileResource() != null && !effect.getWhileResource().isBlank()) {
-                buff.gateResource(effect.getWhileResource().trim(),
-                        effect.getWhileResourceMin() == null ? 1 : effect.getWhileResourceMin(), ctx.owner());
+            if (args.whileResource() != null && !args.whileResource().isBlank()) {
+                buff.gateResource(args.whileResource().trim(),
+                        args.whileResourceMin() == null ? 1 : args.whileResourceMin(), ctx.owner());
             }
             // "while the unit CARRYING this holds X": the mirror of `while_state`, for the case where the condition and the
             // modifier sit on the SAME unit (1307's Epiphany raises the damage its victims take).
-            if (effect.getWhileHolderState() != null && !effect.getWhileHolderState().isBlank()) {
-                buff.gateHolder(effect.getWhileHolderState().trim());
+            if (args.whileHolderState() != null && !args.whileHolderState().isBlank()) {
+                buff.gateHolder(args.whileHolderState().trim());
             }
             // "while the owner's HP bar is at least this share": HP moves on almost every event, so this is a LIVE gate like
             // `while_stacks`. Reader: 1209 Eidolon 4, 「当前生命值百分比 ≥80% 时提高自身 12% 冰属性抗性穿透」.
-            if (effect.getWhileHpPercent() != null) {
-                buff.gateHpPercent(effect.getWhileHpPercent(), ctx.owner());
+            if (args.whileHpPercent() != null) {
+                buff.gateHpPercent(args.whileHpPercent(), ctx.owner());
             }
             // 「为当前生命值百分比 ≤50% 的我方目标提供治疗时」 (1110 Lynx (玲可) 星魂 1): the CARRIER's bar, not the rule owner's -
             // the sibling of the line above for a condition that sits on the unit the modifier is attached to.
-            if (effect.getWhileHolderHpPercent() != null) {
-                buff.gateHolderHp(effect.getWhileHolderHpPercent());
+            if (args.whileHolderHpPercent() != null) {
+                buff.gateHolderHp(args.whileHolderHpPercent());
             }
             // 「【浮元】在场时，使敌方全体全属性抗性降低 20%」 (1222 Lingsha (灵砂) 星魂 6): a LIVE gate on how many living summons
             // the rule owner has. The count is handed in as a closure because summons live on the BATTLE (keyed by their master)
             // and a buff has no battle handle - the same late-read shape the line above uses for a HP bar.
-            if (effect.getWhileSummonCount() != null) {
+            if (args.whileSummonCount() != null) {
                 CanHit summoner = ctx.owner();
-                buff.gateSummons(effect.getWhileSummonCount(),
+                buff.gateSummons(args.whileSummonCount(),
                         () -> battle == null || summoner == null ? 0 : battle.summonCountOf(summoner));
             }
             // "with a 100% base chance, additionally lower the target's all-type RES by 10.00%": an attribute modifier may be ROLLED,
             // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes
             // (no shipped file uses base_chance on MODIFY_ATTR).
-            TriggerInterpreter.attachRolled(battle, target, buff, effect, ctx);
+            TriggerInterpreter.attachRolled(battle, target, buff, spec, ctx);
             // "the raise is X% + Y points" (1409's 【雨过天晴】: `percent_from_skill_param` + `amount_from_skill_param`):
             // the share arm is a FRACTION of the target's base, the constant term is in the attribute's own units - two
             // different modifiers, so the constant gets its own, with the same lifetime and source. Without this the
             // constant is silently dropped (or, when both spellings share one magnitude, applied as a fraction x base).
             if (!absolute) {
-                double constant = TriggerMagnitudes.constantTerm(effect, ctx);
+                double constant = TriggerMagnitudes.constantTerm(spec, ctx);
                 if (constant != 0) {
                     AbstractBuff extra = TriggerInterpreter.withSource(TriggerLifetimes.withTickOwner(
                             TriggerLifetimes.withLifetime(TriggerInterpreter.statModifier(attribute, constant, turns,
-                                    permanent, maxStacks, true), effect), effect, ctx), ctx);
-                    TriggerInterpreter.attachRolled(battle, target, extra, effect, ctx);
+                                    permanent, maxStacks, true), lifetime), lifetime, ctx), ctx);
+                    TriggerInterpreter.attachRolled(battle, target, extra, spec, ctx);
                 }
             }
         }

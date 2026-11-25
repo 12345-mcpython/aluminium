@@ -124,6 +124,20 @@ public interface Magnitude {
     /** @return whether the number is a FIXED report that the energy-regeneration rate does not touch */
     Boolean getFixed();
 
+    /** @return the ceiling on a single application of this number, or {@code null} */
+    Double getAmountCap();
+
+    /**
+     * @return the declared stack ceiling ({@code max_stacks}, else {@code stacks}), or {@code null}
+     *
+     * <p>On the magnitude because it is a property of the <b>number</b> this effect writes, not of the effect: a
+     * modifier and a DOT both need it, and both write a quantity.
+     */
+    Integer stackCap();
+
+    /** @return whether the per-layer multiplier is re-read at every settlement instead of frozen */
+    Boolean getPerStackLive();
+
     /** @return the counter whose layers MULTIPLY this number, or {@code null} */
     String getPerStack();
 

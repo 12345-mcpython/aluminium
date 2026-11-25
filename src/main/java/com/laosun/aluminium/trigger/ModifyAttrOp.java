@@ -15,7 +15,7 @@ import com.laosun.aluminium.enums.AttributeType;
  * plain one is either a share or a flat value, and writing both of those would silently let one win. {@code per_stack}
  * multiplies that number, so it cannot sit beside a {@code scale} (a second multiplier on the same value).
  */
-final class ModifyAttrOp implements OpHandler<OpArgs> {
+final class ModifyAttrOp implements OpHandler<ModifyAttrArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -23,12 +23,35 @@ final class ModifyAttrOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ModifyAttrArgs parse(EffectSpec effect) {
+        boolean permanent = TriggerLifetimes.unticked(effect);
+        // ⚠ `Integer.valueOf` on the placeholder: a `?:` mixing it with the boxed `getTurns()` would unbox a null and
+        // NPE before this op's own validator could refuse a missing duration.
+        Integer turns = permanent
+                ? Integer.valueOf(TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER)
+                : effect.getTurns();
+        return new ModifyAttrArgs(
+                effect.getAttribute(),
+                effect.getBuff(),
+                turns,
+                permanent,
+                effect.getRatio(),
+                Boolean.TRUE.equals(effect.getInstance()),
+                effect.getDamageType(),
+                Boolean.TRUE.equals(effect.getCoexist()),
+                effect.getWhileState(),
+                effect.getWhileStacks(),
+                effect.getWhileStacksMin(),
+                effect.getWhileHolderState(),
+                effect.getWhileHolderHpPercent(),
+                effect.getWhileHpPercent(),
+                effect.getWhileResource(),
+                effect.getWhileResourceMin(),
+                effect.getWhileSummonCount());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ModifyAttrArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         // A damage-type scope is only read on the INSTANCE route; stating it on an ordinary modifier would be silently
         // ignored, which is the hole the closed-set checks exist to close.
@@ -133,7 +156,7 @@ final class ModifyAttrOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.modifyAttr(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, ModifyAttrArgs args) {
+        TriggerEffects.modifyAttr(args, ctx.effect(), ctx.battle(), ctx.firing(), ctx.effect());
     }
 }

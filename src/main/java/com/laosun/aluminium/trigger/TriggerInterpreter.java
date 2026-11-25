@@ -431,7 +431,8 @@ public final class TriggerInterpreter {
             EffectSpec folded = effect.withPercent(effect.getPercent() * (perStepsStairs - 1));
             String folding = normalizeOp(effect, null);
             if ("MODIFY_ATTR".equals(folding)) {
-                TriggerEffects.modifyAttr(battle, folded, effectCtx);
+                var foldedAttr = (ModifyAttrOp) OpRegistry.find(TriggerOperator.MODIFY_ATTR);
+                TriggerEffects.modifyAttr((ModifyAttrArgs) foldedAttr.parse(folded), folded, battle, effectCtx, folded);
                 return;
             }
             if ("MODIFY_DAMAGE_TAKEN".equals(folding)) {
@@ -1224,7 +1225,7 @@ public final class TriggerInterpreter {
      * else a {@code per_stack} may name (a bare counter name, or {@code self_stacks:<NAME>}) can be
      * read from the carrier alone, and a live aura built on it needs no event.
      */
-    static boolean ctxFreeCounter(EffectSpec effect) {
+    static boolean ctxFreeCounter(Magnitude effect) {
         return effect.getPerStack() != null && !effect.getPerStack().isBlank()
                 && !COUNT_FORMS.contains(effect.getPerStack().trim());
     }
@@ -1232,7 +1233,7 @@ public final class TriggerInterpreter {
     /**
      * The counter name behind `self_stacks:<NAME>` (or the bare name), for a live reader.
      */
-    static String counterName(EffectSpec effect) {
+    static String counterName(Magnitude effect) {
         String stated = effect.getPerStack().trim();
         return stated.startsWith("self_stacks:") ? stated.substring("self_stacks:".length()).trim() : stated;
     }
