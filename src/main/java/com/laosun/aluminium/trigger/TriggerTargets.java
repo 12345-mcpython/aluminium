@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.engine.port.BattlePort;
+
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
@@ -28,7 +29,7 @@ import java.util.Locale;
  * that reports nothing. The set is checked at load time (see {@link TriggerValidator}), and
  * everything here assumes it already passed.
  *
- * <p>Note: Resolution needs a {@link Battle} for the group selectors -- "all enemies" is a
+ * <p>Note: Resolution needs a {@code Battle} for the group selectors -- "all enemies" is a
  * question about a camp, not about an effect -- while the single-target selectors answer
  * from the context alone. Both shapes live here because they share the vocabulary and the
  * {@code holder_of:} parsing that decides which one is being asked for.
@@ -49,7 +50,7 @@ final class TriggerTargets {
      * <p>{@code "all_allies"} (alias {@code "party"}) is what makes "all allies' ATK +X%" expressible.
      * It matters more than it looks: most buff talents in this game's data are party-wide, so without
      * this selector the trigger table would only cover self-buffs. It is resolved against
-     * {@link Battle#allies} - the camp, <b>not</b> {@code characters} - so a player-side summon counts as
+     * {@code Battle#allies} - the camp, <b>not</b> {@code characters} - so a player-side summon counts as
      * "our side" and receives the party buff too; and it therefore needs a battle, which the single-target
      * selectors do not.
      *
@@ -59,7 +60,7 @@ final class TriggerTargets {
      * @return the entities the effect applies to (never empty for the single-target selectors)
      * @throws IllegalStateException when {@code all_allies} is used without a battle
      */
-    static List<CanHit> resolveTargets(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static List<CanHit> resolveTargets(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         List<CanHit> resolved = resolveTargetsUnfiltered(battle, effect, ctx);
         if (ctx.targetFilter().isEmpty()) {
             return resolved;
@@ -184,7 +185,7 @@ final class TriggerTargets {
         };
     }
 
-    static List<CanHit> resolveTargetsUnfiltered(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static List<CanHit> resolveTargetsUnfiltered(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         String selector = normalizeTarget(effect);
         if (selector.startsWith(ENEMIES_WITH_STATE_PREFIX)) {
             // "对所有被标上【反击标记】的敌方目标…": the enemy side, filtered by a STATE. Reader: 1107 Clara's Skill.
@@ -564,7 +565,7 @@ final class TriggerTargets {
         return null;
     }
 
-    static List<CanHit> holderOf(Battle battle, String rawSelector, TriggerContext ctx) {
+    static List<CanHit> holderOf(BattlePort battle, String rawSelector, TriggerContext ctx) {
         String raw = rawSelector.trim();
         String state = raw.substring(TriggerVocabulary.HOLDER_OF_PREFIX.length()).trim();
         if (battle == null || ctx.owner() == null) {
@@ -590,7 +591,7 @@ final class TriggerTargets {
      * @param querier the unit whose SIDE is searched
      * @return the holder, or {@code null}
      */
-    static CanHit holderOfOrNull(Battle battle, String state, CanHit querier) {
+    static CanHit holderOfOrNull(BattlePort battle, String state, CanHit querier) {
         if (battle == null || querier == null || state == null) {
             return null;
         }
@@ -698,7 +699,7 @@ final class TriggerTargets {
      * The first character of the party (relic 31), or null when there is no battle.
      */
     static CanHit partyFirst(TriggerContext ctx) {
-        Battle battle = ctx.battle();
+        BattlePort battle = ctx.battle();
         if (battle == null || battle.characters().isEmpty()) {
             return null;
         }
@@ -713,7 +714,7 @@ final class TriggerTargets {
      * can be the acting unit itself), and taking the party's first ally is wrong too (that is the unit who just acted).
      */
     static CanHit nextAllyToAct(TriggerContext ctx) {
-        Battle battle = ctx.battle();
+        BattlePort battle = ctx.battle();
         if (battle == null || battle.queue() == null) {
             return null;
         }
@@ -743,7 +744,7 @@ final class TriggerTargets {
      * it (the five tiers differ only in how much energy is restored).
      */
     static CanHit randomAllyBelowHalfEnergy(TriggerContext ctx) {
-        Battle battle = ctx.battle();
+        BattlePort battle = ctx.battle();
         if (battle == null) {
             return null;
         }

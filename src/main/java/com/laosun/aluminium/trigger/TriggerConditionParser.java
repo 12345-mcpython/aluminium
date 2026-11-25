@@ -2,6 +2,7 @@ package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.TriggerSpec;
+import com.laosun.aluminium.engine.port.BattlePort;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.entity.Countdown;
@@ -1753,7 +1754,7 @@ final class TriggerConditionParser {
 
         @Override
         public boolean test(TriggerContext ctx) {
-            com.laosun.aluminium.Battle battle = ctx.battle();
+            BattlePort battle = ctx.battle();
             if (battle == null) {
                 return false;
             }
@@ -1806,7 +1807,7 @@ final class TriggerConditionParser {
 
         @Override
         public boolean test(TriggerContext ctx) {
-            com.laosun.aluminium.Battle battle = ctx.battle();
+            BattlePort battle = ctx.battle();
             if (battle == null) {
                 return false;
             }

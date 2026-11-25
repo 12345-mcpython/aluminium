@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.engine.port.BattlePort;
+
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -1434,7 +1435,7 @@ public class TriggerTable {
      * <b>field</b> rather than about the event: "忆灵在场时" ("while my Memosprite (忆灵) is out") asks what
      * units exist, and "我方全体" has to name them as effect targets. No event can carry that, because
      * it is not a fact about what just happened - it is a fact about the battlefield, and the battlefield
-     * is {@link Battle}. It is here for exactly those two questions and nothing else: a condition must
+     * is {@code Battle}. It is here for exactly those two questions and nothing else: a condition must
      * not use it to reach into engine state (that is what ops are for). A context built by hand without a
      * battle (as several tests do) makes any such condition <b>fail</b>, the same way a missing party
      * does - never silently pass.
@@ -1445,14 +1446,14 @@ public class TriggerTable {
      *                 hand-built context, which makes those conditions fail rather than guess)
      * @param ruleScope the rule id and the effect's per-target filter
      */
-    public record TriggerContext(TriggerSubject subject, EventFacts eventFacts, Battle battle,
+    public record TriggerContext(TriggerSubject subject, EventFacts eventFacts, BattlePort battle,
                                  RuleScope ruleScope, CastFacts castFacts) {
 
         /**
          * The same context for an event that carries no cast category - i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
-                              Damage damage, Battle battle, SkillCategory fromCast) {
+                              Damage damage, BattlePort battle, SkillCategory fromCast) {
             this(new TriggerSubject(owner, actor, target), new EventFacts(hitCount, amount, damage, fromCast),
                     battle, RuleScope.EMPTY, CastFacts.EMPTY);
         }
@@ -1582,7 +1583,7 @@ public class TriggerTable {
          * The same context for an event that carries no cast category - i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
-                              Damage damage, Battle battle) {
+                              Damage damage, BattlePort battle) {
             this(new TriggerSubject(owner, actor, target), new EventFacts(hitCount, amount, damage, null),
                     battle, RuleScope.EMPTY, CastFacts.EMPTY);
         }
@@ -2404,7 +2405,7 @@ public class TriggerTable {
          * vocabulary is built to avoid, so it fails the condition instead. The same rule every other
          * unreadable variable follows.
          */
-        private static double resourceValue(CanHit owner, String resource, Battle battle) {
+        private static double resourceValue(CanHit owner, String resource, BattlePort battle) {
             if (owner != null && owner.getResources().has(resource)) {
                 return owner.getResources().value(resource);
             }

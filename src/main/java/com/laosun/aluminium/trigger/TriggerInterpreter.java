@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.engine.port.BattlePort;
+
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -243,7 +244,7 @@ public final class TriggerInterpreter {
      * <p>Note: {@code getOpponents} does not filter the dead (the ops do, because only they know whether a dead unit is
      * something they can act on), so the filter lives here: "no target" means no LIVING one.
      */
-    private static boolean hasLivingOpponent(Battle battle, CanHit owner) {
+    private static boolean hasLivingOpponent(BattlePort battle, CanHit owner) {
         if (battle == null || owner == null) {
             return true;                          // nothing to judge the field with: deliver, as every rule did before
         }
@@ -262,7 +263,7 @@ public final class TriggerInterpreter {
      * @param rule   the matched rule
      * @param ctx    the context the rule was matched with
      */
-    public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
+    public static void apply(BattlePort battle, CompiledRule rule, TriggerContext ctx) {
         // A rule-level `pick`: resolved ONCE, before any effect runs, so several effects can name the same randomly chosen
         // unit. The stack in Battle keeps a nested firing (an effect that triggers another rule) from leaking its pick.
         boolean picked = battle != null && rule != null && rule.pick() != null && !rule.pick().isBlank();
@@ -298,7 +299,7 @@ public final class TriggerInterpreter {
      * @param rule   the rule being applied
      * @param ctx    the trigger context
      */
-    private static void applyUnchecked(Battle battle, CompiledRule rule, TriggerContext ctx) {
+    private static void applyUnchecked(BattlePort battle, CompiledRule rule, TriggerContext ctx) {
         int effectIndex = 0;
         double previousCredited = 0;
         // `one_of`: ONE of the rule's effects runs, picked at random. Rolled HERE, once per firing, and not inside the
@@ -479,7 +480,7 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      * @return how many rules fired (useful for tests and diagnostics)
      */
-    public static int fire(Battle battle, TriggerTable table, TriggerEvent event, TriggerContext ctx) {
+    public static int fire(BattlePort battle, TriggerTable table, TriggerEvent event, TriggerContext ctx) {
         if (table == null || table.isEmpty()) {
             return 0;
         }
@@ -673,7 +674,7 @@ public final class TriggerInterpreter {
      * @param args             the shape parsed at load time, or {@code null} when the effect is an amended copy and
      *                         has to be parsed again before it can be performed
      */
-    private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx,
+    private static void applyOne(BattlePort battle, EffectSpec effect, TriggerContext ctx,
                                  double previousCredited, OpArgs args) {
         // ⚠ The only place that sees EVERY rule effect: the engine announces effects elsewhere, but a rule whose
         // effect is a skill-level raise or a resource gain reaches no other hook at all.
@@ -768,7 +769,7 @@ public final class TriggerInterpreter {
      * settlement would interleave two hits' events.
      */
     static void shareDamage(EffectSpec effect, TriggerContext ctx) {
-        Battle battle = ctx.battle();
+        BattlePort battle = ctx.battle();
         var damage = ctx.damage();
         if (battle == null || damage == null) {
             throw new IllegalStateException(
@@ -787,8 +788,8 @@ public final class TriggerInterpreter {
     }
 
     static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
-        Battle battle = ctx.battle();
-        Battle.PendingCast cast = battle == null ? null : battle.currentCast();
+        BattlePort battle = ctx.battle();
+        var cast = battle == null ? null : battle.currentCast();
         if (cast == null) {
             throw new IllegalStateException(
                     "DELEGATE_DAMAGE ran with no cast in progress; CAST_SETUP is fired by SkillExecutor.execute "
@@ -838,7 +839,7 @@ public final class TriggerInterpreter {
      * impossible, and the fix cannot be "pay the resolved unit N times": the amount differs per recipient, so the
      * resolution - not the amount - had to become a list.
      */
-    static void gainEnergy(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void gainEnergy(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             gainEnergyFor(battle, effect, ctx, target);
         }
@@ -851,7 +852,7 @@ public final class TriggerInterpreter {
      * a share of nothing is not a number - that is a loud failure rather than a silent grant of 0, the same call
      * the scale family makes everywhere else.
      */
-    private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
+    private static void gainEnergyFor(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
         if (effect.getValue() != null) {
             // One whole magnitude: `fixed` still decides whether the energy-regeneration rate touches it.
             double amount = TriggerMagnitudes.valueOf(effect, ctx);
@@ -1490,7 +1491,7 @@ public final class TriggerInterpreter {
      *               {@code target})
      * @param ctx    the context
      */
-    static void modifyDamageTaken(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void modifyDamageTaken(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         // Note: A DERIVED magnitude, not `percent`: "at 1 stack raise the damage the enemy takes by 15.00%, and thereafter each additional 1 stack raises it by
         // 5.00%" (1218 椒丘) is `amount + percent x layers`, so a zone reads its own value the same way a MODIFY_ATTR
         // does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently IGNORED -- worse than refusing
@@ -1826,7 +1827,7 @@ public final class TriggerInterpreter {
      *
      * @return {@code true} when the state was attached (or when the rule stated no chance at all)
      */
-    static boolean attachRolled(Battle battle, CanHit target, AbstractBuff buff, EffectSpec effect,
+    static boolean attachRolled(BattlePort battle, CanHit target, AbstractBuff buff, EffectSpec effect,
                                 TriggerContext ctx) {
         Double statedChance = TriggerMagnitudes.baseChanceOf(effect, ctx);
         if (statedChance == null) {
@@ -1906,7 +1907,7 @@ public final class TriggerInterpreter {
      * @param id     the resource id
      * @return the total, summing both stores when there is a battle to ask
      */
-    static int resourceAmount(Battle battle, CanHit owner, String id) {
+    static int resourceAmount(BattlePort battle, CanHit owner, String id) {
         int total = (owner == null || !owner.getResources().has(id)) ? 0 : owner.getResources().value(id);
         return battle == null ? total : total + battle.partyResourceValue(id);
     }
@@ -1925,7 +1926,7 @@ public final class TriggerInterpreter {
      * @param resource the resource whose value moved
      * @param delta    how much it moved (positive for a gain, negative for a spend)
      */
-    static void fireResourceChanged(Battle battle, TriggerContext ctx, String resource, int delta) {
+    static void fireResourceChanged(BattlePort battle, TriggerContext ctx, String resource, int delta) {
         fireResourceChanged(battle, ctx, ctx.owner(), resource, delta);
     }
 
@@ -1934,7 +1935,7 @@ public final class TriggerInterpreter {
      *
      * @param holder the unit the moved store belongs to (its own counter, or its copy of a PARTY one)
      */
-    static void fireResourceChanged(Battle battle, TriggerContext ctx, CanHit holder, String resource,
+    static void fireResourceChanged(BattlePort battle, TriggerContext ctx, CanHit holder, String resource,
                                             int delta) {
         if (battle == null || holder == null) {
             return;
@@ -1965,7 +1966,7 @@ public final class TriggerInterpreter {
      * <p>Note: The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
      * reads it back, so it needs no id).
      */
-    static void startCountdown(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void startCountdown(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         String name = effect.getBuff() == null || effect.getBuff().isBlank()
                 ? (ctx.owner() == null ? "countdown" : ctx.owner().getName() + " 倒计时")
                 : effect.getBuff().trim();
@@ -2109,7 +2110,7 @@ public final class TriggerInterpreter {
      * <p>⚠ A resolved target that is <b>not</b> a summon is a data error, not a silent no-op: "dismiss" applied to a
      * character would read as working (nothing happens) while the sentence is about something else entirely.
      */
-    static void dismissSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void dismissSummon(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (!(target instanceof com.laosun.aluminium.entity.Summon summon)) {
                 throw new IllegalStateException("DISMISS_SUMMON resolved "
@@ -2126,7 +2127,7 @@ public final class TriggerInterpreter {
      * for. Only the owner's own applications are touched - the sentence is about the burn SHE applied - and only the element the
      * rule names.
      */
-    static void boostDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void boostDot(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         double factor = 1 + TriggerMagnitudes.shareOf(effect, ctx);
         com.laosun.aluminium.enums.DamageElement onlyElement =
                 effect.getElement() == null || effect.getElement().isBlank()
@@ -2153,7 +2154,7 @@ public final class TriggerInterpreter {
      * one turn; a buff covers both, expires by itself, and can be removed by name like any other state.
      *
      * <p>Note: <b>What it does NOT do</b> is touch a specific state: the check lives in
-     * {@link Battle#tryApplyDebuff}, which asks the victim for its resistance to the <b>class</b> the incoming state
+     * {@code Battle#tryApplyDebuff}, which asks the victim for its resistance to the <b>class</b> the incoming state
      * declares ({@code AbstractBuff.debuffClass()}). So a control written tomorrow is covered by a resistance written
      * today - the property that makes "immune to control-class negative states" mean the whole family rather than a list of keys.
      *
@@ -2162,7 +2163,7 @@ public final class TriggerInterpreter {
      * is what the closed vocabularies exist to avoid.
      */
 
-    static void resistDebuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void resistDebuff(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         DebuffClass kind = DebuffClass.fromString(effect.getKind());
         // kind may be absent: RESIST_DEBUFF without a class means ANY negative state (1409s immunity clause).
         boolean permanent = TriggerLifetimes.unticked(effect);
@@ -2396,7 +2397,7 @@ public final class TriggerInterpreter {
      * @param ctx    the trigger context
      * @return the repetition count, or {@code 0} when {@code times_from} resolves to zero
      */
-    static int timesCount(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static int timesCount(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         int times = effect.getTimes() == null ? 1 : effect.getTimes();
         String from = effect.getTimesFrom();
         if (from == null) {
@@ -2486,7 +2487,7 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      * @param victim the unit this instance is settled against
      */
-    private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim) {
+    private static void damage(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit victim) {
         damage(battle, effect, ctx, victim, 1);
     }
 
@@ -2496,7 +2497,7 @@ public final class TriggerInterpreter {
      * @param divisor how many victims are sharing the stated magnitude ({@code 1} = the ordinary per-victim reading;
      *                see {@link EffectSpec#getSplit()})
      */
-    static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
+    static void damage(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
         damage(battle, effect, ctx, victim, divisor, 1.0);
     }
 
@@ -2505,7 +2506,7 @@ public final class TriggerInterpreter {
      *
      * @param blastShare the fraction of the centre's magnitude a neighbour takes ({@code 1.0} for the centre itself)
      */
-    private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor,
+    private static void damage(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor,
                                double blastShare) {
         CanHit attacker = ctx.owner();
         // `"attacker": "summon"`: the sentence says the MEMOSPRITE deals it (1409's 忆灵技1: 「小伊卡对敌方全体造成…」).
@@ -2710,7 +2711,7 @@ public final class TriggerInterpreter {
      * @param battle the battle
      * @return the summed current HP
      */
-    private static double totalHp(com.laosun.aluminium.Battle battle) {
+    private static double totalHp(BattlePort battle) {
         double total = 0;
         for (CanHit unit : battle.allies()) {
             total += unit.getCurrentHp();

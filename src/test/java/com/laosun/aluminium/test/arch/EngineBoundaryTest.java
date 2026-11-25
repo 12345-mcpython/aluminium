@@ -38,8 +38,13 @@ public class EngineBoundaryTest {
     private static final String BATTLE = "com.laosun.aluminium.Battle";
     private static final String BATTLE_PACKAGE = "com.laosun.aluminium.battle.";
 
-    /** Packages that may hold the engine's handle: the engine itself, and the two factories that build one. */
-    private static final Set<String> ALLOWED = Set.of("", "battle", "utils");
+    /**
+     * Packages that may hold the engine's handle: the engine itself, the two factories that build one, and the port
+     * package - which is the boundary rather than a caller of it. {@code engine.port.BattlePort} names {@code Battle}
+     * exactly once, in the escape hatch that hands a whole battle to a {@code Skill}; when that hatch is gone the port
+     * package stops naming the engine at all.
+     */
+    private static final Set<String> ALLOWED = Set.of("", "battle", "engine", "utils");
 
     /**
      * The backlog: packages that still hold a {@code Battle} and must stop. Each one is a target of the port work.
@@ -48,13 +53,16 @@ public class EngineBoundaryTest {
      * <ul>
      *   <li>{@code buff} - {@code AbstractBuff}/{@code BuffManager} and four buff classes, for {@code fireStateEnded};</li>
      *   <li>{@code event} - the eleven hooks take {@code Battle} as their first argument;</li>
-     *   <li>{@code trigger} - the interpreter executes effects against the engine, which is the point of it;</li>
      *   <li>{@code entity} - {@code CanHit.onKill(Battle, ...)} and friends;</li>
      *   <li>{@code damage} / {@code skill} / {@code enemy} / {@code data} / {@code ai} - one or two files each.</li>
      * </ul>
+     *
+     * <p><b>{@code trigger} is no longer here</b>: it was the largest holder (eight files) and now reaches the engine
+     * only through {@code engine.port.BattlePort}. That is what the port was for, and this list is where the progress
+     * shows.
      */
     private static final Set<String> KNOWN = Set.of(
-            "ai", "buff", "damage", "data", "enemy", "entity", "event", "skill", "trigger");
+            "ai", "buff", "damage", "data", "enemy", "entity", "event", "skill");
 
     @Test
     public void noPackageOutsideTheEngineHoldsABattle() throws IOException {

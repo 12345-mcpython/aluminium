@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.engine.port.BattlePort;
+
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.DoubleValue;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -83,7 +84,7 @@ final class TriggerEffects {
      *               {@code permanent}, optional {@code max_stacks}, {@code target})
      * @param ctx    the context
      */
-    static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void modifyAttr(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         AttributeType attribute = AttributeType.fromString(effect.getAttribute());
         // A derived magnitude - "the raise is equal to X% + Y% of <somebody's attribute>". It is computed once,
         // when the rule fires, and it is an ABSOLUTE number in the target attribute's units: the documents that
@@ -364,7 +365,7 @@ final class TriggerEffects {
      * <p>Note: <b>toughness must be carried by itself</b> -  - the precedent's own words: *when a cast is DELEGATED the executor expands no damage of its
      * own, so the stance would otherwise be dropped on the floor*. Note: Do not drop {@code stanceFor(true)}.
      */
-    static void castSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void castSkill(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         CanHit actor = TriggerTargets.require(TriggerTargets.resolveTarget(effect, ctx), "target", ctx);
         SkillType slot = effect.getSkill() == null || effect.getSkill().isBlank()
                 ? null
@@ -477,7 +478,7 @@ final class TriggerEffects {
             }
             battle.markNextCastCountedLaughs(effect.getCastCountedLaughs());
         }
-        skill.execute(battle, actor, victims);
+        skill.execute(battle.engine(), actor, victims);
         // The moment "after the surprise attack ends" names: the commanded cast has finished, the original continues afterwards. A
         // commanded cast announces the same CAST_SETUP / SKILL_CAST a real one does, so this is the only event that
         // tells it apart -- see `TriggerEvent.INSERTED_CAST_END`.
@@ -500,7 +501,7 @@ final class TriggerEffects {
      *
      * <p><b>Why the roll is per target.</b> A base chance is rolled for each victim - three enemies can see three
      * different outcomes, which is what "each target has its own 50% chance" means and what the rule-level {@code chance}
-     * (one roll per firing) could not express. It goes through {@link Battle#tryApplyDebuff}, the same entry point
+     * (one roll per firing) could not express. It goes through {@code Battle#tryApplyDebuff}, the same entry point
      * the enemy-side debuff path uses, so the applier's Effect Hit Rate, the victim's Effect RES and its per-state
      * resistance ({@code STAT_CTRL_Frozen} - the reason {@code ControlEffect.resistKey} exists) all apply.
      *
@@ -509,7 +510,7 @@ final class TriggerEffects {
      * is registered rather than folded in here as a field nobody else can use. What this op attaches is the state
      * itself, so "cannot act" is complete.
      */
-    static void applyControl(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void applyControl(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         Constant.ControlEffect control = Constant.CONTROL_STATES.get(effect.getControl().trim());
         if (control == null) {
             // Load-time validation already refused this; reaching here means the table changed under a compiled
@@ -573,7 +574,7 @@ final class TriggerEffects {
      *               {@code target})
      * @param ctx    the context
      */
-    static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void applyState(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         boolean permanent = TriggerLifetimes.unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         // 「植入 1 个随机【缺陷】」: one name out of the list, chosen with the battle's RNG (same source as every other
@@ -684,12 +685,12 @@ final class TriggerEffects {
      * means her attack at that moment, not a live link to her panel (the same snapshot rule every derived value
      * follows).
      *
-     * <p>A {@code base_chance} rolls per target through the same pipeline as a control ({@link Battle#tryApplyDebuff}),
+     * <p>A {@code base_chance} rolls per target through the same pipeline as a control ({@code Battle#tryApplyDebuff}),
      * with no specific-resistance key: the data's {@code STAT_*} resistances are per <i>state</i>, and a DOT's
      * state is its element - which the four-element family has no key for. (That is a fact about the data, not a
      * shortcut: adding one later is passing a key here.)
      */
-    static void applyDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void applyDot(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         // No element named = EVERY DoT on the target ("所有持续伤害"), one instance each.
         DamageElement element = effect.getElement() == null || effect.getElement().isBlank()
                 ? null
@@ -724,7 +725,7 @@ final class TriggerEffects {
      * directions - a unit below the goal gains layers, one above loses them - and layers already equal are left alone,
      * which is what "set" means. Reader: 1218 Jiaoqiu's Ultimate (「把敌方目标的层数统一设置为场上最高值」).
      */
-    static void setStacks(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void setStacks(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         String name = effect.getBuff() == null ? "" : effect.getBuff().trim();
         double wanted = TriggerMagnitudes.resolveScale(effect.getScale(),
                 effect.getPercent() == null ? 1 : effect.getPercent(), ctx);
@@ -757,7 +758,7 @@ final class TriggerEffects {
      * with {@code target_stacks:<name> >= 2}, and without a cap a stray extra event would push the count past it and
      * the rule that resets it would fire twice in a row.
      */
-    static void addStack(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void addStack(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         // "the sentence states no ceiling" is not "one layer": `unbounded_stacks` asks for the largest cap the engine can
         // hold, so the counter keeps every layer the rules give it.
         int cap = effect.stackCap() != null ? effect.stackCap()
@@ -894,7 +895,7 @@ final class TriggerEffects {
      * <p>Note: Its name is required, and not for bookkeeping: "the regeneration effect produced by casting the Skill is extended by 1 turn" (1105 trace 调理) and any
      * removal by name reach it through that string, exactly as a relic set's temporary buff does.
      */
-    static void applyRegen(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void applyRegen(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         String name = effect.getBuff() == null ? "" : effect.getBuff().trim();
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
@@ -911,7 +912,7 @@ final class TriggerEffects {
         }
     }
 
-    static void taunt(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void taunt(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             // Note: Through the resist pipeline like every other negative state: "make the target enter the taunt state" states no
             // probability, which means a 100% BASE chance - the game still runs it through Effect Hit Rate / Effect RES. Writing
@@ -935,7 +936,7 @@ final class TriggerEffects {
      * @param effect the effect ({@code amount}, optional {@code target})
      * @param ctx    the context
      */
-    static void dispel(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void dispel(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         // A CLASS may be named: "remove ... all control-class negative states" (1415's memosprite skill 8). With a class and
         // no amount it means ALL of that class -- "all" spells no count -- which is why the validation below accepts either.
         com.laosun.aluminium.enums.DebuffClass kind = effect.getKind() == null || effect.getKind().isBlank()
@@ -970,7 +971,7 @@ final class TriggerEffects {
      * @param effect the effect ({@code attribute}, {@code amount}, optional {@code target})
      * @param ctx    the context
      */
-    static void removeStacks(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void removeStacks(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         int amount = effect.getValue() != null
                 ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
                 : (int) Math.round(effect.getAmount());
@@ -1009,7 +1010,7 @@ final class TriggerEffects {
      * "negative effects on the carrier", and the two sentences mean opposite things about the same word ("remove"). Keeping
      * them apart is also what lets each one be validated and tested on its own.
      */
-    static void removeBuffs(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void removeBuffs(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         int amount = effect.getValue() != null
                 ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
                 : (int) Math.round(effect.getAmount());
@@ -1030,7 +1031,7 @@ final class TriggerEffects {
      * <p>Note: The replacement is built ONCE per rule firing and shared by every resolved target: it is a skill, not state, and
      * the buff restores whatever each target had in that slot.
      */
-    static void replaceSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void replaceSkill(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         com.laosun.aluminium.entity.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
         SkillType slot;
         try {
@@ -1083,7 +1084,7 @@ final class TriggerEffects {
     /**
      * {@code TICK_DOT}: "immediately produce 1 instance of ... damage" - one extra instance of the named state, at the stated share.
      */
-    static void tickDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void tickDot(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         DamageElement element = DamageElement.fromString(effect.getElement());
         // Note: The share comes from `shareOf`, not from `percent` directly: a rule may state it as `percent_from_resource`, and unboxing `percent` here
         // NPEs. `shareOf` is the engine's own resolver for every share spelling.
@@ -1114,7 +1115,7 @@ final class TriggerEffects {
      * <p>Nothing to lengthen is <b>not</b> an error: the rule fires whenever its event happens (usually the same
      * cast that applied the buff), and "the target carries nothing of mine" is an ordinary empty case.
      */
-    static void extendBuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void extendBuff(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
                 continue;
@@ -1142,7 +1143,7 @@ final class TriggerEffects {
      * settled as one {@link DamageType#SUPER_BREAK} instance, taking the zones and resistance of the element the
      * triggering attack used.
      */
-    static void superBreak(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void superBreak(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         Damage source = ctx.damage();
         if (source == null || source.getStance() <= 0) {
             return;                                   // nothing to convert: an instance that reduces no toughness
@@ -1166,7 +1167,7 @@ final class TriggerEffects {
      * alternative (a field on the damage instance) would need the reduction to be part of the instance, which is exactly
      * what the engine's split (damage first, then a second number) avoids.
      */
-    static void boostToughness(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void boostToughness(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (target == null) {
                 continue;
@@ -1206,7 +1207,7 @@ final class TriggerEffects {
      * thing this method adds - and it must filter to the <b>living</b>, because {@code EnemySkill} takes the
      * first entry of the list it is handed as the main target.
      */
-    static void commandSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void commandSummon(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
         CanHit summon = TriggerTargets.requireSummon(ctx);
         Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
         SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
@@ -1249,7 +1250,7 @@ final class TriggerEffects {
                 // this is the one that actually swings. `stanceFor(true)` is the skill's main-target column: for
                 // an AOE that is `all` (per victim, matching the caster-side path), for BLAST `single`.
                 skill.getData().stanceFor(true));
-        attack.execute(battle, summon, victims);
+        attack.execute(battle.engine(), summon, victims);
     }
 
     /**

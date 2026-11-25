@@ -8,6 +8,7 @@ import com.laosun.aluminium.damage.Damage;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.energy.EnergyGain;
+import com.laosun.aluminium.engine.port.BattlePort;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.entity.Countdown;
@@ -26,7 +27,7 @@ import lombok.Setter;
 import java.util.*;
 
 
-public class Battle {
+public class Battle implements BattlePort {
     /**
      * Battle state machine.
      *
@@ -265,8 +266,16 @@ public class Battle {
             new DebuffService(this, triggerBus);
 
     /**
-     * @param observer the damage observer
+     * {@inheritDoc}
+     *
+     * <p>The one method on {@link BattlePort} that is <b>not</b> a piece of the engine's surface: it returns the engine
+     * itself, for the two call sites that still hand a whole battle to a {@code Skill} or an {@code AttackSequence}.
      */
+    @Override
+    public Battle engine() {
+        return this;
+    }
+
     public void addDamageObserver(DamageObserver observer) {
         observers.addDamage(observer);
     }

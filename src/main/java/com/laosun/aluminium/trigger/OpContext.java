@@ -1,6 +1,6 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.engine.port.BattlePort;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.entity.CanHit;
 
@@ -16,7 +16,7 @@ import java.util.Random;
  * a handler be called with no rule in sight.
  *
  * <p><b>What is deliberately not here.</b> The target helpers below are how a handler should reach a unit; the raw
- * {@link Battle} stays visible because most ops still call it directly. The {@code engine.port} extraction replaces
+ * {@code Battle} stays visible because most ops still call it directly. The {@code engine.port} extraction replaces
  * that field with a narrow interface, and every handler written against these helpers survives that change.
  *
  * @param battle           the battlefield, possibly {@code null} for a single-target selector call from a unit test
@@ -24,7 +24,7 @@ import java.util.Random;
  * @param effect           the effect being executed
  * @param previousCredited how much the previous effect of the same rule actually moved
  */
-record OpContext(Battle battle, TriggerTable.TriggerContext firing, EffectSpec effect, double previousCredited) {
+record OpContext(BattlePort battle, TriggerTable.TriggerContext firing, EffectSpec effect, double previousCredited) {
 
     /**
      * The units this effect reaches, in the order the selector produced them, with the effect's own

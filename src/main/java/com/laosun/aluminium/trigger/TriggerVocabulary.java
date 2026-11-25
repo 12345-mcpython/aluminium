@@ -1,6 +1,5 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
 
 import java.util.Set;
 
@@ -224,10 +223,10 @@ final class TriggerVocabulary {
      * "The whole of the <b>other</b> side" - "to all enemies".
      *
      * <p>Its first user is Himeko (姬子)'s Talent ("deal Fire damage equal to 140% of Himeko (姬子)'s ATK to all enemies"). Every other
-     * group selector reads {@link Battle#allies}, so "all enemies" had no spelling at all: the only way to reach
+     * group selector reads {@code Battle#allies}, so "all enemies" had no spelling at all: the only way to reach
      * the other camp was {@code target}, one unit at a time, which is not what "all" says.
      *
-     * <p>Read through {@link Battle#getOpponents}, so "the enemy side" means "the camp opposing the rule's owner" rather
+     * <p>Read through {@code Battle#getOpponents}, so "the enemy side" means "the camp opposing the rule's owner" rather
      * than "the {@code enemies} list" - the same answer for every character (they are all on our side), and the
      * honest one if a rule ever belongs to an enemy. Note: The dead are <b>not</b> filtered here: like
      * {@code all_allies}, the selector answers "who is on that side", and the op decides what it can do with

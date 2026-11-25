@@ -1,6 +1,5 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.NumberProvider;
@@ -25,7 +24,7 @@ import java.util.Set;
  * and having it do nothing -- is the failure mode the whole closed-set vocabulary exists to
  * prevent, because a rule that never fires reports nothing.
  *
- * <p>Nothing here touches a {@link Battle}: an effect is validated when its file is read,
+ * <p>Nothing here touches a {@code Battle}: an effect is validated when its file is read,
  * long before there is a battle to run it in. That is also why the helpers below build
  * error messages from the spec rather than from engine state.
  */

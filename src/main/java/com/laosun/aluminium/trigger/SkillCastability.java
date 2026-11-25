@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
-import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.engine.port.BattlePort;
+
 import com.laosun.aluminium.beans.SkillEffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.entity.CanHit;
@@ -39,7 +40,7 @@ public final class SkillCastability {
      * @param battle the battle it happens in
      * @return {@code true} when the row states no gate, or every spelled condition holds
      */
-    public static boolean allows(Skill skill, CanHit caster, Battle battle) {
+    public static boolean allows(Skill skill, CanHit caster, BattlePort battle) {
         // 「单场战斗中只能施放 1 次」: history, not a resource - the battle remembers whether the one cast was spent.
         if (battle != null && !battle.singleUseLeft(skill)) {
             return false;
