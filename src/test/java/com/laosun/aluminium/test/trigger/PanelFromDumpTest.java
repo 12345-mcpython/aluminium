@@ -4,6 +4,7 @@ import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.compare.AccountLoadout;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -40,7 +41,13 @@ public class PanelFromDumpTest {
 
     /**
      * Every character's ATTACK and DEFENCE is the capture's own number once the account's relics and cone are applied.
+     *
+     * <p><b>PARKED:</b> {@code dump_data.json} is the re-geared 2026-11-25 account while these facts are a 2026-10-31
+     * capture. Re-enable against a capture recorded on the current build, or against the dump of this one - do not
+     * re-pin the numbers, which would make the case assert the engine against itself.
      */
+    @Disabled("dump_data.json is the 2026-11-25 account while these facts are a 2026-10-31 capture; needs a capture "
+            + "from the current build.")
     @Test
     public void thePanelsAreTheCapturesNumbers() {
         Map<Integer, java.util.List<com.google.gson.JsonObject>> dump = AccountLoadout.dump();
