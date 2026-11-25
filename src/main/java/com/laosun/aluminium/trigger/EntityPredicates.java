@@ -9,6 +9,7 @@ import com.laosun.aluminium.entity.Character;
 import com.laosun.aluminium.entity.Summon;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
+import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.trigger.TriggerTable.Condition;
 import com.laosun.aluminium.trigger.TriggerTable.TriggerContext;
@@ -304,9 +305,7 @@ final class EntityPredicates {
             }
             case "cid" -> unit instanceof Character character && inRange(character.getCid(), value);
             case "state" -> anyOf(value, state -> unit.getBuffManager().hasState(state));
-            case "path" -> anyOf(value, name -> unit instanceof Character character
-                    && character.getPath() != null
-                    && character.getPath().name().equalsIgnoreCase(name.trim()));
+            case "path" -> anyOf(value, name -> isOfPath(unit, name));
             case "element" -> anyOf(value, name -> unit instanceof Character character
                     && character.getElement() != null
                     && character.getElement().name().equalsIgnoreCase(name.trim()));
@@ -433,6 +432,22 @@ final class EntityPredicates {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Whether a unit walks a named Path, judged by IDENTITY rather than by display name.
+     *
+     * <p>{@code Path.fromNameOrNull} answers both the display word and the ASCII identity, so a migrated
+     * condition ({@code target has_path harmony}) and an unmigrated one ({@code 同谐}) name the same Path and
+     * neither can pass by accident on another Path's spelling.
+     *
+     * @param unit the unit asked
+     * @param name the Path as the condition spells it
+     * @return whether that unit walks it
+     */
+    private static boolean isOfPath(CanHit unit, String name) {
+        Path wanted = Path.fromNameOrNull(name.trim());
+        return wanted != null && unit instanceof Character character && character.getPath() == wanted;
     }
 
     /**

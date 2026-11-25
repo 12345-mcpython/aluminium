@@ -3098,7 +3098,9 @@ final class TriggerConditionParser {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' has unknown \"has_path\" name '" + name + "'; the Paths are "
                             + String.join(", ", com.laosun.aluminium.enums.Path.names().stream().sorted().toList())
-                            + " (source: " + spec.getSource() + ")");
+                            + " (ASCII identities: "
+                            + String.join(", ", com.laosun.aluminium.enums.Path.identities().stream().sorted().toList())
+                            + ")" + " (source: " + spec.getSource() + ")");
         }
         return path;
     }

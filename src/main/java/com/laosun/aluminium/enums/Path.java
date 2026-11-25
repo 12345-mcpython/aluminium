@@ -98,6 +98,27 @@ public enum Path {
             Map.entry("记忆", REMEMBRANCE));
 
     /**
+     * The nine Paths by their <b>ASCII identity</b> - what a rule file may write instead of the Chinese
+     * name ({@code allies_with_path:erudition >= 1}).
+     *
+     * <p><b>Why a third map and not {@link #BY_MT}.</b> The data-side {@code mt} is NOT the Path's name:
+     * Erudition's is {@code all}, Harmony's {@code help}, Preservation's {@code protection}, Hunt's
+     * {@code single}. Those are aggregation buckets the data file happens to use, and a condition written
+     * {@code allies_with_path:all >= 1} would read as "every path at once". So the identity is a name of its
+     * own, and {@code fromMt} keeps its separate job.
+     */
+    private static final Map<String, Path> BY_IDENTITY = Map.ofEntries(
+            Map.entry("preservation", PRESERVATION),
+            Map.entry("destruction", DESTRUCTION),
+            Map.entry("hunt", HUNT),
+            Map.entry("erudition", ERUDITION),
+            Map.entry("harmony", HARMONY),
+            Map.entry("nihility", NIHILITY),
+            Map.entry("abundance", ABUNDANCE),
+            Map.entry("elation", ELATION),
+            Map.entry("remembrance", REMEMBRANCE));
+
+    /**
      * The raw Path string on the data side (the {@code mt} of {@code character_data.json}).
      */
     private final String mt;
@@ -142,11 +163,31 @@ public enum Path {
      * become "the target is on some other Path", i.e. a condition that quietly means something else - so the
      * condition DSL refuses it at load time, and it needs a lookup that can say "not a Path".
      *
-     * @param name the Chinese Path name
+     * <p>Both spellings are understood: the Chinese display word and the ASCII identity
+     * ({@code 同谐} and {@code harmony}), so a migrated rule and an unmigrated one mean the same Path.
+     *
+     * @param name the Path's display name or its ASCII identity
      * @return the Path, or {@code null} when the name is not one of the nine
      */
     public static Path fromNameOrNull(String name) {
-        return name == null ? null : BY_NAME.get(name);
+        if (name == null) {
+            return null;
+        }
+        Path path = BY_NAME.get(name);
+        if (path == null) {
+            path = BY_IDENTITY.get(name);
+        }
+        if (path != null) {
+            return path;
+        }
+        // The enum's own constant name is a name too ("HARMONY"): the predicate test and any hand-written
+        // probe spell it that way, and it was accepted before the identities existed.
+        for (Path candidate : values()) {
+            if (candidate.name().equalsIgnoreCase(name)) {
+                return candidate;
+            }
+        }
+        return null;
     }
 
     /**
@@ -154,5 +195,12 @@ public enum Path {
      */
     public static java.util.Set<String> names() {
         return BY_NAME.keySet();
+    }
+
+    /**
+     * The ASCII identities of the nine Paths, for the same error messages.
+     */
+    public static java.util.Set<String> identities() {
+        return BY_IDENTITY.keySet();
     }
 }
