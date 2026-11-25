@@ -1915,44 +1915,6 @@ public final class TriggerInterpreter {
             }
         }
     }
-    /**
-     * {@code RESIST_DEBUFF}: "raise the chance to resist <b>control-class</b> negative states by 35%" / "immune to <b>control-class</b> negative states" - the resolved targets
-     * become harder to control (or burn), for the stated duration or for the whole battle.
-     *
-     * <p><b>Why it is a buff on the carrier.</b> Clara (克拉拉)'s Guardian (守护) is a permanent trace, while Silver Wolf (银狼) LV.999's [防火墻] lasts
-     * one turn; a buff covers both, expires by itself, and can be removed by name like any other state.
-     *
-     * <p>Note: <b>What it does NOT do</b> is touch a specific state: the check lives in
-     * {@code Battle#tryApplyDebuff}, which asks the victim for its resistance to the <b>class</b> the incoming state
-     * declares ({@code AbstractBuff.debuffClass()}). So a control written tomorrow is covered by a resistance written
-     * today - the property that makes "immune to control-class negative states" mean the whole family rather than a list of keys.
-     *
-     * <p>Note: {@code percent: 1} is immunity in this vocabulary, and that is deliberate: "immune to control-class negative states" and
-     * "raise the chance to resist control-class negative states by 35%" are the same mechanic at different strengths, and two spellings for one mechanic
-     * is what the closed vocabularies exist to avoid.
-     */
-
-    static void resistDebuff(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        DebuffClass kind = DebuffClass.fromString(effect.getKind());
-        // kind may be absent: RESIST_DEBUFF without a class means ANY negative state (1409s immunity clause).
-        boolean permanent = TriggerLifetimes.unticked(effect);
-        if (effect.getCharges() != null) {
-            // 「抵抗 1 次负面效果，2 回合后可再次触发」 (1207's 襄尺): a charge shield, not a percentage.
-            int cooldown = effect.getCooldown() == null ? 0 : effect.getCooldown();
-            for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                target.getBuffManager().addBuff(named(
-                        withSource(new DebuffShieldBuff(effect.getCharges(), cooldown), ctx), effect));
-            }
-            return;
-        }
-        int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-            AbstractBuff resist = withSource(TriggerLifetimes.withTickOwner(TriggerLifetimes.withLifetime(
-                    new ClassResistBuff(kind, TriggerMagnitudes.shareOf(effect, ctx), turns, permanent), effect), effect, ctx), ctx);
-            // the name is optional and only content that asks for it gets it (see `named`)
-            target.getBuffManager().addBuff(named(resist, effect));
-        }
-    }
 
     /**
      * Gives a freshly built buff the <b>name the data stated</b> ({@code "buff": "协奏"}), when it states one.
@@ -1960,9 +1922,9 @@ public final class TriggerInterpreter {
      * <p>Note: Unnamed is the normal case and stays exactly as it was: {@code BuffManager.removeState} skips modifiers and
      * resistances with no name, so only the content that asks for a name gets the "removable by that name" lifetime.
      */
-    private static <T extends AbstractBuff> T named(T buff, EffectSpec effect) {
-        if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
-            buff.setBuffName(effect.getBuff().trim());
+    static <T extends AbstractBuff> T named(T buff, String name) {
+        if (name != null && !name.isBlank()) {
+            buff.setBuffName(name.trim());
         }
         return buff;
     }
