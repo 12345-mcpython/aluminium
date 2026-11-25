@@ -733,8 +733,9 @@ public class TriggerTable {
             throw new IllegalArgumentException(
                     "Trigger on " + event.value() + " has no effects (source: " + spec.getSource() + ")");
         }
+        List<OpArgs> compiledArgs = new ArrayList<>();
         for (EffectSpec effect : effects) {
-            TriggerInterpreter.validate(effect, spec);
+            compiledArgs.add(TriggerInterpreter.validate(effect, spec));
             // Note: The "which events can carry this op" checks live HERE, not in the interpreter's validation switch: that
             // switch sees one effect at a time and knows no event, while every rule here is compiled with its own.
             // `SUPER_BREAK` reads "the toughness reduction of this damage" off the settled instance, so DEALING_DAMAGE is the only moment it can
@@ -791,7 +792,8 @@ public class TriggerTable {
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters), List.copyOf(preferences),
                 validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec),
                 spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim(),
-                Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec), validatePick(spec, effects), spec.getChanceFrom()));
+                Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec), validatePick(spec, effects), spec.getChanceFrom(),
+                List.copyOf(compiledArgs)));
     }
 
     /**
@@ -1340,7 +1342,29 @@ public class TriggerTable {
                                 * A chance computed at FIRING time ("每有 1 个负面效果…概率提高 20%", 1305). Resolved and clamped in
                                 * the interpreter; null means {@link #chance} really is a constant.
                                 */
-                               NumberProvider chanceFrom) {
+                               NumberProvider chanceFrom,
+                               /*
+                                * The parsed shape of each effect, by index. Parsed ONCE while this rule was compiled,
+                                * so an op's run-time half reads a record instead of re-interpreting the bean. An op
+                                * the legacy switch still owns answers {@code OpArgs.NONE}, which that switch ignores.
+                                */
+                               List<OpArgs> compiledArgs) {
+
+        /**
+         * The parsed shape of one effect, by that effect's index in {@link #effects}.
+         *
+         * <p>Returns {@code null} when the index is out of range - which the dispatcher reads as "parse it again",
+         * the safe answer for an effect whose index does not line up.
+         *
+         * @param index the effect's index in {@link #effects}
+         * @return the parsed shape, or {@code null} when there is no shape for that index
+         */
+        public OpArgs argsAt(int index) {
+            if (compiledArgs == null || index < 0 || index >= compiledArgs.size()) {
+                return null;
+            }
+            return compiledArgs.get(index);
+        }
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.

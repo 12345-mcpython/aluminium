@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
+import com.laosun.aluminium.trigger.OpRegistry;
 import com.laosun.aluminium.trigger.TriggerOperator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -7,16 +8,24 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Every WIRED op has a dispatch arm, and the dispatcher switches on the ENUM (not on the op string).
+ * Every WIRED op is performed exactly once - by its handler or, while the migration lasts, by the legacy switch.
  *
  * <p>Why this cannot be left to the compiler: the enum switch does catch a misspelled {@code case} (that was the point
  * of moving off strings), but it cannot catch an op that was <b>never written at all</b> - that one falls into the
- * {@code default} arm and only fails when somebody's rule happens to use it. This test turns that into a load-order
- * fact: one arm per wired op, counted from the source.
+ * {@code default} arm and only fails when somebody's rule happens to use it. An op with a handler <b>and</b> a switch
+ * arm is the mirror-image fault and a worse one: both would run, or one of them silently never would, and which is
+ * which depends on a line in the dispatcher rather than on the op.
+ *
+ * <p><b>What changes when the migration finishes.</b> The switch will have no arms left, {@link #arms()} will answer
+ * empty, and this case will assert exactly "the registry covers {@code wiredNames()}" - the same claim, one source.
+ * The transitional shape is deliberate: it lets the registry grow one op at a time without a window in which an op is
+ * performed by nothing.
  */
 public class TriggerDispatchCoverageTest {
 
@@ -24,19 +33,33 @@ public class TriggerDispatchCoverageTest {
             Path.of("src/main/java/com/laosun/aluminium/trigger/TriggerInterpreter.java");
 
     @Test
-    public void thereIsOneArmPerWiredOp() throws IOException {
-        String source = Files.readString(DISPATCHER);
-        int from = source.indexOf("switch (operator)");
-        Assertions.assertTrue(from > 0, "the dispatcher must switch on the TriggerOperator enum");
+    public void everyWiredOpIsDispatchedExactlyOnce() throws IOException {
+        Set<String> arms = arms();
+        Set<String> handled = OpRegistry.handledNames();
 
-        int arms = 0;
-        Matcher matcher = Pattern.compile("case ([A-Z_]+) ->").matcher(source.substring(from));
-        while (matcher.find()) {
-            arms++;
+        Set<String> twice = new TreeSet<>(arms);
+        twice.retainAll(handled);
+        Assertions.assertTrue(twice.isEmpty(),
+                "these ops are performed by BOTH a switch arm and a handler: " + twice
+                        + " - one op has one path; delete one of them");
+
+        Set<String> missing = new TreeSet<>(TriggerOperator.wiredNames());
+        missing.removeAll(arms);
+        missing.removeAll(handled);
+        Assertions.assertTrue(missing.isEmpty(),
+                "these wired ops are performed by NEITHER the switch nor a handler: " + missing);
+    }
+
+    @Test
+    public void everyHandlerNamesAWiredOp() {
+        Set<String> wired = TriggerOperator.wiredNames();
+        Set<String> handled = OpRegistry.handledNames();
+        Assertions.assertTrue(wired.containsAll(handled),
+                "a handler is registered for an op that is not wired: " + minus(handled, wired)
+                        + "; a handler performs what the engine can do, so a planned op cannot have one");
+        for (String name : handled) {
+            Assertions.assertNotNull(TriggerOperator.parse(name), name + " must parse back to a constant");
         }
-
-        Assertions.assertEquals(TriggerOperator.wiredNames().size(), arms,
-                "one dispatch arm per wired op: a new enum constant without an arm would only fail at run time");
     }
 
     @Test
@@ -44,5 +67,42 @@ public class TriggerDispatchCoverageTest {
         for (String name : TriggerOperator.wiredNames()) {
             Assertions.assertNotNull(TriggerOperator.parse(name), name + " must parse back to a constant");
         }
+    }
+
+    /**
+     * The ops the legacy switch still performs, read from the dispatcher's source.
+     *
+     * <p>A grouped arm ({@code case A, B ->}) is split, so the answer is a set of ops rather than a set of arms - the
+     * old count-based version could not see a grouped arm at all and silently under-counted.
+     *
+     * @return the op names the switch dispatches
+     * @throws IOException when the dispatcher cannot be read
+     */
+    private static Set<String> arms() throws IOException {
+        String source = Files.readString(DISPATCHER);
+        int from = source.indexOf("switch (operator)");
+        Assertions.assertTrue(from > 0, "the dispatcher must switch on the TriggerOperator enum");
+        Set<String> names = new TreeSet<>();
+        Matcher matcher = Pattern.compile("case ([A-Z_, ]+) ->").matcher(source.substring(from));
+        while (matcher.find()) {
+            for (String name : matcher.group(1).split(",")) {
+                String trimmed = name.trim();
+                if (!trimmed.isEmpty()) {
+                    names.add(trimmed);
+                }
+            }
+        }
+        return names;
+    }
+
+    /**
+     * @param from  the set to subtract from
+     * @param other the set to subtract
+     * @return a readable difference
+     */
+    private static Set<String> minus(Set<String> from, Set<String> other) {
+        Set<String> answer = new TreeSet<>(from);
+        answer.removeAll(other);
+        return answer;
     }
 }

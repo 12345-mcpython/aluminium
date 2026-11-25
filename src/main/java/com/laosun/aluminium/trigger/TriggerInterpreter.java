@@ -110,21 +110,28 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Rejects an effect that could never work, naming the rule that wrote it.
+     * Rejects an effect that could never work, naming the rule that wrote it, and returns the op's parsed shape.
      *
-     * <p>The rules themselves live in {@link TriggerValidator}, which is where the closed-set
-     * vocabulary, the argument shapes and the duration constraints are checked. This stays as
-     * the entry point {@link TriggerTable} calls while a character's file is compiled, so that
-     * the load-time contract has one name regardless of which class enforces it.
+     * <p>The common guards live in {@link TriggerValidator} - the closed-set vocabulary, the argument shapes and the
+     * duration constraints that every op shares. What is specific to one op is checked by that op's handler, in
+     * {@link OpRegistry}, so the load-time half and the run-time half of an op read the same parsed shape instead of
+     * the same bean twice. This stays the one entry point {@link TriggerTable} calls while a character's file is
+     * compiled, so the load-time contract has one name regardless of which class enforces it.
      *
      * @param effect the effect to check
      * @param spec   the rule it belongs to (used for the error message's source line)
+     * @return the parsed shape the dispatcher will use, or {@link OpArgs#NONE} for an op the legacy switch still owns
      * @throws IllegalArgumentException when the effect names an unknown op, an unwired op, an
      *                                  unknown condition or selector, or a combination the
      *                                  dispatcher could not act on
      */
-    public static void validate(EffectSpec effect, TriggerSpec spec) {
+    public static OpArgs validate(EffectSpec effect, TriggerSpec spec) {
+        // The common guards first, in their existing order: they are order-sensitive (the first violation decides
+        // which message an author sees, and the suite asserts those messages), and they apply to every op including
+        // the migrated ones. Then the op's own handler validates what it just parsed - or the legacy switch does, for
+        // an op that has not moved yet.
         TriggerValidator.validateOne(effect, spec);
+        return OpRegistry.parseAndValidate(effect, spec);
     }
 
     /**
@@ -390,7 +397,12 @@ public final class TriggerInterpreter {
                 // `min_eidolon` cannot express this -- it would switch off the whole rule, base part included.
                 continue;
             }
+            EffectSpec written = effect;
             effect = amendedEffect(effect, ctx);
+            // An amended copy is a DIFFERENT effect - `MODIFY_RULE` rewrote its numbers - so the shape parsed at load
+            // time describes the old one. null makes the handler parse the copy instead. The fast path of
+            // `amendedEffect` returns the same instance, so an unamended effect keeps its load-time shape.
+            OpArgs args = effect == written ? rule.argsAt(thisEffect) : null;
             // This effect's per-target conditions, and its target PREFERENCE (「优先选择…」). The ops below take
             // `effectCtx`, whose filter `resolveTargets` applies -- so the whole vocabulary cost four lines in the loop
             // and one branch in the resolver. The preference is read by the `random_enemy` selector alone.
@@ -439,7 +451,7 @@ public final class TriggerInterpreter {
                     // both sides of the move and the capture of a spend read 0 even though the spend itself worked).
                     // EITHER store, never both (measured: `resourceAmount` ADDS the holder's store to the party's, so a SELF resource was counted twice and a capture of 4 read 8).
                     int creditedBefore = measureForTheDelta(effectCtx, holder, resourceId);
-                    applyOne(battle, effect, effectCtx, previousCredited);
+                    applyOne(battle, effect, effectCtx, previousCredited, args);
                     int creditedAfter = measureForTheDelta(effectCtx, holder, resourceId);
                     // The MAGNITUDE of what the previous effect moved (reader: 114151"for each 1% of overflow spent..."). A gain arrives positive and a spend
                     // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
@@ -449,10 +461,10 @@ public final class TriggerInterpreter {
                     // 「消耗我方全体当前生命值 1%…额外造成 1 次数值为消耗总量 2.5% 的附加伤害」 (cone 23042): the NEXT effect needs
                     // to know how much the consumption took, so the same `amount_from_previous` channel is filled here.
                     double hpBefore = totalHp(battle);
-                    applyOne(battle, effect, effectCtx, previousCredited);
+                    applyOne(battle, effect, effectCtx, previousCredited, args);
                     previousCredited = Math.abs(hpBefore - totalHp(battle));
                 } else {
-                    applyOne(battle, effect, effectCtx, previousCredited);
+                    applyOne(battle, effect, effectCtx, previousCredited, args);
                 }
             }
         }
@@ -646,8 +658,23 @@ public final class TriggerInterpreter {
         return unit == null ? "" : "@" + System.identityHashCode(unit);
     }
 
+    /**
+     * Runs one effect.
+     *
+     * <p><b>Two dispatchers, on purpose, for as long as the migration lasts.</b> An op that has a handler is performed
+     * by it and never reaches the switch below; an op that has not moved yet still switches. The transitional guard
+     * ({@code TriggerDispatchCoverageTest}) asserts the two sets are disjoint and together cover every wired op, so an
+     * op cannot quietly have two meanings - and an op cannot be forgotten between the two.
+     *
+     * @param battle           the battlefield
+     * @param effect           the effect
+     * @param ctx              the firing context, carrying the effect's own target filter
+     * @param previousCredited what the previous effect of the same rule actually moved
+     * @param args             the shape parsed at load time, or {@code null} when the effect is an amended copy and
+     *                         has to be parsed again before it can be performed
+     */
     private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx,
-                                 double previousCredited) {
+                                 double previousCredited, OpArgs args) {
         // ⚠ The only place that sees EVERY rule effect: the engine announces effects elsewhere, but a rule whose
         // effect is a skill-level raise or a resource gain reaches no other hook at all.
         // ⚠ Guarded: `apply(null, ...)` is a supported call for single-target selectors -- the engine's own unit tests use it,
@@ -660,6 +687,11 @@ public final class TriggerInterpreter {
         if (operator == null) {
             throw new IllegalStateException("Op " + op + " is not in TriggerOperator; the enum is the vocabulary, so an unknown"
                     + " name here is an engine fault rather than a content one");
+        }
+        OpHandler<?> handler = OpRegistry.find(operator);
+        if (handler != null) {
+            OpRegistry.apply(handler, new OpContext(battle, ctx, effect, previousCredited), args);
+            return;
         }
         switch (operator) {
             case ADD_ELEMENTAL_WEAKNESS -> {
@@ -738,7 +770,6 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case GAIN_SKILL_POINT -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
             case HEAL -> {
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
                     // Note: The healer is the RULE OWNER, not `null`. A `HEAL` effect is
@@ -846,52 +877,10 @@ public final class TriggerInterpreter {
                             + "when the battle starts), so no extra turn can be granted");
                 }
             }
-            case ADVANCE -> {
-                // One target or a group: "make that target act immediately" and "make the teammates other than oneself act immediately" are the same op, and
-                // the list resolver is what tells them apart (it is the one HEAL/SHIELD already use for "our
-                // side"). Advancing several units is what the group selectors were resolved for.
-                // 「无法使其他友方目标获得行动提前效果」 (1512's 【特邀嘉宾】): the ban lives on the state the GIVER holds, so it is
-                // read from the rule owner, and it only stops advances aimed at OTHERS - the holder may still be advanced.
-                CanHit giver = ctx.owner();
-                boolean banned = giver != null && giver.getBuffManager() != null
-                        && giver.getBuffManager().suppresses("advance_to_others");
-                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    if (banned && target != giver) {
-                        continue;
-                    }
-                    battle.queue().advanceActionByPercent(target, TriggerMagnitudes.shareOf(effect, ctx));
-                }
-            }
             case IGNORE_WEAKNESS -> {
                 int casts = effect.getAmount() == null ? 1 : (int) Math.round(effect.getAmount());
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
                     target.markIgnoreWeaknessCasts(casts);
-                }
-            }
-            case DEPART -> {
-                // 「进入【离场】状态：无法成为技能目标，且不出现在行动序列上」 (1223 貊泽's talent, while 【猎物】 exists).
-                // Two engine facts, one op: the targeting flag and the action order. `RETURN` is its exact inverse; the
-                // content calls one at each end, so a state that never ends (a battle ending) does not leave a phantom.
-                for (CanHit leaving : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    leaving.setUntargetable(true);
-                    battle.queue().removeCombatant(leaving);
-                }
-            }
-            case RETURN -> {
-                // 「回到场上」: targetable again and back in the order. The queue schedules it ONE FULL CYCLE from now,
-                // which is the engine's ordinary "joins mid-battle" rule (Queue.addCombatant) - the unit does not get its
-                // old slot back, and that is the honest reading of "回到原处" for a system that only tracks remaining time.
-                for (CanHit arriving : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    arriving.setUntargetable(false);
-                    battle.queue().addCombatant(arriving);
-                }
-            }
-            case DELAY -> {
-                // 「行动延后 X%」: a one-off push of the target's action bar by X% of its action period.
-                // Unlike ADVANCE there is no "advance_to_others" suppression: that sentence bans advances,
-                // not delays.
-                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    battle.delayMovePercent(target, TriggerMagnitudes.shareOf(effect, ctx));
                 }
             }
             case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
@@ -903,11 +892,6 @@ public final class TriggerInterpreter {
             // The DECLARED cap, not the overflow tier above it. Reader: 1513 Aventurine · Waveflair Eidolon 2
             // (「【热意】上限提高至 50 点」) -- the base declaration states 30 and an Eidolon raises it for the battle.
             case RAISE_RESOURCE_MAX -> raiseResourceMax(effect, ctx);
-            // The pool is team-level and its owner is the policy, so this is the one op that goes
-            // straight to the policy rather than through a unit's resources.
-            case RAISE_SKILL_POINT_CAP -> battle.getSkillPointPolicy().raiseMax(effect.getValue() != null
-                    ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
-                    : (int) Math.round(effect.getAmount()));
             case GAIN_RESOURCE -> {
                 // ⚠ The store that MOVED, not the rule owner's: an effect may grant to somebody else ("give that ally 2
                 // points"), and `resourceAmount(owner)` measured on a unit that does not carry the counter reads 0 on
@@ -1726,7 +1710,7 @@ public final class TriggerInterpreter {
         return (int) Math.round(TriggerMagnitudes.selfResourceOf(scale, ctx) * share);
     }
 
-    private static double scaledAmount(EffectSpec effect, TriggerContext ctx) {
+    static double scaledAmount(EffectSpec effect, TriggerContext ctx) {
         double amount = flatAmount(effect, ctx);
         return Boolean.TRUE.equals(effect.getPerTarget()) ? amount * ctx.hitCount() : amount;
     }

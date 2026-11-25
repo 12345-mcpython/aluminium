@@ -384,22 +384,8 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case GAIN_SKILL_POINT -> {
-                requireAmount(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-            }
-            case RAISE_SKILL_POINT_CAP -> {
-                // Unlike GAIN_SKILL_POINT, a negative amount is meaningful here: it takes a granted bonus
-                // back. Zero is not, because it would silently do nothing.
-                if (effect.getValue() == null && (effect.getAmount() == null || effect.getAmount() == 0)) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " changes the skill point cap, so \"amount\" is a non-zero number of points"
-                                    + " (negative takes a bonus away): got "
-                                    + (effect.getAmount() == null ? "nothing" : effect.getAmount())
-                                    + " (source: " + spec.getSource() + ")");
-                }
-                requireNoStackArguments(effect, op, spec);
-            }
+            // GAIN_SKILL_POINT and RAISE_SKILL_POINT_CAP validate themselves: see GainSkillPointOp and
+            // RaiseSkillPointCapOp. Their arms were deleted rather than left as a second copy of the same rules.
             case HEAL, SHIELD -> {
                 requireAmountOrScale(effect, op, spec, SCALES, "Max HP");
                 requireNoStackArguments(effect, op, spec);
@@ -419,20 +405,9 @@ final class TriggerValidator {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
-            case ADVANCE -> {
-                requirePercent(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-            }
-            case DEPART, RETURN -> {
-                // 「离场」/「回到场上」: a pair of state toggles with no magnitude of its own - the target is the whole
-                // content. A duration would say nothing (the content removes it at the moment the sentence does).
-                requireNoDuration(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-            }
-            case DELAY -> {
-                requirePercent(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-            }
+            // ADVANCE, DELAY, DEPART and RETURN validate themselves (AdvanceOp / DelayOp / DepartOp / ReturnOp):
+            // each needs its share to be a plain percent, or needs no duration at all, and that statement now lives
+            // beside the code that reads it instead of in this switch.
             case RAISE_RESOURCE_CAP -> {
                 // A resource the owner DECLARES, and how far to widen its overflow.
                 requireResource(effect, op, spec);
