@@ -70,19 +70,24 @@ public class TriggerDispatchCoverageTest {
     }
 
     /**
-     * The ops the legacy switch still performs, read from the dispatcher's source.
+     * The ops a legacy {@code switch (operator)} still performs, read from the dispatcher's source.
      *
-     * <p>A grouped arm ({@code case A, B ->}) is split, so the answer is a set of ops rather than a set of arms - the
-     * old count-based version could not see a grouped arm at all and silently under-counted.
+     * <p>Empty is the finished state: the registry is then the only dispatcher. The method is kept rather than deleted
+     * so that re-introducing a switch arm - the shape that let an op be performed twice, or performed and not
+     * validated - fails this case instead of quietly working.
      *
-     * @return the op names the switch dispatches
+     * <p>A grouped arm ({@code case A, B ->}) is split, so the answer is a set of ops rather than a set of arms.
+     *
+     * @return the op names the switch dispatches, empty when there is no switch
      * @throws IOException when the dispatcher cannot be read
      */
     private static Set<String> arms() throws IOException {
         String source = Files.readString(DISPATCHER);
-        int from = source.indexOf("switch (operator)");
-        Assertions.assertTrue(from > 0, "the dispatcher must switch on the TriggerOperator enum");
         Set<String> names = new TreeSet<>();
+        int from = source.indexOf("switch (operator)");
+        if (from < 0) {
+            return names;
+        }
         Matcher matcher = Pattern.compile("case ([A-Z_, ]+) ->").matcher(source.substring(from));
         while (matcher.find()) {
             for (String name : matcher.group(1).split(",")) {

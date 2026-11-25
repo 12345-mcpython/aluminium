@@ -659,12 +659,12 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Runs one effect.
+     * Runs one effect: announce it, resolve the op, and hand it to that op's handler.
      *
-     * <p><b>Two dispatchers, on purpose, for as long as the migration lasts.</b> An op that has a handler is performed
-     * by it and never reaches the switch below; an op that has not moved yet still switches. The transitional guard
-     * ({@code TriggerDispatchCoverageTest}) asserts the two sets are disjoint and together cover every wired op, so an
-     * op cannot quietly have two meanings - and an op cannot be forgotten between the two.
+     * <p><b>No switch.</b> Until the migration finished this method also carried a 466-line {@code switch} over the op
+     * enum, so "which ops does the engine perform" was answered in two places that could disagree (an op could be
+     * performed and not validated, and eight were). Now {@link OpRegistry} is the only answer, and
+     * {@code TriggerDispatchCoverageTest} asserts it covers every wired op.
      *
      * @param battle           the battlefield
      * @param effect           the effect
@@ -689,210 +689,12 @@ public final class TriggerInterpreter {
                     + " name here is an engine fault rather than a content one");
         }
         OpHandler<?> handler = OpRegistry.find(operator);
-        if (handler != null) {
-            OpRegistry.apply(handler, new OpContext(battle, ctx, effect, previousCredited), args);
-            return;
+        if (handler == null) {
+            // Every wired op has a handler, so this means the registry and the enum disagree - an engine fault, not a
+            // content one. TriggerDispatchCoverageTest fails earlier, at build time, if that ever happens.
+            throw new IllegalStateException("Op '" + op + "' is wired but no handler performs it");
         }
-        switch (operator) {
-            case ADD_ELEMENTAL_WEAKNESS -> {
-                // Note: Two named sources beside a real element name (the loader keeps this a closed set):
-                //   `party_first` -- the first character of the party, per 1006's own skill text.
-                //   `random_absent` -- a random element the target does NOT already have (1405).
-                String named = effect.getElement().trim();
-                DamageElement weakness;
-                if ("party_first".equals(named)) {
-                    weakness = battle == null || battle.characters().isEmpty()
-                            ? null : battle.characters().getFirst().getElement();
-                } else if ("random_absent".equals(named)) {
-                    weakness = null;
-                    for (CanHit victim : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                        if (victim instanceof com.laosun.aluminium.enemy.Enemy en) {
-                            java.util.List<DamageElement> absent = new java.util.ArrayList<>();
-                            for (DamageElement candidate : DamageElement.values()) {
-                                if (!en.isWeakTo(candidate)) {
-                                    absent.add(candidate);
-                                }
-                            }
-                            weakness = absent.isEmpty() ? null
-                                    : absent.get(battle.getRng().nextInt(absent.size()));
-                        }
-                    }
-                } else {
-                    weakness = DamageElement.fromString(named);
-                }
-                if (weakness == null) {
-                    // Note: Not an error for the two named sources: 1006 may have no party attribute to offer and
-                    // 1405 may find no absent element. The clause simply does nothing then.
-                    if (TriggerVocabulary.SPECIAL_ELEMENTS.contains(named)) {
-                        break;
-                    }
-                    throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names an element that is not a DamageElement");
-                }
-                for (CanHit victim : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    // "when adding a weakness to an enemy target"(cone 23050). Note: Asked first, then changed, then fired:
-                    //    a repeat insertion is NOT an insertion, and firing then would be a quiet OVER-fire.
-                    if (victim instanceof com.laosun.aluminium.enemy.Enemy en && !en.isWeakTo(weakness)) {
-                        if (effect.getTurns() != null && effect.getTurns() > 0) {
-                            en.addWeakness(weakness, effect.getTurns());
-                        } else {
-                            en.addWeakness(weakness);
-                        }
-                        battle.fire(TriggerPayload.Simple.of(TriggerEvent.WEAKNESS_ADDED, ctx.owner(), en, 0, 0));
-                    }
-                }
-            }
-            case SHIELD -> {
-                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    double amount = grantAmount(effect, target, ctx);
-                    // The TOTAL a shield install writes: overwrite ⇒ just this grant; stacking ⇒ the standing shield plus it.
-                    double installed = amount;
-                    // 「重复获得丹恒•腾荒的护盾时，护盾量可以叠加，最高不超过当前战技提供的护盾量的 300%」 (1414's Skill). A shield
-                    // normally OVERWRITES, so the stacking has to be stated; `cap_*` bounds the total. Only HIS shields stack
-                    // (「丹恒•腾荒的」), which is what `getShieldProvider` answers.
-                    if (Boolean.TRUE.equals(effect.getAddToShield()) && target != null && !target.isDeath()
-                            && (target.getShield() <= 0 || target.getShieldProvider() == ctx.owner())) {
-                        double standing = target.getShield();
-                        double wanted = standing + amount;
-                        if (effect.getCapScale() != null || effect.getCapPercent() != null || effect.getCapAmount() != null) {
-                            double ceiling = TriggerMagnitudes.resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx)
-                                    + (effect.getCapAmount() == null ? 0 : effect.getCapAmount());
-                            if (ceiling > 0) {
-                                wanted = Math.min(wanted, ceiling);
-                            }
-                        }
-                        if (wanted <= standing) {
-                            continue;   // already at the ceiling: no grant, and no fresh timer to reset
-                        }
-                        amount = wanted - standing;   // what this grant ANNOUNCES ...
-                        installed = wanted;           // ... while the shield itself becomes the sum
-                    }
-                    // "lasting N turns" is a *timed* shield: the ShieldBuff installs the value and takes it off
-                    // again, so the number and its lifetime stay one fact. Without `turns` the shield is the
-                    // raw grant it has always been (it comes off only when it is used up).
-                    // Note: Both arms name the provider (`ctx.owner()`): "the shield amount provided by the wearer is raised by X%" is about the
-                    // *giver's* shields, so a grant with no provider would silently ignore the set bonus.
-                    if (effect.getTurns() == null) {
-                        battle.grantShield(ctx.owner(), target, installed, ctx.ruleId());
-                    } else if (target != null && !target.isDeath()) {
-                        target.getBuffManager().addBuff(
-                                withSource(new ShieldBuff(ctx.owner(), installed, effect.getTurns()), ctx));
-                        // The timed path installs its shield through a buff, which has no Battle handle,
-                        // so this is the only place that can announce it. Fired AFTER the buff is on, so a rule that
-                        // answers "when a shield is gained" sees the shield it is reacting to.
-                        if (amount > 0) {
-                            battle.fireForAlly(TriggerPayload.AllySubject.of(
-                                    TriggerEvent.SHIELD_GRANTED, ctx.owner(), target, amount));
-                        }
-                    }
-                }
-            }
-            case ABSORB_DAMAGE -> {
-                // "每点【好活当赏】等同于 200 点抵御值，我方目标受到伤害时，真珠可消耗抵御值抵挡 60% 的伤害" (1503 Pearl (真珠)'s
-                // talent). The grant rides on the PROTECTED unit - that is where the hit lands, so that is where the
-                // absorber has to be - while the counter belongs to whoever PAYS.
-                // Note: `resource`, `unit_amount` and `percent` are all validated at LOAD time (see `validate`), so by
-                // the time this runs they are known good; the casts here are reads, not checks.
-                String resource = effect.getResource().trim();
-                double unitAmount = effect.getUnitAmount();
-                // Any spelling of a share, not only a literal percent: the same "reader keeps its own list" trap the
-                // rest of the file has been collapsing into TriggerMagnitudes.shareOf.
-                double share = TriggerMagnitudes.statesShare(effect)
-                        ? TriggerMagnitudes.shareOf(effect, ctx)
-                        : effect.getPercent();
-                // Who pays. Defaults to the rule's owner (Pearl), which is the documented shape: the counter is hers
-                // while the protected units are the party.
-                CanHit payer = effect.getPayer() == null || effect.getPayer().isBlank()
-                        ? ctx.owner()
-                        : TriggerTargets.require(TriggerTargets.resolveTarget(effect, ctx), "target", ctx);
-                boolean permanent = TriggerLifetimes.unticked(effect);
-                int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
-                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    if (target == null || target.isDeath()) {
-                        continue;
-                    }
-                    target.getBuffManager().addBuff(withSource(TriggerLifetimes.withLifetime(
-                            new com.laosun.aluminium.buff.AbsorbBuff(
-                                    turns, permanent, resource, unitAmount, share, payer),
-                            effect), ctx));
-                }
-            }
-            case DAMAGE -> {
-                // A list, like HEAL/SHIELD: "to all enemies" is one effect that reaches several units, and the
-                // engine settles one instance per victim (that is what a group attack is here).
-                // Note: `times` repeats the WHOLE settlement, and because resolveTargets is called INSIDE the outer
-                // loop, every repetition re-draws its target -- which is what "randomly a single enemy each time" means.
-                // "for each 1 point spent ... 1 extra instance": the repeat count can follow the event.
-                int times = timesCount(battle, effect, ctx);
-                if (times <= 0) {
-                    return;
-                }
-                for (int repeat = 0; repeat < times; repeat++) {
-                    List<CanHit> victims = TriggerTargets.resolveTargets(battle, effect, ctx);
-                    // "由敌方全体均分": the stated magnitude is the TOTAL, so each living victim takes an even share of it.
-                    // ⚠ The divisor counts only the victims that can really take it: a corpse is skipped by `damage`
-                    // below, and counting it would make part of the stated total vanish with nothing to see. An
-                    // INVULNERABLE victim IS counted - its share is simply not settled (see EffectSpec.getSplit).
-                    int divisor = 1;
-                    if (Boolean.TRUE.equals(effect.getSplit())) {
-                        divisor = 0;
-                        for (CanHit victim : victims) {
-                            if (victim != null && !victim.isDeath()) {
-                                divisor++;
-                            }
-                        }
-                        divisor = Math.max(1, divisor);
-                    }
-                    for (CanHit victim : victims) {
-                        damage(battle, effect, ctx, victim, divisor);
-                    }
-                }
-            }
-            case CONSUME_HP -> {
-                // Note: The share vocabulary is the HEAL/SHIELD one, not the modifier one: "consume HP equal to 30% of Blade (刃)'s Max HP"
-                // is `owner_max_hp`, which derivedMagnitude refuses (it names an ATTRIBUTE).
-                for (CanHit spender : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    if (spender != null) {
-                        double spent = spender.consumeHp(grantAmount(effect, spender, ctx));
-                        if (spent > 0) {
-                            // "take damage <b>or</b> consume HP": the second half gets its own event.
-                            // Note: the spent amount goes in the AMOUNT slot. It used to be passed as the HIT COUNT
-                            // (`Simple.of(event, actor, target, (int) round(spent), 0)`), so every `event_amount`
-                            // condition on this event read 0 -- measured: 23039's `event_amount > 500` never fired
-                            // even when 1000 HP was paid. The signature is (event, actor, target, hitCount, amount);
-                            // a hit count is "how many targets", which this event does not have.
-                            battle.fire(TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, spender, spender, 0, spent));
-                        }
-                    }
-                }
-            }
-            case SUMMON -> {
-                // 「若任意「晴空乐手」已在场…」 (1512): a kit may own SEVERAL memosprites, and "which one" is data. Without
-                // the name the op keeps its old meaning (the character's first / its only one).
-                var owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
-                if (Boolean.TRUE.equals(effect.getAnotherInstance())) {
-                    battle.summonAnotherMemosprite(owner);
-                    break;
-                }
-                // 「非忆灵召唤物」 (神君 / 阿哈 / 浮元): the entity has no spec, so it is PLACED with the summoner own panel. The
-                // content says so with `panel_less`, because the two sentences read the same in the document.
-                if (Boolean.TRUE.equals(effect.getPanelLess())) {
-                    if (effect.getMemospriteName() == null || effect.getMemospriteName().isBlank()) {
-                        throw new IllegalStateException(
-                                "Op SUMMON states panel_less but names no entity: say which one (神君 / 阿哈 / 浮元)");
-                    }
-                    battle.placePanelLessSummon(owner, effect.getMemospriteName().trim(),
-                            effect.getSummonSpeed());
-                    break;
-                }
-                if (effect.getMemospriteName() == null || effect.getMemospriteName().isBlank()) {
-                    battle.summonMemosprite(owner);
-                } else {
-                    battle.summonMemosprite(owner, effect.getMemospriteName().trim());
-                }
-            }
-            default -> throw new IllegalStateException(
-                    "Op '" + op + "' reached the dispatcher without an arm");
-        }
+        OpRegistry.apply(handler, new OpContext(battle, ctx, effect, previousCredited), args);
     }
 
     /*
@@ -2594,7 +2396,7 @@ public final class TriggerInterpreter {
      * @param ctx    the trigger context
      * @return the repetition count, or {@code 0} when {@code times_from} resolves to zero
      */
-    private static int timesCount(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static int timesCount(Battle battle, EffectSpec effect, TriggerContext ctx) {
         int times = effect.getTimes() == null ? 1 : effect.getTimes();
         String from = effect.getTimesFrom();
         if (from == null) {
@@ -2694,7 +2496,7 @@ public final class TriggerInterpreter {
      * @param divisor how many victims are sharing the stated magnitude ({@code 1} = the ordinary per-victim reading;
      *                see {@link EffectSpec#getSplit()})
      */
-    private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
+    static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
         damage(battle, effect, ctx, victim, divisor, 1.0);
     }
 

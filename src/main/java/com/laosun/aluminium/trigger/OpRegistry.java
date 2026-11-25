@@ -93,7 +93,13 @@ public final class OpRegistry {
             new SpendResourceOp(),
             new RemoveResourceOp(),
             new RaiseSkillMultiplierOp(),
-            new ResetTriggerLimitOp());
+            new ResetTriggerLimitOp(),
+            new AddElementalWeaknessOp(),
+            new ShieldOp(),
+            new AbsorbDamageOp(),
+            new DamageOp(),
+            new ConsumeHpOp(),
+            new SummonOp());
 
     /** {@link #HANDLERS} indexed by op, built once. */
     private static final Map<TriggerOperator, OpHandler<?>> BY_OP = index();
