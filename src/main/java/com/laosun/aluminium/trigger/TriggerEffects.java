@@ -99,7 +99,7 @@ final class TriggerEffects {
         if (Boolean.TRUE.equals(effect.getInstance()) && ctx.damage() != null) {
             // An optional damage-type scope: "<b>break damage</b> dealt to the target ignores X% of their DEF" (relic 119/4)
             // and "<b>follow-up attacks</b> ignore X% of their DEF". The instance already knows its own type, so this is a comparison, not a new dimension.
-            com.laosun.aluminium.enums.DamageType instanceScope = TriggerInterpreter.parseDamageType(effect, "MODIFY_ATTR", null);
+            com.laosun.aluminium.enums.DamageType instanceScope = TriggerInterpreter.parseDamageType(effect.getDamageType(), "MODIFY_ATTR");
             if (instanceScope != null && ctx.damage().getType() != instanceScope) {
                 return;   // the instance belongs to another damage type: this rule does not speak about it
             }
@@ -850,21 +850,22 @@ final class TriggerEffects {
      * @param effect the effect ({@code percent})
      * @param ctx    the context, which must carry the instance (guaranteed by the load-time event check)
      */
-    static void addDamageFlat(EffectSpec effect, TriggerContext ctx) {
-        Damage damage = ctx.damage();
+    static void addDamageFlat(OpContext ctx, AddDamageArgs args) {
+        Damage damage = ctx.firing().damage();
         if (damage == null) {
             throw new IllegalStateException(
                     "Op ADD_DAMAGE needs the damage instance being settled, but this context carries none");
         }
-        // An addition labelled ELATION belongs to an Elation instance, so it carries that instance's three
-        // factors (ROADMAP:1262: an Elation base is `... x (1+欢愉度) x (1+增笑) x (1+笑点x5/(笑点+240))`).
-        // They are read off the ATTACKER -- the unit whose instance this is -- not the rule owner.
-        // `elation_base` is a table lookup, not an attribute, so it is resolved here rather than by
-        // `derivedMagnitude` -- measured: that reader returned null and the settlement NPE'd.
-        double magnitude = "elation_base".equals(effect.getScale() == null ? "" : effect.getScale().trim())
-                ? TriggerMagnitudes.elationBase(ctx) * (effect.getPercent() == null ? 1 : effect.getPercent())
-                : TriggerMagnitudes.derivedMagnitude(effect, ctx);
-        com.laosun.aluminium.enums.DamageType only = TriggerInterpreter.parseDamageType(effect, "ADD_DAMAGE", null);
+        // An addition labelled ELATION belongs to an Elation instance, so it carries that instance's three factors.
+        // They are read off the ATTACKER -- the unit whose instance this is -- not the rule owner. `elation_base` is a
+        // table lookup, not an attribute, so it is resolved here rather than by `derivedMagnitude`.
+        Magnitude magnitude = args.magnitude();
+        double amountOf = "elation_base".equals(magnitude.getScale() == null ? "" : magnitude.getScale().trim())
+                ? TriggerMagnitudes.elationBase(ctx.firing()) * (magnitude.getPercent() == null ? 1 : magnitude.getPercent())
+                : TriggerMagnitudes.derivedMagnitude(magnitude, ctx.firing());
+        com.laosun.aluminium.enums.DamageType only = args.damageType() == null
+                ? null
+                : TriggerInterpreter.parseDamageType(args.damageType(), "ADD_DAMAGE");
         if (only == com.laosun.aluminium.enums.DamageType.ELATION) {
             CanHit attacker = damage.getAttacker();
             if (attacker == null) {
@@ -872,21 +873,28 @@ final class TriggerEffects {
                         "Op ADD_DAMAGE states damage_type ELATION, but the instance being settled has no attacker"
                                 + " to read 欢愉度 and 增笑 from");
             }
-            magnitude *= 1 + attacker.getAttribute(
+            amountOf *= 1 + attacker.getAttribute(
                     com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get();
-            magnitude *= 1 + attacker.getAttribute(
+            amountOf *= 1 + attacker.getAttribute(
                     com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get();
-            if (ctx.battle() != null) {
-                magnitude *= TriggerInterpreter.laughFactor(ctx, effect);
+            if (args.countedLaughs() != null) {
+                double counted = args.countedLaughs();
+                if (counted < 0) {
+                    throw new IllegalStateException("counted_laughs is " + counted
+                            + "; a laugh count cannot be negative (source: " + ctx.firing().ruleId() + ")");
+                }
+                amountOf *= 1 + counted * 5.0 / (counted + 240);
+            } else if (ctx.battle() != null) {
+                amountOf *= ctx.battle().elationLaughMultiplier();
             }
         }
         // Note: WHERE the amount enters is the sentence's choice, and the two are different numbers. The default is the
-        // base layer (`addFlat`: it crits and is boosted, "提高数值等同于…"). `after_zones` is the other sentence: 「终结技
-        // 对指定敌方单体造成的伤害额外提高…」 (1205's Eidolon 1) names a settled number's raise, so it bypasses every zone.
-        if (Boolean.TRUE.equals(effect.getAfterZones())) {
-            damage.addSettledFlat(magnitude);
+        // base layer (`addFlat`: it crits and is boosted). `after_zones` is the other sentence: 「终结技对指定敌方单体
+        // 造成的伤害额外提高…」 names a settled number's raise, so it bypasses every zone.
+        if (args.afterZones()) {
+            damage.addSettledFlat(amountOf);
         } else {
-            damage.addFlat(magnitude);
+            damage.addFlat(amountOf);
         }
     }
 

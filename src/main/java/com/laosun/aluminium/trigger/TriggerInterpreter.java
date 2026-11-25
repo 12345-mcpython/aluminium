@@ -1357,7 +1357,7 @@ public final class TriggerInterpreter {
         boolean permanent = TriggerLifetimes.unticked(effect);
         int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         // "break damage taken is raised": an optional damage-type scope, spelled with the enum's own names.
-        com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect, "MODIFY_DAMAGE_TAKEN", null);
+        com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect.getDamageType(), "MODIFY_DAMAGE_TAKEN");
         // "increases the Fire DMG the target takes": the ELEMENT scope, beside the damage-type one. Each is checked by the zone
         // itself, so nothing here decides precedence.
         com.laosun.aluminium.enums.DamageElement elementScope = parseScopeElement(effect, "MODIFY_DAMAGE_TAKEN");
@@ -1451,7 +1451,7 @@ public final class TriggerInterpreter {
         // Note: A `damage_type` here must actually SCOPE the boost: the loader accepted it while this method
         // ignored it, so "follow-up attacks only" silently raised every hit -- measured: an ordinary hit against a low-HP
         // target came out 1.24x instead of 1.0x). Same semantics as MODIFY_ATTR's instance route.
-        com.laosun.aluminium.enums.DamageType only = parseDamageType(effect, "BOOST_DAMAGE", null);
+        com.laosun.aluminium.enums.DamageType only = parseDamageType(effect.getDamageType(), "BOOST_DAMAGE");
         if (only != null && damage.getType() != only) {
             return;
         }
@@ -1703,8 +1703,8 @@ public final class TriggerInterpreter {
         }
     }
 
-    static com.laosun.aluminium.enums.DamageType parseDamageType(EffectSpec effect, String op, TriggerSpec spec) {
-        String raw = effect.getDamageType();
+    static com.laosun.aluminium.enums.DamageType parseDamageType(String damageType, String op) {
+        String raw = damageType;
         if (raw == null || raw.isBlank()) {
             return null;
         }
@@ -1714,7 +1714,7 @@ public final class TriggerInterpreter {
             throw new IllegalArgumentException(
                     "Op " + op + " names the damage type '" + raw + "', which is not one this engine settles; known: "
                             + java.util.Arrays.toString(com.laosun.aluminium.enums.DamageType.values())
-                            + (spec == null ? "" : " (source: " + spec.getSource() + ")"));
+                            + " (source: the rule that named it)");
         }
     }
 

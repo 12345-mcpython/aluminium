@@ -11,7 +11,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
  * resistance zone); without it the amount is part of the base. A COUNT is not an amount: {@code times} counts
  * instances, and this op adds one amount - a {@code times} here would be read by nobody.
  */
-final class AddDamageOp implements OpHandler<OpArgs> {
+final class AddDamageOp implements OpHandler<AddDamageArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,12 +19,13 @@ final class AddDamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public AddDamageArgs parse(EffectSpec effect) {
+        return new AddDamageArgs(effect, Boolean.TRUE.equals(effect.getAfterZones()),
+                effect.getDamageType(), effect.getCountedLaughs());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(AddDamageArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireEvent(rule, op, TriggerEvent.DEALING_DAMAGE);
         TriggerMagnitudes.scaleAttribute(effect, op, rule);
@@ -38,7 +39,7 @@ final class AddDamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.addDamageFlat(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, AddDamageArgs args) {
+        TriggerEffects.addDamageFlat(ctx, args);
     }
 }

@@ -94,7 +94,8 @@ public class ArgsMigrationRatchetTest {
             "SPEND_RESOURCE",
             "REMOVE_RESOURCE",
             "GAIN_ENERGY",
-            "SUMMON_SERVANT");
+            "SUMMON_SERVANT",
+            "ADD_DAMAGE");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {
