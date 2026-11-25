@@ -28,7 +28,7 @@ final class AbsorbDamageOp implements OpHandler<AbsorbDamageArgs> {
                 effect.getUnitAmount() == null ? 0 : effect.getUnitAmount(),
                 effect,
                 effect.getPayer(),
-                permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns(),
+                permanent ? Integer.valueOf(TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER) : effect.getTurns(),
                 permanent);
     }
 
