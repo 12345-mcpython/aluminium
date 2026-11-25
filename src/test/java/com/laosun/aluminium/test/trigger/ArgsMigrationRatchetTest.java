@@ -58,7 +58,8 @@ public class ArgsMigrationRatchetTest {
             "DELAY",
             "GAIN_SKILL_POINT",
             "HEAL",
-            "CONSUME_HP");
+            "CONSUME_HP",
+            "SHIELD");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {
