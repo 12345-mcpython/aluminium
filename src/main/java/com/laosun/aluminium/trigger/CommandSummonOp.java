@@ -1,12 +1,14 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 
 /**
- * {@code COMMAND_SUMMON}: order somebody's summoned unit to cast one of its skills.
+ * {@code COMMAND_SUMMON}: order a summon to cast one of its skills.
  *
- * <p>The summoner keeps the action bar; this only makes the summon act out of turn. Registered here so the op has one
- * dispatch path; its load-time checks are still in {@code TriggerValidator}.
+ * <p>The numbers are the NAMED SKILL's, not this file's: stating them here would be a second copy that drifts (and would
+ * lose the per-level table). The victims come from the skill's own shape, not from a selector - pointing this op at
+ * {@code self} or at a teammate would deal the summon's damage to our own side.
  */
 final class CommandSummonOp implements OpHandler<OpArgs> {
 
@@ -18,6 +20,17 @@ final class CommandSummonOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        String op = op().name();
+        TriggerValidator.requireSkill(effect, op, rule);
+        TriggerValidator.requireDamageParam(effect, op, rule);
+        TriggerValidator.requireAttribute(effect, op, rule);
+        TriggerValidator.requireNoDuration(effect, op, rule);
+        TriggerValidator.requireNoStackArguments(effect, op, rule);
+        TriggerValidator.requireNoTarget(effect, op, rule);
     }
 
     @Override
