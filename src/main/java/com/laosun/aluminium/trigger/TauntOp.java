@@ -11,7 +11,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
  * {@code permanent} / {@code until} are refused: a marker with no clock would never come off, and no document writes it
  * that way.
  */
-final class TauntOp implements OpHandler<OpArgs> {
+final class TauntOp implements OpHandler<TauntArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,14 +19,14 @@ final class TauntOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public TauntArgs parse(EffectSpec effect) {
+        return new TauntArgs(effect.getTurns());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(TauntArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
-        Integer turns = effect.getTurns();
+        Integer turns = args.turns();
         if (turns == null || turns <= 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires a positive \"turns\" (how long the taunt lasts); the documents "
@@ -42,7 +42,7 @@ final class TauntOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.taunt(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, TauntArgs args) {
+        TriggerEffects.taunt(ctx, args);
     }
 }

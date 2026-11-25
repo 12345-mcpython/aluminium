@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * states" counts nothing. Both together is legal too: "the newest two of that class". What counts as negative is
  * {@code AbstractBuff.isDebuff()}, decided per buff class.
  */
-final class DispelOp implements OpHandler<OpArgs> {
+final class DispelOp implements OpHandler<DispelArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,14 +18,14 @@ final class DispelOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public DispelArgs parse(EffectSpec effect) {
+        return new DispelArgs(effect.getKind(), effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(DispelArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
-        if (effect.getKind() != null && !effect.getKind().isBlank()) {
+        if (args.kind() != null && !args.kind().isBlank()) {
             TriggerValidator.requireDebuffClass(effect, op, rule);
         } else {
             TriggerValidator.requirePositiveAmount(effect, op, rule);
@@ -35,7 +35,7 @@ final class DispelOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.dispel(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, DispelArgs args) {
+        TriggerEffects.dispel(ctx, args);
     }
 }

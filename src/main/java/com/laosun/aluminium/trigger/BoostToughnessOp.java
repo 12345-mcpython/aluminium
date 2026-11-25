@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * {@code Battle.reduceToughness}, which enemy skills and the demo also call. A {@code scale} is <b>refused</b>: the
  * magnitude is read as a plain {@code percent} when the buff is built, so a scale would load and do nothing.
  */
-final class BoostToughnessOp implements OpHandler<OpArgs> {
+final class BoostToughnessOp implements OpHandler<BoostToughnessArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class BoostToughnessOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public BoostToughnessArgs parse(EffectSpec effect) {
+        return new BoostToughnessArgs(effect, effect.getTurns(), effect.getPerStack(), effect.getPerStackCap());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(BoostToughnessArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         if (effect.getScale() != null && !effect.getScale().isBlank()) {
             throw new IllegalArgumentException(
@@ -37,7 +37,7 @@ final class BoostToughnessOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.boostToughness(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, BoostToughnessArgs args) {
+        TriggerEffects.boostToughness(ctx, args);
     }
 }

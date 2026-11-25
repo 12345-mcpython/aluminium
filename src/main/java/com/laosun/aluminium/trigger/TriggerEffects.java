@@ -912,12 +912,13 @@ final class TriggerEffects {
         }
     }
 
-    static void taunt(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+    static void taunt(OpContext ctx, TauntArgs args) {
+        for (CanHit target : ctx.targets()) {
             // Note: Through the resist pipeline like every other negative state: "make the target enter the taunt state" states no
             // probability, which means a 100% BASE chance - the game still runs it through Effect Hit Rate / Effect RES. Writing
             // the marker directly made the engine's taunt unconditionally certain, which no document says.
-            battle.tryApplyDebuff(ctx.owner(), target, TriggerInterpreter.withSource(new TauntBuff(effect.getTurns()), ctx), 1.0, null);
+            ctx.battle().tryApplyDebuff(ctx.firing().owner(), target,
+                    TriggerInterpreter.withSource(new TauntBuff(args.turns()), ctx.firing()), 1.0, null);
         }
     }
 
@@ -936,16 +937,16 @@ final class TriggerEffects {
      * @param effect the effect ({@code amount}, optional {@code target})
      * @param ctx    the context
      */
-    static void dispel(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        // A CLASS may be named: "remove ... all control-class negative states" (1415's memosprite skill 8). With a class and
-        // no amount it means ALL of that class -- "all" spells no count -- which is why the validation below accepts either.
-        com.laosun.aluminium.enums.DebuffClass kind = effect.getKind() == null || effect.getKind().isBlank()
+    static void dispel(OpContext ctx, DispelArgs args) {
+        // A CLASS may be named: "remove ... all control-class negative states". With a class and no amount it means ALL
+        // of that class -- "all" spells no count -- which is why validation accepts either.
+        com.laosun.aluminium.enums.DebuffClass kind = args.kind() == null || args.kind().isBlank()
                 ? null
-                : com.laosun.aluminium.enums.DebuffClass.fromString(effect.getKind().trim());
-        int amount = effect.getValue() != null
-                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
-                : effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                : com.laosun.aluminium.enums.DebuffClass.fromString(args.kind().trim());
+        int amount = args.magnitude().getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(args.magnitude(), ctx.firing()))
+                : args.magnitude().getAmount() == null ? 0 : (int) Math.round(args.magnitude().getAmount());
+        for (CanHit target : ctx.targets()) {
             if (kind == null) {
                 target.getBuffManager().removeDebuffs(amount);
             } else {
@@ -1167,15 +1168,16 @@ final class TriggerEffects {
      * alternative (a field on the damage instance) would need the reduction to be part of the instance, which is exactly
      * what the engine's split (damage first, then a second number) avoids.
      */
-    static void boostToughness(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+    static void boostToughness(OpContext ctx, BoostToughnessArgs args) {
+        for (CanHit target : ctx.targets()) {
             if (target == null) {
                 continue;
             }
             AbstractBuff boost = TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
-                    new com.laosun.aluminium.buff.ToughnessBoostBuff(TriggerMagnitudes.shareOf(effect, ctx), effect.getTurns(),
-                            effect.getPerStack(), effect.getPerStackCap() == null ? 0 : effect.getPerStackCap()),
-                    effect), ctx);
+                    new com.laosun.aluminium.buff.ToughnessBoostBuff(
+                            TriggerMagnitudes.shareOf(args.magnitude(), ctx.firing()), args.turns(),
+                            args.perStack(), args.perStackCap() == null ? 0 : args.perStackCap()),
+                    ctx.effect()), ctx.firing());
             target.getBuffManager().addBuff(boost);
         }
     }
