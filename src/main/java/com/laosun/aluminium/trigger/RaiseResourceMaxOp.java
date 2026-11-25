@@ -2,13 +2,15 @@ package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
+import com.laosun.aluminium.entity.CanHit;
+import com.laosun.aluminium.state.Resource;
 
 /**
  * {@code RAISE_RESOURCE_MAX}: raise the resource's <b>declaration</b>, for the rest of the battle.
  *
  * <p>The tier below the overflow allowance {@code RAISE_RESOURCE_CAP} widens - one op must not mean two numbers.
  */
-final class RaiseResourceMaxOp implements OpHandler<OpArgs> {
+final class RaiseResourceMaxOp implements OpHandler<RaiseResourceMaxArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -16,12 +18,14 @@ final class RaiseResourceMaxOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public RaiseResourceMaxArgs parse(EffectSpec effect) {
+        return new RaiseResourceMaxArgs(
+                effect.getResource() == null ? "" : effect.getResource().trim(),
+                effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(RaiseResourceMaxArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireResource(effect, op, rule);
         TriggerValidator.requirePositiveAmount(effect, op, rule);
@@ -30,7 +34,11 @@ final class RaiseResourceMaxOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.raiseResourceMax(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, RaiseResourceMaxArgs args) {
+        CanHit holder = ctx.requireTarget("target");
+        Resource resource = TriggerInterpreter.resourceFor(ctx.battle(), holder, args.resource(), op().name());
+        resource.raiseMax(args.magnitude().getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(args.magnitude(), ctx.firing()))
+                : (int) Math.round(args.magnitude().getAmount()));
     }
 }

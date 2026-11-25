@@ -2,14 +2,16 @@ package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
+import com.laosun.aluminium.entity.CanHit;
 
 /**
  * {@code RAISE_ENERGY_BANK}: set how much energy may overflow into the bank.
  *
  * <p>About the <b>energy bar</b>, not a resource - resource overflow is {@code RAISE_RESOURCE_CAP}, and the two must
- * not share a spelling, so naming a {@code resource} here is refused.
+ * not share a spelling, so naming a {@code resource} here is refused. The number is the ALLOWANCE itself, not a delta:
+ * both sentences state the total, and a derived delta (200 − 120 = 80) is a number no param column carries.
  */
-final class RaiseEnergyBankOp implements OpHandler<OpArgs> {
+final class RaiseEnergyBankOp implements OpHandler<RaiseEnergyBankArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -17,12 +19,12 @@ final class RaiseEnergyBankOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public RaiseEnergyBankArgs parse(EffectSpec effect) {
+        return new RaiseEnergyBankArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(RaiseEnergyBankArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requirePositiveAmount(effect, op, rule);
         TriggerValidator.requireNoDuration(effect, op, rule);
@@ -35,7 +37,10 @@ final class RaiseEnergyBankOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.energyBankCap(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, RaiseEnergyBankArgs args) {
+        CanHit holder = ctx.requireTarget("target");
+        holder.setEnergyBankCap(args.magnitude().getValue() != null
+                ? TriggerMagnitudes.valueOf(args.magnitude(), ctx.firing())
+                : args.magnitude().getAmount());
     }
 }

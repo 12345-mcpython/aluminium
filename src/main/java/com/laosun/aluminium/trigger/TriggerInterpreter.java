@@ -863,95 +863,34 @@ public final class TriggerInterpreter {
         return effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
     }
 
-    /**
-     * {@code RAISE_RESOURCE_MAX}: 「【热意】上限提高至 50 点」 - the <b>declared</b> cap, not the overflow tier above it.
-     *
-     * <p><b>Why a second op instead of a flag on {@link #raiseResourceCap}.</b> That one widens {@code maxOverflow}, the
-     * tier where 「可溢出点数」 lives (1407/1408/1512), and normal gains clamp at {@code getMax()} -- a different number.
-     * A flag would make one op mean two quantities, which is the class of ambiguity this vocabulary keeps refusing.
-     *
-     * <p>The raise is additive and lasts the battle ({@code Resource.raiseMax}); the resource must be declared by the
-     * unit or be a battle-level party counter, the same resolution {@code RAISE_RESOURCE_CAP} uses.
-     *
-     * @param effect the effect ({@code resource} + {@code amount}, or a {@code value} provider)
-     * @param ctx    the firing context
-     */
-    static void raiseResourceMax(EffectSpec effect, TriggerContext ctx) {
-        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
-        com.laosun.aluminium.state.Resource resource = holder.getResources().get(effect.getResource());
-        if (resource == null) {
-            resource = ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource());
-        }
-        if (resource == null) {
-            throw new IllegalStateException("RAISE_RESOURCE_MAX names the resource '" + effect.getResource()
-                    + "', which this unit neither declares nor has at party level");
-        }
-        resource.raiseMax(effect.getValue() != null
-                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
-                : (int) Math.round(effect.getAmount()));
-    }
-    /**
-     * {@code RAISE_ENERGY_BANK}: 「可积攒最多 120 点溢出能量」 / 「【湖之祝福】可积攒的溢出能量提高到 200 点」.
-     *
-     * <p>The number is the ALLOWANCE itself, not a delta: both sentences state the total, and the corpus guard
-     * {@code EidolonNumbersComeFromTheDataTest} refuses a number that no param column carries (200 − 120 = 80 is exactly
-     * such a number). Two rules on one event therefore order-depend, which is the convention elsewhere in this project.
-     *
-     * @param effect the effect ({@code amount} = how many points of overflow may be kept in total)
-     * @param ctx    the firing context
-     */
-    static void energyBankCap(EffectSpec effect, TriggerContext ctx) {
-        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
-        holder.setEnergyBankCap(effect.getValue() != null
-                ? TriggerMagnitudes.valueOf(effect, ctx)
-                : effect.getAmount());
-    }
+
 
     /**
-     * {@code DRAW_ENERGY_BANK}: 「施放终结技后清空并恢复相应的能量值」.
+     * The resource a unit carries under that name, or the battle-level counter when it is declared at PARTY scope.
      *
-     * <p>The amount is whatever the unit banked, so nothing is stated here; the bar's own cap still applies (a refund is
-     * not a way past {@code max}). Readers: 1014 Saber's trace 湖之祝福.
+     * <p>A PARTY-scoped resource has no home on the unit - [新蕊] is declared `scope: PARTY` - so the fallback is the
+     * battle-level counter, which is the SAME {@code Resource} object and therefore carries the settable overflow.
      *
-     * @param effect the effect (optionally a {@code target}; the owner by default)
-     * @param ctx    the firing context
+     * @param battle the battlefield, for the party-level fallback
+     * @param holder the unit named by the effect
+     * @param id     the resource name as written
+     * @param op     the op, for the error message
+     * @return the resource
+     * @throws IllegalStateException when neither the unit nor the party declares it
      */
-    static void energyBankDraw(EffectSpec effect, TriggerContext ctx) {
-        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
-        holder.drawEnergyBank();
-    }
-
-    /**
-     * Widens a resource's OVERFLOW for its owner (reader: 114151"[新蕊] can overflow to #3%").
-     *
-     * <p>A declaration states one overflow; a sentence can raise it for the battle. The NORMAL cap is untouched -- this is only the second tier, which is what the sentence is about.
-     *
-     * <p>{@code unbounded: true} sets the allowance to {@link Integer#MAX_VALUE} instead of adding a count, which is
-     * <b>the largest cap the engine can hold</b> - reader: 1408 Phainon (白厄)'s Eidolon 6, 「【火种】的可溢出点数<u>不再
-     * 拥有上限</u>」. {@code Resource.absoluteMax()} saturates on the sum, so the invariant still holds. The two spellings
-     * are exclusive: "by this many more" and "by no limit" are different claims (the validator refuses the pair).
-     */
-    static void raiseResourceCap(EffectSpec effect, TriggerContext ctx) {
-        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
-        // A PARTY-scoped resource has no home on the unit (the same fact `gainResource` records) -- [新蕊] is declared `scope: PARTY` -- so the fallback is the
-        // battle-level counter, which is the SAME `Resource` object and therefore carries the settable overflow.
-        com.laosun.aluminium.state.Resource resource = holder.getResources().get(effect.getResource());
+    static com.laosun.aluminium.state.Resource resourceFor(BattlePort battle, CanHit holder, String id, String op) {
+        com.laosun.aluminium.state.Resource resource = holder.getResources().get(id);
         if (resource == null) {
-            resource = ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource());
+            resource = battle == null ? null : battle.partyResource(id);
         }
         if (resource == null) {
-            throw new IllegalStateException("RAISE_RESOURCE_CAP names the resource '" + effect.getResource()
+            throw new IllegalStateException(op + " names the resource '" + id
                     + "', which this unit neither declares nor has at party level");
         }
-        if (Boolean.TRUE.equals(effect.getUnbounded())) {
-            resource.setMaxOverflow(Integer.MAX_VALUE);
-            return;
-        }
-        int raise = effect.getValue() != null
-                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
-                : (int) Math.round(effect.getAmount());
-        resource.setMaxOverflow(resource.getMaxOverflow() + raise);
+        return resource;
     }
+
+
 
     private static void gainResource(EffectSpec effect, TriggerContext ctx,
                                      double previousCredited) {

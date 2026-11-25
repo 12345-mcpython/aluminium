@@ -7,7 +7,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * {@code DRAW_ENERGY_BANK}: empty the banked overflow back into the energy bar.
  *
  * <p>A separate op from {@code GAIN_ENERGY} because the amount is not stated anywhere - it is whatever the unit
- * happened to bank, so stating {@code amount} or a {@code resource} here is refused.
+ * happened to bank, so stating {@code amount} or a {@code resource} here is refused. Nothing about the effect is read at
+ * fire time beyond its target, which {@link OpContext#requireTarget} resolves.
  */
 final class DrawEnergyBankOp implements OpHandler<OpArgs> {
 
@@ -32,6 +33,6 @@ final class DrawEnergyBankOp implements OpHandler<OpArgs> {
 
     @Override
     public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.energyBankDraw(ctx.effect(), ctx.firing());
+        ctx.requireTarget("target").drawEnergyBank();
     }
 }
