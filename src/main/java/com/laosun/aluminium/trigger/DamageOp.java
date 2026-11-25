@@ -21,7 +21,7 @@ import java.util.List;
  * total, the original damage, or a share of a Max HP - each with its own requirement, and each refused beside the
  * others because two bases would mean the number twice.
  */
-final class DamageOp implements OpHandler<OpArgs> {
+final class DamageOp implements OpHandler<DamageArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -29,12 +29,32 @@ final class DamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public DamageArgs parse(EffectSpec effect) {
+        return new DamageArgs(
+                effect.getAttacker(),
+                effect.getBlast(),
+                effect.getSkill(),
+                effect.getElement(),
+                effect.getElationFrom(),
+                effect.getDamageType(),
+                effect.getPercentPerAllyState(),
+                effect.getAllyState(),
+                effect.getAllyStates() == null ? null : java.util.List.copyOf(effect.getAllyStates()),
+                Boolean.TRUE.equals(effect.getOrdinary()),
+                effect.getStance(),
+                Boolean.TRUE.equals(effect.getIgnoreWeakness()),
+                effect.getCritRate(),
+                effect.getCritDamage(),
+                effect.getCastCategory(),
+                Boolean.TRUE.equals(effect.getUnboosted()),
+                effect.getCountedLaughs(),
+                Boolean.TRUE.equals(effect.getSplit()),
+                Boolean.TRUE.equals(effect.getPerTarget()),
+                effect.getTimes());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(DamageArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         // `times` says "settle N independent times"; `per_target` says "multiply this one settlement by the event's
         // hit count". Together they have two readings, so the pair is refused.
@@ -161,16 +181,17 @@ final class DamageOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        EffectSpec effect = ctx.effect();
-        int times = TriggerInterpreter.timesCount(ctx.battle(), effect, ctx.firing());
+    public void apply(OpContext ctx, DamageArgs args) {
+        // `times` may be a provider ("once per stack") or the event's hit count, so the count itself is still resolved at
+        // fire time; only what the sentence STATES is in the arguments.
+        int times = TriggerInterpreter.timesCount(ctx.battle(), ctx.effect(), ctx.firing());
         if (times <= 0) {
             return;
         }
         for (int repeat = 0; repeat < times; repeat++) {
             List<CanHit> victims = ctx.targets();
             int divisor = 1;
-            if (Boolean.TRUE.equals(effect.getSplit())) {
+            if (args.split()) {
                 divisor = 0;
                 for (CanHit victim : victims) {
                     if (victim != null && !victim.isDeath()) {
@@ -180,7 +201,7 @@ final class DamageOp implements OpHandler<OpArgs> {
                 divisor = Math.max(1, divisor);
             }
             for (CanHit victim : victims) {
-                TriggerInterpreter.damage(ctx.battle(), effect, ctx.firing(), victim, divisor);
+                TriggerInterpreter.damage(args, ctx.effect(), ctx.battle(), ctx.firing(), victim, divisor);
             }
         }
     }

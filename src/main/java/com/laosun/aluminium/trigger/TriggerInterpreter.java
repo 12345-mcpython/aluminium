@@ -1925,9 +1925,9 @@ public final class TriggerInterpreter {
      * otherwise the battle's snapshot. One reader of the table, called from the two places that fold Elation damage, so the
      * two cannot drift apart.
      */
-    static double laughFactor(TriggerContext ctx, EffectSpec effect) {
-        if (effect != null && effect.getCountedLaughs() != null) {
-            double counted = effect.getCountedLaughs();
+    static double laughFactor(TriggerContext ctx, Double countedLaughs) {
+        if (countedLaughs != null) {
+            double counted = countedLaughs;
             if (counted < 0) {
                 throw new IllegalStateException("counted_laughs is " + counted
                         + "; a laugh count cannot be negative (source: " + ctx.ruleId() + ")");
@@ -2144,8 +2144,8 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      * @param victim the unit this instance is settled against
      */
-    private static void damage(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit victim) {
-        damage(battle, effect, ctx, victim, 1);
+    private static void damage(DamageArgs args, Magnitude magnitude, BattlePort battle, TriggerContext ctx, CanHit victim) {
+        damage(args, magnitude, battle, ctx, victim, 1);
     }
 
     /**
@@ -2154,8 +2154,8 @@ public final class TriggerInterpreter {
      * @param divisor how many victims are sharing the stated magnitude ({@code 1} = the ordinary per-victim reading;
      *                see {@link EffectSpec#getSplit()})
      */
-    static void damage(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
-        damage(battle, effect, ctx, victim, divisor, 1.0);
+    static void damage(DamageArgs args, Magnitude magnitude, BattlePort battle, TriggerContext ctx, CanHit victim, int divisor) {
+        damage(args, magnitude, battle, ctx, victim, divisor, 1.0);
     }
 
     /**
@@ -2163,16 +2163,16 @@ public final class TriggerInterpreter {
      *
      * @param blastShare the fraction of the centre's magnitude a neighbour takes ({@code 1.0} for the centre itself)
      */
-    private static void damage(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor,
-                               double blastShare) {
+    private static void damage(DamageArgs args, Magnitude magnitude, BattlePort battle, TriggerContext ctx,
+                               CanHit victim, int divisor, double blastShare) {
         CanHit attacker = ctx.owner();
         // `"attacker": "summon"`: the sentence says the MEMOSPRITE deals it (1409's 忆灵技1: 「小伊卡对敌方全体造成…」).
         // `"attacker": "actor"`: the sentence says the unit that CAUSED this event deals it (1202 Tingyun (停云)'s
         // 「获得【赐福】的目标施放攻击后，会额外造成 1 次等同于**其自身** 40% 攻击力的雷属性附加伤害」 - the damage is the
         // blessed ALLY's, not hers). Everything downstream - which unit's damage-dealt buffs apply, whose ATK the scale
         // reads - follows this one choice, so it is resolved once here rather than patched per zone.
-        if (effect.getAttacker() != null && !effect.getAttacker().isBlank()) {
-            String named = effect.getAttacker().trim();
+        if (args.attacker() != null && !args.attacker().isBlank()) {
+            String named = args.attacker().trim();
             if ("actor".equalsIgnoreCase(named)) {
                 if (ctx.actor() == null) {
                     throw new IllegalStateException("a DAMAGE states \"attacker\": \"actor\", but the event that fired it "
@@ -2217,19 +2217,19 @@ public final class TriggerInterpreter {
         // CENTRE's magnitude, not of the attacker's ATK - that is what 「等同于主目标 25%」 says - so the neighbours are settled
         // from the same effect with the magnitude scaled down. Stated on the effect rather than as a second DAMAGE rule because
         // the centre is drawn INSIDE this settlement: a separate rule cannot know which enemy the instance picked.
-        if (blastShare == 1.0 && effect.getBlast() != null && victim instanceof com.laosun.aluminium.enemy.Enemy centre) {
-            double share = effect.getBlast();
+        if (blastShare == 1.0 && args.blast() != null && victim instanceof com.laosun.aluminium.enemy.Enemy centre) {
+            double share = args.blast();
             for (CanHit neighbour : battle.adjacentEnemies(centre)) {
                 if (neighbour != null && !neighbour.isDeath()) {
-                    damage(battle, effect, ctx, neighbour, divisor, share);
+                    damage(args, magnitude, battle, ctx, neighbour, divisor, share);
                 }
             }
         }
         // ? A literal ratio states no skill at all: "deal damage equal to 80% of Sushang (素裳)'s ATK". The slot lookup is skipped, the multiplier comes
         // from `derivedMagnitude`, and `element` is required by the validator because there is no skill row to lend one.
-        boolean literalRatio = effect.getSkill() == null || effect.getSkill().isBlank();
+        boolean literalRatio = args.skill() == null || args.skill().isBlank();
         SkillType slot = literalRatio ? null
-                : SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+                : SkillType.valueOf(args.skill().trim().toUpperCase(Locale.ROOT));
         Skill skill = literalRatio ? null : attacker.getSkills().get(slot);
         if (!literalRatio && (skill == null || skill.getData() == null)) {
             throw new IllegalStateException(
@@ -2240,7 +2240,7 @@ public final class TriggerInterpreter {
         // while the ultimate itself is a Support skill. So a non-damaging slot is accepted when the rule states the
         // element -- that is the part the skill could not have supplied, and without it the instance would be
         // element-less, which is the silent hole this check was written for.
-        boolean statesElement = effect.getElement() != null && !effect.getElement().isBlank();
+        boolean statesElement = args.element() != null && !args.element().isBlank();
         // ? Skipped for a literal ratio: there is no slot to inspect, and the validator REQUIRES `element` for that form,
         // which is exactly the element-less instance this check was written to catch.
         if (!literalRatio && !skill.getData().getEffect().isDamaging() && !statesElement) {
@@ -2251,25 +2251,25 @@ public final class TriggerInterpreter {
                             + "to lend)");
         }
         double base = skill == null
-                ? TriggerMagnitudes.literalBase(attacker, victim, effect, ctx)   // ? a literal ratio: off the SETTLED attribute, a Max HP share, or the triggering instance's settled value
-                : attacker.getAttribute(AttributeType.ATTACK).get() * TriggerMagnitudes.multiplierOf(skill, effect, attacker)
+                ? TriggerMagnitudes.literalBase(attacker, victim, magnitude, ctx)   // ? a literal ratio: off the SETTLED attribute, a Max HP share, or the triggering instance's settled value
+                : attacker.getAttribute(AttributeType.ATTACK).get() * TriggerMagnitudes.multiplierOf(skill, magnitude, attacker)
                         // A multiplicative `MODIFY_RULE` amendment scales the ROW multiplier here: this share comes from
                         // `damage_param`, so `amendedEffect` (which only scales a literal `percent`) has nothing to multiply.
                         // Reader: 1314 Jade Eidolon 1 on her talent follow-up.
-                        * TriggerMagnitudes.amendmentScale(effect, ctx);
+                        * TriggerMagnitudes.amendmentScale(magnitude, ctx);
         // 「该次欢愉伤害使用【美学底本】的属性值计算」: the formula's UN-UNDERLINED terms are borrowed from the holder of the
         // named state - the base (this table's row, at the HOLDER's level), 欢愉度 and 增笑 - while the underlined ones
         // (the laugh factor, the six zones and the multiplier) stay the instance's own. Note what is NOT borrowed:
         // attack power, which the formula does not contain at all.
         CanHit elationSource = attacker;
-        if (effect.getElationFrom() != null && !effect.getElationFrom().isBlank()) {
-            String state = effect.getElationFrom().trim();
+        if (args.elationFrom() != null && !args.elationFrom().isBlank()) {
+            String state = args.elationFrom().trim();
             elationSource = TriggerTargets.holderOfOrNull(battle, state, ctx.owner());
             if (elationSource == null) {
                 throw new IllegalStateException("this Elation rider computes itself from the holder of 【" + state
                         + "】, and nobody on the field holds it");
             }
-            base = TriggerMagnitudes.elationBaseOf(elationSource, "the holder of 【" + state + "】") * TriggerMagnitudes.shareOf(effect, ctx);
+            base = TriggerMagnitudes.elationBaseOf(elationSource, "the holder of 【" + state + "】") * TriggerMagnitudes.shareOf(magnitude, ctx);
         }
         // "由敌方全体均分": this victim's share of the effect's stated TOTAL. Divided HERE, on the raw magnitude, so
         // everything downstream (the Elation fold, the zones, critical hits) applies to the share the sentence gives
@@ -2285,32 +2285,32 @@ public final class TriggerInterpreter {
         // `DamageType.ELATION` is deliberately not boostable, its own boost is folded into the BASE here, exactly as the cast
         // path does it in `SkillExecutor.hit` -- a type that settles but ignores its own boost zone is the silent hole this
         // project refuses.
-        DamageType damageType = effect.getDamageType() == null || effect.getDamageType().isBlank()
+        DamageType damageType = args.damageType() == null || args.damageType().isBlank()
                 ? null
-                : DamageType.fromString(effect.getDamageType().trim());
+                : DamageType.fromString(args.damageType().trim());
         // ⚠ A rule whose `skill` is TALENT deals a Talent's damage, and stating it here is what lets a screen tell it from a
         // counter or an ultimate's extra hits -- measured, all three arrive as ADDITIONAL and a front end cannot separate them
         // from the rule ordering (six attempts, each breaking a different case). The rule says so, so the engine stamps it.
         // A rule that names its own `damage_type` keeps it: that is a deliberate statement about the instance.
-        if (damageType == null && "TALENT".equalsIgnoreCase(effect.getSkill())) {
+        if (damageType == null && "TALENT".equalsIgnoreCase(args.skill())) {
             damageType = DamageType.TALENT;
         }
         // A share that grows with how many allies hold a state: `percent + per x count`. Expressed as a factor on the BASE
         // because that is where `percent` has already been multiplied in (the base is `percent x the source magnitude`), so
         // `base x (percent + term) / percent` is exactly the share the sentence describes - and it leaves every other row
         // (no `percent_per_ally_state`) untouched.
-        Double perAlly = effect.getPercentPerAllyState();
-        boolean statesTheCountedState = (effect.getAllyState() != null && !effect.getAllyState().isBlank())
-                || (effect.getAllyStates() != null && !effect.getAllyStates().isEmpty());
+        Double perAlly = args.percentPerAllyState();
+        boolean statesTheCountedState = (args.allyState() != null && !args.allyState().isBlank())
+                || (args.allyStates() != null && !args.allyStates().isEmpty());
         if (perAlly != null && statesTheCountedState
-                && base != 0 && effect.getPercent() != null && effect.getPercent() > 0) {
-            double term = TriggerMagnitudes.allyStateTerm(effect, ctx);
+                && base != 0 && magnitude.getPercent() != null && magnitude.getPercent() > 0) {
+            double term = TriggerMagnitudes.allyStateTerm(magnitude, ctx);
             if (term != 0) {
-                base *= 1 + term / effect.getPercent();
+                base *= 1 + term / magnitude.getPercent();
             }
         }
         double settledBase = damageType == DamageType.ELATION
-                ? base * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get()) * laughFactor(ctx, effect)
+                ? base * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get()) * laughFactor(ctx, args.countedLaughs())
                 : base;
         // `damage_type: "TRUE"` is true damage: it SKIPS every zone. Without this branch the op stamps the
         // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
@@ -2318,31 +2318,31 @@ public final class TriggerInterpreter {
         // engine's one true-damage entry: it sets `.trueDamage()`, which `toValue()` honours by skipping the zones.
         // Readers (2): 800 Trailblazer (开拓者)'s [迷迷的声援] (28%) and 1415 Cyrene (昔涟)'s zone (24%), both "true damage equal to X% of the original damage".
         if (damageType == DamageType.TRUE) {
-            battle.applyTrueDamage(attacker, victim, TriggerMagnitudes.elementOf(effect, skill, attacker),
+            battle.applyTrueDamage(attacker, victim, TriggerMagnitudes.elementOf(magnitude, skill, attacker),
                     settledBase);
             return;
         }
-        if (Boolean.TRUE.equals(effect.getOrdinary())) {
+        if (Boolean.TRUE.equals(args.ordinary())) {
             // An ORDINARY instance: the public `applyDamage` settles it as the main instance of a hit, so the
             // victim is credited energy and the instance is an attack -- exactly what "deal Physical damage equal to ..." means, and what the
             // additional-damage path (KILL_ONLY, not-an-attack) could not express.
-            battle.applyDamage(victim, new Damage(attacker, victim, TriggerMagnitudes.elementOf(effect, skill, attacker),
+            battle.applyDamage(victim, new Damage(attacker, victim, TriggerMagnitudes.elementOf(magnitude, skill, attacker),
                     damageType == null ? DamageType.NORMAL : damageType, settledBase));
             return;
         }
         // "天赋的追加攻击**无视弱点属性**削减敌方韧性" (1214's Eidolon 2 / Ultimate): a rule-driven instance never touched
         // toughness before, so a clause that wants it to had no spelling. Opt-in through the effect, and the weakness
         // gate is lifted only when the author says so.
-        if (effect.getStance() != null && victim instanceof com.laosun.aluminium.enemy.Enemy enemy
+        if (args.stance() != null && victim instanceof com.laosun.aluminium.enemy.Enemy enemy
                 && battle != null && battle.enemies().contains(enemy)) {
-            battle.reduceToughness(attacker, enemy, TriggerMagnitudes.elementOf(effect, skill, attacker),
-                    effect.getStance(), null, Boolean.TRUE.equals(effect.getIgnoreWeakness()));
+            battle.reduceToughness(attacker, enemy, TriggerMagnitudes.elementOf(magnitude, skill, attacker),
+                    args.stance(), null, Boolean.TRUE.equals(args.ignoreWeakness()));
         }
-        battle.applyAdditionalDamage(attacker, victim, TriggerMagnitudes.elementOf(effect, skill, attacker), settledBase,
-                effect.getCritRate(), effect.getCritDamage(), damageType, effect.getCastCategory() == null
-                        || effect.getCastCategory().isBlank() ? null
-                        : com.laosun.aluminium.enums.SkillCategory.fromString(effect.getCastCategory().trim()),
-                Boolean.TRUE.equals(effect.getUnboosted()));
+        battle.applyAdditionalDamage(attacker, victim, TriggerMagnitudes.elementOf(magnitude, skill, attacker), settledBase,
+                args.critRate(), args.critDamage(), damageType, args.castCategory() == null
+                        || args.castCategory().isBlank() ? null
+                        : com.laosun.aluminium.enums.SkillCategory.fromString(args.castCategory().trim()),
+                Boolean.TRUE.equals(args.unboosted()));
     }
 
 
