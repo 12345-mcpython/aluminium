@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * this op exists for. Registered here so the op has one dispatch path; it has <b>no</b> load-time checks today (it
  * falls through to {@code TriggerValidator}'s default arm).
  */
-final class BoostDotOp implements OpHandler<OpArgs> {
+final class BoostDotOp implements OpHandler<BoostDotArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,18 +18,18 @@ final class BoostDotOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public BoostDotArgs parse(EffectSpec effect) {
+        return new BoostDotArgs(effect, effect.getElement());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(BoostDotArgs args, EffectSpec effect, TriggerSpec rule) {
         // This op has no arm of its own in TriggerValidator, so this was the default check it used to get there.
         TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.boostDot(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, BoostDotArgs args) {
+        TriggerInterpreter.boostDot(ctx, args);
     }
 }

@@ -11,7 +11,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * {@code TriggerValidator} today (it falls through to the default arm) - writing them is separate work, because a new
  * check can refuse content that loads today.
  */
-final class SetStacksOp implements OpHandler<OpArgs> {
+final class SetStacksOp implements OpHandler<SetStacksArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,18 +19,18 @@ final class SetStacksOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public SetStacksArgs parse(EffectSpec effect) {
+        return new SetStacksArgs(effect.getBuff(), effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(SetStacksArgs args, EffectSpec effect, TriggerSpec rule) {
         // This op has no arm of its own in TriggerValidator, so this was the default check it used to get there.
         TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.setStacks(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, SetStacksArgs args) {
+        TriggerEffects.setStacks(ctx, args);
     }
 }

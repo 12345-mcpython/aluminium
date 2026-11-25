@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * three are one vocabulary. {@code attribute} is the other filter, and {@code kind: "own"} is the origin filter
  * {@code EXTEND_BUFF} has always had. No count: "remove ... state" takes the state off, it does not take N of them.
  */
-final class RemoveStateOp implements OpHandler<OpArgs> {
+final class RemoveStateOp implements OpHandler<RemoveStateArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class RemoveStateOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public RemoveStateArgs parse(EffectSpec effect) {
+        return new RemoveStateArgs(effect.getBuff(), effect.getAttribute(), effect.getKind());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(RemoveStateArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         if (effect.getAttribute() != null && !effect.getAttribute().isBlank()) {
             TriggerValidator.requireAttribute(effect, op, rule);
@@ -48,7 +48,7 @@ final class RemoveStateOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.removeState(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, RemoveStateArgs args) {
+        TriggerEffects.removeState(ctx, args);
     }
 }

@@ -30,6 +30,14 @@ final class DismissSummonOp implements OpHandler<OpArgs> {
 
     @Override
     public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.dismissSummon(ctx.battle(), ctx.effect(), ctx.firing());
+        for (com.laosun.aluminium.entity.CanHit target : ctx.targets()) {
+            if (!(target instanceof com.laosun.aluminium.entity.Summon summon)) {
+                throw new IllegalStateException("DISMISS_SUMMON resolved "
+                        + (target == null ? "null" : target.getName()) + ", which is not a summon");
+            }
+            if (!summon.isDeath()) {
+                summon.perish();
+            }
+        }
     }
 }

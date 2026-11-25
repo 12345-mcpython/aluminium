@@ -9,7 +9,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * <p>Its magnitude is a HEAL amount, so it takes the heal/shield scale vocabulary, not the {@code self_attr:} one the
  * modifier family uses - "equal to 20% of her Max HP" is {@code owner_max_hp}.
  */
-final class ApplyRegenOp implements OpHandler<OpArgs> {
+final class ApplyRegenOp implements OpHandler<ApplyRegenArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -17,12 +17,12 @@ final class ApplyRegenOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ApplyRegenArgs parse(EffectSpec effect) {
+        return new ApplyRegenArgs(effect.getBuff() == null ? "" : effect.getBuff().trim(), effect, effect.getTurns());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ApplyRegenArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireAmountOrScale(effect, op, rule, TriggerValidator.SCALES, "Max HP");
         TriggerValidator.requireDuration(effect, op, rule);
@@ -30,7 +30,7 @@ final class ApplyRegenOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.applyRegen(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, ApplyRegenArgs args) {
+        TriggerEffects.applyRegen(ctx, args);
     }
 }

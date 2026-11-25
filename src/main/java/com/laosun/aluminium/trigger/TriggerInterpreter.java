@@ -1868,44 +1868,22 @@ public final class TriggerInterpreter {
 
 
 
-    /**
-     * 「并使「长夜」消失」: takes a summon off the field <b>without a death</b>.
-     *
-     * <p>Reader: 11413/7 「迷梦，流失，如露」 - 「施放后，消耗全部【忆质】和生命值，并使「长夜」消失」. {@code perish()} is the
-     * engine's "it went away, nobody killed it" (its own javadoc), and the death sweep then announces
-     * {@link TriggerEvent#SUMMON_LEFT}, which is what 风堇's aura and 长夜's own departure rules listen for - so this op
-     * reuses that seam rather than inventing a second removal path.
-     *
-     * <p>⚠ A resolved target that is <b>not</b> a summon is a data error, not a silent no-op: "dismiss" applied to a
-     * character would read as working (nothing happens) while the sentence is about something else entirely.
-     */
-    static void dismissSummon(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-            if (!(target instanceof com.laosun.aluminium.entity.Summon summon)) {
-                throw new IllegalStateException("DISMISS_SUMMON resolved "
-                        + (target == null ? "null" : target.getName()) + ", which is not a summon");
-            }
-            if (!summon.isDeath()) {
-                summon.perish();
-            }
-        }
-    }
 
     /**
      * 「她施加的灼烧状态的**伤害倍率提升 40%**」 (1210 Guinaifen (桂乃芬) 星魂 2): multiply what the DoTs ALREADY on the target settle
      * for. Only the owner's own applications are touched - the sentence is about the burn SHE applied - and only the element the
      * rule names.
      */
-    static void boostDot(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        double factor = 1 + TriggerMagnitudes.shareOf(effect, ctx);
+    static void boostDot(OpContext ctx, BoostDotArgs args) {
+        double factor = 1 + TriggerMagnitudes.shareOf(args.magnitude(), ctx.firing());
         com.laosun.aluminium.enums.DamageElement onlyElement =
-                effect.getElement() == null || effect.getElement().isBlank()
+                args.element() == null || args.element().isBlank()
                         ? null
-                        : com.laosun.aluminium.enums.DamageElement.valueOf(effect.getElement().trim().toUpperCase());
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+                        : com.laosun.aluminium.enums.DamageElement.valueOf(args.element().trim().toUpperCase());
+        for (CanHit target : ctx.targets()) {
             for (com.laosun.aluminium.buff.DotBuff dot
                     : target.getBuffManager().allBuffsOf(com.laosun.aluminium.buff.DotBuff.class)) {
-                if (dot.getSource() != ctx.owner()) {
+                if (dot.getSource() != ctx.firing().owner()) {
                     continue;
                 }
                 if (onlyElement != null && dot.getElement() != onlyElement) {

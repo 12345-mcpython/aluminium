@@ -725,11 +725,11 @@ final class TriggerEffects {
      * directions - a unit below the goal gains layers, one above loses them - and layers already equal are left alone,
      * which is what "set" means. Reader: 1218 Jiaoqiu's Ultimate (「把敌方目标的层数统一设置为场上最高值」).
      */
-    static void setStacks(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        String name = effect.getBuff() == null ? "" : effect.getBuff().trim();
-        double wanted = TriggerMagnitudes.resolveScale(effect.getScale(),
-                effect.getPercent() == null ? 1 : effect.getPercent(), ctx);
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+    static void setStacks(OpContext ctx, SetStacksArgs args) {
+        String name = args.buffName() == null ? "" : args.buffName().trim();
+        double wanted = TriggerMagnitudes.resolveScale(args.magnitude().getScale(),
+                args.magnitude().getPercent() == null ? 1 : args.magnitude().getPercent(), ctx.firing());
+        for (CanHit target : ctx.targets()) {
             int current = target.getBuffManager().stacksOf(name);
             int goal = Math.max(0, (int) Math.round(wanted));
             for (int layer = current; layer < goal; layer++) {
@@ -895,19 +895,18 @@ final class TriggerEffects {
      * <p>Note: Its name is required, and not for bookkeeping: "the regeneration effect produced by casting the Skill is extended by 1 turn" (1105 trace 调理) and any
      * removal by name reach it through that string, exactly as a relic set's temporary buff does.
      */
-    static void applyRegen(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        String name = effect.getBuff() == null ? "" : effect.getBuff().trim();
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+    static void applyRegen(OpContext ctx, ApplyRegenArgs args) {
+        for (CanHit target : ctx.targets()) {
             if (target == null || target.isDeath()) {
                 continue;
             }
             // Note: grantAmount, not derivedMagnitude: the regeneration's magnitude is a HEAL amount, so it shares the
-            // heal/shield scale vocabulary and is worked out per carrier (a 	arget_max_hp regeneration is a different
+            // heal/shield scale vocabulary and is worked out per carrier (a target_max_hp regeneration is a different
             // number for each one). The value is derived once, here, and frozen in the buff.
-            double amount = TriggerInterpreter.grantAmount(effect, target, ctx);
+            double amount = TriggerInterpreter.grantAmount(args.magnitude(), target, ctx.firing());
             AbstractBuff regen = TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
-                    new com.laosun.aluminium.buff.RegenBuff(ctx.owner(), name, amount, effect.getTurns()),
-                    effect), ctx);
+                    new com.laosun.aluminium.buff.RegenBuff(ctx.firing().owner(), args.buffName(), amount, args.turns()),
+                    ctx.effect()), ctx.firing());
             target.getBuffManager().addBuff(regen);
         }
     }
@@ -987,16 +986,16 @@ final class TriggerEffects {
         }
     }
 
-    static void removeState(EffectSpec effect, TriggerContext ctx) {
-        AttributeType byAttribute = effect.getAttribute() == null || effect.getAttribute().isBlank()
+    static void removeState(OpContext ctx, RemoveStateArgs args) {
+        AttributeType byAttribute = args.attribute() == null || args.attribute().isBlank()
                 ? null
-                : AttributeType.fromString(effect.getAttribute().trim());
-        boolean own = effect.getKind() != null && "own".equalsIgnoreCase(effect.getKind().trim());
-        for (CanHit target : TriggerTargets.resolveTargets(ctx.battle(), effect, ctx)) {
+                : AttributeType.fromString(args.attribute().trim());
+        boolean own = args.kind() != null && "own".equalsIgnoreCase(args.kind().trim());
+        for (CanHit target : ctx.targets()) {
             if (own) {
-                target.getBuffManager().removeStateFrom(ctx.owner(), effect.getBuff(), byAttribute);
+                target.getBuffManager().removeStateFrom(ctx.firing().owner(), args.buff(), byAttribute);
             } else if (byAttribute == null) {
-                target.getBuffManager().removeState(effect.getBuff());
+                target.getBuffManager().removeState(args.buff());
             } else {
                 target.getBuffManager().removeState(byAttribute);
             }

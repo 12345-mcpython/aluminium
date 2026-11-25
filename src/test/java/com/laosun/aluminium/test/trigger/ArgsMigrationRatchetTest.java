@@ -76,7 +76,11 @@ public class ArgsMigrationRatchetTest {
             "REMOVE_BUFF",
             "TAUNT",
             "DISPEL",
-            "BOOST_TOUGHNESS");
+            "BOOST_TOUGHNESS",
+            "APPLY_REGEN",
+            "REMOVE_STATE",
+            "SET_STACKS",
+            "BOOST_DOT");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {
