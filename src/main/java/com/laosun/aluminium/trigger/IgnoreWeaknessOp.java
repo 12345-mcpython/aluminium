@@ -7,11 +7,15 @@ import com.laosun.aluminium.entity.CanHit;
 /**
  * {@code IGNORE_WEAKNESS}: the next N casts do not need a weakness to reduce toughness.
  *
- * <p>The cast still reports through; only the weakness gate stops refusing it, which is why the flag lives on the unit
- * and is read by {@code SkillExecutor} rather than here. Registered here so the op has one dispatch path; it has no
- * load-time checks today (it falls through to {@code TriggerValidator}'s default arm).
+ * <p>The cast still reports through; only the weakness gate stops refusing it, which is why the count lives on the unit
+ * and is read by {@code SkillExecutor} rather than here.
+ *
+ * <p><b>The first op whose arguments are parsed rather than re-read.</b> {@code amount} used to be read out of the bean
+ * on every firing; it is a literal count, so it is read once while the table compiles and the run-time half uses
+ * {@link IgnoreWeaknessArgs}. The unstated case ({@code amount} absent) means "one cast", which is a decision the parse
+ * makes once instead of on every hit.
  */
-final class IgnoreWeaknessOp implements OpHandler<OpArgs> {
+final class IgnoreWeaknessOp implements OpHandler<IgnoreWeaknessArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,21 +23,21 @@ final class IgnoreWeaknessOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public IgnoreWeaknessArgs parse(EffectSpec effect) {
+        int casts = effect.getAmount() == null ? 1 : (int) Math.round(effect.getAmount());
+        return new IgnoreWeaknessArgs(casts);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
-        // This op has no arm of its own in TriggerValidator, so this was the default check it used to get there.
+    public void validate(IgnoreWeaknessArgs args, EffectSpec effect, TriggerSpec rule) {
+        // No arm of its own in TriggerValidator: this was the `default` check it used to get there.
         TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        int casts = ctx.effect().getAmount() == null ? 1 : (int) Math.round(ctx.effect().getAmount());
+    public void apply(OpContext ctx, IgnoreWeaknessArgs args) {
         for (CanHit target : ctx.targets()) {
-            target.markIgnoreWeaknessCasts(casts);
+            target.markIgnoreWeaknessCasts(args.casts());
         }
     }
 }
