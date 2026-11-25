@@ -1,0 +1,607 @@
+==============================================================================
+Battle — driven headlessly by BattleDriver
+==============================================================================
+Party   Himeko / March 7th / Luocha
+Enemies 冰锋 / 基层员工•外勤 / 次元扑满
+
+[Ally]  Himeko         HP 2811.8/2811.8  ATK 3807.1  SPD 121  Energy 0/120
+[Ally]  March 7th      HP 1058.4/1058.4  ATK 511.6  SPD 101  Energy 0/120
+[Ally]  Luocha         HP 1511.2/1511.2  ATK 968.6  SPD 101  Energy 0/100
+[Enemy] 冰锋             HP 30000/30000  ATK 662.8  SPD 132  Toughness 60/60  Weak [FIRE, THUNDER]
+[Enemy] 基层员工•外勤        HP 30000/30000  ATK 662.8  SPD 155.8  Toughness 60/60  Weak [FIRE, ICE]
+[Enemy] 次元扑满           HP 30000/30000  ATK 662.8  SPD 109.6  Toughness 90/90  Weak [PHYSICAL, QUANTUM, IMAGINARY]
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 1 (round 1) — 基层员工•外勤
+── before: HP 30000/30000  toughness 60/60
+── action bar: 基层员工•外勤(0) → 冰锋(17.3) → Himeko(27.7) → 次元扑满(40.6) → March 7th(52.2) → Luocha(52.2)
+   casts [? 0] → March 7th  (basic attack)
+   · Himeko unchanged
+   · March 7th HP 1058.4→653.9 (-404.5); energy 0→10
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: 冰锋(17.3) → Himeko(27.7) → 次元扑满(40.6) → March 7th(52.2) → Luocha(52.2) → 基层员工•外勤(64.2)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 2 (round 1) — 冰锋
+── before: HP 30000/30000  toughness 60/60
+── action bar: 冰锋(0) → Himeko(10.3) → 次元扑满(23.3) → March 7th(34.9) → Luocha(34.9) → 基层员工•外勤(46.9)
+   casts [? 0] → Himeko  (basic attack)
+   · Himeko HP 2811.8→2447.2 (-364.6); energy 0→10
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Himeko(10.3) → 次元扑满(23.3) → March 7th(34.9) → Luocha(34.9) → 基层员工•外勤(46.9) → 冰锋(75.8)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 3 (round 1) — Himeko
+── before: HP 2447.2/2811.8  energy 10/120  shield 0
+── action bar: Himeko(0) → 次元扑满(12.9) → March 7th(24.5) → Luocha(24.5) → 基层员工•外勤(36.5) → 冰锋(65.4)
+   casts [BPSKILL 1003] → 冰锋  (target is weak to it)
+   · Himeko energy 10→45
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 HP 30000→14755.9 (-15244.1); toughness 60→0
+   · 基层员工•外勤 HP 30000→27943.8 (-2056.2); toughness 60→30
+   · 次元扑满 unchanged
+   action bar: 次元扑满(12.9) → March 7th(24.5) → Luocha(24.5) → 基层员工•外勤(36.5) → Himeko(82.6) → 冰锋(84.4)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 4 (round 1) — 次元扑满
+── before: HP 30000/30000  toughness 90/90
+── action bar: 次元扑满(0) → March 7th(11.6) → Luocha(11.6) → 基层员工•外勤(23.6) → Himeko(69.7) → 冰锋(71.4)
+   casts [? 0] → Luocha  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha HP 1511.2→1221.4 (-289.8); energy 0→10
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: March 7th(11.6) → Luocha(11.6) → 基层员工•外勤(23.6) → Himeko(69.7) → 冰锋(71.4) → 次元扑满(91.3)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 5 (round 1) — March 7th
+── before: HP 653.9/1058.4  energy 10/120  shield 0
+── action bar: March 7th(0) → Luocha(0) → 基层员工•外勤(12.0) → Himeko(58.1) → 冰锋(59.8) → 次元扑满(79.7)
+   casts [BPSKILL 1001] → March 7th  (shielding the party)
+   · Himeko unchanged
+   · March 7th energy 10→40
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Luocha(0) → 基层员工•外勤(12.0) → Himeko(58.1) → 冰锋(59.8) → 次元扑满(79.7) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 6 (round 1) — Luocha
+── before: HP 1221.4/1511.2  energy 10/100  shield 0
+── action bar: Luocha(0) → 基层员工•外勤(12.0) → Himeko(58.1) → 冰锋(59.8) → 次元扑满(79.7) → March 7th(99.0)
+   casts [NORMAL 1203] → 次元扑满  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha energy 10→30
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 30000→29835.5 (-164.5); toughness 90→60
+   action bar: 基层员工•外勤(12.0) → Himeko(58.1) → 冰锋(59.8) → 次元扑满(79.7) → March 7th(99.0) → Luocha(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 7 (round 2) — 基层员工•外勤
+── before: HP 27943.8/30000  toughness 30/60
+── action bar: 基层员工•外勤(0) → Himeko(46.1) → 冰锋(47.8) → 次元扑满(67.7) → March 7th(87.0) → Luocha(87.0)
+   casts [? 0] → March 7th  (basic attack)
+   · Himeko unchanged
+   · March 7th energy 40→50
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Himeko(46.1) → 冰锋(47.8) → 基层员工•外勤(64.2) → 次元扑满(67.7) → March 7th(87.0) → Luocha(87.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 8 (round 2) — Himeko
+── before: HP 2447.2/2811.8  energy 45/120  shield 0
+── action bar: Himeko(0) → 冰锋(1.7) → 基层员工•外勤(18.1) → 次元扑满(21.6) → March 7th(40.9) → Luocha(40.9)
+   casts [BPSKILL 1003] → 冰锋  (target is weak to it)
+   · Himeko energy 45→80
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 HP 14755.9→9044.2 (-5711.7)
+   · 基层员工•外勤 HP 27943.8→20586.7 (-7357.1); toughness 30→0
+   · 次元扑满 unchanged
+   action bar: 冰锋(1.7) → 次元扑满(21.6) → 基层员工•外勤(34.1) → March 7th(40.9) → Luocha(40.9) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 9 (round 2) — 冰锋
+── before: HP 9044.2/30000  toughness 0/60
+── action bar: 冰锋(0) → 次元扑满(19.9) → 基层员工•外勤(32.4) → March 7th(39.2) → Luocha(39.2) → Himeko(80.9)
+   casts [? 0] → Luocha  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha HP 1221.4→738.3 (-483.0); energy 30→40
+   · 冰锋 HP 9044.2→8898.5 (-145.7); toughness 0→60
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: 次元扑满(19.9) → 基层员工•外勤(32.4) → March 7th(39.2) → Luocha(39.2) → 冰锋(75.8) → Himeko(80.9)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 10 (round 2) — 次元扑满
+── before: HP 29835.5/30000  toughness 60/90
+── action bar: 次元扑满(0) → 基层员工•外勤(12.6) → March 7th(19.3) → Luocha(19.3) → 冰锋(55.9) → Himeko(61.1)
+   casts [? 0] → Himeko  (basic attack)
+   · Himeko HP 2447.2→2228.5 (-218.8); energy 80→90
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: 基层员工•外勤(12.6) → March 7th(19.3) → Luocha(19.3) → 冰锋(55.9) → Himeko(61.1) → 次元扑满(91.3)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 11 (round 2) — 基层员工•外勤
+── before: HP 20586.7/30000  toughness 0/60
+── action bar: 基层员工•外勤(0) → March 7th(6.8) → Luocha(6.8) → 冰锋(43.3) → Himeko(48.5) → 次元扑满(78.7)
+   casts [? 0] → Himeko  (basic attack)
+   · Himeko HP 2228.5→1863.9 (-364.6); energy 90→100
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 20586.7→20441.0 (-145.7); toughness 0→60
+   · 次元扑满 unchanged
+   action bar: March 7th(6.8) → Luocha(6.8) → 冰锋(43.3) → Himeko(48.5) → 基层员工•外勤(64.2) → 次元扑满(78.7)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 12 (round 2) — March 7th
+── before: HP 653.9/1058.4  energy 50/120  shield 52.4
+── action bar: March 7th(0) → Luocha(0) → 冰锋(36.6) → Himeko(41.7) → 基层员工•外勤(57.4) → 次元扑满(71.9)
+   casts [NORMAL 1001] → 次元扑满  (basic attack)
+   · Himeko unchanged
+   · March 7th energy 50→70
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 29835.5→29750.5 (-85.1)
+   action bar: Luocha(0) → 冰锋(36.6) → Himeko(41.7) → 基层员工•外勤(57.4) → 次元扑满(71.9) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 13 (round 2) — Luocha
+── before: HP 738.3/1511.2  energy 40/100  shield 0
+── action bar: Luocha(0) → 冰锋(36.6) → Himeko(41.7) → 基层员工•外勤(57.4) → 次元扑满(71.9) → March 7th(99.0)
+   casts [BPSKILL 1203] → Luocha  (healing the party)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha HP 738.3→1325.8 (+587.5); energy 40→70
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: 冰锋(36.6) → Himeko(41.7) → 基层员工•外勤(57.4) → 次元扑满(71.9) → March 7th(99.0) → Luocha(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 14 (round 3) — 冰锋
+── before: HP 8898.5/30000  toughness 60/60
+── action bar: 冰锋(0) → Himeko(5.2) → 基层员工•外勤(20.9) → 次元扑满(35.4) → March 7th(62.4) → Luocha(62.4)
+   casts [? 0] → Luocha  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha HP 1325.8→842.7 (-483.0); energy 70→80
+   · 冰锋 HP 8898.5→8767.4 (-131.1)
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Himeko(5.2) → 基层员工•外勤(20.9) → 次元扑满(35.4) → March 7th(62.4) → Luocha(62.4) → 冰锋(75.8)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 15 (round 3) — Himeko
+── before: HP 1863.9/2811.8  energy 100/120  shield 0
+── action bar: Himeko(0) → 基层员工•外勤(15.7) → 次元扑满(30.2) → March 7th(57.3) → Luocha(57.3) → 冰锋(70.6)
+   casts [NORMAL 1003] → 次元扑满  (basic attack)
+   · Himeko energy 100→120
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 29750.5→28121.0 (-1629.4)
+   action bar: 基层员工•外勤(15.7) → 次元扑满(30.2) → March 7th(57.3) → Luocha(57.3) → 冰锋(70.6) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 16 (round 3) — 基层员工•外勤
+── before: HP 20441.0/30000  toughness 60/60
+── action bar: 基层员工•外勤(0) → 次元扑满(14.5) → March 7th(41.6) → Luocha(41.6) → 冰锋(54.9) → Himeko(66.9)
+   casts [? 0] → March 7th  (basic attack)
+   · Himeko unchanged
+   · March 7th HP 653.9→301.7 (-352.2); energy 70→80
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 20441.0→20309.9 (-131.1)
+   · 次元扑满 unchanged
+   action bar: 次元扑满(14.5) → March 7th(41.6) → Luocha(41.6) → 冰锋(54.9) → 基层员工•外勤(64.2) → Himeko(66.9)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 17 (round 3) — 次元扑满
+── before: HP 28121.0/30000  toughness 60/90
+── action bar: 次元扑满(0) → March 7th(27.1) → Luocha(27.1) → 冰锋(40.4) → 基层员工•外勤(49.7) → Himeko(52.4)
+   casts [? 0] → Luocha  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha HP 842.7→552.9 (-289.8); energy 80→90
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: March 7th(27.1) → Luocha(27.1) → 冰锋(40.4) → 基层员工•外勤(49.7) → Himeko(52.4) → 次元扑满(91.3)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 18 (round 3) — March 7th
+── before: HP 301.7/1058.4  energy 80/120  shield 0
+── action bar: March 7th(0) → Luocha(0) → 冰锋(13.3) → 基层员工•外勤(22.6) → Himeko(25.4) → 次元扑满(64.2)
+   casts [BPSKILL 1001] → March 7th  (shielding the party)
+   · Himeko unchanged
+   · March 7th energy 80→110
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Luocha(0) → 冰锋(13.3) → 基层员工•外勤(22.6) → Himeko(25.4) → 次元扑满(64.2) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 19 (round 3) — Luocha
+── before: HP 552.9/1511.2  energy 90/100  shield 0
+── action bar: Luocha(0) → 冰锋(13.3) → 基层员工•外勤(22.6) → Himeko(25.4) → 次元扑满(64.2) → March 7th(99.0)
+   casts [NORMAL 1203] → 基层员工•外勤  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha energy 90→100
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 20309.9→20143.9 (-166.1)
+   · 次元扑满 unchanged
+   action bar: 冰锋(13.3) → 基层员工•外勤(22.6) → Himeko(25.4) → 次元扑满(64.2) → March 7th(99.0) → Luocha(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 20 (round 4) — 冰锋
+── before: HP 8767.4/30000  toughness 60/60
+── action bar: 冰锋(0) → 基层员工•外勤(9.3) → Himeko(12.1) → 次元扑满(50.9) → March 7th(85.7) → Luocha(85.7)
+   casts [? 0] → Himeko  (basic attack)
+   · Himeko HP 1863.9→1499.3 (-364.6)
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 HP 8767.4→8636.3 (-131.1)
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: 基层员工•外勤(9.3) → Himeko(12.1) → 次元扑满(50.9) → 冰锋(75.8) → March 7th(85.7) → Luocha(85.7)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 21 (round 4) — 基层员工•外勤
+── before: HP 20143.9/30000  toughness 60/60
+── action bar: 基层员工•外勤(0) → Himeko(2.7) → 次元扑满(41.6) → 冰锋(66.4) → March 7th(76.4) → Luocha(76.4)
+   casts [? 0] → Himeko  (basic attack)
+   · Himeko HP 1499.3→1134.7 (-364.6)
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 20143.9→20012.8 (-131.1)
+   · 次元扑满 unchanged
+   action bar: Himeko(2.7) → 次元扑满(41.6) → 基层员工•外勤(64.2) → 冰锋(66.4) → March 7th(76.4) → Luocha(76.4)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 22 (round 4) — Himeko
+── before: HP 1134.7/2811.8  energy 120/120  shield 0
+── action bar: Himeko(0) → 次元扑满(38.8) → 基层员工•外勤(61.5) → 冰锋(63.7) → March 7th(73.6) → Luocha(73.6)
+   casts [ULTRA 1003] → 冰锋, 基层员工•外勤, 次元扑满  (ultimate is ready)
+   · Himeko energy 120→20
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 HP 8636.3→0 (-8636.3); toughness 60→0
+   · 基层员工•外勤 HP 20012.8→3761.7 (-16251.0); toughness 60→0
+   · 次元扑满 HP 28121.0→25802.8 (-2318.2)
+   action bar: 次元扑满(38.8) → March 7th(73.6) → Luocha(73.6) → 基层员工•外勤(77.5) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 23 (round 4) — 次元扑满
+── before: HP 25802.8/30000  toughness 60/90
+── action bar: 次元扑满(0) → March 7th(34.8) → Luocha(34.8) → 基层员工•外勤(38.7) → Himeko(43.8)
+   casts [? 0] → Luocha  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha HP 552.9→263.1 (-289.8)
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: March 7th(34.8) → Luocha(34.8) → 基层员工•外勤(38.7) → Himeko(43.8) → 次元扑满(91.3)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 24 (round 4) — March 7th
+── before: HP 301.7/1058.4  energy 110/120  shield 456.9
+── action bar: March 7th(0) → Luocha(0) → 基层员工•外勤(3.9) → Himeko(9.0) → 次元扑满(56.5)
+   casts [BPSKILL 1001] → Luocha  (shielding the party)
+   · Himeko unchanged
+   · March 7th energy 110→120
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Luocha(0) → 基层员工•外勤(3.9) → Himeko(9.0) → 次元扑满(56.5) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 25 (round 4) — Luocha
+── before: HP 263.1/1511.2  energy 100/100  shield 456.9
+── action bar: Luocha(0) → 基层员工•外勤(3.9) → Himeko(9.0) → 次元扑满(56.5) → March 7th(99.0)
+   casts [ULTRA 1203] → 基层员工•外勤, 次元扑满  (ultimate is ready)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha energy 100→10
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 3761.7→3318.9 (-442.8)
+   · 次元扑满 HP 25802.8→17730.8 (-8072.0); toughness 60→0
+   action bar: 基层员工•外勤(3.9) → Himeko(9.0) → March 7th(99.0) → Luocha(99.0) → 次元扑满(108.4)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 26 (round 4) — 基层员工•外勤
+── before: HP 3318.9/30000  toughness 0/60
+── action bar: 基层员工•外勤(0) → Himeko(5.1) → March 7th(95.1) → Luocha(95.1) → 次元扑满(104.5)
+   casts [? 0] → Luocha  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha HP 263.1→236.9 (-26.2); energy 10→20
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 3318.9→3173.2 (-145.7); toughness 0→60
+   · 次元扑满 unchanged
+   action bar: Himeko(5.1) → 基层员工•外勤(64.2) → March 7th(95.1) → Luocha(95.1) → 次元扑满(104.5)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 27 (round 5) — Himeko
+── before: HP 1134.7/2811.8  energy 20/120  shield 0
+── action bar: Himeko(0) → 基层员工•外勤(59.1) → March 7th(90.0) → Luocha(90.0) → 次元扑满(99.4)
+   casts [NORMAL 1003] → 基层员工•外勤  (basic attack)
+   · Himeko energy 20→40
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 3173.2→1848.4 (-1324.9); toughness 60→30
+   · 次元扑满 unchanged
+   action bar: 基层员工•外勤(59.1) → Himeko(82.6) → March 7th(90.0) → Luocha(90.0) → 次元扑满(99.4)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 28 (round 5) — 基层员工•外勤
+── before: HP 1848.4/30000  toughness 30/60
+── action bar: 基层员工•外勤(0) → Himeko(23.6) → March 7th(30.9) → Luocha(30.9) → 次元扑满(40.3)
+   casts [? 0] → March 7th  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 1848.4→1717.2 (-131.1)
+   · 次元扑满 unchanged
+   action bar: Himeko(23.6) → March 7th(30.9) → Luocha(30.9) → 次元扑满(40.3) → 基层员工•外勤(64.2)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 29 (round 5) — Himeko
+── before: HP 1134.7/2811.8  energy 40/120  shield 0
+── action bar: Himeko(0) → March 7th(7.4) → Luocha(7.4) → 次元扑满(16.7) → 基层员工•外勤(40.6)
+   casts [BPSKILL 1003] → 基层员工•外勤  (target is weak to it)
+   · Himeko energy 40→75
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 HP 1717.2→0 (-1717.2)
+   · 次元扑满 HP 17730.8→16984.2 (-746.6)
+   action bar: March 7th(7.4) → Luocha(7.4) → 次元扑满(16.7) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 30 (round 5) — March 7th
+── before: HP 301.7/1058.4  energy 120/120  shield 52.4
+── action bar: March 7th(0) → Luocha(0) → 次元扑满(9.4) → Himeko(75.3)
+   casts [ULTRA 1001] → 次元扑满  (ultimate is ready)
+   · Himeko unchanged
+   · March 7th energy 120→5
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 16984.2→16814.1 (-170.1)
+   action bar: Luocha(0) → 次元扑满(9.4) → Himeko(75.3) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 31 (round 5) — Luocha
+── before: HP 236.9/1511.2  energy 20/100  shield 0
+── action bar: Luocha(0) → 次元扑满(9.4) → Himeko(75.3) → March 7th(99.0)
+   casts [NORMAL 1203] → 次元扑满  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha energy 20→40
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 16814.1→16631.3 (-182.8)
+   action bar: 次元扑满(9.4) → Himeko(75.3) → March 7th(99.0) → Luocha(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 32 (round 6) — 次元扑满
+── before: HP 16631.3/30000  toughness 0/90
+── action bar: 次元扑满(0) → Himeko(65.9) → March 7th(89.6) → Luocha(89.6)
+   casts [? 0] → March 7th  (basic attack)
+   · Himeko unchanged
+   · March 7th HP 301.7→111.4 (-190.4); energy 5→15
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 toughness 0→90
+   action bar: Himeko(65.9) → March 7th(89.6) → Luocha(89.6) → 次元扑满(91.3)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 33 (round 6) — Himeko
+── before: HP 1134.7/2811.8  energy 75/120  shield 0
+── action bar: Himeko(0) → March 7th(23.7) → Luocha(23.7) → 次元扑满(25.4)
+   casts [BPSKILL 1003] → 次元扑满  (damaging skill)
+   · Himeko energy 75→105
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 16631.3→14951.5 (-1679.8)
+   action bar: March 7th(23.7) → Luocha(23.7) → 次元扑满(25.4) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 34 (round 6) — March 7th
+── before: HP 111.4/1058.4  energy 15/120  shield 0
+── action bar: March 7th(0) → Luocha(0) → 次元扑满(1.6) → Himeko(58.9)
+   casts [NORMAL 1001] → 次元扑满  (basic attack)
+   · Himeko unchanged
+   · March 7th energy 15→35
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 14951.5→14866.4 (-85.1)
+   action bar: Luocha(0) → 次元扑满(1.6) → Himeko(58.9) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 35 (round 6) — Luocha
+── before: HP 236.9/1511.2  energy 40/100  shield 0
+── action bar: Luocha(0) → 次元扑满(1.6) → Himeko(58.9) → March 7th(99.0)
+   casts [BPSKILL 1203] → March 7th  (healing the party)
+   · Himeko unchanged
+   · March 7th HP 111.4→698.8 (+587.5)
+   · Luocha energy 40→70
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: 次元扑满(1.6) → Himeko(58.9) → March 7th(99.0) → Luocha(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 36 (round 6) — 次元扑满
+── before: HP 14866.4/30000  toughness 90/90
+── action bar: 次元扑满(0) → Himeko(57.3) → March 7th(97.4) → Luocha(97.4)
+   casts [? 0] → Himeko  (basic attack)
+   · Himeko HP 1134.7→915.9 (-218.8); energy 105→115
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Himeko(57.3) → 次元扑满(91.3) → March 7th(97.4) → Luocha(97.4)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 37 (round 7) — Himeko
+── before: HP 915.9/2811.8  energy 115/120  shield 0
+── action bar: Himeko(0) → 次元扑满(34.0) → March 7th(40.1) → Luocha(40.1)
+   casts [NORMAL 1003] → 次元扑满  (basic attack)
+   · Himeko energy 115→120
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 14866.4→13237.0 (-1629.4)
+   action bar: 次元扑满(34.0) → March 7th(40.1) → Luocha(40.1) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 38 (round 7) — 次元扑满
+── before: HP 13237.0/30000  toughness 90/90
+── action bar: 次元扑满(0) → March 7th(6.1) → Luocha(6.1) → Himeko(48.7)
+   casts [? 0] → March 7th  (basic attack)
+   · Himeko unchanged
+   · March 7th HP 698.8→456.1 (-242.7); energy 35→45
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: March 7th(6.1) → Luocha(6.1) → Himeko(48.7) → 次元扑满(91.3)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 39 (round 7) — March 7th
+── before: HP 456.1/1058.4  energy 45/120  shield 0
+── action bar: March 7th(0) → Luocha(0) → Himeko(42.5) → 次元扑满(85.2)
+   casts [BPSKILL 1001] → Luocha  (shielding the party)
+   · Himeko unchanged
+   · March 7th energy 45→75
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Luocha(0) → Himeko(42.5) → 次元扑满(85.2) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 40 (round 7) — Luocha
+── before: HP 236.9/1511.2  energy 70/100  shield 456.9
+── action bar: Luocha(0) → Himeko(42.5) → 次元扑满(85.2) → March 7th(99.0)
+   casts [NORMAL 1203] → 次元扑满  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha energy 70→90
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 13237.0→13072.5 (-164.5); toughness 90→60
+   action bar: Himeko(42.5) → 次元扑满(85.2) → March 7th(99.0) → Luocha(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 41 (round 8) — Himeko
+── before: HP 915.9/2811.8  energy 120/120  shield 0
+── action bar: Himeko(0) → 次元扑满(42.6) → March 7th(56.5) → Luocha(56.5)
+   casts [ULTRA 1003] → 次元扑满  (ultimate is ready)
+   · Himeko energy 120→5
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 13072.5→8575.2 (-4497.3)
+   action bar: 次元扑满(42.6) → March 7th(56.5) → Luocha(56.5) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 42 (round 8) — 次元扑满
+── before: HP 8575.2/30000  toughness 60/90
+── action bar: 次元扑满(0) → March 7th(13.8) → Luocha(13.8) → Himeko(40.0)
+   casts [? 0] → Luocha  (basic attack)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha energy 90→100
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: March 7th(13.8) → Luocha(13.8) → Himeko(40.0) → 次元扑满(91.3)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 43 (round 8) — March 7th
+── before: HP 456.1/1058.4  energy 75/120  shield 0
+── action bar: March 7th(0) → Luocha(0) → Himeko(26.2) → 次元扑满(77.4)
+   casts [BPSKILL 1001] → Luocha  (shielding the party)
+   · Himeko unchanged
+   · March 7th energy 75→105
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 unchanged
+   action bar: Luocha(0) → Himeko(26.2) → 次元扑满(77.4) → March 7th(99.0)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 44 (round 8) — Luocha
+── before: HP 236.9/1511.2  energy 100/100  shield 456.9
+── action bar: Luocha(0) → Himeko(26.2) → 次元扑满(77.4) → March 7th(99.0)
+   casts [ULTRA 1203] → 次元扑满  (ultimate is ready)
+   · Himeko unchanged
+   · March 7th unchanged
+   · Luocha energy 100→10
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 8575.2→503.2 (-8072.0); toughness 60→0
+   action bar: Himeko(26.2) → March 7th(99.0) → Luocha(99.0) → 次元扑满(131.7)
+
+──────────────────────────────────────────────────────────────────────────────
+── Turn 45 (round 9) — Himeko
+── before: HP 915.9/2811.8  energy 5/120  shield 0
+── action bar: Himeko(0) → March 7th(72.8) → Luocha(72.8) → 次元扑满(105.5)
+   casts [NORMAL 1003] → 次元扑满  (basic attack)
+   · Himeko energy 5→30
+   · March 7th unchanged
+   · Luocha unchanged
+   · 冰锋 unchanged
+   · 基层员工•外勤 unchanged
+   · 次元扑满 HP 503.2→0 (-503.2)
+   action bar: March 7th(72.8) → Luocha(72.8) → Himeko(82.6)
+
+──────────────────────────────────────────────────────────────────────────────
+Final: 冰锋             HP 0/30000  [dead]
+Final: 基层员工•外勤        HP 0/30000  [dead]
+Final: 次元扑满           HP 0/30000  [dead]
+Final: Himeko         HP 915.9/2811.8
+Final: March 7th      HP 456.1/1058.4
+Final: Luocha         HP 236.9/1511.2
+Result: FINISHED — WIN, 45 actor-turns, 9 rounds
+──────────────────────────────────────────────────────────────────────────────

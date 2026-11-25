@@ -111,6 +111,11 @@ test {
     // UP-TO-DATE, so the new guard stayed green while the document was wrong - a guard that does not run is worse than
     // none, because it is believed.
     inputs.file('TRIGGER.md')
+    // Same trap, third instance: CONTENT-STATUS.md is read by LedgerCountsMatchJsonTest and
+    // LedgerListsEveryShippedCharacterTest (and by LedgerNumberGuardTest's readers), yet it was never
+    // declared here - so editing the ledger alone left `:test` UP-TO-DATE and the ledger guards did not
+    // run. The two files above are declared for exactly this reason; this one was the omission.
+    inputs.file('CONTENT-STATUS.md')
     // When the requested task is `gate`, the tests must REALLY run: `gate` is the thing a report cites, and an
     // UP-TO-DATE `:test` rewrites the previous XML - the exact trap §3.3 documents. Plain `:test` stays incremental.
     outputs.upToDateWhen { !gradle.startParameter.taskNames.any { it == 'gate' || it.endsWith(':gate') } }
@@ -125,10 +130,28 @@ test {
 // a demo compared against the wrong baseline). A task cannot be half-remembered, and it fails the build on the first
 // non-zero exit, so "GATE: PASS" always means every step ran and returned 0.
 //
-// What it does NOT do: compare demo output against a stored baseline (that needs a human to say "this change is
-// intended"), and mutation checks (AGENT.md §6.4 - those are per-change, not per-batch).
+// What it does NOT do (any more): the demos ARE compared now, against `scenarios/baseline/*.txt`, because a
+// refactor needs "the numbers did not change" as a machine verdict rather than a human one. Re-capturing is a
+// separate task (`captureDemoBaseline`) so a gate run can never rewrite the thing it is comparing against.
+// Mutation checks (AGENT.md §6.4) remain per-change, not per-batch.
 // ======================================================================
 def demoModes = ['battle', 'mechanics', 'technique', 'driven', 'all']
+
+// ----------------------------------------------------------------------
+// Demo baselines - the "the numbers did not change" evidence.
+//
+// `gate` runs the five demos but has never compared their output to anything (see the note on the `gate`
+// task below). While a refactor is in flight "this change is intended" is not a judgement anybody can
+// make, so the output is captured in `scenarios/baseline/<mode>.txt` and diffed here. The demos are
+// deterministic (verified: two runs, same bytes, every mode), which is what makes a byte diff meaningful.
+//
+// Capture is deliberately a separate invocation: a `gate` that rewrote its own baseline would compare the
+// tree against itself and always pass - the "a guard that does not run is worse than none" trap.
+// ----------------------------------------------------------------------
+def demoBaselineDir = file('scenarios/baseline')
+def capturingDemoBaselines = gradle.startParameter.taskNames.any {
+    it == 'captureDemoBaseline' || it.endsWith(':captureDemoBaseline')
+}
 
 def gateDemos = demoModes.collect { mode ->
     tasks.register("gateDemo${mode.capitalize()}", JavaExec) {
@@ -136,6 +159,60 @@ def gateDemos = demoModes.collect { mode ->
         classpath = sourceSets.demo.runtimeClasspath
         mainClass = 'com.laosun.Main'
         args = mode == 'battle' ? [] : [mode]
+        // Captured so the same run can be both shown and compared: the demos take a couple of seconds
+        // each, and running them twice would double that for no extra evidence.
+        def captured = new ByteArrayOutputStream()
+        standardOutput = captured
+        outputs.upToDateWhen { false }
+        doLast {
+            def actual = captured.toString('UTF-8').replace('\r\n', '\n')
+            println actual
+            def baseline = new File(demoBaselineDir, "${mode}.txt")
+            if (capturingDemoBaselines) {
+                demoBaselineDir.mkdirs()
+                baseline.setText(actual, 'UTF-8')
+                println("[demo-baseline] wrote ${baseline}")
+                return
+            }
+            if (!baseline.isFile()) {
+                throw new GradleException("scenarios/baseline/${mode}.txt is missing. Capture it from a tree "
+                        + "believed correct with `gradlew captureDemoBaseline`, and commit it.")
+            }
+            def expected = baseline.getText('UTF-8').replace('\r\n', '\n')
+            if (actual == expected) {
+                println("[demo-baseline] ${mode}: identical to scenarios/baseline/${mode}.txt")
+                return
+            }
+            def got = actual.readLines()
+            def want = expected.readLines()
+            println('=' * 78)
+            println("DEMO BASELINE DIFF: ${mode} (actual vs scenarios/baseline/${mode}.txt)")
+            println('=' * 78)
+            int shown = 0
+            for (int i = 0; i < Math.max(got.size(), want.size()) && shown < 40; i++) {
+                def a = i < got.size() ? got[i] : '<missing>'
+                def b = i < want.size() ? want[i] : '<missing>'
+                if (a != b) {
+                    println(String.format('%4d - %s', i + 1, b))
+                    println(String.format('%4d + %s', i + 1, a))
+                    shown++
+                }
+            }
+            throw new GradleException("the ${mode} demo's output changed "
+                    + "(${got.size()} lines now, ${want.size()} in the baseline). If that is intended, "
+                    + "re-capture with `gradlew captureDemoBaseline` and say why in the commit.")
+        }
+    }
+}
+
+tasks.register('captureDemoBaseline') {
+    group = 'verification'
+    description = 'Rewrites scenarios/baseline/*.txt from THIS tree. Only when the change is intended.'
+    dependsOn gateDemos
+    doLast {
+        println('=' * 78)
+        println("DEMO BASELINE: captured ${gateDemos.size()} modes under scenarios/baseline/ - review and commit them")
+        println('=' * 78)
     }
 }
 

@@ -1,0 +1,339 @@
+==============================================================================
+ aluminium battle demo: Himeko (姬子) / March 7th (三月七) / Luocha (罗刹)  vs  Ice Edge (冰锋) + Junior Staff·Field Agent (基层员工·外勤) + Warp Trotter (次元扑满)
+==============================================================================
+
+[Enemy data] 冰锋  Lv90  HP 30000  ATK 663  DEF 1100  SPD 132
+        Weakness [FIRE, THUNDER]  Toughness 60  Resist {PHYSICAL=0.2, ICE=0.2, WIND=0.2, QUANTUM=0.2, IMAGINARY=0.2}
+[Enemy data] 基层员工•外勤  Lv90  HP 30000  ATK 663  DEF 1100  SPD 156
+        Weakness [FIRE, ICE]  Toughness 60  Resist {PHYSICAL=0.2, THUNDER=0.2, WIND=0.2, QUANTUM=0.2, IMAGINARY=0.2}
+[Enemy data] 次元扑满  Lv90  HP 30000  ATK 663  DEF 1650  SPD 110
+        Weakness [PHYSICAL, QUANTUM, IMAGINARY]  Toughness 90  Resist {FIRE=0.2, ICE=0.2, THUNDER=0.2, WIND=0.2}
+
+[Setup] 冰锋 wears CounterMechanic: counters 50% of its ATK as additional damage
+
+[Technique] declared before the battle: March 7th(1001)
+        → only 三月七 has one modelled (冻人的瞬间: a battle-start Freeze); 姬子's and 罗刹's technique skills have no rule yet
+        → the Freeze can land on [基层员工•外勤, 次元扑满]; immune: [冰锋] (STAT_CTRL_Frozen = 1.0)
+[Opening] Himeko gains SuperBreakBuff (super break marker)
+[Action bar] 基层员工•外勤(96) → 冰锋(114) → Himeko(124) → 次元扑满(137) → March 7th(149) → Luocha(149)
+
+────────── Round 1 (action 1, total action value 0)──────────
+[Enemy] 基层员工•外勤  HP 30000/30000  Toughness 60/60
+        → selected March 7th (aggro 150, team total 325)
+        → 基层员工•外勤 deals 405 to March 7th HP 654/1058, energy on hit → 10
+[Action bar] 冰锋(17) → Himeko(28) → 次元扑满(41) → March 7th(52) → Luocha(52) → 基层员工•外勤(64)
+
+────────── Round 1 (action 2, total action value 96)──────────
+[Enemy] 冰锋  HP 30000/30000  Toughness 60/60
+        → selected Himeko (aggro 75, team total 325)
+        → 冰锋 deals 365 to Himeko HP 2447/2812, energy on hit → 10
+[Action bar] Himeko(10) → 次元扑满(23) → March 7th(35) → Luocha(35) → 基层员工•外勤(47) → 冰锋(76)
+
+────────── Round 1 (action 3, total action value 114)──────────
+[Ally] Himeko  HP 2447/2812  Energy 10/120  SP 3/5
+        → using [Skill]
+        → Himeko deals 15244, energy 45/120; 冰锋 HP 14756/30000, toughness 0/60 [Break FIRE]  DOT×1
+[Action bar] 次元扑满(13) → March 7th(25) → Luocha(25) → 基层员工•外勤(37) → Himeko(83) → 冰锋(84)
+
+────────── Round 1 (action 4, total action value 124)──────────
+[Enemy] 次元扑满  HP 30000/30000  Toughness 90/90
+        → selected Luocha (aggro 100, team total 325)
+        → 次元扑满 deals 290 to Luocha HP 1221/1511, energy on hit → 10
+[Action bar] March 7th(12) → Luocha(12) → 基层员工•外勤(24) → Himeko(70) → 冰锋(71) → 次元扑满(91)
+
+────────── Round 1 (action 5, total action value 137)──────────
+[Ally] March 7th  HP 654/1058  Energy 10/120  SP 2/5
+        → using [Skill: Shield], target March 7th
+        → March 7th shield 457
+[Action bar] Luocha(0) → 基层员工•外勤(12) → Himeko(58) → 冰锋(60) → 次元扑满(80) → March 7th(99)
+
+────────── Round 1 (action 6, total action value 149)──────────
+[Ally] Luocha  HP 1221/1511  Energy 10/100  SP 1/5
+        → using [Basic ATK]
+        → Luocha deals 185, energy 30/100; 冰锋 HP 14571/30000, toughness 0/60 [Break FIRE]  DOT×1
+[Action bar] 基层员工•外勤(12) → Himeko(58) → 冰锋(60) → 次元扑满(80) → March 7th(99) → Luocha(99)
+
+────────── Round 1 (action 7, total action value 149)──────────
+[Enemy] 基层员工•外勤  HP 27944/30000  Toughness 30/60
+        → selected March 7th (aggro 150, team total 325)
+        → 基层员工•外勤 deals 0 to March 7th HP 654/1058 (shield 52), energy on hit → 50
+[Action bar] Himeko(46) → 冰锋(48) → 基层员工•外勤(64) → 次元扑满(68) → March 7th(87) → Luocha(87)
+
+────────── Round 2 (action 8, total action value 161)──────────
+[Ally] Himeko  HP 2083/2812  Energy 45/120  SP 2/5
+        → using [Skill]
+        → Himeko deals 14571, energy 85/120; 冰锋 HP 0/30000, toughness 0/60 [Break FIRE]  DOT×1
+        → 冰锋 defeated
+[Action bar] 次元扑满(22) → 基层员工•外勤(34) → March 7th(41) → Luocha(41) → Himeko(83)
+
+────────── Round 2 (action 9, total action value 207)──────────
+[Enemy] 次元扑满  HP 30000/30000  Toughness 90/90
+        → selected Luocha (aggro 100, team total 325)
+        → 次元扑满 deals 290 to Luocha HP 690/1511, energy on hit → 40
+[Action bar] 基层员工•外勤(13) → March 7th(19) → Luocha(19) → Himeko(61) → 次元扑满(91)
+
+────────── Round 2 (action 10, total action value 228)──────────
+[Enemy] 基层员工•外勤  HP 19445/30000  [Broken FIRE]  Toughness 0/60
+        → selected Luocha (aggro 100, team total 325)
+        → 基层员工•外勤 deals 483 to Luocha HP 207/1511, energy on hit → 50
+[Action bar] March 7th(7) → Luocha(7) → Himeko(49) → 基层员工•外勤(64) → 次元扑满(79)
+
+────────── Round 2 (action 11, total action value 241)──────────
+[Ally] March 7th  HP 654/1058  Energy 50/120  SP 1/5
+        → using [Basic ATK]
+        → March 7th deals 134, energy 70/120; 基层员工•外勤 HP 19311/30000, toughness 30/60  DOT×1
+[Action bar] Luocha(0) → Himeko(42) → 基层员工•外勤(57) → 次元扑满(72) → March 7th(99)
+
+────────── Round 2 (action 12, total action value 248)──────────
+[Ally] Luocha  HP 207/1511  Energy 50/100  SP 2/5
+        → using [Skill: Heal], target Luocha
+        → Luocha HP 207 → 794/1511
+[Action bar] Himeko(42) → 基层员工•外勤(57) → 次元扑满(72) → March 7th(99) → Luocha(99)
+
+────────── Round 2 (action 13, total action value 248)──────────
+[Ally] Himeko  HP 1900/2812  Energy 85/120  SP 1/5
+        → using [Basic ATK]
+        → Himeko deals 8867, energy 110/120; 基层员工•外勤 HP 10443/30000, toughness 0/60 [Break FIRE]  DOT×2
+[Action bar] 次元扑满(30) → 基层员工•外勤(32) → March 7th(57) → Luocha(57) → Himeko(83)
+
+────────── Round 3 (action 14, total action value 289)──────────
+[Enemy] 次元扑满  HP 30000/30000  Toughness 90/90
+        → selected Luocha (aggro 100, team total 325)
+        → 次元扑满 deals 290 to Luocha HP 505/1511, energy on hit → 90
+[Action bar] 基层员工•外勤(2) → March 7th(27) → Luocha(27) → Himeko(52) → 次元扑满(91)
+
+────────── Round 3 (action 15, total action value 319)──────────
+[Enemy] 基层员工•外勤  HP 10152/30000  [Broken FIRE]  Toughness 0/60
+        → selected March 7th (aggro 150, team total 325)
+        → 基层员工•外勤 deals 352 to March 7th HP 302/1058, energy on hit → 80
+[Action bar] March 7th(26) → Luocha(26) → Himeko(51) → 基层员工•外勤(64) → 次元扑满(90)
+
+────────── Round 3 (action 16, total action value 321)──────────
+[Ally] March 7th  HP 302/1058  Energy 80/120  SP 2/5
+        → using [Skill: Shield], target March 7th
+        → March 7th shield 457
+[Action bar] Luocha(0) → Himeko(25) → 基层员工•外勤(39) → 次元扑满(64) → March 7th(99)
+
+────────── Round 3 (action 17, total action value 347)──────────
+[Ally] Luocha  HP 505/1511  Energy 90/100  SP 1/5
+        → using [Basic ATK]
+        → Luocha deals 166, energy 100/100; 基层员工•外勤 HP 9986/30000, toughness 60/60  DOT×2
+[Action bar] Himeko(25) → 基层员工•外勤(39) → 次元扑满(64) → March 7th(99) → Luocha(99)
+
+────────── Round 3 (action 18, total action value 347)──────────
+[Ally] Himeko  HP 1900/2812  Energy 110/120  SP 2/5
+        → using [Skill]
+        → Himeko deals 9986, energy 120/120; 基层员工•外勤 HP 0/30000, toughness 0/60 [Break FIRE]  DOT×3
+        → 基层员工•外勤 defeated
+[Action bar] 次元扑满(39) → March 7th(74) → Luocha(74) → Himeko(83)
+
+────────── Round 4 (action 19, total action value 372)──────────
+[Enemy] 次元扑满  HP 29328/30000  Toughness 90/90
+        → selected Himeko (aggro 75, team total 325)
+        → 次元扑满 deals 219 to Himeko HP 1682/2812, energy on hit → 120
+[Action bar] March 7th(35) → Luocha(35) → Himeko(44) → 次元扑满(91)
+
+────────── Round 4 (action 20, total action value 411)──────────
+[Ally] March 7th  HP 302/1058  Energy 110/120  SP 1/5
+        → using [Basic ATK]
+        → March 7th deals 85, energy 120/120; 次元扑满 HP 29243/30000, toughness 90/90
+[Action bar] Luocha(0) → Himeko(9) → 次元扑满(56) → March 7th(99)
+
+────────── Round 4 (action 21, total action value 446)──────────
+[Ally] Luocha  HP 505/1511  Energy 100/100  SP 2/5
+        → energy reached the ultimate threshold, casting [Ultimate]
+        → Luocha deals 395, energy 5/100; 次元扑满 HP 28848/30000, toughness 30/90
+[Action bar] Himeko(9) → 次元扑满(56) → March 7th(99) → Luocha(99)
+
+────────── Round 4 (action 22, total action value 446)──────────
+[Ally] Himeko  HP 1682/2812  Energy 120/120  SP 2/5
+        → energy reached the ultimate threshold, casting [Ultimate]
+        → Himeko deals 2318, energy 5/120; 次元扑满 HP 26530/30000, toughness 30/90
+[Action bar] 次元扑满(47) → Himeko(83) → March 7th(90) → Luocha(90)
+
+────────── Round 5 (action 23, total action value 455)──────────
+[Enemy] 次元扑满  HP 26530/30000  Toughness 30/90
+        → selected Luocha (aggro 100, team total 325)
+        → 次元扑满 deals 290 to Luocha HP 215/1511, energy on hit → 15
+[Action bar] Himeko(35) → March 7th(43) → Luocha(43) → 次元扑满(91)
+
+────────── Round 5 (action 24, total action value 502)──────────
+[Ally] Himeko  HP 1682/2812  Energy 5/120  SP 2/5
+        → using [Basic ATK]
+        → Himeko deals 840, energy 25/120; 次元扑满 HP 25690/30000, toughness 30/90
+[Action bar] March 7th(7) → Luocha(7) → 次元扑满(56) → Himeko(83)
+
+────────── Round 5 (action 25, total action value 537)──────────
+[Ally] March 7th  HP 302/1058  Energy 120/120  SP 3/5
+        → energy reached the ultimate threshold, casting [Ultimate]
+        → March 7th deals 153, energy 5/120; 次元扑满 HP 25537/30000, toughness 30/90
+[Action bar] Luocha(0) → 次元扑满(49) → Himeko(75) → March 7th(99)
+
+────────── Round 5 (action 26, total action value 545)──────────
+[Ally] Luocha  HP 215/1511  Energy 15/100  SP 3/5
+        → using [Skill: Heal], target Luocha
+        → Luocha HP 215 → 802/1511
+[Action bar] 次元扑满(49) → Himeko(75) → March 7th(99) → Luocha(99)
+
+────────── Round 5 (action 27, total action value 545)──────────
+[Enemy] 次元扑满  HP 25537/30000  Toughness 30/90
+        → selected March 7th (aggro 150, team total 325)
+        → 次元扑满 deals 0 to March 7th HP 302/1058 (shield 214), energy on hit → 15
+[Action bar] Himeko(27) → March 7th(50) → Luocha(50) → 次元扑满(91)
+
+────────── Round 6 (action 28, total action value 593)──────────
+[Ally] Himeko  HP 1682/2812  Energy 25/120  SP 2/5
+        → using [Basic ATK]
+        → Himeko deals 1629, energy 45/120; 次元扑满 HP 23908/30000, toughness 30/90
+[Action bar] March 7th(24) → Luocha(24) → 次元扑满(65) → Himeko(83)
+
+────────── Round 6 (action 29, total action value 620)──────────
+[Ally] March 7th  HP 302/1058  Energy 15/120  SP 3/5
+        → using [Skill: Shield], target March 7th
+        → March 7th shield 457
+[Action bar] Luocha(0) → 次元扑满(41) → Himeko(59) → March 7th(99)
+
+────────── Round 6 (action 30, total action value 644)──────────
+[Ally] Luocha  HP 802/1511  Energy 45/100  SP 2/5
+        → using [Skill: Heal], target March 7th
+        → March 7th HP 302 → 889/1058
+[Action bar] 次元扑满(41) → Himeko(59) → March 7th(99) → Luocha(99)
+
+────────── Round 6 (action 31, total action value 644)──────────
+[Enemy] 次元扑满  HP 23908/30000  Toughness 30/90
+        → selected Luocha (aggro 100, team total 325)
+        → 次元扑满 deals 290 to Luocha HP 512/1511, energy on hit → 85
+[Action bar] Himeko(18) → March 7th(58) → Luocha(58) → 次元扑满(91)
+
+────────── Round 7 (action 32, total action value 685)──────────
+[Ally] Himeko  HP 1682/2812  Energy 45/120  SP 1/5
+        → using [Basic ATK]
+        → Himeko deals 840, energy 65/120; 次元扑满 HP 23068/30000, toughness 30/90
+[Action bar] March 7th(40) → Luocha(40) → 次元扑满(73) → Himeko(83)
+
+────────── Round 7 (action 33, total action value 702)──────────
+[Ally] March 7th  HP 889/1058  Energy 45/120  SP 2/5
+        → using [Skill: Shield], target Luocha
+        → Luocha shield 457
+[Action bar] Luocha(0) → 次元扑满(33) → Himeko(43) → March 7th(99)
+
+────────── Round 7 (action 34, total action value 743)──────────
+[Ally] Luocha  HP 512/1511  Energy 85/100  SP 1/5
+        → using [Basic ATK]
+        → Luocha deals 4085, energy 100/100; 次元扑满 HP 18982/30000, toughness 0/90 [Break IMAGINARY]
+[Action bar] Himeko(43) → 次元扑满(83) → March 7th(99) → Luocha(99)
+
+────────── Round 7 (action 35, total action value 743)──────────
+[Ally] Himeko  HP 1682/2812  Energy 65/120  SP 2/5
+        → using [Basic ATK]
+        → Himeko deals 8021, energy 85/120; 次元扑满 HP 10962/30000, toughness 0/90 [Break IMAGINARY]
+[Action bar] 次元扑满(40) → March 7th(56) → Luocha(56) → Himeko(83)
+
+────────── Round 8 (action 36, total action value 785)──────────
+[Enemy] 次元扑满  HP 10962/30000  [Broken IMAGINARY]  Toughness 0/90
+        → selected March 7th (aggro 150, team total 325)
+        → 次元扑满 deals 0 to March 7th HP 889/1058 (shield 214), energy on hit → 85
+[Action bar] March 7th(16) → Luocha(16) → Himeko(43) → 次元扑满(91)
+
+────────── Round 8 (action 37, total action value 825)──────────
+[Ally] March 7th  HP 889/1058  Energy 85/120  SP 3/5
+        → using [Skill: Shield], target Luocha
+        → Luocha shield 457
+[Action bar] Luocha(0) → Himeko(26) → 次元扑满(75) → March 7th(99)
+
+────────── Round 8 (action 38, total action value 842)──────────
+[Ally] Luocha  HP 512/1511  Energy 100/100  SP 2/5
+        → energy reached the ultimate threshold, casting [Ultimate]
+        → Luocha deals 395, energy 5/100; 次元扑满 HP 10567/30000, toughness 30/90
+[Action bar] Himeko(26) → 次元扑满(75) → March 7th(99) → Luocha(99)
+
+────────── Round 8 (action 39, total action value 842)──────────
+[Ally] Himeko  HP 1682/2812  Energy 85/120  SP 2/5
+        → using [Basic ATK]
+        → Himeko deals 840, energy 105/120; 次元扑满 HP 9727/30000, toughness 30/90
+[Action bar] 次元扑满(49) → March 7th(73) → Luocha(73) → Himeko(83)
+
+────────── Round 9 (action 40, total action value 868)──────────
+[Enemy] 次元扑满  HP 9727/30000  Toughness 30/90
+        → selected Luocha (aggro 100, team total 325)
+        → 次元扑满 deals 0 to Luocha HP 512/1511 (shield 167), energy on hit → 15
+[Action bar] March 7th(24) → Luocha(24) → Himeko(34) → 次元扑满(91)
+
+────────── Round 9 (action 41, total action value 916)──────────
+[Ally] March 7th  HP 889/1058  Energy 115/120  SP 3/5
+        → using [Skill: Shield], target Luocha
+        → Luocha shield 457
+[Action bar] Luocha(0) → Himeko(10) → 次元扑满(67) → March 7th(99)
+
+────────── Round 9 (action 42, total action value 941)──────────
+[Ally] Luocha  HP 512/1511  Energy 15/100  SP 2/5
+        → using [Skill: Heal], target Luocha
+        → Luocha HP 512 → 1100/1511
+[Action bar] Himeko(10) → 次元扑满(67) → March 7th(99) → Luocha(99)
+
+────────── Round 9 (action 43, total action value 941)──────────
+[Ally] Himeko  HP 1682/2812  Energy 105/120  SP 1/5
+        → using [Basic ATK]
+        → Himeko deals 840, energy 120/120; 次元扑满 HP 8887/30000, toughness 30/90
+[Action bar] 次元扑满(57) → Himeko(83) → March 7th(89) → Luocha(89)
+
+────────── Round 10 (action 44, total action value 950)──────────
+[Enemy] 次元扑满  HP 8887/30000  Toughness 30/90
+        → selected Himeko (aggro 75, team total 325)
+        → 次元扑满 deals 219 to Himeko HP 1463/2812, energy on hit → 120
+[Action bar] Himeko(25) → March 7th(32) → Luocha(32) → 次元扑满(91)
+
+────────── Round 10 (action 45, total action value 1008)──────────
+[Ally] Himeko  HP 1463/2812  Energy 120/120  SP 2/5
+        → energy reached the ultimate threshold, casting [Ultimate]
+        → Himeko deals 4497, energy 5/120; 次元扑满 HP 4390/30000, toughness 30/90
+[Action bar] March 7th(7) → Luocha(7) → 次元扑满(66) → Himeko(83)
+
+────────── Round 10 (action 46, total action value 1033)──────────
+[Ally] March 7th  HP 889/1058  Energy 120/120  SP 2/5
+        → energy reached the ultimate threshold, casting [Ultimate]
+        → March 7th deals 153, energy 5/120; 次元扑满 HP 4237/30000, toughness 30/90
+[Action bar] Luocha(0) → 次元扑满(59) → Himeko(76) → March 7th(99)
+
+────────── Round 10 (action 47, total action value 1040)──────────
+[Ally] Luocha  HP 1100/1511  Energy 45/100  SP 2/5
+        → using [Skill: Heal], target Himeko
+        → Himeko HP 1463 → 2050/2812
+[Action bar] 次元扑满(59) → Himeko(76) → March 7th(99) → Luocha(99)
+
+────────── Round 10 (action 48, total action value 1040)──────────
+[Enemy] 次元扑满  HP 4237/30000  Toughness 30/90
+        → selected Luocha (aggro 100, team total 325)
+        → 次元扑满 deals 0 to Luocha HP 1100/1511 (shield 167), energy on hit → 85
+[Action bar] Himeko(17) → March 7th(40) → Luocha(40) → 次元扑满(91)
+
+────────── Round 11 (action 49, total action value 1099)──────────
+[Ally] Himeko  HP 2050/2812  Energy 5/120  SP 1/5
+        → using [Basic ATK]
+        → Himeko deals 1629, energy 25/120; 次元扑满 HP 2607/30000, toughness 30/90
+[Action bar] March 7th(23) → Luocha(23) → 次元扑满(75) → Himeko(83)
+
+────────── Round 11 (action 50, total action value 1116)──────────
+[Ally] March 7th  HP 889/1058  Energy 5/120  SP 2/5
+        → using [Skill: Shield], target Luocha
+        → Luocha shield 457
+[Action bar] Luocha(0) → 次元扑满(52) → Himeko(60) → March 7th(99)
+
+────────── Round 11 (action 51, total action value 1139)──────────
+[Ally] Luocha  HP 1100/1511  Energy 85/100  SP 1/5
+        → using [Basic ATK]
+        → Luocha deals 2607, energy 100/100; 次元扑满 HP 0/30000, toughness 0/90 [Break IMAGINARY]
+        → 次元扑满 defeated
+[Action bar] Himeko(60) → March 7th(99) → Luocha(99)
+
+==============================================================================
+ Battle over: victory (11 rounds / 51 actions)
+==============================================================================
+=== HP Status ===
+Himeko: 2050 / 2812
+March 7th: 889 / 1058
+Luocha: 1100 / 1511
+冰锋: 0 / 30000
+基层员工•外勤: 0 / 30000
+次元扑满: 0 / 30000
+================

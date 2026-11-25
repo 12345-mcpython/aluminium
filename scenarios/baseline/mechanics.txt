@@ -1,0 +1,45 @@
+==============================================================================
+ aluminium mechanics demo: the pieces built most recently, driven for real
+          run with --args="battle" for the whole-fight demo instead
+==============================================================================
+
+[1] Break control states — Ice (冰) locks the action / Quantum (量子)·Imaginary (虚数) slow + push the bar
+    target 次元扑满  speed 110  weakness rewritten to [ICE, QUANTUM, IMAGINARY] (demo affordance)
+    ICE break → control=FROZEN  canAct=false  speed 110 → 110  action value +68  (fixed 25% + element's own 50%)  attached: ControlBuff ctrl:frozen (cannot act)
+    QUANTUM break → control=ENTANGLED  canAct=true  speed 110 → 88  action value +103  (fixed 25% + element's own 20%)  attached: ControlBuff ctrl:entangled (acts, slower)
+    IMAGINARY break → control=IMPRISONED  canAct=true  speed 110 → 99  action value +73  (fixed 25% + element's own 20%)  attached: ControlBuff ctrl:imprisoned (acts, slower)
+    → only Ice (冰) stopped the victim acting; all three pushed the bar further than the fixed quarter alone, which is the element's own delay from Constant.BREAK_EFFECTS
+
+[2] A DOT on OUR character — the burn a boss puts on us
+    冰锋 applies burn to hero: DOT×1, 2 settlements, base 400
+    turn 1: HP 10000 → 9633  (burn settled; DOT×1 left)
+    turn 2: HP 9633 → 9267  (burn settled; DOT×0 left)
+    → gone after its 2 settlements; the next turn is clean, HP 9267
+
+[3] A summon on the ENEMY side — the camp no longer only accepts monsters
+    camp holds 2 unit(s): [冰锋, 冰锋的随从]
+    of which monsters: 1  (enemyUnits() — 'on that side' and 'is a monster' are two questions)
+    our target list: 2 unit(s), so an AOE reaches the summon without anyone naming it
+    hero's AOE (aimed at the monster) → summon HP 2000 → 1918
+    every monster down → status RUNNING (the summon still stands, so this is NOT a win)
+    summon down too → status WIN
+
+[4] A memosprite of OUR side — its panel is a function of its summoner
+    Evernight summoned 长夜 at battle start (its own BATTLE_START rule); it stands in our camp (2 unit(s), 1 monster(s) across the way)
+    HEALTH = 50% × 1557 (summoner)  → 778
+    SPEED = 160 flat  → 160
+    attack: SingleAttack Ice = 50% of the summoner's HEALTH — no ATK anywhere, because the text gives 「长夜」 (Evey) no ATK to use
+[Summon] 长夜  HP 778/778  (summoned by Evernight)
+        → damage base 50% of HEALTH (1557) × 1 hit(s), ICE
+        → 长夜 deals 400 across 1 target(s), main target 冰锋 HP 16098/16498
+[Action bar] 长夜(63) → 冰锋(114) → Evernight(152)
+
+==============================================================================
+ All four scenes ran without the engine refusing anything.
+ What pins each one is a test, not this printout:
+   control states      ControlTest + BreakEffectTableTest
+   DOT as a buff       DotTest (incl. a DOT on a character)
+   summon in the camp  EnemyCampSummonTest
+   memosprite attack   MemospriteAttackTest
+   delay survives slow QueueActionManipulationTest.aDelaySurvivesASpeedChange
+==============================================================================
