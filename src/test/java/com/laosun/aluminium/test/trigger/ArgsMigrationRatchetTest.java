@@ -40,8 +40,13 @@ public class ArgsMigrationRatchetTest {
      *   <li>{@code SUMMON} - which of the three shapes, and the memosprite's name and Speed;</li>
      *   <li>{@code RAISE_SKILL_LEVEL} - which of the three slot spellings, and how many levels;</li>
      *   <li>{@code ADVANCE} / {@code DELAY} / {@code GAIN_SKILL_POINT} - the one magnitude each states, held as a
-     *       {@code Magnitude} so the run-time half never names the bean.</li>
+     *       {@code Magnitude} so the run-time half never names the bean;</li>
+     *   <li>{@code HEAL} / {@code CONSUME_HP} - the same, resolved through the grant path.</li>
      * </ul>
+     *
+     * <p><b>What is NOT on this list on purpose.</b> {@code BOOST_DAMAGE} reads its magnitude <i>and</i> its
+     * {@code per_stack} multiplier, and stacking is a different cluster with its own reader; carrying only half of it
+     * would move the type without moving the knowledge. It waits for {@code per_stack} to be parsed too.
      */
     private static final Set<String> PARSED = Set.of(
             "IGNORE_WEAKNESS",
@@ -51,7 +56,9 @@ public class ArgsMigrationRatchetTest {
             "RAISE_SKILL_LEVEL",
             "ADVANCE",
             "DELAY",
-            "GAIN_SKILL_POINT");
+            "GAIN_SKILL_POINT",
+            "HEAL",
+            "CONSUME_HP");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {

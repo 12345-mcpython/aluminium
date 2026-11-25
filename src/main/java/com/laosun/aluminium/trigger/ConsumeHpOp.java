@@ -12,7 +12,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
  * <b>amount</b> slot (it used to be passed as a hit count, so every {@code event_amount} condition on this event read
  * zero).
  */
-final class ConsumeHpOp implements OpHandler<OpArgs> {
+final class ConsumeHpOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -20,12 +20,12 @@ final class ConsumeHpOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requirePercent(effect, op, rule);
         TriggerValidator.requireNonZeroPercent(effect, op, rule);
@@ -34,12 +34,12 @@ final class ConsumeHpOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
+    public void apply(OpContext ctx, MagnitudeArgs args) {
         for (CanHit spender : ctx.targets()) {
             if (spender == null) {
                 continue;
             }
-            double spent = spender.consumeHp(TriggerInterpreter.grantAmount(ctx.effect(), spender, ctx.firing()));
+            double spent = spender.consumeHp(TriggerInterpreter.grantAmount(args.magnitude(), spender, ctx.firing()));
             if (spent > 0) {
                 ctx.battle().fire(TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, spender, spender, 0, spent));
             }

@@ -11,7 +11,7 @@ import com.laosun.aluminium.entity.CanHit;
  * rule-driven heal read the owner's healing boost exactly as a skill's does. Healing has no duration - HP comes back
  * and stays back - so {@code turns} is refused rather than silently dropped.
  */
-final class HealOp implements OpHandler<OpArgs> {
+final class HealOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,12 +19,12 @@ final class HealOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireAmountOrScale(effect, op, rule, TriggerValidator.SCALES, "Max HP");
         TriggerValidator.requireNoStackArguments(effect, op, rule);
@@ -32,10 +32,10 @@ final class HealOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
+    public void apply(OpContext ctx, MagnitudeArgs args) {
         for (CanHit target : ctx.targets()) {
             ctx.battle().heal(ctx.firing().owner(), target,
-                    TriggerInterpreter.grantAmount(ctx.effect(), target, ctx.firing()));
+                    TriggerInterpreter.grantAmount(args.magnitude(), target, ctx.firing()));
         }
     }
 }
