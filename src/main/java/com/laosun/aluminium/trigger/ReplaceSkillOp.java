@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * {@code { remove: true }} needs none of them - the lifetime was the install's and the removal is immediate - so
  * stating any would be a field with no reader.
  */
-final class ReplaceSkillOp implements OpHandler<OpArgs> {
+final class ReplaceSkillOp implements OpHandler<ReplaceSkillArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class ReplaceSkillOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ReplaceSkillArgs parse(EffectSpec effect) {
+        return new ReplaceSkillArgs(effect.getSkill() == null ? "" : effect.getSkill().trim(), Boolean.TRUE.equals(effect.getRemove()), effect.getSkillId());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ReplaceSkillArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireSkill(effect, op, rule);
         if (Boolean.TRUE.equals(effect.getRemove())) {
@@ -51,7 +51,7 @@ final class ReplaceSkillOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.replaceSkill(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, ReplaceSkillArgs args) {
+        TriggerEffects.replaceSkill(ctx, args);
     }
 }

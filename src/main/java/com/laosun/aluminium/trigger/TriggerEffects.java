@@ -1041,21 +1041,22 @@ final class TriggerEffects {
      * <p>Note: The replacement is built ONCE per rule firing and shared by every resolved target: it is a skill, not state, and
      * the buff restores whatever each target had in that slot.
      */
-    static void replaceSkill(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        com.laosun.aluminium.entity.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+    static void replaceSkill(OpContext ctx, ReplaceSkillArgs args) {
+        com.laosun.aluminium.entity.Character owner =
+                TriggerMagnitudes.requireCharacterOwner(ctx.effect(), ctx.firing());
         SkillType slot;
         try {
-            slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(java.util.Locale.ROOT));
+            slot = SkillType.valueOf(args.skill().trim().toUpperCase(java.util.Locale.ROOT));
         } catch (IllegalArgumentException unknown) {
             throw new IllegalStateException(
-                    "REPLACE_SKILL names the slot '" + effect.getSkill() + "', which is not one this engine knows; known: "
+                    "REPLACE_SKILL names the slot '" + args.skill() + "', which is not one this engine knows; known: "
                             + java.util.Arrays.toString(SkillType.values()));
         }
         // `remove: true` is the other direction: 「当持有的【斗志】小于 2 层时」 means the ordinary attack is back, and a swap
         // that could only be installed would keep the enhanced row forever. Removing the swap restores the original row
         // through SkillSwapBuff's own lifecycle, so there is no second restore path to keep in step.
-        if (Boolean.TRUE.equals(effect.getRemove())) {
-            for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        if (args.remove()) {
+            for (CanHit target : ctx.targets()) {
                 if (target instanceof com.laosun.aluminium.entity.Character character) {
                     for (com.laosun.aluminium.buff.AbstractBuff buff
                             : java.util.List.copyOf(character.getBuffManager().activeBuffs())) {
@@ -1074,7 +1075,7 @@ final class TriggerEffects {
                 : java.util.List.copyOf(owner.getBuffManager().activeBuffs())) {
             if (buff instanceof com.laosun.aluminium.buff.SkillSwapBuff swap && swap.getSlot() == slot
                     && swap.getReplacement() != null
-                    && swap.getReplacement().getSkillSlot() == effect.getSkillId()) {
+                    && swap.getReplacement().getSkillSlot() == args.skillId()) {
                 return;
             }
         }
@@ -1082,11 +1083,12 @@ final class TriggerEffects {
         // shares its slot's level rather than inventing one).
         Skill current = owner.getSkills().get(slot);
         int level = current == null ? 1 : Math.max(1, current.getLevel());
-        Skill replacement = new com.laosun.aluminium.skill.DefaultSkill(owner.getCid(), effect.getSkillId(), level);
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        Skill replacement = new com.laosun.aluminium.skill.DefaultSkill(owner.getCid(), args.skillId(), level);
+        for (CanHit target : ctx.targets()) {
             if (target instanceof com.laosun.aluminium.entity.Character character) {
                 character.getBuffManager().addBuff(TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
-                        new com.laosun.aluminium.buff.SkillSwapBuff(slot, replacement), effect), ctx));
+                        new com.laosun.aluminium.buff.SkillSwapBuff(slot, replacement), ctx.effect()),
+                        ctx.firing()));
             }
         }
     }
@@ -1218,10 +1220,10 @@ final class TriggerEffects {
      * thing this method adds - and it must filter to the <b>living</b>, because {@code EnemySkill} takes the
      * first entry of the list it is handed as the main target.
      */
-    static void commandSummon(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        CanHit summon = TriggerTargets.requireSummon(ctx);
-        Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
-        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+    static void commandSummon(OpContext ctx, CommandSummonArgs args) {
+        CanHit summon = TriggerTargets.requireSummon(ctx.firing());
+        Character owner = TriggerMagnitudes.requireCharacterOwner(args.magnitude(), ctx.firing());
+        SkillType slot = SkillType.valueOf(args.skill().toUpperCase(Locale.ROOT));
         // The skill is the OWNER's: it is her ultimate whose parameter row carries the numbers. The summon is
         // only the one that swings.
         Skill skill = owner.getSkills().get(slot);
@@ -1236,7 +1238,7 @@ final class TriggerEffects {
                             + skill.getData().getEffect() + " rather than a damaging one");
         }
         List<CanHit> victims = new ArrayList<>();
-        for (CanHit unit : battle.getOpponents(summon)) {
+        for (CanHit unit : ctx.battle().getOpponents(summon)) {
             if (unit != null && !unit.isDeath()) {
                 victims.add(unit);
             }
@@ -1248,20 +1250,18 @@ final class TriggerEffects {
                 skill.getData().getElement(),
                 // Note: `owner`, not the summon: the skill and its parameter row are the OWNER's (see above), so its
                 // level - and any "Ultimate Lv. +1" this battle has raised - is the owner's too.
-                TriggerMagnitudes.multiplierOf(skill, effect, owner),
-                1,                                   // one segment: Evernight (长夜月)'s ultimate is "single-target segment count: 1" in its own split
+                TriggerMagnitudes.multiplierOf(skill, args.magnitude(), owner),
+                1,                                   // one segment: Evernight (长夜月)'s ultimate is single-segment
                 DamageType.NORMAL,                   // a real attack by the summon, not additional damage
                 skill.getData().getEffect(),         // the shape the skill itself declares (AoEAttack)
-                AttributeType.fromString(effect.getAttribute()),
+                AttributeType.fromString(args.attribute()),
                 // Note: The toughness too, and for the same reason as the element and the shape: it is written down
-                // once, in this skill's own `stance_list` (141303: `single 0 / all 90`), and the commanded swing
-                // is that skill's damage. Note: It has to be here rather than "the caster's cast already removed it":
-                // when a cast is DELEGATED (`DELEGATE_DAMAGE`) the executor expands no damage of its own, so
-                // the stance would otherwise be dropped on the floor - exactly one of the two must carry it, and
-                // this is the one that actually swings. `stanceFor(true)` is the skill's main-target column: for
-                // an AOE that is `all` (per victim, matching the caster-side path), for BLAST `single`.
+                // once, in this skill's own `stance_list`, and the commanded swing is that skill's damage. Note: It has
+                // to be here rather than "the caster's cast already removed it": when a cast is DELEGATED
+                // (`DELEGATE_DAMAGE`) the executor expands no damage of its own, so the stance would otherwise be
+                // dropped on the floor - exactly one of the two must carry it
                 skill.getData().stanceFor(true));
-        attack.execute(battle.engine(), summon, victims);
+        attack.execute(ctx.battle().engine(), summon, victims);
     }
 
     /**

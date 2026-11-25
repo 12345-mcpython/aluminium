@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * lose the per-level table). The victims come from the skill's own shape, not from a selector - pointing this op at
  * {@code self} or at a teammate would deal the summon's damage to our own side.
  */
-final class CommandSummonOp implements OpHandler<OpArgs> {
+final class CommandSummonOp implements OpHandler<CommandSummonArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class CommandSummonOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public CommandSummonArgs parse(EffectSpec effect) {
+        return new CommandSummonArgs(effect.getSkill() == null ? "" : effect.getSkill().trim(), effect.getAttribute(), effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(CommandSummonArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireSkill(effect, op, rule);
         TriggerValidator.requireDamageParam(effect, op, rule);
@@ -34,7 +34,7 @@ final class CommandSummonOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.commandSummon(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, CommandSummonArgs args) {
+        TriggerEffects.commandSummon(ctx, args);
     }
 }
