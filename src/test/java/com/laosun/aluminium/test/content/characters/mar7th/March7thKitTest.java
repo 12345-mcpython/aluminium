@@ -821,7 +821,7 @@ public class March7thKitTest {
          */
         private void shieldTheAlly() {
             battle.castImmediate(new DefaultSkill(MARCH, SKILL_SLOT, 1), march, List.of(ally));
-            Assertions.assertTrue(ally.getShield() > 0, "precondition: 「为指定我方单体提供…护盾」 (provides a shield to a designated single ally)");
+            Assertions.assertTrue(ally.getShield() > 0, "precondition: 「为指定我方单体提供…char:1001/shield」 (provides a shield to a designated single ally)");
         }
 
         /**

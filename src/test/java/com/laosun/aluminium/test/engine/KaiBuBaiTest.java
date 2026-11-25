@@ -22,7 +22,7 @@ public class KaiBuBaiTest {
     private static final int EVANESCIA = 1505;
     private static final int TEAMMATE = 1513;
     private static final int LEVEL = 80;
-    private static final String GIFT = "好活当赏";
+    private static final String GIFT = "elation:certified_banger";
 
     /**
      * Four instances end, and she converts half of them.

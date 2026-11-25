@@ -39,8 +39,8 @@ public class ElationGiftSnapshotTest {
      */
     private static final int ALLY = 1505;
     private static final int OTHER = 1204;
-    private static final String GIFT = "好活当赏";
-    private static final String LAUGH = "笑点";
+    private static final String GIFT = "elation:certified_banger";
+    private static final String LAUGH = "elation:punchline";
 
     /**
      * The count is taken when the state is granted, and the pool growing afterwards does not change it.

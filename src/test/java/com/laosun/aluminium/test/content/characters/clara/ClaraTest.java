@@ -43,8 +43,8 @@ public class ClaraTest {
 
     private static final int CLARA = 1107;
     private static final int LEVEL = 80;
-    private static final String MARK = "反击标记";
-    private static final String CHARGES = "强化反击";
+    private static final String MARK = "internal:1107/counter_marker";
+    private static final String CHARGES = "char:1107/enhanced_counter";
 
     /**
      * The 10% protection: the same probe hit is 10% smaller on her than on a bare dummy with her DEF.
@@ -82,14 +82,14 @@ public class ClaraTest {
         e1.castSkill();
         boolean e1Kept = e1.enemy.getBuffManager().hasState(MARK);
 
-        Assertions.assertAll("「战技施放后所有【反击标记】失效」 - and 星魂 1's exception to it",
+        Assertions.assertAll("「战技施放后所有【internal:1107/counter_marker】失效」 - and 星魂 1's exception to it",
                 () -> Assertions.assertTrue(baseMarked,
-                        "「攻击克拉拉的敌方目标会被史瓦罗标上【反击标记】」"),
+                        "「攻击克拉拉的敌方目标会被史瓦罗标上【internal:1107/counter_marker】」"),
                 () -> Assertions.assertFalse(baseCleared,
-                        "「战技施放后所有【反击标记】失效」"),
+                        "「战技施放后所有【internal:1107/counter_marker】失效」"),
                 () -> Assertions.assertTrue(e1Marked, "precondition: the attacker is marked"),
                 () -> Assertions.assertTrue(e1Kept,
-                        "「施放战技后，不会清除敌方目标的【反击标记】」 - with the Eidolon the mark stays"));
+                        "「施放战技后，不会清除敌方目标的【internal:1107/counter_marker】」 - with the Eidolon the mark stays"));
     }
 
     /**
@@ -259,7 +259,7 @@ public class ClaraTest {
         Assertions.assertAll("「我方其他目标遭到攻击后…发动反击」 - her own hit is not that clause",
                 () -> Assertions.assertTrue(allyHitHp < hp, "「我方其他目标遭到攻击后…发动反击」"),
                 () -> Assertions.assertTrue(marked,
-                        "「…并对攻击目标添加【反击标记】」 - the counter marks the attacker it hit back"),
+                        "「…并对攻击目标添加【internal:1107/counter_marker】」 - the counter marks the attacker it hit back"),
                 () -> Assertions.assertEquals(ownHp, ownEnemy.getCurrentHp(), 1e-9,
                         "「我方**其他**目标」 - her own hit is the Talent's clause, and that one is not unconditional"));
     }

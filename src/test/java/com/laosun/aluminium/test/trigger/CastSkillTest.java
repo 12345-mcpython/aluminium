@@ -308,12 +308,12 @@ public class CastSkillTest {
         Assertions.assertEquals(expected, him.getShield(), 1e-6,
                 "the shield is the skill's OWN Lv10 row -- which also pins that `level_convention` ran BEFORE the "
                         + "commanded cast (at Lv1 the row would be 0.14 x ATK + 100)");
-        Assertions.assertEquals(expected, ally.getShield(), 1e-6, "「为我方全体提供…护盾」 (provides a shield to all allies): the ally too");
+        Assertions.assertEquals(expected, ally.getShield(), 1e-6, "「为我方全体提供…char:1001/shield」 (provides a shield to all allies): the ally too");
         // Note: THE discriminating assertion for the op's side choice: a non-damaging cast reaches OUR camp. The ally's
         // shield above cannot show it (his own SKILL_CAST rule grants one to all_allies anyway), but a shield on the
         // ENEMY can only come from the commanded cast.
         Assertions.assertEquals(0.0, battle.enemies().getFirst().getShield(), 1e-9,
-                "「为我方全体提供…护盾」 (provides a shield to all allies) -- the commanded cast must never shield the other side");
+                "「为我方全体提供…char:1001/shield」 (provides a shield to all allies) -- the commanded cast must never shield the other side");
         Assertions.assertEquals(pointsBefore, battle.getSkillPoints(),
                 "「此次战技不消耗战技点」 -- a commanded cast never spends one (that is the caller's act)");
         Assertions.assertEquals(attackBefore * 1.15, Attack(him), 1e-6,

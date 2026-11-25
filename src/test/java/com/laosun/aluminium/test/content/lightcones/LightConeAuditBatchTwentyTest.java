@@ -122,7 +122,7 @@ public class LightConeAuditBatchTwentyTest {
         JsonObject ignore = rule(23020, "cone23020_ignore_defence_on_follow_up")
                 .getAsJsonArray("do").get(0).getAsJsonObject();
         System.out.println("[23020] 论辩无视防御: damage_type=" + ignore.get("damage_type") + " percent=" + ignore.get("percent"));
-        Assertions.assertEquals("ADDITIONAL", ignore.get("damage_type").getAsString(), "「**追加攻击**无视防御」");
+        Assertions.assertEquals("ADDITIONAL", ignore.get("damage_type").getAsString(), "「**relic:115/follow_up**无视防御」");
         Assertions.assertEquals(0.24, ignore.get("percent").getAsDouble(), 1e-12, "24%（叠影 1）");
     }
 

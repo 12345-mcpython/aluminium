@@ -11,7 +11,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.16,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -29,7 +29,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.24,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -49,7 +49,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.18,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -67,7 +67,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.27,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -87,7 +87,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.2,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -105,7 +105,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.3,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -125,7 +125,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.22,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -143,7 +143,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.33,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -163,7 +163,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.24,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"
@@ -181,7 +181,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DEFENCE",
           "percent": -0.36,
-          "buff": "茫然",
+          "buff": "cone:23043/bewilderment",
           "base_chance": 1.2,
           "turns": 2,
           "target": "all_enemies"

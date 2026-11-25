@@ -40,15 +40,15 @@ public class NamedBuffTest {
     @Test
     public void removingTheStateTakesItsNamedEffectsWithIt() {
         Fixture f = new Fixture();
-        f.fire(stateAndEffects("协奏"));
+        f.fire(stateAndEffects("char:1309/concerto"));
 
         double boosted = f.attack();
         Assertions.assertTrue(boosted > f.baseAttack, "precondition: the named modifier is on (" + boosted + ")");
-        Assertions.assertTrue(f.hero.getBuffManager().hasState("协奏"), "…and so is the state");
+        Assertions.assertTrue(f.hero.getBuffManager().hasState("char:1309/concerto"), "…and so is the state");
 
-        f.fire(List.of(removeState("协奏")));
+        f.fire(List.of(removeState("char:1309/concerto")));
 
-        Assertions.assertFalse(f.hero.getBuffManager().hasState("协奏"), "the state is off");
+        Assertions.assertFalse(f.hero.getBuffManager().hasState("char:1309/concerto"), "the state is off");
         Assertions.assertEquals(f.baseAttack, f.attack(), 1e-6,
                 "…and the ATK boost came off with it, because it carried the same name (before this field it could "
                         + "only be `permanent` and would have stayed forever)");
@@ -63,10 +63,10 @@ public class NamedBuffTest {
         f.fire(stateAndEffects(null));
         double before = f.attack();
 
-        f.fire(List.of(removeState("协奏")));
+        f.fire(List.of(removeState("char:1309/concerto")));
 
         Assertions.assertEquals(before, f.attack(), 1e-6,
-                "an unnamed modifier survives 「remove 协奏 (Concerto)」 -- only what states a name can be removed by one");
+                "an unnamed modifier survives 「remove char:1309/concerto (Concerto)」 -- only what states a name can be removed by one");
     }
 
     // ==================================================================
@@ -102,7 +102,7 @@ public class NamedBuffTest {
     private static List<TriggerSpec> stateAndEffects(String name) {
         EffectSpec state = new EffectSpec();
         TriggerSpecs.set(state, "op", "APPLY_BUFF");
-        TriggerSpecs.set(state, "buff", "协奏");
+        TriggerSpecs.set(state, "buff", "char:1309/concerto");
         TriggerSpecs.set(state, "permanent", true);
         TriggerSpecs.set(state, "target", "self");
 

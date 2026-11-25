@@ -142,7 +142,7 @@
         },
         {
           "op": "START_COUNTDOWN",
-          "buff": "卡厄斯兰那的额外回合",
+          "buff": "char:1408/kaoslana_extra_turn",
           "speed": 59.4
         },
         {

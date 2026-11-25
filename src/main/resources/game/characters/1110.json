@@ -70,7 +70,7 @@
           "scale": "owner_max_hp",
           "turns": 2,
           "target": "target",
-          "buff": "持续治疗",
+          "buff": "char:1110/regen",
           "percent_from_skill_param": "TALENT:1",
           "amount_from_skill_param": "TALENT:2"
         }
@@ -106,7 +106,7 @@
           "scale": "owner_max_hp",
           "turns": 2,
           "target": "all_allies",
-          "buff": "持续治疗",
+          "buff": "char:1110/regen",
           "percent_from_skill_param": "TALENT:1",
           "amount_from_skill_param": "TALENT:2"
         }
@@ -166,7 +166,7 @@
           "scale": "owner_max_hp",
           "turns": 2,
           "target": "all_allies",
-          "buff": "持续治疗",
+          "buff": "char:1110/regen",
           "percent_from_skill_param": "TALENT:1",
           "amount_from_skill_param": "TALENT:2"
         }

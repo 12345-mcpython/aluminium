@@ -76,7 +76,7 @@ public class EverGloriousMagicalGirlTest {
         var rules = wearer.getTriggerTable().rulesFor(TriggerEvent.DEALING_DAMAGE).stream()
                 .filter(rule -> rule.id().startsWith("relic129_")).toList();
         Assertions.assertEquals(2, rules.size(),
-                "the flat 10% and the laugh stair - the stair was blocked until 笑点 became a battle-level counter");
+                "the flat 10% and the laugh stair - the stair was blocked until elation:punchline became a battle-level counter");
         var effect = rules.get(0).effects().getFirst();
         System.out.println("[129] spec " + rules.getFirst().id() + " attribute=" + effect.getAttribute()
                 + " percent=" + effect.getPercent() + " damage_type=" + effect.getDamageType()

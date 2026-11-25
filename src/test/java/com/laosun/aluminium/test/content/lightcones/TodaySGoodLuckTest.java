@@ -62,7 +62,7 @@ public class TodaySGoodLuckTest {
         double capped = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base;
         System.out.println("[21065] one=" + one + " two=" + two + " after four=" + capped
                 + " perLayer=" + PER_LAYER);
-        Assertions.assertEquals(PER_LAYER, one, 1e-9, "one elation cast is one layer of 12%");
+        Assertions.assertEquals(PER_LAYER, one, 1e-9, "one 欢愉 cast is one layer of 12%");
         Assertions.assertEquals(2 * PER_LAYER, two, 1e-9, "two casts are two layers");
         Assertions.assertEquals(2 * PER_LAYER, capped, 1e-9, "and the text caps it at 2");
     }

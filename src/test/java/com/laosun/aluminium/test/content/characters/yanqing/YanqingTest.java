@@ -66,8 +66,8 @@ public class YanqingTest {
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, yanqing, enemy, 0, 0));
 
-        Assertions.assertTrue(yanqing.getBuffManager().hasState("智剑连心"),
-                "「并为彦卿附加【智剑连心】」 (and applies Soulsteel Sync (【智剑连心】) to Yanqing)");
+        Assertions.assertTrue(yanqing.getBuffManager().hasState("char:1209/blade_and_mind"),
+                "「并为彦卿附加【char:1209/blade_and_mind】」 (and applies Soulsteel Sync (【char:1209/blade_and_mind】) to Yanqing)");
         Assertions.assertEquals(0.2, yanqing.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-9,
                 "「为自身提高20.00%暴击率」 (raises his own CRIT Rate by 20.00%)");
         Assertions.assertEquals(0.3, yanqing.getAttribute(AttributeType.CRIT_ATTACK).get() - dmgBefore, 1e-9,
@@ -83,7 +83,7 @@ public class YanqingTest {
         double unsynced = ultCritDamageGain(false);
 
         Assertions.assertEquals(0.5, synced, 1e-9,
-                "「若彦卿处于【智剑连心】效果，则使其暴击伤害额外提高50%」 (if Yanqing has the Soulsteel Sync (【智剑连心】) effect, his CRIT DMG is raised by an extra 50%)");
+                "「若彦卿处于【char:1209/blade_and_mind】效果，则使其暴击伤害额外提高50%」 (if Yanqing has the Soulsteel Sync (【char:1209/blade_and_mind】) effect, his CRIT DMG is raised by an extra 50%)");
         Assertions.assertEquals(0.0, unsynced, 1e-9,
                 "without the state the extra 50% must not be granted");
     }
@@ -112,7 +112,7 @@ public class YanqingTest {
         battle.startBattle();
         if (synced) {
             // The state is applied DIRECTLY, so the Skill's own CRIT modifiers cannot interfere: this clause is about the Ultimate alone.
-            yanqing.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("智剑连心", 1, false));
+            yanqing.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1209/blade_and_mind", 1, false));
         }
         double before = yanqing.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, yanqing, enemy, 0, 0));
@@ -173,14 +173,14 @@ public class YanqingTest {
         Assertions.assertTrue(before > 0, "precondition: the ultimate's named buff is on him");
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.KILL, yanqing, enemy, 0, 0));
         int after = namedTurns(yanqing);
-        System.out.println("[1209] 终结技增益 turns " + before + " -> " + after);
+        System.out.println("[1209] char:1209/ult_buff turns " + before + " -> " + after);
         Assertions.assertEquals(before + 1, after, "「持续时间全部延长 1 回合」");
     }
 
     private static int namedTurns(Character unit) {
         int total = 0;
         for (AbstractBuff buff : unit.getBuffManager().activeBuffs()) {
-            if ("终结技增益".equals(buff.getBuffName())) {
+            if ("char:1209/ult_buff".equals(buff.getBuffName())) {
                 total += buff.remainingTurns();
             }
         }
@@ -244,9 +244,9 @@ public class YanqingTest {
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - before;
         System.out.println("[1209] effectResGain=" + gain + " hasState="
-                + unit.getBuffManager().hasState("智剑连心"));
+                + unit.getBuffManager().hasState("char:1209/blade_and_mind"));
         Assertions.assertEquals(0.2, gain, 1e-6, "the trace row's own param");
-        Assertions.assertTrue(unit.getBuffManager().hasState("智剑连心"),
+        Assertions.assertTrue(unit.getBuffManager().hasState("char:1209/blade_and_mind"),
                 "the skill's own rule put the state on her");
     }
 
@@ -256,15 +256,15 @@ public class YanqingTest {
         Character yanqing = battle.characters().getFirst();
         battle.castImmediate(yanqing.getSkills().get(SkillType.SKILL), yanqing, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(yanqing.getBuffManager().hasState("智剑连心"), "precondition: the Skill applies it");
+        Assertions.assertTrue(yanqing.getBuffManager().hasState("char:1209/blade_and_mind"), "precondition: the Skill applies it");
         double critWith = yanqing.getAttribute(AttributeType.CRIT_CHANCE).get();
 
         battle.applyDamage(yanqing, new Damage(battle.enemies().getFirst(), yanqing, DamageElement.ICE,
                 DamageType.NORMAL, 1));
         battle.processRequests();
 
-        Assertions.assertFalse(yanqing.getBuffManager().hasState("智剑连心"),
-                "「当彦卿受到伤害后，【智剑连心】将会消失」");
+        Assertions.assertFalse(yanqing.getBuffManager().hasState("char:1209/blade_and_mind"),
+                "「当彦卿受到伤害后，【char:1209/blade_and_mind】将会消失」");
         // The CRIT modifiers are gated on the state (`while_state`), so they leave at the next gate evaluation - the point of
         // this assertion is only that the state itself is gone; the numbers are pinned by the Skill test above.
         Assertions.assertTrue(critWith > 0, "precondition: the sync raises his CRIT Rate while it lasts");
@@ -272,7 +272,7 @@ public class YanqingTest {
 
     @Test
     public void theSecondEidolonRaisesEnergyRecoveryWhileSynced() {
-        Assertions.assertEquals(0.1, energyRegen(2), EPS, "「处于【智剑连心】时，额外提高 10% 的能量恢复效率」");
+        Assertions.assertEquals(0.1, energyRegen(2), EPS, "「处于【char:1209/blade_and_mind】时，额外提高 10% 的能量恢复效率」");
         Assertions.assertEquals(0.0, energyRegen(1), EPS, "before 星魂 2 there is none");
     }
 

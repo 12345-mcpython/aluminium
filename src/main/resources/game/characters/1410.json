@@ -60,7 +60,7 @@
           "attribute": "ATTACK",
           "percent": -0.15,
           "turns": 3,
-          "buff": "结界",
+          "buff": "char:1410/barrier",
           "ticks_on": "self",
           "target": "all_enemies"
         },
@@ -69,7 +69,7 @@
           "attribute": "DEFENCE",
           "percent": -0.25,
           "turns": 3,
-          "buff": "结界",
+          "buff": "char:1410/barrier",
           "ticks_on": "self",
           "target": "all_enemies"
         }
@@ -166,7 +166,7 @@
       "_note": "⭐ `#2` 给普攻、`#3` 给战技（实测：0.3 → 0.42 与 0.4 → 0.56）；存基点。"
     },
     {
-      "id": "ocean_ode_ticks_普攻_physical",
+      "id": "ocean_ode_ticks_basic_physical",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -188,7 +188,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_普攻_fire",
+      "id": "ocean_ode_ticks_basic_fire",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -210,7 +210,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_普攻_ice",
+      "id": "ocean_ode_ticks_basic_ice",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -232,7 +232,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_普攻_wind",
+      "id": "ocean_ode_ticks_basic_wind",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -254,7 +254,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_普攻_thunder",
+      "id": "ocean_ode_ticks_basic_thunder",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -276,7 +276,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_普攻_quantum",
+      "id": "ocean_ode_ticks_basic_quantum",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -298,7 +298,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_普攻_imaginary",
+      "id": "ocean_ode_ticks_basic_imaginary",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -320,7 +320,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_战技_physical",
+      "id": "ocean_ode_ticks_skill_physical",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -342,7 +342,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_战技_fire",
+      "id": "ocean_ode_ticks_skill_fire",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -364,7 +364,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_战技_ice",
+      "id": "ocean_ode_ticks_skill_ice",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -386,7 +386,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_战技_wind",
+      "id": "ocean_ode_ticks_skill_wind",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -408,7 +408,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_战技_thunder",
+      "id": "ocean_ode_ticks_skill_thunder",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -430,7 +430,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_战技_quantum",
+      "id": "ocean_ode_ticks_skill_quantum",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -452,7 +452,7 @@
       "_note": "⭐ 每元素一条：`TICK_DOT` 要求**真元素名**（实测），没有通配拼法。"
     },
     {
-      "id": "ocean_ode_ticks_战技_imaginary",
+      "id": "ocean_ode_ticks_skill_imaginary",
       "on": "ALLY_ATTACK",
       "when": [
         "actor == self",
@@ -542,7 +542,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "RESISTANCE_REDUCTION",
           "percent": 0.2,
-          "buff": "结界",
+          "buff": "char:1410/barrier",
           "turns": 3,
           "ticks_on": "self",
           "target": "all_enemies"

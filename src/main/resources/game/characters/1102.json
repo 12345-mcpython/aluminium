@@ -197,7 +197,7 @@
           "attribute": "SPEED",
           "percent": 0.25,
           "turns": 2,
-          "buff": "加速",
+          "buff": "char:1102/haste",
           "max_stacks": 1,
           "target": "self"
         }

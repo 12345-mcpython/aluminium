@@ -46,12 +46,12 @@ public class PearlKitTest {
     private static final int OTHER = 1204;
     private static final int ALLY = 1204;
     private static final int LEVEL = 80;
-    private static final String COUNTER = "好活当赏";
+    private static final String COUNTER = "elation:certified_banger";
     private static final String CHARGE = "char:1503/charge";
     private static final String DEEP = "char:1503/deep_learning";
     private static final String MARK = "char:1503/aesthetic_original";
     private static final String ARCHETYPE = "char:1503/aesthetic_original";
-    private static final String PUNCHLINE = "笑点";
+    private static final String PUNCHLINE = "elation:punchline";
     private static final double INSIGHT_ELATION = 0.32;
     private static final double PER_POINT_OVER = 0.0003;
     private static final double EPS = 1e-6;
@@ -72,7 +72,7 @@ public class PearlKitTest {
     public void theExtraInstanceFollowsTheArchetypesElationAndNotItsAttack() {
         double withBoost = damageOnSlot8(ELATION_ALLY, 1.0, 2000);
         double without = damageOnSlot8(ELATION_ALLY, 0.0, 2000);
-        System.out.println("[pearl_formA] slot-8 damage with the archetype's 欢愉度 at +100% = " + withBoost
+        System.out.println("[pearl_formA] slot-8 damage with the archetype's elation:elation_degree at +100% = " + withBoost
                 + " ; at +0% = " + without);
 
         double strong = damageOnSlot8(ELATION_ALLY, 0.0, 3000);
@@ -84,7 +84,7 @@ public class PearlKitTest {
                 () -> Assertions.assertTrue(without > 0,
                         "[the instance] the slot-8 enhanced basic deals damage at all"),
                 () -> Assertions.assertTrue(withBoost > without,
-                        "[the 欢愉度] the extra instance reads the ARCHETYPE's 欢愉度 (「使用【char:1503/aesthetic_original】的属性值计算」): "
+                        "[the elation:elation_degree] the extra instance reads the ARCHETYPE's elation:elation_degree (「使用【char:1503/aesthetic_original】的属性值计算」): "
                                 + withBoost + " vs " + without),
                 () -> Assertions.assertEquals(weak, strong, 1e-6,
                         "[the Attack] 欢愉伤害 has no attack-power term, so the archetype's Attack cannot move this"
@@ -98,11 +98,11 @@ public class PearlKitTest {
     public void theNonElationArchetypePaysNoExtraDamage() {
         double boosted = damageOnSlot8(HUNTER, 1.0, 3000);
         double plain = damageOnSlot8(HUNTER, 0.0, 1000);
-        System.out.println("[pearl_formA] slot-9 (non-Elation archetype): 欢愉度+100%/Attack 3000 = " + boosted
+        System.out.println("[pearl_formA] slot-9 (non-Elation archetype): elation:elation_degree+100%/Attack 3000 = " + boosted
                 + " ; +0%/Attack 1000 = " + plain);
         Assertions.assertEquals(plain, boosted, 1e-6,
                 "「若【char:1503/aesthetic_original】为「欢愉」命途」: the other form's sentence has no extra damage, so neither the "
-                        + "archetype's 欢愉度 nor its Attack can move the number");
+                        + "archetype's elation:elation_degree nor its Attack can move the number");
     }
 
     /**
@@ -180,7 +180,7 @@ public class PearlKitTest {
                 + " ; the ally +" + allyGain + " ; the counter reads " + pearl.getResources().value(COUNTER));
 
         Assertions.assertTrue(pearl.getResources().value(COUNTER) >= 1,
-                "precondition: the Ultimate granted 【好活当赏】, which is what the text's gate asks about");
+                "precondition: the Ultimate granted 【elation:certified_banger】, which is what the text's gate asks about");
         Assertions.assertEquals(0.5, pearlGain, EPS, "the party-wide clause includes Pearl herself");
         Assertions.assertEquals(0.5, allyGain, EPS, "and it is party-wide, not self-only");
     }
@@ -556,7 +556,7 @@ public class PearlKitTest {
         Assertions.assertEquals(0, without, EPS_TIGHT,
                 "no technique was used, so the rule's own gate (the 秘技 marker) is not satisfied");
         Assertions.assertEquals(20, with, EPS_TIGHT,
-                "「使用秘技后…下一次战斗开始时，真珠获得 20 点【好活当赏】」");
+                "「使用秘技后…下一次战斗开始时，真珠获得 20 点【elation:certified_banger】」");
     }
 
     /**
@@ -600,8 +600,8 @@ public class PearlKitTest {
         int unmarkedGain = unmarkedPearl.getResources().value(COUNTER);
         System.out.println("[pearl_extra_turn] the Hunt ally's extra turn paid " + unmarkedGain);
 
-        Assertions.assertAll("【好活当赏】获得 30 点",
-                () -> Assertions.assertEquals(30, gained, "[the grant] 【好活当赏】获得 30 点"),
+        Assertions.assertAll("【elation:certified_banger】获得 30 点",
+                () -> Assertions.assertEquals(30, gained, "[the grant] 【elation:certified_banger】获得 30 点"),
                 () -> Assertions.assertEquals(60, partyGained, "[the grant] and 60 points of punchline"),
                 () -> Assertions.assertEquals(0, left, "[the removal] the granted 30 is removed"),
                 () -> Assertions.assertEquals(60, partyLost, "[the removal] and so is the granted 60"),
@@ -697,7 +697,7 @@ public class PearlKitTest {
         double speedWithTraces = speedOf();
         double defenceNoRules = defenceOfPearlWithNoRules();
         double elationNoRules = elationOfPearlWithNoRules();
-        System.out.println("[pearl_stat_traces] effectRES=" + effectRes + " elation=" + elation
+        System.out.println("[pearl_stat_traces] effectRES=" + effectRes + " 欢愉=" + elation
                 + " (with her table emptied: " + elationNoRules + ")"
                 + " defence=" + defence + " (emptied: " + defenceNoRules + ") speed=" + speedWithTraces);
 

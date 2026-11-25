@@ -24,8 +24,8 @@ import java.util.List;
  */
 public class RemovalAnnouncesStateEndedTest {
     private static final int OWNER = 1513;
-    private static final String MOMENT = "阿哈时刻";
-    private static final String REWARD = "好活当赏";
+    private static final String MOMENT = "elation:aha_instant";
+    private static final String REWARD = "elation:certified_banger";
 
     /**
      * Taking the state off by hand is an end, so the reader pays.
@@ -57,7 +57,7 @@ public class RemovalAnnouncesStateEndedTest {
         battle.startBattle();
         battle.processRequests();
         Skill skill = owner.getSkills().get(SkillType.ELATION_SKILL);
-        Assertions.assertNotNull(skill, "precondition: she has an elation skill");
+        Assertions.assertNotNull(skill, "precondition: she has an 欢愉 skill");
         SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies().get(0)));
         battle.processRequests();
         return battle;

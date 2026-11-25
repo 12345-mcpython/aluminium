@@ -289,7 +289,7 @@ public final class CharacterFactory {
      * declaration would have to invent a cap the battle already knows. Content still spells it like any other counter, and
      * {@code TriggerInterpreter} routes the write to the battle.
      */
-    private static final java.util.Set<String> BATTLE_OWNED_COUNTERS = java.util.Set.of("战技点");
+    private static final java.util.Set<String> BATTLE_OWNED_COUNTERS = java.util.Set.of("sys:skill_points");
 
     /**
      * Refuses a merged table that reads a resource this character never declares.

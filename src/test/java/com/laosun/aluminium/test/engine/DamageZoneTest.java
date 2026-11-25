@@ -155,7 +155,7 @@ public class DamageZoneTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(2000, elation.toValue(), EPS,
-                        "elation keeps crit but skips damage boost"),
+                        "欢愉 keeps crit but skips damage boost"),
                 () -> Assertions.assertEquals(BASE, trueDamage.toValue(), EPS,
                         "true damage skips every zone"),
                 () -> Assertions.assertTrue(trueDamage.isTrueDamage(), "the true-damage flag is set"),

@@ -264,7 +264,7 @@ public class FeixiaoTest {
 
         Assertions.assertAll("行迹 解形 (1220102): 「追加攻击的暴击伤害提高36%」 - the compiled rule and the measured ratio",
                 () -> critMods.forEach(effect -> Assertions.assertEquals("ADDITIONAL", effect.getDamageType(),
-                        "「追加攻击」: scoped to follow-up damage")),
+                        "「relic:115/follow_up」: scoped to follow-up damage")),
                 () -> critMods.forEach(effect -> Assertions.assertEquals(0.36, effect.getPercent(), 1e-9,
                         "「提高36%」: the data row states 0.36")),
                 () -> critMods.forEach(effect -> Assertions.assertTrue(Boolean.TRUE.equals(effect.getInstance()),

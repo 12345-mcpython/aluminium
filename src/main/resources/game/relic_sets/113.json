@@ -12,7 +12,7 @@
           "percent": 0.08,
           "turns": 2,
           "max_stacks": 2,
-          "buff": "113/4 暴击率",
+          "buff": "relic:113/crit_chance",
           "target": "self"
         }
       ],
@@ -29,7 +29,7 @@
           "percent": 0.08,
           "turns": 2,
           "max_stacks": 2,
-          "buff": "113/4 暴击率",
+          "buff": "relic:113/crit_chance",
           "target": "self"
         }
       ],

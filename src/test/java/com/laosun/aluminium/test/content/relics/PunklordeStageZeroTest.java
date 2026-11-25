@@ -20,8 +20,8 @@ import com.laosun.aluminium.equipment.Relic;
  */
 public class PunklordeStageZeroTest {
     private static final int SET = 325;
-    private static final String MARK_A = "325_30";
-    private static final String MARK_B = "325_60";
+    private static final String MARK_A = "relic:325/threshold_30";
+    private static final String MARK_B = "relic:325/threshold_60";
 
     private static List<TriggerTable.CompiledRule> rulesFor(TriggerEvent event) {
         return RelicTriggerTables.of(SET).at(2).rulesFor(event);

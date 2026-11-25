@@ -148,15 +148,15 @@ public class TrailblazerTest {
             Battle battle = new Battle(new ArrayList<>(List.of(trailblazer, CharacterFactory.create(1001, LEVEL))),
                     new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
             battle.startBattle();
-            int laughsBefore = battle.partyResourceValue("笑点");
-            int giftBefore = trailblazer.getResources().value("好活当赏");
+            int laughsBefore = battle.partyResourceValue("elation:punchline");
+            int giftBefore = trailblazer.getResources().value("elation:certified_banger");
 
             battle.castImmediate(trailblazer.getSkills().get(SkillType.SKILL), trailblazer, List.of(enemy));
-            int laughsAfter = battle.partyResourceValue("笑点");
-            int giftAfter = trailblazer.getResources().value("好活当赏");
-            System.out.println("[" + cid + "] 笑点 " + laughsBefore + " -> " + laughsAfter
-                    + " ; 好活当赏 " + giftBefore + " -> " + giftAfter);
-            Assertions.assertEquals(giftBefore + 20, giftAfter, cid + ": 「获得 20 点【好活当赏】」");
+            int laughsAfter = battle.partyResourceValue("elation:punchline");
+            int giftAfter = trailblazer.getResources().value("elation:certified_banger");
+            System.out.println("[" + cid + "] elation:punchline " + laughsBefore + " -> " + laughsAfter
+                    + " ; elation:certified_banger " + giftBefore + " -> " + giftAfter);
+            Assertions.assertEquals(giftBefore + 20, giftAfter, cid + ": 「获得 20 点【elation:certified_banger】」");
             Assertions.assertEquals(laughsBefore + 3, laughsAfter, cid + ": 「获得 3 个笑点」");
         }
     }
@@ -241,7 +241,7 @@ public class TrailblazerTest {
                 new ArrayList<>(List.of(enemy)), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         if (bonusGift > 0) {
-            trailblazer.getResources().gain("好活当赏", bonusGift);
+            trailblazer.getResources().gain("elation:certified_banger", bonusGift);
         }
         double[] elation = new double[1];
         battle.addDamageObserver((damage, applied, hpLoss, shield, died) -> {

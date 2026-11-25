@@ -35,8 +35,8 @@ public class ElationLaughMultiplierTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1505;       // declares 好活当赏, so a grant to her is not dropped
     private static final int LAUGHS = 240;      // -> factor 1 + 240*5/(240+240) = 3.5
-    private static final String GIFT = "好活当赏";
-    private static final String LAUGH = "笑点";
+    private static final String GIFT = "elation:certified_banger";
+    private static final String LAUGH = "elation:punchline";
 
     @Test
     public void theFactorFollowsTheCountedStateAndNotThePoolAlone() {
@@ -45,7 +45,7 @@ public class ElationLaughMultiplierTest {
         double elationCounted = damage(false, LAUGHS, true);
         double normalNone = damage(true, 0, false);
         double normalCounted = damage(true, LAUGHS, true);
-        System.out.println("[laugh] elation: none " + elationNone + " ; pool only " + elationPoolOnly
+        System.out.println("[laugh] 欢愉: none " + elationNone + " ; pool only " + elationPoolOnly
                 + " (ratio " + (elationPoolOnly / elationNone) + ") ; counted " + elationCounted
                 + " (ratio " + (elationCounted / elationNone) + ")");
         System.out.println("[laugh] normal: none " + normalNone + " ; counted " + normalCounted);
@@ -53,7 +53,7 @@ public class ElationLaughMultiplierTest {
         Assertions.assertEquals(1.0, elationPoolOnly / elationNone, 1e-6,
                 "a pool that was never counted into a holder is NOT what 欢愉伤害 is computed from");
         Assertions.assertEquals(3.5, elationCounted / elationNone, 1e-6,
-                "once 【好活当赏】 counts 240 笑点 into its holder, the factor is 1 + 240*5/480 = 3.5");
+                "once 【elation:certified_banger】 counts 240 elation:punchline into its holder, the factor is 1 + 240*5/480 = 3.5");
         Assertions.assertEquals(normalNone, normalCounted, 1e-9,
                 "and a NORMAL instance must not see the Elation factor at all");
     }

@@ -39,10 +39,10 @@ public class TrailblazerHarmonyTest {
 
         f.castUltimate();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("伴舞"), "「为我方全体附上【伴舞】效果」 (applies the Backup Dancer (【伴舞】) effect to all allies)");
-        Assertions.assertTrue(f.harmony.getBuffManager().hasState("伴舞"), "…including the caster (「我方全体」 (all allies))");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("char:8005/backup_dancer"), "「为我方全体附上【char:8005/backup_dancer】效果」 (applies the Backup Dancer (【char:8005/backup_dancer】) effect to all allies)");
+        Assertions.assertTrue(f.harmony.getBuffManager().hasState("char:8005/backup_dancer"), "…including the caster (「我方全体」 (all allies))");
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.BREAKING_EFFECT).get() > before,
-                "「持有【伴舞】的我方目标击破特攻提高30%」 (an ally holding Backup Dancer (【伴舞】) gets 30% more Break Effect)");
+                "「持有【char:8005/backup_dancer】的我方目标击破特攻提高30%」 (an ally holding Backup Dancer (【char:8005/backup_dancer】) gets 30% more Break Effect)");
     }
 
     /**
@@ -58,13 +58,13 @@ public class TrailblazerHarmonyTest {
         f.castUltimate();
 
         f.fullTurnOf(f.ally);
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("伴舞"),
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("char:8005/backup_dancer"),
                 "an ally's turn does not shorten it: \"**the Trailblazer**'s turn start\"");
 
         f.fullTurnOf(f.harmony);
         f.fullTurnOf(f.harmony);
         f.fullTurnOf(f.harmony);
-        Assertions.assertFalse(f.ally.getBuffManager().hasState("伴舞"),
+        Assertions.assertFalse(f.ally.getBuffManager().hasState("char:8005/backup_dancer"),
                 "three of HER turns run the 3-turn state out, even on the allies carrying copies");
     }
 

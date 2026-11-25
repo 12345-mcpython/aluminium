@@ -73,14 +73,14 @@ public class GallagherEidolonTest {
         battle.startBattle();
         // Clear whatever the technique put there, so the reading is the Ultimate's own state.
         for (com.laosun.aluminium.buff.AbstractBuff buff : List.copyOf(enemy.getBuffManager().activeBuffs())) {
-            if ("酩酊".equals(buff.getBuffName())) {
+            if ("char:1301/intoxication".equals(buff.getBuffName())) {
                 enemy.getBuffManager().removeBuff(buff);
             }
         }
         battle.castImmediate(gallagher.getSkills().get(SkillType.ULTRA), gallagher, List.of(enemy));
         battle.processRequests();
         return enemy.getBuffManager().activeBuffs().stream()
-                .filter(buff -> "酩酊".equals(buff.getBuffName()))
+                .filter(buff -> "char:1301/intoxication".equals(buff.getBuffName()))
                 .mapToInt(buff -> buff.duration())
                 .max().orElse(0);
     }

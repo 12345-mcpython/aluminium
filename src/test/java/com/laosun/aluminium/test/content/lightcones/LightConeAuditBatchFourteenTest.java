@@ -115,7 +115,7 @@ public class LightConeAuditBatchFourteenTest {
         Fixture bare = new Fixture(null, false, WEARER);
         double skill = f.attribute(AttributeType.SKILL_DAMAGE_BOOST) - bare.attribute(AttributeType.SKILL_DAMAGE_BOOST);
         double followUp = f.attribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST) - bare.attribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST);
-        System.out.println("[21062] 战技 " + skill + " ; 追加攻击 " + followUp);
+        System.out.println("[21062] 战技 " + skill + " ; relic:115/follow_up " + followUp);
         Assertions.assertEquals(0.24, skill, 1e-9, "「战技…伤害提高 24%」");
         Assertions.assertEquals(0.24, followUp, 1e-9, "「…和追加攻击…」");
     }

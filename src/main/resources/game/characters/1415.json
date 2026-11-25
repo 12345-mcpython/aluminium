@@ -737,7 +737,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "终结技已激活",
+          "buff": "sys:ultimate_activated",
           "permanent": true,
           "target": "other_allies"
         },
@@ -827,7 +827,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "终结技已激活",
+          "buff": "sys:ultimate_activated",
           "permanent": true,
           "target": "self"
         }
@@ -861,7 +861,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "终结技已激活",
+          "buff": "sys:ultimate_activated",
           "permanent": true,
           "target": "self"
         }

@@ -371,7 +371,7 @@ public class ArcherTest {
     public void theFollowUpFollowsTheTalentRow() {
         double atZero = followUpPerAttack(0);
         double atFive = followUpPerAttack(5);
-        System.out.println("[1015] 追加攻击 ÷ 攻击力: E0 " + atZero + " ; E5 " + atFive
+        System.out.println("[1015] relic:115/follow_up ÷ 攻击力: E0 " + atZero + " ; E5 " + atFive
                 + "（写死 2.0 的话两档一样）");
         Assertions.assertEquals(1.1, atFive / atZero, 1e-9, "星魂 5 给天赋 +2 级 ⇒ 第 12 行是 2.2（E0 是 2.0）");
     }

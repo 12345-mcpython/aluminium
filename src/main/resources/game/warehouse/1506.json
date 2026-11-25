@@ -14,7 +14,7 @@
         "kind": "control",
         "percent": 1.0,
         "turns": 1,
-        "buff": "防火墙",
+        "buff": "internal:1506/firewall",
         "target": "all_allies"
       }
     ],

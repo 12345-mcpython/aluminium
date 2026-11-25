@@ -25,7 +25,7 @@
     {
       "on": "SKILL_CAST",
       "id": "relic133_skill_raises_party_crit_damage_at_ten_banger",
-      "when": ["actor == self", "self_resource:好活当赏 >= 10"],
+      "when": ["actor == self", "self_resource:elation:certified_banger >= 10"],
       "do": [
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "turns": 3, "target": "all_allies" }
       ],
@@ -35,7 +35,7 @@
     {
       "on": "ULT_CAST",
       "id": "relic133_ult_raises_party_crit_damage_at_ten_banger",
-      "when": ["actor == self", "self_resource:好活当赏 >= 10"],
+      "when": ["actor == self", "self_resource:elation:certified_banger >= 10"],
       "do": [
         { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "turns": 3, "target": "all_allies" }
       ],

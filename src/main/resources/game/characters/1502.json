@@ -48,7 +48,7 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 5
         }
       ],
@@ -91,7 +91,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 3
         }
       ],
@@ -108,7 +108,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 3
         }
       ],
@@ -182,7 +182,7 @@
       "id": "talent_lucky_followup",
       "when": [
         "actor is_ally",
-        "self has_state 好活当赏"
+        "self has_state elation:certified_banger"
       ],
       "do": [
         {
@@ -257,7 +257,7 @@
   ],
   "resources": [
     {
-      "id": "笑点",
+      "id": "elation:punchline",
       "max": 2147483647,
       "initial": 0,
       "scope": "PARTY",

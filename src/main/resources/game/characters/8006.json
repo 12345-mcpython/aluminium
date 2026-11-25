@@ -34,7 +34,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "伴舞",
+          "buff": "char:8005/backup_dancer",
           "turns": 3,
           "ticks_on": "self",
           "target": "all_allies"
@@ -45,7 +45,7 @@
           "percent": 0.3,
           "turns": 3,
           "ticks_on": "self",
-          "buff": "伴舞",
+          "buff": "char:8005/backup_dancer",
           "target": "all_allies"
         }
       ],
@@ -157,7 +157,7 @@
     {
       "on": "DEALING_DAMAGE",
       "when": [
-        "actor has_state 伴舞",
+        "actor has_state char:8005/backup_dancer",
         "target has_state break:weakness"
       ],
       "do": [

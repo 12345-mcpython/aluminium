@@ -4,14 +4,14 @@
   "_status": "partial",
   "resources": [
     {
-      "id": "笑点",
+      "id": "elation:punchline",
       "max": 2147483647,
       "initial": 0,
       "scope": "PARTY",
       "source": "8010 终结技：「获得 5 个笑点」。⚠ 与 1502／1505／1513 共用同名的**队伍级**计数 ✓（数据里没有上限 ⇒ `Integer.MAX_VALUE` ✓）"
     },
     {
-      "id": "好活当赏",
+      "id": "elation:certified_banger",
       "max": 2147483647,
       "initial": 0,
       "source": "8010 终结技：「若目标拥有欢愉技，目标额外获得 **10** 点【好活当赏】」。⚠ 装载器**要求本文件声明它自己规则用到的每一个资源** ✓（与 `1505` 同名同声明 ✓）；数据里没有上限 ⇒ `Integer.MAX_VALUE` ✓"
@@ -99,7 +99,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 5
         }
       ],
@@ -117,7 +117,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 10,
           "target": "target"
         },
@@ -140,7 +140,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 20
         }
       ],
@@ -156,7 +156,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 3
         }
       ],
@@ -168,12 +168,12 @@
       "id": "talent_elation_extra_damage",
       "when": [
         "actor == self",
-        "self_resource:好活当赏 > 0"
+        "self_resource:elation:certified_banger > 0"
       ],
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "max_party_resource:好活当赏",
+          "scale": "max_party_resource:elation:certified_banger",
           "element": "Thunder",
           "damage_type": "ELATION",
           "target": "all_enemies",

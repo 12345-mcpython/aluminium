@@ -9,25 +9,25 @@
   ],
   "resources": [
     {
-      "id": "欢愉度",
+      "id": "elation:elation_degree",
       "max": 2147483647,
       "initial": 0,
       "source": "1505 绯英 天赋 青春•韶华无限: 「绯英获得等同于暴击伤容 50% 的欢愉度」。⚠ 数据里没有上限，所以 max 用 Integer.MAX_VALUE 表示\"游戏从未说过会满\"。"
     },
     {
-      "id": "好活当赏",
+      "id": "elation:certified_banger",
       "max": 2147483647,
       "initial": 0,
       "source": "1505 绯英 秘技 落英•散者皆忆: 「…并获得 20 点【好活当赏】」。⚠ 文本只给了「单次不超过 100 点」，那是单次上限。"
     },
     {
-      "id": "累计能量",
+      "id": "char:1505/accumulated_energy",
       "max": 2147483647,
       "initial": 0,
       "source": "1505 绯英 天赋: 「累计获得 240 点能量时，消耗 240 点累计值…单次获得能量时最多获得 240 点累计值」。⚠ 数据里没有这个计数器的上限（240 是**阈值**与**单次上限**），所以 max 用 Integer.MAX_VALUE 表示\"永不满\"。"
     },
     {
-      "id": "笑点",
+      "id": "elation:punchline",
       "max": 2147483647,
       "initial": 0,
       "scope": "PARTY",
@@ -63,7 +63,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "欢愉度",
+          "resource": "elation:elation_degree",
           "amountFromAttr": "CRIT_ATTACK",
           "amountPercent": 0.5
         }
@@ -78,7 +78,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 20
         }
       ],
@@ -91,13 +91,13 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amountFromEvent": true,
           "amountCap": 100
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amountFromPrevious": true,
           "amountPercent": 0.5,
           "min_eidolon": 1
@@ -112,7 +112,7 @@
       "when": [
         "actor == self",
         "from_category BPSKILL",
-        "self_resource:好活当赏 >= 1"
+        "self_resource:elation:certified_banger >= 1"
       ],
       "do": [
         {
@@ -133,7 +133,7 @@
       "when": [
         "actor == self",
         "from_category ULTRA",
-        "self_resource:好活当赏 >= 1"
+        "self_resource:elation:certified_banger >= 1"
       ],
       "do": [
         {
@@ -154,7 +154,7 @@
       "when": [
         "actor == self",
         "from_category ULTRA",
-        "self_resource:好活当赏 >= 1"
+        "self_resource:elation:certified_banger >= 1"
       ],
       "do": [
         {
@@ -175,7 +175,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "累计能量",
+          "resource": "char:1505/accumulated_energy",
           "amountFromEvent": true,
           "amountCap": 240
         }
@@ -210,7 +210,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 10
         }
       ],
@@ -221,12 +221,12 @@
       "on": "STATE_ENDED",
       "id": "kai_bu_bai_half_of_a_fallen_gift",
       "when": [
-        "actor state_ended 好活当赏"
+        "actor state_ended elation:certified_banger"
       ],
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amountFromEvent": true,
           "target": "self",
           "amountPercent": 0.5

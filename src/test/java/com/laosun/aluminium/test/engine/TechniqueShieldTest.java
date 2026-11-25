@@ -36,7 +36,7 @@ public class TechniqueShieldTest {
         battle.startBattle();
 
         double expected = gepard.getAttribute(AttributeType.DEFENCE).get() * 0.24 + 150;
-        Assertions.assertTrue(gepard.getShield() > 0, "「为我方全体提供…护盾」 (provides a shield to all allies) -- himself");
+        Assertions.assertTrue(gepard.getShield() > 0, "「为我方全体提供…char:1001/shield」 (provides a shield to all allies) -- himself");
         Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
                 "「等同于杰帕德24%防御力+150的护盾」 (a shield equal to 24% of Gepard's DEF + 150): expected " + expected + ", shield " + ally.getShield());
     }

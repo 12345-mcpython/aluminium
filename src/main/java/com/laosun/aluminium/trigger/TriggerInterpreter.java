@@ -1505,7 +1505,7 @@ public final class TriggerInterpreter {
     /**
      * The counter 【好活当赏】's name, and how many of its holder's TURN-ENDS the document's 2 rounds span.
      */
-    private static final String ELATION_GIFT = "好活当赏";
+    private static final String ELATION_GIFT = "elation:certified_banger";
     /**
      * 「持续 2 回合」, counted as the number of the holder's turn-ENDS it survives.
      *
@@ -2070,7 +2070,7 @@ public final class TriggerInterpreter {
      * also why the name appears nowhere in the declared-resource checks - a character does not declare it, the battle has
      * it. Reader: 1506's 【爆爆爆炸蛋】.
      */
-    private static final String SKILL_POINT = "战技点";
+    private static final String SKILL_POINT = "sys:skill_points";
 
     /**
      * "when SPD is greater than or equal to X ... for each 1 point of SPD above that ...": {@code self_attr_above:<ATTRIBUTE>:<threshold>}.

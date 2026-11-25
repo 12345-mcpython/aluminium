@@ -20,7 +20,7 @@ public class ElationAccumulatorTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String ACC = "累计能量";
+    private static final String ACC = "char:1505/accumulated_energy";
 
     private Character elation;
     private Battle battle;

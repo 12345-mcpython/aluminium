@@ -27,7 +27,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "追加攻击",
+          "buff": "relic:115/follow_up",
           "amount": 8,
           "target": "self"
         }
@@ -44,7 +44,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "追加攻击",
+          "buff": "relic:115/follow_up",
           "amount": 1,
           "max_stacks": 8,
           "turns": 3,
@@ -54,7 +54,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.06,
-          "per_stack": "追加攻击",
+          "per_stack": "relic:115/follow_up",
           "turns": 3,
           "target": "self"
         }

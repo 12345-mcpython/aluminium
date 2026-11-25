@@ -35,8 +35,8 @@ public class SiblingHarmonyTest {
 
         battle.castImmediate(tb.getSkills().get(SkillType.ULTRA), tb, List.of(enemy));
 
-        Assertions.assertTrue(ally.getBuffManager().hasState("伴舞"),
-                "\"applies the Backup Dancer (【伴舞】) effect to all allies\" (「为我方全体附上【伴舞】效果」)");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:8005/backup_dancer"),
+                "\"applies the Backup Dancer (【char:8005/backup_dancer】) effect to all allies\" (「为我方全体附上【char:8005/backup_dancer】效果」)");
         // Measured: BREAKING_EFFECT is a FRACTION attribute whose base is 0, and the engine lands this modifier as an absolute 0.3 - i.e. exactly the
         // document's 30%. Asserting a share of the base (the first attempt) expected 0 and compared nothing.
         Assertions.assertEquals(0.3, ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-9,

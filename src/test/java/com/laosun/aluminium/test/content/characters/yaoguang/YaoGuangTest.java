@@ -35,7 +35,7 @@ public class YaoGuangTest {
     private static final int WEARER = 1502;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String LAUGH = "笑点";
+    private static final String LAUGH = "elation:punchline";
     private static final String ZONE = "char:1502/barrier";
 
     // The ultimate group shares one fixture; build() fills these three.
@@ -104,14 +104,14 @@ public class YaoGuangTest {
         double withState = lossToAllyAttack(true);
         double withoutState = lossToAllyAttack(false);
         System.out.println("[1502] ally attack, state up=" + withState + " ; state down=" + withoutState);
-        Assertions.assertTrue(withState > withoutState, "【大吉大利】 must add an instance when she holds 【好活当赏】");
+        Assertions.assertTrue(withState > withoutState, "【大吉大利】 must add an instance when she holds 【elation:certified_banger】");
     }
 
     private static double lossToAllyAttack(boolean holdTheState) {
         Character her = CharacterFactory.create(1502, 80);
         Character ally = CharacterFactory.create(1101, 80);
         if (holdTheState) {
-            her.getBuffManager().addBuff(new StateBuff("好活当赏", 1));
+            her.getBuffManager().addBuff(new StateBuff("elation:certified_banger", 1));
         }
         Battle battle = new Battle(new ArrayList<>(List.of(her, ally)),
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.alwaysRoll(0.0));
@@ -153,7 +153,7 @@ public class YaoGuangTest {
         int laughsAfter = battle.partyResourceValue(LAUGH);
         System.out.println("[1502] resistance penetration: herself " + selfBefore + " -> " + selfAfter
                 + " ; the ally " + allyBefore + " -> " + allyAfter);
-        System.out.println("[1502] Punchline (笑点) on the battle: " + laughsBefore + " -> " + laughsAfter
+        System.out.println("[1502] Punchline (elation:punchline) on the battle: " + laughsBefore + " -> " + laughsAfter
                 + " ; the caster holds it herself? " + yaoguang.getResources().has(LAUGH)
                 + " ; the ally? " + ally.getResources().has(LAUGH));
 
@@ -194,7 +194,7 @@ public class YaoGuangTest {
         battle.castImmediate(her.getSkills().get(SkillType.SKILL), her, List.of(ally));
         battle.processRequests();
         double gained = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBefore;
-        System.out.println("[1502] her elation=" + herElation + " ; ally gained=" + gained + " (expect " + (herElation * 0.2) + ")");
+        System.out.println("[1502] her 欢愉=" + herElation + " ; ally gained=" + gained + " (expect " + (herElation * 0.2) + ")");
         Assertions.assertEquals(herElation * 0.2, gained, 1e-9, "「等同于爻光欢愉度的 20%」");
     }
 
@@ -210,12 +210,12 @@ public class YaoGuangTest {
 
         battle.castImmediate(yao.getSkills().get(SkillType.SKILL), yao, List.of(enemy));
         Assertions.assertTrue(yao.getBuffManager().hasState(ZONE), "「展开结界，持续 3 回合」");
-        int after = battle.partyResourceValue("笑点");
+        int after = battle.partyResourceValue("elation:punchline");
         System.out.println("[1502] laughs after the skill = " + after);
         Assertions.assertEquals(3, after, "「施放…战技后获得 3 个笑点」");
 
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, yao, enemy, 1, 0));
-        Assertions.assertEquals(6, battle.partyResourceValue("笑点"), "「施放普攻…后获得 3 个笑点」");
+        Assertions.assertEquals(6, battle.partyResourceValue("elation:punchline"), "「施放普攻…后获得 3 个笑点」");
     }
 
     @Test
@@ -224,7 +224,7 @@ public class YaoGuangTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = zoneBattle(yao, enemy);
         battle.fire(TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, yao, enemy, 1, 0));
-        Assertions.assertEquals(0, battle.partyResourceValue("笑点"), "no zone, no laughs");
+        Assertions.assertEquals(0, battle.partyResourceValue("elation:punchline"), "no zone, no laughs");
     }
 
     private static Battle zoneBattle(Character yao, Enemy enemy) {

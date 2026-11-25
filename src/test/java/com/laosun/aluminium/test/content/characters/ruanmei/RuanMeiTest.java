@@ -79,9 +79,9 @@ public class RuanMeiTest {
 
         battle.castImmediate(ruanmei.getSkills().get(SkillType.SKILL), ruanmei, List.of(ally));
 
-        Assertions.assertTrue(ruanmei.getBuffManager().hasState("弦外音"),
-                "「施放战技后阮•梅获得【弦外音】」 (after casting the Skill, Ruan Mei gains Overtone (【弦外音】))");
-        Assertions.assertFalse(ally.getBuffManager().hasState("弦外音"),
+        Assertions.assertTrue(ruanmei.getBuffManager().hasState("char:1303/overtone"),
+                "「施放战技后阮•梅获得【char:1303/overtone】」 (after casting the Skill, Ruan Mei gains Overtone (【char:1303/overtone】))");
+        Assertions.assertFalse(ally.getBuffManager().hasState("char:1303/overtone"),
                 "the state is on HER, not on the ally she aimed at");
     }
 
@@ -123,9 +123,9 @@ public class RuanMeiTest {
         battle.castImmediate(ruanMei.getSkills().get(SkillType.SKILL), ruanMei, List.of(ally));
         battle.processRequests();
 
-        Assertions.assertTrue(ruanMei.getBuffManager().hasState("弦外音"), "precondition: the Skill grants 弦外音");
+        Assertions.assertTrue(ruanMei.getBuffManager().hasState("char:1303/overtone"), "precondition: the Skill grants char:1303/overtone");
         Assertions.assertEquals(before + 0.32, ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
-                "「当阮•梅拥有【弦外音】时，我方全体伤害提高 32%」 — the ALLY carries it");
+                "「当阮•梅拥有【char:1303/overtone】时，我方全体伤害提高 32%」 — the ALLY carries it");
     }
 
     // ==================================================================

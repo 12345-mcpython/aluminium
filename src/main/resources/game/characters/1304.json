@@ -47,7 +47,7 @@
             "index": 1
           },
           "turns": 3,
-          "buff": "坚垣筹码",
+          "buff": "char:1304/bulwark_chip",
           "target": "all_allies"
         }
       ],

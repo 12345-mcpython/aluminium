@@ -51,12 +51,12 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "师父",
+          "buff": "char:1224/master",
           "target": "all_allies"
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "师父",
+          "buff": "char:1224/master",
           "permanent": true,
           "target_when": ["target != self"],
           "target": "target"
@@ -67,7 +67,7 @@
           "permanent": true,
           "target": "target",
           "target_when": ["target != self"],
-          "buff": "师父",
+          "buff": "char:1224/master",
           "percent_from_skill_param": "SKILL:0"
         }
       ],
@@ -78,7 +78,7 @@
       "on": "ALLY_ATTACK",
       "id": "talent_charge_on_shifu_attack",
       "when": [
-        "actor has_state 师父"
+        "actor has_state char:1224/master"
       ],
       "do": [
         {
@@ -94,7 +94,7 @@
       "on": "ULT_CAST",
       "id": "talent_charge_on_shifu_ult",
       "when": [
-        "actor has_state 师父"
+        "actor has_state char:1224/master"
       ],
       "do": [
         {
@@ -250,7 +250,7 @@
       "id": "eidolon1_she_is_faster_while_a_master_stands",
       "min_eidolon": 1,
       "when": [
-        "any_ally has_state 师父"
+        "any_ally has_state char:1224/master"
       ],
       "do": [
         {
@@ -288,7 +288,7 @@
       "min_eidolon": 2,
       "per_turn": 1,
       "when": [
-        "actor has_state 师父"
+        "actor has_state char:1224/master"
       ],
       "do": [
         {

@@ -119,7 +119,7 @@ public class LightConeAuditBatchTwentySixTest {
         Assertions.assertEquals("self_stacks:internal:23053/spent_layers", ignore.get("per_stack").getAsString(), "「**每消耗 1 个**战技点」");
         Assertions.assertEquals("ELATION", ignore.get("damage_type").getAsString(), "只对**欢愉伤害**");
         JsonObject pay = effect(23053, "cone23053_turn_spend_pays_out", 2);
-        System.out.println("[23053] char:23053/push_stream: elation boost=" + pay.get("percent") + " target=" + pay.get("target"));
+        System.out.println("[23053] char:23053/push_stream: 欢愉 boost=" + pay.get("percent") + " target=" + pay.get("target"));
         Assertions.assertEquals(0.2, pay.get("percent").getAsDouble(), 1e-12, "「我方全体欢愉度提高 20%」");
         Assertions.assertEquals("all_allies", pay.get("target").getAsString(), "「我方全体」");
     }

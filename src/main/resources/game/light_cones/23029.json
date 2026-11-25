@@ -68,7 +68,7 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.14,
           "turns": 2,
-          "buff": "穷寇之痛",
+          "buff": "cone:23029/cornered_pain",
           "target": "target"
         }
       ],

@@ -68,25 +68,25 @@ public class TriggerStateTest {
      */
     @Test
     public void applyBuffPutsTheNamedStateOnTheOwner() {
-        Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", 2, null));
+        Battle battle = battleWith(stateOp("ALLY_ATTACK", "char:1309/concerto", 2, null));
         Character owner = battle.characters().getFirst();
 
         int applied = fire(battle, owner);
-        boolean inState = owner.getBuffManager().hasState("协奏");
+        boolean inState = owner.getBuffManager().hasState("char:1309/concerto");
         int stateCount = owner.getBuffManager().countBuffs(StateBuff.class);
         boolean otherName = owner.getBuffManager().hasState("char:1212/soul_shift");
 
         Assertions.assertAll("APPLY_BUFF applies and refreshes the named state",
                 () -> Assertions.assertEquals(1, applied, "the rule applies the state"),
-                () -> Assertions.assertTrue(inState, "the owner is now in 【协奏】"),
+                () -> Assertions.assertTrue(inState, "the owner is now in 【char:1309/concerto】"),
                 () -> Assertions.assertEquals(1, stateCount, "exactly one state buff is attached"),
                 () -> Assertions.assertFalse(otherName, "a different name is a different state"));
 
         takeTurn(battle, owner);
-        Integer afterOneTurn = stateDuration(owner, "协奏");
+        Integer afterOneTurn = stateDuration(owner, "char:1309/concerto");
         fire(battle, owner);
         int refreshedCount = owner.getBuffManager().countBuffs(StateBuff.class);
-        Integer refreshed = stateDuration(owner, "协奏");
+        Integer refreshed = stateDuration(owner, "char:1309/concerto");
         Assertions.assertAll("the same state refreshes instead of stacking",
                 () -> Assertions.assertEquals(1, afterOneTurn, "one turn of the duration was burned"),
                 () -> Assertions.assertEquals(1, refreshedCount, "refreshed, not stacked"),
@@ -99,8 +99,8 @@ public class TriggerStateTest {
     @Test
     public void theConditionReadsTheOwnersState() {
         Battle battle = battleWith(
-                stateOp("ALLY_ATTACK", "协奏", 2, null),
-                TriggerSpecs.rule("SKILL_CAST", List.of("self has_state 协奏"), gain(1)));
+                stateOp("ALLY_ATTACK", "char:1309/concerto", 2, null),
+                TriggerSpecs.rule("SKILL_CAST", List.of("self has_state char:1309/concerto"), gain(1)));
         Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
@@ -113,7 +113,7 @@ public class TriggerStateTest {
                         "before the state is applied the conditioned rule must not fire"),
                 () -> Assertions.assertEquals(1, applied, "the state is applied"),
                 () -> Assertions.assertEquals(1, conditionedAfter,
-                        "now that the owner is in 【协奏】, the conditioned rule fires"));
+                        "now that the owner is in 【char:1309/concerto】, the conditioned rule fires"));
     }
 
     /**
@@ -152,12 +152,12 @@ public class TriggerStateTest {
     @Test
     public void statesAreNamedAndTheirDurationIsHonoured() {
         Battle coexisting = battleWith(
-                stateOp("ALLY_ATTACK", "协奏", 2, null),
+                stateOp("ALLY_ATTACK", "char:1309/concerto", 2, null),
                 stateOp("SKILL_CAST", "char:1212/soul_shift", 2, null));
         Character coexistOwner = coexisting.characters().getFirst();
         fire(coexisting, coexistOwner);
         coexisting.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, coexistOwner, null, 0, 0));
-        boolean firstState = coexistOwner.getBuffManager().hasState("协奏");
+        boolean firstState = coexistOwner.getBuffManager().hasState("char:1309/concerto");
         boolean secondState = coexistOwner.getBuffManager().hasState("char:1212/soul_shift");
         int coexistCount = coexistOwner.getBuffManager().countBuffs(StateBuff.class);
 
@@ -168,24 +168,24 @@ public class TriggerStateTest {
                                 + "not classes (matching by class would silently evict the first state)"),
                 () -> Assertions.assertEquals(2, coexistCount, "both state buffs are attached"));
 
-        Battle timed = battleWith(stateOp("ALLY_ATTACK", "协奏", 1, null));
+        Battle timed = battleWith(stateOp("ALLY_ATTACK", "char:1309/concerto", 1, null));
         Character timedOwner = timed.characters().getFirst();
         fire(timed, timedOwner);
-        boolean applied = timedOwner.getBuffManager().hasState("协奏");
+        boolean applied = timedOwner.getBuffManager().hasState("char:1309/concerto");
         takeTurn(timed, timedOwner);
-        boolean expired = timedOwner.getBuffManager().hasState("协奏");
+        boolean expired = timedOwner.getBuffManager().hasState("char:1309/concerto");
 
         Assertions.assertAll("a state expires after its turns",
                 () -> Assertions.assertTrue(applied, "the state is on right after it is applied"),
                 () -> Assertions.assertFalse(expired, "「lasts 1 turn」 is over after that turn"));
 
-        Battle permanent = battleWith(stateOp("ALLY_ATTACK", "协奏", null, true));
+        Battle permanent = battleWith(stateOp("ALLY_ATTACK", "char:1309/concerto", null, true));
         Character permanentOwner = permanent.characters().getFirst();
         fire(permanent, permanentOwner);
         for (int turn = 0; turn < 3; turn++) {
             takeTurn(permanent, permanentOwner);
         }
-        boolean stillThere = permanentOwner.getBuffManager().hasState("协奏");
+        boolean stillThere = permanentOwner.getBuffManager().hasState("char:1309/concerto");
 
         Assertions.assertAll("a permanent state never expires",
                 () -> Assertions.assertTrue(stillThere,
@@ -221,13 +221,13 @@ public class TriggerStateTest {
                 () -> Assertions.assertFalse(offAfterRemove, "「removes ... the state」"));
 
         Battle twoStates = battleWith(
-                stateOp("ALLY_ATTACK", "协奏", 3, null),
+                stateOp("ALLY_ATTACK", "char:1309/concerto", 3, null),
                 stateOp("ALLY_ATTACK", "char:1212/soul_shift", 3, null),
-                removeStateOn("SKILL_CAST", "协奏"));
+                removeStateOn("SKILL_CAST", "char:1309/concerto"));
         Character twoStatesOwner = twoStates.characters().getFirst();
         fire(twoStates, twoStatesOwner);
         fire(twoStates, twoStatesOwner, TriggerEvent.SKILL_CAST);
-        boolean namedGone = twoStatesOwner.getBuffManager().hasState("协奏");
+        boolean namedGone = twoStatesOwner.getBuffManager().hasState("char:1309/concerto");
         boolean otherStateStays = twoStatesOwner.getBuffManager().hasState("char:1212/soul_shift");
 
         Assertions.assertAll("REMOVE_STATE leaves other states alone",
@@ -531,13 +531,13 @@ public class TriggerStateTest {
                     Assertions.assertTrue(e.getMessage().contains(TriggerSpecs.TEST_SOURCE), e.getMessage());
                 },
                 () -> Assertions.assertThrows(IllegalArgumentException.class,
-                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", null, null))),
+                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "char:1309/concerto", null, null))),
                         "no duration at all"),
                 () -> Assertions.assertThrows(IllegalArgumentException.class,
-                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", 2, true))),
+                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "char:1309/concerto", 2, true))),
                         "both durations at once"),
                 () -> Assertions.assertThrows(IllegalArgumentException.class,
-                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "协奏", 0, null))),
+                        () -> new TriggerTable(OWNER, List.of(stateOp("ALLY_ATTACK", "char:1309/concerto", 0, null))),
                         "0 turns would be a state that expires the moment it is applied"),
                 () -> {
                     EffectSpec withAmount = new EffectSpec();
@@ -573,7 +573,7 @@ public class TriggerStateTest {
                 () -> {
                     IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
                             () -> new TriggerTable(OWNER,
-                                    List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("enemy has_state 协奏"), gain(1)))),
+                                    List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("enemy has_state char:1309/concerto"), gain(1)))),
                             "an unknown party in has_state is rejected at load time");
                     Assertions.assertTrue(e.getMessage().contains("enemy"), e.getMessage());
                     Assertions.assertTrue(e.getMessage().contains("self"), "the message must list the known parties");

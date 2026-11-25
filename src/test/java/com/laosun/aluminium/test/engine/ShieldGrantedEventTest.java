@@ -162,7 +162,7 @@ public class ShieldGrantedEventTest {
         TriggerTable table = TriggerTables.of(DAHLIA);
 
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.HEALED),
-                "The Dahlia (大丽花)'s trace needs BOTH halves: \"healing **or** a shield\" (「治疗效果**或**护盾」) -- one alone is a trace that stays silent "
+                "The Dahlia (大丽花)'s trace needs BOTH halves: \"healing **or** a shield\" (「治疗效果**或**char:1001/shield」) -- one alone is a trace that stays silent "
                         + "half the time");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SHIELD_GRANTED), "…the shield half is the other one");
 

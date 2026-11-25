@@ -67,7 +67,7 @@ public class SummerRidesTheSurfSkillPointTest {
                 + afterTwo + " (two casts) ->" + afterThree + " (three casts)");
         Assertions.assertEquals(before + 1, afterWave, "a wave restores one skill point");
         Assertions.assertEquals(beforeCasts, afterTwo, "two casts are not yet a cycle");
-        Assertions.assertEquals(beforeCasts + 1, afterThree, "the third elation cast restores one");
+        Assertions.assertEquals(beforeCasts + 1, afterThree, "the third 欢愉 cast restores one");
     }
 
     @Test
@@ -75,7 +75,7 @@ public class SummerRidesTheSurfSkillPointTest {
         Battle battle = battle(true);
         cast(battle, SkillCategory.ULTRA);
         cast(battle, SkillCategory.BPSKILL);
-        System.out.println("[23064] after two non-elation casts: Elation Skill (欢愉技) counter = "
+        System.out.println("[23064] after two non-欢愉 casts: Elation Skill (欢愉技) counter = "
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT),
                 "the clause counts ELATION casts only (false case)");

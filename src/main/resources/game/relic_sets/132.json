@@ -49,7 +49,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "助燃",
+          "buff": "relic:132/combustion",
           "turns": 2,
           "target": "all_allies"
         },
@@ -58,7 +58,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": 0.15,
           "turns": 2,
-          "while_holder_state": "助燃",
+          "while_holder_state": "relic:132/combustion",
           "target": "all_allies"
         }
       ],

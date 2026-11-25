@@ -52,7 +52,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "max_stacks": 6,
-          "buff": "亢心",
+          "buff": "char:1213/exultation",
           "turns": 1,
           "target": "self",
           "percent_from_skill_param": "TALENT:0"

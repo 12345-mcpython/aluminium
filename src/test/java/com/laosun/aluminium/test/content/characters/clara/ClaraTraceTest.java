@@ -47,7 +47,7 @@ public class ClaraTraceTest {
         Battle battle = battleWith(fixed(0.1));
         Character clara = battle.characters().getFirst();
         clara.getBuffManager().addBuff(new DotBuff(clara, DamageElement.FIRE, 100, 3));
-        clara.getBuffManager().addBuff(new StateBuff("协奏", 3));
+        clara.getBuffManager().addBuff(new StateBuff("char:1309/concerto", 3));
 
         hit(battle, clara);
 

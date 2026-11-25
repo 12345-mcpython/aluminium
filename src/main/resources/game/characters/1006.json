@@ -281,9 +281,9 @@
           "op": "APPLY_BUFF",
           "buff": "char:1006/defect",
           "random_of": [
-            "攻击力降低",
-            "防御力降低",
-            "速度降低"
+            "char:1006/defect_attack_down",
+            "char:1006/defect_defence_down",
+            "char:1006/defect_speed_down"
           ],
           "base_chance": 1,
           "turns": 3,

@@ -75,7 +75,7 @@ public class TurnSuspensionTest {
     public void removingTheStateGivesTheTurnsBack() {
         Fixture f = new Fixture();
         f.suspendMarchFromARule();
-        f.march.getBuffManager().removeState("协奏");
+        f.march.getBuffManager().removeState("char:1309/concerto");
         double attackBefore = f.attack(f.march);
 
         f.takeHerTurn();
@@ -150,7 +150,7 @@ public class TurnSuspensionTest {
     private static TriggerSpec suspendingState() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_BUFF");
-        TriggerSpecs.set(effect, "buff", "协奏");
+        TriggerSpecs.set(effect, "buff", "char:1309/concerto");
         TriggerSpecs.set(effect, "permanent", true);
         TriggerSpecs.set(effect, "suspendsTurns", true);
         TriggerSpecs.set(effect, "target", "self");

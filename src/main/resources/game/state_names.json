@@ -3,22 +3,6 @@
   "_note": "状态 / 层数 / 资源名的**身份表**（唯一声明点，守卫是 `StateNameRegistryTest`）。⚠ 身份是 **(owner, name)**，不是 name：实测「充能」被 **8 个互不相同的机制**用着（上限 3/3/4/8/8/10/10/100/无上限），「结界」是 7 个角色各自的领域 —— 只按名字建表会把它们合成一个，而这正是本地化层最受不了的混淆。\n\n`owner` 三选一：`battle`（战斗模型自己的词汇：控制类、持续伤害、击破、秘技、欢愉子系统 —— 谁上场都用，所以没有归属）、一个 4 位 cid（该角色的术语，**专名与复用词都算**）、`internal`（本项目自造的记账计数器，没有显示语义）。`kind` 跟随 owner（battle / char / internal）。`used_by` 列出真正用到这条身份的文件（跨文件借用，如 1415 用 1412 的「充能」）。`key` 是将来取代中文名的 ASCII 身份：`battle` 现在就必须有，其余等该族迁移时再补；**键一旦等于名字，必须保留 `zh`**。\n\n守卫逐文件**结构化**扫描（只读 `when` 与 `do` 的字段，不读 `_note` / `source` / `_gaps` 散文），每个 (文件, 名字) 必须**恰好**对应一条身份。",
   "entries": [
     {
-      "name": "325_30",
-      "owner": "325",
-      "kind": "char",
-      "used_by": [
-        "325"
-      ]
-    },
-    {
-      "name": "325_60",
-      "owner": "325",
-      "kind": "char",
-      "used_by": [
-        "325"
-      ]
-    },
-    {
       "name": "break:weakness",
       "owner": "battle",
       "kind": "battle",
@@ -57,6 +41,16 @@
       "key": "char:1004/empower"
     },
     {
+      "name": "char:1004/retribution",
+      "owner": "1004",
+      "kind": "char",
+      "used_by": [
+        "1004"
+      ],
+      "zh": "惩戒",
+      "key": "char:1004/retribution"
+    },
+    {
       "name": "char:1006/defect",
       "owner": "1006",
       "kind": "char",
@@ -65,6 +59,30 @@
       ],
       "zh": "缺陷",
       "key": "char:1006/defect"
+    },
+    {
+      "name": "char:1006/defect_attack_down",
+      "owner": "1006",
+      "kind": "char",
+      "used_by": [],
+      "zh": "攻击力降低",
+      "key": "char:1006/defect_attack_down"
+    },
+    {
+      "name": "char:1006/defect_defence_down",
+      "owner": "1006",
+      "kind": "char",
+      "used_by": [],
+      "zh": "防御力降低",
+      "key": "char:1006/defect_defence_down"
+    },
+    {
+      "name": "char:1006/defect_speed_down",
+      "owner": "1006",
+      "kind": "char",
+      "used_by": [],
+      "zh": "速度降低",
+      "key": "char:1006/defect_speed_down"
     },
     {
       "name": "char:1008/last_stand",
@@ -167,6 +185,14 @@
       "key": "char:1102/chaos_butterfly"
     },
     {
+      "name": "char:1102/haste",
+      "owner": "1102",
+      "kind": "char",
+      "used_by": [],
+      "zh": "加速",
+      "key": "char:1102/haste"
+    },
+    {
       "name": "char:1102/nightwalk",
       "owner": "1102",
       "kind": "char",
@@ -177,6 +203,14 @@
       "key": "char:1102/nightwalk"
     },
     {
+      "name": "char:1105/regen",
+      "owner": "1105",
+      "kind": "char",
+      "used_by": [],
+      "zh": "持续治疗",
+      "key": "char:1105/regen"
+    },
+    {
       "name": "char:1106/general_solution",
       "owner": "1106",
       "kind": "char",
@@ -185,6 +219,32 @@
       ],
       "zh": "通解",
       "key": "char:1106/general_solution"
+    },
+    {
+      "name": "char:1107/enhanced_counter",
+      "owner": "1107",
+      "kind": "char",
+      "used_by": [
+        "1107"
+      ],
+      "zh": "强化反击",
+      "key": "char:1107/enhanced_counter"
+    },
+    {
+      "name": "char:1107/ult_damage_reduction",
+      "owner": "1107",
+      "kind": "char",
+      "used_by": [],
+      "zh": "终结技减伤",
+      "key": "char:1107/ult_damage_reduction"
+    },
+    {
+      "name": "char:1110/regen",
+      "owner": "1110",
+      "kind": "char",
+      "used_by": [],
+      "zh": "持续治疗",
+      "key": "char:1110/regen"
     },
     {
       "name": "char:1110/survival_instinct",
@@ -217,6 +277,14 @@
       "key": "char:1112/debt_proof"
     },
     {
+      "name": "char:1112/execution_target",
+      "owner": "1112",
+      "kind": "char",
+      "used_by": [],
+      "zh": "被执行",
+      "key": "char:1112/execution_target"
+    },
+    {
       "name": "char:1112/staggering_rise",
       "owner": "1112",
       "kind": "char",
@@ -225,6 +293,26 @@
       ],
       "zh": "涨幅惊人",
       "key": "char:1112/staggering_rise"
+    },
+    {
+      "name": "char:1201/jade_tile",
+      "owner": "1201",
+      "kind": "char",
+      "used_by": [
+        "1201"
+      ],
+      "zh": "琼玉牌",
+      "key": "char:1201/jade_tile"
+    },
+    {
+      "name": "char:1201/self_drawn_tile",
+      "owner": "1201",
+      "kind": "char",
+      "used_by": [
+        "1201"
+      ],
+      "zh": "不求人",
+      "key": "char:1201/self_drawn_tile"
     },
     {
       "name": "char:1202/blessing",
@@ -247,6 +335,16 @@
       "key": "char:1203/barrier"
     },
     {
+      "name": "char:1203/white_flower_moment",
+      "owner": "1203",
+      "kind": "char",
+      "used_by": [
+        "1203"
+      ],
+      "zh": "白花之刻",
+      "key": "char:1203/white_flower_moment"
+    },
+    {
       "name": "char:1205/charge",
       "owner": "1205",
       "kind": "char",
@@ -265,6 +363,14 @@
       ],
       "zh": "地狱变",
       "key": "char:1205/hellscape"
+    },
+    {
+      "name": "char:1206/haste",
+      "owner": "1206",
+      "kind": "char",
+      "used_by": [],
+      "zh": "加速",
+      "key": "char:1206/haste"
     },
     {
       "name": "char:1206/newborn",
@@ -327,6 +433,34 @@
       "key": "char:1208/ward"
     },
     {
+      "name": "char:1209/blade_and_mind",
+      "owner": "1209",
+      "kind": "char",
+      "used_by": [
+        "1209"
+      ],
+      "zh": "智剑连心",
+      "key": "char:1209/blade_and_mind"
+    },
+    {
+      "name": "char:1209/sword_art",
+      "owner": "1209",
+      "kind": "char",
+      "used_by": [
+        "1209"
+      ],
+      "zh": "御剑真诀",
+      "key": "char:1209/sword_art"
+    },
+    {
+      "name": "char:1209/ult_buff",
+      "owner": "1209",
+      "kind": "char",
+      "used_by": [],
+      "zh": "终结技增益",
+      "key": "char:1209/ult_buff"
+    },
+    {
       "name": "char:1210/fire_swallow",
       "owner": "1210",
       "kind": "char",
@@ -377,6 +511,14 @@
       "key": "char:1212/syzygy"
     },
     {
+      "name": "char:1213/exultation",
+      "owner": "1213",
+      "kind": "char",
+      "used_by": [],
+      "zh": "亢心",
+      "key": "char:1213/exultation"
+    },
+    {
       "name": "char:1213/reverse_scale",
       "owner": "1213",
       "kind": "char",
@@ -385,6 +527,14 @@
       ],
       "zh": "逆鳞",
       "key": "char:1213/reverse_scale"
+    },
+    {
+      "name": "char:1214/karmic_overflow",
+      "owner": "1214",
+      "kind": "char",
+      "used_by": [],
+      "zh": "恶报溢出",
+      "key": "char:1214/karmic_overflow"
     },
     {
       "name": "char:1214/retribution",
@@ -457,6 +607,14 @@
       "key": "char:1220/feihuang"
     },
     {
+      "name": "char:1222/mellow",
+      "owner": "1222",
+      "kind": "char",
+      "used_by": [],
+      "zh": "醇醉",
+      "key": "char:1222/mellow"
+    },
+    {
       "name": "char:1223/charge",
       "owner": "1223",
       "kind": "char",
@@ -517,6 +675,16 @@
       "key": "char:1224/empower"
     },
     {
+      "name": "char:1224/master",
+      "owner": "1224",
+      "kind": "char",
+      "used_by": [
+        "1224"
+      ],
+      "zh": "师父",
+      "key": "char:1224/master"
+    },
+    {
       "name": "char:1225/fox_prayer",
       "owner": "1225",
       "kind": "char",
@@ -537,6 +705,44 @@
       "key": "char:1225/scorching"
     },
     {
+      "name": "char:1301/intoxication",
+      "owner": "1301",
+      "kind": "char",
+      "used_by": [
+        "1301"
+      ],
+      "zh": "酩酊",
+      "key": "char:1301/intoxication"
+    },
+    {
+      "name": "char:1302/ascension",
+      "owner": "1302",
+      "kind": "char",
+      "used_by": [
+        "1302"
+      ],
+      "zh": "升格",
+      "key": "char:1302/ascension"
+    },
+    {
+      "name": "char:1303/barrier",
+      "owner": "1303",
+      "kind": "char",
+      "used_by": [],
+      "zh": "结界",
+      "key": "char:1303/barrier"
+    },
+    {
+      "name": "char:1303/overtone",
+      "owner": "1303",
+      "kind": "char",
+      "used_by": [
+        "1303"
+      ],
+      "zh": "弦外音",
+      "key": "char:1303/overtone"
+    },
+    {
       "name": "char:1304/blind_bet",
       "owner": "1304",
       "kind": "char",
@@ -545,6 +751,14 @@
       ],
       "zh": "盲注",
       "key": "char:1304/blind_bet"
+    },
+    {
+      "name": "char:1304/bulwark_chip",
+      "owner": "1304",
+      "kind": "char",
+      "used_by": [],
+      "zh": "坚垣筹码",
+      "key": "char:1304/bulwark_chip"
     },
     {
       "name": "char:1304/panic",
@@ -667,6 +881,52 @@
       "key": "char:1308/true_red"
     },
     {
+      "name": "char:1309/concerto",
+      "owner": "1309",
+      "kind": "char",
+      "used_by": [
+        "1309"
+      ],
+      "zh": "协奏",
+      "key": "char:1309/concerto"
+    },
+    {
+      "name": "char:1309/concerto_countdown",
+      "owner": "1309",
+      "kind": "char",
+      "used_by": [],
+      "zh": "协奏倒计时",
+      "key": "char:1309/concerto_countdown"
+    },
+    {
+      "name": "char:1310/complete_combustion",
+      "owner": "1310",
+      "kind": "char",
+      "used_by": [
+        "1310"
+      ],
+      "zh": "完全燃烧",
+      "key": "char:1310/complete_combustion"
+    },
+    {
+      "name": "char:1310/complete_combustion_countdown",
+      "owner": "1310",
+      "kind": "char",
+      "used_by": [],
+      "zh": "完全燃烧倒计时",
+      "key": "char:1310/complete_combustion_countdown"
+    },
+    {
+      "name": "char:1312/next_skill_refund",
+      "owner": "1312",
+      "kind": "char",
+      "used_by": [
+        "1312"
+      ],
+      "zh": "下个战技返还战技点",
+      "key": "char:1312/next_skill_refund"
+    },
+    {
       "name": "char:1313/blessed_one",
       "owner": "1313",
       "kind": "char",
@@ -675,6 +935,14 @@
       ],
       "zh": "蒙福者",
       "key": "char:1313/blessed_one"
+    },
+    {
+      "name": "char:1313/e2_blessed_damage",
+      "owner": "1313",
+      "kind": "char",
+      "used_by": [],
+      "zh": "星魂二-蒙福者增伤",
+      "key": "char:1313/e2_blessed_damage"
     },
     {
       "name": "char:1313/eidolon2_pending",
@@ -777,6 +1045,16 @@
       "key": "char:1317/hand_seal"
     },
     {
+      "name": "char:1321/withering",
+      "owner": "1321",
+      "kind": "char",
+      "used_by": [
+        "1321"
+      ],
+      "zh": "败谢",
+      "key": "char:1321/withering"
+    },
+    {
       "name": "char:1401/inspiration",
       "owner": "1401",
       "kind": "char",
@@ -815,6 +1093,22 @@
       ],
       "zh": "匠躯",
       "key": "char:1402/artisan_body"
+    },
+    {
+      "name": "char:1402/e6_thunder_pen",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [],
+      "zh": "星魂6-雷穿透",
+      "key": "char:1402/e6_thunder_pen"
+    },
+    {
+      "name": "char:1402/e6_thunder_pen_garment",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [],
+      "zh": "星魂6-雷穿透-衣匠",
+      "key": "char:1402/e6_thunder_pen_garment"
     },
     {
       "name": "char:1402/eidolon2_pen",
@@ -895,6 +1189,22 @@
       ],
       "zh": "浪漫",
       "key": "char:1402/romance"
+    },
+    {
+      "name": "char:1402/supreme_form_countdown",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [],
+      "zh": "至高之姿-倒计时",
+      "key": "char:1402/supreme_form_countdown"
+    },
+    {
+      "name": "char:1402/supreme_form_speed",
+      "owner": "1402",
+      "kind": "char",
+      "used_by": [],
+      "zh": "至高之姿-速度",
+      "key": "char:1402/supreme_form_speed"
     },
     {
       "name": "char:1402/supreme_posture",
@@ -1047,6 +1357,14 @@
       "key": "char:1408/everlasting_burn"
     },
     {
+      "name": "char:1408/kaoslana_extra_turn",
+      "owner": "1408",
+      "kind": "char",
+      "used_by": [],
+      "zh": "卡厄斯兰那的额外回合",
+      "key": "char:1408/kaoslana_extra_turn"
+    },
+    {
       "name": "char:1408/ravage",
       "owner": "1408",
       "kind": "char",
@@ -1077,6 +1395,14 @@
       "key": "char:1409/after_the_rain"
     },
     {
+      "name": "char:1409/morning_light",
+      "owner": "1409",
+      "kind": "char",
+      "used_by": [],
+      "zh": "疗愈世间的晨曦",
+      "key": "char:1409/morning_light"
+    },
+    {
       "name": "char:1409/ode_to_sky",
       "owner": "1409",
       "kind": "char",
@@ -1096,6 +1422,14 @@
       ],
       "zh": "天空应我的祈愿",
       "key": "char:1409/sky_answer"
+    },
+    {
+      "name": "char:1410/barrier",
+      "owner": "1410",
+      "kind": "char",
+      "used_by": [],
+      "zh": "结界",
+      "key": "char:1410/barrier"
     },
     {
       "name": "char:1410/warm_current",
@@ -1509,6 +1843,16 @@
       "key": "char:1504/gluttony"
     },
     {
+      "name": "char:1505/accumulated_energy",
+      "owner": "1505",
+      "kind": "char",
+      "used_by": [
+        "1505"
+      ],
+      "zh": "累计能量",
+      "key": "char:1505/accumulated_energy"
+    },
+    {
       "name": "char:1506/barrier",
       "owner": "1506",
       "kind": "char",
@@ -1579,6 +1923,34 @@
       "key": "char:1507/barrier"
     },
     {
+      "name": "char:1507/barrier_countdown",
+      "owner": "1507",
+      "kind": "char",
+      "used_by": [],
+      "zh": "结界倒计时",
+      "key": "char:1507/barrier_countdown"
+    },
+    {
+      "name": "char:1507/thousand_forged_soul",
+      "owner": "1507",
+      "kind": "char",
+      "used_by": [
+        "1507"
+      ],
+      "zh": "千锻魂",
+      "key": "char:1507/thousand_forged_soul"
+    },
+    {
+      "name": "char:1510/guiding_semaphore",
+      "owner": "1510",
+      "kind": "char",
+      "used_by": [
+        "1510"
+      ],
+      "zh": "领航旗语",
+      "key": "char:1510/guiding_semaphore"
+    },
+    {
       "name": "char:1512/atmosphere",
       "owner": "1512",
       "kind": "char",
@@ -1607,6 +1979,16 @@
       ],
       "zh": "特邀嘉宾",
       "key": "char:1512/special_guest"
+    },
+    {
+      "name": "char:1513/heat",
+      "owner": "1513",
+      "kind": "char",
+      "used_by": [
+        "1513"
+      ],
+      "zh": "热意",
+      "key": "char:1513/heat"
     },
     {
       "name": "char:20022/remembrance",
@@ -2179,6 +2561,38 @@
       "key": "char:24004/calculation"
     },
     {
+      "name": "char:8001/pinch_steal",
+      "owner": "8001",
+      "kind": "char",
+      "used_by": [],
+      "zh": "牵制盗垒",
+      "key": "char:8001/pinch_steal"
+    },
+    {
+      "name": "char:8001/tenacity",
+      "owner": "8001",
+      "kind": "char",
+      "used_by": [],
+      "zh": "坚韧",
+      "key": "char:8001/tenacity"
+    },
+    {
+      "name": "char:8002/pinch_steal",
+      "owner": "8002",
+      "kind": "char",
+      "used_by": [],
+      "zh": "牵制盗垒",
+      "key": "char:8002/pinch_steal"
+    },
+    {
+      "name": "char:8002/tenacity",
+      "owner": "8002",
+      "kind": "char",
+      "used_by": [],
+      "zh": "坚韧",
+      "key": "char:8002/tenacity"
+    },
+    {
       "name": "char:8003/burning_will",
       "owner": "8003",
       "kind": "char",
@@ -2239,6 +2653,17 @@
       ]
     },
     {
+      "name": "char:8005/backup_dancer",
+      "owner": "8005",
+      "kind": "char",
+      "used_by": [
+        "8005",
+        "8006"
+      ],
+      "zh": "伴舞",
+      "key": "char:8005/backup_dancer"
+    },
+    {
       "name": "char:8007/charge",
       "owner": "8007",
       "kind": "char",
@@ -2279,6 +2704,54 @@
       "key": "char:8008/charge"
     },
     {
+      "name": "cone:21024/spring_disabled",
+      "owner": "21024",
+      "kind": "char",
+      "used_by": [],
+      "zh": "春水初生失效",
+      "key": "cone:21024/spring_disabled"
+    },
+    {
+      "name": "cone:23029/cornered_pain",
+      "owner": "23029",
+      "kind": "char",
+      "used_by": [],
+      "zh": "穷寇之痛",
+      "key": "cone:23029/cornered_pain"
+    },
+    {
+      "name": "cone:23043/bewilderment",
+      "owner": "23043",
+      "kind": "char",
+      "used_by": [],
+      "zh": "茫然",
+      "key": "cone:23043/bewilderment"
+    },
+    {
+      "name": "cone:23045/coronation",
+      "owner": "23045",
+      "kind": "char",
+      "used_by": [],
+      "zh": "加冕",
+      "key": "cone:23045/coronation"
+    },
+    {
+      "name": "cone:23051/garrison",
+      "owner": "23051",
+      "kind": "char",
+      "used_by": [],
+      "zh": "卫戍",
+      "key": "cone:23051/garrison"
+    },
+    {
+      "name": "cone:23058/energy_recovery",
+      "owner": "23058",
+      "kind": "char",
+      "used_by": [],
+      "zh": "能量恢复",
+      "key": "cone:23058/energy_recovery"
+    },
+    {
       "name": "ctrl:frozen",
       "owner": "battle",
       "kind": "battle",
@@ -2301,6 +2774,14 @@
       "key": "ctrl:sublimated",
       "en": "Sublimated",
       "zh": "升华"
+    },
+    {
+      "name": "debuff:weakened",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "debuff:weakened",
+      "en": "Weakened",
+      "zh": "虚弱"
     },
     {
       "name": "dot:bleed",
@@ -2333,6 +2814,38 @@
       "key": "dot:wind_shear",
       "en": "Wind Shear",
       "zh": "风化"
+    },
+    {
+      "name": "elation:aha_instant",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:aha_instant",
+      "en": "Aha Instant",
+      "zh": "阿哈时刻"
+    },
+    {
+      "name": "elation:certified_banger",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:certified_banger",
+      "en": "Certified Banger",
+      "zh": "好活当赏"
+    },
+    {
+      "name": "elation:elation_degree",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:elation_degree",
+      "en": "Elation",
+      "zh": "欢愉度"
+    },
+    {
+      "name": "elation:punchline",
+      "owner": "battle",
+      "kind": "battle",
+      "key": "elation:punchline",
+      "en": "Punchline",
+      "zh": "笑点"
     },
     {
       "name": "internal:1009/own_turns",
@@ -2393,6 +2906,16 @@
       ],
       "zh": "本回合战技次数",
       "key": "internal:1015/skill_casts_this_turn"
+    },
+    {
+      "name": "internal:1107/counter_marker",
+      "owner": "1107",
+      "kind": "internal",
+      "used_by": [
+        "1107"
+      ],
+      "zh": "反击标记",
+      "key": "internal:1107/counter_marker"
     },
     {
       "name": "internal:1112/rise_count",
@@ -2546,6 +3069,16 @@
       "key": "internal:1220/feihuang_count"
     },
     {
+      "name": "internal:1222/action_count",
+      "owner": "1222",
+      "kind": "internal",
+      "used_by": [
+        "1222"
+      ],
+      "zh": "行动次数",
+      "key": "internal:1222/action_count"
+    },
+    {
       "name": "internal:1223/charge_count",
       "owner": "1223",
       "kind": "internal",
@@ -2684,6 +3217,14 @@
       ],
       "zh": "强化普攻次数",
       "key": "internal:1506/enhanced_basic_count"
+    },
+    {
+      "name": "internal:1506/firewall",
+      "owner": "1506",
+      "kind": "internal",
+      "used_by": [],
+      "zh": "防火墙",
+      "key": "internal:1506/firewall"
     },
     {
       "name": "internal:1506/milestone_quota",
@@ -2986,12 +3527,125 @@
       "key": "internal:24000/aeon_layers"
     },
     {
-      "name": "relic130_elation_used",
+      "name": "relic:113/crit_chance",
+      "owner": "113",
+      "kind": "char",
+      "used_by": [],
+      "zh": "113/4 暴击率",
+      "key": "relic:113/crit_chance"
+    },
+    {
+      "name": "relic:115/follow_up",
+      "owner": "115",
+      "kind": "char",
+      "used_by": [
+        "115"
+      ],
+      "zh": "追加攻击",
+      "key": "relic:115/follow_up"
+    },
+    {
+      "name": "relic:117/debuff_amplify",
+      "owner": "117",
+      "kind": "char",
+      "used_by": [
+        "117"
+      ],
+      "zh": "负面激化",
+      "key": "relic:117/debuff_amplify"
+    },
+    {
+      "name": "relic:125/gentle_rain",
+      "owner": "125",
+      "kind": "char",
+      "used_by": [],
+      "zh": "甘霖",
+      "key": "relic:125/gentle_rain"
+    },
+    {
+      "name": "relic:126/assist",
+      "owner": "126",
+      "kind": "char",
+      "used_by": [
+        "126"
+      ],
+      "zh": "助力",
+      "key": "relic:126/assist"
+    },
+    {
+      "name": "relic:130/elation_used",
       "owner": "130",
       "kind": "char",
       "used_by": [
         "130"
-      ]
+      ],
+      "zh": "relic130_elation_used",
+      "key": "relic:130/elation_used"
+    },
+    {
+      "name": "relic:132/combustion",
+      "owner": "132",
+      "kind": "char",
+      "used_by": [
+        "132"
+      ],
+      "zh": "助燃",
+      "key": "relic:132/combustion"
+    },
+    {
+      "name": "relic:315/merit",
+      "owner": "315",
+      "kind": "char",
+      "used_by": [
+        "315"
+      ],
+      "zh": "功勋",
+      "key": "relic:315/merit"
+    },
+    {
+      "name": "relic:324/spent_this_turn",
+      "owner": "324",
+      "kind": "char",
+      "used_by": [
+        "324"
+      ],
+      "zh": "本回合消耗",
+      "key": "relic:324/spent_this_turn"
+    },
+    {
+      "name": "relic:325/threshold_30",
+      "owner": "325",
+      "kind": "char",
+      "used_by": [
+        "325"
+      ],
+      "zh": "325_30",
+      "key": "relic:325/threshold_30"
+    },
+    {
+      "name": "relic:325/threshold_60",
+      "owner": "325",
+      "kind": "char",
+      "used_by": [
+        "325"
+      ],
+      "zh": "325_60",
+      "key": "relic:325/threshold_60"
+    },
+    {
+      "name": "sys:shield",
+      "owner": "battle",
+      "kind": "battle",
+      "used_by": [],
+      "zh": "护盾",
+      "key": "sys:shield"
+    },
+    {
+      "name": "sys:skill_points",
+      "owner": "battle",
+      "kind": "battle",
+      "zh": "战技点",
+      "key": "sys:skill_points"
     },
     {
       "name": "sys:technique",
@@ -3002,279 +3656,12 @@
       "zh": "秘技"
     },
     {
-      "name": "下个战技返还战技点",
-      "owner": "1312",
-      "kind": "char",
-      "used_by": [
-        "1312"
-      ]
-    },
-    {
-      "name": "不求人",
-      "owner": "1201",
-      "kind": "char",
-      "used_by": [
-        "1201"
-      ]
-    },
-    {
-      "name": "伴舞",
-      "owner": "8005",
-      "kind": "char",
-      "used_by": [
-        "8005",
-        "8006"
-      ]
-    },
-    {
-      "name": "功勋",
-      "owner": "315",
-      "kind": "char",
-      "used_by": [
-        "315"
-      ]
-    },
-    {
-      "name": "助力",
-      "owner": "126",
-      "kind": "char",
-      "used_by": [
-        "126"
-      ]
-    },
-    {
-      "name": "助燃",
-      "owner": "132",
-      "kind": "char",
-      "used_by": [
-        "132"
-      ]
-    },
-    {
-      "name": "千锻魂",
-      "owner": "1507",
-      "kind": "char",
-      "used_by": [
-        "1507"
-      ]
-    },
-    {
-      "name": "升格",
-      "owner": "1302",
-      "kind": "char",
-      "used_by": [
-        "1302"
-      ]
-    },
-    {
-      "name": "协奏",
-      "owner": "1309",
-      "kind": "char",
-      "used_by": [
-        "1309"
-      ]
-    },
-    {
-      "name": "反击标记",
-      "owner": "1107",
-      "kind": "internal",
-      "used_by": [
-        "1107"
-      ]
-    },
-    {
-      "name": "好活当赏",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "elation:certified_banger",
-      "en": "Certified Banger"
-    },
-    {
-      "name": "完全燃烧",
-      "owner": "1310",
-      "kind": "char",
-      "used_by": [
-        "1310"
-      ]
-    },
-    {
-      "name": "师父",
-      "owner": "1224",
-      "kind": "char",
-      "used_by": [
-        "1224"
-      ]
-    },
-    {
-      "name": "弦外音",
-      "owner": "1303",
-      "kind": "char",
-      "used_by": [
-        "1303"
-      ]
-    },
-    {
-      "name": "强化反击",
-      "owner": "1107",
-      "kind": "char",
-      "used_by": [
-        "1107"
-      ]
-    },
-    {
-      "name": "御剑真诀",
-      "owner": "1209",
-      "kind": "char",
-      "used_by": [
-        "1209"
-      ]
-    },
-    {
-      "name": "惩戒",
-      "owner": "1004",
-      "kind": "char",
-      "used_by": [
-        "1004"
-      ]
-    },
-    {
-      "name": "战技点",
-      "owner": "1506",
-      "kind": "char",
-      "used_by": [
-        "1506"
-      ]
-    },
-    {
-      "name": "智剑连心",
-      "owner": "1209",
-      "kind": "char",
-      "used_by": [
-        "1209"
-      ]
-    },
-    {
-      "name": "本回合消耗",
-      "owner": "324",
-      "kind": "char",
-      "used_by": [
-        "324"
-      ]
-    },
-    {
-      "name": "欢愉度",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "elation:elation_degree",
-      "en": "Elation"
-    },
-    {
-      "name": "热意",
-      "owner": "1513",
-      "kind": "char",
-      "used_by": [
-        "1513"
-      ]
-    },
-    {
-      "name": "琼玉牌",
-      "owner": "1201",
-      "kind": "char",
-      "used_by": [
-        "1201"
-      ]
-    },
-    {
-      "name": "白花之刻",
-      "owner": "1203",
-      "kind": "char",
-      "used_by": [
-        "1203"
-      ]
-    },
-    {
-      "name": "笑点",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "elation:punchline",
-      "en": "Punchline"
-    },
-    {
-      "name": "累计能量",
-      "owner": "1505",
-      "kind": "char",
-      "used_by": [
-        "1505"
-      ]
-    },
-    {
-      "name": "终结技已激活",
+      "name": "sys:ultimate_activated",
       "owner": "battle",
       "kind": "battle",
       "key": "sys:ultimate_activated",
-      "en": "Ultimate Activated"
-    },
-    {
-      "name": "虚弱",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "debuff:weakened",
-      "en": "Weakened"
-    },
-    {
-      "name": "行动次数",
-      "owner": "1222",
-      "kind": "internal",
-      "used_by": [
-        "1222"
-      ]
-    },
-    {
-      "name": "负面激化",
-      "owner": "117",
-      "kind": "char",
-      "used_by": [
-        "117"
-      ]
-    },
-    {
-      "name": "败谢",
-      "owner": "1321",
-      "kind": "char",
-      "used_by": [
-        "1321"
-      ]
-    },
-    {
-      "name": "追加攻击",
-      "owner": "115",
-      "kind": "char",
-      "used_by": [
-        "115"
-      ]
-    },
-    {
-      "name": "酩酊",
-      "owner": "1301",
-      "kind": "char",
-      "used_by": [
-        "1301"
-      ]
-    },
-    {
-      "name": "阿哈时刻",
-      "owner": "battle",
-      "kind": "battle",
-      "key": "elation:aha_instant",
-      "en": "Aha Instant"
-    },
-    {
-      "name": "领航旗语",
-      "owner": "1510",
-      "kind": "char",
-      "used_by": [
-        "1510"
-      ]
+      "en": "Ultimate Activated",
+      "zh": "终结技已激活"
     }
   ]
 }

@@ -42,7 +42,7 @@ public class EvanesciaLaughLinksTest {
     private static final String RULE = "ult_elation_gift_and_cast";
     private static final int FIXED = 20;
     private static final int LEVEL = 80;
-    private static final String LAUGH = "笑点";
+    private static final String LAUGH = "elation:punchline";
     private static final String HIDDEN = "char:1506/hidden_score";
 
     private Character source;
@@ -79,8 +79,8 @@ public class EvanesciaLaughLinksTest {
         battle.processRequests();
         double commanded = before - enemy.getCurrentHp();
 
-        Assertions.assertEquals(10, ally.getResources().value("好活当赏"),
-                "precondition: the ultimate handed the ally the 10 points of 【好活当赏】");
+        Assertions.assertEquals(10, ally.getResources().value("elation:certified_banger"),
+                "precondition: the ultimate handed the ally the 10 points of 【elation:certified_banger】");
         int frozen = battle.countedLaughPoints();
         Assertions.assertTrue(frozen > 0, "precondition: that grant froze the counted laughs (" + frozen + ")");
 
@@ -113,7 +113,7 @@ public class EvanesciaLaughLinksTest {
                     + " defer_until_wave=" + rule.deferUntilWave()
                     + " when=" + rule.conditions().stream().map(c -> c.source()).toList());
             Assertions.assertEquals(FIXED, cast.getCastCountedLaughs(),
-                    "「固定计入 20 笑点」 rides the cast this effect commands");
+                    "「固定计入 20 elation:punchline」 rides the cast this effect commands");
             Assertions.assertEquals("ELATION_SKILL", cast.getSkill(), "and the cast is the ally's Elation skill");
             Assertions.assertTrue(rule.deferUntilWave(),
                     "「若欢愉技施放前敌方目标被消灭则对新入场的敌方目标发动」 is the rule-level wave redirect");

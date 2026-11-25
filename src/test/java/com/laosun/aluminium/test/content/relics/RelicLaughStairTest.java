@@ -43,9 +43,9 @@ public class RelicLaughStairTest {
         battle.startBattle();
 
         Assertions.assertFalse(BattleResources.declared().isEmpty(), "the pack declares at least one battle counter");
-        Assertions.assertNotNull(battle.partyResource("笑点"),
-                "every battle has 笑点, whether or not a character declares it");
-        Assertions.assertEquals(0, battle.partyResourceValue("笑点"), "and it starts empty");
+        Assertions.assertNotNull(battle.partyResource("elation:punchline"),
+                "every battle has elation:punchline, whether or not a character declares it");
+        Assertions.assertEquals(0, battle.partyResourceValue("elation:punchline"), "and it starts empty");
     }
 
     /**
@@ -63,7 +63,7 @@ public class RelicLaughStairTest {
         Assertions.assertEquals(1, stairs.size(), "one shipped rule");
         var effect = stairs.getFirst().effects().getFirst();
         Assertions.assertEquals(0.01, effect.getPercent(), 1e-9, "1% per layer");
-        Assertions.assertEquals("笑点:5", effect.getPerSteps(), "five points per layer");
+        Assertions.assertEquals("elation:punchline:5", effect.getPerSteps(), "five points per layer");
         Assertions.assertEquals(10, effect.getPerStepsCap(), "「最多 10 层」");
         Assertions.assertEquals("ELATION", effect.getDamageType(), "scoped to Elation damage");
         Assertions.assertEquals(Boolean.TRUE, effect.getInstance(), "as an instance modifier");

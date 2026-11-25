@@ -3,12 +3,12 @@
     {
       "on": "SKILL_POINT_SPENT",
       "when": [
-        "self_stacks:本回合消耗 < 3"
+        "self_stacks:relic:324/spent_this_turn < 3"
       ],
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "本回合消耗",
+          "buff": "relic:324/spent_this_turn",
           "amount": 1,
           "max_stacks": 3,
           "until": "turn_end",
@@ -22,12 +22,12 @@
     {
       "on": "SKILL_POINT_SPENT",
       "when": [
-        "self_stacks:本回合消耗 >= 3"
+        "self_stacks:relic:324/spent_this_turn >= 3"
       ],
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "本回合消耗",
+          "buff": "relic:324/spent_this_turn",
           "amount": 3,
           "target": "self"
         },

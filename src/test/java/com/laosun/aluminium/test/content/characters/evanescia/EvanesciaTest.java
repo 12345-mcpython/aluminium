@@ -49,7 +49,7 @@ public class EvanesciaTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String GIFTS = "好活当赏";
+    private static final String GIFTS = "elation:certified_banger";
 
     // ==================================================================
     // The talent and the technique
@@ -65,10 +65,10 @@ public class EvanesciaTest {
         // the release must be declared BEFORE the battle starts (it was ungated until 2026-11-09).
         battle.markTechniqueUsed(elation);
         battle.startBattle();
-        int elationValue = elation.getResources().value("欢愉度");
-        int gifts = elation.getResources().value("好活当赏");
-        System.out.println("[1505] crit damage=" + critDamage + " -> Elation (欢愉度)=" + elationValue
-                + " (half is " + Math.round(critDamage * 0.5) + ") ; Certified Banger gifts (好活当赏)=" + gifts);
+        int elationValue = elation.getResources().value("elation:elation_degree");
+        int gifts = elation.getResources().value("elation:certified_banger");
+        System.out.println("[1505] crit damage=" + critDamage + " -> Elation (elation:elation_degree)=" + elationValue
+                + " (half is " + Math.round(critDamage * 0.5) + ") ; Certified Banger gifts (elation:certified_banger)=" + gifts);
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
                 "the talent sets the Elation value to half the crit-damage panel");
         Assertions.assertEquals(20, gifts, "and the technique grants 20 gifts at battle start");
@@ -84,8 +84,8 @@ public class EvanesciaTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
-        int elationValue = elation.getResources().value("欢愉度");
-        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> Elation (欢愉度)="
+        int elationValue = elation.getResources().value("elation:elation_degree");
+        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> Elation (elation:elation_degree)="
                 + elationValue + " (half is " + Math.round(critDamage * 0.5) + ")");
         Assertions.assertTrue(critDamage >= 1.4, "the panel really moved (it reads " + critDamage + ")");
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
@@ -116,9 +116,9 @@ public class EvanesciaTest {
                             "the talent derives the value from the crit-damage panel");
                     Assertions.assertEquals(0.5, effect.getAmountPercent(), 1e-9, "and takes half of it");
                 } else if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
-                    // the third source: "获得能量时同步获得等值[好活当赏]" (gaining energy also gains an equal amount of [好活当赏]) -- the amount is the event's own
-                    Assertions.assertEquals("好活当赏", effect.getResource(),
-                            "the mirrored resource is 【好活当赏】 (gifts)");
+                    // the third source: "获得能量时同步获得等值[elation:certified_banger]" (gaining energy also gains an equal amount of [好活当赏]) -- the amount is the event's own
+                    Assertions.assertEquals("elation:certified_banger", effect.getResource(),
+                            "the mirrored resource is 【elation:certified_banger】 (gifts)");
                 } else if ("DAMAGE".equals(effect.getOp())) {
                     // the technique's own damage: a rule-driven ORDINARY instance, so it has no `amount` at all
                     Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "100% of her attack");
@@ -130,7 +130,7 @@ public class EvanesciaTest {
         }
         Assertions.assertEquals(3, seen, "BATTLE_START carries the derive, the technique’s twenty and its damage");
 
-        // The third clause lives on a DIFFERENT event: "获得能量时同步获得等值的[好活当赏]" (gaining energy also gains an equal amount of [好活当赏])
+        // The third clause lives on a DIFFERENT event: "获得能量时同步获得等值的[elation:certified_banger]" (gaining energy also gains an equal amount of [好活当赏])
         // is triggered by ENERGY_GAINED, so it is pinned by reading that event's rules -- the first version of this test counted
         // BATTLE_START only and read 2, which is exactly what made it obvious.
         var theSyncRule = elation.getTriggerTable().rulesFor(
@@ -201,7 +201,7 @@ public class EvanesciaTest {
                 + giftsBefore + " -> " + giftsAfter + " (expected " + (giftsBefore + mirrored) + ")");
         Assertions.assertTrue(mirrored > 0, "the cast really credited energy (it credited " + mirrored + ")");
         Assertions.assertEquals(giftsBefore + mirrored, giftsAfter,
-                "every point of energy is mirrored one-for-one into [好活当赏] (Certified Banger)");
+                "every point of energy is mirrored one-for-one into [elation:certified_banger] (Certified Banger)");
     }
 
     @Test
@@ -226,11 +226,11 @@ public class EvanesciaTest {
     public void theRiderNeedsTheGifts() {
         double withGifts = skillDamage(true);
         double without = skillDamage(false);
-        System.out.println("[1505-rider] the skill took " + withGifts + " while holding [好活当赏] (Certified Banger) and "
+        System.out.println("[1505-rider] the skill took " + withGifts + " while holding [elation:certified_banger] (Certified Banger) and "
                 + without + " after spending it (difference " + (withGifts - without) + ")");
         Assertions.assertTrue(without > 0, "the skill itself deals damage");
         Assertions.assertTrue(withGifts > without,
-                "and holding [好活当赏] (Certified Banger) adds the 8% Elation rider on top");
+                "and holding [elation:certified_banger] (Certified Banger) adds the 8% Elation rider on top");
     }
 
     /**
@@ -262,10 +262,10 @@ public class EvanesciaTest {
     public void theUltimateRiderNeedsTheGifts() {
         double withGifts = ultimateDamage(true);
         double without = ultimateDamage(false);
-        System.out.println("[1505-ult] the ultimate took " + withGifts + " in total while holding [好活当赏] (Certified Banger) and "
+        System.out.println("[1505-ult] the ultimate took " + withGifts + " in total while holding [elation:certified_banger] (Certified Banger) and "
                 + without + " after spending it (difference " + (withGifts - without) + ")");
         Assertions.assertTrue(without > 0, "the ultimate itself deals damage");
-        Assertions.assertTrue(withGifts > without, "holding [好活当赏] (Certified Banger) adds the all-enemy Elation rider");
+        Assertions.assertTrue(withGifts > without, "holding [elation:certified_banger] (Certified Banger) adds the all-enemy Elation rider");
     }
 
     /**
@@ -293,7 +293,7 @@ public class EvanesciaTest {
     private static EffectSpec derive() {
         EffectSpec spec = new EffectSpec();
         TriggerSpecs.set(spec, "op", "GAIN_RESOURCE");
-        TriggerSpecs.set(spec, "resource", "欢愉度");
+        TriggerSpecs.set(spec, "resource", "elation:elation_degree");
         TriggerSpecs.set(spec, "amountFromAttr", "CRIT_ATTACK");
         TriggerSpecs.set(spec, "amountPercent", 0.5);
         return spec;

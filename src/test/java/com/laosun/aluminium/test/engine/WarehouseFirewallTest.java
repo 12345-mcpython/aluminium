@@ -48,7 +48,7 @@ public class WarehouseFirewallTest {
         boolean firstLanded = battle.tryApplyDebuff(battle.enemies().getFirst(), fighter,
                 new ControlBuff(com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("FROZEN"), 2), 1.0, "STAT_CTRL_Frozen");
         battle.processRequests();
-        boolean firewallOn = fighter.getBuffManager().hasState("防火墙");
+        boolean firewallOn = fighter.getBuffManager().hasState("internal:1506/firewall");
 
         // and the payoff: the NEXT control on her is refused -- [防火墙] is what answers it
         boolean landedAfter = battle.tryApplyDebuff(battle.enemies().getFirst(), fighter,
@@ -58,8 +58,8 @@ public class WarehouseFirewallTest {
                 + " ; controls on her=" + fighter.getBuffManager().countBuffs(ControlBuff.class));
 
         Assertions.assertTrue(firewallOn,
-                "「则使我方全体获得【防火墙】」 (then grants all allies Firewall)-- the warehouse clause fired from a character who is not on the field");
+                "「则使我方全体获得【internal:1506/firewall】」 (then grants all allies Firewall)-- the warehouse clause fired from a character who is not on the field");
         Assertions.assertFalse(landedAfter,
-                "「【防火墙】状态下，我方目标免疫敌方目标施加的控制类负面状态」 (while in the Firewall state, our targets are immune to Crowd Control debuffs applied by enemy targets)-- the next control is refused");
+                "「【internal:1506/firewall】状态下，我方目标免疫敌方目标施加的控制类负面状态」 (while in the Firewall state, our targets are immune to Crowd Control debuffs applied by enemy targets)-- the next control is refused");
     }
 }

@@ -309,7 +309,7 @@ public class RobinSummerettoTest {
                 () -> Assertions.assertEquals(afterFirstHeal, afterSecondHeal, 1e-9,
                         "the second heal in the same turn is not a 第一次 and pays nothing"),
                 () -> Assertions.assertEquals(1.0, afterHealAndShield, 1e-9,
-                        "「第一次提供治疗/护盾」 is one event class, so the pair pays once"),
+                        "「第一次提供治疗/char:1001/shield」 is one event class, so the pair pays once"),
                 () -> Assertions.assertEquals(2.0, afterTheNewTurn, 1e-9,
                         "「任意目标回合」: a turn boundary starts the window over"),
                 () -> Assertions.assertEquals(1.0, afterFirstAttack, 1e-9,

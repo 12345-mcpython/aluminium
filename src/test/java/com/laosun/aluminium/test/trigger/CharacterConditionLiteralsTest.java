@@ -174,7 +174,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1208, "BATTLE_START", "level_convention", List.of());
         assertRule(1209, "SKILL_CAST", "skill_soulsteel_sync_and_its_modifiers", List.of("actor == self"));
         assertRule(1209, "ULT_CAST", "ult_crit_chance_on_self", List.of("actor == self"));
-        assertRule(1209, "ULT_CAST", "ult_extra_crit_damage_when_synced", List.of("actor == self", "self has_state 智剑连心"));
+        assertRule(1209, "ULT_CAST", "ult_extra_crit_damage_when_synced", List.of("actor == self", "self has_state char:1209/blade_and_mind"));
         assertRule(1209, "ALLY_ATTACK", "talent_chance_followup", List.of("actor == self"));
         assertRule(1209, "BATTLE_START", "level_convention", List.of());
         assertRule(1209, "SKILL_CAST", "trace_effect_res_while_synced", List.of("actor == self"));
@@ -231,8 +231,8 @@ public class CharacterConditionLiteralsTest {
         assertRule(1223, "SKILL_CAST", "trace_prey_followup_taken", List.of("actor == self"));
         assertRule(1223, "FOLLOW_UP", "trace_skill_point_after_followup", List.of("actor == self"));
         assertRule(1224, "SKILL_CAST", "skill_shifu_and_speed", List.of("actor == self"));
-        assertRule(1224, "ALLY_ATTACK", "talent_charge_on_shifu_attack", List.of("actor has_state 师父"));
-        assertRule(1224, "ULT_CAST", "talent_charge_on_shifu_ult", List.of("actor has_state 师父"));
+        assertRule(1224, "ALLY_ATTACK", "talent_charge_on_shifu_attack", List.of("actor has_state char:1224/master"));
+        assertRule(1224, "ULT_CAST", "talent_charge_on_shifu_ult", List.of("actor has_state char:1224/master"));
         assertRule(1224, "BASIC_ATTACK", "basic_charge", List.of("actor == self"));
         assertRule(1224, "BATTLE_START", "technique_energy", List.of("self has_state sys:technique"));
         assertRule(1224, "BATTLE_START", "level_convention", List.of());
@@ -278,7 +278,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1308, "SKILL_CAST", "skill_slashed_dream", List.of("actor == self"));
         assertRule(1308, "BATTLE_START", "level_convention", List.of());
         assertRule(1308, "BATTLE_START", "talent_ult_damage_taken", List.of());
-        assertRule(1309, "DEALING_DAMAGE", "trace_followup_crit_aura", List.of("self has_state 协奏"));
+        assertRule(1309, "DEALING_DAMAGE", "trace_followup_crit_aura", List.of("self has_state char:1309/concerto"));
         assertRule(1309, "ULT_CAST", "eidolon1_party_pierces_more_while_concerto", List.of("actor == self"));
         assertRule(1309, "BATTLE_START", "eidolon2_the_talent_pays_one_more_energy", List.of());
         assertRule(1309, "ULT_CAST", "eidolon2_party_speed_while_concerto", List.of("actor == self"));
@@ -289,13 +289,13 @@ public class CharacterConditionLiteralsTest {
         assertRule(1310, "WAVE_START", "technique_adds_fire_weakness", List.of("self has_state sys:technique"));
         assertRule(1310, "ULT_CAST", "ult_enters_complete_combustion", List.of("actor == self"));
         assertRule(1310, "COUNTDOWN_TURN", "the_countdown_ends_combustion", List.of("actor == countdown"));
-        assertRule(1310, "CAST_SETUP", "combustion_breaks_faster", List.of("self has_state 完全燃烧"));
+        assertRule(1310, "CAST_SETUP", "combustion_breaks_faster", List.of("self has_state char:1310/complete_combustion"));
         assertRule(1310, "ULT_CAST", "eidolon4_combustion_raises_effect_resistance", List.of("actor == self"));
         assertRule(1310, "ULT_CAST", "eidolon6_combustion_fire_penetration", List.of("actor == self"));
         assertRule(1310, "KILL", "eidolon2_a_kill_in_combustion_earns_a_turn",
-                List.of("actor == self", "self has_state 完全燃烧"));
+                List.of("actor == self", "self has_state char:1310/complete_combustion"));
         assertRule(1310, "BREAK", "eidolon2_a_break_in_combustion_earns_a_turn",
-                List.of("actor == self", "self has_state 完全燃烧"));
+                List.of("actor == self", "self has_state char:1310/complete_combustion"));
         assertRule(1312, "SKILL_POINT_SPENT", "talent_energy_on_skill_point_spent", List.of());
         assertRule(1312, "BATTLE_START", "level_convention", List.of());
         assertRule(1312, "DEALING_DAMAGE", "ult_freeze_per_segment",
@@ -421,14 +421,14 @@ public class CharacterConditionLiteralsTest {
         assertRule(1505, "BATTLE_START", "p1505_elation_value", List.of());
         assertRule(1505, "BATTLE_START", "p1505_technique_gift", List.of("self has_state sys:technique"));
         assertRule(1505, "ENERGY_GAINED", "p1505_energy_sync", List.of());
-        assertRule(1505, "DEALING_DAMAGE", "p1505_skill_elation_rider", List.of("actor == self", "from_category BPSKILL", "self_resource:好活当赏 >= 1.0"));
-        assertRule(1505, "CAST_SETUP", "p1505_ult_elation_rider", List.of("actor == self", "from_category ULTRA", "self_resource:好活当赏 >= 1.0"));
-        assertRule(1505, "CAST_SETUP", "p1505_ult_random_rider", List.of("actor == self", "from_category ULTRA", "self_resource:好活当赏 >= 1.0"));
+        assertRule(1505, "DEALING_DAMAGE", "p1505_skill_elation_rider", List.of("actor == self", "from_category BPSKILL", "self_resource:elation:certified_banger >= 1.0"));
+        assertRule(1505, "CAST_SETUP", "p1505_ult_elation_rider", List.of("actor == self", "from_category ULTRA", "self_resource:elation:certified_banger >= 1.0"));
+        assertRule(1505, "CAST_SETUP", "p1505_ult_random_rider", List.of("actor == self", "from_category ULTRA", "self_resource:elation:certified_banger >= 1.0"));
         assertRule(1505, "ENERGY_GAINED", "p1505_energy_accumulator", List.of());
         assertRule(1505, "BATTLE_START", "p1505_technique_damage", List.of("self has_state sys:technique"));
         assertRule(1505, "CAST_SETUP", "p1505_skill_laughs", List.of("actor == self", "from_category BPSKILL"));
         assertRule(1506, "CAST_SETUP", "p1506_ult_advance", List.of("actor == self", "from_category ULTRA"));
-        assertRule(1506, "RESOURCE_CHANGED", "p1506_laughs_to_hidden", List.of("resource_changed:笑点"));
+        assertRule(1506, "RESOURCE_CHANGED", "p1506_laughs_to_hidden", List.of("resource_changed:elation:punchline"));
         assertRule(1507, "ULT_CAST", "ult_zone_and_thousand_forgings", List.of("actor == self"));
         assertRule(1507, "COUNTDOWN_TURN", "zone_ends_takes_thousand_forgings_off", List.of("actor == countdown"));
         assertRule(1507, "ULT_CAST", "eidolon1_zone_enemy_res_down", List.of("actor == self"));
@@ -443,18 +443,18 @@ public class CharacterConditionLiteralsTest {
         assertRule(1513, "BATTLE_START", "technique_fervor", List.of("self has_state sys:technique"));
         assertRule(1513, "BATTLE_START", "level_convention", List.of());
         assertRule(1513, "RESOURCE_CHANGED", "talent_autocasts_elation",
-                List.of("resource_changed:热意", "self_resource:热意 >= 10.0", "self_resource_before:热意 < 10.0"));
+                List.of("resource_changed:char:1513/heat", "self_resource:char:1513/heat >= 10.0", "self_resource_before:char:1513/heat < 10.0"));
         assertRule(1513, "RESOURCE_CHANGED", "eidolon1_autocasts_at_twenty",
-                List.of("resource_changed:热意", "self_resource:热意 >= 20.0", "self_resource_before:热意 < 20.0"));
+                List.of("resource_changed:char:1513/heat", "self_resource:char:1513/heat >= 20.0", "self_resource_before:char:1513/heat < 20.0"));
         assertRule(1513, "RESOURCE_CHANGED", "eidolon1_autocasts_at_thirty",
-                List.of("resource_changed:热意", "self_resource:热意 >= 30.0", "self_resource_before:热意 < 30.0"));
+                List.of("resource_changed:char:1513/heat", "self_resource:char:1513/heat >= 30.0", "self_resource_before:char:1513/heat < 30.0"));
         assertRule(1513, "CAST_SETUP", "fervor_extra_hit_per_point",
                 List.of("from_category ElationDamage", "actor == self", "from_skill_id == 21.0"));
         assertRule(1513, "BATTLE_START", "eidolon2_the_cap_rises_to_fifty", List.of());
         assertRule(1513, "RESOURCE_CHANGED", "eidolon2_autocasts_at_forty",
-                List.of("resource_changed:热意", "self_resource:热意 >= 40.0", "self_resource_before:热意 < 40.0"));
+                List.of("resource_changed:char:1513/heat", "self_resource:char:1513/heat >= 40.0", "self_resource_before:char:1513/heat < 40.0"));
         assertRule(1513, "RESOURCE_CHANGED", "eidolon2_autocasts_at_fifty",
-                List.of("resource_changed:热意", "self_resource:热意 >= 50.0", "self_resource_before:热意 < 50.0"));
+                List.of("resource_changed:char:1513/heat", "self_resource:char:1513/heat >= 50.0", "self_resource_before:char:1513/heat < 50.0"));
         assertRule(8001, "BREAK", "talent_atk_on_break", List.of("actor == self"));
         assertRule(8001, "BATTLE_START", "level_convention", List.of());
         assertRule(8001, "BATTLE_START", "technique_party_heal", List.of("self has_state sys:technique"));
@@ -480,7 +480,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(8004, "BATTLE_START", "technique_self_shield", List.of("self has_state sys:technique"));
         assertRule(8004, "BATTLE_START", "level_convention", List.of());
         assertRule(8005, "ULT_CAST", "ult_dance", List.of("actor == self"));
-        assertRule(8005, "DEALING_DAMAGE", "ult_super_break", List.of("actor has_state 伴舞", "target has_state break:weakness"));
+        assertRule(8005, "DEALING_DAMAGE", "ult_super_break", List.of("actor has_state char:8005/backup_dancer", "target has_state break:weakness"));
         assertRule(8005, "BREAK", "talent_energy_on_break", List.of());
         assertRule(8005, "BATTLE_START", "technique_breaking_effect", List.of("self has_state sys:technique"));
         assertRule(8005, "BATTLE_START", "level_convention", List.of());

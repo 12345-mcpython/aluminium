@@ -58,8 +58,8 @@ public class ExtendBuffTest {
         reinforced.fire();
 
         Fixture state = new Fixture(
-                TriggerSpecs.applyBuff("协奏", 1, null),
-                TriggerSpecs.extendBuff("协奏", null, 2));
+                TriggerSpecs.applyBuff("char:1309/concerto", 1, null),
+                TriggerSpecs.extendBuff("char:1309/concerto", null, 2));
         state.fire();
 
         Fixture dot = new Fixture(
@@ -123,8 +123,8 @@ public class ExtendBuffTest {
     @Test
     public void aPermanentBuffHasNoCountdownToLengthen() {
         Fixture f = new Fixture(
-                TriggerSpecs.rule("ALLY_ATTACK", null, TriggerSpecs.applyBuff("协奏", null, true)),
-                TriggerSpecs.rule("BASIC_ATTACK", null, TriggerSpecs.extendBuff("协奏", null, 5)));
+                TriggerSpecs.rule("ALLY_ATTACK", null, TriggerSpecs.applyBuff("char:1309/concerto", null, true)),
+                TriggerSpecs.rule("BASIC_ATTACK", null, TriggerSpecs.extendBuff("char:1309/concerto", null, 5)));
         f.fire();
         StateBuff state = f.buff(StateBuff.class);
         int duration = state.duration();
@@ -152,7 +152,7 @@ public class ExtendBuffTest {
         }
         List<Case> cases = List.of(
                 new Case(TriggerSpecs.shield(500, 2, "target"), ShieldBuff.class),
-                new Case(TriggerSpecs.applyBuff("协奏", 2, null), StateBuff.class),
+                new Case(TriggerSpecs.applyBuff("char:1309/concerto", 2, null), StateBuff.class),
                 new Case(TriggerSpecs.modifyAttr("ATTACK", 0.2, 2, null, null, null, "target"), StatModifierBuff.class),
                 new Case(TriggerSpecs.modifyDamageTaken(0.2, 2), VulnerabilityBuff.class),
                 new Case(TriggerSpecs.taunt(1), TauntBuff.class),

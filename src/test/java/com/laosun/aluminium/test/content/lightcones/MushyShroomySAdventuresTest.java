@@ -64,9 +64,9 @@ public class MushyShroomySAdventuresTest {
         double before = elationHit(battle);
         elationCast(battle, SkillCategory.ELATION_DAMAGE);
         double after = elationHit(battle);
-        System.out.println("[21064] elation instance before=" + before + " after=" + after
+        System.out.println("[21064] 欢愉 instance before=" + before + " after=" + after
                 + " ratio=" + (after / before));
-        Assertions.assertEquals(1.06, after / before, 1e-6, "rank 1 states 6% more elation damage taken");
+        Assertions.assertEquals(1.06, after / before, 1e-6, "rank 1 states 6% more 欢愉 damage taken");
     }
 
     @Test
@@ -104,7 +104,7 @@ public class MushyShroomySAdventuresTest {
         double before = arena.applyDamage(target, new Damage(caster, target, DamageElement.FIRE, DamageType.ELATION, 1000));
         arena.castImmediate(elation, caster, List.of(target));
         double after = arena.applyDamage(target, new Damage(caster, target, DamageElement.FIRE, DamageType.ELATION, 1000));
-        System.out.println("[21064] REAL elation cast: before=" + before + " after=" + after
+        System.out.println("[21064] REAL 欢愉 cast: before=" + before + " after=" + after
                 + " ratio=" + (after / before));
         Assertions.assertEquals(1.06, after / before, 1e-6,
                 "the engine's own cast path must hand the category to CAST_SETUP -- that is the wiring, not the condition");

@@ -22,7 +22,7 @@ public class ElationAmountCapTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String GIFTS = "好活当赏";
+    private static final String GIFTS = "elation:certified_banger";
 
     private int mirrored(double energy) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

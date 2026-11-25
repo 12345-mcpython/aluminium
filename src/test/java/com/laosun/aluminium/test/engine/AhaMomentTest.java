@@ -21,8 +21,8 @@ import java.util.List;
  */
 public class AhaMomentTest {
     private static final int OWNER = 1513;
-    private static final String MOMENT = "阿哈时刻";
-    private static final String REWARD = "好活当赏";
+    private static final String MOMENT = "elation:aha_instant";
+    private static final String REWARD = "elation:certified_banger";
 
     /**
      * The cast applies it, its expiry announces it, and the reader answers.
@@ -37,11 +37,11 @@ public class AhaMomentTest {
         Assertions.assertFalse(owner.getBuffManager().hasState(MOMENT), "precondition: not on yet");
 
         Skill elation = owner.getSkills().get(SkillType.ELATION_SKILL);
-        Assertions.assertNotNull(elation, "precondition: she has an elation skill");
+        Assertions.assertNotNull(elation, "precondition: she has an 欢愉 skill");
         SkillExecutor.execute(battle, elation, owner, List.of(battle.enemies().get(0)));
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(MOMENT),
-                "the elation cast applies the moment");
+                "the 欢愉 cast applies the moment");
         Assertions.assertFalse(owner.getBuffManager().hasState(REWARD),
                 "and the reward is not there before it ends");
 

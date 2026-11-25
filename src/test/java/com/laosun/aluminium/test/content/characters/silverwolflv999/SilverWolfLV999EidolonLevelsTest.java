@@ -92,7 +92,7 @@ public class SilverWolfLV999EidolonLevelsTest {
     private static final int ALLY = 1204;
     private static final String HIDDEN = "char:1506/hidden_score";
     private static final String RAMP_RULE = "p1506_enhanced_basic_hidden_ramp";
-    private static final String LAUGH = "笑点";
+    private static final String LAUGH = "elation:punchline";
     private static final String CHARGES = "internal:1506/enhanced_basic_count";
     private static final String QUOTA = "internal:1506/milestone_quota";
     private static final String RULE = "p1506_e2_milestones_while_in_godmode";
@@ -164,7 +164,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         double farOver = elationWithSpeedBuff(2.0);
         double atCap = none + 0.5 + 100 * 0.02;
         double unbounded = none + 0.5 + 179 * 0.02;
-        System.out.println("[1506] 欢愉度 with no Speed buff: " + none + " ; with +50% (Speed 174): " + justOver
+        System.out.println("[1506] elation:elation_degree with no Speed buff: " + none + " ; with +50% (Speed 174): " + justOver
                 + " ; at Speed 339: " + farOver + " ; the ceiling is " + atCap
                 + " and WITHOUT `max_points` 339 Speed would read " + unbounded);
         Assertions.assertAll(
@@ -386,7 +386,7 @@ public class SilverWolfLV999EidolonLevelsTest {
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the wave clause has no Elation instance"));
         Assertions.assertEquals(99.0, elation.getCountedLaughs(), 1e-9,
-                "「本次造成的欢愉伤害固定计入 99 点【好活当赏】」 - the instance states 99 rather than reading the pool");
+                "「本次造成的欢愉伤害固定计入 99 点【elation:certified_banger】」 - the instance states 99 rather than reading the pool");
         Assertions.assertEquals("all_enemies", elation.getTarget(),
                 "and it is still the box's own hit on every enemy");
     }

@@ -97,14 +97,14 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "协奏",
+          "buff": "char:1309/concerto",
           "permanent": true,
           "suspends_turns": true,
           "target": "self"
         },
         {
           "op": "START_COUNTDOWN",
-          "buff": "协奏倒计时",
+          "buff": "char:1309/concerto_countdown",
           "speed": 90
         }
       ],
@@ -122,7 +122,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "scale": "self_attr:ATTACK",
-          "buff": "协奏",
+          "buff": "char:1309/concerto",
           "permanent": true,
           "target": "all_allies",
           "percent_from_skill_param": "ULTRA:0",
@@ -132,7 +132,7 @@
           "op": "RESIST_DEBUFF",
           "kind": "control",
           "percent": 1,
-          "buff": "协奏",
+          "buff": "char:1309/concerto",
           "permanent": true,
           "target": "self"
         }
@@ -153,7 +153,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "DAMAGE_PENETRATION",
           "percent": 0.24,
-          "buff": "协奏",
+          "buff": "char:1309/concerto",
           "permanent": true,
           "target": "all_allies"
         }
@@ -189,7 +189,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
           "percent": 0.16,
-          "buff": "协奏",
+          "buff": "char:1309/concerto",
           "permanent": true,
           "target": "all_allies"
         }
@@ -215,7 +215,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "EFFECT_RESISTANCE",
           "percent": 0.5,
-          "buff": "协奏",
+          "buff": "char:1309/concerto",
           "permanent": true,
           "target": "all_allies"
         }
@@ -229,7 +229,7 @@
       "when": [
         "actor != self",
         "hit_count > 0",
-        "self has_state 协奏"
+        "self has_state char:1309/concerto"
       ],
       "do": [
         {
@@ -254,7 +254,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "协奏",
+          "buff": "char:1309/concerto",
           "target": "all_allies"
         },
         {
@@ -270,7 +270,7 @@
       "on": "DEALING_DAMAGE",
       "id": "trace_followup_crit_aura",
       "when": [
-        "self has_state 协奏"
+        "self has_state char:1309/concerto"
       ],
       "do": [
         {

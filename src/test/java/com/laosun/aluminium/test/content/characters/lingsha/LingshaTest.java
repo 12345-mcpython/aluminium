@@ -52,7 +52,7 @@ public class LingshaTest {
     private static final int MONSTER = 1002011;
     private static final int OTHER_MONSTER = 1002012;
     private static final String STATE = "醇醉";
-    private static final String ACTIONS = "行动次数";
+    private static final String ACTIONS = "internal:1222/action_count";
 
     // ==================================================================
     // The Skill: 14% of her ATK + 420 to all of our side
@@ -394,7 +394,7 @@ public class LingshaTest {
         scene.fire(TriggerEvent.TAKING_HIT, enemy, ally);
         Assertions.assertTrue(enemy.getCurrentHp() < before, "「【浮元】会立即对敌人发动天赋的追加攻击」");
         Assertions.assertEquals(3, fuyuan.getBuffManager().stacksOf(ACTIONS),
-                "「此次触发不消耗【浮元】行动次数」 - the budget is charged at the summon's own turn end, not here");
+                "「此次触发不消耗【浮元】internal:1222/action_count」 - the budget is charged at the summon's own turn end, not here");
 
         before = enemy.getCurrentHp();
         scene.fire(TriggerEvent.TAKING_HIT, enemy, ally);

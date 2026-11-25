@@ -36,7 +36,7 @@
           "attribute": "SPEED",
           "percent": -0.08,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         },
         {
@@ -44,7 +44,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": -0.12,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         }
       ],
@@ -87,7 +87,7 @@
           "attribute": "SPEED",
           "percent": -0.09,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         },
         {
@@ -95,7 +95,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": -0.15,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         }
       ],
@@ -138,7 +138,7 @@
           "attribute": "SPEED",
           "percent": -0.1,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         },
         {
@@ -146,7 +146,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": -0.18,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         }
       ],
@@ -189,7 +189,7 @@
           "attribute": "SPEED",
           "percent": -0.11,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         },
         {
@@ -197,7 +197,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": -0.21,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         }
       ],
@@ -240,7 +240,7 @@
           "attribute": "SPEED",
           "percent": -0.12,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         },
         {
@@ -248,7 +248,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent": -0.24,
           "turns": 2,
-          "buff": "春水初生失效",
+          "buff": "cone:21024/spring_disabled",
           "target": "self"
         }
       ],

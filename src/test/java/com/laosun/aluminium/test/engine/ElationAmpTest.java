@@ -52,7 +52,7 @@ public class ElationAmpTest {
 
         Assertions.assertEquals(ampFactor, amp / plain, 1e-6, "增笑 +100% multiplies the instance by exactly 2");
         Assertions.assertEquals(boostFactor, boost / plain, 1e-6,
-                "欢愉度 +100% multiplies it by (2+b)/(1+b): it shares the factor her baseline already sits in");
+                "elation:elation_degree +100% multiplies it by (2+b)/(1+b): it shares the factor her baseline already sits in");
         // The question this case exists for: two separate +1s give +2 on the PRODUCT, not +1 on a sum. Measured, the
         // two granted together divide by the plain run by 3.818 = 2.0 x 1.909, i.e. the two factors multiplied.
         Assertions.assertEquals(ampFactor * boostFactor, both / plain, 1e-6,

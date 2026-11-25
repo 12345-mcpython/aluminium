@@ -36,7 +36,7 @@
           "instance": true,
           "damage_type": "ELATION",
           "permanent": true,
-          "per_steps": "笑点:5",
+          "per_steps": "elation:punchline:5",
           "per_steps_cap": 10,
           "target": "self"
         }

@@ -65,8 +65,8 @@ public class DebuffTest {
                 () -> Assertions.assertFalse(new ReductionBuff(1, 0.5).isDebuff(),
                         "DMG Reduction (减伤) sits on the defender too, but it is a POSITIVE effect -- where a buff sits does not "
                                 + "decide its side, the text does"),
-                () -> Assertions.assertFalse(new StateBuff("协奏", 2).isDebuff(),
-                        "a named state's side belongs to the rule that applied it (【协奏】 (Concerto) vs 【失重】), so the safe "
+                () -> Assertions.assertFalse(new StateBuff("char:1309/concerto", 2).isDebuff(),
+                        "a named state's side belongs to the rule that applied it (【char:1309/concerto】 (Concerto) vs 【失重】), so the safe "
                                 + "default is 'not a debuff' and APPLY_BUFF gains the side when content needs it"));
     }
 
@@ -108,20 +108,20 @@ public class DebuffTest {
         Character countedOwner = counted.characters().getFirst();
         countedOwner.getBuffManager().addBuff(new DotBuff(countedOwner, DamageElement.FIRE, 100, 3));
         countedOwner.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.2));
-        countedOwner.getBuffManager().addBuff(new StateBuff("协奏", 3));
+        countedOwner.getBuffManager().addBuff(new StateBuff("char:1309/concerto", 3));
         countedOwner.getBuffManager().addBuff(new ReductionBuff(3, 0.2));
         int count = countedOwner.getBuffManager().debuffCount();
 
         Battle oneTaken = battleWith(dispelRule(1));
         Character oneTakenOwner = oneTaken.characters().getFirst();
-        oneTakenOwner.getBuffManager().addBuff(new StateBuff("协奏", 3));
+        oneTakenOwner.getBuffManager().addBuff(new StateBuff("char:1309/concerto", 3));
         oneTakenOwner.getBuffManager().addBuff(new DotBuff(oneTakenOwner, DamageElement.FIRE, 100, 3));
         oneTakenOwner.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.2));
         fire(oneTaken, oneTakenOwner);
 
         Battle nothingToTake = battleWith(dispelRule(1));
         Character nothingToTakeOwner = nothingToTake.characters().getFirst();
-        nothingToTakeOwner.getBuffManager().addBuff(new StateBuff("协奏", 3));
+        nothingToTakeOwner.getBuffManager().addBuff(new StateBuff("char:1309/concerto", 3));
         int fired = fire(nothingToTake, nothingToTakeOwner);
 
         Battle twoTaken = battleWith(dispelRule(2));
@@ -138,7 +138,7 @@ public class DebuffTest {
                 () -> Assertions.assertTrue(oneTakenOwner.getBuffManager().hasBuff(DotBuff.class),
                         "the older debuff is still there -- one dispel removes one"),
                 () -> Assertions.assertTrue(oneTakenOwner.getBuffManager().hasBuff(StateBuff.class),
-                        "and the buff is untouched: Concerto (协奏) is not a negative effect"),
+                        "and the buff is untouched: Concerto (char:1309/concerto) is not a negative effect"),
                 () -> Assertions.assertEquals(1, fired, "the rule fires; there is simply nothing negative"),
                 () -> Assertions.assertTrue(nothingToTakeOwner.getBuffManager().hasBuff(StateBuff.class),
                         "the only buff it carries is still there after the no-op dispel"),

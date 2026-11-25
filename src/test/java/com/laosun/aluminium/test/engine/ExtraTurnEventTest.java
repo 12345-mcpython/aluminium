@@ -42,8 +42,8 @@ import java.util.List;
 public class ExtraTurnEventTest {
     private static final int PEARL = 1503;          // used as the fixture character, and for the counters' names
     private static final int ALLY = 1502;           // a second real unit, and a legal Elation ally
-    private static final String COUNTER = "好活当赏";
-    private static final String LAUGH = "笑点";
+    private static final String COUNTER = "elation:certified_banger";
+    private static final String LAUGH = "elation:punchline";
     private static final double EPS = 1e-9;
 
     /**

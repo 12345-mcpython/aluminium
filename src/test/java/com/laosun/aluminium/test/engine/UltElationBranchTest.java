@@ -26,8 +26,8 @@ public class UltElationBranchTest {
     private static final int CASTER = 8009;
     private static final int TARGET = 1505;
     private static final int LEVEL = 80;
-    private static final String LAUGH = "笑点";
-    private static final String GIFT = "好活当赏";
+    private static final String LAUGH = "elation:punchline";
+    private static final String GIFT = "elation:certified_banger";
 
     /**
      * "Gains 5 Punchline point(s)" -- onto the SHARED party counter.

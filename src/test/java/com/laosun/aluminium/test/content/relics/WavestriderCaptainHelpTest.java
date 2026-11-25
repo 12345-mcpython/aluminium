@@ -52,7 +52,7 @@ public class WavestriderCaptainHelpTest {
                 "the cast was aimed at me, by an ally, who is not me");
         var e = rules.getFirst().effects().getFirst();
         Assertions.assertEquals("ADD_STACK", e.getOp());
-        Assertions.assertEquals("助力", e.getBuff());
+        Assertions.assertEquals("relic:126/assist", e.getBuff());
         Assertions.assertEquals(2.0, e.getMaxStacks(), 1e-9, "at most two stacks");
         System.out.println("[126] shape ok");
     }
@@ -74,7 +74,7 @@ public class WavestriderCaptainHelpTest {
         var rules = RelicTriggerTables.of(126).at(4).rulesFor(TriggerEvent.ULT_CAST).stream()
                 .filter(r -> r.id().equals("relic126_help_payout")).toList();
         Assertions.assertEquals(1, rules.size(), "the payout rule");
-        Assertions.assertEquals(List.of("actor == self", "self_stacks:助力 >= 2.0"),
+        Assertions.assertEquals(List.of("actor == self", "self_stacks:relic:126/assist >= 2.0"),
                 rules.getFirst().conditions().stream().map(c -> c.source()).toList(),
                 "on the wearer's own Ultimate, with two stacks");
         Assertions.assertEquals("REMOVE_STACK", rules.getFirst().effects().get(0).getOp());

@@ -134,7 +134,7 @@ public class DamageScopeBoostTest {
         Assertions.assertAll("a follow-up attacks with its own boost and stays out of the cast vocabulary",
                 () -> Assertions.assertEquals(plain * 1.2, withFollowUpBoost, EPS, "set 115's 2-piece, in one line"),
                 () -> Assertions.assertEquals(plain, additionalDamage(AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS,
-                        "follow-up attack (追加攻击) damage is not Basic ATK (普攻) damage, even when the follow-up came from one"));
+                        "follow-up attack (relic:115/follow_up) damage is not Basic ATK (普攻) damage, even when the follow-up came from one"));
     }
 
     /**

@@ -32,7 +32,7 @@ public class LingeringTearTest {
     private static final int LEVEL = 80;
     private static final int THRESHOLD = 10;
     private static final double BONUS = 0.2;
-    private static final String LAUGHTER = "笑点";
+    private static final String LAUGHTER = "elation:punchline";
 
     /** The panel's layer counter: this cone's own bookkeeping, named in its rule file. */
     private static final String PANEL_LAYER = "internal:20024/punchline_ready";
@@ -58,7 +58,7 @@ public class LingeringTearTest {
     public void theCounterIsTheBattlesNotTheWearers() {
         Battle battle = battle(true);
         Assertions.assertFalse(wearer.getResources().has(LAUGHTER),
-                "the cone no longer declares its own copy - 笑点 is battle-level now");
+                "the cone no longer declares its own copy - elation:punchline is battle-level now");
         Assertions.assertNotNull(battle.partyResource(LAUGHTER),
                 "and every battle has it, declared once in game/battle_resources.json");
         Assertions.assertEquals(0, battle.partyResourceValue(LAUGHTER), "starting empty");

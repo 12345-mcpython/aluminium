@@ -164,8 +164,8 @@ public class TriggerDealingDamageTest {
         Battle battle = battleWith();
         Character owner = battle.characters().getFirst();
 
-        owner.getBuffManager().addBuff(new StateBuff("协奏", 2));
-        Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
+        owner.getBuffManager().addBuff(new StateBuff("char:1309/concerto", 2));
+        Assertions.assertTrue(owner.getBuffManager().hasState("char:1309/concerto"));
         Assertions.assertFalse(owner.getBuffManager().hasState("dot:burn"), "a named state is not a DOT");
         Assertions.assertFalse(owner.getBuffManager().hasState("没听说过"), "and an unknown name is nobody");
     }

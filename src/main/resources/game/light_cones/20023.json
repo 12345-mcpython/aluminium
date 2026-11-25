@@ -14,7 +14,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
           "percent": 0.16,
-          "while_state": "阿哈时刻",
+          "while_state": "elation:aha_instant",
           "permanent": true,
           "target": "self"
         }
@@ -37,7 +37,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
           "percent": 0.2,
-          "while_state": "阿哈时刻",
+          "while_state": "elation:aha_instant",
           "permanent": true,
           "target": "self"
         }
@@ -60,7 +60,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
           "percent": 0.24,
-          "while_state": "阿哈时刻",
+          "while_state": "elation:aha_instant",
           "permanent": true,
           "target": "self"
         }
@@ -83,7 +83,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
           "percent": 0.28,
-          "while_state": "阿哈时刻",
+          "while_state": "elation:aha_instant",
           "permanent": true,
           "target": "self"
         }
@@ -106,7 +106,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ELATION_DAMAGE_BOOST",
           "percent": 0.32,
-          "while_state": "阿哈时刻",
+          "while_state": "elation:aha_instant",
           "permanent": true,
           "target": "self"
         }

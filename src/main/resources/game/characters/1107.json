@@ -46,7 +46,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "反击标记",
+          "buff": "internal:1107/counter_marker",
           "permanent": true,
           "target": "attacker"
         }
@@ -206,7 +206,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "反击标记",
+          "buff": "internal:1107/counter_marker",
           "target": "all_enemies"
         }
       ],
@@ -224,7 +224,7 @@
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
           "element": "Physical",
-          "target": "all_enemies_with_state:反击标记",
+          "target": "all_enemies_with_state:internal:1107/counter_marker",
           "percent_from_skill_param": "SKILL:0"
         }
       ],
@@ -242,7 +242,7 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": -0.25,
           "turns": 2,
-          "buff": "终结技减伤",
+          "buff": "char:1107/ult_damage_reduction",
           "target": "self"
         }
       ],
@@ -258,7 +258,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "强化反击",
+          "buff": "char:1107/enhanced_counter",
           "amount": 2,
           "max_stacks": 2,
           "permanent": true,
@@ -273,7 +273,7 @@
       "id": "ult_enhanced_counter",
       "when": [
         "actor is_enemy",
-        "self_stacks:强化反击 >= 1"
+        "self_stacks:char:1107/enhanced_counter >= 1"
       ],
       "do": [
         {
@@ -286,7 +286,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "强化反击",
+          "buff": "char:1107/enhanced_counter",
           "amount": 1,
           "target": "self"
         }
@@ -304,7 +304,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "强化反击",
+          "buff": "char:1107/enhanced_counter",
           "amount": 1,
           "max_stacks": 3,
           "permanent": true,
@@ -335,7 +335,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "反击标记",
+          "buff": "internal:1107/counter_marker",
           "permanent": true,
           "target": "actor"
         }

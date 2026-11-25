@@ -41,7 +41,7 @@
           "op": "APPLY_REGEN",
           "scale": "owner_max_hp",
           "turns": 2,
-          "buff": "持续治疗",
+          "buff": "char:1105/regen",
           "target": "target",
           "percent_from_skill_param": "SKILL:1",
           "amount_from_skill_param": "SKILL:4"
@@ -116,7 +116,7 @@
       "do": [
         {
           "op": "EXTEND_BUFF",
-          "buff": "持续治疗",
+          "buff": "char:1105/regen",
           "turns": 1,
           "target": "target"
         }
@@ -136,7 +136,7 @@
           "percent": 0.06,
           "amount": 160,
           "turns": 1,
-          "buff": "持续治疗",
+          "buff": "char:1105/regen",
           "target": "all_allies",
           "target_when": [
             "target_hp_percent <= 0.3"
@@ -183,7 +183,7 @@
         },
         {
           "op": "APPLY_BUFF",
-          "buff": "虚弱",
+          "buff": "debuff:weakened",
           "turns": 1,
           "target": "all_enemies"
         },

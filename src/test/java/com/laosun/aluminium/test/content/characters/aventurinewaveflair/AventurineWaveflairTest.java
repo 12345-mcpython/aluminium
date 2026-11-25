@@ -50,8 +50,8 @@ public class AventurineWaveflairTest {
     /** The Elation ally of the milestone cases (1505): their cast must not touch HER counter. */
     private static final int ELATION_ALLY = 1505;
 
-    private static final String FERVOR = "热意";
-    private static final String LAUGH = "笑点";
+    private static final String FERVOR = "char:1513/heat";
+    private static final String LAUGH = "elation:punchline";
     private static final int THRESHOLD = 10;
     private static final int FIXED_LAUGHS = 20;
 
@@ -88,7 +88,7 @@ public class AventurineWaveflairTest {
         Assertions.assertEquals(0, fervorOf(aventurine), "no initial value is stated, so it starts at 0");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(1, fervorOf(aventurine),
-                "「队友施放攻击后，砂金•戏浪获得1点【热意】」 (after an ally casts an attack, Aventurine Waveflair gains 1 point of [热意])");
+                "「队友施放攻击后，砂金•戏浪获得1点【char:1513/heat】」 (after an ally casts an attack, Aventurine Waveflair gains 1 point of [char:1513/heat])");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, aventurine, enemy, 0, 0));
         Assertions.assertEquals(1, fervorOf(aventurine),
@@ -99,9 +99,9 @@ public class AventurineWaveflairTest {
         }
         Assertions.assertEquals(30, fervorOf(aventurine),
                 "forty-one single points reach the declared cap (the base cast does not spend the counter)");
-        aventurine.getResources().gain("热意", 41);
+        aventurine.getResources().gain("char:1513/heat", 41);
         Assertions.assertEquals(30, fervorOf(aventurine),
-                "「【热意】上限为30点」 is the DECLARATION's clamp on one gain");
+                "「【char:1513/heat】上限为30点」 is the DECLARATION's clamp on one gain");
     }
 
     /**
@@ -120,7 +120,7 @@ public class AventurineWaveflairTest {
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aventurine, enemy, 0, 0));
 
-        Assertions.assertEquals(fervor + 8, fervorOf(aventurine), "「获得8点【热意】」 (gains 8 points of [热意])");
+        Assertions.assertEquals(fervor + 8, fervorOf(aventurine), "「获得8点【char:1513/heat】」 (gains 8 points of [char:1513/heat])");
         Assertions.assertEquals(base * 0.3, aventurine.getAttribute(AttributeType.SPEED).get() - before, base * 0.02,
                 "「使自身速度提高30%，持续4回合」 (raises its own SPD by 30% for 4 turns) of the BASE speed: base " + base);
     }
@@ -129,7 +129,7 @@ public class AventurineWaveflairTest {
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int fervorOf(Character unit) {
-        return unit.getResources().get("热意").getValue();
+        return unit.getResources().get("char:1513/heat").getValue();
     }
 
     private static Random fixed() {
@@ -282,10 +282,10 @@ public class AventurineWaveflairTest {
 
         Assertions.assertAll("「获得 4 / 6 / 1 点笑点」: her Skill, her Ultimate and a teammate's attack",
                 () -> Assertions.assertEquals(0, atStart, "the battle starts with none"),
-                () -> Assertions.assertEquals(4, afterSkill, "\"gain 4 笑点\" (gain 4 Punchline)"),
-                () -> Assertions.assertEquals(6, afterUltimate, "\"gain 6 笑点\" (gain 6 Punchline)"),
+                () -> Assertions.assertEquals(4, afterSkill, "\"gain 4 elation:punchline\" (gain 4 Punchline)"),
+                () -> Assertions.assertEquals(6, afterUltimate, "\"gain 6 elation:punchline\" (gain 6 Punchline)"),
                 () -> Assertions.assertEquals(1, afterTeammateAttack,
-                        "\"and 1 笑点\" (and 1 more Punchline)"));
+                        "\"and 1 elation:punchline\" (and 1 more Punchline)"));
     }
 
     /**
@@ -477,7 +477,7 @@ public class AventurineWaveflairTest {
                 + " (fixed " + FIXED_LAUGHS + "), the Elation slot now holds " + slotOf(wolf));
         Assertions.assertTrue(cast > 0, "「立即施放1次…欢愉技」: the crossing performs a cast");
         Assertions.assertEquals(THRESHOLD, fervor(),
-                "the BASE cast does not spend: 「施放时会消耗所有【热意】」 is the ENHANCED row sentence (151321)");
+                "the BASE cast does not spend: 「施放时会消耗所有【char:1513/heat】」 is the ENHANCED row sentence (151321)");
         Assertions.assertEquals(21, slotOf(wolf),
                 "「下一次…强化为【All in！敬炽烈一夏】」 is installed in the Elation slot (data row 21)");
         // ⚠ The fixed 20 is pinned STRUCTURALLY here, and numerically by the ENGINE judge. Measured while writing this:
@@ -485,7 +485,7 @@ public class AventurineWaveflairTest {
         // laugh snapshot between the two casts (the crossing's cast read 554.77, her own next one 1829.52) - the ratio
         // would measure that difference, not the field. What this layer can honestly assert is that the rule STATES 20.
         Assertions.assertEquals(FIXED_LAUGHS, fixedLaughsOf(wolf),
-                "「固定计入 20 笑点」 rides the commanded cast (its number is pinned by CastCountedLaughsTest)");
+                "「固定计入 20 elation:punchline」 rides the commanded cast (its number is pinned by CastCountedLaughsTest)");
         Assertions.assertTrue(frozen >= 0, "the snapshot the other cast folds is a different count: " + frozen);
 
         double beforeOwn = enemy.getCurrentHp();
@@ -494,7 +494,7 @@ public class AventurineWaveflairTest {
         System.out.println("[1513] after her own Elation cast the slot holds " + slotOf(wolf) + " and it dealt "
                 + (beforeOwn - enemy.getCurrentHp()) + " against the crossing's " + cast);
         Assertions.assertEquals(0, fervor(),
-                "the ENHANCED row spends ALL of it (「施放时会消耗所有【热意】」 lives there)");
+                "the ENHANCED row spends ALL of it (「施放时会消耗所有【char:1513/heat】」 lives there)");
         Assertions.assertEquals(20, slotOf(wolf),
                 "next_elation_skill: the swap ends on the Elation cast it was waiting for");
     }
@@ -565,7 +565,7 @@ public class AventurineWaveflairTest {
                 + (beforeEnemy - enemy.getCurrentHp()));
         Assertions.assertTrue(beforeEnemy - enemy.getCurrentHp() > 0, "precondition: the ally's cast really settled");
         Assertions.assertEquals(6, fervor(),
-                "one point from the ally's attack, and nothing spent: 「施放时会消耗所有【热意】」 is about HER cast");
+                "one point from the ally's attack, and nothing spent: 「施放时会消耗所有【char:1513/heat】」 is about HER cast");
     }
 
     /**
@@ -625,7 +625,7 @@ public class AventurineWaveflairTest {
     public void theSecondEidolonRaisesTheCapAndAddsTheFortyAndFiftyCrossings() {
         build(2);
         Assertions.assertEquals(50, wolf.getResources().get(FERVOR).getMax(),
-                "「【热意】上限提高至 50 点」 - the DECLARED cap, raised at battle start");
+                "「【char:1513/heat】上限提高至 50 点」 - the DECLARED cap, raised at battle start");
 
         wolf.getResources().gain(FERVOR, 39);
         double beforeForty = enemy.getCurrentHp();

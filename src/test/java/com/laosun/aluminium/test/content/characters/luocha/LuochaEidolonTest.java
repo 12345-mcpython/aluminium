@@ -88,7 +88,7 @@ public class LuochaEidolonTest {
         bare.cast();
 
         Assertions.assertAll(
-                () -> Assertions.assertTrue(high.ally.getShield() > 0, "「大于等于 50%，则为其提供…护盾」"),
+                () -> Assertions.assertTrue(high.ally.getShield() > 0, "「大于等于 50%，则为其提供…char:1001/shield」"),
                 () -> Assertions.assertEquals(0.0, low.ally.getShield(), 1e-9,
                         "below half HP the shield must not apply - the other half of the sentence is the heal bonus"),
                 () -> Assertions.assertEquals(0.0, bare.ally.getShield(), 1e-9, "E0 has no shield clause"));

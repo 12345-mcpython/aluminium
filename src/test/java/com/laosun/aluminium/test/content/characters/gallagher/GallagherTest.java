@@ -32,8 +32,8 @@ public class GallagherTest {
     @Test
     public void theStateComesFromBattleStartToo() {
         Fixture f = new Fixture();
-        Assertions.assertTrue(f.enemy.getBuffManager().hasState("酩酊"),
-                "「进入战斗后使敌方全体陷入【酩酊】状态，持续2回合」 (after entering battle, puts all enemies into the Besotted (【酩酊】) state for 2 turns)");
+        Assertions.assertTrue(f.enemy.getBuffManager().hasState("char:1301/intoxication"),
+                "「进入战斗后使敌方全体陷入【char:1301/intoxication】状态，持续2回合」 (after entering battle, puts all enemies into the Besotted (【char:1301/intoxication】) state for 2 turns)");
     }
 
 

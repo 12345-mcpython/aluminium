@@ -442,7 +442,7 @@
           "turns": 2,
           "max_stacks": 3,
           "stackable": true,
-          "buff": "疗愈世间的晨曦",
+          "buff": "char:1409/morning_light",
           "target": "summon",
           "percent_from": {
             "type": "skill_param",

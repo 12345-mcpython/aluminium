@@ -20,7 +20,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.1,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -31,7 +31,7 @@
           "percent": 0.003,
           "per_steps": "max_energy-120:10",
           "per_steps_cap": 36,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -60,7 +60,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.115,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -71,7 +71,7 @@
           "percent": 0.003,
           "per_steps": "max_energy-120:10",
           "per_steps_cap": 36,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -100,7 +100,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.13,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -111,7 +111,7 @@
           "percent": 0.003,
           "per_steps": "max_energy-120:10",
           "per_steps_cap": 36,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -140,7 +140,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.145,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -151,7 +151,7 @@
           "percent": 0.003,
           "per_steps": "max_energy-120:10",
           "per_steps_cap": 36,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -180,7 +180,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ENERGY_REGENERATION_RATE",
           "percent": 0.16,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"
@@ -191,7 +191,7 @@
           "percent": 0.003,
           "per_steps": "max_energy-120:10",
           "per_steps_cap": 36,
-          "buff": "能量恢复",
+          "buff": "cone:23058/energy_recovery",
           "max_stacks": 2,
           "permanent": true,
           "target": "self"

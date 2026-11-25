@@ -38,12 +38,12 @@ public class HimekoNovaTest {
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, himeko, enemy, 0, 0));
 
-        Assertions.assertTrue(himeko.getBuffManager().hasState("领航旗语"),
-                "「姬子•启行获得【领航旗语】」 (Himeko - Nova gains Navigator's Semaphore (【领航旗语】))");
-        Assertions.assertFalse(ally.getBuffManager().hasState("领航旗语"),
+        Assertions.assertTrue(himeko.getBuffManager().hasState("char:1510/guiding_semaphore"),
+                "「姬子•启行获得【char:1510/guiding_semaphore】」 (Himeko - Nova gains Navigator's Semaphore (【char:1510/guiding_semaphore】))");
+        Assertions.assertFalse(ally.getBuffManager().hasState("char:1510/guiding_semaphore"),
                 "the state is on HER, not on the party");
         Assertions.assertEquals(0.2, ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - allyBoostBefore, 1e-9,
-                "「当姬子•启行拥有【领航旗语】时，我方全体造成的伤害提高20%」 — the ally carries it, gated on her state");
+                "「当姬子•启行拥有【char:1510/guiding_semaphore】时，我方全体造成的伤害提高20%」 — the ally carries it, gated on her state");
     }
 
     private static Random fixed() {

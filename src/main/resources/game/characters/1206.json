@@ -41,7 +41,7 @@
           "turns": 2,
           "target": "self",
           "max_stacks": 1,
-          "buff": "加速"
+          "buff": "char:1206/haste"
         }
       ],
       "source": "1206 素裳 天赋 游刃若水 (120604, Enhance): 「当场上有敌方目标的弱点被击破，素裳的速度提高20%，持续2回合。」",
@@ -337,7 +337,7 @@
           },
           "turns": 2,
           "max_stacks": 2,
-          "buff": "加速",
+          "buff": "char:1206/haste",
           "target": "self"
         }
       ],

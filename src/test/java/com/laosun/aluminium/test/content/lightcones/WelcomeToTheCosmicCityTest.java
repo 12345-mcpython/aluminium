@@ -90,9 +90,9 @@ public class WelcomeToTheCosmicCityTest {
         Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), BattleFixture.seeded());
         plain.startBattle();
         double plainHit = plain.applyDamage(other, new Damage(plainAlly, other, DamageElement.FIRE, DamageType.ELATION, 1000));
-        System.out.println("[23057] a teammate's elation hit: armed=" + boosted + " plain=" + plainHit);
+        System.out.println("[23057] a teammate's 欢愉 hit: armed=" + boosted + " plain=" + plainHit);
         Assertions.assertEquals(1.0, boosted / plainHit, 1e-9,
-                "the clause is the WEARER's -- a teammate's elation damage is untouched (false case)");
+                "the clause is the WEARER's -- a teammate's 欢愉 damage is untouched (false case)");
     }
 
     @Test
@@ -105,9 +105,9 @@ public class WelcomeToTheCosmicCityTest {
         Character plainWearer = (Character) plain.allies().getFirst();
         double plainElation = plain.applyDamage(enemy, new Damage(plainWearer, enemy, DamageElement.FIRE, DamageType.ELATION, 1000));
         double plainNormal = plain.applyDamage(enemy, new Damage(plainWearer, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
-        System.out.println("[23057] elation ratio=" + (elation / plainElation)
+        System.out.println("[23057] 欢愉 ratio=" + (elation / plainElation)
                 + " ordinary ratio=" + (normal / plainNormal));
-        Assertions.assertTrue(elation / plainElation > 1.0, "elation damage is raised");
+        Assertions.assertTrue(elation / plainElation > 1.0, "欢愉 damage is raised");
         Assertions.assertEquals(1.0, normal / plainNormal, 1e-9,
                 "ordinary damage is NOT -- that is what `damage_type: ELATION` buys");
     }

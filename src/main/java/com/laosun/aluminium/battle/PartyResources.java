@@ -94,6 +94,12 @@ public final class PartyResources {
     }
 
     /**
+     * The shared laugh counter's identity. A constant rather than a literal spelled at the reading site, because the
+     * identity is the same string the content declares and the rules spend: one rename, one place.
+     */
+    private static final String PUNCHLINE = "elation:punchline";
+
+    /**
      * A unit received 【好活当赏】: freeze the party's 笑点 as ITS count, to run down over {@code turns} of
      * its own turns.
      *
@@ -104,7 +110,7 @@ public final class PartyResources {
         if (holder == null || holder.isDeath()) {
             return;
         }
-        laughSnapshots.put(holder, new Snapshot(value("笑点"), Math.max(1, turns)));
+        laughSnapshots.put(holder, new Snapshot(value(PUNCHLINE), Math.max(1, turns)));
     }
 
     /**

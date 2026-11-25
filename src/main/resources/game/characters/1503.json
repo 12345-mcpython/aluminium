@@ -9,14 +9,14 @@
   ],
   "resources": [
     {
-      "id": "好活当赏",
+      "id": "elation:certified_banger",
       "max": 50,
       "initial": 0,
       "source": "1503 真珠 天赋 吞纳沙砾，重塑生机 (150304): 「真珠的【好活当赏】持续时间无限，且持有上限为 50 点」。",
       "note": "⭐ 上限 **50** 与初始 **0** 都是**文档原话** ✓。⭐ 它是**真珠自己**的计数（战技「获得 15 点」、秘技「获得 20 点」、行迹「我方目标回合开始时真珠获得 5 点」），所以默认的 `SELF` 作用域对。⭐ 作为**抵御值**消耗的那一半现已出货 ✓（`talent_spends_haohuo_as_defence_value` ✓，每点 = 200 抵御值、抵挡 60% 伤害 ✓）—— ⚠ 记账的是**真珠自己的这一池** ✓，而吸收器装在**被保护的队友**身上 ✓，这正是 `ABSORB_DAMAGE` 那个 op 存在的理由 ✓。"
     },
     {
-      "id": "笑点",
+      "id": "elation:punchline",
       "max": 2147483647,
       "initial": 0,
       "scope": "PARTY",
@@ -61,7 +61,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 15
         },
         {
@@ -112,7 +112,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 20
         }
       ],
@@ -155,7 +155,7 @@
       "do": [
         {
           "op": "RESET_RESOURCE_CAP",
-          "resource": "好活当赏"
+          "resource": "elation:certified_banger"
         }
       ],
       "source": "1503 真珠 行迹 感知容差 (1503102): 「我方目标回合开始时，真珠获得 5 点【好活当赏】，**最多获得 50 点**【好活当赏】，**真珠回合开始时重置可获得【好活当赏】数量**」。",
@@ -170,7 +170,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 5,
           "max_per_round": 50
         }
@@ -391,7 +391,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 20
         },
         {
@@ -772,7 +772,7 @@
       "id": "trace_tolerance_raises_effect_resistance_while_holding",
       "when": [
         "actor == self",
-        "self_resource:好活当赏 >= 1"
+        "self_resource:elation:certified_banger >= 1"
       ],
       "do": [
         {
@@ -876,7 +876,7 @@
       "do": [
         {
           "op": "ABSORB_DAMAGE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "unit_amount": 200,
           "percent": 0.6,
           "permanent": true,
@@ -895,12 +895,12 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 30
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 60
         }
       ],
@@ -916,12 +916,12 @@
       "do": [
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 60
         },
         {
           "op": "REMOVE_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 120
         }
       ],
@@ -933,7 +933,7 @@
       "id": "enhanced_basic_elation_rider_while_holding",
       "when": [
         "actor == self",
-        "self_resource:好活当赏 >= 1",
+        "self_resource:elation:certified_banger >= 1",
         "from_skill_id == 8"
       ],
       "do": [
@@ -1039,12 +1039,12 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "好活当赏",
+          "resource": "elation:certified_banger",
           "amount": 30
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 60
         }
       ],

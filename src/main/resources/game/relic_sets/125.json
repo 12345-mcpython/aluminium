@@ -14,7 +14,7 @@
           "percent": 0.06,
           "turns": 2,
           "max_stacks": 1,
-          "buff": "甘霖",
+          "buff": "relic:125/gentle_rain",
           "target": "self"
         },
         {
@@ -23,7 +23,7 @@
           "percent": 0.15,
           "turns": 2,
           "max_stacks": 1,
-          "buff": "甘霖",
+          "buff": "relic:125/gentle_rain",
           "target": "all_allies"
         }
       ],

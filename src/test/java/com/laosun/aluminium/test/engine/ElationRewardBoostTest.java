@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class ElationRewardBoostTest {
     private static final int OWNER = 1505;
-    private static final String REWARD = "好活当赏";
+    private static final String REWARD = "elation:certified_banger";
 
     /**
      * With the Eidolon: 150 energy -> 20 + 100 (capped) + 50.

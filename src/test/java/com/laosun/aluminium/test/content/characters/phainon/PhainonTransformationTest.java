@@ -33,7 +33,7 @@ public class PhainonTransformationTest {
     private static final int ALLY = 1002;
     private static final int APPLIER = 1002;
     private static final String STATE = "char:1408/transformation";
-    private static final String COUNTDOWN = "卡厄斯兰那的额外回合";
+    private static final String COUNTDOWN = "char:1408/kaoslana_extra_turn";
     private static final String SEEDS = "char:1408/ember";
     private static final String DOT = "dot:shock";
     private static final int TURNS = 8;

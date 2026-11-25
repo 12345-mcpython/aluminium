@@ -327,7 +327,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "惩戒",
+          "buff": "char:1004/retribution",
           "base_chance": 1,
           "turns": 2,
           "target": "target"
@@ -336,9 +336,9 @@
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": 0.12,
           "turns": 2,
-          "buff": "惩戒",
+          "buff": "char:1004/retribution",
           "target": "target",
-          "while_state": "惩戒"
+          "while_state": "char:1004/retribution"
         }
       ],
       "source": "1004 瓦尔特 行迹 惩戒 (1004101): 「施放终结技时，有100%基础概率使目标受到的伤害提高12%，持续2回合。」",

@@ -136,7 +136,7 @@ public class TheBirthOfTheSelfTest {
         healthy.battle.applyDamage(healthy.enemy, ordinary);
         healthy.battle.processRequests();
         Assertions.assertEquals(1.0, ordinary.boostArea().getRate(), 1e-9,
-                "「追加攻击」 - an ordinary hit carries nothing from this cone");
+                "「relic:115/follow_up」 - an ordinary hit carries nothing from this cone");
     }
 
     private static final class Run {

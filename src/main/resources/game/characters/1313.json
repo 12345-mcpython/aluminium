@@ -369,7 +369,7 @@
           "percent": 0.3,
           "while_holder_state": "char:1313/blessed_one",
           "permanent": true,
-          "buff": "星魂二-蒙福者增伤",
+          "buff": "char:1313/e2_blessed_damage",
           "target": "target_and_summon"
         }
       ],

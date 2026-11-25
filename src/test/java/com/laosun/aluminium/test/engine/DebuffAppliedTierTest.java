@@ -25,7 +25,7 @@ public class DebuffAppliedTierTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
     private static final int RELIC_LEVEL = 15;
-    private static final String COUNTER = "负面激化";
+    private static final String COUNTER = "relic:117/debuff_amplify";
 
     @Test
     public void theFourthPieceScalesWithTheTargetsDebuffCount() {

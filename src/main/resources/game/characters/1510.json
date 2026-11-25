@@ -41,7 +41,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "领航旗语",
+          "buff": "char:1510/guiding_semaphore",
           "turns": 3,
           "target": "self"
         }
@@ -62,7 +62,7 @@
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
           "percent_from_skill_param": "SKILL:0",
           "permanent": true,
-          "while_state": "领航旗语",
+          "while_state": "char:1510/guiding_semaphore",
           "target": "all_allies"
         }
       ],

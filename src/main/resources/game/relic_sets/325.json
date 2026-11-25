@@ -5,12 +5,12 @@
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
         "self_attr:ELATION_DAMAGE_BOOST < 0.8",
-        "!self has_state 325_30"
+        "!self has_state relic:325/threshold_30"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_30",
+          "buff": "relic:325/threshold_30",
           "permanent": true,
           "target": "self"
         },
@@ -30,12 +30,12 @@
       "on": "CAST_SETUP",
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
-        "!self has_state 325_60"
+        "!self has_state relic:325/threshold_60"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_60",
+          "buff": "relic:325/threshold_60",
           "permanent": true,
           "target": "self"
         },
@@ -56,12 +56,12 @@
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
         "self_attr:ELATION_DAMAGE_BOOST < 0.8",
-        "!self has_state 325_30"
+        "!self has_state relic:325/threshold_30"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_30",
+          "buff": "relic:325/threshold_30",
           "permanent": true,
           "target": "self"
         },
@@ -81,12 +81,12 @@
       "on": "SKILL_CAST",
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
-        "!self has_state 325_60"
+        "!self has_state relic:325/threshold_60"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_60",
+          "buff": "relic:325/threshold_60",
           "permanent": true,
           "target": "self"
         },
@@ -107,12 +107,12 @@
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
         "self_attr:ELATION_DAMAGE_BOOST < 0.8",
-        "!self has_state 325_30"
+        "!self has_state relic:325/threshold_30"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_30",
+          "buff": "relic:325/threshold_30",
           "permanent": true,
           "target": "self"
         },
@@ -132,12 +132,12 @@
       "on": "SKILL_POINT_SPENT",
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
-        "!self has_state 325_60"
+        "!self has_state relic:325/threshold_60"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_60",
+          "buff": "relic:325/threshold_60",
           "permanent": true,
           "target": "self"
         },
@@ -158,12 +158,12 @@
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.4",
         "self_attr:ELATION_DAMAGE_BOOST < 0.8",
-        "!self has_state 325_30"
+        "!self has_state relic:325/threshold_30"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_30",
+          "buff": "relic:325/threshold_30",
           "permanent": true,
           "target": "self"
         },
@@ -183,12 +183,12 @@
       "on": "ULT_CAST",
       "when": [
         "self_attr:ELATION_DAMAGE_BOOST >= 0.8",
-        "!self has_state 325_60"
+        "!self has_state relic:325/threshold_60"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "325_60",
+          "buff": "relic:325/threshold_60",
           "permanent": true,
           "target": "self"
         },

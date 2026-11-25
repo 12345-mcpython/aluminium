@@ -70,14 +70,14 @@ import java.util.Random;
 public class SilverWolfLootBoxTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final String LAUGH = "笑点";
+    private static final String LAUGH = "elation:punchline";
     private static final String HIDDEN = "char:1506/hidden_score";
     /**
      * 【好活当赏】 - the box's own gate since the audit (「「银狼LV.999」持有【好活当赏】时」): a RESOURCE, because that is what
      * the clause reads ({@code self_resource:好活当赏 >= 1}). Nothing in her file grants it - the Aha Moment does, and this
      * engine has no Aha stage - so the fixture states the premise.
      */
-    private static final String GIFT = "好活当赏";
+    private static final String GIFT = "elation:certified_banger";
     /**
      * What the scripted roll answers with: a value inside the effect's WEIGHT bucket.
      *
@@ -463,7 +463,7 @@ public class SilverWolfLootBoxTest {
                 + "read 2557.63) ; one enemy takes " + alone + ", two take " + eachOfTwo + " each");
         Assertions.assertAll(
                 () -> Assertions.assertEquals(3197.0383318342465, settled.hpLost(), 1e-6,
-                        "the box settles elation_base x the row's 1.125 x her 欢愉度, through this fixture's zones"),
+                        "the box settles elation_base x the row's 1.125 x her elation:elation_degree, through this fixture's zones"),
                 () -> Assertions.assertEquals(alone, 2 * eachOfTwo, 1e-6,
                         "the stated 90% is the total: with two enemies each takes half, so the TOTAL does not move with N"));
     }

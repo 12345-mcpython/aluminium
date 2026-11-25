@@ -40,7 +40,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "行动次数",
+          "buff": "internal:1222/action_count",
           "value": {
             "type": "skill_param",
             "skill": "TALENT",
@@ -71,7 +71,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "行动次数",
+          "buff": "internal:1222/action_count",
           "value": {
             "type": "skill_param",
             "skill": "TALENT",
@@ -146,7 +146,7 @@
           "percent": 0.25,
           "damage_type": "BREAK",
           "turns": 2,
-          "buff": "醇醉",
+          "buff": "char:1222/mellow",
           "target": "all_enemies"
         }
       ],
@@ -180,7 +180,7 @@
       "id": "fuyuan_strikes_all_foes",
       "when": [
         "actor is_summon",
-        "actor_stacks:行动次数 >= 1",
+        "actor_stacks:internal:1222/action_count >= 1",
         "enemy_count >= 1"
       ],
       "do": [
@@ -223,7 +223,7 @@
       "min_eidolon": 6,
       "when": [
         "actor is_summon",
-        "actor_stacks:行动次数 >= 1",
+        "actor_stacks:internal:1222/action_count >= 1",
         "enemy_count >= 1"
       ],
       "do": [
@@ -251,7 +251,7 @@
       "id": "fuyuan_cleanses_and_heals",
       "when": [
         "actor is_summon",
-        "actor_stacks:行动次数 >= 1"
+        "actor_stacks:internal:1222/action_count >= 1"
       ],
       "do": [
         {
@@ -289,7 +289,7 @@
       "min_eidolon": 4,
       "when": [
         "actor is_summon",
-        "actor_stacks:行动次数 >= 1"
+        "actor_stacks:internal:1222/action_count >= 1"
       ],
       "do": [
         {
@@ -421,7 +421,7 @@
       "do": [
         {
           "op": "REMOVE_STACK",
-          "buff": "行动次数",
+          "buff": "internal:1222/action_count",
           "amount": 1,
           "target": "actor"
         }
@@ -435,7 +435,7 @@
       "id": "fuyuan_leaves_when_spent",
       "when": [
         "actor is_summon",
-        "actor_stacks:行动次数 <= 0"
+        "actor_stacks:internal:1222/action_count <= 0"
       ],
       "do": [
         {
@@ -564,7 +564,7 @@
         },
         {
           "op": "ADD_STACK",
-          "buff": "行动次数",
+          "buff": "internal:1222/action_count",
           "value": {
             "type": "skill_param",
             "skill": "TALENT",
@@ -583,7 +583,7 @@
           },
           "damage_type": "BREAK",
           "turns": 2,
-          "buff": "醇醉",
+          "buff": "char:1222/mellow",
           "target": "all_enemies"
         }
       ],

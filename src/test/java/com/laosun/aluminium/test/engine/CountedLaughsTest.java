@@ -33,7 +33,7 @@ import java.util.List;
 public class CountedLaughsTest {
     private static final int MINE = 1506;
     private static final int ALLY = 1204;
-    private static final String LAUGH = "笑点";
+    private static final String LAUGH = "elation:punchline";
     private static final double EPS = 1e-9;
 
     /**

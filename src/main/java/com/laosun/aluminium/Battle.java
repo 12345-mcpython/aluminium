@@ -1342,7 +1342,7 @@ public class Battle {
      * The state that means "the ultimate is activated": a clause grants it and {@link #isUltraReady} honours it, which is the engine's one spelling of "activating the ultimate".
      * Not from the data -- the documents name the effect, not a state -- so it is named here once, like every other engine-side marker.
      */
-    public static final String ULTIMATE_ACTIVATED_STATE = "终结技已激活";
+    public static final String ULTIMATE_ACTIVATED_STATE = "sys:ultimate_activated";
 
     /**
      * Whether this unit can cast its ultimate right now: reaching the "ult threshold" is

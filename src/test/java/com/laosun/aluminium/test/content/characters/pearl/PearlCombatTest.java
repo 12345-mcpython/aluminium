@@ -49,7 +49,7 @@ public class PearlCombatTest {
     private static final String BARRIER = "char:1503/art_barrier";
     private static final String GRIT = "char:1503/sand_absorb";
     private static final int ENERGY = 90;
-    private static final String COUNTER = "好活当赏";
+    private static final String COUNTER = "elation:certified_banger";
     private static final String CARRIER = "char:1503/rendering_reason";
     private static final double INSTANCE = 100;
     private static final int ELATION_ALLY = 1502;
@@ -92,7 +92,7 @@ public class PearlCombatTest {
         System.out.println("[pearl_defence] large hit: cost " + heavyCost + " (control " + heavyControl
                 + ") ; points spent " + spent);
 
-        Assertions.assertAll("「好活当赏」: the block and its 60% share",
+        Assertions.assertAll("「elation:certified_banger」: the block and its 60% share",
                 () -> Assertions.assertTrue(control > 0,
                         "[the block] precondition: the hit lands when nothing pays for it"),
                 () -> Assertions.assertTrue(cost < control,
@@ -450,7 +450,7 @@ public class PearlCombatTest {
                 + " ; without it = " + empty);
         Assertions.assertTrue(empty > 0, "precondition: the enhanced basic deals damage (" + empty + ")");
         Assertions.assertTrue(holding > empty,
-                "「持有【好活当赏】时，额外造成…」: holding it pays more (" + holding + " vs " + empty + ")");
+                "「持有【elation:certified_banger】时，额外造成…」: holding it pays more (" + holding + " vs " + empty + ")");
     }
 
     /**

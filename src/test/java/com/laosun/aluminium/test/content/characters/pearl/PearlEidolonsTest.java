@@ -45,8 +45,8 @@ public class PearlEidolonsTest {
     private static final int ALLY = 1204;
     private static final int ELATION_ALLY = 1502;
     private static final double EPS = 1.0;
-    private static final String COUNTER = "好活当赏";
-    private static final String PUNCHLINE = "笑点";
+    private static final String COUNTER = "elation:certified_banger";
+    private static final String PUNCHLINE = "elation:punchline";
 
     /**
      * The archetype's 欢愉度, the term the E6 sentence borrows.
@@ -156,7 +156,7 @@ public class PearlEidolonsTest {
         Fraction e0 = fractions(0);
         Fraction e2 = fractions(2);
         System.out.println("[pearl_e2_advance] E0 -> archetype keeps " + e0.archetype
-                + ", elation ally A " + e0.elationA + ", elation ally B " + e0.elationB
+                + ", 欢愉 ally A " + e0.elationA + ", 欢愉 ally B " + e0.elationB
                 + " || E2 -> archetype " + e2.archetype + ", A " + e2.elationA + ", B " + e2.elationB);
         System.out.println("[pearl_e2_advance] at E2 an Elation ally keeps " + e2.elationA
                 + " (expected 0.9 x 0.85 x 0.70 = 0.5355)");
@@ -344,15 +344,15 @@ public class PearlEidolonsTest {
         double zeroPlain = damage(0, PLAIN);
         double e6Boosted = sixBoosted - zeroBoosted;
         double e6Plain = sixPlain - zeroPlain;
-        System.out.println("[pearl_e6] E6: 欢愉度+" + BOOSTED + " -> " + sixBoosted + " ; +" + PLAIN + " -> " + sixPlain
+        System.out.println("[pearl_e6] E6: elation:elation_degree+" + BOOSTED + " -> " + sixBoosted + " ; +" + PLAIN + " -> " + sixPlain
                 + " || E0 (form A alone): " + zeroBoosted + " ; " + zeroPlain
                 + " || E6's own instance: " + e6Boosted + " vs " + e6Plain);
 
         double pearlBoosted = damage(6, PLAIN, BOOSTED) - damage(0, PLAIN, BOOSTED);
         double neitherBoosted = damage(6, PLAIN, PLAIN) - damage(0, PLAIN, PLAIN);
         double allyBoosted = damage(6, BOOSTED, PLAIN) - damage(0, BOOSTED, PLAIN);
-        System.out.println("[pearl_e6] E6's own instance: archetype 欢愉度 +" + BOOSTED + " = " + allyBoosted
-                + " ; Pearl's 欢愉度 +" + BOOSTED + " = " + pearlBoosted
+        System.out.println("[pearl_e6] E6's own instance: archetype elation:elation_degree +" + BOOSTED + " = " + allyBoosted
+                + " ; Pearl's elation:elation_degree +" + BOOSTED + " = " + pearlBoosted
                 + " ; neither = " + neitherBoosted);
 
         double formABoosted = zeroBoosted - zeroPlain;
@@ -360,18 +360,18 @@ public class PearlEidolonsTest {
                 () -> Assertions.assertTrue(sixBoosted > 0,
                         "[the instance] precondition: the enhanced basic deals damage at E6"),
                 () -> Assertions.assertTrue(e6Boosted > 0,
-                        "[the instance] E6 pays more than E0 at the same 欢愉度"),
+                        "[the instance] E6 pays more than E0 at the same elation:elation_degree"),
                 () -> Assertions.assertTrue(e6Boosted > e6Plain,
-                        "[the archetype] E6's own instance follows the archetype's 欢愉度 (" + e6Boosted + " vs "
+                        "[the archetype] E6's own instance follows the archetype's elation:elation_degree (" + e6Boosted + " vs "
                                 + e6Plain + ")"),
                 () -> Assertions.assertTrue(e6Boosted > 2.0 * formABoosted,
                         "[versus form A] E6's instance is 2.4 where form A's is 0.6, so it dominates the difference at"
-                                + " the same 欢愉度 (" + e6Boosted + " vs form A's " + formABoosted + ")"),
+                                + " the same elation:elation_degree (" + e6Boosted + " vs form A's " + formABoosted + ")"),
                 () -> Assertions.assertTrue(zeroBoosted > zeroPlain,
-                        "[versus form A] control: form A alone (E0) also follows the archetype's 欢愉度, which is what"
+                        "[versus form A] control: form A alone (E0) also follows the archetype's elation:elation_degree, which is what"
                                 + " the difference removes"),
                 () -> Assertions.assertTrue(allyBoosted > 1.5 * neitherBoosted,
-                        "[the source] the ARCHETYPE's 欢愉度 is what sizes this instance (" + allyBoosted + " vs "
+                        "[the source] the ARCHETYPE's elation:elation_degree is what sizes this instance (" + allyBoosted + " vs "
                                 + neitherBoosted + ")"),
                 () -> Assertions.assertTrue(pearlBoosted < 1.05 * neitherBoosted,
                         "[not Pearl] and Pearl's must not: the borrowed terms are the archetype's (" + pearlBoosted

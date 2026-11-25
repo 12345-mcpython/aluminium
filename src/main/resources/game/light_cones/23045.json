@@ -11,7 +11,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.4,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -30,7 +30,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.4,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -50,7 +50,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.5,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -69,7 +69,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.5,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -89,7 +89,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.6,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -108,7 +108,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.6,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -128,7 +128,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.7,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -147,7 +147,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.7,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -167,7 +167,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.8,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"
@@ -186,7 +186,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.8,
-          "buff": "加冕",
+          "buff": "cone:23045/coronation",
           "max_stacks": 2,
           "turns": 2,
           "target": "self"

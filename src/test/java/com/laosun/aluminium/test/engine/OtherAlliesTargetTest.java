@@ -187,7 +187,7 @@ public class OtherAlliesTargetTest {
                 () -> Assertions.assertEquals(0, timeRemaining(battle, first), EPS, "\"makes allies other than herself act immediately\" (「使除自身以外的队友立即行动」)"),
                 () -> Assertions.assertEquals(0, timeRemaining(battle, second), EPS, "her second teammate acts too"),
                 () -> Assertions.assertEquals(robinBefore, timeRemaining(battle, robin), EPS,
-                        "her own turn is untouched by this clause (【协奏】 (Concerto) is what does something else to her)"),
+                        "her own turn is untouched by this clause (【char:1309/concerto】 (Concerto) is what does something else to her)"),
                 // Three since 2026-11-02: this ADVANCE, the [协奏] state plus its countdown, and the state's own ATK boost plus
                 // control immunity. A fourth rule (a 20% defence ignore under 「结界」) was removed that day: 知更鸟's document has no
                 // such clause at all (0 mentions of 结界 - her state is 【协奏】), and the sentence it quoted belongs to 1303 阮•梅's
@@ -195,7 +195,7 @@ public class OtherAlliesTargetTest {
                 // Six since 2026-11-11: the three Eidolon auras (1: party penetration, 2: party speed, 4: party effect RES) are
                 // granted on this same cast - the one that ENTERS 【协奏】 - and are grouped by that name for removal.
                 () -> Assertions.assertEquals(6, rules.size(),
-                        "six rules on this cast: the ADVANCE, the 【协奏】 state with its countdown, its ATK boost, and the three Eidolon auras"),
+                        "six rules on this cast: the ADVANCE, the 【char:1309/concerto】 state with its countdown, its ATK boost, and the three Eidolon auras"),
                 () -> Assertions.assertEquals(1, effects.size(), "the first sentence is one effect"),
                 () -> Assertions.assertEquals("ADVANCE", effects.getFirst().getOp(), "「立即行动」 is the ADVANCE op"),
                 () -> Assertions.assertEquals(1.0, effects.getFirst().getPercent(), EPS, "all of the remaining wait"),

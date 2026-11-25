@@ -101,7 +101,7 @@ public class RobinTest {
     public void theAuraNamesTheFollowUpScopeAndShare() {
         Character owner = CharacterFactory.create(ROBIN, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        owner.getBuffManager().addBuff(new StateBuff("协奏", 3, true));
+        owner.getBuffManager().addBuff(new StateBuff("char:1309/concerto", 3, true));
         int seen = 0;
         for (var rule : owner.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(owner, owner, enemy, 0, 0))) {
@@ -130,7 +130,7 @@ public class RobinTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        owner.getBuffManager().addBuff(new StateBuff("协奏", 3, true));
+        owner.getBuffManager().addBuff(new StateBuff("char:1309/concerto", 3, true));
         ally.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 130901));
         boolean allyAlwaysCrits = ally.getAttribute(AttributeType.CRIT_CHANCE).get() >= 1.0;
@@ -156,7 +156,7 @@ public class RobinTest {
         System.out.println("[1309] no state: normal=" + noStateNormal + " followUp=" + noStateFollowUp
                 + " ratio=" + (noStateFollowUp / noStateNormal));
 
-        Assertions.assertAll("trace 1309102: the ally's follow-up, with and without 【协奏】",
+        Assertions.assertAll("trace 1309102: the ally's follow-up, with and without 【char:1309/concerto】",
                 () -> Assertions.assertTrue(allyAlwaysCrits, "precondition: the ally's hits always crit"),
                 () -> Assertions.assertEquals(1.1666666667, followUp / normal, 1e-6,
                         "the owner's aura reaches the ALLY's follow-up"),
@@ -198,7 +198,7 @@ public class RobinTest {
                 "ULT_CAST arrives at the tables once per cast (an event count -- it does NOT count the rules that match)");
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, injector, robin, 0, 0));
         Assertions.assertFalse(robin.getBuffManager().hasState("ctrl:frozen"),
-                "「处于【协奏】状态时，知更鸟免疫控制类负面状态」 (while in the Concerto (【协奏】) state, Robin is immune to Crowd Control debuffs)");
+                "「处于【char:1309/concerto】状态时，知更鸟免疫控制类负面状态」 (while in the Concerto (【char:1309/concerto】) state, Robin is immune to Crowd Control debuffs)");
 
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(robin).getFirst(), robin, 0, 0));
 
@@ -481,7 +481,7 @@ public class RobinTest {
     }
 
     private static final class Run {
-        private static final String STATE = "协奏";
+        private static final String STATE = "char:1309/concerto";
         private final Character robin;
         private final Character ally;
         private final Battle battle;

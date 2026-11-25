@@ -27,8 +27,8 @@ public class TrailblazerDestructionTest {
     private static final int TB = 8001;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-9;
-    private static final String COUNTER_8001 = "牵制盗垒";
-    private static final String COUNTER_8002 = "牵制盗垒";
+    private static final String COUNTER_8001 = "char:8001/pinch_steal";
+    private static final String COUNTER_8002 = "char:8002/pinch_steal";
 
     /**
      * Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层".

@@ -55,7 +55,7 @@
       "do": [
         {
           "op": "START_COUNTDOWN",
-          "buff": "结界倒计时",
+          "buff": "char:1507/barrier_countdown",
           "speed": 70
         },
         {
@@ -63,14 +63,14 @@
           "attribute": "AGGRO_ADDED_RATIO",
           "percent": 10,
           "permanent": true,
-          "buff": "千锻魂",
+          "buff": "char:1507/thousand_forged_soul",
           "target": "self"
         },
         {
           "op": "MODIFY_DAMAGE_TAKEN",
           "percent": -0.5,
           "permanent": true,
-          "buff": "千锻魂",
+          "buff": "char:1507/thousand_forged_soul",
           "target": "self"
         },
         {
@@ -78,7 +78,7 @@
           "attribute": "HEAL_TAKEN_RATIO",
           "percent": 0.5,
           "permanent": true,
-          "buff": "千锻魂",
+          "buff": "char:1507/thousand_forged_soul",
           "target": "self"
         }
       ],
@@ -94,7 +94,7 @@
       "do": [
         {
           "op": "REMOVE_STATE",
-          "buff": "千锻魂",
+          "buff": "char:1507/thousand_forged_soul",
           "target": "self"
         },
         {

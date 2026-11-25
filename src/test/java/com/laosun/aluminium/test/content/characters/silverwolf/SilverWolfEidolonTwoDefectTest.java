@@ -26,7 +26,8 @@ public class SilverWolfEidolonTwoDefectTest {
     private static final int WOLF = 1006;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-    private static final List<String> DEFECTS = List.of("攻击力降低", "防御力降低", "速度降低");
+    private static final List<String> DEFECTS = List.of("char:1006/defect_attack_down",
+            "char:1006/defect_defence_down", "char:1006/defect_speed_down");
 
     @Test
     public void anAllysAttackImplantsOneRandomDefect() {

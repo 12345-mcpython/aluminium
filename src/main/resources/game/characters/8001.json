@@ -41,7 +41,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "max_stacks": 2,
-          "buff": "牵制盗垒",
+          "buff": "char:8001/pinch_steal",
           "permanent": true,
           "target": "self",
           "percent": 0.2
@@ -79,7 +79,7 @@
           "attribute": "DEFENCE",
           "percent": 0.1,
           "max_stacks": 2,
-          "buff": "坚韧",
+          "buff": "char:8001/tenacity",
           "permanent": true,
           "target": "self"
         }
@@ -197,7 +197,7 @@
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "max_stacks": 2,
-          "buff": "牵制盗垒",
+          "buff": "char:8001/pinch_steal",
           "permanent": true,
           "target": "self",
           "percent": 0.2

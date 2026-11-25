@@ -22,7 +22,7 @@ import com.laosun.aluminium.equipment.Relic;
  */
 public class TengokuLivestreamTest {
     private static final int SET = 324;
-    private static final String COUNTER = "本回合消耗";
+    private static final String COUNTER = "relic:324/spent_this_turn";
 
     private static List<TriggerTable.CompiledRule> rules() {
         return RelicTriggerTables.of(SET).at(2).rulesFor(TriggerEvent.SKILL_POINT_SPENT);

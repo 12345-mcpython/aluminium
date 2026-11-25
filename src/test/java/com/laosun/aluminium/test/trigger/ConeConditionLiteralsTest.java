@@ -205,16 +205,16 @@ public class ConeConditionLiteralsTest {
         // ⚠ It pinned KILL + `target == summon`: a summon that LEAVES the field is `SUMMON_LEFT`, and `target == summon`
         // filters on isDeath() - which throws for the unit this event is about (§3.7w).
         assertRule(20022, 5, "SUMMON_LEFT", "cone20022_memorial_removed_when_it_is_killed", List.of("actor is_summon"));
-        assertRule(20024, 1, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:笑点 >= 10.0"));
-        assertRule(20024, 1, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:笑点 < 10.0"));
-        assertRule(20024, 2, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:笑点 >= 10.0"));
-        assertRule(20024, 2, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:笑点 < 10.0"));
-        assertRule(20024, 3, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:笑点 >= 10.0"));
-        assertRule(20024, 3, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:笑点 < 10.0"));
-        assertRule(20024, 4, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:笑点 >= 10.0"));
-        assertRule(20024, 4, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:笑点 < 10.0"));
-        assertRule(20024, 5, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:笑点 >= 10.0"));
-        assertRule(20024, 5, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:笑点 < 10.0"));
+        assertRule(20024, 1, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:elation:punchline >= 10.0"));
+        assertRule(20024, 1, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:elation:punchline < 10.0"));
+        assertRule(20024, 2, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:elation:punchline >= 10.0"));
+        assertRule(20024, 2, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:elation:punchline < 10.0"));
+        assertRule(20024, 3, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:elation:punchline >= 10.0"));
+        assertRule(20024, 3, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:elation:punchline < 10.0"));
+        assertRule(20024, 4, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:elation:punchline >= 10.0"));
+        assertRule(20024, 4, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:elation:punchline < 10.0"));
+        assertRule(20024, 5, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:elation:punchline >= 10.0"));
+        assertRule(20024, 5, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:elation:punchline < 10.0"));
         assertRule(21000, 1, "CAST_SETUP", "cone21000_heal_on_ult", List.of("actor == self", "from_skill ULTRA"));
         assertRule(21000, 2, "CAST_SETUP", "cone21000_heal_on_ult", List.of("actor == self", "from_skill ULTRA"));
         assertRule(21000, 3, "CAST_SETUP", "cone21000_heal_on_ult", List.of("actor == self", "from_skill ULTRA"));

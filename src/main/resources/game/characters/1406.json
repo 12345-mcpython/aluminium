@@ -69,7 +69,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "虚弱",
+          "buff": "debuff:weakened",
           "turns": 2,
           "target": "target"
         },

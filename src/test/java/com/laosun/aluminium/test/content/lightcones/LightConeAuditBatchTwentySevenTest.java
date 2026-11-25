@@ -52,8 +52,8 @@ public class LightConeAuditBatchTwentySevenTest {
         Assertions.assertEquals("ELATION", ignore.get("damage_type").getAsString(), "「造成的**欢愉伤害**无视防御」");
 
         JsonObject pay = effect(23057, "cone23057_laughter_on_self_ult", 0);
-        System.out.println("[23057] 笑点: op=" + pay.get("op") + " resource=" + pay.get("resource") + " amount=" + pay.get("amount"));
-        Assertions.assertEquals("GAIN_RESOURCE", pay.get("op").getAsString(), "「获得 20 点【笑点】」");
+        System.out.println("[23057] elation:punchline: op=" + pay.get("op") + " resource=" + pay.get("resource") + " amount=" + pay.get("amount"));
+        Assertions.assertEquals("GAIN_RESOURCE", pay.get("op").getAsString(), "「获得 20 点【elation:punchline】」");
         Assertions.assertEquals(20.0, pay.get("amount").getAsDouble(), 1e-9, "20 点（叠影 1）");
     }
 

@@ -189,19 +189,19 @@ public class ArgentiTest {
         StacksFixture casts = new StacksFixture();
         StacksFixture hits = new StacksFixture(0, 3);
         hits.fireCast(TriggerEvent.BASIC_ATTACK, 3);
-        int threeHitStacks = hits.argenti.getBuffManager().stacksOf("升格");
+        int threeHitStacks = hits.argenti.getBuffManager().stacksOf("char:1302/ascension");
         double threeHitCrit = hits.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
         hits.fireCast(TriggerEvent.SKILL_CAST, 1);
-        int oneHitStacks = hits.argenti.getBuffManager().stacksOf("升格");
+        int oneHitStacks = hits.argenti.getBuffManager().stacksOf("char:1302/ascension");
 
-        Assertions.assertAll("talent 【升格】: one layer per cast event, one per target hit",
+        Assertions.assertAll("talent 【char:1302/ascension】: one layer per cast event, one per target hit",
                 () -> {
                     for (TriggerEvent cast : List.of(TriggerEvent.BASIC_ATTACK, TriggerEvent.SKILL_CAST,
                             TriggerEvent.ULT_CAST)) {
-                        int before = casts.argenti.getBuffManager().stacksOf("升格");
+                        int before = casts.argenti.getBuffManager().stacksOf("char:1302/ascension");
                         casts.fireCast(cast, 1);
-                        Assertions.assertEquals(1, casts.argenti.getBuffManager().stacksOf("升格") - before,
-                                cast + " marks 【升格】 (Apotheosis) exactly once");
+                        Assertions.assertEquals(1, casts.argenti.getBuffManager().stacksOf("char:1302/ascension") - before,
+                                cast + " marks 【char:1302/ascension】 (Apotheosis) exactly once");
                     }
                 },
                 () -> Assertions.assertEquals(3, threeHitStacks, "three enemies hit: three layers, not one"),
@@ -229,7 +229,7 @@ public class ArgentiTest {
             capped.fireCast(TriggerEvent.BASIC_ATTACK, 1);
         }
         double cappedCrit = capped.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
-        int cappedStacks = capped.argenti.getBuffManager().stacksOf("升格");
+        int cappedStacks = capped.argenti.getBuffManager().stacksOf("char:1302/ascension");
 
         StacksFixture fourthEidolon = new StacksFixture(4);
         double fourthEidolonBase = fourthEidolon.argenti.getAttribute(AttributeType.CRIT_CHANCE).get();
@@ -241,7 +241,7 @@ public class ArgentiTest {
         // Lv12 (0.025 at Lv10, 0.028 at Lv12). That difference is exactly why the rule reads the row instead of a literal.
         int fourthEidolonBonus = fourthEidolon.argenti.ruleEffectMaxStacksBonus("talent_stack_basic");
 
-        Assertions.assertAll("【升格】 cap: ten layers, raised by Eidolon 4",
+        Assertions.assertAll("【char:1302/ascension】 cap: ten layers, raised by Eidolon 4",
                 () -> Assertions.assertEquals(base + 10 * 0.025, cappedCrit, 1e-6,
                         "「该效果最多叠加10层」 (this effect stacks at most 10 times): twelve hits give ten stacks, not twelve"),
                 () -> Assertions.assertEquals(10, cappedStacks,
@@ -263,7 +263,7 @@ public class ArgentiTest {
         f.argentiTurn();
 
         Assertions.assertEquals(base + 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
-                "「回合开始时，立即获得1层【升格】」 (at the start of the turn, immediately gains 1 stack of Apotheosis (【升格】))");
+                "「回合开始时，立即获得1层【char:1302/ascension】」 (at the start of the turn, immediately gains 1 stack of Apotheosis (【char:1302/ascension】))");
     }
 
     /**
@@ -383,7 +383,7 @@ public class ArgentiTest {
             f.fireCast(TriggerEvent.BASIC_ATTACK, 1);
         }
         Assertions.assertEquals(0.7, f.argenti.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,
-                "「每层【升格】额外使暴击伤害提高 4%」 - five layers = +0.20 over the base 0.5");
+                "「每层【char:1302/ascension】额外使暴击伤害提高 4%」 - five layers = +0.20 over the base 0.5");
         Assertions.assertEquals(0.175, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-9,
                 "and the crit-rate half stacks the same way (0.025 x 5 over its base)");
     }

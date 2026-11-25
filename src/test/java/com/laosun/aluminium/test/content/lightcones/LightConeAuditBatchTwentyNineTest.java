@@ -38,7 +38,7 @@ public class LightConeAuditBatchTwentyNineTest {
 
         JsonObject rule = rule(24002, "cone24002_shield_when_unshielded");
         JsonObject shield = rule.getAsJsonArray("do").get(0).getAsJsonObject();
-        System.out.println("[24002] 护盾: scale=" + shield.get("scale") + " percent=" + shield.get("percent")
+        System.out.println("[24002] char:1001/shield: scale=" + shield.get("scale") + " percent=" + shield.get("percent")
                 + " turns=" + shield.get("turns") + " cooldown=" + rule.get("cooldown"));
         Assertions.assertEquals("owner_max_hp", shield.get("scale").getAsString(), "「等同于装备者生命上限」");
         Assertions.assertEquals(0.16, shield.get("percent").getAsDouble(), 1e-12, "16%");
@@ -111,7 +111,7 @@ public class LightConeAuditBatchTwentyNineTest {
         JsonObject skill = effect(24006, "cone24006_ally_elation_on_skill", 0);
         System.out.println("[24006] 目标欢愉度: percent=" + skill.get("percent") + " turns=" + skill.get("turns")
                 + " target=" + skill.get("target"));
-        Assertions.assertEquals("ELATION_DAMAGE_BOOST", skill.get("attribute").getAsString(), "「目标**欢愉度**提高」");
+        Assertions.assertEquals("ELATION_DAMAGE_BOOST", skill.get("attribute").getAsString(), "「目标**elation:elation_degree**提高」");
         Assertions.assertEquals(0.12, skill.get("percent").getAsDouble(), 1e-12, "12%（叠影 1）");
         Assertions.assertEquals("target", skill.get("target").getAsString(), "「**目标**」—— 不是她自己");
         Assertions.assertEquals(2, skill.get("turns").getAsInt(), "「持续 2 回合」");

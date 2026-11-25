@@ -14,14 +14,14 @@
       "source": "1506 银狼LV.999 天赋 有我在，把把都是顺风局: 「【隐藏分】达到 60 点后可激活终结技，达到上限后还可溢出 240 点」。"
     },
     {
-      "id": "笑点",
+      "id": "elation:punchline",
       "max": 2147483647,
       "initial": 0,
       "scope": "PARTY",
       "source": "1506 银狼LV.999 战技／终结技: 「笑点为全队共享」⇒ 队伍级计数。"
     },
     {
-      "id": "好活当赏",
+      "id": "elation:certified_banger",
       "max": 2147483647,
       "initial": 0,
       "source": "1506 银狼LV.999 天赋: 「持有【好活当赏】时，施放普攻、战技对受到攻击的敌方目标造成 40% 的虚数属性欢愉伤害」；终结技的盲盒从句也以它为门。⚠ 文档**没有给她的【好活当赏】上限** ✗ —— 数据里只有名字 / 图标（与 1505／8009 同一判断 ✓）⇒ `max` 用 `Integer.MAX_VALUE` 表示「游戏从未说过会满」✓。⚠ 它是**计数**不是状态 ✓：本项目的口径见下方两条骑手规则的 note 与 1503 的注记 ✓。"
@@ -99,7 +99,7 @@
       "on": "RESOURCE_CHANGED",
       "id": "p1506_laughs_to_hidden",
       "when": [
-        "resource_changed:笑点"
+        "resource_changed:elation:punchline"
       ],
       "do": [
         {
@@ -121,7 +121,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 5
         }
       ],
@@ -314,7 +314,7 @@
       "id": "p1506_banger_basic_rider",
       "when": [
         "actor == self",
-        "self_resource:好活当赏 >= 1",
+        "self_resource:elation:certified_banger >= 1",
         "from_skill_id == 1.0"
       ],
       "do": [
@@ -338,7 +338,7 @@
       "id": "p1506_banger_skill_rider",
       "when": [
         "actor == self",
-        "self_resource:好活当赏 >= 1",
+        "self_resource:elation:certified_banger >= 1",
         "from_skill_id == 2.0"
       ],
       "do": [
@@ -759,18 +759,18 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "战技点",
+          "resource": "sys:skill_points",
           "amount": 2,
           "target": "self",
           "weight": 1,
           "weight_steps": [
-            "战技点:4:-0.9",
-            "战技点:5:-0.099"
+            "sys:skill_points:4:-0.9",
+            "sys:skill_points:5:-0.099"
           ]
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 3,
           "target": "self",
           "weight": 10,
@@ -788,7 +788,7 @@
       "on": "SKILL_POINT_SPENT",
       "id": "p1506_zone_loot_box_on_a_spent_point",
       "when": [
-        "self_resource:好活当赏 >= 1",
+        "self_resource:elation:certified_banger >= 1",
         "self has_state char:1506/barrier",
         "self has_state char:1506/invincible_player"
       ],
@@ -822,18 +822,18 @@
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "战技点",
+          "resource": "sys:skill_points",
           "amount": 2,
           "target": "self",
           "weight": 1,
           "weight_steps": [
-            "战技点:4:-0.9",
-            "战技点:5:-0.099"
+            "sys:skill_points:4:-0.9",
+            "sys:skill_points:5:-0.099"
           ]
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 3,
           "target": "self",
           "weight": 10,

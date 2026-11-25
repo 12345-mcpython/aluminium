@@ -28,7 +28,7 @@ public class FireflyCombustionTest {
     private static final int FIREFLY = 1310;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final String STATE = "完全燃烧";
+    private static final String STATE = "char:1310/complete_combustion";
 
     /**
      * The Ultimate enters the state, swaps both slots, adds 60 SPD, and puts a 70-speed countdown on the order.
@@ -40,12 +40,12 @@ public class FireflyCombustionTest {
 
         run.ult();
 
-        Assertions.assertTrue(run.firefly.getBuffManager().hasState(STATE), "「进入「完全燃烧」状态」");
+        Assertions.assertTrue(run.firefly.getBuffManager().hasState(STATE), "「进入「char:1310/complete_combustion」状态」");
         Assertions.assertEquals(before + 60, run.firefly.getAttribute(AttributeType.SPEED).get(), 1e-6,
                 "「速度提高 60 点」 - sixty POINTS, not a share");
         Assertions.assertEquals(8, run.firefly.getSkills().get(SkillType.COMMON).getSkillSlot(), "强化普攻 (row 8)");
         Assertions.assertEquals(9, run.firefly.getSkills().get(SkillType.SKILL).getSkillSlot(), "强化战技 (row 9)");
-        Assertions.assertEquals(1, run.battle.countdownsOf(run.firefly).size(), "the 完全燃烧 countdown is on the order");
+        Assertions.assertEquals(1, run.battle.countdownsOf(run.firefly).size(), "the char:1310/complete_combustion countdown is on the order");
     }
 
     /**

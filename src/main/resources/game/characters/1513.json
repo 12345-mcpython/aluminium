@@ -11,13 +11,13 @@
   ],
   "resources": [
     {
-      "id": "热意",
+      "id": "char:1513/heat",
       "max": 30,
       "source": "1513 砂金•戏浪 天赋 抛注，听深渊回响 (151304, Enhance): 「砂金•戏浪的【好活当赏】的持续时间增加1回合。队友施放攻击后，砂金•戏浪获得1点【热意】以及1个笑点，【热意】上限为30点。【热意】达到10点时，砂金•戏浪会立即施放1次固定计入20笑点的【举杯！敬炽烈一夏】…」",
       "note": "上限 **30** 是**文档原话** ✓（「【热意】**上限为 30 点**」✓）。⚠ 文档**没说初始值** ✗ ⇒ 保持默认 **0** ✓（与 1224/1412/1317/1201 同一判断 ✓）。⚠ 本文件只声明容量 ✓ 与四处**固定**获取（天赋 +1 ✓、战技 +4 ✓、终结技 +8 ✓、秘技 +2 ✓）；「达到 10 点时立即施放某个欢愉技」✓ 与「施放欢愉技时**消耗所有**热意、每点追加一次伤害」✓ **现在都已出货** ✓（`talent_autocasts_elation` ✓／`fervor_extra_hit_per_point` ✓）；⚠ 仍登记的是它的**强化后**几档与技能行里「10 次 × 18%」那一段 ✗。⚠⚠ 同族的**笑点** ✗ **没有上限** ✗（文档只说\"获得 4 个/6 个/20 个\" ✓）⇒ **不能声明** ✓ ⇒ 与它相关的从句一并登记 ✓（见各条注释 ✓）。"
     },
     {
-      "id": "笑点",
+      "id": "elation:punchline",
       "max": 2147483647,
       "initial": 0,
       "scope": "PARTY",
@@ -54,7 +54,7 @@
       "do": [
         {
           "op": "RAISE_RESOURCE_MAX",
-          "resource": "热意",
+          "resource": "char:1513/heat",
           "amount": 20
         }
       ],
@@ -71,12 +71,12 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "热意",
+          "resource": "char:1513/heat",
           "amount": 1
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 1
         }
       ],
@@ -92,12 +92,12 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 4
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "热意",
+          "resource": "char:1513/heat",
           "amount": 4
         }
       ],
@@ -113,12 +113,12 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "amount": 6
         },
         {
           "op": "GAIN_RESOURCE",
-          "resource": "热意",
+          "resource": "char:1513/heat",
           "amount": 8
         },
         {
@@ -141,7 +141,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "热意",
+          "resource": "char:1513/heat",
           "amount": 2
         }
       ],
@@ -152,9 +152,9 @@
       "on": "RESOURCE_CHANGED",
       "id": "talent_autocasts_elation",
       "when": [
-        "resource_changed:热意",
-        "self_resource:热意 >= 10",
-        "self_resource_before:热意 < 10"
+        "resource_changed:char:1513/heat",
+        "self_resource:char:1513/heat >= 10",
+        "self_resource_before:char:1513/heat < 10"
       ],
       "do": [
         {
@@ -179,9 +179,9 @@
       "id": "eidolon1_autocasts_at_twenty",
       "min_eidolon": 1,
       "when": [
-        "resource_changed:热意",
-        "self_resource:热意 >= 20",
-        "self_resource_before:热意 < 20"
+        "resource_changed:char:1513/heat",
+        "self_resource:char:1513/heat >= 20",
+        "self_resource_before:char:1513/heat < 20"
       ],
       "do": [
         {
@@ -207,9 +207,9 @@
       "id": "eidolon1_autocasts_at_thirty",
       "min_eidolon": 1,
       "when": [
-        "resource_changed:热意",
-        "self_resource:热意 >= 30",
-        "self_resource_before:热意 < 30"
+        "resource_changed:char:1513/heat",
+        "self_resource:char:1513/heat >= 30",
+        "self_resource_before:char:1513/heat < 30"
       ],
       "do": [
         {
@@ -235,9 +235,9 @@
       "id": "eidolon2_autocasts_at_forty",
       "min_eidolon": 2,
       "when": [
-        "resource_changed:热意",
-        "self_resource:热意 >= 40",
-        "self_resource_before:热意 < 40"
+        "resource_changed:char:1513/heat",
+        "self_resource:char:1513/heat >= 40",
+        "self_resource_before:char:1513/heat < 40"
       ],
       "do": [
         {
@@ -263,9 +263,9 @@
       "id": "eidolon2_autocasts_at_fifty",
       "min_eidolon": 2,
       "when": [
-        "resource_changed:热意",
-        "self_resource:热意 >= 50",
-        "self_resource_before:热意 < 50"
+        "resource_changed:char:1513/heat",
+        "self_resource:char:1513/heat >= 50",
+        "self_resource_before:char:1513/heat < 50"
       ],
       "do": [
         {
@@ -299,14 +299,14 @@
           "op": "DAMAGE",
           "scale": "self_attr:ATTACK",
           "percent": 0.21,
-          "times_from": "resource:热意",
+          "times_from": "resource:char:1513/heat",
           "element": "Quantum",
           "damage_type": "ELATION",
           "target": "random_enemy"
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "热意",
+          "resource": "char:1513/heat",
           "spendAll": true,
           "target": "self"
         }
@@ -323,7 +323,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "阿哈时刻",
+          "buff": "elation:aha_instant",
           "turns": 1,
           "target": "self"
         }
@@ -335,22 +335,22 @@
       "on": "STATE_ENDED",
       "id": "elation_moment_reward",
       "when": [
-        "self state_ended 阿哈时刻"
+        "self state_ended elation:aha_instant"
       ],
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "好活当赏",
+          "buff": "elation:certified_banger",
           "turns": 2,
           "target": "self",
           "stackable": true,
           "max_stacks": 2147483647,
-          "scale": "party_resource:笑点",
+          "scale": "party_resource:elation:punchline",
           "percent": 1
         },
         {
           "op": "SPEND_RESOURCE",
-          "resource": "笑点",
+          "resource": "elation:punchline",
           "spendAll": true,
           "target": "self"
         }
@@ -369,7 +369,7 @@
       "do": [
         {
           "op": "GAIN_RESOURCE",
-          "resource": "热意",
+          "resource": "char:1513/heat",
           "amount": 4
         }
       ],

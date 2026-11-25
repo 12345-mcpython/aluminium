@@ -195,9 +195,9 @@ public class DebuffResistTest {
 
         Assertions.assertAll(
                 () -> Assertions.assertEquals(1.0, whileTimed, EPS,
-                        "「while in the [防火墙] (Firewall) state ... immune」 is up when granted"),
+                        "「while in the [internal:1506/firewall] (Firewall) state ... immune」 is up when granted"),
                 () -> Assertions.assertEquals(0.0, afterTick, EPS,
-                        "「while in the [防火墙] (Firewall) state ... immune」 lasts a turn — a buff covers both that and a permanent trace"),
+                        "「while in the [internal:1506/firewall] (Firewall) state ... immune」 lasts a turn — a buff covers both that and a permanent trace"),
                 () -> Assertions.assertEquals(0.35, afterTwoTurns, EPS, "a permanent trace is never ticked"),
                 () -> Assertions.assertEquals(0, debuffs, "carrying it is good for you"),
                 () -> Assertions.assertEquals(0, cleansed, "so a cleanse ignores it"),

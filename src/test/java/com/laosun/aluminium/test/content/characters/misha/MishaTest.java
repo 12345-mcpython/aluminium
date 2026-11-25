@@ -224,13 +224,13 @@ public class MishaTest {
     public void eidolon6RefundsOnePointAfterTheNextSkill() {
         Fixture f = new Fixture(6);
         f.castUltimate();
-        Assertions.assertEquals(1, f.misha.getBuffManager().stacksOf("下个战技返还战技点"),
+        Assertions.assertEquals(1, f.misha.getBuffManager().stacksOf("char:1312/next_skill_refund"),
                 "the Ultimate arms the refund");
 
         int before = f.battle.getSkillPoints();
         f.castSkill();
         Assertions.assertEquals(before + 1, f.battle.getSkillPoints(), "「为我方恢复 1 个战技点」");
-        Assertions.assertEquals(0, f.misha.getBuffManager().stacksOf("下个战技返还战技点"),
+        Assertions.assertEquals(0, f.misha.getBuffManager().stacksOf("char:1312/next_skill_refund"),
                 "「下一次」 — only once");
 
         int after = f.battle.getSkillPoints();

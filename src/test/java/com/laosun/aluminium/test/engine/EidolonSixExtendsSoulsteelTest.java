@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class EidolonSixExtendsSoulsteelTest {
     private static final int YANQING = 1209;
-    private static final String STATE = "智剑连心";
+    private static final String STATE = "char:1209/blade_and_mind";
 
     /**
      * At E6 the kill lengthens it by a turn, so it outlives the tick that would have ended it.

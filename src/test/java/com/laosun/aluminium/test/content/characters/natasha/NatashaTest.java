@@ -697,7 +697,7 @@ public class NatashaTest {
     private static int weakened(Battle battle) {
         int n = 0;
         for (Enemy enemy : battle.enemyUnits()) {
-            if (enemy.getBuffManager().hasState("虚弱")) {
+            if (enemy.getBuffManager().hasState("debuff:weakened")) {
                 n++;
             }
         }

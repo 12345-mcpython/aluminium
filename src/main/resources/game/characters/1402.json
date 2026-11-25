@@ -87,7 +87,7 @@
           "per_stack_live": true,
           "permanent": true,
           "while_state": "char:1402/supreme_posture",
-          "buff": "至高之姿-速度",
+          "buff": "char:1402/supreme_form_speed",
           "target": "self"
         }
       ],
@@ -120,7 +120,7 @@
         {
           "op": "START_COUNTDOWN",
           "speed": 100,
-          "buff": "至高之姿-倒计时"
+          "buff": "char:1402/supreme_form_countdown"
         },
         {
           "op": "ADVANCE",
@@ -383,7 +383,7 @@
           "percent": 0.2,
           "while_state": "char:1402/supreme_posture",
           "permanent": true,
-          "buff": "星魂6-雷穿透",
+          "buff": "char:1402/e6_thunder_pen",
           "target": "self"
         },
         {
@@ -392,7 +392,7 @@
           "percent": 0.2,
           "while_state": "char:1402/supreme_posture",
           "permanent": true,
-          "buff": "星魂6-雷穿透-衣匠",
+          "buff": "char:1402/e6_thunder_pen_garment",
           "target": "summon"
         }
       ],

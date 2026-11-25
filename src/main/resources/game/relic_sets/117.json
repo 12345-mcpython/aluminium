@@ -68,7 +68,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "负面激化",
+          "buff": "relic:117/debuff_amplify",
           "amount": 1,
           "target": "self",
           "turns": 1
@@ -84,7 +84,7 @@
         "actor == self",
         "target_debuff_count >= 2",
         "target_debuff_count < 4",
-        "self_stacks:负面激化 >= 1"
+        "self_stacks:relic:117/debuff_amplify >= 1"
       ],
       "do": [
         {
@@ -105,7 +105,7 @@
       "when": [
         "actor == self",
         "target_debuff_count >= 4",
-        "self_stacks:负面激化 >= 1"
+        "self_stacks:relic:117/debuff_amplify >= 1"
       ],
       "do": [
         {
@@ -126,7 +126,7 @@
       "when": [
         "actor == self",
         "target_debuff_count >= 1",
-        "self_stacks:负面激化 >= 1"
+        "self_stacks:relic:117/debuff_amplify >= 1"
       ],
       "do": [
         {

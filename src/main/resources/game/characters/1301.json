@@ -36,7 +36,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "酩酊",
+          "buff": "char:1301/intoxication",
           "turns": 2,
           "target": "all_enemies"
         },
@@ -45,7 +45,7 @@
           "percent": 0.12,
           "damage_type": "BREAK",
           "turns": 2,
-          "buff": "酩酊",
+          "buff": "char:1301/intoxication",
           "target": "all_enemies"
         },
         {
@@ -64,7 +64,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "酩酊",
+          "buff": "char:1301/intoxication",
           "turns": 2,
           "target": "all_enemies"
         },
@@ -73,7 +73,7 @@
           "percent": 0.12,
           "damage_type": "BREAK",
           "turns": 2,
-          "buff": "酩酊",
+          "buff": "char:1301/intoxication",
           "target": "all_enemies"
         }
       ],
@@ -121,7 +121,7 @@
     {
       "on": "ALLY_ATTACK",
       "when": [
-        "target has_state 酩酊"
+        "target has_state char:1301/intoxication"
       ],
       "do": [
         {
@@ -140,7 +140,7 @@
       "when": [
         "actor == self",
         "from_skill_id == 8",
-        "target has_state 酩酊"
+        "target has_state char:1301/intoxication"
       ],
       "do": [
         {
@@ -245,7 +245,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "酩酊",
+          "buff": "char:1301/intoxication",
           "turns": 3,
           "target": "all_enemies"
         },
@@ -254,7 +254,7 @@
           "percent_from_skill_param": "TALENT:0",
           "damage_type": "BREAK",
           "turns": 3,
-          "buff": "酩酊",
+          "buff": "char:1301/intoxication",
           "target": "all_enemies"
         }
       ],

@@ -135,7 +135,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "败谢",
+          "buff": "char:1321/withering",
           "turns": 3,
           "target": "target"
         }

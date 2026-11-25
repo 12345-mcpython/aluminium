@@ -293,7 +293,7 @@
       "do": [
         {
           "op": "EXTEND_BUFF",
-          "buff": "护盾",
+          "buff": "sys:shield",
           "turns": 1,
           "target": "target"
         }

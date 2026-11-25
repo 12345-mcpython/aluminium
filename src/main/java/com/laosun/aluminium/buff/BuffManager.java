@@ -384,7 +384,7 @@ public class BuffManager {
      * lives here, where it means "the timed shield buff", and the condition DSL keeps its own spelling
      * ({@code has_shield}).
      */
-    public static final String SHIELD_STATE = "护盾";
+    public static final String SHIELD_STATE = "sys:shield";
 
     /**
      * Whether one buff is the one a rule named - by state name (or shield (护盾), the shield state name), or by the attribute a modifier sits on.

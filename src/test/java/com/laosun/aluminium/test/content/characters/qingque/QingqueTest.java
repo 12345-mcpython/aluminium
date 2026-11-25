@@ -85,7 +85,7 @@ public class QingqueTest {
      * The declared resource's value, read through the combatant's own manager.
      */
     private static int tilesOf(Character qingque) {
-        return qingque.getResources().get("琼玉牌").getValue();
+        return qingque.getResources().get("char:1201/jade_tile").getValue();
     }
 
     private static Random fixed() {

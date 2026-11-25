@@ -23,7 +23,7 @@ import java.util.List;
 public class AhaEndExtraTurnTest {
     private static final int OWNER = 1501;
     private static final int ALLY = 1002;
-    private static final String MOMENT = "阿哈时刻";
+    private static final String MOMENT = "elation:aha_instant";
 
     /**
      * Ending the moment owes her an extra turn.

@@ -55,7 +55,7 @@
       "on": "STATE_ENDED",
       "id": "aha_end_extra_turn",
       "when": [
-        "self state_ended 阿哈时刻"
+        "self state_ended elation:aha_instant"
       ],
       "do": [
         {

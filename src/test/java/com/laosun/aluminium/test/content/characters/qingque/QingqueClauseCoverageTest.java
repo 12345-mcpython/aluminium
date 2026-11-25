@@ -61,9 +61,9 @@ public class QingqueClauseCoverageTest {
         JsonObject grant = rule("eidolon4_skill_may_grant_the_unasked_for_state");
         JsonObject use = rule("eidolon4_the_state_adds_a_follow_up");
         return grant.get("chance").getAsDouble() == 0.24
-                && grant.getAsJsonArray("do").toString().contains("不求人")
+                && grant.getAsJsonArray("do").toString().contains("char:1201/self_drawn_tile")
                 && use.get("on").getAsString().equals("ATTACK_FINISHED")
-                && use.getAsJsonArray("when").toString().contains("不求人")
+                && use.getAsJsonArray("when").toString().contains("char:1201/self_drawn_tile")
                 && use.getAsJsonArray("do").toString().contains("COMMON");
     }
 

@@ -27,7 +27,7 @@ import java.util.List;
 public class SpendAllTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1404;
-    private static final String RES = "热意";
+    private static final String RES = "char:1513/heat";
 
     /**
      * The cast spends everything.

@@ -98,7 +98,7 @@ public class GallagherEnhancedAttackTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(gallagher, bystander), List.of(enemy), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
-        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("酩酊", 3));
+        enemy.getBuffManager().addBuff(new com.laosun.aluminium.buff.StateBuff("char:1301/intoxication", 3));
         if (enhanced) {
             // The enhanced basic lives in the COMMON slot only while the Ultimate's swap is on.
             battle.castImmediate(gallagher.getSkills().get(SkillType.ULTRA), gallagher, List.of(enemy));

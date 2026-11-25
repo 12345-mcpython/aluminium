@@ -24,9 +24,9 @@ public class GiftCarriesTheLaughsTest {
     private static final int SPARKLE = 1513;
     private static final int EVANESCIA = 1505;
     private static final int LEVEL = 80;
-    private static final String LAUGHS = "笑点";
-    private static final String GIFT = "好活当赏";
-    private static final String MOMENT = "阿哈时刻";
+    private static final String LAUGHS = "elation:punchline";
+    private static final String GIFT = "elation:certified_banger";
+    private static final String MOMENT = "elation:aha_instant";
 
     /**
      * Four laughs become four instances, and half of them become hers.

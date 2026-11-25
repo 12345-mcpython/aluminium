@@ -34,7 +34,7 @@ public class Relic132ComburentTest {
     private static final int SET = 132;
     /** 1307 Black Swan (黑天鹅): her Skill lowers the target's DEFENCE by 20.8% - the event this set hangs on. */
     private static final int WEARER = 1307;
-    private static final String COMBURENT = "助燃";
+    private static final String COMBURENT = "relic:132/combustion";
 
     /** 「施加防御力降低状态后，使我方全体获得【助燃】…造成的伤害提高 15%」. */
     @Test
@@ -47,10 +47,10 @@ public class Relic132ComburentTest {
         run.lowerDefence();
 
         Assertions.assertTrue(run.wearer.getBuffManager().hasState(COMBURENT),
-                "「使我方全体获得【助燃】」 — the wearer");
+                "「使我方全体获得【relic:132/combustion】」 — the wearer");
         Assertions.assertTrue(run.ally.getBuffManager().hasState(COMBURENT), "and the ally");
         Assertions.assertEquals(0.15, run.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
-                "「持有【助燃】的我方目标造成的伤害提高 15%」");
+                "「持有【relic:132/combustion】的我方目标造成的伤害提高 15%」");
     }
 
     /** The control: an attack that lowers no defence grants nothing. */
@@ -58,7 +58,7 @@ public class Relic132ComburentTest {
     public void anAttackWithoutDefenceReductionGrantsNothing() {
         Run run = new Run();
         run.basicAttack();
-        Assertions.assertFalse(run.ally.getBuffManager().hasState(COMBURENT), "no reduction ⇒ no 【助燃】");
+        Assertions.assertFalse(run.ally.getBuffManager().hasState(COMBURENT), "no reduction ⇒ no 【relic:132/combustion】");
         Assertions.assertEquals(0.0, run.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
                 "and no boost");
     }
@@ -80,7 +80,7 @@ public class Relic132ComburentTest {
         run.lowerDefence();
         run.lowerDefence();
         Assertions.assertEquals(0.15, run.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
-                "a second 【助燃】 does not make it 30%");
+                "a second 【relic:132/combustion】 does not make it 30%");
     }
 
     // ==================================================================

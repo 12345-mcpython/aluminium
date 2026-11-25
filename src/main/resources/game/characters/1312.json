@@ -318,7 +318,7 @@
       "do": [
         {
           "op": "ADD_STACK",
-          "buff": "下个战技返还战技点",
+          "buff": "char:1312/next_skill_refund",
           "max_stacks": 1,
           "permanent": true,
           "target": "self"
@@ -333,7 +333,7 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "self_stacks:下个战技返还战技点 >= 1"
+        "self_stacks:char:1312/next_skill_refund >= 1"
       ],
       "do": [
         {
@@ -342,7 +342,7 @@
         },
         {
           "op": "REMOVE_STACK",
-          "buff": "下个战技返还战技点",
+          "buff": "char:1312/next_skill_refund",
           "amount": 1,
           "target": "self"
         }

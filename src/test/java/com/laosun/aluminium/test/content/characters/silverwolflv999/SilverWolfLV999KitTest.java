@@ -64,7 +64,7 @@ public class SilverWolfLV999KitTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
     private static final int LEVEL = 80;
-    private static final String LAUGH = "笑点";
+    private static final String LAUGH = "elation:punchline";
     private static final String HIDDEN = "char:1506/hidden_score";
     private static final String CHARGES = "internal:1506/enhanced_basic_count";
     private static final String GOD = "char:1506/invincible_player";
@@ -80,7 +80,7 @@ public class SilverWolfLV999KitTest {
      * tell. The audit moved the gate to the resource spelling the corpus already uses (1503's note, 1505's identical
      * clause) and the fixtures now state that premise instead.
      */
-    private static final String GIFT = "好活当赏";
+    private static final String GIFT = "elation:certified_banger";
 
     /**
      * Her Skill gains the 5 笑点 her page states, and her Elation skill gains 15 隐藏分: the two resource clauses her two
@@ -97,7 +97,7 @@ public class SilverWolfLV999KitTest {
         fireElationSkill(battle, wolf);
         int afterElation = wolf.getResources().value(HIDDEN);
         int hiddenGained = afterElation - afterSkill;
-        System.out.println("[1506] the Skill gained " + laughsGained + " 笑点 ; char:1506/hidden_score after the Skill " + afterSkill
+        System.out.println("[1506] the Skill gained " + laughsGained + " elation:punchline ; char:1506/hidden_score after the Skill " + afterSkill
                 + " ; after the Elation skill " + afterElation);
         Assertions.assertAll(
                 () -> Assertions.assertEquals(5, laughsGained, "战技: 「获得 5 个笑点」"),
@@ -336,9 +336,9 @@ public class SilverWolfLV999KitTest {
         System.out.println("[1506] " + label + ": " + without + " -> " + with + " ; delta " + (with - without)
                 + " ; expected the talent row's " + riderShare + " of the same attack (row " + row + ", boosts " + boosts
                 + ", laughs x" + laughs + ") = " + expected);
-        Assertions.assertTrue(with > without, label + " pays the rider while she holds 【好活当赏】");
+        Assertions.assertTrue(with > without, label + " pays the rider while she holds 【elation:certified_banger】");
         Assertions.assertEquals(expected, with - without, 1e-6,
-                label + " pays exactly the talent row's share of her ATTACK folded by 欢愉度/增笑/计入的笑点, settled "
+                label + " pays exactly the talent row's share of her ATTACK folded by elation:elation_degree/增笑/计入的笑点, settled "
                         + "through the same zones");
     }
 

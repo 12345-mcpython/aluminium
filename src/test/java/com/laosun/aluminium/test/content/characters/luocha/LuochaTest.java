@@ -48,12 +48,12 @@ public class LuochaTest {
     @Test
     public void hisSkillAddsOneAbyssFlowerStack() {
         SkillFixture f = new SkillFixture();
-        Assertions.assertEquals(0, f.luocha.getBuffManager().stacksOf("白花之刻"), "precondition: no stacks");
+        Assertions.assertEquals(0, f.luocha.getBuffManager().stacksOf("char:1203/white_flower_moment"), "precondition: no stacks");
 
         f.battle.castImmediate(f.luocha.getSkills().get(SkillType.SKILL), f.luocha, List.of(f.ally));
 
-        Assertions.assertEquals(1, f.luocha.getBuffManager().stacksOf("白花之刻"),
-                "「并使罗刹获得1层【白花之刻】」 (and Luocha (罗刹) gains 1 stack of Abyss Flower (【白花之刻】))");
+        Assertions.assertEquals(1, f.luocha.getBuffManager().stacksOf("char:1203/white_flower_moment"),
+                "「并使罗刹获得1层【char:1203/white_flower_moment】」 (and Luocha (罗刹) gains 1 stack of Abyss Flower (【char:1203/white_flower_moment】))");
     }
 
     private static final class SkillFixture {
@@ -99,7 +99,7 @@ public class LuochaTest {
         // reads 0 and the field is already up by the time this call returns.
         f.castSkill();
         Assertions.assertEquals(0, f.stacks(),
-                "「达到2层时，罗刹会消耗全部【白花之刻】」 -- the two stacks are spent");
+                "「达到2层时，罗刹会消耗全部【char:1203/white_flower_moment】」 -- the two stacks are spent");
         Assertions.assertTrue(f.fieldUp(), "and that is what opens the field");
     }
 
@@ -211,7 +211,7 @@ public class LuochaTest {
         }
 
         int stacks() {
-            return luocha.getBuffManager().stacksOf("白花之刻");
+            return luocha.getBuffManager().stacksOf("char:1203/white_flower_moment");
         }
 
         /**

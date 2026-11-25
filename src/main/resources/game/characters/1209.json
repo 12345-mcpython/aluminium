@@ -35,7 +35,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "智剑连心",
+          "buff": "char:1209/blade_and_mind",
           "turns": 1,
           "target": "self"
         },
@@ -46,7 +46,7 @@
           "turns": 1,
           "target": "self",
           "max_stacks": 2,
-          "while_state": "智剑连心"
+          "while_state": "char:1209/blade_and_mind"
         },
         {
           "op": "MODIFY_ATTR",
@@ -54,7 +54,7 @@
           "percent": 0.3,
           "turns": 1,
           "target": "self",
-          "while_state": "智剑连心"
+          "while_state": "char:1209/blade_and_mind"
         }
       ],
       "source": "1209 彦卿 战技 遥击三尺水 (120902, BPSkill/SingleAttack): 「对指定敌方单体造成等同于彦卿220%攻击力的冰属性伤害，并为彦卿附加【智剑连心】，持续1回合。」",
@@ -73,7 +73,7 @@
           "turns": 1,
           "target": "self",
           "max_stacks": 2,
-          "buff": "终结技增益",
+          "buff": "char:1209/ult_buff",
           "percent_from_skill_param": "TALENT:2"
         }
       ],
@@ -85,7 +85,7 @@
       "id": "ult_extra_crit_damage_when_synced",
       "when": [
         "actor == self",
-        "self has_state 智剑连心"
+        "self has_state char:1209/blade_and_mind"
       ],
       "do": [
         {
@@ -93,7 +93,7 @@
           "attribute": "CRIT_ATTACK",
           "turns": 1,
           "target": "self",
-          "buff": "终结技增益",
+          "buff": "char:1209/ult_buff",
           "percent_from_skill_param": "ULTRA:1"
         }
       ],
@@ -143,12 +143,12 @@
       "min_eidolon": 6,
       "when": [
         "actor == self",
-        "self has_state 智剑连心"
+        "self has_state char:1209/blade_and_mind"
       ],
       "do": [
         {
           "op": "EXTEND_BUFF",
-          "buff": "智剑连心",
+          "buff": "char:1209/blade_and_mind",
           "turns": 1,
           "target": "self"
         }
@@ -166,7 +166,7 @@
       "do": [
         {
           "op": "EXTEND_BUFF",
-          "buff": "终结技增益",
+          "buff": "char:1209/ult_buff",
           "turns": 1,
           "target": "self"
         }
@@ -223,7 +223,7 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "御剑真诀",
+          "buff": "char:1209/sword_art",
           "turns": 2,
           "target": "self"
         }
@@ -236,7 +236,7 @@
       "id": "technique_bonus_against_healthy_targets",
       "when": [
         "actor == self",
-        "self has_state 御剑真诀",
+        "self has_state char:1209/sword_art",
         "target_hp_percent >= 0.5"
       ],
       "do": [
@@ -259,7 +259,7 @@
         {
           "op": "REMOVE_STATE",
           "target": "self",
-          "buff": "智剑连心"
+          "buff": "char:1209/blade_and_mind"
         }
       ],
       "on": "TAKING_HIT"

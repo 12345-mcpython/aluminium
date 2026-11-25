@@ -57,7 +57,7 @@ public class March7thHuntTest {
         // 1) an ordinary ally attack: nobody is the Shifu yet, so nothing is granted
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(start, chargeOf(march),
-                "「【师父】施放攻击」 (the Shifu casts an attack) -- before the Skill, no ally is the Shifu");
+                "「【char:1224/master】施放攻击」 (the Shifu casts an attack) -- before the Skill, no ally is the Shifu");
 
         // 2) her own basic attack: +1
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, march, enemy, 0, 0));
@@ -66,12 +66,12 @@ public class March7thHuntTest {
 
         // 3) mark the ally as the Shifu, then their attack: +1 again
         battle.castImmediate(march.getSkills().get(SkillType.SKILL), march, List.of(ally));
-        Assertions.assertTrue(ally.getBuffManager().hasState("师父"),
-                "「使除自身以外的我方指定单体成为【师父】」 (make a designated single ally other than herself the Shifu)");
+        Assertions.assertTrue(ally.getBuffManager().hasState("char:1224/master"),
+                "「使除自身以外的我方指定单体成为【char:1224/master】」 (make a designated single ally other than herself the Shifu)");
         int beforeShifu = chargeOf(march);
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(beforeShifu + 1, chargeOf(march),
-                "「【师父】施放攻击后，三月七每次获得最多1点充能」 (after the Shifu attacks, March 7th gains at most 1 point of charge each time)");
+                "「【char:1224/master】施放攻击后，三月七每次获得最多1点充能」 (after the Shifu attacks, March 7th gains at most 1 point of charge each time)");
     }
 
     /**

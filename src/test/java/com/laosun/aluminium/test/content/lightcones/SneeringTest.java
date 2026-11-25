@@ -31,7 +31,7 @@ public class SneeringTest {
     private static final int LEVEL = 80;
     /** 1513 Aventurine · Waveflair (砂金•戏浪): the one character whose kit raises 阿哈时刻, so the state really appears. */
     private static final int WEARER = 1513;
-    private static final String MOMENT = "阿哈时刻";
+    private static final String MOMENT = "elation:aha_instant";
 
     /** 「发动时」: casting an Elation skill raises the wearer's Elation by the cone's share. */
     @Test
@@ -46,7 +46,7 @@ public class SneeringTest {
     public void theElationIsBackToTheCharactersOwnWhenTheMomentEnds() {
         Run withCone = new Run(1);
         withCone.castElationSkill();
-        Assertions.assertTrue(withCone.moment(), "precondition: the cast put her inside 阿哈时刻");
+        Assertions.assertTrue(withCone.moment(), "precondition: the cast put her inside elation:aha_instant");
         double inside = withCone.elation();
 
         withCone.endTheMoment();
