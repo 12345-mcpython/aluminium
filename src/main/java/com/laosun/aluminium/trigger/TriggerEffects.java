@@ -575,56 +575,60 @@ final class TriggerEffects {
      *               {@code target})
      * @param ctx    the context
      */
-    static void applyState(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        boolean permanent = TriggerLifetimes.unticked(effect);
-        int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+    static void applyState(OpContext ctx, ApplyBuffArgs args) {
+        boolean permanent = args.permanent();
+        int turns = args.turns();
         // 「植入 1 个随机【缺陷】」: one name out of the list, chosen with the battle's RNG (same source as every other
         // random pick, so a seeded battle replays identically).
         String state;
-        if (effect.getRandomOf() != null && !effect.getRandomOf().isEmpty()) {
-            java.util.List<String> names = effect.getRandomOf();
-            java.util.Random rng = battle == null ? null : battle.getRng();
+        if (args.randomOf() != null && !args.randomOf().isEmpty()) {
+            java.util.List<String> names = args.randomOf();
+            java.util.Random rng = ctx.battle() == null ? null : ctx.rng();
             state = names.get(rng == null ? 0 : rng.nextInt(names.size())).trim();
         } else {
-            state = effect.getBuff().trim();
+            state = args.stateName().trim();
         }
         // How many instances this application carries (reader: 1513's reward, whose state's INSTANCE COUNT is
         // the [符点] it spent). A plain state refreshes on re-application, so only a STACKABLE one is repeated --
         // otherwise the loop would be a no-op dressed as a feature.
         int times = 1;
-        if (Boolean.TRUE.equals(effect.getStackable())) {
-            if (effect.getScale() != null && effect.getScale().trim().startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX)) {
-                times = Math.max(1, (int) Math.round(TriggerMagnitudes.resolveScale(effect.getScale(),
-                        effect.getPercent() == null ? 1 : effect.getPercent(), ctx)));
-            } else if (effect.getAmount() != null) {
-                times = Math.max(1, (int) Math.round(effect.getAmount()));
+        if (args.stackable()) {
+            Magnitude magnitude = args.magnitude();
+            if (magnitude.getScale() != null
+                    && magnitude.getScale().trim().startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX)) {
+                times = Math.max(1, (int) Math.round(TriggerMagnitudes.resolveScale(magnitude.getScale(),
+                        magnitude.getPercent() == null ? 1 : magnitude.getPercent(), ctx.firing())));
+            } else if (magnitude.getAmount() != null) {
+                times = Math.max(1, (int) Math.round(magnitude.getAmount()));
             }
         }
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        for (CanHit target : ctx.targets()) {
             for (int instance = 0; instance < times; instance++) {
                 AbstractBuff buff = TriggerInterpreter.withSource(TriggerLifetimes.withTickOwner(
-                        TriggerLifetimes.withLifetime(Boolean.TRUE.equals(effect.getStackable())
+                        TriggerLifetimes.withLifetime(args.stackable()
                                 ? new StackableStateBuff(state, turns, permanent,
-                                effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
-                                : Boolean.TRUE.equals(effect.getDefersDeath())
+                                args.maxStacks() == null ? 1 : args.maxStacks())
+                                : args.defersDeath()
                                 ? new DeferredDeathBuff(state, turns, permanent)
-                                : new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
+                                : new StateBuff(state, turns, permanent), ctx.effect()),
+                        ctx.effect(), ctx.firing()), ctx.firing());
                 // "will not enter its own turn" rides on the state itself: a turn is not something a state could give back
                 // later, so the flag and the state share one lifetime by construction.
-                if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
+                if (args.suspendsTurns()) {
                     buff.setSuspendsTurns(true);
                 }
                 // 「无法使其他友方目标获得行动提前效果」: the state carries the ban, and the ADVANCE op reads it. Parsed
                 // here so a misspelling is a load-time refusal instead of a ban that silently does nothing.
-                if (effect.getBlocks() != null && !effect.getBlocks().isBlank()) {
-                    buff.setBlocks(blocksOf(effect));
+                if (args.blocks() != null && !args.blocks().isBlank()) {
+                    buff.setBlocks(blocksOf(args.blocks()));
                 }
                 // 「【奥迹】… 也会被视为陷入了风化状态」: the state also answers to other names while it lasts (see
                 // AbstractBuff#countsAs). Stamped on the instance, so spending its last layer stops the aliases too.
-                stampCountsAs(effect, buff);
-                // "with a 100% base chance, make the enemy ... enter the [通解] state": when the rule states one, the state is ROLLED (effect resistance
-                // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
-                TriggerInterpreter.attachRolled(battle, target, buff, effect, ctx);
+                stampCountsAs(args.countsAs(), args.countsAsRequires(), buff);
+                // "with a 100% base chance, make the enemy ... enter the [通解] state": when the rule states one, the state
+                // is ROLLED (effect resistance included); when it states none, this is the plain attach it has always
+                // been -- so no existing file changes.
+                TriggerInterpreter.attachRolled(ctx.battle(), target, buff, args.magnitude(), ctx.firing());
             }
         }
     }
@@ -640,11 +644,11 @@ final class TriggerEffects {
      * @param effect  the effect that created the buff
      * @param created the buff it created
      */
-    private static void stampCountsAs(EffectSpec effect, AbstractBuff created) {
-        if (effect.getCountsAs() == null || effect.getCountsAs().isEmpty()) {
+    private static void stampCountsAs(java.util.List<String> countsAs, String requires, AbstractBuff created) {
+        if (countsAs == null || countsAs.isEmpty()) {
             return;
         }
-        created.setCountsAs(effect.getCountsAs(), effect.getCountsAsRequires());
+        created.setCountsAs(countsAs, requires);
     }
 
     /**
@@ -654,9 +658,9 @@ final class TriggerEffects {
      * @param effect the applying effect
      * @return the parsed set
      */
-    private static java.util.Set<String> blocksOf(EffectSpec effect) {
+    private static java.util.Set<String> blocksOf(String blocks) {
         java.util.Set<String> parsed = new java.util.LinkedHashSet<>();
-        for (String raw : effect.getBlocks().split(",")) {
+        for (String raw : blocks.split(",")) {
             String word = raw.trim();
             if (word.isEmpty()) {
                 continue;
@@ -810,7 +814,7 @@ final class TriggerEffects {
                                         effect),
                                 effect, ctx),
                         ctx);
-                stampCountsAs(effect, stack);
+                stampCountsAs(effect.getCountsAs(), effect.getCountsAsRequires(), stack);
                 // Note: A counter may also be ROLLED - 「有 65% 的基础概率使目标陷入 1 层【奥迹】」 (1307) and cone 23035's
                 // 「100% 的基础概率」. Until 2026-11-04 this line was a plain `addBuff`, so `base_chance` on ADD_STACK was
                 // accepted by the loader and then ignored: the layer landed every time. Measured: 5 cone files and 1307

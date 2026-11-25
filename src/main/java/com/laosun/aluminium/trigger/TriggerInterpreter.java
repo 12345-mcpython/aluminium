@@ -1659,7 +1659,7 @@ public final class TriggerInterpreter {
      *
      * @return {@code true} when the state was attached (or when the rule stated no chance at all)
      */
-    static boolean attachRolled(BattlePort battle, CanHit target, AbstractBuff buff, EffectSpec effect,
+    static boolean attachRolled(BattlePort battle, CanHit target, AbstractBuff buff, Magnitude effect,
                                 TriggerContext ctx) {
         Double statedChance = TriggerMagnitudes.baseChanceOf(effect, ctx);
         if (statedChance == null) {
