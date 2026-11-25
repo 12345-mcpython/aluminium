@@ -10,7 +10,7 @@ import com.laosun.aluminium.entity.CanHit;
  * <p>The unit measured is the one that <b>receives</b>, not the rule's owner: an effect may grant to somebody else, and
  * measuring the owner read 0 on both sides for a teammate's counter.
  */
-final class GainResourceOp implements OpHandler<OpArgs> {
+final class GainResourceOp implements OpHandler<ResourceMoveArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,21 +18,34 @@ final class GainResourceOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ResourceMoveArgs parse(EffectSpec effect) {
+        return new ResourceMoveArgs(
+                effect.getResource() == null ? "" : effect.getResource().trim(),
+                effect,
+                Boolean.TRUE.equals(effect.getSpendAll()),
+                Boolean.TRUE.equals(effect.getOverflowOnly()),
+                Boolean.TRUE.equals(effect.getToMax()),
+                effect.getMaxPerRound(),
+                effect.getAmountFromPrevious(),
+                effect.getAmountFromEvent(),
+                effect.getAmountFromResource(),
+                effect.getAmountFromAttr(),
+                effect.getAmountPercent(),
+                effect.getAmountPercentFromResource(),
+                effect.getAmountCap());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ResourceMoveArgs args, EffectSpec effect, TriggerSpec rule) {
         TriggerValidator.requireResourceMovement(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
+    public void apply(OpContext ctx, ResourceMoveArgs args) {
         CanHit mover = ctx.target();
-        String movedId = ctx.effect().getResource();
+        String movedId = args.resource();
         int before = TriggerInterpreter.resourceAmount(ctx.battle(), mover, movedId);
-        TriggerInterpreter.gainResource(ctx.effect(), ctx.firing(), ctx.previousCredited(), mover);
+        TriggerInterpreter.gainResource(args, args.magnitude(), ctx.firing(), ctx.previousCredited(), mover);
         TriggerInterpreter.fireResourceChanged(ctx.battle(), ctx.firing(), mover, movedId,
                 TriggerInterpreter.resourceAmount(ctx.battle(), mover, movedId) - before);
     }

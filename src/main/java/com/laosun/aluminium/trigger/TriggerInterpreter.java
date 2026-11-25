@@ -756,7 +756,7 @@ public final class TriggerInterpreter {
      * @param effect the effect to inspect
      * @return {@code true} when the amount is read from the producing skill's parameter table
      */
-    static boolean isCastParamScale(EffectSpec effect) {
+    static boolean isCastParamScale(Magnitude effect) {
         return effect.getScale() != null
                 && effect.getScale().trim().startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX);
     }
@@ -856,12 +856,13 @@ public final class TriggerInterpreter {
     /**
      * The share of the EVENT's magnitude: a literal `amount_percent`, or basis points carried in a resource.
      */
-    private static double eventShare(EffectSpec effect, TriggerContext ctx) {
-        if (effect.getAmountPercentFromResource() != null) {
-            com.laosun.aluminium.entity.Character holder = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
-            return holder.getResources().value(effect.getAmountPercentFromResource().trim()) / 10000.0;
+    private static double eventShare(ResourceMoveArgs args, TriggerContext ctx) {
+        if (args.amountPercentFromResource() != null) {
+            com.laosun.aluminium.entity.Character holder =
+                    TriggerMagnitudes.requireCharacterOwner(args.magnitude(), ctx);
+            return holder.getResources().value(args.amountPercentFromResource().trim()) / 10000.0;
         }
-        return effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
+        return args.amountPercent() == null ? 1 : args.amountPercent();
     }
 
 
@@ -893,61 +894,59 @@ public final class TriggerInterpreter {
 
 
 
-    private static void gainResource(EffectSpec effect, TriggerContext ctx,
-                                     double previousCredited) {
-        gainResource(effect, ctx, previousCredited, TriggerTargets.resolveTarget(effect, ctx));
-    }
 
     /**
      * The same, told which unit receives: the caller has already resolved it, and it announces on the same one.
      */
-    static void gainResource(EffectSpec effect, TriggerContext ctx, double previousCredited, CanHit holder) {
+    static void gainResource(ResourceMoveArgs args, Magnitude magnitude, TriggerContext ctx, double previousCredited, CanHit holder) {
         // A gain whose amount is a SHARE of an attribute (reader: 1505's talent "gain an Elation degree equal to
         // 50% of CRIT DMG"). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
         // this method has resolved. Unknown attribute names are refused loudly rather than silently adding zero.
         int amount;
-        if (Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
+        if (Boolean.TRUE.equals(args.amountFromPrevious())) {
             // 1505's Eidolon "additionally gain 50%/100% of the [好活当赏] gained this time".
             // It takes the credited amount of the previous effect after the cap has truncated it.
             amount = (int) Math.round(previousCredited
-                    * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
-        } else if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
-            // The event's own magnitude: "when energy is gained, an equal amount of [好活当赏] is gained at the same time" is exactly this -- the
-            // amount is not a literal and not an attribute, it is what the trigger just reported.
-            amount = (int) Math.round(ctx.amount() * eventShare(effect, ctx));
-        } else if (effect.getAmountFromResource() != null) {
-            // The amount IS a resource's value: a number captured while an ode was cast, handed over when the character later casts.
-            com.laosun.aluminium.entity.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
-            amount = owner.getResources().value(effect.getAmountFromResource().trim());
-        } else if (isCastParamScale(effect)) {
-            //  x percent: the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
-            amount = (int) Math.round(TriggerMagnitudes.castParamValue(effect, ctx,
-                    effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()))
-                    * (effect.getPercent() == null ? 1 : effect.getPercent()));
-        } else if (effect.getAmountFromAttr() == null) {
-            amount = (int) Math.round(scaledAmount(effect, ctx));
+                    * (args.amountPercent() == null ? 1 : args.amountPercent()));
+        } else if (Boolean.TRUE.equals(args.amountFromEvent())) {
+            // The event's own magnitude: "when energy is gained, an equal amount of [好活当赏] is gained at the same
+            // time" is exactly this -- the amount is not a literal and not an attribute, it is what the trigger reported.
+            amount = (int) Math.round(ctx.amount() * eventShare(args, ctx));
+        } else if (args.amountFromResource() != null) {
+            // The amount IS a resource's value: a number captured while an ode was cast, handed over when the character
+            // later casts.
+            com.laosun.aluminium.entity.Character owner =
+                    TriggerMagnitudes.requireCharacterOwner(magnitude, ctx);
+            amount = owner.getResources().value(args.amountFromResource().trim());
+        } else if (isCastParamScale(magnitude)) {
+            //  x percent: the share is usually BELOW 1 and a resource holds an integer, so content stores basis points.
+            amount = (int) Math.round(TriggerMagnitudes.castParamValue(magnitude, ctx,
+                    magnitude.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()))
+                    * (magnitude.getPercent() == null ? 1 : magnitude.getPercent()));
+        } else if (args.amountFromAttr() == null) {
+            amount = (int) Math.round(scaledAmount(magnitude, ctx));
         } else {
-            AttributeType attribute = AttributeType.fromString(effect.getAmountFromAttr());
-            double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
+            AttributeType attribute = AttributeType.fromString(args.amountFromAttr());
+            double share = args.amountPercent() == null ? 1 : args.amountPercent();
             amount = (int) Math.round(holder.getAttribute(attribute).get() * share);
         }
         // A single conversion may be capped (reader: 1505's "a single time ... no more than 100 points"). The clamp is the LAST
         // thing that happens, so it bounds whichever source answered -- a literal, an attribute share or the event's own magnitude.
-        if (effect.getAmountCap() != null) {
-            amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
+        if (args.amountCap() != null) {
+            amount = (int) Math.min(amount, Math.round(args.amountCap()));
         }
-        com.laosun.aluminium.state.Resource party = partyCounterOrNull(ctx, holder, effect.getResource());
+        com.laosun.aluminium.state.Resource party = partyCounterOrNull(ctx, holder, args.resource());
         // `to_max`: the counter is raised to its ceiling, so the amount becomes "however much it is short". Reader: 1503
         // Pearl (真珠)'s 充能 - the counter IS 【深度学习】's duration, so re-entering the state restores the FULL three
         // rather than adding three to the remainder. Note it is measured against the counter's MAXIMUM and not its
         // overflow ceiling: a plain gain on a counter that HAS an overflow allowance pours the spare on top, and the
         // state would then outlast the document by a use.
-        if (Boolean.TRUE.equals(effect.getToMax())) {
+        if (args.toMax()) {
             com.laosun.aluminium.state.Resource counter = party != null ? party
-                    : holder.getResources().get(effect.getResource());
+                    : holder.getResources().get(args.resource());
             if (counter == null) {
                 throw new IllegalStateException("GAIN_RESOURCE to_max names the resource '"
-                        + effect.getResource() + "', which neither " + holder.getName()
+                        + args.resource() + "', which neither " + holder.getName()
                         + " declares nor the battle holds as a party counter");
             }
             amount = Math.min(amount, counter.missingToMax());
@@ -958,12 +957,12 @@ public final class TriggerInterpreter {
         // "5 points per ally turn, at most 50 in a round, reset when Pearl's own turn begins": a per-ROUND allowance
         // rather than a cap on the counter, so the amount is bounded by what the round has left before anything is
         // credited. Note: It is read from the RULE OWNER (`ctx.owner()`), not from the holder: the allowance belongs to
-        // whoever the rule is about, which is the same unit the counters are hers (measured: the trace's own wording
-        // makes the reset Pearl's turn, and the gaining rule fires on her allies' turns).
+        // whoever the rule is about (measured: the trace's own wording makes the reset Pearl's turn, and the gaining
+        // rule fires on her allies' turns).
         CanHit allowanceOwner = ctx.owner() == null ? holder : ctx.owner();
-        if (effect.getMaxPerRound() != null && allowanceOwner != null) {
-            int already = allowanceOwner.getResources().gainedThisRound(effect.getResource());
-            int allowance = (int) Math.round(effect.getMaxPerRound());
+        if (args.maxPerRound() != null && allowanceOwner != null) {
+            int already = allowanceOwner.getResources().gainedThisRound(args.resource());
+            int allowance = (int) Math.round(args.maxPerRound());
             amount = Math.clamp(allowance - already, 0, amount);
             if (amount <= 0) {
                 return;
@@ -971,32 +970,31 @@ public final class TriggerInterpreter {
         }
         // The battle's SKILL POINTS: a counter the battle owns outright (`Battle.getSkillPointPolicy()`), not a
         // `Resource`, so `partyCounterOrNull` cannot answer with it and this is where a rule reaches it. Reader:
-        // 1506 Silver Wolf
-        // LV.999's 【头号补给盲盒】 - 「【爆爆爆炸蛋】：恢复 2 个战技点」 - which is one of the three effects that rule picks
-        // between. Measured: nothing anywhere gained or spent 战技点 before this, so the name had no readout at all.
-        if (SKILL_POINT.equals(effect.getResource()) && ctx.battle() != null) {
+        // 1506 Silver Wolf LV.999's 【头号补给盲盒】 - 「【爆爆爆炸蛋】：恢复 2 个战技点」. Measured: nothing anywhere
+        // gained or spent 战技点 before this, so the name had no readout at all.
+        if (SKILL_POINT.equals(args.resource()) && ctx.battle() != null) {
             ctx.battle().getSkillPointPolicy().gain(amount);
             return;
         }
         // A PARTY-scoped counter has no home on the unit: the battle owns it, so any ally may add to it.
         if (party != null) {
             int credited = party.gain(amount);
-            if (effect.getMaxPerRound() != null) {
-                allowanceOwner.getResources().countGainThisRound(effect.getResource(), credited);
+            if (args.maxPerRound() != null) {
+                allowanceOwner.getResources().countGainThisRound(args.resource(), credited);
             }
             // Note: The state is granted to the HOLDER either way - a party counter still means "this unit received
             // 【好活当赏】" - so the count is taken here too. Measured: a holder that does not declare the counter itself
             // took no snapshot at all, which read as "the second holder's count is 0".
-            noteElationGiftIfThisIsOne(ctx, effect, holder, credited);
+            noteElationGiftIfThisIsOne(ctx, args.resource(), holder, credited);
             return;
         }
-        int credited = holder.getResources().gain(effect.getResource(), amount);
-        if (effect.getMaxPerRound() != null && allowanceOwner != null) {
+        int credited = holder.getResources().gain(args.resource(), amount);
+        if (args.maxPerRound() != null && allowanceOwner != null) {
             // The CREDITED amount, not the amount asked for: a gain truncated by the counter's own cap must not spend
             // the round's allowance on points it never delivered.
-            allowanceOwner.getResources().countGainThisRound(effect.getResource(), credited);
+            allowanceOwner.getResources().countGainThisRound(args.resource(), credited);
         }
-        noteElationGiftIfThisIsOne(ctx, effect, holder, credited);
+        noteElationGiftIfThisIsOne(ctx, args.resource(), holder, credited);
     }
 
     /**
@@ -1021,9 +1019,9 @@ public final class TriggerInterpreter {
      * <p>Note: Only on a gain that actually CREDITED something. A grant truncated to nothing (a counter already at its
      * cap) did not hand the unit the count, and freezing a snapshot for it would invent one.
      */
-    private static void noteElationGiftIfThisIsOne(TriggerContext ctx, EffectSpec effect, CanHit holder,
+    private static void noteElationGiftIfThisIsOne(TriggerContext ctx, String resource, CanHit holder,
                                                    int credited) {
-        if (ctx.battle() == null || credited <= 0 || !ELATION_GIFT.equals(effect.getResource())) {
+        if (ctx.battle() == null || credited <= 0 || !ELATION_GIFT.equals(resource)) {
             return;
         }
         ctx.battle().noteElationGift(holder, ELATION_GIFT_TURNS);
@@ -1048,35 +1046,13 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Takes an amount back off a counter, keeping whatever is left when the counter cannot cover it.
-     *
-     * <p>This is the inverse of {@code GAIN_RESOURCE} for a grant that is explicitly temporary: 1503 Pearl (真珠)'s
-     * ultimate pays the archetype 30 好活当赏 and 60 笑点 for its extra turn and says 「额外回合结束时移除」.
-     *
-     * <p>⚠ <b>Why not {@code SPEND_RESOURCE}.</b> That op is deliberately strict - a spend the author believed would
-     * fit is an error when it does not - and it is the right reading for a COST. A revocation is not a cost: the pool
-     * may legitimately have less by then, because the whole point of this counter is that it gets CONSUMED (Pearl's own
-     * talent spends it as 抵御值). So this clamps: it removes what is there, up to the stated amount, and never fails.
-     *
-     * <p>⚠ <b>What this does NOT do, and why it does not matter here.</b> It removes from the CURRENT value, so a
-     * grant that was spent and then re-earned within the extra turn takes the re-earned points too. Making it
-     * exact would need the grant to be tracked as a separate lot, and the sentence's numbers are fixed and paired
-     * (30 and 60 granted, 30 and 60 removed at the end of the same turn), so there is nothing to track.
-     *
-     * @return how much was actually taken back (0 when there was nothing left)
-     */
-    private static int removeResource(EffectSpec effect, TriggerContext ctx) {
-        return removeResource(effect, ctx, TriggerTargets.resolveTarget(effect, ctx));
-    }
-
-    /**
      * The same, told which unit's store gives the points back: the caller has already resolved it.
      */
-    static int removeResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
-        String id = effect.getResource();
-        int asked = percentOfOwnCounter(effect, ctx);
+    static int removeResource(ResourceMoveArgs args, Magnitude magnitude, TriggerContext ctx, CanHit holder) {
+        String id = args.resource();
+        int asked = percentOfOwnCounter(magnitude, ctx);
         if (asked <= 0) {
-            asked = (int) Math.round(scaledAmount(effect, ctx));
+            asked = (int) Math.round(scaledAmount(magnitude, ctx));
         }
         if (asked <= 0) {
             return 0;
@@ -1094,36 +1070,24 @@ public final class TriggerInterpreter {
         return holder.getResources().spend(id, asked);
     }
 
-    /**
-     * Spends from the target's resource.
-     *
-     * <p>A spend that does not fit is an <b>error</b>, not a silent no-op: unlike skill points (where
-     * "not enough" legitimately means "the player cannot press the button"), a trigger spending a
-     * resource is a rule the author wrote believing the resource would be there. Reporting it beats
-     * letting a character's stack quietly fail to be consumed.
-     *
-     * @throws IllegalStateException when the resource is missing or does not hold enough
-     */
-    private static void spendResource(EffectSpec effect, TriggerContext ctx) {
-        spendResource(effect, ctx, TriggerTargets.resolveTarget(effect, ctx));
-    }
 
     /**
      * The same, told which unit's store pays: the caller has already resolved it (see the SPEND_RESOURCE arm).
      */
-    static void spendResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
-        String id = effect.getResource();
+    static void spendResource(ResourceMoveArgs args, Magnitude magnitude, TriggerContext ctx, CanHit holder) {
+        String id = args.resource();
         // A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
-        // battle-level one -- measured: [笑点] is declared `scope: PARTY` ("Punchline (笑点) is shared by the whole team", glossary 1000002) and the holder's
-        // own Resources does not have it, so "Aha consumes all 笑点 after acting" (10000026) could not be written at all.
+        // battle-level one -- measured: [笑点] is declared `scope: PARTY` ("Punchline (笑点) is shared by the whole team")
+        // and the holder's own Resources does not have it, so "Aha consumes all 笑点 after acting" could not be written.
         com.laosun.aluminium.state.Resource partyCounter = partyCounterOrNull(ctx, holder, id);
         if (partyCounter != null) {
-            // "consume all overflow" is the tier ABOVE the cap (reader: 114151) -- neither `spendAll` (everything) nor a stated amount says it.
-            int spend = Boolean.TRUE.equals(effect.getOverflowOnly())
+            // "consume all overflow" is the tier ABOVE the cap (reader: 114151) -- neither `spendAll` (everything) nor a
+            // stated amount says it.
+            int spend = args.overflowOnly()
                     ? Math.max(0, partyCounter.value() - partyCounter.getMax())
-                    : Boolean.TRUE.equals(effect.getSpendAll())
+                    : args.spendAll()
                     ? partyCounter.value()
-                    : (int) Math.round(scaledAmount(effect, ctx));
+                    : (int) Math.round(scaledAmount(magnitude, ctx));
             if (!partyCounter.spendExactly(spend)) {
                 throw new IllegalStateException(
                         "SPEND_RESOURCE '" + id + "' needs " + spend + " but the party has only "
@@ -1131,15 +1095,15 @@ public final class TriggerInterpreter {
             }
             return;
         }
-        // "consume all [X]": the size is whatever is there; the "not enough"
-        // failure below cannot happen for it, which is why the two spellings are kept apart.
-        int amount = Boolean.TRUE.equals(effect.getOverflowOnly())
+        // "consume all [X]": the size is whatever is there; the "not enough" failure below cannot happen for it, which is
+        // why the two spellings are kept apart.
+        int amount = args.overflowOnly()
                 ? (holder.getResources().has(id)
                 ? Math.max(0, holder.getResources().value(id) - holder.getResources().get(id).getMax())
                 : 0)
-                : Boolean.TRUE.equals(effect.getSpendAll())
+                : args.spendAll()
                 ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)
-                : (int) Math.round(scaledAmount(effect, ctx));
+                : (int) Math.round(scaledAmount(magnitude, ctx));
         if (!holder.getResources().has(id)) {
             throw new IllegalStateException(
                     "SPEND_RESOURCE '" + id + "' but " + holder.getName() + " has no such resource");
@@ -1209,7 +1173,7 @@ public final class TriggerInterpreter {
      *
      * @return the points to take back, or {@code -1} when this effect is not spelled that way
      */
-    private static int percentOfOwnCounter(EffectSpec effect, TriggerContext ctx) {
+    private static int percentOfOwnCounter(Magnitude effect, TriggerContext ctx) {
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
         if (!scale.startsWith(SELF_RESOURCE_PREFIX)) {
             return -1;

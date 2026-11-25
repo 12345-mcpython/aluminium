@@ -11,7 +11,7 @@ import com.laosun.aluminium.entity.CanHit;
  * stated amount removes what is there instead of erroring. It may also name a <b>share</b> of one of the owner's own
  * counters ({@code scale: self_resource:<id>} + {@code percent}) instead of a flat amount.
  */
-final class RemoveResourceOp implements OpHandler<OpArgs> {
+final class RemoveResourceOp implements OpHandler<ResourceMoveArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,20 +19,33 @@ final class RemoveResourceOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ResourceMoveArgs parse(EffectSpec effect) {
+        return new ResourceMoveArgs(
+                effect.getResource() == null ? "" : effect.getResource().trim(),
+                effect,
+                Boolean.TRUE.equals(effect.getSpendAll()),
+                Boolean.TRUE.equals(effect.getOverflowOnly()),
+                Boolean.TRUE.equals(effect.getToMax()),
+                effect.getMaxPerRound(),
+                effect.getAmountFromPrevious(),
+                effect.getAmountFromEvent(),
+                effect.getAmountFromResource(),
+                effect.getAmountFromAttr(),
+                effect.getAmountPercent(),
+                effect.getAmountPercentFromResource(),
+                effect.getAmountCap());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ResourceMoveArgs args, EffectSpec effect, TriggerSpec rule) {
         TriggerValidator.requireResourceMovement(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
+    public void apply(OpContext ctx, ResourceMoveArgs args) {
         CanHit mover = ctx.target();
-        String movedId = ctx.effect().getResource();
-        int removed = TriggerInterpreter.removeResource(ctx.effect(), ctx.firing(), mover);
+        String movedId = args.resource();
+        int removed = TriggerInterpreter.removeResource(args, args.magnitude(), ctx.firing(), mover);
         TriggerInterpreter.fireResourceChanged(ctx.battle(), ctx.firing(), mover, movedId, -removed);
     }
 }
