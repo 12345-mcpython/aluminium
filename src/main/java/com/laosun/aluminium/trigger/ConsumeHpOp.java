@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.TriggerEvent;
 
@@ -9,7 +10,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
  *
  * <p>Distinct from taking damage: {@code HP_CONSUMED} is the event for "paid", and the amount travels in the
  * <b>amount</b> slot (it used to be passed as a hit count, so every {@code event_amount} condition on this event read
- * zero). Registered here so the op has one dispatch path; its load-time checks are still in {@code TriggerValidator}.
+ * zero).
  */
 final class ConsumeHpOp implements OpHandler<OpArgs> {
 
@@ -21,6 +22,15 @@ final class ConsumeHpOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        String op = op().name();
+        TriggerValidator.requirePercent(effect, op, rule);
+        TriggerValidator.requireNonZeroPercent(effect, op, rule);
+        TriggerValidator.requireNoDuration(effect, op, rule);
+        TriggerValidator.requireNoStackArguments(effect, op, rule);
     }
 
     @Override

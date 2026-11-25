@@ -1,13 +1,13 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 
 /**
  * {@code REMOVE_BUFF}: strip named states off the target.
  *
- * <p>The blunt inverse of {@code APPLY_BUFF}; {@code DISPEL} is the class-based one ("remove N negative effects"),
- * which needs no names. Registered here so the op has one dispatch path; its load-time checks are still in
- * {@code TriggerValidator.validateOne}.
+ * <p>The mirror of {@code DISPEL}: that one cleans OUR side's debuffs, this one takes the TARGET's benefits away.
+ * Permanent buffs are skipped by {@code BuffManager.removeBuffs} - nobody's skill dispels a loadout.
  */
 final class RemoveBuffOp implements OpHandler<OpArgs> {
 
@@ -19,6 +19,13 @@ final class RemoveBuffOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        String op = op().name();
+        TriggerValidator.requirePositiveAmount(effect, op, rule);
+        TriggerValidator.requireNoStackArguments(effect, op, rule);
     }
 
     @Override

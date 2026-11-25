@@ -1,13 +1,14 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 
 /**
- * {@code BOOST_TOUGHNESS}: restore toughness to a unit, a whole point at a time.
+ * {@code BOOST_TOUGHNESS}: raise the toughness reduction this instance will cause.
  *
- * <p>The inverse of the reduction every attack performs, and the one op whose `per_stack` reads the stacks of the
- * effect's own holder. Registered here so the op has one dispatch path; its load-time checks are still in
- * {@code TriggerValidator.validateOne}.
+ * <p>A multiplier on the reduction, read at one place ({@code SkillExecutor.applyStanceDamage}) rather than inside
+ * {@code Battle.reduceToughness}, which enemy skills and the demo also call. A {@code scale} is <b>refused</b>: the
+ * magnitude is read as a plain {@code percent} when the buff is built, so a scale would load and do nothing.
  */
 final class BoostToughnessOp implements OpHandler<OpArgs> {
 
@@ -19,6 +20,20 @@ final class BoostToughnessOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        String op = op().name();
+        if (effect.getScale() != null && !effect.getScale().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"scale\", which this op does NOT read yet (it takes a plain \"percent\"); "
+                            + "stating it would silently do nothing (source: " + rule.getSource() + ")");
+        }
+        TriggerValidator.requirePercent(effect, op, rule);
+        TriggerValidator.requireNonZeroPercent(effect, op, rule);
+        TriggerValidator.requireDuration(effect, op, rule);
+        TriggerValidator.requireNoStackArguments(effect, op, rule);
     }
 
     @Override
