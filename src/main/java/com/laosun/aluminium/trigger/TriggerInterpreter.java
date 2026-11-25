@@ -26,11 +26,14 @@ import java.util.Set;
  * prerequisite phase has not landed yet is <b>rejected at load time</b> with the phase named, so a
  * content author learns immediately instead of shipping a rule that silently never works. Those
  * load-time rules live in {@link TriggerValidator}; this class is the half that runs a rule which
- * passed them. The table below is the contract the two halves share, and the names in it are
- * declared in {@link TriggerVocabulary}.
+ * passed them. The table below is kept only as a tombstone and is no longer a contract: the shared
+ * vocabulary is {@link TriggerOperator}, whose constants {@link TriggerVocabulary} derives its sets from.
  *
  * <table border="1">
- *   <caption>Every op: its arguments and whether the engine performs it</caption>
+ *   <caption><b>⚠ Stale on purpose - do not extend.</b> Removed as a registration site: it documents
+ *       19 of the 63 wired ops, and its {@code DAMAGE} row is contradicted by {@link TriggerValidator}
+ *       (a literal {@code scale} + {@code percent} is accepted). The op set is {@link TriggerOperator};
+ *       what an op accepts is declared by the code that reads it.</caption>
  *   <tr><th>op</th><th>arguments</th><th>status</th></tr>
  *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>wired</td></tr>
  *   <tr><td>{@code RAISE_ENERGY_TO}</td><td>{@code percent} (a floor; no-op when already above)</td><td>wired</td></tr>
