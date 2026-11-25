@@ -85,7 +85,15 @@ public final class OpRegistry {
             new AddDamageOp(),
             new CommandSummonOp(),
             new CastSkillOp(),
-            new SummonServantOp());
+            new SummonServantOp(),
+            new GainEnergyOp(),
+            new HealOp(),
+            new RaiseEnergyToOp(),
+            new GainResourceOp(),
+            new SpendResourceOp(),
+            new RemoveResourceOp(),
+            new RaiseSkillMultiplierOp(),
+            new ResetTriggerLimitOp());
 
     /** {@link #HANDLERS} indexed by op, built once. */
     private static final Map<TriggerOperator, OpHandler<?>> BY_OP = index();

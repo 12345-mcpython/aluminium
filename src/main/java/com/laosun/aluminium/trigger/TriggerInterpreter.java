@@ -741,46 +741,6 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case RESET_TRIGGER_LIMIT -> {
-                String wanted = effect.getRule().trim();
-                for (CanHit cleared : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    TriggerTable table = cleared instanceof com.laosun.aluminium.entity.Character ch
-                            ? ch.getTriggerTable() : null;
-                    String limitKey = table == null ? null : table.keyOf(wanted);
-                    if (limitKey == null) {
-                        throw new IllegalStateException(
-                                "Op RESET_TRIGGER_LIMIT names the rule " + wanted + ", which " + cleared.getName()
-                                        + " does not carry -- an id that matches nothing would clear nothing, silently");
-                    }
-                    cleared.resetTriggerLimit(limitKey);
-                }
-            }
-            case GAIN_ENERGY -> gainEnergy(battle, effect, ctx);
-            case RAISE_ENERGY_TO -> {
-                // A FLOOR, not a gain: energy is raised to the stated share of the maximum and left alone
-                // when it is already at or above it. Adding a share instead would overshoot.
-                // 「若为目标恢复的能量不足 40 点，恢复的能量提高至 40 点」 (1313 Sunday (星期日)'s trace 主日渴慕) states the
-                // floor in POINTS instead of as a share, so a flat `amount` is the other spelling of the same op.
-                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    double floor = effect.getAmount() != null
-                            ? effect.getAmount()
-                            : target.getMaxEnergy() * TriggerMagnitudes.shareOf(effect, ctx);
-                    if (target.getCurrentEnergy() < floor) {
-                        target.setCurrentEnergy(Math.min(floor, target.getMaxEnergy()));
-                    }
-                }
-            }
-            case HEAL -> {
-                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    // Note: The healer is the RULE OWNER, not `null`. A `HEAL` effect is
-                    // the owner healing somebody, and `HEALED`'s `actor` is what "healing <b>provided by a teammate</b>" reads; with
-                    // `null` there was no way to ask who healed, so that half of The Dahlia (大丽花)'s trace could not be written.
-                    // Note: no shipped content subscribes to `HEALED` at all, and no shipped
-                    // content grants `OUTGOING_HEALING_BOOST`, so this changes no number today -- it only makes the
-                    // attribution true (and a rule-driven heal now reads the owner's healing boost, as a skill's does).
-                    battle.heal(ctx.owner(), target, grantAmount(effect, target, ctx));
-                }
-            }
             case SHIELD -> {
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
                     double amount = grantAmount(effect, target, ctx);
@@ -856,33 +816,6 @@ public final class TriggerInterpreter {
                             effect), ctx));
                 }
             }
-            case GAIN_RESOURCE -> {
-                // ⚠ The store that MOVED, not the rule owner's: an effect may grant to somebody else ("give that ally 2
-                // points"), and `resourceAmount(owner)` measured on a unit that does not carry the counter reads 0 on
-                // both sides - measured: a teammate granted her 280 hidden points, her store went 20 to 300, and the
-                // event announced nothing. One resolution, handed to the op, so a rolling selector rolls once.
-                CanHit mover = TriggerTargets.resolveTarget(effect, ctx);
-                String movedId = effect.getResource();
-                int before = resourceAmount(battle, mover, movedId);
-                gainResource(effect, ctx, previousCredited, mover);
-                fireResourceChanged(battle, ctx, mover, movedId, resourceAmount(battle, mover, movedId) - before);
-            }
-            case SPEND_RESOURCE -> {
-                CanHit mover = TriggerTargets.resolveTarget(effect, ctx);
-                String movedId = effect.getResource();
-                int before = resourceAmount(battle, mover, movedId);
-                spendResource(effect, ctx, mover);
-                fireResourceChanged(battle, ctx, mover, movedId, resourceAmount(battle, mover, movedId) - before);
-            }
-            // "该额外回合开始时，【美学底本】获得 30 点【好活当赏】…额外回合结束时移除" (1503 Pearl (真珠)'s ultimate): the
-            // inverse of a temporary grant. Deliberately NOT `SPEND_RESOURCE`, which is a strict cost that errors when
-            // the pool is short - a revocation has to clamp instead, because this pool is meant to be consumed.
-            case REMOVE_RESOURCE -> {
-                CanHit mover = TriggerTargets.resolveTarget(effect, ctx);
-                String movedId = effect.getResource();
-                int removed = removeResource(effect, ctx, mover);
-                fireResourceChanged(battle, ctx, mover, movedId, -removed);
-            }
             case DAMAGE -> {
                 // A list, like HEAL/SHIELD: "to all enemies" is one effect that reaches several units, and the
                 // engine settles one instance per victim (that is what a group attack is here).
@@ -913,15 +846,6 @@ public final class TriggerInterpreter {
                         damage(battle, effect, ctx, victim, divisor);
                     }
                 }
-            }
-            case RAISE_SKILL_MULTIPLIER -> {
-                // 「终结技的伤害倍率提高 240%」: the ROW share of one slot is multiplied (x3.4). No zone, no MODIFY_ATTR and
-                // no MODIFY_RULE can say it - the row number is read at settlement, not by a rule. The optional
-                // enemy-count bounds let one sentence state disjoint tiers (1401 Eidolon 6: 3+/2/1 enemies).
-                SkillType multiplierSlot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
-                ctx.owner().amendSkillMultiplier(multiplierSlot,
-                        TriggerMagnitudes.shareOf(effect, ctx),
-                        effect.getMinEnemies(), effect.getMaxEnemies());
             }
             case CONSUME_HP -> {
                 // Note: The share vocabulary is the HEAL/SHIELD one, not the modifier one: "consume HP equal to 30% of Blade (刃)'s Max HP"
@@ -1112,7 +1036,7 @@ public final class TriggerInterpreter {
      * impossible, and the fix cannot be "pay the resolved unit N times": the amount differs per recipient, so the
      * resolution - not the amount - had to become a list.
      */
-    private static void gainEnergy(Battle battle, EffectSpec effect, TriggerContext ctx) {
+    static void gainEnergy(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             gainEnergyFor(battle, effect, ctx, target);
         }
@@ -1304,7 +1228,7 @@ public final class TriggerInterpreter {
     /**
      * The same, told which unit receives: the caller has already resolved it, and it announces on the same one.
      */
-    private static void gainResource(EffectSpec effect, TriggerContext ctx, double previousCredited, CanHit holder) {
+    static void gainResource(EffectSpec effect, TriggerContext ctx, double previousCredited, CanHit holder) {
         // A gain whose amount is a SHARE of an attribute (reader: 1505's talent "gain an Elation degree equal to
         // 50% of CRIT DMG"). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
         // this method has resolved. Unknown attribute names are refused loudly rather than silently adding zero.
@@ -1475,7 +1399,7 @@ public final class TriggerInterpreter {
     /**
      * The same, told which unit's store gives the points back: the caller has already resolved it.
      */
-    private static int removeResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
+    static int removeResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
         String id = effect.getResource();
         int asked = percentOfOwnCounter(effect, ctx);
         if (asked <= 0) {
@@ -1514,7 +1438,7 @@ public final class TriggerInterpreter {
     /**
      * The same, told which unit's store pays: the caller has already resolved it (see the SPEND_RESOURCE arm).
      */
-    private static void spendResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
+    static void spendResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
         String id = effect.getResource();
         // A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
         // battle-level one -- measured: [笑点] is declared `scope: PARTY` ("Punchline (笑点) is shared by the whole team", glossary 1000002) and the holder's
@@ -2180,7 +2104,7 @@ public final class TriggerInterpreter {
      * @param id     the resource id
      * @return the total, summing both stores when there is a battle to ask
      */
-    private static int resourceAmount(Battle battle, CanHit owner, String id) {
+    static int resourceAmount(Battle battle, CanHit owner, String id) {
         int total = (owner == null || !owner.getResources().has(id)) ? 0 : owner.getResources().value(id);
         return battle == null ? total : total + battle.partyResourceValue(id);
     }
@@ -2199,7 +2123,7 @@ public final class TriggerInterpreter {
      * @param resource the resource whose value moved
      * @param delta    how much it moved (positive for a gain, negative for a spend)
      */
-    private static void fireResourceChanged(Battle battle, TriggerContext ctx, String resource, int delta) {
+    static void fireResourceChanged(Battle battle, TriggerContext ctx, String resource, int delta) {
         fireResourceChanged(battle, ctx, ctx.owner(), resource, delta);
     }
 
@@ -2208,7 +2132,7 @@ public final class TriggerInterpreter {
      *
      * @param holder the unit the moved store belongs to (its own counter, or its copy of a PARTY one)
      */
-    private static void fireResourceChanged(Battle battle, TriggerContext ctx, CanHit holder, String resource,
+    static void fireResourceChanged(Battle battle, TriggerContext ctx, CanHit holder, String resource,
                                             int delta) {
         if (battle == null || holder == null) {
             return;
