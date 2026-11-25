@@ -1350,7 +1350,7 @@ public final class TriggerInterpreter {
         return (int) Math.round(TriggerMagnitudes.selfResourceOf(scale, ctx) * share);
     }
 
-    static double scaledAmount(EffectSpec effect, TriggerContext ctx) {
+    static double scaledAmount(Magnitude effect, TriggerContext ctx) {
         double amount = flatAmount(effect, ctx);
         return Boolean.TRUE.equals(effect.getPerTarget()) ? amount * ctx.hitCount() : amount;
     }
@@ -1367,7 +1367,7 @@ public final class TriggerInterpreter {
      * <p>Note: This is the same reader the derived magnitudes use - {@link TriggerMagnitudes#constantTerm} - so the
      * flat and the derived paths cannot disagree about where a constant comes from.
      */
-    private static double flatAmount(EffectSpec effect, TriggerContext ctx) {
+    private static double flatAmount(Magnitude effect, TriggerContext ctx) {
         return TriggerMagnitudes.constantTerm(effect, ctx);
     }
 
@@ -1759,7 +1759,7 @@ public final class TriggerInterpreter {
      * @param target the unit about to receive the heal or shield
      * @param ctx    the context ({@code owner_max_hp} reads the rule owner, i.e. the healer)
      */
-    static double grantAmount(EffectSpec effect, CanHit target, TriggerContext ctx) {
+    static double grantAmount(Magnitude effect, CanHit target, TriggerContext ctx) {
         if (effect.getValue() != null) {
             return TriggerMagnitudes.valueOf(effect, ctx);
         }

@@ -122,6 +122,14 @@ public interface Magnitude {
     List<EffectSpec.Part> getParts();
 
     /**
+     * @return whether the magnitude is multiplied by "how many units this event hit" ({@code per_target})
+     *
+     * <p>Here rather than beside the selector vocabulary because it multiplies the <b>number</b>: "each hit gives one
+     * stack" is a magnitude of one per hit, not a different magnitude.
+     */
+    Boolean getPerTarget();
+
+    /**
      * One term of a multi-part base, as a magnitude of its own.
      *
      * <p>Here because the parts <b>are</b> numbers: "100% ATK + 150% DEF" is two shares that get summed, and the reader

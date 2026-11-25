@@ -38,7 +38,9 @@ public class ArgsMigrationRatchetTest {
      *   <li>{@code RESET_RULE_CHANCE} - the rule id it names;</li>
      *   <li>{@code START_COUNTDOWN} - the stated name (or none) and the Speed;</li>
      *   <li>{@code SUMMON} - which of the three shapes, and the memosprite's name and Speed;</li>
-     *   <li>{@code RAISE_SKILL_LEVEL} - which of the three slot spellings, and how many levels.</li>
+     *   <li>{@code RAISE_SKILL_LEVEL} - which of the three slot spellings, and how many levels;</li>
+     *   <li>{@code ADVANCE} / {@code DELAY} / {@code GAIN_SKILL_POINT} - the one magnitude each states, held as a
+     *       {@code Magnitude} so the run-time half never names the bean.</li>
      * </ul>
      */
     private static final Set<String> PARSED = Set.of(
@@ -46,7 +48,10 @@ public class ArgsMigrationRatchetTest {
             "RESET_RULE_CHANCE",
             "START_COUNTDOWN",
             "SUMMON",
-            "RAISE_SKILL_LEVEL");
+            "RAISE_SKILL_LEVEL",
+            "ADVANCE",
+            "DELAY",
+            "GAIN_SKILL_POINT");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {

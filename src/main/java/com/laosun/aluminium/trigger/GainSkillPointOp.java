@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * {@code amount} is resolved at fire time ({@code amount_from_skill_param} moves with the skill's level), which is
  * why the parsed shape is empty for now - see {@link OpArgs}.
  */
-final class GainSkillPointOp implements OpHandler<OpArgs> {
+final class GainSkillPointOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,18 +18,19 @@ final class GainSkillPointOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         TriggerValidator.requireAmount(effect, op().name(), rule);
         TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        ctx.battle().gainSkillPoint((int) Math.round(ctx.amount()));
+    public void apply(OpContext ctx, MagnitudeArgs args) {
+        ctx.battle().gainSkillPoint((int) Math.round(
+                TriggerInterpreter.scaledAmount(args.magnitude(), ctx.firing())));
     }
 }

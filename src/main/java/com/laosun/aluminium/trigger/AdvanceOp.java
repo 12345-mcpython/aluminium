@@ -11,7 +11,7 @@ import com.laosun.aluminium.entity.CanHit;
  * <b>others</b> lives on the state the <b>giver</b> holds, not on the target, and it does not stop the holder from
  * advancing herself - which is why the check reads {@code ctx.owner()} rather than the unit being moved.
  */
-final class AdvanceOp implements OpHandler<OpArgs> {
+final class AdvanceOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,18 +19,18 @@ final class AdvanceOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         TriggerValidator.requirePercent(effect, op().name(), rule);
         TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
+    public void apply(OpContext ctx, MagnitudeArgs args) {
         CanHit giver = ctx.firing().owner();
         boolean banned = giver != null && giver.getBuffManager() != null
                 && giver.getBuffManager().suppresses("advance_to_others");
@@ -38,7 +38,7 @@ final class AdvanceOp implements OpHandler<OpArgs> {
             if (banned && target != giver) {
                 continue;
             }
-            ctx.battle().queue().advanceActionByPercent(target, ctx.share());
+            ctx.battle().queue().advanceActionByPercent(target, TriggerMagnitudes.shareOf(args.magnitude(), ctx.firing()));
         }
     }
 }

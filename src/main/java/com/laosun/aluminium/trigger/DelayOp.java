@@ -10,7 +10,7 @@ import com.laosun.aluminium.entity.CanHit;
  * <p>The mirror of {@code ADVANCE} with one asymmetry that is content, not an oversight: the sentence that bans
  * advancing others (1512's 【特邀嘉宾】) bans advances only, so a delay reads no suppression.
  */
-final class DelayOp implements OpHandler<OpArgs> {
+final class DelayOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,20 +18,20 @@ final class DelayOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         TriggerValidator.requirePercent(effect, op().name(), rule);
         TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
+    public void apply(OpContext ctx, MagnitudeArgs args) {
         for (CanHit target : ctx.targets()) {
-            ctx.battle().delayMovePercent(target, ctx.share());
+            ctx.battle().delayMovePercent(target, TriggerMagnitudes.shareOf(args.magnitude(), ctx.firing()));
         }
     }
 }
