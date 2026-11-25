@@ -75,7 +75,7 @@ public class UntilTheFlowersBloomAgainTest {
         System.out.println("[23058] ordinary instance before=" + before + " after=" + after
                 + " ratio=" + (after / before));
         Assertions.assertEquals(1 + SHARE, after / before, 1e-6,
-                "the sentence says DMG taken (受到的伤害) -- 15% on EVERY damage type, not 欢愉 only");
+                "the sentence says DMG taken (受到的伤害) -- 15% on EVERY damage type, not elation only");
     }
 
     @Test

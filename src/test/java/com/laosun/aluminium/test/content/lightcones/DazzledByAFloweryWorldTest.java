@@ -87,7 +87,7 @@ public class DazzledByAFloweryWorldTest {
         double capped = hit(battle, DamageType.ELATION);
         System.out.println("[23053] none=" + none + " one=" + one + " four=" + four + " after six=" + capped
                 + " layers=" + wearer.getBuffManager().stacksOf("internal:23053/spent_layers"));
-        Assertions.assertTrue(one > none, "one spent point must raise the settled 欢愉 damage");
+        Assertions.assertTrue(one > none, "one spent point must raise the settled elation damage");
         // The VALUE, not just the direction (discipline 189): the settled damage is `base / (effDef + 200 + 10L)`, and
         // the ignore multiplies effDef. Everything here comes from the engine's own numbers, so a wrong `percent` has to
         // move this line -- a monotonicity-only judge let `5% -> 2.5%` pass (measured, 0 red).

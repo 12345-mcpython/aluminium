@@ -564,7 +564,7 @@ public class RelicAbilityBatchTest {
 
         Assertions.assertAll("314 - the same-Path teammate condition",
                 () -> Assertions.assertEquals(0.12, samePath, 1e-6,
-                        "[314 same Path] Herta (黑塔) is Erudition (智识), like the wearer: \"if there is at least one ally on the same Path as the wearer\" (「若至少存在一名与装备者命途相同的队友」)"),
+                        "[314 same Path] Herta (黑塔) is Erudition (erudition), like the wearer: \"if there is at least one ally on the same Path as the wearer\" (「若至少存在一名与装备者命途相同的队友」)"),
                 () -> Assertions.assertEquals(0, otherPath, 1e-6,
                         "[314 other Path] Guinaifen (桂乃芬) is Nihility (虚无): the condition does not hold, so nothing is granted"));
     }

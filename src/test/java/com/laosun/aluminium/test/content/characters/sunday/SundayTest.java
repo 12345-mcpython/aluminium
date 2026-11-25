@@ -152,7 +152,7 @@ public class SundayTest {
 
         Assertions.assertAll("「对同谐…无法触发立即行动」: the advance is blocked, the share is not",
                 () -> Assertions.assertEquals(harmonyBefore, timeRemaining(battle, harmony), EPS,
-                        "[no advance] 「当星期日对「同谐」命途的角色施放该技能时，无法触发立即行动效果」 (when Sunday casts this Skill on a character of the Harmony (「同谐」) Path, the immediate-action effect cannot be triggered)"),
+                        "[no advance] 「当星期日对「harmony」命途的角色施放该技能时，无法触发立即行动效果」 (when Sunday casts this Skill on a character of the Harmony (「harmony」) Path, the immediate-action effect cannot be triggered)"),
                 () -> Assertions.assertEquals(0.15, damageBoostOf(harmony), EPS,
                         "[the share] only the immediate action (立即行动) is blocked by the sentence, not the DMG boost (「使其造成的伤害提高」)"));
     }

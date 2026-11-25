@@ -24,7 +24,7 @@ public class DamageTypeTest {
         Assertions.assertTrue(DamageType.EXTRA.isCrittable());
         Assertions.assertTrue(DamageType.TECHNIQUE.isCrittable());
         Assertions.assertTrue(DamageType.MEMORY.isCrittable());
-        Assertions.assertTrue(DamageType.ELATION.isCrittable(), "欢愉 damage does get crit stats (HSR.md §6.4)");
+        Assertions.assertTrue(DamageType.ELATION.isCrittable(), "elation damage does get crit stats (HSR.md §6.4)");
 
         Assertions.assertFalse(DamageType.BREAK.isCrittable(), "break damage never crits");
         Assertions.assertFalse(DamageType.SUPER_BREAK.isCrittable(), "super break damage never crits");
@@ -41,7 +41,7 @@ public class DamageTypeTest {
         Assertions.assertFalse(DamageType.BREAK.isBoostable(), "break damage is not boosted");
         Assertions.assertFalse(DamageType.SUPER_BREAK.isBoostable(), "super break damage is not boosted");
         Assertions.assertFalse(DamageType.TRUE.isBoostable(), "true damage is not boosted");
-        Assertions.assertFalse(DamageType.ELATION.isBoostable(), "欢愉 damage is unaffected by damage-increasing effects (HSR.md §6.5)");
+        Assertions.assertFalse(DamageType.ELATION.isBoostable(), "elation damage is unaffected by damage-increasing effects (HSR.md §6.5)");
     }
 
     @Test

@@ -42,7 +42,7 @@ public class AlliesOfPathExceptSelectorTest {
         Fixture f = new Fixture();
         f.owner.setTriggerTable(new TriggerTable(PEARL, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(),
-                        marker("allies_of_path_except:欢愉:self,target")))));
+                        marker("allies_of_path_except:elation:self,target")))));
         f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0));
         f.battle.processRequests();
 
@@ -70,7 +70,7 @@ public class AlliesOfPathExceptSelectorTest {
         Fixture f = new Fixture();
         f.owner.setTriggerTable(new TriggerTable(PEARL, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(),
-                        marker("allies_of_path_except:欢愉:actor")))));
+                        marker("allies_of_path_except:elation:actor")))));
         // `actor` on BATTLE_START is nobody (the event has no actor), so the list names no existing unit.
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
                 () -> f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)));
@@ -103,7 +103,7 @@ public class AlliesOfPathExceptSelectorTest {
         Fixture f = new Fixture();
         f.owner.setTriggerTable(new TriggerTable(PEARL, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(),
-                        marker("allies_of_path_except:欢愉")))));
+                        marker("allies_of_path_except:elation")))));
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
                 () -> f.battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, f.aimed, 0, 0)));
         System.out.println("[path_except] refused: " + refused.getMessage());

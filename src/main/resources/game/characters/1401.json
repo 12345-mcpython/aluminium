@@ -286,7 +286,7 @@
           "attribute": "SPEED",
           "percent": 0.12,
           "permanent": true,
-          "target": "allies_of_path:智识"
+          "target": "allies_of_path:erudition"
         }
       ],
       "source": "1401 大黑塔 星魂 4 第十六把钥匙: 「队伍中的「智识」命途角色的速度提高12%。」 参数 = [0.12]",

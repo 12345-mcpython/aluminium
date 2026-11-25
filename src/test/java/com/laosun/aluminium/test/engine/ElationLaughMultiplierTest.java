@@ -45,7 +45,7 @@ public class ElationLaughMultiplierTest {
         double elationCounted = damage(false, LAUGHS, true);
         double normalNone = damage(true, 0, false);
         double normalCounted = damage(true, LAUGHS, true);
-        System.out.println("[laugh] 欢愉: none " + elationNone + " ; pool only " + elationPoolOnly
+        System.out.println("[laugh] elation: none " + elationNone + " ; pool only " + elationPoolOnly
                 + " (ratio " + (elationPoolOnly / elationNone) + ") ; counted " + elationCounted
                 + " (ratio " + (elationCounted / elationNone) + ")");
         System.out.println("[laugh] normal: none " + normalNone + " ; counted " + normalCounted);

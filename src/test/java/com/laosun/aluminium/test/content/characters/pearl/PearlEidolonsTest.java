@@ -156,7 +156,7 @@ public class PearlEidolonsTest {
         Fraction e0 = fractions(0);
         Fraction e2 = fractions(2);
         System.out.println("[pearl_e2_advance] E0 -> archetype keeps " + e0.archetype
-                + ", 欢愉 ally A " + e0.elationA + ", 欢愉 ally B " + e0.elationB
+                + ", elation ally A " + e0.elationA + ", elation ally B " + e0.elationB
                 + " || E2 -> archetype " + e2.archetype + ", A " + e2.elationA + ", B " + e2.elationB);
         System.out.println("[pearl_e2_advance] at E2 an Elation ally keeps " + e2.elationA
                 + " (expected 0.9 x 0.85 x 0.70 = 0.5355)");

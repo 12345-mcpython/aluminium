@@ -138,7 +138,7 @@
       "on": "SKILL_CAST",
       "when": [
         "actor == self",
-        "!target has_path 同谐"
+        "!target has_path harmony"
       ],
       "do": [
         {

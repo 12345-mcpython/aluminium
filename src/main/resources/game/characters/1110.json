@@ -265,7 +265,7 @@
       "on": "SKILL_CAST",
       "when": [
         "actor == self",
-        "target has_path 毁灭"
+        "target has_path destruction"
       ],
       "source": "1110 玲可 战技 盐渍野营罐头的可食用性: 「…若该目标为「毁灭」或「存护」命途，被敌方攻击的概率大幅提高…」",
       "id": "skill_soft_taunt_for_destruction"
@@ -284,7 +284,7 @@
       "on": "SKILL_CAST",
       "when": [
         "actor == self",
-        "target has_path 存护"
+        "target has_path preservation"
       ],
       "source": "1110 玲可 战技 盐渍野营罐头的可食用性: 「…若该目标为「毁灭」或「存护」命途，被敌方攻击的概率大幅提高…」",
       "id": "skill_soft_taunt_for_preservation"

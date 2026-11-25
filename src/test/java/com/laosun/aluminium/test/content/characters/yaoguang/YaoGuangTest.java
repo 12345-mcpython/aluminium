@@ -194,7 +194,7 @@ public class YaoGuangTest {
         battle.castImmediate(her.getSkills().get(SkillType.SKILL), her, List.of(ally));
         battle.processRequests();
         double gained = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBefore;
-        System.out.println("[1502] her 欢愉=" + herElation + " ; ally gained=" + gained + " (expect " + (herElation * 0.2) + ")");
+        System.out.println("[1502] her elation=" + herElation + " ; ally gained=" + gained + " (expect " + (herElation * 0.2) + ")");
         Assertions.assertEquals(herElation * 0.2, gained, 1e-9, "「等同于爻光欢愉度的 20%」");
     }
 

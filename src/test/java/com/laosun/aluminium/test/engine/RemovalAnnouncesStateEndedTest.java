@@ -57,7 +57,7 @@ public class RemovalAnnouncesStateEndedTest {
         battle.startBattle();
         battle.processRequests();
         Skill skill = owner.getSkills().get(SkillType.ELATION_SKILL);
-        Assertions.assertNotNull(skill, "precondition: she has an 欢愉 skill");
+        Assertions.assertNotNull(skill, "precondition: she has an elation skill");
         SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies().get(0)));
         battle.processRequests();
         return battle;

@@ -29,8 +29,8 @@ public class AggroTest {
         Assertions.assertEquals(100, Path.OTHER.getAggro());
         Assertions.assertEquals(75, Path.HUNT.getAggro(), "Hunt is lower than the usual value; do not treat it as 100");
         Assertions.assertEquals(75, Path.ERUDITION.getAggro());
-        Assertions.assertEquals(Path.DESTRUCTION, Path.fromName("毁灭"));
-        Assertions.assertEquals(Path.PRESERVATION, Path.fromName("存护"));
+        Assertions.assertEquals(Path.DESTRUCTION, Path.fromName("destruction"));
+        Assertions.assertEquals(Path.PRESERVATION, Path.fromName("preservation"));
         Assertions.assertEquals(Path.OTHER, Path.fromName("nonexistent path"), "an unlisted path degrades instead of blowing up");
     }
 

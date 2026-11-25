@@ -49,7 +49,7 @@ public class AlliesWithPathTest {
         battle.processRequests();
         Character pearl = battle.characters().stream().filter(c -> c.getCid() == PEARL).findFirst().orElseThrow();
         pearl.setTriggerTable(new TriggerTable(PEARL, List.of(
-                TriggerSpecs.rule("TURN_START", List.of("allies_with_path:欢愉 >= 2"),
+                TriggerSpecs.rule("TURN_START", List.of("allies_with_path:elation >= 2"),
                         TriggerSpecs.modifyAttr("ATTACK", 0.5, 1)))));
         double before = pearl.getAttribute(AttributeType.ATTACK).get();
         battle.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, pearl, pearl, 0, 0));

@@ -404,7 +404,7 @@ public class PearlCombatTest {
         build(OTHER_ALLY);
         pearlUltimateOnTheArchetype();
         Assertions.assertFalse(ally.getBuffManager().hasState(BARRIER),
-                "the gate is the target's PATH, and this one is not 欢愉");
+                "the gate is the target's PATH, and this one is not elation");
 
         pearl.setCurrentEnergy(0);
         double paid = allyUltimate();

@@ -37,11 +37,11 @@ public class AhaMomentTest {
         Assertions.assertFalse(owner.getBuffManager().hasState(MOMENT), "precondition: not on yet");
 
         Skill elation = owner.getSkills().get(SkillType.ELATION_SKILL);
-        Assertions.assertNotNull(elation, "precondition: she has an 欢愉 skill");
+        Assertions.assertNotNull(elation, "precondition: she has an elation skill");
         SkillExecutor.execute(battle, elation, owner, List.of(battle.enemies().get(0)));
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(MOMENT),
-                "the 欢愉 cast applies the moment");
+                "the elation cast applies the moment");
         Assertions.assertFalse(owner.getBuffManager().hasState(REWARD),
                 "and the reward is not there before it ends");
 

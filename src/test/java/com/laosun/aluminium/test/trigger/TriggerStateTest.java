@@ -471,8 +471,8 @@ public class TriggerStateTest {
     @Test
     public void hasPathReadsTheNamedPartysPath() {
         Battle battle = withAlly(
-                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 同谐"), gain(1)),
-                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 智识"), gain(2)));
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path harmony"), gain(1)),
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path erudition"), gain(2)));
         Character owner = battle.characters().getFirst();
         Character harmony = battle.characters().get(1);
         drainSkillPoints(battle);
@@ -485,7 +485,7 @@ public class TriggerStateTest {
                 () -> Assertions.assertEquals(1, points, "and it is the one that granted a point"));
 
         Battle negation = withAlly(
-                TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path harmony"), gain(1)));
         Character negationOwner = negation.characters().getFirst();
         Character negationHarmony = negation.characters().get(1);
         drainSkillPoints(negation);
@@ -499,7 +499,7 @@ public class TriggerStateTest {
                         "Himeko (姬子) is Erudition, so it holds"));
 
         Battle missing = battleWith(
-                TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
+                TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path harmony"), gain(1)));
         Character missingOwner = missing.characters().getFirst();
         drainSkillPoints(missing);
         int withoutTarget = missing.fire(com.laosun.aluminium.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, missingOwner, null, 1, 0));
@@ -636,7 +636,7 @@ public class TriggerStateTest {
                                     List.of(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 同谐谐"), gain(1)))),
                             "an unknown Path name is refused");
                     Assertions.assertTrue(rejected.getMessage().contains("同谐谐"), rejected.getMessage());
-                    Assertions.assertTrue(rejected.getMessage().contains("同谐"), rejected.getMessage());
+                    Assertions.assertTrue(rejected.getMessage().contains("harmony"), rejected.getMessage());
                 },
                 () -> {
                     IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,

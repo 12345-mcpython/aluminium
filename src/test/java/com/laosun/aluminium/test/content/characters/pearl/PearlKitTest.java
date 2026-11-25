@@ -101,7 +101,7 @@ public class PearlKitTest {
         System.out.println("[pearl_formA] slot-9 (non-Elation archetype): elation:elation_degree+100%/Attack 3000 = " + boosted
                 + " ; +0%/Attack 1000 = " + plain);
         Assertions.assertEquals(plain, boosted, 1e-6,
-                "「若【char:1503/aesthetic_original】为「欢愉」命途」: the other form's sentence has no extra damage, so neither the "
+                "「若【char:1503/aesthetic_original】为「elation」命途」: the other form's sentence has no extra damage, so neither the "
                         + "archetype's elation:elation_degree nor its Attack can move the number");
     }
 
@@ -697,7 +697,7 @@ public class PearlKitTest {
         double speedWithTraces = speedOf();
         double defenceNoRules = defenceOfPearlWithNoRules();
         double elationNoRules = elationOfPearlWithNoRules();
-        System.out.println("[pearl_stat_traces] effectRES=" + effectRes + " 欢愉=" + elation
+        System.out.println("[pearl_stat_traces] effectRES=" + effectRes + " elation=" + elation
                 + " (with her table emptied: " + elationNoRules + ")"
                 + " defence=" + defence + " (emptied: " + defenceNoRules + ") speed=" + speedWithTraces);
 

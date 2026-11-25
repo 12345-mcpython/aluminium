@@ -130,7 +130,7 @@
             "index": 2
           },
           "until": "next_turn_start",
-          "target": "allies_of_path:智识"
+          "target": "allies_of_path:erudition"
         },
         {
           "op": "GAIN_RESOURCE",
@@ -292,8 +292,8 @@
         }
       ],
       "when": [
-        "allies_with_path:智识 >= 1",
-        "allies_with_path:智识 < 2"
+        "allies_with_path:erudition >= 1",
+        "allies_with_path:erudition < 2"
       ],
       "id": "trace_necessary_blank_one_erudition_lifts_his_crit_damage"
     },
@@ -311,7 +311,7 @@
         }
       ],
       "when": [
-        "allies_with_path:智识 >= 2"
+        "allies_with_path:erudition >= 2"
       ],
       "id": "trace_necessary_blank_two_erudition_lifts_the_party"
     },

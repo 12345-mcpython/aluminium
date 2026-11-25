@@ -32,7 +32,7 @@ public class TrailblazerElationTechniqueTest {
                 } else if (Math.abs(boost - 0.2) < 1e-9) {
                     sawTwenty = true;
                 } else {
-                    Assertions.fail("cid " + cid + ": unexpected 欢愉 boost " + boost);
+                    Assertions.fail("cid " + cid + ": unexpected elation boost " + boost);
                 }
             }
             System.out.println("[trailblazer " + cid + "] saw30=" + sawThirty + " saw20=" + sawTwenty);
@@ -50,7 +50,7 @@ public class TrailblazerElationTechniqueTest {
                 new ArrayList<>(List.of(BattleFixture.dummy())), BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertEquals(0.0, him.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get(), 1e-9,
-                "the control: no technique, no 欢愉 boost");
+                "the control: no technique, no elation boost");
     }
 
     /** One run with its own seed: {@code BattleFixture.seeded()} returns {@code new Random(0)} every time, so repeated calls

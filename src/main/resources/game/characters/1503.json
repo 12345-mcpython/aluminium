@@ -183,7 +183,7 @@
       "id": "ult_advances_the_target_at_1_elation_allies",
       "when": [
         "actor == self",
-        "allies_with_path:欢愉 >= 1"
+        "allies_with_path:elation >= 1"
       ],
       "do": [
         {
@@ -201,7 +201,7 @@
       "id": "ult_advances_the_target_at_2_elation_allies",
       "when": [
         "actor == self",
-        "allies_with_path:欢愉 >= 2"
+        "allies_with_path:elation >= 2"
       ],
       "do": [
         {
@@ -219,7 +219,7 @@
       "id": "ult_advances_the_target_at_3_elation_allies",
       "when": [
         "actor == self",
-        "allies_with_path:欢愉 >= 3"
+        "allies_with_path:elation >= 3"
       ],
       "do": [
         {
@@ -237,7 +237,7 @@
       "id": "ult_grants_an_extra_turn_at_four_elation_allies",
       "when": [
         "actor == self",
-        "allies_with_path:欢愉 >= 4"
+        "allies_with_path:elation >= 4"
       ],
       "do": [
         {
@@ -253,7 +253,7 @@
       "id": "eidolon1_raises_elation_at_2_elation_allies",
       "min_eidolon": 1,
       "when": [
-        "allies_with_path:欢愉 >= 2"
+        "allies_with_path:elation >= 2"
       ],
       "do": [
         {
@@ -272,7 +272,7 @@
       "id": "eidolon1_raises_elation_at_3_elation_allies",
       "min_eidolon": 1,
       "when": [
-        "allies_with_path:欢愉 >= 3"
+        "allies_with_path:elation >= 3"
       ],
       "do": [
         {
@@ -291,7 +291,7 @@
       "id": "eidolon1_raises_elation_at_4_elation_allies",
       "min_eidolon": 1,
       "when": [
-        "allies_with_path:欢愉 >= 4"
+        "allies_with_path:elation >= 4"
       ],
       "do": [
         {
@@ -310,7 +310,7 @@
       "id": "art_barrier_on_an_elation_archetype",
       "when": [
         "actor == self",
-        "target has_path 欢愉"
+        "target has_path elation"
       ],
       "do": [
         {
@@ -421,7 +421,7 @@
       "id": "enhanced_basic_is_form_a_for_an_elation_archetype",
       "when": [
         "actor == self",
-        "target has_path 欢愉"
+        "target has_path elation"
       ],
       "do": [
         {
@@ -440,7 +440,7 @@
       "id": "enhanced_basic_is_form_b_otherwise",
       "when": [
         "actor == self",
-        "!target has_path 欢愉"
+        "!target has_path elation"
       ],
       "do": [
         {
@@ -575,7 +575,7 @@
       "when": [
         "actor == self",
         "from_category ElationDamage",
-        "allies_with_path:欢愉 >= 1"
+        "allies_with_path:elation >= 1"
       ],
       "do": [
         {
@@ -597,7 +597,7 @@
       "when": [
         "actor == self",
         "from_category ElationDamage",
-        "allies_with_path:欢愉 >= 2"
+        "allies_with_path:elation >= 2"
       ],
       "do": [
         {
@@ -619,7 +619,7 @@
       "when": [
         "actor == self",
         "from_category ElationDamage",
-        "allies_with_path:欢愉 >= 3"
+        "allies_with_path:elation >= 3"
       ],
       "do": [
         {
@@ -641,7 +641,7 @@
       "when": [
         "actor == self",
         "from_category ElationDamage",
-        "allies_with_path:欢愉 >= 4"
+        "allies_with_path:elation >= 4"
       ],
       "do": [
         {
@@ -678,7 +678,7 @@
       "id": "elation_skill_pays_out_at_1_elation_allies",
       "when": [
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 1"
+        "allies_with_path:elation >= 1"
       ],
       "do": [
         {
@@ -696,7 +696,7 @@
       "id": "elation_skill_pays_out_at_2_elation_allies",
       "when": [
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 2"
+        "allies_with_path:elation >= 2"
       ],
       "do": [
         {
@@ -714,7 +714,7 @@
       "id": "elation_skill_pays_out_at_3_elation_allies",
       "when": [
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 3"
+        "allies_with_path:elation >= 3"
       ],
       "do": [
         {
@@ -732,7 +732,7 @@
       "id": "elation_skill_pays_out_at_4_elation_allies",
       "when": [
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 4"
+        "allies_with_path:elation >= 4"
       ],
       "do": [
         {
@@ -955,7 +955,7 @@
       "when": [
         "eidolon >= 4",
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 1"
+        "allies_with_path:elation >= 1"
       ],
       "do": [
         {
@@ -975,7 +975,7 @@
       "when": [
         "eidolon >= 4",
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 2"
+        "allies_with_path:elation >= 2"
       ],
       "do": [
         {
@@ -995,7 +995,7 @@
       "when": [
         "eidolon >= 4",
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 3"
+        "allies_with_path:elation >= 3"
       ],
       "do": [
         {
@@ -1015,7 +1015,7 @@
       "when": [
         "eidolon >= 4",
         "actor has_state char:1503/rendering_reason",
-        "allies_with_path:欢愉 >= 4"
+        "allies_with_path:elation >= 4"
       ],
       "do": [
         {
@@ -1057,13 +1057,13 @@
       "min_eidolon": 2,
       "when": [
         "actor == self",
-        "allies_with_path:欢愉 >= 1"
+        "allies_with_path:elation >= 1"
       ],
       "do": [
         {
           "op": "ADVANCE",
           "percent": 0.1,
-          "target": "allies_of_path_except:欢愉:self,target"
+          "target": "allies_of_path_except:elation:self,target"
         }
       ],
       "source": "1503 真珠 星魂 2 截取，顷刻破晓的光斑（rank 150302）: 「施放终结技时，使除真珠和【美学底本】外的其他我方「欢愉」命途角色也触发行动提前效果，…」—— 数值沿用大招那三档（10%/15%/30%）。",
@@ -1075,13 +1075,13 @@
       "min_eidolon": 2,
       "when": [
         "actor == self",
-        "allies_with_path:欢愉 >= 2"
+        "allies_with_path:elation >= 2"
       ],
       "do": [
         {
           "op": "ADVANCE",
           "percent": 0.15,
-          "target": "allies_of_path_except:欢愉:self,target"
+          "target": "allies_of_path_except:elation:self,target"
         }
       ],
       "source": "1503 真珠 星魂 2 截取，顷刻破晓的光斑（rank 150302）: 「施放终结技时，使除真珠和【美学底本】外的其他我方「欢愉」命途角色也触发行动提前效果，…」—— 数值沿用大招那三档（10%/15%/30%）。",
@@ -1093,13 +1093,13 @@
       "min_eidolon": 2,
       "when": [
         "actor == self",
-        "allies_with_path:欢愉 >= 3"
+        "allies_with_path:elation >= 3"
       ],
       "do": [
         {
           "op": "ADVANCE",
           "percent": 0.3,
-          "target": "allies_of_path_except:欢愉:self,target"
+          "target": "allies_of_path_except:elation:self,target"
         }
       ],
       "source": "1503 真珠 星魂 2 截取，顷刻破晓的光斑（rank 150302）: 「施放终结技时，使除真珠和【美学底本】外的其他我方「欢愉」命途角色也触发行动提前效果，…」—— 数值沿用大招那三档（10%/15%/30%）。",

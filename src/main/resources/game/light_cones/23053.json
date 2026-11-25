@@ -55,7 +55,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_1",
-      "when": ["allies_with_path:欢愉 >= 1"],
+      "when": ["allies_with_path:elation >= 1"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「装备者在场时，队伍中每有1名「欢愉」命途角色，战技点上限提高#4[i]点，最多提高#5[i]点。」 param = [.., .., .., 0.2, 1, 0.05, 4, 3] → #? = 1 点/名、上限 3 点",
       "_note": "「队伍中**每有 1 名「欢愉」命途角色**，战技点**上限**提高 1 点，**最多提高 3 点**」—— ① 计数器：**`allies_with_path:elation** ✓（引擎现成的数值变量，数我方该命途的存活单位；含装备者自己 ✓）；② RAISE_SKILL_POINT_CAP ✓（加的是**战斗的**战技点上限，1306/1015 的同一口径）；③ 「最多 +3」用**三条规则**表达（≥1、≥2、≥3 各 +1）⇒ 4 名以上也只 +3 ✓；④ BATTLE_START 求值一次即「在场时」✓。"
@@ -63,7 +63,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_2",
-      "when": ["allies_with_path:欢愉 >= 2"],
+      "when": ["allies_with_path:elation >= 2"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第二条（第 2 名）",
       "_note": "同一句的第 2 名计数；第三条见 cone23053_cap_3。"
@@ -71,7 +71,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_3",
-      "when": ["allies_with_path:欢愉 >= 3"],
+      "when": ["allies_with_path:elation >= 3"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第三条（第 3 名，也是上限）",
       "_note": "同一句的第 3 名计数 —— 它同时是「最多提高 3 点」的封顶：没有第 4 条规则 ✓。"
@@ -131,7 +131,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_1",
-      "when": ["allies_with_path:欢愉 >= 1"],
+      "when": ["allies_with_path:elation >= 1"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「装备者在场时，队伍中每有1名「欢愉」命途角色，战技点上限提高#4[i]点，最多提高#5[i]点。」 param = [.., .., .., 0.2, 1, 0.05, 4, 3] → #? = 1 点/名、上限 3 点",
       "_note": "「队伍中**每有 1 名「欢愉」命途角色**，战技点**上限**提高 1 点，**最多提高 3 点**」—— ① 计数器：**`allies_with_path:elation** ✓（引擎现成的数值变量，数我方该命途的存活单位；含装备者自己 ✓）；② RAISE_SKILL_POINT_CAP ✓（加的是**战斗的**战技点上限，1306/1015 的同一口径）；③ 「最多 +3」用**三条规则**表达（≥1、≥2、≥3 各 +1）⇒ 4 名以上也只 +3 ✓；④ BATTLE_START 求值一次即「在场时」✓。"
@@ -139,7 +139,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_2",
-      "when": ["allies_with_path:欢愉 >= 2"],
+      "when": ["allies_with_path:elation >= 2"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第二条（第 2 名）",
       "_note": "同一句的第 2 名计数；第三条见 cone23053_cap_3。"
@@ -147,7 +147,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_3",
-      "when": ["allies_with_path:欢愉 >= 3"],
+      "when": ["allies_with_path:elation >= 3"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第三条（第 3 名，也是上限）",
       "_note": "同一句的第 3 名计数 —— 它同时是「最多提高 3 点」的封顶：没有第 4 条规则 ✓。"
@@ -207,7 +207,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_1",
-      "when": ["allies_with_path:欢愉 >= 1"],
+      "when": ["allies_with_path:elation >= 1"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「装备者在场时，队伍中每有1名「欢愉」命途角色，战技点上限提高#4[i]点，最多提高#5[i]点。」 param = [.., .., .., 0.2, 1, 0.05, 4, 3] → #? = 1 点/名、上限 3 点",
       "_note": "「队伍中**每有 1 名「欢愉」命途角色**，战技点**上限**提高 1 点，**最多提高 3 点**」—— ① 计数器：**`allies_with_path:elation** ✓（引擎现成的数值变量，数我方该命途的存活单位；含装备者自己 ✓）；② RAISE_SKILL_POINT_CAP ✓（加的是**战斗的**战技点上限，1306/1015 的同一口径）；③ 「最多 +3」用**三条规则**表达（≥1、≥2、≥3 各 +1）⇒ 4 名以上也只 +3 ✓；④ BATTLE_START 求值一次即「在场时」✓。"
@@ -215,7 +215,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_2",
-      "when": ["allies_with_path:欢愉 >= 2"],
+      "when": ["allies_with_path:elation >= 2"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第二条（第 2 名）",
       "_note": "同一句的第 2 名计数；第三条见 cone23053_cap_3。"
@@ -223,7 +223,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_3",
-      "when": ["allies_with_path:欢愉 >= 3"],
+      "when": ["allies_with_path:elation >= 3"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第三条（第 3 名，也是上限）",
       "_note": "同一句的第 3 名计数 —— 它同时是「最多提高 3 点」的封顶：没有第 4 条规则 ✓。"
@@ -283,7 +283,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_1",
-      "when": ["allies_with_path:欢愉 >= 1"],
+      "when": ["allies_with_path:elation >= 1"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「装备者在场时，队伍中每有1名「欢愉」命途角色，战技点上限提高#4[i]点，最多提高#5[i]点。」 param = [.., .., .., 0.2, 1, 0.05, 4, 3] → #? = 1 点/名、上限 3 点",
       "_note": "「队伍中**每有 1 名「欢愉」命途角色**，战技点**上限**提高 1 点，**最多提高 3 点**」—— ① 计数器：**`allies_with_path:elation** ✓（引擎现成的数值变量，数我方该命途的存活单位；含装备者自己 ✓）；② RAISE_SKILL_POINT_CAP ✓（加的是**战斗的**战技点上限，1306/1015 的同一口径）；③ 「最多 +3」用**三条规则**表达（≥1、≥2、≥3 各 +1）⇒ 4 名以上也只 +3 ✓；④ BATTLE_START 求值一次即「在场时」✓。"
@@ -291,7 +291,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_2",
-      "when": ["allies_with_path:欢愉 >= 2"],
+      "when": ["allies_with_path:elation >= 2"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第二条（第 2 名）",
       "_note": "同一句的第 2 名计数；第三条见 cone23053_cap_3。"
@@ -299,7 +299,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_3",
-      "when": ["allies_with_path:欢愉 >= 3"],
+      "when": ["allies_with_path:elation >= 3"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第三条（第 3 名，也是上限）",
       "_note": "同一句的第 3 名计数 —— 它同时是「最多提高 3 点」的封顶：没有第 4 条规则 ✓。"
@@ -359,7 +359,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_1",
-      "when": ["allies_with_path:欢愉 >= 1"],
+      "when": ["allies_with_path:elation >= 1"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「装备者在场时，队伍中每有1名「欢愉」命途角色，战技点上限提高#4[i]点，最多提高#5[i]点。」 param = [.., .., .., 0.2, 1, 0.05, 4, 3] → #? = 1 点/名、上限 3 点",
       "_note": "「队伍中**每有 1 名「欢愉」命途角色**，战技点**上限**提高 1 点，**最多提高 3 点**」—— ① 计数器：**`allies_with_path:elation** ✓（引擎现成的数值变量，数我方该命途的存活单位；含装备者自己 ✓）；② RAISE_SKILL_POINT_CAP ✓（加的是**战斗的**战技点上限，1306/1015 的同一口径）；③ 「最多 +3」用**三条规则**表达（≥1、≥2、≥3 各 +1）⇒ 4 名以上也只 +3 ✓；④ BATTLE_START 求值一次即「在场时」✓。"
@@ -367,7 +367,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_2",
-      "when": ["allies_with_path:欢愉 >= 2"],
+      "when": ["allies_with_path:elation >= 2"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第二条（第 2 名）",
       "_note": "同一句的第 2 名计数；第三条见 cone23053_cap_3。"
@@ -375,7 +375,7 @@
     {
       "on": "BATTLE_START",
       "id": "cone23053_cap_3",
-      "when": ["allies_with_path:欢愉 >= 3"],
+      "when": ["allies_with_path:elation >= 3"],
       "do": [ { "op": "RAISE_SKILL_POINT_CAP", "amount": 1 } ],
       "source": "光锥 23053: 「…每有1名「欢愉」命途角色，战技点上限提高1点，最多提高3点。」 第三条（第 3 名，也是上限）",
       "_note": "同一句的第 3 名计数 —— 它同时是「最多提高 3 点」的封顶：没有第 4 条规则 ✓。"

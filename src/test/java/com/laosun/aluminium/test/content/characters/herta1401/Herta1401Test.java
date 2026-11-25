@@ -178,13 +178,13 @@ public class Herta1401Test {
         Run e4 = new Run(4);
         Assertions.assertEquals(0.12 * e4.herta.getAttribute(AttributeType.SPEED).baseValue(),
                 e4.herta.getAttribute(AttributeType.SPEED).get() - e3.herta.getAttribute(AttributeType.SPEED).get(), 1e-6,
-                "she is 智识 herself, so the aura includes her");
+                "she is erudition herself, so the aura includes her");
         Assertions.assertEquals(0.12 * e4.erudition.getAttribute(AttributeType.SPEED).baseValue(),
                 e4.erudition.getAttribute(AttributeType.SPEED).get() - e3.erudition.getAttribute(AttributeType.SPEED).get(), 1e-6,
-                "the other 智识 ally");
+                "the other erudition ally");
         Assertions.assertEquals(e3.other.getAttribute(AttributeType.SPEED).get(),
                 e4.other.getAttribute(AttributeType.SPEED).get(), 1e-6,
-                "a 巡猎 ally is not 「智识」");
+                "a 巡猎 ally is not 「erudition」");
     }
 
     /**

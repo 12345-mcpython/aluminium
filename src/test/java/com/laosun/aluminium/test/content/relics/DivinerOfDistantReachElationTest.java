@@ -50,7 +50,7 @@ public class DivinerOfDistantReachElationTest {
         Assertions.assertEquals("ELATION_DAMAGE_BOOST", e.get(1).getAttribute());
         Assertions.assertEquals(0.10, e.get(1).getPercent(), 1e-9, "10%");
         Assertions.assertEquals("all_allies", e.get(1).getTarget(), "the whole side");
-        System.out.println("[130-欢愉] shape ok");
+        System.out.println("[130-elation] shape ok");
     }
 
     @Test
@@ -65,6 +65,6 @@ public class DivinerOfDistantReachElationTest {
                 RelicTriggerTables.of(130).at(4)
                         .matching(TriggerEvent.CAST_SETUP, ctx(owner, battle, SkillCategory.BPSKILL)).size(),
                 "a plain skill must NOT match");
-        System.out.println("[130-欢愉] category ok");
+        System.out.println("[130-elation] category ok");
     }
 }
