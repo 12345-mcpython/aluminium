@@ -49,7 +49,7 @@ final class TriggerMagnitudes {
      * attribute's own units (the provider {@code attr} / {@code skill_param} / {@code add} terms decide that), so no
      * op-specific scale arithmetic is applied after it.
      */
-    static double valueOf(EffectSpec effect, TriggerContext ctx) {
+    static double valueOf(Magnitude effect, TriggerContext ctx) {
         if (effect.getValue() == null) {
             throw new IllegalStateException("Op " + effect.getOp() + " has no \"value\" to resolve");
         }
@@ -66,7 +66,7 @@ final class TriggerMagnitudes {
      * (0.8 x 481, the settled ATK rather than the base one). A damage instance uses the settled value, so this
      * path reads it directly.
      */
-    static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect, TriggerContext ctx) {
+    static double literalBase(CanHit attacker, CanHit victim, Magnitude effect, TriggerContext ctx) {
         // 「100% 攻击力 + 150% 防御力」 (8003/8004 Preservation Trailblazer Ultimate): several base terms that SUM into ONE
         // instance. Each term is evaluated by the readers below, through a copy that states only that term, so a term may use
         // any scale spelling a single-base damage may. The sum happens BEFORE settlement, which is the whole point: two
@@ -261,7 +261,7 @@ final class TriggerMagnitudes {
      * @return the multiplier for that row
      * @throws IllegalStateException when the row or the column falls outside the data
      */
-    static DamageElement elementOf(EffectSpec effect, Skill skill, CanHit attacker) {
+    static DamageElement elementOf(Magnitude effect, Skill skill, CanHit attacker) {
         if (effect.getElement() != null && !effect.getElement().isBlank()) {
             String named = effect.getElement().trim();
             if (TriggerInterpreter.ATTACKER_ELEMENT.equalsIgnoreCase(named)) {
@@ -274,7 +274,7 @@ final class TriggerMagnitudes {
         return skill == null ? null : skill.getData().getElement();
     }
 
-    static double multiplierOf(Skill skill, EffectSpec effect, CanHit attacker) {
+    static double multiplierOf(Skill skill, Magnitude effect, CanHit attacker) {
         var levels = skill.getData().getSkills();
         int level = effect.getDamageLevel() == null ? attacker.skillLevel(skill) : effect.getDamageLevel();
         int row = level - 1;
@@ -341,7 +341,7 @@ final class TriggerMagnitudes {
      * and then {@code percent_from_skill_param} each cost a round that way, and {@code percent_from_summon_param} was
      * the third.
      */
-    static boolean statesShare(EffectSpec effect) {
+    static boolean statesShare(Magnitude effect) {
         return effect.getPercent() != null || effect.getPercentFrom() != null
                 || effect.getPercentFromCastParam() != null
                 || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null
@@ -365,7 +365,7 @@ final class TriggerMagnitudes {
      * @param ctx    the context (the flat spelling reads the RULE OWNER's own skill)
      * @return the constant term, {@code 0} when neither spelling is stated
      */
-    static double constantTerm(EffectSpec effect, TriggerContext ctx) {
+    static double constantTerm(Magnitude effect, TriggerContext ctx) {
         if (effect.getValue() != null) {
             return valueOf(effect, ctx);
         }
@@ -394,7 +394,7 @@ final class TriggerMagnitudes {
      * <p>Shared by {@code APPLY_DOT} and by {@code APPLY_CONTROL}'s per-turn payload, so the two cannot drift -
      * and both read the <b>rule owner</b>, never the victim.
      */
-    static double dotMagnitude(EffectSpec effect, TriggerContext ctx) {
+    static double dotMagnitude(Magnitude effect, TriggerContext ctx) {
         if (effect.getValue() != null) {
             return applyDerivedCeiling(effect, ctx, valueOf(effect, ctx));
         }
@@ -410,7 +410,10 @@ final class TriggerMagnitudes {
             // keeps one meaning for the scale instead of asking the event to carry a target it never had.
             CanHit victim = ctx.target();
             if (victim == null && ctx.battle() != null) {
-                victim = TriggerTargets.resolveTarget(effect, ctx);
+                // The one place this layer needs the bean rather than a Magnitude: resolving a selector walks the
+                // selector vocabulary, which lives on EffectSpec. The cast is explicit so it is greppable, and it
+                // disappears when a parsed Magnitude carries its resolved unit instead of the spelling.
+                victim = TriggerTargets.resolveTarget((com.laosun.aluminium.beans.EffectSpec) effect, ctx);
             }
             if (victim == null) {
                 throw new IllegalStateException(
@@ -627,7 +630,7 @@ final class TriggerMagnitudes {
      * @param ctx    the trigger context (its battlefield is scanned)
      * @return the term to add to the share, in the same units
      */
-    public static double allyStateTerm(EffectSpec effect, TriggerContext ctx) {
+    public static double allyStateTerm(Magnitude effect, TriggerContext ctx) {
         java.util.List<String> names = new java.util.ArrayList<>();
         if (effect.getAllyStates() != null) {
             for (String each : effect.getAllyStates()) {
@@ -680,7 +683,7 @@ final class TriggerMagnitudes {
      * the hole the guard closed stays closed. Measured across the shipped content: 0 of 1393 effects stated both, so no
      * existing number moved.
      */
-    static double shareOf(EffectSpec effect, TriggerContext ctx) {
+    static double shareOf(Magnitude effect, TriggerContext ctx) {
         if (effect.getValue() != null) {
             // For the share-only ops (`ADVANCE`, `MODIFY_DAMAGE_TAKEN`, ...) `value` is the share itself;
             // the op's own vocabulary says what it is a share of.
@@ -728,7 +731,7 @@ final class TriggerMagnitudes {
      * The base chance an effect states: a literal {@code base_chance}, or one READ from the owner's skill row
      * ({@code base_chance_from_skill_param}), or {@code null} when it states neither (the callers default to 1.0).
      */
-    static Double baseChanceOf(EffectSpec effect, TriggerContext ctx) {
+    static Double baseChanceOf(Magnitude effect, TriggerContext ctx) {
         if (effect.getBaseChanceFromSkillParam() != null) {
             return ownerSkillParamValue(effect, ctx, effect.getBaseChanceFromSkillParam().trim());
         }
@@ -759,7 +762,7 @@ final class TriggerMagnitudes {
      * <p>Note: A memosprite that is not on the field is a <b>loud</b> failure, not 0 - the same rule
      * {@code summon_attr:} follows: a share of a unit that is not there is not a number.
      */
-    static double summonSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
+    static double summonSkillParamValue(Magnitude effect, TriggerContext ctx, String spelled) {
         String[] parts = spelled.split(":", 2);
         int slot = Integer.parseInt(parts[0].trim());
         int index = Integer.parseInt(parts[1].trim());
@@ -804,7 +807,7 @@ final class TriggerMagnitudes {
      * path reads the same row the same way ({@code multiplierOf} - {@code skill.getData().getSkills()},
      * {@code attacker.skillLevel(skill)}, {@code level - 1}).
      */
-    static double castParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
+    static double castParamValue(Magnitude effect, TriggerContext ctx, String spelled) {
         int index = Integer.parseInt(spelled);
         CanHit caster = ctx.actor();
         if (caster == null) {
@@ -851,7 +854,7 @@ final class TriggerMagnitudes {
      * <p>The sibling of {@link #castParamValue}, and the only difference is which skill: that one reads the skill that PRODUCED the event, this one reads
      * the slot the scale names. Same row lookup (`getData().getSkills()` at `skillLevel`, then the index), so the two cannot drift.
      */
-    static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx) {
+    static double ownerSkillParamValue(Magnitude effect, TriggerContext ctx) {
         return ownerSkillParamValue(effect, ctx,
                 effect.getScale().trim().substring(TriggerTable.SKILL_PARAM_PREFIX.length()));
     }
@@ -863,7 +866,7 @@ final class TriggerMagnitudes {
      *
      * <p>It is added to a share the effect states by SPELLING -- a literal `percent` is raised by {@code amendedEffect} instead, so a rule is never raised twice.
      */
-    static double amendmentDelta(EffectSpec effect, TriggerContext ctx) {
+    static double amendmentDelta(Magnitude effect, TriggerContext ctx) {
         if (effect.getPercent() != null) {
             return 0;
         }
@@ -886,7 +889,7 @@ final class TriggerMagnitudes {
      * not by points. When a literal {@code percent} is also stated ({@code shareOf} multiplies by it), this returns
      * {@code 1}: {@code amendedEffect} has already scaled that fraction, and scaling both would apply the amendment twice.
      */
-    static double amendmentScale(EffectSpec effect, TriggerContext ctx) {
+    static double amendmentScale(Magnitude effect, TriggerContext ctx) {
         if (effect.getPercent() != null) {
             return 1;
         }
@@ -907,7 +910,7 @@ final class TriggerMagnitudes {
      * 气氛值) of DEF" - applied only the {@code percent} (0.5%) and silently dropped both the base and the gauge.
      * Measured: the settled {@code DefenceArea} moved by 0.5% at every gauge value, from 0 to 50.
      */
-    static double magnitudeOf(EffectSpec effect, TriggerContext ctx) {
+    static double magnitudeOf(Magnitude effect, TriggerContext ctx) {
         if (effect.getValue() != null) {
             return valueOf(effect, ctx);
         }
@@ -920,7 +923,7 @@ final class TriggerMagnitudes {
         return effect.getAmount() == null ? 0.0 : effect.getAmount();
     }
 
-    static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
+    static double derivedMagnitude(Magnitude effect, TriggerContext ctx) {
         if (effect.getValue() != null) {
             return valueOf(effect, ctx);
         }
@@ -1161,7 +1164,7 @@ final class TriggerMagnitudes {
      * <p>Note: It is a ceiling, not a floor and not a replacement: a small victim keeps its small share, and only a value that
      * would exceed the ceiling is brought down to it.
      */
-    static double applyDerivedCeiling(EffectSpec effect, TriggerContext ctx, double magnitude) {
+    static double applyDerivedCeiling(Magnitude effect, TriggerContext ctx, double magnitude) {
         // Note: The constant ceiling is applied HERE and not in the caller's cap branch: this method
         // return early when there was no `cap_scale`, so a `cap_amount` wired beside it never ran.
         double capped = magnitude;
@@ -1182,7 +1185,7 @@ final class TriggerMagnitudes {
      * the engine grew a second kind of table owner and this op needs a story for it. That is worth an
      * exception rather than a silent skip - {@code SUMMON} would otherwise simply do nothing.
      */
-    static com.laosun.aluminium.entity.Character requireCharacterOwner(EffectSpec effect, TriggerContext ctx) {
+    static com.laosun.aluminium.entity.Character requireCharacterOwner(Magnitude effect, TriggerContext ctx) {
         if (ctx.owner() instanceof com.laosun.aluminium.entity.Character character) {
             return character;
         }
@@ -1204,7 +1207,7 @@ final class TriggerMagnitudes {
      *               already did its job)
      * @return the attribute named by the scale
      */
-    static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
+    static AttributeType scaleAttribute(Magnitude effect, String op, TriggerSpec spec) {
         // A `value` expression names its own source (the provider's `attr` / `skill_param` / ...); there is no
         // single attribute for this method to return, and the caller only uses it to validate a `scale`.
         if (effect.getValue() != null) {
@@ -1278,7 +1281,7 @@ final class TriggerMagnitudes {
      * ({@code amount_from_skill_param}) states no scale at all, and "the scale \"null\"" would send its author looking
      * for a field they never wrote.
      */
-    static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
+    static double ownerSkillParamValue(Magnitude effect, TriggerContext ctx, String spelled) {
         // a share may name ANOTHER character's row: the field says whose, and the slot stays a legal SkillType so the loader check still means something
         com.laosun.aluminium.entity.Character owner;
         if (effect.getSkillParamCid() != null) {
@@ -1319,7 +1322,7 @@ final class TriggerMagnitudes {
      * <p>Extracted so the scale and the {@code original_damage} number provider share one reader - a second copy is
      * where the true-damage correction below would drift from the provider's.
      */
-    static double originalDamageOf(EffectSpec effect, TriggerContext ctx) {
+    static double originalDamageOf(Magnitude effect, TriggerContext ctx) {
         if (ctx == null || ctx.damage() == null) {
             throw new IllegalStateException(
                     "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "

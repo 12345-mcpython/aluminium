@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.trigger.Magnitude;
 import com.laosun.aluminium.trigger.NumberProviders;
 import com.laosun.aluminium.trigger.TriggerInterpreter;
 import lombok.Getter;
@@ -33,7 +34,7 @@ import java.util.List;
 @Getter
 @ToString
 @NoArgsConstructor
-public class EffectSpec {
+public class EffectSpec implements Magnitude {
 
     /**
      * A <b>deep-enough copy</b>: every field is carried over, so a caller can adjust one of them without touching the

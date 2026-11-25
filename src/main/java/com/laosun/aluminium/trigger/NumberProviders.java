@@ -56,7 +56,7 @@ public final class NumberProviders {
      * @param ctx      the firing context
      * @return the number
      */
-    public static double resolve(NumberProvider provider, EffectSpec effect, TriggerContext ctx) {
+    public static double resolve(NumberProvider provider, Magnitude effect, TriggerContext ctx) {
         if (provider == null || provider.getType() == null) {
             throw new IllegalStateException("a number provider needs a \"type\"");
         }
@@ -462,7 +462,7 @@ public final class NumberProviders {
      * <p>A zero-weight entry is legal and never picked, which is how a rule states "this fallback only when nothing else
      * applies". Weights are <b>relative</b>, so they need not sum to 1.
      */
-    private static double weighted(NumberProvider provider, EffectSpec effect, TriggerContext ctx) {
+    private static double weighted(NumberProvider provider, Magnitude effect, TriggerContext ctx) {
         List<NumberProvider.Weighted> distribution = provider.getDistribution();
         if (distribution == null || distribution.isEmpty()) {
             throw new IllegalStateException("a \"weighted_list\" provider needs a non-empty \"distribution\"");
@@ -589,7 +589,7 @@ public final class NumberProviders {
         return ctx.battle().getRng();
     }
 
-    private static double fold(NumberProvider provider, EffectSpec effect, TriggerContext ctx, String type,
+    private static double fold(NumberProvider provider, Magnitude effect, TriggerContext ctx, String type,
                                double identity, java.util.function.DoubleBinaryOperator operator) {
         double result = identity;
         List<NumberProvider> inputs = requireInputs(provider, type);

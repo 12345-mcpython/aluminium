@@ -613,7 +613,7 @@ final class TriggerTargets {
      * @param effect the effect whose scale is being read
      * @return the state name (never blank; the loader refuses a blank one)
      */
-    static String holderAttrState(EffectSpec effect) {
+    static String holderAttrState(Magnitude effect) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String rest = raw.substring(TriggerTable.HOLDER_ATTR_PREFIX.length());
         int lastColon = rest.lastIndexOf(':');
@@ -628,7 +628,7 @@ final class TriggerTargets {
     /**
      * The attribute named by a {@code holder_attr:<STATE>:<ATTRIBUTE>} scale (the part after the last colon).
      */
-    static AttributeType holderAttrAttribute(EffectSpec effect) {
+    static AttributeType holderAttrAttribute(Magnitude effect) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String rest = raw.substring(TriggerTable.HOLDER_ATTR_PREFIX.length());
         int lastColon = rest.lastIndexOf(':');
