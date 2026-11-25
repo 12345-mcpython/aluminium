@@ -110,4 +110,39 @@ public final class BattleFixture {
     public static Battle battle(List<Character> party, List<? extends CanHit> enemies, Random rng) {
         return new Battle(party, enemies, rng);
     }
+
+    /**
+     * A battle that has already started, with the suite's standard RNG.
+     *
+     * <p><b>What it does, exactly.</b> {@code new Battle(party, enemies, seeded())} followed by
+     * {@code startBattle()} - nothing else. It is the six-line idiom 355 judges write by hand, in one call.
+     * {@code startBattle()} ends with its own {@code processRequests()} phases (BATTLE_START, BATTLE_READY,
+     * WAVE_START), so the trailing {@code processRequests()} some judges also write is a no-op, not a step this
+     * method skips.
+     *
+     * <p><b>What it does not decide.</b> Which characters, which enemies, and why - that is the premise and stays
+     * at the call site. A judge that measures before the opening rules have run wants {@link #battle(List, List)}
+     * instead; that is why this is a separate name rather than an extra argument.
+     *
+     * @param party   the player-side combatants
+     * @param enemies the opposing side
+     * @return the started battle
+     */
+    public static Battle started(List<Character> party, List<? extends CanHit> enemies) {
+        return started(party, enemies, seeded());
+    }
+
+    /**
+     * The same, with the judge's own RNG.
+     *
+     * @param party   the player-side combatants
+     * @param enemies the opposing side
+     * @param rng     the judge's RNG
+     * @return the started battle
+     */
+    public static Battle started(List<Character> party, List<? extends CanHit> enemies, Random rng) {
+        Battle battle = battle(party, enemies, rng);
+        battle.startBattle();
+        return battle;
+    }
 }

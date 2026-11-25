@@ -25,8 +25,14 @@ import java.util.stream.Stream;
  * <p><b>Why a guard and not a convention.</b> The audit status of a character is only as good as its notes: a rule with
  * no {@code note} has nothing to re-check, and a rule with no {@code source} cannot be traced back to a document. 42 such
  * rules shipped before this guard existed (15 distinct file/id pairs - the light cones key their rules by rank, so one id
- * repeats across ranks). They are <b>recorded below</b>, so this case fails on any NEW gap and also fails once a recorded
- * one is filled without the list being updated: the list is a to-do, not a permission.
+ * repeats across ranks). Every one of them has been filled, so the backlog is empty and there is no exception list.
+ *
+ * <p><b>Why there is no longer a {@code RECORDED} list.</b> It used to hold the backlog and this case failed in
+ * <b>both</b> directions - a new gap, and a recorded gap that had been filled. The second direction turned progress
+ * into a red: the only way to fix a gap without failing the gate was to edit the list in the same commit, and the
+ * failure message ("delete their lines") made a correct change look like a regression. A to-do list that must be
+ * edited to accept its own completion is a trap, not a guard. Should a backlog ever be needed again, record it in
+ * the ledger ({@code CONTENT-STATUS.md}) where fixing an entry is the expected direction.
  */
 public class ContentProvenanceTest {
 
@@ -35,13 +41,6 @@ public class ContentProvenanceTest {
     /** A rule that shipped without one half of its provenance. */
     private record Gap(String file, String id, String fields) {
     }
-
-    /** The recorded backlog (2026-10-30). Fix one, delete its line. */
-    private static final List<Gap> RECORDED = List.of(
-            // 1006 skill_inserts_party_first_weakness and 1504 ults_immediate_talent: sources filled on 2026-11-02.
-            // 1203 talent_zone_heals_the_attacker: source filled on 2026-11-02 (see its _note).
-            // 1309 ult_zone_defence_ignore: DELETED on 2026-11-02 - the sentence is 1303's Eidolon 1, which already implements it.
-    );
 
     @Test
     public void noRuleShipsWithoutItsSourceAndNote() throws IOException {
@@ -61,23 +60,12 @@ public class ContentProvenanceTest {
             }
         }
 
-        List<String> newGaps = new ArrayList<>();
+        List<String> gaps = new ArrayList<>();
         for (Gap gap : found) {
-            if (!RECORDED.contains(gap)) {
-                newGaps.add(gap.toString());
-            }
+            gaps.add(gap.toString());
         }
-        List<String> fixed = new ArrayList<>();
-        for (Gap recorded : RECORDED) {
-            if (!found.contains(recorded)) {
-                fixed.add(recorded.toString());
-            }
-        }
-        Assertions.assertTrue(newGaps.isEmpty(), "rules shipped without source/note:\n  "
-                + String.join("\n  ", newGaps));
-        Assertions.assertTrue(fixed.isEmpty(), "these recorded gaps are gone - delete their lines from RECORDED:\n  "
-                + String.join("\n  ", fixed));
-        Assertions.assertEquals(RECORDED.size(), found.size(), "backlog size");
+        Assertions.assertTrue(gaps.isEmpty(), "rules shipped without source/note:\n  "
+                + String.join("\n  ", gaps));
     }
 
     /**
