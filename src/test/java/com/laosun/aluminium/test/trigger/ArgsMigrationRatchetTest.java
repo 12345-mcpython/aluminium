@@ -83,7 +83,10 @@ public class ArgsMigrationRatchetTest {
             "BOOST_DOT",
             "EXTEND_BUFF",
             "REMOVE_STACK",
-            "SPEND_STEPS");
+            "SPEND_STEPS",
+            "RAISE_SKILL_MULTIPLIER",
+            "RAISE_SKILL_POINT_CAP",
+            "RESET_TRIGGER_LIMIT");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {

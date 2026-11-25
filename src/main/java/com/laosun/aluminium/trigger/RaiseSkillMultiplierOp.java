@@ -10,10 +10,9 @@ import java.util.Locale;
  * {@code RAISE_SKILL_MULTIPLIER}: multiply one skill slot's row share for the rest of the battle.
  *
  * <p>Neither a zone nor a rule amendment: the row number is read at settlement, so only this op can say "the Ultimate's
- * damage multiplier is raised by 240%". The optional enemy-count window is what lets one sentence state disjoint tiers,
- * and an empty window is refused.
+ * damage multiplier is raised by 240%".
  */
-final class RaiseSkillMultiplierOp implements OpHandler<OpArgs> {
+final class RaiseSkillMultiplierOp implements OpHandler<RaiseSkillMultiplierArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -21,35 +20,38 @@ final class RaiseSkillMultiplierOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public RaiseSkillMultiplierArgs parse(EffectSpec effect) {
+        return new RaiseSkillMultiplierArgs(
+                effect.getSkill() == null ? "" : effect.getSkill().trim(),
+                effect,
+                effect.getMinEnemies(),
+                effect.getMaxEnemies());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(RaiseSkillMultiplierArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireSkill(effect, op, rule);
         TriggerValidator.requirePercent(effect, op, rule);
-        if (effect.getPercent() != null && effect.getPercent() <= 0) {
+        if (args.magnitude().getPercent() != null && args.magnitude().getPercent() <= 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " raises a row multiplier, so \"percent\" must be positive (1.0 = x2.0); a "
                             + "negative share would be a different sentence (source: " + rule.getSource() + ")");
         }
-        Integer min = effect.getMinEnemies();
-        Integer max = effect.getMaxEnemies();
-        if (min != null && min < 1) {
+        if (args.minEnemies() != null && args.minEnemies() < 1) {
             throw new IllegalArgumentException(
                     "Op " + op + " bounds the enemy count, so \"min_enemies\" is at least 1 (source: "
                             + rule.getSource() + ")");
         }
-        if (max != null && max < 1) {
+        if (args.maxEnemies() != null && args.maxEnemies() < 1) {
             throw new IllegalArgumentException(
                     "Op " + op + " bounds the enemy count, so \"max_enemies\" is at least 1 (source: "
                             + rule.getSource() + ")");
         }
-        if (min != null && max != null && max < min) {
+        if (args.minEnemies() != null && args.maxEnemies() != null && args.maxEnemies() < args.minEnemies()) {
             throw new IllegalArgumentException(
-                    "Op " + op + " states an empty enemy window: min_enemies " + min + " > max_enemies " + max
+                    "Op " + op + " states an empty enemy window: min_enemies " + args.minEnemies()
+                            + " > max_enemies " + args.maxEnemies()
                             + " (source: " + rule.getSource() + ")");
         }
         TriggerValidator.requireNoDuration(effect, op, rule);
@@ -57,9 +59,10 @@ final class RaiseSkillMultiplierOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        SkillType slot = SkillType.valueOf(ctx.effect().getSkill().trim().toUpperCase(Locale.ROOT));
-        ctx.firing().owner().amendSkillMultiplier(slot, ctx.share(),
-                ctx.effect().getMinEnemies(), ctx.effect().getMaxEnemies());
+    public void apply(OpContext ctx, RaiseSkillMultiplierArgs args) {
+        SkillType slot = SkillType.valueOf(args.skill().toUpperCase(Locale.ROOT));
+        ctx.firing().owner().amendSkillMultiplier(slot,
+                TriggerMagnitudes.shareOf(args.magnitude(), ctx.firing()),
+                args.minEnemies(), args.maxEnemies());
     }
 }

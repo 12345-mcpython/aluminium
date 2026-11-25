@@ -6,11 +6,10 @@ import com.laosun.aluminium.beans.TriggerSpec;
 /**
  * {@code RAISE_SKILL_POINT_CAP}: move the pool's ceiling, positive or negative.
  *
- * <p>Unlike {@code GAIN_SKILL_POINT}, a negative amount is meaningful here: it takes a granted bonus back, which is
- * how a rule states "for this battle the cap is 7" as a +2 and a later -2. Zero is refused, because it would be a
- * number that does nothing.
+ * <p>Unlike {@code GAIN_SKILL_POINT}, a negative amount is meaningful here: it takes a granted bonus back. Zero is
+ * refused, because it would be a number that does nothing.
  */
-final class RaiseSkillPointCapOp implements OpHandler<OpArgs> {
+final class RaiseSkillPointCapOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,28 +17,30 @@ final class RaiseSkillPointCapOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
-        if (effect.getValue() == null && (effect.getAmount() == null || effect.getAmount() == 0)) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
+        String op = op().name();
+        if (args.magnitude().getValue() == null
+                && (args.magnitude().getAmount() == null || args.magnitude().getAmount() == 0)) {
             throw new IllegalArgumentException(
-                    "Op " + op().name() + " changes the skill point cap, so \"amount\" is a non-zero number of points"
+                    "Op " + op + " changes the skill point cap, so \"amount\" is a non-zero number of points"
                             + " (negative takes a bonus away): got "
-                            + (effect.getAmount() == null ? "nothing" : effect.getAmount())
+                            + (args.magnitude().getAmount() == null ? "nothing" : args.magnitude().getAmount())
                             + " (source: " + rule.getSource() + ")");
         }
-        TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
+        TriggerValidator.requireNoStackArguments(effect, op, rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        EffectSpec effect = ctx.effect();
-        int points = effect.getValue() != null
-                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx.firing()))
-                : (int) Math.round(effect.getAmount());
+    public void apply(OpContext ctx, MagnitudeArgs args) {
+        Magnitude magnitude = args.magnitude();
+        int points = magnitude.getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(magnitude, ctx.firing()))
+                : (int) Math.round(magnitude.getAmount());
         ctx.battle().getSkillPointPolicy().raiseMax(points);
     }
 }
