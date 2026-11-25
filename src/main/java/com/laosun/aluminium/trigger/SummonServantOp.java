@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * be several. Registered here so the op has one dispatch path; its load-time checks are still in
  * {@code TriggerValidator}.
  */
-final class SummonServantOp implements OpHandler<OpArgs> {
+final class SummonServantOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,18 +18,18 @@ final class SummonServantOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         // This op has no arm of its own in TriggerValidator, so this was the default check it used to get there.
         TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        ctx.battle().summonServant(TriggerMagnitudes.requireCharacterOwner(ctx.effect(), ctx.firing()));
+    public void apply(OpContext ctx, MagnitudeArgs args) {
+        ctx.battle().summonServant(TriggerMagnitudes.requireCharacterOwner(args.magnitude(), ctx.firing()));
     }
 }

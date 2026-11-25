@@ -11,7 +11,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * RECIPIENT's own maximum, untouched by the regen rate". A {@code fixed} number that also states {@code scale} is
  * refused, because a fixed number and a share are different magnitudes.
  */
-final class GainEnergyOp implements OpHandler<OpArgs> {
+final class GainEnergyOp implements OpHandler<MagnitudeArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -19,12 +19,12 @@ final class GainEnergyOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public MagnitudeArgs parse(EffectSpec effect) {
+        return new MagnitudeArgs(effect);
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(MagnitudeArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         boolean fixedShare = Boolean.TRUE.equals(effect.getFixed()) && effect.getAmount() == null
                 && (effect.getPercent() != null || effect.getPercentFrom() != null
@@ -56,7 +56,7 @@ final class GainEnergyOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.gainEnergy(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, MagnitudeArgs args) {
+        TriggerInterpreter.gainEnergy(ctx, args);
     }
 }

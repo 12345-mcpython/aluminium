@@ -770,9 +770,9 @@ public final class TriggerInterpreter {
      * impossible, and the fix cannot be "pay the resolved unit N times": the amount differs per recipient, so the
      * resolution - not the amount - had to become a list.
      */
-    static void gainEnergy(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-            gainEnergyFor(battle, effect, ctx, target);
+    static void gainEnergy(OpContext ctx, MagnitudeArgs args) {
+        for (CanHit target : ctx.targets()) {
+            gainEnergyFor(ctx.battle(), args.magnitude(), ctx.firing(), target);
         }
     }
 
@@ -783,7 +783,7 @@ public final class TriggerInterpreter {
      * a share of nothing is not a number - that is a loud failure rather than a silent grant of 0, the same call
      * the scale family makes everywhere else.
      */
-    private static void gainEnergyFor(BattlePort battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
+    private static void gainEnergyFor(BattlePort battle, Magnitude effect, TriggerContext ctx, CanHit target) {
         if (effect.getValue() != null) {
             // One whole magnitude: `fixed` still decides whether the energy-regeneration rate touches it.
             double amount = TriggerMagnitudes.valueOf(effect, ctx);

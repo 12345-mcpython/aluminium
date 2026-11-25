@@ -121,6 +121,12 @@ public interface Magnitude {
     /** @return the multi-part base ("100% ATK + 150% DEF") */
     List<EffectSpec.Part> getParts();
 
+    /** @return whether the number is a FIXED report that the energy-regeneration rate does not touch */
+    Boolean getFixed();
+
+    /** @return a share of the event's own amount, used beside {@code amount_from_event} */
+    Double getAmountPercent();
+
     /**
      * @return whether the magnitude is multiplied by "how many units this event hit" ({@code per_target})
      *
