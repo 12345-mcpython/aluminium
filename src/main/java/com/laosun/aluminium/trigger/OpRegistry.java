@@ -64,7 +64,15 @@ public final class OpRegistry {
             new RaiseSkillLevelOp(),
             new RaiseSkillHitsOp(),
             new StartCountdownOp(),
-            new SpendStepsOp());
+            new SpendStepsOp(),
+            new ExtraTurnOp(),
+            new InsertActionOp(),
+            new IgnoreWeaknessOp(),
+            new ResetResourceCapOp(),
+            new ResetRuleChanceOp(),
+            new ApplyRegenOp(),
+            new SuperBreakOp(),
+            new BoostToughnessOp());
 
     /** {@link #HANDLERS} indexed by op, built once. */
     private static final Map<TriggerOperator, OpHandler<?>> BY_OP = index();

@@ -856,33 +856,6 @@ public final class TriggerInterpreter {
                             effect), ctx));
                 }
             }
-            case INSERT_ACTION -> {
-                // "Demiurge (德谬歌) immediately gains 1 extra turn and automatically casts [花与箭的舞曲]"(1415 memosprite skill 10): a unit outside the action
-                // order acts now -- the game's `TurnInsertAction`. Note: NOT `EXTRA_TURN`: that one cuts into a queue the unit is already in, and
-                // a memosprite at Speed 0 is not in it at all (the game pins it there with `SpeedOverride`).
-                CanHit acting = TriggerTargets.require(TriggerTargets.resolveTarget(effect, ctx), "target", ctx);
-                if (!battle.insertAction(acting)) {
-                    throw new IllegalStateException("INSERT_ACTION makes " + acting.getName()
-                            + " act now, but it is dead or already waiting to act");
-                }
-            }
-            case EXTRA_TURN -> {
-                // Note: A refused grant can vanish: `grantExtraTurn` answers false for a unit that is not in the action
-                // order -- and a memosprite at Speed 0 is exactly that -- so the rule looked like it had worked. Measured on 1415's ode of
-                // genesis, whose clause grants Demiurge (德谬歌) an extra turn: the judge read "extra turn actor = none" and nothing said why.
-                CanHit holder = TriggerTargets.require(TriggerTargets.resolveTarget(effect, ctx), "target", ctx);
-                if (!battle.grantExtraTurn(holder)) {
-                    throw new IllegalStateException("EXTRA_TURN gives " + holder.getName()
-                            + " an extra turn, but it is not in the action order (a memosprite at Speed 0 is skipped "
-                            + "when the battle starts), so no extra turn can be granted");
-                }
-            }
-            case IGNORE_WEAKNESS -> {
-                int casts = effect.getAmount() == null ? 1 : (int) Math.round(effect.getAmount());
-                for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    target.markIgnoreWeaknessCasts(casts);
-                }
-            }
             case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
             // 「可积攒最多 120 点溢出能量」: the bar's overflow allowance. Reader: 1014 Saber's trace 湖之祝福 and its
             // Eidolon 6 (「提高到 200 点」 = the same op with the difference).
@@ -918,23 +891,6 @@ public final class TriggerInterpreter {
                 String movedId = effect.getResource();
                 int removed = removeResource(effect, ctx, mover);
                 fireResourceChanged(battle, ctx, mover, movedId, -removed);
-            }
-            // "真珠回合开始时重置可获得【好活当赏】数量" (1503 Pearl (真珠)'s trace): starts a new round for the per-round
-            // allowances that `max_per_round` charges against. Nothing about the COUNTER changes - only what this round
-            // may still hand out.
-            case RESET_RESOURCE_CAP -> {
-                CanHit resetOwner = ctx.owner();
-                if (resetOwner != null) {
-                    resetOwner.getResources().resetRoundAllowances();
-                }
-            }
-            // "将触发【头号补给盲盒】的固定概率重置为初始值" (1506's 崩坏级伤害演示): the decaying probability goes back to the
-            // rule's own `chance`, so the next firing rolls the initial number again.
-            case RESET_RULE_CHANCE -> {
-                CanHit chanceOwner = ctx.owner();
-                if (chanceOwner != null) {
-                    chanceOwner.resetRuleChance(effect.getRule().trim());
-                }
             }
             case DAMAGE -> {
                 // A list, like HEAL/SHIELD: "to all enemies" is one effect that reaches several units, and the
@@ -1000,9 +956,6 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case BOOST_TOUGHNESS -> TriggerEffects.boostToughness(battle, effect, ctx);
-            case SUPER_BREAK -> TriggerEffects.superBreak(battle, effect, ctx);
-            case APPLY_REGEN -> TriggerEffects.applyRegen(battle, effect, ctx);
             case REGISTER_HEAL_BONUS -> registerHealBonus(effect, ctx);
             case SUMMON -> {
                 // 「若任意「晴空乐手」已在场…」 (1512): a kit may own SEVERAL memosprites, and "which one" is data. Without
