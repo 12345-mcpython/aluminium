@@ -971,15 +971,15 @@ final class TriggerEffects {
      * @param effect the effect ({@code attribute}, {@code amount}, optional {@code target})
      * @param ctx    the context
      */
-    static void removeStacks(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        int amount = effect.getValue() != null
-                ? (int) Math.round(TriggerMagnitudes.valueOf(effect, ctx))
-                : (int) Math.round(effect.getAmount());
-        boolean byName = effect.getBuff() != null && !effect.getBuff().isBlank();
-        AttributeType attribute = byName ? null : AttributeType.fromString(effect.getAttribute());
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+    static void removeStacks(OpContext ctx, RemoveStackArgs args) {
+        int amount = args.magnitude().getValue() != null
+                ? (int) Math.round(TriggerMagnitudes.valueOf(args.magnitude(), ctx.firing()))
+                : (int) Math.round(args.magnitude().getAmount());
+        boolean byName = args.buff() != null && !args.buff().isBlank();
+        AttributeType attribute = byName ? null : AttributeType.fromString(args.attribute());
+        for (CanHit target : ctx.targets()) {
             if (byName) {
-                target.getBuffManager().removeNamedStacks(effect.getBuff(), amount);
+                target.getBuffManager().removeNamedStacks(args.buff(), amount);
             } else {
                 target.getBuffManager().removeStacks(attribute, amount);
             }
@@ -1115,22 +1115,22 @@ final class TriggerEffects {
      * <p>Nothing to lengthen is <b>not</b> an error: the rule fires whenever its event happens (usually the same
      * cast that applied the buff), and "the target carries nothing of mine" is an ordinary empty case.
      */
-    static void extendBuff(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+    static void extendBuff(OpContext ctx, ExtendBuffArgs args) {
+        for (CanHit target : ctx.targets()) {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            // "extend all of one's own buff effects by 1 turn" (readers: 1506's talent and its E2): `EXTEND_BUFF` with an explicit
-            // `"kind": "all"`. The origin filter `extendBuffsFrom` applies is deliberate (its note names "the shield provided by the Skill"), so
-            // "all" -- whoever applied it -- had no spelling; the implicit filter-less form stays refused by `requireExtendFilter`,
-            // because that one would lengthen buffs the sentence never mentions.
-            if (effect.getKind() != null && "all".equalsIgnoreCase(effect.getKind().trim())) {
-                target.getBuffManager().extendAllBuffs(effect.getTurns());
+            // "extend all of one's own buff effects by 1 turn" (readers: 1506's talent and its E2): `EXTEND_BUFF` with
+            // an explicit `"kind": "all"`. The origin filter `extendBuffsFrom` applies is deliberate (its note names
+            // "the shield provided by the Skill"), so "all" -- whoever applied it -- had no spelling; the implicit
+            // filter-less form stays refused by `requireExtendFilter`.
+            if (args.kind() != null && "all".equalsIgnoreCase(args.kind().trim())) {
+                target.getBuffManager().extendAllBuffs(args.turns());
                 continue;
             }
-            target.getBuffManager().extendBuffsFrom(ctx.owner(), effect.getBuff(),
-                    effect.getAttribute() == null ? null : AttributeType.fromString(effect.getAttribute()),
-                    effect.getTurns());
+            target.getBuffManager().extendBuffsFrom(ctx.firing().owner(), args.buff(),
+                    args.attribute() == null ? null : AttributeType.fromString(args.attribute()),
+                    args.turns());
         }
     }
 

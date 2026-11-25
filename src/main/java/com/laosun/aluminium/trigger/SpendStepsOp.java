@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * are separate because one rule may pay two effects per milestone while the counter is charged once. A repeat count
  * here would spend the same milestones once per iteration, so {@code per_steps} is refused.
  */
-final class SpendStepsOp implements OpHandler<OpArgs> {
+final class SpendStepsOp implements OpHandler<SpendStepsArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class SpendStepsOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public SpendStepsArgs parse(EffectSpec effect) {
+        return new SpendStepsArgs(effect.getSteps() == null ? "" : effect.getSteps().trim());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(SpendStepsArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         if (effect.getSteps() == null || effect.getSteps().isBlank()) {
             throw new IllegalArgumentException(
@@ -40,7 +40,7 @@ final class SpendStepsOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.spendSteps(ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, SpendStepsArgs args) {
+        TriggerInterpreter.spendSteps(ctx, args);
     }
 }

@@ -80,7 +80,10 @@ public class ArgsMigrationRatchetTest {
             "APPLY_REGEN",
             "REMOVE_STATE",
             "SET_STACKS",
-            "BOOST_DOT");
+            "BOOST_DOT",
+            "EXTEND_BUFF",
+            "REMOVE_STACK",
+            "SPEND_STEPS");
 
     @Test
     public void theOpsThatParseTheirArgumentsAreStillParsingThem() throws IOException {

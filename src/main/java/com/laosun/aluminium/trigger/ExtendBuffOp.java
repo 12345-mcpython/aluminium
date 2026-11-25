@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * turn" needs its own op. It names the buffs by state or attribute and adds turns to them; {@code permanent} /
  * {@code until} describe how a NEW buff ends and are not read here.
  */
-final class ExtendBuffOp implements OpHandler<OpArgs> {
+final class ExtendBuffOp implements OpHandler<ExtendBuffArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class ExtendBuffOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ExtendBuffArgs parse(EffectSpec effect) {
+        return new ExtendBuffArgs(effect.getTurns(), effect.getKind(), effect.getBuff(), effect.getAttribute());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ExtendBuffArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireSignedTurns(effect, op, rule);
         TriggerValidator.requireNoStackArguments(effect, op, rule);
@@ -37,7 +37,7 @@ final class ExtendBuffOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.extendBuff(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, ExtendBuffArgs args) {
+        TriggerEffects.extendBuff(ctx, args);
     }
 }

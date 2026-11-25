@@ -10,7 +10,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * stackable modifier, which the attribute form cannot address. Removing nothing is not an error - the sentence that
  * says "one stack per turn" fires every turn whether or not there is one.
  */
-final class RemoveStackOp implements OpHandler<OpArgs> {
+final class RemoveStackOp implements OpHandler<RemoveStackArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -18,12 +18,12 @@ final class RemoveStackOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public RemoveStackArgs parse(EffectSpec effect) {
+        return new RemoveStackArgs(effect, effect.getBuff(), effect.getAttribute());
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(RemoveStackArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         boolean byName = effect.getBuff() != null && !effect.getBuff().isBlank();
         boolean byAttribute = effect.getAttribute() != null && !effect.getAttribute().isBlank();
@@ -41,7 +41,7 @@ final class RemoveStackOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerEffects.removeStacks(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, RemoveStackArgs args) {
+        TriggerEffects.removeStacks(ctx, args);
     }
 }

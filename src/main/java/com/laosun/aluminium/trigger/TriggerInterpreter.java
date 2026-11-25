@@ -1161,18 +1161,17 @@ public final class TriggerInterpreter {
      * spend from, and saying so beats silently keeping the milestones and paying them again on the next change. Nothing
      * to spend (fewer than one whole step) is a no-op, because this rule fires on every change of the counter.
      */
-    static void spendSteps(EffectSpec effect, TriggerContext ctx) {
-        String written = effect.getSteps() == null ? "" : effect.getSteps().trim();
-        CounterSteps counter = parseCounterSteps(written, "SPEND_STEPS steps");
-        int milestones = counter.wholeSteps(ctx);
+    static void spendSteps(OpContext ctx, SpendStepsArgs args) {
+        CounterSteps counter = parseCounterSteps(args.steps(), "SPEND_STEPS steps");
+        int milestones = counter.wholeSteps(ctx.firing());
         if (milestones <= 0) {
             return;
         }
         int amount = (int) Math.round(milestones * counter.step());
-        CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
+        CanHit holder = ctx.requireTarget("target");
         // The STORE, wherever it lives: the unit's own counter, or the battle's PARTY-scoped one. An attribute is
         // neither, and a spend that kept the milestones would pay them again on the next change.
-        com.laosun.aluminium.state.Resource party = partyCounterOrNull(ctx, holder, counter.counter());
+        com.laosun.aluminium.state.Resource party = partyCounterOrNull(ctx.firing(), holder, counter.counter());
         com.laosun.aluminium.state.Resource store = party != null ? party
                 : holder.getResources().has(counter.counter()) ? holder.getResources().get(counter.counter())
                 : null;
@@ -1184,10 +1183,9 @@ public final class TriggerInterpreter {
             throw new IllegalStateException("SPEND_STEPS '" + counter.counter() + "' needs " + amount + " but "
                     + holder.getName() + " has only " + store.value());
         }
-        // Announced like every other resource move: the GAIN/SPEND_RESOURCE arms measure around their own call for
-        // the same reason, and a rule forwarding off this counter has to see the consumption. The subject is the
-        // holder whose store was charged, exactly as those arms now name theirs.
-        fireResourceChanged(ctx.battle(), ctx, holder, counter.counter(), -amount);
+        // Announced like every other resource move: a rule forwarding off this counter has to see the consumption. The
+        // subject is the holder whose store was charged, exactly as the other resource ops name theirs.
+        fireResourceChanged(ctx.battle(), ctx.firing(), holder, counter.counter(), -amount);
     }
 
     /*
