@@ -9,7 +9,7 @@ import com.laosun.aluminium.beans.TriggerSpec;
  * <p>Neither direction is an attribute, which is why {@code MODIFY_ATTR} cannot express it. A one-shot effect on the
  * instance being settled ({@code instance}) needs no lifetime; every persistent zone still requires one.
  */
-final class ModifyDamageTakenOp implements OpHandler<OpArgs> {
+final class ModifyDamageTakenOp implements OpHandler<ModifyDamageTakenArgs> {
 
     @Override
     public TriggerOperator op() {
@@ -17,12 +17,35 @@ final class ModifyDamageTakenOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public OpArgs parse(EffectSpec effect) {
-        return OpArgs.NONE;
+    public ModifyDamageTakenArgs parse(EffectSpec effect) {
+        boolean permanent = TriggerLifetimes.unticked(effect);
+        // ⚠ `Integer.valueOf` on the placeholder: a `?:` mixing the primitive with the boxed `getTurns()` would unbox a
+        // null and NPE before this op's own validator could refuse a missing duration.
+        Integer turns = permanent
+                ? Integer.valueOf(TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER)
+                : effect.getTurns();
+        return new ModifyDamageTakenArgs(
+                effect,
+                Boolean.TRUE.equals(effect.getInstance()),
+                turns,
+                permanent,
+                effect.getDamageType(),
+                effect.getScopeElement(),
+                Boolean.TRUE.equals(effect.getFromSelf()),
+                effect.getMaxStacks(),
+                effect.getPerStack(),
+                effect.getPerStackCap(),
+                effect.getBuff(),
+                Boolean.TRUE.equals(effect.getPerStackLive()),
+                effect.getWhileState(),
+                effect.getWhileStacks(),
+                effect.getWhileStacksMin(),
+                effect.getWhileHolderState(),
+                Boolean.TRUE.equals(effect.getCoexist()));
     }
 
     @Override
-    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+    public void validate(ModifyDamageTakenArgs args, EffectSpec effect, TriggerSpec rule) {
         String op = op().name();
         TriggerValidator.requireScopeElement(effect, op, rule);
         TriggerValidator.requireBaseChance(effect, op, rule);
@@ -35,7 +58,7 @@ final class ModifyDamageTakenOp implements OpHandler<OpArgs> {
     }
 
     @Override
-    public void apply(OpContext ctx, OpArgs args) {
-        TriggerInterpreter.modifyDamageTaken(ctx.battle(), ctx.effect(), ctx.firing());
+    public void apply(OpContext ctx, ModifyDamageTakenArgs args) {
+        TriggerInterpreter.modifyDamageTaken(ctx, args);
     }
 }

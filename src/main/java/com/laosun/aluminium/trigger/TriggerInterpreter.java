@@ -435,9 +435,12 @@ public final class TriggerInterpreter {
                 return;
             }
             if ("MODIFY_DAMAGE_TAKEN".equals(folding)) {
-                // A zone is ONE buff: repeating it would replace itself (same kind), so N layers are folded into one zone of
-                // N x the share - exactly as the attribute route above does.
-                modifyDamageTaken(battle, folded, effectCtx);
+                // A zone is ONE buff: repeating it would replace itself (same kind), so N layers are folded into one zone
+                // of N x the share - exactly as the attribute route above does. The copy is re-parsed through its own
+                // handler, so the folded number travels in the arguments instead of a second read of the bean.
+                var zone = (ModifyDamageTakenOp) OpRegistry.find(TriggerOperator.MODIFY_DAMAGE_TAKEN);
+                modifyDamageTaken(new OpContext(battle, effectCtx, folded, 0.0),
+                        (ModifyDamageTakenArgs) zone.parse(folded));
                 return;
             }
         }
@@ -1323,107 +1326,97 @@ public final class TriggerInterpreter {
      *               {@code target})
      * @param ctx    the context
      */
-    static void modifyDamageTaken(BattlePort battle, EffectSpec effect, TriggerContext ctx) {
-        // Note: A DERIVED magnitude, not `percent`: "at 1 stack raise the damage the enemy takes by 15.00%, and thereafter each additional 1 stack raises it by
-        // 5.00%" (1218 椒丘) is `amount + percent x layers`, so a zone reads its own value the same way a MODIFY_ATTR
-        // does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently IGNORED -- worse than refusing
-        // it. A plain zone (no scale) still takes `percent` exactly as before.
-        boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
+    static void modifyDamageTaken(OpContext opCtx, ModifyDamageTakenArgs args) {
+        Magnitude magnitude = args.magnitude();
+        // Note: A DERIVED magnitude, not `percent`: "at 1 stack raise the damage the enemy takes by 15.00%, and thereafter
+        // each additional 1 stack raises it by 5.00%" is `amount + percent x layers`, so a zone reads its own value the
+        // same way a MODIFY_ATTR does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently
+        // IGNORED -- worse than refusing it. A plain zone (no scale) still takes `percent` exactly as before.
+        boolean derived = magnitude.getScale() != null && !magnitude.getScale().isBlank();
         // A plain zone (no scale) takes its share from any of the share spellings, not only a literal percent: 1403
         // writes "使敌人受到的伤害提高" with the row-read share, and unboxing getPercent() there is an NPE.
-        double percent = effect.getValue() != null
-                ? TriggerMagnitudes.shareOf(effect, ctx)
-                : derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx)
-                        : TriggerMagnitudes.statesShare(effect) ? TriggerMagnitudes.shareOf(effect, ctx)
-                                : effect.getPercent();
-        if (Boolean.TRUE.equals(effect.getInstance())) {
-            // One-shot vulnerability/reduction on the instance being settled. Reader: 1315 Boothill's
-            // Eidolon 4 ("that target takes 12% more from him / he takes 12% less from it").
-            if (ctx.damage() == null) {
+        double percent = magnitude.getValue() != null
+                ? TriggerMagnitudes.shareOf(magnitude, opCtx.firing())
+                : derived ? TriggerMagnitudes.derivedMagnitude(magnitude, opCtx.firing())
+                        : TriggerMagnitudes.statesShare(magnitude) ? TriggerMagnitudes.shareOf(magnitude, opCtx.firing())
+                                : magnitude.getPercent();
+        if (args.instance()) {
+            // One-shot vulnerability/reduction on the instance being settled. Reader: 1315 Boothill's Eidolon 4.
+            Damage settling = opCtx.firing().damage();
+            if (settling == null) {
                 throw new IllegalStateException(
                         "Op MODIFY_DAMAGE_TAKEN states \"instance\": true but the context carries no damage instance");
             }
             if (percent >= 0) {
-                ctx.damage().addVulnerable(percent);
+                settling.addVulnerable(percent);
             } else {
-                // 「受到的伤害降低 12%」 (light cone 24002, while shielded): a NEGATIVE share is a reduction, the same
-                // reading the zone arm below already makes (`percent > 0` -> VulnerabilityBuff, else ReductionBuff).
-                // Sending it to the vulnerability zone would rely on that zone accepting negative values, which is a
-                // different zone's arithmetic (and a silent clamp there would turn the clause into a no-op).
-                ctx.damage().addReduction(-percent);
+                // 「受到的伤害降低 12%」: a NEGATIVE share is a reduction, the same reading the zone arm below already
+                // makes. Sending it to the vulnerability zone would rely on that zone accepting negative values.
+                settling.addReduction(-percent);
             }
             return;
         }
-        boolean permanent = TriggerLifetimes.unticked(effect);
-        int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         // "break damage taken is raised": an optional damage-type scope, spelled with the enum's own names.
-        com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect.getDamageType(), "MODIFY_DAMAGE_TAKEN");
-        // "increases the Fire DMG the target takes": the ELEMENT scope, beside the damage-type one. Each is checked by the zone
-        // itself, so nothing here decides precedence.
-        com.laosun.aluminium.enums.DamageElement elementScope = parseScopeElement(effect, "MODIFY_DAMAGE_TAKEN");
-        for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
+        com.laosun.aluminium.enums.DamageType scope = parseDamageType(args.damageType(), "MODIFY_DAMAGE_TAKEN");
+        // "increases the Fire DMG the target takes": the ELEMENT scope, beside the damage-type one. Each is checked by the
+        // zone itself, so nothing here decides precedence.
+        com.laosun.aluminium.enums.DamageElement elementScope = parseScopeElement(args.scopeElement(), "MODIFY_DAMAGE_TAKEN");
+        for (CanHit target : opCtx.targets()) {
             AbstractBuff zone = withSource(TriggerLifetimes.withTickOwner(TriggerLifetimes.withLifetime(percent > 0
                     // ⚠ The element scope goes to the VULNERABILITY branch only: measured, `ReductionBuff` has no scope
-                    // field and no guard at all -- only the vulnerability half ever scoped.
-                    // 「该效果最多叠加 3 层」: the cap is stated by the clause (1204's Eidolon 6). Before this it was declared and
-                    // silently dropped - four hits of one strike measured 1.12x total instead of up to 1.36x, with no symptom.
-                    ? new VulnerabilityBuff(turns, percent, permanent, scope, elementScope,
-                            Boolean.TRUE.equals(effect.getFromSelf()) ? ctx.owner() : null,
-                            effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
-                    : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
-            // 「每有 1 个负面效果 … 最多 100%」 (1006 Silver Wolf (银狼)'s Eidolon 6): the zone's share is a MULTIPLE of the
-            // carrier's negative-effect count, so the buff has to read the count at settlement rather than store a number.
-            // Note: `withTickOwner` joined this chain on. It was missing, so `ticks_on` was a SILENT no-op on
-            if (zone instanceof VulnerabilityBuff vulnerable && effect.getPerStack() != null
-                    && "target_debuff_count".equals(effect.getPerStack().trim()) && effect.getPerStackCap() != null) {
-                vulnerable.setPerDebuffStackCap(effect.getPerStackCap());
+                    // field and no guard at all -- only the vulnerability half ever scoped. 「该效果最多叠加 3 层」: the cap
+                    // is stated by the clause. Before this it was declared and silently dropped.
+                    ? new VulnerabilityBuff(args.turns(), percent, args.permanent(), scope, elementScope,
+                            args.fromSelf() ? opCtx.firing().owner() : null,
+                            args.maxStacks() == null ? 1 : args.maxStacks())
+                    : new ReductionBuff(args.turns(), -percent, args.permanent(), scope), opCtx.effect()),
+                    opCtx.effect(), opCtx.firing()), opCtx.firing());
+            // 「每有 1 个负面效果 … 最多 100%」: the zone's share is a MULTIPLE of the carrier's negative-effect count, so the
+            // buff has to read the count at settlement rather than store a number.
+            if (zone instanceof VulnerabilityBuff vulnerable && args.perStack() != null
+                    && "target_debuff_count".equals(args.perStack().trim()) && args.perStackCap() != null) {
+                vulnerable.setPerDebuffStackCap(args.perStackCap());
             }
-            // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant
-            // "the zone is removed when 椒丘 enters the unable-to-fight state" could never fire -- measured at exactly 1.40x before and after she fell
-            // (AnchorDeathTest). The other four buff-creating ops had it; this one did not.
-            // A NAMED modifier is what REMOVE_STATE can take off (the same field MODIFY_ATTR has used since;
-            // BuffManager.removeState's last loop walks every buff that carries a name). Without it a zone-scoped
-            // "damage taken is lowered" could only be spelled `permanent`, i.e. it would stay on for the rest of the battle --
-            // which is why 150's Soul, Tempered ad Mortem (千锻魂) needs it: the reduction lasts as long as the zone's countdown, not forever.
-            if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
-                zone.setBuffName(effect.getBuff().trim());
+            // A NAMED modifier is what REMOVE_STATE can take off; without it a zone-scoped "damage taken is lowered" could
+            // only be spelled `permanent`, i.e. it would stay on for the rest of the battle.
+            if (args.buffName() != null && !args.buffName().isBlank()) {
+                zone.setBuffName(args.buffName().trim());
             }
-            // "每层【烬煨】使敌人受到的伤害提高 5%": a ZONE whose size follows a moving counter. The share is asked for at every
-            // settlement (`VulnerabilityBuff.makeLive`), which is the same shape the attribute path already has.
-            if (Boolean.TRUE.equals(effect.getPerStackLive()) && effect.getPerStack() != null
-                    && !effect.getPerStack().isBlank()) {
+            // "每层【烬煨】使敌人受到的伤害提高 5%": a ZONE whose size follows a moving counter. The share is asked for at
+            // every settlement (`makeLive`), which is the same shape the attribute path already has.
+            if (args.perStackLive() && args.perStack() != null && !args.perStack().isBlank()) {
                 if (zone instanceof com.laosun.aluminium.buff.VulnerabilityBuff liveZone) {
-                    liveZone.makeLive(() -> percent * TriggerInterpreter.perStackFactor(effect, target, ctx));
+                    liveZone.makeLive(() -> percent
+                            * TriggerInterpreter.perStackFactor(magnitude, target, opCtx.firing()));
                 } else if (zone instanceof com.laosun.aluminium.buff.ReductionBuff liveReduction) {
-                    liveReduction.makeLive(() -> -percent * TriggerInterpreter.perStackFactor(effect, target, ctx));
+                    liveReduction.makeLive(() -> -percent
+                            * TriggerInterpreter.perStackFactor(magnitude, target, opCtx.firing()));
                 }
             }
             // "While the owner holds X": the modifier lives exactly as long as that state (see AbstractBuff.gateBroken).
-            if (effect.getWhileState() != null && !effect.getWhileState().isBlank()) {
-                zone.gate(effect.getWhileState().trim(), ctx.owner());
+            if (args.whileState() != null && !args.whileState().isBlank()) {
+                zone.gate(args.whileState().trim(), opCtx.firing().owner());
             }
-            // "While the owner's counter is at least N": the same question for a THRESHOLD on layers ("蓄能 ≥2 ⇒ +15%"), which
-            // `per_stack` cannot express because it scales continuously instead of switching on.
-            if (effect.getWhileStacks() != null && !effect.getWhileStacks().isBlank()) {
-                int min = effect.getWhileStacksMin() == null ? 1 : effect.getWhileStacksMin();
-                zone.gateStacks(effect.getWhileStacks().trim(), min, ctx.owner());
+            // "While the owner's counter is at least N": the same question for a THRESHOLD on layers ("蓄能 ≥2 ⇒ +15%"),
+            // which `per_stack` cannot express because it scales continuously instead of switching on.
+            if (args.whileStacks() != null && !args.whileStacks().isBlank()) {
+                int min = args.whileStacksMin() == null ? 1 : args.whileStacksMin();
+                zone.gateStacks(args.whileStacks().trim(), min, opCtx.firing().owner());
             }
-            // "While the unit CARRYING this holds X": the mirror of `while_state`, for a condition and a modifier on the SAME
-            // unit (1307's Epiphany raises the damage its victims take).
-            if (effect.getWhileHolderState() != null && !effect.getWhileHolderState().isBlank()) {
-                zone.gateHolder(effect.getWhileHolderState().trim());
+            // "While the unit CARRYING this holds X": the mirror of `while_state`, for a condition and a modifier on the
+            // SAME unit (1307's Epiphany raises the damage its victims take).
+            if (args.whileHolderState() != null && !args.whileHolderState().isBlank()) {
+                zone.gateHolder(args.whileHolderState().trim());
             }
-            // "this zone must live beside another source's zone": the `coexist` ask that MODIFY_ATTR has honoured since
-            // 1408's trace was never read on THIS op, so a second `MODIFY_DAMAGE_TAKEN` from another rule evicted the
-            // first. Measured: 1512's memosprite aura (+11.2%, set at SUMMONED) disappeared the moment light cone 23042's
-            // +36% landed - the ratio came out (1+0.36)/(1+0.112) instead of 1+0.36+0.112, while the game's own capture
-            // carries 0.64 = 0.36 + 0.28, i.e. the two sources DO add.
-            if (Boolean.TRUE.equals(effect.getCoexist())) {
+            // "this zone must live beside another source's zone": the `coexist` ask that MODIFY_ATTR has honoured since...
+            // measured, 1512's memosprite aura (+11.2%) disappeared the moment light cone 23042's +36% landed, while the
+            // game's own capture carries 0.64 = 0.36 + 0.28, i.e. the two sources DO add.
+            if (args.coexist()) {
                 zone.setKeepsSiblings(true);
             }
-            // "with a 100% base chance, raise the DoT damage taken by ... by 30%" (1108 桑波): a zone may be ROLLED, through the same
-            // resist pipeline APPLY_BUFF/APPLY_DOT use. Note: Unstated = attached directly, so no existing file changes.
-            attachRolled(battle, target, zone, effect, ctx);
+            // "with a 100% base chance, raise the DoT damage taken by ... by 30%": a zone may be ROLLED, through the same
+            // resist pipeline APPLY_BUFF/APPLY_DOT use. Note: Unstated = attached directly.
+            attachRolled(opCtx.battle(), target, zone, magnitude, opCtx.firing());
         }
     }
 
@@ -1687,8 +1680,8 @@ public final class TriggerInterpreter {
      * @param op     the op, for the message
      * @return the element, or {@code null} when the rule names none
      */
-    static com.laosun.aluminium.enums.DamageElement parseScopeElement(EffectSpec effect, String op) {
-        String raw = effect.getScopeElement();
+    static com.laosun.aluminium.enums.DamageElement parseScopeElement(String scopeElement, String op) {
+        String raw = scopeElement;
         if (raw == null || raw.isBlank()) {
             return null;
         }
