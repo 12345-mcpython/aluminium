@@ -145,13 +145,13 @@ public class RelicSetTest {
         Assertions.assertAll("the shipped relic_sets.json is loaded and its rows bind",
                 () -> Assertions.assertFalse(Constant.RELIC_SETS.isEmpty(),
                         "relic_sets.json was not loaded — the engine cannot apply any set bonus without it"),
-                // ⚠ CORRECTED (2026-10-18, data migration): 60 -> 62 sets in the current version.
-                () -> Assertions.assertEquals(62, shipped.size(),
-                        "the shipped relic_sets.json holds 62 sets; a different number means "
+                // ⚠ CORRECTED (2026-11-25, 4.7.0 data migration): 62 -> 64 sets (329 神的瞬息欢愉, 330 亚空异容所).
+                () -> Assertions.assertEquals(64, shipped.size(),
+                        "the shipped relic_sets.json holds 64 sets; a different number means "
                                 + "the file changed and this registry line needs re-checking"),
-                // ⚠ CORRECTED (2026-10-18, data migration): 92 -> 96 bonuses (two new sets, 2 + 2).
-                () -> Assertions.assertEquals(96, effects,
-                        "the shipped file holds 96 set bonuses (2- and 4-piece)"),
+                // ⚠ CORRECTED (2026-11-25, 4.7.0 data migration): 96 -> 98 bonuses (the two new sets, 2 pieces each).
+                () -> Assertions.assertEquals(98, effects,
+                        "the shipped file holds 98 set bonuses (2- and 4-piece)"),
                 () -> Assertions.assertTrue(RelicSets.loadCount() >= 1,
                         "the file must have been read at least once"),
                 () -> Assertions.assertSame(Constant.RELIC_SETS, RelicSets.table(),
@@ -216,8 +216,8 @@ public class RelicSetTest {
         // bonuses (most 4-piece effects) are selected but not executed, and if regeneration changes either
         // number, this line is where somebody finds out.
         Assertions.assertAll("the registered gap: stats or a named ability",
-                // ⚠ CORRECTED (2026-10-18, data migration): 57 -> 59 stat bonuses (the two new sets ship one each).
-                () -> Assertions.assertEquals(59, statBonuses, "the shipped file's stat bonuses"),
+                // ⚠ CORRECTED (2026-11-25, 4.7.0 data migration): 59 -> 61 stat bonuses (sets 329 / 330 ship one each).
+                () -> Assertions.assertEquals(61, statBonuses, "the shipped file's stat bonuses"),
                 // ⚠ CORRECTED (2026-10-18, data migration): 35 -> 37 ability-only bonuses.
                 () -> Assertions.assertEquals(37, abilityBonuses,
                         "the shipped file's ability-only bonuses: selected by RelicSuit.activeEffects(), not executed "

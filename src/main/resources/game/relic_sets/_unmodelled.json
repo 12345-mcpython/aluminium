@@ -1,2 +1,18 @@
 {
+  "329": [
+    {
+      "setId": 329,
+      "require": 2,
+      "ability": "Ability53291",
+      "reason": "4.7.0 的新套装（神的瞬息欢愉）。2 件套第二句是「当装备者的【欢愉度】大于等于 #2% 时，进入战斗时立刻使行动提前 #3%」：欢愉度是 `ELATION_DAMAGE_BOOST`，而「进入战斗时」那一刻面板上是否已带着它未核（`self_attr_above` 读的是战斗内属性）。先登记，不近似。"
+    }
+  ],
+  "330": [
+    {
+      "setId": 330,
+      "require": 2,
+      "ability": "Ability53301",
+      "reason": "4.7.0 的新套装（亚空异容所）。2 件套第二句是「当装备者的速度大于等于 #2 时，进入战斗后使我方全体击破特攻提高 #3%」：词汇看起来够（`BATTLE_START` + `self_attr_above:SPEED` + `MODIFY_ATTR BREAKING_EFFECT target: all_allies`），只是本次数据迁移不写内容，留给下一轮；登记在此是为了「没写」与「忘了」不一样。"
+    }
+  ]
 }

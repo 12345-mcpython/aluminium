@@ -333,7 +333,10 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on when the shield-amount
      * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
-    private static final int STILL_REGISTERED = 0;
+    // ⚠ CORRECTED (2026-11-25, 4.7.0 data migration): 0 -> 2. Sets 329 (神的瞬息欢愉) and 330 (亚空异容所) are new
+    // and each carries a 2-piece ability with no rule file, so both are registered in `_unmodelled.json` with the
+    // capability they are missing. The partition invariant is what makes moving this number safe.
+    private static final int STILL_REGISTERED = 2;
 
     /**
      * Ability-only bonuses: {@code properties} empty, the ability is the whole effect.
@@ -351,7 +354,8 @@ public class RelicTriggerTableTest {
      * "no rule file written" and "somebody forgot" looked exactly alike for that shape. Pinned as its own
      * denominator so the next data update that adds one shows up here.
      */
-    private static final int MIXED_STAT_AND_ABILITY = 29;
+    // ⚠ CORRECTED (2026-11-25, 4.7.0 data migration): 29 -> 31 stat + ability bonuses (sets 329 / 330 ship one each).
+    private static final int MIXED_STAT_AND_ABILITY = 31;
 
     /**
      * How many registered abilities the vocabulary <b>could</b> express today.
@@ -792,9 +796,10 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(0, twoPiece,
-                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet (11 until set "
-                        + "128's 2-piece was authored on 2026-09-28)");
+        Assertions.assertEquals(2, twoPiece,
+                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet: since the 4.7.0 "
+                        + "data migration these are 329's (欢愉度 threshold, the panel value at battle start is "
+                        + "not verified) and 330's (looks expressible, one record for the next round)");
     }
 
     // ==================================================================
