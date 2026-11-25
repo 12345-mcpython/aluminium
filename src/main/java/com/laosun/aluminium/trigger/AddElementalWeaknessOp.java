@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enemy.Enemy;
 import com.laosun.aluminium.enums.DamageElement;
@@ -15,8 +16,7 @@ import java.util.List;
  * <p>Two named sources sit beside the real element names: {@code party_first} (the party's first element) and
  * {@code random_absent} (an element the target does not already have). Neither is an error when it yields nothing -
  * the clause simply does nothing. A repeat insertion is <b>not</b> an insertion, so the check happens before the change
- * and the event fires only for a real one. Registered here so the op has one dispatch path; its load-time checks are
- * still in {@code TriggerValidator}.
+ * and the event fires only for a real one.
  */
 final class AddElementalWeaknessOp implements OpHandler<OpArgs> {
 
@@ -28,6 +28,22 @@ final class AddElementalWeaknessOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        if (effect.getElement() == null || effect.getElement().isBlank()) {
+            throw new IllegalArgumentException("Op " + op().name() + " requires element (source: " + rule.getSource() + ")");
+        }
+        // Refused HERE, not at run time: an unknown element that only blows up when the rule finally fires is exactly
+        // the silent mistake this library keeps closing.
+        String named = effect.getElement().trim();
+        if (!TriggerVocabulary.SPECIAL_ELEMENTS.contains(named) && DamageElement.fromString(named) == null) {
+            throw new IllegalArgumentException("Op " + op().name() + " names element \"" + named
+                    + "\", which is neither a DamageElement nor one of " + TriggerVocabulary.SPECIAL_ELEMENTS
+                    + " (source: " + rule.getSource() + ")");
+        }
+        TriggerValidator.requireNoStackArguments(effect, op().name(), rule);
     }
 
     @Override

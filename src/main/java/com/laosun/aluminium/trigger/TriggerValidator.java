@@ -312,213 +312,13 @@ final class TriggerValidator {
             throw new IllegalArgumentException("Trigger op " + op + " is not in TriggerOperator; the validator and the dispatcher share that vocabulary");
         }
         switch (operator) {
-            case ADD_ELEMENTAL_WEAKNESS -> {
-                if (effect.getElement() == null || effect.getElement().isBlank()) {
-                    throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS requires element (source: " + spec.getSource() + ")");
-                }
-                // Note: Reject it HERE, not at run time: an unknown element that only blows up when the rule
-                // finally fires is exactly the silent mistake this library keeps closing.
-                String named = effect.getElement().trim();
-                if (!TriggerVocabulary.SPECIAL_ELEMENTS.contains(named)
-                        && com.laosun.aluminium.enums.DamageElement.fromString(named) == null) {
-                    throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS names element \"" + named
-                            + "\", which is neither a DamageElement nor one of " + TriggerVocabulary.SPECIAL_ELEMENTS
-                            + " (source: " + spec.getSource() + ")");
-                }
-                requireNoStackArguments(effect, op, spec);
-            }
-            case RESET_TRIGGER_LIMIT -> {
-                if (effect.getRule() == null || effect.getRule().isBlank()) {
-                    throw new IllegalArgumentException(
-                            "Op RESET_TRIGGER_LIMIT requires \"rule\" (source: " + spec.getSource() + ")");
-                }
-                requireNoStackArguments(effect, op, spec);
-            }
-            case GAIN_ENERGY -> {
-                // A cast parameter is a third spelling (reader: 1415's ode of sky, "restore #2 energy to Hyacine (风堇)", whose
-                // #2 runs 12 -> 33.6). `ENERGY_SCALES` holds only a share of max energy, so the op could not read a number out of the skill that produced it.
-                // 「固定恢复等同于 #3% 能量上限的能量」 (1512's ultimate): `fixed` + a bare `percent` is a complete statement -
-                // "the stated share of the RECIPIENT's own maximum, untouched by the regen rate" - so the generic
-                // "a share needs a scale" rule does not apply to this pair. Everything else keeps that rule.
-                boolean fixedShare = Boolean.TRUE.equals(effect.getFixed()) && effect.getAmount() == null
-                        && (effect.getPercent() != null || effect.getPercentFrom() != null
-                        || effect.getValue() != null)
-                        && (effect.getScale() == null || effect.getScale().isBlank());
-                if (fixedShare) {
-                    requireNoStackArguments(effect, op, spec);
-                } else if (TriggerInterpreter.isCastParamScale(effect)) {
-                    requireNoStackArguments(effect, op, spec);
-                } else {
-                    requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
-                    requireNoStackArguments(effect, op, spec);
-                }
-                if (Boolean.TRUE.equals(effect.getFixed())) {
-                    // 「固定恢复 N 点」 states a NUMBER, so it cannot also be a share: refusing the pair keeps "fixed" from
-                    // silently deciding which of two magnitudes wins (the same rule `to_max` + `amount` follows).
-                    if (effect.getAmount() == null && !fixedShare) {
-                        throw new IllegalArgumentException(
-                                "Op " + op + " states \"fixed\", so \"amount\" must be the stated number of points: got "
-                                        + (effect.getScale() == null ? "nothing" : "\"scale\": \"" + effect.getScale()
-                                        + "\"") + " (source: " + spec.getSource() + ")");
-                    }
-                    if (effect.getScale() != null && !effect.getScale().isBlank()) {
-                        throw new IllegalArgumentException(
-                                "Op " + op + " states both \"fixed\" and \"scale\": a fixed number and a share of "
-                                        + "something are different magnitudes (source: " + spec.getSource() + ")");
-                    }
-                }
-            }
-            case RAISE_ENERGY_TO -> {
-                // A plain share, because the handler reads it directly: accepting the
-                // percent_from_* spellings here would leave the share unresolved at run time.
-                // 「恢复的能量提高至 40 点」 (1313 Sunday (星期日) trace 主日渴慕) states the floor in POINTS, so a flat
-                // `amount` is the other legal spelling - the same handler reads it directly.
-                if (effect.getAmount() == null) {
-                    requirePercent(effect, op, spec);
-                }
-                if (effect.getPercent() == null && effect.getValue() == null && effect.getAmount() == null) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " names the level to raise energy TO, so it needs a plain \"percent\", "
-                                    + "\"amount\" (points) or \"value\": got a share from a cast parameter or a resource "
-                                    + "instead (source: " + spec.getSource() + ")");
-                }
-                requireNoStackArguments(effect, op, spec);
-            }
-            // GAIN_SKILL_POINT and RAISE_SKILL_POINT_CAP validate themselves: see GainSkillPointOp and
-            // RaiseSkillPointCapOp. Their arms were deleted rather than left as a second copy of the same rules.
-            case HEAL, SHIELD -> {
-                requireAmountOrScale(effect, op, spec, SCALES, "Max HP");
-                requireNoStackArguments(effect, op, spec);
-                if ("HEAL".equals(op)) {
-                    // Healing has no duration -- HP comes back and stays back. Before this, `turns` on a HEAL
-                    // was accepted and silently dropped, which is the class of mistake this project refuses
-                    // (the same reason the six "owner-only" ops refuse a `target`): say it is a mistake rather
-                    // than let the author believe the healing lasts.
-                    requireNoDuration(effect, op, spec);
-                } else if (effect.getTurns() != null && effect.getTurns() <= 0) {
-                    // A timed shield with a non-positive duration would be a shield that expires before it can
-                    // be used -- "no shield" written as a mechanic. Omitting `turns` is how "no limit" is spelled.
-                    throw new IllegalArgumentException(
-                            "Op " + op + " needs a positive \"turns\" when it states one (how many of the "
-                                    + "shielded unit's turns the shield lasts), but has " + effect.getTurns()
-                                    + "; omit the field for a shield that is only removed by being used up "
-                                    + "(source: " + spec.getSource() + ")");
-                }
-            }
-            // ADVANCE, DELAY, DEPART and RETURN validate themselves (AdvanceOp / DelayOp / DepartOp / ReturnOp):
-            // each needs its share to be a plain percent, or needs no duration at all, and that statement now lives
-            // beside the code that reads it instead of in this switch.
-            case RAISE_RESOURCE_CAP -> {
-                // A resource the owner DECLARES, and how far to widen its overflow.
-                requireResource(effect, op, spec);
-                if (Boolean.TRUE.equals(effect.getUnbounded())) {
-                    // 「【火种】的可溢出点数不再拥有上限」 (1408's Eidolon 6): removing the allowance is not "raising it
-                    // by N", so the two spellings are refused together - a count beside "no limit" reads as a bound the
-                    // sentence denies.
-                    if (effect.getAmount() != null || effect.getValue() != null) {
-                        throw new IllegalArgumentException(
-                                "Op " + op + " states both \"unbounded\" and a count (\"amount\" / \"value\"): "
-                                        + "\"no upper limit\" and \"by this many more\" are different claims "
-                                        + "(source: " + spec.getSource() + ")");
-                    }
-                } else if (effect.getValue() == null && (effect.getAmount() == null || effect.getAmount() <= 0)) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " widens a resource's overflow, so \"amount\" is a positive count of points: got "
-                                    + (effect.getAmount() == null ? "nothing" : effect.getAmount())
-                                    + " (source: " + spec.getSource() + ")");
-                }
-            }
-            case RAISE_RESOURCE_MAX -> {
-                // 「【热意】上限提高至 50 点」: the DECLARED cap. Distinct from RAISE_RESOURCE_CAP, which widens the
-                // OVERFLOW tier above it (1407/1408/1512) -- one op must not mean two numbers.
-                requireResource(effect, op, spec);
-                requirePositiveAmount(effect, op, spec);
-                requireNoDuration(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-            }            case RAISE_ENERGY_BANK -> {
-                // 「可积攒最多 120 点溢出能量」: the ALLOWANCE itself (absolute), so a positive count, no duration, and no
-                // resource name (the bar is the unit's own - naming one would be a second thing the op could mean).
-                requirePositiveAmount(effect, op, spec);
-                requireNoDuration(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-                if (effect.getResource() != null) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " sets the ENERGY bar's overflow allowance, so it takes no \"resource\" - "
-                                    + "resource overflow is RAISE_RESOURCE_CAP (source: " + spec.getSource() + ")");
-                }
-            }
-            case DRAW_ENERGY_BANK -> {
-                // No number and no resource: the amount is whatever was banked.
-                if (effect.getAmount() != null || effect.getResource() != null || effect.getValue() != null) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " restores what the energy bank holds, so it states neither \"amount\" nor "
-                                    + "\"resource\" (source: " + spec.getSource() + ")");
-                }
-            }
-            case GAIN_RESOURCE, SPEND_RESOURCE, REMOVE_RESOURCE -> {
-                if (Boolean.TRUE.equals(effect.getSpendAll())) {
-                    // "consume all [X]": a spend with no stated SIZE -- and stating one
-                    // beside it is a contradiction, so it is refused rather than silently preferring one.
-                    if (!"SPEND_RESOURCE".equals(op)) {
-                        throw new IllegalArgumentException(
-                                "Op " + op + " states \"spendAll\", which only means something for SPEND_RESOURCE "
-                                        + "(source: " + spec.getSource() + ")");
-                    }
-                    if (effect.getAmount() != null) {
-                        throw new IllegalArgumentException(
-                                "Op " + op + " states both \"spendAll\" and \"amount\": \"all of it\" and a fixed "
-                                        + "number are different claims (source: " + spec.getSource() + ")");
-                    }
-                } else {
-                    // 「清空累计治疗数值的 50%」: REMOVE_RESOURCE may name a SHARE of one of the owner's own counters
-                    // instead of a flat amount (`scale: self_resource:<id>` + `percent`). Reader: 1409 Hyacine (风堇)'s
-                    // 忆灵技1. Gated on the prefix so every other spelling keeps requiring an amount.
-                    String removeScale = effect.getScale() == null ? "" : effect.getScale().trim();
-                    if ("REMOVE_RESOURCE".equals(op)
-                            && removeScale.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)) {
-                        requirePercent(effect, op, spec);
-                    } else if (TriggerInterpreter.isCastParamScale(effect)) {
-                        requireNoStackArguments(effect, op, spec);
-                    } else {
-                        if (!Boolean.TRUE.equals(effect.getOverflowOnly()) && !Boolean.TRUE.equals(effect.getSpendAll())) {
-                            requireAmount(effect, op, spec);
-                        }
-                    }
-                }
-                requireResource(effect, op, spec);
-                // "最多获得 50 点" (1503 Pearl (真珠)'s trace): an allowance that is not positive would forbid every gain,
-                // which is a rule that does nothing rather than a strict one - so it is refused beside the other
-                // "silently no-op" shapes.
-                if (effect.getMaxPerRound() != null && effect.getMaxPerRound() <= 0) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " states \"max_per_round\" = " + effect.getMaxPerRound()
-                                    + ", which allows no gain at all; give a positive allowance or omit the field"
-                                    + " (source: " + spec.getSource() + ")");
-                }
-                // `to_max` says "however much it is short", which is a claim about a GAIN - the other two ops move the
-                // counter the other way, where it would be a contradiction rather than a shortcut.
-                if (Boolean.TRUE.equals(effect.getToMax()) && !"GAIN_RESOURCE".equals(op)) {
-                    throw new IllegalArgumentException(
-                            "Op " + op + " states \"to_max\", which only means something for GAIN_RESOURCE "
-                                    + "(source: " + spec.getSource() + ")");
-                }
-                requireNoStackArguments(effect, op, spec);
-            }
-            case RESET_RESOURCE_CAP -> {
-                // The other half of `max_per_round`, and it needs the counter named for the same reason: "reset my
-                // allowances" without saying which one is a rule whose subject is missing.
-                requireResource(effect, op, spec);
-                requireNoDuration(effect, op, spec);
-            }
-            case RESET_RULE_CHANCE -> {
-                // "将触发【头号补给盲盒】的固定概率重置为初始值" (1506's 崩坏级伤害演示): the decaying probability's own reset. It
-                // names the rule for the same reason MODIFY_RULE does - "reset the probability" without saying whose
-                // has no subject - and the shape check (the named rule really decays) lives in
-                // TriggerTable.validateAmendments, the only place that can see the whole file.
-                requireRuleReference(effect, op, spec);
-                requireNoDuration(effect, op, spec);
-                requireNoStackArguments(effect, op, spec);
-            }
+            // ADD_ELEMENTAL_WEAKNESS, RESET_TRIGGER_LIMIT, GAIN_ENERGY, RAISE_ENERGY_TO, HEAL and SHIELD validate
+            // themselves (see the handler of each). Their arms are gone rather than kept as a second copy: an op whose
+            // rules are stated twice is the drift this migration exists to end.
+            // RAISE_RESOURCE_CAP, RAISE_RESOURCE_MAX, RAISE_ENERGY_BANK, DRAW_ENERGY_BANK, the three resource-
+            // moving ops, RESET_RESOURCE_CAP and RESET_RULE_CHANCE validate themselves now: see the handler named
+            // after each. The resource trio still shares ONE statement - TriggerValidator.requireResourceMovement -
+            // because those three arms were one grouped case here and the rule must not fork into three copies.
             case DAMAGE -> {
                 // Note: `times` says "settle N independent times"; `per_target` says "multiply this one settlement
                 // by the event's hit count". Together they have two readings, so the pair is refused -- the
@@ -2951,6 +2751,67 @@ final class TriggerValidator {
                             + " (\"control-class\" and \"DoT-class\"); a resistance to a family nobody belongs to would do "
                             + "nothing (source: " + spec.getSource() + ")");
         }
+    }
+
+    /**
+     * The argument rules the three resource-moving ops share, because they read the same fields in different
+     * directions: {@code spendAll} only means something for a spend, {@code to_max} only for a gain, and a
+     * {@code self_resource:} share only for a removal.
+     *
+     * <p>Kept as one method rather than copied into the three handlers: those three arms were one grouped
+     * {@code case} here, and the whole point of the move is that the rule has <b>one</b> statement. The handler decides
+     * <b>which</b> check applies; this decides what the check says.
+     *
+     * @param effect the effect
+     * @param op     the op's name
+     * @param spec   the rule, for {@code source}
+     */
+    static void requireResourceMovement(EffectSpec effect, String op, TriggerSpec spec) {
+        if (Boolean.TRUE.equals(effect.getSpendAll())) {
+            // "consume all [X]": a spend with no stated SIZE -- and stating one beside it is a contradiction, so it is
+            // refused rather than silently preferring one.
+            if (!"SPEND_RESOURCE".equals(op)) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states \"spendAll\", which only means something for SPEND_RESOURCE "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            if (effect.getAmount() != null) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states both \"spendAll\" and \"amount\": \"all of it\" and a fixed "
+                                + "number are different claims (source: " + spec.getSource() + ")");
+            }
+        } else {
+            // 「清空累计治疗数值的 50%」: REMOVE_RESOURCE may name a SHARE of one of the owner's own counters instead
+            // of a flat amount (`scale: self_resource:<id>` + `percent`). Gated on the prefix so every other spelling
+            // keeps requiring an amount.
+            String removeScale = effect.getScale() == null ? "" : effect.getScale().trim();
+            if ("REMOVE_RESOURCE".equals(op) && removeScale.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)) {
+                requirePercent(effect, op, spec);
+            } else if (TriggerInterpreter.isCastParamScale(effect)) {
+                requireNoStackArguments(effect, op, spec);
+            } else {
+                if (!Boolean.TRUE.equals(effect.getOverflowOnly()) && !Boolean.TRUE.equals(effect.getSpendAll())) {
+                    requireAmount(effect, op, spec);
+                }
+            }
+        }
+        requireResource(effect, op, spec);
+        // "最多获得 50 点": an allowance that is not positive would forbid every gain, which is a rule that does
+        // nothing rather than a strict one - so it is refused beside the other "silently no-op" shapes.
+        if (effect.getMaxPerRound() != null && effect.getMaxPerRound() <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"max_per_round\" = " + effect.getMaxPerRound()
+                            + ", which allows no gain at all; give a positive allowance or omit the field"
+                            + " (source: " + spec.getSource() + ")");
+        }
+        // `to_max` says "however much it is short", which is a claim about a GAIN - the other two ops move the
+        // counter the other way, where it would be a contradiction rather than a shortcut.
+        if (Boolean.TRUE.equals(effect.getToMax()) && !"GAIN_RESOURCE".equals(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"to_max\", which only means something for GAIN_RESOURCE "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        requireNoStackArguments(effect, op, spec);
     }
 
     static void requireResource(EffectSpec effect, String op, TriggerSpec spec) {

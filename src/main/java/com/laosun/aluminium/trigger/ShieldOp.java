@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.buff.ShieldBuff;
 import com.laosun.aluminium.entity.CanHit;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -9,9 +10,9 @@ import com.laosun.aluminium.enums.TriggerEvent;
  * {@code SHIELD}: install a shield, replacing or stacking as the effect states.
  *
  * <p>A shield normally <b>overwrites</b>, so "the shield amount can stack, up to 300% of the current Skill's" has to be
- * stated: {@code add_to_shield} turns it on and {@code cap_*} bounds the total. Both arms name the provider, because
- * "the shield amount provided by the wearer is raised by X%" is about the <b>giver's</b> shields. Registered here so
- * the op has one dispatch path; its load-time checks are still in {@code TriggerValidator}.
+ * stated: {@code add_to_shield} turns it on and {@code cap_*} bounds the total. A non-positive {@code turns} is refused
+ * - a timed shield that expires before it can be used is "no shield" written as a mechanic, and omitting {@code turns}
+ * is how "no limit" is spelled.
  */
 final class ShieldOp implements OpHandler<OpArgs> {
 
@@ -23,6 +24,20 @@ final class ShieldOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        String op = op().name();
+        TriggerValidator.requireAmountOrScale(effect, op, rule, TriggerValidator.SCALES, "Max HP");
+        TriggerValidator.requireNoStackArguments(effect, op, rule);
+        if (effect.getTurns() != null && effect.getTurns() <= 0) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " needs a positive \"turns\" when it states one (how many of the "
+                            + "shielded unit's turns the shield lasts), but has " + effect.getTurns()
+                            + "; omit the field for a shield that is only removed by being used up "
+                            + "(source: " + rule.getSource() + ")");
+        }
     }
 
     @Override

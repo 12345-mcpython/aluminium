@@ -1,6 +1,7 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.entity.CanHit;
 
 /**
@@ -8,7 +9,8 @@ import com.laosun.aluminium.entity.CanHit;
  *
  * <p>Energy is raised to the stated share of the maximum and left alone when it is already at or above it; adding a
  * share instead would overshoot. A flat {@code amount} is the other legal spelling (the trace that states the floor in
- * points). Registered here so the op has one dispatch path; its load-time checks are still in {@code TriggerValidator}.
+ * points), and the check accepts those two spellings only - a share carried in a cast parameter or a resource would be
+ * unresolved by the time this op reads it.
  */
 final class RaiseEnergyToOp implements OpHandler<OpArgs> {
 
@@ -20,6 +22,21 @@ final class RaiseEnergyToOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        String op = op().name();
+        if (effect.getAmount() == null) {
+            TriggerValidator.requirePercent(effect, op, rule);
+        }
+        if (effect.getPercent() == null && effect.getValue() == null && effect.getAmount() == null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names the level to raise energy TO, so it needs a plain \"percent\", "
+                            + "\"amount\" (points) or \"value\": got a share from a cast parameter or a resource "
+                            + "instead (source: " + rule.getSource() + ")");
+        }
+        TriggerValidator.requireNoStackArguments(effect, op, rule);
     }
 
     @Override

@@ -1,14 +1,14 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.entity.CanHit;
 
 /**
  * {@code GAIN_RESOURCE}: credit a counter, clamped by its cap and overflow rules, and announce the move.
  *
  * <p>The unit measured is the one that <b>receives</b>, not the rule's owner: an effect may grant to somebody else, and
- * measuring the owner read 0 on both sides for a teammate's counter. Registered here so the op has one dispatch path;
- * its load-time checks are still in {@code TriggerValidator}.
+ * measuring the owner read 0 on both sides for a teammate's counter.
  */
 final class GainResourceOp implements OpHandler<OpArgs> {
 
@@ -20,6 +20,11 @@ final class GainResourceOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        TriggerValidator.requireResourceMovement(effect, op().name(), rule);
     }
 
     @Override

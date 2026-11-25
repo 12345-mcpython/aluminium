@@ -1,14 +1,14 @@
 package com.laosun.aluminium.trigger;
 
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.entity.CanHit;
 
 /**
  * {@code SPEND_RESOURCE}: pay a counter, refusing when the pool is short.
  *
  * <p>The strict half of the resource pair; {@code REMOVE_RESOURCE} is the clamping one, because a revocation must not
- * fail when there is less to take. Registered here so the op has one dispatch path; its load-time checks are still in
- * {@code TriggerValidator}.
+ * fail when there is less to take.
  */
 final class SpendResourceOp implements OpHandler<OpArgs> {
 
@@ -20,6 +20,11 @@ final class SpendResourceOp implements OpHandler<OpArgs> {
     @Override
     public OpArgs parse(EffectSpec effect) {
         return OpArgs.NONE;
+    }
+
+    @Override
+    public void validate(OpArgs args, EffectSpec effect, TriggerSpec rule) {
+        TriggerValidator.requireResourceMovement(effect, op().name(), rule);
     }
 
     @Override
