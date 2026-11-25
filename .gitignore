@@ -6,14 +6,17 @@ build
 # ignored. The rule used to be a blanket directory ignore, which cannot be un-ignored per file, so a clone silently
 # depended on files the rule claimed were not there.
 #
-# Three files in data/ ARE source and stay tracked:
+# Four files in data/ ARE source and stay tracked:
 #   monster_attack_modify_ratio.json  hand-written patch table (the design's original exception)
 #   skill_effects.json                hand-maintained: the generator cannot produce "how to read a non-damaging skill"
+#   skill_effects_rules.json          hand-written whitelist: the slots the generator must NOT generate (the rule
+#                                     table delivers those, or a hand key changes how the row is read)
 #   enemy_skills.json                 self-built: the game data has no enemy skill table at all
 # Everything else - skills.json included - is generated and stays out; README.md names the script and where it writes.
 src/main/resources/data/*
 !src/main/resources/data/monster_attack_modify_ratio.json
 !src/main/resources/data/skill_effects.json
+!src/main/resources/data/skill_effects_rules.json
 !src/main/resources/data/enemy_skills.json
 
 logs/
