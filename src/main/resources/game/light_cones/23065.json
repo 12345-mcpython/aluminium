@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "light_cone": 23065,
+  "1": [
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23065_punchline_then_party_def_ignore",
+      "when": ["actor == self", "target is_ally", "target != self"],
+      "cooldown": 1,
+      "do": [
+        { "op": "GAIN_RESOURCE", "resource": "elation:punchline", "amount": 10 },
+        { "op": "MODIFY_ATTR", "attribute": "DEFENCE_IGNORE", "percent": 0.16, "permanent": true, "target": "all_allies" }
+      ],
+      "source": "光锥 23065 (当第一声「阿哈」响起), 叠影 1: 「使装备者的基础速度提高#1[i]点。对我方其他单体施放战技时，获得#2[i]个笑点，该效果每间隔#3[i]回合最多触发1次，随后使我方全体在本场战斗中造成伤害时无视敌方目标#4[i]%的防御力，该效果无法叠加。」 param Lv1 = [12, 10, 1, 0.16]",
+      "_note": "⭐ **基础速度那句归数据** ✓：`weapon_skill_data[0].ability_property` 就是 `{speed: 12}`（引擎按 `props` 装配，23008 的记法）⇒ 规则里**不重写**，否则 +24。\n⭐ **`笑点` = `elation:punchline`** ✓（`battle_resources.json` 全局声明，scope PARTY、无上限）—— 与 1501/1502/1513 的「获得 N 个笑点」同一拼法。\n⭐ 「对我方其他单体施放战技」 = `actor == self` + `target is_ally` + `target != self` ✓（`target != self` 见于 1006/1101）。「其他」正是最后那个 `!= self`。\n⭐ 「每间隔 1 回合最多触发 1 次」 = 规则级 `cooldown: 1` ✓（按持有者回合递减；与 `per_turn` 不是一个意思，TRIGGER.md 有记）。\n⭐ 「本场战斗中…无法叠加」 = `permanent: true` + 同属性同目标互相替换（`MODIFY_ATTR` 的默认区间，无需 `max_stacks`）⑤。\n判据：`com.laosun.aluminium.test.content.lightcones.Cone23065FirstEchoTest`。"
+    }
+  ]
+}
