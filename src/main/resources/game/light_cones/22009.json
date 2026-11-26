@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "light_cone": 22009,
+  "1": [
+    {
+      "on": "BATTLE_START",
+      "id": "cone22009_crit_damage_one_elation_ally",
+      "when": ["allies_with_path:欢愉 >= 1", "allies_with_path:欢愉 < 2"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.06, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 22009 (在世界尽头相会吧！), 叠影 1: 「队伍中每有1名「欢愉」命途的角色，使装备者的暴击伤害提高#1[i]%。」 param Lv1 #1 = 0.06",
+      "_note": "「每有 1 名欢愉命途 ⇒ 暴击伤害 +6%」——`allies_with_path:欢愉` 只存在于**条件**变量（不是数值提供者），所以照 1405 那刻夏行迹的同一拼法：**按人数切成互斥窗口**，每个窗口写**绝对值**（同属性修饰会互相替换，写增量只会剩一条）。窗口 1/2/3/4 见下三条。\n⛔ **同句后半未写**：「星神★阿哈在场时，装备者的暴击伤害额外提高#2[i]%（12%）」—— 词汇里没有「我方存在某个 cid」的条件（`any_ally` 只认 `has_state`，`allies_of_path`/`ally_cid` 是**目标选择器**不是条件）⇒ 登记，不近似。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone22009_crit_damage_two_elation_allies",
+      "when": ["allies_with_path:欢愉 >= 2", "allies_with_path:欢愉 < 3"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.12, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 22009: 「队伍中每有1名「欢愉」命途的角色，使装备者的暴击伤害提高#1[i]%。」 param Lv1 #1 = 0.06 ⇒ 2 名 = 0.12",
+      "_note": "窗口 2：2 名欢愉，绝对份额 0.12（不是再加 0.06）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone22009_crit_damage_three_elation_allies",
+      "when": ["allies_with_path:欢愉 >= 3", "allies_with_path:欢愉 < 4"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.18, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 22009: 「队伍中每有1名「欢愉」命途的角色，使装备者的暴击伤害提高#1[i]%。」 param Lv1 #1 = 0.06 ⇒ 3 名 = 0.18",
+      "_note": "窗口 3：3 名欢愉，绝对份额 0.18。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "cone22009_crit_damage_four_elation_allies",
+      "when": ["allies_with_path:欢愉 >= 4"],
+      "do": [
+        { "op": "MODIFY_ATTR", "attribute": "CRIT_ATTACK", "percent": 0.24, "permanent": true, "target": "self" }
+      ],
+      "source": "光锥 22009: 「队伍中每有1名「欢愉」命途的角色，使装备者的暴击伤害提高#1[i]%。」 param Lv1 #1 = 0.06 ⇒ 4 名（上限，队伍只有四人）= 0.24",
+      "_note": "窗口 4：满编四名，绝对份额 0.24，也就是这句话的上限。"
+    }
+  ]
+}
