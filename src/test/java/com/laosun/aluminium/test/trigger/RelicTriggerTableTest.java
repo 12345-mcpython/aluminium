@@ -245,6 +245,7 @@ public class RelicTriggerTableTest {
             "108/4",
             "315/2",
             "313/2",
+            "329/2",
             "330/2",
             PASSERBY + "/" + FOUR_PIECE,
             GLACIAL + "/" + FOUR_PIECE,
@@ -334,10 +335,11 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on when the shield-amount
      * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
-    // ⚠ CORRECTED (2026-11-26): 2 -> 1. The 4.7.0 migration registered both new sets (329 神的瞬息欢愉, 330 亚空异容所);
-    // 330 is now authored (`game/relic_sets/330.json`, judged by `Relic330SubspaceTest`), so only 329 is left registered.
-    // The partition invariant is what makes moving this number safe.
-    private static final int STILL_REGISTERED = 1;
+    // ⚠ CORRECTED (2026-11-26): 2 -> 1 -> 0. The 4.7.0 migration registered both new sets (329 神的瞬息欢愉,
+    // 330 亚空异容所), and both are now authored (`game/relic_sets/330.json` and `329.json`, judged by
+    // `Relic330SubspaceTest` / `Relic329GodsMomentTest`), so `_unmodelled.json` is empty and every ability-bearing
+    // bonus is a rule file. The partition invariant is what makes moving this number safe.
+    private static final int STILL_REGISTERED = 0;
 
     /**
      * Ability-only bonuses: {@code properties} empty, the ability is the whole effect.
@@ -797,10 +799,9 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(1, twoPiece,
-                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet: since 330 (亚空异容所) "
-                        + "was authored this is only 329's (欢愉度 threshold, the panel value at battle start is "
-                        + "not verified)");
+        Assertions.assertEquals(0, twoPiece,
+                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet: none, since 329 "
+                        + "(神的瞬息欢愉) joined 330 and every planar ability now has a rule file");
     }
 
     // ==================================================================

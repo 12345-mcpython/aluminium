@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "relic_set": 329,
+  "2": [
+    {
+      "on": "BATTLE_READY",
+      "id": "relic329_2_advance_on_high_elation",
+      "when": ["self_attr:ELATION_DAMAGE_BOOST >= 0.4"],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.4,
+          "target": "self"
+        }
+      ],
+      "source": "relic set 329 (神的瞬息欢愉 / God's Moment of Joy), 2-piece ability Ability53291: 「使装备者的速度提高#1[i]%。当装备者的欢愉度大于等于#2[i]%时，进入战斗时立刻使行动提前#3[i]%。」 param = [0.06, 0.4, 0.4]",
+      "_note": "「速度提高 6%」 is the data's `properties` (SpeedAddedRatio 0.06), so this file carries only the second sentence - the same split as 103 / 115 / 330.\n⚠ `BATTLE_READY`, not `BATTLE_START`: 欢愉度 (`ELATION_DAMAGE_BOOST`) is raised by other opening rules (traces, techniques, other relics), and `BATTLE_START` rules run in team order - a gate there would answer differently depending on where the raiser stands. `BATTLE_READY` is the engine's second phase for exactly this sentence shape (precedent: cone 23046's 「进入战斗时，若我方的战技点上限 ≥ 6 点」).\n⚠ The panel at that moment DOES carry the relic's own stats - measured when 330 landed (its `self_attr:SPEED >= 145` gate reads 145.1, of which 6.9 is the suit's own share).\n⚠ `ADVANCE`'s percent is the fraction of the REMAINING wait that is skipped, so 「行动提前 40%」 leaves 60% of it - the same arithmetic the 1210102 trace (投狭) pins.\n判据：`com.laosun.aluminium.test.content.relics.Relic329GodsMomentTest`。"
+    }
+  ]
+}
