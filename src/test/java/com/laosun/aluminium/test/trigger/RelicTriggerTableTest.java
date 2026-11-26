@@ -245,6 +245,7 @@ public class RelicTriggerTableTest {
             "108/4",
             "315/2",
             "313/2",
+            "330/2",
             PASSERBY + "/" + FOUR_PIECE,
             GLACIAL + "/" + FOUR_PIECE,
             SIZZLING + "/" + FOUR_PIECE,
@@ -333,10 +334,10 @@ public class RelicTriggerTableTest {
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on when the shield-amount
      * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
-    // ⚠ CORRECTED (2026-11-25, 4.7.0 data migration): 0 -> 2. Sets 329 (神的瞬息欢愉) and 330 (亚空异容所) are new
-    // and each carries a 2-piece ability with no rule file, so both are registered in `_unmodelled.json` with the
-    // capability they are missing. The partition invariant is what makes moving this number safe.
-    private static final int STILL_REGISTERED = 2;
+    // ⚠ CORRECTED (2026-11-26): 2 -> 1. The 4.7.0 migration registered both new sets (329 神的瞬息欢愉, 330 亚空异容所);
+    // 330 is now authored (`game/relic_sets/330.json`, judged by `Relic330SubspaceTest`), so only 329 is left registered.
+    // The partition invariant is what makes moving this number safe.
+    private static final int STILL_REGISTERED = 1;
 
     /**
      * Ability-only bonuses: {@code properties} empty, the ability is the whole effect.
@@ -796,10 +797,10 @@ public class RelicTriggerTableTest {
     @Test
     public void theRegistryCoversTheTwoPiecesTierToo() {
         long twoPiece = RelicTriggerTables.unmodelled().stream().filter(e -> e.require() == TWO_PIECE).count();
-        Assertions.assertEquals(2, twoPiece,
-                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet: since the 4.7.0 "
-                        + "data migration these are 329's (欢愉度 threshold, the panel value at battle start is "
-                        + "not verified) and 330's (looks expressible, one record for the next round)");
+        Assertions.assertEquals(1, twoPiece,
+                "the ability-bearing bonuses at the 2-piece tier that are not expressible yet: since 330 (亚空异容所) "
+                        + "was authored this is only 329's (欢愉度 threshold, the panel value at battle start is "
+                        + "not verified)");
     }
 
     // ==================================================================

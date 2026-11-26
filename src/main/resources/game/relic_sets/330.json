@@ -1,0 +1,22 @@
+{
+  "schema": 1,
+  "relic_set": 330,
+  "2": [
+    {
+      "on": "BATTLE_START",
+      "id": "relic330_2_break_effect_on_fast_wearer",
+      "when": ["self_attr:SPEED >= 145"],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BREAKING_EFFECT",
+          "percent": 0.18,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "relic set 330 (亚空异容所 / Subspace ASC Center), 2-piece ability Ability53301: 「使装备者的速度提高#1[i]%，当装备者的速度大于等于#2[i]时，进入战斗后使我方全体击破特攻提高#3[i]%，该效果无法叠加。」 param = [0.06, 145, 0.18]",
+      "_note": "「速度提高 6%」是数据侧的 `properties`（SpeedAddedRatio 0.06），所以本文件只写第二句 —— 与 103 / 115 同一个约定：属性归数据，条件效果归规则。\n⚠ 门读的是**总和**：遗器的属性在角色装配时已折算进面板（`RelicSuit.addSetBonusValues` → `calcTotalValue`），所以 `BATTLE_START` 那一刻 `self_attr:SPEED` 已经含这 6%。判据 `Relic330SubspaceTest` 用「同一块板、只差这一件套装」把它钉住：139 < 145 < 145.9。\n「该效果无法叠加」= 同属性同目标的修饰互相替换（`MODIFY_ATTR` 的默认区间），所以这里不写 `max_stacks`；重复一次 `BATTLE_START` 仍是 18%。\n判据：`com.laosun.aluminium.test.content.relics.Relic330SubspaceTest`。"
+    }
+  ]
+}
